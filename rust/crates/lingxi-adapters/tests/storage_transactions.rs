@@ -1,14 +1,20 @@
 //! R02-A07｜提交失败无假成功（REQUIRED）— integration with REAL filesystem
 //! faults (no mock hooks on the write path).
 //!
-//! Fault injection method (argued in R02-T04_REPORT.md §设计决定): the
-//! `uchg` user-immutable flag on the live WAL sidecar makes `write(2)`
-//! fail with EPERM **through already-open file descriptors** — a real
-//! IO error on the real database files at commit time (a plain chmod
-//! cannot do this: open descriptors bypass permission bits). The tests
-//! assert the port-level outcome (explicit error, no events) and then
-//! reopen the database and query the REAL rows to prove no half terminal
-//! state exists after recovery.
+//! Fault injection method (argued in R02-T04_REPORT.md §设计决定; header
+//! corrected per R02-T04 REVIEW_R1 F01): the real mechanism is
+//! `setrlimit(RLIMIT_FSIZE)` (soft limit lowered in a child; see
+//! `tests/disk_full_fault.rs` where the live fault-injection cases live) —
+//! the WAL append that would grow the file past the limit fails with
+//! EFBIG inside the kernel at COMMIT TIME on the real database files.
+//! The `uchg` user-immutable flag mentioned by an earlier revision of
+//! this header was probed and REJECTED as an injection mechanism: it
+//! blocks open()/metadata changes but does NOT make `write(2)` fail
+//! through already-open descriptors (measured, R02-T04_REPORT.md §3.7).
+//! A plain chmod cannot do it either: open descriptors bypass permission
+//! bits. The tests assert the port-level outcome (explicit error, no
+//! events) and then reopen the database and query the REAL rows to prove
+//! no half terminal state exists after recovery.
 //!
 //! Coverage required by the task instructions:
 //! - commit-phase failure (WAL write fails at commit);

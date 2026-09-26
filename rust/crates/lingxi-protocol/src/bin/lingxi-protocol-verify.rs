@@ -15,6 +15,7 @@ use std::path::Path;
 use std::process::ExitCode;
 
 use lingxi_protocol::canon::{canonical_bytes, sha256_hex};
+use lingxi_protocol::devgate::bound_repo_root;
 use lingxi_protocol::*;
 use serde::de::DeserializeOwned;
 use serde_json::Value;
@@ -42,16 +43,24 @@ fn reencode_typed(type_name: &str, bytes: &[u8]) -> Result<Vec<u8>, String> {
 }
 
 fn main() -> ExitCode {
+    // RR-T08-F1 hardening (same rule as lingxi-protocol-gen): bind the
+    // repo root from the runtime working directory, never from a
+    // compile-time path that a reused target dir could point at another
+    // checkout with.
+    let bound_root = match bound_repo_root() {
+        Ok(root) => root,
+        Err(err) => {
+            eprintln!("error: {err}");
+            return ExitCode::from(2);
+        }
+    };
     let args: Vec<String> = std::env::args().collect();
     let golden_dir = args
         .windows(2)
         .find(|w| w[0] == "--golden")
         .map(|w| w[1].clone())
         .unwrap_or_else(|| {
-            Path::new(env!("CARGO_MANIFEST_DIR"))
-                .ancestors()
-                .nth(3)
-                .unwrap()
+            bound_root
                 .join("contracts/generated/golden")
                 .to_string_lossy()
                 .into_owned()

@@ -1,0 +1,75 @@
+{
+ "results": [
+  {
+   "case": "ws-evil-origin",
+   "expected": 403,
+   "actual": 403,
+   "ok": true,
+   "detail": "{\"code\":\"forbidden\",\"details\":{\"causeId\":\"transport.bad_origin\",\"reason\":\"bad_origin\",\"requestId\":\"req-5963304f9ccc937a6d806eb3809a678f\"},\"message\":\"transport policy rejected the request\",\"retryable\":false}"
+  },
+  {
+   "case": "ws-foreign-host",
+   "expected": 403,
+   "actual": 403,
+   "ok": true,
+   "detail": "HTTP/1.1 403 Forbidden"
+  },
+  {
+   "case": "ws-no-credential",
+   "expected": 401,
+   "actual": 401,
+   "ok": true,
+   "detail": "{\"code\":\"unauthorized\",\"details\":{\"causeId\":\"auth.missing_credential\",\"reason\":\"missing_credential\",\"requestId\":\"req-bb5738b8974b809686a8f85c836f56cc\"},\"message\":\"authentication required\",\"retryable\":false}"
+  },
+  {
+   "case": "ws-ticket-legit-origin-upgrade",
+   "expected": 101,
+   "actual": 101,
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "case": "ws-server-hello",
+   "expected": true,
+   "actual": true,
+   "ok": true,
+   "detail": "{\"dataEpoch\":1,\"protocol\":\"lingxi.wire\",\"selectedProtocol\":1,\"serverKind\":\"lingxi-service\",\"serverVersion\":\"0.0.0\",\"wire"
+  },
+  {
+   "case": "ws-session-read-owner",
+   "expected": true,
+   "actual": true,
+   "ok": true,
+   "detail": "{\"runCount\":1,\"sessionId\":\"sess_local_alpha\",\"type\":\"sessionReadResult\"}"
+  },
+  {
+   "case": "ws-ticket-replay",
+   "expected": 401,
+   "actual": 401,
+   "ok": true,
+   "detail": "{\"code\":\"unauthorized\",\"details\":{\"causeId\":\"auth.invalid_ws_ticket\",\"reason\":\"invalid_ws_ticket\",\"requestId\":\"req-4bd1ddd42138edfa2ce1276d760f1be9\"},\"message\":\"authentication required\",\"retryable\":false}"
+  },
+  {
+   "case": "ws-no-origin-cli-bearer",
+   "expected": 101,
+   "actual": 101,
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "case": "ws-cli-server-hello",
+   "expected": true,
+   "actual": true,
+   "ok": true,
+   "detail": "{\"dataEpoch\":1,\"protocol\":\"lingxi.wire\",\"selectedProtocol\":1,\"serverKind\":\"lingxi-service\",\"serverVersion\":\"0.0.0\",\"wire"
+  },
+  {
+   "case": "ws-ticket-expired",
+   "expected": 401,
+   "actual": 401,
+   "ok": true,
+   "detail": "{\"code\":\"unauthorized\",\"details\":{\"causeId\":\"auth.invalid_ws_ticket\",\"reason\":\"invalid_ws_ticket\",\"requestId\":\"req-4c8343e4f70fc7d195bcdf732847a455\"},\"message\":\"authentication required\",\"retryable\":false}"
+  }
+ ],
+ "all_ok": true
+}

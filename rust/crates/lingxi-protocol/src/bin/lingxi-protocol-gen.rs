@@ -767,22 +767,26 @@ fn check_tree(root: &Path, files: &BTreeMap<String, Vec<u8>>) -> Vec<String> {
     problems
 }
 
-fn repo_root() -> PathBuf {
-    Path::new(env!("CARGO_MANIFEST_DIR"))
-        .ancestors()
-        .nth(3)
-        .expect("crate is at rust/crates/lingxi-protocol")
-        .to_path_buf()
-}
-
 fn main() -> ExitCode {
+    // RR-T08-F1 hardening: bind the repo root from the runtime working
+    // directory and REFUSE to run against a checkout other than the one
+    // this binary was compiled in (a shared/leaked CARGO_TARGET_DIR can
+    // otherwise execute a foreign checkout's binary and validate that
+    // checkout's tree — observed wrong-tree green, 2026-09-25).
+    let repo_root = match lingxi_protocol::devgate::bound_repo_root() {
+        Ok(root) => root,
+        Err(err) => {
+            eprintln!("error: {err}");
+            return ExitCode::from(2);
+        }
+    };
     let args: Vec<String> = std::env::args().collect();
     let check = args.iter().any(|a| a == "--check");
     let out = args
         .windows(2)
         .find(|w| w[0] == "--out")
         .map(|w| PathBuf::from(&w[1]))
-        .unwrap_or_else(|| repo_root().join("contracts/generated"));
+        .unwrap_or_else(|| repo_root.join("contracts/generated"));
 
     let files = build_tree();
     if check {

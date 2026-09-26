@@ -19,10 +19,14 @@
 //! ```
 //!
 //! Permission policy (unix): the runtime dir is created with mode 0700 and
-//! tightened back to 0700 if it exists with wider bits (logged by the
-//! caller). Windows: directory existence/type checks only — mode ops are a
-//! unix concept; the Windows branch is documented but not verified on this
-//! machine (same platform boundary as R02-T01).
+//! NORMALIZED to exactly 0700 if it exists with any different bits — wider
+//! bits are tightened AND stricter bits (e.g. 0500) are widened back to
+//! 0700, because the service must retain owner write access to its own
+//! runtime dir (T02 REVIEW_R1 F02: this is "normalize to 0700", not
+//! "only tighten"; normalization is logged by the caller). Windows:
+//! directory existence/type checks only — mode ops are a unix concept; the
+//! Windows branch is documented but not verified on this machine (same
+//! platform boundary as R02-T01).
 
 use std::io;
 use std::path::{Path, PathBuf};
@@ -103,9 +107,11 @@ pub fn prepare_layout(home: &Path) -> Result<DataRootLayout, ConfigError> {
     })
 }
 
-/// Creates `path` (if missing) with private permissions and tightens an
-/// existing dir back to 0700 on unix. Returns whether the mode was
-/// tightened (for the caller's safe log).
+/// Creates `path` (if missing) with private permissions and NORMALIZES an
+/// existing dir to exactly 0700 on unix: wider bits are tightened, and
+/// stricter bits (owner-write stripped) are widened back — the service
+/// must be able to write its own runtime dir. Returns whether the mode
+/// was changed (for the caller's safe log).
 pub fn ensure_private_dir(path: &Path) -> Result<bool, ConfigError> {
     #[cfg(unix)]
     {

@@ -59,6 +59,10 @@ trap cleanup EXIT
 fail() { echo "FAIL: $*" >&2; exit 1; }
 note() { printf '%s\n' "$*" | tee -a "$EVIDENCE_DIR/summary.txt"; }
 
+# R02-T07 REVIEW_R1 F03: annotate each run (summary.txt used to stack
+# repeated runs with no run marker) and use run-relative timestamps.
+RUN_STAMP="$(date '+%Y-%m-%dT%H:%M:%S%z')"
+note "== run $RUN_STAMP (pid $$) =="
 note "== R02-T07 / R02-A14 slow-subscriber storm (toolchain $TOOLCHAIN, target $TARGET_DIR) =="
 
 note "== building lingxi-service (--locked, offline) =="
@@ -89,7 +93,10 @@ TOKEN=$(python3 -c 'import json,sys; print(json.load(open(sys.argv[1]))["token"]
   "$HOME_DIR/lingxi-service/local-token.json")
 
 # ── S1/S2: slow subscriber A, healthy subscriber B, real writer storm ──────
-note "== S1/S2: subscriber A stops reading; B keeps reading; 400 executes commit 800 key events =="
+# Writer volumes (EXECUTES / SEQUENTIAL) are constants of the probe below;
+# the summary intentionally carries NO duplicated hard-coded counts
+# (R02-T07 REVIEW_R1 F03) — storm-results.json is the numeric authority.
+note "== S1/S2: subscriber A stops reading; B keeps reading; writers commit key events until the subscriber-queue cap is reached =="
 ADDR="$ADDR" TOKEN="$TOKEN" SERVICE_PID="$SERVICE_PID" EVIDENCE_DIR="$EVIDENCE_DIR" \
 python3 - > "$EVIDENCE_DIR/ws-probe.log" 2>&1 <<'PYEOF' &
 import base64, json, os, socket, struct, threading, time
@@ -400,7 +407,8 @@ for _ in $(seq 1 300); do
 done
 tail -14 "$EVIDENCE_DIR/ws-probe.log"
 grep -q "STORM COMPLETE" "$EVIDENCE_DIR/ws-probe.log" || fail "S1/S2 storm probe did not complete cleanly (see ws-probe.log)"
-note "PASS S1: all 400 concurrent executes answered 200 (writers not stalled by the slow subscriber)"
+EXECUTES_DONE="$(python3 -c "import json;print(json.load(open('$EVIDENCE_DIR/storm-results.json'))['executes_concurrent'])")"
+note "PASS S1: all $EXECUTES_DONE concurrent executes answered 200 (writers not stalled by the slow subscriber; count read from storm-results.json)"
 note "PASS S1: healthy subscriber B's merged view equals the durable head (no silent loss)"
 note "PASS S2: slow subscriber A got the EXPLICIT snapshot_required (reason=slow_consumer) and resubscribed"
 

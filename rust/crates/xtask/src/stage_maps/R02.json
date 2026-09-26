@@ -1,0 +1,114 @@
+{
+  "schemaVersion": 1,
+  "resultVersion": "lingxi.xtask.verify-stage.v1",
+  "stage": "R02",
+  "defaultTimeoutSecs": 1200,
+  "commands": {
+    "a01_smoke": {
+      "argv": ["bash", "scripts/rust-tauri/r02_t01_service_smoke.sh", "{EVIDENCE}/A01"],
+      "timeoutSecs": 1800,
+      "evidencePaths": [
+        "{EVIDENCE}/A01/a01-health-check.log",
+        "{EVIDENCE}/A01/a01-shutdown.log",
+        "{EVIDENCE}/A01/a01-deptree-evidence.log"
+      ]
+    },
+    "a02_boundary_negative": {
+      "argv": ["bash", "scripts/rust-tauri/r02_t01_boundary_negative.sh", "{EVIDENCE}/A02"],
+      "timeoutSecs": 1800,
+      "evidencePaths": [
+        "{EVIDENCE}/A02/a02-summary.log",
+        "{EVIDENCE}/A02/a02-residue-check.log"
+      ]
+    },
+    "a03_dual_instance": {
+      "argv": ["bash", "scripts/rust-tauri/r02_t02_dual_instance.sh", "{EVIDENCE}/A03"],
+      "timeoutSecs": 1800,
+      "evidencePaths": ["{EVIDENCE}/A03/a03-summary.txt"]
+    },
+    "a04_path_priority": {
+      "argv": ["bash", "scripts/rust-tauri/r02_t02_path_priority.sh", "{EVIDENCE}/A04"],
+      "timeoutSecs": 1800,
+      "evidencePaths": ["{EVIDENCE}/A04/a04-summary.txt"]
+    },
+    "a05_a06_auth_matrix": {
+      "argv": ["bash", "scripts/rust-tauri/r02_t03_auth_matrix.sh", "{EVIDENCE}/A05_A06"],
+      "timeoutSecs": 1800,
+      "evidencePaths": [
+        "{EVIDENCE}/A05_A06/summary.txt",
+        "{EVIDENCE}/A05_A06/ws-matrix.json"
+      ]
+    },
+    "a07_a08_storage_tx": {
+      "argv": ["bash", "scripts/rust-tauri/r02_t04_storage_tx.sh", "{EVIDENCE}/A07_A08"],
+      "timeoutSecs": 1800,
+      "evidencePaths": [
+        "{EVIDENCE}/A07_A08/s1-counts-after-stop.json",
+        "{EVIDENCE}/A07_A08/s4-hashes-after.txt"
+      ]
+    },
+    "a09_a10_events_matrix": {
+      "argv": ["bash", "scripts/rust-tauri/r02_t05_events_matrix.sh", "{EVIDENCE}/A09_A10"],
+      "timeoutSecs": 1800,
+      "evidencePaths": [
+        "{EVIDENCE}/A09_A10/probe-matrix.jsonl",
+        "{EVIDENCE}/A09_A10/key-events-dump.json"
+      ]
+    },
+    "a11_backup_restore": {
+      "argv": ["bash", "scripts/rust-tauri/r02_t06_backup_restore.sh", "{EVIDENCE}/A11"],
+      "timeoutSecs": 1800,
+      "evidencePaths": ["{EVIDENCE}/A11/backup-restore/summary.txt"]
+    },
+    "a12_recovery_drill": {
+      "argv": ["bash", "scripts/rust-tauri/r02_t06_recovery_drill.sh", "{EVIDENCE}/A12"],
+      "timeoutSecs": 1800,
+      "evidencePaths": ["{EVIDENCE}/A12/recovery-drill/summary.txt"]
+    },
+    "a13_redaction_scan": {
+      "argv": ["bash", "scripts/rust-tauri/r02_t07_redaction_scan.sh", "{EVIDENCE}/A13"],
+      "timeoutSecs": 1800,
+      "evidencePaths": [
+        "{EVIDENCE}/A13/redaction-scan/summary.txt",
+        "{EVIDENCE}/A13/redaction-scan/inventory.txt"
+      ]
+    },
+    "a14_slow_subscriber": {
+      "argv": ["bash", "scripts/rust-tauri/r02_t07_slow_subscriber.sh", "{EVIDENCE}/A14"],
+      "timeoutSecs": 1800,
+      "evidencePaths": ["{EVIDENCE}/A14/slow-subscriber/storm-results.json"]
+    },
+    "a15_full_chain": {
+      "argv": ["bash", "scripts/rust-tauri/r02_t08_full_chain_smoke.sh", "{EVIDENCE}/A15"],
+      "timeoutSecs": 1800,
+      "evidencePaths": ["{EVIDENCE}/A15/full-chain/summary.txt"]
+    },
+    "a16_legacy_regression": {
+      "argv": [
+        "bash",
+        "scripts/rust-tauri/r02_t08_legacy_entry_regression.sh",
+        "{EVIDENCE}/A16"
+      ],
+      "timeoutSecs": 3600,
+      "evidencePaths": ["{EVIDENCE}/A16/legacy-entry/summary.txt"]
+    }
+  },
+  "scenarios": [
+    { "id": "R02-A01", "requirement": "REQUIRED", "commandRefs": ["a01_smoke"] },
+    { "id": "R02-A02", "requirement": "REQUIRED", "commandRefs": ["a02_boundary_negative"] },
+    { "id": "R02-A03", "requirement": "REQUIRED", "commandRefs": ["a03_dual_instance"] },
+    { "id": "R02-A04", "requirement": "REQUIRED", "commandRefs": ["a04_path_priority"] },
+    { "id": "R02-A05", "requirement": "REQUIRED", "commandRefs": ["a05_a06_auth_matrix"] },
+    { "id": "R02-A06", "requirement": "REQUIRED", "commandRefs": ["a05_a06_auth_matrix"] },
+    { "id": "R02-A07", "requirement": "REQUIRED", "commandRefs": ["a07_a08_storage_tx"] },
+    { "id": "R02-A08", "requirement": "REQUIRED", "commandRefs": ["a07_a08_storage_tx"] },
+    { "id": "R02-A09", "requirement": "REQUIRED", "commandRefs": ["a09_a10_events_matrix"] },
+    { "id": "R02-A10", "requirement": "REQUIRED", "commandRefs": ["a09_a10_events_matrix"] },
+    { "id": "R02-A11", "requirement": "REQUIRED", "commandRefs": ["a11_backup_restore"] },
+    { "id": "R02-A12", "requirement": "REQUIRED", "commandRefs": ["a12_recovery_drill"] },
+    { "id": "R02-A13", "requirement": "REQUIRED", "commandRefs": ["a13_redaction_scan"] },
+    { "id": "R02-A14", "requirement": "REQUIRED", "commandRefs": ["a14_slow_subscriber"] },
+    { "id": "R02-A15", "requirement": "REQUIRED", "commandRefs": ["a15_full_chain"] },
+    { "id": "R02-A16", "requirement": "REQUIRED", "commandRefs": ["a16_legacy_regression"] }
+  ]
+}

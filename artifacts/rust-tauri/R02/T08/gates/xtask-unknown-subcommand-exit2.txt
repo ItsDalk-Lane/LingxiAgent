@@ -1,0 +1,35 @@
+error: unknown subcommand "bogus" (expected check-contracts, check-boundaries, verify-stage or --help)
+
+xtask — Lingxi Rust verification orchestrator (R02-T08)
+
+usage:
+  cargo run --manifest-path rust/Cargo.toml -p xtask -- <SUBCOMMAND>
+
+subcommands:
+  check-contracts                regenerate contracts and diff against the
+                                 committed tree (scripts/rust-tauri/
+                                 r01-t02-check-generated.sh); exit 0 only if
+                                 drift-free
+  check-boundaries               machine-enforced ownership + dependency
+                                 contract (docs/rust-tauri/R01/
+                                 r01_t01_check_ownership.py, O1-O8 + D1-D5);
+                                 exit 0 only if no violation
+  verify-stage <STAGE> --evidence <DIR>
+                                 execute the stage's registered acceptance
+                                 commands (stage map: xtask
+                                 src/stage_maps/<STAGE>.json), archive each
+                                 command's stdout/stderr under DIR, verify
+                                 declared evidence files exist, and write
+                                 DIR/verify-stage-result.json with real exit
+                                 codes, platform and tested SHA. Non-zero on
+                                 unknown stage, invalid/empty map, missing
+                                 evidence, timeout, or any command failure.
+  --help                         print this help and exit 0
+
+notes:
+  - every registered command is a REAL command (cargo tests / gate scripts /
+    checkers); results are taken from real exit codes, never from PASS
+    strings inside JSON;
+  - the repo root is bound from the current working directory and must match
+    the compile-time root (RR-T08-F1) — cross-checkout reuse is refused.
+

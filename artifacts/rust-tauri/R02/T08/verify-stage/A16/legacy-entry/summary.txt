@@ -1,0 +1,19 @@
+== run 2026-09-27T04:48:25+0800 (pid 39516) ==
+== R02-T08 / R02-A16 legacy-entry regression ==
+== tested base commit 5741989165fe7e04c9a58a9d35c7747d3599d274 (plus uncommitted T08 work; zero changes to the Node/Electron surface) ==
+== E1: production entry surface unchanged vs base ==
+PASS E1-diff-empty (git diff base..worktree over core/ server/ desktop/ shared/ tests/ package.json package-lock.json = empty)
+PASS E1-package-main (package.json main = desktop/bootstrap.cjs)
+PASS E1-no-rust-in-launch (grep lingxi-service|rust-target|/rust/ over launch.js/main.cjs/bootstrap.cjs/boot.cjs = 0 hits)
+== E2: npm run typecheck ==
+PASS E2-typecheck (exit 0; tsc x3)
+== E3: npm run typecheck:core-contracts ==
+PASS E3-core-contracts (exit 0)
+== E4: incumbent boundary gates ==
+PASS E4-boundary-gates (dependency + tool-invocation, exit 0 each)
+== E5: full npm test (vitest) with pre-existing-red classification ==
+npm test raw exit code: 1 (archived in e5-npm-test.log)
+failed test files: tests/post-verification-audit-seal.test.ts tests/round2-delivery-evidence.test.ts tests/round3-delivery-evidence.test.ts 
+PASS E5-no-new-failures (every failed file is in the pre-existing seal-lag family)
+PASS E5-anti-masking (0 T08/new-stack files in the failure lists; red is about committed R01/R02 vs the lagging seal coordinate)
+== R02-T08 / R02-A16 legacy-entry regression: ALL GREEN (no default switch, no new failures) ==

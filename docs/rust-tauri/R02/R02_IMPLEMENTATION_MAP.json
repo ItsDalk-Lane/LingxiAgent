@@ -1,0 +1,111 @@
+{
+  "schemaVersion": 1,
+  "artifactKind": "implementation-map-overlay",
+  "task_id": "R02-T08",
+  "stage_id": "R02",
+  "generated_by": "EXECUTOR-R02-T08（2026-09-26；一次性执行代理，无 commit/push 授权）",
+  "purpose": "R02-T08 步骤 5：把 R00 的 stores/entrypoints/acceptance map 更新为实际实现路径并交接 R03。采用『冻结原件 + 本覆盖层』方式：R00 三份 map 是 R00 阶段封存交付（哈希钉在 R00_HANDOFF.json，逐项 0 失配），本文件不改写它们，而是叠加登记 R01/R02 已落盘的新栈实际实现路径；R03 以『R00 原件（旧栈现役事实）+ 本覆盖层（新栈已验证事实）』为输入。",
+  "source_maps_frozen": {
+    "note": "登记时点（TASK_BASE_SHA 5741989165fe7e04c9a58a9d35c7747d3599d274 工作树）的 SHA-256；校验失败说明 R00 交付被动过，先查封印再消费本覆盖层",
+    "hashes": {
+      "STORES.json": "6067bdd3be7d0232c182d8f9c1beb147e1a5b59a3fa3ae137889f31a75d7b493",
+      "ENTRYPOINTS.json": "f69e658f8b35b5a486a764872e27c82b599c84ef49404903f5b72f4b0b84d669",
+      "ACCEPTANCE_MAP.json": "96f70219d1df88249e8df073f4dfe211f8562cef20f7e45b1c03064feb5362be"
+    }
+  },
+  "rule": "本覆盖层只登记 R02（含 R01 前置）已实现并真实接线的新栈路径；R00 清单中所有未列出的 store/entrypoint 仍归旧 Node 栈所有、仍按 R00 原件为准。新栈不写旧数据根（ADR-004：分离数据根 + epoch 闸），旧栈现役行为未变（R02-A16）。",
+  "stores_overlay": [
+    {
+      "r00_ref": null,
+      "note": "新栈自有权威库（R00 时不存在；对应 R00 清单中旧栈会话事实链的 Rust 对应物，非同库迁移——迁移归 R08）",
+      "id": "rust-runs-db",
+      "classification_kind": "authoritative",
+      "implementation_path": "rust/crates/lingxi-adapters/src/storage/run_store.rs（RUNS_DB_FILE_NAME=runs.db）+ migrations.rs + queue.rs + backup.rs",
+      "data_path": "{service_home}/lingxi-service/data/runs.db（+ -wal/-shm）",
+      "owner_process": "lingxi-service（单写者，经有界 DbQueue）",
+      "schema_authority": "lingxi_adapters::storage::migrations（版本化迁移；指纹登记 docs/rust-tauri/R02/R02-T04_STORAGE_REGISTRY.json）",
+      "established_by": "R02-T04；验收 R02-A07/A08 + r02_t04_storage_tx.sh"
+    },
+    {
+      "id": "rust-instance-identity",
+      "classification_kind": "authoritative",
+      "implementation_path": "rust/crates/lingxi-service/src/paths.rs + instance.rs",
+      "data_path": "{service_home}/lingxi-service/{instance.lock,instance.json,instance.stale.json}",
+      "owner_process": "lingxi-service",
+      "contract": "OS 文件锁=唯一存活权威；陈旧记录归档+接管；记录原子写",
+      "established_by": "R02-T02；验收 R02-A03/A04 + r02_t02_dual_instance.sh / r02_t02_path_priority.sh"
+    },
+    {
+      "id": "rust-data-epoch-stamp",
+      "classification_kind": "authoritative",
+      "implementation_path": "rust/crates/lingxi-service/src/epoch.rs（STAMP_FILE_NAME=data-epoch.json；含 transition journal）",
+      "data_path": "{service_home}/data-epoch.json",
+      "owner_process": "lingxi-service（启动闸 fail-closed）",
+      "contract": "RR-T07-PROD-DEFECT-1 新栈闭口：损坏/更高代次/未完成迁移一律拒启（exit 2），不自动清库",
+      "established_by": "R02-T06；验收 R02-A12 + r02_t06_recovery_drill.sh"
+    },
+    {
+      "id": "rust-local-token",
+      "classification_kind": "authoritative",
+      "implementation_path": "rust/crates/lingxi-service/src/auth.rs（LOCAL_TOKEN_FILE=local-token.json）",
+      "data_path": "{service_home}/lingxi-service/local-token.json（0600）",
+      "owner_process": "lingxi-service",
+      "contract": "per-start 环回 token；重启即更换；身份只在验证边界创建",
+      "established_by": "R02-T03；验收 R02-A05/A06 + r02_t03_auth_matrix.sh"
+    },
+    {
+      "id": "rust-service-logs",
+      "classification_kind": "rebuildable_cache",
+      "implementation_path": "rust/crates/lingxi-service/src/logging.rs + redaction.rs",
+      "data_path": "{service_home}/lingxi-service/logs/service-{seq:06}.log（0600，默认 5MiB×7）",
+      "owner_process": "lingxi-service",
+      "contract": "每行过现役镜像脱敏器；附接失败=显式降级 stderr-only（LINGXI_SERVICE_LOG_WRITE_FAILED）",
+      "established_by": "R02-T07；验收 R02-A13 + r02_t07_redaction_scan.sh"
+    }
+  ],
+  "entrypoints_overlay": [
+    {
+      "r00_ref": null,
+      "note": "新栈入口，不替换任何 R00 清单中的现役入口（默认入口仍是 Electron/Node，见 R02-A16 证据）",
+      "id": "EP-RUST-SERVICE-01",
+      "category": "headless_service",
+      "title": "lingxi-service headless 二进制（Rust 独立服务组合根）",
+      "status": "active_rust_stack",
+      "anchors": [
+        { "file": "rust/crates/lingxi-service/src/main.rs", "expect": "LINGXI_SERVICE_READY stdout 就绪行契约" },
+        { "file": "rust/crates/lingxi-service/src/lib.rs", "expect": "build_router / bootstrap_with_deps" }
+      ],
+      "principal_source": "per-start 环回 token（local-token.json）；身份只在 auth::AuthService 验证边界创建",
+      "binding": "HTTP/WS 每请求绑定 principal→agent/session 资源范围",
+      "auth": "Bearer token；WS 需 POST /lingxi/v1/ws-ticket 签发票据；Origin/Host 守卫",
+      "launch": "见 docs/rust-tauri/R02/SERVICE_START_AND_SHUTDOWN.md §1-2（--home 必给，无默认根）",
+      "established_by": "R02-T01/T02/T03；R02-A01/A15"
+    },
+    {
+      "id": "EP-RUST-INSPECT-01",
+      "category": "maintenance_cli",
+      "title": "lingxi-storage-inspect 维护 CLI（备份/restore-verify/检查）",
+      "status": "active_rust_stack",
+      "anchors": [{ "file": "rust/crates/lingxi-adapters/src/bin/lingxi-storage-inspect.rs", "expect": "backup / restore-verify 子命令" }],
+      "auth": "直接文件系统访问（维护工具，不经服务）",
+      "established_by": "R02-T06；R02-A11"
+    }
+  ],
+  "acceptance_map_overlay": {
+    "note": "R02 的 16 个基础场景→真实证据命令映射已机器化为 xtask 阶段图（verify-stage 消费）；R00 ACCEPTANCE_MAP 中 R02-A01..A16 的 NOT_STARTED 状态由以下执行记录取代（状态与证据指针见 docs/rust-tauri/R02/R02_ACCEPTANCE_LEDGER.json）",
+    "machine_map": "rust/crates/xtask/src/stage_maps/R02.json（xtask verify-stage R02 --evidence <dir> 执行并产出真实退出码/平台/SHA/日志）",
+    "scenario_command_binds": "见 rust/crates/xtask/src/stage_maps/R02.json scenarios[]（R02-A01..R02-A16 全 REQUIRED）"
+  },
+  "not_replaced": {
+    "claim": "R02 零改动 Node/Electron 生产面（core/ server/ desktop/ shared/ tests/ package.json），默认入口未指向 rust 栈",
+    "evidence": "artifacts/rust-tauri/R02/T08/verify-stage/A16/legacy-entry/e1-*.txt（diff 为空 + main 字段 + launch 路径 0 rust 引用）"
+  },
+  "handoff_to_r03": {
+    "must_consume": [
+      "xtask 三命令（check-contracts/check-boundaries/verify-stage）与阶段图格式（rust/crates/xtask/src/stage_maps/R02.json 为模板；R03 在同文件模式上加 R03.json 并注册进 STAGE_MAPS）",
+      "ServiceState/StoragePort/EventPort/Clock/RequestIdGen 注入面与 8 个资源上限旗标（docs/rust-tauri/R02/R02_HANDOFF.json interfaces）",
+      "运行布局与退出码：docs/rust-tauri/R02/SERVICE_START_AND_SHUTDOWN.md",
+      "R00 原件（本文件 source_maps_frozen 钉住）+ 本覆盖层，二者并读"
+    ]
+  }
+}

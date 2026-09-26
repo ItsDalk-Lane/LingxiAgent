@@ -7,7 +7,10 @@
 set -euo pipefail
 cd "$(dirname "$0")/../.."
 
-export CARGO_TARGET_DIR="${CARGO_TARGET_DIR:-/tmp/lingxi-r01t02-target}"
+# RR-T08-F1 hardening (R02-T08): default target dir derived from this
+# checkout's path — never a fixed shared dir (a leftover foreign-checkout
+# binary once validated the wrong tree; see r01-t02-check-generated.sh).
+export CARGO_TARGET_DIR="${CARGO_TARGET_DIR:-/tmp/lingxi-r01t02-target-$(printf '%s' "$PWD" | shasum -a 256 | cut -c1-16)}"
 TS_OUT="$(mktemp -d /tmp/lingxi-r01t02-ts-out.XXXXXX)"
 trap 'rm -rf "$TS_OUT"' EXIT
 CARGO_OFFLINE="env -u all_proxy -u ALL_PROXY -u http_proxy -u HTTP_PROXY -u https_proxy -u HTTPS_PROXY CARGO_NET_OFFLINE=true"

@@ -1,0 +1,99 @@
+{
+ "spec_version": "1.0",
+ "stage_id": "R02",
+ "status": "READY_FOR_REVIEW",
+ "generated_by": "ZCode:EXECUTOR-R02-T08（2026-09-26/27；一次性执行代理，无 commit/push 授权；状态为执行者口径，最终 PASS/ACCEPTED 归总控另派的独立验收）",
+ "source_sha": "5741989165fe7e04c9a58a9d35c7747d3599d274",
+ "source_sha_note": "T08 开工基线 HEAD（=TASK_BASE_SHA=远端 HEAD）；T08 交付为未提交工作树，由 working_tree_digest 钉住。授权提交后按 05 协议绑定最终候选 SHA 重跑关键门禁。",
+ "branch": "codex/rust-tauri-migration",
+ "working_tree_digest": "94f95e7a53dac99f5cfacea2e6eca3043da6ff20afb261cf9c68b7388ce32332",
+ "working_tree_digest_scope": "SHA-256 over 9707 行（sha256+两空格+路径，按路径排序）：全部 git 跟踪文件的工作树内容 + 未跟踪非忽略新文件 + artifacts/rust-tauri/R02/T08/ 下被忽略的 .log/.txt/.json 证据；排除自引用的 R02_HANDOFF.json、R02_REPORT.md（内嵌 digest 值）与明细文件自身。逐行明细：artifacts/rust-tauri/R02/T08/working-tree-digest.txt（计算器 docs/rust-tauri/R02/r02_t08_worktree_digest.py）",
+ "accepted_stage_candidate": {
+  "note": "T01–T07 已各自独立验收 PASS 并提交推送（acceptance-catalog 口径）；T08 为本阶段收口任务，候选=本工作树",
+  "last_accepted_task_commit": "5741989165fe7e04c9a58a9d35c7747d3599d274",
+  "t08_review": null
+ },
+ "protocol_version": {
+  "lingxi.wire": { "min_supported": 1, "max_supported": 1, "authority": "rust/crates/lingxi-protocol/ serde 类型 + docs/rust-tauri/R01/PROTOCOL_SPEC.md", "status": "R02 冻结未变；生成物 --check 零漂移（T08 xtask check-contracts exit 0）" },
+  "data_epoch": { "value": 1, "authority": "rust/crates/lingxi-service/src/epoch.rs + ADR-004", "status": "新栈 fail-closed 闸（RR-T07-PROD-DEFECT-1 新栈闭口，R02-T06）" },
+  "events_wire": { "authority": "rust/crates/lingxi-service/src/events.rs（envelope: eventId/sessionId/runId/attempt/streamId/seq/eventType/schemaVersion；控制帧 subscribed/snapshot_required）", "status": "R02-T05 冻结；seq 由单流单写者产生；u64 走十进制字符串（lingxi.wire）" },
+  "error_surface": { "authority": "rust/crates/lingxi-service/src/lib.rs EndpointError（status + ProtocolError{code,message,retryable,details}；details.causeId/details.requestId 扩展点）", "status": "冻结 ProtocolError 结构零改动（contracts --check 证明），扩展仅进 details" },
+  "api_compat_matrix": { "entries": 624, "status": "R02 零改动（extract --check 624 entries 零漂移）" }
+ },
+ "data_epoch": {
+  "current_DATA_EPOCH": 1,
+  "new_stack_policy": "epoch 闸 fail-closed：损坏印章/更高代次/未完成迁移/外来未印数据一律拒启 exit 2（LINGXI_DATA_EPOCH_* 标记行），绝不自动清库（R02-T06 修复 RR-T07-PROD-DEFECT-1 的新栈形态）",
+  "separation": "新栈数据根与旧 Node 数据根分离（ADR-004）；新栈无默认根（无 --home/--test-mode/环境变量即拒启）；旧栈现役写入零变化（R02-A16）"
+ },
+ "dependency_locks": {
+  "package-lock.json": "e54a16fe14f15b47（未动）",
+  "rust/Cargo.lock": "5c43390c894421e6（T08 仅 +7 行：xtask 成员块 + serde_json 依赖引用；零新增第三方包/版本）",
+  "rust-toolchain.toml": "eec3410410647a7d（1.98.1 + rustfmt/clippy）",
+  "note": "xtask 零新增依赖（serde_json 复用锁内版本；参数解析手写）；关键版本表见 docs/rust-tauri/R01/DEPENDENCY_DECISIONS.md"
+ },
+ "accepted_tasks": [
+  { "task_id": "R02-T01", "verdict": "PASS(R1)", "commit": "（见 ORCHESTRATOR_PROGRESS.json / 各 chore 提交）", "deliverables": ["rust/crates/lingxi-service 组合根", "r02_t01_service_smoke.sh", "r02_t01_boundary_negative.sh"] },
+  { "task_id": "R02-T02", "verdict": "PASS(R1)", "deliverables": ["config/paths/instance", "r02_t02_dual_instance.sh", "r02_t02_path_priority.sh", "r02_t02_f01_env_token_negative.sh"] },
+  { "task_id": "R02-T03", "verdict": "PASS(R1)", "deliverables": ["auth/transport/ws", "r02_t03_auth_matrix.sh", "r02_t03_ws_probe.py"] },
+  { "task_id": "R02-T04", "verdict": "PASS(R1)", "deliverables": ["lingxi-adapters storage（migrations/queue/run_store/backup）", "R02-T04_STORAGE_REGISTRY.json", "r02_t04_storage_tx.sh"] },
+  { "task_id": "R02-T05", "verdict": "PASS(R2)", "deliverables": ["events.rs（快照/游标/显式 detach）", "r02_t05_events_matrix.sh", "r02_t05_events_probe.py"] },
+  { "task_id": "R02-T06", "verdict": "PASS(R2)", "deliverables": ["backup/shutdown/epoch 闸（PROD-DEFECT-1 闭口）", "r02_t06_backup_restore.sh", "r02_t06_recovery_drill.sh"] },
+  { "task_id": "R02-T07", "verdict": "PASS(R1)", "deliverables": ["redaction/logging/inject、causeId/requestId、8 上限旗标", "r02_t07_redaction_scan.sh", "r02_t07_slow_subscriber.sh"] },
+  { "task_id": "R02-T08", "verdict": "READY_FOR_REVIEW（执行者口径）", "commit": null,
+    "deliverables": ["rust/crates/xtask（三命令+阶段图+负向测试）", "devgate 根绑定 + 三脚本 F1 硬化", "r02_t08_full_chain_smoke.sh+probe（A15）", "r02_t08_legacy_entry_regression.sh（A16）", "SERVICE_START_AND_SHUTDOWN.md", "R02_IMPLEMENTATION_MAP.json", "R02_ACCEPTANCE_LEDGER.json", "R02_REPORT.md", "R02-T08_REPORT.md", "artifacts/rust-tauri/R02/T08/"] }
+ ],
+ "interfaces": [
+  { "name": "lingxi-service 二进制", "version": "serverVersion 0.0.0 / wire 1..1 / data-epoch 1", "authority": "rust/crates/lingxi-service/src/main.rs（USAGE=--help 权威）+ lib.rs server_version()", "consumers": "R03 状态机 / R04 工具网关 / R08 旧客户端 / R09 Tauri 宿主", "status": "独立可启动（无桌面依赖，R02-A01/A15）；启动说明与关闭诊断手册 docs/rust-tauri/R02/SERVICE_START_AND_SHUTDOWN.md", "known_gaps": ["serverVersion 仍为 0.0.0 占位（R09 打包面定版）"] },
+  { "name": "HTTP/WS 路由面", "version": "随 lingxi.wire v1", "authority": "lib.rs build_router：health/me/sessions(+execute,events)/ws-ticket/devices/credentials/ws", "consumers": "R03/R04/R05/R08", "status": "认证/授权/Origin/Host/速率/上限全链生效；A05/A06/A13/A14/A15 实测" },
+  { "name": "EventService 订阅面", "version": "v1", "authority": "src/events.rs（subscribe_events + cursor；subscribed/snapshot_required 控制帧；envelope 见 protocol_version.events_wire）", "consumers": "R03/R08", "status": "快照+游标无空隙、过期显式重建、上限显式拒绝（A09/A10/A14）" },
+  { "name": "StoragePort/RunDatabase", "version": "migrations 版本化（R02-T04_STORAGE_REGISTRY.json 指纹）", "authority": "rust/crates/lingxi-adapters/src/storage/*；库文件 {home}/lingxi-service/data/runs.db", "consumers": "R03（终态/取消恢复）、R08（迁移）", "status": "同事务终态+事件；有界单写者队列；在线备份/恢复；故障注入负向（A07/A08/A11/A12）" },
+  { "name": "注入面（Clock/RequestIdGen/ServiceDeps）", "version": "R02-T07", "authority": "src/inject.rs + lib.rs bootstrap_with_deps；8 个资源上限旗标（USAGE）", "consumers": "R03（取消/并发测试需确定性时钟）", "status": "ManualClock/SequentialRequestIdGen 零 sleep 实测（T07 resource_limits）" },
+  { "name": "错误码与标记行", "version": "v1", "authority": "lib.rs EndpointError + LINGXI_* 标记（SINGLE_WRITER_BLOCKED/STALE_RECORD_TAKEN_OVER/DATA_EPOCH_*/SHUTDOWN_TIMEOUT/LOG_WRITE_FAILED/TRANSPORT_REJECTED/AUTH_REJECTED）", "consumers": "R03/R08/R09", "status": "退出码表 0-6 见 SERVICE_START_AND_SHUTDOWN.md §4；R02-A12/A15 实测" },
+  { "name": "xtask 验证编排", "version": "lingxi.xtask.verify-stage.v1", "authority": "rust/crates/xtask（main.rs+stage_map.rs+verify.rs+stage_maps/R02.json）", "consumers": "R03+ 每阶段（新增 stage_maps/R03.json 并注册 STAGE_MAPS）", "status": "check-contracts/check-boundaries/verify-stage R02 全绿；未知阶段/空集/缺证据/超时/假成功负向全绿；RR-T08-F1 运行期根绑定" },
+  { "name": "R00 盘点覆盖层", "version": "1", "authority": "docs/rust-tauri/R02/R02_IMPLEMENTATION_MAP.json（R00 三 map 原件 SHA 钉住）", "consumers": "R03（盘点输入）", "status": "stores/entrypoints/acceptance 的新栈实现路径登记完成" }
+ ],
+ "unresolved_items_note": "单一事实源为 docs/rust-tauri/R01/RISK_REGISTER.json（继承项）+ 本文件本清单（R02 新增/收口项）。状态 OPEN 的修复确认归独立验收，登记关闭归总控。",
+ "unresolved_items": [
+  { "id": "RR-T08-F1", "severity": "MEDIUM", "source": "docs/rust-tauri/R01/RISK_REGISTER.json", "summary": "T02 三门禁脚本跨检出错绑", "fix": "已按 RISK_REGISTER 两个建议方向双保险硬化（gen/verify 运行期根绑定 devgate::bound_repo_root + 三脚本默认 target 按检出派生）；修复前错绑绿/修复后拒绝负向证据 6 件套", "evidence": "artifacts/rust-tauri/R02/T08/f1-hardening/（F1-1..F1-7 见 R02-T08_REPORT §6.3）", "status": "FIXED（待独立验收确认后由总控置 CLOSED）" },
+  { "id": "RR-T02-FINFO1", "severity": "INFO", "source": "docs/rust-tauri/R01/RISK_REGISTER.json", "summary": "contentSha 复算须重跑提取器", "fix": "PROTOCOL_SPEC §10 补说明完成（不改需求语义、不触及生成物）", "evidence": "docs/rust-tauri/R01/PROTOCOL_SPEC.md §10 末段；check-generated 门禁保持 exit 0", "status": "FIXED（待独立验收确认后由总控置 CLOSED）" },
+  { "id": "RR-T07-PROD-DEFECT-1", "severity": "HIGH", "source": "docs/rust-tauri/R01/RISK_REGISTER.json", "summary": "现役 epoch 闸 fail-open", "fix": "新栈形态已在 R02-T06 闭口（fail-closed 实测）；现役 Node 侧修复不属 R02（旧栈现役面零改动纪律，R02-A16）", "evidence": "verify-stage/A12/recovery-drill/summary.txt", "status": "NEW-STACK-CLOSED（现役侧维持原归属与处置）" },
+  { "id": "RR-R05-REDACTION-BOUNDARY", "severity": "MEDIUM", "source": "R02-T07 REVIEW_R1 F02（T08 补记归档）", "summary": "Rust 脱敏器不含 / 与 = 的 token 类：标准 base64（含字面 /）provider token 会漏网，现役捕获；现役 PII/CLI 旗标/aws-configure/Windows 路径规则未镜像", "fix": "无需本阶段修复（R02 凭证形态不可达）；redaction.rs 模块文档与 R02-T07_REPORT §4.2 已完整记载", "evidence": "rust/crates/lingxi-service/src/redaction.rs 模块文档；R02-T07_REPORT §4.2", "status": "OPEN（截止阶段 R05：接入真实 provider token 前必须复核/补齐）" },
+  { "id": "RR-SEAL-COORDINATE-LAG", "severity": "MEDIUM", "source": "R02-T08 执行记录（R01 同款预存在红）", "summary": "审计封印坐标落后于已授权 R01/R02 提交：post-verification-audit-seal / round2 / round3 交付证据族在 HEAD 红（失败清单 0 个 T08 文件，反掩码证据在 A16 e5 日志）", "fix": "不属执行任务修复面；须按 PROGRESS.md 封印工作流在授权提交后推进；不得为使检查变绿扩大白名单", "evidence": "artifacts/rust-tauri/R02/T08/verify-stage/A16/legacy-entry/e5-npm-test.log", "status": "OPEN（归属：总控封印流程）" },
+  { "id": "RR-R03-XTASK-MAP", "severity": "INFO", "source": "R02-T08 交接", "summary": "R03 尚未注册阶段图：verify-stage R03 现为 exit 2（契约行为）", "fix": "R03 执行任务建 stage_maps/R03.json（模板=R02.json）并注册进 xtask STAGE_MAPS，场景绑真实命令", "evidence": "rust/crates/xtask/src/main.rs STAGE_MAPS 注释", "status": "OPEN（截止阶段 R03）" },
+  { "id": "RR-T07-F02-REDACTION-DOC-R05", "severity": "INFO", "source": "T07 移交", "summary": "与 RR-R05-REDACTION-BOUNDARY 同源（保留原编号可溯）；本阶段完成文档面补记", "fix": "见 RR-R05-REDACTION-BOUNDARY", "evidence": "同上", "status": "MERGED into RR-R05-REDACTION-BOUNDARY" }
+ ],
+ "handoff_conventions": [
+  "RR-T06-R2-F05 采纳：修复/门禁证据统一存档原始命令输出（命令行+原始尾行+真实退出码），摘要不自证——本阶段全部 T08 证据为原始日志",
+  "cargo 门禁一律显式经 rustup 锁定工具链 + --locked + 为本检出派生/显式传递专属 CARGO_TARGET_DIR（RR-T08-F1 惯例，xtask 与三脚本已内置）",
+  "xtask 不得以『统计 JSON 中 PASS』满足任务：判定只来自真实退出码与证据文件存在性"
+ ],
+ "artifact_hashes": { "note": "T08 交付逐文件 SHA-256 见 artifacts/rust-tauri/R02/T08/working-tree-digest.txt（明细行即哈希）；关键报告哈希由独立验收现算（本文件自引用规避，不预写自哈希）" },
+ "allowed_next_scope": {
+  "next_stage": "R03（运行状态机、并发、取消与恢复）",
+  "must_consume": [
+   "docs/rust-tauri/R02/R02_HANDOFF.json（本文件：interfaces/退出码/资源上限/注入面）",
+   "docs/rust-tauri/R02/R02_ACCEPTANCE_LEDGER.json（16 场景执行者口径证据指针）",
+   "docs/rust-tauri/R02/R02_IMPLEMENTATION_MAP.json（R00 原件+新栈覆盖层）",
+   "docs/rust-tauri/R02/SERVICE_START_AND_SHUTDOWN.md（运行布局/退出码/关闭诊断）",
+   "rust/crates/xtask（R03 阶段图登记机制 + verify-stage 执行模型）",
+   "RISK_REGISTER.json 全表（每条含截止阶段与失败处理）"
+  ],
+  "dependency_order": "R01→R02（本交接）→R03→R04→R05→R06→R07→R08→R09→R10→R11",
+  "not_allowed": "R04+ 任务；生产默认入口切换；真实数据迁移；真实供应商；未授权发布"
+ },
+ "review_evidence": [
+  { "task_id": "R02-T01", "report": "docs/rust-tauri/R02/R02-T01_REVIEW_R1.md", "verdict": "PASS" },
+  { "task_id": "R02-T02", "report": "docs/rust-tauri/R02/R02-T02_REVIEW_R1.md", "verdict": "PASS" },
+  { "task_id": "R02-T03", "report": "docs/rust-tauri/R02/R02-T03_REVIEW_R1.md", "verdict": "PASS" },
+  { "task_id": "R02-T04", "report": "docs/rust-tauri/R02/R02-T04_REVIEW_R1.md", "verdict": "PASS" },
+  { "task_id": "R02-T05", "report": "docs/rust-tauri/R02/R02-T05_REVIEW_R1.md + R02-T05_REVIEW_R2.md", "verdict": "PASS(R2)" },
+  { "task_id": "R02-T06", "report": "docs/rust-tauri/R02/R02-T06_REVIEW_R1.md + R02-T06_REVIEW_R2.md", "verdict": "PASS(R2)" },
+  { "task_id": "R02-T07", "report": "docs/rust-tauri/R02/R02-T07_REVIEW_R1.md", "verdict": "PASS(R1)" },
+  { "task_id": "R02-T08", "report": "docs/rust-tauri/R02/R02-T08_REPORT.md（执行者；独立验收待总控另派）", "verdict": "READY_FOR_REVIEW" }
+ ],
+ "stage_gate_position": "阶段级验收未开始（归总控）：本文件+R02_REPORT.md 为候选；xtask verify-stage R02 overall PASS 为执行者全量复跑证据，不代位独立验收",
+ "remote_write_authorized": false,
+ "production_data_authorized": false,
+ "paid_or_external_test_authorized": false,
+ "release_authorized": false
+}

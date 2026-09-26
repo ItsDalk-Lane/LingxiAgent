@@ -53,10 +53,14 @@ ORCHESTRATOR_PROGRESS.json。
    请求关联 ID、文件日志与轮转、注入时钟/ID 面、CLI 上限配置面。
 5. `tracing-appender` 不在 Cargo.lock（锁内仅 tracing 0.1.44 / tracing-subscriber
    0.3.23）→ 按任务约束走零新增：自实现按尺寸轮转 + 数量裁剪。
-6. `Mailbox::recv`（T05）存在 **tokio `Notify` 丢失唤醒窗口**：`notified()` 首次
-   poll 才注册 waiter，`create → try_recv(空) → await` 之间到达的
-   `notify_waiters` 会丢失——消费者带着非空队列永久沉睡。二进制级 A14 演练
-   （健康订阅者静默停更、无 detach、无日志）复现；为 A14 必修项（见 §5.2）。
+6. `Mailbox::recv`（T05）的 `notified()` 首次 poll 才注册 waiter，`create →
+   try_recv(空) → await` 之间到达的 `notify_waiters` 在**旧版 tokio 通用语义**
+   下存在丢失唤醒窗口（R02-T07 REVIEW_R1 F01 勘误：在锁定 tokio 1.53.1 下该
+   窗口经审阅方源码级+确定性差分+压力级三重验证**并不成立**——`Notify` 的
+   `notify_waiters_calls` 计数快照会补捕首次 poll 前的唤醒，基线代码无缺陷）。
+   本次改动按 tokio 官方 canonical 模式把 `Notified::enable()` 前置，作为
+   **前向稳健加固**保留（对更旧 tokio 语义也稳健），不是缺陷级修复（见 §5.2
+   与 F01 勘误）。
 7. 审计封印测试族开工即红（seal 坐标落后于已授权 R02 提交，R01 同款预存在红）；
    复跑 `npm test -- --run tests/post-verification-audit-seal.test.ts`：
    1 failed | 2 passed（`gates/audit-seal.log`）。如实记录，未使其变绿，
@@ -98,7 +102,9 @@ ORCHESTRATOR_PROGRESS.json。
   `SubscriberCapKind`）→ `SubscribeReject::SubscriberLimit{scope,limit}`；
   `evict_idle_streams`（无订阅者且无 parked 的事件缓存流按序驱逐——基线由
   known-head 对齐无损重建）；detach 路径新增带真实队列统计的 error! 观测行；
-  `HubStats`/`hub_stats()`；**`Mailbox::recv` 丢失唤醒修复（`Notified::enable()`）**；
+  `HubStats`/`hub_stats()`；**`Mailbox::recv` 前向稳健加固（`Notified::enable()`
+  前置——tokio 官方 canonical 模式；R02-T07 REVIEW_R1 F01 勘误：锁定 tokio
+  1.53.1 下基线并无丢失唤醒缺陷，此改动为加固而非缺陷修复）**；
   新增 4 个 hub 级测试（上限显式拒绝×2、驱逐无损、风暴显式性）。
 - `rust/crates/lingxi-service/src/config.rs`：新增 8 个严格解析的 CLI 上限旗标
   （重复/空/0/旗形值全部响亮拒绝）+ 2 个测试。
@@ -142,11 +148,21 @@ shared/ tests/` 为空）、任务书、contracts/generated/（门禁零漂移�
   行缓冲 sink，stderr+文件同源）；②`LINGXI_*` 标记行（打印前过 `redact_line`）；
   ③错误响应体 `message`（enrichment 中间件，带 data home 替换）；④stdout
   READY 行不脱敏（机器契约，T01/T02 脚本依赖，且该行无密钥材料）。
-- 与现役的**两处记载分歧**（模块文档明示）：①`/`与`=`不进 token 字符类——
-  本栈凭证形态（base64url 无填充/hex）不含二者，而结构化路径/`request_id=`
-  诊断必须存活（T02 安全日志契约）；②`data:` base64、`hana_dev_`/`hana_ws_`
-  前缀为 Rust 侧补齐。17 个单元测试钉住：泄漏反例全绿 + 关联 ID
-  （run_/sess_/req-/seq）全存活 + 普通诊断逐字不变。
+- 与现役的**分歧与省略面**（R02-T07 REVIEW_R1 F02 补记，模块文档同步完整
+  版）：①`/`与`=`不进本侧 token 字符类——精确边界（对拍实测）：≥40 字符
+  且含字面 `/`（或与 `.`/`/`/`-` 相邻，或被 `/`/`=` 切成 <40 段）的长随机
+  串**现役捕获、本侧漏网**；不含 `/`/`=`/`.` 相邻的 hex64/base64url 串本侧
+  恰恰**被捕获**（原"无 / 无 . 无 = 的 ≥40 字符串会漏网"的表述不准）。本栈
+  凭证形态（base64url 无填充/hex、`hana_dev_`/`hana_ws_` 前缀）R02 范围内
+  不可达该边界；**R05 接入真实 provider token（标准 base64 可含 `/`）前必须
+  复核**。②现役规则未镜像的省略（当前服务不打印 CLI 参数/正文/PII，现实
+  影响为零，但须记载）：PII 规则（email/credit-card/CN-ID/SSN）、
+  `CLI_SECRET_FLAG_RE`、`CONFIG_SECRET_VALUE_RE`、Windows 用户路径
+  （`C:\Users\`）。③对拍实测一致（非分歧）：Host 头内嵌 token 两边都不
+  脱敏；`?token=` 双规则 `[redacted]]` 伪影两边逐字一致；非 secret 查询键
+  本侧保留 `state=[token]`（现役改写 `?[token]`，本侧更保结构）。④`data:`
+  base64、`hana_dev_`/`hana_ws_` 前缀为 Rust 侧补齐。17 个单元测试钉住：
+  泄漏反例全绿 + 关联 ID（run_/sess_/req-/seq）全存活 + 普通诊断逐字不变。
 - **正文记录遵循现有设置**：服务从不记录请求/消息正文（与现役默认一致——
   正文只存在于脱敏后的业务事件流），且无任何打开正文记录的开关；证据包
   导出即日志/stderr/响应体本身，脱敏在写入点之前完成。
@@ -249,10 +265,10 @@ macOS 27.0 arm64；合成 /tmp home。证据：`artifacts/rust-tauri/R02/T07/`�
 
 | # | 覆盖 | 命令 | 退出码 | 结果 | 证据 |
 |---|---|---|---|---|---|
-| A14-1 | 前置=真实 WS 订阅者 A（SO_RCVBUF 4KB，读 subscribed 控制帧后停读）+ 健康订阅者 B（持续读）；操作=真实并发写者（24 并发×400）+ 确定性顺序量（1200）直至达到 `--event-subscriber-queue 4` 上限 | `bash scripts/rust-tauri/r02_t07_slow_subscriber.sh artifacts/rust-tauri/R02/T07` | **0** | 全部 1400 execute 200（写者零停滞） | `slow-subscriber/summary.txt`、`ws-probe.log`、`storm-results.json` |
+| A14-1 | 前置=真实 WS 订阅者 A（SO_RCVBUF 4KB，读 subscribed 控制帧后停读）+ 健康订阅者 B（持续读）；操作=真实并发写者（EXECUTES=1000，24 线程并发）+ 确定性顺序量（SEQUENTIAL=1200）直至达到 `--event-subscriber-queue 4` 上限 | `bash scripts/rust-tauri/r02_t07_slow_subscriber.sh artifacts/rust-tauri/R02/T07` | **0** | 全部 2200 execute 200（写者零停滞） | `slow-subscriber/summary.txt`、`ws-probe.log`、`storm-results.json` |
 | A14-2 | 明确断开/要求快照（非静默丢关键事件——T05 语义保持） | 同上 | 0 | A 收到显式 `snapshot_required`（reason=slow_consumer，缓冲帧 1437 先行送达）后同连接 resubscribe 成功；服务端 detach 观测行含真实队列统计（queue_capacity=4、dropped_deltas=0、last seq） | `ws-probe.log`、`detach-lines.txt`、`service.err` |
-| A14-3 | 其他客户端不受损 | 同上 | 0 | B 合并视图==持久头（3372/3372 seq 连续，live-only 无需重建）；`GET /health` 风暴后 200 | `storm-results.json`、`ws-probe.log` |
-| A14-4 | 内存有界（可观测证据：真实 RSS 采样，非手填） | 同上 | 0 | 200ms 采样贯穿风暴：first 11,008 KB / peak 16,080 KB / final 16,080 KB（远低于 512MB 断言上限，风暴后零增长） | `rss-samples.csv`（174 样本）、`storm-results.json` |
+| A14-3 | 其他客户端不受损 | 同上 | 0 | B 合并视图==持久头（3384/3384 seq 连续，live-only 无需重建；以提交的 `storm-results.json` durable_key_events=3384 为准）；`GET /health` 风暴后 200 | `storm-results.json`、`ws-probe.log` |
+| A14-4 | 内存有界（可观测证据：真实 RSS 采样，非手填） | 同上 | 0 | 200ms 采样贯穿风暴：first 11,136 KB / peak 17,040 KB / final 17,040 KB（远低于 512MB 断言上限，风暴后零增长；以提交的 `storm-results.json`/`rss-samples.csv` 147 样本为准） | `rss-samples.csv`（147 样本）、`storm-results.json` |
 | A14-5 | 负载与队列监控（真实采样） | 同上 | 0 | 服务端 detach 行（error! 级）携带 capacity/dropped_deltas/last_seq 实测值；hub 级 `hub_stats()` 单测覆盖 | `detach-lines.txt`、events.rs 单测 |
 
 ### 7.3 门禁与回归（全部亲手执行）
@@ -262,7 +278,7 @@ macOS 27.0 arm64；合成 /tmp home。证据：`artifacts/rust-tauri/R02/T07/`�
 | fmt | `cargo fmt --all -- --check`（锁定 1.98.1） | 0 | 终端执行（无 diff 输出） |
 | clippy | `cargo clippy --workspace --all-targets --locked -- -D warnings` | 0（0 error） | 终端执行 |
 | 全量测试 | `cargo test --workspace --locked --no-fail-fast` | 0（**269 passed / 0 failed，38 套件**） | `gates/cargo-test-workspace.log` |
-| T01–T06 回归 9 脚本 | smoke/boundary/dual-instance/f01-env-token/path-priority/auth-matrix/storage-tx/events-matrix/backup-restore/recovery-drill（证据定向 `gates/reg-*/`，T01–T06 已提交证据零覆写） | 0 ×10（含 dual-instance 重跑） | `gates/reg-*.log` + `gates/reg-*/` |
+| T01–T06 回归 10 脚本 | smoke/boundary/dual-instance/f01-env-token/path-priority/auth-matrix/storage-tx/events-matrix/backup-restore/recovery-drill（证据定向 `gates/reg-*/`，T01–T06 已提交证据零覆写） | 0 ×10 | `gates/reg-*.log` + `gates/reg-*/` |
 | 冻结契约 | `scripts/rust-tauri/r01-t02-check-generated.sh` | 0 | `gates/generated-contracts-check.log` |
 | 依赖/所有权 | `python3 -B docs/rust-tauri/R01/r01_t01_check_ownership.py` | 0（RESULT: OK） | `gates/ownership-check.log` |
 | 审计封印族 | `npm test -- --run tests/post-verification-audit-seal.test.ts` | 1（**1 failed / 2 passed，预存在红**：seal 坐标落后于已授权 R02 提交；未触碰坐标/白名单） | `gates/audit-seal.log` |
@@ -293,11 +309,13 @@ macOS 27.0 arm64；合成 /tmp home。证据：`artifacts/rust-tauri/R02/T07/`�
    产生 `request handled` 行（否则每次单写者碰撞检查都会改变 probee 的 home
    树——T02/A03 树哈希契约）。错误响应体 enrichment 不受影响；若后续需要
    健康探针审计线，须显式决策并同步 T02 契约。
-2. **脱敏器与现役正则的记载分歧**（`/`、`=` 不进 token 类，§4.2）：为保住
-   T02「安全日志显示有效路径」与 `request_id=` 关联诊断。理论上一个 ≥40 字符、
-   无 `/`、无 `.`、无 `=` 的无前缀随机串才可能漏网——本栈不存在该形态密钥
-   （hex/base64url 均被前缀规则或赋值/查询规则覆盖）；A13 全量扫描为最终
-   把关。
+2. **脱敏器与现役正则的分歧与省略面**（F02 补记后的精确边界，§4.2）：为保住
+   T02「安全日志显示有效路径」与 `request_id=` 关联诊断，`/`、`=` 不进本侧
+   token 类。真实漏网条件（对拍实测）是"≥40 字符候选被 `/`/`=` 切成 <40 段
+   或与 `.`/`/`/`-` 相邻"——hex64/base64url（无 `/`/`=`）实测被捕获；本栈
+   不存在该形态密钥，**R05 引入真实 provider token 前必须复核此边界**；
+   现役 PII/CLI 旗标/aws-configure/Windows 路径规则未镜像（当前服务不打印
+   该类内容）。A13 全量扫描为最终把关。
 3. `--http-rate-max` 放开即失去速率保护：A14 演练用 100000 仅限合成环境；
    生产默认 240/10s 不变（USAGE 明示）。
 4. hub 流注册表上限（4096）触发「无流可逐」时会跳过该事件的 live 扇出
@@ -306,10 +324,15 @@ macOS 27.0 arm64；合成 /tmp home。证据：`artifacts/rust-tauri/R02/T07/`�
 5. 日志文件在 home 树内（`{home}/lingxi-service/logs/`）：任何对 home 做全树
    哈希的**未来**脚本需知悉该诊断面（T02 现有脚本不受影响——其实例内写入
    仅发生在自身运行期，其断言窗口内无写入）。已由 dual-instance 回归实证。
-6. **T05 继承缺陷修复**：`Mailbox::recv` 丢失唤醒（`Notified::enable()`）属
-   对 T05 交付的缺陷级变更（A14 演练复现：健康订阅者静默停更、无 detach、
-   无日志）。已回归 T05 全部测试与 events-matrix 脚本（全绿）；独立验收宜
-   重点复核该修复。
+6. **`Mailbox::recv` 前向稳健加固（F01 勘误后的定性）**：`Notified::enable()`
+   前置属对 T05 交付的**加固**而非缺陷级修复——R02-T07 REVIEW_R1 F01 经
+   源码级（tokio 1.53.1 `notify_waiters_calls` 计数补捕）、确定性差分（窗口内
+   publish 新旧实现均交付）与压力级（40 轮零停滞）三重验证裁定：锁定工具链下
+   基线 `recv()` 不存在所声称的丢失唤醒窗口，原"二进制级 A14 演练复现"的叙述
+   系误诊（执行者开发期观测疑似与 reorder 溢出的显式 PublicationGap detach
+   混淆）。加固代码语义严格不弱于基线、无新唤醒问题，全部 events 测试与
+   events-matrix 回归绿，按审阅要求保留；后续阶段判断 tokio `Notify` 语义时
+   以本勘误为准。
 
 ## 10. git status --short 全文（报告时点）
 
@@ -343,10 +366,12 @@ macOS 27.0 arm64；合成 /tmp home。证据：`artifacts/rust-tauri/R02/T07/`�
    /tmp/任意目录`——核对 B 合并视图==持久头、A 的 snapshot_required(reason=
    slow_consumer)+resubscribe、`detach-lines.txt` 的真实队列统计、
    `rss-samples.csv` 采样连续性；对 `storm-results.json` 逐字段核对。
-3. **Mailbox 丢失唤醒修复（T05 继承缺陷）**：审 `events.rs` `Mailbox::recv`
-   的 `Notified::enable()` 论证；复跑 `cargo test -p lingxi-service`（events
-   18 用例）+ `r02_t05_events_matrix.sh`；可尝试在旧实现上运行
-   `hub_storm_is_explicit_at_every_subscriber`/A14 演练以确认复现力。
+3. **Mailbox 加固定性勘误（T05 交付面）**：审 `events.rs` `Mailbox::recv` 的
+   `Notified::enable()` 论证——注意 R02-T07 REVIEW_R1 F01 已裁定基线在锁定
+   tokio 1.53.1 下无丢失唤醒缺陷，本改动定性为前向稳健加固（非缺陷修复）；
+   复跑 `cargo test -p lingxi-service`（events 18 用例）+
+   `r02_t05_events_matrix.sh`；可尝试在旧实现上运行
+   `hub_storm_is_explicit_at_every_subscriber`/A14 演练以复核加固的无损性。
 4. **causeId/requestId 面**：`cargo test -p lingxi-service --test
    resource_limits`；任一 401 响应体核对 `details.causeId/requestId` 与
    stderr 标记行的 `request_id=` 对得上。

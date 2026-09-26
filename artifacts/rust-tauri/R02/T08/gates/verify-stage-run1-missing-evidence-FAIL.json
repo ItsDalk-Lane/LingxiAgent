@@ -1,0 +1,368 @@
+{
+  "commands": [
+    {
+      "argv": [
+        "bash",
+        "scripts/rust-tauri/r02_t01_service_smoke.sh",
+        "{EVIDENCE}/A01"
+      ],
+      "durationMs": 2343,
+      "evidencePaths": [
+        "{EVIDENCE}/A01/a01-health-check.log",
+        "{EVIDENCE}/A01/a01-shutdown.log",
+        "{EVIDENCE}/A01/a01-deptree-evidence.log"
+      ],
+      "exitCode": 0,
+      "key": "a01_smoke",
+      "missingEvidence": [],
+      "status": "PASS",
+      "timedOut": false
+    },
+    {
+      "argv": [
+        "bash",
+        "scripts/rust-tauri/r02_t01_boundary_negative.sh",
+        "{EVIDENCE}/A02"
+      ],
+      "durationMs": 2140,
+      "evidencePaths": [
+        "{EVIDENCE}/A02/a02-summary.log",
+        "{EVIDENCE}/A02/a02-residue-check.log"
+      ],
+      "exitCode": 0,
+      "key": "a02_boundary_negative",
+      "missingEvidence": [],
+      "status": "PASS",
+      "timedOut": false
+    },
+    {
+      "argv": [
+        "bash",
+        "scripts/rust-tauri/r02_t02_dual_instance.sh",
+        "{EVIDENCE}/A03"
+      ],
+      "durationMs": 2736,
+      "evidencePaths": [
+        "{EVIDENCE}/A03/a03-summary.txt"
+      ],
+      "exitCode": 0,
+      "key": "a03_dual_instance",
+      "missingEvidence": [],
+      "status": "PASS",
+      "timedOut": false
+    },
+    {
+      "argv": [
+        "bash",
+        "scripts/rust-tauri/r02_t02_path_priority.sh",
+        "{EVIDENCE}/A04"
+      ],
+      "durationMs": 1279,
+      "evidencePaths": [
+        "{EVIDENCE}/A04/a04-summary.txt"
+      ],
+      "exitCode": 0,
+      "key": "a04_path_priority",
+      "missingEvidence": [],
+      "status": "PASS",
+      "timedOut": false
+    },
+    {
+      "argv": [
+        "bash",
+        "scripts/rust-tauri/r02_t03_auth_matrix.sh",
+        "{EVIDENCE}/A05_A06"
+      ],
+      "durationMs": 46638,
+      "evidencePaths": [
+        "{EVIDENCE}/A05_A06/summary.txt",
+        "{EVIDENCE}/A05_A06/ws-matrix.json"
+      ],
+      "exitCode": 0,
+      "key": "a05_a06_auth_matrix",
+      "missingEvidence": [],
+      "status": "PASS",
+      "timedOut": false
+    },
+    {
+      "argv": [
+        "bash",
+        "scripts/rust-tauri/r02_t04_storage_tx.sh",
+        "{EVIDENCE}/A07_A08"
+      ],
+      "durationMs": 2251,
+      "evidencePaths": [
+        "{EVIDENCE}/A07_A08/s1-counts-after-stop.json",
+        "{EVIDENCE}/A07_A08/s4-hashes-after.txt"
+      ],
+      "exitCode": 0,
+      "key": "a07_a08_storage_tx",
+      "missingEvidence": [],
+      "status": "PASS",
+      "timedOut": false
+    },
+    {
+      "argv": [
+        "bash",
+        "scripts/rust-tauri/r02_t05_events_matrix.sh",
+        "{EVIDENCE}/A09_A10"
+      ],
+      "durationMs": 1896,
+      "evidencePaths": [
+        "{EVIDENCE}/A09_A10/probe-matrix.jsonl",
+        "{EVIDENCE}/A09_A10/key-events-dump.json"
+      ],
+      "exitCode": 0,
+      "key": "a09_a10_events_matrix",
+      "missingEvidence": [],
+      "status": "PASS",
+      "timedOut": false
+    },
+    {
+      "argv": [
+        "bash",
+        "scripts/rust-tauri/r02_t06_backup_restore.sh",
+        "{EVIDENCE}/A11"
+      ],
+      "durationMs": 2557,
+      "evidencePaths": [
+        "{EVIDENCE}/A11/summary.txt"
+      ],
+      "exitCode": 0,
+      "key": "a11_backup_restore",
+      "missingEvidence": [
+        "{EVIDENCE}/A11/summary.txt"
+      ],
+      "status": "FAIL",
+      "timedOut": false
+    },
+    {
+      "argv": [
+        "bash",
+        "scripts/rust-tauri/r02_t06_recovery_drill.sh",
+        "{EVIDENCE}/A12"
+      ],
+      "durationMs": 1789,
+      "evidencePaths": [
+        "{EVIDENCE}/A12/summary.txt"
+      ],
+      "exitCode": 0,
+      "key": "a12_recovery_drill",
+      "missingEvidence": [
+        "{EVIDENCE}/A12/summary.txt"
+      ],
+      "status": "FAIL",
+      "timedOut": false
+    },
+    {
+      "argv": [
+        "bash",
+        "scripts/rust-tauri/r02_t07_redaction_scan.sh",
+        "{EVIDENCE}/A13"
+      ],
+      "durationMs": 9259,
+      "evidencePaths": [
+        "{EVIDENCE}/A13/redaction-scan/summary.txt",
+        "{EVIDENCE}/A13/redaction-scan/inventory.txt"
+      ],
+      "exitCode": 0,
+      "key": "a13_redaction_scan",
+      "missingEvidence": [],
+      "status": "PASS",
+      "timedOut": false
+    },
+    {
+      "argv": [
+        "bash",
+        "scripts/rust-tauri/r02_t07_slow_subscriber.sh",
+        "{EVIDENCE}/A14"
+      ],
+      "durationMs": 33187,
+      "evidencePaths": [
+        "{EVIDENCE}/A14/slow-subscriber/storm-results.json"
+      ],
+      "exitCode": 0,
+      "key": "a14_slow_subscriber",
+      "missingEvidence": [],
+      "status": "PASS",
+      "timedOut": false
+    },
+    {
+      "argv": [
+        "bash",
+        "scripts/rust-tauri/r02_t08_full_chain_smoke.sh",
+        "{EVIDENCE}/A15"
+      ],
+      "durationMs": 953,
+      "evidencePaths": [
+        "{EVIDENCE}/A15/full-chain/summary.txt"
+      ],
+      "exitCode": 0,
+      "key": "a15_full_chain",
+      "missingEvidence": [],
+      "status": "PASS",
+      "timedOut": false
+    },
+    {
+      "argv": [
+        "bash",
+        "scripts/rust-tauri/r02_t08_legacy_entry_regression.sh",
+        "{EVIDENCE}/A16"
+      ],
+      "durationMs": 135743,
+      "evidencePaths": [
+        "{EVIDENCE}/A16/summary.txt"
+      ],
+      "exitCode": 0,
+      "key": "a16_legacy_regression",
+      "missingEvidence": [
+        "{EVIDENCE}/A16/summary.txt"
+      ],
+      "status": "FAIL",
+      "timedOut": false
+    }
+  ],
+  "finishedAtUnixMs": 1790455399516,
+  "overall": "FAIL",
+  "platform": {
+    "arch": "aarch64",
+    "family": "unix",
+    "os": "macos"
+  },
+  "resultVersion": "lingxi.xtask.verify-stage.v1",
+  "scenarios": [
+    {
+      "commandRefs": [
+        "a01_smoke"
+      ],
+      "id": "R02-A01",
+      "requirement": "REQUIRED",
+      "status": "PASS"
+    },
+    {
+      "commandRefs": [
+        "a02_boundary_negative"
+      ],
+      "id": "R02-A02",
+      "requirement": "REQUIRED",
+      "status": "PASS"
+    },
+    {
+      "commandRefs": [
+        "a03_dual_instance"
+      ],
+      "id": "R02-A03",
+      "requirement": "REQUIRED",
+      "status": "PASS"
+    },
+    {
+      "commandRefs": [
+        "a04_path_priority"
+      ],
+      "id": "R02-A04",
+      "requirement": "REQUIRED",
+      "status": "PASS"
+    },
+    {
+      "commandRefs": [
+        "a05_a06_auth_matrix"
+      ],
+      "id": "R02-A05",
+      "requirement": "REQUIRED",
+      "status": "PASS"
+    },
+    {
+      "commandRefs": [
+        "a05_a06_auth_matrix"
+      ],
+      "id": "R02-A06",
+      "requirement": "REQUIRED",
+      "status": "PASS"
+    },
+    {
+      "commandRefs": [
+        "a07_a08_storage_tx"
+      ],
+      "id": "R02-A07",
+      "requirement": "REQUIRED",
+      "status": "PASS"
+    },
+    {
+      "commandRefs": [
+        "a07_a08_storage_tx"
+      ],
+      "id": "R02-A08",
+      "requirement": "REQUIRED",
+      "status": "PASS"
+    },
+    {
+      "commandRefs": [
+        "a09_a10_events_matrix"
+      ],
+      "id": "R02-A09",
+      "requirement": "REQUIRED",
+      "status": "PASS"
+    },
+    {
+      "commandRefs": [
+        "a09_a10_events_matrix"
+      ],
+      "id": "R02-A10",
+      "requirement": "REQUIRED",
+      "status": "PASS"
+    },
+    {
+      "commandRefs": [
+        "a11_backup_restore"
+      ],
+      "id": "R02-A11",
+      "requirement": "REQUIRED",
+      "status": "FAIL"
+    },
+    {
+      "commandRefs": [
+        "a12_recovery_drill"
+      ],
+      "id": "R02-A12",
+      "requirement": "REQUIRED",
+      "status": "FAIL"
+    },
+    {
+      "commandRefs": [
+        "a13_redaction_scan"
+      ],
+      "id": "R02-A13",
+      "requirement": "REQUIRED",
+      "status": "PASS"
+    },
+    {
+      "commandRefs": [
+        "a14_slow_subscriber"
+      ],
+      "id": "R02-A14",
+      "requirement": "REQUIRED",
+      "status": "PASS"
+    },
+    {
+      "commandRefs": [
+        "a15_full_chain"
+      ],
+      "id": "R02-A15",
+      "requirement": "REQUIRED",
+      "status": "PASS"
+    },
+    {
+      "commandRefs": [
+        "a16_legacy_regression"
+      ],
+      "id": "R02-A16",
+      "requirement": "REQUIRED",
+      "status": "FAIL"
+    }
+  ],
+  "stage": "R02",
+  "startedAtUnixMs": 1790455156737,
+  "testedSha": "5741989165fe7e04c9a58a9d35c7747d3599d274",
+  "toolchainChannel": "1.98.1",
+  "worktreeDirty": true
+}

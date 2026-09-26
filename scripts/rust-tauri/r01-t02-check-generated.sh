@@ -6,10 +6,19 @@
 # rustup-pinned toolchain parsed from rust-toolchain.toml, never a bare
 # PATH-resolved cargo — the gate must not depend on PATH ordering (e.g. a
 # Homebrew cargo earlier in PATH).
+#
+# RR-T08-F1 hardening (R02-T08): the default CARGO_TARGET_DIR is DERIVED
+# FROM THIS CHECKOUT'S PATH, so two checkouts never share build artifacts.
+# The former fixed shared default (/tmp/lingxi-r01t02-target) let a
+# leftover binary compiled in another checkout validate that checkout's
+# contracts/generated tree instead of this one (wrong-tree green,
+# 2026-09-25). A lingxi-protocol-gen compiled for THIS checkout also
+# refuses at runtime to validate a foreign checkout (devgate::bound_repo_root).
+# An explicitly provided CARGO_TARGET_DIR is still honored.
 set -euo pipefail
 cd "$(dirname "$0")/../.."
 
-export CARGO_TARGET_DIR="${CARGO_TARGET_DIR:-/tmp/lingxi-r01t02-target}"
+export CARGO_TARGET_DIR="${CARGO_TARGET_DIR:-/tmp/lingxi-r01t02-target-$(printf '%s' "$PWD" | shasum -a 256 | cut -c1-16)}"
 
 TOOLCHAIN="$(sed -n 's/^channel[[:space:]]*=[[:space:]]*"\([^"]*\)".*/\1/p' rust-toolchain.toml | head -n 1)"
 if [ -z "$TOOLCHAIN" ]; then

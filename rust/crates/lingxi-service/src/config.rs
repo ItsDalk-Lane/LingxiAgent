@@ -449,10 +449,17 @@ where
                         flag: "--log-max-bytes".to_string(),
                     });
                 }
-                options.log_max_bytes = Some(parse_limit_value(
+                // R02-T07 REVIEW_R1 F04: the declared lower bound is enforced
+                // HERE, at parse time, exactly like the other limit flags —
+                // a below-range value is a loud exit-2 startup error, not a
+                // pass-through that only fails (or silently degrades) later
+                // at log-attach time. The bound mirrors
+                // logging::LogRotationConfig::validate (defense in depth).
+                options.log_max_bytes = Some(parse_limit_value_min(
                     &mut iter,
                     "--log-max-bytes",
-                    "bytes per log file before rotation (>= 65536)",
+                    "bytes per log file before rotation (>= 64)",
+                    64,
                 )?);
             }
             "--log-max-files" => {
@@ -461,10 +468,13 @@ where
                         flag: "--log-max-files".to_string(),
                     });
                 }
-                options.log_max_files = Some(parse_limit_value(
+                // R02-T07 REVIEW_R1 F04: parse-time lower bound (rotation
+                // needs a successor file), same exit-2 semantics.
+                options.log_max_files = Some(parse_limit_value_min(
                     &mut iter,
                     "--log-max-files",
                     "log files kept on disk (>= 2)",
+                    2,
                 )? as usize);
             }
             "--http-rate-max" => {
@@ -520,6 +530,30 @@ where
         return Err(ConfigError::InvalidLimit {
             flag: flag.to_string(),
             value,
+            constraint: constraint.to_string(),
+        });
+    }
+    Ok(parsed)
+}
+
+/// Same as [`parse_limit_value`] plus an inclusive lower bound enforced at
+/// parse time (R02-T07 REVIEW_R1 F04): a value below `min` is the same loud
+/// [`ConfigError::InvalidLimit`] the other limit flags produce, instead of
+/// surfacing later (or degrading) at use time.
+fn parse_limit_value_min<I>(
+    iter: &mut I,
+    flag: &str,
+    constraint: &str,
+    min: u64,
+) -> Result<u64, ConfigError>
+where
+    I: Iterator<Item = String>,
+{
+    let parsed = parse_limit_value(iter, flag, constraint)?;
+    if parsed < min {
+        return Err(ConfigError::InvalidLimit {
+            flag: flag.to_string(),
+            value: parsed.to_string(),
             constraint: constraint.to_string(),
         });
     }
@@ -1120,6 +1154,39 @@ mod tests {
         assert_eq!(cli.max_subscribers, Some(32));
         assert_eq!(cli.log_max_bytes, Some(1048576));
         assert_eq!(cli.log_max_files, Some(3));
+    }
+
+    // R02-T07 REVIEW_R1 F04: the declared lower bounds of the two log-rotation
+    // flags are enforced at PARSE time (loud InvalidLimit, exit-2 path), the
+    // same as every other limit flag — never "accepted here, failed (or
+    // silently degraded) later at log-attach time".
+    #[test]
+    fn log_flag_range_violations_are_parse_time_errors() {
+        // Below the declared bound -> rejected at parse.
+        for (flag, value) in [
+            ("--log-max-bytes", "1"),
+            ("--log-max-bytes", "32"),
+            ("--log-max-bytes", "63"),
+            ("--log-max-files", "1"),
+        ] {
+            let err = parse_cli(["--home", "/tmp/h", flag, value]).unwrap_err();
+            assert!(
+                matches!(err, ConfigError::InvalidLimit { .. }),
+                "{flag} {value:?}: expected InvalidLimit, got {err:?}"
+            );
+        }
+        // The declared bounds themselves parse fine.
+        let cli = parse_cli([
+            "--home",
+            "/tmp/h",
+            "--log-max-bytes",
+            "64",
+            "--log-max-files",
+            "2",
+        ])
+        .expect("declared lower bounds are accepted");
+        assert_eq!(cli.log_max_bytes, Some(64));
+        assert_eq!(cli.log_max_files, Some(2));
     }
 
     #[test]

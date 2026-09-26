@@ -25,6 +25,41 @@
 //! What is deliberately preserved: correlation identifiers (request ids,
 //! session ids, run ids, event ids, seq numbers) are short and never match
 //! the secret shapes — pinned by tests so A13's "关联 ID 保留" holds.
+//!
+//! Recorded divergences from the incumbent redactor (R02-T07 REVIEW_R1
+//! F02 — listed here so R05 re-checks them BEFORE wiring real provider
+//! credentials; none is reachable with the current R02 credential shapes):
+//!
+//! 1. PRECISE LONG-TOKEN BOUNDARY (measured against the incumbent, same
+//!    input pair): `/` and `=` are NOT in this port's token character
+//!    class (the incumbent's is). Two concrete consequences, both proven
+//!    by node-vs-Rust probes during the R02-T07 review:
+//!    - a >=40-char token containing a literal `/` (which splits it into
+//!      two <40 segments, or abuts `.`/`-`) is caught by the incumbent
+//!      but MISSED by this port;
+//!    - plain hex64 / base64url WITHOUT `/`/`=`/`.` adjacency IS caught
+//!      here (the old "no / no . no = survives" claim was wrong — the
+//!      real miss condition is `/`/`=` splitting the candidate into <40
+//!      segments or boundary adjacency).
+//!
+//!    R02-scope credentials (base64url unpadded / hex / `hana_*`-prefixed)
+//!    never contain `/`, so R02 surfaces are safe; an R05 provider token
+//!    that is standard base64 WITH padding/literal `/` would NOT be
+//!    redacted here — re-verify before R05 logs any provider material.
+//! 2. INCUMBENT RULES NOT PORTED (omissions, currently unreachable because
+//!    this service never logs CLI arguments, message bodies or PII):
+//!    the incumbent's PII rules (email / credit-card / CN-ID / SSN),
+//!    `CLI_SECRET_FLAG_RE` (space-separated CLI secret flags), and
+//!    `CONFIG_SECRET_VALUE_RE` (aws-configure style). Also the incumbent
+//!    Windows user-path shape (`C:\Users\…`) is not mirrored (this port
+//!    redacts POSIX-style user paths only).
+//! 3. VERIFIED-IDENTICAL, NOT DIVERGENCES (probed same-input, both sides):
+//!    tokens embedded in a Host header value are NOT redacted by either
+//!    implementation; the `?token=…` query+assignment double-rule
+//!    produces the same `[redacted]]` cosmetic double-bracket artifact on
+//!    both sides (no leak); for a NON-secret long query value this port
+//!    keeps `state=[token]` where the incumbent rewrites `?[token]`
+//!    (this port is the more structure-preserving of the two).
 
 /// Replacement marker (same word as the incumbent redactor).
 pub const REDACTED: &str = "[redacted]";

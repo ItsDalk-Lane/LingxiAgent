@@ -68,9 +68,10 @@
    "module": "xtask",
    "kind": "build-automation",
    "crate_path": "rust/crates/xtask",
-   "status": "planned",
+   "status": "exists",
    "establish_stage": "R02",
-   "responsibility": "schema、边界、测试编排与产物检查"
+   "responsibility": "05 §3 新 Rust 验证接口：check-contracts / check-boundaries / verify-stage 测试编排器——执行登记的真实命令并传播真实退出码；RR-T08-F1 运行期仓库根绑定",
+   "established_by": "R02-T08（deliberate registry update：planned→exists，crate 落盘并由 D5 双向校验核对；DEP-07 桌面禁令自此对其生效；零新增第三方依赖——serde_json 复用锁内版本）"
   },
   {
    "module": "tauri-host",

@@ -16,7 +16,8 @@
 //!   logs to stderr via tracing, so harnesses can wait deterministically.
 //! - SIGINT/SIGTERM trigger graceful shutdown; the instance record is
 //!   removed only if it is still ours; exit code 0 on clean stop, 4 if
-//!   shutdown record-cleanup failed, 1 on serve failure. Nothing swallowed.
+//!   shutdown record-cleanup failed, 5 if the run-database shutdown
+//!   (drain/checkpoint) failed, and 1 on serve failure. Nothing swallowed.
 
 use std::process::ExitCode;
 
@@ -69,10 +70,14 @@ Options:
                           the cap a subscribe is rejected (503 / budget_exceeded,
                           reason=subscriber_limit).
   --log-max-bytes <N>         Bytes per log file before rotation (default
-                          5242880 = 5 MiB). Log files live under
+                          5242880 = 5 MiB; minimum 64). Log files live under
                           {home}/lingxi-service/logs/ and every line is
                           redacted before it reaches stderr or the file.
-  --log-max-files <N>         Log files kept on disk, oldest pruned (default 7).
+                          A value below the minimum is a parse-time startup
+                          error (exit 2), like every other limit flag.
+  --log-max-files <N>         Log files kept on disk, oldest pruned (default 7;
+                          minimum 2 — rotation needs a successor). Below the
+                          minimum is a parse-time startup error (exit 2).
   --http-rate-max <N>         Per-peer HTTP request budget per 10 s window
                           (default 240). Over the budget a request is
                           explicitly rejected with 429
@@ -345,7 +350,7 @@ async fn main() -> ExitCode {
     tracing::info!(
         local_token_file = %state.auth().local_token_path().display(),
         run_database = %state.storage().db_path().display(),
-        "auth service bootstrapped (per-start loopback token, owner-only);          run database migrated and seeded"
+        "auth service bootstrapped (per-start loopback token, owner-only); run database migrated and seeded"
     );
 
     // ---- serve; publish the instance record once the address is known ----

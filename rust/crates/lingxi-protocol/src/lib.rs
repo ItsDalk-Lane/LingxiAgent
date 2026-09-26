@@ -24,6 +24,7 @@ use schemars::JsonSchema;
 use serde::{Deserialize, Deserializer, Serialize, Serializer};
 
 pub mod canon;
+pub mod devgate;
 pub mod handshake;
 pub mod wire;
 

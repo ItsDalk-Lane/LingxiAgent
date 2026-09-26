@@ -1,0 +1,401 @@
+{
+ "spec_version": "1.0",
+ "stage_id": "R02",
+ "generated_by": "EXECUTOR-R02-T08（2026-09-26；一次性执行代理；状态为执行者口径 READY_FOR_REVIEW，最终 PASS 归独立验收与根总控）",
+ "tested_sha": "5741989165fe7e04c9a58a9d35c7747d3599d274",
+ "tested_sha_note": "5741989165fe7e04c9a58a9d35c7747d3599d274（=TASK_BASE_SHA=远端 HEAD）+ 本任务未提交工作树（working_tree_digest 钉住，见 R02_HANDOFF.json）",
+ "platform": {
+  "arch": "aarch64",
+  "family": "unix",
+  "os": "macos"
+ },
+ "toolchain": "1.98.1",
+ "executor_run": {
+  "tool": "xtask verify-stage R02 --evidence artifacts/rust-tauri/R02/T08/verify-stage",
+  "result_version": "lingxi.xtask.verify-stage.v1",
+  "overall": "PASS",
+  "result_json": "artifacts/rust-tauri/R02/T08/verify-stage/verify-stage-result.json",
+  "note": "每条命令为真实执行（真实退出码/时长/日志落盘）；缺证据、命令失败、超时均使 verify-stage 非零退出。run1 曾因阶段图 evidencePaths 声明错误判 A11/A12/A16 FAIL（缺证据执法的真实演示），修正后重跑全 PASS；run1 结果归档 gates/verify-stage-run1-missing-evidence-FAIL.json"
+ },
+ "scenarios": [
+  {
+   "id": "R02-A01",
+   "task_id": "R02-T01",
+   "name": "无桌面启动",
+   "requirement": "REQUIRED",
+   "status": "PASS（执行者口径 READY_FOR_REVIEW；独立验收另派）",
+   "expected": "启动真实二进制并执行健康检查；依赖树无桌面包",
+   "command_ref": "a01_smoke",
+   "command": "bash scripts/rust-tauri/r02_t01_service_smoke.sh {EVIDENCE}/A01",
+   "exit_code": 0,
+   "timed_out": false,
+   "duration_ms": 1070,
+   "platform": "macOS 27.0 arm64（Darwin 27.0.0）",
+   "tested_sha": "5741989165fe7e04c9a58a9d35c7747d3599d274 + 未提交 T08 改动",
+   "evidence_root": "artifacts/rust-tauri/R02/T08/verify-stage/a01_smoke",
+   "evidence": [
+    "artifacts/rust-tauri/R02/T08/verify-stage/A01/a01-health-check.log",
+    "artifacts/rust-tauri/R02/T08/verify-stage/A01/a01-shutdown.log",
+    "artifacts/rust-tauri/R02/T08/verify-stage/A01/a01-deptree-evidence.log"
+   ],
+   "review": null
+  },
+  {
+   "id": "R02-A02",
+   "task_id": "R02-T01",
+   "name": "违反依赖规则失败",
+   "requirement": "REQUIRED",
+   "status": "PASS（执行者口径 READY_FOR_REVIEW；独立验收另派）",
+   "expected": "注入违规边→边界门禁失败并定位 crate/edge；还原后复绿；零残留",
+   "command_ref": "a02_boundary_negative",
+   "command": "bash scripts/rust-tauri/r02_t01_boundary_negative.sh {EVIDENCE}/A02",
+   "exit_code": 0,
+   "timed_out": false,
+   "duration_ms": 2012,
+   "platform": "macOS 27.0 arm64（Darwin 27.0.0）",
+   "tested_sha": "5741989165fe7e04c9a58a9d35c7747d3599d274 + 未提交 T08 改动",
+   "evidence_root": "artifacts/rust-tauri/R02/T08/verify-stage/a02_boundary_negative",
+   "evidence": [
+    "artifacts/rust-tauri/R02/T08/verify-stage/A02/a02-summary.log",
+    "artifacts/rust-tauri/R02/T08/verify-stage/A02/a02-residue-check.log"
+   ],
+   "review": null
+  },
+  {
+   "id": "R02-A03",
+   "task_id": "R02-T02",
+   "name": "双实例拒写",
+   "requirement": "REQUIRED",
+   "status": "PASS（执行者口径 READY_FOR_REVIEW；独立验收另派）",
+   "expected": "第二实例同 home 拒启（exit 3 + marker）；首实例数据未损坏（树哈希）",
+   "command_ref": "a03_dual_instance",
+   "command": "bash scripts/rust-tauri/r02_t02_dual_instance.sh {EVIDENCE}/A03",
+   "exit_code": 0,
+   "timed_out": false,
+   "duration_ms": 2753,
+   "platform": "macOS 27.0 arm64（Darwin 27.0.0）",
+   "tested_sha": "5741989165fe7e04c9a58a9d35c7747d3599d274 + 未提交 T08 改动",
+   "evidence_root": "artifacts/rust-tauri/R02/T08/verify-stage/a03_dual_instance",
+   "evidence": [
+    "artifacts/rust-tauri/R02/T08/verify-stage/A03/a03-summary.txt"
+   ],
+   "review": null
+  },
+  {
+   "id": "R02-A04",
+   "task_id": "R02-T02",
+   "name": "路径优先级不意外覆盖",
+   "requirement": "REQUIRED",
+   "status": "PASS（执行者口径 READY_FOR_REVIEW；独立验收另派）",
+   "expected": "CLI/env/config/test-mode 优先级按协议选择；文件探针证明实际根",
+   "command_ref": "a04_path_priority",
+   "command": "bash scripts/rust-tauri/r02_t02_path_priority.sh {EVIDENCE}/A04",
+   "exit_code": 0,
+   "timed_out": false,
+   "duration_ms": 1279,
+   "platform": "macOS 27.0 arm64（Darwin 27.0.0）",
+   "tested_sha": "5741989165fe7e04c9a58a9d35c7747d3599d274 + 未提交 T08 改动",
+   "evidence_root": "artifacts/rust-tauri/R02/T08/verify-stage/a04_path_priority",
+   "evidence": [
+    "artifacts/rust-tauri/R02/T08/verify-stage/A04/a04-summary.txt"
+   ],
+   "review": null
+  },
+  {
+   "id": "R02-A05",
+   "task_id": "R02-T03",
+   "name": "伪造身份无效",
+   "requirement": "REQUIRED",
+   "status": "PASS（执行者口径 READY_FOR_REVIEW；独立验收另派）",
+   "expected": "无凭证/伪 principal/伪 sessionId 全部拒绝且无副作用",
+   "command_ref": "a05_a06_auth_matrix",
+   "command": "bash scripts/rust-tauri/r02_t03_auth_matrix.sh {EVIDENCE}/A05_A06",
+   "exit_code": 0,
+   "timed_out": false,
+   "duration_ms": 46473,
+   "platform": "macOS 27.0 arm64（Darwin 27.0.0）",
+   "tested_sha": "5741989165fe7e04c9a58a9d35c7747d3599d274 + 未提交 T08 改动",
+   "evidence_root": "artifacts/rust-tauri/R02/T08/verify-stage/a05_a06_auth_matrix",
+   "evidence": [
+    "artifacts/rust-tauri/R02/T08/verify-stage/A05_A06/summary.txt",
+    "artifacts/rust-tauri/R02/T08/verify-stage/A05_A06/ws-matrix.json"
+   ],
+   "review": null
+  },
+  {
+   "id": "R02-A06",
+   "task_id": "R02-T03",
+   "name": "恶意网页无法借 loopback 越权",
+   "requirement": "REQUIRED",
+   "status": "PASS（执行者口径 READY_FOR_REVIEW；独立验收另派）",
+   "expected": "非法 Origin/Host、过期票据按规则拒绝；正常 desktop/CLI 形态不受损",
+   "command_ref": "a05_a06_auth_matrix",
+   "command": "bash scripts/rust-tauri/r02_t03_auth_matrix.sh {EVIDENCE}/A05_A06",
+   "exit_code": 0,
+   "timed_out": false,
+   "duration_ms": 46473,
+   "platform": "macOS 27.0 arm64（Darwin 27.0.0）",
+   "tested_sha": "5741989165fe7e04c9a58a9d35c7747d3599d274 + 未提交 T08 改动",
+   "evidence_root": "artifacts/rust-tauri/R02/T08/verify-stage/a05_a06_auth_matrix",
+   "evidence": [
+    "artifacts/rust-tauri/R02/T08/verify-stage/A05_A06/summary.txt",
+    "artifacts/rust-tauri/R02/T08/verify-stage/A05_A06/ws-matrix.json"
+   ],
+   "review": null
+  },
+  {
+   "id": "R02-A07",
+   "task_id": "R02-T04",
+   "name": "提交失败无假成功",
+   "requirement": "REQUIRED",
+   "status": "PASS（执行者口径 READY_FOR_REVIEW；独立验收另派）",
+   "expected": "真实注入提交期写错误→显式失败、无完成事件、重启无半条终态",
+   "command_ref": "a07_a08_storage_tx",
+   "command": "bash scripts/rust-tauri/r02_t04_storage_tx.sh {EVIDENCE}/A07_A08",
+   "exit_code": 0,
+   "timed_out": false,
+   "duration_ms": 2106,
+   "platform": "macOS 27.0 arm64（Darwin 27.0.0）",
+   "tested_sha": "5741989165fe7e04c9a58a9d35c7747d3599d274 + 未提交 T08 改动",
+   "evidence_root": "artifacts/rust-tauri/R02/T08/verify-stage/a07_a08_storage_tx",
+   "evidence": [
+    "artifacts/rust-tauri/R02/T08/verify-stage/A07_A08/s1-counts-after-stop.json",
+    "artifacts/rust-tauri/R02/T08/verify-stage/A07_A08/s4-hashes-after.txt"
+   ],
+   "review": null
+  },
+  {
+   "id": "R02-A08",
+   "task_id": "R02-T04",
+   "name": "重放迁移幂等",
+   "requirement": "REQUIRED",
+   "status": "PASS（执行者口径 READY_FOR_REVIEW；独立验收另派）",
+   "expected": "重复启动/迁移无重复表与数据、版本不回退",
+   "command_ref": "a07_a08_storage_tx",
+   "command": "bash scripts/rust-tauri/r02_t04_storage_tx.sh {EVIDENCE}/A07_A08",
+   "exit_code": 0,
+   "timed_out": false,
+   "duration_ms": 2106,
+   "platform": "macOS 27.0 arm64（Darwin 27.0.0）",
+   "tested_sha": "5741989165fe7e04c9a58a9d35c7747d3599d274 + 未提交 T08 改动",
+   "evidence_root": "artifacts/rust-tauri/R02/T08/verify-stage/a07_a08_storage_tx",
+   "evidence": [
+    "artifacts/rust-tauri/R02/T08/verify-stage/A07_A08/s1-counts-after-stop.json",
+    "artifacts/rust-tauri/R02/T08/verify-stage/A07_A08/s4-hashes-after.txt"
+   ],
+   "review": null
+  },
+  {
+   "id": "R02-A09",
+   "task_id": "R02-T05",
+   "name": "快照与订阅无空隙",
+   "requirement": "REQUIRED",
+   "status": "PASS（执行者口径 READY_FOR_REVIEW；独立验收另派）",
+   "expected": "写者与订阅竞态下关键事件不漏不重、序列边界明确",
+   "command_ref": "a09_a10_events_matrix",
+   "command": "bash scripts/rust-tauri/r02_t05_events_matrix.sh {EVIDENCE}/A09_A10",
+   "exit_code": 0,
+   "timed_out": false,
+   "duration_ms": 1820,
+   "platform": "macOS 27.0 arm64（Darwin 27.0.0）",
+   "tested_sha": "5741989165fe7e04c9a58a9d35c7747d3599d274 + 未提交 T08 改动",
+   "evidence_root": "artifacts/rust-tauri/R02/T08/verify-stage/a09_a10_events_matrix",
+   "evidence": [
+    "artifacts/rust-tauri/R02/T08/verify-stage/A09_A10/probe-matrix.jsonl",
+    "artifacts/rust-tauri/R02/T08/verify-stage/A09_A10/key-events-dump.json"
+   ],
+   "review": null
+  },
+  {
+   "id": "R02-A10",
+   "task_id": "R02-T05",
+   "name": "缓存过期可恢复",
+   "requirement": "REQUIRED",
+   "status": "PASS（执行者口径 READY_FOR_REVIEW；独立验收另派）",
+   "expected": "过期/越界 cursor 得到显式快照要求，重建后与权威一致",
+   "command_ref": "a09_a10_events_matrix",
+   "command": "bash scripts/rust-tauri/r02_t05_events_matrix.sh {EVIDENCE}/A09_A10",
+   "exit_code": 0,
+   "timed_out": false,
+   "duration_ms": 1820,
+   "platform": "macOS 27.0 arm64（Darwin 27.0.0）",
+   "tested_sha": "5741989165fe7e04c9a58a9d35c7747d3599d274 + 未提交 T08 改动",
+   "evidence_root": "artifacts/rust-tauri/R02/T08/verify-stage/a09_a10_events_matrix",
+   "evidence": [
+    "artifacts/rust-tauri/R02/T08/verify-stage/A09_A10/probe-matrix.jsonl",
+    "artifacts/rust-tauri/R02/T08/verify-stage/A09_A10/key-events-dump.json"
+   ],
+   "review": null
+  },
+  {
+   "id": "R02-A11",
+   "task_id": "R02-T06",
+   "name": "WAL 状态备份可恢复",
+   "requirement": "REQUIRED",
+   "status": "PASS（执行者口径 READY_FOR_REVIEW；独立验收另派）",
+   "expected": "在线备份未 checkpoint 数据→恢复件完整、事务边界正确",
+   "command_ref": "a11_backup_restore",
+   "command": "bash scripts/rust-tauri/r02_t06_backup_restore.sh {EVIDENCE}/A11",
+   "exit_code": 0,
+   "timed_out": false,
+   "duration_ms": 2542,
+   "platform": "macOS 27.0 arm64（Darwin 27.0.0）",
+   "tested_sha": "5741989165fe7e04c9a58a9d35c7747d3599d274 + 未提交 T08 改动",
+   "evidence_root": "artifacts/rust-tauri/R02/T08/verify-stage/a11_backup_restore",
+   "evidence": [
+    "artifacts/rust-tauri/R02/T08/verify-stage/A11/backup-restore/summary.txt"
+   ],
+   "review": null
+  },
+  {
+   "id": "R02-A12",
+   "task_id": "R02-T06",
+   "name": "损坏库不自动丢弃",
+   "requirement": "REQUIRED",
+   "status": "PASS（执行者口径 READY_FOR_REVIEW；独立验收另派）",
+   "expected": "四种损坏形态拒启/降级且保留原文件，不造空库假恢复",
+   "command_ref": "a12_recovery_drill",
+   "command": "bash scripts/rust-tauri/r02_t06_recovery_drill.sh {EVIDENCE}/A12",
+   "exit_code": 0,
+   "timed_out": false,
+   "duration_ms": 1800,
+   "platform": "macOS 27.0 arm64（Darwin 27.0.0）",
+   "tested_sha": "5741989165fe7e04c9a58a9d35c7747d3599d274 + 未提交 T08 改动",
+   "evidence_root": "artifacts/rust-tauri/R02/T08/verify-stage/a12_recovery_drill",
+   "evidence": [
+    "artifacts/rust-tauri/R02/T08/verify-stage/A12/recovery-drill/summary.txt"
+   ],
+   "review": null
+  },
+  {
+   "id": "R02-A13",
+   "task_id": "R02-T07",
+   "name": "敏感值不出现在日志",
+   "requirement": "REQUIRED",
+   "status": "PASS（执行者口径 READY_FOR_REVIEW；独立验收另派）",
+   "expected": "正常+错误流量的全部日志面对预设敏感值 0 命中；关联 ID 保留",
+   "command_ref": "a13_redaction_scan",
+   "command": "bash scripts/rust-tauri/r02_t07_redaction_scan.sh {EVIDENCE}/A13",
+   "exit_code": 0,
+   "timed_out": false,
+   "duration_ms": 9209,
+   "platform": "macOS 27.0 arm64（Darwin 27.0.0）",
+   "tested_sha": "5741989165fe7e04c9a58a9d35c7747d3599d274 + 未提交 T08 改动",
+   "evidence_root": "artifacts/rust-tauri/R02/T08/verify-stage/a13_redaction_scan",
+   "evidence": [
+    "artifacts/rust-tauri/R02/T08/verify-stage/A13/redaction-scan/summary.txt",
+    "artifacts/rust-tauri/R02/T08/verify-stage/A13/redaction-scan/inventory.txt"
+   ],
+   "review": null
+  },
+  {
+   "id": "R02-A14",
+   "task_id": "R02-T07",
+   "name": "慢订阅者不拖垮服务",
+   "requirement": "REQUIRED",
+   "status": "PASS（执行者口径 READY_FOR_REVIEW；独立验收另派）",
+   "expected": "慢订阅者显式 snapshot_required detach；他人无损；RSS 有界",
+   "command_ref": "a14_slow_subscriber",
+   "command": "bash scripts/rust-tauri/r02_t07_slow_subscriber.sh {EVIDENCE}/A14",
+   "exit_code": 0,
+   "timed_out": false,
+   "duration_ms": 33130,
+   "platform": "macOS 27.0 arm64（Darwin 27.0.0）",
+   "tested_sha": "5741989165fe7e04c9a58a9d35c7747d3599d274 + 未提交 T08 改动",
+   "evidence_root": "artifacts/rust-tauri/R02/T08/verify-stage/a14_slow_subscriber",
+   "evidence": [
+    "artifacts/rust-tauri/R02/T08/verify-stage/A14/slow-subscriber/storm-results.json",
+    "artifacts/rust-tauri/R02/T08/verify-stage/A14/slow-subscriber/summary.txt"
+   ],
+   "review": null
+  },
+  {
+   "id": "R02-A15",
+   "task_id": "R02-T08",
+   "name": "真实二进制完成全链",
+   "requirement": "REQUIRED",
+   "status": "PASS（执行者口径 READY_FOR_REVIEW；独立验收另派）",
+   "expected": "启动→认证→写数据→订阅→关闭→重启读取全链通过；无遗留子进程/端口",
+   "command_ref": "a15_full_chain",
+   "command": "bash scripts/rust-tauri/r02_t08_full_chain_smoke.sh {EVIDENCE}/A15",
+   "exit_code": 0,
+   "timed_out": false,
+   "duration_ms": 966,
+   "platform": "macOS 27.0 arm64（Darwin 27.0.0）",
+   "tested_sha": "5741989165fe7e04c9a58a9d35c7747d3599d274 + 未提交 T08 改动",
+   "evidence_root": "artifacts/rust-tauri/R02/T08/verify-stage/a15_full_chain",
+   "evidence": [
+    "artifacts/rust-tauri/R02/T08/verify-stage/A15/full-chain/summary.txt",
+    "artifacts/rust-tauri/R02/T08/verify-stage/A15/full-chain/pre-restart-head.json"
+   ],
+   "review": null
+  },
+  {
+   "id": "R02-A16",
+   "task_id": "R02-T08",
+   "name": "不影响旧入口",
+   "requirement": "REQUIRED",
+   "status": "PASS（执行者口径 READY_FOR_REVIEW；独立验收另派）",
+   "expected": "零改动旧入口面；typecheck x2 + 边界门禁 + 全量 npm test 无新增失败；默认入口未指向 rust",
+   "command_ref": "a16_legacy_regression",
+   "command": "bash scripts/rust-tauri/r02_t08_legacy_entry_regression.sh {EVIDENCE}/A16",
+   "exit_code": 0,
+   "timed_out": false,
+   "duration_ms": 136723,
+   "platform": "macOS 27.0 arm64（Darwin 27.0.0）",
+   "tested_sha": "5741989165fe7e04c9a58a9d35c7747d3599d274 + 未提交 T08 改动",
+   "evidence_root": "artifacts/rust-tauri/R02/T08/verify-stage/a16_legacy_regression",
+   "evidence": [
+    "artifacts/rust-tauri/R02/T08/verify-stage/A16/legacy-entry/summary.txt",
+    "artifacts/rust-tauri/R02/T08/verify-stage/A16/legacy-entry/e1-diff-node-surface.txt",
+    "artifacts/rust-tauri/R02/T08/verify-stage/A16/legacy-entry/e5-npm-test.log"
+   ],
+   "review": null
+  }
+ ],
+ "additional_gates": [
+  {
+   "id": "fmt",
+   "command": "cargo fmt --all -- --check（锁定 1.98.1）",
+   "exit_code": 0,
+   "evidence": "终端执行（无 diff；另见 T08 报告 §门禁）"
+  },
+  {
+   "id": "clippy",
+   "command": "cargo clippy --workspace --all-targets --locked -- -D warnings",
+   "exit_code": 0,
+   "evidence": "终端执行 + artifacts/rust-tauri/R02/T08/gates/（/clippy.log 于 /tmp 环境运行，报告记录退出码）"
+  },
+  {
+   "id": "cargo-test-workspace",
+   "command": "cargo test --workspace --locked --offline --no-fail-fast",
+   "exit_code": 0,
+   "evidence": "artifacts/rust-tauri/R02/T08/gates/cargo-test-workspace.log（287 passed / 0 failed，39 个测试目标）"
+  },
+  {
+   "id": "xtask-check-contracts",
+   "command": "cargo run -p xtask -- check-contracts",
+   "exit_code": 0,
+   "evidence": "artifacts/rust-tauri/R02/T08/gates/xtask-check-contracts.log"
+  },
+  {
+   "id": "xtask-check-boundaries",
+   "command": "cargo run -p xtask -- check-boundaries",
+   "exit_code": 0,
+   "evidence": "artifacts/rust-tauri/R02/T08/gates/xtask-check-boundaries.log"
+  },
+  {
+   "id": "xtask-negatives",
+   "command": "--help / verify-stage R09 / 未知子命令 / 阶段图负向测试 16 例",
+   "exit_code": 0,
+   "evidence": "gates/xtask-help.txt、gates/xtask-unknown-stage-exit2.txt、gates/xtask-unknown-subcommand-exit2.txt、cargo test -p xtask（16 tests）"
+  },
+  {
+   "id": "audit-seal-family",
+   "command": "npm test 内含 post-verification-audit-seal / round2 / round3 交付证据族",
+   "exit_code": 1,
+   "evidence": "verify-stage/A16/legacy-entry/e5-npm-test.log",
+   "note": "预存在红：seal 坐标落后于已授权 R01/R02 提交（失败清单 0 个 T08 文件）；不属本任务、未触碰坐标/白名单"
+  }
+ ]
+}

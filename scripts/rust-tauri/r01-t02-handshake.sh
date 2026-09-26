@@ -6,7 +6,9 @@
 set -euo pipefail
 cd "$(dirname "$0")/../.."
 
-export CARGO_TARGET_DIR="${CARGO_TARGET_DIR:-/tmp/lingxi-r01t02-target}"
+# RR-T08-F1 hardening (R02-T08): default target dir derived from this
+# checkout's path — never a fixed shared dir (see r01-t02-check-generated.sh).
+export CARGO_TARGET_DIR="${CARGO_TARGET_DIR:-/tmp/lingxi-r01t02-target-$(printf '%s' "$PWD" | shasum -a 256 | cut -c1-16)}"
 OUT_DIR="${1:-/tmp/lingxi-r01t02-handshake}"
 mkdir -p "$OUT_DIR"
 SERVER_BIN="$CARGO_TARGET_DIR/debug/lingxi-proto-server"

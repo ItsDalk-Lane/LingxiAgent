@@ -16,11 +16,15 @@
 # lingxi-adapters — the R02-T04 port-implementation crate (SQLite-backed
 # storage for the new run/message database behind a bounded single-writer
 # work queue; deliberate D5 registry update planned→exists, bound by
-# DEP-07/DEP-09: no desktop stack, no dependency on lingxi-service).
-# The remaining responsibility modules
-# (lingxi-adapters / lingxi-cli / xtask) are declared in
-# docs/rust-tauri/R01/ADR-001-ownership.md with their establishment stages
-# and will be added as workspace members by later tasks.
+# DEP-07/DEP-09: no desktop stack, no dependency on lingxi-service), plus
+# xtask — the R02-T08 verification orchestrator (05 §3 check-contracts /
+# check-boundaries / verify-stage; deliberate D5 registry update
+# planned→exists; zero NEW third-party dependencies — serde_json reused from
+# the lock — and RR-T08-F1 runtime repo-root binding).
+# The remaining responsibility module
+# (lingxi-cli) is declared in
+# docs/rust-tauri/R01/ADR-001-ownership.md with its establishment stage
+# and will be added as a workspace member by a later task.
 #
 # Hard rules enforced by docs/rust-tauri/R01/r01_t01_check_ownership.py
 # against docs/rust-tauri/R01/DEPENDENCY_RULES.json:
@@ -35,7 +39,8 @@
 #     tokio/axum/reqwest/rusqlite/tracing/tracing-subscriber/jsonschema/rmcp,
 #     exact versions pinned in Cargo.lock; R01-T04 promoted libc from
 #     transitive to direct dependency of lingxi-browser-spike, same locked
-#     version; R02-T01's lingxi-service reuses locked versions only);
+#     version; R02-T01's lingxi-service reuses locked versions only; R02-T08's
+#     xtask reuses serde_json from the lock — zero new package versions);
 #     the toolchain itself is pinned
 #     by rust-toolchain.toml at the repo root (R01-T03).
 [workspace]
@@ -47,6 +52,7 @@ members = [
     "crates/lingxi-browser-spike",
     "crates/lingxi-service",
     "crates/lingxi-adapters",
+    "crates/xtask",
 ]
 
 [workspace.package]

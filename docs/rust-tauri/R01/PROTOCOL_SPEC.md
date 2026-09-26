@@ -163,3 +163,11 @@ golden、内容摘要、跨语言字节相等判定统一使用该 profile：
 任意提交上成立，`--check` 为全文逐字节比较、无字段豁免。门禁
 `scripts/rust-tauri/r01-t02-check-generated.sh` 解析 `rust-toolchain.toml` 的 channel 并
 经 `rustup run` 显式调用锁定工具链，不依赖 PATH 顺序。
+
+contentSha 复算限制（RR-T02-FINFO1，R02-T08 补记）：contentSha 的哈希输入是提取器
+（`scripts/rust-tauri/r01-t02-extract-api-surface.mjs`）**运行期内部的全量清单**——包含
+未全部落入矩阵正文的结构（如完整的 mounts 与 preloadIpcChannels 映射）。因此 contentSha
+**无法仅由 API_COMPAT_MATRIX.json 重算**：任何需要复算/核对 contentSha 的审计都必须
+重新运行提取器本身（`node scripts/rust-tauri/r01-t02-extract-api-surface.mjs --check`
+或重新生成并比对），不能把矩阵里可见的字段拼回去算。矩阵 `--check` 门禁（全文逐字节
+比较）已经覆盖"矩阵内容与提取器输出一致"这一定义，无需从矩阵外部复算该戳。
