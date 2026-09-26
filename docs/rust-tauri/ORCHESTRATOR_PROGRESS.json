@@ -2035,30 +2035,58 @@
         "R02-A14": "PASS"
       },
       "task_commit_sha": "43ae288bad42cda7432dba90b97f4e216ffa4f8d",
-      "push_result": null,
+      "push_result": {
+        "status": "CONFIRMED",
+        "remote_branch": "origin/codex/rust-tauri-migration",
+        "remote_head": "5741989165fe7e04c9a58a9d35c7747d3599d274",
+        "note": "task commit 43ae288ba + ledger commit 574198916 pushed; ls-remote verified"
+      },
       "blockers": [],
       "task_commit_note": "任务提交（本账本提交的直接父提交）；两提交一并推送，push_result 由下一账本提交补登"
     },
     "R02-T08": {
       "name": "独立服务交付与门禁",
       "stage_id": "R02",
-      "status": "PENDING",
-      "task_base_sha": null,
-      "executor_id": null,
-      "execution_result": null,
-      "review_round": 0,
-      "reviewer_id": null,
-      "review_verdict": null,
-      "findings": [],
+      "status": "DONE",
+      "task_base_sha": "5741989165fe7e04c9a58a9d35c7747d3599d274",
+      "executor_id": "ZCode:R02-T08-exec-r1 (agent_ac035f9a-1db8-4d78-9c25-fa5338f2f4f1)",
+      "execution_result": "READY_FOR_REVIEW",
+      "review_round": 1,
+      "reviewer_id": "ZCode:R02-T08-review-r1 (agent_3432ddad-14d9-49b2-8deb-cc10e705781c)",
+      "review_verdict": "PASS",
+      "findings": [
+        {
+          "id": "R1-F01",
+          "severity": "MINOR",
+          "summary": "文档数字/指针漂移簇：T08_REPORT 引用旧 digest f6058f26（复算最终值 94f95e7a，HANDOFF/REPORT 钉值正确）；§9→R02_REPORT §10 悬空指针；未跟踪数 11 实为 13；命令计数 14/12 实为 13/11。纯文档，无证据伪造",
+          "review_report": "docs/rust-tauri/R02/R02-T08_REVIEW_R1.md",
+          "resolution": "登记 RISK_REGISTER，R02 阶段审阅/R03 文档面收口时更正"
+        },
+        {
+          "id": "R1-F02",
+          "severity": "MINOR",
+          "summary": "xtask 阶段图 resultVersion 必填但不校验语义且无负向测试（05 §3 字面要求）；输出版本恒为二进制常量",
+          "review_report": "docs/rust-tauri/R02/R02-T08_REVIEW_R1.md",
+          "resolution": "登记 RISK_REGISTER，R03 建图维护时补语义校验与负向"
+        },
+        {
+          "id": "R1-F03",
+          "severity": "MINOR",
+          "summary": "verify-stage 证据存在性检查+目录不清空：复用证据目录时「exit 0 但不产出证据」会被陈旧文件掩蔽（scratch 实证）；现行每轮新目录惯例下不可达",
+          "review_report": "docs/rust-tauri/R02/R02-T08_REVIEW_R1.md",
+          "resolution": "登记 RISK_REGISTER，R03 建图时收口（每场景目录清空或新鲜性校验）"
+        }
+      ],
       "repair_agent_id": null,
       "root_cause_agent_id": null,
       "acceptance_results": {
-        "R02-A15": "NOT_STARTED",
-        "R02-A16": "NOT_STARTED"
+        "R02-A15": "PASS",
+        "R02-A16": "PASS"
       },
-      "task_commit_sha": null,
+      "task_commit_sha": "f1dcdac80161441ba767898550330373bec673be",
       "push_result": null,
-      "blockers": []
+      "blockers": [],
+      "task_commit_note": "任务提交（本账本提交的直接父提交）；两提交一并推送，push_result 由下一账本提交补登；另有 4 项 NON-ISSUE 详见评审报告 §7"
     },
     "R03-T01": {
       "name": "实现运行与尝试状态机",
