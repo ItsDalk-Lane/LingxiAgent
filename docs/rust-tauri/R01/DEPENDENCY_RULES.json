@@ -24,9 +24,10 @@
    "module": "lingxi-adapters",
    "kind": "adapters",
    "crate_path": "rust/crates/lingxi-adapters",
-   "status": "planned",
+   "status": "exists",
    "establish_stage": "R02",
-   "responsibility": "storage/models/tools/integrations 各模块的端口实现，由 service 注入"
+   "established_by": "R02-T04（deliberate registry update：planned→exists，crate 落盘并由 D5 双向校验核对；DEP-03/DEP-07/DEP-09 自此对其生效）",
+   "responsibility": "storage/models/tools/integrations 各模块的端口实现，由 service 注入（R02-T04 落地 storage：新运行/消息 SQLite 库 + 有界单写者队列）"
   },
   {
    "module": "lingxi-service",
@@ -179,6 +180,21 @@
    "enforcement": "cargo-metadata-transitive (在 tauri-host 建立后生效)",
    "effective_from_stage": "R09",
    "rationale": "宿主和传输只能依赖内核公开接口；Tauri 不拥有 Agent 业务执行权"
+  },
+  {
+   "id": "DEP-09",
+   "name": "adapters-no-service",
+   "applies_to_modules": [
+    "lingxi-adapters"
+   ],
+   "forbidden_dep_patterns": [
+    "lingxi-service"
+   ],
+   "forbidden_source_tokens": [],
+   "enforcement": "cargo-metadata-transitive + manifest-declaration-scan（与 D1 同一执行器）",
+   "effective_from_stage": "R02-T04",
+   "added_by": "R02-T04（crate establish 时的必要 DEP 规则扩展）：adapters 是 port 实现层，由 service 组合根注入；反向依赖 service 即组合根倒挂（service 持有传输/配置/生命周期，被 adapter 依赖后无法替换注入方向）。adapters 对 kernel 的依赖方向（实现其 ports）合法，DEP-03 保证 kernel 永不反向依赖 adapters。",
+   "rationale": "port 实现不得依赖组合根；注入只能单向 service→adapters"
   },
   {
    "id": "DEP-06",
