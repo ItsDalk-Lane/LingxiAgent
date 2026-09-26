@@ -1790,30 +1790,86 @@
         "R02-A06": "PASS"
       },
       "task_commit_sha": "95b65bd484ecc287c0df1b4ba71ffe0e1db43265",
-      "push_result": null,
+      "push_result": {
+        "status": "CONFIRMED",
+        "remote_branch": "origin/codex/rust-tauri-migration",
+        "remote_head": "0ba54e325ab418caa57a8d9605bc492e793bcd5d",
+        "note": "task commit 95b65bd48 + ledger commit 0ba54e325 pushed; ls-remote verified"
+      },
       "blockers": [],
       "task_commit_note": "任务提交（本账本提交的直接父提交）；两提交一并推送，push_result 由下一账本提交补登"
     },
     "R02-T04": {
       "name": "实现存储 ports 与运行库事务",
       "stage_id": "R02",
-      "status": "PENDING",
-      "task_base_sha": null,
-      "executor_id": null,
-      "execution_result": null,
-      "review_round": 0,
-      "reviewer_id": null,
-      "review_verdict": null,
-      "findings": [],
+      "status": "DONE",
+      "task_base_sha": "0ba54e325ab418caa57a8d9605bc492e793bcd5d",
+      "executor_id": "ZCode:R02-T04-exec-r1 (agent_72b05e77-f396-4b05-9442-14ecfca1b931)",
+      "execution_result": "READY_FOR_REVIEW",
+      "review_round": 1,
+      "reviewer_id": "ZCode:R02-T04-review-r1 (agent_ae5a2490-4cdf-4aaf-adb6-0c94315597fb)",
+      "review_verdict": "PASS",
+      "findings": [
+        {
+          "id": "R1-F01",
+          "severity": "MINOR",
+          "summary": "过时 uchg 头注释（故障注入方式演进后未清理）",
+          "review_report": "docs/rust-tauri/R02/R02-T04_REVIEW_R1.md",
+          "resolution": "不阻塞；注释清理由后续触碰该文件的 T 顺带（T06/T08 候选）"
+        },
+        {
+          "id": "R1-F02",
+          "severity": "MINOR",
+          "summary": "main.rs docstring 缺 exit 5 + 两处日志空格残留",
+          "review_report": "docs/rust-tauri/R02/R02-T04_REVIEW_R1.md",
+          "resolution": "不阻塞；T08 交付文档/退出码手册统一收口"
+        },
+        {
+          "id": "R1-F03",
+          "severity": "MINOR",
+          "summary": "T01 脚本/报告“断言仍兼容”表述不实（N-C 实际改为环依赖形态拒绝，fail-safe 方向）",
+          "review_report": "docs/rust-tauri/R02/R02-T04_REVIEW_R1.md",
+          "resolution": "不阻塞；拦截效力已经 3 注入 3 拦截复跑证实，表述以验收报告为准"
+        },
+        {
+          "id": "R1-F04",
+          "severity": "MINOR",
+          "summary": "runs.db 文件 0644（目录 0700 已保护）",
+          "review_report": "docs/rust-tauri/R02/R02-T04_REVIEW_R1.md",
+          "resolution": "不阻塞；加固建议挂 T06（备份/关闭与文件语义任务）或 T08 收口复核"
+        },
+        {
+          "id": "R1-F05",
+          "severity": "MINOR",
+          "summary": "HTTP 级 storage 500/503 映射未线上断言",
+          "review_report": "docs/rust-tauri/R02/R02-T04_REVIEW_R1.md",
+          "resolution": "不阻塞；T08 二进制全链冒烟时补线上断言"
+        },
+        {
+          "id": "R1-F06",
+          "severity": "NON-ISSUE",
+          "summary": "Cargo.lock “+14 行”实为 +17（实质成立：仅成员块引用零新包）",
+          "review_report": "docs/rust-tauri/R02/R02-T04_REVIEW_R1.md",
+          "resolution": "报告计数口径以验收复核为准"
+        },
+        {
+          "id": "R1-F07",
+          "severity": "MINOR",
+          "summary": "执行会话两个未披露孤儿进程（T02 遗留测试二进制，/tmp 合成 home）",
+          "review_report": "docs/rust-tauri/R02/R02-T04_REVIEW_R1.md",
+          "resolution": "总控已于 2026-09-26 kill 384/476 并确认清理（ORPHANS_CLEANED）"
+        }
+      ],
       "repair_agent_id": null,
       "root_cause_agent_id": null,
       "acceptance_results": {
-        "R02-A07": "NOT_STARTED",
-        "R02-A08": "NOT_STARTED"
+        "R02-A07": "PASS",
+        "R02-A08": "PASS"
       },
-      "task_commit_sha": null,
+      "task_commit_sha": "dbfbc18566e2fd1e32a25d4b342b2fd8a9ec3c36",
       "push_result": null,
-      "blockers": []
+      "blockers": [],
+      "task_commit_note": "任务提交（本账本提交的直接父提交）；两提交一并推送，push_result 由下一账本提交补登"
     },
     "R02-T05": {
       "name": "事件顺序、快照和断线续读",
