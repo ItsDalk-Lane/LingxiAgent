@@ -165,7 +165,7 @@
     },
     "R02": {
       "title": "Rust独立服务、存储与事件基础",
-      "status": "IN_PROGRESS",
+      "status": "READY_FOR_STAGE_REVIEW",
       "task_ids": [
         "R02-T01",
         "R02-T02",
@@ -180,7 +180,8 @@
       "stage_review_round": 0,
       "stage_verdict": null,
       "stage_acceptance_commit_sha": null,
-      "blockers": []
+      "blockers": [],
+      "r02_stage_controller_note": "八T全部经全新执行/验收（T05、T06 各一轮修复循环）独立 PASS 并逐任务推送核对；16 个 REQUIRED 验收场景全部由真实 Rust 二进制/真实命令执行判定（xtask verify-stage R02 overall PASS 16/16，非手填统计）；R01 移交项 RR-T08-F1/RR-T02-FINFO1 闭环、PROD-DEFECT-1 新栈侧闭环；RISK_REGISTER R02 版已登记（14 OPEN 全部绑定真实截止阶段）；审计封印族预存在红如实归因（坐标 ab4f2281 落后于已授权提交，0 个 R02 文件，反掩码经 T08 验收独立核验）；完整阶段验收须由根总控另派全新 Codex 子代理独立执行，本总控不宣布阶段 PASS。候选指纹=HEAD（见任务账本 task_commit_sha 链）。"
     },
     "R03": {
       "title": "运行状态机、并发、取消与恢复",
@@ -2084,7 +2085,12 @@
         "R02-A16": "PASS"
       },
       "task_commit_sha": "f1dcdac80161441ba767898550330373bec673be",
-      "push_result": null,
+      "push_result": {
+        "status": "CONFIRMED",
+        "remote_branch": "origin/codex/rust-tauri-migration",
+        "remote_head": "9b95b4803d0d39c0e72cdcf2c37f3319f2ad3b26",
+        "note": "task commit f1dcdac80 + ledger commit 9b95b4803 pushed; ls-remote verified"
+      },
       "blockers": [],
       "task_commit_note": "任务提交（本账本提交的直接父提交）；两提交一并推送，push_result 由下一账本提交补登；另有 4 项 NON-ISSUE 详见评审报告 §7"
     },
