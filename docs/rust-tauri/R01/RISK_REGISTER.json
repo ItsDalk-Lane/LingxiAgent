@@ -3,7 +3,7 @@
   "task_id": "R01-T08",
   "stage_id": "R01",
   "generated_by": "ZCode:R01-T08-exec-r1",
-  "updated_by": "ZCode:R01 阶段修复 R4（2026-09-26）：按 R01 阶段验收 R4 F02 更新 RR-ENV-CLOSURE-DRIFT 与 RR-AUDIT-SEAL-PREEXISTING 的 R2 时态为 R3 修复后事实（闭包漂移已由 R3 候选根除、剩余条件为正式提交后在真实候选上复验），R2 失败历史保留（前次：R3 为 15 个关卡冻结契约递延绑定条目补充结构化截止阶段坐标 resolve_by_stage_id / resolve_latest_stage_id（R01 阶段验收 R3 F01 修复：与真实阶段索引 R00–R11 及检查器冻结契约 deadline_stage/latest_stage 三方机器校验一致），正文 resolve_by_stage 与其余字段未改（前次：R2 更新 RR-AUDIT-SEAL-PREEXISTING + 新增 RR-ENV-CLOSURE-DRIFT，43→44 条，2026-09-26））",
+  "updated_by": "Codex总控2026-09-26：仅据真实正式封印74/74+全量0失败+远端核对关闭两条治理风险；15跨阶段递延风险保持原期限与状态。",
   "date": "2026-09-25",
   "platform_scope": "全部 VERIFIED 结论仅覆盖 macOS 27.0 arm64 单机实测；Windows/Linux/macOS x64 未验证项一律挂 R09/R10 强制关卡",
   "status_values": {
@@ -398,28 +398,46 @@
       "source": "docs/rust-tauri/R00/R00_HANDOFF.json unresolved_items AUDIT-SEAL-PREEXISTING（条目 ID 承继保留）；R01 阶段验收 R1 F02 + R01 阶段修复 R1 复证后重分类（2026-09-25）；R01 阶段验收 R2 F03 补充推送可行性缺口 + R01 阶段修复 R2 分片化预演（2026-09-26）",
       "severity": "GATE",
       "category": "audit-seal",
-      "summary": "审计四文件门禁在 R01 候选实为新增 6 红，不能再称 R00 预存：正式 R00 C4 基线（328cc8bb）提交后复验 68/68 绿、全量 npm test 14942 passed/0 failed（/tmp/r00-seal-c4-postcommit.md）；R01 候选 HEAD（36399937）实测 62/68、6 FAIL（post-verification-audit-seal 1、round2-delivery-evidence 3、round3-delivery-evidence 2；upstream-sync-matrix 7/7 绿）。根因=VERIFIED_SOURCE_SHA 仍指 R00 C3（f2b8c687），R01 的 2103 个新增/修改文件不在审计白名单，diff guard 按其设计拒绝。原 T08 登记「4 用例预存 FAIL 原样承继 R00」的两基点分类以非正式基点（R00-T08/R00 stage base）得出，经 R01 阶段验收 R1 F02 以正式 C4 封印基线复证不成立。坐标推进=把适用验证绑定到 R01 阶段复验通过的真实候选提交后，以纯审计提交更新 VERIFIED_SOURCE_SHA；需提交授权，属总控 seal 工作流，非 R01 实现缺陷。R01 阶段验收 R2 F03 追加：封印再生成的两份 .patch.gz（267MB/577MB）超 GitHub 100MiB 单文件硬限，照原单体交付提交后无法推送；R01 阶段修复 R2 交付受控分片机制（patch-gzip-shards/v1，45MB 片、清单最后落盘、完整性语义不损失），并在 /tmp 隔离副本完成全链预演：分片生成 VERIFIED、坐标推进后四文件门禁 74/74、HEAD 可达集与裸仓实收对象审计 0 个 >100MiB（最大 97,003,232 B 为历史已推送的 round3 补丁）、裸仓推送 SHA 一致。R2 预演曾同时暴露本机环境性 cli-runtime-closure 漂移（R2 时态，历史保留：nft 新增 /bin/bash 追踪项，与 R1/R2/R01 内容无关，三实验证实，使当时全量 npm test 2 红）；该漂移已由 R01 阶段修复 R3 候选根除（normalizeNftTraceFiles 宿主绝对/越界路径类级过滤 + census finally 恢复/结构性断言，同机再生成 8949 文件零漂移），R3 /tmp 封印预演坐标推进后全量 npm test 14949 passed/0 failed/exit 0（预演 SHA 不作正式坐标）",
+      "summary": "当前已关闭（正式真实提交后复验并推送），证据见 formal_closeout；以下为历史发现与修复时点：审计四文件门禁在 R01 候选实为新增 6 红，不能再称 R00 预存：正式 R00 C4 基线（328cc8bb）提交后复验 68/68 绿、全量 npm test 14942 passed/0 failed（/tmp/r00-seal-c4-postcommit.md）；R01 候选 HEAD（36399937）实测 62/68、6 FAIL（post-verification-audit-seal 1、round2-delivery-evidence 3、round3-delivery-evidence 2；upstream-sync-matrix 7/7 绿）。根因=VERIFIED_SOURCE_SHA 仍指 R00 C3（f2b8c687），R01 的 2103 个新增/修改文件不在审计白名单，diff guard 按其设计拒绝。原 T08 登记「4 用例预存 FAIL 原样承继 R00」的两基点分类以非正式基点（R00-T08/R00 stage base）得出，经 R01 阶段验收 R1 F02 以正式 C4 封印基线复证不成立。坐标推进=把适用验证绑定到 R01 阶段复验通过的真实候选提交后，以纯审计提交更新 VERIFIED_SOURCE_SHA；需提交授权，属总控 seal 工作流，非 R01 实现缺陷。R01 阶段验收 R2 F03 追加：封印再生成的两份 .patch.gz（267MB/577MB）超 GitHub 100MiB 单文件硬限，照原单体交付提交后无法推送；R01 阶段修复 R2 交付受控分片机制（patch-gzip-shards/v1，45MB 片、清单最后落盘、完整性语义不损失），并在 /tmp 隔离副本完成全链预演：分片生成 VERIFIED、坐标推进后四文件门禁 74/74、HEAD 可达集与裸仓实收对象审计 0 个 >100MiB（最大 97,003,232 B 为历史已推送的 round3 补丁）、裸仓推送 SHA 一致。R2 预演曾同时暴露本机环境性 cli-runtime-closure 漂移（R2 时态，历史保留：nft 新增 /bin/bash 追踪项，与 R1/R2/R01 内容无关，三实验证实，使当时全量 npm test 2 红）；该漂移已由 R01 阶段修复 R3 候选根除（normalizeNftTraceFiles 宿主绝对/越界路径类级过滤 + census finally 恢复/结构性断言，同机再生成 8949 文件零漂移），R3 /tmp 封印预演坐标推进后全量 npm test 14949 passed/0 failed/exit 0（预演 SHA 不作正式坐标）",
       "evidence": "/tmp/r00-seal-c4-postcommit.md（正式 C4：68/68 + 14942/0）+ /tmp/r01-stage-review-r1-seal-gate.log（R01 候选 62/68、6 FAIL）+ artifacts/rust-tauri/R01/STAGE_REPAIR_R1/audit-seal-gate-rerun.txt（阶段修复 R1 独立复跑同值）+ R00 历史证据 artifacts/rust-tauri/R00/T08/audit-seal-repro-r{1,2}.log、artifacts/rust-tauri/R00/STAGE_REPAIR_R1/audit-seal-{stage-base,head}.log + R2 预演 artifacts/rust-tauri/R01/STAGE_REPAIR_R2/{seal-rehearsal-r2-ceremony.txt,audit-push-rehearsal-r2.txt,closure-drift-attribution-r2.txt,npm-test-r2-rerun-failures.txt} + R3 修复与预演 artifacts/rust-tauri/R01/STAGE_REPAIR_R3/{f02-closure-regen-zero-drift-r3.txt,seal-rehearsal-r3-ceremony.txt}",
-      "resolve_by_stage": "总控按 PROGRESS.md seal 工作流收口：R01 阶段复验 PASS 后，先把适用验证绑定到实际候选提交（含坐标与矩阵投影再生），再以纯审计提交推进 VERIFIED_SOURCE_SHA 并复验差异门禁；R01 阶段修复 R1 完成方法预演、R01 阶段修复 R2 补齐推送可行性（分片化）与对象尺寸审计、R01 阶段修复 R3 已根除本机 cli-runtime-closure 环境漂移（同机再生成零漂移，不再需要再生提交环境对齐闭包或换环境方案），剩余条件=正式提交后在真实候选上复验（四文件门禁 74/74、全量 npm test 0 失败、分片重组哈希一致、可达对象 0 个 ≥100MiB、工作树零漂移、远端 SHA 一致），预演 SHA 不作正式坐标",
+      "resolve_by_stage": "当前已按R01真实正式封印完成，证据见 formal_closeout。历史处理条件：总控按 PROGRESS.md seal 工作流收口：R01 阶段复验 PASS 后，先把适用验证绑定到实际候选提交（含坐标与矩阵投影再生），再以纯审计提交推进 VERIFIED_SOURCE_SHA 并复验差异门禁；R01 阶段修复 R1 完成方法预演、R01 阶段修复 R2 补齐推送可行性（分片化）与对象尺寸审计、R01 阶段修复 R3 已根除本机 cli-runtime-closure 环境漂移（同机再生成零漂移，不再需要再生提交环境对齐闭包或换环境方案），剩余条件=正式提交后在真实候选上复验（四文件门禁 74/74、全量 npm test 0 失败、分片重组哈希一致、可达对象 0 个 ≥100MiB、工作树零漂移、远端 SHA 一致），预演 SHA 不作正式坐标",
       "owner": "总控/治理动作（非 R01 实现缺陷）",
       "failure_handling": "不把全量 npm test 标 PASS、不扩白名单、不退役门禁/测试、不改断言、不虚报验证坐标；不得再将本项称为 R00 预存四红——正式 C4 基线为绿，R01 候选六红为新增；封印推进前的红灯如实保留；分片交付不得以牺牲校验语义换取可推送（重组 sha256 必须等于 patchSha256、MISMATCH 不改写既有交付）",
-      "status": "OPEN",
+      "status": "CLOSED",
       "reclassified_by": "R01 阶段修复 R1（2026-09-25）：按 R01 阶段验收 R1 F02 修复要求，以正式 R00 C4 封印基线复证推翻原 CARRIED 承继分类；条目 ID 保留以维持既有引用（HANDOFF/账本 npm_test_note 已同步更正）",
       "r2_update": "R01 阶段修复 R2（2026-09-26）：按 R01 阶段验收 R2 F03 修复要求交付受控分片交付机制并完成 /tmp 隔离全链预演（含推送与对象尺寸审计）；条目保持 OPEN——正式封印推进与全量 npm test 环境漂移治理均属总控授权动作",
-      "r3_update": "R01 阶段修复 R3（2026-09-26）：normalizeNftTraceFiles 类级过滤宿主绝对/越界路径 + census finally 恢复/结构性断言（不改基线、不删测试、不放松守卫）；修复后同机再生成 8949 文件零漂移，/tmp 封印预演坐标推进后四文件门禁 74/74、全量 npm test 14949 passed/0 failed/exit 0——R2 预演的 2 个环境性红已根除。R01 阶段修复 R4（2026-09-26）：按 R01 阶段验收 R4 F02 把本条目 R2 时态（「正式封印前需治理」「正式执行前还需处理环境漂移」）更新为 R3 修复后事实——漂移已修复，剩余条件为正式提交后在真实候选上复验；R2 失败历史保留，正式封印未提前记为完成"
+      "r3_update": "R01 阶段修复 R3（2026-09-26）：normalizeNftTraceFiles 类级过滤宿主绝对/越界路径 + census finally 恢复/结构性断言（不改基线、不删测试、不放松守卫）；修复后同机再生成 8949 文件零漂移，/tmp 封印预演坐标推进后四文件门禁 74/74、全量 npm test 14949 passed/0 failed/exit 0——R2 预演的 2 个环境性红已根除。R01 阶段修复 R4（2026-09-26）：按 R01 阶段验收 R4 F02 把本条目 R2 时态（「正式封印前需治理」「正式执行前还需处理环境漂移」）更新为 R3 修复后事实——漂移已修复，剩余条件为正式提交后在真实候选上复验；R2 失败历史保留，正式封印未提前记为完成",
+      "formal_closeout": {
+        "status": "CLOSED",
+        "actual_source_commit": "fe394bbbef22c7879338b9bee8fc7ee5a80d22b0",
+        "actual_audit_commit": "398fe69765be3f4444e895f286a278cd4c687c4b",
+        "remote_head": "398fe69765be3f4444e895f286a278cd4c687c4b",
+        "results": "artifacts/rust-tauri/R01/FORMAL_SEAL_P1/RESULTS.json",
+        "results_sha256": "9b41c0bf2f0c19d6e05d004ddae6b889d7a0643dc3b54bc0e9cc6d2c335e6171",
+        "note": "真实提交后四文件74/74、全量14949 passed/0 failed/15 skipped、工作区零漂移；两个交付分片逐片/重组与可达对象尺寸校验通过、实际远端一致。原始失败和修复历史保留，不代表其他平台已验证。"
+      }
     },
     {
       "id": "RR-ENV-CLOSURE-DRIFT",
       "source": "R01 阶段修复 R2 全量 npm test 预演复跑（2026-09-26，/tmp 隔离副本 R2a'' 树）；R01 阶段验收 R4 F02 + R01 阶段修复 R4 更新时态（2026-09-26）",
       "severity": "MEDIUM",
       "category": "test-hygiene",
-      "summary": "（R2 发现，历史保留）本机当前环境再生 build/cli-runtime-closure.json 与已提交版漂移：nft 追踪新增一项 /bin/bash（totalFiles 8949→8950，+14/-3）。已提交闭包生成于 2026-09-22 19:58 +0800（8d55046d5），node v24.16.0 与 package-lock 自当时未变。三实验归因：漂移在裸 HEAD 363999378 与闭包出生提交 8d55046d5 的裸树上同样复现——与 R1 候选、R2 修复及 R01 全部内容无关，属本机环境性变化。该漂移激活一处预存测试竞态：tests/cli-closure-census.test.ts『原位再生成』用例重写受跟踪文件，与 round2/round3 交付测试的生成器 tree==HEAD 守卫在全量并行套件中相撞，致 2 个现场重放用例红（firstDiff=build/cli-runtime-closure.json）；四文件门禁单独运行不含 census 测试，不受此影响。（R01 阶段修复 R3 已修复）根因=nft 静态分析解析 lib/sandbox/* 的 /bin/bash 硬编码 spawn 目标并把本机该路径文件计入追踪，宿主绝对路径穿过 normalizeSourceGraphPath 落进闭包；修复=normalizeNftTraceFiles 类级过滤宿主绝对/越界路径（committed 基线 8949 项零绝对/零越界路径即既有语义，不改基线、不提交机器特定数据、跨机器收敛同一基线）+ census 原位重写用例 finally 恢复快照 +「matches committed」用例结构性断言禁止宿主绝对条目。修复后同机再生成 8949 文件零漂移，R3 /tmp 封印预演坐标推进后全量 npm test 14949 passed/0 failed/exit 0（预演 SHA 不作正式坐标）",
+      "summary": "当前已关闭（正式真实提交后复验并推送），证据见 formal_closeout；以下为历史发现与修复时点：（R2 发现，历史保留）本机当前环境再生 build/cli-runtime-closure.json 与已提交版漂移：nft 追踪新增一项 /bin/bash（totalFiles 8949→8950，+14/-3）。已提交闭包生成于 2026-09-22 19:58 +0800（8d55046d5），node v24.16.0 与 package-lock 自当时未变。三实验归因：漂移在裸 HEAD 363999378 与闭包出生提交 8d55046d5 的裸树上同样复现——与 R1 候选、R2 修复及 R01 全部内容无关，属本机环境性变化。该漂移激活一处预存测试竞态：tests/cli-closure-census.test.ts『原位再生成』用例重写受跟踪文件，与 round2/round3 交付测试的生成器 tree==HEAD 守卫在全量并行套件中相撞，致 2 个现场重放用例红（firstDiff=build/cli-runtime-closure.json）；四文件门禁单独运行不含 census 测试，不受此影响。（R01 阶段修复 R3 已修复）根因=nft 静态分析解析 lib/sandbox/* 的 /bin/bash 硬编码 spawn 目标并把本机该路径文件计入追踪，宿主绝对路径穿过 normalizeSourceGraphPath 落进闭包；修复=normalizeNftTraceFiles 类级过滤宿主绝对/越界路径（committed 基线 8949 项零绝对/零越界路径即既有语义，不改基线、不提交机器特定数据、跨机器收敛同一基线）+ census 原位重写用例 finally 恢复快照 +「matches committed」用例结构性断言禁止宿主绝对条目。修复后同机再生成 8949 文件零漂移，R3 /tmp 封印预演坐标推进后全量 npm test 14949 passed/0 failed/exit 0（预演 SHA 不作正式坐标）",
       "evidence": "artifacts/rust-tauri/R01/STAGE_REPAIR_R2/closure-drift-attribution-r2.txt（实验A=R2a'' 树、实验B=裸 HEAD、实验C=8d55046d5 裸树，三树漂移逐字节一致）+ artifacts/rust-tauri/R01/STAGE_REPAIR_R2/npm-test-r2-rerun-failures.txt（2 红现场）+ artifacts/rust-tauri/R01/STAGE_REPAIR_R3/f02-closure-regen-zero-drift-r3.txt（修复后零漂移）+ artifacts/rust-tauri/R01/STAGE_REPAIR_R3/seal-rehearsal-r3-ceremony.txt（预演全量 14949/0）",
-      "resolve_by_stage": "已由 R01 阶段修复 R3 候选修复（同机再生成零漂移），不再需要再生提交环境对齐闭包或换环境裁决；剩余条件=正式提交后在真实候选上复验再生成零漂移与全量 npm test 0 失败；若其他机器出现新的环境性漂移，census 用例将就地报错并恢复工作树，按本条目重新登记治理而非记绿",
+      "resolve_by_stage": "当前已按R01真实正式封印完成，证据见 formal_closeout。历史处理条件：已由 R01 阶段修复 R3 候选修复（同机再生成零漂移），不再需要再生提交环境对齐闭包或换环境裁决；剩余条件=正式提交后在真实候选上复验再生成零漂移与全量 npm test 0 失败；若其他机器出现新的环境性漂移，census 用例将就地报错并恢复工作树，按本条目重新登记治理而非记绿",
       "owner": "总控/治理动作（非 R01/R2 修复缺陷）",
       "failure_handling": "不把环境性红灯标绿或记作通过；不删除 census 原位再生成用例或生成器树净守卫任一侧；不为取绿提交未经治理决策的机器特定闭包；正式封印报告须如实携带本项状态；修复候选未正式提交并复验前本项保持 OPEN",
-      "status": "OPEN",
-      "r3_update": "R01 阶段修复 R3（2026-09-26）：按上述方案修复（normalizeNftTraceFiles 类级过滤 + census finally 恢复/结构性断言，不改基线不删测试不放松守卫），修复后同机再生成零漂移、R3 预演全量 14949/0。R01 阶段修复 R4（2026-09-26）：按 R01 阶段验收 R4 F02 把本条目 R2 现在时（「本机当前环境再生…漂移」「致 2 个现场重放用例红」「正式封印前由总控裁决」）改写为 R2 历史发现 + R3 修复后事实，剩余条件=正式提交后在真实候选上复验；R2 失败历史保留，条目在候选正式提交并复验前保持 OPEN"
+      "status": "CLOSED",
+      "r3_update": "R01 阶段修复 R3（2026-09-26）：按上述方案修复（normalizeNftTraceFiles 类级过滤 + census finally 恢复/结构性断言，不改基线不删测试不放松守卫），修复后同机再生成零漂移、R3 预演全量 14949/0。R01 阶段修复 R4（2026-09-26）：按 R01 阶段验收 R4 F02 把本条目 R2 现在时（「本机当前环境再生…漂移」「致 2 个现场重放用例红」「正式封印前由总控裁决」）改写为 R2 历史发现 + R3 修复后事实，剩余条件=正式提交后在真实候选上复验；R2 失败历史保留，条目在候选正式提交并复验前保持 OPEN",
+      "formal_closeout": {
+        "status": "CLOSED",
+        "actual_source_commit": "fe394bbbef22c7879338b9bee8fc7ee5a80d22b0",
+        "actual_audit_commit": "398fe69765be3f4444e895f286a278cd4c687c4b",
+        "remote_head": "398fe69765be3f4444e895f286a278cd4c687c4b",
+        "results": "artifacts/rust-tauri/R01/FORMAL_SEAL_P1/RESULTS.json",
+        "results_sha256": "9b41c0bf2f0c19d6e05d004ddae6b889d7a0643dc3b54bc0e9cc6d2c335e6171",
+        "note": "真实提交后四文件74/74、全量14949 passed/0 failed/15 skipped、工作区零漂移；两个交付分片逐片/重组与可达对象尺寸校验通过、实际远端一致。原始失败和修复历史保留，不代表其他平台已验证。"
+      }
     },
     {
       "id": "RR-BLK-CREDENTIALS",

@@ -1,0 +1,123 @@
+  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+   106:37  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+   512:44  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+   512:55  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+   671:44  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+   671:55  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+   722:44  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+   722:55  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  2271:29  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  2275:39  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+<WORKTREE>/tests/win32-install-acl-heal.test.ts
+  153:18  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+<WORKTREE>/tests/win32-runtime-cache.test.ts
+  147:77  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  152:77  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  157:77  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  162:70  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  163:70  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  169:70  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+<WORKTREE>/tests/win32-sandbox-helper.test.ts
+  203:32  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+<WORKTREE>/tests/win32-sandbox-index.test.ts
+   5:7   warning  'Type' is assigned a value but never used  @typescript-eslint/no-unused-vars
+  32:33  warning  Unexpected any. Specify a different type   @typescript-eslint/no-explicit-any
+  32:46  warning  Unexpected any. Specify a different type   @typescript-eslint/no-explicit-any
+  44:39  warning  Unexpected any. Specify a different type   @typescript-eslint/no-explicit-any
+  46:43  warning  Unexpected any. Specify a different type   @typescript-eslint/no-explicit-any
+  64:43  warning  Unexpected any. Specify a different type   @typescript-eslint/no-explicit-any
+  76:8   warning  Unexpected any. Specify a different type   @typescript-eslint/no-explicit-any
+  96:10  warning  Unexpected any. Specify a different type   @typescript-eslint/no-explicit-any
+
+<WORKTREE>/tests/win32-sandbox-policy.test.ts
+   68:10  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  142:10  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  211:10  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+<WORKTREE>/tests/workflow-host-api.test.ts
+    8:33  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+   40:18  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+   64:18  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  139:79  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  158:60  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  266:68  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  277:66  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  287:69  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  288:70  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  329:20  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  345:20  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  381:17  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  492:18  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  506:14  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  514:18  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  524:18  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+<WORKTREE>/tests/workflow-integration.test.ts
+  7:42  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+<WORKTREE>/tests/workflow-journal.test.ts
+  12:42  warning  Empty block statement  no-empty
+
+<WORKTREE>/tests/workflow-node-folder-scope.test.ts
+  21:45  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+<WORKTREE>/tests/workflow-tool.test.ts
+   44:10   warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+   75:10   warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+   79:35   warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  104:124  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  134:10   warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  151:35   warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  164:102  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  177:90   warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  194:10   warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  212:117  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  231:10   warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  243:117  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  260:10   warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  274:124  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  287:124  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  309:10   warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  327:124  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  359:10   warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  395:10   warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  481:141  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  506:141  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  533:23   warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  556:124  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  648:35   warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  671:90   warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  691:10   warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+<WORKTREE>/tests/workspace-disposal-route.test.ts
+  41:40  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  42:17  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+<WORKTREE>/tests/workspace-instruction-files-exclude.test.ts
+  84:34  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  84:52  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+<WORKTREE>/tests/workspace-snapshots.test.ts
+  254:53  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+<WORKTREE>/tests/workspace-watch-registry.test.ts
+  6:18  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  7:21  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+<WORKTREE>/tests/ws-session-context.test.ts
+  10:19  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  11:14  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  12:15  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+<WORKTREE>/vite.config.ts
+  23:9  warning  'CSS_PLACEHOLDER_RE' is assigned a value but never used  @typescript-eslint/no-unused-vars
+
+✖ 10896 problems (0 errors, 10896 warnings)
+  0 errors and 34 warnings potentially fixable with the `--fix` option.
+
+
+EVIDENCE r01-formal-p1-lint EXIT 0 MANIFEST 89ffcd0e621712d85197b285213f695480ef60c317dbd95cf43be8c75867a186

@@ -1,0 +1,7 @@
+
+> lingxi@0.1.43 typecheck:core-contracts
+> node scripts/check-core-contracts-strict.mjs
+
+Core contracts strict check passed (28 files).
+
+EVIDENCE r01-formal-p1-contracts EXIT 0 MANIFEST 89ffcd0e621712d85197b285213f695480ef60c317dbd95cf43be8c75867a186

@@ -1,0 +1,156 @@
+{
+  "phase": "p1",
+  "status": "PASS_PUSH_CONFIRMED",
+  "source_commit": "cdc170d7ce8e8742cc269c59347c20d75835d871",
+  "evidence_commit": "fe394bbbef22c7879338b9bee8fc7ee5a80d22b0",
+  "audit_commit": "398fe69765be3f4444e895f286a278cd4c687c4b",
+  "remote_head": "398fe69765be3f4444e895f286a278cd4c687c4b",
+  "formal_checks": {
+    "guard": {
+      "command": [
+        "node",
+        ".sync-audit/verify-post-verification-diff.mjs"
+      ],
+      "exit_code": 0,
+      "commit_sha": "398fe69765be3f4444e895f286a278cd4c687c4b",
+      "seconds": 0.05,
+      "log": "/tmp/r01-formal-seal/p1-formal-guard.log",
+      "log_sha256": "b535152ce44857b9692ad6182388126f176fba9d2f6cb05c71bdf991bc2a1e94",
+      "counts": null
+    },
+    "matrix": {
+      "command": [
+        "node",
+        ".sync-audit/build-sync-matrix.mjs",
+        "--check"
+      ],
+      "exit_code": 0,
+      "commit_sha": "398fe69765be3f4444e895f286a278cd4c687c4b",
+      "seconds": 1.37,
+      "log": "/tmp/r01-formal-seal/p1-formal-matrix.log",
+      "log_sha256": "cec0b2a37adf6bf759c2a56dcca0183786afefd89069532d392456a5de659465",
+      "counts": null
+    },
+    "fourfile": {
+      "command": [
+        "npx",
+        "vitest",
+        "run",
+        "tests/post-verification-audit-seal.test.ts",
+        "tests/upstream-sync-matrix.test.ts",
+        "tests/round2-delivery-evidence.test.ts",
+        "tests/round3-delivery-evidence.test.ts"
+      ],
+      "exit_code": 0,
+      "commit_sha": "398fe69765be3f4444e895f286a278cd4c687c4b",
+      "seconds": 70.28,
+      "log": "/tmp/r01-formal-seal/p1-formal-fourfile.log",
+      "log_sha256": "a5d87720770cf9b0fdb3f00b3bc9dc52a4383b00998460a5ee154ed32253f064",
+      "counts": {
+        "passed": 74,
+        "failed": 0,
+        "skipped": 0
+      }
+    },
+    "npm": {
+      "command": [
+        "npm",
+        "test",
+        "--",
+        "--reporter=verbose"
+      ],
+      "exit_code": 0,
+      "commit_sha": "398fe69765be3f4444e895f286a278cd4c687c4b",
+      "seconds": 110.68,
+      "log": "/tmp/r01-formal-seal/p1-formal-npm-retry1.log",
+      "log_sha256": "345d8a974b9f4bfd19b0333ffea72a44ec4139d4054eb79bc373d307b72c1396",
+      "counts": {
+        "passed": 14949,
+        "failed": 0,
+        "skipped": 15
+      }
+    }
+  },
+  "failed_formal_attempts": [
+    {
+      "command": [
+        "npm",
+        "test"
+      ],
+      "exit_code": 1,
+      "commit_sha": "398fe69765be3f4444e895f286a278cd4c687c4b",
+      "seconds": 108.74,
+      "log": "/tmp/r01-formal-seal/p1-formal-npm.log",
+      "log_sha256": "dce3e5a8f8079696431c4ee02560a494667a4fd2a87aa6a2b80b50d9b8bdcb90",
+      "counts": {
+        "passed": 14948,
+        "failed": 0,
+        "skipped": 15
+      }
+    }
+  ],
+  "diagnosis": "首轮正式全量没有测试断言失败，但usearch.node原生线程初始化抛Napi::Error导致一个worker SIGABRT、1个用例未完成（14948/0/15，exit1）。系统崩溃记录node-2026-09-26-124932.ips，fault thread usearch.node napi_register_module_v1。源码/配置未改，工作树检查中；保留失败，重跑原完整集合带详细日志判定是否瞬态；不能称全量PASS或推进R02。",
+  "retry_result": "同一真实审计SHA、零源码/配置变化，全量完整重跑14949/0/15，exit0；首轮原生worker异常保留为失败记录，不将原失败改绿。",
+  "zero_drift": true,
+  "reachable_max_blob_bytes": 97003232,
+  "oversized_blob_count": 0,
+  "logs": [
+    {
+      "path": "artifacts/rust-tauri/R01/FORMAL_SEAL_P1/p1-boundary.txt",
+      "sha256": "376fb96fcbc7562930dd1627982ef8f059a81925ee6c8fde39f739a9eb7487f5"
+    },
+    {
+      "path": "artifacts/rust-tauri/R01/FORMAL_SEAL_P1/p1-build-renderer.txt",
+      "sha256": "3ee5d93038d982ef3ebe58ae71c0a1582ed23404af8e0d18717d560c09ec4c98"
+    },
+    {
+      "path": "artifacts/rust-tauri/R01/FORMAL_SEAL_P1/p1-contracts.txt",
+      "sha256": "dd47897d4a344bbd126243e6b96a178f09922e0f3f721287d2f295c3a7130632"
+    },
+    {
+      "path": "artifacts/rust-tauri/R01/FORMAL_SEAL_P1/p1-formal-fourfile.txt",
+      "sha256": "a5d87720770cf9b0fdb3f00b3bc9dc52a4383b00998460a5ee154ed32253f064"
+    },
+    {
+      "path": "artifacts/rust-tauri/R01/FORMAL_SEAL_P1/p1-formal-guard.txt",
+      "sha256": "b535152ce44857b9692ad6182388126f176fba9d2f6cb05c71bdf991bc2a1e94"
+    },
+    {
+      "path": "artifacts/rust-tauri/R01/FORMAL_SEAL_P1/p1-formal-matrix.txt",
+      "sha256": "cec0b2a37adf6bf759c2a56dcca0183786afefd89069532d392456a5de659465"
+    },
+    {
+      "path": "artifacts/rust-tauri/R01/FORMAL_SEAL_P1/p1-formal-npm-retry1.txt",
+      "sha256": "345d8a974b9f4bfd19b0333ffea72a44ec4139d4054eb79bc373d307b72c1396"
+    },
+    {
+      "path": "artifacts/rust-tauri/R01/FORMAL_SEAL_P1/p1-formal-npm.txt",
+      "sha256": "dce3e5a8f8079696431c4ee02560a494667a4fd2a87aa6a2b80b50d9b8bdcb90"
+    },
+    {
+      "path": "artifacts/rust-tauri/R01/FORMAL_SEAL_P1/p1-green-r3.txt",
+      "sha256": "737add2f0fb51c3b97fd217d6e7480b414e38c99072e63fc8e5debe70a203553"
+    },
+    {
+      "path": "artifacts/rust-tauri/R01/FORMAL_SEAL_P1/p1-lint.txt",
+      "sha256": "0166756b4de083234395ec20350b5ba0053ba31c57364cf384fa2833db47ed43"
+    },
+    {
+      "path": "artifacts/rust-tauri/R01/FORMAL_SEAL_P1/p1-patch-r2.txt",
+      "sha256": "1cc2022834413f6c5b75db191f7dac5ca1d3ed1908dfea181c6b48fba86a7e56"
+    },
+    {
+      "path": "artifacts/rust-tauri/R01/FORMAL_SEAL_P1/p1-patch-r3.txt",
+      "sha256": "3fb6f96a23af2439a793e730d86cf0c9d296831b930d471ef2bf76c9b018a46d"
+    },
+    {
+      "path": "artifacts/rust-tauri/R01/FORMAL_SEAL_P1/p1-push.txt",
+      "sha256": "f459f38b37f0d96dd39e9ea603ff2816f2601b753631f7438a082c96692c1bb0"
+    },
+    {
+      "path": "artifacts/rust-tauri/R01/FORMAL_SEAL_P1/p1-typecheck.txt",
+      "sha256": "24dbb0c4d360956393b7920142be5e41c435bb1a43730c437e10624538195672"
+    }
+  ],
+  "note": "真实提交后实测与实际远端核对，非预演。第11轮独立PASS后的产品/测试/配置字节未改。最终纯文档收口将再次绑定证据/六坐标复验并推送后才进入R02。"
+}

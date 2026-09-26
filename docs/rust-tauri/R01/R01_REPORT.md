@@ -1,6 +1,21 @@
 # R01 阶段报告｜目标契约与高风险替代验证
 
-## 最新总控状态：独立 PASS，正式封印待完成（2026-09-26）
+## 最新正式状态：ACCEPTED（2026-09-26）
+
+完整 R01 第11轮独立 PASS 后，已在真实源码/证据提交 `fe394bbbef22c7879338b9bee8fc7ee5a80d22b0`、
+真实审计提交 `398fe69765be3f4444e895f286a278cd4c687c4b` 上完成正式矩阵：四文件 **74/74**；
+全量 **14949 passed / 0 failed / 15 skipped**；guard与matrix检查通过；工作区零漂移。
+round2/round3交付 source/seal 两态真实重放 VERIFIED；逐片与重组hash相符，最大分片45,000,000B；
+可达blob最大97,003,232B，0件≥100,000,000B；推送后实际远端为 `398fe69765be3f4444e895f286a278cd4c687c4b`。
+原始日志与哈希见 [正式封印结果](../../../artifacts/rust-tauri/R01/FORMAL_SEAL_P1/RESULTS.json)。
+首轮全量曾因 usearch.node 原生线程初始化崩溃 exit1（14948通过、1用例未完成）；
+失败日志保留。同一SHA、零代码/配置变化完整重跑14949/0/15、exit0，不把原失败算通过。
+本次仅补充纯证据/文档收口，将再次冻结证据、同步六坐标并复验推送后进入R02；未预报第二轮结果。
+RR-AUDIT-SEAL-PREEXISTING与RR-ENV-CLOSURE-DRIFT按实际正式结果关闭；15递延仍按原关卡管控。
+下文历史失败与预演记录保留；本结论仅覆盖本机macOS arm64，不称跨平台或真实用户迁移已完成。
+
+
+## 第11轮独立 PASS 后的封印前记录（历史时点）
 
 全新 Codex `/root/r01_stage_review_r11` 对完整 R01 的126件冻结候选判 PASS，无阻断项。
 报告逐字节归档为 [第11轮阶段独立验收](STAGE_HISTORY/R01_STAGE_REVIEW_R11.md)，
@@ -15,7 +30,7 @@ SHA-256 `ffd77f3addd0ce3a988274984101a20411df0e7a84ecb0ff07b029aeb719b126`。
 
 ## 阶段与结论
 
-**STAGE_PASS_SEAL_PENDING**（执行汇总结论 + R01 阶段修复 R1/R2/R3/R4/R5/R6/R7/R8 更新；阶段放行归总控另派的全新
+**ACCEPTED**（执行汇总结论 + R01 阶段修复 R1/R2/R3/R4/R5/R6/R7/R8 更新；阶段放行归总控另派的全新
 Codex 阶段独立复验，本报告不含执行者或修复者自评阶段 PASS）。
 
 阶段验收进展（2026-09-25）：T01–T08 任务级独立验收全部 PASS 并已提交推送（T08 独立验收 R1 PASS，

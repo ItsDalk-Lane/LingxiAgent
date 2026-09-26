@@ -4,8 +4,8 @@
   "start_branch": "main",
   "implementation_branch": "codex/rust-tauri-migration",
   "start_head": "7d1a0c6bc28062ff455adcf8f68c3a80b117e90d",
-  "current_head": "363999378482dfed42733a3c4e8ad20ac82fd0fc",
-  "current_head_note": "记录时实际本地/远端 HEAD 均为 363999378482dfed42733a3c4e8ad20ac82fd0fc；当前为126件独立 PASS 候选与纯证据索引更新，正式源码/证据和审计提交尚待执行。账本不能自嵌自身提交 SHA。",
+  "current_head": "398fe69765be3f4444e895f286a278cd4c687c4b",
+  "current_head_note": "记录前的真实已验证且已推送R01封印HEAD；本次纯文档收口不能自嵌自身SHA，最终外部checkpoint与PROGRESS正式复验记录共同给出下一坐标。",
   "remote": "origin",
   "remote_default_branch": "main",
   "taskbook_manifest_sha256": "49968287f564a2a470d55fe4295a26ef70a71ccb4b16e38933567e89076a5c3f",
@@ -120,7 +120,7 @@
     },
     "R01": {
       "title": "目标契约与高风险替代验证",
-      "status": "STAGE_PASS_SEAL_PENDING",
+      "status": "ACCEPTED",
       "task_ids": [
         "R01-T01",
         "R01-T02",
@@ -134,7 +134,7 @@
       "stage_base_sha": "328cc8bb5a807bdaad520b459907fb1fa4e10dca",
       "stage_review_round": 11,
       "stage_verdict": "PASS",
-      "stage_acceptance_commit_sha": null,
+      "stage_acceptance_commit_sha": "cdc170d7ce8e8742cc269c59347c20d75835d871",
       "blockers": [],
       "stage_review_agent_id": "Codex:/root/r01_stage_review_r11",
       "stage_review_report": "docs/rust-tauri/R01/STAGE_HISTORY/R01_STAGE_REVIEW_R11.md",
@@ -144,21 +144,24 @@
       "stage_repair_report": "/tmp/r01-stage-repair-r10.md",
       "stage_repair_report_sha256": "eb7278f092c5c1212059ea5a8d442ec7bcc21b8090a3229d3a7967f8784bb5aa",
       "stage_repair_note": "修复候选=HEAD 363999378+未提交改动（R1–R9 候选全部保留+R10 修复；逐文件 SHA-256 与候选指纹见修复报告 /tmp/r01-stage-repair-r10.md）；报告 SHA-256 待总控提交后由后续账本提交补登（同 R00/R1–R9 惯例）。F01（R10：引号豁免跳过整个期限区域+括号内终结符截断完整期限声明——R9 的引号紧包豁免 continue 跳过整个触发词，词名之后的实际赋值/改期『“最迟”字段：原定 R09，现改 R10 完成』（四种支持引号同族）与非唯一期限『“最迟” R09/R10 完成』『「最迟」 Ｒ０９／Ｒ１０ 完成』全部逃逸核验；区域终结符不看括号层次，『最迟（原定 R09；现改 R10）完成』及括号内换行同形截断完整改期声明；评审另独立裁定『最晚于 R10 完成』『R10 前必须完成』等已披露明确截止不得凭文档化边界自动当普通上下文，并查明 R9 修复报告『任务书明确禁止同义词枚举』声称无原文依据——历史报告保留原文，现行文档按查明结果更正）：r01_t08_gate_check.py 契约 1.10-stage-repair-r10 引入 G6f 期限区域完整性与已披露边界期限拒绝——引号紧包收窄为仅豁免该触发词自身解析义务（词名误拒限制修复保持），其「触发词起到括号感知终结符止」的后续区域仍逐引用与结构化 resolve_latest_stage_id 一致；区域边界括号感知（未闭合括号内终结符不终止区域、延伸至末尾为失败关闭方向）；「最晚」并入触发词族（迟/晚对称封闭形态族）逐处核验；阶段锚定『之前/以前/前』边界期限按新类别 risk-stage-boundary-unsupported 失败关闭拒绝；机器书写/交接契约成文（期限表达一律触发词族+完整阶段 ID，四种支持引号仅词名引用）。修复后行为：词名后改期/斜杠/全角斜杠/括号内分号与换行/最晚于 R10/R10 前必须完成→exit 1；词名纯介绍（含直角引号）、最晚于 R09 一致、词名后一致提及→exit 0；R1–R9 全部正负保持（R9 两例文档化边界正向按评审裁定翻转为负向——加强拒绝非放宽）。负向：自测 107/107（N1–N84 全保留+N85–N96+P9/P10/P11）、真实 CLI 电池 11 正+74 负；R10 评审 23 变体+四引号 4 例重放全按预期、R9 评审 25 变体 25/25（仅两例裁定翻转）、R1–R8 留存反例 38/38 逐项不变（合计 91/91），正向真实数据判定不变（exit 0/PASS_WITH_CONDITIONS/15 递延 TRACKED，gate 证据三件按 1.10 契约重生成）。R1–R9 全部修复与负向保持；A15 覆盖自测、A16 隔离检查不变；RISK_REGISTER.json 本轮一字节未动（纯检查器侧修复）；本修复未在主仓运行任何会重写交付 gzip 的脚本。",
-      "r01_stage_controller_note": "T01–T08 已独立验收并提交推送；完整阶段第11轮独立 PASS，正式封印待真实提交后复验，未放行 R02。此前失败及修复原文逐字节归档于 docs/rust-tauri/R01/STAGE_HISTORY。",
+      "r01_stage_controller_note": "八T独立PASS并推送、完整阶段第11轮独立PASS，真实正式矩阵74/74、全量0失败、远端核对完成。纯文档收口第二轮正式证据复验/推送后放行R02。",
       "formal_seal": {
-        "status": "STAGE_PASS_SEAL_PENDING",
+        "status": "ACCEPTED",
         "stage_verdict": "PASS",
         "review_round": 11,
         "reviewer_id": "Codex:/root/r01_stage_review_r11",
         "report": "docs/rust-tauri/R01/STAGE_HISTORY/R01_STAGE_REVIEW_R11.md",
         "report_sha256": "ffd77f3addd0ce3a988274984101a20411df0e7a84ecb0ff07b029aeb719b126",
-        "frozen_fingerprint": "1917800317b41362c2c330b3f5c096c3c2891d2356481bee0b3803bc780f6be7",
-        "frozen_candidate_count": 126,
-        "blocking_findings": [],
-        "formal_seal_status": "PENDING_REAL_COMMIT_VERIFICATION",
+        "formal_seal_status": "PASS_PUSH_CONFIRMED",
+        "formal_source_commit": "fe394bbbef22c7879338b9bee8fc7ee5a80d22b0",
+        "formal_audit_commit": "398fe69765be3f4444e895f286a278cd4c687c4b",
+        "formal_results": "artifacts/rust-tauri/R01/FORMAL_SEAL_P1/RESULTS.json",
+        "formal_results_sha256": "9b41c0bf2f0c19d6e05d004ddae6b889d7a0643dc3b54bc0e9cc6d2c335e6171",
+        "verified_remote_head": "398fe69765be3f4444e895f286a278cd4c687c4b",
         "next_stage_authorized": false,
-        "note": "完整 R01 冻结候选独立 PASS；正式提交后封印与最终 ACCEPTED 尚未完成，六项旧坐标/证据红灯仍为未通过，不进入 R02。"
-      }
+        "next_stage_note": "R01真实正式矩阵与推送已通过；本次纯文档收口仍须第二轮证据/六坐标复验推送，之后进入R02，不在本提交预报第二轮通过。"
+      },
+      "stage_push_result": "CONFIRMED_ORIGIN"
     },
     "R02": {
       "title": "Rust独立服务、存储与事件基础",
