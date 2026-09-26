@@ -32,8 +32,9 @@
       "module": "lingxi-service",
       "kind": "service",
       "crate_path": "rust/crates/lingxi-service",
-      "status": "planned",
+      "status": "exists",
       "establish_stage": "R02",
+      "established_by": "R02-T01（deliberate registry update：crate 落盘并由 D5 双向校验核对；DEP-07 桌面禁令自此对其生效）",
       "responsibility": "HTTP/WS、身份边界、配置、进程组合根"
     },
     {
@@ -220,6 +221,25 @@
       "enforcement": "cargo-metadata-transitive",
       "effective_from_stage": "R01-T01",
       "rationale": "Rust 服务无需 Tauri 也能启动（02 §1）；headless workspace 全程无桌面依赖"
+    },
+    {
+      "id": "DEP-08",
+      "name": "kernel-no-infrastructure",
+      "applies_to_modules": [
+        "lingxi-kernel"
+      ],
+      "forbidden_dep_patterns": [
+        "lingxi-service",
+        "axum",
+        "reqwest",
+        "hyper",
+        "rusqlite"
+      ],
+      "forbidden_source_tokens": [],
+      "enforcement": "cargo-metadata-transitive + manifest-declaration-scan（与 D1 同一执行器）",
+      "effective_from_stage": "R02-T01",
+      "added_by": "R02-T01（任务书步骤 1 契约句「domain 不直接访问 HTTP、UI、环境变量或数据库」的机器执法：组合根倒挂 kernel→service、HTTP 客户端/服务器（axum/reqwest/hyper）与 SQLite（rusqlite）均拒；UI 桌面栈已由 DEP-01/02 覆盖；std::env 的环境变量访问不属依赖边，由 R02-T02 配置解析任务在 service 侧收口）",
+      "rationale": "domain 只经 ports 谈外界（02 §2）；传输/存储实现由 service 注入，kernel 反向依赖基础设施即架构倒挂"
     }
   ],
   "trust_boundaries": [

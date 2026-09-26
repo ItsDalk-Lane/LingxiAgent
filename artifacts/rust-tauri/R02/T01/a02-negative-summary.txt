@@ -1,0 +1,14 @@
+[green-baseline] gate exit code: 0 (expected 0)
+[na-source-token] gate exit code: 1 (expected non-zero)
+[na-source-token] localized: DEP-02
+[na-source-token] localized: lingxi-kernel
+[na-source-token] localized: forbidden token 'AppHandle' in rust/crates/lingxi-kernel/src/lib.rs
+[green-na-restored] gate exit code: 0 (expected 0)
+[nb-dep-edge] gate exit code: 1 (expected non-zero)
+[nb-dep-edge] localized: DEP-02
+[nb-dep-edge] localized: module lingxi-kernel transitively depends on forbidden \['tauri'\]
+[green-nb-restored] gate exit code: 0 (expected 0)
+[nc-service-inversion] gate exit code: 1 (expected non-zero)
+[nc-service-inversion] localized: DEP-08
+[nc-service-inversion] localized: module lingxi-kernel transitively depends on forbidden \['lingxi-service'\]
+[green-nc-restored] gate exit code: 0 (expected 0)

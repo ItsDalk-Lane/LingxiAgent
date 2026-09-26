@@ -1,0 +1,3 @@
+workspace members (5): ['lingxi-browser-spike', 'lingxi-kernel', 'lingxi-protocol', 'lingxi-service', 'lingxi-spike']
+resolve-graph packages: 283
+desktop dependency scan: 0 hits for patterns ['tauri', 'electron', 'tao', 'wry', 'webkit2gtk', 'winit', 'webview']

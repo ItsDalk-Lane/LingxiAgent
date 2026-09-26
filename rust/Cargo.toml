@@ -1,5 +1,5 @@
 # Lingxi Rust workspace (R01-T01 minimal prototype; R01-T03 added lingxi-spike;
-# R01-T04 added lingxi-browser-spike).
+# R01-T04 added lingxi-browser-spike; R02-T01 added lingxi-service).
 #
 # Scope: the two core crates that must exist for R01-A01
 # (lingxi-protocol, lingxi-kernel), plus lingxi-spike — the R01-T03
@@ -9,24 +9,30 @@
 # plus lingxi-browser-spike — the R01-T04 controlled-Chromium browser-host
 # replacement prototype (CDP over --remote-debugging-pipe; base64/libc/serde/
 # serde_json/sha2 only, no new third-party versions; registered as
-# kind=prototype, bound by DEP-07).
+# kind=prototype, bound by DEP-07), plus lingxi-service — the R02-T01
+# independent service / composition root (headless binary: explicit config,
+# health endpoint, graceful shutdown; registered as kind=service, bound by
+# DEP-07; port injections arrive with R02-T03/T04/T05).
 # The remaining responsibility modules
-# (lingxi-adapters / lingxi-service / lingxi-cli / xtask) are declared in
+# (lingxi-adapters / lingxi-cli / xtask) are declared in
 # docs/rust-tauri/R01/ADR-001-ownership.md with their establishment stages
-# and will be added as workspace members by later stages.
+# and will be added as workspace members by later tasks.
 #
 # Hard rules enforced by docs/rust-tauri/R01/r01_t01_check_ownership.py
 # against docs/rust-tauri/R01/DEPENDENCY_RULES.json:
 #   - lingxi-protocol and lingxi-kernel must not depend on tauri/electron
 #     (or any desktop/webview stack).
 #   - lingxi-kernel must not depend on lingxi-adapters (ports live in
-#     kernel; implementations are injected by lingxi-service).
+#     kernel; implementations are injected by lingxi-service), nor on
+#     lingxi-service / HTTP clients / HTTP servers / SQLite (DEP-08:
+#     the domain never reaches transport or storage directly).
 #   - third-party crates enter only through this workspace (introduced by
 #     R01-T02: serde/serde_json/schemars/sha1/sha2/base64; R01-T03 added
 #     tokio/axum/reqwest/rusqlite/tracing/tracing-subscriber/jsonschema/rmcp,
 #     exact versions pinned in Cargo.lock; R01-T04 promoted libc from
 #     transitive to direct dependency of lingxi-browser-spike, same locked
-#     version); the toolchain itself is pinned
+#     version; R02-T01's lingxi-service reuses locked versions only);
+#     the toolchain itself is pinned
 #     by rust-toolchain.toml at the repo root (R01-T03).
 [workspace]
 resolver = "2"
@@ -35,6 +41,7 @@ members = [
     "crates/lingxi-kernel",
     "crates/lingxi-spike",
     "crates/lingxi-browser-spike",
+    "crates/lingxi-service",
 ]
 
 [workspace.package]

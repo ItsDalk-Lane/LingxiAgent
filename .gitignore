@@ -32,6 +32,9 @@ TODO.md
 # ═══════════════════════════════════════════
 # 构建产物
 # ═══════════════════════════════════════════
+# Rust workspace 构建产物（R02-T01 增补：R01-T08 核查发现根 .gitignore 未覆盖；
+# 门禁惯例仍要求 cargo 命令使用仓库外专属 CARGO_TARGET_DIR，见 RR-T08-F1）
+rust/target/
 dist/
 dist-server/
 dist-server-open/

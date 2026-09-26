@@ -1,0 +1,16 @@
+== toolchain: rustup run 1.98.1 (rustc 1.98.1 (48a229cea 2026-09-01))
+== [1/5] build the service binary (locked, offline, isolated target dir)
+    Finished `dev` profile [unoptimized + debuginfo] target(s) in 0.05s
+== [2/5] dependency-tree desktop proof (cargo metadata resolve graph)
+workspace members (5): ['lingxi-browser-spike', 'lingxi-kernel', 'lingxi-protocol', 'lingxi-service', 'lingxi-spike']
+resolve-graph packages: 283
+desktop dependency scan: 0 hits for patterns ['tauri', 'electron', 'tao', 'wry', 'webkit2gtk', 'winit', 'webview']
+== [3/5] start real service process (synthetic /tmp home, loopback, ephemeral port)
+service ready: pid=82955 addr=127.0.0.1:55862 home=/tmp/lingxi-r02-t01-smoke-home.dM8M5w
+== [4/5] health check
+health validation: OK (minimal surface, protocol-sourced versions)
+== [5/5] clean shutdown (SIGTERM, exit 0, port freed, no children)
+service exit code after SIGTERM: 0
+no leftover child processes: OK
+port closed after shutdown: OK
+A01 RESULT: PASS (build, desktop-free dep tree, real-process start, health 200, clean SIGTERM shutdown)

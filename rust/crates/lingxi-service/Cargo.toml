@@ -1,0 +1,29 @@
+[package]
+name = "lingxi-service"
+description = "Rust independent service / composition root (R02-T01): process entrypoint, explicit configuration, transport wiring and port injection. The domain (lingxi-kernel) never reaches HTTP/UI/env/database directly - implementations are injected here as R02 storage/event tasks land them."
+version = "0.0.0"
+edition.workspace = true
+license.workspace = true
+publish.workspace = true
+
+# R02-T01: every third-party crate below is already a locked member of the
+# workspace dependency tree (introduced by R01-T02/T03 for lingxi-protocol /
+# lingxi-spike); no new third-party version enters rust/Cargo.lock with this
+# crate. Exact versions: axum 0.8.9, tokio 1.53.1, serde 1.0.229,
+# serde_json 1.0.151, tracing 0.1.44, tracing-subscriber 0.3.23
+# (docs/rust-tauri/R01/DEPENDENCY_DECISIONS.md total lock table).
+#
+# Deliberately NOT a dependency at R02-T01:
+#   - lingxi-kernel: no port implementation exists yet (storage is R02-T04,
+#     events R02-T05, auth R02-T03). An unused edge would be a fake
+#     "composition" - the edge is added by the first task that actually
+#     injects a port implementation.
+#   - reqwest / rusqlite: no outbound HTTP and no database access at T01.
+[dependencies]
+axum = "0.8.9"
+lingxi-protocol = { path = "../lingxi-protocol" }
+serde = { version = "1.0.229", features = ["derive"] }
+serde_json = "1.0.151"
+tokio = { version = "1.53.1", features = ["macros", "rt-multi-thread", "net", "signal", "io-util", "time"] }
+tracing = "0.1.44"
+tracing-subscriber = { version = "0.3.23", features = ["fmt", "env-filter"] }
