@@ -1923,30 +1923,65 @@
         "R02-A10": "PASS(R2)"
       },
       "task_commit_sha": "01715943dcc0685cd9ccfdc1df06a4524b88cf10",
-      "push_result": null,
+      "push_result": {
+        "status": "CONFIRMED",
+        "remote_branch": "origin/codex/rust-tauri-migration",
+        "remote_head": "2aa80f506464e6cba7ec001b987d649e1164faaf",
+        "note": "task commit 01715943d + ledger commit 2aa80f506 pushed; ls-remote verified"
+      },
       "blockers": [],
       "task_commit_note": "任务提交（本账本提交的直接父提交）；两提交一并推送，push_result 由下一账本提交补登"
     },
     "R02-T06": {
       "name": "备份、关闭与启动恢复",
       "stage_id": "R02",
-      "status": "PENDING",
-      "task_base_sha": null,
-      "executor_id": null,
-      "execution_result": null,
-      "review_round": 0,
-      "reviewer_id": null,
-      "review_verdict": null,
-      "findings": [],
+      "status": "DONE",
+      "task_base_sha": "2aa80f506464e6cba7ec001b987d649e1164faaf",
+      "executor_id": "ZCode:R02-T06-exec-r1 (agent_503ee04a-b4fe-4ea7-b566-14d3bc82f865)",
+      "execution_result": "READY_FOR_REVIEW",
+      "review_round": 2,
+      "reviewer_id": "ZCode:R02-T06-review-r2 (agent_02977db3-bd05-45c1-b6ec-98a020f16c21)；R1=agent_8db628ac-2fea-47b4-9b8e-c959120d6e（更正：agent_8db628ac-2fea-47b4-9bb0-…以验收报告记录为准）",
+      "review_verdict": "PASS(R2)",
+      "findings": [
+        {
+          "id": "R1-F01",
+          "severity": "BLOCKING→CLOSED",
+          "summary": "并发备份测试断言把「无半事务」误写成「无 in-flight run」致 6/10 非确定性失败+报告 229/0 不可复现（产品实现无缺陷）",
+          "review_report": "docs/rust-tauri/R02/R02-T06_REVIEW_R1.md",
+          "resolution": "REPAIR-R1（agent_d4ce1402-36c6-4a18-9ff1-fee2175cf08e）：断言改事务一致性语义（备份=作业前缀完整快照：runs 行⇒start 事件+attempt 同事务、completed⇔done 对拍、event 总数=run+completed、in-flight≤1 且必为前缀末位、seq 连续）+固定交错用例+oneshot 确定性；31 次连续绿；R2 复验关闭（对抗确认非永真）"
+        },
+        {
+          "id": "R1-F02",
+          "severity": "MINOR→CLOSED",
+          "summary": "备份产物 0644/0755 与活库 0600 不一致且未登记",
+          "review_report": "docs/rust-tauri/R02/R02-T06_REVIEW_R1.md",
+          "resolution": "REPAIR-R1 tighten_owner_only 接入备份/恢复 4 处（0700/0600、预建 0777 被收紧、失败响亮）；R2 二进制亲测关闭"
+        },
+        {
+          "id": "R2-F05",
+          "severity": "MINOR",
+          "summary": "repair-r1/f01-test-25x.log 为手写摘要非原始 cargo 输出（独立证据不自足；R2 25 连跑+231/0 独立复现其结论）",
+          "review_report": "docs/rust-tauri/R02/R02-T06_REVIEW_R2.md",
+          "resolution": "不阻塞；T08 交付核查时复核证据原始性惯例"
+        },
+        {
+          "id": "PROD-DEFECT-1",
+          "severity": "REGISTERED→CLOSED(新栈侧)",
+          "summary": "data-epoch-coordinator corrupt-failure fail-open+警告文本失实（R01 立项，归属 R02）",
+          "review_report": "docs/rust-tauri/R02/R02-T06_REVIEW_R2.md",
+          "resolution": "新 Rust epoch 闸 corrupt 类一律拒启 fail-closed、journal_evidence 如实（1→2 明示）、谎报字符串钉住；4 变体演练+验收者 8 个自构对抗变体全部无 fail-open；Node 生产代码零字节改动（红线）；RISK_REGISTER 状态更新在阶段收口写入"
+        }
+      ],
       "repair_agent_id": null,
       "root_cause_agent_id": null,
       "acceptance_results": {
-        "R02-A11": "NOT_STARTED",
-        "R02-A12": "NOT_STARTED"
+        "R02-A11": "PASS(R2)",
+        "R02-A12": "PASS(R2)"
       },
-      "task_commit_sha": null,
+      "task_commit_sha": "0651854f6c830f83dcec8655208284558607c2f4",
       "push_result": null,
-      "blockers": []
+      "blockers": [],
+      "task_commit_note": "任务提交（本账本提交的直接父提交）；两提交一并推送，push_result 由下一账本提交补登"
     },
     "R02-T07": {
       "name": "日志、错误和有界资源",
