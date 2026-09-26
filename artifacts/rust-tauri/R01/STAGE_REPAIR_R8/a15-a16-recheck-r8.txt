@@ -1,0 +1,9 @@
+# R01 阶段修复 R8 — A15 覆盖自测+真实数据 / A16 隔离检查（iso；本文件为 node_modules 修复后重跑记录）
+# 生成时间: 2026-09-26 09:47:44
+
+== A15 coverage --self-test ==
+SELF-TEST OK (6/6)
+== A15 coverage 真实数据 ==
+RESULT: COVERAGE-CLOSED (736 F-ID 双向映射闭合；11 关键事实单负责人；14 Pi 能力无第二 loop 保留项)
+== A16 isolation ==
+RESULT: ISOLATED（生产入口零引用 R01 原型/生成物）

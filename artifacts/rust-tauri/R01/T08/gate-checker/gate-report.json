@@ -9,11 +9,6 @@
      "status": "VERIFIED"
     },
     {
-     "id": "viewport_screenshot",
-     "result": "PASS",
-     "status": "VERIFIED"
-    },
-    {
      "id": "session_isolation",
      "result": "PASS",
      "status": "VERIFIED"
@@ -29,14 +24,19 @@
      "status": "VERIFIED"
     },
     {
+     "id": "viewport_screenshot",
+     "result": "PASS",
+     "status": "VERIFIED"
+    },
+    {
      "id": "fetch_interception_layer",
-     "result": "TRACKED(RR-T05-X1 -> R09（browser worker 边界实现与门禁）)",
+     "result": "TRACKED(RR-T05-X1 -> R09 最迟 R09)",
      "risk_id": "RR-T05-X1",
      "status": "UNVERIFIED"
     },
     {
      "id": "webrtc_exfiltration_boundary",
-     "result": "TRACKED(RR-T05-N2 -> R09（门禁显式决策，如 launcher 层开关/策略禁用）)",
+     "result": "TRACKED(RR-T05-N2 -> R09 最迟 R09)",
      "risk_id": "RR-T05-N2",
      "status": "UNVERIFIED"
     }
@@ -64,12 +64,12 @@
      "status": "VERIFIED"
     },
     {
-     "id": "ws_loopback_boundary",
+     "id": "matrix_28_verified",
      "result": "PASS",
      "status": "VERIFIED"
     },
     {
-     "id": "matrix_28_verified",
+     "id": "ws_loopback_boundary",
      "result": "PASS",
      "status": "VERIFIED"
     }
@@ -87,11 +87,6 @@
      "status": "VERIFIED"
     },
     {
-     "id": "version_incompatibility_diagnosis",
-     "result": "PASS",
-     "status": "VERIFIED"
-    },
-    {
      "id": "generated_drift_free",
      "result": "PASS",
      "status": "VERIFIED"
@@ -102,32 +97,37 @@
      "status": "VERIFIED"
     },
     {
+     "id": "version_incompatibility_diagnosis",
+     "result": "PASS",
+     "status": "VERIFIED"
+    },
+    {
      "id": "canonical_non_bmp_divergence",
-     "result": "TRACKED(RR-T02-F1 -> R04（工具网关消费规范序列化之前）)",
+     "result": "TRACKED(RR-T02-F1 -> R04 最迟 R04)",
      "risk_id": "RR-T02-F1",
      "status": "OPEN_FINDING"
     },
     {
-     "id": "ts_canonical_float_bigint",
-     "result": "TRACKED(RR-T02-F2 -> R04（先于 R04/R08 的协议消费点，验收裁定口径）)",
-     "risk_id": "RR-T02-F2",
-     "status": "OPEN_FINDING"
-    },
-    {
      "id": "eventpayload_fallback_invariants",
-     "result": "TRACKED(RR-T02-F3 -> R04（先于 R04/R08）)",
+     "result": "TRACKED(RR-T02-F3 -> R04 最迟 R04)",
      "risk_id": "RR-T02-F3",
      "status": "OPEN_FINDING"
     },
     {
      "id": "seq_parse_lenient",
-     "result": "TRACKED(RR-T02-F4 -> R04)",
+     "result": "TRACKED(RR-T02-F4 -> R04 最迟 R04)",
      "risk_id": "RR-T02-F4",
      "status": "OPEN_FINDING"
     },
     {
+     "id": "ts_canonical_float_bigint",
+     "result": "TRACKED(RR-T02-F2 -> R04 最迟 R04)",
+     "risk_id": "RR-T02-F2",
+     "status": "OPEN_FINDING"
+    },
+    {
      "id": "ws_close_code_hardcoded",
-     "result": "TRACKED(RR-T02-F5 -> R08（旧 Electron 客户端接入消费 WS 语义之前）)",
+     "result": "TRACKED(RR-T02-F5 -> R08 最迟 R08)",
      "risk_id": "RR-T02-F5",
      "status": "OPEN_FINDING"
     }
@@ -140,7 +140,7 @@
    "adr": "docs/rust-tauri/R01/TAURI_SPIKE_REPORT.md（选型证据）",
    "capabilities": [
     {
-     "id": "window_tray_shortcut_notification_clipboard_dialog_accessibility_updater_loginstartup_restart",
+     "id": "capability_matrix_source",
      "result": "PASS",
      "status": "VERIFIED"
     },
@@ -150,26 +150,14 @@
      "status": "VERIFIED"
     },
     {
-     "id": "capability_matrix_source",
+     "id": "window_tray_shortcut_notification_clipboard_dialog_accessibility_updater_loginstartup_restart",
      "result": "PASS",
      "status": "VERIFIED"
     },
     {
-     "id": "recording_authorized_path",
-     "result": "TRACKED(RR-T06-MIC -> R09)",
-     "risk_id": "RR-T06-MIC",
-     "status": "UNVERIFIED"
-    },
-    {
-     "id": "speech_recognition_authorized_chain",
-     "result": "TRACKED(RR-T06-SPEECH -> R09)",
-     "risk_id": "RR-T06-SPEECH",
-     "status": "UNVERIFIED"
-    },
-    {
-     "id": "screen_real_capture",
-     "result": "TRACKED(RR-T06-SCREEN -> R09)",
-     "risk_id": "RR-T06-SCREEN",
+     "id": "cross_platform_windows_linux_macx64",
+     "result": "TRACKED(RR-T06-PLATFORM -> R09 最迟 R10)",
+     "risk_id": "RR-T06-PLATFORM",
      "status": "UNVERIFIED"
     },
     {
@@ -179,9 +167,21 @@
      "status": "UNVERIFIED"
     },
     {
-     "id": "cross_platform_windows_linux_macx64",
-     "result": "TRACKED(RR-T06-PLATFORM -> R09（宿主集成）最迟 R10（跨平台产物）)",
-     "risk_id": "RR-T06-PLATFORM",
+     "id": "recording_authorized_path",
+     "result": "TRACKED(RR-T06-MIC -> R09 最迟 R09)",
+     "risk_id": "RR-T06-MIC",
+     "status": "UNVERIFIED"
+    },
+    {
+     "id": "screen_real_capture",
+     "result": "TRACKED(RR-T06-SCREEN -> R09 最迟 R09)",
+     "risk_id": "RR-T06-SCREEN",
+     "status": "UNVERIFIED"
+    },
+    {
+     "id": "speech_recognition_authorized_chain",
+     "result": "TRACKED(RR-T06-SPEECH -> R09 最迟 R09)",
+     "risk_id": "RR-T06-SPEECH",
      "status": "UNVERIFIED"
     }
    ],
@@ -193,6 +193,11 @@
    "adr": "docs/rust-tauri/R01/ADR-004-storage-cutover.md",
    "capabilities": [
     {
+     "id": "data_compatibility_matrix",
+     "result": "PASS",
+     "status": "VERIFIED"
+    },
+    {
      "id": "old_binary_write_refusal",
      "result": "PASS",
      "status": "VERIFIED"
@@ -203,27 +208,22 @@
      "status": "VERIFIED"
     },
     {
-     "id": "data_compatibility_matrix",
-     "result": "PASS",
-     "status": "VERIFIED"
+     "id": "cooperative_gate_physical_separation",
+     "result": "TRACKED(RR-T07-F2 -> R08 最迟 R09)",
+     "risk_id": "RR-T07-F2",
+     "status": "DOCUMENTED"
     },
     {
      "id": "corrupt_failure_failopen_fix",
-     "result": "TRACKED(RR-T07-PROD-DEFECT-1 -> R02（新 coordinator 实现时修复并重跑 4 变体演练）)",
+     "result": "TRACKED(RR-T07-PROD-DEFECT-1 -> R02 最迟 R02)",
      "risk_id": "RR-T07-PROD-DEFECT-1",
      "status": "REGISTERED_DEFECT"
     },
     {
      "id": "shell_local_stores_gate",
-     "result": "TRACKED(RR-T07-F3 -> R09（强制项）)",
+     "result": "TRACKED(RR-T07-F3 -> R09 最迟 R09)",
      "risk_id": "RR-T07-F3",
      "status": "UNVERIFIED"
-    },
-    {
-     "id": "cooperative_gate_physical_separation",
-     "result": "TRACKED(RR-T07-F2 -> R08/R09（分离数据根/原子活动目录指针落地时覆盖）)",
-     "risk_id": "RR-T07-F2",
-     "status": "DOCUMENTED"
     }
    ],
    "problems": [],
@@ -232,10 +232,23 @@
   }
  },
  "blocking_reasons": [],
+ "contract": {
+  "authority": "FROZEN_CONTRACT（r01_t08_gate_check.py 内冻结，独立于被验输入）",
+  "domains": [
+   "browser_host",
+   "pdf_renderer",
+   "protocol_chain",
+   "shell_capabilities",
+   "storage_cutover"
+  ],
+  "version": "1.10-stage-repair-r10"
+ },
+ "contract_violations": [],
  "deferred_count": 15,
  "implementation_platform": "macOS 27.0 arm64",
  "inputs_file": "/Users/study_superior/Desktop/Code/LingxiAgent/docs/rust-tauri/R01/r01_t08_gate_inputs.json",
  "register_file": "/Users/study_superior/Desktop/Code/LingxiAgent/docs/rust-tauri/R01/RISK_REGISTER.json",
+ "register_violations": [],
  "shell_replacement_path": "ALLOWED_FOR_NEXT_STAGE_ONLY: 实施平台高风险必需能力均有真实原型证据；15 个递延项已全部挂账（截止阶段+失败处理），跨平台/授权态放行挂 R09/R10 强制关卡",
  "verdict": "PASS_WITH_CONDITIONS"
 }

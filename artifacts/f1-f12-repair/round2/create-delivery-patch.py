@@ -20,6 +20,20 @@ PATCH = OUT / "patches/89bc0b64-to-r01-r10-source.patch.gz"
 VERIFIED_SOURCE_SHA_FILE = ROOT / ".sync-audit/verified-source-sha.txt"
 SEAL_GUARD = ROOT / ".sync-audit/verify-post-verification-diff.mjs"
 
+# 受控分片交付（R01 阶段验收 R2 F03）：R01 证据树进入 BASE→current 全树 diff 后，
+# 重生成的确定性 gzip 达 267MB（round3 577MB），超 GitHub 普通 Git 单文件
+# 100 MiB 推送硬限，单体交付不可推送。超过 SHARD_BYTES 时改为分片交付：
+# 补丁字节本身不变（patchSha256/patchBytes 仍钉住完整 gzip 载荷），仅存储分帧为
+#   <patch>.part-00001 … .part-NNNNN + <patch>.shards.json（格式 patch-gzip-shards/v1，
+#   逐片钉住 path/bytes/sha256，清单自身亦记录载荷总哈希）；消费者按序重组后必须
+#   复算出同一 patchSha256——完整性校验语义不损失。45,000,000 B 同时低于
+#   GitHub 100 MiB 硬限与 50 MB 警告线。LINGXI_PATCH_SHARD_BYTES_OVERRIDE 仅供
+#   /tmp 合成夹具测试分片路径（证据测试断言真实运行时未设置，与 BASE 覆盖同约定）。
+SHARD_BYTES = int(os.environ.get("LINGXI_PATCH_SHARD_BYTES_OVERRIDE") or 45_000_000)
+SHARD_SUFFIX = ".part-"
+SHARDS_MANIFEST_SUFFIX = ".shards.json"
+SHARDS_FORMAT = "patch-gzip-shards/v1"
+
 
 def sha256(data: bytes) -> str:
     return hashlib.sha256(data).hexdigest()
@@ -218,18 +232,90 @@ def build_patch() -> tuple[bytes, bytes]:
     return content, stored
 
 
-def deliver_patch(stored: bytes) -> None:
-    """同目录临时文件 + 原子替换写入交付路径；异常时删除临时文件，
-    交付路径保持原字节（原本不存在则仍不存在）。"""
-    PATCH.parent.mkdir(parents=True, exist_ok=True)
-    fd, tmp_name = tempfile.mkstemp(prefix=f".{PATCH.name}.", suffix=".tmp", dir=PATCH.parent)
+def _atomic_write(path: pathlib.Path, data: bytes) -> None:
+    """同目录临时文件 + 原子替换写入；异常时删除临时文件。"""
+    path.parent.mkdir(parents=True, exist_ok=True)
+    fd, tmp_name = tempfile.mkstemp(prefix=f".{path.name}.", suffix=".tmp", dir=path.parent)
     try:
         with os.fdopen(fd, "wb") as handle:
-            handle.write(stored)
-        os.replace(tmp_name, PATCH)
+            handle.write(data)
+        os.replace(tmp_name, path)
     except BaseException:
         pathlib.Path(tmp_name).unlink(missing_ok=True)
         raise
+
+
+def _stale_shard_paths(keep_rel: set) -> list:
+    """交付族中不在本次目标集内的既有分片文件（按名枚举，不含清单/单体）。"""
+    if not PATCH.parent.is_dir():
+        return []
+    return [p for p in sorted(PATCH.parent.glob(PATCH.name + SHARD_SUFFIX + "*"))
+            if str(p.relative_to(ROOT)) not in keep_rel]
+
+
+def plan_delivery(stored: bytes) -> tuple:
+    """计算交付形态：(result 字段 dict, 分片清单字节或 None)。
+
+    单体（len(stored) <= SHARD_BYTES）：原合同原路径，无清单无分片。
+    分片：逐片 path/bytes/sha256 + 清单（含载荷总哈希），单体路径不落盘。
+    """
+    if len(stored) <= SHARD_BYTES:
+        return ({
+            "patchFormat": "single",
+            "patchShardBytes": SHARD_BYTES,
+            "patchManifest": None,
+            "patchShards": None,
+            "patchMaxDeliveredFileBytes": len(stored),
+        }, None)
+    shards = []
+    count = (len(stored) + SHARD_BYTES - 1) // SHARD_BYTES
+    for i in range(count):
+        chunk = stored[i * SHARD_BYTES:(i + 1) * SHARD_BYTES]
+        shards.append({
+            "path": f"{PATCH.relative_to(ROOT)}{SHARD_SUFFIX}{i + 1:05d}",
+            "bytes": len(chunk),
+            "sha256": sha256(chunk),
+        })
+    manifest = {
+        "format": SHARDS_FORMAT,
+        "patch": str(PATCH.relative_to(ROOT)),
+        "patchBytes": len(stored),
+        "patchSha256": sha256(stored),
+        "shardBytes": SHARD_BYTES,
+        "shards": shards,
+    }
+    manifest_bytes = (json.dumps(manifest, ensure_ascii=False, sort_keys=True, indent=2) + "\n").encode()
+    return ({
+        "patchFormat": "sharded",
+        "patchShardBytes": SHARD_BYTES,
+        "patchManifest": str(PATCH.relative_to(ROOT)) + SHARDS_MANIFEST_SUFFIX,
+        "patchShards": shards,
+        "patchMaxDeliveredFileBytes": max(s["bytes"] for s in shards),
+    }, manifest_bytes)
+
+
+def deliver_patch(stored: bytes, plan: dict, manifest_bytes) -> None:
+    """按 plan 交付；只在全部适用条件 VERIFIED 后被调用（MISMATCH 不改写）。
+
+    分片交付顺序：逐片原子写入 → 清单最后原子就位（清单 = 分片交付的提交点）
+    → 回收单体与陈旧分片。中途 IO 异常留下的半成品会被消费者的逐片/总哈希
+    复算识别，不可能被当成有效交付。单体与分片两种形态不共存（互斥回收）。
+    """
+    if plan["patchFormat"] == "single":
+        _atomic_write(PATCH, stored)
+        pathlib.Path(str(PATCH) + SHARDS_MANIFEST_SUFFIX).unlink(missing_ok=True)
+        for stale in _stale_shard_paths(set()):
+            stale.unlink()
+        return
+    keep_rel = set()
+    for i, shard in enumerate(plan["patchShards"]):
+        chunk = stored[i * SHARD_BYTES:(i + 1) * SHARD_BYTES]
+        _atomic_write(ROOT / shard["path"], chunk)
+        keep_rel.add(shard["path"])
+    _atomic_write(ROOT / plan["patchManifest"], manifest_bytes)
+    PATCH.unlink(missing_ok=True)
+    for stale in _stale_shard_paths(keep_rel):
+        stale.unlink()
 
 
 def replay_and_verify(patch: bytes, stored: bytes) -> dict:
@@ -281,12 +367,14 @@ def replay_and_verify(patch: bytes, stored: bytes) -> dict:
     # 不只比较生成 index 与重放 index（C1 独立审查 F2）。
     frozen_raw = (OUT / "SOURCE_MANIFEST.json").read_bytes()
     frozen = json.loads(frozen_raw.decode())["files"]
+    plan, _manifest_bytes = plan_delivery(stored)
     result = {
         "base": BASE,
         "patch": str(PATCH.relative_to(ROOT)),
         "patchBytes": len(stored),
         "patchSha256": sha256(stored),
         "patchUncompressedBytes": len(patch),
+        **plan,
         "sourceManifestHash": sha256(current),
         "replayedSourceManifestHash": sha256(replayed),
         "frozenSourceManifestHash": sha256(frozen_raw),
@@ -372,5 +460,6 @@ if __name__ == "__main__":
         for failure in outcome["failures"]:
             print(failure, file=sys.stderr)
         sys.exit(1)
-    # 只在全部适用条件 VERIFIED 后原子替换交付补丁；MISMATCH/异常不改写。
-    deliver_patch(stored)
+    # 只在全部适用条件 VERIFIED 后原子交付；MISMATCH/异常不改写。
+    plan, manifest_bytes = plan_delivery(stored)
+    deliver_patch(stored, plan, manifest_bytes)

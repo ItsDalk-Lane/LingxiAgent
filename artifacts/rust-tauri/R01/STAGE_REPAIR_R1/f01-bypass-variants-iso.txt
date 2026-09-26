@@ -1,0 +1,5 @@
+v1-delete-user-takeover: exit=1 VERDICT: NO-GO
+v2-empty-areas: exit=1 VERDICT: NO-GO
+v3-delete-sha256: exit=1 VERDICT: NO-GO
+v4-delete-deferred: exit=1 VERDICT: NO-GO
+v5-delete-domain: exit=1 VERDICT: NO-GO

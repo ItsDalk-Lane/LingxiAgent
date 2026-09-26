@@ -1,0 +1,62 @@
+# R01 阶段修复 R5 — self-test 完整输出（契约 1.5-stage-repair-r5，59 用例）
+PASS positive-control: 真实 R01 数据 verdict=PASS_WITH_CONDITIONS（browser_host=COMPLETE，deferred=15）
+PASS-NEG N1-screenshot-pass-takeover-fail: verdict=NO-GO browser_host=NOT_COMPLETE shell_path=BLOCKED: 存在未真实验证的高风险必需能力/不可信证据/冻结契约闭合违例，替壳路径明确阻塞…
+PASS-NEG N2-evidence-hash-tampered: verdict=NO-GO pdf_renderer=BLOCKED
+PASS-NEG N3-untracked-deferred: verdict=NO-GO browser_host=BLOCKED
+PASS-NEG N4-required-unverified: verdict=NO-GO storage_cutover=NOT_COMPLETE
+PASS-NEG N5-deleted-user-takeover-rejected: verdict=NO-GO browser_host=BLOCKED
+PASS-NEG N6-deleted-domain-rejected: verdict=NO-GO violations=1
+PASS-NEG N7-deleted-sha256-rejected: verdict=NO-GO pdf_renderer=BLOCKED
+PASS-NEG N8-deleted-deferred-rejected: verdict=NO-GO shell_capabilities=BLOCKED
+PASS-NEG N9-extra-domain-rejected: verdict=NO-GO violations=1
+PASS-NEG N10-renamed-capability-rejected: verdict=NO-GO browser_host=BLOCKED
+PASS-NEG N11-duplicate-capability-rejected: verdict=NO-GO browser_host=BLOCKED
+PASS-NEG N12-deferred-invalid-status-rejected: verdict=NO-GO browser_host=BLOCKED
+PASS-NEG N13-deferred-risk-rebound-rejected: verdict=NO-GO browser_host=BLOCKED
+PASS-NEG N14-evidence-rerouted-rejected: verdict=NO-GO browser_host=BLOCKED
+PASS-NEG N15-emptied-areas-rejected: verdict=NO-GO violations=5
+PASS-NEG N16-risk-entry-incomplete-rejected: verdict=NO-GO browser_host=BLOCKED
+PASS-NEG N17-resolve-by-stage-null: verdict=NO-GO want=risk-incomplete JSON null
+PASS-NEG N18-failure-handling-array: verdict=NO-GO want=risk-incomplete JSON []
+PASS-NEG N19-resolve-by-stage-object: verdict=NO-GO want=risk-incomplete JSON {}
+PASS-NEG N20-failure-handling-blank: verdict=NO-GO want=risk-incomplete 空白字符串
+PASS-NEG N21-resolve-by-stage-number: verdict=NO-GO want=risk-incomplete JSON 数字
+PASS-NEG N22-failure-handling-placeholder: verdict=NO-GO want=risk-incomplete 占位值
+PASS-NEG N23-risk-closed-vs-deferred: verdict=NO-GO want=risk-status-contradiction 登记 CLOSED vs 输入 UNVERIFIED
+PASS-NEG N24-risk-closed-in-r01-vs-deferred: verdict=NO-GO want=risk-status-contradiction 登记 CLOSED_IN_R01 vs 输入 UNVERIFIED
+PASS-NEG N25-registered-defect-status-mismatch: verdict=NO-GO want=risk-status-contradiction 登记 OPEN vs 输入 REGISTERED_DEFECT（要求 REGISTERED）
+PASS-NEG N26-duplicate-risk-id-rejected: verdict=NO-GO register_violations=1
+PASS-NEG N27-risk-entry-missing-id-rejected: verdict=NO-GO register_violations=1
+PASS-NEG N28-risks-non-list-rejected: verdict=NO-GO register_violations=1
+PASS-NEG N29-stage-text-nonexistent: verdict=NO-GO want=risk-stage-unknown 正文 R99 不在 R00–R11
+PASS-NEG N30-stage-both-nonexistent: verdict=NO-GO want=risk-stage-unknown 双字段 R99 不在 R00–R11
+PASS-NEG N31-stage-vague-text: verdict=NO-GO want=risk-stage-vague 无阶段坐标
+PASS-NEG N32-stage-deadline-too-late: verdict=NO-GO want=risk-stage-deadline-mismatch 契约 R04，改 R10
+PASS-NEG N33-stage-wrong-attribution: verdict=NO-GO want=risk-stage-deadline-mismatch 契约 R09，改 R02
+PASS-NEG N34-stage-latest-past-gate: verdict=NO-GO want=risk-stage-latest-mismatch 契约最迟 R09
+PASS-NEG N35-stage-latest-beyond-declared: verdict=NO-GO want=risk-stage-latest-mismatch 契约最迟 R10
+PASS-NEG N36-stage-text-field-diverge: verdict=NO-GO want=risk-stage-text-mismatch 正文 R09 vs 字段 R10
+PASS-NEG N37-stage-current-stage: verdict=NO-GO want=risk-stage-current-or-past R01 非后续阶段
+PASS-NEG N38-stage-field-deleted: verdict=NO-GO want=risk-stage-field-missing 缺 resolve_by_stage_id
+PASS-NEG N39-stage-latest-field-deleted: verdict=NO-GO want=risk-stage-field-missing 缺 resolve_latest_stage_id
+PASS-NEG N40-stage-order-inverted: verdict=NO-GO want=risk-stage-order-inverted deadline R08 > latest R07
+PASS-NEG N41-stage-field-null: verdict=NO-GO want=risk-stage-field-missing JSON null
+PASS-NEG N42-stage-latest-marker-diverge: verdict=NO-GO want=risk-stage-text-mismatch 最迟 R11 vs 字段 R10
+PASS-NEG N43-stage-hidden-nonexistent-token: verdict=NO-GO want=risk-stage-unknown 正文内嵌 R99
+PASS-NEG N44-stage-text-r099: verdict=NO-GO want=risk-stage-unknown 正文 R099 完整提取不截断
+PASS-NEG N45-stage-text-mixed-r09-r099: verdict=NO-GO want=risk-stage-unknown 混合 R09/R099
+PASS-NEG N46-stage-text-prefixed-xr09: verdict=NO-GO want=risk-stage-disguised 前缀伪装 XR09
+PASS-NEG N47-stage-text-suffixed-r09x: verdict=NO-GO want=risk-stage-disguised 后缀伪装 R09X
+PASS-NEG N48-stage-latest-marker-r099: verdict=NO-GO want=risk-stage-unknown 最迟标记 R099 完整形态
+PASS-NEG N49-stage-text-r0999: verdict=NO-GO want=risk-stage-unknown R0999 不在 R00–R11
+PASS-NEG N50-stage-text-underscore-suffix: verdict=NO-GO want=risk-stage-disguised 下划线伪装 R09_stage
+PASS-NEG N51-stage-text-dot-substage: verdict=NO-GO want=risk-stage-disguised 点号小阶段 R09.5 完整复合形态
+PASS-NEG N52-stage-text-hyphen-substage: verdict=NO-GO want=risk-stage-disguised 连字符小阶段 R09-5
+PASS-NEG N53-stage-text-fullwidth-dot-substage: verdict=NO-GO want=risk-stage-disguised 全角点小阶段 R09．5
+PASS-NEG N54-stage-text-fullwidth-hyphen-substage: verdict=NO-GO want=risk-stage-disguised 全角连字符小阶段 R09－5
+PASS-NEG N55-stage-text-multi-level-substage: verdict=NO-GO want=risk-stage-disguised 多级小阶段 R09.5.1
+PASS-NEG N56-stage-text-concat-two-stages: verdict=NO-GO want=risk-stage-disguised 点号拼接 R09.R10
+PASS-NEG N57-stage-latest-marker-dot-substage: verdict=NO-GO want=risk-stage-disguised 最迟标记复合 R09.5
+PASS-NEG N58-stage-text-mixed-real-compound: verdict=NO-GO want=risk-stage-disguised 混合 R09/R09.5
+SELF-TEST OK (59/59)
+SELFTEST_EXIT=0

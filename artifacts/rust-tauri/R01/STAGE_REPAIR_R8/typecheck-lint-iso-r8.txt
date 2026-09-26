@@ -1,0 +1,10 @@
+# R01 阶段修复 R8 — typecheck + lint（iso；node_modules 修复后重跑）
+# 生成时间: 2026-09-26 09:48:48
+
+== npm run typecheck（tsc×3）==
+> tsc --noEmit && tsc --noEmit -p tsconfig.node.json && tsc --noEmit -p tsconfig.test.json
+
+exit=0
+== npm run lint ==
+✖ 10896 problems (0 errors, 10896 warnings)
+exit=0

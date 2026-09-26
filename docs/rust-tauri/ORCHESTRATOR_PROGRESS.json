@@ -4,7 +4,8 @@
   "start_branch": "main",
   "implementation_branch": "codex/rust-tauri-migration",
   "start_head": "7d1a0c6bc28062ff455adcf8f68c3a80b117e90d",
-  "current_head": "f783a8e8e263c9565a76b8fad8cabc688c8a2b6d",
+  "current_head": "363999378482dfed42733a3c4e8ad20ac82fd0fc",
+  "current_head_note": "记录时实际本地/远端 HEAD 均为 363999378482dfed42733a3c4e8ad20ac82fd0fc；当前为126件独立 PASS 候选与纯证据索引更新，正式源码/证据和审计提交尚待执行。账本不能自嵌自身提交 SHA。",
   "remote": "origin",
   "remote_default_branch": "main",
   "taskbook_manifest_sha256": "49968287f564a2a470d55fe4295a26ef70a71ccb4b16e38933567e89076a5c3f",
@@ -119,7 +120,7 @@
     },
     "R01": {
       "title": "目标契约与高风险替代验证",
-      "status": "READY_FOR_REVIEW",
+      "status": "STAGE_PASS_SEAL_PENDING",
       "task_ids": [
         "R01-T01",
         "R01-T02",
@@ -131,11 +132,33 @@
         "R01-T08"
       ],
       "stage_base_sha": "328cc8bb5a807bdaad520b459907fb1fa4e10dca",
-      "stage_review_round": 0,
-      "stage_verdict": "PENDING_STAGE_ACCEPTANCE",
+      "stage_review_round": 11,
+      "stage_verdict": "PASS",
       "stage_acceptance_commit_sha": null,
       "blockers": [],
-      "r01_stage_controller_note": "R01-T01..T08 全部经全新独立验收代理 PASS 并已提交推送；R01_REPORT/R01_HANDOFF/RISK_REGISTER/R01_ACCEPTANCE_LEDGER 已由 R01-T08 冻结。本总控不宣告阶段 PASS：阶段级独立验收须由用户另建全新 Codex 子代理执行；阶段验收前不进入 R02。 远端 origin/codex/rust-tauri-migration 已核至 f783a8e8e（ls-remote 验证），包含 T01–T08 全部任务与账本提交。"
+      "stage_review_agent_id": "Codex:/root/r01_stage_review_r11",
+      "stage_review_report": "docs/rust-tauri/R01/STAGE_HISTORY/R01_STAGE_REVIEW_R11.md",
+      "stage_review_report_sha256": "ffd77f3addd0ce3a988274984101a20411df0e7a84ecb0ff07b029aeb719b126",
+      "stage_findings": [],
+      "stage_repair_agent_id": "ZCode:R01 阶段修复 R10（ZCode 一次性任务；非 R1–R9 修复者、非 R1–R10 阶段验收者、非任一 T 代理）",
+      "stage_repair_report": "/tmp/r01-stage-repair-r10.md",
+      "stage_repair_report_sha256": "eb7278f092c5c1212059ea5a8d442ec7bcc21b8090a3229d3a7967f8784bb5aa",
+      "stage_repair_note": "修复候选=HEAD 363999378+未提交改动（R1–R9 候选全部保留+R10 修复；逐文件 SHA-256 与候选指纹见修复报告 /tmp/r01-stage-repair-r10.md）；报告 SHA-256 待总控提交后由后续账本提交补登（同 R00/R1–R9 惯例）。F01（R10：引号豁免跳过整个期限区域+括号内终结符截断完整期限声明——R9 的引号紧包豁免 continue 跳过整个触发词，词名之后的实际赋值/改期『“最迟”字段：原定 R09，现改 R10 完成』（四种支持引号同族）与非唯一期限『“最迟” R09/R10 完成』『「最迟」 Ｒ０９／Ｒ１０ 完成』全部逃逸核验；区域终结符不看括号层次，『最迟（原定 R09；现改 R10）完成』及括号内换行同形截断完整改期声明；评审另独立裁定『最晚于 R10 完成』『R10 前必须完成』等已披露明确截止不得凭文档化边界自动当普通上下文，并查明 R9 修复报告『任务书明确禁止同义词枚举』声称无原文依据——历史报告保留原文，现行文档按查明结果更正）：r01_t08_gate_check.py 契约 1.10-stage-repair-r10 引入 G6f 期限区域完整性与已披露边界期限拒绝——引号紧包收窄为仅豁免该触发词自身解析义务（词名误拒限制修复保持），其「触发词起到括号感知终结符止」的后续区域仍逐引用与结构化 resolve_latest_stage_id 一致；区域边界括号感知（未闭合括号内终结符不终止区域、延伸至末尾为失败关闭方向）；「最晚」并入触发词族（迟/晚对称封闭形态族）逐处核验；阶段锚定『之前/以前/前』边界期限按新类别 risk-stage-boundary-unsupported 失败关闭拒绝；机器书写/交接契约成文（期限表达一律触发词族+完整阶段 ID，四种支持引号仅词名引用）。修复后行为：词名后改期/斜杠/全角斜杠/括号内分号与换行/最晚于 R10/R10 前必须完成→exit 1；词名纯介绍（含直角引号）、最晚于 R09 一致、词名后一致提及→exit 0；R1–R9 全部正负保持（R9 两例文档化边界正向按评审裁定翻转为负向——加强拒绝非放宽）。负向：自测 107/107（N1–N84 全保留+N85–N96+P9/P10/P11）、真实 CLI 电池 11 正+74 负；R10 评审 23 变体+四引号 4 例重放全按预期、R9 评审 25 变体 25/25（仅两例裁定翻转）、R1–R8 留存反例 38/38 逐项不变（合计 91/91），正向真实数据判定不变（exit 0/PASS_WITH_CONDITIONS/15 递延 TRACKED，gate 证据三件按 1.10 契约重生成）。R1–R9 全部修复与负向保持；A15 覆盖自测、A16 隔离检查不变；RISK_REGISTER.json 本轮一字节未动（纯检查器侧修复）；本修复未在主仓运行任何会重写交付 gzip 的脚本。",
+      "r01_stage_controller_note": "T01–T08 已独立验收并提交推送；完整阶段第11轮独立 PASS，正式封印待真实提交后复验，未放行 R02。此前失败及修复原文逐字节归档于 docs/rust-tauri/R01/STAGE_HISTORY。",
+      "formal_seal": {
+        "status": "STAGE_PASS_SEAL_PENDING",
+        "stage_verdict": "PASS",
+        "review_round": 11,
+        "reviewer_id": "Codex:/root/r01_stage_review_r11",
+        "report": "docs/rust-tauri/R01/STAGE_HISTORY/R01_STAGE_REVIEW_R11.md",
+        "report_sha256": "ffd77f3addd0ce3a988274984101a20411df0e7a84ecb0ff07b029aeb719b126",
+        "frozen_fingerprint": "1917800317b41362c2c330b3f5c096c3c2891d2356481bee0b3803bc780f6be7",
+        "frozen_candidate_count": 126,
+        "blocking_findings": [],
+        "formal_seal_status": "PENDING_REAL_COMMIT_VERIFICATION",
+        "next_stage_authorized": false,
+        "note": "完整 R01 冻结候选独立 PASS；正式提交后封印与最终 ACCEPTED 尚未完成，六项旧坐标/证据红灯仍为未通过，不进入 R02。"
+      }
     },
     "R02": {
       "title": "Rust独立服务、存储与事件基础",
@@ -1255,7 +1278,12 @@
         "R01-A08": "PASS"
       },
       "task_commit_sha": "abe4d5452ed6d455bc2c53f8e0c813afd80aa0e8",
-      "push_result": null,
+      "push_result": {
+        "status": "CONFIRMED",
+        "remote_branch": "origin/codex/rust-tauri-migration",
+        "remote_head": "5a8a8e24ab9e8e105da5132d16b175221a91d646",
+        "note": "task commit abe4d5452 + ledger commit 5a8a8e24a（其直接子提交）已推送：remote-tracking reflog 2026-09-25 13:07:28 +0800 update by push 至 5a8a8e24a；R01 阶段修复 R1 按 git 历史/远端祖先证据补登（原 null 为记录缺口，非未推送）"
+      },
       "blockers": [],
       "review_report": "docs/rust-tauri/R01/R01-T04_REVIEW_R1.md",
       "review_report_sha256": "59a5efe438f9e54185baf64d428d40b5302fbd62aec3e34138589e60754d3aa5",
@@ -1348,7 +1376,12 @@
         "R01-A10": "PASS"
       },
       "task_commit_sha": "4fa0b573ce8cb9b574d78e72b72455f98e360273",
-      "push_result": null,
+      "push_result": {
+        "status": "CONFIRMED",
+        "remote_branch": "origin/codex/rust-tauri-migration",
+        "remote_head": "76bd42c439e180163b150a0058bd6c9e4875c940",
+        "note": "task commit 4fa0b573c + ledger commit 76bd42c43（其直接子提交）已推送：remote-tracking reflog 2026-09-25 15:38:05 +0800 update by push 至 76bd42c43；R01 阶段修复 R1 按 git 历史/远端祖先证据补登（原 null 为记录缺口，非未推送）"
+      },
       "blockers": [],
       "review_report": "docs/rust-tauri/R01/R01-T05_REVIEW_R2.md",
       "review_report_sha256": "08423fa7c6d41237975e478e57ceb8e7ac5271ebed8b9476d539d74c367c711f",
@@ -1420,7 +1453,12 @@
         "R01-A12": "PASS"
       },
       "task_commit_sha": "8994c67bc48f607769c50299a6c59e638425a58b",
-      "push_result": null,
+      "push_result": {
+        "status": "CONFIRMED",
+        "remote_branch": "origin/codex/rust-tauri-migration",
+        "remote_head": "82870879d02b23a03c65fcf6cb9fb03b1425012b",
+        "note": "task commit 8994c67bc + ledger commit 82870879d（其直接子提交）已推送：remote-tracking reflog 2026-09-25 18:56:22 +0800 update by push 至 82870879d；R01 阶段修复 R1 按 git 历史/远端祖先证据补登（原 null 为记录缺口，非未推送）"
+      },
       "blockers": [],
       "review_report": "docs/rust-tauri/R01/R01-T06_REVIEW_R2.md",
       "review_report_sha256": "b506be877c51f359988b7dedfd9b6b206d4588025553c9954e4c32059ce5005e",
@@ -1492,7 +1530,12 @@
         "R01-A14": "PASS"
       },
       "task_commit_sha": "73bde3b5a28944ef9f69e228128c9206ad424145",
-      "push_result": null,
+      "push_result": {
+        "status": "CONFIRMED",
+        "remote_branch": "origin/codex/rust-tauri-migration",
+        "remote_head": "2bbec6d072f1a06305392828bfe3a7fd9739e667",
+        "note": "task commit 73bde3b5a + ledger commit 2bbec6d07（其直接子提交）已推送：remote-tracking reflog 2026-09-25 20:56:06 +0800 update by push 至 2bbec6d07；R01 阶段修复 R1 按 git 历史/远端祖先证据补登（原 null 为记录缺口，非未推送）"
+      },
       "blockers": [],
       "review_report": "docs/rust-tauri/R01/R01-T07_REVIEW_R2.md",
       "review_report_sha256": "7a12213446f43e9314999cbdc7105374de4a87c28df903c185259ebd381fbceb",
@@ -1558,8 +1601,8 @@
       "push_result": {
         "status": "CONFIRMED",
         "remote_branch": "origin/codex/rust-tauri-migration",
-        "remote_head": "f783a8e8e263c9565a76b8fad8cabc688c8a2b6d",
-        "note": "task commit 358299c1e + ledger commit f783a8e8e pushed; ls-remote verified"
+        "remote_head": "363999378482dfed42733a3c4e8ad20ac82fd0fc",
+        "note": "task commit 358299c1e + ledger commits f783a8e8e（22:32:23 +0800）/363999378（22:34:54 +0800）pushed；remote-tracking reflog 两次 update by push 实证；ls-remote 复核远端=363999378（R01 阶段修复 R1 补登第二个账本提交并更新 remote_head）"
       },
       "blockers": [],
       "review_report": "docs/rust-tauri/R01/R01-T08_REVIEW_R1.md",
@@ -1578,7 +1621,19 @@
           "sha256": "766ef4260bac2b4dbf36a04a6b78dd3b3d63b6088db8d6b7c7eca86a91be62ce"
         }
       ],
-      "repair_rounds_completed": 0
+      "repair_rounds_completed": 0,
+      "post_pass_repairs": [
+        {
+          "id": "stage-review-r1-F01-F02",
+          "origin": "R01 阶段独立验收 R1（/tmp/r01-stage-review-r1.md）BLOCKING findings F01（A15 关卡可被删项绕过）+ F02（阶段证据停留 T08 执行前、审计失败分类与正式 R00 C4 基线相反）",
+          "repair_agent_id": "ZCode:R01 阶段修复 R1（ZCode 一次性任务）",
+          "verdict": "READY_FOR_INDEPENDENT_STAGE_REREVIEW",
+          "commit": null,
+          "repair_report": "/tmp/r01-stage-repair-r1.md",
+          "summary": "F01：r01_t08_gate_check.py 引入 FROZEN_CONTRACT 冻结契约（必需域/必需能力 ID/证据路径/递延集合与风险绑定独立于被验输入钉住；删域/删 user_takeover/删 sha256/删递延/改名/重复/额外/证据改指/登记簿删条目全拒绝），自测负向 5→17 全绿，正向真实数据 PASS_WITH_CONDITIONS 不变，关卡证据以加固版检查器重生成。F02：R01_REPORT/R01_HANDOFF/R01_ACCEPTANCE_LEDGER/RISK_REGISTER/本账本按真实 T08 提交推送（358299c1e+f783a8e8e/363999378）与正式 R00 C4 基线（68/68 绿、全量 14942/0）更正；审计 6 红定性为 R01 新增（坐标仍指 C3 f2b8c687），封印推进留待总控 seal 工作流授权提交（/tmp 隔离预演方案已备）。",
+          "candidate": "HEAD 363999378 + 未提交修复改动（逐文件 SHA-256 见修复报告候选指纹）；阶段复验 PASS 后由总控提交并补登 commit/SHA"
+        }
+      ]
     },
     "R02-T01": {
       "name": "实现 workspace 与组合根",

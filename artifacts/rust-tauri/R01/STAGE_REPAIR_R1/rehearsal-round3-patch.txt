@@ -1,0 +1,21 @@
+{
+  "base": "67dee5d2de9d3b9fc75ec5ef5c555e93c65b3ccd",
+  "patch": "artifacts/f1-f12-repair/round3-c01-c03/patches/67dee5d2-to-round3-c01-c03.patch.gz",
+  "patchBytes": 577324221,
+  "patchSha256": "d7ab3fed0f5e3633707a19ebbea8b6f92bf7a009fec0c037f21fb71f53c59d76",
+  "patchUncompressedBytes": 967668154,
+  "sourceManifestHash": "2528b2e680a3808569e7bacfb0bd944bca192802a306701b836bb71352f4565a",
+  "replayedSourceManifestHash": "2528b2e680a3808569e7bacfb0bd944bca192802a306701b836bb71352f4565a",
+  "frozenSourceManifestHash": "2528b2e680a3808569e7bacfb0bd944bca192802a306701b836bb71352f4565a",
+  "frozenManifestEntries": 8174,
+  "replayedMatchesCurrent": true,
+  "replayedMatchesFrozenManifest": true,
+  "state": "source",
+  "verifiedSourceSha": "f2b8c687ae7bb5511edbaf5f6e0945affb0c80b8",
+  "verifiedSourceObjectType": "commit",
+  "frozenMatchesVerifiedCommit": null,
+  "currentMatchesHead": null,
+  "sealGuardPassed": null,
+  "failures": [],
+  "result": "VERIFIED"
+}

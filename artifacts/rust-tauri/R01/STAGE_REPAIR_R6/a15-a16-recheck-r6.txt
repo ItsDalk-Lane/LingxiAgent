@@ -1,0 +1,26 @@
+# A15 覆盖自测 6/6 + 真实数据 COVERAGE-CLOSED；A16 隔离检查 ISOLATED（iso）
+# 归档时间 2026-09-26；原始日志 /tmp/r01-repair-r6/logs/a15-a16-iso-r6.txt
+
+== A15 覆盖自测（coverage_check --self-test）==
+PASS positive-control: 未变异输入必须 COVERAGE-CLOSED
+PASS-NEG N1-dropped-mapping: 删除 F-D01-DESKTOP_BEHAVIOR-DESKTOP-BEHAVIOR-QUICK-CHAT-WINDOW-A2C385 后检出: ['C1-ownership-count', 'C2-unmapped-feature']
+PASS-NEG N2-worker-owner: 检出: ['C3-no-worker-owner']
+PASS-NEG N3-unregistered-owner: 检出: ['C3-owner-registered']
+PASS-NEG N4-second-loop-retained: 检出: ['C8-pi-no-second-loop']
+PASS-NEG N5-worker-critical-fact: 检出: ['C5-critical-fact-owners']
+SELF-TEST OK (6/6)
+coverage-selftest exit=0
+
+== A15 覆盖检查真实数据 ==
+PASS C9-pi-coverage-diff: unmapped_index_symbols/vendor_files/adapter_submodules/hooks 全空
+PASS C9-worker-counterexamples: 19 条 worker 反例全部闭合
+RESULT: COVERAGE-CLOSED (736 F-ID 双向映射闭合；11 关键事实单负责人；14 Pi 能力无第二 loop 保留项)
+coverage exit=0
+
+== A16 隔离检查 ==
+prototype tracked files (rust/+spike/+contracts/+tests/migration/r01-*+scripts/rust-tauri/r01-*): 209
+prototype files under production dirs: 0
+gitignore spike build outputs: {'spike/tauri-shell/app/src-tauri/target/': True, 'spike/tauri-shell/app/node_modules/': True}
+gitignore rust/target ignored: False（如实报告；不判负，目录约定建议 R02 增补）
+RESULT: ISOLATED（生产入口零引用 R01 原型/生成物）
+isolation exit=0

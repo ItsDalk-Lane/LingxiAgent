@@ -1,0 +1,93 @@
+OK   r10-adv-original: want=0 got=0 first=None text='R09（browser worker 边界实现与门禁）'
+OK   r10-adv-correction: want=1 got=1 first=risk-stage-text-mismatch text='R09（宿主集成）最迟（原定 R09，现改 R10）完成'
+OK   r10-adv-postpone: want=1 got=1 first=risk-stage-text-mismatch text='R09（宿主集成）最迟由原定的 R09 顺延至 R10 完成'
+OK   r10-adv-or: want=1 got=1 first=risk-stage-text-mismatch text='R09（宿主集成）最迟在 R09 或 R10 完成'
+OK   r10-adv-slash: want=1 got=1 first=risk-stage-text-mismatch text='R09（宿主集成）最迟 R09/R10 完成'
+OK   r10-adv-fw-correction: want=1 got=1 first=risk-stage-text-mismatch text='R09（宿主集成）最迟（原定 Ｒ０９，现改 Ｒ１０）完成'
+OK   r10-adv-fw-slash: want=1 got=1 first=risk-stage-text-mismatch text='R09（宿主集成）最迟 Ｒ０９／Ｒ１０ 完成'
+OK   r10-adv-fw-or: want=1 got=1 first=risk-stage-text-mismatch text='R09（宿主集成）最迟在 Ｒ０９ 或 Ｒ１０ 完成'
+OK   r10-adv-latin-or: want=1 got=1 first=risk-stage-text-mismatch text='R09（宿主集成）最迟在 R09 or R10 完成'
+OK   r10-adv-consistent: want=0 got=0 first=None text='R09 最迟 R09；最迟 R09'
+OK   r10-adv-same-clause: want=0 got=0 first=None text='R09 最迟 R09 完成（R09 复核）'
+OK   r10-adv-context: want=0 got=0 first=None text='R09（宿主集成）；R10（后续平台事项）最迟 R09'
+OK   r10-adv-quote-context: want=0 got=0 first=None text='R09 最迟 R09 完成；R10 文档介绍“最迟”字段'
+OK   r10-adv-quote-full: want=1 got=1 first=risk-stage-text-mismatch text='R09（宿主集成）“最迟 R10”完成'
+OK   r10-adv-quote-correction: want=1 got=1 first=risk-stage-text-mismatch text='R09（宿主集成）“最迟”原定 R09，现改 R10 完成'
+OK   r10-adv-quote-field: want=1 got=1 first=risk-stage-text-mismatch text='R09（宿主集成）“最迟”字段：原定 R09，现改 R10 完成'
+OK   r10-adv-quote-slash: want=1 got=1 first=risk-stage-text-mismatch text='R09（宿主集成）“最迟” R09/R10 完成'
+OK   r10-adv-quote-fw-slash: want=1 got=1 first=risk-stage-text-mismatch text='R09（宿主集成）「最迟」 Ｒ０９／Ｒ１０ 完成'
+OK   r10-adv-period-correction: want=1 got=1 first=risk-stage-text-mismatch text='R09（宿主集成）最迟（原定 R09；现改 R10）完成'
+OK   r10-adv-newline-correction: want=1 got=1 first=risk-stage-text-mismatch text='R09（宿主集成）最迟（原定 R09\n现改 R10）完成'
+OK   r10-adv-colon-correction: want=1 got=1 first=risk-stage-text-mismatch text='R09（宿主集成）最迟原定 R09，现改 R10 完成'
+OK   r10-adv-latest-synonym: want=1 got=1 first=risk-stage-text-mismatch text='R09（宿主集成）；最晚于 R10 完成'
+OK   r10-adv-before-suffix: want=1 got=1 first=risk-stage-boundary-unsupported text='R09（宿主集成）；R10 前必须完成'
+OK   r10-adv-double: want=1 got=1 first=risk-stage-text-mismatch text='R09 最迟 R09；最迟：R10'
+OK   r10-quote-pair-1: want=1 got=1 first=risk-stage-text-mismatch text='R09（宿主集成）“最迟”字段：原定 R09，现改 R10 完成'
+OK   r10-quote-pair-2: want=1 got=1 first=risk-stage-text-mismatch text='R09（宿主集成）「最迟」字段：原定 R09，现改 R10 完成'
+OK   r10-quote-pair-3: want=1 got=1 first=risk-stage-text-mismatch text='R09（宿主集成）『最迟』字段：原定 R09，现改 R10 完成'
+OK   r10-quote-pair-4: want=1 got=1 first=risk-stage-text-mismatch text='R09（宿主集成）"最迟"字段：原定 R09，现改 R10 完成'
+OK   r9-original: want=0 got=0 first=None text='R09（browser worker 边界实现与门禁）'
+OK   r9-r7-double: want=1 got=1 first=risk-stage-text-mismatch text='R09（宿主集成）最迟 R09；最迟 R10（虚构放宽关卡）'
+OK   r9-r7-reversed: want=1 got=1 first=risk-stage-text-mismatch text='R09（宿主集成）最迟 R10；最迟 R09'
+OK   r9-r7-fw: want=1 got=1 first=risk-stage-text-mismatch text='R09（宿主集成）最迟 Ｒ０９；最迟 Ｒ１０'
+OK   r9-r8-colon: want=1 got=1 first=risk-stage-text-mismatch text='R09（宿主集成）最迟 R09；最迟：R10（虚构放宽关卡）'
+OK   r9-r8-colon-fw: want=1 got=1 first=risk-stage-text-mismatch text='R09（宿主集成）最迟 R09；最迟：Ｒ１０（虚构放宽关卡）'
+OK   r9-r8-yu: want=1 got=1 first=risk-stage-text-mismatch text='R09（宿主集成）最迟 R09；最迟于 R10（虚构放宽关卡）'
+OK   r9-r8-single-colon: want=1 got=1 first=risk-stage-text-mismatch text='R09（宿主集成）最迟：R10（虚构放宽关卡）'
+OK   r9-r8-unresolved: want=1 got=1 first=risk-stage-latest-unresolved text='R09（宿主集成）最迟于第三阶段完成'
+OK   r9-consistent: want=0 got=0 first=None text='R09（宿主集成）最迟 R09；最迟 R09（重复但一致）'
+OK   r9-consistent-connectors: want=0 got=0 first=None text='R09（宿主集成）最迟：R09；最迟于 R09'
+OK   r9-context: want=0 got=0 first=None text='R09（宿主集成）；R10（后续平台事项）最迟 R09'
+OK   r9-not-later-consistent: want=0 got=0 first=None text='R09（宿主集成）不晚于 R09 完成'
+OK   r9-connector-16: want=1 got=1 first=risk-stage-text-mismatch text='R09 最迟甲甲甲甲甲甲甲甲甲甲甲甲甲甲甲甲R10'
+OK   r9-connector-17: want=1 got=1 first=risk-stage-latest-unresolved text='R09 最迟甲甲甲甲甲甲甲甲甲甲甲甲甲甲甲甲甲R10'
+OK   r9-connector-r: want=1 got=1 first=risk-stage-latest-unresolved text='R09 最迟由 risk owner 于 R10 完成'
+OK   r9-newline: want=1 got=1 first=risk-stage-latest-unresolved text='R09 最迟\nR10'
+OK   r9-one-trigger-slash: want=1 got=1 first=risk-stage-text-mismatch text='R09（宿主集成）最迟 R09/R10 完成'
+OK   r9-one-trigger-or: want=1 got=1 first=risk-stage-text-mismatch text='R09（宿主集成）最迟在 R09 或 R10 完成'
+OK   r9-one-trigger-correction: want=1 got=1 first=risk-stage-text-mismatch text='R09（宿主集成）最迟（原定 R09，现改 R10）完成'
+OK   r9-one-trigger-old-new: want=1 got=1 first=risk-stage-text-mismatch text='R09（宿主集成）最迟由原定的 R09 顺延至 R10 完成'
+OK   r9-bare-deadline: want=1 got=1 first=risk-stage-boundary-unsupported text='R09（宿主集成）；R10 前必须完成'
+OK   r9-synonym: want=1 got=1 first=risk-stage-text-mismatch text='R09（宿主集成）；最晚于 R10 完成'
+OK   r9-quoted-context: want=0 got=0 first=None text='R09 最迟 R09 完成；R10 文档介绍“最迟”字段'
+OK   r9-plain-context: want=0 got=0 first=None text='R09 最迟 R09 完成；R10（后续平台事项）'
+OK   r1r8-repro-1: want=1/['risk-stage-unknown'] got=1/risk-stage-unknown src=/tmp/r01-repair-r5/repro/r099.json
+OK   r1r8-repro-2: want=1/['risk-stage-disguised'] got=1/risk-stage-disguised src=/tmp/r01-repair-r5/repro/r09-slash-dot5.json
+OK   r1r8-repro-3: want=1/['risk-stage-unknown'] got=1/risk-stage-unknown src=/tmp/r01-repair-r5/repro/r99.json
+OK   r1r8-repro-4: want=0/[] got=0/None src=/tmp/r01-repair-r5/repro/control-original.json
+OK   r1r8-repro-5: want=1/['risk-stage-disguised'] got=1/risk-stage-disguised src=/tmp/r01-repair-r5/repro/r09-dot-r10.json
+OK   r1r8-repro-6: want=1/['risk-stage-disguised'] got=1/risk-stage-disguised src=/tmp/r01-repair-r5/repro/latest-r09-dot-5.json
+OK   r1r8-repro-7: want=1/['risk-stage-unknown'] got=1/risk-stage-unknown src=/tmp/r01-repair-r5/repro/r0999.json
+OK   r1r8-repro-8: want=1/['risk-stage-disguised'] got=1/risk-stage-disguised src=/tmp/r01-repair-r5/repro/r09-stage.json
+OK   r1r8-repro-9: want=1/['risk-stage-disguised'] got=1/risk-stage-disguised src=/tmp/r01-repair-r5/repro/r09-multi-dot.json
+OK   r1r8-repro-10: want=1/['risk-stage-disguised'] got=1/risk-stage-disguised src=/tmp/r01-repair-r5/repro/xr09.json
+OK   r1r8-repro-11: want=1/['risk-stage-disguised'] got=1/risk-stage-disguised src=/tmp/r01-repair-r5/repro/r09-dot-5.json
+OK   r1r8-repro-12: want=1/['risk-stage-disguised'] got=1/risk-stage-disguised src=/tmp/r01-repair-r5/repro/r09-hyphen-5.json
+OK   r1r8-repro-13: want=1/['risk-stage-unknown'] got=1/risk-stage-unknown src=/tmp/r01-repair-r5/repro/latest-r099.json
+OK   r1r8-repro-14: want=1/['risk-stage-disguised'] got=1/risk-stage-disguised src=/tmp/r01-repair-r5/repro/r09-fullwidthhyphen-5.json
+OK   r1r8-repro-15: want=1/['risk-stage-unknown'] got=1/risk-stage-unknown src=/tmp/r01-repair-r5/repro/r09-r099.json
+OK   r1r8-repro-16: want=1/['risk-stage-disguised'] got=1/risk-stage-disguised src=/tmp/r01-repair-r5/repro/latest-r09-hyphen-5.json
+OK   r1r8-repro-17: want=1/['risk-stage-disguised'] got=1/risk-stage-disguised src=/tmp/r01-repair-r5/repro/r09x.json
+OK   r1r8-repro-18: want=1/['risk-stage-disguised'] got=1/risk-stage-disguised src=/tmp/r01-repair-r5/repro/r09-fullwidthdot-5.json
+OK   r1r8-repro-19: want=1/['risk-stage-unknown'] got=1/risk-stage-unknown src=/tmp/r01-repair-r6/repro/fw-r99-first.json
+OK   r1r8-repro-20: want=0/[] got=0/None src=/tmp/r01-repair-r6/repro/fw-r09-first.json
+OK   r1r8-repro-21: want=1/['risk-stage-text-mismatch'] got=1/risk-stage-text-mismatch src=/tmp/r01-repair-r6/repro/fw-latest-r10.json
+OK   r1r8-repro-22: want=1/['risk-stage-unknown'] got=1/risk-stage-unknown src=/tmp/r01-repair-r6/repro/probe-fwR-ascii-digit-99.json
+OK   r1r8-repro-23: want=0/[] got=0/None src=/tmp/r01-repair-r6/repro/probe-asciiR-fwdigit-ok.json
+OK   r1r8-repro-24: want=1/['risk-stage-disguised'] got=1/risk-stage-disguised src=/tmp/r01-repair-r6/repro/probe-fw-xr09.json
+OK   r1r8-repro-25: want=1/['risk-stage-disguised'] got=1/risk-stage-disguised src=/tmp/r01-repair-r6/repro/probe-lowercase-r99.json
+OK   r1r8-repro-26: want=1/['risk-stage-text-mismatch'] got=1/risk-stage-text-mismatch src=/tmp/r01-r7-double-latest.json
+OK   r1r8-repro-27: want=0/[] got=0/None src=/tmp/r01-r7-R7-double-latest-same.json
+OK   r1r8-repro-28: want=1/['risk-stage-text-mismatch'] got=1/risk-stage-text-mismatch src=/tmp/r01-r7-double-latest-variant.json
+OK   r1r8-repro-29: want=0/[] got=0/None src=/tmp/r01-r7-original-control.json
+OK   r1r8-repro-30: want=1/['risk-stage-unknown'] got=1/risk-stage-unknown src=/tmp/r01-r7-R6-fullwidth-first.json
+OK   r1r8-repro-31: want=1/['risk-stage-text-mismatch'] got=1/risk-stage-text-mismatch src=/tmp/r01-r7-R7-double-latest-conflict.json
+OK   r1r8-repro-32: want=1/['risk-stage-text-mismatch'] got=1/risk-stage-text-mismatch src=/tmp/r01-r7-single-latest-r10.json
+OK   r1r8-repro-33: want=0/[] got=0/None src=/tmp/r01-r7-R6-fullwidth-valid.json
+OK   r1r8-repro-34: want=1/['risk-stage-unknown'] got=1/risk-stage-unknown src=/tmp/r01-r7-R4-unknown-full.json
+OK   r1r8-repro-35: want=1/['risk-stage-disguised'] got=1/risk-stage-disguised src=/tmp/r01-r7-R5-dot-substage.json
+OK   r1r8-repro-36: want=0/[] got=0/None src=/tmp/r01-r7-R7-contextual-R10-control.json
+OK   r1r8-repro-37: want=1/['risk-stage-text-mismatch'] got=1/risk-stage-text-mismatch src=/tmp/r01-r7-double-latest-reversed.json
+OK   r1r8-repro-38: want=1/['risk-stage-text-mismatch'] got=1/risk-stage-text-mismatch src=/tmp/r01-r7-R6-fullwidth-latest.json
+
+R10 REPLAY: 91/91 OK（fails=0）

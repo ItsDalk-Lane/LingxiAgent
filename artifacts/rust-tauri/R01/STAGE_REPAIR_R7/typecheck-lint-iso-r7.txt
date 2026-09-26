@@ -1,0 +1,11 @@
+# R01 阶段修复 R7 — typecheck / lint（仅 /tmp 隔离副本运行）
+# 生成时间: 2026-09-26；iso=/tmp/r01-repair-r7/iso
+
+## typecheck（tsc ×3：root + tsconfig.node + tsconfig.test）
+$ npm run typecheck
+exit=0
+
+## lint
+$ npm run lint
+exit=0 — 0 errors / 10896 warnings（与 R4/R5/R6 持平；全文 1MB+ 未归档，可在 iso 复跑，约 2 分钟）
+原始全文：/tmp/r01-repair-r7/logs/{typecheck,lint}.txt

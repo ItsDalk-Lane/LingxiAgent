@@ -1,0 +1,19 @@
+# R01 阶段修复 R7 — 闭包再生成零漂移 + census（仅 /tmp 隔离副本运行；主仓未运行）
+# 生成时间: 2026-09-26；iso=/tmp/r01-repair-r7/iso
+# 本会话全程未在主仓运行 compute-cli-closure.mjs 或任何会重写交付 gzip 的脚本/测试。
+
+## 闭包再生成
+$ node scripts/compute-cli-closure.mjs
+exit=0
+build/cli-runtime-closure.json
+open-boundary baseline: 1 coupling edge(s) (evidence-needed=1), 1 evidence-needed, 0 provisional
+build/open-boundary-baseline.json
+$ git status --porcelain -- build/
+（零输出 = 再生成零漂移）
+
+## census 单文件
+$ npx vitest run tests/cli-closure-census.test.ts
+exit=0
+ Test Files  1 passed (1)
+      Tests  23 passed (23)
+（含原位重写用例；跑后 build/ 零漂移）

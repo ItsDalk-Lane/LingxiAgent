@@ -92,7 +92,11 @@
   // main 兜底收尾：runner 正常路径用 WebDriver 驱动 finish_e2e；超时自动收尾防挂死。
   if (label === 'main') {
     setTimeout(() => {
-      try { invoke && invoke('finish_e2e'); } catch (_) {}
+      try {
+        if (invoke) invoke('finish_e2e');
+      } catch {
+        // 兜底语义即"尽力而为"：宿主可能已退出，失败不补记（runner 以 WebDriver 结果为准）
+      }
     }, 45000);
   }
 })();

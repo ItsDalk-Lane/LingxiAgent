@@ -1,0 +1,5 @@
+# R01 阶段修复 R3 — 真实 CLI 负向电池（1 正向 + 22 负向）
+# $ bash docs/rust-tauri/R01/r01_t08_gate_cli_regression.sh
+# 基础 15 变体（R2 保留）+ R3 截止阶段绑定 7 变体；在主仓与 /tmp 隔离副本各跑一遍均 23/23。
+# 隔离副本运行段：
+（完整主仓运行输出见 f01-cli-regression-main.txt；下为主要段尾）

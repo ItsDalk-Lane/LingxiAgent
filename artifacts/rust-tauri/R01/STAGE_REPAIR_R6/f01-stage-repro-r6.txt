@@ -1,0 +1,14 @@
+# R6 评审原样反例 2 条（fw-r99-first / fw-latest-r10）+ 相近形态变体 5 条 + 对照；iso 真实 CLI（契约 1.6-stage-repair-r6）
+# 归档时间 2026-09-26；原始日志 /tmp/r01-repair-r6/logs/f01-repro-iso-r6.txt
+
+== R6 原样反例 + 相近形态（iso 真实 CLI）==
+fw-r99-first: exit=1 verdict=NO-GO cat=BLOCKED(risk-stage-unknown)
+fw-latest-r10: exit=1 verdict=NO-GO cat=BLOCKED(risk-stage-text-mismatch)
+fw-r09-first: exit=0 verdict=PASS_WITH_CONDITIONS cat=none
+probe-asciiR-fwdigit-ok: exit=0 verdict=PASS_WITH_CONDITIONS cat=none
+probe-lowercase-r99: exit=1 verdict=NO-GO cat=BLOCKED(risk-stage-disguised)
+probe-fw-xr09: exit=1 verdict=NO-GO cat=BLOCKED(risk-stage-disguised)
+probe-fwR-ascii-digit-99: exit=1 verdict=NO-GO cat=BLOCKED(risk-stage-unknown)
+
+== control-original（真实登记未改）==
+control exit=0（期望 0）

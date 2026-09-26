@@ -5,8 +5,10 @@ import { execFileSync, spawnSync } from "node:child_process";
 import { describe, expect, it } from "vitest";
 import {
   createPatchFixture,
+  deliveryFamilyPaths,
   disposeFixture,
   expectCorruptPatchRejected,
+  expectDeliveryConsistent,
   expectFailurePreservesDeliveredPatch,
   expectMismatch,
   expectNonCommitCoordinateRejected,
@@ -15,6 +17,10 @@ import {
   expectSourceCoordinateRejected,
   expectSourceStateVerified,
   fixtureGit,
+  restoreDeliveryFamily,
+  runPatchScript,
+  snapshotDeliveryFamily,
+  snapshotDigest,
   tamperFrozenManifest,
 } from "./helpers/patch-seal-fixture";
 
@@ -195,19 +201,21 @@ describe("round3 C01-C03 候选交付证据契约", () => {
     const summary = JSON.parse(log.slice(log.indexOf("{"), log.lastIndexOf("}") + 1));
     expect(summary.base).toBe(BASE);
     expect(summary.sourceManifestHash).toBe(summary.replayedSourceManifestHash);
-    expect(fs.existsSync(path.join(ROOT, summary.patch))).toBe(true);
-    expect(sha256(fs.readFileSync(path.join(ROOT, summary.patch)))).toBe(summary.patchSha256);
+    // R2 F03：单体/分片两形态的交付一致性（缺 patchFormat 的历史记录按 single）。
+    expectDeliveryConsistent(ROOT, summary);
   });
 
   it("round3: 现场重放增量补丁并按 source/seal 两状态验收（不只读历史 VERIFIED 记录）", { timeout: 180_000 }, () => {
     // C2 独立复核 F1：历史记录核对不能证明现行脚本可用，必须现场执行。
-    // 真实运行绝不设置夹具专用 BASE 覆盖（防以测试钩子冒充生产路径）。
+    // 真实运行绝不设置夹具专用覆盖（防以测试钩子冒充生产路径）。
     // 现场重放按当前树再生成补丁字节（round3 补丁 diff 面包含证据文件，封印态下
-    // 字节必然漂移）；断言在再生成字节上真实执行，完成后恢复原字节以保住交付
-    // 产物与历史记录哈希。保持在本文件末位，先于它运行的记录核对不受再生成影响。
+    // 字节必然漂移）；断言在再生成字节上真实执行，完成后恢复整个交付族
+    // （单体或分片+清单）以保住交付产物与历史记录哈希（R2 F03：交付可能为
+    // 受控分片形态）。保持在本文件末位，先于它运行的记录核对不受再生成影响。
     expect(process.env.LINGXI_PATCH_BASE_OVERRIDE).toBeUndefined();
+    expect(process.env.LINGXI_PATCH_SHARD_BYTES_OVERRIDE).toBeUndefined();
     const patchFile = path.join(OUT, "patches", "67dee5d2-to-round3-c01-c03.patch.gz");
-    const preserved = fs.readFileSync(patchFile);
+    const preserved = snapshotDeliveryFamily(patchFile);
     try {
       const output = execFileSync("python3", [
         path.join(OUT, "create-round3-patch.py"),
@@ -243,11 +251,11 @@ describe("round3 C01-C03 候选交付证据契约", () => {
         expect(result.sealGuardPassed).toBe(true);
         expect(result.verifiedSourceSha).toMatch(/^[0-9a-f]{40}$/);
       }
-      expect(result.patchBytes).toBeGreaterThan(0);
-      expect(fs.existsSync(path.join(ROOT, result.patch))).toBe(true);
-      expect(sha256(fs.readFileSync(path.join(ROOT, result.patch)))).toBe(result.patchSha256);
+      // R2 F03：单体/分片两形态的交付一致性（逐片复算、重组==载荷哈希、
+      // 每个交付文件低于 GitHub 100 MiB 推送硬限）。
+      expectDeliveryConsistent(ROOT, result);
     } finally {
-      fs.writeFileSync(patchFile, preserved);
+      restoreDeliveryFamily(patchFile, preserved);
     }
   });
 });
@@ -490,6 +498,70 @@ describe("round3 补丁脚本双状态回归矩阵（/tmp 合成夹具）", () =
     const fx = createPatchFixture("round3");
     try {
       expectReplayMismatchRejected(fx);
+    } finally {
+      disposeFixture(fx);
+    }
+  });
+
+  it("分片正向：超阈值时交付受控分片，逐片与重组哈希可复算，单体不共存（R2 F03）", () => {
+    const fx = createPatchFixture("round3");
+    try {
+      process.env.LINGXI_PATCH_SHARD_BYTES_OVERRIDE = "256";
+      try {
+        const run = runPatchScript(fx);
+        expect(run.status, run.stderr).toBe(0);
+        const result = JSON.parse(run.stdout.trim());
+        expect(result.result).toBe("VERIFIED");
+        expect(result.patchFormat).toBe("sharded");
+        expect(result.patchShardBytes).toBe(256);
+        expect(result.patchShards.length).toBeGreaterThan(1);
+        expectDeliveryConsistent(fx.dir, result);
+        expect(fs.existsSync(fx.patchPath)).toBe(false);
+      } finally {
+        delete process.env.LINGXI_PATCH_SHARD_BYTES_OVERRIDE;
+      }
+    } finally {
+      disposeFixture(fx);
+    }
+  });
+
+  it("分片负向：MISMATCH 不改写既有分片交付（清单与全部分片字节保留，R2 F03）", () => {
+    const fx = createPatchFixture("round3");
+    try {
+      process.env.LINGXI_PATCH_SHARD_BYTES_OVERRIDE = "256";
+      try {
+        expect(runPatchScript(fx).status).toBe(0);
+        expect(deliveryFamilyPaths(fx.patchPath).length).toBeGreaterThan(2);
+        const before = snapshotDigest(snapshotDeliveryFamily(fx.patchPath));
+        tamperFrozenManifest(fx);
+        const run = runPatchScript(fx);
+        expect(run.status, `应判 MISMATCH: ${run.stdout}`).toBe(1);
+        expect(snapshotDigest(snapshotDeliveryFamily(fx.patchPath)),
+          "MISMATCH 后分片交付族必须逐字节不变").toBe(before);
+      } finally {
+        delete process.env.LINGXI_PATCH_SHARD_BYTES_OVERRIDE;
+      }
+    } finally {
+      disposeFixture(fx);
+    }
+  });
+
+  it("分片/单体双向转换互斥回收：单体→分片移除单体，分片→单体回收分片与清单（R2 F03）", () => {
+    const fx = createPatchFixture("round3");
+    try {
+      expect(runPatchScript(fx).status).toBe(0);
+      expect(fs.existsSync(fx.patchPath)).toBe(true);
+      process.env.LINGXI_PATCH_SHARD_BYTES_OVERRIDE = "256";
+      try {
+        expect(runPatchScript(fx).status).toBe(0);
+      } finally {
+        delete process.env.LINGXI_PATCH_SHARD_BYTES_OVERRIDE;
+      }
+      expect(fs.existsSync(fx.patchPath), "分片交付后单体必须移除").toBe(false);
+      expect(fs.existsSync(`${fx.patchPath}.shards.json`)).toBe(true);
+      expect(runPatchScript(fx).status).toBe(0);
+      expect(fs.existsSync(fx.patchPath), "单体交付必须恢复").toBe(true);
+      expect(deliveryFamilyPaths(fx.patchPath)).toEqual([fx.patchPath]);
     } finally {
       disposeFixture(fx);
     }

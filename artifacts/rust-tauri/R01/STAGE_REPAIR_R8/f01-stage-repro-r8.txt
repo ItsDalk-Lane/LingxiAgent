@@ -1,0 +1,16 @@
+# R01 阶段修复 R8 — R8 评审原样反例与对照复测（契约 1.8-stage-repair-r8，主仓真实 CLI）
+# 生成时间: 2026-09-26 09:38:19
+# 方法：与 R8 评审同法——仅改 /tmp 登记副本 RR-T05-X1.resolve_by_stage 正文，结构化坐标保持 R09/R09 原样
+# $ python3 -B docs/rust-tauri/R01/r01_t08_gate_check.py --register /tmp/r01-r8-*.json
+
+control	exit=0	verdict=PASS_WITH_CONDITIONS	categories=[]	body=R09（browser worker 边界实现与门禁）
+r7-original	exit=1	verdict=NO-GO	categories=['risk-stage-text-mismatch']	body=R09（宿主集成）最迟 R09；最迟 R10（虚构放宽关卡）
+r7-reversed	exit=1	verdict=NO-GO	categories=['risk-stage-text-mismatch']	body=R09（宿主集成）最迟 R10；最迟 R09
+r7-fullwidth	exit=1	verdict=NO-GO	categories=['risk-stage-text-mismatch']	body=R09（宿主集成）最迟 Ｒ０９；最迟 Ｒ１０
+r7-consistent	exit=0	verdict=PASS_WITH_CONDITIONS	categories=[]	body=R09（宿主集成）最迟 R09；最迟 R09（重复但一致）
+r7-context	exit=0	verdict=PASS_WITH_CONDITIONS	categories=[]	body=R09（宿主集成）；R10（后续平台事项）最迟 R09
+colon-conflict	exit=1	verdict=NO-GO	categories=['risk-stage-text-mismatch']	body=R09（宿主集成）最迟 R09；最迟：R10（虚构放宽关卡）
+fullwidth-colon-conflict	exit=1	verdict=NO-GO	categories=['risk-stage-text-mismatch']	body=R09（宿主集成）最迟 R09；最迟：Ｒ１０（虚构放宽关卡）
+yu-conflict	exit=1	verdict=NO-GO	categories=['risk-stage-text-mismatch']	body=R09（宿主集成）最迟 R09；最迟于 R10（虚构放宽关卡）
+single-colon-conflict	exit=1	verdict=NO-GO	categories=['risk-stage-text-mismatch']	body=R09（宿主集成）最迟：R10（虚构放宽关卡）
+exit=0

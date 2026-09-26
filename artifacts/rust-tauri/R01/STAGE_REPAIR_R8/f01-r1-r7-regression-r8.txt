@@ -1,0 +1,49 @@
+# R01 阶段修复 R8 — R7 评审原样反例(13) + R1–R6 全套反例(25) 回归复测（契约 1.8-stage-repair-r8，主仓真实 CLI）
+# 生成时间: 2026-09-26 09:38:26
+# 对照基准：STAGE_REPAIR_R7/f01-stage-repro-r7.txt 与 f01-r1-r6-regression-r7.txt 的 exit+类别逐项不变
+
+== R7 评审原样反例与变体（13 例，/tmp/r01-r7-*.json）==
+PASS r01-r7-R4-unknown-full.json: exit=1(want 1) verdict=NO-GO(want NO-GO) cats=['risk-stage-unknown'](want ['risk-stage-unknown'])
+PASS r01-r7-R5-dot-substage.json: exit=1(want 1) verdict=NO-GO(want NO-GO) cats=['risk-stage-disguised'](want ['risk-stage-disguised'])
+PASS r01-r7-R6-fullwidth-first.json: exit=1(want 1) verdict=NO-GO(want NO-GO) cats=['risk-stage-unknown'](want ['risk-stage-unknown'])
+PASS r01-r7-R6-fullwidth-latest.json: exit=1(want 1) verdict=NO-GO(want NO-GO) cats=['risk-stage-text-mismatch'](want ['risk-stage-text-mismatch'])
+PASS r01-r7-R6-fullwidth-valid.json: exit=0(want 0) verdict=PASS_WITH_CONDITIONS(want PASS_WITH_CONDITIONS) cats=[](want [])
+PASS r01-r7-R7-contextual-R10-control.json: exit=0(want 0) verdict=PASS_WITH_CONDITIONS(want PASS_WITH_CONDITIONS) cats=[](want [])
+PASS r01-r7-R7-double-latest-conflict.json: exit=1(want 1) verdict=NO-GO(want NO-GO) cats=['risk-stage-text-mismatch'](want ['risk-stage-text-mismatch'])
+PASS r01-r7-R7-double-latest-same.json: exit=0(want 0) verdict=PASS_WITH_CONDITIONS(want PASS_WITH_CONDITIONS) cats=[](want [])
+PASS r01-r7-double-latest-reversed.json: exit=1(want 1) verdict=NO-GO(want NO-GO) cats=['risk-stage-text-mismatch'](want ['risk-stage-text-mismatch'])
+PASS r01-r7-double-latest-variant.json: exit=1(want 1) verdict=NO-GO(want NO-GO) cats=['risk-stage-text-mismatch'](want ['risk-stage-text-mismatch'])
+PASS r01-r7-double-latest.json: exit=1(want 1) verdict=NO-GO(want NO-GO) cats=['risk-stage-text-mismatch'](want ['risk-stage-text-mismatch'])
+PASS r01-r7-original-control.json: exit=0(want 0) verdict=PASS_WITH_CONDITIONS(want PASS_WITH_CONDITIONS) cats=[](want [])
+PASS r01-r7-single-latest-r10.json: exit=1(want 1) verdict=NO-GO(want NO-GO) cats=['risk-stage-text-mismatch'](want ['risk-stage-text-mismatch'])
+checked 13, mismatches 0
+exit=0
+
+== R1–R6 全套反例（25 例，/tmp/r01-repair-r5/repro + /tmp/r01-repair-r6/repro）==
+PASS control-original.json: exit=0(want 0) cats=[] note=正向放行
+PASS latest-r09-dot-5.json: exit=1(want 1) cats=['risk-stage-disguised'] note=risk-stage-disguised
+PASS latest-r09-hyphen-5.json: exit=1(want 1) cats=['risk-stage-disguised'] note=risk-stage-disguised
+PASS latest-r099.json: exit=1(want 1) cats=['risk-stage-unknown'] note=risk-stage-unknown
+PASS r09-dot-5.json: exit=1(want 1) cats=['risk-stage-disguised'] note=risk-stage-disguised
+PASS r09-dot-r10.json: exit=1(want 1) cats=['risk-stage-disguised'] note=risk-stage-disguised
+PASS r09-fullwidthdot-5.json: exit=1(want 1) cats=['risk-stage-disguised'] note=risk-stage-disguised
+PASS r09-fullwidthhyphen-5.json: exit=1(want 1) cats=['risk-stage-disguised'] note=risk-stage-disguised
+PASS r09-hyphen-5.json: exit=1(want 1) cats=['risk-stage-disguised'] note=risk-stage-disguised
+PASS r09-multi-dot.json: exit=1(want 1) cats=['risk-stage-disguised'] note=risk-stage-disguised
+PASS r09-r099.json: exit=1(want 1) cats=['risk-stage-unknown'] note=risk-stage-unknown
+PASS r09-slash-dot5.json: exit=1(want 1) cats=['risk-stage-disguised'] note=risk-stage-disguised
+PASS r09-stage.json: exit=1(want 1) cats=['risk-stage-disguised'] note=risk-stage-disguised
+PASS r099.json: exit=1(want 1) cats=['risk-stage-unknown'] note=risk-stage-unknown
+PASS r0999.json: exit=1(want 1) cats=['risk-stage-unknown'] note=risk-stage-unknown
+PASS r09x.json: exit=1(want 1) cats=['risk-stage-disguised'] note=risk-stage-disguised
+PASS r99.json: exit=1(want 1) cats=['risk-stage-unknown'] note=risk-stage-unknown
+PASS xr09.json: exit=1(want 1) cats=['risk-stage-disguised'] note=risk-stage-disguised
+PASS fw-latest-r10.json: exit=1(want 1) cats=['risk-stage-text-mismatch'] note=risk-stage-text-mismatch
+PASS fw-r09-first.json: exit=0(want 0) cats=[] note=正向放行
+PASS fw-r99-first.json: exit=1(want 1) cats=['risk-stage-unknown'] note=risk-stage-unknown
+PASS probe-asciiR-fwdigit-ok.json: exit=0(want 0) cats=[] note=正向放行
+PASS probe-fw-xr09.json: exit=1(want 1) cats=['risk-stage-disguised'] note=risk-stage-disguised
+PASS probe-fwR-ascii-digit-99.json: exit=1(want 1) cats=['risk-stage-unknown'] note=risk-stage-unknown
+PASS probe-lowercase-r99.json: exit=1(want 1) cats=['risk-stage-disguised'] note=risk-stage-disguised
+TOTAL 25, mismatches 0
+exit=0

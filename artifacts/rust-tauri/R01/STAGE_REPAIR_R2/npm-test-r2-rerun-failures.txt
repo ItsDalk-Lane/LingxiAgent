@@ -1,0 +1,42 @@
+# R01 阶段修复 R2 — 全量 npm test 重跑失败段摘录（iso R2a''，2026-09-26 01:47 +0800）
+# 全量日志：/tmp/r01-repair-r2/logs/npm-test-rerun.log（约 1.2 万行，不入包）
+# 结果：Test Files 2 failed | 1464 passed | 3 skipped (1469)；Tests 2 failed | 14946 passed
+
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 2 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  tests/round2-delivery-evidence.test.ts > R10 round2 交付证据契约 > R10-09: 增量补丁从干净 89bc0b64 重放后按 source/seal 两状态验收
+Error: Command failed: python3 /private/tmp/r01-repair-r2/iso/artifacts/f1-f12-repair/round2/create-delivery-patch.py
+current source manifest does not match HEAD (uncommitted or untracked source changes): firstDiff=["build/cli-runtime-closure.json"]
+
+ ❯ tests/round2-delivery-evidence.test.ts:255:22
+    253|     const preserved = snapshotDeliveryFamily(patchFile);
+    254|     try {
+    255|       const output = execFileSync("python3", [
+       |                      ^
+    256|         path.join(OUT, "create-delivery-patch.py"),
+    257|       ], { cwd: ROOT, encoding: "utf8" });
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/2]⎯
+
+ FAIL  tests/round3-delivery-evidence.test.ts > round3 C01-C03 候选交付证据契约 > round3: 现场重放增量补丁并按 source/seal 两状态验收（不只读历史 VERIFIED 记录）
+Error: Command failed: python3 /private/tmp/r01-repair-r2/iso/artifacts/f1-f12-repair/round3-c01-c03/create-round3-patch.py
+current source manifest does not match HEAD (uncommitted or untracked source changes): firstDiff=["build/cli-runtime-closure.json"]
+
+ ❯ tests/round3-delivery-evidence.test.ts:220:22
+    218|     const preserved = snapshotDeliveryFamily(patchFile);
+    219|     try {
+    220|       const output = execFileSync("python3", [
+       |                      ^
+    221|         path.join(OUT, "create-round3-patch.py"),
+    222|       ], { cwd: ROOT, encoding: "utf8" });
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/2]⎯
+
+
+ Test Files  2 failed | 1464 passed | 3 skipped (1469)
+      Tests  2 failed | 14946 passed | 15 skipped (14963)
+   Start at  01:47:29
+   Duration  100.83s (transform 50.54s, setup 20.63s, import 963.49s, tests 997.26s, environment 253.32s)
+
+RERUN-EXIT=1

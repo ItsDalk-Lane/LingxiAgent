@@ -1,0 +1,155 @@
+# R01 阶段修复 R2 — 预演脚本留档（在 /tmp 隔离副本上运行，勿在主仓运行）
+===== ceremony-r2.sh =====
+#!/usr/bin/env bash
+# R01 stage-repair R2 — SEAL REHEARSAL ceremony (disposable /tmp clone only).
+# 与 R00 C3/C4、R1 预演同构；本轮回证 R2 F03 修复：双补丁按受控分片交付，
+# 每个 Git 对象 < 100 MiB，推送可成立（以本地 bare 仓审计代替真实远端）。
+# 流程：R2c'（候选+R2修复）→ 绿色电池（含 npm run lint，F02 修复后回证）
+#   → round2/round3 分片补丁 VERIFIED → vitest 三文件 → R2s''
+#   → 六处坐标推进 → R2a'' → guard 绿 → 四文件门禁 → 全量 npm test
+#   → 对象尺寸审计 + 本地 bare 推送演练 + 终态零漂移核对。
+set -uo pipefail
+cd /tmp/r01-repair-r2/iso
+unset http_proxy https_proxy all_proxy HTTP_PROXY HTTPS_PROXY ALL_PROXY
+R2=artifacts/f1-f12-repair/round2
+R3=artifacts/f1-f12-repair/round3-c01-c03
+LOG=/tmp/r01-repair-r2/logs
+mkdir -p "$LOG"
+
+echo "== [0] commit R2c' (rehearsal candidate: R1 candidate + R2 fixes) =="
+git add -A
+git -c user.name="REHEARSAL-R2" -c user.email="rehearsal@example.invalid" commit -q -m "REHEARSAL R2c': R01 stage candidate + repair R2 (not real)"
+R2C=$(git rev-parse HEAD)
+echo "R2C=$R2C"
+
+step() {
+  echo; echo "== $1 =="; shift
+  STEP_N=$((STEP_N + 1))
+  "$@" > "$LOG/step-$(printf '%02d' $STEP_N).log" 2>&1
+  local rc=$?
+  tail -4 "$LOG/step-$(printf '%02d' $STEP_N).log"
+  [ $rc -eq 0 ] || { echo "STEP-FAILED exit=$rc: $* (log: $LOG/step-$(printf '%02d' $STEP_N).log)"; exit 91; }
+}
+STEP_N=0
+
+step "[1/9] round2 green: typecheck"        python3 $R2/run-evidence.py r01-seal-r2-typecheck npm run typecheck
+step "[2/9] round2 green: core-contracts"   python3 $R2/run-evidence.py r01-seal-r2-contracts npm run typecheck:core-contracts
+step "[3/9] round2 green: lint:boundary"    python3 $R2/run-evidence.py r01-seal-r2-boundary npm run lint:boundary
+# R2 F02 修复回证：lint 是 R00 C3 仪式电池成员，本轮重新纳入（R1 预演曾因 T06 spike 61 errors 剔除）。
+step "[4/9] round2 green: npm run lint"     python3 $R2/run-evidence.py r01-seal-r2-lint npm run lint
+step "[5/9] round2 green: build:renderer"   python3 $R2/run-evidence.py r01-seal-r2-build-renderer npm run build:renderer
+step "[6/9] round2 patch VERIFIED (sharded)" python3 $R2/run-evidence.py r01-seal-r2-patch-r2 python3 $R2/create-delivery-patch.py
+step "[7/9] round3 patch VERIFIED (sharded)" python3 $R3/run-evidence.py r01-seal-r2-patch-r3 python3 $R3/create-round3-patch.py
+step "[8/9] vitest evidence+matrix trio"    python3 $R3/run-evidence.py r01-seal-r2-green-r3 npx vitest run tests/round2-delivery-evidence.test.ts tests/round3-delivery-evidence.test.ts tests/upstream-sync-matrix.test.ts
+
+echo; echo "== [9/9] commit R2s'' =="
+git add -A
+git -c user.name="REHEARSAL-R2" -c user.email="rehearsal@example.invalid" commit -q -m "REHEARSAL: R2 source/evidence re-freeze + green records + sharded patches (not real)"
+R2S=$(git rev-parse HEAD)
+echo "R2S=$R2S"
+
+echo; echo "== coordinate advance -> R2a'' =="
+echo "$R2S" > .sync-audit/verified-source-sha.txt
+OLD=f2b8c687ae7bb5511edbaf5f6e0945affb0c80b8
+sed -i '' "s/^const VERIFIED_SOURCE_SHA = \"$OLD\";/const VERIFIED_SOURCE_SHA = \"$R2S\";/" .sync-audit/build-sync-matrix.mjs
+sed -i '' "16s/$OLD/$R2S/" PROGRESS.md
+sed -i '' "18s/$OLD/$R2S/" UPSTREAM_SYNC_AUDIT.md
+node .sync-audit/build-sync-matrix.mjs || exit 92
+git add .sync-audit/verified-source-sha.txt .sync-audit/build-sync-matrix.mjs .sync-audit/upstream-sync-matrix.json UPSTREAM_SYNC_MATRIX.md UPSTREAM_SYNC_AUDIT.md PROGRESS.md
+git -c user.name="REHEARSAL-R2" -c user.email="rehearsal@example.invalid" commit -q -m "REHEARSAL: pure-audit coordinate advance to R2s'' (not real)"
+R2A=$(git rev-parse HEAD)
+echo "R2A=$R2A"
+echo "audit-only files in R2s''..R2a'':"
+git diff --name-only "$R2S..$R2A"
+node .sync-audit/verify-post-verification-diff.mjs || exit 93
+
+echo; echo "== four-file gate at R2a'' =="
+npx vitest run tests/post-verification-audit-seal.test.ts tests/upstream-sync-matrix.test.ts tests/round2-delivery-evidence.test.ts tests/round3-delivery-evidence.test.ts 2>&1 | tail -6
+GATE=${PIPESTATUS[0]}
+echo "FOUR-FILE-GATE-EXIT=$GATE"
+
+echo; echo "== full npm test at R2a'' =="
+npm test 2>&1 | tail -8
+FULL=${PIPESTATUS[0]}
+echo "FULL-NPM-TEST-EXIT=$FULL"
+
+echo; echo "== git object size audit (GitHub 100 MiB hard limit) =="
+git cat-file --batch-all-objects --batch-check='%(objecttype) %(objectsize) %(objectname)' \
+  | sort -k2 -n -r | head -5
+MAXBLOB=$(git cat-file --batch-all-objects --batch-check='%(objecttype) %(objectsize)' | awk '$1=="blob"{print $2}' | sort -n | tail -1)
+echo "MAX-BLOB-BYTES=$MAXBLOB (limit=104857600)"
+[ "$MAXBLOB" -lt 104857600 ] || { echo "OBJECT-SIZE-AUDIT-FAILED"; exit 94; }
+
+echo; echo "== delivered patch family sizes =="
+find $R2/patches $R3/patches -type f | sort | xargs stat -f "%z  %N"
+
+echo; echo "== push rehearsal to local bare remote =="
+rm -rf /tmp/r01-repair-r2/remote.git
+git init -q --bare /tmp/r01-repair-r2/remote.git
+git push -q file:///tmp/r01-repair-r2/remote.git HEAD:refs/heads/r01-seal-rehearsal-r2 || exit 95
+REMOTE_SHA=$(git --git-dir=/tmp/r01-repair-r2/remote.git rev-parse refs/heads/r01-seal-rehearsal-r2)
+echo "REMOTE_SHA=$REMOTE_SHA (local=$R2A)"
+[ "$REMOTE_SHA" = "$R2A" ] || { echo "PUSH-VERIFY-FAILED"; exit 96; }
+RMAX=$(git --git-dir=/tmp/r01-repair-r2/remote.git cat-file --batch-all-objects --batch-check='%(objecttype) %(objectsize)' | awk '$1=="blob"{print $2}' | sort -n | tail -1)
+echo "REMOTE-MAX-BLOB-BYTES=$RMAX"
+[ "$RMAX" -lt 104857600 ] || { echo "REMOTE-OBJECT-SIZE-FAILED"; exit 97; }
+
+echo; echo "== final zero-drift check =="
+git status --porcelain | head -10
+DRIFT=$(git status --porcelain | wc -l | tr -d ' ')
+echo "WORKTREE-DRIFT-ENTRIES=$DRIFT"
+echo "CEREMONY-DONE R2C=$R2C R2S=$R2S R2A=$R2A GATE=$GATE FULL=$FULL MAXBLOB=$MAXBLOB REMOTE_MAX=$RMAX DRIFT=$DRIFT"
+
+===== continue-audit-push.sh =====
+#!/usr/bin/env bash
+# R01 阶段修复 R2 — F03 预演续跑：可达集对象审计 + 本地裸仓推送预演。
+# 修正首次仪式的审计口径：git push 只发送"从推送引用可达"的对象，
+# --batch-all-objects 会把本地不可达残留（历史暂存 blob）误算进去。
+# 这里审计两个集合：
+#   A) R2a'' 可达 blob（本地视角：推送会发送的全集）
+#   B) 裸仓实际收到的全部对象（GitHub 视角的 ground truth）
+set -uo pipefail
+ISO=/tmp/r01-repair-r2/iso
+REMOTE=/tmp/r01-repair-r2/remote.git
+R2A=$(git -C "$ISO" rev-parse HEAD)
+LIMIT=104857600   # 100 MiB GitHub hard limit
+WARN=52428800     # 50 MB GitHub warning threshold
+
+echo "== reachable-set audit at R2a'' ($R2A) =="
+git -C "$ISO" rev-list --objects HEAD | awk '{print $1}' \
+  | git -C "$ISO" cat-file --batch-check='%(objecttype) %(objectsize) %(objectname)' \
+  | awk -v lim="$LIMIT" -v warn="$WARN" '$1=="blob" {
+      if ($2+0 >= lim) { over[++no] = $0 }
+      else if ($2+0 >= warn) { warnlist[++nw] = $0 }
+      if ($2+0+0 > max) { max = $2+0; maxline = $0 }
+      n++
+    } END {
+      printf("REACHABLE-BLOBS=%d MAX=%d OVER-100MiB=%d WARN-50MB=%d\n", n, max, no+0, nw+0)
+      print "MAX-LINE: " maxline
+      for (i in over) print "OVER: " over[i]
+      for (i in warnlist) print "WARN: " warnlist[i]
+    }'
+
+echo "== push rehearsal to local bare remote =="
+rm -rf "$REMOTE"
+git init --bare -q "$REMOTE"
+git -C "$ISO" push --force "$REMOTE" HEAD:refs/heads/codex/rust-tauri-migration 2>&1 | tail -3
+REMOTE_SHA=$(git -C "$REMOTE" rev-parse refs/heads/codex/rust-tauri-migration)
+echo "LOCAL_R2A=$R2A"
+echo "REMOTE_SHA=$REMOTE_SHA"
+if [ "$REMOTE_SHA" = "$R2A" ]; then echo "PUSH-REHEARSAL-OK"; else echo "PUSH-REHEARSAL-MISMATCH"; fi
+
+echo "== remote received-object audit (GitHub-view ground truth) =="
+git -C "$REMOTE" cat-file --batch-all-objects --batch-check='%(objecttype) %(objectsize) %(objectname)' \
+  | awk -v lim="$LIMIT" -v warn="$WARN" '$1=="blob" {
+      if ($2+0 >= lim) { over[++no] = $0 }
+      else if ($2+0 >= warn) { warnlist[++nw] = $0 }
+      if ($2+0 > max) { max = $2; maxline = $0 }
+      n++
+    } END {
+      printf("REMOTE-BLOBS=%d MAX=%d OVER-100MiB=%d WARN-50MB=%d\n", n, max, no+0, nw+0)
+      print "MAX-LINE: " maxline
+      for (i in over) print "OVER: " over[i]
+      for (i in warnlist) print "WARN: " warnlist[i]
+    }'
+echo "CONTINUE-DONE"

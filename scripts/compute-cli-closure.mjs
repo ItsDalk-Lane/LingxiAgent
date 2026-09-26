@@ -950,6 +950,13 @@ const PLATFORM_VARIANT_SUFFIX_RE =
 
 const PLATFORM_VARIANT_PLACEHOLDER = "<platform>";
 
+// Host-absolute paths: posix-absolute or Windows drive-qualified. nft's static
+// analysis resolves hardcoded spawn targets (e.g. the "/bin/bash" literals in
+// lib/sandbox/*) and emits whatever file exists at that path on the TRACING
+// machine -- an environmental artifact describing the build host, not the
+// shippable closure.
+const HOST_ABSOLUTE_PATH_RE = /^(?:\/|[A-Za-z]:[\\/])/;
+
 // Splits a traced path at its innermost `node_modules/<pkg>` boundary.
 // Returns null for paths that are not inside a package (repo sources) or that
 // stop at the package directory itself.
@@ -973,6 +980,11 @@ export function normalizeNftTraceFiles({ fileList, scratchRel }) {
     .map(toPosix)
     .filter((relPath) => {
       if (relPath === scratchRel || relPath === "package.json" || relPath === "node_modules") return false;
+      // Host-absolute and root-escaping entries never describe the closure:
+      // the committed baseline lists worktree-relative and node_modules-logical
+      // paths only. Dropping the whole class keeps generation deterministic
+      // across machines instead of re-baselining per-host trace artifacts.
+      if (HOST_ABSOLUTE_PATH_RE.test(relPath) || relPath === ".." || relPath.startsWith("../")) return false;
       // Native addon bytes are produced for a specific OS, architecture, and
       // Node ABI. The packaged server installs them with its target runtime;
       // including a locally rebuilt copy here would make this source closure

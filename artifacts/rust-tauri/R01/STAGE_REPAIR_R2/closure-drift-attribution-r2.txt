@@ -1,0 +1,59 @@
+# R01 阶段修复 R2 — 全量 npm test 2 红的环境性归因（三个再生实验）
+# 现象：cli-closure-census 测试原位重写 build/cli-runtime-closure.json，本机当前 nft
+# 追踪多出一项 /bin/bash（committed 版生成于 2026-09-22 19:58 +0800 时不含）；
+# 写脏工作树后，round2/round3 现场重放生成器的 tree==HEAD 守卫拒绝运行 → 2 红。
+# 归因：在三个树上再生闭包，漂移完全一致（+14/-3，均新增 /bin/bash 项）：
+#   实验A = iso 含 R1 候选+R2 修复的 R2a'' 树；
+#   实验B = 裸 HEAD 363999378（无 R1/R2 任何改动）；
+#   实验C = 8d55046d5（committed 闭包的出生提交本身）。
+# 结论：漂移与 R1 候选、R2 修复、乃至 R01 全部内容无关，属本机环境性变化
+# （node v24.16.0 自 5 月未变，package-lock 自 09-22 未变）；预存测试间竞态
+# （census 原位写 × 生成器树净守卫）只是被环境漂移激活。修复它需动无关文件，
+# 超出 R2 授权范围，如实上报并建议后续治理。
+
+===== 实验A：iso R2a''（含 R1+R2） =====
+cli runtime closure: 8950 files (nft-runtime-trace=8104, source-graph=835, runtime-asset=11)
+build/cli-runtime-closure.json
+open-boundary baseline: 1 coupling edge(s) (evidence-needed=1), 1 evidence-needed, 0 provisional
+build/open-boundary-baseline.json
+EXP-A-EXIT=0
+ build/cli-runtime-closure.json | 17 ++++++++++++++---
+ 1 file changed, 14 insertions(+), 3 deletions(-)
+
+===== 实验B：pristine HEAD 363999378 =====
+cli runtime closure: 8950 files (nft-runtime-trace=8104, source-graph=835, runtime-asset=11)
+build/cli-runtime-closure.json
+open-boundary baseline: 1 coupling edge(s) (evidence-needed=1), 1 evidence-needed, 0 provisional
+build/open-boundary-baseline.json
+EXP-B-EXIT=0
+ build/cli-runtime-closure.json | 17 ++++++++++++++---
+ 1 file changed, 14 insertions(+), 3 deletions(-)
+diff --git a/build/cli-runtime-closure.json b/build/cli-runtime-closure.json
+index 5f963a983..fa677d842 100644
+--- a/build/cli-runtime-closure.json
++++ b/build/cli-runtime-closure.json
+@@ -198,6 +198,17 @@
+     }
+   ],
+   "files": [
++    {
++      "path": "/bin/bash",
++      "inputType": "nft-runtime-trace",
++      "provenance": [
++        {
++          "root": "nft-server-bundle",
++          "kind": "nft-trace"
++        }
++      ],
++      "reason": "nft-runtime-trace via nft-server-bundle (see roots[] for the full explanation)"
++    },
+     {
+
+===== 实验C：8d55046d5（闭包出生提交） =====
+cli runtime closure: 8950 files (nft-runtime-trace=8104, source-graph=835, runtime-asset=11)
+build/cli-runtime-closure.json
+open-boundary baseline: 1 coupling edge(s) (evidence-needed=1), 1 evidence-needed, 0 provisional
+build/open-boundary-baseline.json
+EXP-C-EXIT=0
+ build/cli-runtime-closure.json | 17 ++++++++++++++---
+ 1 file changed, 14 insertions(+), 3 deletions(-)

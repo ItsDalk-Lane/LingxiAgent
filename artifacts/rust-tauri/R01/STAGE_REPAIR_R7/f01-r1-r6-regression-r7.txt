@@ -1,0 +1,31 @@
+# R01 阶段修复 R7 — R1–R6 全套正负反例回归（契约 1.7-stage-repair-r7，主仓真实 CLI）
+# 生成时间: 2026-09-26 08:28:55
+# 登记副本：/tmp/r01-repair-r5/repro/*.json（R1–R5 全套 18 例）+ /tmp/r01-repair-r6/repro/*.json（R6 七例）
+
+PASS  control-original.json: exit=0 正向放行
+PASS-NEG r99.json: exit=1 risk-stage-unknown
+PASS-NEG latest-r099.json: exit=1 risk-stage-unknown
+PASS-NEG r099.json: exit=1 risk-stage-unknown
+PASS-NEG r09-r099.json: exit=1 risk-stage-unknown
+PASS-NEG xr09.json: exit=1 risk-stage-disguised
+PASS-NEG r09x.json: exit=1 risk-stage-disguised
+PASS-NEG r0999.json: exit=1 risk-stage-unknown
+PASS-NEG r09-stage.json: exit=1 risk-stage-disguised
+PASS-NEG r09-dot-5.json: exit=1 risk-stage-disguised
+PASS-NEG r09-hyphen-5.json: exit=1 risk-stage-disguised
+PASS-NEG r09-fullwidthdot-5.json: exit=1 risk-stage-disguised
+PASS-NEG r09-fullwidthhyphen-5.json: exit=1 risk-stage-disguised
+PASS-NEG r09-multi-dot.json: exit=1 risk-stage-disguised
+PASS-NEG r09-dot-r10.json: exit=1 risk-stage-disguised
+PASS-NEG latest-r09-dot-5.json: exit=1 risk-stage-disguised
+PASS-NEG latest-r09-hyphen-5.json: exit=1 risk-stage-disguised
+PASS-NEG r09-slash-dot5.json: exit=1 risk-stage-disguised
+PASS-NEG fw-r99-first.json: exit=1 risk-stage-unknown
+PASS-NEG fw-latest-r10.json: exit=1 risk-stage-text-mismatch
+PASS  fw-r09-first.json: exit=0 正向放行
+PASS  probe-asciiR-fwdigit-ok.json: exit=0 正向放行
+PASS-NEG probe-fw-xr09.json: exit=1 risk-stage-disguised
+PASS-NEG probe-fwR-ascii-digit-99.json: exit=1 risk-stage-unknown
+PASS-NEG probe-lowercase-r99.json: exit=1 risk-stage-disguised
+
+REGRESSION TOTAL: 25 按预期 / 0 偏离（共 25 例）

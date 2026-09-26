@@ -1,0 +1,9 @@
+# R01 阶段修复 R9 — typecheck/lint（iso=/tmp/r01-repair-r9/iso）
+# 全文日志：/tmp/r01-repair-r9/iso-typecheck-closure.log、/tmp/r01-repair-r9/iso-lint.log
+== typecheck ==
+typecheck exit=0
+== closure regen ==
+closure exit=0
+build drift lines: 0
+✖ 10896 problems (0 errors, 10896 warnings)
+lint exit=0

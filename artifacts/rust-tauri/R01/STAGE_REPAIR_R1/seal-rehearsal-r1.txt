@@ -1,0 +1,65 @@
+R01 阶段修复 R1 — 审计封印 /tmp 隔离预演摘要
+==============================================
+预演副本：/tmp/r01-repair-r1/iso（363999378 的本地 clone + candidate.patch + node_modules 软链）
+预演脚本：/tmp/r01-repair-r1/ceremony.sh（本目录 seal-rehearsal-ceremony.txt 为完整日志）
+预演时间：2026-09-25/26（darwin arm64, node v24.16.0, python3）
+
+提交链（全部 REHEARSAL 标记，非正式提交）
+----------------------------------------
+363999378  主仓真实 HEAD（阶段修复 R1 起点，本地=远程）
+d8e4192f0  R1c'  模拟阶段修复候选提交（9 个候选文件：F01 检查器 + F02 五份文档/账本 + T08 关卡证据重生成）
+45f287c67  R1s'' 模拟 source/evidence 提交（证据重冻结 + 绿色门禁记录 + 补丁 VERIFIED 记录）
+a29f0b957  R1a'' 模拟纯审计提交（六处坐标推进到 R1s''；R1s''..R1a'' 恰 6 个白名单审计文件）
+
+重冻结清单（R1c' 树，清单条目 8174；C4 时代为 6071）
+--------------------------------------------------
+round2  SOURCE_MANIFEST sha256 = cc6cc09441cb4adf175f3ad8a014cdde3d6a1cc7e593e0655a851c344e4c8486
+round3  SOURCE_MANIFEST sha256 = 2528b2e680a3808569e7bacfb0bd944bca192802a306701b836bb71352f4565a
+两族清单均含修复后检查器 docs/rust-tauri/R01/r01_t08_gate_check.py
+（sha256 76487885dab02df73c0661deb5b04444d31bb34b49779665b438a950bf23d5e9）
+
+绿色门禁记录（run-evidence.py 仪式，绑定上述清单哈希，均 EXIT 0）
+----------------------------------------------------------------
+round2 族：r01-seal-r1-{typecheck, contracts, boundary, build-renderer} + r01-seal-r1-patch-r2（VERIFIED）
+round3 族：r01-seal-r1-patch-r3（VERIFIED）+ r01-seal-r1-green-r3（vitest 65/65）
+注意：R00 C3 仪式包含的 `npm run lint` 在 R01 候选树上为红（61 errors，全部位于
+R01-T06 引入的 spike/tauri-shell/{scripts/probe_webdriver.mjs 25, app/frontend/probe.js 25,
+scripts/evidence_server.mjs 11}，no-undef 浏览器/WDIO 全局；主仓单文件 eslint 复核同值）。
+该红色先于本修复存在、与本修复无关，预演电池已剔除；正式封印前需总控裁决（修 spike lint 或调整
+eslint 作用域），不得为变绿而扩大豁免。
+
+交付补丁重生成尺寸（封存 R1c' 树后的确定性字节）
+----------------------------------------------
+round2 patches/89bc0b64-to-r01-r10-source.patch.gz        267,221,850 B（现库内 29,581,472 B）
+round3 patches/67dee5d2-to-round3-c01-c03.patch.gz        577,433,322 B（仪式内；前次直接运行 577,324,221 B，
+                                                            差异来自证据文件漂移，属设计内）现库内 89,457,199 B
+round3 未压缩 967,668,154 B。根因：artifacts/rust-tauri/R01 受控证据 253,098,384 B 进入
+BASE→current 全树 diff（全树清单字节合计 521,188,390 B）。
+结论：两文件均超 GitHub 单文件 100MB 推送硬限——封印提交在现行证据合同下不可推送。
+这是封印步骤的真实前置阻塞（不属于阶段修复本身的失败），需总控治理裁决
+（补丁分片/证据瘦身/排除合同修订等），本任务不擅自改动门禁合同。
+
+封印态终验（R1a''）
+------------------
+node .sync-audit/verify-post-verification-diff.mjs
+  ✓ post-verification diff guard OK: 45f287c6..a29f0b95 仅 6 个审计文件变化
+node .sync-audit/build-sync-matrix.mjs --check → exit 0（projection sha256 8bf6c07a… 不变）
+四文件审计门禁：tests/post-verification-audit-seal.test.ts（3）+ upstream-sync-matrix（7）
+  + round2-delivery-evidence（32）+ round3-delivery-evidence（26）
+  = 68/68 PASS（exit 0）；门禁运行后工作树保持干净（补丁字节确定性复原）。
+
+候选态对照（封印前，主仓/隔离副本同值）
+--------------------------------------
+同一四文件门禁在候选态（坐标仍指 R00 C3 f2b8c687，R01 新增 ~2100 个非白名单文件）：
+62/68，6 FAIL = post-verification-audit-seal(1: 非审计文件改动) + round2 R10-03/R10-04/R10-09(3)
++ round3 manifest/replay(2)。该红为保护器按设计工作（HEAD 越过已验坐标），非 R00 遗留四红：
+R00 C4 正式提交 328cc8bb5a 上实测 68/68 + 14942/0（/tmp/r00-seal-c4-postcommit.md）。
+
+正式封印后复验条件（总控获提交授权后执行）
+----------------------------------------
+1. 真实 R1c 落地（本候选 9 文件 + 本目录证据包），独立阶段复验 PASS。
+2. 按 ceremony 同序执行：run-evidence 绿色电池（剔除或先修复 lint）→ 两族 patch VERIFIED 记录
+   → 提交真实 R1s（含 SOURCE_MANIFEST×2/manifests/COMMAND_RESULTS/logs/patches）。
+3. 六处坐标推进到真实 R1s 并提交纯审计 R1a；guard 绿；四文件门禁 68/68；工作树干净。
+4. 推送前解决 patch.gz 100MB 硬限问题，否则封印提交只能留在本地。
+5. 复跑本修复全部隔离门禁（见 /tmp/r01-stage-repair-r1.md 复验矩阵）。

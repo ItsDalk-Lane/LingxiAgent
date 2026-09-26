@@ -16,6 +16,7 @@ import crypto from "node:crypto";
 import fs from "node:fs";
 import os from "node:os";
 import path from "node:path";
+import zlib from "node:zlib";
 import { execFileSync, spawnSync } from "node:child_process";
 import { expect } from "vitest";
 
@@ -413,4 +414,157 @@ export function expectReplayMismatchRejected(fx: PatchFixture): void {
     ? runPythonDriver(fx, REPLAY_MISMATCH_DRIVER_R2, [path.join(fx.dir, "src", "app.txt")])
     : runPythonDriver(fx, REPLAY_MISMATCH_DRIVER_R3);
   expect(run.status, `重放不等未判 MISMATCH: ${run.stderr}`).toBe(0);
+}
+
+/* ------------------------------------------------------------------ *
+ * R01 阶段验收 R2 F03：受控分片交付合同的共享断言与交付族快照工具。    *
+ * 分片只改变存储分帧：patchSha256/patchBytes 仍钉住完整 gzip 载荷，    *
+ * 逐片 path/bytes/sha256 由 <patch>.shards.json 清单钉住，消费者按序   *
+ * 重组后必须复算出同一载荷哈希——完整性校验语义与单体时代一致。         *
+ * ------------------------------------------------------------------ */
+
+/** GitHub 普通 Git 单文件推送硬限 100 MiB（交付物每个文件都必须低于它）。 */
+export const GITHUB_SINGLE_FILE_LIMIT = 100 * 1024 * 1024;
+
+/**
+ * 交付清单/结果里的相对路径一律先校验再读写：拒绝绝对路径与 .. 片段，
+ * 解析后必须仍位于 rootAbs 内（防篡改清单把读取引出仓库/夹具根）。
+ */
+function resolveContained(rootAbs: string, rel: string): string {
+  expect(typeof rel).toBe("string");
+  expect(path.isAbsolute(rel), `交付路径不得为绝对路径: ${rel}`).toBe(false);
+  expect(rel.split(/[\\/]/).includes(".."), `交付路径不得含 .. 片段: ${rel}`).toBe(false);
+  const root = path.resolve(rootAbs);
+  const resolved = path.resolve(root, rel);
+  expect(
+    resolved === root || resolved.startsWith(root + path.sep),
+    `交付路径必须位于根目录内: ${rel}`,
+  ).toBe(true);
+  return resolved;
+}
+
+/** 交付族现存文件（单体 + <patch>.shards.json + <patch>.part-*），按名排序。 */
+export function deliveryFamilyPaths(patchAbsPath: string): string[] {
+  const dir = path.dirname(patchAbsPath);
+  const name = path.basename(patchAbsPath);
+  const out: string[] = [];
+  if (fs.existsSync(patchAbsPath)) out.push(patchAbsPath);
+  const manifest = `${patchAbsPath}.shards.json`;
+  if (fs.existsSync(manifest)) out.push(manifest);
+  if (fs.existsSync(dir)) {
+    for (const entry of fs.readdirSync(dir).filter((e) => e.startsWith(`${name}.part-`)).sort()) {
+      out.push(path.join(dir, entry));
+    }
+  }
+  return out;
+}
+
+/** 交付族快照（绝对路径→字节），用于 preserve/restore 与「失败不改写」断言。 */
+export function snapshotDeliveryFamily(patchAbsPath: string): Map<string, Buffer> {
+  return new Map(deliveryFamilyPaths(patchAbsPath).map((p) => [p, fs.readFileSync(p)]));
+}
+
+/** 恢复交付族到快照状态：删除快照外文件、重写快照文件（含被删除形态的重建）。 */
+export function restoreDeliveryFamily(patchAbsPath: string, snap: Map<string, Buffer>): void {
+  for (const p of deliveryFamilyPaths(patchAbsPath)) {
+    if (!snap.has(p)) fs.rmSync(p, { force: true });
+  }
+  for (const [p, bytes] of snap) {
+    fs.mkdirSync(path.dirname(p), { recursive: true });
+    fs.writeFileSync(p, bytes);
+  }
+}
+
+/** 快照内容摘要（文件名+字节），用于断言 MISMATCH/异常后交付族逐字节不变。 */
+export function snapshotDigest(snap: Map<string, Buffer>): string {
+  const h = crypto.createHash("sha256");
+  for (const [p, b] of [...snap].sort()) {
+    h.update(path.basename(p));
+    h.update("\0");
+    h.update(b);
+    h.update("\0");
+  }
+  return h.digest("hex");
+}
+
+/** 交付结果（生成器 stdout JSON / 历史记录）中本断言族关心的字段形状。 */
+export interface PatchDeliveryResultShape {
+  patch: string;
+  patchBytes: number;
+  patchSha256: string;
+  patchFormat?: string;
+  patchManifest?: string;
+  patchShardBytes?: number;
+  patchShards?: Array<{ path: string; bytes: number; sha256: string }>;
+  patchUncompressedBytes?: number;
+}
+
+/** 分片清单文件（.shards.json）的契约形状，与生成器写入端一一对应。 */
+export interface PatchShardsManifestShape {
+  format: string;
+  patch: string;
+  patchBytes: number;
+  patchSha256: string;
+  shardBytes: number;
+  shards: Array<{ path: string; bytes: number; sha256: string }>;
+}
+
+/**
+ * 交付一致性断言（R2 F03 分片合同）。rootAbs 为补丁相对路径的解析根
+ * （主仓 ROOT 或夹具目录）。缺 patchFormat 字段的历史记录按 single 处理。
+ *
+ * single：单体存在、字节级哈希/尺寸与 result 一致、低于 GitHub 硬限、
+ *   无清单无分片残留。
+ * sharded：单体不存在；清单 format/patch/总哈希/分片阈值与 result 一致；
+ *   逐片存在且 bytes/sha256 复算一致、每片 ≤ patchShardBytes 且低于硬限；
+ *   按序重组 == 完整载荷（sha256 == patchSha256），重组字节可 gunzip 且
+ *   仍是 git 补丁文本（重放语义不损失）。
+ */
+export function expectDeliveryConsistent(rootAbs: string, result: PatchDeliveryResultShape): void {
+  expect(result.patchBytes).toBeGreaterThan(0);
+  expect(typeof result.patch).toBe("string");
+  const patchAbs = resolveContained(rootAbs, result.patch);
+  const manifestAbs = `${patchAbs}.shards.json`;
+  if ((result.patchFormat ?? "single") === "single") {
+    expect(fs.existsSync(patchAbs), "single 形态单体必须存在").toBe(true);
+    const body = fs.readFileSync(patchAbs);
+    expect(body.byteLength).toBe(result.patchBytes);
+    expect(sha256(body)).toBe(result.patchSha256);
+    expect(body.byteLength).toBeLessThan(GITHUB_SINGLE_FILE_LIMIT);
+    expect(fs.existsSync(manifestAbs), "single 形态不得残留分片清单").toBe(false);
+    const leftovers = fs.readdirSync(path.dirname(patchAbs))
+      .filter((e) => e.startsWith(`${path.basename(patchAbs)}.part-`));
+    expect(leftovers, "single 形态不得残留分片").toEqual([]);
+    return;
+  }
+  expect(result.patchFormat).toBe("sharded");
+  expect(fs.existsSync(patchAbs), "sharded 形态单体不得存在").toBe(false);
+  expect(result.patchManifest).toBe(`${result.patch}.shards.json`);
+  expect(fs.existsSync(manifestAbs), "分片清单必须存在").toBe(true);
+  const manifest = JSON.parse(fs.readFileSync(manifestAbs, "utf8")) as PatchShardsManifestShape;
+  expect(manifest.format).toBe("patch-gzip-shards/v1");
+  expect(manifest.patch).toBe(result.patch);
+  expect(manifest.patchBytes).toBe(result.patchBytes);
+  expect(manifest.patchSha256).toBe(result.patchSha256);
+  expect(manifest.shardBytes).toBe(result.patchShardBytes);
+  expect(manifest.shards.length).toBeGreaterThan(1);
+  expect(manifest.shards.map((s) => s.path))
+    .toEqual((result.patchShards ?? []).map((s) => s.path));
+  const parts: Buffer[] = [];
+  for (const shard of manifest.shards) {
+    const body = fs.readFileSync(resolveContained(rootAbs, shard.path));
+    expect(body.byteLength, `${shard.path} 尺寸不符`).toBe(shard.bytes);
+    expect(sha256(body), `${shard.path} 哈希不符`).toBe(shard.sha256);
+    expect(shard.bytes).toBeLessThanOrEqual(result.patchShardBytes);
+    expect(shard.bytes, `${shard.path} 超 GitHub 单文件硬限`).toBeLessThan(GITHUB_SINGLE_FILE_LIMIT);
+    parts.push(body);
+  }
+  const whole = Buffer.concat(parts);
+  expect(whole.byteLength).toBe(result.patchBytes);
+  expect(sha256(whole), "按序重组必须复算出完整载荷哈希").toBe(result.patchSha256);
+  const raw = zlib.gunzipSync(whole);
+  expect(raw.byteLength).toBe(result.patchUncompressedBytes);
+  // 只校验补丁头部（git diff 输出必然以 diff --git 开头）：整段 toString 会让
+  // 数百 MB 级补丁撞上 V8 字符串上限。
+  expect(raw.subarray(0, 65536).toString("utf8")).toContain("diff --git");
 }

@@ -3,6 +3,7 @@
   "task_id": "R01-T08",
   "stage_id": "R01",
   "generated_by": "ZCode:R01-T08-exec-r1",
+  "updated_by": "ZCode:R01 阶段修复 R4（2026-09-26）：按 R01 阶段验收 R4 F02 更新 RR-ENV-CLOSURE-DRIFT 与 RR-AUDIT-SEAL-PREEXISTING 的 R2 时态为 R3 修复后事实（闭包漂移已由 R3 候选根除、剩余条件为正式提交后在真实候选上复验），R2 失败历史保留（前次：R3 为 15 个关卡冻结契约递延绑定条目补充结构化截止阶段坐标 resolve_by_stage_id / resolve_latest_stage_id（R01 阶段验收 R3 F01 修复：与真实阶段索引 R00–R11 及检查器冻结契约 deadline_stage/latest_stage 三方机器校验一致），正文 resolve_by_stage 与其余字段未改（前次：R2 更新 RR-AUDIT-SEAL-PREEXISTING + 新增 RR-ENV-CLOSURE-DRIFT，43→44 条，2026-09-26））",
   "date": "2026-09-25",
   "platform_scope": "全部 VERIFIED 结论仅覆盖 macOS 27.0 arm64 单机实测；Windows/Linux/macOS x64 未验证项一律挂 R09/R10 强制关卡",
   "status_values": {
@@ -21,6 +22,8 @@
       "summary": "规范 JSON 键排序在非 BMP 边界 Rust/TS 分叉（Rust 按 UTF-8 字节序、TS 按 UTF-16 码元序，U+E000 与 U+10000/U+1F004 混排时相对序不同）",
       "evidence": "R01-T02_REVIEW_R1 §5 F1；A03 对抗样本 s5 DIFF",
       "resolve_by_stage": "R04（工具网关消费规范序列化之前）",
+      "resolve_by_stage_id": "R04",
+      "resolve_latest_stage_id": "R04",
       "owner": "R04 协议消费方任务（总控指派）",
       "failure_handling": "fail-closed：未修复前 R04 不得放行依赖跨端 canonical 一致性的路径；修复须加非 BMP 混排 golden 回归",
       "status": "OPEN"
@@ -33,6 +36,8 @@
       "summary": "TS canonical-json 对含浮点/>2^53 整数的合法第三方 schema 硬失败；PROTOCOL_SPEC §8 与 §9 表述矛盾",
       "evidence": "R01-T02_REVIEW_R1 §5 F2；A03 对抗样本 s6 TS 硬错误",
       "resolve_by_stage": "R04（先于 R04/R08 的协议消费点，验收裁定口径）",
+      "resolve_by_stage_id": "R04",
+      "resolve_latest_stage_id": "R04",
       "owner": "R04 协议消费方任务（总控指派）",
       "failure_handling": "fail-closed：未修复前第三方工具 schema 携带浮点/大整数 default 的工具不得宣称兼容；spec 矛盾须随修复一并消除",
       "status": "OPEN"
@@ -45,6 +50,8 @@
       "summary": "生成 schema 的 EventPayload 回退分支吞掉畸形已知事件；eventType 一致性与 schemaVersion=1 两信封不变量未编码进 schema",
       "evidence": "R01-T02_REVIEW_R1 §5 F3",
       "resolve_by_stage": "R04（先于 R04/R08）",
+      "resolve_by_stage_id": "R04",
+      "resolve_latest_stage_id": "R04",
       "owner": "R04 协议消费方任务（总控指派）",
       "failure_handling": "fail-closed：未编码不变量前，畸形已知事件可能被静默当作未知事件放行；修复须把两不变量编码进生成 schema 并加畸形已知事件负向用例",
       "status": "OPEN"
@@ -57,6 +64,8 @@
       "summary": "Rust 侧 Seq/u64 解析接受 007/+5，比 schema pattern 宽松",
       "evidence": "R01-T02_REVIEW_R1 §5 F4",
       "resolve_by_stage": "R04",
+      "resolve_by_stage_id": "R04",
+      "resolve_latest_stage_id": "R04",
       "owner": "R04 协议消费方任务（总控指派）",
       "failure_handling": "fail-closed：宽严不一致期间以 TS/schema 侧为准拒收；修复后加 007/+5 负向 golden",
       "status": "OPEN"
@@ -69,6 +78,8 @@
       "summary": "WS 关闭码对 invalid_message 也硬编码 4409/version_incompatible",
       "evidence": "R01-T02_REVIEW_R1 §5 F5",
       "resolve_by_stage": "R08（旧 Electron 客户端接入消费 WS 语义之前）",
+      "resolve_by_stage_id": "R08",
+      "resolve_latest_stage_id": "R08",
       "owner": "R08 接入任务（总控指派）",
       "failure_handling": "fail-closed：客户端不得以 4409 反推版本不兼容；修复后补 close-code 矩阵用例",
       "status": "OPEN"
@@ -130,6 +141,8 @@
       "summary": "WebRTC 位于 Fetch 域与 CSP connect-src 双重边界之外（规范层面不受 CSP connect-src 管辖，数据通道走 UDP/DTLS），未做端到端外带验证",
       "evidence": "R01-T05_REVIEW_R2.md §N2（ATK6：offer 创建成功且 SDP 含 host candidate）",
       "resolve_by_stage": "R09（门禁显式决策，如 launcher 层开关/策略禁用）",
+      "resolve_by_stage_id": "R09",
+      "resolve_latest_stage_id": "R09",
       "owner": "R09 宿主集成任务",
       "failure_handling": "fail-closed：R09 落实 WS 等价边界时必须一并显式决策 WebRTC；未决策前不得宣称不可信页无外带通道",
       "status": "OPEN"
@@ -154,6 +167,8 @@
       "summary": "T04 浏览器 spike（spike_browser.rs）无 Fetch 拦截层、资源约束仅靠代理层；loopback WS 在其原型路径同样不受候选代码约束，与 T05 R1-F1 属同一机制族缺口",
       "evidence": "R01-T05_REPAIR_R1.md 交叉影响段；R01-T04 原型路径（代理层对 loopback 放行是吊具语义）",
       "resolve_by_stage": "R09（browser worker 边界实现与门禁）",
+      "resolve_by_stage_id": "R09",
+      "resolve_latest_stage_id": "R09",
       "owner": "R09 宿主集成任务",
       "failure_handling": "fail-closed：R09 必须验证 Fetch+CSP 双边界覆盖 browser worker（含 loopback WS），不得以 T04 spike 代理层证据替代候选代码边界证据",
       "status": "OPEN"
@@ -262,6 +277,8 @@
       "summary": "录音（麦克风采集）：拒绝路径 VERIFIED，授权后采集正链路 UNVERIFIED-interactive（TCC not_determined，未触发任何授权弹窗，未伪造授权）",
       "evidence": "SHELL_CAPABILITY_MATRIX capabilities.recording；tcc_snapshot_macos.microphone=not_determined",
       "resolve_by_stage": "R09",
+      "resolve_by_stage_id": "R09",
+      "resolve_latest_stage_id": "R09",
       "owner": "R09 原生能力任务",
       "failure_handling": "fail-closed：未实测授权正链路前，录音能力不得标 VERIFIED；R09 须在真实授权态下完成采集闭环",
       "status": "OPEN"
@@ -274,6 +291,8 @@
       "summary": "语音识别/听写：权限查询路径 VERIFIED，授权与识别链路 UNVERIFIED（TCC speech_recognition=not_determined）",
       "evidence": "SHELL_CAPABILITY_MATRIX capabilities.speech",
       "resolve_by_stage": "R09",
+      "resolve_by_stage_id": "R09",
+      "resolve_latest_stage_id": "R09",
       "owner": "R09 原生能力任务",
       "failure_handling": "fail-closed：同 RR-T06-MIC；听写功能放行以真实授权+识别闭环为前提",
       "status": "OPEN"
@@ -286,6 +305,8 @@
       "summary": "屏幕/窗口捕获：权限查询与手势约束 VERIFIED，真实屏幕采集 UNVERIFIED",
       "evidence": "SHELL_CAPABILITY_MATRIX capabilities.screen",
       "resolve_by_stage": "R09",
+      "resolve_by_stage_id": "R09",
+      "resolve_latest_stage_id": "R09",
       "owner": "R09 原生能力任务",
       "failure_handling": "fail-closed：屏幕采集能力未真实采集验证前不得宣称等价；R09 真实采集闭环为强制关卡",
       "status": "OPEN"
@@ -298,6 +319,8 @@
       "summary": "网络代理矩阵 UNVERIFIED（system-proxy 行为跨平台一致性未实测）",
       "evidence": "SHELL_CAPABILITY_MATRIX capabilities.proxy=UNVERIFIED",
       "resolve_by_stage": "R09 最迟 R10",
+      "resolve_by_stage_id": "R09",
+      "resolve_latest_stage_id": "R10",
       "owner": "R09/R10 平台验收负责人",
       "failure_handling": "fail-closed：代理行为未实测前不得宣称与现役 Electron 代理行为等价",
       "status": "OPEN"
@@ -310,6 +333,8 @@
       "summary": "T06 全部 VERIFIED 仅覆盖 macOS 27.0 arm64；Windows x64/Linux x64/macOS x64 全部 UNVERIFIED",
       "evidence": "SHELL_CAPABILITY_MATRIX.platform_scope_note；PLATFORM_BUILD_MATRIX platforms",
       "resolve_by_stage": "R09（宿主集成）最迟 R10（跨平台产物）",
+      "resolve_by_stage_id": "R09",
+      "resolve_latest_stage_id": "R10",
       "owner": "R09/R10 平台验收负责人",
       "failure_handling": "fail-closed：跨平台放行等待 R09/R10 真实结果；不得把 macOS arm64 结论外推到其他平台",
       "status": "OPEN"
@@ -334,6 +359,8 @@
       "summary": "生产缺陷：data-epoch-coordinator corrupt-failure fail-open（R7/R9/R10 变体：torn 印章/日志/缺失印章但有可读高位过渡日志时丢弃 toEpoch → mustBlock 误判放行，实测各写入 55 新条目）且警告文本失实（固定输出 'no higher-epoch evidence was found'）",
       "evidence": "R01-T07_REVIEW_R2.md 变体表（r7/r9/r10 fail-open 实测）；artifacts/rust-tauri/R01/T07/repair-r1/",
       "resolve_by_stage": "R02（新 coordinator 实现时修复并重跑 4 变体演练）",
+      "resolve_by_stage_id": "R02",
+      "resolve_latest_stage_id": "R02",
       "owner": "R02 存储任务（归属候选）",
       "failure_handling": "fail-closed 方向：R02 新实现须 corrupt 类一律拒写且警告文本如实；R01 不改生产代码（红线遵守）；旧程序侧风险由 ADR-004 D2 分离根/原子指针方案覆盖",
       "status": "REGISTERED"
@@ -346,6 +373,8 @@
       "summary": "desktop 壳 6 个 shell-local 存储（desktop-diagnostics/desktop-gpu-startup-state/desktop-window-version-state 等）不过 epoch 闸，新旧壳共享根争抢风险",
       "evidence": "DATA_COMPATIBILITY_MATRIX.json 6 个 shell-local 存储 epoch_protection note；ADR-004 §5 R09 强制项",
       "resolve_by_stage": "R09（强制项）",
+      "resolve_by_stage_id": "R09",
+      "resolve_latest_stage_id": "R09",
       "owner": "R09 宿主集成任务",
       "failure_handling": "fail-closed：R09 新宿主落地时必须为 shell-local 存储定界（独立根或纳入闸），未处理不得放行新旧壳并行运行",
       "status": "OPEN"
@@ -358,21 +387,39 @@
       "summary": "印章篡改窗口实证闸为协作式（手动改印章 2→1 后旧程序真实写入 96 条目、改回恢复拒写）；物理隔离必要性支撑 ADR-004 D2",
       "evidence": "ADR-004 D2 缺口清单第 3 条；ROLLBACK_DESIGN §1 第 5 条",
       "resolve_by_stage": "R08/R09（分离数据根/原子活动目录指针落地时覆盖）",
+      "resolve_by_stage_id": "R08",
+      "resolve_latest_stage_id": "R09",
       "owner": "R08 迁移演练 / R09 宿主集成",
       "failure_handling": "已入档为设计依据；不得以「闸已挡篡改」对外表述（闸是协作式的）",
       "status": "DOCUMENTED"
     },
     {
       "id": "RR-AUDIT-SEAL-PREEXISTING",
-      "source": "docs/rust-tauri/R00/R00_HANDOFF.json unresolved_items AUDIT-SEAL-PREEXISTING（原样承继）",
+      "source": "docs/rust-tauri/R00/R00_HANDOFF.json unresolved_items AUDIT-SEAL-PREEXISTING（条目 ID 承继保留）；R01 阶段验收 R1 F02 + R01 阶段修复 R1 复证后重分类（2026-09-25）；R01 阶段验收 R2 F03 补充推送可行性缺口 + R01 阶段修复 R2 分片化预演（2026-09-26）",
       "severity": "GATE",
       "category": "audit-seal",
-      "summary": "审计封印家族 4 用例 FAIL（未修绿、未删除、未扩白名单）的两基点分类：相对 R00-T08 基点为预存（R00 首个任务提交起即失败）；相对 R00 stage base 为本阶段提交触发（增量含 R00 迁移文件）。根因=VERIFIED_SOURCE_SHA=46f12ab1c 审计白名单不含迁移增量。R01 提交后继续预期红",
-      "evidence": "artifacts/rust-tauri/R00/T08/audit-seal-repro-r{1,2}.log + a15-repro-verify-r1.log + artifacts/rust-tauri/R00/STAGE_REPAIR_R1/audit-seal-{stage-base,head}.log（exit 0/1 两基点实证）",
-      "resolve_by_stage": "总控按 PROGRESS.md seal 工作流收口（先把验证证据绑定复验后的真实候选提交，再重绑 VERIFIED_SOURCE_SHA）",
+      "summary": "审计四文件门禁在 R01 候选实为新增 6 红，不能再称 R00 预存：正式 R00 C4 基线（328cc8bb）提交后复验 68/68 绿、全量 npm test 14942 passed/0 failed（/tmp/r00-seal-c4-postcommit.md）；R01 候选 HEAD（36399937）实测 62/68、6 FAIL（post-verification-audit-seal 1、round2-delivery-evidence 3、round3-delivery-evidence 2；upstream-sync-matrix 7/7 绿）。根因=VERIFIED_SOURCE_SHA 仍指 R00 C3（f2b8c687），R01 的 2103 个新增/修改文件不在审计白名单，diff guard 按其设计拒绝。原 T08 登记「4 用例预存 FAIL 原样承继 R00」的两基点分类以非正式基点（R00-T08/R00 stage base）得出，经 R01 阶段验收 R1 F02 以正式 C4 封印基线复证不成立。坐标推进=把适用验证绑定到 R01 阶段复验通过的真实候选提交后，以纯审计提交更新 VERIFIED_SOURCE_SHA；需提交授权，属总控 seal 工作流，非 R01 实现缺陷。R01 阶段验收 R2 F03 追加：封印再生成的两份 .patch.gz（267MB/577MB）超 GitHub 100MiB 单文件硬限，照原单体交付提交后无法推送；R01 阶段修复 R2 交付受控分片机制（patch-gzip-shards/v1，45MB 片、清单最后落盘、完整性语义不损失），并在 /tmp 隔离副本完成全链预演：分片生成 VERIFIED、坐标推进后四文件门禁 74/74、HEAD 可达集与裸仓实收对象审计 0 个 >100MiB（最大 97,003,232 B 为历史已推送的 round3 补丁）、裸仓推送 SHA 一致。R2 预演曾同时暴露本机环境性 cli-runtime-closure 漂移（R2 时态，历史保留：nft 新增 /bin/bash 追踪项，与 R1/R2/R01 内容无关，三实验证实，使当时全量 npm test 2 红）；该漂移已由 R01 阶段修复 R3 候选根除（normalizeNftTraceFiles 宿主绝对/越界路径类级过滤 + census finally 恢复/结构性断言，同机再生成 8949 文件零漂移），R3 /tmp 封印预演坐标推进后全量 npm test 14949 passed/0 failed/exit 0（预演 SHA 不作正式坐标）",
+      "evidence": "/tmp/r00-seal-c4-postcommit.md（正式 C4：68/68 + 14942/0）+ /tmp/r01-stage-review-r1-seal-gate.log（R01 候选 62/68、6 FAIL）+ artifacts/rust-tauri/R01/STAGE_REPAIR_R1/audit-seal-gate-rerun.txt（阶段修复 R1 独立复跑同值）+ R00 历史证据 artifacts/rust-tauri/R00/T08/audit-seal-repro-r{1,2}.log、artifacts/rust-tauri/R00/STAGE_REPAIR_R1/audit-seal-{stage-base,head}.log + R2 预演 artifacts/rust-tauri/R01/STAGE_REPAIR_R2/{seal-rehearsal-r2-ceremony.txt,audit-push-rehearsal-r2.txt,closure-drift-attribution-r2.txt,npm-test-r2-rerun-failures.txt} + R3 修复与预演 artifacts/rust-tauri/R01/STAGE_REPAIR_R3/{f02-closure-regen-zero-drift-r3.txt,seal-rehearsal-r3-ceremony.txt}",
+      "resolve_by_stage": "总控按 PROGRESS.md seal 工作流收口：R01 阶段复验 PASS 后，先把适用验证绑定到实际候选提交（含坐标与矩阵投影再生），再以纯审计提交推进 VERIFIED_SOURCE_SHA 并复验差异门禁；R01 阶段修复 R1 完成方法预演、R01 阶段修复 R2 补齐推送可行性（分片化）与对象尺寸审计、R01 阶段修复 R3 已根除本机 cli-runtime-closure 环境漂移（同机再生成零漂移，不再需要再生提交环境对齐闭包或换环境方案），剩余条件=正式提交后在真实候选上复验（四文件门禁 74/74、全量 npm test 0 失败、分片重组哈希一致、可达对象 0 个 ≥100MiB、工作树零漂移、远端 SHA 一致），预演 SHA 不作正式坐标",
       "owner": "总控/治理动作（非 R01 实现缺陷）",
-      "failure_handling": "不把全量 npm test 标 PASS、不扩白名单、不退役门禁、不虚报验证坐标；R01-T08 不重跑全量 npm test，本登记为分类承继",
-      "status": "CARRIED"
+      "failure_handling": "不把全量 npm test 标 PASS、不扩白名单、不退役门禁/测试、不改断言、不虚报验证坐标；不得再将本项称为 R00 预存四红——正式 C4 基线为绿，R01 候选六红为新增；封印推进前的红灯如实保留；分片交付不得以牺牲校验语义换取可推送（重组 sha256 必须等于 patchSha256、MISMATCH 不改写既有交付）",
+      "status": "OPEN",
+      "reclassified_by": "R01 阶段修复 R1（2026-09-25）：按 R01 阶段验收 R1 F02 修复要求，以正式 R00 C4 封印基线复证推翻原 CARRIED 承继分类；条目 ID 保留以维持既有引用（HANDOFF/账本 npm_test_note 已同步更正）",
+      "r2_update": "R01 阶段修复 R2（2026-09-26）：按 R01 阶段验收 R2 F03 修复要求交付受控分片交付机制并完成 /tmp 隔离全链预演（含推送与对象尺寸审计）；条目保持 OPEN——正式封印推进与全量 npm test 环境漂移治理均属总控授权动作",
+      "r3_update": "R01 阶段修复 R3（2026-09-26）：normalizeNftTraceFiles 类级过滤宿主绝对/越界路径 + census finally 恢复/结构性断言（不改基线、不删测试、不放松守卫）；修复后同机再生成 8949 文件零漂移，/tmp 封印预演坐标推进后四文件门禁 74/74、全量 npm test 14949 passed/0 failed/exit 0——R2 预演的 2 个环境性红已根除。R01 阶段修复 R4（2026-09-26）：按 R01 阶段验收 R4 F02 把本条目 R2 时态（「正式封印前需治理」「正式执行前还需处理环境漂移」）更新为 R3 修复后事实——漂移已修复，剩余条件为正式提交后在真实候选上复验；R2 失败历史保留，正式封印未提前记为完成"
+    },
+    {
+      "id": "RR-ENV-CLOSURE-DRIFT",
+      "source": "R01 阶段修复 R2 全量 npm test 预演复跑（2026-09-26，/tmp 隔离副本 R2a'' 树）；R01 阶段验收 R4 F02 + R01 阶段修复 R4 更新时态（2026-09-26）",
+      "severity": "MEDIUM",
+      "category": "test-hygiene",
+      "summary": "（R2 发现，历史保留）本机当前环境再生 build/cli-runtime-closure.json 与已提交版漂移：nft 追踪新增一项 /bin/bash（totalFiles 8949→8950，+14/-3）。已提交闭包生成于 2026-09-22 19:58 +0800（8d55046d5），node v24.16.0 与 package-lock 自当时未变。三实验归因：漂移在裸 HEAD 363999378 与闭包出生提交 8d55046d5 的裸树上同样复现——与 R1 候选、R2 修复及 R01 全部内容无关，属本机环境性变化。该漂移激活一处预存测试竞态：tests/cli-closure-census.test.ts『原位再生成』用例重写受跟踪文件，与 round2/round3 交付测试的生成器 tree==HEAD 守卫在全量并行套件中相撞，致 2 个现场重放用例红（firstDiff=build/cli-runtime-closure.json）；四文件门禁单独运行不含 census 测试，不受此影响。（R01 阶段修复 R3 已修复）根因=nft 静态分析解析 lib/sandbox/* 的 /bin/bash 硬编码 spawn 目标并把本机该路径文件计入追踪，宿主绝对路径穿过 normalizeSourceGraphPath 落进闭包；修复=normalizeNftTraceFiles 类级过滤宿主绝对/越界路径（committed 基线 8949 项零绝对/零越界路径即既有语义，不改基线、不提交机器特定数据、跨机器收敛同一基线）+ census 原位重写用例 finally 恢复快照 +「matches committed」用例结构性断言禁止宿主绝对条目。修复后同机再生成 8949 文件零漂移，R3 /tmp 封印预演坐标推进后全量 npm test 14949 passed/0 failed/exit 0（预演 SHA 不作正式坐标）",
+      "evidence": "artifacts/rust-tauri/R01/STAGE_REPAIR_R2/closure-drift-attribution-r2.txt（实验A=R2a'' 树、实验B=裸 HEAD、实验C=8d55046d5 裸树，三树漂移逐字节一致）+ artifacts/rust-tauri/R01/STAGE_REPAIR_R2/npm-test-r2-rerun-failures.txt（2 红现场）+ artifacts/rust-tauri/R01/STAGE_REPAIR_R3/f02-closure-regen-zero-drift-r3.txt（修复后零漂移）+ artifacts/rust-tauri/R01/STAGE_REPAIR_R3/seal-rehearsal-r3-ceremony.txt（预演全量 14949/0）",
+      "resolve_by_stage": "已由 R01 阶段修复 R3 候选修复（同机再生成零漂移），不再需要再生提交环境对齐闭包或换环境裁决；剩余条件=正式提交后在真实候选上复验再生成零漂移与全量 npm test 0 失败；若其他机器出现新的环境性漂移，census 用例将就地报错并恢复工作树，按本条目重新登记治理而非记绿",
+      "owner": "总控/治理动作（非 R01/R2 修复缺陷）",
+      "failure_handling": "不把环境性红灯标绿或记作通过；不删除 census 原位再生成用例或生成器树净守卫任一侧；不为取绿提交未经治理决策的机器特定闭包；正式封印报告须如实携带本项状态；修复候选未正式提交并复验前本项保持 OPEN",
+      "status": "OPEN",
+      "r3_update": "R01 阶段修复 R3（2026-09-26）：按上述方案修复（normalizeNftTraceFiles 类级过滤 + census finally 恢复/结构性断言，不改基线不删测试不放松守卫），修复后同机再生成零漂移、R3 预演全量 14949/0。R01 阶段修复 R4（2026-09-26）：按 R01 阶段验收 R4 F02 把本条目 R2 现在时（「本机当前环境再生…漂移」「致 2 个现场重放用例红」「正式封印前由总控裁决」）改写为 R2 历史发现 + R3 修复后事实，剩余条件=正式提交后在真实候选上复验；R2 失败历史保留，条目在候选正式提交并复验前保持 OPEN"
     },
     {
       "id": "RR-BLK-CREDENTIALS",

@@ -1,0 +1,18 @@
+# R01 阶段修复 R8 — 闭包再生成零漂移 + census 单文件（iso；主仓不运行；重跑记录：首次跑因 iso 组装事故存在 node_modules/node_modules 嵌套副本干扰 nft 追踪产生伪漂移，已删除嵌套副本并还原 build/ 后重跑，事故与结论如实保留于修复报告）
+# 生成时间: 2026-09-26 09:46:09
+
+== node scripts/compute-cli-closure.mjs ==
+build/cli-runtime-closure.json
+open-boundary baseline: 1 coupling edge(s) (evidence-needed=1), 1 evidence-needed, 0 provisional
+build/open-boundary-baseline.json
+exit=0
+== git status --porcelain -- build/（零输出=零漂移）==
+(end)
+== npx vitest run tests/cli-closure-census.test.ts ==
+ Test Files  1 passed (1)
+      Tests  23 passed (23)
+   Start at  09:46:27
+   Duration  68.11s (transform 92ms, setup 19ms, import 184ms, tests 67.83s, environment 0ms)
+
+== 再核 build/ 零漂移 ==
+(end)

@@ -1,0 +1,124 @@
+# R01 阶段修复 R3 — /tmp 封印预演全链仪式日志（ceremony-r3.sh，一次性副本 /tmp/r01-repair-r3/iso）
+# 预演提交链：R3c'=d1cfc7f29ae9357679acc612df87aa9a931d7f6a（候选源冻结）→ R3s''=d6800d892b5023c35eae0520ade9c1e231580b80（绿色记录+分片交付）→ R3a''=500ee91db41efc2e699808e07f56e5da67fafa6e（纯审计坐标推进）
+# 全部为 REHEARSAL-R3 彩排提交，不作正式坐标
+
+== [0] commit R3c' (rehearsal candidate: R1+R2 candidate + R3 fixes) ==
+R3C=d1cfc7f29ae9357679acc612df87aa9a931d7f6a
+
+== [1/9] round2 green: typecheck ==
+> tsc --noEmit && tsc --noEmit -p tsconfig.node.json && tsc --noEmit -p tsconfig.test.json
+
+
+EVIDENCE r01-seal-r3-typecheck EXIT 0 MANIFEST ccf59d9a618db5caedf4807e1fdb78c82fddb14f24cdf401a426148567cff1e8
+
+== [2/9] round2 green: core-contracts ==
+
+Core contracts strict check passed (28 files).
+
+EVIDENCE r01-seal-r3-contracts EXIT 0 MANIFEST ccf59d9a618db5caedf4807e1fdb78c82fddb14f24cdf401a426148567cff1e8
+
+== [3/9] round2 green: lint:boundary ==
+
+lint:boundary ok -- 1 known open->closed edge(s), all within the tracked ratchet baseline (existing debt, not newly introduced).
+
+EVIDENCE r01-seal-r3-boundary EXIT 0 MANIFEST ccf59d9a618db5caedf4807e1fdb78c82fddb14f24cdf401a426148567cff1e8
+
+== [4/9] round2 green: npm run lint ==
+  0 errors and 34 warnings potentially fixable with the `--fix` option.
+
+
+EVIDENCE r01-seal-r3-lint EXIT 0 MANIFEST ccf59d9a618db5caedf4807e1fdb78c82fddb14f24cdf401a426148567cff1e8
+
+== [5/9] round2 green: build:renderer ==
+- Adjust chunk size limit for this warning via build.chunkSizeWarningLimit.
+✓ built in 7.11s
+
+EVIDENCE r01-seal-r3-build-renderer EXIT 0 MANIFEST ccf59d9a618db5caedf4807e1fdb78c82fddb14f24cdf401a426148567cff1e8
+
+== [6/9] round2 patch VERIFIED (sharded) ==
+{"base": "89bc0b64bf0a9b84ef3532efaa66c23213affb70", "currentMatchesHead": null, "failures": [], "frozenManifestEntries": 8200, "frozenMatchesVerifiedCommit": null, "frozenSourceManifestHash": "ccf59d9a618db5caedf4807e1fdb78c82fddb14f24cdf401a426148567cff1e8", "patch": "artifacts/f1-f12-repair/round2/patches/89bc0b64-to-r01-r10-source.patch.gz", "patchBytes": 267408980, "patchFormat": "sharded", "patchManifest": "artifacts/f1-f12-repair/round2/patches/89bc0b64-to-r01-r10-source.patch.gz.shards.json", "patchMaxDeliveredFileBytes": 45000000, "patchSha256": "9bf43ab78a1dd88a2d75c9e9ae1332558aeb7637a9e2bdd7a8c510abbe7d14d6", "patchShardBytes": 45000000, "patchShards": [{"bytes": 45000000, "path": "artifacts/f1-f12-repair/round2/patches/89bc0b64-to-r01-r10-source.patch.gz.part-00001", "sha256": "0ff7430864c29d67fc8891058b7e84afb1fa891edb900c20c09cc94a7d27689a"}, {"bytes": 45000000, "path": "artifacts/f1-f12-repair/round2/patches/89bc0b64-to-r01-r10-source.patch.gz.part-00002", "sha256": "d8bdd92ac6001cb455299d4f30660b97e6d8aac1ef36f9a524b95e57a1999570"}, {"bytes": 45000000, "path": "artifacts/f1-f12-repair/round2/patches/89bc0b64-to-r01-r10-source.patch.gz.part-00003", "sha256": "c4b90611718480e5806a8f567a38b35de46dcd27692dbed1aede37bea87f4d43"}, {"bytes": 45000000, "path": "artifacts/f1-f12-repair/round2/patches/89bc0b64-to-r01-r10-source.patch.gz.part-00004", "sha256": "a101e611400e0a2142d1e11e522fb915db350e5d14b024f79b2e3a5096f68675"}, {"bytes": 45000000, "path": "artifacts/f1-f12-repair/round2/patches/89bc0b64-to-r01-r10-source.patch.gz.part-00005", "sha256": "fc49a3624eec4994efe8ec890d8504d256526b1e29d54add9b506423066a53a4"}, {"bytes": 42408980, "path": "artifacts/f1-f12-repair/round2/patches/89bc0b64-to-r01-r10-source.patch.gz.part-00006", "sha256": "96ab93f197dbead764801f00b061470b1deababd9d17b9d468d3949f97f80cc2"}], "patchUncompressedBytes": 498094826, "replayedMatchesCurrent": true, "replayedMatchesFrozenManifest": true, "replayedSourceManifestHash": "ccf59d9a618db5caedf4807e1fdb78c82fddb14f24cdf401a426148567cff1e8", "result": "VERIFIED", "sealGuardPassed": null, "sourceManifestHash": "ccf59d9a618db5caedf4807e1fdb78c82fddb14f24cdf401a426148567cff1e8", "state": "source", "verifiedSourceObjectType": "commit", "verifiedSourceSha": "f2b8c687ae7bb5511edbaf5f6e0945affb0c80b8"}
+
+EVIDENCE r01-seal-r3-patch-r2 EXIT 0 MANIFEST ccf59d9a618db5caedf4807e1fdb78c82fddb14f24cdf401a426148567cff1e8
+
+== [7/9] round3 patch VERIFIED (sharded) ==
+  "result": "VERIFIED"
+}
+
+EVIDENCE r01-seal-r3-patch-r3 EXIT 0 MANIFEST 3411cae7dabdd93b0ca9c15b9b4222adb86c4a482a248117399c8fae03ea2357
+
+== [8/9] vitest evidence+matrix trio ==
+   Duration  74.85s (transform 135ms, setup 58ms, import 104ms, tests 135.90s, environment 0ms)
+
+
+EVIDENCE r01-seal-r3-green-r3 EXIT 0 MANIFEST 3411cae7dabdd93b0ca9c15b9b4222adb86c4a482a248117399c8fae03ea2357
+
+== [9/9] commit R3s'' ==
+R3S=d6800d892b5023c35eae0520ade9c1e231580b80
+
+== coordinate advance -> R3a'' ==
+✓ wrote .sync-audit/upstream-sync-matrix.json and UPSTREAM_SYNC_MATRIX.md
+✓ 133 paths: ADOPTED 25 / ADAPTED 100 / REGENERATED 4 / INTENTIONAL_DIVERGENCE 4 (sum 133)
+  projection sha256: 8bf6c07a873c2b25c51db12ae36addb89cbfe33f23747fcdd3d32b4c7878dbc9
+R3A=500ee91db41efc2e699808e07f56e5da67fafa6e
+audit-only files in R3s''..R3a'':
+.sync-audit/build-sync-matrix.mjs
+.sync-audit/upstream-sync-matrix.json
+.sync-audit/verified-source-sha.txt
+PROGRESS.md
+UPSTREAM_SYNC_AUDIT.md
+UPSTREAM_SYNC_MATRIX.md
+✓ post-verification diff guard OK: d6800d892b5023c35eae0520ade9c1e231580b80..HEAD 仅 6 个审计文件变化
+
+== four-file gate at R3a'' ==
+
+ Test Files  4 passed (4)
+      Tests  74 passed (74)
+   Start at  03:35:16
+   Duration  69.46s (transform 145ms, setup 82ms, import 104ms, tests 123.11s, environment 0ms)
+
+FOUR-FILE-GATE-EXIT=0
+
+== full npm test at R3a'' ==
+     ✓ is idempotent: two independent full runs produce identical output  54705ms
+     ✓ writeCliRuntimeClosure/writeOpenBoundaryBaseline regenerate the exact committed files in place  19095ms
+
+ Test Files  1466 passed | 3 skipped (1469)
+      Tests  14949 passed | 15 skipped (14964)
+   Start at  03:36:25
+   Duration  102.30s (transform 49.57s, setup 20.23s, import 947.80s, tests 1010.47s, environment 254.80s)
+
+FULL-NPM-TEST-EXIT=0
+
+== reachable-object size audit (GitHub 100 MiB hard limit, R2 §4.4 口径) ==
+REACHABLE-MAX-BLOB-BYTES=97003232 (limit=104857600)
+
+== delivered patch family sizes ==
+45000000  artifacts/f1-f12-repair/round2/patches/89bc0b64-to-r01-r10-source.patch.gz.part-00001
+45000000  artifacts/f1-f12-repair/round2/patches/89bc0b64-to-r01-r10-source.patch.gz.part-00002
+45000000  artifacts/f1-f12-repair/round2/patches/89bc0b64-to-r01-r10-source.patch.gz.part-00003
+45000000  artifacts/f1-f12-repair/round2/patches/89bc0b64-to-r01-r10-source.patch.gz.part-00004
+45000000  artifacts/f1-f12-repair/round2/patches/89bc0b64-to-r01-r10-source.patch.gz.part-00005
+42408980  artifacts/f1-f12-repair/round2/patches/89bc0b64-to-r01-r10-source.patch.gz.part-00006
+1628  artifacts/f1-f12-repair/round2/patches/89bc0b64-to-r01-r10-source.patch.gz.shards.json
+45000000  artifacts/f1-f12-repair/round3-c01-c03/patches/67dee5d2-to-round3-c01-c03.patch.gz.part-00001
+45000000  artifacts/f1-f12-repair/round3-c01-c03/patches/67dee5d2-to-round3-c01-c03.patch.gz.part-00002
+45000000  artifacts/f1-f12-repair/round3-c01-c03/patches/67dee5d2-to-round3-c01-c03.patch.gz.part-00003
+45000000  artifacts/f1-f12-repair/round3-c01-c03/patches/67dee5d2-to-round3-c01-c03.patch.gz.part-00004
+45000000  artifacts/f1-f12-repair/round3-c01-c03/patches/67dee5d2-to-round3-c01-c03.patch.gz.part-00005
+45000000  artifacts/f1-f12-repair/round3-c01-c03/patches/67dee5d2-to-round3-c01-c03.patch.gz.part-00006
+45000000  artifacts/f1-f12-repair/round3-c01-c03/patches/67dee5d2-to-round3-c01-c03.patch.gz.part-00007
+45000000  artifacts/f1-f12-repair/round3-c01-c03/patches/67dee5d2-to-round3-c01-c03.patch.gz.part-00008
+45000000  artifacts/f1-f12-repair/round3-c01-c03/patches/67dee5d2-to-round3-c01-c03.patch.gz.part-00009
+45000000  artifacts/f1-f12-repair/round3-c01-c03/patches/67dee5d2-to-round3-c01-c03.patch.gz.part-00010
+45000000  artifacts/f1-f12-repair/round3-c01-c03/patches/67dee5d2-to-round3-c01-c03.patch.gz.part-00011
+45000000  artifacts/f1-f12-repair/round3-c01-c03/patches/67dee5d2-to-round3-c01-c03.patch.gz.part-00012
+37786681  artifacts/f1-f12-repair/round3-c01-c03/patches/67dee5d2-to-round3-c01-c03.patch.gz.part-00013
+3308  artifacts/f1-f12-repair/round3-c01-c03/patches/67dee5d2-to-round3-c01-c03.patch.gz.shards.json
+
+== push rehearsal to local bare remote ==
+REMOTE_SHA=500ee91db41efc2e699808e07f56e5da67fafa6e (local=500ee91db41efc2e699808e07f56e5da67fafa6e)
+REMOTE-MAX-BLOB-BYTES=97003232
+
+== final zero-drift check ==
+WORKTREE-DRIFT-ENTRIES=0
+CEREMONY-DONE R3C=d1cfc7f29ae9357679acc612df87aa9a931d7f6a R3S=d6800d892b5023c35eae0520ade9c1e231580b80 R3A=500ee91db41efc2e699808e07f56e5da67fafa6e GATE=0 FULL=0 REACHABLE_MAX=97003232 REMOTE_MAX=97003232 DRIFT=0

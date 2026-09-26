@@ -1,0 +1,39 @@
+# R01 阶段修复 R3 证据 — F02 根因复现与修复回证：nft 宿主绝对路径 /bin/bash 类过滤
+# 生成时间: 2026-09-26 03:41:16 
+# 执行者: ZCode:R01 阶段修复 R3（一次性任务，非 R1/R2 修复者/评审者）
+
+## 1. 修复前独立复现（裸 HEAD 363999378 隔离树，node_modules 软链）
+$ node scripts/compute-cli-closure.mjs && git diff --stat
+cli runtime closure: 8950 files (nft-runtime-trace=8104, source-graph=835, runtime-asset=11)
+build/cli-runtime-closure.json
+open-boundary baseline: 1 coupling edge(s) (evidence-needed=1), 1 evidence-needed, 0 provisional
+build/open-boundary-baseline.json
+
+→ +14/-3，新增 /bin/bash 绝对路径条目（与 R2 归因/R3 评审一致）；实验后已 git checkout 还原裸树。
+
+## 2. 修复后（/tmp 隔离候选树，同一台机器同一环境）
+$ node scripts/compute-cli-closure.mjs && git status --porcelain
+cli runtime closure: 8949 files (source-graph=835, runtime-asset=11, nft-runtime-trace=8103)
+build/cli-runtime-closure.json
+open-boundary baseline: 1 coupling edge(s) (evidence-needed=1), 1 evidence-needed, 0 provisional
+build/open-boundary-baseline.json
+
+→ 8949 文件（漂移消失），build/cli-runtime-closure.json 与 build/open-boundary-baseline.json 均不再出现于 git status——
+再生成与已提交基线逐字节一致；未改基线、未提交任何机器特定数据，跨机器语义=闭包只含仓内相对路径与 node_modules 逻辑路径。
+
+## 3. census 测试文件单独运行（干净候选树，含原位重写用例）
+
+ RUN  v4.1.10 /private/tmp/r01-repair-r3/iso
+
+ ✓ tests/cli-closure-census.test.ts (23 tests) 69556ms
+     ✓ matches the committed deterministic closure and baseline  17886ms
+     ✓ is idempotent: two independent full runs produce identical output  34697ms
+     ✓ writeCliRuntimeClosure/writeOpenBoundaryBaseline regenerate the exact committed files in place  16910ms
+
+ Test Files  1 passed (1)
+      Tests  23 passed (23)
+   Start at  03:22:06
+   Duration  69.83s (transform 93ms, setup 21ms, import 184ms, tests 69.56s, environment 0ms)
+
+
+→ 23/23 全绿（22 既有 + 1 新增归一化单测）；运行后 build/ 目录零漂移。

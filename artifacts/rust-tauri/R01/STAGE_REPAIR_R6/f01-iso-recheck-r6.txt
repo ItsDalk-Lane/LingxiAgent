@@ -1,0 +1,37 @@
+# iso 复跑：gate 自测 67/67 + CLI 电池 2 正+43 负 + 真实登记 exit 0/PASS_WITH_CONDITIONS
+# 归档时间 2026-09-26；原始日志 /tmp/r01-repair-r6/logs/f01-gate-battery-iso-r6.txt
+
+== iso gate self-test ==
+PASS-NEG N56-stage-text-concat-two-stages: verdict=NO-GO want=risk-stage-disguised 点号拼接 R09.R10
+PASS-NEG N57-stage-latest-marker-dot-substage: verdict=NO-GO want=risk-stage-disguised 最迟标记复合 R09.5
+PASS-NEG N58-stage-text-mixed-real-compound: verdict=NO-GO want=risk-stage-disguised 混合 R09/R09.5
+PASS-NEG N59-stage-text-fullwidth-r99-first: verdict=NO-GO want=risk-stage-unknown 全角 Ｒ９９ 折叠为 R99，不在 R00–R11
+PASS-NEG N60-stage-latest-fullwidth-r10: verdict=NO-GO want=risk-stage-text-mismatch 最迟 Ｒ１０ 折叠为 R10 vs 结构化 R09
+PASS-NEG N61-stage-text-fullwidth-r10-first: verdict=NO-GO want=risk-stage-text-mismatch 全角 Ｒ１０ 折叠为首坐标 R10
+PASS-NEG N62-stage-text-fullwidth-r-ascii-digit: verdict=NO-GO want=risk-stage-unknown 混合宽度 Ｒ99 折叠为 R99
+PASS-NEG N63-stage-text-fullwidth-compound-xr09: verdict=NO-GO want=risk-stage-disguised ＸＲ０９ 折叠为 XR09 复合形态
+PASS-NEG N64-stage-text-lowercase-r99: verdict=NO-GO want=risk-stage-disguised 小写 r99 不是合法引用（大小写契约）
+PASS-NEG N65-stage-text-fullwidth-lowercase-r99: verdict=NO-GO want=risk-stage-disguised 全角小写 ｒ９９ 折叠为 r99
+PASS P2-positive-fullwidth-normalized: verdict=PASS_WITH_CONDITIONS 全角 Ｒ０９ 规范化后与结构化 R09 一致（TRACKED 命中=True）
+SELF-TEST OK (67/67)
+selftest exit=0
+
+== iso CLI battery ==
+PASS-NEG cli-stage-text-concat-two-stages: exit=1 含 'risk-stage-disguised'
+PASS-NEG cli-stage-latest-marker-dot-substage: exit=1 含 'risk-stage-disguised'
+PASS-NEG cli-stage-text-mixed-real-compound: exit=1 含 'risk-stage-disguised'
+PASS-NEG cli-stage-text-fullwidth-r99-first: exit=1 含 'risk-stage-unknown'
+PASS-NEG cli-stage-text-latest-fullwidth-r10: exit=1 含 'risk-stage-text-mismatch'
+PASS-NEG cli-stage-text-fullwidth-r10-first: exit=1 含 'risk-stage-text-mismatch'
+PASS-NEG cli-stage-text-fullwidth-r-ascii-digit: exit=1 含 'risk-stage-unknown'
+PASS-NEG cli-stage-text-fullwidth-compound-xr09: exit=1 含 'risk-stage-disguised'
+PASS-NEG cli-stage-text-lowercase-r99: exit=1 含 'risk-stage-disguised'
+PASS-NEG cli-stage-text-fullwidth-lowercase-r99: exit=1 含 'risk-stage-disguised'
+PASS cli-stage-text-fullwidth-normalized-positive: exit=0 PASS_WITH_CONDITIONS（全角规范化一致正向）
+CLI-REGRESSION OK（2 正向 + 43 负向）
+battery exit=0
+
+== iso gate check real register ==
+VERDICT: PASS_WITH_CONDITIONS
+SHELL-REPLACEMENT: ALLOWED_FOR_NEXT_STAGE_ONLY: 实施平台高风险必需能力均有真实原型证据；15 个递延项已全部挂账（截止阶段+失败处理），跨平台/授权态放行挂 R09/R10 强制关卡
+gate exit=0

@@ -1,0 +1,19 @@
+# iso 闭包再生成 8949 文件零漂移（git status --porcelain -- build/ 零输出）+ census 23/23
+# 归档时间 2026-09-26；原始日志 /tmp/r01-repair-r6/logs/f02-closure-census-iso-r6.txt
+
+== 闭包再生成（iso，写 build/）==
+cli runtime closure: 8949 files (source-graph=835, runtime-asset=11, nft-runtime-trace=8103)
+build/cli-runtime-closure.json
+open-boundary baseline: 1 coupling edge(s) (evidence-needed=1), 1 evidence-needed, 0 provisional
+build/open-boundary-baseline.json
+closure exit=0
+-- git status --porcelain -- build/（零输出=零漂移）--
+-- end --
+
+== census 单文件 ==
+
+ Test Files  1 passed (1)
+      Tests  23 passed (23)
+   Start at  06:31:25
+   Duration  68.43s (transform 93ms, setup 21ms, import 183ms, tests 68.15s, environment 0ms)
+

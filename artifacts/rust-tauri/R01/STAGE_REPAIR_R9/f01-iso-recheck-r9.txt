@@ -1,0 +1,42 @@
+# R01 阶段修复 R9 — iso 副本复核（/tmp/r01-repair-r9/iso；HEAD 363999378 克隆 + 逐字节复制的候选路径，node_modules 单次 APFS 克隆无嵌套）
+# 代码与三件关卡证据在 iso 构建时即为当前版（SHA-256 与主仓逐项一致已复核）；账本/报告/证据文件终态同步后另做全量零漂移哈希比对
+== gate self-test（iso） ==
+SELF-TEST OK (92/92)
+== gate CLI 电池（iso） ==
+CLI-REGRESSION OK（8 正向 + 62 负向）
+== gate 真实数据（iso） ==
+VERDICT: PASS_WITH_CONDITIONS
+SHELL-REPLACEMENT: ALLOWED_FOR_NEXT_STAGE_ONLY: 实施平台高风险必需能力均有真实原型证据；15 个递延项已全部挂账（截止阶段+失败处理），跨平台/授权态放行挂 R09/R10 强制关卡
+== A15 覆盖自测+真实数据（iso） ==
+SELF-TEST OK (6/6)
+RESULT: COVERAGE-CLOSED (736 F-ID 双向映射闭合；11 关键事实单负责人；14 Pi 能力无第二 loop 保留项)
+== A16 隔离检查（iso） ==
+RESULT: ISOLATED（生产入口零引用 R01 原型/生成物）
+== R9 评审 25 变体（iso，登记副本在 /tmp/r01-repair-r9/） ==
+OK   original: expected_exit=0 exit=0
+OK   r7-double: expected_exit=1 exit=1
+OK   r7-reversed: expected_exit=1 exit=1
+OK   r7-fw: expected_exit=1 exit=1
+OK   r8-colon: expected_exit=1 exit=1
+OK   r8-colon-fw: expected_exit=1 exit=1
+OK   r8-yu: expected_exit=1 exit=1
+OK   r8-single-colon: expected_exit=1 exit=1
+OK   r8-unresolved: expected_exit=1 exit=1
+OK   consistent: expected_exit=0 exit=0
+OK   consistent-connectors: expected_exit=0 exit=0
+OK   context: expected_exit=0 exit=0
+OK   not-later-consistent: expected_exit=0 exit=0
+OK   connector-16: expected_exit=1 exit=1
+OK   connector-17: expected_exit=1 exit=1
+OK   connector-r: expected_exit=1 exit=1
+OK   newline: expected_exit=1 exit=1
+OK   one-trigger-slash: expected_exit=1 exit=1
+OK   one-trigger-or: expected_exit=1 exit=1
+OK   one-trigger-correction: expected_exit=1 exit=1
+OK   one-trigger-old-new: expected_exit=1 exit=1
+OK   bare-deadline: expected_exit=0 exit=0
+OK   synonym: expected_exit=0 exit=0
+OK   quoted-context: expected_exit=0 exit=0
+OK   plain-context: expected_exit=0 exit=0
+ISO-ADVERSARIAL OK (25/25)
+# adversarial exit=0

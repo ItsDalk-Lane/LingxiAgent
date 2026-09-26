@@ -1,0 +1,26 @@
+# R01 阶段修复 R4 — /tmp 隔离副本 F01 复检（iso=/tmp/r01-repair-r4/iso，rsync 自主仓候选工作区）
+
+## --self-test
+SELF-TEST OK (51/51)
+
+## 真实 CLI 负向电池
+CLI-REGRESSION OK（1 正向 + 28 负向）
+
+## R4 评审原样反例（v0 R99 / v1 R099 / v2 R09-R099 / v3 XR09）与正向对照
+v0: exit=1  v1: exit=1  v2: exit=1  v3: exit=1（主仓同批实测；VERDICT 见下）
+--- v0 ---
+VERDICT: NO-GO
+    PROBLEM: 递延项 fetch_interception_layer 风险条目 RR-T05-X1：resolve_by_stage 正文引用的阶段 R99 不存在于真实阶段索引（R00–R11）——不存在的阶段不得挂账
+    PROBLEM: 递延项 fetch_interception_layer 风险条目 RR-T05-X1：resolve_by_stage 正文首个阶段坐标 R99 与结构化截止阶段 R09 不一致——不得以正文措辞绕开结构化绑定
+--- v1 ---
+VERDICT: NO-GO
+    PROBLEM: 递延项 fetch_interception_layer 风险条目 RR-T05-X1：resolve_by_stage 正文引用的阶段 R099 不存在于真实阶段索引（R00–R11）——不存在的阶段不得挂账
+    PROBLEM: 递延项 fetch_interception_layer 风险条目 RR-T05-X1：resolve_by_stage 正文首个阶段坐标 R099 与结构化截止阶段 R09 不一致——不得以正文措辞绕开结构化绑定
+--- v2 ---
+VERDICT: NO-GO
+    PROBLEM: 递延项 fetch_interception_layer 风险条目 RR-T05-X1：resolve_by_stage 正文引用的阶段 R099 不存在于真实阶段索引（R00–R11）——不存在的阶段不得挂账
+--- v3 ---
+VERDICT: NO-GO
+    PROBLEM: 递延项 fetch_interception_layer 风险条目 RR-T05-X1：resolve_by_stage 正文含伪装/截断形态的阶段引用 'R09'（被嵌入更长标识或带相邻字母数字/下划线）——完整标识核验下不得截断成合法阶段放行
+--- positive ---
+VERDICT: PASS_WITH_CONDITIONS

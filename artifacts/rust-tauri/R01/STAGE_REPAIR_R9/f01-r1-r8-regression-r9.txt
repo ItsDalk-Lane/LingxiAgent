@@ -1,0 +1,42 @@
+# R01 阶段修复 R9 — R1–R8 留存 CLI 反例回归（主仓真实 CLI；退出码与首阻断类别与历史逐项一致）
+# 期望基准：R9 评审留档 /tmp/r01-r9-old-repros.json（38 例 = R1–R6 25 + R7 13，评审重放过）
+OK   r099.json: want_exit=1 exit=1 want_first=risk-stage-unknown first=risk-stage-unknown
+OK   r09-slash-dot5.json: want_exit=1 exit=1 want_first=risk-stage-disguised first=risk-stage-disguised
+OK   r99.json: want_exit=1 exit=1 want_first=risk-stage-unknown first=risk-stage-unknown
+OK   control-original.json: want_exit=0 exit=0 want_first=- first=-
+OK   r09-dot-r10.json: want_exit=1 exit=1 want_first=risk-stage-disguised first=risk-stage-disguised
+OK   latest-r09-dot-5.json: want_exit=1 exit=1 want_first=risk-stage-disguised first=risk-stage-disguised
+OK   r0999.json: want_exit=1 exit=1 want_first=risk-stage-unknown first=risk-stage-unknown
+OK   r09-stage.json: want_exit=1 exit=1 want_first=risk-stage-disguised first=risk-stage-disguised
+OK   r09-multi-dot.json: want_exit=1 exit=1 want_first=risk-stage-disguised first=risk-stage-disguised
+OK   xr09.json: want_exit=1 exit=1 want_first=risk-stage-disguised first=risk-stage-disguised
+OK   r09-dot-5.json: want_exit=1 exit=1 want_first=risk-stage-disguised first=risk-stage-disguised
+OK   r09-hyphen-5.json: want_exit=1 exit=1 want_first=risk-stage-disguised first=risk-stage-disguised
+OK   latest-r099.json: want_exit=1 exit=1 want_first=risk-stage-unknown first=risk-stage-unknown
+OK   r09-fullwidthhyphen-5.json: want_exit=1 exit=1 want_first=risk-stage-disguised first=risk-stage-disguised
+OK   r09-r099.json: want_exit=1 exit=1 want_first=risk-stage-unknown first=risk-stage-unknown
+OK   latest-r09-hyphen-5.json: want_exit=1 exit=1 want_first=risk-stage-disguised first=risk-stage-disguised
+OK   r09x.json: want_exit=1 exit=1 want_first=risk-stage-disguised first=risk-stage-disguised
+OK   r09-fullwidthdot-5.json: want_exit=1 exit=1 want_first=risk-stage-disguised first=risk-stage-disguised
+OK   fw-r99-first.json: want_exit=1 exit=1 want_first=risk-stage-unknown first=risk-stage-unknown
+OK   fw-r09-first.json: want_exit=0 exit=0 want_first=- first=-
+OK   fw-latest-r10.json: want_exit=1 exit=1 want_first=risk-stage-text-mismatch first=risk-stage-text-mismatch
+OK   probe-fwR-ascii-digit-99.json: want_exit=1 exit=1 want_first=risk-stage-unknown first=risk-stage-unknown
+OK   probe-asciiR-fwdigit-ok.json: want_exit=0 exit=0 want_first=- first=-
+OK   probe-fw-xr09.json: want_exit=1 exit=1 want_first=risk-stage-disguised first=risk-stage-disguised
+OK   probe-lowercase-r99.json: want_exit=1 exit=1 want_first=risk-stage-disguised first=risk-stage-disguised
+OK   r01-r7-double-latest.json: want_exit=1 exit=1 want_first=risk-stage-text-mismatch first=risk-stage-text-mismatch
+OK   r01-r7-R7-double-latest-same.json: want_exit=0 exit=0 want_first=- first=-
+OK   r01-r7-double-latest-variant.json: want_exit=1 exit=1 want_first=risk-stage-text-mismatch first=risk-stage-text-mismatch
+OK   r01-r7-original-control.json: want_exit=0 exit=0 want_first=- first=-
+OK   r01-r7-R6-fullwidth-first.json: want_exit=1 exit=1 want_first=risk-stage-unknown first=risk-stage-unknown
+OK   r01-r7-R7-double-latest-conflict.json: want_exit=1 exit=1 want_first=risk-stage-text-mismatch first=risk-stage-text-mismatch
+OK   r01-r7-single-latest-r10.json: want_exit=1 exit=1 want_first=risk-stage-text-mismatch first=risk-stage-text-mismatch
+OK   r01-r7-R6-fullwidth-valid.json: want_exit=0 exit=0 want_first=- first=-
+OK   r01-r7-R4-unknown-full.json: want_exit=1 exit=1 want_first=risk-stage-unknown first=risk-stage-unknown
+OK   r01-r7-R5-dot-substage.json: want_exit=1 exit=1 want_first=risk-stage-disguised first=risk-stage-disguised
+OK   r01-r7-R7-contextual-R10-control.json: want_exit=0 exit=0 want_first=- first=-
+OK   r01-r7-double-latest-reversed.json: want_exit=1 exit=1 want_first=risk-stage-text-mismatch first=risk-stage-text-mismatch
+OK   r01-r7-R6-fullwidth-latest.json: want_exit=1 exit=1 want_first=risk-stage-text-mismatch first=risk-stage-text-mismatch
+R1-R8-FIXTURES OK (38/38)
+# exit=0

@@ -1,0 +1,53 @@
+# R01 阶段修复 R3 证据 — R3 评审 F01 原样反例复测：RR-T05-X1 resolve_by_stage → R99（不存在的阶段）
+# 生成时间: 2026-09-26 03:41:16 
+# 执行者: ZCode:R01 阶段修复 R3（一次性任务，非 R1/R2 修复者/评审者）
+
+# 复现方法与 R3 评审一致：复制 RISK_REGISTER.json 到 /tmp，仅改 resolve_by_stage 正文为 R99，其余不动
+# $ python3 -B docs/rust-tauri/R01/r01_t08_gate_check.py --register /tmp/r01-repair-r3/risk-invalid-deadline.json --out /tmp/r01-repair-r3/risk-invalid-deadline-report.json
+# 修复前（R3 评审）：exit 0 / PASS_WITH_CONDITIONS，TRACKED(RR-T05-X1 -> R99（不存在的阶段）)
+# 修复后（本证物）：exit 1 / NO-GO，双理由拒绝
+
+[     BLOCKED] browser_host
+    navigation_snapshot_input_scroll: VERIFIED -> PASS
+    session_isolation: VERIFIED -> PASS
+    untrusted_page_sandbox: VERIFIED -> PASS
+    user_takeover: VERIFIED -> PASS
+    viewport_screenshot: VERIFIED -> PASS
+    fetch_interception_layer: UNVERIFIED -> BLOCKED(risk-stage-unknown)
+    webrtc_exfiltration_boundary: UNVERIFIED -> TRACKED(RR-T05-N2 -> R09 最迟 R09)
+    PROBLEM: 递延项 fetch_interception_layer 风险条目 RR-T05-X1：resolve_by_stage 正文引用的阶段 R99 不存在于真实阶段索引（R00–R11）——不存在的阶段不得挂账
+    PROBLEM: 递延项 fetch_interception_layer 风险条目 RR-T05-X1：resolve_by_stage 正文首个阶段坐标 R99 与结构化截止阶段 R09 不一致——不得以正文措辞绕开结构化绑定
+[    COMPLETE] pdf_renderer
+    chinese_longdoc_fidelity: VERIFIED -> PASS
+    dangerous_resource_denial: VERIFIED -> PASS
+    infinite_script_timeout: VERIFIED -> PASS
+    matrix_28_verified: VERIFIED -> PASS
+    ws_loopback_boundary: VERIFIED -> PASS
+[    COMPLETE] protocol_chain
+    cross_language_roundtrip: VERIFIED -> PASS
+    generated_drift_free: VERIFIED -> PASS
+    ownership_machine_gate: VERIFIED -> PASS
+    version_incompatibility_diagnosis: VERIFIED -> PASS
+    canonical_non_bmp_divergence: OPEN_FINDING -> TRACKED(RR-T02-F1 -> R04 最迟 R04)
+    eventpayload_fallback_invariants: OPEN_FINDING -> TRACKED(RR-T02-F3 -> R04 最迟 R04)
+    seq_parse_lenient: OPEN_FINDING -> TRACKED(RR-T02-F4 -> R04 最迟 R04)
+    ts_canonical_float_bigint: OPEN_FINDING -> TRACKED(RR-T02-F2 -> R04 最迟 R04)
+    ws_close_code_hardcoded: OPEN_FINDING -> TRACKED(RR-T02-F5 -> R08 最迟 R08)
+[    COMPLETE] shell_capabilities
+    capability_matrix_source: VERIFIED -> PASS
+    sidecar_lifecycle_acl: VERIFIED -> PASS
+    window_tray_shortcut_notification_clipboard_dialog_accessibility_updater_loginstartup_restart: VERIFIED -> PASS
+    cross_platform_windows_linux_macx64: UNVERIFIED -> TRACKED(RR-T06-PLATFORM -> R09 最迟 R10)
+    proxy_matrix: UNVERIFIED -> TRACKED(RR-T06-PROXY -> R09 最迟 R10)
+    recording_authorized_path: UNVERIFIED -> TRACKED(RR-T06-MIC -> R09 最迟 R09)
+    screen_real_capture: UNVERIFIED -> TRACKED(RR-T06-SCREEN -> R09 最迟 R09)
+    speech_recognition_authorized_chain: UNVERIFIED -> TRACKED(RR-T06-SPEECH -> R09 最迟 R09)
+[    COMPLETE] storage_cutover
+    data_compatibility_matrix: VERIFIED -> PASS
+    old_binary_write_refusal: VERIFIED -> PASS
+    rollback_no_data_loss_drill: VERIFIED -> PASS
+    cooperative_gate_physical_separation: DOCUMENTED -> TRACKED(RR-T07-F2 -> R08 最迟 R09)
+    corrupt_failure_failopen_fix: REGISTERED_DEFECT -> TRACKED(RR-T07-PROD-DEFECT-1 -> R02 最迟 R02)
+    shell_local_stores_gate: UNVERIFIED -> TRACKED(RR-T07-F3 -> R09 最迟 R09)
+VERDICT: NO-GO
+SHELL-REPLACEMENT: BLOCKED: 存在未真实验证的高风险必需能力/不可信证据/冻结契约闭合违例，替壳路径明确阻塞

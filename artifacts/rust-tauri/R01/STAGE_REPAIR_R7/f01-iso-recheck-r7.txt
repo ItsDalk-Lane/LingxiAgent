@@ -1,0 +1,29 @@
+# R01 阶段修复 R7 — /tmp 隔离副本复验（iso=/tmp/r01-repair-r7/iso）
+# 生成时间: 2026-09-26 08:37:17
+# iso HEAD: 363999378482dfed42733a3c4e8ad20ac82fd0fc
+# 注：首次 iso 记录中反例段的 exit 采集被 shell 展开顺序污染（$(basename) 先于 $? 求值），本段为修正后的有效记录
+
+== gate --self-test（iso）
+SELF-TEST OK (72/72)
+selftest exit=0
+
+== 真实 CLI 电池（iso）
+CLI-REGRESSION OK（4 正向 + 46 负向）
+battery exit=0
+
+== gate 真实数据（iso）
+15
+real-data exit=0（15=TRACKED 行数，exit 0=PASS_WITH_CONDITIONS）
+
+== R7 评审原样反例+变体（iso，与评审同法，修正 exit 采集）
+r01-r7-double-latest.json: exit=1 VERDICT: NO-GO BLOCKED(risk-stage-text-mismatch)
+r01-r7-R7-double-latest-conflict.json: exit=1 VERDICT: NO-GO BLOCKED(risk-stage-text-mismatch)
+r01-r7-double-latest-reversed.json: exit=1 VERDICT: NO-GO BLOCKED(risk-stage-text-mismatch)
+r01-r7-double-latest-variant.json: exit=1 VERDICT: NO-GO BLOCKED(risk-stage-text-mismatch)
+r01-r7-single-latest-r10.json: exit=1 VERDICT: NO-GO BLOCKED(risk-stage-text-mismatch)
+r01-r7-R7-double-latest-same.json: exit=0 VERDICT: PASS_WITH_CONDITIONS 放行
+r01-r7-R7-contextual-R10-control.json: exit=0 VERDICT: PASS_WITH_CONDITIONS 放行
+r01-r7-original-control.json: exit=0 VERDICT: PASS_WITH_CONDITIONS 放行
+
+== R1–R6 全套反例回归（iso，25 例）
+R1–R6 回归: 25 按预期 / 0 偏离（共 25 例）

@@ -1,0 +1,22 @@
+# R01 阶段修复 R2 — F01 真实 CLI 负向回归电池（15 负向 + 1 正向对照）
+# date: 2026-09-26 02:05:49 +0800  host: Darwin 27.0.0 arm64
+# cmd: bash docs/rust-tauri/R01/r01_t08_gate_cli_regression.sh
+
+PASS C0-cli-positive-control: exit=0 verdict=PASS_WITH_CONDITIONS
+PASS-NEG cli-null-field: exit=1 含 'risk-incomplete'
+PASS-NEG cli-object-field: exit=1 含 'risk-incomplete'
+PASS-NEG cli-array-field: exit=1 含 'risk-incomplete'
+PASS-NEG cli-blank-field: exit=1 含 'risk-incomplete'
+PASS-NEG cli-number-field: exit=1 含 'risk-incomplete'
+PASS-NEG cli-bool-field: exit=1 含 'risk-incomplete'
+PASS-NEG cli-placeholder-field: exit=1 含 'risk-incomplete'
+PASS-NEG cli-deleted-field: exit=1 含 'risk-incomplete'
+PASS-NEG cli-closed-status: exit=1 含 'risk-status-contradiction'
+PASS-NEG cli-closed-in-r01-status: exit=1 含 'risk-status-contradiction'
+PASS-NEG cli-defect-status-mismatch: exit=1 含 'risk-status-contradiction'
+PASS-NEG cli-documented-status-mismatch: exit=1 含 'risk-status-contradiction'
+PASS-NEG cli-duplicate-id: exit=1 含 '重复'
+PASS-NEG cli-missing-id: exit=1 含 '缺合法 id'
+PASS-NEG cli-risks-non-list: exit=1 含 '非列表'
+CLI-REGRESSION OK（1 正向 + 15 负向）
+EXIT=0

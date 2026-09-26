@@ -1,18 +1,249 @@
 {
   "spec_version": "1.0",
   "stage_id": "R01",
-  "status": "READY_FOR_REVIEW",
+  "status": "STAGE_PASS_SEAL_PENDING",
   "generated_by": "ZCode:R01-T08-exec-r1（2026-09-25；执行代理，无 commit/push 授权）",
+  "updated_by": "Codex 总控（2026-09-26）：纯证据索引收口，第11轮完整阶段独立 PASS，正式 seal 待真实提交后复验；不改产品源码/测试/配置。",
   "source_sha": "2bbec6d072f1a06305392828bfe3a7fd9739e667",
-  "source_sha_note": "R01-T08 交付尚未提交（执行代理不 commit）；source_sha 为开工基线 HEAD。T01–T07 提交均已推送（见 accepted_tasks）；T08 候选=HEAD+未提交交付，由 working_tree_digest 钉住。",
+  "source_sha_note": "历史候选快照（保留不改写）：T08 执行开工基线 HEAD；T08 未提交交付由 working_tree_digest 钉住。T08 交付此后已提交并推送，当前被验收的阶段候选坐标见 accepted_stage_candidate。",
   "branch": "codex/rust-tauri-migration",
   "working_tree_digest": "239acceb24459d7f0c1d1f5575f83f3864f04e03288c26292bee861de105e404",
   "working_tree_digest_scope": "SHA-256 over 8686 行（sha256+两空格+路径，按路径排序）：全部 git 跟踪文件的工作树内容 + 未跟踪非忽略新文件 + artifacts/rust-tauri/R01/T08/ 下被 *.log 规则忽略的证据文件；排除自引用的 R01_HANDOFF.json 与明细文件自身。逐行明细：artifacts/rust-tauri/R01/T08/working-tree-digest.txt",
+  "accepted_stage_candidate": {
+    "note": "当前已被独立验收并推送的 R01 阶段候选坐标（R01 阶段修复 R1 补登，替代此前只有执行前快照的状态）",
+    "t08_task_commit": "358299c1e9a768a75186f197686d25ee6636d6d7",
+    "ledger_commits": [
+      "f783a8e8e263c9565a76b8fad8cabc688c8a2b6d",
+      "363999378482dfed42733a3c4e8ad20ac82fd0fc"
+    ],
+    "remote_head": "363999378482dfed42733a3c4e8ad20ac82fd0fc",
+    "remote_verified": "ls-remote origin codex/rust-tauri-migration（2026-09-25 R01 阶段修复 R1 复核，本地=远端）；remote-tracking reflog 22:32:23/22:34:54 +0800 两次 update by push",
+    "t08_review": {
+      "verdict": "PASS(R1)",
+      "reviewer_id": "ZCode:R01-T08-review-r1 (agent_2c68e944-d448-4db2-abde-c2a00f817d2e)",
+      "report": "docs/rust-tauri/R01/R01-T08_REVIEW_R1.md",
+      "report_sha256": "4a0c50ade4b10d3bb18b8303c78fb0670a42fee86852d4faf380804f9d731fcf"
+    },
+    "stage_review_r1": {
+      "verdict": "FAIL",
+      "findings": [
+        "F01",
+        "F02"
+      ],
+      "reviewer_id": "Codex:/root/r01_stage_review_r1",
+      "report": "/tmp/r01-stage-review-r1.md",
+      "report_sha256": "0ace64a61fdcff4aa6d15b9eaa890b55ca91b30c3fed2d62ddc77653ec2dc020"
+    },
+    "stage_repair_r1": {
+      "status": "READY_FOR_INDEPENDENT_STAGE_REREVIEW",
+      "agent_id": "ZCode:R01 阶段修复 R1（ZCode 一次性任务）",
+      "report": "/tmp/r01-stage-repair-r1.md",
+      "candidate": "HEAD 363999378 + 未提交修复改动（逐文件 SHA-256 候选指纹见修复报告）；阶段复验 PASS 前不宣告阶段通过、不进入 R02，PASS 后由总控提交推送并推进账本坐标",
+      "report_sha256": "2843c62c867cdbfe0e7aa0f3d4c1f3214359eb5160f9358a942573c40d4959b2"
+    },
+    "stage_review_r2": {
+      "verdict": "FAIL",
+      "findings": [
+        "F01",
+        "F02",
+        "F03"
+      ],
+      "reviewer_id": "Codex:/root/r01_stage_review_r2",
+      "report": "/tmp/r01-stage-review-r2.md",
+      "report_sha256": "727e82f0323fd067b33f49a7c09a44dc494cc58ee5c0697aa5ca490f12f71e82"
+    },
+    "stage_repair_r2": {
+      "status": "READY_FOR_INDEPENDENT_STAGE_REREVIEW",
+      "agent_id": "ZCode:R01 阶段修复 R2（ZCode 一次性任务）",
+      "report": "/tmp/r01-stage-repair-r2.md",
+      "candidate": "HEAD 363999378 + R1 候选全部保留 + R2 未提交修复改动（逐文件 SHA-256 候选指纹见修复报告）；F01 有意义字符串/状态一致性/登记完整性收口（自测 29/29、CLI 电池 16/16）、F02 eslint 环境收口（61→0 errors）、F03 双补丁受控分片（patch-gzip-shards/v1）+ /tmp 全链预演绿（分片 VERIFIED、门禁 74/74、对象审计 0 超限、裸仓推送一致）；环境性 cli-runtime-closure 漂移致全量 npm test 2 红已归因登记（RR-ENV-CLOSURE-DRIFT）；阶段复验 PASS 前不宣告阶段通过、不进入 R02，PASS 后由总控提交推送并推进账本/封印坐标（预演 SHA 不作正式坐标）",
+      "report_sha256": "5cddb8c74366d366d2da87803f5bb68566e6e48fdb0c6bcd6d773e7d6b73fc06"
+    },
+    "stage_review_r3": {
+      "verdict": "FAIL",
+      "findings": [
+        "F01",
+        "F02"
+      ],
+      "reviewer_id": "Codex:/root/r01_stage_review_r3（全新子代理，只读验收，未参与 R01 执行/T 验收/R1/R2 阶段验收或修复）",
+      "report": "/tmp/r01-stage-review-r3.md",
+      "report_sha256": "df460deb5453bb27757f47f9c4f7eb8c76c548eeafe4fac94c06976a795bf64f",
+      "frozen_fingerprint": "beee5117ed3bd0382efa3ac6ac43d353cc37befa56c12ecb6e29e60169808038（R1+R2 候选评审冻结指纹）"
+    },
+    "stage_repair_r3": {
+      "status": "READY_FOR_INDEPENDENT_STAGE_REREVIEW",
+      "repairer_id": "ZCode:R01 阶段修复 R3（ZCode 一次性任务）",
+      "report": "/tmp/r01-stage-repair-r3.md",
+      "report_sha256": "56587d5718faa7bc4ff3032d52a77402e4715f202538c1d3fdd15d72526677cb",
+      "note": "报告 SHA-256 待总控提交后由后续账本提交补登（同 R1/R2 惯例）。F01：截止阶段机器校验绑定（契约 1.3-stage-repair-r3，冻结阶段索引+逐项 deadline/latest+结构化坐标四方核验），自测 44/44、CLI 电池 1 正+22 负、R99 原样反例 exit 1。F02：nft 宿主绝对路径类过滤（不改基线跨机器收敛）+ census finally 恢复 + 结构性断言加强；修复后同机再生成 8949 文件零漂移，候选态全量 npm test 14949/6（全为预期封印前红，2 环境性红消失），/tmp 封印预演 R3a'' 处四文件门禁 74/74、全量 npm test 14949 passed/0 failed/exit 0、可达集与裸仓 0 个 ≥100MiB、推送 SHA 一致、终态零漂移。"
+    },
+    "stage_review_r4": {
+      "verdict": "FAIL",
+      "findings": [
+        "F01",
+        "F02"
+      ],
+      "reviewer_id": "Codex:/root/r01_stage_review_r4（全新子代理，只读验收，未参与 R01 执行/T 验收/R1–R3 阶段验收或修复）",
+      "report": "/tmp/r01-stage-review-r4.md",
+      "report_sha256": "0d6ce6834a0426bfcae1273f18f030ba38907f687cc27a7767b31c75966deab8",
+      "frozen_fingerprint": "3430e659b0e91e32b26053dbfcff14769a6c874e4605d119e592568c4787465d（R1+R2+R3 候选评审冻结指纹）"
+    },
+    "stage_repair_r4": {
+      "status": "READY_FOR_INDEPENDENT_STAGE_REREVIEW",
+      "repairer_id": "ZCode:R01 阶段修复 R4（ZCode 一次性任务）",
+      "report": "/tmp/r01-stage-repair-r4.md",
+      "report_sha256": "2a5b91c02acd961d0908d8c8d1304dd77bf914b661e2247d9e270580e6a031d7",
+      "note": "报告 SHA-256 待总控提交后由后续账本提交补登（同 R1/R2/R3 惯例）。F01：完整标识阶段引用校验（契约 1.4-stage-repair-r4，G6b——完整形态提取 R+数字全文不截断并逐个核验真实阶段索引，形似但被嵌入更长标识/带相邻字母数字下划线的伪装出现单独拒绝 risk-stage-disguised，「最迟 X」按完整形态捕获核验），自测 51/51（N1–N43 全保留 + N44–N50 新负向）、真实 CLI 电池 1 正+28 负、R4 评审 v0(R99)/v1(R099)/v2(R09/R099)/v3(XR09) 原样反例全部 exit 1/NO-GO。F02：RISK_REGISTER 两条与 ACCEPTANCE_LEDGER npm_test_note/description 的 R2 现在时更新为 R3 修复后事实（漂移已根除、剩余条件=正式提交后在真实候选上复验），R2 失败历史保留，不提前称正式封印完成。"
+    },
+    "stage_review_r5": {
+      "verdict": "FAIL",
+      "findings": [
+        "F01",
+        "F02"
+      ],
+      "reviewer_id": "Codex:/root/r01_stage_review_r5（全新子代理，只读验收，未参与 R01 执行/T 验收/R1–R4 阶段验收或修复）",
+      "report": "/tmp/r01-stage-review-r5.md",
+      "report_sha256": "3107c695916f600d4e00b2be2eb5cb0fe3d49aa5135efb764247ee498f519b21",
+      "frozen_fingerprint": "2e3913b6d1f8f580cbd7c90e2526844bd8d68be71d5825c4fdcba6b8eb2e9309（R1+R2+R3+R4 候选评审冻结指纹）",
+      "f02_note": "F02 为非独立阻断的证据范围账数不符：R4 修复报告 §3/§7 与 /tmp/r01-repair-r4/r4-file-hashes.txt 标题写 STAGE_REPAIR_R4 12 件/候选 18+48=66，实际 11 件/18+47=65；11 件哈希逐项匹配、无被点名缺失的关键日志，属报告计数错误而非证据缺失。R4 原报告及其已记录 SHA 不改写，历史可追溯。"
+    },
+    "stage_repair_r5": {
+      "status": "READY_FOR_INDEPENDENT_STAGE_REREVIEW",
+      "repairer_id": "ZCode:R01 阶段修复 R5（ZCode 一次性任务；非 R1–R4 修复者、非 R1–R5 阶段验收者、非任一 T 代理）",
+      "report": "/tmp/r01-stage-repair-r5.md",
+      "report_sha256": "84456ef2588388dbcf6c7419854480526c28bfc4ccbc28fffda93a5ba06abf02",
+      "note": "报告 SHA-256 待总控提交后由后续账本提交补登（同 R1–R4 惯例）。F01：标识延续字符边界扩展（契约 1.5-stage-repair-r5，G6b 扩展）——合法阶段引用=R+数字完整 token 且紧邻前后均非「标识延续字符」（字母/数字/下划线 + 点号/连字符族：ASCII 与全角点、全角下划线/连字符、en–em dash、间隔号；空白/斜杠/中文标点为合法分隔符），复合/小阶段/拼接出现（R09.5/R09-5/R09．5/R09－5/R09.5.1/R09.R10 等）按向两侧扩展的完整复合形态拒绝 risk-stage-disguised，不再截成 R09 放行，「最迟 X」标记同规则；自测 59/59（N1–N50 全保留+N51–N58 新负向）、真实 CLI 电池 1 正+36 负、R5 评审原样反例（三字面量）与 R1–R4 全套反例 18/18 exit 1/NO-GO，正向真实数据判定不变。F02：实际证据范围更正——STAGE_REPAIR_R4 11 件、候选 18 修改+47 新增=65 文件；逐文件核实 11 件哈希与 R4 所列 SHA 逐项匹配，无第 12 件计划内证据（R4 报告证据矩阵点名日志全部在列），属 R4 报告计数错误而非证据缺失；R4 原报告不改写。"
+    },
+    "stage_review_r6": {
+      "verdict": "FAIL",
+      "findings": [
+        "F01"
+      ],
+      "reviewer_id": "Codex:/root/r01_stage_review_r6（全新子代理，只读验收，未参与 R1–R5 阶段验收、R1–R5 修复或 T01–T08 执行/验收）",
+      "report": "/tmp/r01-stage-review-r6.md",
+      "report_sha256": "7c3cc019f7462bf971105dbf0683faf7f531b7d9d7cda740f76836f25a7865b5",
+      "frozen_fingerprint": "b14cc659712942cc4df910621fd6078e4bee98ff8d5f4fdb7d7984b91e892215（R1–R5 候选评审冻结指纹，18 修改+57 新增=75 件，原像 284,639 B）",
+      "f01_note": "全角同形阶段隐藏绕过：检查器 STAGE_TOKEN_RE/STAGE_DISGUISE_RE/LATEST_MARKER_RE 三条正则只从 ASCII R 起始，全角同形 Ｒ９９/Ｒ１０/Ｒ０９ 完全不参加提取、真实阶段索引核验与「最迟」一致性核验——正文首位「Ｒ９９（不存在的截止阶段）；R09（仅用于宿主集成）」与「R09（宿主集成）最迟 Ｒ１０（虚构放宽关卡）」两条真实 CLI 误放 exit 0/PASS_WITH_CONDITIONS/TRACKED(R09)；而 R０９（ASCII R+全角数字）反被 \\d Unicode 语义提取后拒，同族处理不一致。大小写 r99 混用同病，评审列为可由修复一并收口的契约选择。"
+    },
+    "stage_repair_r6": {
+      "status": "READY_FOR_INDEPENDENT_STAGE_REREVIEW",
+      "repairer_id": "ZCode:R01 阶段修复 R6（ZCode 一次性任务；非 R1–R5 修复者、非 R1–R6 阶段验收者、非任一 T 代理）",
+      "report": "/tmp/r01-stage-repair-r6.md",
+      "report_sha256": "d33659ba0798822a310c2ee1467272e9e4b98c49a439b9efe182dc37539458e8",
+      "note": "报告 SHA-256 待总控提交后由后续账本提交补登（同 R1–R5 惯例）。F01：G6c 全角同形 1:1 等长折叠+大小写契约（契约 1.6-stage-repair-r6）——_fold_stage_homoglyphs() 折叠全角拉丁字母/全角数字为 ASCII，提取与全部核验在折叠文本上进行（span 与原文 1:1 对齐、伪装形态报告切片取原文），结构化坐标 resolve_by_stage_id/resolve_latest_stage_id 不折叠保持 ASCII 精确权威；合法引用仅认大写 R，小写 r+数字（含全角）按伪装形态拒绝。修复后 Ｒ９９ 首位→risk-stage-unknown、最迟 Ｒ１０→risk-stage-text-mismatch、Ｒ０９+R09 规范化一致→exit 0、R０９→exit 0、r99/ｒ９９/ＸＲ０９/Ｒ99→拒绝。自测 67/67（N1–N58 全保留+N59–N65 新负向+P2 全角规范化正向）、真实 CLI 电池 2 正+43 负、R6 原样反例 2 条+变体 5 条 exit 1/NO-GO、R1–R5 全套 18/18 类别不变，正向真实数据判定不变；RISK_REGISTER.json 本轮一字节未动。"
+    },
+    "stage_review_r7": {
+      "verdict": "FAIL",
+      "findings": [
+        "F01"
+      ],
+      "reviewer_id": "Codex:/root/r01_stage_review_r7（全新只读阶段复验代理；未参与 R1–R6 阶段验收、ZCode 修复或 T01–T08 执行与验收）",
+      "report": "/tmp/r01-stage-review-r7.md",
+      "report_sha256": "e2bf485c725806ab8c052fec2a32a887d26611eb14e5c3df0c1201f15b3ea1c1",
+      "frozen_fingerprint": "04dea823b8ff24703241ec2d6128efcb991586565d585e9249e5f61044b3999f（R1–R6 候选评审冻结指纹，18 修改+67 新增=85 件，原像 307,095 B）",
+      "f01_note": "重复「最迟」中第二个相矛盾的期限被忽略：检查器对折叠后正文用 LATEST_MARKER_RE.search() 只校验第一处「最迟」标记——仅改临时登记 RR-T05-X1 resolve_by_stage 正文为「R09（宿主集成）最迟 R09；最迟 R10（虚构放宽关卡）」（结构化 resolve_by_stage_id/resolve_latest_stage_id 保持 R09/R09），真实 CLI 仍 exit 0/PASS_WITH_CONDITIONS；第二处相矛盾的强制期限被完全忽略，风险交接正文与机器接受的最迟期限不一致。单处「最迟 R10」与顺序交换「最迟 R10；最迟 R09」均正确拒绝，说明仅首处受检。"
+    },
+    "stage_repair_r7": {
+      "status": "READY_FOR_INDEPENDENT_STAGE_REREVIEW",
+      "repairer_id": "ZCode:R01 阶段修复 R7（ZCode 一次性任务；非 R1–R6 修复者、非 R1–R7 阶段验收者、非任一 T 代理）",
+      "report": "/tmp/r01-stage-repair-r7.md",
+      "report_sha256": "813eed988e1424a5127b75b63e50638b90d0c2e0b01e23d4e626326ff927f995",
+      "note": "报告 SHA-256 待总控提交后由后续账本提交补登（同 R1–R6 惯例）。F01：G6d「最迟」标记逐处核验、失败关闭（契约 1.7-stage-repair-r7）——LATEST_MARKER_RE 由 search() 改 finditer 遍历折叠后正文全部「最迟 X」标记：任一引用不存在阶段→risk-stage-unknown、任一≠结构化 resolve_latest_stage_id→risk-stage-text-mismatch；清晰契约：正文每一处「最迟」均为强制期限声明，须全部与结构化最迟关卡一致方可放行（「最迟 R09；最迟 R09」放行），任一相矛盾即拒；与「最迟」语法无关的正常阶段提及（如「R10（后续平台事项）」）不构成最迟标记、不误伤；结构化坐标仍是判定权威，不放宽到更晚阶段。修复后：R09…最迟 R09；最迟 R10→exit 1/risk-stage-text-mismatch、最迟 R10；最迟 R09→exit 1、全角混用 最迟 Ｒ０９；最迟 Ｒ１０→exit 1、最迟 R09；最迟 R09→exit 0、上下文提及 R10→exit 0。自测 72/72（N1–N65 全保留+N66–N68 新负向+P3/P4 两个新正向）、真实 CLI 电池 4 正+46 负、R7 评审原样反例与变体 13/13、R1–R6 全套反例 25/25 复测全部按预期，正向真实数据判定不变（exit 0/PASS_WITH_CONDITIONS/15 递延 TRACKED）；RISK_REGISTER.json 本轮一字节未动。"
+    },
+    "stage_review_r8": {
+      "verdict": "FAIL",
+      "findings": [
+        "F01"
+      ],
+      "reviewer_id": "Codex:/root/r01_stage_review_r8（全新阶段只读复验代理；未参加 R1–R7 阶段验收、ZCode 修复、T01–T08 执行或任务验收）",
+      "report": "/tmp/r01-stage-review-r8.md",
+      "report_sha256": "8e926451df0ef4b9a3f03c9a50d07710493c48e795b3318950b8d130c160ebba",
+      "frozen_fingerprint": "1c2bd57d3f973cc49e428fc6476af61e4ff0bbc18706702bc87ca0a2be624d29（R1–R7 候选评审冻结指纹，18 修改+77 新增=95 件，原像 325,821 B）",
+      "f01_note": "带常见连接词或标点的「最迟」声明绕过逐处核验：R7 标记语法只识别「最迟」后接可选空白再紧跟阶段 ID——仅改临时登记 RR-T05-X1 resolve_by_stage 正文为「R09（宿主集成）最迟 R09；最迟：R10（虚构放宽关卡）」（全角冒号）、「…最迟：Ｒ１０…」（全角冒号+全角阶段）、「…最迟于 R10…」（连接词）或单处「最迟：R10」（结构化 resolve_by_stage_id/resolve_latest_stage_id 保持 R09/R09）时真实 CLI 均 exit 0/PASS_WITH_CONDITIONS 误放；通用阶段扫描虽看见真实存在的 R10 但只查其在 R00–R11 索引中存在，既不与结构化最迟 R09 比较，也不将其当作强制期限，直接违背「正文每一处「最迟」均为强制期限声明、任一相矛盾即拒」的 G6d 契约。R7 原样/顺序交换/全角混用仍正确拒绝，两处一致与上下文提及正向不受影响。"
+    },
+    "stage_repair_r8": {
+      "status": "READY_FOR_INDEPENDENT_STAGE_REREVIEW",
+      "repairer_id": "ZCode:R01 阶段修复 R8（ZCode 一次性任务；非 R1–R7 修复者、非 R1–R8 阶段验收者、非任一 T 代理）",
+      "report": "/tmp/r01-stage-repair-r8.md",
+      "report_sha256": "a0daa60cb0c98b6e323b95368f250083129fb5bf539cc4a6b180651217a4c653",
+      "note": "报告 SHA-256 待总控提交后由后续账本提交补登（同 R1–R7 惯例）。F01：G6d 连接形态扩展、失败关闭（契约 1.8-stage-repair-r8）——LATEST_MARKER_RE 升级为「触发词族（最迟/不迟于/不得迟于/不晚于/不得晚于）+ 有界连接段（≤16 字符自然书写杂讯，段内不得出现 R/r 与子句终结符）+ 完整阶段 ID」，R8 评审原样四种误放形态（最迟：R10 / 最迟：Ｒ１０ / 最迟于 R10 / 单处最迟：R10）修复后全部 exit 1/NO-GO/risk-stage-text-mismatch；新增失败关闭类别 risk-stage-latest-unresolved：触发词在子句内解析不出阶段 ID（如「最迟于第三阶段完成」）即拒。修复后：R7 原样/顺序交换/全角混用仍 exit 1、多处一致（含连接形态「最迟：R09；最迟于 R09」）与上下文提及 R10 exit 0、否定连接式一致（不晚于 R09）exit 0。自测 83/83（N1–N68 全保留+N69–N77 新负向+P5/P6 两个新正向）、真实 CLI 电池 6 正+54 负（扩 8 个 R8 变体）、R8 评审原样反例与对照 10/10、R7 评审原样反例与变体 13/13、R1–R6 全套反例 25/25 复测全部按预期，正向真实数据判定不变（exit 0/PASS_WITH_CONDITIONS/15 递延 TRACKED）；RISK_REGISTER.json 本轮一字节未动。"
+    },
+    "stage_review_r9": {
+      "verdict": "FAIL",
+      "findings": [
+        "F01"
+      ],
+      "reviewer_id": "Codex:/root/r01_stage_review_r9（全新阶段只读复验代理；未参加 R1–R8 阶段验收、ZCode 修复或 T01–T08 执行/验收）",
+      "report": "/tmp/r01-stage-review-r9.md",
+      "report_sha256": "b98763a11c1875b0e3ebf28c78e9d48e10f2fbd6dbec8e9e054d115a5277ad58",
+      "frozen_fingerprint": "0c70bc5360375b7ea7982e33209a95666a6b75f561d6b4c2b5481b4d2b4e8845（R1–R8 候选评审冻结指纹，18 修改+87 新增=105 件，原像 352,485 B）",
+      "f01_note": "单个期限声明子句中的「原定→改期」仍只校验首个阶段：RR-T05-X1 结构化 deadline/latest 与冻结契约保持 R09/R09，仅改该条 resolve_by_stage 正文为「R09（宿主集成）最迟（原定 R09，现改 R10）完成」「…最迟由原定的 R09 顺延至 R10 完成」「…最迟在 R09 或 R10 完成」「…最迟 R09/R10 完成」（及全角变体）时真实 CLI 均 exit 0/PASS_WITH_CONDITIONS 误放——机器只核验触发词后的首个阶段，未核验同一期限声明内的改期结果；人工交接期限与机器接受的冻结期限仍相矛盾。另披露非阻断限制：触发词被引用为字段名（R10 文档介绍“最迟”字段）可能被误拒为 unresolved。"
+    },
+    "stage_repair_r9": {
+      "status": "READY_FOR_INDEPENDENT_STAGE_REREVIEW",
+      "repairer_id": "ZCode:R01 阶段修复 R9（ZCode 一次性任务；非 R1–R8 修复者、非 R1–R9 阶段验收者、非任一 T 代理）",
+      "report": "/tmp/r01-stage-repair-r9.md",
+      "report_sha256": "5dd9db4bd4a33777ffd49a6615ce3cc9c0b4cd6e929eaaba2f3e57740d564f6a",
+      "note": "报告 SHA-256 待总控提交后由后续账本提交补登（同 R1–R8 惯例）。F01：G6e 期限子句唯一一致（契约 1.9-stage-repair-r9）——每个显式期限触发词治理「从触发词起到子句终结符止」的完整区域，区域内每个完整阶段引用都必须与结构化 resolve_latest_stage_id 一致，出现任何其他阶段（改期/顺延/选择「或」/斜杠并列及全角变体）即无法机器判定唯一一致期限，按 risk-stage-text-mismatch 失败关闭拒绝；不枚举改期/顺延/选择语言，任何第二阶段统一覆盖；成对引号紧包的触发词（“最迟”等）为引用词名而非期限声明，不触发解析义务、不治理期限子句（闭引号紧邻触发词末端，被包裹内容不可能携带阶段 ID，豁免无法隐藏期限——R9 评审披露误拒限制的最小处理）。修复后：R9 评审原样四变体（改期/顺延/或/斜杠）→exit 1/NO-GO/risk-stage-text-mismatch、全角变体与拉丁 or 连接同拒、引号词名引用→exit 0；R7/R8 原样反例仍 exit 1、多处一致（含同子句内重复一致）与上下文提及 R10 及无触发词裸后缀边界仍 exit 0。自测 92/92（N1–N77 全保留+N78–N84 新负向+P7/P8 两个新正向）、真实 CLI 电池 8 正+62 负（扩 8 负+2 正）、R9 评审 25 变体 25/25、R1–R8 留存 CLI 反例 38/38 复测全部按预期，正向真实数据判定不变（exit 0/PASS_WITH_CONDITIONS/15 递延 TRACKED，关卡证据三件按 1.9 契约重生成）；RISK_REGISTER.json 本轮一字节未动。"
+    },
+    "stage_review_r10": {
+      "verdict": "FAIL",
+      "findings": [
+        "F01"
+      ],
+      "reviewer_id": "Codex:/root/r01_stage_review_r10（全新阶段只读复验代理；未参加 R1–R9 阶段验收、ZCode 修复或 T01–T08 执行/验收）",
+      "report": "/tmp/r01-stage-review-r10.md",
+      "report_sha256": "c6433031f5e2c94bcba28a1d052dcd0f53f10eb9bc3193f3c2c61d8709052aa3",
+      "frozen_fingerprint": "39e9bdd7a4576e7b7437400b321302c5608c5e9cc06cfff62bf04bba73a853e3（R1–R9 候选评审冻结指纹，18 修改+98 新增=116 件，原像 380,578 B）",
+      "f01_note": "引号豁免跳过实际赋值/改期的整个后续期限区域，括号内部的分号或换行也截断完整期限声明：RR-T05-X1 结构化 deadline/latest 与冻结契约保持 R09/R09，仅改该条 resolve_by_stage 正文为「R09（宿主集成）“最迟”字段：原定 R09，现改 R10 完成」（四种支持引号同族）、「R09（宿主集成）“最迟” R09/R10 完成」、「R09（宿主集成）「最迟」 Ｒ０９／Ｒ１０ 完成」、「R09（宿主集成）最迟（原定 R09；现改 R10）完成」（及括号内换行同形）时真实 CLI 均 exit 0/PASS_WITH_CONDITIONS 误放——人工交接期限与机器冻结期限不能保证一致。评审另独立裁定：「最晚于 R10 完成」「R10 前必须完成」等已披露明确截止不能凭「文档化边界」自动当普通上下文；R9 修复报告「任务书明确禁止同义词枚举」声称经查无原任务书原文依据。"
+    },
+    "stage_repair_r10": {
+      "status": "READY_FOR_INDEPENDENT_STAGE_REREVIEW",
+      "repairer_id": "ZCode:R01 阶段修复 R10（ZCode 一次性任务；非 R1–R9 修复者、非 R1–R10 阶段验收者、非任一 T 代理）",
+      "report": "/tmp/r01-stage-repair-r10.md",
+      "report_sha256": "eb7278f092c5c1212059ea5a8d442ec7bcc21b8090a3229d3a7967f8784bb5aa",
+      "note": "报告 SHA-256 待总控提交后由后续账本提交补登（同 R1–R9 惯例）。F01：G6f 期限区域完整性与已披露边界期限拒绝（契约 1.10-stage-repair-r10）——(1) 引号紧包豁免收窄为仅豁免该触发词自身解析义务（词名引用无须解析出阶段 ID，R9 披露词名误拒限制的修复保持），其「触发词起到括号感知终结符止」的后续区域仍逐引用与结构化 resolve_latest_stage_id 一致，词名/字段名引用不得遮蔽同子句内随后的实际赋值/改期/选择；(2) 区域边界括号感知：未闭合全/半角括号内终结符不终止区域，未闭合括号使区域延伸至文本末尾（失败关闭方向）；(3) 「最晚」并入显式期限触发词族（迟/晚对称封闭形态族补全，非开放同义词枚举——R9 修复报告称任务书明确禁止该方向经 R10 评审查无原文依据，现行文档已更正、历史报告保留原文），「最晚于 R10」≠结构化最迟即拒、一致「最晚于 R09」放行；(4) 阶段锚定「之前/以前/前」边界期限书写按新类别 risk-stage-boundary-unsupported 失败关闭拒绝（机器契约不支持 before-stage 语义核验，R9 曾记文档化边界正向的两例按 R10 评审独立裁定翻转为负向——加强拒绝非放宽旧断言）；机器书写/交接契约成文：期限表达一律用触发词族（最迟/最晚/不迟于/不得迟于/不晚于/不得晚于）+完整阶段 ID（或结构化坐标），四种支持引号（“”/「」/『』/ASCII \"）仅用于词名引用。修复后：评审粗体反例（词名后改期四引号族/词名后斜杠与全角斜杠/括号内分号与换行/最晚于 R10/R10 前必须完成及「之前」同族）→exit 1；词名纯介绍（含直角引号）、最晚于 R09 一致、词名后一致提及→exit 0；R1–R9 全部正负保持。自测 107/107（N1–N84 全保留+N85–N96 十二个新负向+P9/P10/P11 三个新正向）、真实 CLI 电池 11 正+74 负、R10 评审 23 变体+四引号对照 4 例重放（9 误放全转 exit 1、5 正向保持、既有负向保持）、R9 评审 25 变体 25/25（仅两例裁定翻转）、R1–R8 留存 CLI 反例 38/38 逐项不变（合计 91/91），正向真实数据判定不变（exit 0/PASS_WITH_CONDITIONS/15 递延 TRACKED，关卡证据三件按 1.10 契约重生成）；RISK_REGISTER.json 本轮一字节未动。"
+    },
+    "stage_review_r11": {
+      "status": "STAGE_PASS_SEAL_PENDING",
+      "stage_verdict": "PASS",
+      "review_round": 11,
+      "reviewer_id": "Codex:/root/r01_stage_review_r11",
+      "report": "docs/rust-tauri/R01/STAGE_HISTORY/R01_STAGE_REVIEW_R11.md",
+      "report_sha256": "ffd77f3addd0ce3a988274984101a20411df0e7a84ecb0ff07b029aeb719b126",
+      "frozen_fingerprint": "1917800317b41362c2c330b3f5c096c3c2891d2356481bee0b3803bc780f6be7",
+      "frozen_candidate_count": 126,
+      "blocking_findings": [],
+      "formal_seal_status": "PENDING_REAL_COMMIT_VERIFICATION",
+      "next_stage_authorized": false,
+      "note": "完整 R01 冻结候选独立 PASS；正式提交后封印与最终 ACCEPTED 尚未完成，六项旧坐标/证据红灯仍为未通过，不进入 R02。"
+    }
+  },
   "protocol_version": {
-    "lingxi.wire": {"min_supported": 1, "max_supported": 1, "authority": "rust/crates/lingxi-protocol/ serde 类型 + docs/rust-tauri/R01/PROTOCOL_SPEC.md", "status": "新协议独立轴，本阶段冻结 v1；生成物 contracts/generated（56 文件）--check 零漂移门禁"},
-    "PRELOAD_API_VERSION": {"value": 1, "source": "shared/contract-versions.json", "status": "现役冻结未升级；宿主桥属 native_host 映射（R09 Tauri 化），不进 lingxi.wire"},
-    "SERVER_PROTOCOL_VERSION": {"value": 1, "source": "shared/contract-versions.json", "status": "现役冻结；迁移期由兼容层保留（API_COMPAT_MATRIX 427 项 retain）"},
-    "api_compat_matrix": {"entries": 624, "byCategory": {"business_compat": 427, "native_host": 197}, "sha256": "6f7a34244b23f94e6300fbd777f0c834fa2d233bfb8ca2e963a9fe068cb2af06"}
+    "lingxi.wire": {
+      "min_supported": 1,
+      "max_supported": 1,
+      "authority": "rust/crates/lingxi-protocol/ serde 类型 + docs/rust-tauri/R01/PROTOCOL_SPEC.md",
+      "status": "新协议独立轴，本阶段冻结 v1；生成物 contracts/generated（56 文件）--check 零漂移门禁"
+    },
+    "PRELOAD_API_VERSION": {
+      "value": 1,
+      "source": "shared/contract-versions.json",
+      "status": "现役冻结未升级；宿主桥属 native_host 映射（R09 Tauri 化），不进 lingxi.wire"
+    },
+    "SERVER_PROTOCOL_VERSION": {
+      "value": 1,
+      "source": "shared/contract-versions.json",
+      "status": "现役冻结；迁移期由兼容层保留（API_COMPAT_MATRIX 427 项 retain）"
+    },
+    "api_compat_matrix": {
+      "entries": 624,
+      "byCategory": {
+        "business_compat": 427,
+        "native_host": 197
+      },
+      "sha256": "6f7a34244b23f94e6300fbd777f0c834fa2d233bfb8ca2e963a9fe068cb2af06"
+    }
   },
   "data_epoch": {
     "current_DATA_EPOCH": 1,
@@ -26,88 +257,447 @@
     "note": "Rust 工具链 1.98.1（rustup 锁定，组件 rustfmt+clippy）；关键版本表见 DEPENDENCY_DECISIONS.md 总锁表（tokio 1.53.1/axum 0.8.9/reqwest 0.13.5/rustls 0.23.45/rusqlite 0.40.2/rmcp 3.4.1/schemars 1.2.2/jsonschema 0.57.0 等，280 包条目）"
   },
   "accepted_tasks": [
-    {"task_id": "R01-T01", "commit": "58e00b53d9fc6be03d64f51e33313f3f0063a51a", "verdict": "PASS(R3)", "deliverables": ["ADR-001-ownership.md", "DEPENDENCY_RULES.json", "OWNERSHIP_TARGET.json", "r01_t01_check_ownership.py", "r01_t01_build_ownership.py"]},
-    {"task_id": "R01-T02", "commit": "9390ae01d9e8145400eb3c44e8044bc2e1b46524", "post_pass_fix": "b9442d86f3da87aaea4f51faeeecb68483b09a1e（headSha 内容派生戳，复验 PASS）", "verdict": "PASS(R1)+fix PASS", "deliverables": ["PROTOCOL_SPEC.md", "rust/crates/lingxi-protocol", "contracts/generated/", "API_COMPAT_MATRIX.json"]},
-    {"task_id": "R01-T03", "commit": "5b63323b9a81b7e7603b32ace0673674b8bc2405", "verdict": "PASS(R1)", "deliverables": ["DEPENDENCY_DECISIONS.md", "PLATFORM_BUILD_MATRIX.json", "rust-toolchain.toml", "rust/Cargo.lock", "rust/crates/lingxi-spike"]},
-    {"task_id": "R01-T04", "commit": "abe4d5452ed6d455bc2c53f8e0c813afd80aa0e8", "docfix_commit": "abe4d5452ed6d455bc2c53f8e0c813afd80aa0e8（docfix 实质内容——D-09 版本号修正、BROWSER_SPIKE_REPORT 措辞精确化、artifacts/rust-tauri/R01/T04/docfix-r1-gcm/ 证据——随 T04 主提交入库；5a8a8e24ab9e8e105da5132d16b175221a91d646 仅为账本记录提交，实测仅含 ORCHESTRATOR_PROGRESS.json。R01-T08 独立验收 R1 O1 修正：原指针误指向账本提交）", "verdict": "PASS(R1)+docfix PASS", "deliverables": ["ADR-002-browser-host.md", "BROWSER_SPIKE_REPORT.md", "rust/crates/lingxi-browser-spike（CDP 原型）"]},
-    {"task_id": "R01-T05", "commit": "4fa0b573ce8cb9b574d78e72b72455f98e360273", "verdict": "PASS(R2)", "deliverables": ["ADR-003-document-renderer.md", "PDF_SPIKE_REPORT.md", "tests/migration/r01-t05/（19 场景 replay+矩阵+负向）"]},
-    {"task_id": "R01-T06", "commit": "8994c67bc48f607769c50299a6c59e638425a58b", "verdict": "PASS(R2)", "deliverables": ["TAURI_SPIKE_REPORT.md", "SHELL_CAPABILITY_MATRIX.json", "spike/tauri-shell/（84 文件）"]},
-    {"task_id": "R01-T07", "commit": "73bde3b5a28944ef9f69e228128c9206ad424145", "verdict": "PASS(R2)", "deliverables": ["ADR-004-storage-cutover.md", "DATA_COMPATIBILITY_MATRIX.json", "ROLLBACK_DESIGN.md", "r01_t07_build_matrix.py"]},
-    {"task_id": "R01-T08", "commit": null, "verdict": "READY_FOR_REVIEW（执行证据齐备；独立验收待总控另派）", "deliverables": ["R01_REPORT.md", "R01_HANDOFF.json", "RISK_REGISTER.json", "R01_ACCEPTANCE_LEDGER.json", "R01-T08_REPORT.md", "r01_t08_coverage_check.py", "r01_t08_gate_check.py", "r01_t08_gate_inputs.json", "r01_t08_isolation_check.py", "artifacts/rust-tauri/R01/T08/"]}
+    {
+      "task_id": "R01-T01",
+      "commit": "58e00b53d9fc6be03d64f51e33313f3f0063a51a",
+      "verdict": "PASS(R3)",
+      "deliverables": [
+        "ADR-001-ownership.md",
+        "DEPENDENCY_RULES.json",
+        "OWNERSHIP_TARGET.json",
+        "r01_t01_check_ownership.py",
+        "r01_t01_build_ownership.py"
+      ]
+    },
+    {
+      "task_id": "R01-T02",
+      "commit": "9390ae01d9e8145400eb3c44e8044bc2e1b46524",
+      "post_pass_fix": "b9442d86f3da87aaea4f51faeeecb68483b09a1e（headSha 内容派生戳，复验 PASS）",
+      "verdict": "PASS(R1)+fix PASS",
+      "deliverables": [
+        "PROTOCOL_SPEC.md",
+        "rust/crates/lingxi-protocol",
+        "contracts/generated/",
+        "API_COMPAT_MATRIX.json"
+      ]
+    },
+    {
+      "task_id": "R01-T03",
+      "commit": "5b63323b9a81b7e7603b32ace0673674b8bc2405",
+      "verdict": "PASS(R1)",
+      "deliverables": [
+        "DEPENDENCY_DECISIONS.md",
+        "PLATFORM_BUILD_MATRIX.json",
+        "rust-toolchain.toml",
+        "rust/Cargo.lock",
+        "rust/crates/lingxi-spike"
+      ]
+    },
+    {
+      "task_id": "R01-T04",
+      "commit": "abe4d5452ed6d455bc2c53f8e0c813afd80aa0e8",
+      "docfix_commit": "abe4d5452ed6d455bc2c53f8e0c813afd80aa0e8（docfix 实质内容——D-09 版本号修正、BROWSER_SPIKE_REPORT 措辞精确化、artifacts/rust-tauri/R01/T04/docfix-r1-gcm/ 证据——随 T04 主提交入库；5a8a8e24ab9e8e105da5132d16b175221a91d646 仅为账本记录提交，实测仅含 ORCHESTRATOR_PROGRESS.json。R01-T08 独立验收 R1 O1 修正：原指针误指向账本提交）",
+      "verdict": "PASS(R1)+docfix PASS",
+      "deliverables": [
+        "ADR-002-browser-host.md",
+        "BROWSER_SPIKE_REPORT.md",
+        "rust/crates/lingxi-browser-spike（CDP 原型）"
+      ]
+    },
+    {
+      "task_id": "R01-T05",
+      "commit": "4fa0b573ce8cb9b574d78e72b72455f98e360273",
+      "verdict": "PASS(R2)",
+      "deliverables": [
+        "ADR-003-document-renderer.md",
+        "PDF_SPIKE_REPORT.md",
+        "tests/migration/r01-t05/（19 场景 replay+矩阵+负向）"
+      ]
+    },
+    {
+      "task_id": "R01-T06",
+      "commit": "8994c67bc48f607769c50299a6c59e638425a58b",
+      "verdict": "PASS(R2)",
+      "deliverables": [
+        "TAURI_SPIKE_REPORT.md",
+        "SHELL_CAPABILITY_MATRIX.json",
+        "spike/tauri-shell/（84 文件）"
+      ]
+    },
+    {
+      "task_id": "R01-T07",
+      "commit": "73bde3b5a28944ef9f69e228128c9206ad424145",
+      "verdict": "PASS(R2)",
+      "deliverables": [
+        "ADR-004-storage-cutover.md",
+        "DATA_COMPATIBILITY_MATRIX.json",
+        "ROLLBACK_DESIGN.md",
+        "r01_t07_build_matrix.py"
+      ]
+    },
+    {
+      "task_id": "R01-T08",
+      "commit": "358299c1e9a768a75186f197686d25ee6636d6d7",
+      "ledger_commits": [
+        "f783a8e8e263c9565a76b8fad8cabc688c8a2b6d",
+        "363999378482dfed42733a3c4e8ad20ac82fd0fc"
+      ],
+      "verdict": "PASS(R1)（独立验收 R1，报告 R01-T08_REVIEW_R1.md；R01 阶段修复 R1 对关卡检查器做 FROZEN_CONTRACT 加固，属阶段修复候选待阶段复验）",
+      "deliverables": [
+        "R01_REPORT.md",
+        "R01_HANDOFF.json",
+        "RISK_REGISTER.json",
+        "R01_ACCEPTANCE_LEDGER.json",
+        "R01-T08_REPORT.md",
+        "r01_t08_coverage_check.py",
+        "r01_t08_gate_check.py",
+        "r01_t08_gate_inputs.json",
+        "r01_t08_isolation_check.py",
+        "artifacts/rust-tauri/R01/T08/"
+      ]
+    }
   ],
-  "unresolved_items_note": "单一事实源为 docs/rust-tauri/R01/RISK_REGISTER.json（43 条，含每条 severity/证据/截止阶段/失败处理/状态）。此处为索引式全量列表；R00 承继项权属不变。",
+  "unresolved_items_note": "单一事实源为 docs/rust-tauri/R01/RISK_REGISTER.json（44 条，含每条 severity/证据/截止阶段/失败处理/状态）。此处为索引式全量列表；R00 承继项权属不变。",
   "unresolved_items": [
-    {"id": "RR-T02-F1", "summary": "canonical 键排序非 BMP 边界 Rust/TS 分叉", "resolve_by_stage": "R04", "status": "OPEN"},
-    {"id": "RR-T02-F2", "summary": "TS canonical-json 浮点/>2^53 第三方 schema 硬失败 + spec §8/§9 矛盾", "resolve_by_stage": "R04（先于 R04/R08）", "status": "OPEN"},
-    {"id": "RR-T02-F3", "summary": "EventPayload 回退吞畸形已知事件 + 两信封不变量未编码", "resolve_by_stage": "R04（先于 R04/R08）", "status": "OPEN"},
-    {"id": "RR-T02-F4", "summary": "Rust Seq 解析宽松（007/+5）", "resolve_by_stage": "R04", "status": "OPEN"},
-    {"id": "RR-T02-F5", "summary": "WS close code 对 invalid_message 硬编码 4409", "resolve_by_stage": "R08", "status": "OPEN"},
-    {"id": "RR-T02-FINFO1", "summary": "contentSha 不可仅由矩阵重算，PROTOCOL_SPEC §10 补说明", "resolve_by_stage": "R02", "status": "OPEN"},
-    {"id": "RR-T08-F1", "summary": "T08 新发现：T02 门禁脚本共享 CARGO_TARGET_DIR + 编译期 CARGO_MANIFEST_DIR 致陈旧二进制错绑遗留克隆树（本仓库树已经全新 target 复跑证明零漂移；缺陷限门禁健壮性）", "resolve_by_stage": "R02", "status": "OPEN"},
-    {"id": "RR-T03-F3", "summary": "check_deps 动态库缺失分支 macOS 仅源码确证", "resolve_by_stage": "R09/R10", "status": "OPEN"},
-    {"id": "RR-T05-N1", "summary": "负向资产注释误注封堵机制（setBlockedURLs→CSP）", "resolve_by_stage": "R01-T08", "status": "CLOSED_IN_R01（本任务已更正注释）"},
-    {"id": "RR-T05-N2", "summary": "WebRTC 在 Fetch+CSP 双重边界外", "resolve_by_stage": "R09（显式决策）", "status": "OPEN"},
-    {"id": "RR-T05-N3", "summary": "T05 证据清单分裂两处说明", "resolve_by_stage": "R01-T08", "status": "CLOSED_IN_R01（本任务说明收口）"},
-    {"id": "RR-T05-X1", "summary": "T04 spike_browser 无 Fetch 拦截层，loopback WS 不受候选代码约束", "resolve_by_stage": "R09", "status": "OPEN"},
-    {"id": "RR-T06-R1", "summary": "对话框 cancel-only 语义（blocking 变体外挂起/合成 Escape 不兑现回调）", "resolve_by_stage": "R09", "status": "OPEN"},
-    {"id": "RR-T06-R2", "summary": "/tmp 符号链接 current_exe 拒绝（sidecar/updater）", "resolve_by_stage": "R09", "status": "OPEN"},
-    {"id": "RR-T06-R3", "summary": "自动生成权限无前缀 allow-<command>", "resolve_by_stage": "R09", "status": "OPEN"},
-    {"id": "RR-T06-R4", "summary": "tauri-driver 无 macOS；E2E 走 wdio+feature 门控", "resolve_by_stage": "R09/R10", "status": "OPEN"},
-    {"id": "RR-T06-R5", "summary": "WKWebView 媒体约束（手势/TCC 不弹窗）", "resolve_by_stage": "R09", "status": "OPEN"},
-    {"id": "RR-T06-R6", "summary": "updater 强制 https；dangerousInsecureTransportProtocol 禁进生产", "resolve_by_stage": "R09", "status": "OPEN"},
-    {"id": "RR-T06-R7", "summary": "未打包二进制通知/自启动归属终端宿主上下文", "resolve_by_stage": "R09", "status": "OPEN"},
-    {"id": "RR-T06-R8", "summary": "CSP loopback connect-src 仅 spike 证据管道", "resolve_by_stage": "R09", "status": "OPEN"},
-    {"id": "RR-T06-MIC", "summary": "录音授权后采集正链路 UNVERIFIED", "resolve_by_stage": "R09", "status": "OPEN"},
-    {"id": "RR-T06-SPEECH", "summary": "听写授权与识别链路 UNVERIFIED", "resolve_by_stage": "R09", "status": "OPEN"},
-    {"id": "RR-T06-SCREEN", "summary": "屏幕真实采集 UNVERIFIED", "resolve_by_stage": "R09", "status": "OPEN"},
-    {"id": "RR-T06-PROXY", "summary": "代理矩阵 UNVERIFIED", "resolve_by_stage": "R09 最迟 R10", "status": "OPEN"},
-    {"id": "RR-T06-PLATFORM", "summary": "Windows/Linux/macOS x64 全部 UNVERIFIED", "resolve_by_stage": "R09 最迟 R10", "status": "OPEN"},
-    {"id": "RR-T04-INCIDENT-1", "summary": "T04 初版代理未限目标致浏览器后台外发一次（已修补+披露）", "resolve_by_stage": "已修补；后续沿用限 loopback 吊具", "status": "DOCUMENTED"},
-    {"id": "RR-T07-PROD-DEFECT-1", "summary": "生产缺陷：data-epoch-coordinator corrupt-failure fail-open + 警告文本失实", "resolve_by_stage": "R02（归属候选）", "status": "REGISTERED"},
-    {"id": "RR-T07-F3", "summary": "desktop 壳 6 个 shell-local 存储不过闸（共享根争抢）", "resolve_by_stage": "R09（强制项）", "status": "OPEN"},
-    {"id": "RR-T07-F2", "summary": "协作式闸定性（印章篡改窗口实证）", "resolve_by_stage": "R08/R09 覆盖", "status": "DOCUMENTED"},
-    {"id": "RR-AUDIT-SEAL-PREEXISTING", "summary": "审计封印 4 用例预存 FAIL 两基点分类（原样承继 R00；R01 提交后继续预期红；封印推进属总控 seal 工作流）", "resolve_by_stage": "总控 seal 工作流", "status": "CARRIED"},
-    {"id": "RR-BLK-CREDENTIALS", "summary": "真实供应商凭证/测试账号 LIVE 未授权", "resolve_by_stage": "R10", "status": "CARRIED"},
-    {"id": "RR-BLK-PLATFORM", "summary": "四组目标平台真机缺失", "resolve_by_stage": "R10", "status": "CARRIED"},
-    {"id": "RR-BLK-LONGRUN-G1", "summary": "长时资源增长（2h/1000 任务）未测", "resolve_by_stage": "R10", "status": "CARRIED"},
-    {"id": "RR-BLK-RELEASE-AUTH", "summary": "R11-A14 远程发布未授权", "resolve_by_stage": "R11", "status": "CARRIED"},
-    {"id": "RR-T03-R3-F01", "summary": "heartbeat 巡检状态写入未在 W 表行级登记", "resolve_by_stage": "R07", "owner_task": "R07-T12", "status": "CARRIED"},
-    {"id": "RR-T03-R3-F02", "summary": "autolearn 后台模型作业形态未登记相邻形态", "resolve_by_stage": "R07", "owner_task": "R07-T12", "status": "CARRIED"},
-    {"id": "RR-R00-T05-F03", "summary": "模型替身可控断点 hang 能力未演练", "resolve_by_stage": "R03", "status": "CARRIED"},
-    {"id": "RR-R00-T05-F04", "summary": "normalize tmp-path 正则理论过屏蔽（实测影响零）", "resolve_by_stage": "后续夹具演进", "status": "CARRIED"},
-    {"id": "RR-R00-T06-F08", "summary": "office 产品链指标未入 BASELINE_BENCHMARK（指针已建）", "resolve_by_stage": "R08/R10", "status": "CARRIED"},
-    {"id": "RR-R00-T06-F09", "summary": "bench 字节统计 unit 标签沿用 ms", "resolve_by_stage": "bench 脚本演进", "status": "CARRIED"},
-    {"id": "RR-R00-T06-F10", "summary": "T06 报告 bundle 指纹措辞失准（已勘误）", "resolve_by_stage": "已收口", "status": "CARRIED"},
-    {"id": "RR-R00-T06-O1", "summary": "流式首增量 CV=0.522 略超 0.5 未加注", "resolve_by_stage": "R08", "status": "CARRIED"},
-    {"id": "RR-R00-ROUND2-SIDEEFFECT", "summary": "round2/round3 测试副作用弄脏工作区", "resolve_by_stage": "后续测试卫生任务", "status": "CARRIED"}
+    {
+      "id": "RR-T02-F1",
+      "summary": "canonical 键排序非 BMP 边界 Rust/TS 分叉",
+      "resolve_by_stage": "R04",
+      "status": "OPEN"
+    },
+    {
+      "id": "RR-T02-F2",
+      "summary": "TS canonical-json 浮点/>2^53 第三方 schema 硬失败 + spec §8/§9 矛盾",
+      "resolve_by_stage": "R04（先于 R04/R08）",
+      "status": "OPEN"
+    },
+    {
+      "id": "RR-T02-F3",
+      "summary": "EventPayload 回退吞畸形已知事件 + 两信封不变量未编码",
+      "resolve_by_stage": "R04（先于 R04/R08）",
+      "status": "OPEN"
+    },
+    {
+      "id": "RR-T02-F4",
+      "summary": "Rust Seq 解析宽松（007/+5）",
+      "resolve_by_stage": "R04",
+      "status": "OPEN"
+    },
+    {
+      "id": "RR-T02-F5",
+      "summary": "WS close code 对 invalid_message 硬编码 4409",
+      "resolve_by_stage": "R08",
+      "status": "OPEN"
+    },
+    {
+      "id": "RR-T02-FINFO1",
+      "summary": "contentSha 不可仅由矩阵重算，PROTOCOL_SPEC §10 补说明",
+      "resolve_by_stage": "R02",
+      "status": "OPEN"
+    },
+    {
+      "id": "RR-T08-F1",
+      "summary": "T08 新发现：T02 门禁脚本共享 CARGO_TARGET_DIR + 编译期 CARGO_MANIFEST_DIR 致陈旧二进制错绑遗留克隆树（本仓库树已经全新 target 复跑证明零漂移；缺陷限门禁健壮性）",
+      "resolve_by_stage": "R02",
+      "status": "OPEN"
+    },
+    {
+      "id": "RR-T03-F3",
+      "summary": "check_deps 动态库缺失分支 macOS 仅源码确证",
+      "resolve_by_stage": "R09/R10",
+      "status": "OPEN"
+    },
+    {
+      "id": "RR-T05-N1",
+      "summary": "负向资产注释误注封堵机制（setBlockedURLs→CSP）",
+      "resolve_by_stage": "R01-T08",
+      "status": "CLOSED_IN_R01（本任务已更正注释）"
+    },
+    {
+      "id": "RR-T05-N2",
+      "summary": "WebRTC 在 Fetch+CSP 双重边界外",
+      "resolve_by_stage": "R09（显式决策）",
+      "status": "OPEN"
+    },
+    {
+      "id": "RR-T05-N3",
+      "summary": "T05 证据清单分裂两处说明",
+      "resolve_by_stage": "R01-T08",
+      "status": "CLOSED_IN_R01（本任务说明收口）"
+    },
+    {
+      "id": "RR-T05-X1",
+      "summary": "T04 spike_browser 无 Fetch 拦截层，loopback WS 不受候选代码约束",
+      "resolve_by_stage": "R09",
+      "status": "OPEN"
+    },
+    {
+      "id": "RR-T06-R1",
+      "summary": "对话框 cancel-only 语义（blocking 变体外挂起/合成 Escape 不兑现回调）",
+      "resolve_by_stage": "R09",
+      "status": "OPEN"
+    },
+    {
+      "id": "RR-T06-R2",
+      "summary": "/tmp 符号链接 current_exe 拒绝（sidecar/updater）",
+      "resolve_by_stage": "R09",
+      "status": "OPEN"
+    },
+    {
+      "id": "RR-T06-R3",
+      "summary": "自动生成权限无前缀 allow-<command>",
+      "resolve_by_stage": "R09",
+      "status": "OPEN"
+    },
+    {
+      "id": "RR-T06-R4",
+      "summary": "tauri-driver 无 macOS；E2E 走 wdio+feature 门控",
+      "resolve_by_stage": "R09/R10",
+      "status": "OPEN"
+    },
+    {
+      "id": "RR-T06-R5",
+      "summary": "WKWebView 媒体约束（手势/TCC 不弹窗）",
+      "resolve_by_stage": "R09",
+      "status": "OPEN"
+    },
+    {
+      "id": "RR-T06-R6",
+      "summary": "updater 强制 https；dangerousInsecureTransportProtocol 禁进生产",
+      "resolve_by_stage": "R09",
+      "status": "OPEN"
+    },
+    {
+      "id": "RR-T06-R7",
+      "summary": "未打包二进制通知/自启动归属终端宿主上下文",
+      "resolve_by_stage": "R09",
+      "status": "OPEN"
+    },
+    {
+      "id": "RR-T06-R8",
+      "summary": "CSP loopback connect-src 仅 spike 证据管道",
+      "resolve_by_stage": "R09",
+      "status": "OPEN"
+    },
+    {
+      "id": "RR-T06-MIC",
+      "summary": "录音授权后采集正链路 UNVERIFIED",
+      "resolve_by_stage": "R09",
+      "status": "OPEN"
+    },
+    {
+      "id": "RR-T06-SPEECH",
+      "summary": "听写授权与识别链路 UNVERIFIED",
+      "resolve_by_stage": "R09",
+      "status": "OPEN"
+    },
+    {
+      "id": "RR-T06-SCREEN",
+      "summary": "屏幕真实采集 UNVERIFIED",
+      "resolve_by_stage": "R09",
+      "status": "OPEN"
+    },
+    {
+      "id": "RR-T06-PROXY",
+      "summary": "代理矩阵 UNVERIFIED",
+      "resolve_by_stage": "R09 最迟 R10",
+      "status": "OPEN"
+    },
+    {
+      "id": "RR-T06-PLATFORM",
+      "summary": "Windows/Linux/macOS x64 全部 UNVERIFIED",
+      "resolve_by_stage": "R09 最迟 R10",
+      "status": "OPEN"
+    },
+    {
+      "id": "RR-T04-INCIDENT-1",
+      "summary": "T04 初版代理未限目标致浏览器后台外发一次（已修补+披露）",
+      "resolve_by_stage": "已修补；后续沿用限 loopback 吊具",
+      "status": "DOCUMENTED"
+    },
+    {
+      "id": "RR-T07-PROD-DEFECT-1",
+      "summary": "生产缺陷：data-epoch-coordinator corrupt-failure fail-open + 警告文本失实",
+      "resolve_by_stage": "R02（归属候选）",
+      "status": "REGISTERED"
+    },
+    {
+      "id": "RR-T07-F3",
+      "summary": "desktop 壳 6 个 shell-local 存储不过闸（共享根争抢）",
+      "resolve_by_stage": "R09（强制项）",
+      "status": "OPEN"
+    },
+    {
+      "id": "RR-T07-F2",
+      "summary": "协作式闸定性（印章篡改窗口实证）",
+      "resolve_by_stage": "R08/R09 覆盖",
+      "status": "DOCUMENTED"
+    },
+    {
+      "id": "RR-AUDIT-SEAL-PREEXISTING",
+      "summary": "审计四文件门禁：正式 R00 C4 基线 68/68 绿+全量 14942/0，R01 候选 62/68、6 FAIL 为 R01 增量新增（坐标仍指 C3 f2b8c687）——原「预存四红承继 R00」分类经阶段验收 R1 F02 复证推翻；封印推进需提交授权，属总控 seal 工作流。R2 F03 追加：封印再生成双补丁 267MB/577MB 超 GitHub 100MiB 硬限；阶段修复 R2 交付受控分片（patch-gzip-shards/v1）并完成 /tmp 全链预演（分片 VERIFIED、门禁 74/74、可达集与裸仓实收 0 个 >100MiB 对象、裸仓推送 SHA 一致），预演 SHA 不作正式坐标。R2 预演曾暴露的本机环境性 cli-runtime-closure 漂移已由阶段修复 R3 候选根除（同机再生成 8949 文件零漂移，预演坐标推进后全量 npm test 14949 passed/0 failed/exit 0），不再需要环境对齐/换环境方案；剩余条件=正式提交后在真实候选上复验（R4 F02 时态更正，R2 失败历史保留）",
+      "resolve_by_stage": "总控 seal 工作流（R3 候选已根除环境漂移；剩余条件=正式提交后在真实候选上复验，预演 SHA 不作正式坐标）",
+      "status": "OPEN"
+    },
+    {
+      "id": "RR-ENV-CLOSURE-DRIFT",
+      "summary": "（R2 发现，历史保留）本机环境性 cli-runtime-closure 漂移（nft 新增 /bin/bash 追踪项，三实验证实与 R1/R2/R01 内容无关）激活预存测试竞态（census 原位写 × 生成器树净守卫），当时全量 npm test 2 红；四文件门禁不受影响。（R01 阶段修复 R3 已修复）normalizeNftTraceFiles 类级过滤宿主绝对/越界路径 + census finally 恢复/结构性断言（不改基线不删测试不放松守卫），修复后同机再生成 8949 文件零漂移、R3 预演全量 14949/0；剩余条件=正式提交后在真实候选上复验再生成零漂移与全量 0 失败，候选提交并复验前保持 OPEN（详见 RISK_REGISTER 同名条目）",
+      "resolve_by_stage": "已由 R01 阶段修复 R3 候选修复；剩余条件=正式提交后在真实候选上复验再生成零漂移与全量 0 失败",
+      "status": "OPEN"
+    },
+    {
+      "id": "RR-BLK-CREDENTIALS",
+      "summary": "真实供应商凭证/测试账号 LIVE 未授权",
+      "resolve_by_stage": "R10",
+      "status": "CARRIED"
+    },
+    {
+      "id": "RR-BLK-PLATFORM",
+      "summary": "四组目标平台真机缺失",
+      "resolve_by_stage": "R10",
+      "status": "CARRIED"
+    },
+    {
+      "id": "RR-BLK-LONGRUN-G1",
+      "summary": "长时资源增长（2h/1000 任务）未测",
+      "resolve_by_stage": "R10",
+      "status": "CARRIED"
+    },
+    {
+      "id": "RR-BLK-RELEASE-AUTH",
+      "summary": "R11-A14 远程发布未授权",
+      "resolve_by_stage": "R11",
+      "status": "CARRIED"
+    },
+    {
+      "id": "RR-T03-R3-F01",
+      "summary": "heartbeat 巡检状态写入未在 W 表行级登记",
+      "resolve_by_stage": "R07",
+      "owner_task": "R07-T12",
+      "status": "CARRIED"
+    },
+    {
+      "id": "RR-T03-R3-F02",
+      "summary": "autolearn 后台模型作业形态未登记相邻形态",
+      "resolve_by_stage": "R07",
+      "owner_task": "R07-T12",
+      "status": "CARRIED"
+    },
+    {
+      "id": "RR-R00-T05-F03",
+      "summary": "模型替身可控断点 hang 能力未演练",
+      "resolve_by_stage": "R03",
+      "status": "CARRIED"
+    },
+    {
+      "id": "RR-R00-T05-F04",
+      "summary": "normalize tmp-path 正则理论过屏蔽（实测影响零）",
+      "resolve_by_stage": "后续夹具演进",
+      "status": "CARRIED"
+    },
+    {
+      "id": "RR-R00-T06-F08",
+      "summary": "office 产品链指标未入 BASELINE_BENCHMARK（指针已建）",
+      "resolve_by_stage": "R08/R10",
+      "status": "CARRIED"
+    },
+    {
+      "id": "RR-R00-T06-F09",
+      "summary": "bench 字节统计 unit 标签沿用 ms",
+      "resolve_by_stage": "bench 脚本演进",
+      "status": "CARRIED"
+    },
+    {
+      "id": "RR-R00-T06-F10",
+      "summary": "T06 报告 bundle 指纹措辞失准（已勘误）",
+      "resolve_by_stage": "已收口",
+      "status": "CARRIED"
+    },
+    {
+      "id": "RR-R00-T06-O1",
+      "summary": "流式首增量 CV=0.522 略超 0.5 未加注",
+      "resolve_by_stage": "R08",
+      "status": "CARRIED"
+    },
+    {
+      "id": "RR-R00-ROUND2-SIDEEFFECT",
+      "summary": "round2/round3 测试副作用弄脏工作区",
+      "resolve_by_stage": "后续测试卫生任务",
+      "status": "CARRIED"
+    }
   ],
   "interfaces": [
-    {"name": "lingxi.wire", "version": "v1（min=max=1）", "authority": "rust/crates/lingxi-protocol/（serde 权威源）+ PROTOCOL_SPEC.md", "consumers": "R02 service / R03 run 状态机 / R04 工具网关 / R05 模型网关 / R08 旧客户端接入", "status": "冻结；生成物 --check 零漂移（T08 全新 target 复跑 exit 0）", "known_gaps": ["RR-T02-F1..F5"]},
-    {"name": "contracts/generated", "version": "随 lingxi.wire v1", "authority": "lingxi-protocol-gen（禁止手改）", "consumers": "TS 兼容层（tests/migration/r01-t02 为参考消费端）", "status": "56 文件 + MANIFEST sha256 c9e4d8d1…", "known_gaps": ["RR-T08-F1 门禁脚本健壮性"]},
-    {"name": "ownership-gate", "version": "1", "authority": "OWNERSHIP_TARGET.json + DEPENDENCY_RULES.json + r01_t01_check_ownership.py", "consumers": "R02 起所有实现任务（模块边界门禁）", "status": "正向+N1–N15+生成器 --check 在 T08 复跑全绿"},
-    {"name": "data-epoch-gate", "version": "现役 DATA_EPOCH=1 / 目标 ADR-004", "authority": "ADR-004 + DATA_COMPATIBILITY_MATRIX.json + ROLLBACK_DESIGN.md", "consumers": "R02 存储实现 / R08 迁移演练 / R09 宿主", "status": "策略冻结并实测；corrupt fail-open 立项 RR-T07-PROD-DEFECT-1"},
-    {"name": "preload-bridge（现役）", "version": "1", "authority": "shared/contract-versions.json + PlatformApi", "consumers": "现役 renderer", "status": "冻结未改；native_host 映射 197 项入 API_COMPAT_MATRIX（R09 Tauri 化）"},
-    {"name": "artifact-signing-keyset", "version": "pinned-keyset v2（只追加）", "authority": "shared/artifact-core/pinned-keyset.json", "consumers": "scripts/notarize.cjs / 更新检查", "status": "未改动；轮换规则不变（R11）"}
+    {
+      "name": "lingxi.wire",
+      "version": "v1（min=max=1）",
+      "authority": "rust/crates/lingxi-protocol/（serde 权威源）+ PROTOCOL_SPEC.md",
+      "consumers": "R02 service / R03 run 状态机 / R04 工具网关 / R05 模型网关 / R08 旧客户端接入",
+      "status": "冻结；生成物 --check 零漂移（T08 全新 target 复跑 exit 0）",
+      "known_gaps": [
+        "RR-T02-F1..F5"
+      ]
+    },
+    {
+      "name": "contracts/generated",
+      "version": "随 lingxi.wire v1",
+      "authority": "lingxi-protocol-gen（禁止手改）",
+      "consumers": "TS 兼容层（tests/migration/r01-t02 为参考消费端）",
+      "status": "56 文件 + MANIFEST sha256 c9e4d8d1…",
+      "known_gaps": [
+        "RR-T08-F1 门禁脚本健壮性"
+      ]
+    },
+    {
+      "name": "ownership-gate",
+      "version": "1",
+      "authority": "OWNERSHIP_TARGET.json + DEPENDENCY_RULES.json + r01_t01_check_ownership.py",
+      "consumers": "R02 起所有实现任务（模块边界门禁）",
+      "status": "正向+N1–N15+生成器 --check 在 T08 复跑全绿"
+    },
+    {
+      "name": "data-epoch-gate",
+      "version": "现役 DATA_EPOCH=1 / 目标 ADR-004",
+      "authority": "ADR-004 + DATA_COMPATIBILITY_MATRIX.json + ROLLBACK_DESIGN.md",
+      "consumers": "R02 存储实现 / R08 迁移演练 / R09 宿主",
+      "status": "策略冻结并实测；corrupt fail-open 立项 RR-T07-PROD-DEFECT-1"
+    },
+    {
+      "name": "preload-bridge（现役）",
+      "version": "1",
+      "authority": "shared/contract-versions.json + PlatformApi",
+      "consumers": "现役 renderer",
+      "status": "冻结未改；native_host 映射 197 项入 API_COMPAT_MATRIX（R09 Tauri 化）"
+    },
+    {
+      "name": "artifact-signing-keyset",
+      "version": "pinned-keyset v2（只追加）",
+      "authority": "shared/artifact-core/pinned-keyset.json",
+      "consumers": "scripts/notarize.cjs / 更新检查",
+      "status": "未改动；轮换规则不变（R11）"
+    }
   ],
   "artifact_hashes": {
-    "note": "T08 交付逐文件 SHA-256（本文件自引用除外）；R01 全阶段交付哈希分见各 T 报告与 R01_ACCEPTANCE_LEDGER.json",
-    "docs/rust-tauri/R01/R01_REPORT.md": "7ca9e182036db25e35db122b18a36e2cddac9df647af00101531d8bc190e58c2",
+    "note": "T08 交付逐文件 SHA-256（本文件自引用除外）；R01 全阶段交付哈希分见各 T 报告与 R01_ACCEPTANCE_LEDGER.json。R01 阶段修复 R1 重算：R01_REPORT.md、RISK_REGISTER.json、R01_ACCEPTANCE_LEDGER.json（F02 更正）、r01_t08_gate_check.py（F01 FROZEN_CONTRACT 修复）、gate-report.json（加固版检查器重生成）。R01 阶段修复 R2 重算：R01_REPORT.md（R2 进展叙述）、RISK_REGISTER.json（seal 条目 R2 更新 + 新增 RR-ENV-CLOSURE-DRIFT，43→44 条）、R01_ACCEPTANCE_LEDGER.json（A15 登记/npm_test_note/描述）、r01_t08_gate_check.py（F01 有意义字符串/状态一致性/登记完整性，契约 1.2-stage-repair-r2）、gate-report.json（1.2 契约重生成，判定不变）；新增钉住 r01_t08_gate_cli_regression.sh（F01 真实 CLI 负向电池）。R01 阶段修复 R3 重算（2026-09-26）：R01_REPORT.md（R3 进展与 F02 治理叙述）、RISK_REGISTER.json（15 个递延绑定条目补结构化 resolve_by_stage_id/resolve_latest_stage_id + updated_by，正文与其余字段未改）、R01_ACCEPTANCE_LEDGER.json（A15 R3 叙事）、r01_t08_gate_check.py（G6 截止阶段机器校验绑定，契约 1.3-stage-repair-r3）、r01_t08_gate_cli_regression.sh（电池扩至 1 正+22 负）、gate-report.json（1.3 契约重生成，15 递延 TRACKED 改机器可校验格式，判定不变）；新增钉住 scripts/compute-cli-closure.mjs 与 tests/cli-closure-census.test.ts（F02：nft 宿主绝对路径类过滤 + census 隔离加固/结构性断言，不改基线不放松断言）。gate-check.log/gate-selftest.log 按 1.3 契约重生成（44 用例），不在钉住清单内的其余 12 项复算一致。R01 阶段修复 R4 重算（2026-09-26）：R01_REPORT.md（R4 进展叙述）、RISK_REGISTER.json（R4 F02：RR-ENV-CLOSURE-DRIFT/RR-AUDIT-SEAL-PREEXISTING R2 时态更新为 R3 修复后事实+r3_update 字段，R2 失败历史保留）、R01_ACCEPTANCE_LEDGER.json（R4 F02：npm_test_note/description 补 R3/R4 事实）、r01_t08_gate_check.py（G6b 完整标识边界校验，契约 1.4-stage-repair-r4）、r01_t08_gate_cli_regression.sh（电池扩至 1 正+28 负）、gate-report.json（1.4 契约重生成，判定不变）；gate-check.log/gate-selftest.log 按 1.4 契约重生成（51 用例），不在钉住清单内的其余 12 项复算一致。R01 阶段修复 R5 重算（2026-09-26）：R01_REPORT.md（R5 进展叙述）、R01_ACCEPTANCE_LEDGER.json（A15 stage_repair_note 与 description 补 R5 链；npm_test_note 无新事实不改）、r01_t08_gate_check.py（G6b 边界扩展：标识延续字符=字母/数字/下划线+点号/连字符族，复合形态按完整复合拒绝，契约 1.5-stage-repair-r5）、r01_t08_gate_cli_regression.sh（电池扩至 1 正+36 负）、gate-report.json（1.5 契约重生成，判定不变）；gate-check.log/gate-selftest.log 按 1.5 契约重生成（59 用例）；钉住清单 20 项全部复算一致（5 项按 R5 改动重算+15 项未触碰逐字节复核）。F02 更正：R4 报告 §3/§7 与 /tmp/r01-repair-r4/r4-file-hashes.txt 曾写 STAGE_REPAIR_R4 12 件/候选 66（18 修改+48 新增），实际 11 件/65（18 修改+47 新增）；11 件哈希逐项匹配、无第 12 件计划内证据，R4 原报告不改写。R01 阶段修复 R6 重算（2026-09-26）：R01_REPORT.md（R6 进展叙述）、R01_ACCEPTANCE_LEDGER.json（A15 stage_repair_note 与 description 补 R6 链；npm_test_note 无新事实不改）、r01_t08_gate_check.py（G6c 全角同形 1:1 等长折叠+大小写契约伪装拒绝，契约 1.6-stage-repair-r6）、r01_t08_gate_cli_regression.sh（电池扩至 2 正+43 负）、gate-report.json（1.6 契约重生成，判定不变）；gate-check.log/gate-selftest.log 按 1.6 契约重生成（67 用例）；RISK_REGISTER.json 本轮未触碰（87e34d0e… 保持）；钉住清单 20 项全部复算一致（5 项按 R6 改动重算+15 项未触碰逐字节复核）。R01 阶段修复 R7 重算（2026-09-26）：R01_REPORT.md（R7 进展叙述）、R01_ACCEPTANCE_LEDGER.json（A15 stage_repair_note 与 description 补 R7 链；npm_test_note 无新事实不改）、r01_t08_gate_check.py（G6d「最迟」标记逐处核验、失败关闭，契约 1.7-stage-repair-r7）、r01_t08_gate_cli_regression.sh（电池扩至 4 正+46 负）、gate-report.json（1.7 契约重生成，判定不变）；gate-check.log/gate-selftest.log 按 1.7 契约重生成（72 用例）；RISK_REGISTER.json 本轮未触碰（87e34d0e… 保持）；钉住清单 20 项全部复算一致（5 项按 R7 改动重算+15 项未触碰逐字节复核）。R01 阶段修复 R8 重算（2026-09-26）：R01_REPORT.md（R8 进展叙述）、R01_ACCEPTANCE_LEDGER.json（A15 stage_repair_note 与 description 补 R8 链）、r01_t08_gate_check.py（G6d 连接形态扩展+失败关闭 risk-stage-latest-unresolved，契约 1.8-stage-repair-r8）、r01_t08_gate_cli_regression.sh（电池扩至 6 正+54 负）、gate-report.json（1.8 契约重生成，判定不变）；gate-check.log/gate-selftest.log 按 1.8 契约重生成（83 用例）；RISK_REGISTER.json 本轮未触碰（87e34d0e… 保持）；钉住清单 20 项全部复算一致（5 项按 R8 改动重算+15 项未触碰逐字节复核）。R01 阶段修复 R9 重算（2026-09-26）：R01_REPORT.md（R9 进展叙述）、R01_ACCEPTANCE_LEDGER.json（A15 stage_repair_note 与 description 补 R9 链）、r01_t08_gate_check.py（G6e 期限子句唯一一致+引号词名豁免，契约 1.9-stage-repair-r9）、r01_t08_gate_cli_regression.sh（电池扩至 8 正+62 负）、gate-report.json（1.9 契约重生成，语义差异仅 contract.version，判定不变）；gate-check.log/gate-selftest.log 按 1.9 契约重生成（92 用例）；RISK_REGISTER.json 本轮未触碰（87e34d0e… 保持）；钉住清单 20 项全部复算一致（5 项按 R9 改动重算+15 项未触碰逐字节复核）。R01 阶段修复 R10 重算（2026-09-26）：R01_REPORT.md（R10 进展叙述与声称更正）、R01_ACCEPTANCE_LEDGER.json（A15 stage_repair_note 补 R10 链）、r01_t08_gate_check.py（G6f 期限区域完整性+已披露边界期限拒绝，契约 1.10-stage-repair-r10）、r01_t08_gate_cli_regression.sh（电池扩至 11 正+74 负）、gate-report.json（1.10 契约重生成，判定不变）；gate-check.log/gate-selftest.log 按 1.10 契约重生成（107 用例）；RISK_REGISTER.json 本轮未触碰（87e34d0e… 保持）；钉住清单 20 项全部复算一致（5 项按 R10 改动重算+15 项未触碰逐字节复核） 总控第11轮PASS纯证据索引更新：更正O01计数，更新报告/验收账本哈希；产品/测试/配置哈希全部保持验收时字节。",
+    "docs/rust-tauri/R01/R01_REPORT.md": "4900210c02cefccfb2bbc461f2ebe212b23c769b1f7b2f3674e184c8b7720e54",
     "docs/rust-tauri/R01/R01-T08_REPORT.md": "2aa086147c70193bfeb8d8b590b15abb8ea9485b13c3c5d8217b430a8b6cd94d",
-    "docs/rust-tauri/R01/RISK_REGISTER.json": "2157764c60146a17389ae4873014f40bb4612a51d58dff0cb3450ac9edf86f18",
-    "docs/rust-tauri/R01/R01_ACCEPTANCE_LEDGER.json": "39492b89f4489506804d1505576eeb09c33b5365d7fa3160a3955bd0cbb541c5",
+    "docs/rust-tauri/R01/RISK_REGISTER.json": "87e34d0e92cd011d79eb4a9f39f410c64ffc42e2ecfcb1d37ab20d360d69f307",
+    "docs/rust-tauri/R01/R01_ACCEPTANCE_LEDGER.json": "ca9320a9a6d732be46b07bab280881ea248b368dae4edc50164cd8b0ba26beef",
     "docs/rust-tauri/R01/r01_t08_coverage_check.py": "6c707a67fd1eba180a686cadcde7e3688756851bfc3f2fa7354e3979fc309b29",
-    "docs/rust-tauri/R01/r01_t08_gate_check.py": "376e7b822da24e5c7082c8808f47e47bd2e98163fbb91030241af12369de2f59",
+    "docs/rust-tauri/R01/r01_t08_gate_check.py": "47bae50aa51a37c9412512370c6b0d7156bae374ee45ef1cc4857a538ac0abaa",
+    "docs/rust-tauri/R01/r01_t08_gate_cli_regression.sh": "94bea206687817f9a6d52eeddc301221f1b60314286c4ea45965812c271b29e4",
     "docs/rust-tauri/R01/r01_t08_gate_inputs.json": "89e3e146ef02deedb41b05729f481a973515add5cc9ca00d00bd8f2b4b0071cd",
     "docs/rust-tauri/R01/r01_t08_isolation_check.py": "30261c5932cf1ee7e1f9974bc07fa88bd1695a805803138136710a5565498dc7",
     "tests/migration/r01-t05/negative/ws-loopback.html": "568ef680f20c448e453317d1680fadd4cb31e28694a50eccdbb94fdc2e7366eb",
     "tests/migration/r01-t05/run_repair_r1_negative.sh": "b1b9c355c73cae9dd46248a8aac48b8f36260fa9c81e8623c1be16fa5cb6a8ee",
     "artifacts/rust-tauri/R01/T08/disposition/t06-binaries-disposition.json": "3e1390b39560e4657f8c642133046c08e9d7e52b61ec5af01b9c55bf7a219876",
     "artifacts/rust-tauri/R01/T08/coverage/coverage-report.json": "6bd67c386e5e28ed9478d661750cef025d34f49467e49f1ed83d73f2f3f6aa8c",
-    "artifacts/rust-tauri/R01/T08/gate-checker/gate-report.json": "13e5fb98b48bc64fd7333dc1d38ab7eb130893d0d9a75f1652a74f96b197347f",
+    "artifacts/rust-tauri/R01/T08/gate-checker/gate-report.json": "c7f152fdf668e1e683e3474494f8a709a95d44eb2c5136c90add47427b8c34da",
     "artifacts/rust-tauri/R01/T08/isolation/isolation-report.json": "f13b4fbe37ee00d2b2028b06fe1fd4d893d190e3c9c9e791f7e1946de414ad4d",
     "docs/rust-tauri/R01/OWNERSHIP_TARGET.json": "6dfbdd6c7f6c1c705e156a6b043b7c137003f7ce3a6ad1d6ffa1e3c80bd9e381",
     "docs/rust-tauri/R00/FEATURE_INVENTORY.json": "48141268281fcb854f1674d53f526c5a6149e20504c8a2c818f3ed2abed11039",
-    "docs/rust-tauri/R00/PI_REPLACEMENT_MATRIX.json": "c16b01b7bc038522696a3d74a9b8bf46f5e00581455d97ddeb77ddd217ab6d56"
+    "docs/rust-tauri/R00/PI_REPLACEMENT_MATRIX.json": "c16b01b7bc038522696a3d74a9b8bf46f5e00581455d97ddeb77ddd217ab6d56",
+    "scripts/compute-cli-closure.mjs": "5f0604ab6aa169e6c7926763d07278c0dc59dd26caf3936fd9fec10169513466",
+    "tests/cli-closure-census.test.ts": "cddb32aedcf184aa9df36d07e044392df69996ae081fb20bf0d249ed3c62c27c"
   },
   "allowed_next_scope": {
     "next_stage": "R02（Rust 独立服务、存储与事件基础）",
@@ -134,19 +724,60 @@
       "把仅打开窗口当替代验证；把 UNVERIFIED 项写成已验证",
       "生产 CSP/代理/updater 配置定稿（RR-T06-R6/R8、RR-T06-PROXY）",
       "跨平台放行结论（仅 macOS arm64 有实测）"
-    ]
+    ],
+    "formal_gate": "仅在真实提交后正式封印74/74、全量0失败、推送远端核对完成，才放行R02。"
   },
   "review_evidence": [
-    {"task_id": "R01-T01", "report": "docs/rust-tauri/R01/R01-T01_REVIEW_R3.md", "verdict": "PASS"},
-    {"task_id": "R01-T02", "report": "docs/rust-tauri/R01/R01-T02_REVIEW_R1.md + R01-T02_FIX_HEADSHA_REVIEW_R1.md", "verdict": "PASS"},
-    {"task_id": "R01-T03", "report": "docs/rust-tauri/R01/R01-T03_REVIEW_R1.md", "verdict": "PASS"},
-    {"task_id": "R01-T04", "report": "docs/rust-tauri/R01/R01-T04_REVIEW_R1.md + R01-T04_DOCFIX_REVIEW_R1.md", "verdict": "PASS"},
-    {"task_id": "R01-T05", "report": "docs/rust-tauri/R01/R01-T05_REVIEW_R2.md", "verdict": "PASS"},
-    {"task_id": "R01-T06", "report": "docs/rust-tauri/R01/R01-T06_REVIEW_R2.md", "verdict": "PASS"},
-    {"task_id": "R01-T07", "report": "docs/rust-tauri/R01/R01-T07_REVIEW_R2.md", "verdict": "PASS"},
-    {"task_id": "R01-T08", "report": "待总控另派独立验收代理（执行证据：artifacts/rust-tauri/R01/T08/）", "verdict": "PENDING"}
+    {
+      "task_id": "R01-T01",
+      "report": "docs/rust-tauri/R01/R01-T01_REVIEW_R3.md",
+      "verdict": "PASS"
+    },
+    {
+      "task_id": "R01-T02",
+      "report": "docs/rust-tauri/R01/R01-T02_REVIEW_R1.md + R01-T02_FIX_HEADSHA_REVIEW_R1.md",
+      "verdict": "PASS"
+    },
+    {
+      "task_id": "R01-T03",
+      "report": "docs/rust-tauri/R01/R01-T03_REVIEW_R1.md",
+      "verdict": "PASS"
+    },
+    {
+      "task_id": "R01-T04",
+      "report": "docs/rust-tauri/R01/R01-T04_REVIEW_R1.md + R01-T04_DOCFIX_REVIEW_R1.md",
+      "verdict": "PASS"
+    },
+    {
+      "task_id": "R01-T05",
+      "report": "docs/rust-tauri/R01/R01-T05_REVIEW_R2.md",
+      "verdict": "PASS"
+    },
+    {
+      "task_id": "R01-T06",
+      "report": "docs/rust-tauri/R01/R01-T06_REVIEW_R2.md",
+      "verdict": "PASS"
+    },
+    {
+      "task_id": "R01-T07",
+      "report": "docs/rust-tauri/R01/R01-T07_REVIEW_R2.md",
+      "verdict": "PASS"
+    },
+    {
+      "task_id": "R01-T08",
+      "report": "docs/rust-tauri/R01/R01-T08_REVIEW_R1.md（SHA-256 4a0c50ad…）",
+      "verdict": "PASS"
+    },
+    {
+      "stage_id": "R01",
+      "reviewer_id": "Codex:/root/r01_stage_review_r11",
+      "report": "docs/rust-tauri/R01/STAGE_HISTORY/R01_STAGE_REVIEW_R11.md",
+      "report_sha256": "ffd77f3addd0ce3a988274984101a20411df0e7a84ecb0ff07b029aeb719b126",
+      "verdict": "PASS",
+      "formal_seal": "PENDING"
+    }
   ],
-  "stage_gate_position": "阶段关卡检查器真实数据判定 PASS_WITH_CONDITIONS（五高风险域必需能力在实施平台全部 VERIFIED 且证据哈希复算一致；15 递延项全部挂账）；负向 5/5 证明演示证据不能遮蔽用户接管等关键能力失败。设计边界说明（R01-T08 独立验收 R1 O2）：关卡检查器对递延项挂账的核验为「风险条目存在 + resolve_by_stage/failure_handling 字段非空」，无法机器识别伪造的敷衍条目；条目真实性由独立验收抽样核对与后续阶段关卡承担，属设计内分工，非缺陷。阶段放行（PASS/ACCEPTED）归独立验收与总控。",
+  "stage_gate_position": "阶段关卡检查器真实数据判定 PASS_WITH_CONDITIONS（五高风险域必需能力在实施平台全部 VERIFIED 且证据哈希复算一致；15 递延项全部挂账）。R01 阶段验收 R1 F01 发现检查器把必需能力全集交给被验输入自报（删 user_takeover/删域/删 sha256/删递延均放行）；R01 阶段修复 R1 引入 FROZEN_CONTRACT 冻结契约——五域、各域必需能力 ID 与证据路径、递延项集合及其风险绑定全部由检查器内契约钉住，独立于被验输入，删域/删项/改名/重复/额外/证据改指/登记簿删条目全部拒绝——负向扩展至 17/17 全绿，正向真实数据判定不变，关卡证据（selftest/check 日志与 gate-report.json）已用加固版检查器重生成。R01 阶段验收 R2 F01 发现同根因遗漏（str() 转换使 JSON null/{}/[] 冒充非空字段、登记 CLOSED 与输入递延矛盾亦放行）；R01 阶段修复 R2 收口为严格有意义字符串校验（拒绝 null/对象/数组/数字/空白/占位值）+ 输入递延状态与登记状态一致性 + 登记完整性（缺 id/重复 id/非列表）拒绝——自测 29/29、真实 CLI 负向电池 16/16（r01_t08_gate_cli_regression.sh），R1 全部闭合保持，正向真实数据判定不变（契约 1.2-stage-repair-r2，关卡证据重生成）。设计边界说明（R01-T08 独立验收 R1 O2，语义按 R2 更新）：关卡检查器对递延项挂账的核验为「风险条目存在 + resolve_by_stage/failure_handling 为有意义字符串且与输入递延状态一致 + 绑定与契约一致」，无法机器识别伪造的敷衍条目；条目真实性由独立验收抽样核对与后续阶段关卡承担，属设计内分工，非缺陷。阶段放行（PASS/ACCEPTED）归全新 Codex 阶段复验与总控。。R01 阶段验收 R3 F01 发现截止阶段仅校验「有意义字符串」、正文改 R99 仍放行；R01 阶段修复 R3 引入 G6 截止阶段机器校验绑定（契约 1.3-stage-repair-r3）：检查器内冻结真实阶段索引 REAL_STAGE_INDEX（R00–R11，冻结自任务书 stage-index.json——该目录未入 git 跟踪，冻结副本保证任何检出可复现可审计），FROZEN_CONTRACT 递延绑定升级为 {risk_id, deadline_stage, latest_stage}（冻结自登记正文已声明并经关卡放行的坐标，跨平台/授权态缺口保持 R09/R10 强制关卡），风险登记 15 个递延绑定条目补结构化 resolve_by_stage_id/resolve_latest_stage_id；结构化坐标必须真实存在、严格晚于 R01、与契约一致、latest≥deadline，正文首个 token/「最迟」token/全部 token 须与结构化坐标及阶段索引一致——R99/含糊「以后」/过晚/错误归属/越过最迟关卡/倒挂/文本不一致一律 BLOCKED；自测 44/44、真实 CLI 电池 1 正向+22 负向、R3 评审 R99 原样反例 exit 1/NO-GO，正向真实数据判定不变（关卡证据按 1.3 契约重生成，TRACKED 行改机器可校验格式 TRACKED(<risk> -> <deadline> 最迟 <latest>)）。R01 阶段验收 R4 F01 发现 G6 的 R\\d{2} token 提取无边界检查——伪装/更长标识被截成合法阶段（正文 R099/R0999 截成 R09、XR09/R09X 截出 R09，v1/v2/v3 原样反例 exit 0/PASS_WITH_CONDITIONS）；R01 阶段修复 R4 新增 G6b 完整标识边界校验（契约 1.4-stage-repair-r4）：完整形态提取（R+1 位以上数字、前后边界非字母数字/下划线）取代截断提取——R099 完整提取即拒（risk-stage-unknown），形似阶段引用但被嵌入更长标识/带相邻字母数字下划线的伪装出现（XR09/R09X/R09_stage）单独拒绝（risk-stage-disguised），「最迟 X」按完整形态捕获并核验存在性与一致性；自测 51/51（N1–N43 全保留 + N44–N50）、真实 CLI 电池 1 正+28 负、R4 评审 v0(R99)/v1(R099)/v2(R09/R099)/v3(XR09) 原样反例全部 exit 1/NO-GO，正向真实数据判定不变（关卡证据按 1.4 契约重生成）。R01 阶段验收 R5 F01 发现 G6b 边界类 [A-Za-z0-9_] 仍把点号/连字符当合法 token 边界——正文 R09.5/R09-5/R09．5 虚构小阶段被截成 R09 放行（真实 CLI exit 0/PASS_WITH_CONDITIONS/TRACKED(R09)，而 stage-index 只有 R00–R11）；R01 阶段修复 R5 扩展边界类为「标识延续字符」=字母/数字/下划线+点号/连字符族（ASCII 与全角点、全角下划线/连字符、en–em dash、间隔号），明确合法阶段引用完整语法=R+数字完整 token 且紧邻前后均非延续字符（空白/斜杠/中文标点为合法分隔符），复合/小阶段/拼接出现按向两侧扩展的完整复合形态拒绝（risk-stage-disguised，如 R09.5/R09-5/R09．5/R09－5/R09.5.1/R09.R10），「最迟 X」同规则；自测 59/59（N1–N50 全保留+N51–N58）、真实 CLI 电池 1 正+36 负、R5 原样反例与 R1–R4 全套反例 18/18 exit 1/NO-GO，正向真实数据判定不变（关卡证据按 1.5 契约重生成）。R5 F02 更正 R4 报告证据范围计数（STAGE_REPAIR_R4 12 件/候选 66 实为 11 件/65，11 件哈希均匹配、无第 12 件计划内证据，R4 原报告不改写）。R01 阶段验收 R6 F01 发现三条阶段正则（STAGE_TOKEN_RE/STAGE_DISGUISE_RE/LATEST_MARKER_RE）只从 ASCII R 起始——全角同形 Ｒ９９/Ｒ１０/Ｒ０９ 完全不参加提取与核验，正文首位「Ｒ９９（不存在的截止阶段）；R09（仅用于宿主集成）」与「R09（宿主集成）最迟 Ｒ１０（虚构放宽关卡）」两条真实 CLI 误放 exit 0/PASS_WITH_CONDITIONS/TRACKED(R09)，而 R０９（ASCII R+全角数字）反被 \\d Unicode 语义提取后拒，同族处理不一致；R01 阶段修复 R6 引入 G6c 全角同形 1:1 等长折叠（契约 1.6-stage-repair-r6）：_fold_stage_homoglyphs() 对全角拉丁字母（U+FF21–FF3A、U+FF41–FF5A）与全角数字（U+FF10–FF19）做 1:1 等长折叠，阶段引用提取、真实阶段索引核验、正文首位=结构化 deadline、「最迟」=结构化 latest 全部在折叠文本上进行（span 与原文 1:1 对齐，伪装形态报告切片取原文），结构化坐标 resolve_by_stage_id/resolve_latest_stage_id 不折叠、保持 ASCII 精确权威；大小写契约明确化——合法引用仅认大写 R，小写 r+数字（含全角）按伪装形态拒绝（risk-stage-disguised）。修复后：Ｒ９９ 首位→risk-stage-unknown、最迟 Ｒ１０→risk-stage-text-mismatch、Ｒ０９+R09 规范化一致→exit 0（正向形态，满足评审「至少识别/规范化正文首个视觉阶段」期望）、R０９→exit 0、r99/ｒ９９/ＸＲ０９/Ｒ99→拒绝；自测 67/67（N1–N58 全保留+N59–N65+P2 全角规范化正向）、真实 CLI 电池 2 正+43 负、R6 原样反例 2 条与合理变体 5 条及 R1–R5 全套 18/18 全部按预期，正向真实数据判定不变（关卡证据按 1.6 契约重生成，RISK_REGISTER.json 一字节未动）。R01 阶段验收 R7 F01 发现「最迟」标记只查首处——检查器对折叠后正文用 LATEST_MARKER_RE.search() 只校验第一个匹配，正文「最迟 R09；最迟 R10」（结构化最迟 R09）的第二处相矛盾强制期限被完全忽略（真实 CLI exit 0/PASS_WITH_CONDITIONS），风险交接正文与机器接受的最迟期限不一致；R01 阶段修复 R7 引入 G6d 每一处「最迟 X」逐处核验、失败关闭（契约 1.7-stage-repair-r7）：finditer 遍历折叠后正文全部「最迟」标记，任一引用不存在阶段即 risk-stage-unknown、任一与结构化 resolve_latest_stage_id 不符即 risk-stage-text-mismatch——清晰契约：每一处「最迟」均为强制期限声明，须全部与结构化最迟关卡一致方可放行，任一相矛盾即拒；与「最迟」语法无关的正常阶段提及（如「R10（后续平台事项）」）不构成最迟标记、不误伤；结构化坐标仍是判定权威，不放宽到更晚阶段。自测 72/72（N1–N65 全保留+N66–N68 新负向+P3 多处一致/P4 上下文提及两个新正向）、真实 CLI 电池 4 正+46 负、R7 评审原样反例与变体 13/13、R1–R6 全套反例 25/25 全部按预期，正向真实数据判定不变（关卡证据按 1.7 契约重生成，RISK_REGISTER.json 一字节未动）。R01 阶段验收 R8 F01 发现带常见连接词或标点的「最迟」声明绕过逐处核验——R7 标记语法只识别「最迟」后接空白再紧跟阶段 ID，正文「最迟：R10」（全角冒号）、「最迟：Ｒ１０」（全角冒号+全角阶段）、「最迟于 R10」（连接词）及单处「最迟：R10」（结构化最迟保持 R09/R09）均 exit 0/PASS_WITH_CONDITIONS 误放：明确而矛盾的最迟期限不构成标记，通用阶段扫描只查 R10 在 R00–R11 存在、不与结构化最迟比较；R01 阶段修复 R8 引入 G6d 连接形态扩展、失败关闭（契约 1.8-stage-repair-r8）：LATEST_MARKER_RE 升级为触发词族（最迟/不迟于/不得迟于/不晚于/不得晚于）+ 有界连接段（≤16 字符自然书写杂讯：空白/全半角冒号/连接词等；段内不得出现 R/r 与子句终结符——期限声明必须落在同一子句内，跨子句的阶段是上下文提及）+ 完整阶段 ID，逐处核验语义不变（任一引用不存在阶段即 risk-stage-unknown、任一与结构化 resolve_latest_stage_id 不符即 risk-stage-text-mismatch）；失败关闭：任一触发词出现而在其子句内解析不出阶段 ID（如「最迟于第三阶段完成」的自然语言期限）即 risk-stage-latest-unresolved，无法机器核验的期限不得替代结构化坐标放行；与触发词语法无关的正常阶段提及不构成期限标记、不误伤；结构化坐标仍是判定权威，不放宽到更晚阶段。自测 83/83（N1–N68 全保留+N69–N77 新负向+P5 连接形态一致/P6 否定连接式一致两个新正向）、真实 CLI 电池 6 正+54 负（扩 8 个 R8 变体）、R8 评审原样反例与对照 10/10、R7 评审原样反例与变体 13/13、R1–R6 全套反例 25/25 全部按预期，正向真实数据判定不变（关卡证据按 1.8 契约重生成，RISK_REGISTER.json 一字节未动）。R01 阶段验收 R9 F01 发现单个期限声明子句内的改期/顺延/或/斜杠第二阶段只核验首阶段——R8 标记语法把触发词绑定到其后首个阶段 ID，「最迟（原定 R09，现改 R10）完成」「最迟由原定的 R09 顺延至 R10 完成」「最迟在 R09 或 R10 完成」「最迟 R09/R10 完成」及全角变体（结构化坐标保持 R09/R09）真实 CLI 均 exit 0/PASS_WITH_CONDITIONS 误放：第二阶段被通用阶段扫描当普通上下文只查存在性，人工交接期限与机器接受期限仍相矛盾；R01 阶段修复 R9 引入 G6e 期限子句唯一一致（契约 1.9-stage-repair-r9）：每个触发词治理「从触发词起到子句终结符止」的完整区域，区域内每个完整阶段引用都必须与结构化 resolve_latest_stage_id 一致，出现任何其他阶段即无法机器判定唯一一致期限，按 risk-stage-text-mismatch 失败关闭拒绝——不枚举改期/顺延/选择语言（中文「或」、拉丁「or」、半/全角斜杠及其组合由「区域内出现第二阶段」统一覆盖）；触发词被成对引号紧包（“最迟”等）时为引用词名而非期限声明，不触发解析义务（闭引号紧邻触发词末端，被包裹内容不可能携带阶段 ID，豁免无法隐藏任何期限）；触发词之前的阶段是截止坐标上下文（首坐标校验管辖）、终结符之后的阶段是普通上下文提及（存在性校验管辖），均不受本规则约束；结构化坐标仍是判定权威，不放宽到更晚阶段。自测 92/92（N1–N77 全保留+N78–N84 七个新负向+P7 同子句内重复一致/P8 引号词名两个新正向）、真实 CLI 电池 8 正+62 负（扩 8 个 R9 负向+2 个 R9 正向）、R9 评审 25 变体 25/25（四误放转 exit 1、引号误拒转 exit 0、其余正负不变）、R1–R8 留存 CLI 反例 38/38 退出码与首阻断类别逐项不变，正向真实数据判定不变（关卡证据按 1.9 契约重生成，RISK_REGISTER.json 本轮一字节未动）。R01 阶段验收 R10 F01 发现 R9 引号紧包豁免实际跳过整个触发词（解析义务+区域治理一并移除）——词名之后的实际赋值/改期「“最迟”字段：原定 R09，现改 R10 完成」（四种支持引号同族）与非唯一期限「“最迟” R09/R10 完成」「「最迟」 Ｒ０９／Ｒ１０ 完成」全部 exit 0 误放，且区域终结符不看括号层次，括号内分号/换行「最迟（原定 R09；现改 R10）完成」截断完整改期声明；评审另独立裁定「最晚于 R10 完成」「R10 前必须完成」等已披露明确截止不得凭文档化边界自动当普通上下文，并查明 R9 修复报告「任务书明确禁止同义词枚举」声称无原文依据（历史报告保留原文，现行文档按查明结果更正）；R01 阶段修复 R10 引入 G6f 期限区域完整性与已披露边界期限拒绝（契约 1.10-stage-repair-r10）：引号紧包只豁免该触发词自身解析义务，其「触发词起到括号感知终结符止」的后续区域仍逐引用与结构化 resolve_latest_stage_id 一致——词名/字段名引用不得遮蔽同子句内随后的实际赋值/改期/选择；区域边界括号感知（未闭合括号内终结符不终止区域、延伸至末尾为失败关闭方向）；「最晚」并入触发词族（迟/晚对称封闭形态族）逐处核验；阶段锚定「之前/以前/前」边界期限按 risk-stage-boundary-unsupported 失败关闭拒绝；机器书写/交接契约成文（期限表达一律触发词族+完整阶段 ID，四种支持引号仅词名引用）。自测 107/107（N1–N84 全保留+N85–N96+P9/P10/P11）、真实 CLI 电池 11 正+74 负、R10 评审 24 变体+四引号 4 例重放全按预期、R9 评审 25 变体 25/25（仅两例裁定翻转）、R1–R8 留存反例 38/38 逐项不变（合计 91/91），正向真实数据判定不变（关卡证据三件按 1.10 契约重生成，RISK_REGISTER.json 本轮一字节未动）。 最新总控状态：第11轮完整阶段独立PASS，无阻断项；正式seal/最终ACCEPTED待真实提交后复验，R02未放行。",
   "remote_write_authorized": false,
   "production_data_authorized": false,
   "paid_or_external_test_authorized": false,

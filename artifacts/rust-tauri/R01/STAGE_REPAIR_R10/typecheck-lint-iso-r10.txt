@@ -1,0 +1,12 @@
+# R01 阶段修复 R10 — iso 重型静态套件
+== npm run typecheck（tsc×3）exit=0 ==
+
+> lingxi@0.1.43 typecheck
+> tsc --noEmit && tsc --noEmit -p tsconfig.node.json && tsc --noEmit -p tsconfig.test.json
+
+
+== npm run lint exit=0 ==
+
+✖ 10896 problems (0 errors, 10896 warnings)
+  0 errors and 34 warnings potentially fixable with the `--fix` option.
+

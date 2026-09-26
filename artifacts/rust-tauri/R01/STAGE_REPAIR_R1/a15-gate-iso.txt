@@ -1,0 +1,65 @@
+== F01 gate self-test (fixed checker, FROZEN_CONTRACT) ==
+PASS positive-control: 真实 R01 数据 verdict=PASS_WITH_CONDITIONS（browser_host=COMPLETE，deferred=15）
+PASS-NEG N1-screenshot-pass-takeover-fail: verdict=NO-GO browser_host=NOT_COMPLETE shell_path=BLOCKED: 存在未真实验证的高风险必需能力/不可信证据/冻结契约闭合违例，替壳路径明确阻塞…
+PASS-NEG N2-evidence-hash-tampered: verdict=NO-GO pdf_renderer=BLOCKED
+PASS-NEG N3-untracked-deferred: verdict=NO-GO browser_host=BLOCKED
+PASS-NEG N4-required-unverified: verdict=NO-GO storage_cutover=NOT_COMPLETE
+PASS-NEG N5-deleted-user-takeover-rejected: verdict=NO-GO browser_host=BLOCKED
+PASS-NEG N6-deleted-domain-rejected: verdict=NO-GO violations=1
+PASS-NEG N7-deleted-sha256-rejected: verdict=NO-GO pdf_renderer=BLOCKED
+PASS-NEG N8-deleted-deferred-rejected: verdict=NO-GO shell_capabilities=BLOCKED
+PASS-NEG N9-extra-domain-rejected: verdict=NO-GO violations=1
+PASS-NEG N10-renamed-capability-rejected: verdict=NO-GO browser_host=BLOCKED
+PASS-NEG N11-duplicate-capability-rejected: verdict=NO-GO browser_host=BLOCKED
+PASS-NEG N12-deferred-invalid-status-rejected: verdict=NO-GO browser_host=BLOCKED
+PASS-NEG N13-deferred-risk-rebound-rejected: verdict=NO-GO browser_host=BLOCKED
+PASS-NEG N14-evidence-rerouted-rejected: verdict=NO-GO browser_host=BLOCKED
+PASS-NEG N15-emptied-areas-rejected: verdict=NO-GO violations=5
+PASS-NEG N16-risk-entry-incomplete-rejected: verdict=NO-GO browser_host=BLOCKED
+SELF-TEST OK (17/17)
+exit=0
+
+== F01 positive real data ==
+[    COMPLETE] browser_host
+    navigation_snapshot_input_scroll: VERIFIED -> PASS
+    session_isolation: VERIFIED -> PASS
+    untrusted_page_sandbox: VERIFIED -> PASS
+    user_takeover: VERIFIED -> PASS
+    viewport_screenshot: VERIFIED -> PASS
+    fetch_interception_layer: UNVERIFIED -> TRACKED(RR-T05-X1 -> R09（browser worker 边界实现与门禁）)
+    webrtc_exfiltration_boundary: UNVERIFIED -> TRACKED(RR-T05-N2 -> R09（门禁显式决策，如 launcher 层开关/策略禁用）)
+[    COMPLETE] pdf_renderer
+    chinese_longdoc_fidelity: VERIFIED -> PASS
+    dangerous_resource_denial: VERIFIED -> PASS
+    infinite_script_timeout: VERIFIED -> PASS
+    matrix_28_verified: VERIFIED -> PASS
+    ws_loopback_boundary: VERIFIED -> PASS
+[    COMPLETE] protocol_chain
+    cross_language_roundtrip: VERIFIED -> PASS
+    generated_drift_free: VERIFIED -> PASS
+    ownership_machine_gate: VERIFIED -> PASS
+    version_incompatibility_diagnosis: VERIFIED -> PASS
+    canonical_non_bmp_divergence: OPEN_FINDING -> TRACKED(RR-T02-F1 -> R04（工具网关消费规范序列化之前）)
+    eventpayload_fallback_invariants: OPEN_FINDING -> TRACKED(RR-T02-F3 -> R04（先于 R04/R08）)
+    seq_parse_lenient: OPEN_FINDING -> TRACKED(RR-T02-F4 -> R04)
+    ts_canonical_float_bigint: OPEN_FINDING -> TRACKED(RR-T02-F2 -> R04（先于 R04/R08 的协议消费点，验收裁定口径）)
+    ws_close_code_hardcoded: OPEN_FINDING -> TRACKED(RR-T02-F5 -> R08（旧 Electron 客户端接入消费 WS 语义之前）)
+[    COMPLETE] shell_capabilities
+    capability_matrix_source: VERIFIED -> PASS
+    sidecar_lifecycle_acl: VERIFIED -> PASS
+    window_tray_shortcut_notification_clipboard_dialog_accessibility_updater_loginstartup_restart: VERIFIED -> PASS
+    cross_platform_windows_linux_macx64: UNVERIFIED -> TRACKED(RR-T06-PLATFORM -> R09（宿主集成）最迟 R10（跨平台产物）)
+    proxy_matrix: UNVERIFIED -> TRACKED(RR-T06-PROXY -> R09 最迟 R10)
+    recording_authorized_path: UNVERIFIED -> TRACKED(RR-T06-MIC -> R09)
+    screen_real_capture: UNVERIFIED -> TRACKED(RR-T06-SCREEN -> R09)
+    speech_recognition_authorized_chain: UNVERIFIED -> TRACKED(RR-T06-SPEECH -> R09)
+[    COMPLETE] storage_cutover
+    data_compatibility_matrix: VERIFIED -> PASS
+    old_binary_write_refusal: VERIFIED -> PASS
+    rollback_no_data_loss_drill: VERIFIED -> PASS
+    cooperative_gate_physical_separation: DOCUMENTED -> TRACKED(RR-T07-F2 -> R08/R09（分离数据根/原子活动目录指针落地时覆盖）)
+    corrupt_failure_failopen_fix: REGISTERED_DEFECT -> TRACKED(RR-T07-PROD-DEFECT-1 -> R02（新 coordinator 实现时修复并重跑 4 变体演练）)
+    shell_local_stores_gate: UNVERIFIED -> TRACKED(RR-T07-F3 -> R09（强制项）)
+VERDICT: PASS_WITH_CONDITIONS
+SHELL-REPLACEMENT: ALLOWED_FOR_NEXT_STAGE_ONLY: 实施平台高风险必需能力均有真实原型证据；15 个递延项已全部挂账（截止阶段+失败处理），跨平台/授权态放行挂 R09/R10 强制关卡
+exit=0

@@ -174,6 +174,32 @@ describe("compute-cli-closure: fail-closed validation", () => {
     expect(normalized).toContain("node_modules/some-tool-linux-x64/package.json");
   });
 
+  it("drops host-absolute and root-escaping nft entries while keeping repo-relative ones", () => {
+    const scratchRel = "build/.cli-closure-nft-scratch-test.mjs";
+    // nft resolves hardcoded spawn targets like the "/bin/bash" literals in
+    // lib/sandbox/* and emits whatever exists on the tracing machine -- a
+    // host artifact, not a shippable closure entry. The committed baseline
+    // contains worktree-relative and node_modules-logical paths only.
+    const normalized = normalizeNftTraceFiles({
+      fileList: new Set([
+        scratchRel,
+        "package.json",
+        "/bin/bash",
+        "C:\\Windows\\System32\\cmd.exe",
+        "C:/Windows/System32/cmd.exe",
+        "../../etc/passwd",
+        "lib/sandbox/script.ts",
+        "node_modules/better-sqlite3/lib/database.js",
+      ]),
+      scratchRel,
+    });
+
+    expect(normalized).toContain("lib/sandbox/script.ts");
+    expect(normalized).toContain("node_modules/better-sqlite3/lib/database.js");
+    expect(normalized.every((p) => !p.startsWith("/") && !p.startsWith("../") && !/^[A-Za-z]:[\\/]/.test(p)))
+      .toBe(true);
+  });
+
   it("flags a non-literal dynamic import() as a hit", () => {
     const hits = scanDynamicCallSites({
       relPath: "fixture.ts",
@@ -296,6 +322,15 @@ describe("compute-cli-closure: full generation (real esbuild + nft, slow)", () =
     // 路径 join）不是机器局部路径，若纳入扫描会永远误报。
     const { dynamicCallSites: _echoedAllowlist, ...portableClosure } = generatedClosure;
     expect(JSON.stringify(portableClosure)).not.toMatch(/(?:\/Users\/|\/home\/|[A-Za-z]:\\)/);
+    // Structural counterpart of the portability scan: the closure census lists
+    // worktree-relative and node_modules-logical files only. A host-absolute
+    // entry (e.g. a nft-traced "/bin/bash") must fail loudly here instead of
+    // being written into the tracked baseline and dirtying the worktree.
+    for (const file of generatedClosure.files) {
+      expect(file.path.startsWith("/"), `host-absolute closure entry: ${file.path}`).toBe(false);
+      expect(file.path.startsWith("../"), `root-escaping closure entry: ${file.path}`).toBe(false);
+      expect(/^[A-Za-z]:[\\/]/.test(file.path), `drive-qualified closure entry: ${file.path}`).toBe(false);
+    }
 
     const generatedBaseline = computeOpenBoundaryBaseline({ closure: generatedClosure });
     const committedBaseline = JSON.parse(fs.readFileSync(BASELINE_PATH, "utf-8"));
@@ -323,16 +358,30 @@ describe("compute-cli-closure: full generation (real esbuild + nft, slow)", () =
   it("writeCliRuntimeClosure/writeOpenBoundaryBaseline regenerate the exact committed files in place", async () => {
     const before = fs.readFileSync(CLOSURE_PATH, "utf-8");
     const beforeBaseline = fs.readFileSync(BASELINE_PATH, "utf-8");
-    // Reuses the closure writeCliRuntimeClosure already computed (rather
-    // than calling computeCliRuntimeClosure a second time) to avoid paying
-    // for a second full esbuild+nft pass in an already-slow test file.
-    const { closure, outPath } = await writeCliRuntimeClosure({ rootDir: REPOSITORY_ROOT });
-    const { outPath: baselineOutPath } = await writeOpenBoundaryBaseline({ rootDir: REPOSITORY_ROOT, closure });
-    expect(outPath).toBe(CLOSURE_PATH);
-    expect(baselineOutPath).toBe(BASELINE_PATH);
-    const after = fs.readFileSync(CLOSURE_PATH, "utf-8");
-    const afterBaseline = fs.readFileSync(BASELINE_PATH, "utf-8");
-    expect(after).toBe(before);
-    expect(afterBaseline).toBe(beforeBaseline);
+    try {
+      // Reuses the closure writeCliRuntimeClosure already computed (rather
+      // than calling computeCliRuntimeClosure a second time) to avoid paying
+      // for a second full esbuild+nft pass in an already-slow test file.
+      const { closure, outPath } = await writeCliRuntimeClosure({ rootDir: REPOSITORY_ROOT });
+      const { outPath: baselineOutPath } = await writeOpenBoundaryBaseline({ rootDir: REPOSITORY_ROOT, closure });
+      expect(outPath).toBe(CLOSURE_PATH);
+      expect(baselineOutPath).toBe(BASELINE_PATH);
+      const after = fs.readFileSync(CLOSURE_PATH, "utf-8");
+      const afterBaseline = fs.readFileSync(BASELINE_PATH, "utf-8");
+      expect(after).toBe(before);
+      expect(afterBaseline).toBe(beforeBaseline);
+    } finally {
+      // Test isolation (R01 stage repair R3 F02): the in-place write targets
+      // tracked files shared with the whole suite. If a future environment
+      // drift makes the assertions above fail, restore the committed bytes so
+      // this test reports its own failure without leaving the worktree dirty
+      // for the delivery generators' tree==HEAD guard to trip over.
+      if (fs.readFileSync(CLOSURE_PATH, "utf-8") !== before) {
+        fs.writeFileSync(CLOSURE_PATH, before, "utf-8");
+      }
+      if (fs.readFileSync(BASELINE_PATH, "utf-8") !== beforeBaseline) {
+        fs.writeFileSync(BASELINE_PATH, beforeBaseline, "utf-8");
+      }
+    }
   }, 420_000);
 });

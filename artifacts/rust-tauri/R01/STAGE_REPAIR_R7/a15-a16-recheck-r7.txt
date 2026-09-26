@@ -1,0 +1,31 @@
+# R01 阶段修复 R7 — A15/A16 复验（iso=/tmp/r01-repair-r7/iso，契约 1.7-stage-repair-r7）
+# 生成时间: 2026-09-26（iso 内真实运行；原始全文 /tmp/r01-repair-r7/logs/）
+
+## A15 关卡真实数据（G6d 修复后正向判定不变）
+$ python3 -B docs/rust-tauri/R01/r01_t08_gate_check.py
+VERDICT: PASS_WITH_CONDITIONS（15 递延项全部 TRACKED；详见 f01-iso-recheck-r7.txt 与 gate-report.json）
+$ python3 -B docs/rust-tauri/R01/r01_t08_gate_check.py --self-test
+SELF-TEST OK (72/72)
+
+## A16 覆盖检查自测
+$ python3 -B docs/rust-tauri/R01/r01_t08_coverage_check.py --self-test
+PASS-NEG N5-worker-critical-fact: 检出: ['C5-critical-fact-owners']
+SELF-TEST OK (6/6)
+
+## A16 覆盖检查真实数据
+$ python3 -B docs/rust-tauri/R01/r01_t08_coverage_check.py
+PASS C7-reverse-histogram: 19 个 owner 承载 F-ID；零 F-ID owner（非缺陷，承担存储/职责）: ['adapters.models', 'adapters.storage', 'cli.commands', 'react-ui', 'service.auth', 'service.composition', 'worker.bridge-sdk', 'worker.browser-engine', 'worker.doc-parse', 'worker.media-encode', 'xtask.automation']
+PASS C8-pi-count: Pi 能力 14 条
+PASS C8-pi-no-second-loop: 14 条 Pi 能力全部 KERNEL_MIGRATION 且有 Rust 归属与目标阶段——无仅靠第二 Agent loop 的保留项
+PASS C9-pi-coverage-diff: unmapped_index_symbols/vendor_files/adapter_submodules/hooks 全空
+PASS C9-worker-counterexamples: 19 条 worker 反例全部闭合
+RESULT: COVERAGE-CLOSED (736 F-ID 双向映射闭合；11 关键事实单负责人；14 Pi 能力无第二 loop 保留项)
+
+## A16 隔离核查
+$ python3 -B docs/rust-tauri/R01/r01_t08_isolation_check.py
+scanned production files: 2209
+prototype tracked files (rust/+spike/+contracts/+tests/migration/r01-*+scripts/rust-tauri/r01-*): 209
+prototype files under production dirs: 0
+gitignore spike build outputs: {'spike/tauri-shell/app/src-tauri/target/': True, 'spike/tauri-shell/app/node_modules/': True}
+gitignore rust/target ignored: False（如实报告；不判负，目录约定建议 R02 增补）
+RESULT: ISOLATED（生产入口零引用 R01 原型/生成物）

@@ -1,0 +1,19 @@
+# R01 阶段修复 R7 — 四文件门禁（候选态，仅 /tmp 隔离副本运行；主仓未运行）
+# 生成时间: 2026-09-26；iso=/tmp/r01-repair-r7/iso
+$ npx vitest run tests/upstream-sync-matrix.test.ts tests/post-verification-audit-seal.test.ts tests/round2-delivery-evidence.test.ts tests/round3-delivery-evidence.test.ts
+exit=1（候选态预期：6 红全部为封印前红，与 R5/R6 候选态同集）
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 6 ⎯⎯⎯⎯⎯⎯⎯
+ Test Files  3 failed | 1 passed (4)
+      Tests  6 failed | 68 passed (74)
+
+失败明细（6 红 = 预期封印前红集合：audit-seal diff guard 1（VERIFIED_SOURCE_SHA 旧坐标）+ round2 3（R10-03/R10-04/R10-09）+ round3 2（manifest/replay）；upstream-sync-matrix 7/7 绿）：
+× changes since VERIFIED_SOURCE_SHA are audit-only (allowlist enforced) 25ms
+× R10-03: 当前源码摘要可复算，且存在同摘要、执行期间未漂移的绿色门禁 125ms
+× R10-04: tracked 与 untracked 源文件全部进入 manifest，证据/报告/补丁排除规则明示 114ms
+× R10-09: 增量补丁从干净 89bc0b64 重放后按 source/seal 两状态验收 29226ms
+× round3: 源码 manifest 可复算，且覆盖本轮新增源码与测试 123ms
+× round3: 现场重放增量补丁并按 source/seal 两状态验收（不只读历史 VERIFIED 记录） 32335ms
+
+如实说明：候选未提交，审计坐标未推进（VERIFIED_SOURCE_SHA 仍指 R00 C3 f2b8c687…），6 红不因本修复伪造转绿；正式提交后须 74/74。
+原始全文：/tmp/r01-repair-r7/logs/fourfile.txt

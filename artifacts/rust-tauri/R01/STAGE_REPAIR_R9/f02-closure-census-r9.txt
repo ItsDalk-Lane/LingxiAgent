@@ -1,0 +1,9 @@
+# R01 阶段修复 R9 — 闭包真实再生成 + census（iso=/tmp/r01-repair-r9/iso）
+# 全文日志：/tmp/r01-repair-r9/iso-typecheck-closure.log、/tmp/r01-repair-r9/iso-census-fourfile.log
+== 闭包再生成 ==
+open-boundary baseline: 1 coupling edge(s) (evidence-needed=1), 1 evidence-needed, 0 provisional
+build/open-boundary-baseline.json
+closure exit=0；git status --porcelain -- build/ 输出行数：0（0=零漂移）
+== census 单文件 ==
+      Tests  23 passed (23)
+ Test Files  3 failed | 1 passed (4)

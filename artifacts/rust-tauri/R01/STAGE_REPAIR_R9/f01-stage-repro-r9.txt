@@ -1,0 +1,31 @@
+# R01 阶段修复 R9 — R9 评审原样 25 变体重放（主仓真实 CLI；仅改 /tmp 登记副本 RR-T05-X1 正文，结构化坐标 R09/R09 不动）
+# 复现器：/tmp/r01-repair-r9/rerun-adversarial.py（变体硬编码转写自 R9 评审 /tmp/r01-r9-adversarial.py 变体表，不 eval 外部输入）
+# 期望：R7/R8 已拒 13 例保持 exit 1；R9 修复四误放（slash/or/correction/old-new）转 exit 1；
+#       quoted-context 误拒转 exit 0；其余正向保持 exit 0
+OK   original: expected_exit=0 exit=0 verdict=PASS_WITH_CONDITIONS first_category=- text='R09（browser worker 边界实现与门禁）'
+OK   r7-double: expected_exit=1 exit=1 verdict=NO-GO first_category=risk-stage-text-mismatch text='R09（宿主集成）最迟 R09；最迟 R10（虚构放宽关卡）'
+OK   r7-reversed: expected_exit=1 exit=1 verdict=NO-GO first_category=risk-stage-text-mismatch text='R09（宿主集成）最迟 R10；最迟 R09'
+OK   r7-fw: expected_exit=1 exit=1 verdict=NO-GO first_category=risk-stage-text-mismatch text='R09（宿主集成）最迟 Ｒ０９；最迟 Ｒ１０'
+OK   r8-colon: expected_exit=1 exit=1 verdict=NO-GO first_category=risk-stage-text-mismatch text='R09（宿主集成）最迟 R09；最迟：R10（虚构放宽关卡）'
+OK   r8-colon-fw: expected_exit=1 exit=1 verdict=NO-GO first_category=risk-stage-text-mismatch text='R09（宿主集成）最迟 R09；最迟：Ｒ１０（虚构放宽关卡）'
+OK   r8-yu: expected_exit=1 exit=1 verdict=NO-GO first_category=risk-stage-text-mismatch text='R09（宿主集成）最迟 R09；最迟于 R10（虚构放宽关卡）'
+OK   r8-single-colon: expected_exit=1 exit=1 verdict=NO-GO first_category=risk-stage-text-mismatch text='R09（宿主集成）最迟：R10（虚构放宽关卡）'
+OK   r8-unresolved: expected_exit=1 exit=1 verdict=NO-GO first_category=risk-stage-latest-unresolved text='R09（宿主集成）最迟于第三阶段完成'
+OK   consistent: expected_exit=0 exit=0 verdict=PASS_WITH_CONDITIONS first_category=- text='R09（宿主集成）最迟 R09；最迟 R09（重复但一致）'
+OK   consistent-connectors: expected_exit=0 exit=0 verdict=PASS_WITH_CONDITIONS first_category=- text='R09（宿主集成）最迟：R09；最迟于 R09'
+OK   context: expected_exit=0 exit=0 verdict=PASS_WITH_CONDITIONS first_category=- text='R09（宿主集成）；R10（后续平台事项）最迟 R09'
+OK   not-later-consistent: expected_exit=0 exit=0 verdict=PASS_WITH_CONDITIONS first_category=- text='R09（宿主集成）不晚于 R09 完成'
+OK   connector-16: expected_exit=1 exit=1 verdict=NO-GO first_category=risk-stage-text-mismatch text='R09 最迟甲甲甲甲甲甲甲甲甲甲甲甲甲甲甲甲R10'
+OK   connector-17: expected_exit=1 exit=1 verdict=NO-GO first_category=risk-stage-latest-unresolved text='R09 最迟甲甲甲甲甲甲甲甲甲甲甲甲甲甲甲甲甲R10'
+OK   connector-r: expected_exit=1 exit=1 verdict=NO-GO first_category=risk-stage-latest-unresolved text='R09 最迟由 risk owner 于 R10 完成'
+OK   newline: expected_exit=1 exit=1 verdict=NO-GO first_category=risk-stage-latest-unresolved text='R09 最迟\nR10'
+OK   one-trigger-slash: expected_exit=1 exit=1 verdict=NO-GO first_category=risk-stage-text-mismatch text='R09（宿主集成）最迟 R09/R10 完成'
+OK   one-trigger-or: expected_exit=1 exit=1 verdict=NO-GO first_category=risk-stage-text-mismatch text='R09（宿主集成）最迟在 R09 或 R10 完成'
+OK   one-trigger-correction: expected_exit=1 exit=1 verdict=NO-GO first_category=risk-stage-text-mismatch text='R09（宿主集成）最迟（原定 R09，现改 R10）完成'
+OK   one-trigger-old-new: expected_exit=1 exit=1 verdict=NO-GO first_category=risk-stage-text-mismatch text='R09（宿主集成）最迟由原定的 R09 顺延至 R10 完成'
+OK   bare-deadline: expected_exit=0 exit=0 verdict=PASS_WITH_CONDITIONS first_category=- text='R09（宿主集成）；R10 前必须完成'
+OK   synonym: expected_exit=0 exit=0 verdict=PASS_WITH_CONDITIONS first_category=- text='R09（宿主集成）；最晚于 R10 完成'
+OK   quoted-context: expected_exit=0 exit=0 verdict=PASS_WITH_CONDITIONS first_category=- text='R09 最迟 R09 完成；R10 文档介绍“最迟”字段'
+OK   plain-context: expected_exit=0 exit=0 verdict=PASS_WITH_CONDITIONS first_category=- text='R09 最迟 R09 完成；R10（后续平台事项）'
+R9-ADVERSARIAL OK (25/25)
+# exit=0

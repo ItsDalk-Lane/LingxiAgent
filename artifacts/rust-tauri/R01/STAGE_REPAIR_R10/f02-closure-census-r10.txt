@@ -1,0 +1,11 @@
+# R01 阶段修复 R10 — iso 闭包再生成与 census
+== node scripts/compute-cli-closure.mjs exit=0 ==
+build/cli-runtime-closure.json
+open-boundary baseline: 1 coupling edge(s) (evidence-needed=1), 1 evidence-needed, 0 provisional
+build/open-boundary-baseline.json
+git status --porcelain -- build/ 输出行数: 0（零漂移）
+
+== npx vitest run tests/cli-closure-census.test.ts exit=0 ==
+ Test Files  1 passed (1)
+      Tests  23 passed (23)
+census 后 build/ 漂移行数: 0

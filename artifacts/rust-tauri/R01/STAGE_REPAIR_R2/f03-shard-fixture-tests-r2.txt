@@ -1,0 +1,22 @@
+# R01 阶段修复 R2 — F03 分片合同夹具测试（合成 git 夹具，不触主仓交付物）
+# date: 2026-09-26 02:09:50 +0800  host: Darwin 27.0.0 arm64
+# cmd: npx vitest run tests/round2-delivery-evidence.test.ts tests/round3-delivery-evidence.test.ts -t 分片
+
+
+ RUN  v4.1.10 /Users/study_superior/Desktop/Code/LingxiAgent
+
+ ✓ tests/round3-delivery-evidence.test.ts (29 tests | 26 skipped) 2027ms
+     ✓ 分片正向：超阈值时交付受控分片，逐片与重组哈希可复算，单体不共存（R2 F03）  477ms
+     ✓ 分片负向：MISMATCH 不改写既有分片交付（清单与全部分片字节保留，R2 F03）  682ms
+     ✓ 分片/单体双向转换互斥回收：单体→分片移除单体，分片→单体回收分片与清单（R2 F03）  867ms
+ ✓ tests/round2-delivery-evidence.test.ts (35 tests | 32 skipped) 2320ms
+     ✓ 分片正向：超阈值时交付受控分片，逐片与重组哈希可复算，单体不共存（R2 F03）  519ms
+     ✓ 分片负向：MISMATCH 不改写既有分片交付（清单与全部分片字节保留，R2 F03）  773ms
+     ✓ 分片/单体双向转换互斥回收：单体→分片移除单体，分片→单体回收分片与清单（R2 F03）  1027ms
+
+ Test Files  2 passed (2)
+      Tests  6 passed | 58 skipped (64)
+   Start at  02:09:51
+   Duration  2.44s (transform 93ms, setup 40ms, import 71ms, tests 4.35s, environment 0ms)
+
+EXIT=0

@@ -81,6 +81,30 @@ export default [
     },
   },
 
+  // R01-T06 Tauri spike 原型（隔离目录，不进入生产入口；规则不放宽，只声明
+  // 真实运行环境）：app/frontend 页面探针运行在 Tauri webview（浏览器环境）。
+  {
+    files: ['spike/tauri-shell/app/frontend/**/*.js'],
+    languageOptions: {
+      globals: {
+        ...globals.browser,
+      },
+    },
+  },
+
+  // spike scripts 是 Node 侧 runner/证据服务器/WDIO 探针（loopback 吊具）；
+  // fetch/AbortSignal 为 Node 18+ 内建，与上面 Node 块同一约定。
+  {
+    files: ['spike/tauri-shell/scripts/**/*.mjs'],
+    languageOptions: {
+      globals: {
+        ...globals.node,
+        fetch: 'readonly',
+        AbortSignal: 'readonly',
+      },
+    },
+  },
+
   // Vitest files mix Node helpers with jsdom/browser primitives.
   {
     files: ['tests/**/*.{js,mjs,ts,tsx}'],

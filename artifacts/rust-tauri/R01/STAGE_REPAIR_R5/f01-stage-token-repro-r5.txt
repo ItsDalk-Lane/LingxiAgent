@@ -1,0 +1,59 @@
+# R01 阶段修复 R5 — R5 评审原样反例复测（契约 1.5-stage-repair-r5）
+# 方法与 R5 评审完全一致：仅改临时登记副本 RR-T05-X1.resolve_by_stage 正文，
+# 结构化 resolve_by_stage_id/resolve_latest_stage_id（R09/R09）与其余字段、仓库文件一字节不动；
+# 登记副本 /tmp/r01-repair-r5/repro/，逐例调用真实 CLI python3 -B docs/rust-tauri/R01/r01_t08_gate_check.py --register <副本>
+# 修复前（R5 评审实测）：r09-dot-5 / r09-hyphen-5 / r09-fullwidthdot-5 均 exit 0 / PASS_WITH_CONDITIONS / TRACKED(R09)；
+OK  control-original text None exit 0
+   VERDICT: PASS_WITH_CONDITIONS
+   fetch_interception_layer: UNVERIFIED -> TRACKED(RR-T05-X1 -> R09 最迟 R09)
+OK  r99 text 'R99（不存在的阶段）' exit 1
+   VERDICT: NO-GO
+   fetch_interception_layer: UNVERIFIED -> BLOCKED(risk-stage-unknown)
+OK  r099 text 'R099（不存在的阶段）' exit 1
+   VERDICT: NO-GO
+   fetch_interception_layer: UNVERIFIED -> BLOCKED(risk-stage-unknown)
+OK  r09-r099 text 'R09/R099（混合伪造阶段）' exit 1
+   VERDICT: NO-GO
+   fetch_interception_layer: UNVERIFIED -> BLOCKED(risk-stage-unknown)
+OK  xr09 text 'XR09（伪装阶段）' exit 1
+   VERDICT: NO-GO
+   fetch_interception_layer: UNVERIFIED -> BLOCKED(risk-stage-disguised)
+OK  r09x text 'R09X（伪装阶段）' exit 1
+   VERDICT: NO-GO
+   fetch_interception_layer: UNVERIFIED -> BLOCKED(risk-stage-disguised)
+OK  r0999 text 'R0999（伪装阶段）' exit 1
+   VERDICT: NO-GO
+   fetch_interception_layer: UNVERIFIED -> BLOCKED(risk-stage-unknown)
+OK  r09-stage text 'R09_stage（伪装阶段）' exit 1
+   VERDICT: NO-GO
+   fetch_interception_layer: UNVERIFIED -> BLOCKED(risk-stage-disguised)
+OK  latest-r099 text 'R09 最迟 R099' exit 1
+   VERDICT: NO-GO
+   fetch_interception_layer: UNVERIFIED -> BLOCKED(risk-stage-unknown)
+OK  r09-dot-5 text 'R09.5（虚构小阶段）' exit 1
+   VERDICT: NO-GO
+   fetch_interception_layer: UNVERIFIED -> BLOCKED(risk-stage-disguised)
+OK  r09-hyphen-5 text 'R09-5（虚构小阶段）' exit 1
+   VERDICT: NO-GO
+   fetch_interception_layer: UNVERIFIED -> BLOCKED(risk-stage-disguised)
+OK  r09-fullwidthdot-5 text 'R09．5（虚构小阶段）' exit 1
+   VERDICT: NO-GO
+   fetch_interception_layer: UNVERIFIED -> BLOCKED(risk-stage-disguised)
+OK  r09-fullwidthhyphen-5 text 'R09－5（虚构小阶段）' exit 1
+   VERDICT: NO-GO
+   fetch_interception_layer: UNVERIFIED -> BLOCKED(risk-stage-disguised)
+OK  r09-multi-dot text 'R09.5.1（多级虚构小阶段）' exit 1
+   VERDICT: NO-GO
+   fetch_interception_layer: UNVERIFIED -> BLOCKED(risk-stage-disguised)
+OK  r09-dot-r10 text 'R09.R10（点号拼接阶段标识）' exit 1
+   VERDICT: NO-GO
+   fetch_interception_layer: UNVERIFIED -> BLOCKED(risk-stage-disguised)
+OK  latest-r09-dot-5 text 'R09 最迟 R09.5' exit 1
+   VERDICT: NO-GO
+   fetch_interception_layer: UNVERIFIED -> BLOCKED(risk-stage-disguised)
+OK  latest-r09-hyphen-5 text 'R09 最迟 R09-5' exit 1
+   VERDICT: NO-GO
+   fetch_interception_layer: UNVERIFIED -> BLOCKED(risk-stage-disguised)
+OK  r09-slash-dot5 text 'R09/R09.5（混合真实阶段与虚构小阶段）' exit 1
+   VERDICT: NO-GO
+   fetch_interception_layer: UNVERIFIED -> BLOCKED(risk-stage-disguised)

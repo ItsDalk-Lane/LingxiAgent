@@ -1,0 +1,30 @@
+# R01 阶段修复 R2 — F03 可达集对象审计 + 本地裸仓推送预演（修正审计口径后续跑）
+# 口径修正：首次仪式的 git cat-file --batch-all-objects 把本地不可达残留 blob 计入；
+# git push 只发送可达对象，故改为审计 (A) HEAD 可达集 (B) 裸仓实收对象（GitHub 视角）。
+# 复制自 /tmp/r01-repair-r2/logs/continue-audit-push.log
+
+== reachable-set audit at R2a'' (facc3e293e801fd7df16eab632728a03e79ef260) ==
+REACHABLE-BLOBS=14579 MAX=97003232 OVER-100MiB=0 WARN-50MB=6
+MAX-LINE: blob 97003232 046e5913bb03396b99cafd7d8e156fa092e58f36
+WARN: blob 87549864 718565fb1b8a612d3788896ecf3e0005ca29b11b
+WARN: blob 70854224 92a341612f34e1bfaae950dcecfcbb201d0528d3
+WARN: blob 70032617 54b8e409e187a1f7f821c03f0eb0cd7af33f5310
+WARN: blob 97003232 046e5913bb03396b99cafd7d8e156fa092e58f36
+WARN: blob 82685333 a1cc24c2038b82077c988c5b4bee30923157eda6
+WARN: blob 89457199 c5de3d17672adfe8320ee25bf54d5feae56acc31
+== push rehearsal to local bare remote ==
+To /tmp/r01-repair-r2/remote.git
+ * [new branch]          HEAD -> codex/rust-tauri-migration
+LOCAL_R2A=facc3e293e801fd7df16eab632728a03e79ef260
+REMOTE_SHA=facc3e293e801fd7df16eab632728a03e79ef260
+PUSH-REHEARSAL-OK
+== remote received-object audit (GitHub-view ground truth) ==
+REMOTE-BLOBS=14579 MAX=97003232 OVER-100MiB=0 WARN-50MB=6
+MAX-LINE: blob 97003232 046e5913bb03396b99cafd7d8e156fa092e58f36
+WARN: blob 70032617 54b8e409e187a1f7f821c03f0eb0cd7af33f5310
+WARN: blob 87549864 718565fb1b8a612d3788896ecf3e0005ca29b11b
+WARN: blob 70854224 92a341612f34e1bfaae950dcecfcbb201d0528d3
+WARN: blob 82685333 a1cc24c2038b82077c988c5b4bee30923157eda6
+WARN: blob 89457199 c5de3d17672adfe8320ee25bf54d5feae56acc31
+WARN: blob 97003232 046e5913bb03396b99cafd7d8e156fa092e58f36
+CONTINUE-DONE

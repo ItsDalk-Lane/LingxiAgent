@@ -1,0 +1,22 @@
+# R1–R5 全套原样反例 18 例回归（登记副本来自 /tmp/r01-repair-r5/repro，仅改 RR-T05-X1 正文）；iso 真实 CLI，类别与 R5 不变
+# 归档时间 2026-09-26；原始日志 /tmp/r01-repair-r6/logs/f01-r1-r5-regression-iso-r6.txt
+
+== R1–R5 全套原样反例回归（iso，18 例来自 /tmp/r01-repair-r5/repro）==
+control-original: exit=0 PASS-PATH
+latest-r09-dot-5: exit=1 BLOCKED(risk-stage-disguised)
+latest-r09-hyphen-5: exit=1 BLOCKED(risk-stage-disguised)
+latest-r099: exit=1 BLOCKED(risk-stage-unknown)
+r09-dot-5: exit=1 BLOCKED(risk-stage-disguised)
+r09-dot-r10: exit=1 BLOCKED(risk-stage-disguised)
+r09-fullwidthdot-5: exit=1 BLOCKED(risk-stage-disguised)
+r09-fullwidthhyphen-5: exit=1 BLOCKED(risk-stage-disguised)
+r09-hyphen-5: exit=1 BLOCKED(risk-stage-disguised)
+r09-multi-dot: exit=1 BLOCKED(risk-stage-disguised)
+r09-r099: exit=1 BLOCKED(risk-stage-unknown)
+r09-slash-dot5: exit=1 BLOCKED(risk-stage-disguised)
+r09-stage: exit=1 BLOCKED(risk-stage-disguised)
+r099: exit=1 BLOCKED(risk-stage-unknown)
+r0999: exit=1 BLOCKED(risk-stage-unknown)
+r09x: exit=1 BLOCKED(risk-stage-disguised)
+r99: exit=1 BLOCKED(risk-stage-unknown)
+xr09: exit=1 BLOCKED(risk-stage-disguised)

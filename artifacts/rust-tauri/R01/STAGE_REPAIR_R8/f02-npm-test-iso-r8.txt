@@ -1,0 +1,15 @@
+# R01 阶段修复 R8 — 全量 npm test（iso，候选态）
+# 生成时间: 2026-09-26 09:52:59
+# $ npm test
+
+ Test Files  3 failed | 1463 passed | 3 skipped (1469)
+      Tests  6 failed | 14943 passed | 15 skipped (14964)
+失败 6 项（与四文件门禁同集，预期封印前红）：
+ FAIL  tests/post-verification-audit-seal.test.ts > post-verification audit seal (diff guard) > changes since VERIFIED_SOURCE_SHA are audit-only (allowlist enforced)
+ FAIL  tests/round2-delivery-evidence.test.ts > R10 round2 交付证据契约 > R10-03: 当前源码摘要可复算，且存在同摘要、执行期间未漂移的绿色门禁
+ FAIL  tests/round2-delivery-evidence.test.ts > R10 round2 交付证据契约 > R10-04: tracked 与 untracked 源文件全部进入 manifest，证据/报告/补丁排除规则明示
+ FAIL  tests/round2-delivery-evidence.test.ts > R10 round2 交付证据契约 > R10-09: 增量补丁从干净 89bc0b64 重放后按 source/seal 两状态验收
+ FAIL  tests/round3-delivery-evidence.test.ts > round3 C01-C03 候选交付证据契约 > round3: 源码 manifest 可复算，且覆盖本轮新增源码与测试
+ FAIL  tests/round3-delivery-evidence.test.ts > round3 C01-C03 候选交付证据契约 > round3: 现场重放增量补丁并按 source/seal 两状态验收（不只读历史 VERIFIED 记录）
+
+npm test exit=1（6 红全部为 VERIFIED_SOURCE_SHA 旧坐标引起的预期封印前红，与 R5/R6/R7/R8 评审候选态同数同集，R8 零新增红）

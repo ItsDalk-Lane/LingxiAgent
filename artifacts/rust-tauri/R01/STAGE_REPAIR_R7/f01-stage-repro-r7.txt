@@ -1,0 +1,44 @@
+# R01 阶段修复 R7 — R7 评审原样复现登记复测（契约 1.7-stage-repair-r7，主仓真实 CLI）
+# 生成时间: 2026-09-26 08:28:11
+# 方法：与 R7 评审同法——仅改 /tmp 登记副本 RR-T05-X1.resolve_by_stage 正文，结构化坐标保持 R09/R09 原样
+# $ python3 -B docs/rust-tauri/R01/r01_t08_gate_check.py --register /tmp/r01-r7-*.json
+
+== r01-r7-original-control.json
+   正文: R09（browser worker 边界实现与门禁）
+   exit=0 VERDICT: PASS_WITH_CONDITIONS （无 BLOCKED 类别=放行）
+== r01-r7-single-latest-r10.json
+   正文: R09（宿主集成）最迟 R10（虚构放宽关卡）
+   exit=1 VERDICT: NO-GO BLOCKED(risk-stage-text-mismatch)
+== r01-r7-double-latest.json
+   正文: R09（宿主集成）最迟 R09；最迟 R10（虚构放宽关卡）
+   exit=1 VERDICT: NO-GO BLOCKED(risk-stage-text-mismatch)
+== r01-r7-R7-double-latest-conflict.json
+   正文: R09（宿主集成）最迟 R09；最迟 R10（放宽截止）
+   exit=1 VERDICT: NO-GO BLOCKED(risk-stage-text-mismatch)
+== r01-r7-double-latest-reversed.json
+   正文: R09（宿主集成）最迟 R10；最迟 R09
+   exit=1 VERDICT: NO-GO BLOCKED(risk-stage-text-mismatch)
+== r01-r7-double-latest-variant.json
+   正文: R09（宿主集成）最迟 Ｒ０９；最迟 Ｒ１０
+   exit=1 VERDICT: NO-GO BLOCKED(risk-stage-text-mismatch)
+== r01-r7-R7-double-latest-same.json
+   正文: R09（宿主集成）最迟 R09；最迟 R09（重复但一致）
+   exit=0 VERDICT: PASS_WITH_CONDITIONS （无 BLOCKED 类别=放行）
+== r01-r7-R7-contextual-R10-control.json
+   正文: R09（宿主集成）；R10（后续平台事项）最迟 R09
+   exit=0 VERDICT: PASS_WITH_CONDITIONS （无 BLOCKED 类别=放行）
+== r01-r7-R4-unknown-full.json
+   正文: R099（不存在的截止阶段）；R09（宿主集成）
+   exit=1 VERDICT: NO-GO BLOCKED(risk-stage-unknown)
+== r01-r7-R5-dot-substage.json
+   正文: R09.5（不存在的小阶段）；R09（宿主集成）
+   exit=1 VERDICT: NO-GO BLOCKED(risk-stage-disguised)
+== r01-r7-R6-fullwidth-first.json
+   正文: Ｒ９９（不存在的截止阶段）；R09（仅用于宿主集成）
+   exit=1 VERDICT: NO-GO BLOCKED(risk-stage-unknown)
+== r01-r7-R6-fullwidth-latest.json
+   正文: R09（宿主集成）最迟 Ｒ１０（虚构放宽关卡）
+   exit=1 VERDICT: NO-GO BLOCKED(risk-stage-text-mismatch)
+== r01-r7-R6-fullwidth-valid.json
+   正文: Ｒ０９（看似合法的截止）；R09（校验）
+   exit=0 VERDICT: PASS_WITH_CONDITIONS （无 BLOCKED 类别=放行）

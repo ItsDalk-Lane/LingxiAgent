@@ -1,0 +1,298 @@
+== [0] reset to R1c' ==
+d8e4192f0 REHEARSAL: simulated R01 stage repair R1 candidate commit (not real)
+
+== [1/8] round2 green: typecheck ==
+
+> lingxi@0.1.43 typecheck
+> tsc --noEmit && tsc --noEmit -p tsconfig.node.json && tsc --noEmit -p tsconfig.test.json
+
+
+EVIDENCE r01-seal-r1-typecheck EXIT 0 MANIFEST cc6cc09441cb4adf175f3ad8a014cdde3d6a1cc7e593e0655a851c344e4c8486
+
+== [2/8] round2 green: core-contracts ==
+
+> lingxi@0.1.43 typecheck:core-contracts
+> node scripts/check-core-contracts-strict.mjs
+
+Core contracts strict check passed (28 files).
+
+EVIDENCE r01-seal-r1-contracts EXIT 0 MANIFEST cc6cc09441cb4adf175f3ad8a014cdde3d6a1cc7e593e0655a851c344e4c8486
+
+== [3/8] round2 green: lint:boundary ==
+
+> lingxi@0.1.43 lint:boundary
+> node scripts/lint-open-boundary.mjs
+
+lint:boundary ok -- 1 known open->closed edge(s), all within the tracked ratchet baseline (existing debt, not newly introduced).
+
+EVIDENCE r01-seal-r1-boundary EXIT 0 MANIFEST cc6cc09441cb4adf175f3ad8a014cdde3d6a1cc7e593e0655a851c344e4c8486
+
+== [4/7] round2 green: build:renderer ==
+            7.77 kB │ gzip:   3.33 kB
+../dist-renderer/assets/haxe-H-WmDvRZ.js                                 7.89 kB │ gzip:   2.95 kB
+../dist-renderer/assets/erlang-BNw1qcRV.js                               8.10 kB │ gzip:   2.89 kB
+../dist-renderer/assets/verilog-C6RDOZhf.js                              8.24 kB │ gzip:   3.52 kB
+../dist-renderer/assets/index-CeTfx1TE.js                                8.33 kB │ gzip:   3.59 kB
+../dist-renderer/assets/diagram-7IWD3JNH-BqFiuQ4w.js                     8.37 kB │ gzip:   3.74 kB
+../dist-renderer/assets/dagre-VZM6K2ZE-C1rnwW_A.js                       8.60 kB │ gzip:   3.33 kB
+../dist-renderer/assets/sas-B4kiWyti.js                                  9.33 kB │ gzip:   4.11 kB
+../dist-renderer/assets/MediaViewer-zCd2z-Kt.js                          9.61 kB │ gzip:   3.71 kB
+../dist-renderer/assets/perl-CdXCOZ3F.js                                 9.75 kB │ gzip:   3.46 kB
+../dist-renderer/assets/cynefinDiagram-MW4NZA55-CuXnlxCw.js             10.13 kB │ gzip:   3.65 kB
+../dist-renderer/assets/gherkin-heZmZLOM.js                             10.16 kB │ gzip:   5.09 kB
+../dist-renderer/assets/stateDiagram-OKZ733FA-FZyCIn5R.js               10.46 kB │ gzip:   3.67 kB
+../dist-renderer/assets/diagram-B4RE2ZJO-DZSkwL5C.js                    10.75 kB │ gzip:   4.15 kB
+../dist-renderer/assets/clojure-BMjYHr_A.js                             10.82 kB │ gzip:   3.99 kB
+../dist-renderer/assets/idl-BEugSyMb.js                                 11.63 kB │ gzip:   4.52 kB
+../dist-renderer/assets/index-aXNGBZOz.js                               12.84 kB │ gzip:   5.67 kB
+../dist-renderer/assets/index-C42D-w2K.js                               12.85 kB │ gzip:   4.17 kB
+../dist-renderer/assets/index-rusf3s97.js                               14.81 kB │ gzip:   6.02 kB
+../dist-renderer/assets/WindowControls-IXqI_umC.js                      15.14 kB │ gzip:   5.89 kB
+../dist-renderer/assets/chunk-6Q2QTUOP-8hxEGtFs.js                      15.74 kB │ gzip:   4.41 kB
+../dist-renderer/assets/diagram-Q27KOJAE-CtRzSdPu.js                    15.99 kB │ gzip:   5.72 kB
+../dist-renderer/assets/SessionStatusCard-Wziq91OY.js                   16.16 kB │ gzip:   5.44 kB
+../dist-renderer/assets/index-CUnnBQ_0.js                               16.45 kB │ gzip:   7.52 kB
+../dist-renderer/assets/MobileApp-DATCrd0I.js                           16.79 kB │ gzip:   5.81 kB
+../dist-renderer/assets/quick-chat-C1f05Rri.js                          17.01 kB │ gzip:   6.47 kB
+../dist-renderer/assets/javascript-iXu5QeM3.js                          17.08 kB │ gzip:   5.75 kB
+../dist-renderer/assets/ishikawaDiagram-WSZJBQD7-B_ohz3q4.js            17.51 kB │ gzip:   6.67 kB
+../dist-renderer/assets/kanban-definition-27J2QSJJ-HYe_cEy3.js          20.33 kB │ gzip:   7.23 kB
+../dist-renderer/assets/index-CC5k3Vj_.js                               21.09 kB │ gzip:   9.43 kB
+../dist-renderer/assets/index-DRE3ABQr.js                               21.35 kB │ gzip:   9.82 kB
+../dist-renderer/assets/clike-B9uivgTg.js                               22.30 kB │ gzip:   7.86 kB
+../dist-renderer/assets/index-YOSmQsbR.js                               23.19 kB │ gzip:  10.46 kB
+../dist-renderer/assets/sankeyDiagram-W5VNT64P-ubqZmsgs.js              23.24 kB │ gzip:   8.58 kB
+../dist-renderer/assets/mindmap-definition-FAOFIHXS-C86EUjUM.js         23.49 kB │ gzip:   7.96 kB
+../dist-renderer/assets/journeyDiagram-NVQOT4AX-Bf80uEaP.js             23.61 kB │ gzip:   8.37 kB
+../dist-renderer/assets/graph-DOmOIIwC.js                               23.92 kB │ gzip:   8.32 kB
+../dist-renderer/assets/wardleyDiagram-T6FBY63Y-jjNy-y4g.js             25.54 kB │ gzip:   6.81 kB
+../dist-renderer/assets/stylus-B533Al4x.js                              25.80 kB │ gzip:   8.60 kB
+../dist-renderer/assets/index-D5Dmcfsy.js                               25.98 kB │ gzip:  11.68 kB
+../dist-renderer/assets/index-DVXdEgHE.js                               26.40 kB │ gzip:   8.82 kB
+../dist-renderer/assets/css-BnMrqG3P.js                                 27.13 kB │ gzip:   8.47 kB
+../dist-renderer/assets/erDiagram-JOGREHBK-dYoX9JS0.js                  27.14 kB │ gzip:   9.44 kB
+../dist-renderer/assets/index-DKrfUygp.js                               28.82 kB │ gzip:  11.73 kB
+../dist-renderer/assets/gitGraphDiagram-DS77QQ5N-BPjB-f2w.js            29.45 kB │ gzip:   8.72 kB
+../dist-renderer/assets/timeline-definition-Z64GVDOM-tiwLW_Su.js        30.87 kB │ gzip:  10.18 kB
+../dist-renderer/assets/index-BA6TvP6M.js                               30.96 kB │ gzip:  12.73 kB
+../dist-renderer/assets/layout-D-LzfAck.js                              31.00 kB │ gzip:  11.19 kB
+../dist-renderer/assets/requirementDiagram-LRYGKXZP-U1T7Vktg.js         31.04 kB │ gzip:   9.77 kB
+../dist-renderer/assets/index-DuKUrHq2.js                               32.47 kB │ gzip:  13.14 kB
+../dist-renderer/assets/quadrantDiagram-CIZ2JOQS-pbq7vFsZ.js            34.05 kB │ gzip:  10.00 kB
+../dist-renderer/assets/sql-D0XecflT.js                                 37.05 kB │ gzip:  10.94 kB
+../dist-renderer/assets/onboarding-Bnn3BZ7t.js                          37.07 kB │ gzip:   9.90 kB
+../dist-renderer/assets/chunk-5RXB4S5H-B6IFwdNg.js                      38.12 kB │ gzip:  12.54 kB
+../dist-renderer/assets/index-DMUMUxYH.js                               40.87 kB │ gzip:  16.82 kB
+../dist-renderer/assets/xychartDiagram-ELKLHX3M-DNQck0pl.js             41.98 kB │ gzip:  12.07 kB
+../dist-renderer/assets/vennDiagram-T6HMQDX7-C6Ev_-Oa.js                42.00 kB │ gzip:  15.72 kB
+../dist-renderer/assets/index-eouLO8-c.js                               44.32 kB │ gzip:  15.40 kB
+../dist-renderer/assets/index-Rn9-Taj6.js                               45.27 kB │ gzip:  19.23 kB
+../dist-renderer/assets/chunk-GF5L2VYU-CrzrrafN.js                      49.18 kB │ gzip:  15.75 kB
+../dist-renderer/assets/PreviewPanel-CZfMyxRx.js                        50.43 kB │ gzip:  16.44 kB
+../dist-renderer/assets/flowDiagram-UKHOOZJN-CVQKs1a0.js                60.72 kB │ gzip:  19.52 kB
+../dist-renderer/assets/PlanModeButton-BAwKz0hH.js                      65.54 kB │ gzip:  24.75 kB
+../dist-renderer/assets/ganttDiagram-PKOTCBZU-B2c_PsxL.js               69.73 kB │ gzip:  23.58 kB
+../dist-renderer/assets/c4Diagram-5PPSVZJV-uQ-GAc2J.js                  69.98 kB │ gzip:  19.65 kB
+../dist-renderer/assets/index-gSf8wvFn.js                               70.95 kB │ gzip:  25.92 kB
+../dist-renderer/assets/blockDiagram-VBNYF7ZC-BGZ12MY8.js               73.78 kB │ gzip:  21.28 kB
+../dist-renderer/assets/cose-bilkent-JH36ORCC-B7EBg3pI.js               81.74 kB │ gzip:  22.50 kB
+../dist-renderer/assets/index-CGr5kfvE.js                               87.10 kB │ gzip:  34.58 kB
+../dist-renderer/assets/index-DMVZakKz.js                               98.03 kB │ gzip:  28.53 kB
+../dist-renderer/assets/index-DZEarHUq.js                              100.69 kB │ gzip:  33.70 kB
+../dist-renderer/assets/sequenceDiagram-SI44F4Z6-gahX5HCg.js           117.00 kB │ gzip:  31.16 kB
+../dist-renderer/assets/swimlanes-SLNWSIFB-DjSAH3_D.js                 118.86 kB │ gzip:  43.66 kB
+../dist-renderer/assets/PreviewEditor-DEyWPTjJ.js                      128.93 kB │ gzip:  40.30 kB
+../dist-renderer/assets/AnimationPrimitives-v9me_9cj.js                132.98 kB │ gzip:  44.18 kB
+../dist-renderer/assets/architectureDiagram-T3A2C74G-AD3r8mOe.js       151.87 kB │ gzip:  43.17 kB
+../dist-renderer/assets/main-criG4Dx2.js                               154.42 kB │ gzip:  47.24 kB
+../dist-renderer/assets/index-BbHlmgKX.js                              193.23 kB │ gzip:  60.64 kB
+../dist-renderer/assets/default-workspace-constants-BgxV258V.js        203.37 kB │ gzip:  25.39 kB
+../dist-renderer/assets/katex-HP8lGamR.js                              261.31 kB │ gzip:  77.57 kB
+../dist-renderer/assets/app-file-drag-DmqYrV53.js                      355.92 kB │ gzip: 113.94 kB
+../dist-renderer/assets/cytoscape.esm-DH6-wILU.js                      441.80 kB │ gzip: 141.55 kB
+../dist-renderer/assets/SendButton-CM2UOW25.js                         460.52 kB │ gzip: 136.16 kB
+../dist-renderer/assets/theme-registry-BBmOuR54.js                     553.43 kB │ gzip: 180.93 kB
+../dist-renderer/assets/mermaid.core-DFUzhup7.js                       623.21 kB │ gzip: 149.40 kB
+../dist-renderer/assets/cynefin-VYW2F7L2-CaYOPgiC.js                   688.14 kB │ gzip: 154.16 kB
+../dist-renderer/assets/SettingsContent-Bo_C0w4r.js                    697.35 kB │ gzip: 181.71 kB
+../dist-renderer/assets/ChatPage-B6PGz_wC.js                           751.64 kB │ gzip: 234.22 kB
+
+(!) Some chunks are larger than 500 kB after minification. Consider:
+- Using dynamic import() to code-split the application
+- Use build.rollupOptions.output.manualChunks to improve chunking: https://rollupjs.org/configuration-options/#output-manualchunks
+- Adjust chunk size limit for this warning via build.chunkSizeWarningLimit.
+✓ built in 7.11s
+
+EVIDENCE r01-seal-r1-build-renderer EXIT 0 MANIFEST cc6cc09441cb4adf175f3ad8a014cdde3d6a1cc7e593e0655a851c344e4c8486
+
+== [5/7] round2 patch VERIFIED record ==
+{"base": "89bc0b64bf0a9b84ef3532efaa66c23213affb70", "currentMatchesHead": null, "failures": [], "frozenManifestEntries": 8174, "frozenMatchesVerifiedCommit": null, "frozenSourceManifestHash": "cc6cc09441cb4adf175f3ad8a014cdde3d6a1cc7e593e0655a851c344e4c8486", "patch": "artifacts/f1-f12-repair/round2/patches/89bc0b64-to-r01-r10-source.patch.gz", "patchBytes": 267221850, "patchSha256": "c700b178e18d31c78633a6da739ff1c93e0c29d86c0cc0dc28ead5aa029475f4", "patchUncompressedBytes": 495953042, "replayedMatchesCurrent": true, "replayedMatchesFrozenManifest": true, "replayedSourceManifestHash": "cc6cc09441cb4adf175f3ad8a014cdde3d6a1cc7e593e0655a851c344e4c8486", "result": "VERIFIED", "sealGuardPassed": null, "sourceManifestHash": "cc6cc09441cb4adf175f3ad8a014cdde3d6a1cc7e593e0655a851c344e4c8486", "state": "source", "verifiedSourceObjectType": "commit", "verifiedSourceSha": "f2b8c687ae7bb5511edbaf5f6e0945affb0c80b8"}
+
+EVIDENCE r01-seal-r1-patch-r2 EXIT 0 MANIFEST cc6cc09441cb4adf175f3ad8a014cdde3d6a1cc7e593e0655a851c344e4c8486
+
+== [6/7] round3 patch VERIFIED record ==
+{
+  "base": "67dee5d2de9d3b9fc75ec5ef5c555e93c65b3ccd",
+  "patch": "artifacts/f1-f12-repair/round3-c01-c03/patches/67dee5d2-to-round3-c01-c03.patch.gz",
+  "patchBytes": 577433322,
+  "patchSha256": "7e678a5f6b0df3f226ce6e90ebdbbac12f1dde5bb5a6254361cd68a83a9c61af",
+  "patchUncompressedBytes": 968940900,
+  "sourceManifestHash": "2528b2e680a3808569e7bacfb0bd944bca192802a306701b836bb71352f4565a",
+  "replayedSourceManifestHash": "2528b2e680a3808569e7bacfb0bd944bca192802a306701b836bb71352f4565a",
+  "frozenSourceManifestHash": "2528b2e680a3808569e7bacfb0bd944bca192802a306701b836bb71352f4565a",
+  "frozenManifestEntries": 8174,
+  "replayedMatchesCurrent": true,
+  "replayedMatchesFrozenManifest": true,
+  "state": "source",
+  "verifiedSourceSha": "f2b8c687ae7bb5511edbaf5f6e0945affb0c80b8",
+  "verifiedSourceObjectType": "commit",
+  "frozenMatchesVerifiedCommit": null,
+  "currentMatchesHead": null,
+  "sealGuardPassed": null,
+  "failures": [],
+  "result": "VERIFIED"
+}
+
+EVIDENCE r01-seal-r1-patch-r3 EXIT 0 MANIFEST 2528b2e680a3808569e7bacfb0bd944bca192802a306701b836bb71352f4565a
+
+== [7/7] round3 green: vitest evidence+matrix ==
+
+ RUN  v4.1.10 <WORKTREE>
+
+ ✓ tests/upstream-sync-matrix.test.ts (7 tests) 90ms
+ ✓ tests/round2-delivery-evidence.test.ts (32 tests) 64123ms
+     ✓ R10-02: COMMAND_RESULTS 的日志与源码 manifest 均存在且 SHA-256 可复算  342ms
+     ✓ R10-03: 当前源码摘要可复算，且存在同摘要、执行期间未漂移的绿色门禁  1058ms
+     ✓ R10-04: tracked 与 untracked 源文件全部进入 manifest，证据/报告/补丁排除规则明示  534ms
+     ✓ R10-09: 增量补丁从干净 89bc0b64 重放后按 source/seal 两状态验收  50725ms
+     ✓ source 状态：当前==完整冻结 manifest 时 seal guard 红不否决 VERIFIED  443ms
+     ✓ seal 状态：冻结==VERIFIED、VERIFIED..HEAD 仅审计、当前==HEAD → VERIFIED  497ms
+     ✓ 负向：冻结 manifest 任一条目被篡改 → MISMATCH  519ms
+     ✓ 负向：当前未提交的源码修改 → MISMATCH（guard 只看 commits，需当前==HEAD）  522ms
+     ✓ 负向：当前未跟踪的新增源码文件 → MISMATCH  519ms
+     ✓ 负向：当前未提交的源码删除 → MISMATCH  516ms
+     ✓ 负向：当前未提交的审计文件变化 → MISMATCH（防候选字节冒充 HEAD）  535ms
+     ✓ 负向：VERIFIED..HEAD 含非白名单已提交路径 → MISMATCH  580ms
+     ✓ 负向：VERIFIED_SOURCE_SHA 指向不存在的对象 → MISMATCH  542ms
+     ✓ 负向：VERIFIED_SOURCE_SHA 指向 tree 对象（存在且树内容相同）→ 脚本与 guard 均拒绝（C3 F1）  515ms
+     ✓ 负向：VERIFIED_SOURCE_SHA 指向 annotated tag 对象 → 脚本与 guard 均拒绝  530ms
+     ✓ 负向：VERIFIED_SOURCE_SHA 指向 blob 对象 → 脚本与 guard 均拒绝  522ms
+     ✓ 负向（source 通道）：tree 对象坐标（内容匹配、重冻后命中快捷返回）→ MISMATCH（R2 F1）  495ms
+     ✓ 负向（source 通道）：annotated tag 对象坐标 → MISMATCH  518ms
+     ✓ 负向（source 通道）：blob 对象坐标 → MISMATCH  510ms
+     ✓ 负向（source 通道）：坐标指向不存在的对象 → MISMATCH  495ms
+     ✓ 负向（source 通道）：坐标非 40 位十六进制 → MISMATCH  496ms
+     ✓ 负向（source 通道）：坐标文件缺失 → MISMATCH  464ms
+     ✓ 负向：MISMATCH 不改写交付补丁（哨兵字节保留 / 原本不存在则仍不存在）  747ms
+     ✓ 负向：VERIFIED 指向树不等于冻结 manifest（错误冻结）→ MISMATCH  581ms
+     ✓ 负向：补丁损坏 → 重放校验拒绝（非零退出）  396ms
+     ✓ 负向：重放与当前 index 不等 → MISMATCH（保留原有重放校验）  418ms
+ ✓ tests/round3-delivery-evidence.test.ts (26 tests) 70424ms
+     ✓ round3: 源码 manifest 可复算，且覆盖本轮新增源码与测试  1067ms
+     ✓ round3: 现场重放增量补丁并按 source/seal 两状态验收（不只读历史 VERIFIED 记录）  59782ms
+     ✓ source 状态：当前==完整冻结 manifest 时 seal guard 红不否决 VERIFIED  378ms
+     ✓ seal 状态：冻结==VERIFIED、VERIFIED..HEAD 仅审计、当前==HEAD → VERIFIED  444ms
+     ✓ 负向：冻结 manifest 任一条目被篡改 → MISMATCH  441ms
+     ✓ 负向：当前未提交/未跟踪的源码变化 → MISMATCH（guard 只看 commits，需当前==HEAD）  854ms
+     ✓ 负向：当前未提交的审计文件变化 → MISMATCH（防候选字节冒充 HEAD）  443ms
+     ✓ 负向：VERIFIED..HEAD 含非白名单已提交路径 → MISMATCH  476ms
+     ✓ 负向：VERIFIED_SOURCE_SHA 指向不存在的对象 → MISMATCH  447ms
+     ✓ 负向：VERIFIED_SOURCE_SHA 指向 tree 对象（存在且树内容相同）→ 脚本与 guard 均拒绝（C3 F1）  462ms
+     ✓ 负向：VERIFIED_SOURCE_SHA 指向 annotated tag 对象 → 脚本与 guard 均拒绝  465ms
+     ✓ 负向：VERIFIED_SOURCE_SHA 指向 blob 对象 → 脚本与 guard 均拒绝  448ms
+     ✓ 负向（source 通道）：tree 对象坐标（内容匹配、重冻后命中快捷返回）→ MISMATCH（R2 F1）  426ms
+     ✓ 负向（source 通道）：annotated tag 对象坐标 → MISMATCH  445ms
+     ✓ 负向（source 通道）：blob 对象坐标 → MISMATCH  440ms
+     ✓ 负向（source 通道）：坐标指向不存在的对象 → MISMATCH  431ms
+     ✓ 负向（source 通道）：坐标非 40 位十六进制 → MISMATCH  423ms
+     ✓ 负向（source 通道）：坐标文件缺失 → MISMATCH  416ms
+     ✓ 负向：MISMATCH 不改写交付补丁（哨兵字节保留 / 原本不存在则仍不存在）  656ms
+     ✓ 负向：VERIFIED 指向树不等于冻结 manifest（错误冻结）→ MISMATCH  522ms
+     ✓ 负向：补丁损坏 → 重放校验拒绝（非零退出）  338ms
+
+ Test Files  3 passed (3)
+      Tests  65 passed (65)
+   Start at  00:15:59
+   Duration  70.56s (transform 133ms, setup 59ms, import 100ms, tests 134.64s, environment 0ms)
+
+
+EVIDENCE r01-seal-r1-green-r3 EXIT 0 MANIFEST 2528b2e680a3808569e7bacfb0bd944bca192802a306701b836bb71352f4565a
+
+== commit R1s'' ==
+R1s''=45f287c679fcfd33f23816f1e550c32b0603fee8
+
+== coordinate advance -> R1a'' ==
+✓ wrote .sync-audit/upstream-sync-matrix.json and UPSTREAM_SYNC_MATRIX.md
+✓ 133 paths: ADOPTED 25 / ADAPTED 100 / REGENERATED 4 / INTENTIONAL_DIVERGENCE 4 (sum 133)
+  projection sha256: 8bf6c07a873c2b25c51db12ae36addb89cbfe33f23747fcdd3d32b4c7878dbc9
+R1a''=a29f0b957c92def52d0fa24663c01eb185744307
+.sync-audit/build-sync-matrix.mjs
+.sync-audit/upstream-sync-matrix.json
+.sync-audit/verified-source-sha.txt
+PROGRESS.md
+UPSTREAM_SYNC_AUDIT.md
+UPSTREAM_SYNC_MATRIX.md
+✓ post-verification diff guard OK: 45f287c679fcfd33f23816f1e550c32b0603fee8..HEAD 仅 6 个审计文件变化
+
+== four-file gate at R1a'' ==
+
+ RUN  v4.1.10 /private/tmp/r01-repair-r1/iso
+
+ ✓ tests/post-verification-audit-seal.test.ts (3 tests) 65ms
+ ✓ tests/upstream-sync-matrix.test.ts (7 tests) 67ms
+ ✓ tests/round2-delivery-evidence.test.ts (32 tests) 67244ms
+     ✓ R10-02: COMMAND_RESULTS 的日志与源码 manifest 均存在且 SHA-256 可复算  333ms
+     ✓ R10-03: 当前源码摘要可复算，且存在同摘要、执行期间未漂移的绿色门禁  2330ms
+     ✓ R10-09: 增量补丁从干净 89bc0b64 重放后按 source/seal 两状态验收  52933ms
+     ✓ source 状态：当前==完整冻结 manifest 时 seal guard 红不否决 VERIFIED  442ms
+     ✓ seal 状态：冻结==VERIFIED、VERIFIED..HEAD 仅审计、当前==HEAD → VERIFIED  520ms
+     ✓ 负向：冻结 manifest 任一条目被篡改 → MISMATCH  523ms
+     ✓ 负向：当前未提交的源码修改 → MISMATCH（guard 只看 commits，需当前==HEAD）  516ms
+     ✓ 负向：当前未跟踪的新增源码文件 → MISMATCH  526ms
+     ✓ 负向：当前未提交的源码删除 → MISMATCH  537ms
+     ✓ 负向：当前未提交的审计文件变化 → MISMATCH（防候选字节冒充 HEAD）  515ms
+     ✓ 负向：VERIFIED..HEAD 含非白名单已提交路径 → MISMATCH  554ms
+     ✓ 负向：VERIFIED_SOURCE_SHA 指向不存在的对象 → MISMATCH  514ms
+     ✓ 负向：VERIFIED_SOURCE_SHA 指向 tree 对象（存在且树内容相同）→ 脚本与 guard 均拒绝（C3 F1）  523ms
+     ✓ 负向：VERIFIED_SOURCE_SHA 指向 annotated tag 对象 → 脚本与 guard 均拒绝  536ms
+     ✓ 负向：VERIFIED_SOURCE_SHA 指向 blob 对象 → 脚本与 guard 均拒绝  509ms
+     ✓ 负向（source 通道）：tree 对象坐标（内容匹配、重冻后命中快捷返回）→ MISMATCH（R2 F1）  491ms
+     ✓ 负向（source 通道）：annotated tag 对象坐标 → MISMATCH  506ms
+     ✓ 负向（source 通道）：blob 对象坐标 → MISMATCH  503ms
+     ✓ 负向（source 通道）：坐标指向不存在的对象 → MISMATCH  481ms
+     ✓ 负向（source 通道）：坐标非 40 位十六进制 → MISMATCH  570ms
+     ✓ 负向（source 通道）：坐标文件缺失 → MISMATCH  494ms
+     ✓ 负向：MISMATCH 不改写交付补丁（哨兵字节保留 / 原本不存在则仍不存在）  757ms
+     ✓ 负向：VERIFIED 指向树不等于冻结 manifest（错误冻结）→ MISMATCH  598ms
+     ✓ 负向：补丁损坏 → 重放校验拒绝（非零退出）  396ms
+     ✓ 负向：重放与当前 index 不等 → MISMATCH（保留原有重放校验）  417ms
+ ✓ tests/round3-delivery-evidence.test.ts (26 tests) 74275ms
+     ✓ round3: 源码 manifest 可复算，且覆盖本轮新增源码与测试  2344ms
+     ✓ round3: 现场重放增量补丁并按 source/seal 两状态验收（不只读历史 VERIFIED 记录）  62279ms
+     ✓ source 状态：当前==完整冻结 manifest 时 seal guard 红不否决 VERIFIED  383ms
+     ✓ seal 状态：冻结==VERIFIED、VERIFIED..HEAD 仅审计、当前==HEAD → VERIFIED  449ms
+     ✓ 负向：冻结 manifest 任一条目被篡改 → MISMATCH  462ms
+     ✓ 负向：当前未提交/未跟踪的源码变化 → MISMATCH（guard 只看 commits，需当前==HEAD）  876ms
+     ✓ 负向：当前未提交的审计文件变化 → MISMATCH（防候选字节冒充 HEAD）  460ms
+     ✓ 负向：VERIFIED..HEAD 含非白名单已提交路径 → MISMATCH  498ms
+     ✓ 负向：VERIFIED_SOURCE_SHA 指向不存在的对象 → MISMATCH  456ms
+     ✓ 负向：VERIFIED_SOURCE_SHA 指向 tree 对象（存在且树内容相同）→ 脚本与 guard 均拒绝（C3 F1）  469ms
+     ✓ 负向：VERIFIED_SOURCE_SHA 指向 annotated tag 对象 → 脚本与 guard 均拒绝  474ms
+     ✓ 负向：VERIFIED_SOURCE_SHA 指向 blob 对象 → 脚本与 guard 均拒绝  444ms
+     ✓ 负向（source 通道）：tree 对象坐标（内容匹配、重冻后命中快捷返回）→ MISMATCH（R2 F1）  412ms
+     ✓ 负向（source 通道）：annotated tag 对象坐标 → MISMATCH  437ms
+     ✓ 负向（source 通道）：blob 对象坐标 → MISMATCH  413ms
+     ✓ 负向（source 通道）：坐标指向不存在的对象 → MISMATCH  429ms
+     ✓ 负向（source 通道）：坐标非 40 位十六进制 → MISMATCH  422ms
+     ✓ 负向（source 通道）：坐标文件缺失 → MISMATCH  423ms
+     ✓ 负向：MISMATCH 不改写交付补丁（哨兵字节保留 / 原本不存在则仍不存在）  689ms
+     ✓ 负向：VERIFIED 指向树不等于冻结 manifest（错误冻结）→ MISMATCH  512ms
+     ✓ 负向：补丁损坏 → 重放校验拒绝（非零退出）  339ms
+
+ Test Files  4 passed (4)
+      Tests  68 passed (68)
+   Start at  00:17:24
+   Duration  74.41s (transform 166ms, setup 77ms, import 119ms, tests 141.65s, environment 0ms)
+
+FOUR-FILE-GATE-EXIT=0
+CEREMONY-DONE R1S=45f287c679fcfd33f23816f1e550c32b0603fee8 R1A=a29f0b957c92def52d0fa24663c01eb185744307 GATE=0

@@ -1,0 +1,80 @@
+# R01 阶段修复 R5 — /tmp 隔离副本复检（iso=/tmp/r01-repair-r5/iso，rsync 主仓候选工作区 + APFS 克隆 .git/node_modules）
+# 复跑时间: 2026-09-26 05:34:02
+
+## F01 进程内自测（iso）
+PASS-NEG N58-stage-text-mixed-real-compound: verdict=NO-GO want=risk-stage-disguised 混合 R09/R09.5
+SELF-TEST OK (59/59)
+SELFTEST_EXIT=0
+
+## F01 真实 CLI 电池（iso）
+PASS-NEG cli-stage-text-mixed-real-compound: exit=1 含 'risk-stage-disguised'
+CLI-REGRESSION OK（1 正向 + 36 负向）
+CLI_EXIT=0
+
+## F01 R5 评审原样反例（iso，18 例）
+control-original exit=0
+latest-r09-dot-5 exit=1
+latest-r09-hyphen-5 exit=1
+latest-r099 exit=1
+r09-dot-5 exit=1
+r09-dot-r10 exit=1
+r09-fullwidthdot-5 exit=1
+r09-fullwidthhyphen-5 exit=1
+r09-hyphen-5 exit=1
+r09-multi-dot exit=1
+r09-r099 exit=1
+r09-slash-dot5 exit=1
+r09-stage exit=1
+r099 exit=1
+r0999 exit=1
+r09x exit=1
+r99 exit=1
+xr09 exit=1
+
+## A15 覆盖自测（iso）
+SELF-TEST OK (6/6)
+COVERAGE_EXIT=0
+
+## A16 隔离检查（iso）
+RESULT: ISOLATED（生产入口零引用 R01 原型/生成物）
+ISOLATION_EXIT=0
+
+## F02 闭包再生成零漂移（iso）
+REGEN_EXIT=0
+git status --porcelain -- build/ 输出行数: 0
+
+## F02 census 单文件（iso）
+ Test Files  1 passed (1)
+      Tests  23 passed (23)
+CENSUS_EXIT=0
+
+## 四文件门禁（iso，候选态）
+ ❯ tests/post-verification-audit-seal.test.ts (3 tests | 1 failed) 73ms
+     × changes since VERIFIED_SOURCE_SHA are audit-only (allowlist enforced) 28ms
+post-verification diff guard failed: uri/R01/T05/repair-r1/replay/a09/old/probe/page-58.png
+post-verification diff guard failed: uri/R01/T05/repair-r1/replay/a09/old/probe/page-58.png
+ ❯ tests/round2-delivery-evidence.test.ts (35 tests | 3 failed) 43760ms
+     × R10-03: 当前源码摘要可复算，且存在同摘要、执行期间未漂移的绿色门禁 42ms
+     × R10-04: tracked 与 untracked 源文件全部进入 manifest，证据/报告/补丁排除规则明示 39ms
+     × R10-09: 增量补丁从干净 89bc0b64 重放后按 source/seal 两状态验收 29996ms
+ ❯ tests/round3-delivery-evidence.test.ts (29 tests | 2 failed) 44501ms
+     × round3: 源码 manifest 可复算，且覆盖本轮新增源码与测试 43ms
+     × round3: 现场重放增量补丁并按 source/seal 两状态验收（不只读历史 VERIFIED 记录） 33330ms
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 6 ⎯⎯⎯⎯⎯⎯⎯
+FOURFILE_EXIT=0
+
+## 四文件门禁（iso，候选态；真实退出码）
+命令: npx vitest run <审计四文件门禁>（完整文件清单与逐用例输出见同目录 f02-fourfile-iso-r5.txt 日志头）
+FOURFILE_REAL_EXIT=1（预期：候选态 6 红为坐标未推进的预期封印前红）
+Test Files  3 failed | 1 passed (4)；Tests  6 failed | 68 passed (74)
+6 红集合与 R4 候选态一致：audit-seal 1（diff guard：VERIFIED_SOURCE_SHA 仍指 R00 C3）+ round2 3（R10-03/R10-04/R10-09）+ round3 2（manifest/replay）
+
+## lint（iso）
+LINT_EXIT=0；0 errors / 10896 warnings（与 R4 持平）；完整日志 lint-iso-r5.txt
+
+## typecheck（iso）
+TYPECHECK_EXIT=0（tsc ×3：root + tsconfig.node + tsconfig.test）；完整日志 typecheck-iso-r5.txt
+
+## 说明
+- 隔离副本 rsync 自主仓候选工作区（排除 .git/node_modules/rust/target/.mimosa），.git 与 node_modules 为 APFS 克隆；一次性使用，不入候选。
+- F02 闭包再生成 node scripts/compute-cli-closure.mjs 在 iso 内执行（主仓不运行任何会重写交付 gzip 的脚本），build/ 零漂移。

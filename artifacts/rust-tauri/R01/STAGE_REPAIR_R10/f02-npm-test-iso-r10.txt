@@ -1,0 +1,7 @@
+# R01 阶段修复 R10 — iso 全量 npm test（候选态）
+ Test Files  3 failed | 1463 passed | 3 skipped (1469)
+      Tests  6 failed | 14943 passed | 15 skipped (14964)
+npm exit=1
+（6 红=预期封印前红集合，与四文件门禁同集：audit-seal 旧坐标 1 + round2 R10-03/04/09 3 + round3 manifest/replay 2；与 R7/R8/R9/R10 评审候选态同数同集，R10 修复零新增红）
+失败用例明细:
+

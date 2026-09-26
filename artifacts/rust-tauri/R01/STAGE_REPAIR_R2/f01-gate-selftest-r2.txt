@@ -1,0 +1,35 @@
+# R01 阶段修复 R2 — F01 关卡检查器进程内自测（真实 CLI 入口）
+# date: 2026-09-26 02:05:49 +0800  host: Darwin 27.0.0 arm64
+# cmd: python3 -B docs/rust-tauri/R01/r01_t08_gate_check.py --self-test
+
+PASS positive-control: 真实 R01 数据 verdict=PASS_WITH_CONDITIONS（browser_host=COMPLETE，deferred=15）
+PASS-NEG N1-screenshot-pass-takeover-fail: verdict=NO-GO browser_host=NOT_COMPLETE shell_path=BLOCKED: 存在未真实验证的高风险必需能力/不可信证据/冻结契约闭合违例，替壳路径明确阻塞…
+PASS-NEG N2-evidence-hash-tampered: verdict=NO-GO pdf_renderer=BLOCKED
+PASS-NEG N3-untracked-deferred: verdict=NO-GO browser_host=BLOCKED
+PASS-NEG N4-required-unverified: verdict=NO-GO storage_cutover=NOT_COMPLETE
+PASS-NEG N5-deleted-user-takeover-rejected: verdict=NO-GO browser_host=BLOCKED
+PASS-NEG N6-deleted-domain-rejected: verdict=NO-GO violations=1
+PASS-NEG N7-deleted-sha256-rejected: verdict=NO-GO pdf_renderer=BLOCKED
+PASS-NEG N8-deleted-deferred-rejected: verdict=NO-GO shell_capabilities=BLOCKED
+PASS-NEG N9-extra-domain-rejected: verdict=NO-GO violations=1
+PASS-NEG N10-renamed-capability-rejected: verdict=NO-GO browser_host=BLOCKED
+PASS-NEG N11-duplicate-capability-rejected: verdict=NO-GO browser_host=BLOCKED
+PASS-NEG N12-deferred-invalid-status-rejected: verdict=NO-GO browser_host=BLOCKED
+PASS-NEG N13-deferred-risk-rebound-rejected: verdict=NO-GO browser_host=BLOCKED
+PASS-NEG N14-evidence-rerouted-rejected: verdict=NO-GO browser_host=BLOCKED
+PASS-NEG N15-emptied-areas-rejected: verdict=NO-GO violations=5
+PASS-NEG N16-risk-entry-incomplete-rejected: verdict=NO-GO browser_host=BLOCKED
+PASS-NEG N17-resolve-by-stage-null: verdict=NO-GO want=risk-incomplete JSON null
+PASS-NEG N18-failure-handling-array: verdict=NO-GO want=risk-incomplete JSON []
+PASS-NEG N19-resolve-by-stage-object: verdict=NO-GO want=risk-incomplete JSON {}
+PASS-NEG N20-failure-handling-blank: verdict=NO-GO want=risk-incomplete 空白字符串
+PASS-NEG N21-resolve-by-stage-number: verdict=NO-GO want=risk-incomplete JSON 数字
+PASS-NEG N22-failure-handling-placeholder: verdict=NO-GO want=risk-incomplete 占位值
+PASS-NEG N23-risk-closed-vs-deferred: verdict=NO-GO want=risk-status-contradiction 登记 CLOSED vs 输入 UNVERIFIED
+PASS-NEG N24-risk-closed-in-r01-vs-deferred: verdict=NO-GO want=risk-status-contradiction 登记 CLOSED_IN_R01 vs 输入 UNVERIFIED
+PASS-NEG N25-registered-defect-status-mismatch: verdict=NO-GO want=risk-status-contradiction 登记 OPEN vs 输入 REGISTERED_DEFECT（要求 REGISTERED）
+PASS-NEG N26-duplicate-risk-id-rejected: verdict=NO-GO register_violations=1
+PASS-NEG N27-risk-entry-missing-id-rejected: verdict=NO-GO register_violations=1
+PASS-NEG N28-risks-non-list-rejected: verdict=NO-GO register_violations=1
+SELF-TEST OK (29/29)
+EXIT=0

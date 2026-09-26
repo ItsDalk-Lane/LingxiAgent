@@ -1,0 +1,16 @@
+# iso typecheck（tsc×3）exit 0；lint 0 errors / 10896 warnings（与 R4/R5 持平）
+# 归档时间 2026-09-26；原始日志 /tmp/r01-repair-r6/logs/typecheck-lint-iso-r6.txt
+
+== typecheck（tsc x3）==
+
+> lingxi@0.1.43 typecheck
+> tsc --noEmit && tsc --noEmit -p tsconfig.node.json && tsc --noEmit -p tsconfig.test.json
+
+typecheck exit=0
+
+== lint ==
+
+✖ 10896 problems (0 errors, 10896 warnings)
+  0 errors and 34 warnings potentially fixable with the `--fix` option.
+
+lint exit=0

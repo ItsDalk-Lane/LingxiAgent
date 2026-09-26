@@ -1,6 +1,110 @@
+# R01 阶段修复 R10 — self-test 完整输出（契约 1.10-stage-repair-r10，107 用例）
 PASS positive-control: 真实 R01 数据 verdict=PASS_WITH_CONDITIONS（browser_host=COMPLETE，deferred=15）
-PASS-NEG N1-screenshot-pass-takeover-fail: verdict=NO-GO browser_host=NOT_COMPLETE shell_path=BLOCKED: 存在未真实验证的高风险必需能力/不可信证据，替壳路径明确阻塞…
+PASS-NEG N1-screenshot-pass-takeover-fail: verdict=NO-GO browser_host=NOT_COMPLETE shell_path=BLOCKED: 存在未真实验证的高风险必需能力/不可信证据/冻结契约闭合违例，替壳路径明确阻塞…
 PASS-NEG N2-evidence-hash-tampered: verdict=NO-GO pdf_renderer=BLOCKED
-PASS-NEG N3-untracked-deferred: verdict=NO-GO shell_capabilities=BLOCKED
+PASS-NEG N3-untracked-deferred: verdict=NO-GO browser_host=BLOCKED
 PASS-NEG N4-required-unverified: verdict=NO-GO storage_cutover=NOT_COMPLETE
-SELF-TEST OK (5/5)
+PASS-NEG N5-deleted-user-takeover-rejected: verdict=NO-GO browser_host=BLOCKED
+PASS-NEG N6-deleted-domain-rejected: verdict=NO-GO violations=1
+PASS-NEG N7-deleted-sha256-rejected: verdict=NO-GO pdf_renderer=BLOCKED
+PASS-NEG N8-deleted-deferred-rejected: verdict=NO-GO shell_capabilities=BLOCKED
+PASS-NEG N9-extra-domain-rejected: verdict=NO-GO violations=1
+PASS-NEG N10-renamed-capability-rejected: verdict=NO-GO browser_host=BLOCKED
+PASS-NEG N11-duplicate-capability-rejected: verdict=NO-GO browser_host=BLOCKED
+PASS-NEG N12-deferred-invalid-status-rejected: verdict=NO-GO browser_host=BLOCKED
+PASS-NEG N13-deferred-risk-rebound-rejected: verdict=NO-GO browser_host=BLOCKED
+PASS-NEG N14-evidence-rerouted-rejected: verdict=NO-GO browser_host=BLOCKED
+PASS-NEG N15-emptied-areas-rejected: verdict=NO-GO violations=5
+PASS-NEG N16-risk-entry-incomplete-rejected: verdict=NO-GO browser_host=BLOCKED
+PASS-NEG N17-resolve-by-stage-null: verdict=NO-GO want=risk-incomplete JSON null
+PASS-NEG N18-failure-handling-array: verdict=NO-GO want=risk-incomplete JSON []
+PASS-NEG N19-resolve-by-stage-object: verdict=NO-GO want=risk-incomplete JSON {}
+PASS-NEG N20-failure-handling-blank: verdict=NO-GO want=risk-incomplete 空白字符串
+PASS-NEG N21-resolve-by-stage-number: verdict=NO-GO want=risk-incomplete JSON 数字
+PASS-NEG N22-failure-handling-placeholder: verdict=NO-GO want=risk-incomplete 占位值
+PASS-NEG N23-risk-closed-vs-deferred: verdict=NO-GO want=risk-status-contradiction 登记 CLOSED vs 输入 UNVERIFIED
+PASS-NEG N24-risk-closed-in-r01-vs-deferred: verdict=NO-GO want=risk-status-contradiction 登记 CLOSED_IN_R01 vs 输入 UNVERIFIED
+PASS-NEG N25-registered-defect-status-mismatch: verdict=NO-GO want=risk-status-contradiction 登记 OPEN vs 输入 REGISTERED_DEFECT（要求 REGISTERED）
+PASS-NEG N26-duplicate-risk-id-rejected: verdict=NO-GO register_violations=1
+PASS-NEG N27-risk-entry-missing-id-rejected: verdict=NO-GO register_violations=1
+PASS-NEG N28-risks-non-list-rejected: verdict=NO-GO register_violations=1
+PASS-NEG N29-stage-text-nonexistent: verdict=NO-GO want=risk-stage-unknown 正文 R99 不在 R00–R11
+PASS-NEG N30-stage-both-nonexistent: verdict=NO-GO want=risk-stage-unknown 双字段 R99 不在 R00–R11
+PASS-NEG N31-stage-vague-text: verdict=NO-GO want=risk-stage-vague 无阶段坐标
+PASS-NEG N32-stage-deadline-too-late: verdict=NO-GO want=risk-stage-deadline-mismatch 契约 R04，改 R10
+PASS-NEG N33-stage-wrong-attribution: verdict=NO-GO want=risk-stage-deadline-mismatch 契约 R09，改 R02
+PASS-NEG N34-stage-latest-past-gate: verdict=NO-GO want=risk-stage-latest-mismatch 契约最迟 R09
+PASS-NEG N35-stage-latest-beyond-declared: verdict=NO-GO want=risk-stage-latest-mismatch 契约最迟 R10
+PASS-NEG N36-stage-text-field-diverge: verdict=NO-GO want=risk-stage-text-mismatch 正文 R09 vs 字段 R10
+PASS-NEG N37-stage-current-stage: verdict=NO-GO want=risk-stage-current-or-past R01 非后续阶段
+PASS-NEG N38-stage-field-deleted: verdict=NO-GO want=risk-stage-field-missing 缺 resolve_by_stage_id
+PASS-NEG N39-stage-latest-field-deleted: verdict=NO-GO want=risk-stage-field-missing 缺 resolve_latest_stage_id
+PASS-NEG N40-stage-order-inverted: verdict=NO-GO want=risk-stage-order-inverted deadline R08 > latest R07
+PASS-NEG N41-stage-field-null: verdict=NO-GO want=risk-stage-field-missing JSON null
+PASS-NEG N42-stage-latest-marker-diverge: verdict=NO-GO want=risk-stage-text-mismatch 最迟 R11 vs 字段 R10
+PASS-NEG N43-stage-hidden-nonexistent-token: verdict=NO-GO want=risk-stage-unknown 正文内嵌 R99
+PASS-NEG N44-stage-text-r099: verdict=NO-GO want=risk-stage-unknown 正文 R099 完整提取不截断
+PASS-NEG N45-stage-text-mixed-r09-r099: verdict=NO-GO want=risk-stage-unknown 混合 R09/R099
+PASS-NEG N46-stage-text-prefixed-xr09: verdict=NO-GO want=risk-stage-disguised 前缀伪装 XR09
+PASS-NEG N47-stage-text-suffixed-r09x: verdict=NO-GO want=risk-stage-disguised 后缀伪装 R09X
+PASS-NEG N48-stage-latest-marker-r099: verdict=NO-GO want=risk-stage-unknown 最迟标记 R099 完整形态
+PASS-NEG N49-stage-text-r0999: verdict=NO-GO want=risk-stage-unknown R0999 不在 R00–R11
+PASS-NEG N50-stage-text-underscore-suffix: verdict=NO-GO want=risk-stage-disguised 下划线伪装 R09_stage
+PASS-NEG N51-stage-text-dot-substage: verdict=NO-GO want=risk-stage-disguised 点号小阶段 R09.5 完整复合形态
+PASS-NEG N52-stage-text-hyphen-substage: verdict=NO-GO want=risk-stage-disguised 连字符小阶段 R09-5
+PASS-NEG N53-stage-text-fullwidth-dot-substage: verdict=NO-GO want=risk-stage-disguised 全角点小阶段 R09．5
+PASS-NEG N54-stage-text-fullwidth-hyphen-substage: verdict=NO-GO want=risk-stage-disguised 全角连字符小阶段 R09－5
+PASS-NEG N55-stage-text-multi-level-substage: verdict=NO-GO want=risk-stage-disguised 多级小阶段 R09.5.1
+PASS-NEG N56-stage-text-concat-two-stages: verdict=NO-GO want=risk-stage-disguised 点号拼接 R09.R10
+PASS-NEG N57-stage-latest-marker-dot-substage: verdict=NO-GO want=risk-stage-disguised 最迟标记复合 R09.5
+PASS-NEG N58-stage-text-mixed-real-compound: verdict=NO-GO want=risk-stage-disguised 混合 R09/R09.5
+PASS-NEG N59-stage-text-fullwidth-r99-first: verdict=NO-GO want=risk-stage-unknown 全角 Ｒ９９ 折叠为 R99，不在 R00–R11
+PASS-NEG N60-stage-latest-fullwidth-r10: verdict=NO-GO want=risk-stage-text-mismatch 最迟 Ｒ１０ 折叠为 R10 vs 结构化 R09
+PASS-NEG N61-stage-text-fullwidth-r10-first: verdict=NO-GO want=risk-stage-text-mismatch 全角 Ｒ１０ 折叠为首坐标 R10
+PASS-NEG N62-stage-text-fullwidth-r-ascii-digit: verdict=NO-GO want=risk-stage-unknown 混合宽度 Ｒ99 折叠为 R99
+PASS-NEG N63-stage-text-fullwidth-compound-xr09: verdict=NO-GO want=risk-stage-disguised ＸＲ０９ 折叠为 XR09 复合形态
+PASS-NEG N64-stage-text-lowercase-r99: verdict=NO-GO want=risk-stage-disguised 小写 r99 不是合法引用（大小写契约）
+PASS-NEG N65-stage-text-fullwidth-lowercase-r99: verdict=NO-GO want=risk-stage-disguised 全角小写 ｒ９９ 折叠为 r99
+PASS P2-positive-fullwidth-normalized: verdict=PASS_WITH_CONDITIONS 全角 Ｒ０９ 规范化后与结构化 R09 一致（TRACKED 命中=True）
+PASS-NEG N66-stage-latest-double-conflict: verdict=NO-GO want=risk-stage-text-mismatch 第二处最迟 R10 ≠ 结构化 R09
+PASS-NEG N67-stage-latest-double-reversed: verdict=NO-GO want=risk-stage-text-mismatch 首处最迟 R10 ≠ 结构化 R09
+PASS-NEG N68-stage-latest-double-fullwidth-mixed: verdict=NO-GO want=risk-stage-text-mismatch 全角 Ｒ１０ 折叠为 R10，第二处与结构化 R09 矛盾
+PASS P3-positive-double-latest-consistent: verdict=PASS_WITH_CONDITIONS 两处最迟 R09 均与结构化一致（TRACKED 命中=True）
+PASS P4-positive-contextual-r10-not-marker: verdict=PASS_WITH_CONDITIONS 上下文提及 R10 非最迟标记不误伤（TRACKED 命中=True）
+PASS-NEG N69-stage-latest-fullwidth-colon-conflict: verdict=NO-GO want=risk-stage-text-mismatch 全角冒号连接的第二处最迟 R10 ≠ 结构化 R09
+PASS-NEG N70-stage-latest-fullwidth-colon-fullwidth-stage: verdict=NO-GO want=risk-stage-text-mismatch 全角冒号+全角 Ｒ１０ 折叠 R10 ≠ 结构化 R09
+PASS-NEG N71-stage-latest-yu-conflict: verdict=NO-GO want=risk-stage-text-mismatch 「最迟于」连接的 R10 ≠ 结构化 R09
+PASS-NEG N72-stage-latest-single-colon-conflict: verdict=NO-GO want=risk-stage-text-mismatch 单处「最迟：R10」≠ 结构化 R09
+PASS-NEG N73-stage-latest-halfwidth-colon-conflict: verdict=NO-GO want=risk-stage-text-mismatch 半角冒号连接的 R10 ≠ 结构化 R09
+PASS-NEG N74-stage-latest-wei-conflict: verdict=NO-GO want=risk-stage-text-mismatch 「最迟为」连接的 R10 ≠ 结构化 R09
+PASS-NEG N75-stage-latest-not-later-than-conflict: verdict=NO-GO want=risk-stage-text-mismatch 「不晚于 R10」≠ 结构化最迟 R09
+PASS-NEG N76-stage-latest-must-not-delay-fullwidth-conflict: verdict=NO-GO want=risk-stage-text-mismatch 「不得迟于 Ｒ１０」折叠 R10 ≠ 结构化 R09
+PASS-NEG N77-stage-latest-unresolved-trigger: verdict=NO-GO want=risk-stage-latest-unresolved 触发词「最迟」无法解析出阶段 ID，失败关闭
+PASS P5-positive-connector-forms-consistent: verdict=PASS_WITH_CONDITIONS 全角冒号/连接词形态最迟 R09 均一致（TRACKED 命中=True）
+PASS P6-positive-negative-trigger-consistent: verdict=PASS_WITH_CONDITIONS 「不晚于 R09」与结构化一致（TRACKED 命中=True）
+PASS-NEG N78-stage-latest-clause-correction: verdict=NO-GO want=risk-stage-text-mismatch 同一子句内改期至 R10，第二阶段与结构化 R09 矛盾
+PASS-NEG N79-stage-latest-clause-postponed: verdict=NO-GO want=risk-stage-text-mismatch 同一子句内顺延至 R10，第二阶段与结构化 R09 矛盾
+PASS-NEG N80-stage-latest-clause-or-choice: verdict=NO-GO want=risk-stage-text-mismatch 「或」引入第二阶段，唯一一致期限无法判定
+PASS-NEG N81-stage-latest-clause-slash-pair: verdict=NO-GO want=risk-stage-text-mismatch 斜杠并列第二阶段 R10 与结构化 R09 矛盾
+PASS-NEG N82-stage-latest-clause-fullwidth-correction: verdict=NO-GO want=risk-stage-text-mismatch 全角 Ｒ１０ 折叠 R10，第二阶段与结构化 R09 矛盾
+PASS-NEG N83-stage-latest-clause-fullwidth-slash: verdict=NO-GO want=risk-stage-text-mismatch 全角斜杠并列，第二阶段 R10 与结构化 R09 矛盾
+PASS-NEG N84-stage-latest-clause-latin-or: verdict=NO-GO want=risk-stage-text-mismatch 拉丁 or 引入第二阶段，区域规则统一覆盖
+PASS P7-positive-clause-repeat-consistent: verdict=PASS_WITH_CONDITIONS 同子句内重复 R09 均与结构化一致（TRACKED 命中=True）
+PASS P8-positive-quoted-trigger-wordname: verdict=PASS_WITH_CONDITIONS 引号词名引用「“最迟”」非期限声明不误拒（TRACKED 命中=True）
+PASS-NEG N85-stage-quote-wordname-correction: verdict=NO-GO want=risk-stage-text-mismatch 词名引用不遮蔽其后实际改期 R10
+PASS-NEG N86-stage-quote-fieldname-correction: verdict=NO-GO want=risk-stage-text-mismatch 字段名引用不豁免其后的实际赋值/改期
+PASS-NEG N87-stage-quote-fieldname-corner: verdict=NO-GO want=risk-stage-text-mismatch 「」词名引用同族不遮蔽改期
+PASS-NEG N88-stage-quote-fieldname-double-corner: verdict=NO-GO want=risk-stage-text-mismatch 『』词名引用同族不遮蔽改期
+PASS-NEG N89-stage-quote-fieldname-ascii: verdict=NO-GO want=risk-stage-text-mismatch ASCII 引号词名引用同族不遮蔽改期
+PASS-NEG N90-stage-quote-wordname-slash-pair: verdict=NO-GO want=risk-stage-text-mismatch 词名引用后的非唯一期限不得豁免
+PASS-NEG N91-stage-quote-wordname-fw-slash: verdict=NO-GO want=risk-stage-text-mismatch 全角斜杠非唯一期限折叠后同拒
+PASS-NEG N92-stage-paren-semicolon-correction: verdict=NO-GO want=risk-stage-text-mismatch 括号内分号不截断完整改期声明
+PASS-NEG N93-stage-paren-newline-correction: verdict=NO-GO want=risk-stage-text-mismatch 括号内换行不截断完整改期声明
+PASS-NEG N94-stage-latest-synonym-conflict: verdict=NO-GO want=risk-stage-text-mismatch 「最晚」入触发词族，R10 ≠ 结构化 R09
+PASS-NEG N95-stage-before-suffix-conflict: verdict=NO-GO want=risk-stage-boundary-unsupported 阶段锚定「前」边界期限机器不支持即拒
+PASS-NEG N96-stage-before-suffix-variant: verdict=NO-GO want=risk-stage-boundary-unsupported 「之前」同族前边界期限同拒
+PASS P9-positive-quoted-wordname-corner: verdict=PASS_WITH_CONDITIONS 「」词名引用非期限声明不误拒（TRACKED 命中=True）
+PASS P10-positive-latest-synonym-consistent: verdict=PASS_WITH_CONDITIONS 「最晚于 R09」与结构化一致放行（TRACKED 命中=True）
+PASS P11-positive-quoted-consistent-mention: verdict=PASS_WITH_CONDITIONS 词名引用后一致提及 R09 放行（TRACKED 命中=True）
+SELF-TEST OK (107/107)
+# exit=0

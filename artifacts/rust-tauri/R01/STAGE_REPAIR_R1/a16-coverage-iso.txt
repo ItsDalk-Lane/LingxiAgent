@@ -1,0 +1,24 @@
+PASS C1-inventory-count: features=736
+PASS C1-ownership-count: feature_ownership=736
+PASS C1-store-count: store_ownership=69
+PASS C2-bijection: 736 F-ID 双向一一对应，无缺失/孤儿/重复
+PASS C3-owner-registered: 全部 target_owner 在 owner_registry 登记
+PASS C3-no-worker-owner: 无 F-ID 由 worker 类 owner 承载（worker_restrictions 规则 3）
+PASS C4-implementation-path: 全部 F-ID 有非空且合法的实施阶段（实现路径存在）
+PASS C5-critical-facts-set: 11 条关键事实与冻结集精确一致
+PASS C5-critical-fact-owners: 11 条关键事实均由 core/service 类 owner 单独负责
+PASS C6-store-owners: 69 个存储 target_owner 全部登记，authoritative 均有目标写进程
+PASS C6-no-worker-store: 无存储由 worker 类 owner 承载
+PASS C7-reverse-histogram: 19 个 owner 承载 F-ID；零 F-ID owner（非缺陷，承担存储/职责）: ['adapters.models', 'adapters.storage', 'cli.commands', 'react-ui', 'service.auth', 'service.composition', 'worker.bridge-sdk', 'worker.browser-engine', 'worker.doc-parse', 'worker.media-encode', 'xtask.automation']
+PASS C8-pi-count: Pi 能力 14 条
+PASS C8-pi-no-second-loop: 14 条 Pi 能力全部 KERNEL_MIGRATION 且有 Rust 归属与目标阶段——无仅靠第二 Agent loop 的保留项
+PASS C9-pi-coverage-diff: unmapped_index_symbols/vendor_files/adapter_submodules/hooks 全空
+PASS C9-worker-counterexamples: 19 条 worker 反例全部闭合
+RESULT: COVERAGE-CLOSED (736 F-ID 双向映射闭合；11 关键事实单负责人；14 Pi 能力无第二 loop 保留项)
+PASS positive-control: 未变异输入必须 COVERAGE-CLOSED
+PASS-NEG N1-dropped-mapping: 删除 F-D01-DESKTOP_BEHAVIOR-DESKTOP-BEHAVIOR-QUICK-CHAT-WINDOW-A2C385 后检出: ['C1-ownership-count', 'C2-unmapped-feature']
+PASS-NEG N2-worker-owner: 检出: ['C3-no-worker-owner']
+PASS-NEG N3-unregistered-owner: 检出: ['C3-owner-registered']
+PASS-NEG N4-second-loop-retained: 检出: ['C8-pi-no-second-loop']
+PASS-NEG N5-worker-critical-fact: 检出: ['C5-critical-fact-owners']
+SELF-TEST OK (6/6)

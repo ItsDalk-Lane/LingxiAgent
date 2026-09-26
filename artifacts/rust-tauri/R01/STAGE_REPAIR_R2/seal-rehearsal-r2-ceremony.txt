@@ -1,0 +1,99 @@
+# R01 阶段修复 R2 — F03 封印分步预演仪式全程日志（/tmp/r01-repair-r2/iso 隔离副本）
+# 候选提交链：R2c' f14d89d30 → R2s'' 1eca294f5 → R2a'' facc3e293（均为预演 SHA，非正式坐标）
+# 复制自 /tmp/r01-repair-r2/logs/ceremony-r2.log（生成于 2026-09-26 01:33-01:40 +0800）
+
+== [0] commit R2c' (rehearsal candidate: R1 candidate + R2 fixes) ==
+R2C=f14d89d30a63e75d796f701bbbd2a25cf9f1204f
+
+== [1/9] round2 green: typecheck ==
+> tsc --noEmit && tsc --noEmit -p tsconfig.node.json && tsc --noEmit -p tsconfig.test.json
+
+
+EVIDENCE r01-seal-r2-typecheck EXIT 0 MANIFEST f821748b423080542280dfa1507462c2b9e67bdd234b9ca332f6060284a1205c
+
+== [2/9] round2 green: core-contracts ==
+
+Core contracts strict check passed (28 files).
+
+EVIDENCE r01-seal-r2-contracts EXIT 0 MANIFEST f821748b423080542280dfa1507462c2b9e67bdd234b9ca332f6060284a1205c
+
+== [3/9] round2 green: lint:boundary ==
+
+lint:boundary ok -- 1 known open->closed edge(s), all within the tracked ratchet baseline (existing debt, not newly introduced).
+
+EVIDENCE r01-seal-r2-boundary EXIT 0 MANIFEST f821748b423080542280dfa1507462c2b9e67bdd234b9ca332f6060284a1205c
+
+== [4/9] round2 green: npm run lint ==
+  0 errors and 34 warnings potentially fixable with the `--fix` option.
+
+
+EVIDENCE r01-seal-r2-lint EXIT 0 MANIFEST f821748b423080542280dfa1507462c2b9e67bdd234b9ca332f6060284a1205c
+
+== [5/9] round2 green: build:renderer ==
+- Adjust chunk size limit for this warning via build.chunkSizeWarningLimit.
+✓ built in 6.77s
+
+EVIDENCE r01-seal-r2-build-renderer EXIT 0 MANIFEST f821748b423080542280dfa1507462c2b9e67bdd234b9ca332f6060284a1205c
+
+== [6/9] round2 patch VERIFIED (sharded) ==
+{"base": "89bc0b64bf0a9b84ef3532efaa66c23213affb70", "currentMatchesHead": null, "failures": [], "frozenManifestEntries": 8191, "frozenMatchesVerifiedCommit": null, "frozenSourceManifestHash": "f821748b423080542280dfa1507462c2b9e67bdd234b9ca332f6060284a1205c", "patch": "artifacts/f1-f12-repair/round2/patches/89bc0b64-to-r01-r10-source.patch.gz", "patchBytes": 267310615, "patchFormat": "sharded", "patchManifest": "artifacts/f1-f12-repair/round2/patches/89bc0b64-to-r01-r10-source.patch.gz.shards.json", "patchMaxDeliveredFileBytes": 45000000, "patchSha256": "284e1ef024c68d8e1b0699bf71ed25777903a7d7ff11a5170331e8616e3d608f", "patchShardBytes": 45000000, "patchShards": [{"bytes": 45000000, "path": "artifacts/f1-f12-repair/round2/patches/89bc0b64-to-r01-r10-source.patch.gz.part-00001", "sha256": "6de2d39153776c902410a8b0814683c7cdbd9815e9069b78c166bff20d0e1c32"}, {"bytes": 45000000, "path": "artifacts/f1-f12-repair/round2/patches/89bc0b64-to-r01-r10-source.patch.gz.part-00002", "sha256": "b7b48039ebf23a3aef5860b44e82b0696ac9f2e4b2c4121c2887e6b1d1c359c4"}, {"bytes": 45000000, "path": "artifacts/f1-f12-repair/round2/patches/89bc0b64-to-r01-r10-source.patch.gz.part-00003", "sha256": "58c502e0bd9a816ac527b9dac5234152a8bc5e7d7e962a03e0a29670efe34940"}, {"bytes": 45000000, "path": "artifacts/f1-f12-repair/round2/patches/89bc0b64-to-r01-r10-source.patch.gz.part-00004", "sha256": "00f3d317f4c23c0697afff9357df692b57a49e305d1c01e57155b286ef0ca701"}, {"bytes": 45000000, "path": "artifacts/f1-f12-repair/round2/patches/89bc0b64-to-r01-r10-source.patch.gz.part-00005", "sha256": "746768e03c21ba44f01fef6faf3ee1c699ace3479a759fc2df2a8a4ba81ccf55"}, {"bytes": 42310615, "path": "artifacts/f1-f12-repair/round2/patches/89bc0b64-to-r01-r10-source.patch.gz.part-00006", "sha256": "c01b73c0f9a3fef89dc2899e4c1fcef62e2d4db1611499b56d06ccb1db066680"}], "patchUncompressedBytes": 496774264, "replayedMatchesCurrent": true, "replayedMatchesFrozenManifest": true, "replayedSourceManifestHash": "f821748b423080542280dfa1507462c2b9e67bdd234b9ca332f6060284a1205c", "result": "VERIFIED", "sealGuardPassed": null, "sourceManifestHash": "f821748b423080542280dfa1507462c2b9e67bdd234b9ca332f6060284a1205c", "state": "source", "verifiedSourceObjectType": "commit", "verifiedSourceSha": "f2b8c687ae7bb5511edbaf5f6e0945affb0c80b8"}
+
+EVIDENCE r01-seal-r2-patch-r2 EXIT 0 MANIFEST f821748b423080542280dfa1507462c2b9e67bdd234b9ca332f6060284a1205c
+
+== [7/9] round3 patch VERIFIED (sharded) ==
+  "result": "VERIFIED"
+}
+
+EVIDENCE r01-seal-r2-patch-r3 EXIT 0 MANIFEST 7a215bc6b069900a5ee9bf1f404250b0df4f1596e0ad9a458cf3ac1c5f6a91f5
+
+== [8/9] vitest evidence+matrix trio ==
+   Duration  73.84s (transform 134ms, setup 61ms, import 102ms, tests 134.21s, environment 0ms)
+
+
+EVIDENCE r01-seal-r2-green-r3 EXIT 0 MANIFEST 7a215bc6b069900a5ee9bf1f404250b0df4f1596e0ad9a458cf3ac1c5f6a91f5
+
+== [9/9] commit R2s'' ==
+R2S=1eca294f5c9a7d7d2f52fb99e36401894321e01a
+
+== coordinate advance -> R2a'' ==
+✓ wrote .sync-audit/upstream-sync-matrix.json and UPSTREAM_SYNC_MATRIX.md
+✓ 133 paths: ADOPTED 25 / ADAPTED 100 / REGENERATED 4 / INTENTIONAL_DIVERGENCE 4 (sum 133)
+  projection sha256: 8bf6c07a873c2b25c51db12ae36addb89cbfe33f23747fcdd3d32b4c7878dbc9
+R2A=facc3e293e801fd7df16eab632728a03e79ef260
+audit-only files in R2s''..R2a'':
+.sync-audit/build-sync-matrix.mjs
+.sync-audit/upstream-sync-matrix.json
+.sync-audit/verified-source-sha.txt
+PROGRESS.md
+UPSTREAM_SYNC_AUDIT.md
+UPSTREAM_SYNC_MATRIX.md
+✓ post-verification diff guard OK: 1eca294f5c9a7d7d2f52fb99e36401894321e01a..HEAD 仅 6 个审计文件变化
+
+== four-file gate at R2a'' ==
+
+ Test Files  4 passed (4)
+      Tests  74 passed (74)
+   Start at  01:37:27
+   Duration  68.51s (transform 155ms, setup 81ms, import 116ms, tests 121.16s, environment 0ms)
+
+FOUR-FILE-GATE-EXIT=0
+
+== full npm test at R2a'' ==
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/2]⎯
+
+
+ Test Files  1 failed | 1465 passed | 3 skipped (1469)
+      Tests  2 failed | 14946 passed | 15 skipped (14963)
+   Start at  01:38:36
+   Duration  101.48s (transform 48.67s, setup 20.44s, import 943.90s, tests 1006.69s, environment 254.27s)
+
+FULL-NPM-TEST-EXIT=1
+
+== git object size audit (GitHub 100 MiB hard limit) ==
+blob 324997026 50464929e52af7c942d4d9e25af60df9c31f3663
+blob 323014537 4c005979a03ad4e88a514960bbb656e47ba9dd5f
+blob 323012739 9076843e900cd40d3d6b13d123481d7a0d9fbb1d
+blob 319108227 6440f64ed4e80d657203e91dd14ecc331a57f13e
+blob 224453484 2155c9e98b061ef83860fa52e21870335e8f7bb5
+MAX-BLOB-BYTES=324997026 (limit=104857600)
+OBJECT-SIZE-AUDIT-FAILED

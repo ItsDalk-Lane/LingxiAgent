@@ -1,0 +1,26 @@
+# R01 阶段修复 R4 — /tmp 隔离副本 A15/A16 与 F02 配套复测
+
+## r01_t08_coverage_check.py --self-test（A16）
+SELF-TEST OK (6/6)
+
+## r01_t08_isolation_check.py（A16/A15）
+RESULT: ISOLATED（生产入口零引用 R01 原型/生成物）
+
+## F02：node scripts/compute-cli-closure.mjs 再生成后 build/ 零漂移
+regen exit=0; git status --porcelain -- build/ 行数=0（零漂移=与已提交基线逐字节一致）
+
+## census 单文件（含原位重写用例）
+      Tests  23 passed (23)
+
+## 分片夹具用例（R2 F03 回归，round2+round3 各 3 个）
+      Tests  6 passed | 58 skipped (64)
+
+## typecheck（tsc×3）exit=0
+## npm run lint：0 errors / 10896 warnings（与 R3 持平）
+✖ 10896 problems (0 errors, 10896 warnings)
+## cargo test --workspace：19 binary 45/45 passed（候选零 Rust 改动）
+cargo passed: 45
+
+## 四文件门禁候选态（预期 6 红=封印前红集合：post-verification-audit-seal 1 / round2 3 / round3 2）
+ Test Files  3 failed | 1 passed (4)
+      Tests  6 failed | 68 passed (74)

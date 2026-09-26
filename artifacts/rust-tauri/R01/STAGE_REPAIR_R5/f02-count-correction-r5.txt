@@ -1,0 +1,41 @@
+# R01 阶段修复 R5 — F02 证据范围计数更正核实（2026-09-26）
+# R4 修复报告 §3/§7 与 /tmp/r01-repair-r4/r4-file-hashes.txt 标题写 STAGE_REPAIR_R4 12 件/候选 18+48=66；
+# 实际 11 件/候选 18 修改+47 新增=65。本轮逐文件核实：
+
+## 1) STAGE_REPAIR_R4/ 实际文件清单与哈希（11 件，.mimosa/ 为 git 忽略的本地扫描缓存不计入候选）
+cde5466a95797449d0819068e7d33990fd8d125d7ff9fa14b31b8f70686e54a5  artifacts/rust-tauri/R01/STAGE_REPAIR_R4/a15-a16-f02-iso-r4.txt
+9fc16e10c78acc8a3edc60642e339eab6b57f1120c344c3306120829dcc0a1fb  artifacts/rust-tauri/R01/STAGE_REPAIR_R4/f01-cli-regression-r4.txt
+f6bbe9a857d9e823273d7e52afd7d8c1094fa647d2f61068d0b4805d28eb561f  artifacts/rust-tauri/R01/STAGE_REPAIR_R4/f01-gate-selftest-r4.txt
+a8831ce9c692ab78278e76031be268bef1549f25d47ebece4e1afdec0ec1723b  artifacts/rust-tauri/R01/STAGE_REPAIR_R4/f01-iso-recheck-r4.txt
+6cc6848312a2c9ee85ec67a5f36f18a4eabf8cddef105fd220302a3a969988c3  artifacts/rust-tauri/R01/STAGE_REPAIR_R4/f01-stage-token-repro-r4.txt
+620e4bf99d415a8d4b9719455cc575f3f867d09eaff0502ab462d3f3ede06600  artifacts/rust-tauri/R01/STAGE_REPAIR_R4/f02-fourfile-candidate-state-r4.txt
+272651ce8cd8b5e7642cf4716091a6a7c66759e62e9e76a699760028a972eee9  artifacts/rust-tauri/R01/STAGE_REPAIR_R4/f02-fourfile-final-r4.txt
+6360bf424f638bb04e41a8125080d6871e3a2a8ec59a89b371e5f90aafc56e9e  artifacts/rust-tauri/R01/STAGE_REPAIR_R4/f02-npm-test-candidate-state-r4.txt
+654b8228216964a870a086b30b33257b4c37fd6b276349e4153753a719bb1ba6  artifacts/rust-tauri/R01/STAGE_REPAIR_R4/lint-iso-r4.txt
+b32daeef2af45d85547f664e7ad68b9dd0c290942ad702592eff35b5cb4a65d8  artifacts/rust-tauri/R01/STAGE_REPAIR_R4/typecheck-iso-r4.txt
+b1a1a890d4c1c5517e17add1aed47ad2220a1f441a154b7df12cf1f111840107  artifacts/rust-tauri/R01/STAGE_REPAIR_R4/typecheck-lint-cargo-iso-r4.txt
+
+## 2) 与 R4 所列 SHA（/tmp/r01-repair-r4/r4-file-hashes.txt，11 条）逐项比对
+MATCH  artifacts/rust-tauri/R01/STAGE_REPAIR_R4/a15-a16-f02-iso-r4.txt
+MATCH  artifacts/rust-tauri/R01/STAGE_REPAIR_R4/f01-cli-regression-r4.txt
+MATCH  artifacts/rust-tauri/R01/STAGE_REPAIR_R4/f01-gate-selftest-r4.txt
+MATCH  artifacts/rust-tauri/R01/STAGE_REPAIR_R4/f01-iso-recheck-r4.txt
+MATCH  artifacts/rust-tauri/R01/STAGE_REPAIR_R4/f01-stage-token-repro-r4.txt
+MATCH  artifacts/rust-tauri/R01/STAGE_REPAIR_R4/f02-fourfile-candidate-state-r4.txt
+MATCH  artifacts/rust-tauri/R01/STAGE_REPAIR_R4/f02-fourfile-final-r4.txt
+MATCH  artifacts/rust-tauri/R01/STAGE_REPAIR_R4/f02-npm-test-candidate-state-r4.txt
+MATCH  artifacts/rust-tauri/R01/STAGE_REPAIR_R4/lint-iso-r4.txt
+MATCH  artifacts/rust-tauri/R01/STAGE_REPAIR_R4/typecheck-iso-r4.txt
+MATCH  artifacts/rust-tauri/R01/STAGE_REPAIR_R4/typecheck-lint-cargo-iso-r4.txt
+比对结果：11/11 MATCH
+
+## 3) 候选总数核实
+候选总数在 R5 冻结时点实测：git status --porcelain -uall 共 75 项 = 18 个已跟踪修改 + 57 个新文件
+（其中 47 个新文件属 R1–R4 既有候选，10 个为本轮 STAGE_REPAIR_R5 证据；F02 所述『R4 候选=65 文件』
+指 R4 冻结时点 18+47，见 R5 报告 §范围；本文件 §1/§2 的 11 件与哈希为 R4 时点事实，未受 R5 追加影响。）
+
+## 4) 结论
+- 11 件全部存在且哈希与 R4 所列逐项匹配；R4 报告证据矩阵（§4）点名的日志全部在列（11 件即全部点名件）。
+- 未发现第 12 件计划内证据：R4 报告 §3/§4/§7 与 r4-file-hashes.txt 除计数措辞（「12 件」）外无任何第 12 件文件名或哈希；「12 件」标题下仅列 11 条 SHA。
+- 判定：R4 报告计数错误（多计一件），非证据缺失；F02 为非独立阻断的证据范围账数不符。
+- 处置：R4 原报告 /tmp/r01-stage-repair-r4.md 及其已记录 SHA 0d6ce683… 不改写；实际范围更正写入 R01_HANDOFF.json（stage_repair_r5/artifact_hashes note）、ORCHESTRATOR_PROGRESS.json（stage_repair_note）、R01_REPORT.md（R5 进展段）、R01_ACCEPTANCE_LEDGER.json（description）。
