@@ -516,6 +516,22 @@ export const DYNAMIC_CALL_ALLOWLIST = Object.freeze([
       + "a probed binary's absolute path, never an import target. Same bounded-timeout "
       + "probe contract as the sibling entry above.",
   },
+  {
+    file: "cli/rust-service.ts",
+    callee: "execFileSync",
+    argText: "reader",
+    reason:
+      "Windows Rust runtime record read: execFileSync(reader, ['--read-private-runtime-json', ...]) "
+      + "invokes the packaged Rust reader binary (lingxi-service.exe) so instance.json / "
+      + "local-token.json are read through the verified helper's private handle instead of "
+      + "raw fs on win32 (readPrivateJson). reader is resolved at runtime by "
+      + "resolveWindowsRustReader() -- a full verification chain (build.json manifest fields, "
+      + "PE header machine check, sha256 digest, toolchain + rust source digest) over "
+      + "dist-rust-service/win-<arch>/ or the activated server artifacts tree, so the path "
+      + "is genuinely runtime-computed and layout-dependent. The target is a packaged "
+      + "native artifact, not repo source, so it never enters the module closure by design "
+      + "(same pattern as the system-speech-adapter helper spawn entry above).",
+  },
 ]);
 
 const SPAWN_FAMILY_NAMES = new Set([

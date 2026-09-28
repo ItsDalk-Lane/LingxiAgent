@@ -199,8 +199,15 @@ note "PASS boot1-ready addr=$ADDR home=$HOME_DIR"
 OLD_TOKEN="$(python3 -c 'import json,sys; from pathlib import Path; print(json.loads(Path(sys.argv[1]).read_text(encoding="utf-8"))["token"])' "$HOME_DIR/lingxi-service/local-token.json")"
 [ -n "$OLD_TOKEN" ] || fail "pre-restart token missing"
 
-python3 scripts/rust-tauri/r02_t08_full_chain_probe.py boot-and-write "${ADDR##*:}" "$HOME_DIR" \
-  2> "$EVIDENCE_DIR/probe1.err" > "$EVIDENCE_DIR/probe1.pass-lines"
+# set -e 下直接调用会让失败在诊断并入 summary 之前中止脚本（后续 tee/if
+# 成为不可达死代码）；用 if ! 承接非零退出：先把 pass-lines + stderr 并入
+# summary、回显 stderr，再显式 fail（失败仍然非零退出）。
+if ! python3 scripts/rust-tauri/r02_t08_full_chain_probe.py boot-and-write "${ADDR##*:}" "$HOME_DIR" \
+  2> "$EVIDENCE_DIR/probe1.err" > "$EVIDENCE_DIR/probe1.pass-lines"; then
+  { cat "$EVIDENCE_DIR/probe1.pass-lines"; cat "$EVIDENCE_DIR/probe1.err"; } | tee -a "$EVIDENCE_DIR/summary.txt"
+  cat "$EVIDENCE_DIR/probe1.err" >&2
+  fail "probe phase 1 failed"
+fi
 { cat "$EVIDENCE_DIR/probe1.pass-lines"; cat "$EVIDENCE_DIR/probe1.err"; } | tee -a "$EVIDENCE_DIR/summary.txt"
 if [ -s "$EVIDENCE_DIR/probe1.err" ]; then cat "$EVIDENCE_DIR/probe1.err" >&2; fail "probe phase 1 failed"; fi
 note "PASS phase1 (health/auth-negative/auth/write/subscribe/live-event/read-your-writes/future-cursor)"
@@ -221,8 +228,14 @@ SERVICE_PID=$!
 ADDR="$(wait_ready "$EVIDENCE_DIR/service2.out" "$SERVICE_PID")"
 note "PASS boot2-ready addr=$ADDR"
 
-printf '%s\n' "$OLD_TOKEN" | python3 scripts/rust-tauri/r02_t08_full_chain_probe.py readback "${ADDR##*:}" "$HOME_DIR" \
-  2> "$EVIDENCE_DIR/probe2.err" > "$EVIDENCE_DIR/probe2.pass-lines"
+# 与 phase 1 同型：printf | python3 管道在 set -e/pipefail 下失败会先于诊断
+# 输出中止脚本；if ! 承接管道整体退出码，失败时诊断并入 summary 后显式 fail。
+if ! printf '%s\n' "$OLD_TOKEN" | python3 scripts/rust-tauri/r02_t08_full_chain_probe.py readback "${ADDR##*:}" "$HOME_DIR" \
+  2> "$EVIDENCE_DIR/probe2.err" > "$EVIDENCE_DIR/probe2.pass-lines"; then
+  { cat "$EVIDENCE_DIR/probe2.pass-lines"; cat "$EVIDENCE_DIR/probe2.err"; } | tee -a "$EVIDENCE_DIR/summary.txt"
+  cat "$EVIDENCE_DIR/probe2.err" >&2
+  fail "probe phase 2 failed"
+fi
 { cat "$EVIDENCE_DIR/probe2.pass-lines"; cat "$EVIDENCE_DIR/probe2.err"; } | tee -a "$EVIDENCE_DIR/summary.txt"
 if [ -s "$EVIDENCE_DIR/probe2.err" ]; then cat "$EVIDENCE_DIR/probe2.err" >&2; fail "probe phase 2 failed"; fi
 note "PASS phase2 (old-token-rejected/new-token auth / session readback / events preserved / health)"

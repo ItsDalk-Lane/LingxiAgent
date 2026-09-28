@@ -1,0 +1,7 @@
+candidate npm raw exit: 1
+base seal-family raw exit: 0
+candidate classes by file:
+tests/post-verification-audit-seal.test.ts	seal-coordinate-lag
+tests/round2-delivery-evidence.test.ts	seal-coordinate-lag,uncommitted-source-rejection
+tests/round3-delivery-evidence.test.ts	seal-coordinate-lag,uncommitted-source-rejection
+base classes by file:

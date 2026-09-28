@@ -672,6 +672,8 @@ fn leaf(
         r00_due: TEST_R00_DUE.into(),
         assertion_contract: contract,
         original_assertion_cases: Vec::new(),
+        deferred_r07_cases: Vec::new(),
+        early_evidence_command_refs: Vec::new(),
     }
 }
 
@@ -860,10 +862,9 @@ fn single_stage_leaf_with_matching_case_can_still_pass() {
         evidence_preexisting: Vec::new(),
         cleanup: None,
     }];
-    let (status, reason, cases) =
-        super::roll_up_supplemental_leaf(&item, "RX", &outcomes, &root, &evidence);
-    assert_eq!(status, "PASS", "{reason}");
-    assert_eq!(cases[0]["status"], "PASS");
+    let roll = super::roll_up_supplemental_leaf(&item, "RX", &outcomes, &root, &evidence);
+    assert_eq!(roll.status, "PASS", "{}", roll.reason);
+    assert_eq!(roll.assertion_results[0]["status"], "PASS");
     std::fs::remove_dir_all(&root).ok();
 }
 
@@ -899,15 +900,17 @@ fn dual_stage_leaf_passes_only_with_complete_original_behavior_cases() {
         evidence_preexisting: Vec::new(),
         cleanup: None,
     }];
-    let (status, reason, _) =
-        super::roll_up_supplemental_leaf(&item, "R02", &outcomes, &root, &evidence);
-    assert_eq!(status, "PASS", "{reason}");
+    let roll = super::roll_up_supplemental_leaf(&item, "R02", &outcomes, &root, &evidence);
+    assert_eq!(roll.status, "PASS", "{}", roll.reason);
 
     item.original_assertion_cases = vec![vec!["positive".into()], vec!["positive".into()]];
-    let (status, reason, _) =
-        super::roll_up_supplemental_leaf(&item, "R02", &outcomes, &root, &evidence);
-    assert_eq!(status, "FAIL", "{reason}");
-    assert!(reason.contains("unique executed case"), "{reason}");
+    let roll = super::roll_up_supplemental_leaf(&item, "R02", &outcomes, &root, &evidence);
+    assert_eq!(roll.status, "FAIL", "{}", roll.reason);
+    assert!(
+        roll.reason.contains("unique executed case"),
+        "{}",
+        roll.reason
+    );
     std::fs::remove_dir_all(&root).ok();
 }
 
@@ -946,12 +949,12 @@ fn duplicate_leaf_case_identity_cannot_hide_a_failed_record() {
             evidence_preexisting: Vec::new(),
             cleanup: None,
         }];
-        let (status, reason, _) =
-            super::roll_up_supplemental_leaf(&item, "RX", &outcomes, &root, &evidence);
-        assert_eq!(status, "FAIL", "{label}: {reason}");
+        let roll = super::roll_up_supplemental_leaf(&item, "RX", &outcomes, &root, &evidence);
+        assert_eq!(roll.status, "FAIL", "{label}: {}", roll.reason);
         assert!(
-            reason.contains("duplicate evidence case name"),
-            "{label}: {reason}"
+            roll.reason.contains("duplicate evidence case name"),
+            "{label}: {}",
+            roll.reason
         );
         std::fs::remove_dir_all(&root).ok();
     }
@@ -988,10 +991,9 @@ fn unpinned_failed_case_in_shared_leaf_file_is_not_silent() {
         evidence_preexisting: Vec::new(),
         cleanup: None,
     }];
-    let (status, reason, _) =
-        super::roll_up_supplemental_leaf(&item, "RX", &outcomes, &root, &evidence);
-    assert_eq!(status, "FAIL", "{reason}");
-    assert!(reason.contains("other-leaf-failed"), "{reason}");
+    let roll = super::roll_up_supplemental_leaf(&item, "RX", &outcomes, &root, &evidence);
+    assert_eq!(roll.status, "FAIL", "{}", roll.reason);
+    assert!(roll.reason.contains("other-leaf-failed"), "{}", roll.reason);
     std::fs::remove_dir_all(&root).ok();
 }
 
@@ -1376,63 +1378,112 @@ fn embedded_r02_map_declares_the_34_supplemental_leaves() {
             .filter(|l| l.basis_kind == kind)
             .count()
     };
+    // R02-final group 1 stage ownership: exactly 25 share leaves + 9
+    // deferred leaves; no legacy basis kind remains in the live map.
+    assert_eq!(
+        count_kind(crate::stage_map::BASIS_R02_SHARE_SATISFIED),
+        25,
+        "25 R02-share leaves (17 management + 6 protocol + 1 serve + 1 sessions)"
+    );
+    assert_eq!(count_kind(crate::stage_map::BASIS_DEFERRED_TO_R07), 9);
     assert_eq!(
         count_kind(crate::stage_map::BASIS_ROUTE_PRESENT_STATIC)
             + count_kind(crate::stage_map::BASIS_PROTOCOL)
             + count_kind(crate::stage_map::BASIS_AUTH_PRIMITIVE_ONLY)
             + count_kind(crate::stage_map::BASIS_CLIENT_ONLY_STAGE_CONFLICT)
             + count_kind(crate::stage_map::BASIS_FULL_ORIGINAL_BEHAVIOR),
-        34,
-        "every original leaf has exactly one evidence basis"
+        0,
+        "the live R02 map carries no legacy basis kinds"
     );
-    assert_eq!(
-        count_kind(crate::stage_map::BASIS_CLIENT_ONLY_STAGE_CONFLICT),
-        0
-    );
-    assert!(count_kind(crate::stage_map::BASIS_FULL_ORIGINAL_BEHAVIOR) >= 18);
     assert!(r02
         .supplemental_leaves
         .iter()
         .all(|l| l.requirement == "REQUIRED_SUPPLEMENTAL"));
-    // 原账对 34 项都登记了 R02 与 R07 责任；局部案例不能冒充完整原叶。
+    // 原账对 34 项都登记了 R02 与 R07 责任；份额叶与递延叶都保留双归属。
     assert!(r02.supplemental_leaves.iter().all(|l| {
         l.r00_execution_stage_ids.iter().any(|id| id == "R02")
             && l.r00_execution_stage_ids.iter().any(|id| id == "R07")
     }));
+    // F1 回归：serve 叶的生产者命令必须已注册（缺失即加载期硬错）。
+    assert!(r02
+        .commands
+        .iter()
+        .any(|c| c.key == "supplemental_cli_rust_matrix"));
+    let serve = r02
+        .supplemental_leaves
+        .iter()
+        .find(|l| l.id == "R00-T02-LA-1B09760C2B1C")
+        .expect("serve leaf present");
+    assert_eq!(
+        serve.basis_kind,
+        crate::stage_map::BASIS_R02_SHARE_SATISFIED
+    );
+    assert_eq!(
+        serve.assertion_contract.as_ref().unwrap().producer_command,
+        "supplemental_cli_rust_matrix"
+    );
+    assert_eq!(
+        serve.assertion_contract.as_ref().unwrap().cases.len(),
+        9,
+        "serve leaf keeps its 9 all-server gating pins"
+    );
     for l in r02
         .supplemental_leaves
         .iter()
-        .filter(|l| l.basis_kind == crate::stage_map::BASIS_CLIENT_ONLY_STAGE_CONFLICT)
+        .filter(|l| l.basis_kind == crate::stage_map::BASIS_DEFERRED_TO_R07)
     {
         assert!(
-            l.evidence_command_refs.is_empty() && l.evidence_paths.is_empty(),
-            "{}: a BLOCKED conflict leaf must carry no pass-able evidence",
+            l.evidence_command_refs.is_empty(),
+            "{}: a deferred leaf must carry no GATING evidence commands",
             l.id
         );
         assert!(
             l.assertion_contract.is_none(),
-            "{}: a BLOCKED conflict leaf must carry no assertion contract",
+            "{}: a deferred leaf must carry no assertion contract",
+            l.id
+        );
+        assert!(
+            l.evidence_paths.is_empty(),
+            "{}: a deferred leaf must carry no pass-able evidencePaths",
+            l.id
+        );
+        for key in &l.early_evidence_command_refs {
+            assert!(
+                r02.commands.iter().any(|c| &c.key == key),
+                "{}: early-evidence command {key:?} must stay registered",
+                l.id
+            );
+        }
+        for record in &l.deferred_r07_cases {
+            assert!(
+                l.evidence_command_refs.contains(&record.producer_command)
+                    || l.early_evidence_command_refs
+                        .contains(&record.producer_command),
+                "{}: deferred case {:?} producer must run for this leaf",
+                l.id,
+                record.case
+            );
+        }
+        assert!(
+            !l.r00_assertions.is_empty() && !l.r00_then.is_empty() && !l.r00_due.is_empty(),
+            "{}: R00 mirror fields must be present",
             l.id
         );
     }
     for l in r02
         .supplemental_leaves
         .iter()
-        .filter(|l| l.basis_kind != crate::stage_map::BASIS_CLIENT_ONLY_STAGE_CONFLICT)
+        .filter(|l| l.basis_kind == crate::stage_map::BASIS_R02_SHARE_SATISFIED)
     {
         assert!(
             !l.evidence_command_refs.is_empty(),
-            "{}: an R02-share leaf must bind evidence commands",
+            "{}: a share leaf must bind evidence commands",
             l.id
         );
-        // R14-F01: every pass-able leaf carries the machine-checked cases
-        // that consume its original R00 assertions.
-        let contract = l.assertion_contract.as_ref().unwrap_or_else(|| {
-            panic!(
-                "{}: non-conflict leaf must declare an assertionContract",
-                l.id
-            )
-        });
+        let contract = l
+            .assertion_contract
+            .as_ref()
+            .unwrap_or_else(|| panic!("{}: share leaf must declare an assertionContract", l.id));
         assert!(
             l.evidence_command_refs.contains(&contract.producer_command),
             "{}: the contract's producer must be one of the leaf's bound commands",
@@ -1449,17 +1500,376 @@ fn embedded_r02_map_declares_the_34_supplemental_leaves() {
             l.id
         );
     }
-    for l in r02
+    // sessions leaf split: exactly the 6 server-side gating pins; the 4 CLI
+    // rendering cases move to deferredR07Cases (observed, never gating).
+    let sessions = r02
         .supplemental_leaves
         .iter()
-        .filter(|l| l.basis_kind == crate::stage_map::BASIS_FULL_ORIGINAL_BEHAVIOR)
-    {
-        assert_eq!(l.original_assertion_cases.len(), l.r00_assertions.len());
-        assert_ne!(
-            l.assertion_contract.as_ref().unwrap().producer_command,
-            "a05_a06_auth_matrix",
-            "{}: generic authentication checks cannot prove original full behavior",
-            l.id
-        );
+        .find(|l| l.id == "R00-T02-LA-200D4E5D52C9")
+        .expect("sessions leaf present");
+    let contract = sessions.assertion_contract.as_ref().unwrap();
+    let gating: Vec<&str> = contract.cases.iter().map(|c| c.case.as_str()).collect();
+    assert_eq!(
+        gating,
+        vec![
+            "a05-sessions-list-owner",
+            "a05-sessions-list-owner-contains-own-session",
+            "a05-sessions-list-foreign-principal",
+            "a05-sessions-list-foreign-excludes-owner-sessions",
+            "a05-sessions-list-empty-shape",
+            "a05-sessions-list-no-credential",
+        ]
+    );
+    let deferred: Vec<&str> = sessions
+        .deferred_r07_cases
+        .iter()
+        .map(|c| c.case.as_str())
+        .collect();
+    assert_eq!(
+        deferred,
+        vec![
+            "a05-cli-sessions-owner-list",
+            "a05-cli-sessions-foreign-empty",
+            "a05-cli-sessions-unauthorized-error",
+            "a05-cli-sessions-limit-20",
+        ]
+    );
+}
+
+// ── R02-final group 1: stage-ownership kinds (share/deferred) ───────────
+
+/// Outcomes helper: one passing and (optionally) one failing command.
+fn outcome(key: &str, exit: i32) -> crate::verify::CommandOutcome {
+    crate::verify::CommandOutcome {
+        key: key.to_string(),
+        exit_code: Some(exit),
+        timed_out: false,
+        internal_error: None,
+        evidence_missing: Vec::new(),
+        evidence_preexisting: Vec::new(),
+        cleanup: None,
     }
+}
+
+#[test]
+fn r02_share_satisfied_dual_stage_leaf_passes_on_share_pins() {
+    // F2 回归：双阶段叶（r00ExecutionStageIds 含 RY）在份额图钉全过时必须
+    // PASS——旧「另属后续阶段→BLOCKED」分支等于要求 R02 先证 R07 客户端
+    // 行为，属阶段所有权越界，已撤销（仅旧图 legacy kind 保留回放防护）。
+    let root = temp_root("share-pass");
+    let evidence = root.join("evidence");
+    std::fs::create_dir_all(&evidence).expect("create evidence root");
+    std::fs::write(
+        evidence.join("leaf-cases.json"),
+        r#"{"schema":"lingxi.leaf-case-results.v1","cases":[{"case":"share-pin","expect":200,"actual":200,"ok":true},{"case":"deferred-render","expect":1,"actual":1,"ok":true}]}"#,
+    )
+    .expect("write case evidence");
+    let mut item = leaf(
+        "R00-T02-LA-TESTSHARE00000",
+        crate::stage_map::BASIS_R02_SHARE_SATISFIED,
+        &["good"],
+        &[],
+        contract("good", "{EVIDENCE}/leaf-cases.json", &[("share-pin", 200)]),
+    );
+    item.deferred_r07_cases = vec![crate::stage_map::LeafDeferredCase {
+        case: "deferred-render".into(),
+        expect: 1,
+        producer_command: "good".into(),
+        evidence_path: "{EVIDENCE}/leaf-cases.json".into(),
+    }];
+    // TEST_R00_STAGE_IDS = [RX, RY]: a genuinely dual-stage leaf.
+    let outcomes = vec![outcome("good", 0)];
+    let roll = super::roll_up_supplemental_leaf(&item, "RX", &outcomes, &root, &evidence);
+    assert_eq!(roll.status, "PASS", "{}", roll.reason);
+    assert!(roll.reason.contains("R07 remainder stays REQUIRED"));
+    assert_eq!(roll.assertion_results[0]["status"], "PASS");
+    // The deferred case is OBSERVED (it held) but never gates.
+    assert_eq!(roll.deferred_case_results.len(), 1);
+    assert_eq!(roll.deferred_case_results[0]["status"], "OBSERVED_HELD");
+    std::fs::remove_dir_all(&root).ok();
+}
+
+#[test]
+fn r02_share_satisfied_leaf_fails_when_a_pin_does_not_hold() {
+    let root = temp_root("share-fail");
+    let evidence = root.join("evidence");
+    std::fs::create_dir_all(&evidence).expect("create evidence root");
+    std::fs::write(
+        evidence.join("leaf-cases.json"),
+        r#"{"schema":"lingxi.leaf-case-results.v1","cases":[{"case":"share-pin","expect":200,"actual":403,"ok":false}]}"#,
+    )
+    .expect("write drifted case evidence");
+    let item = leaf(
+        "R00-T02-LA-TESTSHAREFAIL00",
+        crate::stage_map::BASIS_R02_SHARE_SATISFIED,
+        &["good"],
+        &[],
+        contract("good", "{EVIDENCE}/leaf-cases.json", &[("share-pin", 200)]),
+    );
+    let outcomes = vec![outcome("good", 0)];
+    let roll = super::roll_up_supplemental_leaf(&item, "RX", &outcomes, &root, &evidence);
+    assert_eq!(roll.status, "FAIL", "{}", roll.reason);
+    assert!(roll.reason.contains("original-assertion cases not holding"));
+    std::fs::remove_dir_all(&root).ok();
+}
+
+#[test]
+fn legacy_partial_dual_stage_leaf_stays_blocked_for_old_map_replay() {
+    // 旧图回放防护：protocol_basis/route_basis_present_static 的双阶段叶仍
+    // BLOCKED（现行 R02 图已无这类叶——份额叶必须显式声明份额语义）。
+    let root = temp_root("legacy-block");
+    let evidence = root.join("evidence");
+    std::fs::create_dir_all(&evidence).expect("create evidence root");
+    std::fs::write(
+        evidence.join("leaf-cases.json"),
+        r#"{"schema":"lingxi.leaf-case-results.v1","cases":[{"case":"pin","expect":200,"actual":200,"ok":true}]}"#,
+    )
+    .expect("write case evidence");
+    let item = leaf(
+        "R00-T02-LA-TESTLEGACY00000",
+        crate::stage_map::BASIS_PROTOCOL,
+        &["good"],
+        &[],
+        contract("good", "{EVIDENCE}/leaf-cases.json", &[("pin", 200)]),
+    );
+    let outcomes = vec![outcome("good", 0)];
+    let roll = super::roll_up_supplemental_leaf(&item, "RX", &outcomes, &root, &evidence);
+    assert_eq!(roll.status, "BLOCKED", "{}", roll.reason);
+    assert!(roll.reason.contains("another stage"));
+    assert!(roll.reason.contains("r02_share_satisfied"));
+    std::fs::remove_dir_all(&root).ok();
+}
+
+#[test]
+fn deferred_leaf_rollup_is_fixed_and_observational() {
+    // 递延叶固定 DEFERRED_TO_R07：earlyEvidence 命令通过时附观察结果；
+    // 未通过时叶状态不变（验收不归 R02），但命令 FAIL 由 overall 拦截。
+    let root = temp_root("deferred-rollup");
+    let evidence = root.join("evidence");
+    std::fs::create_dir_all(&evidence).expect("create evidence root");
+    std::fs::write(
+        evidence.join("client-cases.json"),
+        r#"{"schema":"lingxi.leaf-case-results.v1","cases":[{"case":"render","expect":1,"actual":1,"ok":true}]}"#,
+    )
+    .expect("write early case evidence");
+    let mut item = leaf(
+        "R00-T02-LA-TESTDEFERRED000",
+        crate::stage_map::BASIS_DEFERRED_TO_R07,
+        &[],
+        &[],
+        None,
+    );
+    item.early_evidence_command_refs = vec!["client".into()];
+    item.deferred_r07_cases = vec![crate::stage_map::LeafDeferredCase {
+        case: "render".into(),
+        expect: 1,
+        producer_command: "client".into(),
+        evidence_path: "{EVIDENCE}/client-cases.json".into(),
+    }];
+    let roll =
+        super::roll_up_supplemental_leaf(&item, "RX", &[outcome("client", 0)], &root, &evidence);
+    assert_eq!(roll.status, "DEFERRED_TO_R07");
+    assert!(roll.reason.contains("still REQUIRED"));
+    assert!(roll.reason.contains("belongs to the R07 stage"));
+    assert_eq!(roll.deferred_case_results[0]["status"], "OBSERVED_HELD");
+    assert_eq!(
+        roll.early_evidence.as_ref().unwrap()["commandsNotPassing"],
+        serde_json::json!([])
+    );
+
+    // Producer failed this run: the leaf STAYS deferred, the failure is
+    // only reported (the overall gate blocks on the command FAIL instead).
+    let roll =
+        super::roll_up_supplemental_leaf(&item, "RX", &[outcome("client", 3)], &root, &evidence);
+    assert_eq!(roll.status, "DEFERRED_TO_R07");
+    assert!(roll.reason.contains("early-evidence commands not passing"));
+    assert_eq!(roll.deferred_case_results[0]["status"], "NOT_OBSERVED");
+    assert_eq!(
+        roll.early_evidence.as_ref().unwrap()["commandsNotPassing"],
+        serde_json::json!(["client"])
+    );
+    std::fs::remove_dir_all(&root).ok();
+}
+
+#[test]
+fn share_and_deferred_coverage_makes_overall_pass() {
+    // PASS ∪ DEFERRED_TO_R07 覆盖全部补充叶 + 全部命令通过 → overall PASS。
+    let root = temp_root("covered");
+    write_minimal_r00_ledger(
+        &root,
+        &[
+            ("R00-T02-LA-TESTSHAREOK0000", "REQUIRED_SUPPLEMENTAL"),
+            ("R00-T02-LA-TESTDEFEROK0000", "REQUIRED_SUPPLEMENTAL"),
+        ],
+    );
+    let evidence = root.join("evidence");
+    let map = StageMap {
+        stage: "RX".into(),
+        result_version: crate::RESULT_VERSION.into(),
+        default_timeout_secs: 60,
+        commands: vec![
+            spec(
+                "good",
+                &[
+                    "sh",
+                    "-c",
+                    "printf ok > {EVIDENCE}/good.txt && \
+                     printf '{\"schema\":\"lingxi.leaf-case-results.v1\",\"cases\":[{\"case\":\"share-pin\",\"expect\":200,\"actual\":200,\"ok\":true},{\"case\":\"render\",\"expect\":1,\"actual\":1,\"ok\":true}]}' \
+                     > {EVIDENCE}/leaf-cases.json",
+                ],
+                &["{EVIDENCE}/good.txt"],
+                60,
+            ),
+            // Early-evidence producer of the deferred leaf's R07 remainder:
+            // runs (referenced only by earlyEvidenceCommandRefs), stays
+            // healthy, but its cases never gate the leaf in R02.
+            spec(
+                "client",
+                &["sh", "-c", "printf early > {EVIDENCE}/early.txt"],
+                &["{EVIDENCE}/early.txt"],
+                60,
+            ),
+        ],
+        scenarios: vec![crate::stage_map::Scenario {
+            id: "RX-A01".into(),
+            requirement: "REQUIRED".into(),
+            command_refs: vec!["good".into()],
+        }],
+        supplemental_leaves: vec![
+            leaf(
+                "R00-T02-LA-TESTSHAREOK0000",
+                crate::stage_map::BASIS_R02_SHARE_SATISFIED,
+                &["good"],
+                &[],
+                contract("good", "{EVIDENCE}/leaf-cases.json", &[("share-pin", 200)]),
+            ),
+            {
+                let mut deferred = leaf(
+                    "R00-T02-LA-TESTDEFEROK0000",
+                    crate::stage_map::BASIS_DEFERRED_TO_R07,
+                    &[],
+                    &[],
+                    None,
+                );
+                deferred.early_evidence_command_refs = vec!["client".into()];
+                deferred.deferred_r07_cases = vec![crate::stage_map::LeafDeferredCase {
+                    case: "render".into(),
+                    expect: 1,
+                    producer_command: "client".into(),
+                    evidence_path: "{EVIDENCE}/leaf-cases.json".into(),
+                }];
+                deferred
+            },
+        ],
+    };
+    let report =
+        verify_stage(&map, &root, &evidence, "deadbeef", false, 0).expect("runs to completion");
+    assert_eq!(report["overall"], "PASS");
+    assert_eq!(
+        report["supplementalLeafCoverage"]["pass"],
+        serde_json::json!(1)
+    );
+    assert_eq!(
+        report["supplementalLeafCoverage"]["deferredToR07"],
+        serde_json::json!(1)
+    );
+    assert_eq!(
+        report["supplementalLeafCoverage"]["fail"],
+        serde_json::json!(0)
+    );
+    assert_eq!(
+        report["supplementalLeafCoverage"]["blocked"],
+        serde_json::json!(0)
+    );
+    assert_eq!(
+        report["supplementalLeafCoverage"]["deferredLeafIds"],
+        serde_json::json!(["R00-T02-LA-TESTDEFEROK0000"])
+    );
+    assert_eq!(
+        report["supplementalLeafCoverage"]["commandsNotPassing"],
+        serde_json::json!([])
+    );
+    // The early-evidence command really ran (execution order includes it).
+    let keys: Vec<&str> = report["commands"]
+        .as_array()
+        .unwrap()
+        .iter()
+        .map(|c| c["key"].as_str().unwrap())
+        .collect();
+    assert!(
+        keys.contains(&"client"),
+        "early-evidence producer ran: {keys:?}"
+    );
+    let deferred_entry = &report["supplementalLeafScenarios"][1];
+    assert_eq!(deferred_entry["status"], "DEFERRED_TO_R07");
+    assert_eq!(deferred_entry["deferredToStage"], "R07");
+    assert_eq!(
+        deferred_entry["deferredR07Cases"][0]["status"],
+        "OBSERVED_HELD"
+    );
+    let share_entry = &report["supplementalLeafScenarios"][0];
+    assert_eq!(share_entry["status"], "PASS");
+    assert_eq!(share_entry["deferredToStage"], "R07");
+    std::fs::remove_dir_all(&root).ok();
+}
+
+#[test]
+fn failing_early_evidence_command_blocks_overall_but_leaf_stays_deferred() {
+    // 提前实现的已提交代码必须保持健康：earlyEvidence 生产者失败是命令
+    // FAIL，阻断 overall；但递延叶状态固定 DEFERRED_TO_R07，不静默变绿
+    // 也不伪装成本阶段失败。
+    let root = temp_root("early-fail");
+    write_minimal_r00_ledger(
+        &root,
+        &[("R00-T02-LA-TESTDEFERBAD000", "REQUIRED_SUPPLEMENTAL")],
+    );
+    let evidence = root.join("evidence");
+    let map = StageMap {
+        stage: "RX".into(),
+        result_version: crate::RESULT_VERSION.into(),
+        default_timeout_secs: 60,
+        commands: vec![spec(
+            "bad",
+            &["sh", "-c", "exit 5"],
+            &["{EVIDENCE}/x.txt"],
+            60,
+        )],
+        scenarios: vec![crate::stage_map::Scenario {
+            id: "RX-A01".into(),
+            requirement: "REQUIRED".into(),
+            command_refs: vec!["bad".into()],
+        }],
+        supplemental_leaves: vec![{
+            let mut deferred = leaf(
+                "R00-T02-LA-TESTDEFERBAD000",
+                crate::stage_map::BASIS_DEFERRED_TO_R07,
+                &[],
+                &[],
+                None,
+            );
+            deferred.early_evidence_command_refs = vec!["bad".into()];
+            deferred
+        }],
+    };
+    let report =
+        verify_stage(&map, &root, &evidence, "deadbeef", false, 0).expect("runs to completion");
+    assert_eq!(report["commands"][0]["status"], "FAIL");
+    assert_eq!(
+        report["supplementalLeafScenarios"][0]["status"],
+        "DEFERRED_TO_R07"
+    );
+    assert!(report["supplementalLeafScenarios"][0]["reason"]
+        .as_str()
+        .unwrap()
+        .contains("early-evidence commands not passing"));
+    assert_eq!(
+        report["supplementalLeafCoverage"]["deferredToR07"],
+        serde_json::json!(1)
+    );
+    assert_eq!(
+        report["supplementalLeafCoverage"]["commandsNotPassing"],
+        serde_json::json!(["bad"])
+    );
+    assert_eq!(report["overall"], "FAIL");
+    std::fs::remove_dir_all(&root).ok();
 }

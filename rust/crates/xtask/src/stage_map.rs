@@ -49,6 +49,17 @@ pub struct Scenario {
 /// holds those BLOCKED pending a root disposition; they can never be PASS.
 /// The fifth is reserved for the complete ORIGINAL behavior, including
 /// the formerly R07-owned client branches, genuinely exercised now.
+/// R02-final repair group 1 adds the stage-ownership kinds commanded by
+/// the R02 closeout directive (the R17-era "pull the R07-T09 client
+/// behavior into the R02 gate" authorization is revoked for GATING
+/// purposes; the early implementations stay registered and running):
+/// `r02_share_satisfied` declares that the leaf's pinned cases are exactly
+/// the R02 share — all share pins holding is a PASS for the R02 share
+/// (the R07 remainder is carried as text, never as a gate precondition),
+/// and `deferred_to_r07` declares a leaf with NO R02 gating share: it is
+/// still REQUIRED, its acceptance moves to R07, and it may only bind
+/// NON-gating `earlyEvidenceCommandRefs` (health of the pre-implemented
+/// code) — never a gating contract.
 pub const BASIS_ROUTE_PRESENT_STATIC: &str = "route_basis_present_static";
 pub const BASIS_PROTOCOL: &str = "protocol_basis";
 pub const BASIS_AUTH_PRIMITIVE_ONLY: &str = "auth_primitive_only";
@@ -56,12 +67,21 @@ pub const BASIS_CLIENT_ONLY_STAGE_CONFLICT: &str = "client_only_stage_boundary_c
 /// 原行为（含前端正反分支）已由本阶段独立生产者完整实测；必须逐条列出
 /// R00 原断言与专属案例的对应关系，不能只把原 R07 份额写成字符串后放行。
 pub const BASIS_FULL_ORIGINAL_BEHAVIOR: &str = "full_original_behavior";
+/// R02 份额已证：本叶钉住的案例即 R02 份额全部内容，份额图钉全过即本叶
+/// R02 份额 PASS；R07 余款以 r07Share 文本随结果输出，不作为 R02 门禁。
+pub const BASIS_R02_SHARE_SATISFIED: &str = "r02_share_satisfied";
+/// 无 R02 门禁份额：仍 REQUIRED，验收归属 R07（DEFERRED_TO_R07 ≠
+/// NOT_APPLICABLE/optional，最终产品要求不变）。仅 r00_execution_stage_ids
+/// 含后续阶段的叶允许声明；不得带门禁 assertionContract/门禁 commandRefs。
+pub const BASIS_DEFERRED_TO_R07: &str = "deferred_to_r07";
 pub const SUPPLEMENTAL_BASIS_KINDS: &[&str] = &[
     BASIS_ROUTE_PRESENT_STATIC,
     BASIS_PROTOCOL,
     BASIS_AUTH_PRIMITIVE_ONLY,
     BASIS_CLIENT_ONLY_STAGE_CONFLICT,
     BASIS_FULL_ORIGINAL_BEHAVIOR,
+    BASIS_R02_SHARE_SATISFIED,
+    BASIS_DEFERRED_TO_R07,
 ];
 
 /// One machine-checked case expectation of a leaf's `assertionContract`
@@ -85,6 +105,20 @@ pub struct LeafAssertionContract {
     pub producer_command: String,
     pub evidence_path: String,
     pub cases: Vec<LeafCaseExpect>,
+}
+
+/// One NON-gating deferred R07 case record (R02-final group 1): the case
+/// belongs to the leaf's R07 remainder (client rendering, deferred
+/// capability), so the gate may OBSERVE its recorded value but never uses
+/// it to judge the leaf in R02. `producer_command`/`evidence_path` name
+/// where the observation comes from — the same producer machinery as the
+/// gating contract, minus the gate.
+#[derive(Debug, Clone, PartialEq)]
+pub struct LeafDeferredCase {
+    pub case: String,
+    pub expect: i64,
+    pub producer_command: String,
+    pub evidence_path: String,
 }
 
 /// One R00 REQUIRED_SUPPLEMENTAL leaf scenario whose R02 share this stage
@@ -134,6 +168,14 @@ pub struct SupplementalLeaf {
     /// 与 r00_assertions 同序。仅 full_original_behavior 可声明；每条原
     /// 断言必须由不同的专属案例覆盖，且所有钉住的案例都须被归属。
     pub original_assertion_cases: Vec<Vec<String>>,
+    /// R07 递延案例登记（仅 r02_share_satisfied / deferred_to_r07 可声明）：
+    /// 记录归属 R07 验收的案例（如 sessions 叶的 4 个 CLI 渲染案例、
+    /// 纯客户端叶的全部提前实现案例）。仅观察、不判 R02。
+    pub deferred_r07_cases: Vec<LeafDeferredCase>,
+    /// 非门禁提前实现证据命令（仅 deferred_to_r07 可声明）：命令保留注册
+    /// 并照常运行（失败仍是命令 FAIL——提前实现的已提交代码必须保持
+    /// 健康），但不构成本叶的 R02 门禁。
+    pub early_evidence_command_refs: Vec<String>,
 }
 
 /// A parsed stage map.
@@ -484,6 +526,17 @@ pub fn parse_stage_map(text: &str) -> Result<StageMap, String> {
                              conflict the gate is required to hold BLOCKED)"
                         )));
                     }
+                } else if basis_kind == BASIS_DEFERRED_TO_R07 {
+                    // 递延叶的 R07 义务不由本门禁判定：绑定门禁证据命令
+                    // 等于把 R07 验收又拉回 R02，与递延声明自相矛盾。
+                    if !evidence_command_refs.is_empty() {
+                        return Err(err(&format!(
+                            "supplemental leaf {id:?} is deferred to R07 and must not bind \
+                             GATING evidence commands (its acceptance belongs to R07; only \
+                             non-gating earlyEvidenceCommandRefs may keep the pre-implemented \
+                             producers running)"
+                        )));
+                    }
                 } else if evidence_command_refs.is_empty() {
                     return Err(err(&format!(
                         "supplemental leaf {id:?} evidenceCommandRefs must not be empty (a \
@@ -491,6 +544,43 @@ pub fn parse_stage_map(text: &str) -> Result<StageMap, String> {
                          the map, not a pass)"
                     )));
                 }
+                // 非门禁提前实现证据命令：仅递延叶可声明，且必须是已注册
+                // 命令（这些命令照常运行、照常计入 freshness/清理检查）。
+                let early_evidence_command_refs = match entry.get("earlyEvidenceCommandRefs") {
+                    Some(v) => {
+                        if basis_kind != BASIS_DEFERRED_TO_R07 {
+                            return Err(err(&format!(
+                                "supplemental leaf {id:?} declares earlyEvidenceCommandRefs \
+                                 without deferred_to_r07 (only a deferred leaf may keep \
+                                 non-gating early-evidence producers running)"
+                            )));
+                        }
+                        let list = v.as_array().ok_or_else(|| {
+                            err(&format!(
+                                "supplemental leaf {id:?} earlyEvidenceCommandRefs must be \
+                                 an array"
+                            ))
+                        })?;
+                        let mut refs = Vec::with_capacity(list.len());
+                        for reference in list {
+                            let key = non_empty_string(
+                                reference,
+                                &format!(
+                                    "supplemental leaf {id:?} earlyEvidenceCommandRefs element"
+                                ),
+                            )?;
+                            if !commands_value.contains_key(&key) {
+                                return Err(err(&format!(
+                                    "supplemental leaf {id:?} references unknown early-evidence \
+                                     command {key:?}"
+                                )));
+                            }
+                            refs.push(key);
+                        }
+                        refs
+                    }
+                    None => Vec::new(),
+                };
                 let evidence_paths = match entry.get("evidencePaths") {
                     Some(v) => {
                         let list = v.as_array().ok_or_else(|| {
@@ -509,6 +599,14 @@ pub fn parse_stage_map(text: &str) -> Result<StageMap, String> {
                             return Err(err(&format!(
                                 "supplemental leaf {id:?} is BLOCKED by stage-boundary \
                                  conflict and must not declare pass-able evidencePaths"
+                            )));
+                        }
+                        if basis_kind == BASIS_DEFERRED_TO_R07 && !paths.is_empty() {
+                            return Err(err(&format!(
+                                "supplemental leaf {id:?} is deferred to R07 and must not \
+                                 declare pass-able evidencePaths (its acceptance is not judged \
+                                 by this gate; the early-evidence producers' own declared \
+                                 evidencePaths carry the freshness checks)"
                             )));
                         }
                         paths
@@ -542,6 +640,19 @@ pub fn parse_stage_map(text: &str) -> Result<StageMap, String> {
                     &format!("supplemental leaf {id:?} r00ExecutionStageIds"),
                     false,
                 )?;
+                // 递延只对真实双阶段（含后续阶段）的叶合法：一个只归属
+                // 本阶段的叶没有可递延的验收归属，标 deferred 只会是
+                // 把本阶段义务静默扫地出门。
+                if basis_kind == BASIS_DEFERRED_TO_R07
+                    && !r00_execution_stage_ids.iter().any(|s| s.as_str() != stage)
+                {
+                    return Err(err(&format!(
+                        "supplemental leaf {id:?} is marked deferred_to_r07 but its \
+                         r00ExecutionStageIds {r00_execution_stage_ids:?} contain no later \
+                         stage — deferral requires a later stage to carry the acceptance \
+                         (a single-{stage} leaf may never defer)"
+                    )));
+                }
                 let r00_ledger_status = non_empty_string(
                     entry.get("r00LedgerStatus").ok_or_else(|| {
                         err(&format!(
@@ -586,17 +697,23 @@ pub fn parse_stage_map(text: &str) -> Result<StageMap, String> {
                 )?;
 
                 // R14-F01: the per-leaf assertion contract. Every
-                // NON-conflict leaf MUST declare one — a leaf whose PASS is
-                // justified only by a green command exit (with no case the
-                // gate can re-verify against the original assertion) is
-                // exactly the fake-green path R14-F01 closes. A conflict
-                // leaf must NOT declare one (it can never be PASS).
+                // NON-conflict, NON-deferred leaf MUST declare one — a leaf
+                // whose PASS is justified only by a green command exit (with
+                // no case the gate can re-verify against the original
+                // assertion) is exactly the fake-green path R14-F01 closes.
+                // A conflict leaf must NOT declare one (it can never be
+                // PASS); a deferred_to_r07 leaf must not either (its R07
+                // acceptance is not judged by this gate — the deferred cases
+                // below are observations, never gates).
+                let uncontracted_kind = basis_kind == BASIS_CLIENT_ONLY_STAGE_CONFLICT
+                    || basis_kind == BASIS_DEFERRED_TO_R07;
                 let assertion_contract = match entry.get("assertionContract") {
                     Some(v) => {
-                        if basis_kind == BASIS_CLIENT_ONLY_STAGE_CONFLICT {
+                        if uncontracted_kind {
                             return Err(err(&format!(
-                                "supplemental leaf {id:?} is a stage-boundary conflict and \
-                                 must not declare an assertionContract (it can never be PASS)"
+                                "supplemental leaf {id:?} must not declare an assertionContract \
+                                 ({} can never be judged PASS by this gate)",
+                                basis_kind
                             )));
                         }
                         let contract = v.as_object().ok_or_else(|| {
@@ -702,7 +819,7 @@ pub fn parse_stage_map(text: &str) -> Result<StageMap, String> {
                         })
                     }
                     None => {
-                        if basis_kind != BASIS_CLIENT_ONLY_STAGE_CONFLICT {
+                        if !uncontracted_kind {
                             return Err(err(&format!(
                                 "supplemental leaf {id:?} missing assertionContract (every \
                                  non-conflict leaf must declare the machine-checked cases \
@@ -795,6 +912,125 @@ pub fn parse_stage_map(text: &str) -> Result<StageMap, String> {
                     }
                     None => Vec::new(),
                 };
+                // R02-final group 1: the deferred R07 case records — which
+                // cases of this leaf belong to the R07 remainder (never
+                // judged by this gate, only observed). Only the
+                // stage-ownership kinds may declare them: a legacy-kind or
+                // full_original_behavior leaf pinning a "deferred" case
+                // would blur which cases are the gate.
+                let deferred_r07_cases = match entry.get("deferredR07Cases") {
+                    Some(v) => {
+                        if basis_kind != BASIS_R02_SHARE_SATISFIED
+                            && basis_kind != BASIS_DEFERRED_TO_R07
+                        {
+                            return Err(err(&format!(
+                                "supplemental leaf {id:?} declares deferredR07Cases with \
+                                 basisKind {basis_kind:?} (only r02_share_satisfied and \
+                                 deferred_to_r07 may record R07-remainder cases)"
+                            )));
+                        }
+                        let list = v.as_array().ok_or_else(|| {
+                            err(&format!(
+                                "supplemental leaf {id:?} deferredR07Cases must be an array"
+                            ))
+                        })?;
+                        let mut deferred = Vec::with_capacity(list.len());
+                        for item in list {
+                            let object = item.as_object().ok_or_else(|| {
+                                err(&format!(
+                                    "supplemental leaf {id:?} deferredR07Cases entry must be \
+                                     an object"
+                                ))
+                            })?;
+                            let case = non_empty_string(
+                                object.get("case").ok_or_else(|| {
+                                    err(&format!(
+                                        "supplemental leaf {id:?} deferredR07Cases entry \
+                                         missing case name"
+                                    ))
+                                })?,
+                                &format!("supplemental leaf {id:?} deferredR07Cases case name"),
+                            )?;
+                            if deferred
+                                .iter()
+                                .any(|recorded: &LeafDeferredCase| recorded.case == case)
+                            {
+                                return Err(err(&format!(
+                                    "supplemental leaf {id:?} deferredR07Cases repeats case \
+                                     name {case:?}"
+                                )));
+                            }
+                            if let Some(contract) = assertion_contract.as_ref() {
+                                if contract.cases.iter().any(|pinned| pinned.case == case) {
+                                    return Err(err(&format!(
+                                        "supplemental leaf {id:?} case {case:?} is both a \
+                                         gating pin and a deferred R07 case — each case must \
+                                         have exactly one ownership"
+                                    )));
+                                }
+                            }
+                            let expect =
+                                object
+                                    .get("expect")
+                                    .and_then(Value::as_i64)
+                                    .ok_or_else(|| {
+                                        err(&format!(
+                                            "supplemental leaf {id:?} deferredR07Cases case \
+                                         {case:?} must have an integer expect value"
+                                        ))
+                                    })?;
+                            let producer_command = non_empty_string(
+                                object.get("producerCommand").ok_or_else(|| {
+                                    err(&format!(
+                                        "supplemental leaf {id:?} deferredR07Cases case \
+                                         {case:?} missing producerCommand"
+                                    ))
+                                })?,
+                                &format!(
+                                    "supplemental leaf {id:?} deferredR07Cases case {case:?} \
+                                     producerCommand"
+                                ),
+                            )?;
+                            if !commands_value.contains_key(&producer_command) {
+                                return Err(err(&format!(
+                                    "supplemental leaf {id:?} deferredR07Cases case {case:?} \
+                                     references unknown producer command {producer_command:?}"
+                                )));
+                            }
+                            let runs_for_this_leaf = evidence_command_refs
+                                .contains(&producer_command)
+                                || early_evidence_command_refs.contains(&producer_command);
+                            if !runs_for_this_leaf {
+                                return Err(err(&format!(
+                                    "supplemental leaf {id:?} deferredR07Cases case {case:?} \
+                                     producer {producer_command:?} is neither a gating nor an \
+                                     early-evidence command of this leaf — a producer that \
+                                     never runs can never write the case's evidence"
+                                )));
+                            }
+                            let evidence_path = non_empty_string(
+                                object.get("evidencePath").ok_or_else(|| {
+                                    err(&format!(
+                                        "supplemental leaf {id:?} deferredR07Cases case \
+                                         {case:?} missing evidencePath"
+                                    ))
+                                })?,
+                                &format!(
+                                    "supplemental leaf {id:?} deferredR07Cases case {case:?} \
+                                     evidencePath"
+                                ),
+                            )?;
+                            deferred.push(LeafDeferredCase {
+                                case,
+                                expect,
+                                producer_command,
+                                evidence_path,
+                            });
+                        }
+                        deferred
+                    }
+                    None => Vec::new(),
+                };
                 leaves.push(SupplementalLeaf {
                     id,
                     feature_id,
@@ -816,6 +1052,8 @@ pub fn parse_stage_map(text: &str) -> Result<StageMap, String> {
                     r00_due,
                     assertion_contract,
                     original_assertion_cases,
+                    deferred_r07_cases,
+                    early_evidence_command_refs,
                 });
             }
             leaves
@@ -1278,5 +1516,276 @@ mod map_tests {
         );
         let err = parse_stage_map(&text).unwrap_err();
         assert!(err.contains("duplicate supplemental leaf id"), "{err}");
+    }
+
+    // ── R02-final group 1: r02_share_satisfied / deferred_to_r07 ─────────
+
+    /// Builds a test map by mutating SUPPLEMENTAL_VALID's single leaf with
+    /// `edit` (a serde_json::Value → Value in-place closure) and parses it.
+    fn edited_map(edit: impl FnOnce(&mut serde_json::Value)) -> Result<StageMap, String> {
+        let mut value: serde_json::Value =
+            serde_json::from_str(SUPPLEMENTAL_VALID).expect("valid test fixture");
+        edit(&mut value);
+        parse_stage_map(&value.to_string())
+    }
+
+    /// Rewrites the leaf into a minimal deferred_to_r07 shape (drops the
+    /// contract and the gating refs); extra mutations on top.
+    fn deferred_leaf(edit: impl FnOnce(&mut serde_json::Value)) -> Result<StageMap, String> {
+        edited_map(|value| {
+            let leaf = &mut value["supplementalLeafScenarios"][0];
+            leaf["basisKind"] = serde_json::json!("deferred_to_r07");
+            leaf["evidenceCommandRefs"] = serde_json::json!([]);
+            leaf.as_object_mut().unwrap().remove("assertionContract");
+            edit(value);
+        })
+    }
+
+    #[test]
+    fn share_satisfied_leaf_parses_with_contract() {
+        let map = edited_map(|value| {
+            value["supplementalLeafScenarios"][0]["basisKind"] =
+                serde_json::json!(BASIS_R02_SHARE_SATISFIED);
+        })
+        .expect("share leaf parses");
+        let leaf = &map.supplemental_leaves[0];
+        assert_eq!(leaf.basis_kind, BASIS_R02_SHARE_SATISFIED);
+        assert!(leaf.assertion_contract.is_some());
+        assert!(leaf.deferred_r07_cases.is_empty());
+    }
+
+    #[test]
+    fn share_satisfied_leaf_without_contract_is_a_hard_error() {
+        let err = edited_map(|value| {
+            value["supplementalLeafScenarios"][0]["basisKind"] =
+                serde_json::json!(BASIS_R02_SHARE_SATISFIED);
+            value["supplementalLeafScenarios"][0]
+                .as_object_mut()
+                .unwrap()
+                .remove("assertionContract");
+        })
+        .unwrap_err();
+        assert!(err.contains("missing assertionContract"), "{err}");
+    }
+
+    #[test]
+    fn deferred_leaf_parses_with_early_evidence_and_deferred_cases() {
+        let map = deferred_leaf(|value| {
+            let leaf = &mut value["supplementalLeafScenarios"][0];
+            leaf["earlyEvidenceCommandRefs"] = serde_json::json!(["a_ok"]);
+            leaf["deferredR07Cases"] = serde_json::json!([{
+                "case": "client-render",
+                "expect": 1,
+                "producerCommand": "a_ok",
+                "evidencePath": "{EVIDENCE}/RX/leaf-cases.json",
+            }]);
+        })
+        .expect("deferred leaf parses");
+        let leaf = &map.supplemental_leaves[0];
+        assert_eq!(leaf.basis_kind, BASIS_DEFERRED_TO_R07);
+        assert!(leaf.evidence_command_refs.is_empty());
+        assert!(leaf.assertion_contract.is_none());
+        assert_eq!(leaf.early_evidence_command_refs, vec!["a_ok"]);
+        assert_eq!(leaf.deferred_r07_cases.len(), 1);
+        assert_eq!(leaf.deferred_r07_cases[0].case, "client-render");
+        assert_eq!(leaf.deferred_r07_cases[0].expect, 1);
+    }
+
+    #[test]
+    fn deferred_leaf_with_assertion_contract_is_a_hard_error() {
+        let err = edited_map(|value| {
+            value["supplementalLeafScenarios"][0]["basisKind"] =
+                serde_json::json!(BASIS_DEFERRED_TO_R07);
+            value["supplementalLeafScenarios"][0]["evidenceCommandRefs"] = serde_json::json!([]);
+            // keep the assertionContract on purpose
+        })
+        .unwrap_err();
+        assert!(
+            err.contains("must not declare an assertionContract"),
+            "{err}"
+        );
+    }
+
+    #[test]
+    fn deferred_leaf_with_gating_refs_is_a_hard_error() {
+        // Keeping GATING evidenceCommandRefs on a deferred leaf must not
+        // parse — gating refs would pull the R07 acceptance back into R02.
+        let err = edited_map(|value| {
+            value["supplementalLeafScenarios"][0]["basisKind"] =
+                serde_json::json!(BASIS_DEFERRED_TO_R07);
+            value["supplementalLeafScenarios"][0]
+                .as_object_mut()
+                .unwrap()
+                .remove("assertionContract");
+            // evidenceCommandRefs stays ["a_ok"]
+        })
+        .unwrap_err();
+        assert!(
+            err.contains("must not bind GATING evidence commands"),
+            "{err}"
+        );
+    }
+
+    #[test]
+    fn deferred_leaf_with_evidence_paths_is_a_hard_error() {
+        let err = deferred_leaf(|value| {
+            value["supplementalLeafScenarios"][0]["earlyEvidenceCommandRefs"] =
+                serde_json::json!(["a_ok"]);
+            value["supplementalLeafScenarios"][0]["evidencePaths"] =
+                serde_json::json!(["{EVIDENCE}/RX/out.txt"]);
+        })
+        .unwrap_err();
+        assert!(
+            err.contains("must not declare pass-able evidencePaths"),
+            "{err}"
+        );
+    }
+
+    #[test]
+    fn single_stage_leaf_cannot_defer() {
+        let err = deferred_leaf(|value| {
+            value["supplementalLeafScenarios"][0]["r00ExecutionStageIds"] =
+                serde_json::json!(["RX"]);
+        })
+        .unwrap_err();
+        assert!(err.contains("contain no later stage"), "{err}");
+    }
+
+    #[test]
+    fn deferred_cases_on_a_legacy_kind_are_a_hard_error() {
+        let err = edited_map(|value| {
+            value["supplementalLeafScenarios"][0]["deferredR07Cases"] = serde_json::json!([{
+                "case": "client-render",
+                "expect": 1,
+                "producerCommand": "a_ok",
+                "evidencePath": "{EVIDENCE}/RX/leaf-cases.json",
+            }]);
+        })
+        .unwrap_err();
+        assert!(
+            err.contains("only r02_share_satisfied and deferred_to_r07"),
+            "{err}"
+        );
+    }
+
+    #[test]
+    fn deferred_case_with_unknown_producer_is_a_hard_error() {
+        let err = deferred_leaf(|value| {
+            let leaf = &mut value["supplementalLeafScenarios"][0];
+            leaf["earlyEvidenceCommandRefs"] = serde_json::json!(["a_ok"]);
+            leaf["deferredR07Cases"] = serde_json::json!([{
+                "case": "client-render",
+                "expect": 1,
+                "producerCommand": "not_registered",
+                "evidencePath": "{EVIDENCE}/RX/leaf-cases.json",
+            }]);
+        })
+        .unwrap_err();
+        assert!(err.contains("references unknown producer command"), "{err}");
+    }
+
+    #[test]
+    fn deferred_case_producer_outside_leaf_commands_is_a_hard_error() {
+        // Producer is REGISTERED (a second command) but neither a gating nor
+        // an early-evidence command of this leaf — it would never run for
+        // the leaf, so its case evidence could never be written this run.
+        let err = edited_map(|value| {
+            let leaf = &mut value["supplementalLeafScenarios"][0];
+            leaf["basisKind"] = serde_json::json!(BASIS_R02_SHARE_SATISFIED);
+            leaf["deferredR07Cases"] = serde_json::json!([{
+                "case": "client-render",
+                "expect": 1,
+                "producerCommand": "b_two",
+                "evidencePath": "{EVIDENCE}/RX/out2.txt",
+            }]);
+            value["commands"]["b_two"] = serde_json::json!({
+                "argv": ["bash", "gate2.sh", "{EVIDENCE}/RX"],
+                "evidencePaths": ["{EVIDENCE}/RX/out2.txt"]
+            });
+        })
+        .unwrap_err();
+        assert!(
+            err.contains("is neither a gating nor an early-evidence command"),
+            "{err}"
+        );
+    }
+
+    #[test]
+    fn deferred_case_names_must_be_unique() {
+        let err = deferred_leaf(|value| {
+            let leaf = &mut value["supplementalLeafScenarios"][0];
+            leaf["earlyEvidenceCommandRefs"] = serde_json::json!(["a_ok"]);
+            leaf["deferredR07Cases"] = serde_json::json!([
+                { "case": "client-render", "expect": 1, "producerCommand": "a_ok",
+                  "evidencePath": "{EVIDENCE}/RX/leaf-cases.json" },
+                { "case": "client-render", "expect": 1, "producerCommand": "a_ok",
+                  "evidencePath": "{EVIDENCE}/RX/leaf-cases.json" },
+            ]);
+        })
+        .unwrap_err();
+        assert!(err.contains("repeats case name"), "{err}");
+    }
+
+    #[test]
+    fn a_case_cannot_be_both_gating_and_deferred() {
+        let err = edited_map(|value| {
+            let leaf = &mut value["supplementalLeafScenarios"][0];
+            leaf["basisKind"] = serde_json::json!(BASIS_R02_SHARE_SATISFIED);
+            // "case-no-credential" is already a gating pin of the contract.
+            leaf["deferredR07Cases"] = serde_json::json!([{
+                "case": "case-no-credential",
+                "expect": 401,
+                "producerCommand": "a_ok",
+                "evidencePath": "{EVIDENCE}/RX/leaf-cases.json",
+            }]);
+        })
+        .unwrap_err();
+        assert!(
+            err.contains("both a gating pin and a deferred R07 case"),
+            "{err}"
+        );
+    }
+
+    #[test]
+    fn early_evidence_refs_require_a_deferred_leaf() {
+        let err = edited_map(|value| {
+            value["supplementalLeafScenarios"][0]["earlyEvidenceCommandRefs"] =
+                serde_json::json!(["a_ok"]);
+        })
+        .unwrap_err();
+        assert!(err.contains("without deferred_to_r07"), "{err}");
+    }
+
+    #[test]
+    fn early_evidence_refs_must_reference_registered_commands() {
+        let err = deferred_leaf(|value| {
+            value["supplementalLeafScenarios"][0]["earlyEvidenceCommandRefs"] =
+                serde_json::json!(["nope"]);
+        })
+        .unwrap_err();
+        assert!(err.contains("unknown early-evidence command"), "{err}");
+    }
+
+    // F1 regression: an assertionContract producer that is not a registered
+    // command must be a LOAD-time hard error (the R02 map once referenced
+    // `supplemental_cli_rust_matrix` before registering it).
+    #[test]
+    fn unregistered_producer_command_is_a_hard_parse_error() {
+        let err = edited_map(|value| {
+            let leaf = &mut value["supplementalLeafScenarios"][0];
+            leaf["evidenceCommandRefs"] = serde_json::json!(["ghost_producer"]);
+            leaf["assertionContract"]["producerCommand"] = serde_json::json!("ghost_producer");
+        })
+        .unwrap_err();
+        // The leaf-level refs check fires first and names the command.
+        assert!(err.contains("references unknown command"), "{err}");
+        // Pointing ONLY the producer at the ghost (refs still a_ok) hits the
+        // producer-specific message instead.
+        let err = edited_map(|value| {
+            value["supplementalLeafScenarios"][0]["assertionContract"]["producerCommand"] =
+                serde_json::json!("ghost_producer");
+        })
+        .unwrap_err();
+        assert!(err.contains("references unknown producer command"), "{err}");
     }
 }

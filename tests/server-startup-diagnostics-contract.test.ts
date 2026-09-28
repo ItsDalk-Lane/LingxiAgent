@@ -92,7 +92,11 @@ describe("server startup diagnostics contract", () => {
     const mainSource = fs.readFileSync(path.join(root, "desktop", "main.cjs"), "utf-8");
     const shutdown = extractFunctionSource(mainSource, "shutdownServer");
 
-    expect(shutdown).toContain('if (process.platform === "win32") {\n      await requestServerShutdown(serverPort, serverToken);');
+    // R17 Rust wiring: the guardian pipeline only applies to Node-owned
+    // servers; a lingxi-service child is killed directly (covered by its own
+    // vm test below). The assertion still pins the exact branch shape so the
+    // token-auth grace stays the first step of the Node path.
+    expect(shutdown).toContain("if (process.platform === \"win32\" && serverNodeKind !== 'lingxi-service') {\n      await requestServerShutdown(serverPort, serverToken);");
     expect(shutdown).toContain("requestWindowsServerGuardianStop(proc);");
     expect(shutdown.indexOf("requestServerShutdown(serverPort, serverToken)")).toBeLessThan(
       shutdown.indexOf("requestWindowsServerGuardianStop(proc)"),
@@ -165,6 +169,7 @@ describe("server startup diagnostics contract", () => {
     });
     vm.runInContext(`
       let serverProcess = ownedProc;
+      let serverNodeKind = null;
       let reusedServerPid = null;
       let reusedServerOwned = false;
       let serverPort = 14500;
@@ -201,6 +206,7 @@ describe("server startup diagnostics contract", () => {
     });
     vm.runInContext(`
       let serverProcess = null;
+      let serverNodeKind = null;
       let reusedServerPid = 9876;
       let reusedServerOwned = true;
       let serverPort = 14500;
@@ -238,6 +244,7 @@ describe("server startup diagnostics contract", () => {
     });
     vm.runInContext(`
       let serverProcess = failedGuardian;
+      let serverNodeKind = null;
       let reusedServerPid = null;
       let reusedServerOwned = false;
       let serverPort = 14500;
@@ -252,6 +259,57 @@ describe("server startup diagnostics contract", () => {
     });
     expect(context.shutdownState().serverProcess).toBe(failedGuardian);
     await expect(context.shutdownServer()).resolves.toMatchObject({ confirmed: false });
+  });
+
+  it("shuts down an owned Windows Rust service directly without the Node guardian pipeline", async () => {
+    // R17: a lingxi-service child never runs under the native Job guardian,
+    // so its win32 shutdown must not touch the token-auth request, the
+    // guardian control pipe, or the guardian convergence confirmation — it
+    // kills the child and verifies the exit through the owned handle only.
+    const mainSource = fs.readFileSync(path.join(root, "desktop", "main.cjs"), "utf-8");
+    const shutdown = extractFunctionSource(mainSource, "shutdownServer");
+    const rustProc = { pid: 4322, exitCode: null, signalCode: null };
+    let killCalls: Array<string | undefined> = [];
+    let shutdownRequests = 0;
+    let controlStops = 0;
+    let confirmChecks = 0;
+    const context = vm.createContext({
+      rustProc,
+      killCalls,
+      process: { platform: "win32" },
+      console: { log() {}, warn() {} },
+      hasChildExitObserved: () => false,
+      requestServerShutdown: async () => { shutdownRequests++; return true; },
+      waitForProcessExit: async () => false,
+      _intentionalServerStops: new WeakSet(),
+      isWindowsServerGuardianShutdownConfirmed: () => { confirmChecks++; return true; },
+      requestWindowsServerGuardianStop: () => { controlStops++; return true; },
+      signalPidOnPosix: () => { throw new Error("unexpected POSIX signal"); },
+      SERVER_SHUTDOWN_GRACE_MS: 1,
+      SERVER_FORCE_KILL_WAIT_MS: 1,
+      fs: { unlinkSync() {} },
+      path: { join: () => "server-info.json" },
+      lingxiHome: "C:\\hana",
+    });
+    vm.runInContext(`
+      let serverProcess = rustProc;
+      let serverNodeKind = "lingxi-service";
+      let reusedServerPid = null;
+      let reusedServerOwned = false;
+      let serverPort = 14500;
+      let serverToken = "token";
+      rustProc.kill = (signal) => { killCalls.push(signal); return true; };
+      ${shutdown}
+      function shutdownState() { return { serverProcess }; }
+      function killState() { return killCalls; }
+    `, context);
+
+    await expect(context.shutdownServer()).resolves.toMatchObject({ confirmed: false });
+    expect(shutdownRequests).toBe(0);
+    expect(controlStops).toBe(0);
+    expect(confirmChecks).toBe(0);
+    // SIGTERM first, then the force kill once the grace window misses.
+    expect(context.killState()).toEqual(["SIGTERM", undefined]);
   });
 
   it("suppresses a late intentional guardian exit after transient update flags reset", async () => {

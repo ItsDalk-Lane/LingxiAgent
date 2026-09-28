@@ -1,0 +1,72 @@
+{
+  "schema": "lingxi.leaf-case-results.v1",
+  "cases": [
+    {
+      "case": "sharing-color-success-default-denied",
+      "expect": 1,
+      "actual": 1,
+      "ok": true,
+      "observed": {
+        "defaultColor": "light",
+        "persistedColor": "dark",
+        "previewChanged": true,
+        "deniedThrows": true,
+        "selectedAfterDenial": "dark"
+      }
+    },
+    {
+      "case": "sharing-width-success-default-denied",
+      "expect": 1,
+      "actual": 1,
+      "ok": true,
+      "observed": {
+        "defaultWidth": "mobile",
+        "persistedWidth": "desktop",
+        "previewChanged": true,
+        "deniedThrows": true,
+        "selectedAfterDenial": "desktop"
+      }
+    },
+    {
+      "case": "sharing-font-limit-success-default-denied",
+      "expect": 1,
+      "actual": 1,
+      "ok": true,
+      "observed": {
+        "defaultFont": "settings.fonts.followReading",
+        "persistedFont": "serif",
+        "defaultLimit": 10000,
+        "persistedLimit": "1500",
+        "deniedThrows": true,
+        "visibleLimitAfterDenial": "1500"
+      }
+    },
+    {
+      "case": "sharing-container-cold-cache-timeout-error",
+      "expect": 1,
+      "actual": 1,
+      "ok": true,
+      "observed": {
+        "cold": {
+          "maskBefore": true,
+          "readyAfter": true
+        },
+        "cached": {
+          "oldContentVisible": true,
+          "backgroundRefresh": true
+        },
+        "timeout": {
+          "waitedMs": 15000,
+          "forcedReady": true
+        },
+        "error": {
+          "logged": true,
+          "ready": true
+        },
+        "providers": {
+          "failureDidNotBlockReady": true
+        }
+      }
+    }
+  ]
+}

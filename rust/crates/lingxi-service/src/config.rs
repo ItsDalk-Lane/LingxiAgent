@@ -43,6 +43,7 @@
 
 use std::fmt;
 use std::path::{Path, PathBuf};
+use std::sync::atomic::{AtomicU64, Ordering};
 
 use lingxi_adapters::storage::{MAX_QUEUE_CAPACITY, MAX_QUEUE_WAIT_TIMEOUT_MS};
 
@@ -810,16 +811,22 @@ pub fn read_config_home(path: &Path) -> Result<PathBuf, ConfigError> {
 
 /// Builds a unique synthetic home directory name for test mode.
 ///
-/// Uniqueness mixes the pid with nanosecond time: two calls in the same
-/// process never collide, and no random source is required (zero new
-/// dependencies). The *contents* of this name never feed any other path —
-/// it becomes the home itself, nothing is appended to user strings.
+/// Uniqueness mixes the pid, a per-process monotonically increasing
+/// counter, and nanosecond time: two calls in the same process never
+/// collide — the counter alone guarantees that even when clock
+/// resolution collapses back-to-back calls into the same nanosecond
+/// (observed in practice on loaded hosts). No random source is required
+/// (zero new dependencies). The *contents* of this name never feed any
+/// other path — it becomes the home itself, nothing is appended to user
+/// strings.
 pub fn test_mode_home_name(pid: u32) -> String {
+    static COUNTER: AtomicU64 = AtomicU64::new(0);
+    let seq = COUNTER.fetch_add(1, Ordering::Relaxed);
     let nanos = std::time::SystemTime::now()
         .duration_since(std::time::UNIX_EPOCH)
         .map(|d| d.as_nanos())
         .unwrap_or(0);
-    format!("lingxi-service-test-{pid}-{nanos:x}")
+    format!("lingxi-service-test-{pid}-{seq}-{nanos:x}")
 }
 
 /// Resolves the effective data root per the documented precedence:
@@ -1375,10 +1382,20 @@ mod tests {
 
     #[test]
     fn test_mode_home_name_is_unique_and_prefixed() {
-        let a = test_mode_home_name(std::process::id());
-        let b = test_mode_home_name(std::process::id());
-        assert_ne!(a, b);
-        assert!(a.starts_with("lingxi-service-test-"));
+        // Tight-loop N generations: even when the clock never advances
+        // between calls, the in-process counter must keep every name
+        // distinct (guards the same-nanosecond collision seen in the wild).
+        const N: usize = 512;
+        let mut seen = std::collections::HashSet::with_capacity(N);
+        for _ in 0..N {
+            let name = test_mode_home_name(std::process::id());
+            assert!(name.starts_with("lingxi-service-test-"));
+            assert!(
+                seen.insert(name.clone()),
+                "duplicate test_mode_home_name: {name}"
+            );
+        }
+        assert_eq!(seen.len(), N);
     }
 
     // ── R02-T07: resource-limit flags ───────────────────────────────────────

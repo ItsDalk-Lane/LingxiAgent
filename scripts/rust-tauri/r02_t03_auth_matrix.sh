@@ -57,6 +57,12 @@ CARGO="env -u all_proxy -u ALL_PROXY -u http_proxy -u HTTP_PROXY -u https_proxy 
 
 HOME_DIR=""
 SERVICE_PID=""
+# R02-final G3: 完成标志。本机 bash 3.2.57 上 set -u 崩溃（unbound
+# variable）进入 EXIT trap 时 $? 已经是 0，单独 `trap cleanup EXIT` 会让
+# 崩溃的脚本以 0 退出（fail-open）。trap 现在先记录 rc、跑原封不动的
+# cleanup、再显式以 rc 退出；若脚本从未到达末行（未完成），即使 rc 被
+# 崩溃路径丢失也强制非零。cleanup 残留分支的 exit 1 仍然直接生效。
+SCRIPT_COMPLETED=0
 # R02 stage-repair R7 / R7-F02: SERVICE_PID is the CURRENT handle of this
 # run's service child — retired (cleared) after every wait/reap (the
 # shutdown-hygiene path already did). The trap signals it ONLY while it
@@ -162,7 +168,7 @@ cleanup() {
   fi
   return 0
 }
-trap cleanup EXIT
+trap 'rc=$?; cleanup; if [ "$SCRIPT_COMPLETED" -ne 1 ] && [ "$rc" -eq 0 ]; then rc=1; fi; exit "$rc"' EXIT
 
 fail() { echo "FAIL: $*" >&2; exit 1; }
 note() { printf '%s\n' "$*" | tee -a "$EVIDENCE_DIR/summary.txt"; }
@@ -493,17 +499,17 @@ req GET "/lingxi/v1/sessions" -H "$BEARER"
 expect_code 200 "$REPLY" "a05-sessions-list-owner"
 OWNER_SESS_HITS="$(printf '%s' "$BODY" | grep -c 'sess_local_alpha' || true)"
 [ "$OWNER_SESS_HITS" -ge 1 ] || fail "owner sessions list does not contain sess_local_alpha: $BODY"
-record_case "a05-sessions-list-owner-contains-own-session" 1 1
+record_case "a05-sessions-list-owner-contains-own-session" 1 1 1
 note "PASS a05-sessions-list-owner-contains-own-session"
 req GET "/lingxi/v1/sessions" -H "Authorization: Bearer $FOREIGN_SECRET"
 expect_code 200 "$REPLY" "a05-sessions-list-foreign-principal"
 FOREIGN_SESS_HITS="$(printf '%s' "$BODY" | grep -c 'sess_local_alpha' || true)"
 [ "$FOREIGN_SESS_HITS" = 0 ] || fail "foreign principal sees the owner's sessions: $BODY"
-record_case "a05-sessions-list-foreign-excludes-owner-sessions" 0 "$FOREIGN_SESS_HITS"
+record_case "a05-sessions-list-foreign-excludes-owner-sessions" 0 "$FOREIGN_SESS_HITS" 1
 note "PASS a05-sessions-list-foreign-excludes-owner-sessions"
 EMPTY_SHAPE_HITS="$(printf '%s' "$BODY" | grep -c '"sessions":\[\]' || true)"
 [ "$EMPTY_SHAPE_HITS" -ge 1 ] || fail "foreign principal list is not the empty-list shape: $BODY"
-record_case "a05-sessions-list-empty-shape" 1 "$EMPTY_SHAPE_HITS"
+record_case "a05-sessions-list-empty-shape" 1 "$EMPTY_SHAPE_HITS" 1
 note "PASS a05-sessions-list-empty-shape"
 req GET "/lingxi/v1/sessions"
 expect_code 401 "$REPLY" "a05-sessions-list-no-credential"
@@ -814,3 +820,4 @@ SERVICE_PID=""
 MARKERS="$(grep -c "LINGXI_AUTH_REJECTED\|LINGXI_TRANSPORT_REJECTED" "$EVIDENCE_DIR/server-stderr.log" || true)"
 note "negative protocol log markers on stderr: ${MARKERS} lines"
 note "== ALL CASES PASSED =="
+SCRIPT_COMPLETED=1

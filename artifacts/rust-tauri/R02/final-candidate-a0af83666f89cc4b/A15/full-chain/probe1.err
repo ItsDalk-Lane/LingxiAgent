@@ -1,0 +1,1 @@
+FAIL upgrade failed: 400 b'HTTP/1.1 400 Bad Request\r\ncontent-type: application/json\r\ncontent-length: 242\r\ndate: Mon, 28 Sep 2026 15:14:51 GMT\r\n\r\n{"code":"invalid_message","details":{"causeId":"transport.invalid_ws_upgrade","rea'

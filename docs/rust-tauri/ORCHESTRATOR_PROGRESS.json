@@ -4,8 +4,8 @@
   "start_branch": "main",
   "implementation_branch": "codex/rust-tauri-migration",
   "start_head": "7d1a0c6bc28062ff455adcf8f68c3a80b117e90d",
-  "current_head": "9b98c679678888b60ff2e32bd67d3da6fc2f5c4f",
-  "current_head_note": "R18 只读核到的真实当前 HEAD；分支 codex/rust-tauri-migration，工作区仍有未提交候选。历史 R01 封印坐标保留在 R01 阶段记录；当前 R02 未封印、未提交、未推送。",
+  "current_head": "cdd213078f6947217000c7ecd1a36ab5ffe2bb01",
+  "current_head_note": "2026-09-28 R02 最终收口：HEAD 为 R02_FINAL_REPAIR_BASE_SHA；最终候选 = HEAD + 授权修复工作树（e876171c5cd0a6f8，digest 96d5aa25…）；R02 ACCEPTED，独立验收 PASS。stage_acceptance_commit_sha 于验收提交后回填。",
   "remote": "origin",
   "remote_default_branch": "main",
   "taskbook_manifest_sha256": "49968287f564a2a470d55fe4295a26ef70a71ccb4b16e38933567e89076a5c3f",
@@ -165,8 +165,8 @@
     },
     "R02": {
       "title": "Rust独立服务、存储与事件基础",
-      "status": "R18_FAIL__A16_CONTRACT_CONFLICT__DYNAMIC_BLOCKED",
-      "current_controller_position": "2026-09-28 R18：现行全范围交接见 docs/rust-tauri/R02/R02_FULL_SCOPE_HANDOFF_R18.md，修复前冻结问题表及任务补遗仍保留。A15 旧产品缺陷的探针已按后来授权静态修正，但当前候选真运行 BLOCKED；A16 原 E1 零变更/零 Rust 入口条件与获授权提前接入客户端直接冲突，按原门禁静态 FAIL；34 叶仍无完整合法 Gate，真服务检查、完整独立验收、封印和推送均未完成。R03 禁入。下方 r02_stage_controller_note 是历史滚动记录。",
+      "status": "ACCEPTED",
+      "current_controller_position": "2026-09-28 最终收口完成：3 只读审计（合同/A16 语义/证据绑定）恢复阶段所有权（34 叶 = 25 R02 份额 + 9 DEFERRED_TO_R07，R00 原件零修改）；12 个根因修复组（G1 所有权恢复+命令注册缺口、G2 A16 语义、G3 record_case/trap、G4 探针 ws_key、G5 A16 自引用绑定、G6 API 矩阵、G7 两测试语义、G8 六契约钉住物、G9 LAN 快速失败、G10 E5 分类新形态、G11 WS 撤销关闭竞态、G12 唯一名碰撞）；6 轮门禁（R1/R2/R3 FAIL 根因留存、R4/R5 环境窗中止、R6 全绿）；最终候选 e876171c5cd0a6f8 完整门禁 GREEN + 全新独立验收者 VERDICT PASS（FINDINGS NONE、9 项抽查重跑全过、PRODUCTION DEFAULT=Node/Electron）。证据根 final-candidate-e876171c5cd0a6f8/；过程报告 21 件固化于其 post-gate-closeout/。R03 允许按任务书启动。",
       "task_ids": [
         "R02-T01",
         "R02-T02",
@@ -178,8 +178,8 @@
         "R02-T08"
       ],
       "stage_base_sha": "201584f2917a7fd96d6ea603bdeddbd420082cfe",
-      "stage_review_round": 15,
-      "stage_verdict": "FAIL",
+      "stage_review_round": 22,
+      "stage_verdict": "PASS",
       "stage_review_r1": {
         "reviewer": "根总控另派的全新 Codex 阶段级独立评审（R1）",
         "report": "/tmp/r02-stage-review-r1.md",
@@ -220,34 +220,24 @@
       "stage_acceptance_commit_sha": null,
       "blockers": [
         {
-          "id": "R02-R18-LEAF-COVERAGE",
-          "status": "FAIL",
-          "summary": "R00 34 个原始叶中仅 20 个有完整检查定义、14 个仍为局部定义；当前候选 34 个完整合法结果均缺。真实 Agent/模型/工具及其他客户端/服务行为不得用通用认证案例代替。详见 R02_FULL_SCOPE_HANDOFF_R18.md。"
+          "id": "R02-SEAL-COORDINATE-LAG",
+          "status": "DEFERRED_TO_SEAL_WORKFLOW",
+          "summary": "seal 三件套 npm 红为 A16 登记族（坐标 ab4f2281 滞后），按 PROGRESS.md 封印流程另行推进；非 R02 技术门禁。"
         },
         {
-          "id": "R02-R18-A16-E1",
-          "status": "FAIL",
-          "summary": "A16 原 E1 要求旧桌面文件零改和启动路径零 Rust 引用；获授权提前实现原 R00 客户端行为后当前候选静态违反两项，原门禁未放宽。完整 A16 未执行。"
+          "id": "R02-WINDOWS-R09-R10",
+          "status": "DEFERRED_TO_R09_R10",
+          "summary": "Windows 真机与正式签名/公证/安装包归 R09–R11；代码侧消费者修复+定向 74/74 已过（R18-N01 系列）。"
         },
         {
-          "id": "R02-R18-WINDOWS-CONSUMERS",
-          "status": "FAIL",
-          "summary": "Windows 本地令牌的桌面与 CLI 新消费者缺同一句柄 ACL/身份闭环，为本轮后修引入、原 R02 多平台合同内的同根漏项；尚需源码修正、Windows 编译和实机负向。"
+          "id": "R02-DEFERRED-R07-LEAVES",
+          "status": "DEFERRED_TO_R07",
+          "summary": "9 项 R00 必需补充叶的客户端行为验收归 R07（REQUIRED 保持，R07 阶段图机器消费）。"
         },
         {
-          "id": "R02-R18-DYNAMIC",
-          "status": "BLOCKED",
-          "summary": "平台先前拒绝真 TCP 及完整动态验收；当前候选未合法运行全 npm、A01–A16 真服务矩阵、34 原叶及完整 verify。A15 探针静态已修，但真重启仍 BLOCKED；Git 隔离夹具已获用户授权并真实通过，仅夹具范围 PASS。"
-        },
-        {
-          "id": "R02-R18-PACKAGE",
-          "status": "FAIL",
-          "summary": "当前默认 Mac 安装包构建 exit 1（缺正式公证凭据）；本地跳过公证结构包 exit 0 只证明结构。Windows target/实机未运行，正式安装和跨平台验收未闭。"
-        },
-        {
-          "id": "R02-R18-SEAL",
-          "status": "BLOCKED",
-          "summary": "完整独立阶段 PASS、当前候选合法门禁和证据尚缺；正式封印、最终检查、提交/普通推送均未执行，R03 禁止启动。"
+          "id": "R02-RUNNER-ENV-INTERFERENCE",
+          "status": "DOCUMENTED",
+          "summary": "本机 macOS 防火墙对未签名二进制 LAN 入站的上下文拦截（spike+service 同 cargo 调用）；门禁以逐 crate 分区同一测试集规避；G9 快速失败加固。"
         }
       ],
       "historical_blockers_r6_r13": [
@@ -478,6 +468,47 @@
         "status": "STATIC_CHANGE_ONLY_UNVERIFIED",
         "summary": "verify-stage 对 21 项 auth_primitive_only 通用案例即使全绿也固定 BLOCKED；其余 11 项非冲突叶同时归属 R07，R02 案例全绿也至多支持局部份额，不冒充完整原叶 PASS。2 项客户端边界冲突本已 BLOCKED，34 项原叶保持 REQUIRED，overall 不得 PASS；增加回归检查源文件并同步交接。未执行运行门禁，不宣称阶段 PASS。",
         "blocked": "R9-F09 被拒编辑、2 项客户端阶段边界冲突、必要动态门禁与一次性 Git fixture 授权仍未解除；不得进入 R03。"
+      },
+      "historical_blockers_r18": [
+        {
+          "id": "R02-R18-LEAF-COVERAGE",
+          "resolution": "最终门禁 25 叶份额 PASS + 9 DEFERRED（见 verify-stage supplementalLeafScenarios）"
+        },
+        {
+          "id": "R02-R18-A16-E1",
+          "resolution": "A16 语义修正为「默认未切换+无新增回归」；E1a/b 降级记录、E1d 七断言全过（G2/G5/G10）"
+        },
+        {
+          "id": "R02-R18-WINDOWS-CONSUMERS",
+          "resolution": "代码侧修复完成（R18 followup 74/74）；真机验证归 R09/R10"
+        },
+        {
+          "id": "R02-R18-DYNAMIC",
+          "resolution": "最终门禁全动态真实执行（TCP 放行窗口 + 分区规避干扰）"
+        },
+        {
+          "id": "R02-R18-PACKAGE",
+          "resolution": "正式打包/公证按指令归 R09–R11，不属 R02 门禁"
+        },
+        {
+          "id": "R02-R18-SEAL",
+          "resolution": "转为 R02-SEAL-COORDINATE-LAG（DEFERRED_TO_SEAL_WORKFLOW）"
+        }
+      ],
+      "final_acceptance": {
+        "accepted_at_utc": "2026-09-28T20:55:15Z",
+        "candidate_id": "e876171c5cd0a6f8",
+        "candidate_source_digest": "96d5aa252c59dddced6731501e3c7016414bb5ce30a5d553d84c742ef6afb846",
+        "base_sha": "cdd213078f6947217000c7ecd1a36ab5ffe2bb01",
+        "gate_round": 6,
+        "gate_evidence_root": "artifacts/rust-tauri/R02/final-candidate-e876171c5cd0a6f8/",
+        "reviewer": "R02-FINAL-STAGE-REVIEWER-R1（全新身份）",
+        "review_report": "docs/rust-tauri/R02/R02_FINAL_STAGE_REVIEW_R1.md",
+        "review_verdict": "PASS",
+        "review_findings": "NONE",
+        "production_default": "Node/Electron",
+        "stage_acceptance_commit_sha": null,
+        "stage_acceptance_commit_note": "验收通过后的修复提交 SHA 于 accept 提交回填真实值"
       }
     },
     "R03": {

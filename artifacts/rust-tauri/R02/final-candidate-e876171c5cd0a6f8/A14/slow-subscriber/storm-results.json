@@ -1,0 +1,16 @@
+{
+  "executes_concurrent": 1000,
+  "executes_sequential": 1200,
+  "durable_key_events": 4400,
+  "all_executes_200": true,
+  "b_complete": true,
+  "b_needed_explicit_rebuild": false,
+  "a_buffered_before_detach": 1436,
+  "a_detach_reason": "slow_consumer",
+  "a_resubscribed": true,
+  "rss_min_kb": 17104,
+  "rss_max_kb": 23392,
+  "rss_last_kb": 23392,
+  "health_after": 200,
+  "rss_bounded_ceiling_kb": 512000
+}

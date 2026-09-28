@@ -1,11 +1,19 @@
 # R02｜Rust 独立服务、存储与事件基础 — 阶段报告
 
-> **现行状态（2026-09-28）**：R02 阶段 FAIL，不得进入 R03。A15 已知产品
-> 缺陷的探针源码已按后来获得的授权静态修正；当时的审批拒绝记录仍保留，
-> 当前候选的 A15 真运行尚未完成。34 个 R00 必需补充场景仍无完整合规证据，
-> 必需动态检查、独立阶段验收和正式封印均未完成。下方 §1–§29 保留各旧时点
-> 原记录；[R18 全范围交接](R02_FULL_SCOPE_HANDOFF_R18.md)是当前合同、问题、
-> 候选与限制的唯一现行入口。不得按本文旧时点的 READY/16 项旧绿放行 R03。
+> **现行状态（2026-09-28 最终收口）**：**R02 ACCEPTED**（独立最终阶段验收
+> VERDICT: PASS，见 [R02_FINAL_STAGE_REVIEW_R1.md](R02_FINAL_STAGE_REVIEW_R1.md)）。
+> 最终候选 `R02_CANDIDATE_ID = e876171c5cd0a6f8`（HEAD cdd213078 + 授权修复
+> 工作树，candidate source digest `96d5aa25…fb846`，11409 文件），完整门禁
+> 第 6 轮全绿（fmt/clippy/全测试集/check-contracts/check-boundaries/
+> verify-stage overall PASS：16/16 基础场景 + 34 叶 = 25 R02 份额 PASS +
+> 9 DEFERRED_TO_R07 + 0 FAIL/BLOCKED、20/20 命令证据干净、候选绑定全程
+> stable），证据根 `artifacts/rust-tauri/R02/final-candidate-e876171c5cd0a6f8/`。
+> 过程性 Gate 失败轮（a0af83666f89cc4b / a29e5adbb404ad70 / fc9971898df7a9e8）
+> 按历史原样保留。生产默认入口仍为 Node/Electron（A16 新语义：默认未切换 +
+> 受影响回归无新增失败）。**历史候选失败；最终候选已在当前 SHA 上重新验证
+> 通过**；正式审计封印推进（seal 三件套坐标滞后族）留待封印工作流，不属
+> 本阶段技术门禁。下方 §1–§30 与各历史轮记录原样保留；[R18 全范围交接]
+> (R02_FULL_SCOPE_HANDOFF_R18.md) 转为历史问题表，其未闭合项的处置见 §31。
 
 按 91 交付模板填写。本文是**执行者口径的阶段候选报告**：阶段状态
 READY_FOR_REVIEW；最终 PASS/ACCEPTED 归总控另派的独立验收代理。
@@ -1257,3 +1265,67 @@ G11 同根报告同步遗漏：交接旧滚动段落的“现行”语气、验�
 记录、实现图未述本轮 34 叶的保守状态。本轮已给旧滚动段落加历史
 说明，补 R15 记录和当前状态，不改历史报告，也不把静态改动写成验收
 通过。R02 仍为 FAIL；动态验证、A15 和正式交付门槛状态不变。
+
+## 31. 最终收口（2026-09-28；本节为现行结论，取代 §30 的候选状态口径）
+
+**结论：R02 ACCEPTED。** 独立最终阶段验收（全新身份、未参与任何实现/修复/旧评审）
+[REPORT](R02_FINAL_STAGE_REVIEW_R1.md)：R02-T01–T08 全 PASS、A01–A16 全 PASS、
+25 项 R02 份额补充义务 PASS、9 项 R07 递延义务全部在账（REQUIRED 未弱化）、
+PRODUCTION DEFAULT = Node/Electron、FINDINGS: NONE、**VERDICT: PASS**。验收者
+独立重跑了认证负向、存储故障、事件续读、关停恢复 drill、A15 全链（ALL GREEN、
+runId/eventId/seq 连续、旧 token 401/新 token 200、无遗留进程端口）、A16 三链
+实测与候选 digest 独立复算（无漂移）。
+
+**最终候选**：`R02_CANDIDATE_ID = e876171c5cd0a6f8`；HEAD
+`cdd213078f6947217000c7ecd1a36ab5ffe2bb01` + 授权修复工作树（20 项跟踪改动 +
+1 rename）；candidate source digest
+`96d5aa252c59dddced6731501e3c7016414bb5ce30a5d553d84c742ef6afb846`（11409 文件，
+candidate.rs 口径、排除证据根子树）。依赖锁：`rust/Cargo.lock` 90111c4b…、
+`package-lock.json` e54a16fe…、`rust-toolchain.toml` eec34104…（1.98.1）。
+
+**最终门禁（第 6 轮，2026-09-28T20:22–20:37Z，/tmp/r02-final/gate-r6/summary.txt）**：
+cargo fmt / clippy(-D warnings) / **逐 crate 分区全测试集**（lingxi-protocol、
+lingxi-kernel、lingxi-adapters、lingxi-service、xtask、lingxi-spike、
+lingxi-browser-spike——与 `cargo test --workspace` 完全相同的测试二进制与断言
+集合；分区原因见下）/ check-contracts（API_COMPAT_MATRIX 626 条目含 R17 接线
+新增 2 API 无删除）/ check-boundaries / `xtask verify-stage R02
+--evidence artifacts/rust-tauri/R02/final-candidate-e876171c5cd0a6f8/` 全部
+exit 0；结果 JSON：overall PASS、candidateSourceBinding.stable=true
+（before==after==96d5aa25…、20 命令 checkpoint 全 stable）、runnerSourceBinding
+PASS、16/16 场景 PASS、34 叶 = 25 pass + 9 deferred + 0 fail + 0 blocked、
+20/20 命令 preExisting/missing/timedOut 全空。A15 全链 ALL GREEN（含
+instance-record-removed）；A16 GREEN（默认入口七断言全过、E5 无族外新红、
+全部红块按完整句形分类、候选原始 npm exit 1 属登记态 seal 族坐标滞后）。
+
+**环境限制与如实登记（不构成技术门禁项）**：
+1. 本机 macOS 应用防火墙对未签名二进制非 loopback 入站的拦截是间歇/上下文相关
+   的：`lingxi-spike` 与 `lingxi-service` 测试二进制**同 cargo 调用**先后运行时，
+   management LAN 用例（0.0.0.0 绑定 + 192.168.3.5 自连）被内核级丢弃（0 字文
+   节送达；二分实验 6 组复现/对照；系统签名 python 与单 crate 调用不受影响）。
+   最终门禁以逐 crate 分区执行同一测试集规避，**测试集合未变**。G9 已把该形
+   态从无限挂起加固为 ≤20s 快速如实失败（panic 含环境诊断句，不跳过断言）。
+2. Windows 真机验证（ACL/句柄/消费者负向、四平台安装）与正式签名/公证/
+   安装包登记到 R09–R11（R18-N01 代码侧修复 + 无端口定向 74/74 已过；激活目
+   录信任链与独立包签名信任依赖正式签名体系）。跨平台条件编译正确性以本机
+   可验证部分为准。
+3. 正式审计封印（`.sync-audit` 坐标 ab4f2281 滞后 20+ 提交）属封印工作流
+   （seal 三件套红 = A16 登记族），按 PROGRESS.md 流程另行推进，不影响本阶段
+   技术判定。
+
+**34 叶最终拆账**：25 `r02_share_satisfied`（管理面服务端语义 17 + 协议原语 6 +
+serve 启动语义 1 + sessions 服务侧份额 1）PASS；9 `deferred_to_r07`（CLI help、
+sharing UI、静态托管×2、mobile bootstrap、thinking-level×3、UI access）保持
+REQUIRED、验收归属 R07，R07 阶段图必须消费其余款（stage map
+supplementalLeafScenarios 机器可读）。R00 原件零修改（r00* 镜像逐字全等核对
+持续通过）。
+
+**修复轮记录**：本轮总控编排（基线 cdd213078 = R02_FINAL_REPAIR_BASE_SHA）下，
+3 个只读审计（合同/A16 语义/证据绑定）+ 12 个按根因修复组 + 6 轮门禁执行 +
+1 次独立最终验收。全部报告固化于最终证据根 `post-gate-closeout/`（21 件）。
+历史 R1–R21 的 FAIL/BLOCKED/首败记录全部原样保留（§3–§30、R18 交接、
+artifacts 旧目录）；本节只登记最终候选事实。
+
+**交接**：`R02_HANDOFF.json` 已绑定最终候选（source_sha=提交后回填见
+ORCHESTRATOR；current_candidate=e876171c5cd0a6f8）；R03 允许范围 =
+R03 任务书（运行状态机、并发、取消与恢复）；R07 递延 9 项与 Windows/打包
+登记项不得丢失。

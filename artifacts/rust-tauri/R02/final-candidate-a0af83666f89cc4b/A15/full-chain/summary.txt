@@ -1,0 +1,6 @@
+== run 2026-09-28T23:14:50+0800 (pid 85031) ==
+== R02-T08 / R02-A15 full-chain smoke (toolchain 1.98.1, target /tmp/rust-target-r02-final) ==
+== building lingxi-service (--locked, offline) ==
+PASS build
+== boot 1: start, authenticate, write, subscribe ==
+PASS boot1-ready addr=127.0.0.1:51886 home=/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T//lingxi-r02t08-a15-home.Il1bGr

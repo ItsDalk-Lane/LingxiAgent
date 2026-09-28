@@ -1,0 +1,18 @@
+ M build/cli-runtime-closure.json
+ M build/persistence-schema-fingerprint.json
+ M desktop/src/react/settings/SettingsContent.tsx
+ M docs/rust-tauri/R01/API_COMPAT_MATRIX.json
+ M export-manifest.json
+ M rust/crates/lingxi-service/tests/auth_matrix.rs
+ M rust/crates/lingxi-service/tests/r00_management_leaves.rs
+ M rust/crates/xtask/src/stage_map.rs
+ M rust/crates/xtask/src/stage_maps/R02.json
+ M rust/crates/xtask/src/verify.rs
+ M rust/crates/xtask/src/verify/runner_tests.rs
+ M scripts/compute-cli-closure.mjs
+ M scripts/rust-tauri/r02_t03_auth_matrix.sh
+ M scripts/rust-tauri/r02_t08_full_chain_probe.py
+ M scripts/rust-tauri/r02_t08_full_chain_smoke.sh
+ M scripts/rust-tauri/r02_t08_legacy_entry_regression.sh
+RM tests/desktop-rust-local-service.test.cjs -> tests/desktop-rust-local-service.test.mjs
+ M tests/server-startup-diagnostics-contract.test.ts

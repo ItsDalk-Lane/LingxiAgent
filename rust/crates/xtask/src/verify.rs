@@ -92,8 +92,9 @@ use std::time::{Duration, Instant};
 use serde_json::{json, Value};
 
 use crate::stage_map::{
-    StageMap, SupplementalLeaf, BASIS_AUTH_PRIMITIVE_ONLY, BASIS_CLIENT_ONLY_STAGE_CONFLICT,
-    BASIS_FULL_ORIGINAL_BEHAVIOR,
+    LeafDeferredCase, StageMap, SupplementalLeaf, BASIS_AUTH_PRIMITIVE_ONLY,
+    BASIS_CLIENT_ONLY_STAGE_CONFLICT, BASIS_DEFERRED_TO_R07, BASIS_FULL_ORIGINAL_BEHAVIOR,
+    BASIS_PROTOCOL, BASIS_R02_SHARE_SATISFIED, BASIS_ROUTE_PRESENT_STATIC,
 };
 use crate::RESULT_VERSION;
 
@@ -576,30 +577,177 @@ fn check_leaf_assertion_contract(
     (results, failures.join("; "))
 }
 
-/// 根据已执行命令与证据汇总一个 R00 补充叶项。所有引用命令、证据文件和
-/// 图钉案例必须通过；未执行命令不能算通过。阶段边界冲突项保持 BLOCKED。
-/// R15-F01：通用认证案例即使全绿，也不能证明各叶项原行为；
-/// `auth_primitive_only` 在登记逐叶专属证据前保持 BLOCKED。
-/// 对同时归属后续阶段的原始叶项，本阶段案例也仅是局部证据；
-/// 未完成原叶行为或正式责任处置前，不把局部结果升级为原叶 PASS。
+/// 根据已执行命令与证据汇总一个 R00 补充叶项。门禁叶（协议/份额/完整
+/// 行为）要求所有引用命令、证据文件和图钉案例通过；未执行命令不能算
+/// 通过。阶段边界冲突项保持 BLOCKED。R15-F01：通用认证案例即使全绿，
+/// 也不能证明各叶项原行为；`auth_primitive_only` 在登记逐叶专属证据前
+/// 保持 BLOCKED（旧图回放防护——现行 R02 图已不再使用该 kind）。
+/// R02-final group 1（阶段所有权恢复）：
+/// - `r02_share_satisfied`：全部份额图钉 ok 且命令通过即本叶 R02 份额
+///   PASS，结果附带 r07Share 义务文本与 deferredToStage=R07——R07 余款
+///   不再是 R02 PASS 的前置（撤销 R17 轮的越界门禁语义）。
+/// - `deferred_to_r07`：无 R02 门禁份额，固定输出 DEFERRED_TO_R07（仍
+///   REQUIRED、验收归 R07），附 r07Share 文本与（若有）earlyEvidence
+///   观察。递延仅限显式声明的叶，不允许任何叶静默跳过。
+/// - 旧「另属后续阶段→BLOCKED」分支仅保留给旧图的局部 kind
+///   （protocol_basis/route_basis_present_static）回放防护；对
+///   full_original_behavior 与 r02_share_satisfied 不再拦截。
+#[derive(Debug, Clone, PartialEq)]
+pub struct LeafRollUp {
+    pub status: String,
+    pub reason: String,
+    pub assertion_results: Vec<Value>,
+    pub deferred_case_results: Vec<Value>,
+    /// 递延叶的提前实现命令健康观察（非门禁）。
+    pub early_evidence: Option<Value>,
+}
+
+/// 观察一个递延 R07 案例的记录值：只读取、不判定。生产者未通过或文件
+/// 缺失时返回 NOT_OBSERVED 并说明原因——观察失败不是叶失败，但命令
+/// 失败已在 overall 层面按命令 FAIL 处理（提前实现的代码必须保持健康）。
+fn observe_deferred_case(
+    record: &LeafDeferredCase,
+    outcomes: &[CommandOutcome],
+    repo_root: &Path,
+    evidence_root: &Path,
+) -> Value {
+    let producer_passed = outcomes
+        .iter()
+        .any(|o| o.key == record.producer_command && o.passed());
+    if !producer_passed {
+        return json!({
+            "case": record.case,
+            "expect": record.expect,
+            "producerCommand": record.producer_command,
+            "evidencePath": record.evidence_path,
+            "status": "NOT_OBSERVED",
+            "reason": format!(
+                "early-evidence producer {:?} did not pass in this run",
+                record.producer_command
+            ),
+        });
+    }
+    let path = resolve_evidence_path(&record.evidence_path, repo_root, evidence_root);
+    let observed = std::fs::read_to_string(&path)
+        .map_err(|e| format!("missing ({e})"))
+        .and_then(|text| {
+            serde_json::from_str::<Value>(&text).map_err(|e| format!("not valid JSON: {e}"))
+        })
+        .and_then(|parsed| {
+            let schema_ok =
+                parsed.get("schema").and_then(Value::as_str) == Some(LEAF_CASE_RESULTS_SCHEMA);
+            if !schema_ok {
+                return Err("schema mismatch".to_string());
+            }
+            parsed
+                .get("cases")
+                .and_then(Value::as_array)
+                .cloned()
+                .ok_or_else(|| "no cases array".to_string())
+        });
+    let cases = match observed {
+        Ok(cases) => cases,
+        Err(reason) => {
+            return json!({
+                "case": record.case,
+                "expect": record.expect,
+                "producerCommand": record.producer_command,
+                "evidencePath": record.evidence_path,
+                "status": "NOT_OBSERVED",
+                "reason": reason,
+            });
+        }
+    };
+    let matches: Vec<&Value> = cases
+        .iter()
+        .filter(|c| c.get("case").and_then(Value::as_str) == Some(record.case.as_str()))
+        .collect();
+    if matches.len() != 1 {
+        return json!({
+            "case": record.case,
+            "expect": record.expect,
+            "producerCommand": record.producer_command,
+            "evidencePath": record.evidence_path,
+            "status": "NOT_OBSERVED",
+            "reason": format!("expected exactly one recorded entry, found {}", matches.len()),
+        });
+    }
+    let recorded = matches[0];
+    let actual = recorded.get("actual").and_then(Value::as_i64);
+    let ok = recorded.get("ok").and_then(Value::as_bool);
+    let held = ok == Some(true) && actual == Some(record.expect);
+    json!({
+        "case": record.case,
+        "expect": record.expect,
+        "actual": actual,
+        "recordedOk": ok,
+        "producerCommand": record.producer_command,
+        "evidencePath": record.evidence_path,
+        "status": if held { "OBSERVED_HELD" } else { "OBSERVED_NOT_HELD" },
+    })
+}
+
 fn roll_up_supplemental_leaf(
     leaf: &SupplementalLeaf,
     stage: &str,
     outcomes: &[CommandOutcome],
     repo_root: &Path,
     evidence_root: &Path,
-) -> (String, String, Vec<Value>) {
+) -> LeafRollUp {
     if leaf.basis_kind == BASIS_CLIENT_ONLY_STAGE_CONFLICT {
-        return (
-            "BLOCKED".to_string(),
-            format!(
+        return LeafRollUp {
+            status: "BLOCKED".to_string(),
+            reason: format!(
                 "stage-boundary conflict with the R00 original is unresolved — this leaf \
                  can never be PASS in the gate; see evidenceRequired for the required \
                  root disposition: {}",
                 leaf.evidence_required
             ),
-            Vec::new(),
+            assertion_results: Vec::new(),
+            deferred_case_results: Vec::new(),
+            early_evidence: None,
+        };
+    }
+    // 递延叶：固定 DEFERRED_TO_R07，附 r07Share 义务文本与 earlyEvidence
+    // 观察。提前实现命令未通过不改叶状态（验收不归本门禁），但命令
+    // FAIL 由 overall 的全命令通过条件拦下，绝不静默变绿。
+    if leaf.basis_kind == BASIS_DEFERRED_TO_R07 {
+        let deferred_case_results = leaf
+            .deferred_r07_cases
+            .iter()
+            .map(|record| observe_deferred_case(record, outcomes, repo_root, evidence_root))
+            .collect::<Vec<_>>();
+        let early_not_passing: Vec<&str> = leaf
+            .early_evidence_command_refs
+            .iter()
+            .filter(|key| !outcomes.iter().any(|o| o.key == **key && o.passed()))
+            .map(|key| key.as_str())
+            .collect();
+        let mut reason = format!(
+            "deferred to R07: this R00 leaf is still REQUIRED but has no R02 gating share; \
+             its acceptance belongs to the R07 stage, which must consume the remainder: {}",
+            leaf.r07_share
         );
+        if !early_not_passing.is_empty() {
+            reason.push_str(&format!(
+                " (early-evidence commands not passing this run (still command FAILs, health \
+                 of the pre-implemented code is mandatory): {early_not_passing:?})"
+            ));
+        }
+        let early_evidence = json!({
+            "commandRefs": leaf.early_evidence_command_refs,
+            "commandsNotPassing": early_not_passing,
+            "note": "non-gating: producers of the pre-implemented R07 behavior stay registered \
+                     and run every gate; their failures are command FAILs but never gate this \
+                     leaf in R02",
+        });
+        return LeafRollUp {
+            status: "DEFERRED_TO_R07".to_string(),
+            reason,
+            assertion_results: Vec::new(),
+            deferred_case_results,
+            early_evidence: Some(early_evidence),
+        };
     }
     let failed_refs: Vec<&str> = leaf
         .evidence_command_refs
@@ -617,18 +765,26 @@ fn roll_up_supplemental_leaf(
     // 核对证据范围：通用认证案例不能证明每项原始叶行为。
     let (assertion_results, assertion_failures) =
         check_leaf_assertion_contract(leaf, outcomes, repo_root, evidence_root);
+    // 递延案例只观察不判定（份额叶拆分出的 R07 余款案例）。
+    let deferred_case_results = leaf
+        .deferred_r07_cases
+        .iter()
+        .map(|record| observe_deferred_case(record, outcomes, repo_root, evidence_root))
+        .collect::<Vec<_>>();
     if failed_refs.is_empty() && missing_paths.is_empty() && assertion_failures.is_empty() {
         if leaf.basis_kind == BASIS_AUTH_PRIMITIVE_ONLY {
-            return (
-                "BLOCKED".to_string(),
-                format!(
+            return LeafRollUp {
+                status: "BLOCKED".to_string(),
+                reason: format!(
                     "authentication-primitives passed, but their generic status-code cases do \
                      not prove this R00 leaf's original behavior or side effects; leaf-specific \
                      positive and negative evidence is still required: {}",
                     leaf.evidence_required
                 ),
                 assertion_results,
-            );
+                deferred_case_results,
+                early_evidence: None,
+            };
         }
         if leaf.basis_kind == BASIS_FULL_ORIGINAL_BEHAVIOR {
             // The parser enforces this shape for loaded maps. Recheck here
@@ -662,62 +818,91 @@ fn roll_up_supplemental_leaf(
                     .enumerate()
                     .all(|(index, case)| !covered[..index].contains(case));
             if !coverage_complete {
-                return (
-                    "FAIL".to_string(),
-                    "full_original_behavior lacks a unique executed case for every original \
-                     R00 assertion (parser invariant violated)"
+                return LeafRollUp {
+                    status: "FAIL".to_string(),
+                    reason: "full_original_behavior lacks a unique executed case for every \
+                             original R00 assertion (parser invariant violated)"
                         .to_string(),
                     assertion_results,
-                );
+                    deferred_case_results,
+                    early_evidence: None,
+                };
             }
-            return ("PASS".to_string(), String::new(), assertion_results);
+            return LeafRollUp {
+                status: "PASS".to_string(),
+                reason: String::new(),
+                assertion_results,
+                deferred_case_results,
+                early_evidence: None,
+            };
         }
-        if leaf
-            .r00_execution_stage_ids
-            .iter()
-            .any(|id| id.as_str() != stage)
+        // 旧图回放防护：局部 kind 的双阶段叶仍按原语义阻断（现行 R02 图
+        // 中已没有这类叶——份额叶一律显式声明 r02_share_satisfied）。
+        // full_original_behavior 与 r02_share_satisfied 不再被拦截：要求
+        // R02 先证 R07 客户端行为属阶段所有权越界（本轮撤销）。
+        if (leaf.basis_kind == BASIS_PROTOCOL || leaf.basis_kind == BASIS_ROUTE_PRESENT_STATIC)
+            && leaf
+                .r00_execution_stage_ids
+                .iter()
+                .any(|id| id.as_str() != stage)
         {
-            return (
-                "BLOCKED".to_string(),
-                format!(
-                    "this R00 leaf is also due in another stage ({:?}); passing {} cases \
-                     provides at most partial current-stage evidence, not proof of the complete \
-                     original behavior. \
-                     Keep the leaf required until complete behavior evidence is registered in \
-                     this gate or the original responsibility receives an authorized disposition",
-                    leaf.r00_execution_stage_ids, stage
+            return LeafRollUp {
+                status: "BLOCKED".to_string(),
+                reason: format!(
+                    "this R00 leaf is also due in another stage ({:?}); the legacy \
+                     partial basisKind {:?} does not declare an explicit stage-share split \
+                     (migrate the leaf to r02_share_satisfied or deferred_to_r07)",
+                    leaf.r00_execution_stage_ids, leaf.basis_kind
                 ),
                 assertion_results,
-            );
+                deferred_case_results,
+                early_evidence: None,
+            };
         }
-        ("PASS".to_string(), String::new(), assertion_results)
-    } else {
-        let mut reasons = Vec::new();
-        if !failed_refs.is_empty() {
-            reasons.push(format!(
-                "evidence commands not passing (or not executed): {failed_refs:?}"
-            ));
-        }
-        if !missing_paths.is_empty() {
-            reasons.push(format!(
-                "missing required evidence artifacts: {missing_paths:?}"
-            ));
-        }
-        if !assertion_failures.is_empty() {
-            reasons.push(format!(
-                "original-assertion cases not holding: {assertion_failures}"
-            ));
-        }
-        (
-            "FAIL".to_string(),
+        let reason = if leaf.basis_kind == BASIS_R02_SHARE_SATISFIED {
             format!(
-                "no legal evidence for the R02 share of this leaf: {} — a required \
-                 leaf without evidence (or whose original assertions did not hold as \
-                 recorded) is a failure, never a pass",
-                reasons.join("; ")
-            ),
+                "R02 share satisfied: all share pins held; the R07 remainder stays REQUIRED \
+                 and moves with deferredToStage=R07: {}",
+                leaf.r07_share
+            )
+        } else {
+            String::new()
+        };
+        return LeafRollUp {
+            status: "PASS".to_string(),
+            reason,
             assertion_results,
-        )
+            deferred_case_results,
+            early_evidence: None,
+        };
+    }
+    let mut reasons = Vec::new();
+    if !failed_refs.is_empty() {
+        reasons.push(format!(
+            "evidence commands not passing (or not executed): {failed_refs:?}"
+        ));
+    }
+    if !missing_paths.is_empty() {
+        reasons.push(format!(
+            "missing required evidence artifacts: {missing_paths:?}"
+        ));
+    }
+    if !assertion_failures.is_empty() {
+        reasons.push(format!(
+            "original-assertion cases not holding: {assertion_failures}"
+        ));
+    }
+    LeafRollUp {
+        status: "FAIL".to_string(),
+        reason: format!(
+            "no legal evidence for the R02 share of this leaf: {} — a required \
+             leaf without evidence (or whose original assertions did not hold as \
+             recorded) is a failure, never a pass",
+            reasons.join("; ")
+        ),
+        assertion_results,
+        deferred_case_results,
+        early_evidence: None,
     }
 }
 
@@ -1527,6 +1712,15 @@ where
                 order.push(key.clone());
             }
         }
+        // R02-final group 1: a deferred leaf's NON-gating early-evidence
+        // producers still RUN (health of the pre-implemented R07 behavior is
+        // mandatory; their failures are command FAILs) — they are never
+        // silently skipped either.
+        for key in &leaf.early_evidence_command_refs {
+            if !order.contains(key) {
+                order.push(key.clone());
+            }
+        }
     }
 
     let mut command_json = Vec::new();
@@ -1620,12 +1814,14 @@ where
     // never again be the whole story.
     let mut supplemental_json = Vec::with_capacity(map.supplemental_leaves.len());
     let mut supplemental_pass = 0usize;
+    let mut supplemental_deferred = 0usize;
     let mut supplemental_fail = 0usize;
     let mut supplemental_blocked = 0usize;
     let mut r00_mismatch = 0usize;
+    let mut status_deferred_ids: Vec<String> = Vec::new();
     for leaf in &map.supplemental_leaves {
-        let (status, reason, assertion_results) =
-            roll_up_supplemental_leaf(leaf, &map.stage, &outcomes, repo_root, evidence_root);
+        let roll = roll_up_supplemental_leaf(leaf, &map.stage, &outcomes, repo_root, evidence_root);
+        let status = roll.status;
         // R14-F01: surface the mirrored R00 binding next to the verdict so
         // a consumer sees WHICH original record this leaf was graded
         // against (the pre-run cross-check already guarantees equality —
@@ -1655,19 +1851,32 @@ where
         );
         match status.as_str() {
             "PASS" => supplemental_pass += 1,
+            "DEFERRED_TO_R07" => {
+                supplemental_deferred += 1;
+                status_deferred_ids.push(leaf.id.clone());
+            }
             "BLOCKED" => supplemental_blocked += 1,
             _ => supplemental_fail += 1,
         }
+        // R02-final group 1 (V7): every leaf entry states its stage
+        // ownership explicitly — the share kinds carry the R07 remainder as
+        // `deferredToStage` so a consumer can never misread "R02 share
+        // judged" as "whole leaf done"; deferred leaves list their R07
+        // remainder cases with the observed (non-gating) values.
+        let carries_r07_remainder = leaf.basis_kind == BASIS_R02_SHARE_SATISFIED
+            || leaf.basis_kind == BASIS_DEFERRED_TO_R07;
         supplemental_json.push(json!({
             "id": leaf.id,
             "featureId": leaf.feature_id,
             "requirement": leaf.requirement,
             "basisKind": leaf.basis_kind,
+            "deferredToStage": if carries_r07_remainder { json!("R07") } else { Value::Null },
             "r00Mirror": mirror_json,
             "r02Share": leaf.r02_share,
             "r07Share": leaf.r07_share,
             "evidenceRequired": leaf.evidence_required,
             "evidenceCommandRefs": leaf.evidence_command_refs,
+            "earlyEvidenceCommandRefs": leaf.early_evidence_command_refs,
             "evidencePaths": leaf.evidence_paths,
             "assertionContract": leaf.assertion_contract.as_ref().map(|c| json!({
                 "producerCommand": c.producer_command,
@@ -1677,7 +1886,9 @@ where
                     "expect": p.expect,
                 })).collect::<Vec<_>>(),
             })),
-            "assertionResults": assertion_results,
+            "assertionResults": roll.assertion_results,
+            "deferredR07Cases": roll.deferred_case_results,
+            "earlyEvidence": roll.early_evidence,
             "originalAssertionCases": leaf.original_assertion_cases.iter().enumerate()
                 .map(|(index, cases)| json!({
                     "r00AssertionIndex": index,
@@ -1686,7 +1897,7 @@ where
                 }))
                 .collect::<Vec<_>>(),
             "status": status,
-            "reason": reason,
+            "reason": roll.reason,
         }));
     }
     // Defensive: the pre-run cross-check guarantees every declared leaf
@@ -1697,10 +1908,56 @@ where
              after the pre-run cross-check — invariant violation, failing closed"
         ));
     }
-    let supplemental_all_pass = supplemental_pass == map.supplemental_leaves.len()
-        && map.supplemental_leaves.len() == r00_expected.len();
+    // Defense in depth (V3): the DEFERRED set in the result must EQUAL the
+    // set declared deferred_to_r07 in the stage map — the status derives
+    // from the basis kind, but a mismatch here means an invariant broke and
+    // must abort, never pass.
+    let mut declared_deferred_ids: Vec<String> = map
+        .supplemental_leaves
+        .iter()
+        .filter(|leaf| leaf.basis_kind == BASIS_DEFERRED_TO_R07)
+        .map(|leaf| leaf.id.clone())
+        .collect();
+    status_deferred_ids.sort();
+    declared_deferred_ids.sort();
+    if declared_deferred_ids != status_deferred_ids {
+        return Err(format!(
+            "internal: the DEFERRED_TO_R07 leaf set ({:?}) does not equal the \
+             deferred_to_r07 declarations in the stage map ({:?}) — invariant violation, \
+             failing closed",
+            status_deferred_ids, declared_deferred_ids
+        ));
+    }
+    // 覆盖计数：期望总数 = pass + deferred + fail + blocked。
+    let supplemental_total = map.supplemental_leaves.len();
+    if supplemental_pass + supplemental_deferred + supplemental_fail + supplemental_blocked
+        != supplemental_total
+    {
+        return Err(format!(
+            "internal: supplemental leaf counts (pass {} + deferred {} + fail {} + blocked {}) \
+             do not add up to the {} declared leaves — invariant violation, failing closed",
+            supplemental_pass,
+            supplemental_deferred,
+            supplemental_fail,
+            supplemental_blocked,
+            supplemental_total
+        ));
+    }
+    // PASS∪DEFERRED 全覆盖才允许 overall PASS；deferred 集合与声明全等已
+    // 上面核对。另：所有已执行命令必须全部通过——提前实现的
+    // early-evidence 生产者（client/static 矩阵）失败仍是命令 FAIL，
+    // 已提交的提前实现代码必须保持健康，不得静默变绿。
+    let commands_not_passing: Vec<&str> = outcomes
+        .iter()
+        .filter(|outcome| !outcome.passed())
+        .map(|outcome| outcome.key.as_str())
+        .collect();
+    let supplemental_covered = supplemental_pass + supplemental_deferred == supplemental_total
+        && supplemental_total == r00_expected.len();
 
-    let overall_pass = scenario_json.iter().all(|s| s["status"] == "PASS") && supplemental_all_pass;
+    let overall_pass = scenario_json.iter().all(|s| s["status"] == "PASS")
+        && supplemental_covered
+        && commands_not_passing.is_empty();
     let finished = crate::now_ms();
 
     Ok(json!({
@@ -1725,20 +1982,37 @@ where
             "expectedFromR00Ledger": r00_expected.len(),
             "declaredInStageMap": map.supplemental_leaves.len(),
             "pass": supplemental_pass,
+            "deferredToR07": supplemental_deferred,
             "fail": supplemental_fail,
             "blocked": supplemental_blocked,
+            "deferredLeafIds": declared_deferred_ids,
+            "shareSatisfiedLeafIds": map
+                .supplemental_leaves
+                .iter()
+                .filter(|leaf| leaf.basis_kind == BASIS_R02_SHARE_SATISFIED)
+                .map(|leaf| leaf.id.as_str())
+                .collect::<Vec<_>>(),
+            "commandsNotPassing": commands_not_passing,
             "note": "R13-F01/R14-F01: this stage gate CONSUMES the R00 \
                      REQUIRED_SUPPLEMENTAL leaves bound to the stage (cross-checked for \
                      set equality AND per-leaf FULL-record equality — feature, kind, \
                      task/stage responsibility, status, result/test registries, then, \
                      assertions, due — against both R00 ledgers before any command \
-                     ran). A BLOCKED entry is an unresolved stage-boundary \
+                     ran). R02-final group 1 stage ownership: expected == pass + \
+                     deferredToR07 + fail + blocked, and overall PASS requires \
+                     PASS ∪ DEFERRED_TO_R07 to cover every leaf. DEFERRED_TO_R07 is \
+                     NOT a waiver: the leaf stays REQUIRED and its acceptance \
+                     belongs to R07, which must consume the remainder (deferredToStage \
+                     + r07Share on each entry); the deferred set is verified EQUAL to \
+                     the stage map's deferred_to_r07 declarations. Early-evidence \
+                     producers of pre-implemented R07 behavior stay registered and \
+                     run; any failing command (commandsNotPassing) still blocks \
+                     overall PASS. A BLOCKED entry is an unresolved stage-boundary \
                      conflict, a generic-authentication leaf whose cases do not \
-                     prove its original behavior, or a dual-stage leaf with only \
-                     its current-stage share evidenced. A FAIL entry lacks legal \
-                     evidence for its R02 share or its pinned cases did not hold as \
-                     recorded in the producer's structured case file. Neither status \
-                     permits an overall PASS.",
+                     prove its original behavior, or a legacy partial-kind dual-stage \
+                     leaf. A FAIL entry lacks legal evidence for its R02 share or its \
+                     pinned cases did not hold as recorded in the producer's \
+                     structured case file.",
         },
         "overall": if overall_pass { "PASS" } else { "FAIL" },
     }))

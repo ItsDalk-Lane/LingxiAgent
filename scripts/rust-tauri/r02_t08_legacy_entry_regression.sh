@@ -10,6 +10,80 @@
 # enumerate R02/T08 paths. This rewrite binds the comparison to explicit
 # SHAs and replays the failing family at BOTH ends of the range.
 #
+# R02 FINAL CLOSEOUT (repair-group2, 2026-09-28): E1 semantics corrected to
+# the governing A16 definition — "the incumbent Node/Electron PRODUCTION
+# DEFAULT entry is not switched and no new client-affecting regressions
+# appeared" — replacing the pre-closeout predicate "zero diff over the
+# production surface / zero rust references in the launch path", which
+# permanently failed the gate once the AUTHORIZED opt-in client wiring
+# landed (53-file surface diff; guarded rust references in main.cjs that
+# are pure serverNodeKind guards/publication points). E1a/E1b are now
+# RECORD-ONLY evidence of the authorized wiring range; E1c plus the new
+# E1d default-entry assertion set carry the gate. E5's candidate-red
+# whitelist is generalized to "baseline-replay reds ∪ REGISTERED
+# pre-existing failure families" (an explicit registration ledger; today
+# it equals the seal coordinate-lag trio — the frozen VERIFIED_SOURCE_SHA
+# predates the authorized R01/R02 commits, a seal-workflow coordinate lag
+# per PROGRESS.md's seal process, not an R02 behavior regression). E4.5
+# adds the renderer build to the regression surface (the authorized wiring
+# touches renderer sources). The R1-R11 repair history is preserved; only
+# the current-behaviour bullets (E1/E5) are updated to match. Evidence
+# basis: /tmp/r02-final/a16-audit-r1.md (A16-AUDITOR-R1).
+#
+# R02 FINAL CLOSEOUT repair-group5 (E0 self-reference binding defect,
+# 2026-09-28): the final-candidate verify stage runs this gate with an
+# IN-REPO evidence root (artifacts/rust-tauri/R02/final-candidate-<id>/
+# A16/legacy-entry), and the gate itself writes there BETWEEN the two
+# worktree bindings — summary.txt appends, the binding tsv going from
+# empty (the shell redirect creates it before python populates it) to
+# full, the e0-candidate-dirty.* captures — so the exhaustive binding
+# could never mirror byte-identically: the main-repo scan and the
+# candidate-copy scan differed BY CONSTRUCTION (first real evidence:
+# final-candidate-a0af83666f89cc4b, "candidate copy does not mirror the
+# invoking worktree"). The chain had only ever been green with
+# out-of-repo /tmp evidence roots. Fix: both bindings exclude EXACTLY
+# this gate's own evidence subtree ($EVIDENCE_DIR — repo-relative prefix
+# computed ONCE and passed UNCHANGED to both scans), record the active
+# exclusion as `#` header rows inside both tsv files, and keep EVERYTHING
+# ELSE fully bound: the other verify-stage evidence directories are
+# static during this gate's run and stay in the binding; the runner's
+# stdout/stderr captures are gitignored (*.log) and never were part of
+# it; candidate source never lives under this gate's own output
+# directory; and the orchestrator's xtask candidate binding (full-tree
+# SHA over the candidate) remains the outer backstop. The R4-F02 lesson
+# is unchanged — the candidate SOURCE binding stays complete; the only
+# invisible paths are this run's own OUTPUT. The E0s fixtures prove the
+# exclusion surgical: excluded-subtree changes are invisible, a content
+# change ANYWHERE else still flips the binding, and without the prefix
+# the binding stays exhaustive.
+#
+# R02 FINAL CLOSEOUT repair-group10 (gate round 2, 2026-09-28/29): E5(3)
+# registered the guard-tail WINDOW form. Gate round 2's candidate run
+# failed E5 with `UNRECOGNIZED,seal-coordinate-lag,
+# uncommitted-source-rejection` on round2/round3 — those blocks embed the
+# generators' `post-verification diff guard failed: {guard_output[-500:]}`
+# line, and with this repo's ~2100-violator listing the window carries NO
+# ✗ sentence at all (front-cut path fragment + `  - ` listing lines,
+# ending mid-token where the guard's own console.error output was lost
+# past the 64 KiB pipe buffer at process.exit — the captured guard part
+# is byte-exactly 65536). Both reds' true causes are still the two
+# REGISTERED ones (seal coordinate lag + dirty candidate tree); the
+# shapes were simply absent from the ledger. Registered PRECISELY, no
+# generalization: generator-wrapper producer binding in the same block,
+# printable-ASCII no-space/no-colon fragment (every guard sentence suffix
+# carries a space or the full-width `）` — sentence material can never
+# pose as a path fragment), at least one complete `  - ` listing line,
+# and the reconstructed window EXACTLY 500 code points (the literal
+# [-500:] slice; all-ASCII by grammar so the length is locale-proof).
+# Evidence: artifacts/rust-tauri/R02/final-candidate-a29e5adbb404ad70/
+# A16/legacy-entry/e5-candidate-blocks.txt (round2 block 4, round3 block
+# 6) + /tmp/r02-final/repair-group10-r1.md. Eight E0s fixtures pin it:
+# the two real gate-r2 windows and a derived complete-end variant
+# classify; five single-point mutations (off-by-one char, trailing junk,
+# sentence fragment, wrong producer, deleted line) all stay UNRECOGNIZED.
+# The bare `.py` tail and mid-sentence cuts of R6-F01 REMAIN unregistered
+# — fail-closed unchanged.
+#
 # R02 stage-repair R4 rewrite (review finding R4-F02). The R1 rewrite still
 # built the "baseline" by copying the dirty candidate worktree and running
 # `git checkout -f BASE`: that restores TRACKED files only, so untracked
@@ -25,6 +99,10 @@
 #       tracked modification AND every untracked (non-ignored) file with
 #       its content SHA-256, never `--untracked-files=no` — and the
 #       candidate copy must reproduce that binding byte-identically.
+#       (repair-group5: the ONE exclusion is this gate's own evidence
+#       subtree, applied symmetrically to both scans — see the
+#       bind_worktree header; everything else, including every other
+#       verify-stage evidence directory, remains fully bound.)
 #   E0b baseline purity (R5 workflow + R5-F01 rework): the ORIGINAL user
 #       attachment prohibits `git reset --hard` and `git clean -fd` with
 #       NO throwaway-copy exception, and the R4 construction used exactly
@@ -108,21 +186,39 @@
 #       and its agreement with the exit code and the FAIL-block count:
 #       exit 0 + `Test Files 1 failed (1)` is CONTRADICTORY and a bare
 #       truncated `Test Files 1` is UNPARSEABLE — neither is GREEN.
-#   E1  entry-unchanged vs BASE: `git diff BASE -- <production surface>`
-#       evaluated inside the candidate copy, PLUS the candidate binding
-#       (which sees untracked files that git diff cannot) intersected with
-#       the same surface; package.json "main" still desktop/bootstrap.cjs;
-#       the launch path contains no rust-stack reference.
+#   E1  default-entry-not-switched (final-closeout semantics, see the
+#       closeout block above): the surface diff vs BASE and the candidate
+#       binding (which sees untracked files that git diff cannot)
+#       intersected with the same surface are archived as the
+#       authorized-wiring audit trail (RECORD ONLY — never gated). The
+#       GATED assertions are: package.json "main" still
+#       desktop/bootstrap.cjs; the runtime selector defaults to node
+#       (rustDesktopEnabled: unset/node → false, explicit rust → true);
+#       nothing in the launch/packaging chain injects
+#       LINGXI_DESKTOP_SERVER_RUNTIME; main.cjs keeps the
+#       rustDesktopEnabled() startServer guard AND the incumbent Node
+#       server body (server-info.json handling); bootstrap still loads
+#       main(.bundle).cjs by isPackaged; cli/args.ts defaults runtime
+#       "node"; the data-root no-double-write guards
+#       (RUST_DESKTOP_NODE_SERVER_INFO_PRESENT mutex + rust
+#       RUNTIME_DIR_NAME layout) are present.
 #   E2/E3/E4  npm run typecheck (tsc x3), typecheck:core-contracts,
 #       check:dependency-boundaries + check:tool-invocation-boundaries —
 #       executed INSIDE the candidate copy.
+#   E4.5  npm run build:renderer (final closeout): the authorized client
+#       wiring touches renderer sources, so the renderer build is part of
+#       the no-new-regressions surface — executed INSIDE the candidate
+#       copy.
 #   E5  failure attribution by REPLAY, with CONTENT-BASED cause
 #       classification:
 #       - the full npm test runs in the candidate copy;
 #       - the three documented seal-family test files run again in the
 #         pristine BASE_SHA copy;
-#       - candidate failing files must be a subset of the documented seal
-#         family (a red OUTSIDE the family always fails);
+#       - candidate failing files must be a subset of the BASELINE
+#         REPLAY's failing files ∪ REGISTERED pre-existing failure
+#         families (an explicit registration ledger, currently the seal
+#         trio — a red OUTSIDE that union always fails; registration is
+#         a documented audit decision, never a way to absorb a new red);
 #       - parseability (R5-F01): a non-zero npm exit whose log shows
 #         neither a vitest "Test Files" summary nor any parsable FAIL
 #         block is an UNPARSEABLE failure — the gate fails closed instead
@@ -144,12 +240,24 @@
 #                                        carries the COMPLETE non-audit-
 #                                        change diagnostic, and so does a
 #                                        direct guard `✗` line carrying it;
+#                                        repair-group10: the guard-tail
+#                                        WINDOW also counts — the
+#                                        generators' guard_output[-500:]
+#                                        slice over a listing longer than
+#                                        the window (front-cut printable-
+#                                        ASCII path fragment + ≥1 complete
+#                                        `  - ` listing line + exactly 500
+#                                        code points reconstructed, ONLY
+#                                        inside a block whose first payload
+#                                        row is a GENERATOR wrapper; gate-r2
+#                                        round2 block 4 / round3 block 6);
 #                                        ANY other guard reason or payload
 #                                        shape (R6-F01: missing coordinate
 #                                        file, non-hex / non-commit
 #                                        coordinate, `git diff ..HEAD 失败`,
 #                                        permission failure, a TRUNCATED
-#                                        line or a bare tail window) is
+#                                        sentence, a bare or geometry-
+#                                        violating tail window) is
 #                                        NOT this class — it is
 #                                        UNRECOGNIZED and fails the gate
 #                                        at both ends (fail closed; the
@@ -188,8 +296,10 @@
 # this gate at all and nothing of the invoking worktree is ever deleted.
 #
 # This script is a REGRESSION gate, not a seal: PASS means "the production
-# surface is unchanged vs BASE and no new test failures appeared at the
-# candidate". It never asserts an audit-seal PASS; the formal seal remains
+# DEFAULT entry is not switched (Node/Electron incumbent default, asserted
+# structurally by E1c+E1d) and no new test failures appeared at the
+# candidate vs the baseline replay ∪ registered pre-existing failure
+# families". It never asserts an audit-seal PASS; the formal seal remains
 # the orchestrator's governance step, and any rehearsal SHA recorded here
 # is a regression-attribution coordinate, not a seal coordinate.
 #
@@ -229,20 +339,39 @@ git merge-base --is-ancestor "$BASE_SHA" "$CANDIDATE_SHA" \
 note "PASS E0-ancestry (base is an ancestor of candidate)"
 
 # ── Complete worktree binding (tracked modifications AND untracked content) ─
-# bind_worktree <repo> <out.tsv>: one line per non-clean path —
-# `<sha256|->  <XY>  <path>` sorted by path. Untracked (non-ignored) files
-# are included with their content hash; renames record the new path.
+# bind_worktree <repo> <out.tsv> [exclude-prefix]: one line per non-clean
+# path — `<sha256|->  <XY>  <path>` sorted by path. Untracked (non-ignored)
+# files are included with their content hash; renames record the new path.
 # This is the full candidate state — never git's tracked-only view
 # (R4-F02: `--untracked-files=no` let four new candidate files slip past
 # the binding and into the baseline).
+#
+# R02 final-closeout repair-group5 (E0 self-reference): the optional
+# exclude-prefix is THIS GATE'S OWN EVIDENCE SUBTREE ($EVIDENCE_DIR,
+# repo-relative), and nothing else. When the evidence root lives inside
+# the repository (the verify-stage layout), the gate itself writes there
+# between the two bindings — summary.txt appends, this very tsv going
+# from empty to populated, the e0-candidate-dirty.* captures — so an
+# exhaustive binding can never mirror byte-identically (the two scans
+# differ BY CONSTRUCTION; see the repair-group5 header block above).
+# Both scans exclude the SAME prefix symmetrically, and the active
+# exclusion is recorded as a `#` header row in BOTH tsv files so the
+# compared artifacts stay self-describing and auditable. Files under
+# the prefix are this run's OUTPUT (runner evidence), never candidate
+# source; every other path — including the other verify-stage evidence
+# directories, static during this gate's run — stays fully bound. With
+# no third argument (the E0s scratch fixtures) or an empty prefix
+# (evidence root outside the repository, the historical /tmp layout)
+# the binding stays exhaustive and emits no header row.
 bind_worktree() {
-  python3 - "$1" > "$2" <<'PYBIND'
+  python3 - "$1" "${3:-}" > "$2" <<'PYBIND'
 import hashlib
 import os
 import subprocess
 import sys
 
 repo = sys.argv[1]
+exclude = sys.argv[2] if len(sys.argv) > 2 else ""
 raw = subprocess.run(
     ["git", "-C", repo, "status", "--porcelain=v1", "-z", "--untracked-files=all"],
     check=True, capture_output=True,
@@ -260,6 +389,11 @@ while i < len(records):
     if "R" in xy or "C" in xy:
         # rename/copy records carry the original path in the next record
         i += 1
+    if exclude and (path == exclude or path.startswith(exclude + "/")):
+        # this gate's own run-time evidence output subtree — excluded
+        # SYMMETRICALLY from every binding that passes the same prefix
+        # (repair-group5; see the function header)
+        continue
     digest = "-"
     full = os.path.join(repo, path)
     if os.path.isfile(full) and not os.path.islink(full):
@@ -267,22 +401,49 @@ while i < len(records):
             digest = hashlib.sha256(fh.read()).hexdigest()
     rows.append((path, xy, digest))
 rows.sort()
+if exclude:
+    print(f"# binding-exclusion: {exclude}/** — this gate's own run-time evidence output subtree (runner output, never candidate source); applied symmetrically to BOTH the main-repo binding and the candidate-copy binding (E0 mirror compare)")
 for path, xy, digest in rows:
     print(f"{digest}  {xy}  {path}")
 PYBIND
 }
 
-# Candidate worktree state — recorded COMPLETELY, never hidden.
-bind_worktree "$MAIN_REPO" "$EVIDENCE_DIR/e0-candidate-binding.tsv"
-if [ -s "$EVIDENCE_DIR/e0-candidate-binding.tsv" ]; then
+# The exclusion prefix (repair-group5): $EVIDENCE_DIR relative to the
+# repo root, computed ONCE from the two canonical (pwd -P) paths and
+# passed UNCHANGED to both bindings — the candidate copy reproduces the
+# same repo-relative layout, so one prefix serves both scans
+# symmetrically. Empty (no exclusion) when the evidence root lives
+# OUTSIDE the repository: the binding there stays exhaustive.
+EVIDENCE_REL_PREFIX="$(python3 - "$MAIN_REPO" "$EVIDENCE_DIR" <<'PYREL'
+import os
+import sys
+
+rel = os.path.relpath(sys.argv[2], sys.argv[1])
+if rel == "." or rel == ".." or rel.startswith(".." + os.sep):
+    print("")
+else:
+    print(rel)
+PYREL
+)"
+
+# Candidate worktree state — recorded COMPLETELY, never hidden. The ONE
+# exclusion is this gate's own evidence subtree (repair-group5: with an
+# in-repo evidence root the gate's own writes between the two scans made
+# the mirror compare fail BY CONSTRUCTION); see bind_worktree's header.
+bind_worktree "$MAIN_REPO" "$EVIDENCE_DIR/e0-candidate-binding.tsv" "$EVIDENCE_REL_PREFIX"
+CANDIDATE_BINDING_ROWS="$(grep -vc '^#' "$EVIDENCE_DIR/e0-candidate-binding.tsv" || true)"
+if [ "$CANDIDATE_BINDING_ROWS" -gt 0 ]; then
   git status --porcelain --untracked-files=no > "$EVIDENCE_DIR/e0-candidate-dirty.txt"
   git diff > "$EVIDENCE_DIR/e0-candidate-dirty.diff"
   DIRTY_DIGEST="$(shasum -a 256 "$EVIDENCE_DIR/e0-candidate-dirty.diff" | awk '{print $1}')"
   CANDIDATE_DIRTY=1
-  note "NOTE candidate-worktree-dirty: this run binds the WORKTREE (uncommitted changes), tracked diff sha256=$DIRTY_DIGEST, full tracked+untracked binding in e0-candidate-binding.tsv ($(wc -l < "$EVIDENCE_DIR/e0-candidate-binding.tsv" | tr -d ' ') paths)"
+  note "NOTE candidate-worktree-dirty: this run binds the WORKTREE (uncommitted changes), tracked diff sha256=$DIRTY_DIGEST, full tracked+untracked binding in e0-candidate-binding.tsv ($CANDIDATE_BINDING_ROWS paths)"
 else
   CANDIDATE_DIRTY=0
   note "candidate worktree clean: this run binds commit $CANDIDATE_SHA exactly"
+fi
+if [ -n "$EVIDENCE_REL_PREFIX" ]; then
+  note "NOTE e0-binding-exclusion: $EVIDENCE_REL_PREFIX/** (this gate's own run-time evidence output subtree — in-repo evidence root; runner output, never candidate source; applied symmetrically to both bindings — recorded in the # header row of e0-candidate-binding.tsv)"
 fi
 
 # ── Isolated copies (APFS copy-on-write; main worktree stays read-only) ────
@@ -305,9 +466,12 @@ note "== isolated copies under $WORK =="
 cp -Rc "$MAIN_REPO" "$CAND_COPY"
 
 # Candidate copy must mirror the invoking worktree EXACTLY — tracked
-# modifications and untracked file contents alike.
+# modifications and untracked file contents alike. The exclusion prefix
+# is the SAME one used for the main-repo binding above (repair-group5:
+# symmetric exclusion of this gate's own evidence subtree; everything
+# else must still match byte for byte).
 [ "$(git -C "$CAND_COPY" rev-parse HEAD)" = "$CANDIDATE_SHA" ] || fail "candidate copy HEAD mismatch"
-bind_worktree "$CAND_COPY" "$WORK/candidate-copy-binding.tsv"
+bind_worktree "$CAND_COPY" "$WORK/candidate-copy-binding.tsv" "$EVIDENCE_REL_PREFIX"
 cmp -s "$EVIDENCE_DIR/e0-candidate-binding.tsv" "$WORK/candidate-copy-binding.tsv" \
   || fail "candidate copy does not mirror the invoking worktree (tracked+untracked content binding differs)"
 
@@ -379,7 +543,19 @@ printf '%s\n' "$SEAL_FAMILY" > "$EVIDENCE_DIR/e5-seal-family.txt"
 #     (two-space dash + one token, nothing else on the line);
 #   - the GENERATOR's embedded tail (create-delivery-patch.py /
 #     create-round3-patch.py `post-verification diff guard failed: ` + the
-#     guard's `✗ …` output);
+#     guard's `✗ …` output) — INCLUDING the guard-tail WINDOW variant
+#     (repair-group10, gate-r2 evidence): when the violator listing is
+#     longer than the 500-code-point window the generators slice off the
+#     guard's output (`guard_output[-500:]`), the ✗ sentence is gone and
+#     the embedded line is `post-verification diff guard failed: ` + a
+#     front-cut printable-ASCII path fragment, followed by the guard's
+#     complete `  - path` listing lines and (when the guard's own
+#     console.error was lost past the 64 KiB pipe buffer at exit) a final
+#     mid-token listing line; accepted ONLY as that exact structure —
+#     generator wrapper as the block's first payload row, fragment with
+#     no space/colon/non-ASCII (sentence material can never pass), ≥1
+#     complete listing line, and the reconstructed fragment+lines window
+#     EXACTLY 500 code points;
 #   - the GENERATOR's uncommitted/untracked refusal with its firstDiff body;
 #   - the Node wrapper `Error: Command failed: <argv0> <script>` — ONLY as
 #     the FIRST payload row of a block (it is the head of the thrown
@@ -402,10 +578,17 @@ SEAL_LAG_SENT_GUARD='VERIFIED_SOURCE_SHA 之后出现非审计文件改动（禁
 SEAL_LAG_SENT_ASSERT='VERIFIED_SOURCE_SHA 之后出现了非审计文件改动（禁止修改生产代码/测试逻辑/runtime artifacts）'
 SEAL_LAG_GUARD_PREFIX='post-verification diff guard failed:'
 UNCOMMITTED_DIAG='current source manifest does not match HEAD (uncommitted or untracked source changes)'
-cat > "$EVIDENCE_DIR/e5-cause-classes.txt" <<CLASSES
-seal-coordinate-lag	committed non-audit changes post-date the frozen VERIFIED_SOURCE_SHA — ONLY a payload line that is EXACTLY one of the real producers' complete shapes (the seal test's AssertionError sentence, the guard's direct `✗` sentence line, or the generator's guard-embedded line carrying the COMPLETE sentence) classifies here; each shape may end with the trailing `:` and NOTHING else. A line that carries the complete sentence PLUS additional content (R7-F01: an appended `Error: EACCES: permission denied`) still records the known cause AND is UNRECOGNIZED for its unexplained remainder; any other guard payload (missing/wrong coordinate file, non-hex/non-commit coordinate, `git diff ..HEAD 失败`, permission failure, truncated sentence, tail window) is NOT this class.
-uncommitted-source-rejection	a patch generator refused: ${UNCOMMITTED_DIAG}: firstDiff=[…] — the COMPLETE generator line whose firstDiff body is EXACTLY the producers' json.dumps(diff_paths[:3], ensure_ascii=False) output (a JSON array of 1..3 repo-relative path string literals, nothing else on the line; R9-F01: validated element-by-element, non-JSON/mixed/truncated/empty fail closed) and nothing else; expected at the candidate only while the worktree is dirty; at the base it proves baseline pollution (gate FAILS)
-UNRECOGNIZED	every payload line that is not a COMPLETE recognized shape and not COMPLETELY part of one's body. R8-F01: every structural category is bound to its producer INSIDE the same block — the `  - path` listing only under a complete guard `✗`/embedded line, the bare-path/diff-body/matcher lines only under the complete AssertionError lead, the wrapper only as the first payload row and only for the three real family commands, the warning only as git's complete CRLF sentence. A body line without its producing lead, a `  - path`/warning/matcher/wrapper line with ANY trailing content, a bare token containing `:`, a `fatal:` line, any foreign Error/✗/Traceback, a truncated or tail-window guard refusal, a zero-payload block, or a block no recognized diagnostic FULLY explains is UNRECOGNIZED (gate FAILS CLOSED, per BLOCK — no "registered unreadable" class exists; an unproven cause never takes the gate green, at either end)
+# repair-group10: the heredoc delimiter is QUOTED — the previous unquoted
+# form left the backticked terms below live to shell command substitution
+# (`✗`, `Error: EACCES…`, `git diff ..HEAD 失败` each ran as a command:
+# "✗: command not found" on the gate's stderr, and the backticked segments
+# were silently REPLACED by empty output inside this archived ledger — a
+# silent corruption of the audit record). The one intended expansion
+# ($UNCOMMITTED_DIAG) is now written literally.
+cat > "$EVIDENCE_DIR/e5-cause-classes.txt" <<'CLASSES'
+seal-coordinate-lag	committed non-audit changes post-date the frozen VERIFIED_SOURCE_SHA — ONLY a payload line that is EXACTLY one of the real producers' complete shapes (the seal test's AssertionError sentence, the guard's direct `✗` sentence line, or the generator's guard-embedded line carrying the COMPLETE sentence) classifies here; each shape may end with the trailing `:` and NOTHING else. repair-group10 (gate-r2 round2 block 4 / round3 block 6): the generator's guard-tail WINDOW is the fourth registered shape — `post-verification diff guard failed: ` + a front-cut printable-ASCII path fragment + the guard's complete `  - path` listing lines (final line possibly mid-token where the guard's output was lost past the 64 KiB pipe buffer), accepted ONLY under a GENERATOR wrapper as the block's first payload row, ONLY with no space/colon/non-ASCII in the fragment (sentence material can never pose as a path fragment), ONLY with at least one complete listing line, and ONLY when the reconstructed window is EXACTLY 500 code points (the literal guard_output[-500:] window). A line that carries the complete sentence PLUS additional content (R7-F01: an appended `Error: EACCES: permission denied`) still records the known cause AND is UNRECOGNIZED for its unexplained remainder; any other guard payload (missing/wrong coordinate file, non-hex/non-commit coordinate, `git diff ..HEAD 失败`, permission failure, truncated sentence, bare or geometry-violating tail window) is NOT this class.
+uncommitted-source-rejection	a patch generator refused: current source manifest does not match HEAD (uncommitted or untracked source changes): firstDiff=[…] — the COMPLETE generator line whose firstDiff body is EXACTLY the producers' json.dumps(diff_paths[:3], ensure_ascii=False) output (a JSON array of 1..3 repo-relative path string literals, nothing else on the line; R9-F01: validated element-by-element, non-JSON/mixed/truncated/empty fail closed) and nothing else; expected at the candidate only while the worktree is dirty; at the base it proves baseline pollution (gate FAILS)
+UNRECOGNIZED	every payload line that is not a COMPLETE recognized shape and not COMPLETELY part of one's body. R8-F01: every structural category is bound to its producer INSIDE the same block — the `  - path` listing only under a complete guard `✗`/embedded line or a VALIDATED guard-tail window (repair-group10: generator-wrapped, ≥1 complete listing line, exactly 500 code points — a bare `.py` tail, a wrong-length run, a mid-sentence fragment, or a window under any other first row stays right here), the bare-path/diff-body/matcher lines only under the complete AssertionError lead, the wrapper only as the first payload row and only for the three real family commands, the warning only as git's complete CRLF sentence. A body line without its producing lead, a `  - path`/warning/matcher/wrapper line with ANY trailing content, a bare token containing `:`, a `fatal:` line, any foreign Error/✗/Traceback, a truncated or unregistered tail-window guard refusal, a zero-payload block, or a block no recognized diagnostic FULLY explains is UNRECOGNIZED (gate FAILS CLOSED, per BLOCK — no "registered unreadable" class exists; an unproven cause never takes the gate green, at either end)
 CLASSES
 
 # extract_blocks <vitest-log> <copy-path>: prints one
@@ -625,6 +808,74 @@ classify_file() {
       # literal ASCII parentheses, which an ERE would read as grouping
       # operators.
       uncommitted_prefix = uncommitted_sent ": firstDiff=["
+      # R02 final-closeout repair-group10 (gate-r2 evidence: artifacts/
+      # rust-tauri/R02/final-candidate-a29e5adbb404ad70/A16/legacy-entry/
+      # e5-candidate-blocks.txt — tests/round2-delivery-evidence.test.ts
+      # block 4, tests/round3-delivery-evidence.test.ts block 6): the
+      # guard-tail WINDOW form. Both patch generators print the guard
+      # refusal as `guard_prefix + " " + guard_output[-500:]`
+      # (artifacts/f1-f12-repair/round2/create-delivery-patch.py:449,
+      # artifacts/f1-f12-repair/round3-c01-c03/create-round3-patch.py:449)
+      # — the LAST 500 code points of the guard output. When the
+      # changed-file listing is longer than the window (this repo at
+      # gate-r2: ~65 KB, ~2100 violators), the ✗ sentence is windowed
+      # away and what remains is a FRONT-CUT PATH FRAGMENT ([-500:] cuts
+      # mid-path; gate-r2: `udit-r17-cli-rust-targeted/typecheck-05/
+      # exit-codes.txt`) followed by the guard own complete `  - path`
+      # listing lines, ending in a mid-token line when the guard
+      # console.error output was itself lost beyond the 64 KiB pipe
+      # buffer at process.exit(1) (gate-r2 window ending: `  - artifacts/
+      # rust-t`; the guard part byte-exactly 65536). Registered as a
+      # STRUCTURED shape anchored to the producer exact geometry — no
+      # substring is ever accepted:
+      #   • producer binding: ONLY inside a block whose FIRST payload
+      #     row is one of the two GENERATOR wrappers — the prefix line
+      #     has no other producer (a window under the node-guard wrapper
+      #     or any other first row is UNRECOGNIZED);
+      #   • fragment grammar `[!-9;-~]*` (printable ASCII, no space, no
+      #     colon): every suffix fragment of EVERY guard fail() sentence
+      #     carries a space or the full-width `）`/CJK tail, so sentence
+      #     material can never pose as a path fragment (a mid-sentence
+      #     cut stays UNRECOGNIZED — the truncated-guard fixture);
+      #   • ≥1 following listing line and ≥1 COMPLETE listing line
+      #     (`  - ` + the same ASCII grammar; the bare `.py` tail of the
+      #     R6-F01 fixtures has zero following lines and stays
+      #     UNRECOGNIZED);
+      #   • the reconstructed window — fragment plus newline-joined
+      #     listing lines, no trailing newline — is EXACTLY 500 code
+      #     points (all-ASCII by grammar, so length is locale-proof):
+      #     the literal `[-500:]` window size. Any mutation (dropped
+      #     char/line, appended junk, foreign line inside the run)
+      #     breaks the geometry and fails closed.
+      # A validated window proves the guard violator listing existed,
+      # and only the non-audit-change refusal ever prints one — the
+      # block records seal-coordinate-lag and the window rows are its
+      # body.
+      guard_tail_prefix = guard_prefix " "
+      genwrapper_exact = "^Error: Command failed: (python3 [^ ]+/create-delivery-patch\\.py|python3 [^ ]+/create-round3-patch\\.py)$"
+      tail_frag_exact = "^[!-9;-~]*$"
+      tail_line_exact = "^  - [!-9;-~]*$"
+      for (b = 1; b <= maxb; b++) {
+        win_start[b] = 0; win_end[b] = 0
+        if (n[b] < 3) continue
+        if (payload[b, 2] !~ genwrapper_exact) continue
+        for (i = 3; i <= n[b]; i++) {
+          if (substr(payload[b, i], 1, length(guard_tail_prefix)) != guard_tail_prefix) continue
+          frag = substr(payload[b, i], length(guard_tail_prefix) + 1)
+          if (frag !~ tail_frag_exact) break   # sentence material / foreign tail: no window; the line is judged below
+          win = frag; consumed = 0; complete_seen = 0
+          for (j = i + 1; j <= n[b]; j++) {
+            if (payload[b, j] !~ tail_line_exact) break
+            win = win "\n" payload[b, j]
+            consumed++
+            if (length(payload[b, j]) > 4) complete_seen = 1
+          }
+          if (consumed >= 1 && complete_seen && length(win) == 500) {
+            win_start[b] = i; win_end[b] = i + consumed
+          }
+          break   # exactly one guard-prefix line per real generator failure; an unvalidated one stays fail-closed
+        }
+      }
       seal = 0; uncommitted = 0; unrecognized = 0
       for (b = 1; b <= maxb; b++) {
         if (n[b] == 0) continue   # block ids are LOG-global: ids with no rows for THIS file belong to other files
@@ -634,6 +885,10 @@ classify_file() {
           line = payload[b, i]
           if (line == "⟦FAIL-BLOCK⟧") continue              # block marker: proves existence, explains nothing
           if (line == "") continue                          # blank separator inside a real message body
+          # repair-group10: a row inside a VALIDATED guard-tail window is
+          # the body of the classified seal-lag diagnostic (see the
+          # pre-pass above) — explained, never foreign.
+          if (win_start[b] && i >= win_start[b] && i <= win_end[b]) continue
           if (index(line, sent_assert) || index(line, sent_pre sent_post)) {
             # The COMPLETE known sentence is present (with or without 了).
             # It proves the known cause — but ONLY the exact complete
@@ -714,6 +969,10 @@ classify_file() {
           # a pass-through).
           b_foreign = 1
         }
+        # repair-group10: a validated guard-tail window proves the guard
+        # refused with the non-audit-change violator listing (the only
+        # fail() sentence that ever prints one) — seal-coordinate-lag.
+        if (win_start[b]) b_seal = 1
         if (b_seal) seal = 1
         if (b_uncommitted) uncommitted = 1
         # An EMPTY block, a zero-payload block (marker only), or an
@@ -1235,6 +1494,166 @@ current source manifest does not match HEAD (uncommitted or untracked source cha
 FIX
 sc_expect uncommitted-trailing-junk "$SELFCHECK/uncommitted-trailing-junk.log" uncommitted-source-rejection UNRECOGNIZED
 
+# ── repair-group10: guard-tail WINDOW fixtures (gate-r2 evidence — the
+# exact blocks that made gate round 2 fail E5 with `UNRECOGNIZED,
+# seal-coordinate-lag, uncommitted-source-rejection` for round2/round3).
+# Producer mechanics (create-delivery-patch.py:449 /
+# create-round3-patch.py:449): the generators embed the guard refusal as
+# `post-verification diff guard failed: {guard_output[-500:]}`; with a
+# listing longer than the window the ✗ sentence is gone and the line
+# carries a front-cut path fragment + the guard's `  - ` listing lines,
+# ending mid-token where the guard's own output was lost past the 64 KiB
+# pipe buffer at process.exit (verified: the captured guard part is byte-
+# exactly 65536 in the gate-r2 log). Both real windows are EXACTLY 500
+# code points reconstructed. ─────────────────────────────────────────────
+# POSITIVE 1 — the real gate-r2 round2 block 4 text (wrapper + 2 of the
+# 72 real CRLF warning lines kept — classification is per line, the count
+# changes nothing — + the real firstDiff line + the real 500-point
+# window). Source: artifacts/rust-tauri/R02/final-candidate-
+# a29e5adbb404ad70/A16/legacy-entry/e5-candidate-blocks.txt, block 4.
+cat > "$SELFCHECK/guard-window-r2-round2.log" <<'FIX'
+ FAIL  fixture.ts > round2 > R10-09 replay
+Error: Command failed: python3 /x/artifacts/f1-f12-repair/round2/create-delivery-patch.py
+warning: in the working copy of 'artifacts/rust-tauri/R02/T07/redaction-scan/p1-execute-ok.headers', CRLF will be replaced by LF the next time Git touches it
+warning: in the working copy of 'artifacts/rust-tauri/R02/final-candidate-a29e5adbb404ad70/A13/redaction-scan/p2-ws-bad-query.headers', CRLF will be replaced by LF the next time Git touches it
+current source manifest does not match HEAD (uncommitted or untracked source changes): firstDiff=["artifacts/rust-tauri/R02/final-candidate-a0af83666f89cc4b/A01/a01-cargo-metadata.err", "artifacts/rust-tauri/R02/final-candidate-a0af83666f89cc4b/A01/a01-cargo-metadata.json", "artifacts/rust-tauri/R02/final-candidate-a0af83666f89cc4b/A01/a01-child-snapshot.tsv"]
+post-verification diff guard failed: udit-r17-cli-rust-targeted/typecheck-05/exit-codes.txt
+  - artifacts/rust-tauri/R02/audit-r17-cli-rust-targeted/typecheck-05/start-utc.txt
+  - artifacts/rust-tauri/R02/audit-r17-cli-rust-targeted/typecheck-06/candidate-sha256.txt
+  - artifacts/rust-tauri/R02/audit-r17-cli-rust-targeted/typecheck-06/commands.txt
+  - artifacts/rust-tauri/R02/audit-r17-cli-rust-targeted/typecheck-06/end-utc.txt
+  - artifacts/rust-tauri/R02/audit-r17-cli-rust-targeted/typecheck-06/exit-codes.txt
+  - artifacts/rust-t
+ ❯ fixture.ts:255:22
+FIX
+sc_expect guard-window-r2-round2 "$SELFCHECK/guard-window-r2-round2.log" seal-coordinate-lag uncommitted-source-rejection
+
+# POSITIVE 2 — the real gate-r2 round3 block 6 text (create-round3-patch
+# wrapper; same deterministic window — both generators embed the SAME
+# guard output). Source: e5-candidate-blocks.txt, block 6.
+cat > "$SELFCHECK/guard-window-r2-round3.log" <<'FIX'
+ FAIL  fixture.ts > round3 > replay
+Error: Command failed: python3 /x/artifacts/f1-f12-repair/round3-c01-c03/create-round3-patch.py
+warning: in the working copy of 'artifacts/rust-tauri/R02/T08/verify-stage/A13/redaction-scan/p1-execute-ok.headers', CRLF will be replaced by LF the next time Git touches it
+current source manifest does not match HEAD (uncommitted or untracked source changes): firstDiff=["artifacts/rust-tauri/R02/final-candidate-a0af83666f89cc4b/A01/a01-cargo-metadata.err", "artifacts/rust-tauri/R02/final-candidate-a0af83666f89cc4b/A01/a01-cargo-metadata.json", "artifacts/rust-tauri/R02/final-candidate-a0af83666f89cc4b/A01/a01-child-snapshot.tsv"]
+post-verification diff guard failed: udit-r17-cli-rust-targeted/typecheck-05/exit-codes.txt
+  - artifacts/rust-tauri/R02/audit-r17-cli-rust-targeted/typecheck-05/start-utc.txt
+  - artifacts/rust-tauri/R02/audit-r17-cli-rust-targeted/typecheck-06/candidate-sha256.txt
+  - artifacts/rust-tauri/R02/audit-r17-cli-rust-targeted/typecheck-06/commands.txt
+  - artifacts/rust-tauri/R02/audit-r17-cli-rust-targeted/typecheck-06/end-utc.txt
+  - artifacts/rust-tauri/R02/audit-r17-cli-rust-targeted/typecheck-06/exit-codes.txt
+  - artifacts/rust-t
+ ❯ fixture.ts:220:18
+FIX
+sc_expect guard-window-r2-round3 "$SELFCHECK/guard-window-r2-round3.log" seal-coordinate-lag uncommitted-source-rejection
+
+# POSITIVE 3 — derived (not gate-r2 bytes; producer-mechanics variant):
+# the SAME window geometry with the guard output NOT pipe-truncated, so
+# the final window line is a COMPLETE listing line. The fragment is
+# padded so the reconstruction is exactly 500 code points.
+cat > "$SELFCHECK/guard-window-complete-end.log" <<'FIX'
+ FAIL  fixture.ts > round2 > R10-09 replay
+Error: Command failed: python3 /x/artifacts/f1-f12-repair/round2/create-delivery-patch.py
+current source manifest does not match HEAD (uncommitted or untracked source changes): firstDiff=["docs/x.json"]
+post-verification diff guard failed: rust-tauri/R02/audit-r17-cli
+  - artifacts/rust-tauri/R02/audit-r17-cli-rust-targeted/typecheck-05/start-utc.txt
+  - artifacts/rust-tauri/R02/audit-r17-cli-rust-targeted/typecheck-06/candidate-sha256.txt
+  - artifacts/rust-tauri/R02/audit-r17-cli-rust-targeted/typecheck-06/commands.txt
+  - artifacts/rust-tauri/R02/audit-r17-cli-rust-targeted/typecheck-06/end-utc.txt
+  - artifacts/rust-tauri/R02/audit-r17-cli-rust-targeted/typecheck-06/exit-codes.txt
+  - docs/rust-tauri/R01/API_COMPAT_MATRIX.json
+ ❯ fixture.ts:255:22
+FIX
+sc_expect guard-window-complete-end "$SELFCHECK/guard-window-complete-end.log" seal-coordinate-lag uncommitted-source-rejection
+
+# NEGATIVE 1 — single-point mutation: one character dropped from the
+# window's final line (500 → 499). The geometry anchor fails closed.
+cat > "$SELFCHECK/guard-window-off-by-one.log" <<'FIX'
+ FAIL  fixture.ts > round2 > R10-09 replay
+Error: Command failed: python3 /x/artifacts/f1-f12-repair/round2/create-delivery-patch.py
+current source manifest does not match HEAD (uncommitted or untracked source changes): firstDiff=["docs/x.json"]
+post-verification diff guard failed: udit-r17-cli-rust-targeted/typecheck-05/exit-codes.txt
+  - artifacts/rust-tauri/R02/audit-r17-cli-rust-targeted/typecheck-05/start-utc.txt
+  - artifacts/rust-tauri/R02/audit-r17-cli-rust-targeted/typecheck-06/candidate-sha256.txt
+  - artifacts/rust-tauri/R02/audit-r17-cli-rust-targeted/typecheck-06/commands.txt
+  - artifacts/rust-tauri/R02/audit-r17-cli-rust-targeted/typecheck-06/end-utc.txt
+  - artifacts/rust-tauri/R02/audit-r17-cli-rust-targeted/typecheck-06/exit-codes.txt
+  - artifacts/rust-
+ ❯ fixture.ts:255:22
+FIX
+sc_expect guard-window-off-by-one "$SELFCHECK/guard-window-off-by-one.log" uncommitted-source-rejection UNRECOGNIZED
+
+# NEGATIVE 2 — trailing junk appended to the final window line: neither
+# the listing grammar nor the 500-point geometry survives.
+cat > "$SELFCHECK/guard-window-trailing-junk.log" <<'FIX'
+ FAIL  fixture.ts > round2 > R10-09 replay
+Error: Command failed: python3 /x/artifacts/f1-f12-repair/round2/create-delivery-patch.py
+current source manifest does not match HEAD (uncommitted or untracked source changes): firstDiff=["docs/x.json"]
+post-verification diff guard failed: udit-r17-cli-rust-targeted/typecheck-05/exit-codes.txt
+  - artifacts/rust-tauri/R02/audit-r17-cli-rust-targeted/typecheck-05/start-utc.txt
+  - artifacts/rust-tauri/R02/audit-r17-cli-rust-targeted/typecheck-06/candidate-sha256.txt
+  - artifacts/rust-tauri/R02/audit-r17-cli-rust-targeted/typecheck-06/commands.txt
+  - artifacts/rust-tauri/R02/audit-r17-cli-rust-targeted/typecheck-06/end-utc.txt
+  - artifacts/rust-tauri/R02/audit-r17-cli-rust-targeted/typecheck-06/exit-codes.txt
+  - artifacts/rust-t Error: EACCES: permission denied
+ ❯ fixture.ts:255:22
+FIX
+sc_expect guard-window-trailing-junk "$SELFCHECK/guard-window-trailing-junk.log" uncommitted-source-rejection UNRECOGNIZED
+
+# NEGATIVE 3 — the fragment replaced by SENTENCE material (`artifacts）:`
+# is a legal mid-sentence cut suffix of the guard's ✗ line): sentence
+# material can never pose as a path fragment — UNRECOGNIZED, and the
+# whole run loses its producing lead.
+cat > "$SELFCHECK/guard-window-sentence-fragment.log" <<'FIX'
+ FAIL  fixture.ts > round2 > R10-09 replay
+Error: Command failed: python3 /x/artifacts/f1-f12-repair/round2/create-delivery-patch.py
+current source manifest does not match HEAD (uncommitted or untracked source changes): firstDiff=["docs/x.json"]
+post-verification diff guard failed: artifacts）:
+  - artifacts/rust-tauri/R02/audit-r17-cli-rust-targeted/typecheck-05/start-utc.txt
+  - artifacts/rust-tauri/R02/audit-r17-cli-rust-targeted/typecheck-06/candidate-sha256.txt
+  - artifacts/rust-tauri/R02/audit-r17-cli-rust-targeted/typecheck-06/commands.txt
+  - artifacts/rust-tauri/R02/audit-r17-cli-rust-targeted/typecheck-06/end-utc.txt
+  - artifacts/rust-tauri/R02/audit-r17-cli-rust-targeted/typecheck-06/exit-codes.txt
+  - artifacts/rust-t
+ ❯ fixture.ts:255:22
+FIX
+sc_expect guard-window-sentence-fragment "$SELFCHECK/guard-window-sentence-fragment.log" uncommitted-source-rejection UNRECOGNIZED
+
+# NEGATIVE 4 — producer binding: the identical valid window under the
+# NODE-GUARD wrapper (a producer that never prints the embedded prefix)
+# must NOT classify — the window form exists only under a GENERATOR
+# wrapper.
+cat > "$SELFCHECK/guard-window-wrong-producer.log" <<'FIX'
+ FAIL  fixture.ts > round2 > manifestSourceRef
+Error: Command failed: node /x/.sync-audit/verify-post-verification-diff.mjs
+current source manifest does not match HEAD (uncommitted or untracked source changes): firstDiff=["docs/x.json"]
+post-verification diff guard failed: udit-r17-cli-rust-targeted/typecheck-05/exit-codes.txt
+  - artifacts/rust-tauri/R02/audit-r17-cli-rust-targeted/typecheck-05/start-utc.txt
+  - artifacts/rust-tauri/R02/audit-r17-cli-rust-targeted/typecheck-06/candidate-sha256.txt
+  - artifacts/rust-tauri/R02/audit-r17-cli-rust-targeted/typecheck-06/commands.txt
+  - artifacts/rust-tauri/R02/audit-r17-cli-rust-targeted/typecheck-06/end-utc.txt
+  - artifacts/rust-tauri/R02/audit-r17-cli-rust-targeted/typecheck-06/exit-codes.txt
+  - artifacts/rust-t
+ ❯ fixture.ts:95:15
+FIX
+sc_expect guard-window-wrong-producer "$SELFCHECK/guard-window-wrong-producer.log" uncommitted-source-rejection UNRECOGNIZED
+
+# NEGATIVE 5 — one complete listing line deleted from the run (500 → 419
+# points): the geometry anchor fails closed.
+cat > "$SELFCHECK/guard-window-missing-line.log" <<'FIX'
+ FAIL  fixture.ts > round2 > R10-09 replay
+Error: Command failed: python3 /x/artifacts/f1-f12-repair/round2/create-delivery-patch.py
+current source manifest does not match HEAD (uncommitted or untracked source changes): firstDiff=["docs/x.json"]
+post-verification diff guard failed: udit-r17-cli-rust-targeted/typecheck-05/exit-codes.txt
+  - artifacts/rust-tauri/R02/audit-r17-cli-rust-targeted/typecheck-05/start-utc.txt
+  - artifacts/rust-tauri/R02/audit-r17-cli-rust-targeted/typecheck-06/candidate-sha256.txt
+  - artifacts/rust-tauri/R02/audit-r17-cli-rust-targeted/typecheck-06/end-utc.txt
+  - artifacts/rust-tauri/R02/audit-r17-cli-rust-targeted/typecheck-06/exit-codes.txt
+  - artifacts/rust-t
+ ❯ fixture.ts:255:22
+FIX
+sc_expect guard-window-missing-line "$SELFCHECK/guard-window-missing-line.log" uncommitted-source-rejection UNRECOGNIZED
+
 # Positive control: a GREEN log (no FAIL block at all) parses to an empty
 # failing-file set and zero classes — the legal all-green state the
 # pristine baseline is expected to produce (never an error).
@@ -1607,53 +2026,189 @@ cmp -s "$SELFCHECK/bind-b.tsv" "$SELFCHECK/bind-c.tsv" \
   && fail "E0s: binding missed a new untracked file"
 grep -q 'untracked.rs' "$SELFCHECK/bind-a.tsv" \
   || fail "E0s: binding does not list untracked files at all"
+# R02 final-closeout repair-group5: the E0 self-reference exclusion must
+# be SURGICAL. Rehearsed on the no-commit scratch repo with the REAL
+# verify-stage prefix shape: changes under the EXCLUDED subtree are
+# invisible to the binding (that is the fix — those files are this
+# gate's own run-time output), a content change ANYWHERE ELSE still
+# flips the binding (the exclusion must never mask candidate source),
+# the active exclusion is recorded as a binding header row, and WITHOUT
+# the prefix the evidence subtree stays fully bound (the default
+# binding remains exhaustive).
+SCRATCH_EV="artifacts/rust-tauri/R02/final-candidate-fixture/A16/legacy-entry"
+mkdir -p "$SCRATCH/$SCRATCH_EV"
+printf 'summary line\n' > "$SCRATCH/$SCRATCH_EV/summary.txt"
+bind_worktree "$SCRATCH" "$SELFCHECK/bind-ev1.tsv" "$SCRATCH_EV"
+printf 'summary line grew between the two scans\n' > "$SCRATCH/$SCRATCH_EV/summary.txt"
+printf 'binding rows\n' > "$SCRATCH/$SCRATCH_EV/e0-candidate-binding.tsv"
+bind_worktree "$SCRATCH" "$SELFCHECK/bind-ev2.tsv" "$SCRATCH_EV"
+cmp -s "$SELFCHECK/bind-ev1.tsv" "$SELFCHECK/bind-ev2.tsv" \
+  || fail "E0s: excluded-subtree changes must not change the binding (E0 self-reference exclusion broken)"
+grep -q "^# binding-exclusion: $SCRATCH_EV/" "$SELFCHECK/bind-ev1.tsv" \
+  || fail "E0s: the active exclusion must be recorded in the binding header row"
+if awk '{print $3}' "$SELFCHECK/bind-ev1.tsv" | grep -qxF "$SCRATCH_EV/summary.txt"; then
+  fail "E0s: excluded paths must not appear as binding rows"
+fi
+printf 'changed-again\n' > "$SCRATCH/untracked.rs"
+bind_worktree "$SCRATCH" "$SELFCHECK/bind-ev3.tsv" "$SCRATCH_EV"
+cmp -s "$SELFCHECK/bind-ev2.tsv" "$SELFCHECK/bind-ev3.tsv" \
+  && fail "E0s: the exclusion masked a non-excluded untracked content change"
+bind_worktree "$SCRATCH" "$SELFCHECK/bind-ev4.tsv"
+grep -qF "$SCRATCH_EV/summary.txt" "$SELFCHECK/bind-ev4.tsv" \
+  || fail "E0s: without the exclusion prefix the evidence subtree must stay fully bound (default exhaustive)"
 # The baseline-CONSTRUCTION proof is the E0 purity assert on the real
 # freshly-built base copy (HEAD == BASE_SHA, empty diff, empty status):
 # the R4 scratch-repo rehearsal used `checkout -f` + `clean -fd` and is
 # gone with them — the real construction contains no such commands.
 {
   echo "binding: identical-state match OK; untracked content change detected; new untracked file detected (no-commit scratch repo)"
+  echo "binding exclusion (repair-group5): excluded-subtree changes invisible; non-excluded content change still detected; header row recorded; default binding stays exhaustive without the prefix"
   echo "baseline construction: proven by the E0 purity asserts on the real fresh copy (no checkout -f / clean -fd anywhere)"
 } | tee -a "$EVIDENCE_DIR/e0s-self-checks.log"
-note "PASS E0s-gate-self-checks (45 classifier fixtures incl. every REAL guard failure sentence, the zero-payload shapes, the R7 same-line/same-block mixes, the real direct-guard shape, the R8 structural-mixing negatives (compact Error:EACCES token, list/warning/matcher/wrapper tails, foreign/misplaced wrapper) and the producer-binding negatives (body lines without their lead) plus the REAL matcher-summary/diff-body positives, the R9-F01 firstDiff structure fixtures (legal `]`/`,`/escape/non-ASCII paths pure, non-JSON/mixed/truncated/empty/4-element/trailing-junk payloads fail closed) + no-block-rows rejection + green positive control + parseability predicate incl. exit-0 summary completeness and summary/exit consistency with the R9-F01 one-directional header-loss rule (suite-error no-arrow header and multi-error headers are PARSABLE; headers < Tests-failed is CONTRADICTORY) and the R10-F01 floors (headers < Test-Files-failed count — the zero-header suite-error summary hole — and Tests-failed>0 with Test-Files-failed==0 incoherence — both CONTRADICTORY; counts side-channel records files_failed/distinct_files/verdict) + exact-identity family membership checks + no-commit binding checks; details in e0s-self-checks.log)"
+note "PASS E0s-gate-self-checks (53 classifier fixtures incl. every REAL guard failure sentence, the zero-payload shapes, the R7 same-line/same-block mixes, the real direct-guard shape, the R8 structural-mixing negatives (compact Error:EACCES token, list/warning/matcher/wrapper tails, foreign/misplaced wrapper) and the producer-binding negatives (body lines without their lead) plus the REAL matcher-summary/diff-body positives, the R9-F01 firstDiff structure fixtures (legal bracket/comma/escape/non-ASCII paths pure, non-JSON/mixed/truncated/empty/4-element/trailing-junk payloads fail closed), the repair-group10 guard-tail-window fixtures (the two gate-r2 round2/round3 REAL 500-point windows + the derived complete-end variant classify seal+uncommitted; single-point mutations — off-by-one char, trailing junk, sentence-material fragment, wrong producer wrapper, deleted listing line — all fail closed to UNRECOGNIZED) + no-block-rows rejection + green positive control + parseability predicate incl. exit-0 summary completeness and summary/exit consistency with the R9-F01 one-directional header-loss rule (suite-error no-arrow header and multi-error headers are PARSABLE; headers < Tests-failed is CONTRADICTORY) and the R10-F01 floors (headers < Test-Files-failed count — the zero-header suite-error summary hole — and Tests-failed>0 with Test-Files-failed==0 incoherence — both CONTRADICTORY; counts side-channel records files_failed/distinct_files/verdict) + exact-identity family membership checks + no-commit binding checks; details in e0s-self-checks.log)"
 
-# ── E1: entry-unchanged proofs (inside the candidate copy, so uncommitted
-#        candidate state is included) ──────────────────────────────────────
-note "== E1: production entry surface unchanged vs base =="
+# ── E1: default-entry-not-switched proofs (inside the candidate copy, so
+#        uncommitted candidate state is included) ────────────────────────────
+# R02 final closeout (repair-group2): A16's correct semantics are "the
+# incumbent Node/Electron PRODUCTION DEFAULT is not switched and no new
+# client-affecting regressions appeared" — NOT "zero diff over the
+# desktop/tests/package.json surface" and NOT "zero rust references in
+# the launch path". Authorized opt-in wiring (explicit runtime selection,
+# packaged preview resources, guarded branches) legitimately touches that
+# surface; the assertions below pin the DEFAULT (Node/Electron) while the
+# authorized wiring range is ARCHIVED as evidence. Evidence basis:
+# /tmp/r02-final/a16-audit-r1.md (A16-AUDITOR-R1).
+note "== E1: default entry not switched (Node/Electron incumbent default) =="
+
+# E1a (RECORD ONLY — authorized-wiring audit trail): the surface diff vs
+# BASE, computed and archived, never gated. The pre-closeout zero-diff
+# FAIL semantics was the wrong predicate — it went permanently red the
+# moment the authorized client wiring landed, regardless of the default
+# runtime. This list documents WHAT was wired for the audit; the gate
+# itself is E1c + E1d below.
 git -C "$CAND_COPY" diff --name-only "$BASE_SHA" -- \
   core/ server/ desktop/ shared/ tests/ package.json package-lock.json \
-  > "$EVIDENCE_DIR/e1-diff-node-surface.txt"
-if [ -s "$EVIDENCE_DIR/e1-diff-node-surface.txt" ]; then
-  cat "$EVIDENCE_DIR/e1-diff-node-surface.txt" >&2
-  fail "E1: Node/Electron surface changed vs base $BASE_SHA"
+  > "$EVIDENCE_DIR/e1-surface-diff-files.txt"
+SURFACE_DIFF_COUNT="$(grep -c . "$EVIDENCE_DIR/e1-surface-diff-files.txt" || true)"
+if [ "$SURFACE_DIFF_COUNT" = "0" ]; then
+  echo "(empty — no audited-surface file differs from base $BASE_SHA)" >> "$EVIDENCE_DIR/e1-surface-diff-files.txt"
 fi
-note "PASS E1-diff-empty (git diff base..candidate over core/ server/ desktop/ shared/ tests/ package.json package-lock.json = empty)"
+note "RECORD E1a-surface-diff (authorized wiring range vs base $BASE_SHA: $SURFACE_DIFF_COUNT file(s) — archived in e1-surface-diff-files.txt, not gated)"
 
-# git diff cannot see UNTRACKED files — intersect the full candidate
-# binding with the same production surface (R4-F02: the binding now covers
-# every tracked+untracked path, so a new file inside the surface fails
-# here instead of slipping through).
-awk '{print $3}' "$EVIDENCE_DIR/e0-candidate-binding.tsv" \
-  | grep -E '^(core/|server/|desktop/|shared/|tests/|package\.json|package-lock\.json)$|^(core/|server/|desktop/|shared/|tests/)' \
-  > "$EVIDENCE_DIR/e1-binding-surface-hits.txt" || true
-if [ -s "$EVIDENCE_DIR/e1-binding-surface-hits.txt" ]; then
-  cat "$EVIDENCE_DIR/e1-binding-surface-hits.txt" >&2
-  fail "E1: candidate worktree carries uncommitted/untracked changes inside the production surface (see e1-binding-surface-hits.txt)"
+# E1b (RECORD ONLY): the uncommitted/untracked part of the wiring range —
+# git diff cannot see untracked files, so intersect the full candidate
+# binding (R4-F02: every tracked+untracked path) with the same surface
+# and archive it. The prefix branch also carries the package.json /
+# package-lock.json name forms so the record is complete. The binding's
+# `#` header row (repair-group5 exclusion record) is data-free and is
+# skipped before the field extraction.
+grep -v '^#' "$EVIDENCE_DIR/e0-candidate-binding.tsv" | awk '{print $3}' \
+  | grep -E '^(core/|server/|desktop/|shared/|tests/|package\.json|package-lock\.json)' \
+  > "$EVIDENCE_DIR/e1-binding-surface-intersect.txt" || true
+BINDING_HIT_COUNT="$(grep -c . "$EVIDENCE_DIR/e1-binding-surface-intersect.txt" || true)"
+if [ "$BINDING_HIT_COUNT" = "0" ]; then
+  echo "(empty — the candidate binding has no tracked/untracked path inside the audited surface)" >> "$EVIDENCE_DIR/e1-binding-surface-intersect.txt"
 fi
-note "PASS E1-binding-clean (full tracked+untracked candidate binding has zero entries inside the production surface)"
+note "RECORD E1b-binding-surface-intersect (uncommitted/untracked part of the wiring range: $BINDING_HIT_COUNT path(s) — archived in e1-binding-surface-intersect.txt, not gated)"
 
+# E1c: the Electron entry point is still the incumbent bootstrap.
 MAIN_FIELD="$(cd "$CAND_COPY" && node -p "require('./package.json').main")"
-[ "$MAIN_FIELD" = "desktop/bootstrap.cjs" ] || fail "E1: package.json main is '$MAIN_FIELD', expected desktop/bootstrap.cjs"
-note "PASS E1-package-main (package.json main = desktop/bootstrap.cjs)"
+[ "$MAIN_FIELD" = "desktop/bootstrap.cjs" ] || fail "E1c: package.json main is '$MAIN_FIELD', expected desktop/bootstrap.cjs"
+note "PASS E1c-package-main (package.json main = desktop/bootstrap.cjs)"
 
-LAUNCH_HITS="$(cd "$CAND_COPY" && grep -nE 'lingxi-service|rust-target|/rust/' scripts/launch.js desktop/main.cjs desktop/bootstrap.cjs server/boot.cjs 2>/dev/null || true)"
-: > "$EVIDENCE_DIR/e1-launch-rust-refs.txt"
-[ -n "$LAUNCH_HITS" ] && printf '%s\n' "$LAUNCH_HITS" > "$EVIDENCE_DIR/e1-launch-rust-refs.txt"
-if [ -n "$LAUNCH_HITS" ]; then
-  printf '%s\n' "$LAUNCH_HITS" >&2
-  fail "E1: production launch path references the rust stack"
+# E1d: the default-entry-not-switched assertion set. Every assertion runs
+# INSIDE the candidate copy; ANY violation fails E1. Evidence per
+# assertion lands in e1-default-entry-assertions.txt. Grep-based
+# assertions capture stderr too and require grep's exact exit status, so
+# a missing file (exit 2) fails CLOSED instead of passing vacuously.
+E1D_LOG="$EVIDENCE_DIR/e1-default-entry-assertions.txt"
+: > "$E1D_LOG"
+
+# d-1 runtime selector default: unset → node, 'node' → node, 'rust' → rust.
+set +e
+(cd "$CAND_COPY" && node -e "const m=require('./desktop/src/shared/rust-local-service.cjs'); if(m.rustDesktopEnabled({})!==false||m.rustDesktopEnabled({LINGXI_DESKTOP_SERVER_RUNTIME:'node'})!==false||m.rustDesktopEnabled({LINGXI_DESKTOP_SERVER_RUNTIME:'rust'})!==true)process.exit(1); console.log('d-1 rustDesktopEnabled: {} -> false (node), node -> false, rust -> true')") >> "$E1D_LOG" 2>&1
+D1_STATUS=$?
+set -e
+if [ "$D1_STATUS" -ne 0 ]; then
+  tail -5 "$E1D_LOG" >&2
+  fail "E1d-1: desktop runtime selector no longer defaults to node (rustDesktopEnabled behavior changed or the module is unreadable — see e1-default-entry-assertions.txt)"
 fi
-note "PASS E1-no-rust-in-launch (grep lingxi-service|rust-target|/rust/ over launch.js/main.cjs/bootstrap.cjs/boot.cjs = 0 hits)"
+note "PASS E1d-1-runtime-default (rustDesktopEnabled: unset/node → false, explicit rust → true)"
+
+# d-2 no default injection: nothing in the launch/packaging chain may set
+# LINGXI_DESKTOP_SERVER_RUNTIME for the user (package.json scripts AND
+# build/electron-builder sections, launch.js, bootstrap.cjs, notarize.cjs).
+set +e
+INJECTION_HITS="$(cd "$CAND_COPY" && grep -n 'LINGXI_DESKTOP_SERVER_RUNTIME' package.json scripts/launch.js desktop/bootstrap.cjs scripts/notarize.cjs 2>&1)"
+INJECTION_STATUS=$?
+set -e
+{ echo "--- d-2 injection grep (exit $INJECTION_STATUS) ---"; printf '%s\n' "$INJECTION_HITS"; } >> "$E1D_LOG"
+if [ "$INJECTION_STATUS" -ne 1 ] || [ -n "$INJECTION_HITS" ]; then
+  printf '%s\n' "$INJECTION_HITS" >&2
+  fail "E1d-2: the launch/packaging chain injects LINGXI_DESKTOP_SERVER_RUNTIME (package.json / scripts/launch.js / desktop/bootstrap.cjs / scripts/notarize.cjs) or the grep could not run — see e1-default-entry-assertions.txt"
+fi
+note "PASS E1d-2-no-default-injection (LINGXI_DESKTOP_SERVER_RUNTIME absent from package.json, scripts/launch.js, desktop/bootstrap.cjs, scripts/notarize.cjs)"
+
+# d-3 branch guard + incumbent Node body: main.cjs guards the Rust branch
+# with rustDesktopEnabled() and keeps the incumbent Node server body
+# (server-info.json reuse/cleanup/spawn) as the default path.
+set +e
+GUARD_HITS="$(cd "$CAND_COPY" && grep -nF 'if (rustDesktopEnabled())' desktop/main.cjs 2>&1)"
+GUARD_STATUS=$?
+NODE_BODY_HITS="$(cd "$CAND_COPY" && grep -nF 'server-info.json' desktop/main.cjs 2>&1)"
+NODE_BODY_STATUS=$?
+set -e
+{ echo "--- d-3 guard grep (exit $GUARD_STATUS) ---"; printf '%s\n' "$GUARD_HITS"; echo "--- d-3 node-body grep (exit $NODE_BODY_STATUS) ---"; printf '%s\n' "$NODE_BODY_HITS"; } >> "$E1D_LOG"
+if [ "$GUARD_STATUS" -ne 0 ] || [ -z "$GUARD_HITS" ] || [ "$NODE_BODY_STATUS" -ne 0 ] || [ -z "$NODE_BODY_HITS" ]; then
+  { printf '%s\n' "$GUARD_HITS"; printf '%s\n' "$NODE_BODY_HITS"; } >&2
+  fail "E1d-3: desktop main.cjs lost the rustDesktopEnabled() startServer guard and/or the incumbent Node server body (server-info.json handling) — see e1-default-entry-assertions.txt"
+fi
+note "PASS E1d-3-branch-guard (main.cjs: 'if (rustDesktopEnabled())' guards the Rust branch; incumbent Node server body with server-info.json handling intact)"
+
+# d-4 bootstrap load chain: bootstrap still selects main(.bundle).cjs by
+# isPackaged and requires it — the incumbent entry chain
+# package.json main → bootstrap.cjs → main(.bundle).cjs.
+set +e
+BOOTSTRAP_SELECT="$(cd "$CAND_COPY" && grep -nE 'app\.isPackaged.*main\.bundle\.cjs.*main\.cjs' desktop/bootstrap.cjs 2>&1)"
+BOOTSTRAP_SELECT_STATUS=$?
+BOOTSTRAP_REQUIRE="$(cd "$CAND_COPY" && grep -nF 'require(app.isPackaged' desktop/bootstrap.cjs 2>&1)"
+BOOTSTRAP_REQUIRE_STATUS=$?
+set -e
+{ echo "--- d-4 bootstrap select grep (exit $BOOTSTRAP_SELECT_STATUS) ---"; printf '%s\n' "$BOOTSTRAP_SELECT"; echo "--- d-4 bootstrap require grep (exit $BOOTSTRAP_REQUIRE_STATUS) ---"; printf '%s\n' "$BOOTSTRAP_REQUIRE"; } >> "$E1D_LOG"
+if [ "$BOOTSTRAP_SELECT_STATUS" -ne 0 ] || [ -z "$BOOTSTRAP_SELECT" ] || [ "$BOOTSTRAP_REQUIRE_STATUS" -ne 0 ] || [ -z "$BOOTSTRAP_REQUIRE" ]; then
+  { printf '%s\n' "$BOOTSTRAP_SELECT"; printf '%s\n' "$BOOTSTRAP_REQUIRE"; } >&2
+  fail "E1d-4: desktop/bootstrap.cjs no longer selects/requires main(.bundle).cjs by app.isPackaged — see e1-default-entry-assertions.txt"
+fi
+note "PASS E1d-4-bootstrap-load-chain (bootstrap.cjs: app.isPackaged selects and requires main.bundle.cjs / main.cjs)"
+
+# d-5 CLI default runtime stays node.
+set +e
+CLI_DEFAULT="$(cd "$CAND_COPY" && grep -nF 'runtime: "node"' cli/args.ts 2>&1)"
+CLI_DEFAULT_STATUS=$?
+set -e
+{ echo "--- d-5 cli default grep (exit $CLI_DEFAULT_STATUS) ---"; printf '%s\n' "$CLI_DEFAULT"; } >> "$E1D_LOG"
+if [ "$CLI_DEFAULT_STATUS" -ne 0 ] || [ -z "$CLI_DEFAULT" ]; then
+  printf '%s\n' "$CLI_DEFAULT" >&2
+  fail "E1d-5: cli/args.ts no longer defaults runtime to \"node\" — see e1-default-entry-assertions.txt"
+fi
+note "PASS E1d-5-cli-default-node (cli/args.ts default runtime = \"node\")"
+
+# d-6 data-root no-double-write guards on both sides: the desktop Rust
+# start refuses a data home owned by a Node server, and the Rust service
+# keeps its runtime records inside the isolated {home}/lingxi-service/
+# layout (never {home}/server-info.json).
+set +e
+DESKTOP_MUTEX="$(cd "$CAND_COPY" && grep -nF 'RUST_DESKTOP_NODE_SERVER_INFO_PRESENT' desktop/main.cjs 2>&1)"
+DESKTOP_MUTEX_STATUS=$?
+RUST_LAYOUT="$(cd "$CAND_COPY" && grep -nF 'const RUNTIME_DIR_NAME: &str = "lingxi-service"' rust/crates/lingxi-service/src/paths.rs 2>&1)"
+RUST_LAYOUT_STATUS=$?
+set -e
+{ echo "--- d-6 desktop mutex grep (exit $DESKTOP_MUTEX_STATUS) ---"; printf '%s\n' "$DESKTOP_MUTEX"; echo "--- d-6 rust layout grep (exit $RUST_LAYOUT_STATUS) ---"; printf '%s\n' "$RUST_LAYOUT"; } >> "$E1D_LOG"
+if [ "$DESKTOP_MUTEX_STATUS" -ne 0 ] || [ -z "$DESKTOP_MUTEX" ] || [ "$RUST_LAYOUT_STATUS" -ne 0 ] || [ -z "$RUST_LAYOUT" ]; then
+  { printf '%s\n' "$DESKTOP_MUTEX"; printf '%s\n' "$RUST_LAYOUT"; } >&2
+  fail "E1d-6: data-root no-double-write guards missing (RUST_DESKTOP_NODE_SERVER_INFO_PRESENT in desktop/main.cjs and/or RUNTIME_DIR_NAME in rust/crates/lingxi-service/src/paths.rs) — see e1-default-entry-assertions.txt"
+fi
+note "PASS E1d-6-no-double-write-guards (main.cjs RUST_DESKTOP_NODE_SERVER_INFO_PRESENT mutex + rust paths.rs RUNTIME_DIR_NAME runtime-dir layout both present)"
 
 # ── E2/E3: typechecks (candidate copy) ─────────────────────────────────────
 note "== E2: npm run typecheck (candidate copy) =="
@@ -1669,6 +2224,17 @@ note "== E4: incumbent boundary gates (candidate copy) =="
 (cd "$CAND_COPY" && npm run check:dependency-boundaries) > "$EVIDENCE_DIR/e4-dependency-boundaries.log" 2>&1 || { tail -20 "$EVIDENCE_DIR/e4-dependency-boundaries.log" >&2; fail "E4: dependency-boundaries failed"; }
 (cd "$CAND_COPY" && npm run check:tool-invocation-boundaries) > "$EVIDENCE_DIR/e4-tool-invocation-boundaries.log" 2>&1 || { tail -20 "$EVIDENCE_DIR/e4-tool-invocation-boundaries.log" >&2; fail "E4: tool-invocation-boundaries failed"; }
 note "PASS E4-boundary-gates (dependency + tool-invocation, exit 0 each)"
+
+# ── E4.5: renderer build (candidate copy) ──────────────────────────────────
+# R02 final closeout: the authorized client wiring touches renderer sources
+# (server-connection / websocket / status surfaces), so the renderer build
+# is part of the no-new-regressions surface; the pre-closeout gate never
+# built it. Runs INSIDE the candidate copy (its outputs land there, never
+# in the invoking worktree).
+note "== E4.5: npm run build:renderer (candidate copy) =="
+(cd "$CAND_COPY" && npm run build:renderer) > "$EVIDENCE_DIR/e4-5-build-renderer.log" 2>&1 \
+  || { tail -20 "$EVIDENCE_DIR/e4-5-build-renderer.log" >&2; fail "E4.5: build:renderer failed"; }
+note "PASS E4.5-build-renderer (exit 0; vite build --config vite.config.ts)"
 
 # ── E5: failure attribution by replay ──────────────────────────────────────
 note "== E5a: full npm test (candidate copy) =="
@@ -1786,24 +2352,39 @@ note "PASS E5-file-level-coverage-base (base: $BASE_HEADER_FILES distinct FAIL-h
 NEW_REDS="$(comm -23 "$EVIDENCE_DIR/e5-candidate-failed-files.txt" "$EVIDENCE_DIR/e5-base-failed-files.txt")"
 if [ -n "$NEW_REDS" ]; then
   printf '%s\n' "$NEW_REDS" > "$EVIDENCE_DIR/e5-new-since-base.txt"
-  note "NOTE new-since-base (green at base, red at candidate): $(printf '%s' "$NEW_REDS" | tr '\n' ' ' ) — must be family members with registered-class causes (checked below)"
+  note "NOTE new-since-base (green at base, red at candidate): $(printf '%s' "$NEW_REDS" | tr '\n' ' ' ) — must be inside baseline-reds ∪ registered pre-existing families with registered-class causes (checked below)"
 fi
 
-# (2) Every failing file must be in the documented seal family — EXACT
-# whole-line identity (R7-F01): a failing file whose complete path merely
-# CONTAINS a member (the `.regression.test.ts` suffix shape) is outside
-# the family and fails the gate here.
-NON_FAMILY="$(non_family_files "$EVIDENCE_DIR/e5-candidate-failed-files.txt")"
-if [ -n "$NON_FAMILY" ]; then
-  printf '%s\n' "$NON_FAMILY" | tee "$EVIDENCE_DIR/e5-non-family-failures.txt" >&2
-  fail "E5: candidate failures outside the documented seal family (exact whole-line identity; see e5-non-family-failures.txt)"
+# (2) No NEW failing files vs the baseline (R02 final closeout semantics):
+# a candidate red passes only when its COMPLETE path is EXACTLY (R7-F01
+# whole-line identity — a path that merely CONTAINS a member, the
+# `.regression.test.ts` suffix shape, is outside) EITHER a red of the
+# pristine BASE replay OR a member of a REGISTERED pre-existing failure
+# family. The registration list below is an explicit ledger of DOCUMENTED
+# pre-existing reds — registering a family is an audit decision that
+# carries its own evidence, NEVER a way to absorb a new red: any candidate
+# red outside base-reds ∪ registered families still fails the gate right
+# here. Current registration = the seal coordinate-lag trio: the frozen
+# VERIFIED_SOURCE_SHA predates the authorized R01/R02 commits, so the
+# committed-but-newer deliverables legitimately read as "non-audit
+# changes" — a seal-workflow coordinate lag governed by PROGRESS.md's
+# seal process (the orchestrator's step, out of scope for this gate),
+# not an R02 behavior regression.
+REGISTERED_PREEXISTING_FAMILY="$SEAL_FAMILY"
+printf '%s\n' "$REGISTERED_PREEXISTING_FAMILY" > "$EVIDENCE_DIR/e5-registered-preexisting-family.txt"
+sort -u "$EVIDENCE_DIR/e5-base-failed-files.txt" "$EVIDENCE_DIR/e5-registered-preexisting-family.txt" \
+  > "$EVIDENCE_DIR/e5-allowed-reds.txt"
+NEW_OUTSIDE="$(comm -23 "$EVIDENCE_DIR/e5-candidate-failed-files.txt" "$EVIDENCE_DIR/e5-allowed-reds.txt")"
+if [ -n "$NEW_OUTSIDE" ]; then
+  printf '%s\n' "$NEW_OUTSIDE" | tee "$EVIDENCE_DIR/e5-non-family-failures.txt" >&2
+  fail "E5: candidate failures OUTSIDE baseline-replay reds ∪ registered pre-existing families (exact whole-line identity; see e5-non-family-failures.txt vs e5-allowed-reds.txt)"
 fi
 BASE_NON_FAMILY="$(non_family_files "$EVIDENCE_DIR/e5-base-failed-files.txt")"
 if [ -n "$BASE_NON_FAMILY" ]; then
   printf '%s\n' "$BASE_NON_FAMILY" | tee "$EVIDENCE_DIR/e5-base-non-family-failures.txt" >&2
   fail "E5: BASE replay shows failures outside the seal family — the family's base state is broken, attribution impossible"
 fi
-note "PASS E5-family-membership (all reds at both ends are EXACTLY the three documented seal files — whole-line identity, substring look-alikes rejected)"
+note "PASS E5-no-new-reds (every candidate red ∈ baseline-replay reds ∪ registered pre-existing families — exact whole-line identity, substring look-alikes rejected; registration ledger archived in e5-registered-preexisting-family.txt (currently the seal trio: coordinate lag per the seal workflow, not an R02 regression); allowed set in e5-allowed-reds.txt; base replay reds all inside the registered family)"
 
 # (3) Content-based cause classification at BOTH ends. Every failing file
 # gets its classes from the actual generator/guard diagnostics. Class
@@ -1862,7 +2443,7 @@ fi
 # UNRECOGNIZED and has already failed the gate above, at BOTH ends (a
 # pristine base must not trip the guard at all; a candidate guard refusal
 # whose cause cannot be completely read is an unproven failure).
-note "PASS E5-cause-classification (every red BLOCK at both ends independently classified from actual generator/guard diagnostics against COMPLETE end-anchored producer shapes with R8-F01 producer binding: body lines legitimate only under their complete lead, wrapper only first-row-and-only-real-family-commands, structural prefixes never pass-through; no bare wrapper accepted; no recognized block absorbs an unrecognized sibling; a line carrying a complete known sentence PLUS anything else, and any unknown payload line (fatal:, foreign error, truncated/tail-window/missing-coordinate guard refusal, zero payload), is UNRECOGNIZED and has failed the gate; no registered-unreadable acceptance exists)"
+note "PASS E5-cause-classification (every red BLOCK at both ends independently classified from actual generator/guard diagnostics against COMPLETE end-anchored producer shapes with R8-F01 producer binding: body lines legitimate only under their complete lead, wrapper only first-row-and-only-real-family-commands, structural prefixes never pass-through; repair-group10: the guard-tail WINDOW — generator wrapper + ASCII path fragment + >=1 complete listing line + exactly 500 code points reconstructed — is the registered fourth seal-lag shape, every other window geometry included; no bare wrapper accepted; no recognized block absorbs an unrecognized sibling; a line carrying a complete known sentence PLUS anything else, and any unknown payload line (fatal:, foreign error, truncated/unregistered-tail-window/missing-coordinate guard refusal, zero payload), is UNRECOGNIZED and has failed the gate; no registered-unreadable acceptance exists)"
 
 # (3b) Class registration — the two documented classes are recorded
 # separately and loudly; neither is repainted as formal green.
@@ -1961,4 +2542,4 @@ if [ -n "$RESOLVED" ]; then
   note "NOTE resolved-since-base (red at base, green at candidate): $(printf '%s' "$RESOLVED" | tr '\n' ' ')"
 fi
 
-note "== R02-A16 legacy-entry regression: GREEN — production surface unchanged vs $BASE_SHA; no new failures at $CANDIDATE_SHA; base replay ran on a pristine historical checkout; all reds classified from actual diagnostics with file-level coverage pinned to the summary at both ends (R10-F01: distinct FAIL-header files >= summary files_failed, parser-drift assert) (candidate raw exit $CAND_EXIT, base raw exit $BASE_EXIT — registered, not formal green) =="
+note "== R02-A16 legacy-entry regression: GREEN — default entry NOT switched vs $BASE_SHA (Node/Electron incumbent default: E1c entry chain + E1d runtime-default / no-injection / branch-guard / bootstrap-load / cli-default / no-double-write assertions all hold; authorized wiring range archived in e1-surface-diff-files.txt); no new regressions vs baseline (candidate reds ⊆ baseline-replay reds ∪ registered pre-existing families, currently the seal trio); base replay ran on a pristine historical checkout; all reds classified from actual diagnostics with file-level coverage pinned to the summary at both ends (R10-F01: distinct FAIL-header files >= summary files_failed, parser-drift assert) (candidate raw exit $CAND_EXIT, base raw exit $BASE_EXIT — registered, not formal green) =="

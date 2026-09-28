@@ -1,0 +1,5 @@
+ M rust/crates/xtask/src/stage_map.rs
+ M rust/crates/xtask/src/stage_maps/R02.json
+ M rust/crates/xtask/src/verify.rs
+ M rust/crates/xtask/src/verify/runner_tests.rs
+ M scripts/rust-tauri/r02_t08_legacy_entry_regression.sh

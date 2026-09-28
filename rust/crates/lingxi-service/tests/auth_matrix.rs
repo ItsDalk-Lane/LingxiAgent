@@ -768,8 +768,13 @@ async fn a05_unreadable_registry_fails_closed_and_recovers() {
         None,
     )
     .await;
-    assert_eq!(status, 401, "invalid registry must deny: {body}");
-    assert!(body.contains("auth_registry_unavailable"), "body: {body}");
+    // Registry faults are SERVER-side failures (500 device_registry_failure,
+    // pinned by the R02 management-matrix cases
+    // management-*-registry-failure-not-empty), never 401 bad-credential
+    // denials — the fail-closed invariant is the deny itself plus the
+    // byte-preservation and no-recreate assertions below.
+    assert_eq!(status, 500, "invalid registry must deny: {body}");
+    assert!(body.contains("device_registry_failure"), "body: {body}");
     assert_eq!(std::fs::read(&path).unwrap(), b"{invalid json");
 
     std::fs::remove_file(&path).unwrap();
@@ -781,8 +786,8 @@ async fn a05_unreadable_registry_fails_closed_and_recovers() {
         None,
     )
     .await;
-    assert_eq!(status, 401, "missing registry must deny: {body}");
-    assert!(body.contains("auth_registry_unavailable"), "body: {body}");
+    assert_eq!(status, 500, "missing registry must deny: {body}");
+    assert!(body.contains("device_registry_failure"), "body: {body}");
     assert!(
         !path.exists(),
         "denied request must not recreate the registry"
@@ -810,8 +815,8 @@ async fn a05_unreadable_registry_fails_closed_and_recovers() {
         None,
     )
     .await;
-    assert_eq!(status, 401, "missing device registry must deny: {body}");
-    assert!(body.contains("auth_registry_unavailable"), "body: {body}");
+    assert_eq!(status, 500, "missing device registry must deny: {body}");
+    assert!(body.contains("device_registry_failure"), "body: {body}");
     std::fs::write(&devices_path, valid_devices).unwrap();
     server.stop_and_assert_clean().await;
 }
@@ -983,6 +988,63 @@ async fn a05_ws_ticket_and_live_socket_observe_external_revocation() {
     .await;
     let error = frame_text(&client_ws_read(&mut ws).await);
     assert!(error.contains("invalid_credential"), "error: {error}");
+    assert_eq!(close_code(&client_ws_read(&mut ws).await), Some(4401));
+    server.stop_and_assert_clean().await;
+}
+
+/// R02 收口 group 11 契约回归：服务端主动 close（撤销复查）之后，迟到
+/// 的客户端写入不得破坏已经送达的错误帧/close 帧。修复前服务端写完
+/// close 帧就丢弃连接，客户端此后再写会触发内核 RST；对端 TCP 栈对
+/// RST 与已排队未读数据的处理因平台而异（Linux 丢弃队列数据，macOS
+/// 本机实测保留），所以本用例在本机不构成修复前必挂的判别器——修复
+/// 前的失败率证据见 20 次循环（2 失败，auth_matrix.rs:405 ConnectionReset），
+/// 修复后 30 次循环全绿；排空机制本身的确定性判别在 lib.rs 单元测试
+/// `ws_drain_*`。本用例钉住的是线上契约：无论对端在 close 后多晚写，
+/// 已写出的错误帧 + close(4401) 必须原样可读。
+#[tokio::test]
+async fn a05_ws_late_client_write_after_server_close_keeps_frames_intact() {
+    let server = default_server("a05-ws-late-write").await;
+    let (status, body) = http(
+        server.addr,
+        "POST",
+        "/lingxi/v1/devices/credentials",
+        &[("Authorization", &server.bearer())],
+        Some(r#"{"userId":"user_late","scopes":["chat"]}"#),
+    )
+    .await;
+    assert_eq!(status, 201, "issue device credential: {body}");
+    let value: serde_json::Value = serde_json::from_str(&body).unwrap();
+    let credential_id = value["credentialId"].as_str().unwrap().to_string();
+    let secret = value["secret"].as_str().unwrap().to_string();
+
+    let mut ws = ws_upgrade(
+        server.addr,
+        "/lingxi/v1/ws",
+        &[("Authorization", &format!("Bearer {secret}"))],
+    )
+    .await
+    .expect("device socket upgrades");
+    let hello = serde_json::json!({
+        "protocol": "lingxi.wire", "clientKind": "test", "clientVersion": "0",
+        "protocolMin": 1, "protocolMax": 1,
+    });
+    client_ws_send(&mut ws, hello.to_string().as_bytes()).await;
+    let _ = frame_text(&client_ws_read(&mut ws).await);
+
+    // 运行中撤销：客户端不发送任何帧，让定时复查自己发现并主动关闭。
+    externally_revoke_credential(&server.home, &credential_id);
+    let error = frame_text(&client_ws_read(&mut ws).await);
+    assert!(error.contains("invalid_credential"), "error: {error}");
+
+    // 服务端已发出 close 之后的迟到写入（慢客户端/刚发出下一帧的形态）。
+    client_ws_send(
+        &mut ws,
+        br#"{"type":"session_read","sessionId":"sess_local_alpha"}"#,
+    )
+    .await;
+    // 修复后服务端处于排空收尾：迟到帧被消费丢弃，排队的 close(4401)
+    // 帧不受任何对端写活动影响。
+    tokio::time::sleep(Duration::from_millis(300)).await;
     assert_eq!(close_code(&client_ws_read(&mut ws).await), Some(4401));
     server.stop_and_assert_clean().await;
 }
@@ -2178,15 +2240,18 @@ async fn r00_access_devices_pairing_thinking_qr_and_static_boundaries() {
 #[tokio::test]
 async fn device_registry_failure_is_not_reported_as_bad_credentials() {
     let server = default_server("device-registry-error-status").await;
+    // Issue a VALID credential first (201 — the issuance contract used by
+    // every other test in this file; an empty body is 400 missing userId,
+    // which would never reach the registry-fault semantics under test).
     let (status, body) = http(
         server.addr,
         "POST",
         "/lingxi/v1/devices/credentials",
         &[("Authorization", &server.bearer())],
-        Some("{}"),
+        Some(r#"{"userId":"user_registry_probe","scopes":["chat"]}"#),
     )
     .await;
-    assert_eq!(status, 200, "{body}");
+    assert_eq!(status, 201, "{body}");
     let secret = serde_json::from_str::<serde_json::Value>(&body).unwrap()["secret"]
         .as_str()
         .unwrap()
@@ -2221,6 +2286,10 @@ async fn device_registry_failure_is_not_reported_as_bad_credentials() {
     )
     .await;
     assert_eq!(status, 500, "bearer registry failure: {body}");
+    assert!(
+        body.contains("device_registry_failure") && !body.contains("invalid_credential"),
+        "registry fault must not be reported as a bad credential: {body}"
+    );
     let (status, body) = http(
         server.addr,
         "POST",
@@ -2230,6 +2299,10 @@ async fn device_registry_failure_is_not_reported_as_bad_credentials() {
     )
     .await;
     assert_eq!(status, 500, "web login registry failure: {body}");
+    assert!(
+        body.contains("device_registry_failure") && !body.contains("invalid_credential"),
+        "registry fault must not be reported as a bad credential: {body}"
+    );
     let (status, body) = http(
         server.addr,
         "GET",
@@ -2239,6 +2312,10 @@ async fn device_registry_failure_is_not_reported_as_bad_credentials() {
     )
     .await;
     assert_eq!(status, 500, "cookie registry failure: {body}");
+    assert!(
+        body.contains("device_registry_failure") && !body.contains("invalid_credential"),
+        "registry fault must not be reported as a bad credential: {body}"
+    );
     std::fs::write(&registry_path, original).unwrap();
     let (status, body) = http(
         server.addr,

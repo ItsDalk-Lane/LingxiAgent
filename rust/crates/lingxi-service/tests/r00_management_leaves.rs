@@ -37,6 +37,23 @@ impl HttpResponse {
     }
 }
 
+/// 有界等待超时的统一失败出口：panic（即测试 FAIL），绝不返回假响应或跳过断言。
+/// 只是把这个测试文件里对真实服务的等待从「可能无限挂起」变成「快速如实失败」。
+fn request_stalled(
+    addr: SocketAddr,
+    method: &str,
+    path: &str,
+    phase: &str,
+    read_bytes: usize,
+) -> ! {
+    panic!(
+        "request to {addr} stalled during {phase} ({method} {path}, {read_bytes} bytes read so \
+         far) — if addr is a non-loopback self-address, the macOS application firewall / proxy \
+         TUN may be blocking inbound connections to this unsigned test binary; this is an \
+         environment failure surfaced honestly, not a skipped assertion"
+    )
+}
+
 async fn request(
     addr: SocketAddr,
     method: &str,
@@ -44,9 +61,16 @@ async fn request(
     headers: &[(&str, &str)],
     body: Option<&str>,
 ) -> HttpResponse {
-    let mut stream = tokio::net::TcpStream::connect(addr)
-        .await
-        .expect("connect to real service");
+    // 连接本身 10 秒预算：防火墙 / 代理 TUN 拦截下 connect 可能永远不返回。
+    let mut stream = match tokio::time::timeout(
+        Duration::from_secs(10),
+        tokio::net::TcpStream::connect(addr),
+    )
+    .await
+    {
+        Ok(connect) => connect.expect("connect to real service"),
+        Err(_) => request_stalled(addr, method, path, "connect", 0),
+    };
     let mut head = format!("{method} {path} HTTP/1.1\r\nHost: {addr}\r\nConnection: close\r\n");
     for (name, value) in headers {
         head.push_str(&format!("{name}: {value}\r\n"));
@@ -58,29 +82,37 @@ async fn request(
         ));
     }
     head.push_str("\r\n");
-    stream
-        .write_all(head.as_bytes())
-        .await
-        .expect("write request");
-    if let Some(body) = body {
-        stream.write_all(body.as_bytes()).await.expect("write body");
-    }
     let mut raw = Vec::new();
-    loop {
-        let mut chunk = [0_u8; 4096];
-        match stream.read(&mut chunk).await {
-            Ok(0) => break,
-            Ok(size) => raw.extend_from_slice(&chunk[..size]),
-            Err(err)
-                if matches!(
-                    err.kind(),
-                    std::io::ErrorKind::ConnectionReset | std::io::ErrorKind::BrokenPipe
-                ) =>
-            {
-                break
-            }
-            Err(err) => panic!("read response: {err}"),
+    // 写请求 + 读响应整体 20 秒预算（读循环在内）：LAN 自连请求被环境丢弃时
+    // 必须在预算内 panic，而不是把整个 cargo test 挂到外层 SIGTERM。
+    let exchanged = tokio::time::timeout(Duration::from_secs(20), async {
+        stream
+            .write_all(head.as_bytes())
+            .await
+            .expect("write request");
+        if let Some(body) = body {
+            stream.write_all(body.as_bytes()).await.expect("write body");
         }
+        loop {
+            let mut chunk = [0_u8; 4096];
+            match stream.read(&mut chunk).await {
+                Ok(0) => break,
+                Ok(size) => raw.extend_from_slice(&chunk[..size]),
+                Err(err)
+                    if matches!(
+                        err.kind(),
+                        std::io::ErrorKind::ConnectionReset | std::io::ErrorKind::BrokenPipe
+                    ) =>
+                {
+                    break
+                }
+                Err(err) => panic!("read response: {err}"),
+            }
+        }
+    })
+    .await;
+    if exchanged.is_err() {
+        request_stalled(addr, method, path, "write/read exchange", raw.len());
     }
     let text = String::from_utf8_lossy(&raw);
     let (headers, body) = text
@@ -158,11 +190,19 @@ async fn start_server_with_config(
         )
         .await
     });
-    let addr = match ready_rx.await {
-        Ok(addr) => addr,
-        Err(err) => panic!(
+    // READY 等待同样有界（10 秒）：真实服务迟迟不 bind/listen 时快速如实 panic，
+    // 不让整个测试无限挂起。语义不变——成功路径仍是拿到真实绑定地址。
+    let addr = match tokio::time::timeout(Duration::from_secs(10), ready_rx).await {
+        Ok(Ok(addr)) => addr,
+        Ok(Err(err)) => panic!(
             "real service READY failed: {err}; run result: {:?}",
             handle.await
+        ),
+        Err(_) => panic!(
+            "real service READY never arrived within 10s — service bind/listen may be stalled \
+             by the same environment (macOS application firewall / proxy TUN blocking inbound \
+             connections to this unsigned test binary); this is an environment failure \
+             surfaced honestly, not a skipped assertion"
         ),
     };
     TestServer {

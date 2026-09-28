@@ -2241,6 +2241,9 @@ async fn run_ws_session<IO>(
     let _session_guard = shutdown::WsSessionGuard::new(state.ws_shutdown());
     let (reader, mut writer) = tokio::io::split(io);
     let mut frame_reader = ws::ClientFrameReader::new(reader);
+    // 关停广播分支在统一关停预算内已写 close(1001) 并立即返回（进程即将
+    // 退出，不再等待排空）；其余服务端主动关闭统一走会话末尾的干净收尾。
+    let mut exited_by_shutdown = false;
     async {
     // 撤销可能发生在客户端静默期间，或订阅尚无新事件时；定时复核可让
     // 已升级连接在没有下一帧的情况下失效。跳过积压 tick，避免突发重读。
@@ -2256,6 +2259,7 @@ async fn run_ws_session<IO>(
             shutdown = shutdown_rx.changed() => {
                 let _ = shutdown;
                 let _ = ws::write_ws_close(&mut writer, 1001, "server_shutdown").await;
+                exited_by_shutdown = true;
                 return;
             }
             _ = auth_tick.tick() => {
@@ -2362,6 +2366,7 @@ async fn run_ws_session<IO>(
                 // complete within the deadline.
                 let _ = shutdown;
                 let _ = ws::write_ws_close(&mut writer, 1001, "server_shutdown").await;
+                exited_by_shutdown = true;
                 return;
             }
             _ = auth_tick.tick() => {
@@ -2705,7 +2710,48 @@ async fn run_ws_session<IO>(
     .await;
     // 所有 return 分支先离开内部会话，再中止并等待读半边。管理层的
     // 会话计数 guard 此时仍在，故关停不会把未回收的读任务误判为已排空。
+    if !exited_by_shutdown {
+        drain_ws_after_server_close(&mut frame_reader, &mut shutdown_rx).await;
+    }
     frame_reader.shutdown().await;
+}
+
+/// 服务端主动发送 close 帧后、最终丢弃连接前的入站排空宽限：收到
+/// close 的合规客户端应尽快回送 close 或停止发送；不回送的对端最多
+/// 占用这段宽限（连接槽保持有界），到期后仍按期限丢弃连接。
+const WS_CLOSE_DRAIN_GRACE: std::time::Duration = std::time::Duration::from_secs(5);
+
+/// 服务端主动关闭的统一干净收尾（R02 收口 group 11 根因修复）。此前
+/// 写完错误帧 + close 帧后各分支直接 `return`，会话任务随即丢弃
+/// upgraded IO：若对端此刻还有未读入站数据（或 close 之后仍在写入），
+/// 内核把这次关闭变成 RST，而对端 TCP 栈收到 RST 会连同接收队列里
+/// 已经送达、尚未读走的错误帧/close 帧一起丢弃，读侧表现为
+/// `ConnectionReset` —— 即 a05 撤销用例偶发失败的两条竞态形态
+/// （消息边界复查 vs 1s 定时复查只是触发点不同，关闭形态同根）。
+/// 修复：close 之后不立刻丢弃，继续消费并丢弃后续入站帧，直到对端
+/// 回送 close（完成 close 握手）、断开、收到关停广播或宽限到期。
+async fn drain_ws_after_server_close(
+    frame_reader: &mut ws::ClientFrameReader,
+    shutdown_rx: &mut tokio::sync::watch::Receiver<bool>,
+) {
+    let deadline = tokio::time::Instant::now() + WS_CLOSE_DRAIN_GRACE;
+    loop {
+        tokio::select! {
+            _ = tokio::time::sleep_until(deadline) => return,
+            changed = shutdown_rx.changed() => {
+                // 关停广播（或 sender 消失）：预算内进程正在退出，立即让出。
+                let _ = changed;
+                return;
+            }
+            frame = frame_reader.recv() => match frame {
+                // 对端 close（close 握手完成）、EOF 或读任务已结束：对端
+                // 不再发送，丢弃连接不会再制造未读数据。
+                Ok(Some(ws::WsFrame::Close(..))) | Ok(None) | Err(_) => return,
+                // 其余帧（text/ping/pong）只消费并丢弃，不回应。
+                Ok(Some(_)) => {}
+            },
+        }
+    }
 }
 
 /// Machine reason detail block for subscribe rejections, with the
@@ -3199,5 +3245,93 @@ mod tests {
             ..base.clone()
         };
         validate_resource_deps(&boundary).expect("usize::MAX/2 is the valid boundary");
+    }
+
+    // ── group 11：服务端主动 close 后的统一干净收尾（确定性单测）──────
+    //
+    // 集成层只能以竞态触发「close 时入站尚未读取」（服务端调度不可从
+    // 黑盒对端控制），排空机制本身在这里用内存双工管道确定性验证。
+
+    /// 写一个带掩码的客户端帧（RFC 6455 §5.1：客户端帧必须掩码）。
+    async fn send_masked_client_frame(
+        io: &mut tokio::io::DuplexStream,
+        opcode: u8,
+        payload: &[u8],
+    ) {
+        use tokio::io::AsyncWriteExt as _;
+        let mask = [0x11_u8, 0x22, 0x33, 0x44];
+        let mut out = vec![0x80 | opcode, 0x80 | payload.len() as u8];
+        out.extend_from_slice(&mask);
+        out.extend(
+            payload
+                .iter()
+                .enumerate()
+                .map(|(i, byte)| byte ^ mask[i % 4]),
+        );
+        io.write_all(&out).await.expect("write masked client frame");
+    }
+
+    #[tokio::test]
+    async fn ws_drain_consumes_late_frames_and_ends_on_client_close() {
+        let (mut client, server) = tokio::io::duplex(4096);
+        let (reader, _writer) = tokio::io::split(server);
+        let mut framed = ws::ClientFrameReader::new(reader);
+        let (_tx, mut shutdown_rx) = tokio::sync::watch::channel(false);
+
+        // 「客户端已发送帧但服务端尚未处理」的迟到形态：text + ping。
+        send_masked_client_frame(&mut client, 0x1, b"{\"type\":\"session_read\"}").await;
+        send_masked_client_frame(&mut client, 0x9, b"late-ping").await;
+
+        let drain = tokio::spawn(async move {
+            drain_ws_after_server_close(&mut framed, &mut shutdown_rx).await
+        });
+        // 迟到帧必须被消费丢弃，排空不得因 text/ping 提前结束。
+        tokio::time::sleep(std::time::Duration::from_millis(50)).await;
+        assert!(
+            !drain.is_finished(),
+            "drain must outlive late text/ping frames"
+        );
+
+        // 对端回送 close（close 握手完成）→ 排空立即结束。
+        let close_payload = 1000_u16.to_be_bytes().to_vec();
+        send_masked_client_frame(&mut client, 0x8, &close_payload).await;
+        tokio::time::timeout(std::time::Duration::from_secs(2), drain)
+            .await
+            .expect("drain ends on client close")
+            .expect("drain task join");
+    }
+
+    #[tokio::test]
+    async fn ws_drain_ends_on_shutdown_broadcast_and_peer_eof() {
+        use tokio::io::AsyncWriteExt as _;
+        // 关停广播：进程正在退出，排空必须立即让出（不等宽限也不等 close）。
+        {
+            let (_client, server) = tokio::io::duplex(64);
+            let (reader, _writer) = tokio::io::split(server);
+            let mut framed = ws::ClientFrameReader::new(reader);
+            let (tx, mut shutdown_rx) = tokio::sync::watch::channel(false);
+            let drain = tokio::time::timeout(std::time::Duration::from_secs(2), async move {
+                let notify = tokio::spawn(async move {
+                    tokio::time::sleep(std::time::Duration::from_millis(20)).await;
+                    tx.send(true).expect("shutdown broadcast");
+                });
+                drain_ws_after_server_close(&mut framed, &mut shutdown_rx).await;
+                notify.await.expect("notify task join");
+            });
+            drain.await.expect("drain yields on shutdown broadcast");
+        }
+        // 对端直接断开（EOF）：不再有入站来源，排空立即结束。
+        {
+            let (mut client, server) = tokio::io::duplex(64);
+            let (reader, _writer) = tokio::io::split(server);
+            let mut framed = ws::ClientFrameReader::new(reader);
+            let (_tx, mut shutdown_rx) = tokio::sync::watch::channel(false);
+            client.shutdown().await.expect("client half-close");
+            tokio::time::timeout(std::time::Duration::from_secs(2), async move {
+                drain_ws_after_server_close(&mut framed, &mut shutdown_rx).await
+            })
+            .await
+            .expect("drain ends on peer EOF");
+        }
     }
 }

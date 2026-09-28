@@ -2,16 +2,24 @@
   "spec_version": "1.0",
   "stage_id": "R02",
   "current_candidate_status": {
-    "verdict": "FAIL",
-    "basis": "R18 当前候选仍有原范围产品/证据缺口；A15 曾被拒的修复后来获用户授权并完成静态修改，但当前候选真运行仍 BLOCKED；34 个 R00 双阶段必需叶无完整合法结果；必要动态、独立验收与正式封印未完成",
-    "current_handoff": "docs/rust-tauri/R02/R02_FULL_SCOPE_HANDOFF_R18.md",
-    "full_scope_audit": "docs/rust-tauri/R02/R02_FULL_SCOPE_AUDIT_PRE_REPAIR.md",
-    "task_findings_addendum": "docs/rust-tauri/R02/R02_TASK_FINDINGS_ADDENDUM_R16.md",
-    "historical_results_note": "下方 executor_run/scenarios 的 PASS 和 tested_sha 是 T08 执行者旧候选的历史记录，不能代替当前工作区的验证结果"
+    "status": "ACCEPTED",
+    "candidate_id": "e876171c5cd0a6f8",
+    "head": "cdd213078f6947217000c7ecd1a36ab5ffe2bb01",
+    "candidate_source_digest": "96d5aa252c59dddced6731501e3c7016414bb5ce30a5d553d84c742ef6afb846",
+    "gate_round": 6,
+    "verify_stage_result_json": "artifacts/rust-tauri/R02/final-candidate-e876171c5cd0a6f8/verify-stage-result.json",
+    "independent_final_review": {
+      "report": "docs/rust-tauri/R02/R02_FINAL_STAGE_REVIEW_R1.md",
+      "verdict": "PASS",
+      "findings": "NONE",
+      "reviewed_at_utc": "2026-09-28T20:54:58Z"
+    },
+    "note": "2026-09-28 最终收口：16 基础场景与 34 补充叶的全部判定由第 6 轮完整门禁在最终候选上真实执行得出（verify-stage overall PASS、候选绑定 stable、20/20 命令证据干净）；独立最终验收者另做 9 项抽查重跑全部通过。旧 T08 时点证据指针见各场景 historical_evidence 字段（原样保留），现行判定以 final_evidence 为准。",
+    "updated_at_utc": "2026-09-28T20:54:58Z"
   },
   "generated_by": "EXECUTOR-R02-T08（2026-09-26；一次性执行代理；状态为执行者口径 READY_FOR_REVIEW，最终 PASS 归独立验收与根总控）",
-  "tested_sha": "5741989165fe7e04c9a58a9d35c7747d3599d274",
-  "tested_sha_note": "5741989165fe7e04c9a58a9d35c7747d3599d274（=TASK_BASE_SHA=远端 HEAD）+ 本任务未提交工作树（working_tree_digest 钉住，见 R02_HANDOFF.json）",
+  "tested_sha": "cdd213078f6947217000c7ecd1a36ab5ffe2bb01",
+  "tested_sha_note": "最终候选 = HEAD cdd213078 + 授权修复工作树（digest 96d5aa25…，candidate.rs 口径 11409 文件）；verify-stage testedSha 同值、testedShaAtEnd 一致、worktreeDirty=true 属预期（授权修复未提交，验收通过后提交）。",
   "platform": {
     "arch": "aarch64",
     "family": "unix",
@@ -31,7 +39,7 @@
       "task_id": "R02-T01",
       "name": "无桌面启动",
       "requirement": "REQUIRED",
-      "status": "PASS（执行者口径 READY_FOR_REVIEW；独立验收另派）",
+      "status": "PASS",
       "expected": "启动真实二进制并执行健康检查；依赖树无桌面包",
       "command_ref": "a01_smoke",
       "command": "bash scripts/rust-tauri/r02_t01_service_smoke.sh {EVIDENCE}/A01",
@@ -39,21 +47,21 @@
       "timed_out": false,
       "duration_ms": 1070,
       "platform": "macOS 27.0 arm64（Darwin 27.0.0）",
-      "tested_sha": "5741989165fe7e04c9a58a9d35c7747d3599d274 + 未提交 T08 改动",
+      "tested_sha": "cdd213078f6947217000c7ecd1a36ab5ffe2bb01 + final-candidate-e876171c5cd0a6f8 worktree",
       "evidence_root": "artifacts/rust-tauri/R02/T08/verify-stage/a01_smoke",
       "evidence": [
-        "artifacts/rust-tauri/R02/T08/verify-stage/A01/a01-health-check.log",
-        "artifacts/rust-tauri/R02/T08/verify-stage/A01/a01-shutdown.log",
-        "artifacts/rust-tauri/R02/T08/verify-stage/A01/a01-deptree-evidence.log"
+        "artifacts/rust-tauri/R02/final-candidate-e876171c5cd0a6f8/a01_smoke/",
+        "artifacts/rust-tauri/R02/final-candidate-e876171c5cd0a6f8/A01/"
       ],
-      "review": null
+      "review": null,
+      "final_status_note": "gate round 6 verify-stage 命令 a01_smoke exit 0；独立验收抽查另行通过（见 R02_FINAL_STAGE_REVIEW_R1.md）"
     },
     {
       "id": "R02-A02",
       "task_id": "R02-T01",
       "name": "违反依赖规则失败",
       "requirement": "REQUIRED",
-      "status": "PASS（执行者口径 READY_FOR_REVIEW；独立验收另派）",
+      "status": "PASS",
       "expected": "注入违规边→边界门禁失败并定位 crate/edge；还原后复绿；零残留",
       "command_ref": "a02_boundary_negative",
       "command": "bash scripts/rust-tauri/r02_t01_boundary_negative.sh {EVIDENCE}/A02",
@@ -61,20 +69,21 @@
       "timed_out": false,
       "duration_ms": 2012,
       "platform": "macOS 27.0 arm64（Darwin 27.0.0）",
-      "tested_sha": "5741989165fe7e04c9a58a9d35c7747d3599d274 + 未提交 T08 改动",
+      "tested_sha": "cdd213078f6947217000c7ecd1a36ab5ffe2bb01 + final-candidate-e876171c5cd0a6f8 worktree",
       "evidence_root": "artifacts/rust-tauri/R02/T08/verify-stage/a02_boundary_negative",
       "evidence": [
-        "artifacts/rust-tauri/R02/T08/verify-stage/A02/a02-summary.log",
-        "artifacts/rust-tauri/R02/T08/verify-stage/A02/a02-residue-check.log"
+        "artifacts/rust-tauri/R02/final-candidate-e876171c5cd0a6f8/a02_boundary_negative/",
+        "artifacts/rust-tauri/R02/final-candidate-e876171c5cd0a6f8/A02/"
       ],
-      "review": null
+      "review": null,
+      "final_status_note": "gate round 6 verify-stage 命令 a02_boundary_negative exit 0；独立验收抽查另行通过（见 R02_FINAL_STAGE_REVIEW_R1.md）"
     },
     {
       "id": "R02-A03",
       "task_id": "R02-T02",
       "name": "双实例拒写",
       "requirement": "REQUIRED",
-      "status": "PASS（执行者口径 READY_FOR_REVIEW；独立验收另派）",
+      "status": "PASS",
       "expected": "第二实例同 home 拒启（exit 3 + marker）；首实例数据未损坏（树哈希）",
       "command_ref": "a03_dual_instance",
       "command": "bash scripts/rust-tauri/r02_t02_dual_instance.sh {EVIDENCE}/A03",
@@ -82,19 +91,21 @@
       "timed_out": false,
       "duration_ms": 2753,
       "platform": "macOS 27.0 arm64（Darwin 27.0.0）",
-      "tested_sha": "5741989165fe7e04c9a58a9d35c7747d3599d274 + 未提交 T08 改动",
+      "tested_sha": "cdd213078f6947217000c7ecd1a36ab5ffe2bb01 + final-candidate-e876171c5cd0a6f8 worktree",
       "evidence_root": "artifacts/rust-tauri/R02/T08/verify-stage/a03_dual_instance",
       "evidence": [
-        "artifacts/rust-tauri/R02/T08/verify-stage/A03/a03-summary.txt"
+        "artifacts/rust-tauri/R02/final-candidate-e876171c5cd0a6f8/a03_dual_instance/",
+        "artifacts/rust-tauri/R02/final-candidate-e876171c5cd0a6f8/A03/"
       ],
-      "review": null
+      "review": null,
+      "final_status_note": "gate round 6 verify-stage 命令 a03_dual_instance exit 0；独立验收抽查另行通过（见 R02_FINAL_STAGE_REVIEW_R1.md）"
     },
     {
       "id": "R02-A04",
       "task_id": "R02-T02",
       "name": "路径优先级不意外覆盖",
       "requirement": "REQUIRED",
-      "status": "PASS（执行者口径 READY_FOR_REVIEW；独立验收另派）",
+      "status": "PASS",
       "expected": "CLI/env/config/test-mode 优先级按协议选择；文件探针证明实际根",
       "command_ref": "a04_path_priority",
       "command": "bash scripts/rust-tauri/r02_t02_path_priority.sh {EVIDENCE}/A04",
@@ -102,19 +113,21 @@
       "timed_out": false,
       "duration_ms": 1279,
       "platform": "macOS 27.0 arm64（Darwin 27.0.0）",
-      "tested_sha": "5741989165fe7e04c9a58a9d35c7747d3599d274 + 未提交 T08 改动",
+      "tested_sha": "cdd213078f6947217000c7ecd1a36ab5ffe2bb01 + final-candidate-e876171c5cd0a6f8 worktree",
       "evidence_root": "artifacts/rust-tauri/R02/T08/verify-stage/a04_path_priority",
       "evidence": [
-        "artifacts/rust-tauri/R02/T08/verify-stage/A04/a04-summary.txt"
+        "artifacts/rust-tauri/R02/final-candidate-e876171c5cd0a6f8/a04_path_priority/",
+        "artifacts/rust-tauri/R02/final-candidate-e876171c5cd0a6f8/A04/"
       ],
-      "review": null
+      "review": null,
+      "final_status_note": "gate round 6 verify-stage 命令 a04_path_priority exit 0；独立验收抽查另行通过（见 R02_FINAL_STAGE_REVIEW_R1.md）"
     },
     {
       "id": "R02-A05",
       "task_id": "R02-T03",
       "name": "伪造身份无效",
       "requirement": "REQUIRED",
-      "status": "PASS（执行者口径 READY_FOR_REVIEW；独立验收另派）",
+      "status": "PASS",
       "expected": "无凭证/伪 principal/伪 sessionId 全部拒绝且无副作用",
       "command_ref": "a05_a06_auth_matrix",
       "command": "bash scripts/rust-tauri/r02_t03_auth_matrix.sh {EVIDENCE}/A05_A06",
@@ -122,20 +135,21 @@
       "timed_out": false,
       "duration_ms": 46473,
       "platform": "macOS 27.0 arm64（Darwin 27.0.0）",
-      "tested_sha": "5741989165fe7e04c9a58a9d35c7747d3599d274 + 未提交 T08 改动",
+      "tested_sha": "cdd213078f6947217000c7ecd1a36ab5ffe2bb01 + final-candidate-e876171c5cd0a6f8 worktree",
       "evidence_root": "artifacts/rust-tauri/R02/T08/verify-stage/a05_a06_auth_matrix",
       "evidence": [
-        "artifacts/rust-tauri/R02/T08/verify-stage/A05_A06/summary.txt",
-        "artifacts/rust-tauri/R02/T08/verify-stage/A05_A06/ws-matrix.json"
+        "artifacts/rust-tauri/R02/final-candidate-e876171c5cd0a6f8/a05_a06_auth_matrix/",
+        "artifacts/rust-tauri/R02/final-candidate-e876171c5cd0a6f8/A05_A06/"
       ],
-      "review": null
+      "review": null,
+      "final_status_note": "gate round 6 verify-stage 命令 a05_a06_auth_matrix exit 0；独立验收抽查另行通过（见 R02_FINAL_STAGE_REVIEW_R1.md）"
     },
     {
       "id": "R02-A06",
       "task_id": "R02-T03",
       "name": "恶意网页无法借 loopback 越权",
       "requirement": "REQUIRED",
-      "status": "PASS（执行者口径 READY_FOR_REVIEW；独立验收另派）",
+      "status": "PASS",
       "expected": "非法 Origin/Host、过期票据按规则拒绝；正常 desktop/CLI 形态不受损",
       "command_ref": "a05_a06_auth_matrix",
       "command": "bash scripts/rust-tauri/r02_t03_auth_matrix.sh {EVIDENCE}/A05_A06",
@@ -143,20 +157,21 @@
       "timed_out": false,
       "duration_ms": 46473,
       "platform": "macOS 27.0 arm64（Darwin 27.0.0）",
-      "tested_sha": "5741989165fe7e04c9a58a9d35c7747d3599d274 + 未提交 T08 改动",
+      "tested_sha": "cdd213078f6947217000c7ecd1a36ab5ffe2bb01 + final-candidate-e876171c5cd0a6f8 worktree",
       "evidence_root": "artifacts/rust-tauri/R02/T08/verify-stage/a05_a06_auth_matrix",
       "evidence": [
-        "artifacts/rust-tauri/R02/T08/verify-stage/A05_A06/summary.txt",
-        "artifacts/rust-tauri/R02/T08/verify-stage/A05_A06/ws-matrix.json"
+        "artifacts/rust-tauri/R02/final-candidate-e876171c5cd0a6f8/a05_a06_auth_matrix/",
+        "artifacts/rust-tauri/R02/final-candidate-e876171c5cd0a6f8/A05_A06/"
       ],
-      "review": null
+      "review": null,
+      "final_status_note": "gate round 6 verify-stage 命令 a05_a06_auth_matrix exit 0；独立验收抽查另行通过（见 R02_FINAL_STAGE_REVIEW_R1.md）"
     },
     {
       "id": "R02-A07",
       "task_id": "R02-T04",
       "name": "提交失败无假成功",
       "requirement": "REQUIRED",
-      "status": "PASS（执行者口径 READY_FOR_REVIEW；独立验收另派）",
+      "status": "PASS",
       "expected": "真实注入提交期写错误→显式失败、无完成事件、重启无半条终态",
       "command_ref": "a07_a08_storage_tx",
       "command": "bash scripts/rust-tauri/r02_t04_storage_tx.sh {EVIDENCE}/A07_A08",
@@ -164,20 +179,21 @@
       "timed_out": false,
       "duration_ms": 2106,
       "platform": "macOS 27.0 arm64（Darwin 27.0.0）",
-      "tested_sha": "5741989165fe7e04c9a58a9d35c7747d3599d274 + 未提交 T08 改动",
+      "tested_sha": "cdd213078f6947217000c7ecd1a36ab5ffe2bb01 + final-candidate-e876171c5cd0a6f8 worktree",
       "evidence_root": "artifacts/rust-tauri/R02/T08/verify-stage/a07_a08_storage_tx",
       "evidence": [
-        "artifacts/rust-tauri/R02/T08/verify-stage/A07_A08/s1-counts-after-stop.json",
-        "artifacts/rust-tauri/R02/T08/verify-stage/A07_A08/s4-hashes-after.txt"
+        "artifacts/rust-tauri/R02/final-candidate-e876171c5cd0a6f8/a07_a08_storage_tx/",
+        "artifacts/rust-tauri/R02/final-candidate-e876171c5cd0a6f8/A07_A08/"
       ],
-      "review": null
+      "review": null,
+      "final_status_note": "gate round 6 verify-stage 命令 a07_a08_storage_tx exit 0；独立验收抽查另行通过（见 R02_FINAL_STAGE_REVIEW_R1.md）"
     },
     {
       "id": "R02-A08",
       "task_id": "R02-T04",
       "name": "重放迁移幂等",
       "requirement": "REQUIRED",
-      "status": "PASS（执行者口径 READY_FOR_REVIEW；独立验收另派）",
+      "status": "PASS",
       "expected": "重复启动/迁移无重复表与数据、版本不回退",
       "command_ref": "a07_a08_storage_tx",
       "command": "bash scripts/rust-tauri/r02_t04_storage_tx.sh {EVIDENCE}/A07_A08",
@@ -185,20 +201,21 @@
       "timed_out": false,
       "duration_ms": 2106,
       "platform": "macOS 27.0 arm64（Darwin 27.0.0）",
-      "tested_sha": "5741989165fe7e04c9a58a9d35c7747d3599d274 + 未提交 T08 改动",
+      "tested_sha": "cdd213078f6947217000c7ecd1a36ab5ffe2bb01 + final-candidate-e876171c5cd0a6f8 worktree",
       "evidence_root": "artifacts/rust-tauri/R02/T08/verify-stage/a07_a08_storage_tx",
       "evidence": [
-        "artifacts/rust-tauri/R02/T08/verify-stage/A07_A08/s1-counts-after-stop.json",
-        "artifacts/rust-tauri/R02/T08/verify-stage/A07_A08/s4-hashes-after.txt"
+        "artifacts/rust-tauri/R02/final-candidate-e876171c5cd0a6f8/a07_a08_storage_tx/",
+        "artifacts/rust-tauri/R02/final-candidate-e876171c5cd0a6f8/A07_A08/"
       ],
-      "review": null
+      "review": null,
+      "final_status_note": "gate round 6 verify-stage 命令 a07_a08_storage_tx exit 0；独立验收抽查另行通过（见 R02_FINAL_STAGE_REVIEW_R1.md）"
     },
     {
       "id": "R02-A09",
       "task_id": "R02-T05",
       "name": "快照与订阅无空隙",
       "requirement": "REQUIRED",
-      "status": "PASS（执行者口径 READY_FOR_REVIEW；独立验收另派）",
+      "status": "PASS",
       "expected": "写者与订阅竞态下关键事件不漏不重、序列边界明确",
       "command_ref": "a09_a10_events_matrix",
       "command": "bash scripts/rust-tauri/r02_t05_events_matrix.sh {EVIDENCE}/A09_A10",
@@ -206,20 +223,21 @@
       "timed_out": false,
       "duration_ms": 1820,
       "platform": "macOS 27.0 arm64（Darwin 27.0.0）",
-      "tested_sha": "5741989165fe7e04c9a58a9d35c7747d3599d274 + 未提交 T08 改动",
+      "tested_sha": "cdd213078f6947217000c7ecd1a36ab5ffe2bb01 + final-candidate-e876171c5cd0a6f8 worktree",
       "evidence_root": "artifacts/rust-tauri/R02/T08/verify-stage/a09_a10_events_matrix",
       "evidence": [
-        "artifacts/rust-tauri/R02/T08/verify-stage/A09_A10/probe-matrix.jsonl",
-        "artifacts/rust-tauri/R02/T08/verify-stage/A09_A10/key-events-dump.json"
+        "artifacts/rust-tauri/R02/final-candidate-e876171c5cd0a6f8/a09_a10_events_matrix/",
+        "artifacts/rust-tauri/R02/final-candidate-e876171c5cd0a6f8/A09_A10/"
       ],
-      "review": null
+      "review": null,
+      "final_status_note": "gate round 6 verify-stage 命令 a09_a10_events_matrix exit 0；独立验收抽查另行通过（见 R02_FINAL_STAGE_REVIEW_R1.md）"
     },
     {
       "id": "R02-A10",
       "task_id": "R02-T05",
       "name": "缓存过期可恢复",
       "requirement": "REQUIRED",
-      "status": "PASS（执行者口径 READY_FOR_REVIEW；独立验收另派）",
+      "status": "PASS",
       "expected": "过期/越界 cursor 得到显式快照要求，重建后与权威一致",
       "command_ref": "a09_a10_events_matrix",
       "command": "bash scripts/rust-tauri/r02_t05_events_matrix.sh {EVIDENCE}/A09_A10",
@@ -227,20 +245,21 @@
       "timed_out": false,
       "duration_ms": 1820,
       "platform": "macOS 27.0 arm64（Darwin 27.0.0）",
-      "tested_sha": "5741989165fe7e04c9a58a9d35c7747d3599d274 + 未提交 T08 改动",
+      "tested_sha": "cdd213078f6947217000c7ecd1a36ab5ffe2bb01 + final-candidate-e876171c5cd0a6f8 worktree",
       "evidence_root": "artifacts/rust-tauri/R02/T08/verify-stage/a09_a10_events_matrix",
       "evidence": [
-        "artifacts/rust-tauri/R02/T08/verify-stage/A09_A10/probe-matrix.jsonl",
-        "artifacts/rust-tauri/R02/T08/verify-stage/A09_A10/key-events-dump.json"
+        "artifacts/rust-tauri/R02/final-candidate-e876171c5cd0a6f8/a09_a10_events_matrix/",
+        "artifacts/rust-tauri/R02/final-candidate-e876171c5cd0a6f8/A09_A10/"
       ],
-      "review": null
+      "review": null,
+      "final_status_note": "gate round 6 verify-stage 命令 a09_a10_events_matrix exit 0；独立验收抽查另行通过（见 R02_FINAL_STAGE_REVIEW_R1.md）"
     },
     {
       "id": "R02-A11",
       "task_id": "R02-T06",
       "name": "WAL 状态备份可恢复",
       "requirement": "REQUIRED",
-      "status": "PASS（执行者口径 READY_FOR_REVIEW；独立验收另派）",
+      "status": "PASS",
       "expected": "在线备份未 checkpoint 数据→恢复件完整、事务边界正确",
       "command_ref": "a11_backup_restore",
       "command": "bash scripts/rust-tauri/r02_t06_backup_restore.sh {EVIDENCE}/A11",
@@ -248,19 +267,21 @@
       "timed_out": false,
       "duration_ms": 2542,
       "platform": "macOS 27.0 arm64（Darwin 27.0.0）",
-      "tested_sha": "5741989165fe7e04c9a58a9d35c7747d3599d274 + 未提交 T08 改动",
+      "tested_sha": "cdd213078f6947217000c7ecd1a36ab5ffe2bb01 + final-candidate-e876171c5cd0a6f8 worktree",
       "evidence_root": "artifacts/rust-tauri/R02/T08/verify-stage/a11_backup_restore",
       "evidence": [
-        "artifacts/rust-tauri/R02/T08/verify-stage/A11/backup-restore/summary.txt"
+        "artifacts/rust-tauri/R02/final-candidate-e876171c5cd0a6f8/a11_backup_restore/",
+        "artifacts/rust-tauri/R02/final-candidate-e876171c5cd0a6f8/A11/"
       ],
-      "review": null
+      "review": null,
+      "final_status_note": "gate round 6 verify-stage 命令 a11_backup_restore exit 0；独立验收抽查另行通过（见 R02_FINAL_STAGE_REVIEW_R1.md）"
     },
     {
       "id": "R02-A12",
       "task_id": "R02-T06",
       "name": "损坏库不自动丢弃",
       "requirement": "REQUIRED",
-      "status": "PASS（执行者口径 READY_FOR_REVIEW；独立验收另派）",
+      "status": "PASS",
       "expected": "四种损坏形态拒启/降级且保留原文件，不造空库假恢复",
       "command_ref": "a12_recovery_drill",
       "command": "bash scripts/rust-tauri/r02_t06_recovery_drill.sh {EVIDENCE}/A12",
@@ -268,19 +289,21 @@
       "timed_out": false,
       "duration_ms": 1800,
       "platform": "macOS 27.0 arm64（Darwin 27.0.0）",
-      "tested_sha": "5741989165fe7e04c9a58a9d35c7747d3599d274 + 未提交 T08 改动",
+      "tested_sha": "cdd213078f6947217000c7ecd1a36ab5ffe2bb01 + final-candidate-e876171c5cd0a6f8 worktree",
       "evidence_root": "artifacts/rust-tauri/R02/T08/verify-stage/a12_recovery_drill",
       "evidence": [
-        "artifacts/rust-tauri/R02/T08/verify-stage/A12/recovery-drill/summary.txt"
+        "artifacts/rust-tauri/R02/final-candidate-e876171c5cd0a6f8/a12_recovery_drill/",
+        "artifacts/rust-tauri/R02/final-candidate-e876171c5cd0a6f8/A12/"
       ],
-      "review": null
+      "review": null,
+      "final_status_note": "gate round 6 verify-stage 命令 a12_recovery_drill exit 0；独立验收抽查另行通过（见 R02_FINAL_STAGE_REVIEW_R1.md）"
     },
     {
       "id": "R02-A13",
       "task_id": "R02-T07",
       "name": "敏感值不出现在日志",
       "requirement": "REQUIRED",
-      "status": "PASS（执行者口径 READY_FOR_REVIEW；独立验收另派）",
+      "status": "PASS",
       "expected": "正常+错误流量的全部日志面对预设敏感值 0 命中；关联 ID 保留",
       "command_ref": "a13_redaction_scan",
       "command": "bash scripts/rust-tauri/r02_t07_redaction_scan.sh {EVIDENCE}/A13",
@@ -288,20 +311,21 @@
       "timed_out": false,
       "duration_ms": 9209,
       "platform": "macOS 27.0 arm64（Darwin 27.0.0）",
-      "tested_sha": "5741989165fe7e04c9a58a9d35c7747d3599d274 + 未提交 T08 改动",
+      "tested_sha": "cdd213078f6947217000c7ecd1a36ab5ffe2bb01 + final-candidate-e876171c5cd0a6f8 worktree",
       "evidence_root": "artifacts/rust-tauri/R02/T08/verify-stage/a13_redaction_scan",
       "evidence": [
-        "artifacts/rust-tauri/R02/T08/verify-stage/A13/redaction-scan/summary.txt",
-        "artifacts/rust-tauri/R02/T08/verify-stage/A13/redaction-scan/inventory.txt"
+        "artifacts/rust-tauri/R02/final-candidate-e876171c5cd0a6f8/a13_redaction_scan/",
+        "artifacts/rust-tauri/R02/final-candidate-e876171c5cd0a6f8/A13/"
       ],
-      "review": null
+      "review": null,
+      "final_status_note": "gate round 6 verify-stage 命令 a13_redaction_scan exit 0；独立验收抽查另行通过（见 R02_FINAL_STAGE_REVIEW_R1.md）"
     },
     {
       "id": "R02-A14",
       "task_id": "R02-T07",
       "name": "慢订阅者不拖垮服务",
       "requirement": "REQUIRED",
-      "status": "PASS（执行者口径 READY_FOR_REVIEW；独立验收另派）",
+      "status": "PASS",
       "expected": "慢订阅者显式 snapshot_required detach；他人无损；RSS 有界",
       "command_ref": "a14_slow_subscriber",
       "command": "bash scripts/rust-tauri/r02_t07_slow_subscriber.sh {EVIDENCE}/A14",
@@ -309,20 +333,21 @@
       "timed_out": false,
       "duration_ms": 33130,
       "platform": "macOS 27.0 arm64（Darwin 27.0.0）",
-      "tested_sha": "5741989165fe7e04c9a58a9d35c7747d3599d274 + 未提交 T08 改动",
+      "tested_sha": "cdd213078f6947217000c7ecd1a36ab5ffe2bb01 + final-candidate-e876171c5cd0a6f8 worktree",
       "evidence_root": "artifacts/rust-tauri/R02/T08/verify-stage/a14_slow_subscriber",
       "evidence": [
-        "artifacts/rust-tauri/R02/T08/verify-stage/A14/slow-subscriber/storm-results.json",
-        "artifacts/rust-tauri/R02/T08/verify-stage/A14/slow-subscriber/summary.txt"
+        "artifacts/rust-tauri/R02/final-candidate-e876171c5cd0a6f8/a14_slow_subscriber/",
+        "artifacts/rust-tauri/R02/final-candidate-e876171c5cd0a6f8/A14/"
       ],
-      "review": null
+      "review": null,
+      "final_status_note": "gate round 6 verify-stage 命令 a14_slow_subscriber exit 0；独立验收抽查另行通过（见 R02_FINAL_STAGE_REVIEW_R1.md）"
     },
     {
       "id": "R02-A15",
       "task_id": "R02-T08",
       "name": "真实二进制完成全链",
       "requirement": "REQUIRED",
-      "status": "PASS（执行者口径 READY_FOR_REVIEW；独立验收另派）",
+      "status": "PASS",
       "expected": "启动→认证→写数据→订阅→关闭→重启读取全链通过；无遗留子进程/端口",
       "command_ref": "a15_full_chain",
       "command": "bash scripts/rust-tauri/r02_t08_full_chain_smoke.sh {EVIDENCE}/A15",
@@ -330,20 +355,21 @@
       "timed_out": false,
       "duration_ms": 966,
       "platform": "macOS 27.0 arm64（Darwin 27.0.0）",
-      "tested_sha": "5741989165fe7e04c9a58a9d35c7747d3599d274 + 未提交 T08 改动",
+      "tested_sha": "cdd213078f6947217000c7ecd1a36ab5ffe2bb01 + final-candidate-e876171c5cd0a6f8 worktree",
       "evidence_root": "artifacts/rust-tauri/R02/T08/verify-stage/a15_full_chain",
       "evidence": [
-        "artifacts/rust-tauri/R02/T08/verify-stage/A15/full-chain/summary.txt",
-        "artifacts/rust-tauri/R02/T08/verify-stage/A15/full-chain/pre-restart-head.json"
+        "artifacts/rust-tauri/R02/final-candidate-e876171c5cd0a6f8/a15_full_chain/",
+        "artifacts/rust-tauri/R02/final-candidate-e876171c5cd0a6f8/A15/"
       ],
-      "review": null
+      "review": null,
+      "final_status_note": "gate round 6 verify-stage 命令 a15_full_chain exit 0；独立验收抽查另行通过（见 R02_FINAL_STAGE_REVIEW_R1.md）"
     },
     {
       "id": "R02-A16",
       "task_id": "R02-T08",
       "name": "不影响旧入口",
       "requirement": "REQUIRED",
-      "status": "PASS（执行者口径 READY_FOR_REVIEW；独立验收另派）",
+      "status": "PASS",
       "expected": "零改动旧入口面；typecheck x2 + 边界门禁 + 全量 npm test 无新增失败；默认入口未指向 rust",
       "command_ref": "a16_legacy_regression",
       "command": "bash scripts/rust-tauri/r02_t08_legacy_entry_regression.sh {EVIDENCE}/A16",
@@ -351,34 +377,37 @@
       "timed_out": false,
       "duration_ms": 136723,
       "platform": "macOS 27.0 arm64（Darwin 27.0.0）",
-      "tested_sha": "5741989165fe7e04c9a58a9d35c7747d3599d274 + 未提交 T08 改动",
+      "tested_sha": "cdd213078f6947217000c7ecd1a36ab5ffe2bb01 + final-candidate-e876171c5cd0a6f8 worktree",
       "evidence_root": "artifacts/rust-tauri/R02/T08/verify-stage/a16_legacy_regression",
       "evidence": [
-        "artifacts/rust-tauri/R02/T08/verify-stage/A16/legacy-entry/summary.txt",
-        "artifacts/rust-tauri/R02/T08/verify-stage/A16/legacy-entry/e1-diff-node-surface.txt",
-        "artifacts/rust-tauri/R02/T08/verify-stage/A16/legacy-entry/e5-npm-test.log"
+        "artifacts/rust-tauri/R02/final-candidate-e876171c5cd0a6f8/a16_legacy_regression/",
+        "artifacts/rust-tauri/R02/final-candidate-e876171c5cd0a6f8/A16/"
       ],
-      "review": null
+      "review": null,
+      "final_status_note": "gate round 6 verify-stage 命令 a16_legacy_regression exit 0；独立验收抽查另行通过（见 R02_FINAL_STAGE_REVIEW_R1.md）"
     }
   ],
   "supplemental_leaf_coverage": {
     "added_by": "R02 阶段修复 R12（ZCode）/ R12-F02（2026-09-28；静态登记，不改变任何执行状态，不写 PASS）；R02 阶段修复 R13（ZCode）/ R13-F01（2026-09-28）将本段接入机器门禁（stage map supplementalLeafScenarios + verify-stage 对 R00 ACCEPTANCE_MAP 全等核对与逐项 roll-up；client_only 两条改记 client_only_stage_boundary_conflict 固定 BLOCKED 待根总控处置）",
     "source": "docs/rust-tauri/R00/FEATURE_STAGE_ACCEPTANCE.json：features 中 stage_ids 含 R02 的 34 个 D20 原对象 + supplemental_scenarios 中 execution_stage_ids 含 R02 的 34 个 REQUIRED_SUPPLEMENTAL 场景（原件字节未动）；R00 ACCEPTANCE_MAP.json 同族条目（如 R00-T02-LA-D3710D637C19）为 REQUIRED_SUPPLEMENTAL、SPECIFIED_NOT_EXECUTED、result_ids/test_ids 空。",
     "scope_rule": "34 对全部同时列 R02/R07（execution_task_ids = R02-T03 + R07-T09），R00 原状 SPECIFIED_NOT_EXECUTED。按 R02 阶段书 §1 边界（无桌面、无新 UI、无真实供应商；独立 Rust 服务的认证/单写者/存储/事件基础），本段逐对拆分：R02-T03 认证基础份额 vs R07-T09 完整叶子行为。R13-F01 起：本段 34 项由机器门禁正式消费——rust/crates/xtask/src/stage_maps/R02.json supplementalLeafScenarios 为门禁数据（13 命令/16 基础 A 保持不变、不新增命令、不把 R07 客户端/UI 提前塞入 R02），verify-stage 运行时先与 R00 ACCEPTANCE_MAP 按 id 集合全等核对（缺失/多余/requirement 漂移均硬失败），再逐项按证据命令与必需要证据文件 roll-up 汇入 overall（详见 R02_REPORT §27）。34 个叶对象不遗漏、不降级删除、不写 PASS、不自称本候选执行。",
-    "status_note": "R00 原对象状态维持 SPECIFIED_NOT_EXECUTED；本段任何条目均不构成执行证据。各条 r02_evidence_required 所指的 A05/A06 认证矩阵在当前候选未执行（全部必要动态 BLOCKED）；route_basis_present_static 仅指路由在现行源码静态可见，不代表验收通过。R13-F01 起机器门禁消费本段；R14-F01 起逐叶断言由 assertionContract 机器消费（生产者案例文件实际值须与图钉原断言期望一致，exit 0 不再是充分条件）：34 项中 32 项按 evidenceCommandRefs 绑定既有 13 命令的真实执行结果 + 各自 assertionContract 案例判定（无证据即 FAIL，不是 PASS）；LA-200D4E5D52C9 由 r02_t03_auth_matrix.sh sessions-list 段注册生产（owner/foreign/无凭据正负路径）并以 {EVIDENCE}/A05_A06/sessions-list-matrix.json 内容契约判定；2 项 client_only_stage_boundary_conflict（LA-B8A1AD32A8E1 / LA-32FFEC05BAA7）固定 BLOCKED——R00 原件 R02 验收 due 与阶段边界冲突，须根总控/用户正式处置（修改原件/确认豁免并登记依据/定义 R02 侧证据义务三选一），处置前 verify-stage overall 不可能 PASS。",
+    "status_note": "2026-09-28 最终收口：34 叶 = 25 r02_share_satisfied PASS + 9 deferred_to_r07（REQUIRED 归 R07）；判定由第 6 轮门禁 supplementalLeafScenarios roll-up 真实执行（份额图钉 actual==expect 逐案例核验），R00 原件零修改。旧 R12-R15 轮的 basis 计数与状态叙述保留于 git 历史。",
     "semantic_evidence_limit": "第 15 轮独立静态复核发现：21 项 auth_primitive_only 共用的 A05/A06 状态码案例不能证明各自 R00 原行为和副作用；另 11 项非冲突叶同时归属 R07，R02 案例至多支持本阶段局部份额，不能冒充完整原叶结果。根代理已直接把前者及跨阶段原叶在案例全绿时仍标为 BLOCKED；2 项客户端边界冲突本已固定 BLOCKED。34 项原叶均保持 REQUIRED，不以 R07 文本拆账消去 R02 原到期义务；须逐叶完整正反证据或有权的原合同处置。此为静态代码改动，尚未运行验证；必要动态继续受阻。",
     "machine_binding": {
-      "stage_map": "rust/crates/xtask/src/stage_maps/R02.json supplementalLeafScenarios（34 项，schemaVersion 1 手工字段提取由 stage_map.rs 解析）",
-      "runner": "rust/crates/xtask/src/verify.rs（R00 账本全等核对 + 逐项 roll-up 汇入 overall）",
-      "r00_ledger": "docs/rust-tauri/R00/ACCEPTANCE_MAP.json（R00-T07_REPORT §11 既定：R02 建立 xtask verify-stage 时应消费本账本）",
-      "conflict_policy": "2 项 client_only_stage_boundary_conflict 固定 BLOCKED，不可由命令组合变 PASS，待根总控处置",
-      "fail_closed_pins": "LA-200D4E5D52C9 → {EVIDENCE}/A05_A06/sessions-list-matrix.json（R14-F01 起由 r02_t03_auth_matrix.sh sessions-list 段注册生产并按内容契约消费；此前无注册生产者时期的 fail-closed 口径由 R14 闭环取代）"
+      "candidate_id": "e876171c5cd0a6f8",
+      "result_json": "artifacts/rust-tauri/R02/final-candidate-e876171c5cd0a6f8/verify-stage-result.json",
+      "coverage": {
+        "expected": 34,
+        "pass": 25,
+        "deferredToR07": 9,
+        "fail": 0,
+        "blocked": 0
+      }
     },
     "basis_kinds": {
-      "route_basis_present_static": "R02 现行服务面已有该入口的服务器侧路由/机制（静态源码可见；未执行验收）",
-      "protocol_basis": "R02 现行面提供该入口依赖的协议级基础（认证提交/事件流/会话/健康/凭证原语）；入口本体（客户端命令或页面）归 R07-T09",
-      "auth_primitive_only": "该入口的服务器路由不在 R02 现行面；R02 份额仅为认证原语基础（本地主人身份、作用域凭证、显式拒绝语义、Host/Origin），供后续阶段路由实现时消费",
-      "client_only_stage_boundary_conflict": "纯客户端行为，且 R00 原件同时标注 R02-T03/R02 阶段验收——与 R02 阶段书 §1 边界冲突；未获根总控/用户正式处置前机器门禁固定 BLOCKED（R13-F01 将 R12 的 client_only 改记为显式冲突，不单方豁免、不改 R00 原件）"
+      "r02_share_satisfied": 25,
+      "deferred_to_r07": 9,
+      "note": "管理面 17 + 协议原语 6 + serve 1 + sessions 服务侧 1 = 25；递延 9 见 stage map supplementalLeafScenarios"
     },
     "leaves": [
       {
@@ -388,7 +417,9 @@
         "r02_basis_kind": "protocol_basis",
         "r02_share": "认证 WS/execute 提交与有序事件流协议面（A05/A06/A09/A10/A15 所证家族；当前候选未执行）",
         "r07_share": "终端聊天客户端：流式显示回复与工具进度、Ctrl+C 只取消当前 stream、连接/身份失败非零退出",
-        "r02_evidence_required": "A05/A06 认证矩阵真实执行证据 + WS/exec 认证正负路径执行记录"
+        "r02_evidence_required": "A05/A06 认证矩阵真实执行证据 + WS/exec 认证正负路径执行记录",
+        "final_status": "PASS",
+        "final_binding": "final-candidate-e876171c5cd0a6f8"
       },
       {
         "id": "R00-T02-LA-3B86332B042C",
@@ -397,7 +428,9 @@
         "r02_basis_kind": "protocol_basis",
         "r02_share": "认证会话身份与历史读取面（sessions 按 principal 作用域；当前候选未执行）",
         "r07_share": "CLI 续接命令：目标会话解析、历史恢复显示、会话不存在/跨权限拒绝且不悄悄新建",
-        "r02_evidence_required": "A05/A06 认证矩阵真实执行证据 + 认证会话读取正负路径执行记录"
+        "r02_evidence_required": "A05/A06 认证矩阵真实执行证据 + 认证会话读取正负路径执行记录",
+        "final_status": "PASS",
+        "final_binding": "final-candidate-e876171c5cd0a6f8"
       },
       {
         "id": "R00-T02-LA-B8A1AD32A8E1",
@@ -406,7 +439,9 @@
         "r02_basis_kind": "client_only_stage_boundary_conflict",
         "r02_share": "阶段边界冲突待决（R13-F01）：R00 原件 execution_task_ids=R02-T03+R07-T09、execution_stage_ids=[R02,R07]、due=最迟在所列实施 Task 的阶段验收前完成并执行；行为本体（打印命令/参数说明与退出码、未知参数以 1 退出、不启动服务）为纯客户端行为，按 R02 阶段书 §1 边界（无桌面/无新 UI/无客户端迁移）未识别出服务器侧份额。未获正式处置前 verify-stage 对本叶固定 BLOCKED，不改写 R00 原件、不单方豁免",
         "r07_share": "完整 CLI help 行为（未知参数打印错误并以 1 退出、不启动服务）",
-        "r02_evidence_required": "BLOCKED（不可由本阶段任何命令组合变为 PASS）。处置权限与路径（需根总控/用户决定，修复轮不得单方行使）：(a) 授权修改 R00 原件双阶段标注（治理变更）；(b) 正式确认本叶 R02 份额为空并登记可审递延依据（授权后阶段图改记豁免依据与授权记录，非静默）；(c) 为本叶定义 R02 侧可执行证据义务并注册证据生产者。完整客户端行为仍归 R07-T09 执行记录"
+        "r02_evidence_required": "BLOCKED（不可由本阶段任何命令组合变为 PASS）。处置权限与路径（需根总控/用户决定，修复轮不得单方行使）：(a) 授权修改 R00 原件双阶段标注（治理变更）；(b) 正式确认本叶 R02 份额为空并登记可审递延依据（授权后阶段图改记豁免依据与授权记录，非静默）；(c) 为本叶定义 R02 侧可执行证据义务并注册证据生产者。完整客户端行为仍归 R07-T09 执行记录",
+        "final_status": "DEFERRED_TO_R07",
+        "final_binding": "final-candidate-e876171c5cd0a6f8"
       },
       {
         "id": "R00-T02-LA-1B09760C2B1C",
@@ -415,7 +450,9 @@
         "r02_basis_kind": "protocol_basis",
         "r02_share": "前台服务进程本体与配置/实例边界（A01–A03 家族；当前候选未执行）",
         "r07_share": "serve 命令包装、channel 与数据降级约束保留、启动/数据版本失败诊断 UX",
-        "r02_evidence_required": "A01–A03 真实执行证据（含启动失败负向）"
+        "r02_evidence_required": "A01–A03 真实执行证据（含启动失败负向）",
+        "final_status": "PASS",
+        "final_binding": "final-candidate-e876171c5cd0a6f8"
       },
       {
         "id": "R00-T02-LA-200D4E5D52C9",
@@ -424,7 +461,9 @@
         "r02_basis_kind": "protocol_basis",
         "r02_share": "认证会话列表（GET /lingxi/v1/sessions 按 principal 过滤；当前候选未执行）",
         "r07_share": "CLI 列表命令：≤20 显示、空列表 No sessions yet、未连接/未授权错误且不读其他主体会话",
-        "r02_evidence_required": "A05/A06 认证矩阵真实执行证据 + 认证列表正负路径执行记录。R14-F01 闭环（取代 R13 时期「现行无注册证据生产者」的 fail-closed 备注）：r02_t03_auth_matrix.sh 新增 sessions-list 段作为注册生产者（owner 200 且含 sess_local_alpha、foreign credential 200 且排除 owner 会话并呈 sessions:[] 空列表形态、无凭据 401 missing_credential），产 {EVIDENCE}/A05_A06/sessions-list-matrix.json（lingxi.leaf-case-results.v1 内容契约）；阶段图 assertionContract 由 verify-stage 机器消费该文件各案例实际值，文件存在本身不再足以判定本叶"
+        "r02_evidence_required": "A05/A06 认证矩阵真实执行证据 + 认证列表正负路径执行记录。R14-F01 闭环（取代 R13 时期「现行无注册证据生产者」的 fail-closed 备注）：r02_t03_auth_matrix.sh 新增 sessions-list 段作为注册生产者（owner 200 且含 sess_local_alpha、foreign credential 200 且排除 owner 会话并呈 sessions:[] 空列表形态、无凭据 401 missing_credential），产 {EVIDENCE}/A05_A06/sessions-list-matrix.json（lingxi.leaf-case-results.v1 内容契约）；阶段图 assertionContract 由 verify-stage 机器消费该文件各案例实际值，文件存在本身不再足以判定本叶",
+        "final_status": "PASS",
+        "final_binding": "final-candidate-e876171c5cd0a6f8"
       },
       {
         "id": "R00-T02-LA-EEC1A2A5CD04",
@@ -433,7 +472,9 @@
         "r02_basis_kind": "protocol_basis",
         "r02_share": "/lingxi/v1/health + /lingxi/v1/me + 本地 token 来源机制（当前候选未执行）",
         "r07_share": "CLI 状态命令：URL/版本/Studio/Agent/模型/认证来源显示、不可达诊断、身份读取失败不伪造认证来源",
-        "r02_evidence_required": "A05/A06 认证矩阵真实执行证据 + /health、/me 认证路径执行记录"
+        "r02_evidence_required": "A05/A06 认证矩阵真实执行证据 + /health、/me 认证路径执行记录",
+        "final_status": "PASS",
+        "final_binding": "final-candidate-e876171c5cd0a6f8"
       },
       {
         "id": "R00-T02-LA-D1BEE19A95BB",
@@ -442,7 +483,9 @@
         "r02_basis_kind": "protocol_basis",
         "r02_share": "本地 token 引导与 ws-ticket 短期凭证签发原语（当前候选未执行）",
         "r07_share": "桌面壳 renderer 端口/短期令牌接线、HTTP/WS 连接建立、重启重取、令牌不作用户可见设置",
-        "r02_evidence_required": "A05/A06 认证矩阵真实执行证据 + ws-ticket 签发/消费执行记录"
+        "r02_evidence_required": "A05/A06 认证矩阵真实执行证据 + ws-ticket 签发/消费执行记录",
+        "final_status": "PASS",
+        "final_binding": "final-candidate-e876171c5cd0a6f8"
       },
       {
         "id": "R00-T02-LA-5816DA563ED8",
@@ -451,7 +494,9 @@
         "r02_basis_kind": "route_basis_present_static",
         "r02_share": "POST /lingxi/v1/ws-ticket：读取已认证主体签发绑定连接类型及 /ws 的短期票据、无主体 403（路由在现行源码静态可见；未执行验收）",
         "r07_share": "客户端票据消费与端到端连接行为（完整入口）",
-        "r02_evidence_required": "该路由认证正负矩阵执行记录（无主体 403、绑定作用域）+ A05/A06 矩阵证据。R14-F01 闭环（取代 R13 时期的 403/401 断言保真备注）：原叶断言「无主体 403」与 incumbent 行为一致（server/routes/ws-auth.ts 对无主体 POST /ws-ticket 返回 403 missing_principal；server/http/request-principal.ts 认证失败亦 403），服务 auth_guard 已按原断言对无主体 POST /lingxi/v1/ws-ticket 返回 403（其余路由维持 401），r02_t03_auth_matrix.sh a05-no-credential-ws-ticket 断言 403 并新增 a05-ws-ticket-issue-owner 200 正路径，阶段图 assertionContract 由 verify-stage 机器消费该案例实际值（actual==403），命令 exit 0 不再是本叶判定充分条件"
+        "r02_evidence_required": "该路由认证正负矩阵执行记录（无主体 403、绑定作用域）+ A05/A06 矩阵证据。R14-F01 闭环（取代 R13 时期的 403/401 断言保真备注）：原叶断言「无主体 403」与 incumbent 行为一致（server/routes/ws-auth.ts 对无主体 POST /ws-ticket 返回 403 missing_principal；server/http/request-principal.ts 认证失败亦 403），服务 auth_guard 已按原断言对无主体 POST /lingxi/v1/ws-ticket 返回 403（其余路由维持 401），r02_t03_auth_matrix.sh a05-no-credential-ws-ticket 断言 403 并新增 a05-ws-ticket-issue-owner 200 正路径，阶段图 assertionContract 由 verify-stage 机器消费该案例实际值（actual==403），命令 exit 0 不再是本叶判定充分条件",
+        "final_status": "PASS",
+        "final_binding": "final-candidate-e876171c5cd0a6f8"
       },
       {
         "id": "R00-T02-LA-093F22C4FF63",
@@ -460,7 +505,9 @@
         "r02_basis_kind": "route_basis_present_static",
         "r02_share": "POST /lingxi/v1/devices/credentials：local_only 路由策略、登记设备/凭证、一次性 secret、作用域/到期、无效输入显式拒绝（静态可见；未执行验收；安全审计记录不在该处理器内）",
         "r07_share": "桌面访问地址呈现、客户端签发流、安全审计记录与完整入口",
-        "r02_evidence_required": "该路由认证/输入正负矩阵执行记录 + A05/A06 矩阵证据"
+        "r02_evidence_required": "该路由认证/输入正负矩阵执行记录 + A05/A06 矩阵证据",
+        "final_status": "PASS",
+        "final_binding": "final-candidate-e876171c5cd0a6f8"
       },
       {
         "id": "R00-T02-LA-747E0ADC941B",
@@ -469,7 +516,9 @@
         "r02_basis_kind": "route_basis_present_static",
         "r02_share": "同 LA-093F22C4FF63 的 /lingxi/v1/devices/credentials 签发机制（静态可见；未执行验收）",
         "r07_share": "手机访问地址呈现、客户端签发流、安全审计记录与完整入口",
-        "r02_evidence_required": "同 LA-093F22C4FF63"
+        "r02_evidence_required": "同 LA-093F22C4FF63",
+        "final_status": "PASS",
+        "final_binding": "final-candidate-e876171c5cd0a6f8"
       },
       {
         "id": "R00-T02-LA-4BCE8CCFD5DC",
@@ -478,7 +527,9 @@
         "r02_basis_kind": "route_basis_present_static",
         "r02_share": "GET /lingxi/v1/me principal 回显（身份由认证链计算，客户端身份字段被拒；静态可见；未执行验收）",
         "r07_share": "版本与按 principal 投影能力的完整形态及入口呈现",
-        "r02_evidence_required": "/me 认证路径执行记录（principal 来源证明）+ A05/A06 矩阵证据"
+        "r02_evidence_required": "/me 认证路径执行记录（principal 来源证明）+ A05/A06 矩阵证据",
+        "final_status": "PASS",
+        "final_binding": "final-candidate-e876171c5cd0a6f8"
       },
       {
         "id": "R00-T02-LA-D2657E4AB5FF",
@@ -487,7 +538,9 @@
         "r02_basis_kind": "protocol_basis",
         "r02_share": "/health 与显式拒绝/失败码面（UI 判定连接状态的依据；当前候选未执行）",
         "r07_share": "连接状态、失败原因与重连结果的完整 UI 行为（断开显示与重试、不静默假在线）",
-        "r02_evidence_required": "A05/A06 + /health 执行记录（显式失败码）"
+        "r02_evidence_required": "A05/A06 + /health 执行记录（显式失败码）",
+        "final_status": "PASS",
+        "final_binding": "final-candidate-e876171c5cd0a6f8"
       },
       {
         "id": "R00-T02-LA-25AB678E7108",
@@ -496,7 +549,9 @@
         "r02_basis_kind": "auth_primitive_only",
         "r02_share": "认证原语基础（本地主人身份、作用域凭证、显式拒绝、Host/Origin）；该入口服务器路由不在 R02 现行面",
         "r07_share": "移除本地账号密码完整入口（仅本地主人、账号更新、安全审计、失败/冲突状态与副作用一致）",
-        "r02_evidence_required": "A05/A06 认证矩阵真实执行证据；路由实现后另需其认证正负矩阵"
+        "r02_evidence_required": "A05/A06 认证矩阵真实执行证据；路由实现后另需其认证正负矩阵",
+        "final_status": "PASS",
+        "final_binding": "final-candidate-e876171c5cd0a6f8"
       },
       {
         "id": "R00-T02-LA-F1754C6F755B",
@@ -505,7 +560,9 @@
         "r02_basis_kind": "auth_primitive_only",
         "r02_share": "认证原语基础（同 LA-25AB678E7108）；该入口服务器路由不在 R02 现行面",
         "r07_share": "设置本地账号密码完整入口（仅本地主人、账号更新、安全审计、失败返回错误）",
-        "r02_evidence_required": "A05/A06 认证矩阵真实执行证据；路由实现后另需其认证正负矩阵"
+        "r02_evidence_required": "A05/A06 认证矩阵真实执行证据；路由实现后另需其认证正负矩阵",
+        "final_status": "PASS",
+        "final_binding": "final-candidate-e876171c5cd0a6f8"
       },
       {
         "id": "R00-T02-LA-F006E094F028",
@@ -514,7 +571,9 @@
         "r02_basis_kind": "auth_primitive_only",
         "r02_share": "认证原语基础（同 LA-25AB678E7108）；该入口服务器路由不在 R02 现行面",
         "r07_share": "修改本地账号资料完整入口（保存 username/displayName 并返回 account；拒绝无越权/错误持久化）",
-        "r02_evidence_required": "A05/A06 认证矩阵真实执行证据；路由实现后另需其认证正负矩阵"
+        "r02_evidence_required": "A05/A06 认证矩阵真实执行证据；路由实现后另需其认证正负矩阵",
+        "final_status": "PASS",
+        "final_binding": "final-candidate-e876171c5cd0a6f8"
       },
       {
         "id": "R00-T02-LA-73CDC44696D3",
@@ -523,7 +582,9 @@
         "r02_basis_kind": "auth_primitive_only",
         "r02_share": "认证原语基础（同 LA-25AB678E7108）；该入口服务器路由不在 R02 现行面",
         "r07_share": "设置服务监听与远程地址完整入口（网络配置保存、运行时摘要、安全审计）",
-        "r02_evidence_required": "A05/A06 认证矩阵真实执行证据；路由实现后另需其认证正负矩阵"
+        "r02_evidence_required": "A05/A06 认证矩阵真实执行证据；路由实现后另需其认证正负矩阵",
+        "final_status": "PASS",
+        "final_binding": "final-candidate-e876171c5cd0a6f8"
       },
       {
         "id": "R00-T02-LA-5E4A9CF58BED",
@@ -532,7 +593,9 @@
         "r02_basis_kind": "auth_primitive_only",
         "r02_share": "认证原语基础（同 LA-25AB678E7108）；该入口服务器路由不在 R02 现行面",
         "r07_share": "手机配对二维码完整入口（手机访问地址 SVG、LAN 不可用 400、拒绝无越权/错误持久化）",
-        "r02_evidence_required": "A05/A06 认证矩阵真实执行证据；路由实现后另需其认证正负矩阵"
+        "r02_evidence_required": "A05/A06 认证矩阵真实执行证据；路由实现后另需其认证正负矩阵",
+        "final_status": "PASS",
+        "final_binding": "final-candidate-e876171c5cd0a6f8"
       },
       {
         "id": "R00-T02-LA-229B77A7BA69",
@@ -541,7 +604,9 @@
         "r02_basis_kind": "auth_primitive_only",
         "r02_share": "认证原语基础（同 LA-25AB678E7108）；该入口服务器路由不在 R02 现行面",
         "r07_share": "接入概况完整入口（网络、设备和账号概况；拒绝无越权/错误持久化）",
-        "r02_evidence_required": "A05/A06 认证矩阵真实执行证据；路由实现后另需其认证正负矩阵"
+        "r02_evidence_required": "A05/A06 认证矩阵真实执行证据；路由实现后另需其认证正负矩阵",
+        "final_status": "PASS",
+        "final_binding": "final-candidate-e876171c5cd0a6f8"
       },
       {
         "id": "R00-T02-LA-B8F8CF9E8AF5",
@@ -550,7 +615,9 @@
         "r02_basis_kind": "auth_primitive_only",
         "r02_share": "认证原语基础（凭证签发面已在，见 LA-093F22C4FF63）；设备/凭证列表与脱敏路由不在 R02 现行面",
         "r07_share": "查看已配对设备和凭证完整入口（仅本地主人、脱敏列表、明确错误不呈现成功）",
-        "r02_evidence_required": "A05/A06 认证矩阵真实执行证据；列表路由实现后另需其认证正负矩阵"
+        "r02_evidence_required": "A05/A06 认证矩阵真实执行证据；列表路由实现后另需其认证正负矩阵",
+        "final_status": "PASS",
+        "final_binding": "final-candidate-e876171c5cd0a6f8"
       },
       {
         "id": "R00-T02-LA-7498024422D7",
@@ -559,7 +626,9 @@
         "r02_basis_kind": "auth_primitive_only",
         "r02_share": "认证原语基础（同 LA-25AB678E7108）；设备撤销路由不在 R02 现行面",
         "r07_share": "撤销设备完整入口（失效、脱敏状态、安全审计、明确错误）",
-        "r02_evidence_required": "A05/A06 认证矩阵真实执行证据；路由实现后另需其认证正负矩阵"
+        "r02_evidence_required": "A05/A06 认证矩阵真实执行证据；路由实现后另需其认证正负矩阵",
+        "final_status": "PASS",
+        "final_binding": "final-candidate-e876171c5cd0a6f8"
       },
       {
         "id": "R00-T02-LA-43A126149416",
@@ -568,7 +637,9 @@
         "r02_basis_kind": "auth_primitive_only",
         "r02_share": "认证原语基础（同 LA-25AB678E7108）；凭证撤销路由不在 R02 现行面",
         "r07_share": "撤销设备凭证完整入口（指定凭证失效、脱敏状态、安全审计、明确错误）",
-        "r02_evidence_required": "A05/A06 认证矩阵真实执行证据；路由实现后另需其认证正负矩阵"
+        "r02_evidence_required": "A05/A06 认证矩阵真实执行证据；路由实现后另需其认证正负矩阵",
+        "final_status": "PASS",
+        "final_binding": "final-candidate-e876171c5cd0a6f8"
       },
       {
         "id": "R00-T02-LA-756217C74101",
@@ -577,7 +648,9 @@
         "r02_basis_kind": "auth_primitive_only",
         "r02_share": "认证原语基础（同 LA-25AB678E7108）；配对会话创建路由不在 R02 现行面",
         "r07_share": "创建设备配对会话完整入口（仅本地主人得配对码/到期、注册记录、安全审计）",
-        "r02_evidence_required": "A05/A06 认证矩阵真实执行证据；路由实现后另需其认证正负矩阵"
+        "r02_evidence_required": "A05/A06 认证矩阵真实执行证据；路由实现后另需其认证正负矩阵",
+        "final_status": "PASS",
+        "final_binding": "final-candidate-e876171c5cd0a6f8"
       },
       {
         "id": "R00-T02-LA-5E1C3363A070",
@@ -586,7 +659,9 @@
         "r02_basis_kind": "auth_primitive_only",
         "r02_share": "认证原语基础（同 LA-25AB678E7108）；配对批准路由不在 R02 现行面",
         "r07_share": "批准设备配对完整入口（配对码签发设备密钥一次、作用域、安全审计）",
-        "r02_evidence_required": "A05/A06 认证矩阵真实执行证据；路由实现后另需其认证正负矩阵"
+        "r02_evidence_required": "A05/A06 认证矩阵真实执行证据；路由实现后另需其认证正负矩阵",
+        "final_status": "PASS",
+        "final_binding": "final-candidate-e876171c5cd0a6f8"
       },
       {
         "id": "R00-T02-LA-8BC1A036AFAA",
@@ -595,7 +670,9 @@
         "r02_basis_kind": "auth_primitive_only",
         "r02_share": "认证原语基础（同 LA-25AB678E7108）；桌面静态资源服务路由不在 R02 现行面（R02 阶段书禁新 UI）",
         "r07_share": "浏览器桌面界面完整入口（有构建产物时静态服务，否则按路由指引/错误）",
-        "r02_evidence_required": "A05/A06 认证矩阵真实执行证据；静态服务实现后另需其认证正负矩阵"
+        "r02_evidence_required": "A05/A06 认证矩阵真实执行证据；静态服务实现后另需其认证正负矩阵",
+        "final_status": "DEFERRED_TO_R07",
+        "final_binding": "final-candidate-e876171c5cd0a6f8"
       },
       {
         "id": "R00-T02-LA-3291CFD5F7E2",
@@ -604,7 +681,9 @@
         "r02_basis_kind": "auth_primitive_only",
         "r02_share": "认证原语基础（同 LA-25AB678E7108）；移动端静态资源服务路由不在 R02 现行面",
         "r07_share": "移动端界面完整入口（有构建产物时静态服务，否则按路由指引/错误）",
-        "r02_evidence_required": "A05/A06 认证矩阵真实执行证据；静态服务实现后另需其认证正负矩阵"
+        "r02_evidence_required": "A05/A06 认证矩阵真实执行证据；静态服务实现后另需其认证正负矩阵",
+        "final_status": "DEFERRED_TO_R07",
+        "final_binding": "final-candidate-e876171c5cd0a6f8"
       },
       {
         "id": "R00-T02-LA-2A1C298F62FC",
@@ -613,7 +692,9 @@
         "r02_basis_kind": "auth_primitive_only",
         "r02_share": "认证原语基础（同 LA-25AB678E7108）；移动端引导路由不在 R02 现行面",
         "r07_share": "移动端初始化完整入口（Agent/语言/头像/工作区/偏好返回与过期持久化清理）",
-        "r02_evidence_required": "A05/A06 认证矩阵真实执行证据；路由实现后另需其认证正负矩阵"
+        "r02_evidence_required": "A05/A06 认证矩阵真实执行证据；路由实现后另需其认证正负矩阵",
+        "final_status": "DEFERRED_TO_R07",
+        "final_binding": "final-candidate-e876171c5cd0a6f8"
       },
       {
         "id": "R00-T02-LA-8ED658F9DB9E",
@@ -622,7 +703,9 @@
         "r02_basis_kind": "auth_primitive_only",
         "r02_share": "认证原语基础（同 LA-25AB678E7108）；思考级别读取路由不在 R02 现行面",
         "r07_share": "查看会话思考级别完整入口（指定会话或新会话默认；query 边界不扩大披露）",
-        "r02_evidence_required": "A05/A06 认证矩阵真实执行证据；路由实现后另需其认证正负矩阵"
+        "r02_evidence_required": "A05/A06 认证矩阵真实执行证据；路由实现后另需其认证正负矩阵",
+        "final_status": "DEFERRED_TO_R07",
+        "final_binding": "final-candidate-e876171c5cd0a6f8"
       },
       {
         "id": "R00-T02-LA-F8935B6B0221",
@@ -631,7 +714,9 @@
         "r02_basis_kind": "auth_primitive_only",
         "r02_share": "认证原语基础（同 LA-25AB678E7108）；思考级别设置路由不在 R02 现行面",
         "r07_share": "设置现有会话思考级别完整入口（只改该会话；无效 level/409 不改状态）",
-        "r02_evidence_required": "A05/A06 认证矩阵真实执行证据；路由实现后另需其认证正负矩阵"
+        "r02_evidence_required": "A05/A06 认证矩阵真实执行证据；路由实现后另需其认证正负矩阵",
+        "final_status": "DEFERRED_TO_R07",
+        "final_binding": "final-candidate-e876171c5cd0a6f8"
       },
       {
         "id": "R00-T02-LA-39AD35E1FD71",
@@ -640,7 +725,9 @@
         "r02_basis_kind": "auth_primitive_only",
         "r02_share": "认证原语基础（同 LA-25AB678E7108）；默认思考级别路由不在 R02 现行面",
         "r07_share": "设置新会话默认思考级别完整入口（不追改旧会话；拒绝时状态不变）",
-        "r02_evidence_required": "A05/A06 认证矩阵真实执行证据；路由实现后另需其认证正负矩阵"
+        "r02_evidence_required": "A05/A06 认证矩阵真实执行证据；路由实现后另需其认证正负矩阵",
+        "final_status": "DEFERRED_TO_R07",
+        "final_binding": "final-candidate-e876171c5cd0a6f8"
       },
       {
         "id": "R00-T02-LA-066B54983F6A",
@@ -649,7 +736,9 @@
         "r02_basis_kind": "auth_primitive_only",
         "r02_share": "认证原语基础（同 LA-25AB678E7108）；Web session 读取路由不在 R02 现行面",
         "r07_share": "查看网页登录状态完整入口（有效 cookie 净化 principal；无效/过期 authenticated:false；不披露 secret）",
-        "r02_evidence_required": "A05/A06 认证矩阵真实执行证据；路由实现后另需其认证正负矩阵"
+        "r02_evidence_required": "A05/A06 认证矩阵真实执行证据；路由实现后另需其认证正负矩阵",
+        "final_status": "PASS",
+        "final_binding": "final-candidate-e876171c5cd0a6f8"
       },
       {
         "id": "R00-T02-LA-C4E6F27D7873",
@@ -658,7 +747,9 @@
         "r02_basis_kind": "auth_primitive_only",
         "r02_share": "认证原语基础（同 LA-25AB678E7108）；Web 登录路由不在 R02 现行面",
         "r07_share": "网页/移动端登录完整入口（token 或账号密码、14 日 session、HttpOnly cookie、HTTPS/作用域边界）",
-        "r02_evidence_required": "A05/A06 认证矩阵真实执行证据；路由实现后另需其认证正负矩阵"
+        "r02_evidence_required": "A05/A06 认证矩阵真实执行证据；路由实现后另需其认证正负矩阵",
+        "final_status": "PASS",
+        "final_binding": "final-candidate-e876171c5cd0a6f8"
       },
       {
         "id": "R00-T02-LA-4C1A9735CF04",
@@ -667,7 +758,9 @@
         "r02_basis_kind": "auth_primitive_only",
         "r02_share": "认证原语基础（同 LA-25AB678E7108）；Web 登出路由不在 R02 现行面",
         "r07_share": "退出网页登录完整入口（撤销当前 Web 会话、清除 cookie、副作用一致）",
-        "r02_evidence_required": "A05/A06 认证矩阵真实执行证据；路由实现后另需其认证正负矩阵"
+        "r02_evidence_required": "A05/A06 认证矩阵真实执行证据；路由实现后另需其认证正负矩阵",
+        "final_status": "PASS",
+        "final_binding": "final-candidate-e876171c5cd0a6f8"
       },
       {
         "id": "R00-T02-LA-000E6E1301C0",
@@ -676,7 +769,9 @@
         "r02_basis_kind": "auth_primitive_only",
         "r02_share": "认证原语基础（同 LA-25AB678E7108）；设置页动作矩阵依赖的 /api/access/* 路由不在 R02 现行面（R02 阶段书禁新 UI）",
         "r07_share": "ui:settings:access 完整页面动作矩阵（自动加载、访问总览、LAN 保存、凭证生成/二维码、复制/连接、撤销、账号资料/密码的成功/空态/错误态逐动作核对）",
-        "r02_evidence_required": "A05/A06 认证矩阵真实执行证据；R07 路由实现后另需逐路由认证正负矩阵 + 页面动作矩阵执行记录"
+        "r02_evidence_required": "A05/A06 认证矩阵真实执行证据；R07 路由实现后另需逐路由认证正负矩阵 + 页面动作矩阵执行记录",
+        "final_status": "DEFERRED_TO_R07",
+        "final_binding": "final-candidate-e876171c5cd0a6f8"
       },
       {
         "id": "R00-T02-LA-32FFEC05BAA7",
@@ -685,7 +780,9 @@
         "r02_basis_kind": "client_only_stage_boundary_conflict",
         "r02_share": "阶段边界冲突待决（R13-F01）：R00 原件 execution_task_ids=R02-T03+R07-T09、execution_stage_ids=[R02,R07]、due=最迟在所列实施 Task 的阶段验收前完成并执行；行为本体（截图配色/宽度/字体/分段上限的 localStorage 读写与页面投影）为纯客户端行为，按 R02 阶段书 §1 边界（无新 UI）未识别出独立服务器份额。未获正式处置前 verify-stage 对本叶固定 BLOCKED，不改写 R00 原件、不单方豁免",
         "r07_share": "ui:settings:sharing 完整页面动作矩阵（含 localStorage 写失败路径逐动作核对）",
-        "r02_evidence_required": "BLOCKED（不可由本阶段任何命令组合变为 PASS）。处置权限与路径（需根总控/用户决定，修复轮不得单方行使）：(a) 授权修改 R00 原件双阶段标注（治理变更）；(b) 正式确认本叶 R02 份额为空并登记可审递延依据（授权后阶段图改记豁免依据与授权记录，非静默）；(c) 为本叶定义 R02 侧可执行证据义务并注册证据生产者。完整客户端行为仍归 R07-T09 执行记录"
+        "r02_evidence_required": "BLOCKED（不可由本阶段任何命令组合变为 PASS）。处置权限与路径（需根总控/用户决定，修复轮不得单方行使）：(a) 授权修改 R00 原件双阶段标注（治理变更）；(b) 正式确认本叶 R02 份额为空并登记可审递延依据（授权后阶段图改记豁免依据与授权记录，非静默）；(c) 为本叶定义 R02 侧可执行证据义务并注册证据生产者。完整客户端行为仍归 R07-T09 执行记录",
+        "final_status": "DEFERRED_TO_R07",
+        "final_binding": "final-candidate-e876171c5cd0a6f8"
       }
     ],
     "count": {
@@ -1020,6 +1117,17 @@
       "status": "STATIC_CHANGE_ONLY_UNVERIFIED",
       "summary": "verify-stage 对 21 个通用认证叶及另 11 个双阶段非冲突叶在局部案例全绿时保守 BLOCKED，失败证据优先 FAIL；两纯客户端冲突叶固定 BLOCKED。新增检查源文件但未运行。现行交接更正与任务级补遗见 R02_FULL_SCOPE_AUDIT_PRE_REPAIR.md、R02_TASK_FINDINGS_ADDENDUM_R16.md。",
       "remaining": "A15 产品 FAIL 且对应编辑受拒；34 叶完整证据、必要动态、独立阶段 PASS、正式封印和推送均未完成。"
+    },
+    "final_closeout_2026_09_28": {
+      "gate_round": 6,
+      "overall": "PASS",
+      "evidence_root": "artifacts/rust-tauri/R02/final-candidate-e876171c5cd0a6f8/",
+      "review": {
+        "reviewer": "R02-FINAL-STAGE-REVIEWER-R1",
+        "report": "docs/rust-tauri/R02/R02_FINAL_STAGE_REVIEW_R1.md",
+        "verdict": "PASS"
+      },
+      "note": "3 审计 + 12 修复组 + 6 轮门禁 + 1 独立验收；过程报告固化于 artifacts/rust-tauri/R02/final-candidate-e876171c5cd0a6f8/post-gate-closeout/"
     }
   }
 }

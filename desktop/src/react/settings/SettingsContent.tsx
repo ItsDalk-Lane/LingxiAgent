@@ -355,11 +355,19 @@ export function SettingsContent({
                 </div>
               )}
               <ErrorBoundary region={effectiveActiveTab} resetKeys={[effectiveActiveTab]}>
-                <SettingsPage tab={effectiveActiveTab} layout={effectiveActiveTab === 'providers' ? 'fill' : 'flow'}>
-                  {rustSettingsUnavailable && effectiveActiveTab !== 'access'
-                    ? <div role="alert">{t('settings.rustCoreUnavailable')}</div>
-                    : <ActiveTab />}
-                </SettingsPage>
+                {rustSettingsUnavailable && effectiveActiveTab !== 'access' ? (
+                  // Rust core 不可用时整页内容替换为提示条。提示条仍走同一个页面
+                  // 原语（同 padding/布局），只是页体从 <ActiveTab /> 换成 alert——
+                  // SettingsContent 的页面清单契约要求每个 tab 的页体都是
+                  // <SettingsPage><ActiveTab /></SettingsPage> 原语形态。
+                  <SettingsPage tab={effectiveActiveTab} layout={effectiveActiveTab === 'providers' ? 'fill' : 'flow'}>
+                    <div role="alert">{t('settings.rustCoreUnavailable')}</div>
+                  </SettingsPage>
+                ) : (
+                  <SettingsPage tab={effectiveActiveTab} layout={effectiveActiveTab === 'providers' ? 'fill' : 'flow'}>
+                    <ActiveTab />
+                  </SettingsPage>
+                )}
               </ErrorBoundary>
             </div>
           </div>

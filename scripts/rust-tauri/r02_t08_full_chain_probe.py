@@ -23,6 +23,7 @@ the orchestrating bash script fails loudly). Prints one "PASS <label>" line
 per assertion so the orchestrator's summary is reconstructable.
 """
 
+import base64
 import json
 import os
 import socket
@@ -102,7 +103,10 @@ def http(port, method, path, bearer=None, body=None):
 # ---- minimal RFC6455 client (client frames MUST be masked) ------------------
 
 def ws_key():
-    return os.urandom(16).hex()
+    # RFC 6455 §4.1: Sec-WebSocket-Key is 16 random bytes, base64-encoded
+    # (standard alphabet). The server validates exactly this shape (base64
+    # decode -> len == 16); a hex string decodes to 24 bytes and is rejected.
+    return base64.b64encode(os.urandom(16)).decode()
 
 
 def upgrade(port, bearer):
