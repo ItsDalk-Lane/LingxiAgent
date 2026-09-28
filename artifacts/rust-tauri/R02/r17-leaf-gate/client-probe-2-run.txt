@@ -1,0 +1,5 @@
+R02 R00 supplemental client leaf producer, post CLI Rust explicit-route implementation.
+Command: python3 scripts/rust-tauri/r02_client_leaf_matrix.py artifacts/rust-tauri/R02/r17-leaf-gate/client-probe-2
+Start: 2026-09-28 07:32:17 UTC; end: 2026-09-28 07:32:19 UTC (wrapper log creation/modification times); exit: 0.
+Raw wrapper output: client-probe-2-run.log. Seven structured cases and direct command/UI observations: client-probe-2/leaf-cases.json, summary.json, three CLI stdout/stderr pairs, three synthetic-home before/after trees, Sharing Vitest raw stdout/stderr and sharing-cases.json. Candidate source SHA-256: client-probe-2-source-sha256.txt.
+Result: local client producer 7/7 PASS. It observes CLI help/unknown args and Sharing UI only; it does not establish that chat/status/session/serve R00 leaves or all 34 leaves pass. Earlier client-probe-1 remains an older candidate observation.

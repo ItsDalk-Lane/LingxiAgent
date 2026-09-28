@@ -120,6 +120,7 @@ async fn a11_online_backup_captures_wal_resident_committed_data_and_restores() {
             queue_capacity: 64,
             busy_timeout_ms: 5_000,
             checkpoint_pages: 10_000_000,
+            ..StoreOptions::default()
         },
     )
     .await;
@@ -187,6 +188,7 @@ async fn a11_pure_online_backup_without_precheckpoint_is_also_complete() {
             queue_capacity: 64,
             busy_timeout_ms: 5_000,
             checkpoint_pages: 10_000_000,
+            ..StoreOptions::default()
         },
     )
     .await;

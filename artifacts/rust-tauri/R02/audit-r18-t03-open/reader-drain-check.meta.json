@@ -1,0 +1,23 @@
+{
+  "command": [
+    "/Users/study_superior/.cargo/bin/cargo",
+    "check",
+    "--offline",
+    "--locked",
+    "-p",
+    "lingxi-service",
+    "--all-targets"
+  ],
+  "cwd": "/Users/study_superior/Desktop/Code/LingxiAgent/rust",
+  "start_utc": "2026-09-28T11:45:46.791808+00:00",
+  "end_utc": "2026-09-28T11:45:47.992644+00:00",
+  "exit_code": 0,
+  "source_sha256": {
+    "rust/crates/lingxi-service/src/auth.rs": "5d9408afc747e3249f0d7b7d9148be8fe3c22eb1aac3815835b466c409cf31e8",
+    "rust/crates/lingxi-service/src/ws.rs": "9b31a59ff3497bdddb49369e8d00443ece63248e391d224f0260db108572497e",
+    "rust/crates/lingxi-service/src/lib.rs": "a6ac041f3fd4529e22ccf40ff66e404740fc40da1a5ce8fce2c5cb3df22db587",
+    "rust/crates/lingxi-service/src/management.rs": "8f589dd18a2ff43128e7a4859fd6bd2fef76cec8b2e32af3fd4afc7c85977f1d",
+    "scripts/rust-tauri/r02_t03_ws_probe.py": "48631721be81c668196a9336cbbc86ea58f577f8109de6b35461ff292640fec2"
+  },
+  "raw_log": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R02/audit-r18-t03-open/reader-drain-check.raw.log"
+}

@@ -1,0 +1,29 @@
+{
+  "command": [
+    "cargo",
+    "test",
+    "--offline",
+    "-p",
+    "xtask",
+    "embedded_r02_map",
+    "--",
+    "--nocapture"
+  ],
+  "startUtc": "2026-09-28T09:49:57.897129+00:00",
+  "endUtc": "2026-09-28T09:49:58.758516+00:00",
+  "exitCode": 0,
+  "sourceStable": true,
+  "beforeSha256": {
+    "rust/crates/xtask/src/stage_maps/R02.json": "7df61ead4127e45ef51f5e89b818b7a02504d42457440667daeaaaff471637f0",
+    "rust/crates/xtask/src/stage_map.rs": "d4f26b837393c50d78c3abfdfd6252d1e7d8ee9166ace1ba0e63f57e6f0f8885",
+    "rust/crates/xtask/src/verify.rs": "8e71ef231b0fa928d89543e7f37c492cd43cf103ba6fdf9b815b997e79c440f5",
+    "rust/crates/xtask/src/verify/runner_tests.rs": "624e69017c160629ba8d00365f20ccc760da639c323e9383cff5a341b884a7c7"
+  },
+  "afterSha256": {
+    "rust/crates/xtask/src/stage_maps/R02.json": "7df61ead4127e45ef51f5e89b818b7a02504d42457440667daeaaaff471637f0",
+    "rust/crates/xtask/src/stage_map.rs": "d4f26b837393c50d78c3abfdfd6252d1e7d8ee9166ace1ba0e63f57e6f0f8885",
+    "rust/crates/xtask/src/verify.rs": "8e71ef231b0fa928d89543e7f37c492cd43cf103ba6fdf9b815b997e79c440f5",
+    "rust/crates/xtask/src/verify/runner_tests.rs": "624e69017c160629ba8d00365f20ccc760da639c323e9383cff5a341b884a7c7"
+  },
+  "kind": "targeted in-process stage-map tests; no true TCP"
+}

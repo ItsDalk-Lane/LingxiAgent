@@ -1,0 +1,28 @@
+{
+  "command": [
+    "/Users/study_superior/.cargo/bin/cargo",
+    "check",
+    "--offline",
+    "--locked",
+    "-p",
+    "lingxi-service",
+    "--all-targets"
+  ],
+  "cwd": "/Users/study_superior/Desktop/Code/LingxiAgent/rust",
+  "start_utc": "2026-09-28T11:41:03.645341+00:00",
+  "end_utc": "2026-09-28T11:41:04.852873+00:00",
+  "exit_code": 0,
+  "source_sha256": {
+    "rust/crates/lingxi-service/src/auth.rs": "5d9408afc747e3249f0d7b7d9148be8fe3c22eb1aac3815835b466c409cf31e8",
+    "rust/crates/lingxi-service/src/ws.rs": "9b31a59ff3497bdddb49369e8d00443ece63248e391d224f0260db108572497e",
+    "rust/crates/lingxi-service/src/lib.rs": "8357ba8e51bda3647a279c74ec19c0e71a8a95a6c560e8de04bb1776da410558",
+    "rust/crates/lingxi-service/src/management.rs": "8f589dd18a2ff43128e7a4859fd6bd2fef76cec8b2e32af3fd4afc7c85977f1d",
+    "rust/crates/lingxi-service/src/sessions.rs": "1adbf8a4c350a6c0ca60024d92c352daf78992b0a2283d97717ecf530969c832",
+    "rust/crates/lingxi-service/tests/event_subscription.rs": "bec57962c25cdcfbc758249fd8bfdedfdfdb016345c862dfd990044563308fdf",
+    "rust/crates/lingxi-service/tests/service_persistence.rs": "df2d83ef51389a530834234520625cbc1025d189b71deb3176a3aabad5f7e5d7",
+    "rust/crates/lingxi-service/tests/resource_limits.rs": "a8fcbdea6f8dbc040b5ec2c8a6bca736d9f3270bd04a8f9481ddc57dff29dc5f",
+    "rust/crates/lingxi-service/tests/execute_concurrency.rs": "823211290da255930025f06c95077538d067eb217015fedcedeae9eb191db0d1",
+    "scripts/rust-tauri/r02_t03_ws_probe.py": "ed16629946f82a2579708459e75f77a80a6b86326feeb7a3658e5f7f510433b1"
+  },
+  "raw_log": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R02/audit-r18-t03-open/reader-final-check.raw.log"
+}

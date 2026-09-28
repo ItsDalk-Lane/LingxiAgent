@@ -1,0 +1,6 @@
+start=2026-09-28T11:17:38.550183+00:00
+command1=/Users/study_superior/.cargo/bin/cargo test --offline --locked --manifest-path rust/Cargo.toml -p lingxi-service paths::tests --lib
+command2=/Users/study_superior/.cargo/bin/cargo test --offline --locked --manifest-path rust/Cargo.toml -p lingxi-adapters --test backup_restore
+end=2026-09-28T11:17:58.218104+00:00
+service_exit=0
+adapters_exit=0

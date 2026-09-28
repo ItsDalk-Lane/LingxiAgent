@@ -1,0 +1,31 @@
+{
+  "schema": "lingxi.leaf-case-results.v1",
+  "cases": [
+    {
+      "case": "access-rust-route-and-qr",
+      "expect": 1,
+      "actual": 1,
+      "ok": true,
+      "observed": {
+        "connectionIdentity": "lingxi-service",
+        "summaryPath": "/lingxi/v1/access/summary",
+        "qrPath": "/lingxi/v1/access/mobile-qr.svg",
+        "credentialPath": "/lingxi/v1/access/mobile-credentials",
+        "revokePath": "/lingxi/v1/devices/example/revoke"
+      }
+    },
+    {
+      "case": "access-legacy-route-and-qr",
+      "expect": 1,
+      "actual": 1,
+      "ok": true,
+      "observed": {
+        "connectionIdentity": "legacy",
+        "summaryPath": "/api/access/summary",
+        "qrPath": "/api/access/mobile-qr.svg",
+        "credentialPath": "/api/access/mobile-credentials",
+        "revokePath": "/api/devices/example/revoke"
+      }
+    }
+  ]
+}

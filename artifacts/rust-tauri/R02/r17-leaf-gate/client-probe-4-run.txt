@@ -1,0 +1,5 @@
+R02/R00 supplemental client leaves, after G5 loopback-token principal check update.
+Command: python3 scripts/rust-tauri/r02_client_leaf_matrix.py artifacts/rust-tauri/R02/r17-leaf-gate/client-probe-4
+Started: 2026-09-28 07:49:52 UTC; ended: 2026-09-28 07:49:55 UTC (wrapper log birth/modification times); exit: 0.
+Raw wrapper output: client-probe-4-run.log. Seven structured cases and actual process/UI records: client-probe-4/leaf-cases.json, summary.json, CLI stdout/stderr, synthetic-home trees, Sharing Vitest stdout/stderr and sharing-cases.json. Candidate source digest: client-probe-4-source-sha256.txt.
+Local producer result: 7/7 PASS for CLI help/unknown arguments and Sharing UI. Probe 1/2/3 remain earlier candidate observations. Other R00 leaves remain BLOCKED or FAIL pending their own evidence and full R02 verification.

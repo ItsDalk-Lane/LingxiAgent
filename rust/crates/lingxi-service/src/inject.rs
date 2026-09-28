@@ -67,14 +67,36 @@ pub trait RequestIdGen: Send + Sync + std::fmt::Debug {
     fn next_request_id(&self) -> String;
 }
 
-/// Production source: OS random device, same entropy source as the auth
-/// secrets (`req-` + 16 random bytes hex).
+/// Production source: the system secure random device, same entropy
+/// authority as the auth secrets (`req-` + 16 random bytes hex).
 #[derive(Debug, Clone, Copy, Default)]
 pub struct RandomRequestIdGen;
 
 impl RequestIdGen for RandomRequestIdGen {
     fn next_request_id(&self) -> String {
-        format!("req-{}", crate::auth::hex_random_public(16))
+        // R9-F05: request ids are CORRELATION handles, not credentials —
+        // they never key authorization. The system CSPRNG is the only
+        // random source; when it fails the id degrades EXPLICITLY (a
+        // `req-degraded-` prefix plus a per-process counter, and a warn
+        // log) so every consumer can SEE the degradation — never a silent
+        // fallback that looks random. Auth credentials never take this
+        // path: they refuse issuance instead (auth.rs).
+        match crate::auth::hex_random_public(16) {
+            Ok(hex) => format!("req-{hex}"),
+            Err(err) => {
+                static DEGRADED_SEQ: AtomicU64 = AtomicU64::new(0);
+                tracing::warn!(
+                    error = %err,
+                    "system secure random source unavailable: minting an EXPLICITLY degraded \
+                     request id (correlation only, never a credential)"
+                );
+                format!(
+                    "req-degraded-{}-{}",
+                    std::process::id(),
+                    DEGRADED_SEQ.fetch_add(1, Ordering::AcqRel)
+                )
+            }
+        }
     }
 }
 
@@ -129,6 +151,9 @@ mod tests {
         let gen = RandomRequestIdGen;
         let a = gen.next_request_id();
         let b = gen.next_request_id();
+        // The healthy path: 16 system-CSPRNG bytes as hex. (An EXPLICITLY
+        // degraded `req-degraded-…` id is only minted when the OS CSPRNG
+        // fails — R9-F05; not exercised here, this machine has one.)
         assert!(a.starts_with("req-") && a.len() == "req-".len() + 32);
         assert_ne!(a, b);
     }

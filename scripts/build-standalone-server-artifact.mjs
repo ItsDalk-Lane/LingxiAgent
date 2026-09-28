@@ -21,6 +21,7 @@ import { assertRuntimeComplete, MINGIT_VERSION } from "./mingit-runtime.js";
 const require = createRequire(import.meta.url);
 const ustar = require("../shared/artifact-core/ustar.cjs");
 const activation = require("../shared/artifact-core/activation.cjs");
+const { verifyRustServiceDirectory } = require("../desktop/src/shared/rust-local-service.cjs");
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -185,6 +186,11 @@ export async function buildWindowsStandaloneArtifact(opts = {}) {
   for (const output of [...createdOutputs, legacySignaturePath]) fs.rmSync(output, { force: true });
 
   assertServerTree(serverDir);
+  // 独立包的外层版本、Node 服务和 Rust 程序必须来自同一次构建。
+  const bundledVersion = JSON.parse(fs.readFileSync(path.join(serverDir, "package.json"), "utf8")).version;
+  if (bundledVersion !== version) {
+    throw new Error(`[standalone] packaged server version ${bundledVersion} does not match artifact version ${version}`);
+  }
   assertDirectory(gitDir, "MinGit runtime");
   try {
     assertRuntimeComplete(gitDir);
@@ -192,6 +198,7 @@ export async function buildWindowsStandaloneArtifact(opts = {}) {
     throw new Error(`[standalone] MinGit runtime is incomplete; refusing to publish\n${error.message}`);
   }
   assertFile(helperPath, "Windows sandbox helper");
+  verifyRustServiceDirectory({ directory: path.join(serverDir, "rust-service"), platform: STANDALONE_PLATFORM, arch, appVersion: version });
 
   fs.mkdirSync(artifactOutDir, { recursive: true });
 
@@ -234,6 +241,7 @@ export async function buildWindowsStandaloneArtifact(opts = {}) {
         server: `${STANDALONE_LAYOUT_ROOT}/server`,
         git: `${STANDALONE_LAYOUT_ROOT}/git`,
         sandboxHelper: `${STANDALONE_LAYOUT_ROOT}/sandbox/windows/lingxi-win-sandbox.exe`,
+        rustService: `${STANDALONE_LAYOUT_ROOT}/server/rust-service`,
       },
       runtime: { minGitVersion: MINGIT_VERSION },
     };

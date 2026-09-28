@@ -1,0 +1,30 @@
+{
+  "command": [
+    "npm",
+    "run",
+    "typecheck"
+  ],
+  "startUtc": "2026-09-28T10:11:49.201821+00:00",
+  "endUtc": "2026-09-28T10:12:11.754681+00:00",
+  "exitCode": 0,
+  "sourceStable": true,
+  "beforeSha256": {
+    "desktop/src/react/services/server-connection.ts": "40719d4fa066c94f8491d4b207b57b257986522373731e1693824ee2c9c7e82b",
+    "desktop/src/react/services/websocket.ts": "aaff04be508df86c51320c30aee5e9c243ee946269bd80e23e291aaed323a1a6",
+    "desktop/src/react/app-init.ts": "a8522ad2e1e82e431a7b2c871ea606dc6bbd2eb02d6befa9902b5352bf22da3b",
+    "desktop/src/react/settings/SettingsContent.tsx": "a9595bc89e5bfba12c3338eeef6a6894e840af9d419e290b5b0c9638397f51ef",
+    "desktop/src/react/stores/connection-slice.ts": "5e85a4321308b8b1a6f8c7cce1e389ffa2b0083df2df281979234e4607227a95",
+    "desktop/src/react/components/StatusBar.tsx": "6774fdea75011a59c70eec9a330c00b1366783ed69d62a0f43379223a7a79ab9",
+    "desktop/src/react/__tests__/components/R02StatusBar.test.tsx": "5f5efc8dcd7af75bea60ea500313cd64f1979c1b7c3ec21d43eb67490c7cc604"
+  },
+  "afterSha256": {
+    "desktop/src/react/services/server-connection.ts": "40719d4fa066c94f8491d4b207b57b257986522373731e1693824ee2c9c7e82b",
+    "desktop/src/react/services/websocket.ts": "aaff04be508df86c51320c30aee5e9c243ee946269bd80e23e291aaed323a1a6",
+    "desktop/src/react/app-init.ts": "a8522ad2e1e82e431a7b2c871ea606dc6bbd2eb02d6befa9902b5352bf22da3b",
+    "desktop/src/react/settings/SettingsContent.tsx": "a9595bc89e5bfba12c3338eeef6a6894e840af9d419e290b5b0c9638397f51ef",
+    "desktop/src/react/stores/connection-slice.ts": "5e85a4321308b8b1a6f8c7cce1e389ffa2b0083df2df281979234e4607227a95",
+    "desktop/src/react/components/StatusBar.tsx": "6774fdea75011a59c70eec9a330c00b1366783ed69d62a0f43379223a7a79ab9",
+    "desktop/src/react/__tests__/components/R02StatusBar.test.tsx": "5f5efc8dcd7af75bea60ea500313cd64f1979c1b7c3ec21d43eb67490c7cc604"
+  },
+  "kind": "no-port typecheck"
+}

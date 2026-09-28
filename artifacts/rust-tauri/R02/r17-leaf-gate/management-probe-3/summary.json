@@ -1,0 +1,31 @@
+{
+  "schema": "lingxi.r02-management-producer.v1",
+  "command": [
+    "cargo",
+    "test",
+    "--manifest-path",
+    "rust/Cargo.toml",
+    "--locked",
+    "--offline",
+    "-p",
+    "lingxi-service",
+    "--test",
+    "r00_management_leaves",
+    "--",
+    "--nocapture"
+  ],
+  "startUtc": "2026-09-28T07:56:56.036747+00:00",
+  "endUtc": "2026-09-28T07:57:00.033774+00:00",
+  "exitCode": 0,
+  "timedOut": false,
+  "sourceSha256": {
+    "rust/crates/lingxi-service/tests/r00_management_leaves.rs": "54e0c96db623eedd683065c01029c752e25bd514a5416303a56f85f9b5325da0",
+    "rust/crates/lingxi-service/src/management.rs": "5b92a1c7817f648cacc35972fe4184d1f8f2d3989b3bb058e75e3c8383c4d249",
+    "rust/crates/lingxi-service/src/auth.rs": "45bce455198b5200a6d8e5c283557006aa593742ab3223420643ddf054b2d085",
+    "rust/crates/lingxi-service/src/lib.rs": "9634cf91cf482cf68eff03a04a397458c859d631c1dc74f25b79d80aa622e62e",
+    "scripts/rust-tauri/r02_management_leaf_matrix.py": "76342a702fb66c8903369fbadb9c9cc0a867420ee5c7d5388e68e20b37943614"
+  },
+  "caseCount": 33,
+  "issues": [],
+  "status": "PASS"
+}

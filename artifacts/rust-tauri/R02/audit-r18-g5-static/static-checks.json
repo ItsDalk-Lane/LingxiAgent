@@ -1,0 +1,145 @@
+[
+  {
+    "argv": [
+      "bash",
+      "-n",
+      "scripts/rust-tauri/r02_t01_service_smoke.sh"
+    ],
+    "started_utc": "2026-09-28T10:14:22.880902+00:00",
+    "ended_utc": "2026-09-28T10:14:22.885072+00:00",
+    "exit_code": 0,
+    "stdout": "",
+    "stderr": ""
+  },
+  {
+    "argv": [
+      "bash",
+      "-n",
+      "scripts/rust-tauri/r02_t02_dual_instance.sh"
+    ],
+    "started_utc": "2026-09-28T10:14:22.885079+00:00",
+    "ended_utc": "2026-09-28T10:14:22.888981+00:00",
+    "exit_code": 0,
+    "stdout": "",
+    "stderr": ""
+  },
+  {
+    "argv": [
+      "bash",
+      "-n",
+      "scripts/rust-tauri/r02_t02_path_priority.sh"
+    ],
+    "started_utc": "2026-09-28T10:14:22.888989+00:00",
+    "ended_utc": "2026-09-28T10:14:22.892767+00:00",
+    "exit_code": 0,
+    "stdout": "",
+    "stderr": ""
+  },
+  {
+    "argv": [
+      "bash",
+      "-n",
+      "scripts/rust-tauri/r02_t03_auth_matrix.sh"
+    ],
+    "started_utc": "2026-09-28T10:14:22.892772+00:00",
+    "ended_utc": "2026-09-28T10:14:22.896701+00:00",
+    "exit_code": 0,
+    "stdout": "",
+    "stderr": ""
+  },
+  {
+    "argv": [
+      "bash",
+      "-n",
+      "scripts/rust-tauri/r02_t04_storage_tx.sh"
+    ],
+    "started_utc": "2026-09-28T10:14:22.896708+00:00",
+    "ended_utc": "2026-09-28T10:14:22.900069+00:00",
+    "exit_code": 0,
+    "stdout": "",
+    "stderr": ""
+  },
+  {
+    "argv": [
+      "bash",
+      "-n",
+      "scripts/rust-tauri/r02_t05_events_matrix.sh"
+    ],
+    "started_utc": "2026-09-28T10:14:22.900075+00:00",
+    "ended_utc": "2026-09-28T10:14:22.903093+00:00",
+    "exit_code": 0,
+    "stdout": "",
+    "stderr": ""
+  },
+  {
+    "argv": [
+      "bash",
+      "-n",
+      "scripts/rust-tauri/r02_t06_backup_restore.sh"
+    ],
+    "started_utc": "2026-09-28T10:14:22.903097+00:00",
+    "ended_utc": "2026-09-28T10:14:22.906475+00:00",
+    "exit_code": 0,
+    "stdout": "",
+    "stderr": ""
+  },
+  {
+    "argv": [
+      "bash",
+      "-n",
+      "scripts/rust-tauri/r02_t06_recovery_drill.sh"
+    ],
+    "started_utc": "2026-09-28T10:14:22.906478+00:00",
+    "ended_utc": "2026-09-28T10:14:22.910077+00:00",
+    "exit_code": 0,
+    "stdout": "",
+    "stderr": ""
+  },
+  {
+    "argv": [
+      "bash",
+      "-n",
+      "scripts/rust-tauri/r02_t07_redaction_scan.sh"
+    ],
+    "started_utc": "2026-09-28T10:14:22.910081+00:00",
+    "ended_utc": "2026-09-28T10:14:22.913551+00:00",
+    "exit_code": 0,
+    "stdout": "",
+    "stderr": ""
+  },
+  {
+    "argv": [
+      "bash",
+      "-n",
+      "scripts/rust-tauri/r02_t07_slow_subscriber.sh"
+    ],
+    "started_utc": "2026-09-28T10:14:22.913555+00:00",
+    "ended_utc": "2026-09-28T10:14:22.917026+00:00",
+    "exit_code": 0,
+    "stdout": "",
+    "stderr": ""
+  },
+  {
+    "argv": [
+      "git",
+      "diff",
+      "--check",
+      "--",
+      "scripts/rust-tauri/r02_t01_service_smoke.sh",
+      "scripts/rust-tauri/r02_t02_dual_instance.sh",
+      "scripts/rust-tauri/r02_t02_path_priority.sh",
+      "scripts/rust-tauri/r02_t03_auth_matrix.sh",
+      "scripts/rust-tauri/r02_t04_storage_tx.sh",
+      "scripts/rust-tauri/r02_t05_events_matrix.sh",
+      "scripts/rust-tauri/r02_t06_backup_restore.sh",
+      "scripts/rust-tauri/r02_t06_recovery_drill.sh",
+      "scripts/rust-tauri/r02_t07_redaction_scan.sh",
+      "scripts/rust-tauri/r02_t07_slow_subscriber.sh"
+    ],
+    "started_utc": "2026-09-28T10:14:22.917031+00:00",
+    "ended_utc": "2026-09-28T10:14:22.930026+00:00",
+    "exit_code": 0,
+    "stdout": "",
+    "stderr": ""
+  }
+]

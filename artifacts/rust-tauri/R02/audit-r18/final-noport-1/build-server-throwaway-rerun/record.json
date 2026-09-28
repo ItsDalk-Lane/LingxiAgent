@@ -1,0 +1,36 @@
+{
+  "startedUtc": "2026-09-28T11:57:30.674881+00:00",
+  "endedUtc": "2026-09-28T11:58:22.516026+00:00",
+  "records": [
+    {
+      "name": "keygen",
+      "argv": [
+        "node",
+        "scripts/artifact-keygen.mjs",
+        "--out",
+        "/private/tmp/lingxi-r02-r18-sign-4utfdqz6/private.pem"
+      ],
+      "startedUtc": "2026-09-28T11:57:30.675160+00:00",
+      "endedUtc": "2026-09-28T11:57:30.710846+00:00",
+      "exitCode": 0,
+      "stdoutSha256": "3038569370c7c3271b4a3f7a482feb1e61bc9057c581635833f22538b749dab4",
+      "stderrSha256": "62e988eb8994fc29f98024a81d608a58379dffa49992289959a269476b6df1ea"
+    },
+    {
+      "name": "build-server",
+      "argv": [
+        "npm",
+        "run",
+        "build:server"
+      ],
+      "startedUtc": "2026-09-28T11:57:30.711718+00:00",
+      "endedUtc": "2026-09-28T11:58:22.515406+00:00",
+      "exitCode": 0,
+      "stdoutSha256": "60835805f8bb9302d27e0d8629290937566754ec6970254eb4a26ca3808da506",
+      "stderrSha256": "3b1692169b3f539c091b9e921db9f85aec97b8bed59a9eb67c80308334e1342a",
+      "signature": "throwaway local key outside repository"
+    }
+  ],
+  "temporarySecretRemoved": true,
+  "sourceManifest": "../source-after-sha256.txt"
+}

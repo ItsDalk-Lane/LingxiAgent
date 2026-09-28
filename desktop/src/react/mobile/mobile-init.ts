@@ -34,6 +34,7 @@ export interface MobilePrincipal {
 export interface MobileAuthSession {
   authenticated: boolean;
   principal: MobilePrincipal | null;
+  backend: 'node' | 'rust';
 }
 
 export interface MobileBootstrap {
@@ -57,16 +58,69 @@ export interface MobileBootstrap {
 let mobileHandlersConfigured = false;
 
 export async function readMobileAuthSession(): Promise<MobileAuthSession> {
-  return rawJson<MobileAuthSession>('/api/web-auth/session');
+  // 旧服务的会话入口优先；它明确拒绝或不存在时，才核对 Rust 的公开身份。
+  const legacy = await fetch('/api/web-auth/session', {
+    headers: { Accept: 'application/json' },
+    credentials: 'same-origin',
+  });
+  if (legacy.ok) {
+    const session = await mobileJson<Omit<MobileAuthSession, 'backend'>>(legacy, '/api/web-auth/session');
+    return { ...requireMobileSession(session), backend: 'node' };
+  }
+  if (![401, 403, 404].includes(legacy.status)) {
+    throw new Error(`mobile session request failed: ${legacy.status} ${legacy.statusText}`);
+  }
+  const health = await fetch('/lingxi/v1/health', {
+    headers: { Accept: 'application/json' },
+    credentials: 'same-origin',
+  });
+  if (!health.ok) {
+    throw new Error(`mobile server identity could not be verified: ${health.status} ${health.statusText}`);
+  }
+  const identity = await mobileJson<Record<string, unknown>>(health, '/lingxi/v1/health');
+  if (identity.serverKind !== 'lingxi-service' || identity.status !== 'ok') {
+    throw new Error('mobile server identity could not be verified');
+  }
+  const session = await rawJson<Omit<MobileAuthSession, 'backend'>>('/lingxi/v1/web-auth/session');
+  return { ...requireMobileSession(session), backend: 'rust' };
 }
 
-export async function initializeMobileRuntime(principal: MobilePrincipal): Promise<{
+function requireMobileSession(value: Omit<MobileAuthSession, 'backend'>): Omit<MobileAuthSession, 'backend'> {
+  if (!value || typeof value.authenticated !== 'boolean'
+    || (value.authenticated && (!value.principal || typeof value.principal !== 'object'))) {
+    throw new Error('mobile session response is incomplete');
+  }
+  return value;
+}
+
+async function mobileJson<T>(response: Response, path: string): Promise<T> {
+  const contentType = response.headers.get('Content-Type');
+  if (contentType && !/\bapplication\/(?:[\w.-]+\+)?json\b/i.test(contentType)) {
+    throw new Error(`mobile server returned non-JSON response for ${path}`);
+  }
+  try {
+    return await response.json() as T;
+  } catch {
+    throw new Error(`mobile server returned invalid JSON for ${path}`);
+  }
+}
+
+export async function initializeMobileRuntime(principal: MobilePrincipal, backend: MobileAuthSession['backend']): Promise<{
   identity: ServerIdentity;
   bootstrap: MobileBootstrap;
 }> {
   configureMobileMessageHandlers();
 
-  const identity = await rawJson<ServerIdentity>('/api/server/identity');
+  const identity = await rawJson<ServerIdentity>(backend === 'rust'
+    ? '/lingxi/v1/server/identity'
+    : '/api/server/identity');
+  if (backend === 'rust') {
+    if (identity.serverNodeKind !== 'lingxi-service') {
+      throw new Error('Rust mobile server identity does not match');
+    }
+    // Rust 尚无完整移动端 bootstrap/会话创建/模型流，不能转入旧聊天界面。
+    throw new Error(window.t?.('status.rustCoreUnavailable') || 'Rust mobile workspace is unavailable');
+  }
   warnIfServerProtocolMismatch(identity);
   const connection = createBrowserServerConnection({
     identity,
@@ -153,8 +207,12 @@ export async function loadMobileSessions({
   selectFirst?: boolean;
 } = {}): Promise<Session[]> {
   const res = await lingxiFetch('/api/sessions');
-  const sessions = await res.json() as Session[];
-  const next = Array.isArray(sessions) ? sessions : [];
+  const sessions = await res.json() as unknown;
+  if (!Array.isArray(sessions)
+    || !sessions.every((session) => session && typeof session.path === 'string' && session.path.trim())) {
+    throw new Error('mobile sessions response is incomplete');
+  }
+  const next = sessions as Session[];
   useStore.getState().setSessions(next);
 
   const state = useStore.getState();
@@ -344,5 +402,5 @@ async function rawJson<T>(path: string, options: RequestInit = {}): Promise<T> {
     } catch {}
     throw new Error(detail);
   }
-  return await res.json() as T;
+  return await mobileJson<T>(res, path);
 }

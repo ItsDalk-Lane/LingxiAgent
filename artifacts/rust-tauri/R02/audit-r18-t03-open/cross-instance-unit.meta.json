@@ -1,0 +1,22 @@
+{
+  "command": [
+    "/Users/study_superior/.cargo/bin/cargo",
+    "test",
+    "--offline",
+    "--locked",
+    "-p",
+    "lingxi-service",
+    "--lib",
+    "auth::tests::live_device_revocation_is_visible_to_another_auth_instance"
+  ],
+  "cwd": "/Users/study_superior/Desktop/Code/LingxiAgent/rust",
+  "start_utc": "2026-09-28T11:28:35.247341+00:00",
+  "end_utc": "2026-09-28T11:28:37.843044+00:00",
+  "exit_code": 0,
+  "source_sha256": {
+    "rust/crates/lingxi-service/src/auth.rs": "84bb14974a857952613008b8c30fcdd78c4b0fdc7807a67f1c1cbdc36f754f6d",
+    "rust/crates/lingxi-service/src/ws.rs": "a8c72be7290d5ed83ba029403e4dd8e4ec703f7a6c4dfb906772bda2bedb4bb8",
+    "rust/crates/lingxi-service/src/lib.rs": "bd966b8be61ce6e96ffb168b354b728a9c6044f908bba0f6d790b5426afd6dfd"
+  },
+  "raw_log": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R02/audit-r18-t03-open/cross-instance-unit.raw.log"
+}

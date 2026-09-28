@@ -172,7 +172,15 @@ impl RotatingLogFile {
 
     fn open_current(&mut self) -> io::Result<()> {
         let path = self.path_for(self.seq);
+        #[cfg(windows)]
+        if !path.exists() {
+            drop(lingxi_adapters::storage::windows_acl::create_private_file(
+                &path,
+            )?);
+        }
         let file = fs::File::options().create(true).append(true).open(&path)?;
+        #[cfg(windows)]
+        lingxi_adapters::storage::windows_acl::ensure_private_file(&path)?;
         // Owner-only, mirroring the storage conventions (explicit chmod, not
         // umask luck).
         #[cfg(unix)]

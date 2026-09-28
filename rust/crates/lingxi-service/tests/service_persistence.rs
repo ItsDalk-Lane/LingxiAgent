@@ -42,6 +42,7 @@ async fn owner_principal(state: &ServiceState) -> lingxi_service::Principal {
         server_node_id: None,
         device_id: None,
         credential_id: None,
+        web_session_id: None,
         connection_kind: lingxi_service::auth::ConnectionKindSerde::Local,
         credential_kind: lingxi_service::CredentialKind::LoopbackToken,
         trust_state: lingxi_service::TrustState::Local,
@@ -165,5 +166,5 @@ async fn _service_still_serves_over_http(home: &std::path::Path) {
     let state = ServiceState::bootstrap(config_for(home), &layout)
         .await
         .expect("bootstrap");
-    let _ = run(state, async {}, |_addr| {}).await;
+    let _ = run(state, async {}, |_addr| {}, None).await;
 }

@@ -1,9 +1,12 @@
-import { describe, expect, it } from "vitest";
+import { describe, expect, it, vi } from "vitest";
 import {
   cliChatMessageMatchesSession,
   createCliChatAbortMessage,
   createCliChatPromptMessage,
   formatSessionLine,
+  planCliInterrupt,
+  printStatus,
+  printSessions,
   reduceCliChatStreamIdentity,
   selectSession,
 } from "../cli/chat.ts";
@@ -30,6 +33,36 @@ describe("CLI chat session helpers", () => {
     const line = formatSessionLine(sessions[0], 1);
     expect(line).toContain("Alpha");
     expect(line).toContain("Hana");
+  });
+});
+
+describe("CLI status and list failure boundaries", () => {
+  it("does not present a connection hint as authenticated identity", async () => {
+    const output = vi.spyOn(console, "log").mockImplementation(() => {});
+    try {
+      await printStatus({
+        health: async () => ({ agent: "Hana", version: "1.0" }),
+        identity: async () => { throw new Error("unauthorized"); },
+      } as any, { baseUrl: "http://127.0.0.1:1", source: "server-info" });
+      const rendered = output.mock.calls.flat().join("\n");
+      expect(rendered).toContain("unavailable (identity check failed)");
+      expect(rendered).not.toContain("server-info");
+    } finally {
+      output.mockRestore();
+    }
+  });
+
+  it("prints at most 20 sessions and preserves the empty-list message", async () => {
+    const output = vi.spyOn(console, "log").mockImplementation(() => {});
+    try {
+      await printSessions({ sessions: async () => [] } as any);
+      expect(output.mock.calls.flat().join("\n")).toContain("No sessions yet.");
+      output.mockClear();
+      await printSessions({ sessions: async () => Array.from({ length: 24 }, (_, index) => ({ path: `s${index}`, title: `S${index}` })) } as any);
+      expect(output).toHaveBeenCalledTimes(20);
+    } finally {
+      output.mockRestore();
+    }
   });
 });
 
@@ -103,5 +136,28 @@ describe("standalone CLI session stream contract", () => {
       streamId: "stream-b",
       isStreaming: false,
     })).toEqual(identity);
+    expect(cliChatMessageMatchesSession(identity, { type: "text_delta", delta: "untagged" })).toBe(false);
+    expect(cliChatMessageMatchesSession({ sessionPath: "/tmp/a.jsonl" }, {
+      type: "text_delta", sessionId: "sess-b", delta: "wrong session with only an ID",
+    })).toBe(false);
+    expect(cliChatMessageMatchesSession({ sessionId: "sess-a" }, {
+      type: "tool_start", sessionPath: "/tmp/b.jsonl", name: "wrong session tool",
+    })).toBe(false);
+    expect(cliChatMessageMatchesSession({ sessionPath: "/tmp/a.jsonl" }, {
+      type: "error", sessionId: "sess-b", message: "wrong session error",
+    })).toBe(false);
+    expect(cliChatMessageMatchesSession({ sessionPath: "/tmp/a.jsonl" }, {
+      type: "text_delta", sessionPath: "/tmp/a.jsonl", delta: "right session",
+    })).toBe(true);
+  });
+
+  it("Ctrl+C targets only the active stream and waits for an unknown stream identity", () => {
+    expect(planCliInterrupt({ ...identity, isStreaming: false })).toEqual({ kind: "exit" });
+    expect(planCliInterrupt({ ...identity, streamId: null, pendingPrompt: true })).toEqual({ kind: "wait" });
+    expect(planCliInterrupt(identity)).toEqual({
+      kind: "abort",
+      message: { type: "abort", sessionId: "sess-a", sessionPath: "/tmp/a.jsonl", streamId: "stream-a" },
+    });
+    expect(planCliInterrupt({ ...identity, abortRequestedStreamId: "stream-a" })).toEqual({ kind: "already-requested" });
   });
 });

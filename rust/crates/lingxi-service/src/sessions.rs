@@ -117,6 +117,15 @@ pub trait SessionBackend: Send + Sync {
         session_id: &str,
         limit: u32,
     ) -> impl Future<Output = Result<Vec<RunSummaryRow>, StorageError>> + Send;
+    /// Allocates the run id for a NEW execute (R02 stage-repair R1 / F01).
+    /// This is the ONLY legitimate source of run ids on this surface: an
+    /// atomic, durably-seeded per-database counter — never a `total_runs()
+    /// + 1` read, which races under concurrency and let distinct
+    /// submissions collapse into one run. Two calls never return the same
+    /// id, including at an identical `now_ms` and across restarts.
+    /// R5-F02: exhaustion surfaces as an explicit
+    /// [`StorageError::RunIdExhausted`] (never a panic/wrap/re-issue).
+    fn allocate_run_id(&self, now_ms: u64) -> Result<String, StorageError>;
 }
 
 /// Object-safe erasure of [`SessionBackend`] (RPITIT traits are not
@@ -141,6 +150,7 @@ pub trait SessionBackendErased: Send + Sync {
         session_id: &'a str,
         limit: u32,
     ) -> Pin<Box<dyn Future<Output = Result<Vec<RunSummaryRow>, StorageError>> + Send + 'a>>;
+    fn allocate_run_id_erased(&self, now_ms: u64) -> Result<String, StorageError>;
 }
 
 impl<T: SessionBackend> SessionBackendErased for T {
@@ -173,6 +183,9 @@ impl<T: SessionBackend> SessionBackendErased for T {
     ) -> Pin<Box<dyn Future<Output = Result<Vec<RunSummaryRow>, StorageError>> + Send + 'a>> {
         Box::pin(SessionBackend::recent_runs(self, session_id, limit))
     }
+    fn allocate_run_id_erased(&self, now_ms: u64) -> Result<String, StorageError> {
+        SessionBackend::allocate_run_id(self, now_ms)
+    }
 }
 
 impl SessionBackend for RunDatabase {
@@ -200,6 +213,9 @@ impl SessionBackend for RunDatabase {
         limit: u32,
     ) -> impl Future<Output = Result<Vec<RunSummaryRow>, StorageError>> + Send {
         RunDatabase::recent_runs(self, session_id, limit)
+    }
+    fn allocate_run_id(&self, now_ms: u64) -> Result<String, StorageError> {
+        RunDatabase::allocate_run_id(self, now_ms)
     }
 }
 
@@ -313,13 +329,17 @@ impl SessionStore {
         // Bound what we record (defense in depth; the body limit already
         // bounds the request).
         let recorded_input: String = input.chars().take(2000).collect();
-        let run_seq = self
+        // R02 stage-repair R1 / F01: the run id comes from the backend's
+        // atomic allocator, never from a `total_runs + 1` read — under
+        // concurrency that read races and distinct submissions collapsed
+        // into one run id (the idempotent-start path then reported success
+        // for work it never recorded). Every execute of an accepted request
+        // now mints its own run; storage-level idempotent replay remains
+        // for genuine same-`RunContext` retries only.
+        let run_id = self
             .backend
-            .total_runs_erased()
-            .await
-            .map_err(SessionExecuteError::Storage)?
-            + 1;
-        let run_id = format!("run_{:016x}_{:06x}", now_ms, run_seq);
+            .allocate_run_id_erased(now_ms)
+            .map_err(SessionExecuteError::Storage)?;
 
         let ctx = RunContext {
             principal: kernel_principal_of(principal),
@@ -490,6 +510,7 @@ mod tests {
             server_node_id: None,
             device_id: None,
             credential_id: None,
+            web_session_id: None,
             connection_kind: ConnectionKindSerde::Local,
             credential_kind: CredentialKind::LoopbackToken,
             trust_state: TrustState::Local,
@@ -507,6 +528,7 @@ mod tests {
             server_node_id: None,
             device_id: Some("device_x".to_string()),
             credential_id: Some("cred_x".to_string()),
+            web_session_id: None,
             connection_kind: ConnectionKindSerde::Lan,
             credential_kind: CredentialKind::DeviceCredential,
             trust_state: TrustState::Lan,
@@ -520,6 +542,9 @@ mod tests {
     struct MemoryBackend {
         sessions: Vec<SessionRow>,
         runs: SharedRuns, // (session_id, run_id)
+        /// Atomic id allocator mirroring the real backend's contract (F01):
+        /// unique per call, seeded from the current run count.
+        next_run_seq: std::sync::atomic::AtomicU64,
     }
 
     impl SessionBackend for MemoryBackend {
@@ -565,6 +590,13 @@ mod tests {
                     status: "completed".to_string(),
                 })
                 .collect())
+        }
+        fn allocate_run_id(&self, now_ms: u64) -> Result<String, StorageError> {
+            let seq = self
+                .next_run_seq
+                .fetch_add(1, std::sync::atomic::Ordering::Relaxed)
+                + 1;
+            Ok(format!("run_{now_ms:016x}_{seq:06x}"))
         }
     }
 
@@ -625,6 +657,7 @@ mod tests {
             SessionStore::new(MemoryBackend {
                 sessions: SessionStore::seed_rows(1000),
                 runs: std::sync::Arc::clone(&runs),
+                next_run_seq: std::sync::atomic::AtomicU64::new(0),
             }),
             runs,
         )
@@ -737,6 +770,58 @@ mod tests {
             port.outcomes.lock().unwrap().is_empty(),
             "no outcome may be committed on failure"
         );
+        drop(events);
+        let _ = std::fs::remove_dir_all(dir);
+    }
+
+    #[tokio::test]
+    async fn concurrent_executes_never_collapse_into_one_run_id() {
+        // R02 stage-repair R1 / F01 regression: 64 distinct-input executes
+        // at the SAME millisecond must produce 64 distinct run ids. Pre-fix
+        // the `total_runs + 1` read raced and 64 concurrent submissions
+        // collapsed into 2 runs with 64 success receipts.
+        let (store, runs) = store_with_runs();
+        let port = std::sync::Arc::new(FakePort {
+            fail_outcome: false,
+            runs,
+            outcomes: StdMutex::new(Vec::new()),
+        });
+        let (events, dir) = event_service_for_test().await;
+        let store = std::sync::Arc::new(store);
+        let events = std::sync::Arc::new(events);
+        let owner = owner_principal();
+        let mut tasks = Vec::new();
+        for n in 0..64 {
+            let store = std::sync::Arc::clone(&store);
+            let port = std::sync::Arc::clone(&port);
+            let events = std::sync::Arc::clone(&events);
+            let owner = owner.clone();
+            tasks.push(tokio::spawn(async move {
+                store
+                    .execute_for(
+                        port.as_ref(),
+                        events.as_ref(),
+                        &owner,
+                        "sess_local_alpha",
+                        &format!("distinct-input-{n}"),
+                        4242,
+                    )
+                    .await
+                    .expect("execute")
+                    .run_id
+            }));
+        }
+        let mut ids = std::collections::HashSet::new();
+        for t in tasks {
+            ids.insert(t.await.unwrap());
+        }
+        assert_eq!(
+            ids.len(),
+            64,
+            "every distinct submission is its own run: {} ids",
+            ids.len()
+        );
+        assert_eq!(store.run_count("sess_local_alpha").await.unwrap(), 64);
         drop(events);
         let _ = std::fs::remove_dir_all(dir);
     }

@@ -1,0 +1,4 @@
+start_utc=2026-09-28T06:17:37Z
+command=rustfmt --edition 2021 --check --config skip_children=true rust/crates/lingxi-service/src/auth.rs rust/crates/lingxi-service/src/ws.rs rust/crates/lingxi-service/src/lib.rs rust/crates/lingxi-service/tests/auth_matrix.rs
+end_utc=2026-09-28T06:17:37Z
+exit_status=1

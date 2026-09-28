@@ -1,0 +1,32 @@
+{
+  "command": [
+    "cargo",
+    "check",
+    "--offline",
+    "-p",
+    "lingxi-service",
+    "--test",
+    "r00_management_leaves"
+  ],
+  "startUtc": "2026-09-28T09:49:36.871447+00:00",
+  "endUtc": "2026-09-28T09:49:39.783502+00:00",
+  "exitCode": 0,
+  "sourceStable": true,
+  "beforeSha256": {
+    "rust/crates/lingxi-service/tests/r00_management_leaves.rs": "7cf8248103f2442d1474ae643e65f17c486d907746d76f8868acc7abcf84c66e",
+    "rust/crates/lingxi-service/src/auth.rs": "8a281cbc6646b55ecde0ddd81c99904d1d584c2a74c29623e00f28f5072e3970",
+    "rust/crates/lingxi-service/src/management.rs": "02631fd03e6768c10effdee3a515f961d6a3d64b0be9d4fb7ac8a03fd3e1d75e",
+    "rust/crates/lingxi-service/src/security_audit.rs": "9b748bd1211a7ed6c6b1fae3782f8a4cca8efc1cf576a044f496a68b5800297e",
+    "rust/crates/xtask/src/stage_maps/R02.json": "7df61ead4127e45ef51f5e89b818b7a02504d42457440667daeaaaff471637f0",
+    "scripts/rust-tauri/r02_management_leaf_matrix.py": "91319b9c9c19fdfef6307d42ee50721d5e6cb3430cf5c1ebfee3a5e4c65fb57f"
+  },
+  "afterSha256": {
+    "rust/crates/lingxi-service/tests/r00_management_leaves.rs": "7cf8248103f2442d1474ae643e65f17c486d907746d76f8868acc7abcf84c66e",
+    "rust/crates/lingxi-service/src/auth.rs": "8a281cbc6646b55ecde0ddd81c99904d1d584c2a74c29623e00f28f5072e3970",
+    "rust/crates/lingxi-service/src/management.rs": "02631fd03e6768c10effdee3a515f961d6a3d64b0be9d4fb7ac8a03fd3e1d75e",
+    "rust/crates/lingxi-service/src/security_audit.rs": "9b748bd1211a7ed6c6b1fae3782f8a4cca8efc1cf576a044f496a68b5800297e",
+    "rust/crates/xtask/src/stage_maps/R02.json": "7df61ead4127e45ef51f5e89b818b7a02504d42457440667daeaaaff471637f0",
+    "scripts/rust-tauri/r02_management_leaf_matrix.py": "91319b9c9c19fdfef6307d42ee50721d5e6cb3430cf5c1ebfee3a5e4c65fb57f"
+  },
+  "kind": "compile-only; no test execution or TCP"
+}

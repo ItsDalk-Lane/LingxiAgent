@@ -1,0 +1,19 @@
+--- artifacts/rust-tauri/R02/audit-r16/prechange-full-sha256-corrected.txt	2026-09-28 13:13:04
++++ artifacts/rust-tauri/R02/audit-r16/poststatic-full-source-sha256.txt	2026-09-28 13:22:53
+@@ -7507,11 +7507,12 @@
+ 69d94455449c1d589fd8bd7f83c0da2d16750c4449311d176e93cec69091af09  docs/rust-tauri/R02/R02-T07_REVIEW_R1.md
+ 497dfc6b143f495df5c343bdedd1c3bf4c869d0502f0f414f127c31459bd48ce  docs/rust-tauri/R02/R02-T08_REPORT.md
+ 186396650f1568ca4d6403c67ef373e104cd2598e6fa77c6ef4048caa9f5e0f4  docs/rust-tauri/R02/R02-T08_REVIEW_R1.md
+-e3576c4716a3963dd6b2147ed73637bfab5d98fe83e7f09b4d9cf677655831f2  docs/rust-tauri/R02/R02_ACCEPTANCE_LEDGER.json
+-db53036d83c6d709b2d6705e7448c7ef921c0e55db3251f26c057ca6b3233ce3  docs/rust-tauri/R02/R02_HANDOFF.json
++5ec1fc164cfead977084294bf44194325028f8523d59d755a49d554cad701f78  docs/rust-tauri/R02/R02_ACCEPTANCE_LEDGER.json
++79a747a56759438c2b0a44b76b79c9cda3ef0e153d0a259feb3a653cdc9c7979  docs/rust-tauri/R02/R02_FULL_SCOPE_AUDIT_PRE_REPAIR.md
++0678be4336ae1bf394b4bada1de51537224aa82c1f00b289fa0708c0187bf4e2  docs/rust-tauri/R02/R02_HANDOFF.json
+ 780669328bb2addf6b888e03a0ad6e8f84a33809dbb46e0512cb8d784ced5111  docs/rust-tauri/R02/R02_IMPLEMENTATION_MAP.json
+-ba6930c9582056c5319d60d6158fd34fb2e3b7fa72248710fe63f5e5f536d20b  docs/rust-tauri/R02/R02_REPORT.md
+-d9bff448bf49006c2f55af527d3d89055f6108e3284645f1f43e758b2e464d82  docs/rust-tauri/R02/RISK_REGISTER.json
++84daf2f033c9eeac765b617612c71b2070d63c8f605d9698e85b7d35926467a2  docs/rust-tauri/R02/R02_REPORT.md
++0d53d468369a2f50f2aebf23b1a9abb8bfcefd33eb9bcf2f36551da863c08f32  docs/rust-tauri/R02/RISK_REGISTER.json
+ b10c650bde2d50368310213e01f7bb8b313104e711bdd93c0be00abc3d77f850  docs/rust-tauri/R02/SERVICE_START_AND_SHUTDOWN.md
+ 85c5ce24c14f60a2a3b667c0a6db58ffbf460aeb1fd7f47ab6102bb915da118d  docs/rust-tauri/R02/r02_t08_worktree_digest.py
+ e6b4d2b2f81ef13884dad9ac592c801575da9696901bd828358411f64d5f44a8  docs/tasks/2026-09-11-todo-experience/ACCEPTANCE.md

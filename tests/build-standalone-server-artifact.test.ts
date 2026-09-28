@@ -17,9 +17,12 @@ import {
   standaloneRestrictedTokenSmokeSpec,
   verifyWindowsStandaloneArtifact,
 } from "../scripts/verify-standalone-server-artifact.mjs";
+import { resolveWindowsRustReader } from "../cli/rust-service.ts";
+import { rustSourceDigest } from "../scripts/build-rust-desktop-service.mjs";
 
 const require = createRequire(import.meta.url);
 const ustar = require("../shared/artifact-core/ustar.cjs");
+const { rustServiceContentDigest } = require("../desktop/src/shared/rust-local-service.cjs");
 const tempRoots: string[] = [];
 
 function makeTempRoot() {
@@ -51,10 +54,31 @@ function createInputs(root: string) {
   const helperPath = path.join(root, "dist-sandbox", "win-x64", "lingxi-win-sandbox.exe");
   writeFile(path.dirname(helperPath), path.basename(helperPath), "sandbox helper");
 
+  const rustDir = path.join(serverDir, "rust-service");
+  const executable = Buffer.alloc(2048);
+  executable.write("MZ", 0);
+  executable.writeUInt32LE(128, 0x3c);
+  executable.write("PE\0\0", 128);
+  executable.writeUInt16LE(0x8664, 132);
+  executable.writeUInt16LE(1, 134);
+  executable.writeUInt16LE(240, 148);
+  executable.writeUInt16LE(0x20b, 152);
+  executable.writeUInt32LE(1536, 408);
+  executable.writeUInt32LE(512, 412);
+  fs.mkdirSync(rustDir, { recursive: true });
+  fs.writeFileSync(path.join(rustDir, "lingxi-service.exe"), executable);
+  const sha256 = createHash("sha256").update(executable).digest("hex");
+  fs.writeFileSync(path.join(rustDir, "build.json"), JSON.stringify({
+    schemaVersion: 1, platform: "win", arch: "x64", target: "x86_64-pc-windows-msvc",
+    toolchain: "1.98.1", appVersion: "1.2.3", binary: "lingxi-service.exe",
+    sha256, contentSha256: rustServiceContentDigest(executable, "win32"), sourceSha256: "a".repeat(64),
+  }));
+
   return {
     serverDir,
     gitDir,
     helperPath,
+    rustDir,
   };
 }
 
@@ -133,6 +157,8 @@ describe("Windows standalone server artifact", () => {
     await ustar.extract(result.archivePath, extractDir);
     const layoutRoot = path.join(extractDir, STANDALONE_LAYOUT_ROOT);
     expect(fs.readdirSync(layoutRoot).sort()).toEqual(["git", "hana-server.cmd", "hana.cmd", "sandbox", "server"]);
+    expect(fs.readFileSync(path.join(layoutRoot, "server", "rust-service", "build.json"), "utf8"))
+      .toBe(fs.readFileSync(path.join(inputs.rustDir, "build.json"), "utf8"));
     expect(fs.readFileSync(path.join(layoutRoot, "server", "lib", "runtime.json"), "utf8"))
       .toBe("server source must remain unchanged\n");
     expect(fs.readFileSync(path.join(layoutRoot, "git", "cmd", "git.exe"), "utf8")).toBe("git cmd");
@@ -154,12 +180,60 @@ describe("Windows standalone server artifact", () => {
     await expect(
       verifyWindowsStandaloneArtifact({ rootDir: root, log: () => {} }),
     ).resolves.toMatchObject({ archivePath: result.archivePath });
+
+    const cliFile = path.join(layoutRoot, "server", "bundle", "cli.js");
+    const rustBinary = path.join(layoutRoot, "server", "rust-service", "lingxi-service.exe");
+    fs.writeFileSync(path.join(extractDir, "Lingxi.exe"), "unrelated adjacent file");
+    expect(resolveWindowsRustReader(cliFile, "x64")).toBe(rustBinary);
+    const readerManifestPath = path.join(layoutRoot, "server", "rust-service", "build.json");
+    const readerManifest = JSON.parse(fs.readFileSync(readerManifestPath, "utf8"));
+    fs.writeFileSync(readerManifestPath, JSON.stringify({ ...readerManifest, appVersion: "9.9.9" }));
+    expect(() => resolveWindowsRustReader(cliFile, "x64")).toThrow(/manifest does not match/);
+    fs.writeFileSync(readerManifestPath, JSON.stringify(readerManifest));
+    const changed = fs.readFileSync(rustBinary);
+    changed[512] ^= 1;
+    fs.writeFileSync(rustBinary, changed);
+    expect(() => resolveWindowsRustReader(cliFile, "x64")).toThrow(/digest mismatch/);
   });
 
   it("fails closed when the packaged server is missing", async () => {
     const root = makeTempRoot();
     await expect(buildWindowsStandaloneArtifact({ rootDir: root, log: () => {} }))
       .rejects.toThrow(/packaged server directory is missing/);
+  });
+
+  it("解包复验拒绝与外层发行版本不同的 Rust reader", async () => {
+    const root = makeTempRoot();
+    createInputs(root);
+    const output = await buildWindowsStandaloneArtifact({ rootDir: root, log: () => {} });
+    const staging = path.join(root, "mutated-archive");
+    await ustar.extract(output.archivePath, staging);
+    const rustManifest = path.join(staging, STANDALONE_LAYOUT_ROOT, "server", "rust-service", "build.json");
+    const original = JSON.parse(fs.readFileSync(rustManifest, "utf8"));
+    fs.writeFileSync(rustManifest, JSON.stringify({ ...original, appVersion: "9.9.9" }));
+    await ustar.packTree(staging, output.archivePath);
+    const outer = JSON.parse(fs.readFileSync(output.manifestPath, "utf8"));
+    outer.archive.sha256 = createHash("sha256").update(fs.readFileSync(output.archivePath)).digest("hex");
+    outer.archive.size = fs.statSync(output.archivePath).size;
+    fs.writeFileSync(output.manifestPath, JSON.stringify(outer));
+    await expect(verifyWindowsStandaloneArtifact({ rootDir: root, log: () => {} }))
+      .rejects.toThrow(/does not match/);
+  });
+
+  it("解包复验拒绝与外层发行版本不同的 Node 服务", async () => {
+    const root = makeTempRoot();
+    createInputs(root);
+    const output = await buildWindowsStandaloneArtifact({ rootDir: root, log: () => {} });
+    const staging = path.join(root, "mutated-server-archive");
+    await ustar.extract(output.archivePath, staging);
+    fs.writeFileSync(path.join(staging, STANDALONE_LAYOUT_ROOT, "server", "package.json"), '{"version":"1.2.2"}\n');
+    await ustar.packTree(staging, output.archivePath);
+    const outer = JSON.parse(fs.readFileSync(output.manifestPath, "utf8"));
+    outer.archive.sha256 = createHash("sha256").update(fs.readFileSync(output.archivePath)).digest("hex");
+    outer.archive.size = fs.statSync(output.archivePath).size;
+    fs.writeFileSync(output.manifestPath, JSON.stringify(outer));
+    await expect(verifyWindowsStandaloneArtifact({ rootDir: root, log: () => {} }))
+      .rejects.toThrow(/packaged server version/);
   });
 
   it("fails closed when MinGit is incomplete", async () => {
@@ -176,6 +250,74 @@ describe("Windows standalone server artifact", () => {
     fs.rmSync(inputs.helperPath);
     await expect(buildWindowsStandaloneArtifact({ rootDir: root, log: () => {} }))
       .rejects.toThrow(/Windows sandbox helper is missing/);
+  });
+
+  it("拒绝缺失或被改写的随包 Rust 程序", async () => {
+    const root = makeTempRoot();
+    const inputs = createInputs(root);
+    const binary = path.join(inputs.rustDir, "lingxi-service.exe");
+    fs.rmSync(binary);
+    await expect(buildWindowsStandaloneArtifact({ rootDir: root, log: () => {} }))
+      .rejects.toThrow(/ENOENT/);
+    const bytes = Buffer.alloc(2048);
+    fs.writeFileSync(binary, bytes);
+    await expect(buildWindowsStandaloneArtifact({ rootDir: root, log: () => {} }))
+      .rejects.toThrow(/matching Windows executable/);
+  });
+
+  it("拒绝把旧版本 Node 服务和新版本 Rust 清单拼成独立包", async () => {
+    const root = makeTempRoot();
+    const inputs = createInputs(root);
+    fs.writeFileSync(path.join(inputs.serverDir, "package.json"), '{"version":"1.2.2"}\n');
+    await expect(buildWindowsStandaloneArtifact({ rootDir: root, log: () => {} }))
+      .rejects.toThrow(/packaged server version/);
+  });
+
+  it("激活版和回退版只读取同版本且受指针引用的 Rust 程序", () => {
+    const root = makeTempRoot();
+    const inputs = createInputs(root);
+    const active = path.join(root, "artifacts", "server", "1.2.3-win32-x64");
+    fs.cpSync(inputs.serverDir, active, { recursive: true });
+    const receipt = { version: "1.2.3", sha256: "b".repeat(64) };
+    fs.writeFileSync(path.join(active, ".verified"), JSON.stringify(receipt));
+    const pointerDir = path.join(root, "artifacts", "pointers");
+    fs.mkdirSync(pointerDir, { recursive: true });
+    const pointer = { kind: "server", platformArch: "win32-x64", version: "1.2.3",
+      versionDir: active, sha256: receipt.sha256 };
+    const previous = path.join(pointerDir, "stable.previous.json");
+    fs.writeFileSync(previous, JSON.stringify(pointer));
+    const cliFile = path.join(active, "bundle", "cli.js");
+    expect(resolveWindowsRustReader(cliFile, "x64"))
+      .toBe(path.join(active, "rust-service", "lingxi-service.exe"));
+    fs.writeFileSync(previous, JSON.stringify({ ...pointer, sha256: "c".repeat(64) }));
+    expect(() => resolveWindowsRustReader(cliFile, "x64")).toThrow(/pointer mismatch/);
+    fs.writeFileSync(previous, JSON.stringify(pointer));
+    fs.writeFileSync(path.join(active, ".verified"), JSON.stringify({ ...receipt, version: "1.2.2" }));
+    expect(() => resolveWindowsRustReader(cliFile, "x64")).toThrow(/receipt mismatch/);
+    fs.writeFileSync(path.join(active, ".verified"), JSON.stringify(receipt));
+    fs.writeFileSync(path.join(active, "package.json"), JSON.stringify({ version: "1.2.2" }));
+    expect(() => resolveWindowsRustReader(cliFile, "x64")).toThrow(/package version mismatch/);
+  });
+
+  it("源码 CLI 拒绝旧 Rust stage，也不切到未经核验的 debug 程序", () => {
+    const root = makeTempRoot();
+    const inputs = createInputs(root);
+    const stage = path.join(root, "dist-rust-service", "win-x64");
+    fs.cpSync(inputs.rustDir, stage, { recursive: true });
+    writeFile(root, "rust-toolchain.toml", '[toolchain]\nchannel = "1.98.1"\n');
+    writeFile(root, "rust/Cargo.toml", '[workspace]\n');
+    const manifestPath = path.join(stage, "build.json");
+    const manifest = JSON.parse(fs.readFileSync(manifestPath, "utf8"));
+    fs.writeFileSync(manifestPath, JSON.stringify({ ...manifest,
+      sourceSha256: rustSourceDigest(path.join(root, "rust")) }));
+    const cliFile = path.join(root, "cli", "rust-service.ts");
+    expect(resolveWindowsRustReader(cliFile, "x64"))
+      .toBe(path.join(stage, "lingxi-service.exe"));
+    writeFile(root, "rust/Cargo.toml", '[workspace]\n# newer source\n');
+    expect(() => resolveWindowsRustReader(cliFile, "x64")).toThrow(/stale/);
+    fs.rmSync(stage, { recursive: true });
+    writeFile(root, "rust/target/debug/lingxi-service.exe", "unverified debug");
+    expect(() => resolveWindowsRustReader(cliFile, "x64")).toThrow(/ENOENT/);
   });
 
   it("does not make standalone packaging depend on release signing credentials", async () => {

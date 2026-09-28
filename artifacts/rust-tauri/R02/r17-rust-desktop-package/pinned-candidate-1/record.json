@@ -1,0 +1,153 @@
+{
+  "platform": "macOS-27.0-arm64-arm-64bit-Mach-O",
+  "cwd": "/Users/study_superior/Desktop/Code/LingxiAgent",
+  "sourceBefore": {
+    "package.json": "6c8b5bd6c67bffe1c030a83f16d4ed07d1f702f6fb8ab5612f13f71dfc0b2117",
+    "rust-toolchain.toml": "eec3410410647a7d39f25371e73dda3ecfd5e7c10359090fff11e83053e11c37",
+    ".gitignore": "04a7a7232349e925477701b6e937e6bb6e118b869cdd5a6c4af684979a4598ad",
+    "build/shell-surface-manifest.json": "7f7d46dd74c7ab6f3617c0fe6e66073a396e69c4ab9ae96283abc1f1acb0ee73",
+    "scripts/build-rust-desktop-service.mjs": "9ab45a59496398811b5758f8d30ab89ba877406b32007be2624051b9621caa85",
+    "scripts/build-shell.mjs": "ad40dc89a04fff8882a6e1f2215bc3251d1ee809070f579e710a96e47725cd03",
+    "scripts/fix-modules.cjs": "76f1139cdf52303cdee84f56b90868269c29cf14dae15fb18a5f8903abaa9a08",
+    "scripts/notarize.cjs": "681231351b91c045a957952b05dc16f6d04fc75c78aa4c9ec17e793a53efa86a",
+    "scripts/resign-adhoc.cjs": "4b62fdd38f7f04bdcc6c3879fe1715ed719679f0ad9858250adbdd0f17a044e3",
+    "desktop/main.cjs": "8309c590f752d8caedef869646542297c0386d303afb4482b8b2ec7945700da5",
+    "desktop/src/shared/rust-local-service.cjs": "408ddb8bf33ac7deafdfc038aa813c802668aeb45b6172fb18c1149f80eaab29",
+    "tests/desktop-rust-local-service.test.cjs": "990d9bc58b3952e427ec47eaa82bdd412efa806031083df6b6bd6de36d441180"
+  },
+  "rustTreeBefore": "d97676b1c13a0671de87071b9406046d675455bd6b707185e77cfa582bcb35c8",
+  "checks": [
+    {
+      "command": [
+        "/Users/study_superior/.cargo/bin/rustup",
+        "run",
+        "1.98.1",
+        "rustc",
+        "-vV"
+      ],
+      "startUtc": "2026-09-28T11:22:39Z",
+      "endUtc": "2026-09-28T11:22:39Z",
+      "exit": 0,
+      "rawLog": "check-00.log"
+    },
+    {
+      "command": [
+        "/Users/study_superior/.cargo/bin/rustup",
+        "run",
+        "1.98.1",
+        "cargo",
+        "--version"
+      ],
+      "startUtc": "2026-09-28T11:22:39Z",
+      "endUtc": "2026-09-28T11:22:39Z",
+      "exit": 0,
+      "rawLog": "check-01.log"
+    },
+    {
+      "command": [
+        "node",
+        "scripts/build-rust-desktop-service.mjs"
+      ],
+      "startUtc": "2026-09-28T11:22:39Z",
+      "endUtc": "2026-09-28T11:23:01Z",
+      "exit": 0,
+      "rawLog": "check-02.log"
+    },
+    {
+      "command": [
+        "node",
+        "scripts/build-rust-desktop-service.mjs",
+        "--verify"
+      ],
+      "startUtc": "2026-09-28T11:23:01Z",
+      "endUtc": "2026-09-28T11:23:01Z",
+      "exit": 0,
+      "rawLog": "check-03.log"
+    },
+    {
+      "command": [
+        "node",
+        "--test",
+        "tests/desktop-rust-local-service.test.cjs"
+      ],
+      "startUtc": "2026-09-28T11:23:01Z",
+      "endUtc": "2026-09-28T11:23:01Z",
+      "exit": 0,
+      "rawLog": "check-04.log"
+    },
+    {
+      "command": [
+        "node",
+        "node_modules/vitest/vitest.mjs",
+        "run",
+        "tests/package-build-order.test.ts",
+        "tests/linux-build-config.test.ts",
+        "tests/shell-surface-manifest.test.ts"
+      ],
+      "startUtc": "2026-09-28T11:23:01Z",
+      "endUtc": "2026-09-28T11:23:01Z",
+      "exit": 0,
+      "rawLog": "check-05.log"
+    },
+    {
+      "command": [
+        "npm",
+        "run",
+        "build:main"
+      ],
+      "startUtc": "2026-09-28T11:23:01Z",
+      "endUtc": "2026-09-28T11:23:03Z",
+      "exit": 0,
+      "rawLog": "check-06.log"
+    },
+    {
+      "command": [
+        "node",
+        "--check",
+        "desktop/main.bundle.cjs"
+      ],
+      "startUtc": "2026-09-28T11:23:03Z",
+      "endUtc": "2026-09-28T11:23:03Z",
+      "exit": 0,
+      "rawLog": "check-07.log"
+    },
+    {
+      "command": [
+        "git",
+        "diff",
+        "--check"
+      ],
+      "startUtc": "2026-09-28T11:23:03Z",
+      "endUtc": "2026-09-28T11:23:03Z",
+      "exit": 0,
+      "rawLog": "check-08.log"
+    }
+  ],
+  "sourceAfter": {
+    "package.json": "6c8b5bd6c67bffe1c030a83f16d4ed07d1f702f6fb8ab5612f13f71dfc0b2117",
+    "rust-toolchain.toml": "eec3410410647a7d39f25371e73dda3ecfd5e7c10359090fff11e83053e11c37",
+    ".gitignore": "04a7a7232349e925477701b6e937e6bb6e118b869cdd5a6c4af684979a4598ad",
+    "build/shell-surface-manifest.json": "7f7d46dd74c7ab6f3617c0fe6e66073a396e69c4ab9ae96283abc1f1acb0ee73",
+    "scripts/build-rust-desktop-service.mjs": "9ab45a59496398811b5758f8d30ab89ba877406b32007be2624051b9621caa85",
+    "scripts/build-shell.mjs": "ad40dc89a04fff8882a6e1f2215bc3251d1ee809070f579e710a96e47725cd03",
+    "scripts/fix-modules.cjs": "76f1139cdf52303cdee84f56b90868269c29cf14dae15fb18a5f8903abaa9a08",
+    "scripts/notarize.cjs": "681231351b91c045a957952b05dc16f6d04fc75c78aa4c9ec17e793a53efa86a",
+    "scripts/resign-adhoc.cjs": "4b62fdd38f7f04bdcc6c3879fe1715ed719679f0ad9858250adbdd0f17a044e3",
+    "desktop/main.cjs": "8309c590f752d8caedef869646542297c0386d303afb4482b8b2ec7945700da5",
+    "desktop/src/shared/rust-local-service.cjs": "408ddb8bf33ac7deafdfc038aa813c802668aeb45b6172fb18c1149f80eaab29",
+    "tests/desktop-rust-local-service.test.cjs": "990d9bc58b3952e427ec47eaa82bdd412efa806031083df6b6bd6de36d441180"
+  },
+  "rustTreeAfter": "d97676b1c13a0671de87071b9406046d675455bd6b707185e77cfa582bcb35c8",
+  "stageManifestAtEnd": {
+    "schemaVersion": 1,
+    "platform": "mac",
+    "arch": "arm64",
+    "target": "aarch64-apple-darwin",
+    "toolchain": "1.98.1",
+    "appVersion": "0.1.43",
+    "binary": "lingxi-service",
+    "sha256": "8c8a3a00666506f9927b943f7a00d3494c1e8597e04869ad2d28941566209fa1",
+    "contentSha256": "8c8a3a00666506f9927b943f7a00d3494c1e8597e04869ad2d28941566209fa1",
+    "sourceSha256": "77d10c4be48027b60eff0ee822edfa3d8736cd774d45725078be15a0797d9777"
+  }
+}

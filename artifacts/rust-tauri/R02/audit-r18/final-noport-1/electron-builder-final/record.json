@@ -1,0 +1,14 @@
+{
+  "command": [
+    "node_modules/.bin/electron-builder",
+    "--dir"
+  ],
+  "cwd": "/Users/study_superior/Desktop/Code/LingxiAgent",
+  "startedUtc": "2026-09-28T11:58:42.492791+00:00",
+  "endedUtc": "2026-09-28T11:58:55.281881+00:00",
+  "exitCode": 1,
+  "stdoutSha256": "d20b8382928177c59253a124e94711f79108d8e01c61fcb0fe96b06d28032422",
+  "stderrSha256": "abab7c4267639365bf07bd7ad2e82ee0e08670de8ef6965260ca5c338548a2bd",
+  "sourceManifest": "../source-after-sha256.txt",
+  "note": "current source package attempt; true installed app acceptance not implied"
+}

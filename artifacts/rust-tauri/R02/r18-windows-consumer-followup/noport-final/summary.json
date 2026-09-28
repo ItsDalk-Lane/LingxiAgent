@@ -1,0 +1,163 @@
+{
+  "platform": "Darwin",
+  "checks": [
+    {
+      "name": "typecheck",
+      "argv": [
+        "npm",
+        "run",
+        "typecheck"
+      ],
+      "cwd": "/Users/study_superior/Desktop/Code/LingxiAgent",
+      "started_utc": "2026-09-28T13:10:51.681661+00:00",
+      "ended_utc": "2026-09-28T13:11:15.920112+00:00",
+      "exit": 0,
+      "stdout_sha256": "b32daeef2af45d85547f664e7ad68b9dd0c290942ad702592eff35b5cb4a65d8",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "cli-artifact-tests",
+      "argv": [
+        "./node_modules/.bin/vitest",
+        "run",
+        "tests/cli-rust-service.test.ts",
+        "tests/build-server-artifact.test.ts",
+        "tests/build-standalone-server-artifact.test.ts"
+      ],
+      "cwd": "/Users/study_superior/Desktop/Code/LingxiAgent",
+      "started_utc": "2026-09-28T13:11:15.920519+00:00",
+      "ended_utc": "2026-09-28T13:11:16.734649+00:00",
+      "exit": 0,
+      "stdout_sha256": "da0c3b5af260cb197c5d473055109e125085fdfe9ad1596c7421b0b5c9b11826",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "desktop-tests",
+      "argv": [
+        "node",
+        "--test",
+        "tests/desktop-rust-local-service.test.cjs"
+      ],
+      "cwd": "/Users/study_superior/Desktop/Code/LingxiAgent",
+      "started_utc": "2026-09-28T13:11:16.735030+00:00",
+      "ended_utc": "2026-09-28T13:11:16.822984+00:00",
+      "exit": 0,
+      "stdout_sha256": "120efaff7b8370e0b9f322571c9366ca32fe1b571fb60dcbb11d3735b4003007",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "build-server-syntax",
+      "argv": [
+        "node",
+        "--check",
+        "scripts/build-server.mjs"
+      ],
+      "cwd": "/Users/study_superior/Desktop/Code/LingxiAgent",
+      "started_utc": "2026-09-28T13:11:16.823351+00:00",
+      "ended_utc": "2026-09-28T13:11:16.848859+00:00",
+      "exit": 0,
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "server-artifact-syntax",
+      "argv": [
+        "node",
+        "--check",
+        "scripts/build-server-artifact.mjs"
+      ],
+      "cwd": "/Users/study_superior/Desktop/Code/LingxiAgent",
+      "started_utc": "2026-09-28T13:11:16.849135+00:00",
+      "ended_utc": "2026-09-28T13:11:16.873122+00:00",
+      "exit": 0,
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "standalone-builder-syntax",
+      "argv": [
+        "node",
+        "--check",
+        "scripts/build-standalone-server-artifact.mjs"
+      ],
+      "cwd": "/Users/study_superior/Desktop/Code/LingxiAgent",
+      "started_utc": "2026-09-28T13:11:16.873410+00:00",
+      "ended_utc": "2026-09-28T13:11:16.897253+00:00",
+      "exit": 0,
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "standalone-verifier-syntax",
+      "argv": [
+        "node",
+        "--check",
+        "scripts/verify-standalone-server-artifact.mjs"
+      ],
+      "cwd": "/Users/study_superior/Desktop/Code/LingxiAgent",
+      "started_utc": "2026-09-28T13:11:16.897522+00:00",
+      "ended_utc": "2026-09-28T13:11:16.922374+00:00",
+      "exit": 0,
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "cli-bundle",
+      "argv": [
+        "./node_modules/.bin/esbuild",
+        "cli/entry.ts",
+        "--bundle",
+        "--platform=node",
+        "--format=esm",
+        "--target=node24",
+        "--external:ws",
+        "--outfile=/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R02/r18-windows-consumer-followup/noport-final/cli-bundle.mjs"
+      ],
+      "cwd": "/Users/study_superior/Desktop/Code/LingxiAgent",
+      "started_utc": "2026-09-28T13:11:16.922626+00:00",
+      "ended_utc": "2026-09-28T13:11:16.934874+00:00",
+      "exit": 0,
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_sha256": "127097c6f59e4e39db3ab491db767d5ed2f292d6ecd11585af1b19638eb9f453"
+    },
+    {
+      "name": "diff-check",
+      "argv": [
+        "git",
+        "diff",
+        "--check"
+      ],
+      "cwd": "/Users/study_superior/Desktop/Code/LingxiAgent",
+      "started_utc": "2026-09-28T13:11:16.935235+00:00",
+      "ended_utc": "2026-09-28T13:11:17.023890+00:00",
+      "exit": 0,
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    }
+  ],
+  "source_before": {
+    ".github/workflows/build.yml": "fcaaf96d4d74a0184dc28e79b7585fd024635e068aba5040f59fc8b51d204800",
+    "package.json": "83767a9dd10f5cb7a15d8eb3af1a18fc25a8682182a6da8d1d3ff1febbe55c84",
+    "cli/rust-service.ts": "5215855a4bac180adddc098516d460ee63c063973ac3f6450064eb1510d8184c",
+    "scripts/build-server.mjs": "58917383e0558bc096793f7696334b9b0d7364c8426f9f67d2248397738c9464",
+    "scripts/build-server-artifact.mjs": "995211fb013e277e4f9cead360b987b9d156ff414b32d703619c833a8c1c8580",
+    "scripts/build-standalone-server-artifact.mjs": "29229fc494f6bc042c9e9a42f9c27746951789fb771d45d707d1e141f9be14ce",
+    "scripts/verify-standalone-server-artifact.mjs": "c5aae42899b27cab54c2f7808d868b174982379bcc3eb38013efce49dad425ed",
+    "tests/build-server-artifact.test.ts": "c194c44ebad24aa2d86534829f5f0625441c3aec045bfd59809766d106ca0ded",
+    "tests/build-standalone-server-artifact.test.ts": "f0128abf1dc765192133dce689e1f507b9e6763a571bd3b104038b7c45219844",
+    "tests/desktop-rust-local-service.test.cjs": "26c85d103a583bf83823be7c68b8da29fa113d56e0f072d2d3e7d23149afa8e1"
+  },
+  "source_after": {
+    ".github/workflows/build.yml": "fcaaf96d4d74a0184dc28e79b7585fd024635e068aba5040f59fc8b51d204800",
+    "package.json": "83767a9dd10f5cb7a15d8eb3af1a18fc25a8682182a6da8d1d3ff1febbe55c84",
+    "cli/rust-service.ts": "5215855a4bac180adddc098516d460ee63c063973ac3f6450064eb1510d8184c",
+    "scripts/build-server.mjs": "58917383e0558bc096793f7696334b9b0d7364c8426f9f67d2248397738c9464",
+    "scripts/build-server-artifact.mjs": "995211fb013e277e4f9cead360b987b9d156ff414b32d703619c833a8c1c8580",
+    "scripts/build-standalone-server-artifact.mjs": "29229fc494f6bc042c9e9a42f9c27746951789fb771d45d707d1e141f9be14ce",
+    "scripts/verify-standalone-server-artifact.mjs": "c5aae42899b27cab54c2f7808d868b174982379bcc3eb38013efce49dad425ed",
+    "tests/build-server-artifact.test.ts": "c194c44ebad24aa2d86534829f5f0625441c3aec045bfd59809766d106ca0ded",
+    "tests/build-standalone-server-artifact.test.ts": "f0128abf1dc765192133dce689e1f507b9e6763a571bd3b104038b7c45219844",
+    "tests/desktop-rust-local-service.test.cjs": "26c85d103a583bf83823be7c68b8da29fa113d56e0f072d2d3e7d23149afa8e1"
+  },
+  "source_unchanged": true
+}

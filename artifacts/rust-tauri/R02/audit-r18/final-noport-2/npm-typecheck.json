@@ -1,0 +1,16 @@
+{
+  "name": "npm-typecheck",
+  "argv": [
+    "npm",
+    "run",
+    "typecheck"
+  ],
+  "cwd": "/Users/study_superior/Desktop/Code/LingxiAgent",
+  "startedUtc": "2026-09-28T12:40:01.506862+00:00",
+  "endedUtc": "2026-09-28T12:40:26.567259+00:00",
+  "exitCode": 0,
+  "stdout": "artifacts/rust-tauri/R02/audit-r18/final-noport-2/npm-typecheck.stdout.log",
+  "stdoutSha256": "b32daeef2af45d85547f664e7ad68b9dd0c290942ad702592eff35b5cb4a65d8",
+  "stderr": "artifacts/rust-tauri/R02/audit-r18/final-noport-2/npm-typecheck.stderr.log",
+  "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+}

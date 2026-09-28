@@ -1,0 +1,62 @@
+{
+  "utc": "2026-09-28T13:17:46.938823+00:00",
+  "base": "201584f2917a7fd96d6ea603bdeddbd420082cfe",
+  "head": "9b98c679678888b60ff2e32bd67d3da6fc2f5c4f",
+  "diff": {
+    "argv": [
+      "git",
+      "diff",
+      "--name-only",
+      "201584f2917a7fd96d6ea603bdeddbd420082cfe",
+      "--",
+      "core/",
+      "server/",
+      "desktop/",
+      "shared/",
+      "tests/",
+      "package.json",
+      "package-lock.json"
+    ],
+    "exitCode": 0,
+    "stdout": "desktop/main.cjs\ndesktop/preload.cjs\ndesktop/src/locales/en.json\ndesktop/src/locales/ja.json\ndesktop/src/locales/ko.json\ndesktop/src/locales/zh-TW.json\ndesktop/src/locales/zh.json\ndesktop/src/react/__tests__/app-init.test.ts\ndesktop/src/react/__tests__/components/composer-send.transaction.test.ts\ndesktop/src/react/__tests__/mobile/MobileApp.test.tsx\ndesktop/src/react/__tests__/services/server-connection.test.ts\ndesktop/src/react/__tests__/settings/SettingsContent.test.tsx\ndesktop/src/react/app-init.ts\ndesktop/src/react/components/StatusBar.tsx\ndesktop/src/react/components/input/composer-send.ts\ndesktop/src/react/mobile/MobileApp.tsx\ndesktop/src/react/mobile/mobile-init.ts\ndesktop/src/react/onboarding/OnboardingApp.tsx\ndesktop/src/react/onboarding/__tests__/OnboardingApp.test.tsx\ndesktop/src/react/quick-chat/QuickChatApp.tsx\ndesktop/src/react/services/server-connection.ts\ndesktop/src/react/services/websocket.ts\ndesktop/src/react/settings/SettingsContent.tsx\ndesktop/src/react/settings/__tests__/SettingsContent.test.tsx\ndesktop/src/react/settings/api.ts\ndesktop/src/react/settings/store.ts\ndesktop/src/react/settings/tabs/AccessTab.tsx\ndesktop/src/react/settings/tabs/SharingTab.tsx\ndesktop/src/react/stores/connection-slice.ts\ndesktop/src/react/types.ts\npackage.json\ntests/build-server-artifact.test.ts\ntests/build-standalone-server-artifact.test.ts\ntests/cli-args.test.ts\ntests/cli-chat.test.ts\n",
+    "stderr": ""
+  },
+  "status": {
+    "argv": [
+      "git",
+      "status",
+      "--short",
+      "--",
+      "core/",
+      "server/",
+      "desktop/",
+      "shared/",
+      "tests/",
+      "package.json",
+      "package-lock.json"
+    ],
+    "exitCode": 0,
+    "stdout": " M desktop/main.cjs\n M desktop/preload.cjs\n M desktop/src/locales/en.json\n M desktop/src/locales/ja.json\n M desktop/src/locales/ko.json\n M desktop/src/locales/zh-TW.json\n M desktop/src/locales/zh.json\n M desktop/src/react/__tests__/app-init.test.ts\n M desktop/src/react/__tests__/components/composer-send.transaction.test.ts\n M desktop/src/react/__tests__/mobile/MobileApp.test.tsx\n M desktop/src/react/__tests__/services/server-connection.test.ts\n M desktop/src/react/__tests__/settings/SettingsContent.test.tsx\n M desktop/src/react/app-init.ts\n M desktop/src/react/components/StatusBar.tsx\n M desktop/src/react/components/input/composer-send.ts\n M desktop/src/react/mobile/MobileApp.tsx\n M desktop/src/react/mobile/mobile-init.ts\n M desktop/src/react/onboarding/OnboardingApp.tsx\n M desktop/src/react/onboarding/__tests__/OnboardingApp.test.tsx\n M desktop/src/react/quick-chat/QuickChatApp.tsx\n M desktop/src/react/services/server-connection.ts\n M desktop/src/react/services/websocket.ts\n M desktop/src/react/settings/SettingsContent.tsx\n M desktop/src/react/settings/__tests__/SettingsContent.test.tsx\n M desktop/src/react/settings/api.ts\n M desktop/src/react/settings/store.ts\n M desktop/src/react/settings/tabs/AccessTab.tsx\n M desktop/src/react/settings/tabs/SharingTab.tsx\n M desktop/src/react/stores/connection-slice.ts\n M desktop/src/react/types.ts\n M package.json\n M tests/build-server-artifact.test.ts\n M tests/build-standalone-server-artifact.test.ts\n M tests/cli-args.test.ts\n M tests/cli-chat.test.ts\n?? desktop/src/react/__tests__/components/R02StatusBar.test.tsx\n?? desktop/src/react/__tests__/services/R02RustWebSocket.test.ts\n?? desktop/src/react/settings/__tests__/R02AccessCredentialLeaf.test.tsx\n?? desktop/src/react/settings/__tests__/R02AccessRoute.test.tsx\n?? desktop/src/react/settings/__tests__/R02SharingLeaf.test.tsx\n?? desktop/src/shared/rust-local-service.cjs\n?? tests/cli-chat-runtime.test.ts\n?? tests/cli-rust-service.test.ts\n?? tests/desktop-rust-local-service.test.cjs\n",
+    "stderr": ""
+  },
+  "packageMain": "desktop/bootstrap.cjs",
+  "launchReferenceLineNumbers": {
+    "scripts/launch.js": [],
+    "desktop/main.cjs": [
+      973,
+      1312,
+      1322,
+      2183,
+      4713,
+      6473,
+      6739,
+      6751,
+      6759,
+      6770
+    ],
+    "desktop/bootstrap.cjs": [],
+    "server/boot.cjs": []
+  },
+  "verdict": "STATIC_FAIL_E1_CURRENT_SOURCE",
+  "note": "This is a read-only source comparison, not an A16 test run."
+}

@@ -316,17 +316,22 @@ export function QuickChatApp() {
     let cancelled = false;
     async function bootstrap() {
       try {
-        const [serverPort, serverToken] = await Promise.all([
-          window.hana?.getServerPort?.(),
-          window.hana?.getServerToken?.(),
-        ]);
-        const local = createLocalServerConnection({ serverPort, serverToken });
+        const info = window.hana?.getServerConnectionInfo
+          ? await window.hana.getServerConnectionInfo()
+          : await Promise.all([
+            window.hana?.getServerPort?.(),
+            window.hana?.getServerToken?.(),
+          ]).then(([port, token]) => ({ port, token, serverNodeKind: null, serverNodeTransport: 'http' }));
+        const local = createLocalServerConnection({
+          serverPort: info.port, serverToken: info.token,
+          serverNodeKind: info.serverNodeKind, serverNodeTransport: info.serverNodeTransport,
+        });
         if (!local) throw new Error('server connection unavailable');
+        if (local.serverNodeKind === 'lingxi-service') throw new Error('Rust quick chat is not migrated');
         if (cancelled) return;
         setConnection(local);
         connectionRef.current = local;
-        useStore.getState().setLocalServerConnection?.(serverPort ?? null, serverToken ?? null);
-        useStore.setState({ connected: true });
+        useStore.getState().setLocalServerConnection?.(info.port ?? null, info.token ?? null);
 
         const [agentsRes, healthRes, configRes, permissionRes, prefsRes, modelsRes] = await Promise.all([
           fetch(buildConnectionUrl(local, '/api/agents?fresh=1'), {
@@ -356,7 +361,11 @@ export function QuickChatApp() {
           prefsRes.json(),
           modelsRes.json().catch(() => ({})),
         ]);
+        if (![agentsRes, healthRes, configRes, permissionRes, prefsRes, modelsRes].every((res) => res.ok)) {
+          throw new Error('Quick chat startup endpoint failed');
+        }
         if (cancelled) return;
+        useStore.setState({ connected: true });
         const quickChatPrefs = normalizeQuickChatPreferences(prefsData?.quickChat);
         reuseTimeoutMinutesRef.current = quickChatPrefs.reuseTimeoutMinutes;
         setReuseTimeoutMinutes(quickChatPrefs.reuseTimeoutMinutes);
@@ -390,7 +399,12 @@ export function QuickChatApp() {
         applyRuntimePermissionMode(resolveQuickChatPermissionMode(permissionData));
       } catch (err) {
         console.error('[quick-chat] bootstrap failed:', err);
-        if (!cancelled) setError(t('quickChat.serviceUnavailable'));
+        if (!cancelled) {
+          connectionRef.current = null;
+          setConnection(null);
+          useStore.setState({ connected: false });
+          setError(t('quickChat.serviceUnavailable'));
+        }
       }
     }
     bootstrap();

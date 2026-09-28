@@ -1,0 +1,100 @@
+{
+  "platform": "macOS-27.0-arm64-arm-64bit-Mach-O",
+  "python": "3.14.3",
+  "cwd": "/Users/study_superior/Desktop/Code/LingxiAgent",
+  "sourceBefore": {
+    "package.json": "6c8b5bd6c67bffe1c030a83f16d4ed07d1f702f6fb8ab5612f13f71dfc0b2117",
+    ".gitignore": "04a7a7232349e925477701b6e937e6bb6e118b869cdd5a6c4af684979a4598ad",
+    "build/shell-surface-manifest.json": "7f7d46dd74c7ab6f3617c0fe6e66073a396e69c4ab9ae96283abc1f1acb0ee73",
+    "scripts/build-rust-desktop-service.mjs": "a99deffc02e71109c9824abd7052dbda7f2c2b1a5e7026ad43ff49fcef89206a",
+    "scripts/build-shell.mjs": "fa5898ea1ec19fa228ab6d9918178cf8aa31659ed6ca18b3084bda839c065122",
+    "scripts/fix-modules.cjs": "2b511eac712ea2bfe9263e49341b835200efb0acf52bf36a691c28a0cf4e4767",
+    "scripts/notarize.cjs": "15e5a409a5cedfe3a1ebf35e9993d22fd82b24f5d016f2b7c2dd45a813388e63",
+    "scripts/resign-adhoc.cjs": "4b62fdd38f7f04bdcc6c3879fe1715ed719679f0ad9858250adbdd0f17a044e3",
+    "desktop/main.cjs": "cfe506d5999fb9cd8e44cc026d2abd497e3afaa214bb0d140829c6a95c64926b",
+    "desktop/src/shared/rust-local-service.cjs": "bf2dc5f4dcfcf3e5d2f2f2fac2e46ee6c0ddb29e81a4059944b43a3fa743b205",
+    "tests/desktop-rust-local-service.test.cjs": "5d9bf82140b4dff7a56107e49c08fb3baf39e7cfb91dbdb688fa7a5d63aae497"
+  },
+  "checks": [
+    {
+      "command": [
+        "node",
+        "scripts/build-rust-desktop-service.mjs",
+        "--verify"
+      ],
+      "startUtc": "2026-09-28T11:06:09Z",
+      "endUtc": "2026-09-28T11:06:09Z",
+      "exit": 0,
+      "rawLog": "check-00.log"
+    },
+    {
+      "command": [
+        "node",
+        "--test",
+        "tests/desktop-rust-local-service.test.cjs"
+      ],
+      "startUtc": "2026-09-28T11:06:09Z",
+      "endUtc": "2026-09-28T11:06:09Z",
+      "exit": 0,
+      "rawLog": "check-01.log"
+    },
+    {
+      "command": [
+        "node",
+        "node_modules/vitest/vitest.mjs",
+        "run",
+        "tests/shell-surface-manifest.test.ts"
+      ],
+      "startUtc": "2026-09-28T11:06:09Z",
+      "endUtc": "2026-09-28T11:06:09Z",
+      "exit": 0,
+      "rawLog": "check-02.log"
+    },
+    {
+      "command": [
+        "npm",
+        "run",
+        "build:main"
+      ],
+      "startUtc": "2026-09-28T11:06:09Z",
+      "endUtc": "2026-09-28T11:06:11Z",
+      "exit": 0,
+      "rawLog": "check-03.log"
+    },
+    {
+      "command": [
+        "node",
+        "--check",
+        "desktop/main.bundle.cjs"
+      ],
+      "startUtc": "2026-09-28T11:06:11Z",
+      "endUtc": "2026-09-28T11:06:11Z",
+      "exit": 0,
+      "rawLog": "check-04.log"
+    },
+    {
+      "command": [
+        "git",
+        "diff",
+        "--check"
+      ],
+      "startUtc": "2026-09-28T11:06:11Z",
+      "endUtc": "2026-09-28T11:06:11Z",
+      "exit": 0,
+      "rawLog": "check-05.log"
+    }
+  ],
+  "sourceAfter": {
+    "package.json": "6c8b5bd6c67bffe1c030a83f16d4ed07d1f702f6fb8ab5612f13f71dfc0b2117",
+    ".gitignore": "04a7a7232349e925477701b6e937e6bb6e118b869cdd5a6c4af684979a4598ad",
+    "build/shell-surface-manifest.json": "7f7d46dd74c7ab6f3617c0fe6e66073a396e69c4ab9ae96283abc1f1acb0ee73",
+    "scripts/build-rust-desktop-service.mjs": "a99deffc02e71109c9824abd7052dbda7f2c2b1a5e7026ad43ff49fcef89206a",
+    "scripts/build-shell.mjs": "fa5898ea1ec19fa228ab6d9918178cf8aa31659ed6ca18b3084bda839c065122",
+    "scripts/fix-modules.cjs": "2b511eac712ea2bfe9263e49341b835200efb0acf52bf36a691c28a0cf4e4767",
+    "scripts/notarize.cjs": "15e5a409a5cedfe3a1ebf35e9993d22fd82b24f5d016f2b7c2dd45a813388e63",
+    "scripts/resign-adhoc.cjs": "4b62fdd38f7f04bdcc6c3879fe1715ed719679f0ad9858250adbdd0f17a044e3",
+    "desktop/main.cjs": "cfe506d5999fb9cd8e44cc026d2abd497e3afaa214bb0d140829c6a95c64926b",
+    "desktop/src/shared/rust-local-service.cjs": "bf2dc5f4dcfcf3e5d2f2f2fac2e46ee6c0ddb29e81a4059944b43a3fa743b205",
+    "tests/desktop-rust-local-service.test.cjs": "5d9bf82140b4dff7a56107e49c08fb3baf39e7cfb91dbdb688fa7a5d63aae497"
+  }
+}

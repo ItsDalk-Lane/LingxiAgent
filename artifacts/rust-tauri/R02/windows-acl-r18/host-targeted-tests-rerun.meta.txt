@@ -1,0 +1,4 @@
+start=2026-09-28T11:01:56.475088+00:00
+command=cargo test --offline --locked --manifest-path rust/Cargo.toml -p lingxi-service paths::tests --lib
+end=2026-09-28T11:01:59.848050+00:00
+exit=0

@@ -379,6 +379,7 @@ beforeEach(() => {
   wsMocks.current = { send: vi.fn(), readyState: 1 };
   resetComposerSendCoordinatorForTests();
   seedSession();
+  useStore.setState({ activeServerConnection: null } as never);
   mocks.editorDoc = { type: 'doc', content: [] };
   mocks.ensureSession.mockResolvedValue({ sessionId: SESSION_ID, sessionPath: PATH, agentId: 'hana' });
   mocks.lingxiFetch.mockResolvedValue(new Response(JSON.stringify({
@@ -396,6 +397,13 @@ afterEach(() => {
 });
 
 describe('composer-send 显式结果与快照（S01–S15）', () => {
+  it('Rust wire 只有握手时拒绝旧聊天帧且不清空输入', async () => {
+    useStore.setState({ activeServerConnection: { serverNodeKind: 'lingxi-service' } } as never);
+    const result = await dispatchComposerSend(makeBundle('仍在输入框的文字'), makeDeps());
+    expect(result).toEqual({ kind: 'blocked', code: 'rust_core_unavailable', retryable: false });
+    expect(wsMocks.current!.send).not.toHaveBeenCalled();
+  });
+
   it('S01：普通发送视频预检失败，编辑器、草稿、附件与引用全部保留', async () => {
     seedSession({
       drafts: { [SESSION_ID]: '还没写完的草稿' },

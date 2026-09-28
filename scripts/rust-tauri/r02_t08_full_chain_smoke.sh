@@ -25,8 +25,10 @@ cd "$(dirname "$0")/../.."
 
 EVIDENCE_DIR="${1:-artifacts/rust-tauri/R02/T08/A15-direct}"
 EVIDENCE_DIR="$EVIDENCE_DIR/full-chain"
+[ ! -e "$EVIDENCE_DIR" ] || { echo "FAIL: A15 evidence directory already exists: $EVIDENCE_DIR" >&2; exit 1; }
 mkdir -p "$EVIDENCE_DIR"
-TARGET_DIR="${CARGO_TARGET_DIR:-/tmp/rust-target-r02-t08}"
+EVIDENCE_DIR="$(cd "$EVIDENCE_DIR" && pwd -P)"
+TARGET_DIR="${CARGO_TARGET_DIR:-${TMPDIR:-/tmp}/rust-target-r02-t08}"
 
 TOOLCHAIN="$(sed -n 's/^channel[[:space:]]*=[[:space:]]*"\([^"]*\)".*/\1/p' rust-toolchain.toml | head -n 1)"
 [ -n "$TOOLCHAIN" ] || { echo "ERROR: no toolchain in rust-toolchain.toml" >&2; exit 1; }
@@ -39,12 +41,111 @@ CARGO="env -u all_proxy -u ALL_PROXY -u http_proxy -u HTTP_PROXY -u https_proxy 
 
 HOME_DIR=""
 SERVICE_PID=""
-cleanup() {
-  if [ -n "$SERVICE_PID" ] && kill -0 "$SERVICE_PID" 2>/dev/null; then
-    kill -TERM "$SERVICE_PID" 2>/dev/null || true
-    wait "$SERVICE_PID" 2>/dev/null || true
+# R02 stage-repair R7 / R7-F02: SERVICE_PID is the CURRENT handle — set
+# on spawn, RETIRED (cleared) after every wait/reap (the close1/close2
+# paths already did). The trap signals it ONLY while it still proves
+# CURRENT ownership (exists AND ppid is THIS shell): a retired or
+# recycled number is never signalled (R6-F02 A12 pattern).
+# R12-F01: the boolean probe's false branch conflated exited/foreign/
+# unobservable and the trap's owned branch was `kill -TERM; wait` with
+# NO deadline — a child ignoring or delaying TERM hung the trap itself,
+# and this trap runs on the FAILURE path of the very leftover-process
+# acceptance it protects. Four-state probe + bounded ladder below
+# (≈10 s worst case per handle); residue reported loudly at expiry,
+# never an unbounded wait.
+child_state() {
+  # child_state <pid> → exited | owned | foreign | unobservable
+  local ppid
+  if ! kill -0 "$1" 2>/dev/null; then
+    printf 'exited\n'
+    return 0
   fi
-  [ -n "$HOME_DIR" ] && [ -d "$HOME_DIR" ] && rm -rf "$HOME_DIR"
+  ppid="$(ps -o ppid= -p "$1" 2>/dev/null | tr -d '[:space:]')"
+  if [ -z "$ppid" ]; then
+    printf 'unobservable\n'
+  elif [ "$ppid" = "$$" ]; then
+    printf 'owned\n'
+  else
+    printf 'foreign\n'
+  fi
+}
+# R12-F01: bounded stop for ONE provably-owned handle under THIS script's
+# contract (TERM first — the close1/close2 graceful stops and their exit
+# codes are the acceptance assertions and stay untouched): TERM → ≤5 s
+# poll → direct-pid KILL only while still provably ours → ≤5 s re-check.
+# Prints the final state.
+bounded_stop_owned() {
+  local pid="$1" state="" i
+  kill -TERM "$pid" 2>/dev/null || true
+  for i in $(seq 1 100); do
+    state="$(child_state "$pid")"
+    case "$state" in
+      exited|foreign) break ;;
+      owned|unobservable) : ;;
+    esac
+    sleep 0.05
+  done
+  if [ "${state:-owned}" = "owned" ]; then
+    kill -KILL "$pid" 2>/dev/null || true
+    for i in $(seq 1 100); do
+      state="$(child_state "$pid")"
+      case "$state" in
+        exited|foreign) break ;;
+        owned|unobservable) : ;;
+      esac
+      sleep 0.05
+    done
+  fi
+  printf '%s\n' "${state:-unobservable}"
+}
+# 两次正常关停共用同一归属/限时规则；调用点仍核对退出码 0。
+stop_service_gracefully() {
+  local pid="$1" state
+  [ "$(child_state "$pid")" = "owned" ] || fail "service $pid not owned before graceful stop"
+  state="$(bounded_stop_owned "$pid")"
+  case "$state" in
+    exited) ;;
+    *) fail "service $pid survived the TERM/KILL budget (state=$state)" ;;
+  esac
+  if wait "$pid"; then SERVICE_STOP_RC=0; else SERVICE_STOP_RC=$?; fi
+}
+cleanup() {
+  local residue=0 state
+  if [ -n "$SERVICE_PID" ]; then
+    state="$(child_state "$SERVICE_PID")"
+    case "$state" in
+      owned)
+        case "$(bounded_stop_owned "$SERVICE_PID")" in
+          exited)
+            wait "$SERVICE_PID" 2>/dev/null || true
+            ;;
+          *)
+            echo "cleanup: pid $SERVICE_PID may still be running after stop budget — preserving synthetic home $HOME_DIR" >&2
+            residue=1
+            ;;
+        esac
+        ;;
+      exited)
+        wait "$SERVICE_PID" 2>/dev/null || true
+        ;;
+      foreign)
+        echo "cleanup: pid $SERVICE_PID is NOT currently owned by this shell — preserving synthetic home $HOME_DIR" >&2
+        residue=1
+        ;;
+      unobservable)
+        echo "cleanup: pid $SERVICE_PID ownership UNOBSERVABLE (ps unreadable) — preserving synthetic home $HOME_DIR" >&2
+        residue=1
+        ;;
+    esac
+    SERVICE_PID=""
+  fi
+  if [ "$residue" -eq 0 ]; then
+    [ -n "$HOME_DIR" ] && [ -d "$HOME_DIR" ] && rm -rf "$HOME_DIR"
+  else
+    # 无法证明服务已退出时保留数据根与现场，且整项验收失败。
+    trap - EXIT
+    exit 1
+  fi
   return 0
 }
 trap cleanup EXIT
@@ -87,12 +188,16 @@ leftover_check() { # $1=label
 
 # ── boot 1: start -> authenticate -> write -> subscribe ────────────────────
 note "== boot 1: start, authenticate, write, subscribe =="
-HOME_DIR="$(mktemp -d /tmp/lingxi-r02t08-a15-home.XXXXXX)"
+HOME_DIR=$(mktemp -d "${TMPDIR:-/tmp}/lingxi-r02t08-a15-home.XXXXXX")
 export A15_HEAD_FILE="$EVIDENCE_DIR/pre-restart-head.json"
+export A15_EVIDENCE_DIR="$EVIDENCE_DIR"
 "$BIN" --home "$HOME_DIR" > "$EVIDENCE_DIR/service1.out" 2> "$EVIDENCE_DIR/service1.err" &
 SERVICE_PID=$!
 ADDR="$(wait_ready "$EVIDENCE_DIR/service1.out" "$SERVICE_PID")"
 note "PASS boot1-ready addr=$ADDR home=$HOME_DIR"
+# 旧令牌仅保留在本脚本内存，供重启后的拒绝断言使用，不写入交付证据。
+OLD_TOKEN="$(python3 -c 'import json,sys; from pathlib import Path; print(json.loads(Path(sys.argv[1]).read_text(encoding="utf-8"))["token"])' "$HOME_DIR/lingxi-service/local-token.json")"
+[ -n "$OLD_TOKEN" ] || fail "pre-restart token missing"
 
 python3 scripts/rust-tauri/r02_t08_full_chain_probe.py boot-and-write "${ADDR##*:}" "$HOME_DIR" \
   2> "$EVIDENCE_DIR/probe1.err" > "$EVIDENCE_DIR/probe1.pass-lines"
@@ -102,8 +207,8 @@ note "PASS phase1 (health/auth-negative/auth/write/subscribe/live-event/read-you
 
 # ── graceful close 1 ────────────────────────────────────────────────────────
 note "== close 1: SIGTERM graceful shutdown =="
-kill -TERM "$SERVICE_PID"
-set +e; wait "$SERVICE_PID"; EXIT1=$?; set -e
+stop_service_gracefully "$SERVICE_PID"
+EXIT1="$SERVICE_STOP_RC"
 SERVICE_PID=""
 [ "$EXIT1" -eq 0 ] || fail "expected exit 0 on graceful stop, got $EXIT1"
 note "PASS close1-exit-0 (service exit code $EXIT1)"
@@ -116,7 +221,7 @@ SERVICE_PID=$!
 ADDR="$(wait_ready "$EVIDENCE_DIR/service2.out" "$SERVICE_PID")"
 note "PASS boot2-ready addr=$ADDR"
 
-python3 scripts/rust-tauri/r02_t08_full_chain_probe.py readback "${ADDR##*:}" "$HOME_DIR" \
+printf '%s\n' "$OLD_TOKEN" | python3 scripts/rust-tauri/r02_t08_full_chain_probe.py readback "${ADDR##*:}" "$HOME_DIR" \
   2> "$EVIDENCE_DIR/probe2.err" > "$EVIDENCE_DIR/probe2.pass-lines"
 { cat "$EVIDENCE_DIR/probe2.pass-lines"; cat "$EVIDENCE_DIR/probe2.err"; } | tee -a "$EVIDENCE_DIR/summary.txt"
 if [ -s "$EVIDENCE_DIR/probe2.err" ]; then cat "$EVIDENCE_DIR/probe2.err" >&2; fail "probe phase 2 failed"; fi
@@ -124,8 +229,8 @@ note "PASS phase2 (old-token-rejected/new-token auth / session readback / events
 
 # ── graceful close 2 + final leftover checks ────────────────────────────────
 note "== close 2: SIGTERM graceful shutdown =="
-kill -TERM "$SERVICE_PID"
-set +e; wait "$SERVICE_PID"; EXIT2=$?; set -e
+stop_service_gracefully "$SERVICE_PID"
+EXIT2="$SERVICE_STOP_RC"
 SERVICE_PID=""
 [ "$EXIT2" -eq 0 ] || fail "expected exit 0 on second graceful stop, got $EXIT2"
 note "PASS close2-exit-0 (service exit code $EXIT2)"

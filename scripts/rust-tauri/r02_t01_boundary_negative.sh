@@ -31,7 +31,7 @@ cd "$(dirname "$0")/../.."
 
 EVIDENCE_DIR="${1:-artifacts/rust-tauri/R02/T01}"
 mkdir -p "$EVIDENCE_DIR"
-export CARGO_TARGET_DIR="${CARGO_TARGET_DIR:-/tmp/rust-target-r02-t01}"
+export CARGO_TARGET_DIR="${CARGO_TARGET_DIR:-${TMPDIR:-/tmp}/rust-target-r02-t01}"
 
 TOOLCHAIN="$(sed -n 's/^channel[[:space:]]*=[[:space:]]*"\([^"]*\)".*/\1/p' rust-toolchain.toml | head -n 1)"
 if [ -z "$TOOLCHAIN" ]; then
@@ -58,7 +58,7 @@ KERNEL_LIB="rust/crates/lingxi-kernel/src/lib.rs"
 KERNEL_MANIFEST="rust/crates/lingxi-kernel/Cargo.toml"
 LOCKFILE="rust/Cargo.lock"
 
-GUARD_DIR="$(mktemp -d /tmp/lingxi-r02-t01-negative.XXXXXX)"
+GUARD_DIR=$(mktemp -d "${TMPDIR:-/tmp}/lingxi-r02-t01-negative.XXXXXX")
 DIRTY=0
 cleanup() {
   local code=$?

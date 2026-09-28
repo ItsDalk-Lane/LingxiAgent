@@ -155,6 +155,7 @@ export interface SettingsState {
   activeSubTabs: Record<string, string>;
   platformName: string | null;
   ready: boolean;
+  rustSettingsUnavailable: boolean;
 
   // pins
 
@@ -215,6 +216,7 @@ export const useSettingsStore = create<SettingsStore>()((set, get) => ({
   activeSubTabs: {},
   platformName: null,
   ready: false,
+  rustSettingsUnavailable: false,
 
   // pins
 

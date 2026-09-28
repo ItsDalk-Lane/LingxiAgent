@@ -162,7 +162,18 @@ fn user_version(conn: &Connection) -> Result<u64, StorageError> {
 }
 
 fn set_user_version(conn: &Connection, version: u64) -> Result<(), StorageError> {
-    conn.pragma_update(None, "user_version", version as i64)
+    // Same signed-32-bit sqlite3Atoi consumer as busy_timeout /
+    // wal_autocheckpoint (sqlite3.c PragTyp_HEADER_VALUE, OP_SetCookie p3) —
+    // an out-of-range value would not error, it would store 0. Migration
+    // versions are internal constants far below this bound, but the cast
+    // stays checked so this pragma can never silently write 0 either
+    // (R02 stage-repair R4 / R4-F01 same-root-cause sweep).
+    let version_i32 = i32::try_from(version).map_err(|_| StorageError::Internal {
+        detail: format!(
+            "migration version {version} exceeds the PRAGMA user_version range (signed 32-bit)"
+        ),
+    })?;
+    conn.pragma_update(None, "user_version", version_i32)
         .map_err(map_rusqlite)
 }
 

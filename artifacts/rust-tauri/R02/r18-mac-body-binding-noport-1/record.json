@@ -1,0 +1,50 @@
+{
+  "candidateBefore": {
+    "desktop/src/shared/rust-local-service.cjs": "1fec1b82cb0cdaa0e440e06010d7ceae84120cadb5594e8a079260c46b256f21",
+    "scripts/notarize.cjs": "4f08ead1342a699d20c58c109899c2945a8c8c9374a6d921283ac5865d867211",
+    "scripts/build-rust-desktop-service.mjs": "9ab45a59496398811b5758f8d30ab89ba877406b32007be2624051b9621caa85",
+    "tests/desktop-rust-local-service.test.cjs": "377bcc6b4328c573b67d9450f096ed0c500f5217698ce8ca544e15c3b3318768"
+  },
+  "candidateAfter": {
+    "desktop/src/shared/rust-local-service.cjs": "1fec1b82cb0cdaa0e440e06010d7ceae84120cadb5594e8a079260c46b256f21",
+    "scripts/notarize.cjs": "4f08ead1342a699d20c58c109899c2945a8c8c9374a6d921283ac5865d867211",
+    "scripts/build-rust-desktop-service.mjs": "9ab45a59496398811b5758f8d30ab89ba877406b32007be2624051b9621caa85",
+    "tests/desktop-rust-local-service.test.cjs": "377bcc6b4328c573b67d9450f096ed0c500f5217698ce8ca544e15c3b3318768"
+  },
+  "sourceStable": true,
+  "checks": [
+    {
+      "command": [
+        "node",
+        "--test",
+        "tests/desktop-rust-local-service.test.cjs"
+      ],
+      "startUtc": "2026-09-28T11:41:30.919796+00:00",
+      "endUtc": "2026-09-28T11:41:31.012734+00:00",
+      "exit": 0,
+      "log": "check-1.log"
+    },
+    {
+      "command": [
+        "node",
+        "--check",
+        "desktop/src/shared/rust-local-service.cjs"
+      ],
+      "startUtc": "2026-09-28T11:41:31.013101+00:00",
+      "endUtc": "2026-09-28T11:41:31.040994+00:00",
+      "exit": 0,
+      "log": "check-2.log"
+    },
+    {
+      "command": [
+        "node",
+        "--check",
+        "scripts/notarize.cjs"
+      ],
+      "startUtc": "2026-09-28T11:41:31.041255+00:00",
+      "endUtc": "2026-09-28T11:41:31.068588+00:00",
+      "exit": 0,
+      "log": "check-3.log"
+    }
+  ]
+}

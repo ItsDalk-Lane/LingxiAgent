@@ -1,0 +1,10 @@
+检查：xtask package full unit tests（本轮中间候选，非最终阶段验收）
+开始 UTC：2026-09-28 06:23:41
+结束 UTC：2026-09-28 06:24:24（结束查询时间；原始日志显示测试用时 4.42 秒）
+实际命令：env -u all_proxy -u ALL_PROXY -u http_proxy -u HTTP_PROXY -u https_proxy -u HTTPS_PROXY CARGO_NET_OFFLINE=true CARGO_TARGET_DIR=/private/tmp/lingxi-r02-r17-xtask-target /Users/study_superior/.cargo/bin/rustup run 1.98.1 cargo test --manifest-path rust/Cargo.toml --locked -p xtask > artifacts/rust-tauri/R02/r17-leaf-gate/xtask-test-escalated.log 2>&1
+平台条件：sandbox_permissions=require_escalated，自动审批允许；执行前同条件只读 ps 成功。早先默认 sandbox 下 ps 的 exit 127 / operation not permitted 和首次测试 FAIL 保留在前一份记录，不改写。
+退出码：0（PASS，仅此 xtask 包本轮文件候选）。
+结果：54 passed, 0 failed, 0 ignored。
+原始日志：xtask-test-escalated.log（不覆盖第一次失败日志）。
+检查前五文件 SHA：pretest2-source-sha256.txt。工作区其他文件由并行任务持续编辑，故此测试不能冒充最终候选全文件绑定或阶段 PASS。
+环境：macOS 本地主机，锁定 Rust 1.98.1，Cargo offline、隔离 target dir。

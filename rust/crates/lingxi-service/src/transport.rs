@@ -48,7 +48,7 @@
 //!   forgeries over plain HTTP from remote pages, exotic schemes — is
 //!   rejected with `bad_origin` before authentication.
 
-use std::net::SocketAddr;
+use std::net::{IpAddr, SocketAddr};
 
 /// Configured network exposure of the listener.
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -235,17 +235,79 @@ pub fn check_origin(origin_header: Option<&str>) -> OriginVerdict {
         return OriginVerdict::Allowed;
     }
     for scheme in ["http://", "https://"] {
-        let Some(rest) = value.strip_prefix(scheme) else {
+        let Some(_) = value.strip_prefix(scheme) else {
             continue;
         };
-        let host_port = rest.split(['/', '?', '#']).next().unwrap_or("");
-        let host = normalize_host_header(host_port);
+        let Ok(uri) = value.parse::<axum::http::Uri>() else {
+            return OriginVerdict::Forbidden;
+        };
+        let Some(authority) = uri.authority() else {
+            return OriginVerdict::Forbidden;
+        };
+        // 浏览器的 Origin 只含 scheme 与 authority，路径、查询和片段不是合法来源。
+        if value != format!("{scheme}{authority}") {
+            return OriginVerdict::Forbidden;
+        }
+        let host = normalize_host_header(authority.as_str());
         return match host.as_str() {
             "localhost" | "127.0.0.1" | "[::1]" | "::1" => OriginVerdict::Allowed,
             _ => OriginVerdict::Forbidden,
         };
     }
     OriginVerdict::Forbidden
+}
+
+/// 局域网网页只能使用服务实际监听的协议、端口和本机网卡 IP；不能信任任意 Host 域名。
+pub(crate) struct ServiceOriginContext<'a> {
+    pub mode: NetworkMode,
+    pub actual_port: u16,
+    pub secure: bool,
+    pub bind_ip: IpAddr,
+    pub local_ips: &'a [IpAddr],
+    pub public_base_url: Option<&'a str>,
+}
+
+pub(crate) fn check_service_origin(
+    origin_header: Option<&str>,
+    host_header: &str,
+    context: ServiceOriginContext<'_>,
+) -> OriginVerdict {
+    let base = check_origin(origin_header);
+    if base != OriginVerdict::Forbidden || context.mode != NetworkMode::Lan {
+        return base;
+    }
+    let Some(origin) = origin_header else {
+        return base;
+    };
+    let scheme = if context.secure { "https" } else { "http" };
+    // 自定义域名只接受管理员保存的精确地址，并与真实连接协议及 Host 对齐。
+    if let Some(public_base_url) = context.public_base_url {
+        if let Ok(uri) = public_base_url.parse::<axum::http::Uri>() {
+            if uri.scheme_str() == Some(scheme)
+                && uri
+                    .authority()
+                    .is_some_and(|authority| authority.as_str() == host_header)
+                && origin == public_base_url
+            {
+                return OriginVerdict::Allowed;
+            }
+        }
+    }
+    let Ok(host) = host_header.parse::<SocketAddr>() else {
+        return base;
+    };
+    if host.port() != context.actual_port
+        || host.ip().is_loopback()
+        || !context.local_ips.contains(&host.ip())
+        || (!context.bind_ip.is_unspecified() && context.bind_ip != host.ip())
+    {
+        return base;
+    }
+    if origin == format!("{scheme}://{host_header}") {
+        OriginVerdict::Allowed
+    } else {
+        base
+    }
 }
 
 #[cfg(test)]
@@ -382,6 +444,14 @@ mod tests {
             check_origin(Some("http://127.0.0.1.evil.example")),
             OriginVerdict::Forbidden
         );
+        assert_eq!(
+            check_origin(Some("http://localhost:5173/path")),
+            OriginVerdict::Forbidden
+        );
+        assert_eq!(
+            check_origin(Some("http://localhost:5173?ticket=fake")),
+            OriginVerdict::Forbidden
+        );
         // Exotic schemes and empty values fail closed.
         assert_eq!(
             check_origin(Some("ws://localhost")),
@@ -390,6 +460,125 @@ mod tests {
         assert_eq!(check_origin(Some("")), OriginVerdict::Forbidden);
         assert_eq!(
             check_origin(Some("chrome-extension://abc")),
+            OriginVerdict::Forbidden
+        );
+    }
+
+    #[test]
+    fn lan_browser_origin_matches_real_interface_scheme_and_port() {
+        let bind: IpAddr = "0.0.0.0".parse().unwrap();
+        let local: IpAddr = "192.168.4.2".parse().unwrap();
+        let ips = [local];
+        let verdict = |origin: &str, host: &str, port: u16, secure: bool, bind_ip| {
+            check_service_origin(
+                Some(origin),
+                host,
+                ServiceOriginContext {
+                    mode: NetworkMode::Lan,
+                    actual_port: port,
+                    secure,
+                    bind_ip,
+                    local_ips: &ips,
+                    public_base_url: None,
+                },
+            )
+        };
+        assert_eq!(
+            verdict(
+                "http://192.168.4.2:18799",
+                "192.168.4.2:18799",
+                18799,
+                false,
+                bind
+            ),
+            OriginVerdict::Allowed
+        );
+        assert_eq!(
+            verdict(
+                "https://192.168.4.2:18799",
+                "192.168.4.2:18799",
+                18799,
+                true,
+                bind
+            ),
+            OriginVerdict::Allowed
+        );
+        for origin in [
+            "http://192.168.4.3:18799",
+            "http://192.168.4.2:18800",
+            "https://192.168.4.2:18799",
+            "http://192.168.4.2:18799/path",
+            "http://evil.example:18799",
+        ] {
+            assert_eq!(
+                verdict(origin, "192.168.4.2:18799", 18799, false, bind),
+                OriginVerdict::Forbidden,
+                "{origin}"
+            );
+        }
+        assert_eq!(
+            verdict(
+                "http://192.168.4.2:18799",
+                "192.168.4.2:18799",
+                18799,
+                false,
+                "192.168.4.3".parse().unwrap()
+            ),
+            OriginVerdict::Forbidden
+        );
+        assert_eq!(
+            verdict(
+                "http://192.168.4.2:18799",
+                "evil.example:18799",
+                18799,
+                false,
+                bind
+            ),
+            OriginVerdict::Forbidden
+        );
+        assert_eq!(
+            check_service_origin(
+                Some("http://192.168.4.2:18799"),
+                "192.168.4.2:18799",
+                ServiceOriginContext {
+                    mode: NetworkMode::Loopback,
+                    actual_port: 18799,
+                    secure: false,
+                    bind_ip: bind,
+                    local_ips: &ips,
+                    public_base_url: None,
+                },
+            ),
+            OriginVerdict::Forbidden
+        );
+        assert_eq!(
+            check_service_origin(
+                Some("https://my-lingxi.example:18799"),
+                "my-lingxi.example:18799",
+                ServiceOriginContext {
+                    mode: NetworkMode::Lan,
+                    actual_port: 18799,
+                    secure: true,
+                    bind_ip: bind,
+                    local_ips: &ips,
+                    public_base_url: Some("https://my-lingxi.example:18799"),
+                },
+            ),
+            OriginVerdict::Allowed
+        );
+        assert_eq!(
+            check_service_origin(
+                Some("http://my-lingxi.example:18799"),
+                "my-lingxi.example:18799",
+                ServiceOriginContext {
+                    mode: NetworkMode::Lan,
+                    actual_port: 18799,
+                    secure: false,
+                    bind_ip: bind,
+                    local_ips: &ips,
+                    public_base_url: Some("https://my-lingxi.example:18799"),
+                },
+            ),
             OriginVerdict::Forbidden
         );
     }

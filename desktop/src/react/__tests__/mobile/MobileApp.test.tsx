@@ -86,6 +86,7 @@ describe('MobileApp', () => {
     'mobile.auth.plaintextWarning': '远程明文链路不接收账号密码。',
     'mobile.auth.submit': '登录',
     'mobile.auth.scopeError': '当前登录缺少工作台权限，请重新输入访问密钥。',
+    'status.rustCoreUnavailable': 'Rust 聊天尚不可用',
   };
 
   beforeEach(() => {
@@ -162,6 +163,42 @@ describe('MobileApp', () => {
     expect(window.i18n.load).toHaveBeenCalledWith('zh-CN');
     expect(screen.getByLabelText('访问密钥')).toBeInTheDocument();
     expect(screen.queryByText('mobile.auth.title')).not.toBeInTheDocument();
+    expect(fetchMock).not.toHaveBeenCalledWith('/lingxi/v1/health', expect.anything());
+  });
+
+  it('rejects an HTML response from the old session route without choosing a backend', async () => {
+    fetchMock.mockResolvedValueOnce(new Response('<html>fallback</html>', {
+      status: 200,
+      headers: { 'Content-Type': 'text/html' },
+    }));
+
+    render(<MobileApp />);
+
+    expect(await screen.findByText('mobile server returned non-JSON response for /api/web-auth/session')).toBeInTheDocument();
+    expect(fetchMock).toHaveBeenCalledTimes(1);
+    expect(screen.getByRole('button', { name: '登录' })).toBeInTheDocument();
+  });
+
+  it('rejects a legacy session server failure without silently trying Rust', async () => {
+    fetchMock.mockResolvedValueOnce(new Response(JSON.stringify({ error: 'failed' }), { status: 500 }));
+
+    render(<MobileApp />);
+
+    expect(await screen.findByText(/mobile session request failed: 500/)).toBeInTheDocument();
+    expect(fetchMock).toHaveBeenCalledTimes(1);
+  });
+
+  it('rejects an HTML Rust health response after the old route is absent', async () => {
+    fetchMock.mockResolvedValueOnce(new Response(null, { status: 404 }));
+    fetchMock.mockResolvedValueOnce(new Response('<html>fallback</html>', {
+      status: 200,
+      headers: { 'Content-Type': 'text/html' },
+    }));
+
+    render(<MobileApp />);
+
+    expect(await screen.findByText('mobile server returned non-JSON response for /lingxi/v1/health')).toBeInTheDocument();
+    expect(fetchMock).toHaveBeenCalledTimes(2);
   });
 
   it('can submit a username and password login without sending a device credential', async () => {
@@ -197,6 +234,44 @@ describe('MobileApp', () => {
     // initializeMobileRuntime() → connectWebSocket() 无人 await，不等到 shell
     // 就绪就结束用例，会把 setState / fetch / WS onopen 泄漏给后续用例。
     await waitForMobileChatReady();
+  });
+
+  it('uses the Rust auth routes and never enters the old mobile workspace', async () => {
+    let rustSessions = 0;
+    fetchMock.mockImplementation((input: RequestInfo | URL) => {
+      const url = String(input);
+      if (url === '/api/web-auth/session') {
+        return Promise.resolve(new Response(null, { status: 404 }));
+      }
+      if (url === '/lingxi/v1/health') {
+        return Promise.resolve(jsonResponse({ serverKind: 'lingxi-service', status: 'ok' }));
+      }
+      if (url === '/lingxi/v1/web-auth/session') {
+        rustSessions++;
+        return Promise.resolve(jsonResponse(rustSessions === 1
+          ? { authenticated: false, principal: null }
+          : { authenticated: true, principal: principal(['chat', 'resources.read', 'files.read', 'files.write'], 'password') }));
+      }
+      if (url === '/lingxi/v1/web-auth/login') return Promise.resolve(jsonResponse({ ok: true }));
+      if (url === '/lingxi/v1/server/identity') {
+        return Promise.resolve(jsonResponse({ serverNodeKind: 'lingxi-service' }));
+      }
+      throw new Error(`unexpected mobile request: ${url}`);
+    });
+
+    render(<MobileApp />);
+    fireEvent.click(await screen.findByRole('tab', { name: '用户名密码' }));
+    fireEvent.change(screen.getByLabelText('用户名'), { target: { value: 'owner' } });
+    fireEvent.change(screen.getByLabelText('密码'), { target: { value: 'secret' } });
+    fireEvent.click(screen.getByRole('button', { name: '登录' }));
+
+    await waitFor(() => expect(screen.getByText('Rust 聊天尚不可用')).toBeInTheDocument());
+    const loginCall = fetchMock.mock.calls.find(([input]) => String(input) === '/lingxi/v1/web-auth/login');
+    expect(JSON.parse(String(loginCall?.[1]?.body))).toEqual({
+      username: 'owner', password: 'secret', clientKind: 'mobile',
+    });
+    expect(fetchMock.mock.calls.some(([input]) => String(input) === '/api/mobile/bootstrap')).toBe(false);
+    expect(screen.getByRole('button', { name: '登录' })).toBeInTheDocument();
   });
 
   it('returns stale browser sessions without file scopes to login', async () => {
@@ -877,6 +952,9 @@ function jsonResponseForMobile(
   _options?: RequestInit,
   overrides: { bootstrap?: Record<string, unknown> } = {},
 ): unknown {
+  if (url.includes('/api/ws-ticket')) {
+    return { ticket: 'mobile-test-ws-ticket' };
+  }
   if (url.includes('/api/server/identity')) {
     return {
       serverId: 'server_1',

@@ -1,0 +1,5 @@
+R02 R17 supplemental leaf Gate package tests, 2026-09-28 UTC.
+Command (both): env -u all_proxy -u ALL_PROXY -u http_proxy -u HTTP_PROXY -u https_proxy -u HTTPS_PROXY CARGO_NET_OFFLINE=true CARGO_TARGET_DIR=/private/tmp/lingxi-r02-r17-xtask-target /Users/study_superior/.cargo/bin/rustup run 1.98.1 cargo test --manifest-path rust/Cargo.toml --locked -p xtask
+Execution: platform-approved require_escalated; repository working tree, offline dependency resolution, isolated CARGO_TARGET_DIR.
+First: 06:50:28–06:50:34 UTC; exit 101; original log xtask-test-client-closure.log; 55 passed, 1 failed. The new dual-stage full-original unit fixture provided two mapped case groups but only one synthetic original assertion, so the stricter Gate correctly returned FAIL. No original log was overwritten.
+After fixing that synthetic fixture: 06:51:25–06:51:30 UTC; exit 0; original log xtask-test-client-closure-rerun.log; 56 passed, 0 failed. R02.json descriptive note was corrected after this run; no executable assertion contract was changed by that edit. This package PASS does not constitute full R02 stage PASS.

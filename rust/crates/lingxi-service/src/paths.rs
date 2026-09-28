@@ -23,10 +23,9 @@
 //! bits are tightened AND stricter bits (e.g. 0500) are widened back to
 //! 0700, because the service must retain owner write access to its own
 //! runtime dir (T02 REVIEW_R1 F02: this is "normalize to 0700", not
-//! "only tighten"; normalization is logged by the caller). Windows:
-//! directory existence/type checks only — mode ops are a unix concept; the
-//! Windows branch is documented but not verified on this machine (same
-//! platform boundary as R02-T01).
+//! "only tighten"; normalization is logged by the caller). Windows uses
+//! owner-and-SYSTEM-only protected DACLs; native Windows verification is
+//! still required.
 
 use std::io;
 use std::path::{Path, PathBuf};
@@ -70,7 +69,7 @@ pub fn prepare_layout(home: &Path) -> Result<DataRootLayout, ConfigError> {
             value: home.to_path_buf(),
         });
     }
-    if home == Path::new("/") {
+    if home.parent().is_none() {
         return Err(ConfigError::HomeIsFilesystemRoot {
             value: home.to_path_buf(),
         });
@@ -80,7 +79,16 @@ pub fn prepare_layout(home: &Path) -> Result<DataRootLayout, ConfigError> {
             value: home.to_path_buf(),
         });
     }
-    if !home.exists() {
+    let new_home = !home.exists();
+    if new_home {
+        #[cfg(windows)]
+        lingxi_adapters::storage::windows_acl::ensure_private_directory(home).map_err(
+            |source| ConfigError::HomeCreateFailed {
+                value: home.to_path_buf(),
+                source: source.to_string(),
+            },
+        )?;
+        #[cfg(not(windows))]
         std::fs::create_dir_all(home).map_err(|source| ConfigError::HomeCreateFailed {
             value: home.to_path_buf(),
             source: source.to_string(),
@@ -91,6 +99,20 @@ pub fn prepare_layout(home: &Path) -> Result<DataRootLayout, ConfigError> {
             value: home.to_path_buf(),
             source: format!("cannot canonicalize data root: {source}"),
         })?;
+    if canonical.parent().is_none() {
+        return Err(ConfigError::HomeIsFilesystemRoot { value: canonical });
+    }
+    #[cfg(windows)]
+    {
+        if new_home {
+            lingxi_adapters::storage::windows_acl::ensure_private_directory(&canonical)
+                .map_err(|source| dir_io_error(&canonical, source))?;
+        } else {
+            let _guard =
+                lingxi_adapters::storage::windows_acl::require_private_directory(&canonical)
+                    .map_err(|source| dir_io_error(&canonical, source))?;
+        }
+    }
 
     let runtime_dir = canonical.join(RUNTIME_DIR_NAME);
     ensure_private_dir(&runtime_dir)?;
@@ -150,18 +172,18 @@ pub fn ensure_private_dir(path: &Path) -> Result<bool, ConfigError> {
         }
         Ok(false)
     }
-    #[cfg(not(unix))]
+    #[cfg(windows)]
     {
-        if path.exists() {
-            if !path.is_dir() {
-                return Err(ConfigError::HomeIsNotADirectory {
-                    value: path.to_path_buf(),
-                });
-            }
-            return Ok(false);
-        }
-        std::fs::create_dir_all(path).map_err(|source| dir_io_error(path, source))?;
-        Ok(false)
+        lingxi_adapters::storage::windows_acl::ensure_private_directory(path)
+            .map_err(|source| dir_io_error(path, source))?;
+        Ok(true)
+    }
+    #[cfg(not(any(unix, windows)))]
+    {
+        Err(dir_io_error(
+            path,
+            io::Error::other("private directories unsupported"),
+        ))
     }
 }
 
@@ -180,6 +202,21 @@ fn dir_io_error(path: &Path, source: io::Error) -> ConfigError {
 /// The temp name is derived from the pid, a nanosecond timestamp and a
 /// process-wide counter — never from user input.
 pub fn atomic_write(path: &Path, bytes: &[u8]) -> Result<(), io::Error> {
+    atomic_write_impl(path, bytes, false)
+}
+
+/// 安全记录在临时文件创建时就限制为仅主人可读，避免先替换再 chmod 的短暂暴露。
+pub fn atomic_write_private(path: &Path, bytes: &[u8]) -> Result<(), io::Error> {
+    atomic_write_impl(path, bytes, true)
+}
+
+fn atomic_write_impl(path: &Path, bytes: &[u8], private: bool) -> Result<(), io::Error> {
+    #[cfg(windows)]
+    let _parent_guard = lingxi_adapters::storage::windows_acl::require_private_directory(
+        path.parent().ok_or_else(|| {
+            io::Error::new(io::ErrorKind::InvalidInput, "write path has no parent")
+        })?,
+    )?;
     use std::sync::atomic::{AtomicU64, Ordering};
     static SEQ: AtomicU64 = AtomicU64::new(0);
     let seq = SEQ.fetch_add(1, Ordering::Relaxed);
@@ -192,7 +229,26 @@ pub fn atomic_write(path: &Path, bytes: &[u8]) -> Result<(), io::Error> {
     // fsync the file before rename.
     {
         use std::io::Write as _;
-        let mut file = std::fs::File::create(&tmp)?;
+        #[cfg(windows)]
+        let mut file = if private {
+            lingxi_adapters::storage::windows_acl::create_private_file(&tmp)?
+        } else {
+            std::fs::OpenOptions::new()
+                .write(true)
+                .create_new(true)
+                .open(&tmp)?
+        };
+        #[cfg(not(windows))]
+        let mut file = {
+            let mut options = std::fs::OpenOptions::new();
+            options.write(true).create_new(true);
+            #[cfg(unix)]
+            if private {
+                use std::os::unix::fs::OpenOptionsExt as _;
+                options.mode(0o600);
+            }
+            options.open(&tmp)?
+        };
         file.write_all(bytes)?;
         file.sync_all()?;
     }
@@ -262,9 +318,15 @@ mod tests {
             prepare_layout(Path::new("relative/dir")),
             Err(ConfigError::RelativeHome { .. })
         ));
-        // Filesystem root is never a valid home.
+        // 当前平台的文件系统根永远不能作为数据目录。
+        let root = std::env::current_dir()
+            .unwrap()
+            .ancestors()
+            .last()
+            .unwrap()
+            .to_path_buf();
         assert!(matches!(
-            prepare_layout(Path::new("/")),
+            prepare_layout(&root),
             Err(ConfigError::HomeIsFilesystemRoot { .. })
         ));
         let file_home = synthetic("layout-file");

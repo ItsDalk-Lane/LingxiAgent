@@ -1,0 +1,31 @@
+{
+  "command": [
+    "cargo",
+    "test",
+    "--manifest-path",
+    "rust/Cargo.toml",
+    "--locked",
+    "--offline",
+    "-p",
+    "xtask",
+    "--bin",
+    "xtask",
+    "embedded_r02_map",
+    "--",
+    "--nocapture"
+  ],
+  "startUtc": "2026-09-28T10:49:43.451447+00:00",
+  "endUtc": "2026-09-28T10:49:44.398494+00:00",
+  "exitCode": 0,
+  "sourceSha256Before": {
+    "rust/crates/xtask/src/stage_maps/R02.json": "aece7791ab8860b534ca7d6ea9f01bd58b2301681ab3ca93a227028194cfee6b",
+    "rust/crates/lingxi-service/tests/r00_management_leaves.rs": "a55ff3fc1c07c013a8e2a214f309e033a104c4c570cd16dcea3d8f09a99a0b2a",
+    "scripts/rust-tauri/r02_management_leaf_matrix.py": "cd766f17c7a25441a49b85682c9b559e0feb5bddfb8461f4ad4cf6214318fbce"
+  },
+  "sourceSha256After": {
+    "rust/crates/xtask/src/stage_maps/R02.json": "aece7791ab8860b534ca7d6ea9f01bd58b2301681ab3ca93a227028194cfee6b",
+    "rust/crates/lingxi-service/tests/r00_management_leaves.rs": "a55ff3fc1c07c013a8e2a214f309e033a104c4c570cd16dcea3d8f09a99a0b2a",
+    "scripts/rust-tauri/r02_management_leaf_matrix.py": "cd766f17c7a25441a49b85682c9b559e0feb5bddfb8461f4ad4cf6214318fbce"
+  },
+  "sourceChangedDuringCheck": false
+}

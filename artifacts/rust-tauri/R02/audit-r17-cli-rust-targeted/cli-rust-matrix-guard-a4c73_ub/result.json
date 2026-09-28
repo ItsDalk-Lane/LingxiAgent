@@ -1,0 +1,14 @@
+{
+  "command": [
+    "python3",
+    "scripts/rust-tauri/r02_cli_rust_matrix.py",
+    "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R02/audit-r17-cli-rust-targeted/run-08"
+  ],
+  "started_utc": "2026-09-28T08:37:51.864765+00:00",
+  "ended_utc": "2026-09-28T08:37:52.035067+00:00",
+  "exit": 1,
+  "old_stdout_sha_before": "311a09485a1dd7b722b2d0d1bd08f3756e52a235378e7e7404f0fa8f7c3c13c4",
+  "old_stdout_sha_after": "311a09485a1dd7b722b2d0d1bd08f3756e52a235378e7e7404f0fa8f7c3c13c4",
+  "producer_sha256": "e53f0957c81b52d549280155d3306466804ca166b3958e11e77b732596cf96aa",
+  "pass": true
+}

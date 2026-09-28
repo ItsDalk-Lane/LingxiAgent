@@ -19,19 +19,35 @@
 #
 # Probes: for each case the script asserts
 #   (a) the READY line's home=/source= (resolution assertion),
-#   (b) <root>/lingxi-service/instance.json EXISTS on the winning root
+#   (b) the SELF-REPORTED root is canonically EQUAL to the INDEPENDENTLY
+#       expected winner passed by the case (R9-F06: the old probes only
+#       trusted the self-report — a service that wrongly materialized a
+#       fourth location while PRINTING the expected source label would
+#       have passed; expected vs actual is now compared via physical
+#       canonical forms, macOS /private alias included),
+#   (c) <expected-winner>/lingxi-service/instance.json EXISTS — probed at
+#       the INDEPENDENT expectation, not at the self-reported path
 #       (file probe of the real choice),
-#   (c) every non-winning candidate root does NOT exist at all
+#   (d) every non-winning candidate root does NOT exist at all
 #       (neither its literal path nor its /private alias on macOS),
-#   (d) the stderr safe log shows "data root resolved" with the source.
+#   (e) the stderr safe log shows "data root resolved" with the source.
 #
 # Usage: scripts/rust-tauri/r02_t02_path_priority.sh [EVIDENCE_DIR]
 set -euo pipefail
 cd "$(dirname "$0")/../.."
 
 EVIDENCE_DIR="${1:-artifacts/rust-tauri/R02/T02}"
+# 每轮证据目录必须全新，防止独立直跑时旧日志覆盖或冒充本轮结果。
+if [ -L "$EVIDENCE_DIR" ] || { [ -e "$EVIDENCE_DIR" ] && [ ! -d "$EVIDENCE_DIR" ]; }; then
+  echo "ERROR: evidence path is not a regular directory: $EVIDENCE_DIR" >&2
+  exit 1
+fi
+if [ -d "$EVIDENCE_DIR" ]; then
+  FIRST_ENTRY="$(find "$EVIDENCE_DIR" -mindepth 1 -print -quit)" || exit 1
+  [ -z "$FIRST_ENTRY" ] || { echo "ERROR: evidence directory is not empty: $EVIDENCE_DIR" >&2; exit 1; }
+fi
 mkdir -p "$EVIDENCE_DIR"
-TARGET_DIR="${CARGO_TARGET_DIR:-/tmp/rust-target-r02-t02}"
+TARGET_DIR="${CARGO_TARGET_DIR:-${TMPDIR:-/tmp}/rust-target-r02-t02}"
 
 TOOLCHAIN="$(sed -n 's/^channel[[:space:]]*=[[:space:]]*"\([^"]*\)".*/\1/p' rust-toolchain.toml | head -n 1)"
 if [ -z "$TOOLCHAIN" ]; then
@@ -50,8 +66,125 @@ CARGO="env -u all_proxy -u ALL_PROXY -u http_proxy -u HTTP_PROXY -u https_proxy 
   CARGO_NET_OFFLINE=true CARGO_TARGET_DIR=$TARGET_DIR rustup run $TOOLCHAIN cargo"
 
 SCRATCH=""
-cleanup() { [ -n "$SCRATCH" ] && [ -d "$SCRATCH" ] && rm -rf "$SCRATCH"; }
+CASE_PID=""
+# R02 stage-repair R7 / R7-F02: CASE_PID is the CURRENT handle of the
+# running case service — set on spawn, RETIRED (cleared) after every
+# wait/reap (stop_case already did; the trap and the start-failure path
+# now retire too). The trap signals it ONLY while it still proves
+# CURRENT ownership (exists AND ppid is THIS shell): a retired or
+# recycled number is never signalled (the R6-F02 A12 pattern). R7's
+# static observation: the old trap removed only SCRATCH, so an assertion
+# failure between start_case and stop_case LEAKED the running service.
+# R12-F01: the boolean probe's false branch conflated exited/foreign/
+# unobservable and the trap's owned branch was `kill -TERM; wait` with
+# NO deadline — a child ignoring TERM hung the trap itself. Four-state
+# probe + bounded ladder below: ≈10 s worst case per handle, residue
+# reported loudly at expiry, never an unbounded wait.
+child_state() {
+  # child_state <pid> → exited | owned | foreign | unobservable
+  local ppid
+  if ! kill -0 "$1" 2>/dev/null; then
+    printf 'exited\n'
+    return 0
+  fi
+  ppid="$(ps -o ppid= -p "$1" 2>/dev/null | tr -d '[:space:]')"
+  if [ -z "$ppid" ]; then
+    printf 'unobservable\n'
+  elif [ "$ppid" = "$$" ]; then
+    printf 'owned\n'
+  else
+    printf 'foreign\n'
+  fi
+}
+# R12-F01: bounded stop for ONE provably-owned handle under THIS script's
+# contract (TERM first — stop_case asserts the graceful stop; it stays
+# untouched): TERM → ≤5 s poll → direct-pid KILL only while still
+# provably ours → ≤5 s re-check. Prints the final state.
+bounded_stop_owned() {
+  local pid="$1" state="" i
+  # 发信号前在函数内再次核实，调用方的先前判断不能替代当前归属。
+  state="$(child_state "$pid")"
+  if [ "$state" != "owned" ]; then printf '%s\n' "$state"; return 0; fi
+  kill -TERM "$pid" 2>/dev/null || true
+  for i in $(seq 1 100); do
+    state="$(child_state "$pid")"
+    case "$state" in
+      exited|foreign) break ;;
+      owned|unobservable) : ;;
+    esac
+    sleep 0.05
+  done
+  if [ "${state:-owned}" = "owned" ]; then
+    state="$(child_state "$pid")"
+  fi
+  if [ "$state" = "owned" ]; then
+    kill -KILL "$pid" 2>/dev/null || true
+    for i in $(seq 1 100); do
+      state="$(child_state "$pid")"
+      case "$state" in
+        exited|foreign) break ;;
+        owned|unobservable) : ;;
+      esac
+      sleep 0.05
+    done
+  fi
+  printf '%s\n' "${state:-unobservable}"
+}
+cleanup() {
+  local cleanup_residue=0
+  if [ -n "$CASE_PID" ]; then
+    case "$(child_state "$CASE_PID")" in
+      owned)
+        case "$(bounded_stop_owned "$CASE_PID")" in
+          exited)
+            wait "$CASE_PID" 2>/dev/null || true
+            ;;
+          foreign)
+            echo "cleanup: pid $CASE_PID 已不属于本脚本，不等待或发信号" >&2
+            cleanup_residue=1
+            ;;
+          owned)
+            echo "cleanup: pid $CASE_PID still OWNED after the TERM and KILL budgets — RESIDUE left behind, no unbounded wait" >&2
+            cleanup_residue=1
+            ;;
+          unobservable)
+            echo "cleanup: pid $CASE_PID state UNOBSERVABLE after the stop budgets — not signalled further, no unbounded wait; possible residue" >&2
+            cleanup_residue=1
+            ;;
+        esac
+        ;;
+      exited)
+        wait "$CASE_PID" 2>/dev/null || true
+        ;;
+      foreign)
+        echo "cleanup: pid $CASE_PID is NOT currently owned by this shell — NOT signalled" >&2
+        cleanup_residue=1
+        ;;
+      unobservable)
+        echo "cleanup: pid $CASE_PID ownership UNOBSERVABLE (ps unreadable) — NOT signalled" >&2
+        cleanup_residue=1
+        ;;
+    esac
+    CASE_PID=""
+  fi
+  if [ "$cleanup_residue" -eq 0 ]; then
+    [ -n "$SCRATCH" ] && [ -d "$SCRATCH" ] && rm -rf "$SCRATCH"
+  else
+    echo "cleanup: 进程仍存活或归属不明，保留本轮 scratch=$SCRATCH 供核查" >&2
+    exit 1
+  fi
+  return 0
+}
 trap cleanup EXIT
+
+# Self-contained logging environment (R02 stage-repair R1): this script
+# ASSERTS on info-level safe-log lines ("data root resolved", source=…).
+# The service reads RUST_LOG with an info default, but a caller that
+# exports RUST_LOG=warn (e.g. the verify-stage runner keeps its own output
+# quiet) would starve those lines and fail the script for the wrong
+# reason. Pin info for every service spawn below; the binary's own
+# behavior is unchanged.
+export RUST_LOG=info
 
 echo "== toolchain: rustup run $TOOLCHAIN ($(rustup run "$TOOLCHAIN" rustc --version | head -n 1))"
 echo "== [build] lingxi-service (locked, offline, isolated target dir)"
@@ -61,7 +194,7 @@ tail -n 1 "$EVIDENCE_DIR/a04-build.log"
 BIN="$TARGET_DIR/debug/lingxi-service"
 test -x "$BIN"
 
-SCRATCH="$(mktemp -d /tmp/lingxi-r02t02-a04.XXXXXX)"
+SCRATCH=$(mktemp -d "${TMPDIR:-/tmp}/lingxi-r02t02-a04.XXXXXX")
 : > "$EVIDENCE_DIR/a04-summary.txt"
 # Candidate roots are per-case and do NOT exist up front; each case proves
 # exactly one of them gets materialized by that case's own run.
@@ -98,6 +231,44 @@ assert_materialized() { # the winning root must carry the runtime record
   }
 }
 
+# canonic <path>: the PHYSICAL canonical form (all symlinks resolved,
+# macOS /private prefix included) when the path exists; otherwise the
+# /private-aware lexical form. The service prints home= through
+# std::fs::canonicalize, so the self-reported root arrives in physical
+# form while the case variables carry the literal mktemp form — both
+# sides must be canonicalized before comparison (R9-F06).
+canonic() {
+  local p="$1"
+  if [ -d "$p" ]; then
+    (cd "$p" && pwd -P)
+  else
+    case "$p" in
+      /private/*) printf '%s' "$p" ;;
+      /*) printf '/private%s' "$p" ;;
+      *) printf '%s' "$p" ;;
+    esac
+  fi
+}
+
+# R9-F06: the winning root is verified against the case's OWN independent
+# expectation, never against the service's self-report alone: the actual
+# (READY) root and the expected winner must be canonically EQUAL, and the
+# runtime record must exist under the EXPECTED root (probing it through
+# the expected literal path, which the canonical-equality check has just
+# tied to the actual one). A service that materialized anywhere else —
+# or printed the expected source label while choosing a fourth location —
+# fails here.
+expect_root() { # $1=case-name $2=expected-winner-root (independent)
+  local name="$1" expected="$2" actual_canon expected_canon
+  actual_canon="$(canonic "$READY_HOME")"
+  expected_canon="$(canonic "$expected")"
+  [ "$actual_canon" = "$expected_canon" ] || {
+    echo "ERROR: case $name self-reported root $READY_HOME is not the independently expected winner $expected (canonical: $actual_canon vs $expected_canon)" >&2
+    return 1
+  }
+  assert_materialized "$expected"
+}
+
 start_case() { # $1=case-name $2=expected-source; binary args in "$@:3"
   # Starts the REAL binary, waits for READY, validates the READY line and
   # the safe-log resolution line, and leaves the process RUNNING (file
@@ -116,7 +287,11 @@ start_case() { # $1=case-name $2=expected-source; binary args in "$@:3"
     sleep 0.1
   done
   if ! grep -q 'LINGXI_SERVICE_READY addr=' "$CASE_OUT" 2>/dev/null; then
-    wait "$CASE_PID" || true
+    # 未就绪的服务可能仍在运行；交给有期限的 EXIT 清理，不直接 wait。
+    if [ "$(child_state "$CASE_PID")" = "exited" ]; then
+      wait "$CASE_PID" || true
+      CASE_PID=""
+    fi
     echo "ERROR: case $name never became ready" >&2
     exit 1
   fi
@@ -134,23 +309,27 @@ start_case() { # $1=case-name $2=expected-source; binary args in "$@:3"
 }
 
 stop_case() { # clean SIGTERM stop + own-record cleanup assertions
-  local rc
-  kill -TERM "$CASE_PID"
-  set +e
-  wait "$CASE_PID"
-  rc=$?
-  set -e
+  local rc state
+  [ "$(child_state "$CASE_PID")" = "owned" ] || {
+    echo "ERROR: case $CASE_NAME service is not an owned live child before TERM" >&2; return 1; }
+  state="$(bounded_stop_owned "$CASE_PID")"
+  case "$state" in
+    exited) ;;
+    *) echo "ERROR: case $CASE_NAME did not stop within the TERM/KILL budget (state=$state)" >&2; return 1 ;;
+  esac
+  if wait "$CASE_PID"; then rc=0; else rc=$?; fi
+  # 回收后立即退役，失败退出时的 trap 不得碰已复用的数字。
+  CASE_PID=""
   [ "$rc" -eq 0 ] || { echo "ERROR: case $CASE_NAME unclean stop ($rc)" >&2; exit 1; }
   [ ! -f "$READY_HOME/lingxi-service/instance.json" ] || {
     echo "ERROR: case $CASE_NAME clean stop must remove the own record" >&2; exit 1; }
   [ -f "$READY_HOME/lingxi-service/instance.lock" ] || {
     echo "ERROR: case $CASE_NAME runtime dir vanished (lock file expected)" >&2; exit 1; }
-  CASE_PID=""
 }
 
 echo "== [1] only CLI"
 start_case cli cli env -u LINGXI_HOME "$BIN" --home "$R_CLI"
-assert_materialized "$READY_HOME"
+expect_root cli "$R_CLI"
 assert_absent "$R_ENV"; assert_absent "$R_CFG"
 stop_case
 echo "only CLI materialized: OK"
@@ -158,7 +337,7 @@ echo "only CLI materialized: OK"
 echo "== [2] only env"
 R_CLI2="$SCRATCH/case2/root-cli2"; R_CFG2="$SCRATCH/case2/root-config2"
 start_case env env env LINGXI_HOME="$R_ENV" "$BIN"
-assert_materialized "$READY_HOME"
+expect_root env "$R_ENV"
 assert_absent "$R_CFG2"; assert_absent "$R_CLI2"
 stop_case
 echo "only env materialized (fresh candidates untouched): OK"
@@ -166,7 +345,7 @@ echo "only env materialized (fresh candidates untouched): OK"
 echo "== [3] only config file"
 R_CLI3="$SCRATCH/case3/root-cli3"; R_ENV3="$SCRATCH/case3/root-env3"
 start_case config-file config-file env -u LINGXI_HOME "$BIN" --config "$CFG"
-assert_materialized "$READY_HOME"
+expect_root config-file "$R_CFG"
 assert_absent "$R_CLI3"; assert_absent "$R_ENV3"
 stop_case
 echo "only config materialized (fresh candidates untouched): OK"
@@ -179,7 +358,7 @@ CFG4="$SCRATCH/case4/service.json"
 mkdir -p "$SCRATCH/case4"
 printf '{"home": "%s"}\n' "$R_CFG4" > "$CFG4"
 start_case conflict cli env LINGXI_HOME="$R_ENV4" "$BIN" --home "$R_CLI4" --config "$CFG4"
-assert_materialized "$READY_HOME"
+expect_root conflict "$R_CLI4"
 assert_absent "$R_ENV4"; assert_absent "$R_CFG4"
 stop_case
 grep -q "env(LINGXI_HOME)=$R_ENV4" "$EVIDENCE_DIR/a04-conflict-stderr.log" || {
@@ -197,6 +376,10 @@ printf '{"home": "%s"}\n' "$R_CFG2" > "$CFG2"
 start_case test-mode test-mode env LINGXI_HOME="$R_ENV2" "$BIN" \
   --home "$R_CLI2" --config "$CFG2" --test-mode
 assert_absent "$R_CLI2"; assert_absent "$R_ENV2"; assert_absent "$R_CFG2"
+# No independent winner exists BY DESIGN here: test mode mints a fresh
+# synthetic home, so the assertion is the home's SHAPE (the fixed
+# lingxi-service-test- prefix) plus the record probe at that path, and
+# the three prod-lookalike candidates must stay untouched (R9-F06 note).
 case "$READY_HOME" in
   */lingxi-service-test-*) : ;;
   *) echo "ERROR: test-mode home has unexpected shape: $READY_HOME" >&2; exit 1 ;;

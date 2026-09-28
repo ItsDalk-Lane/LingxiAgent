@@ -5,6 +5,11 @@ function nonEmptyString(value) {
   return typeof value === "string" && value.trim() ? value.trim() : null;
 }
 
+const SESSION_STREAM_TYPES = new Set([
+  "text_delta", "mood_start", "mood_text", "mood_end", "thinking_start", "thinking_end",
+  "tool_start", "tool_end", "turn_end", "status", "abort_rejected",
+]);
+
 export function createCliChatPromptMessage(identity, text) {
   const sessionId = nonEmptyString(identity?.sessionId);
   const sessionPath = nonEmptyString(identity?.sessionPath);
@@ -20,6 +25,14 @@ export function createCliChatAbortMessage(identity) {
   return { type: "abort", sessionId, sessionPath, streamId };
 }
 
+export function planCliInterrupt(identity) {
+  if (identity?.isStreaming !== true && identity?.pendingPrompt !== true) return { kind: "exit" };
+  const message = createCliChatAbortMessage(identity);
+  if (!message) return { kind: "wait" };
+  if (identity?.abortRequestedStreamId === message.streamId) return { kind: "already-requested" };
+  return { kind: "abort", message };
+}
+
 export function cliChatMessageMatchesSession(identity, msg) {
   const sessionId = nonEmptyString(identity?.sessionId);
   const sessionPath = nonEmptyString(identity?.sessionPath);
@@ -27,6 +40,12 @@ export function cliChatMessageMatchesSession(identity, msg) {
   const messageSessionPath = nonEmptyString(msg?.sessionPath);
   if (sessionId && messageSessionId && messageSessionId !== sessionId) return false;
   if (sessionPath && messageSessionPath && messageSessionPath !== sessionPath) return false;
+  const matchedIdentity = (sessionId && messageSessionId === sessionId)
+    || (sessionPath && messageSessionPath === sessionPath);
+  // 仅携带未知身份的帧也必须丢弃，不能因本地缺少另一种身份就放行。
+  if ((SESSION_STREAM_TYPES.has(msg?.type)
+    || (msg?.type === "error" && (messageSessionId || messageSessionPath)))
+    && !matchedIdentity) return false;
   return true;
 }
 
@@ -80,7 +99,7 @@ export async function printStatus(client, connection) {
   console.log(`  ${ansi.dim}Studio${ansi.reset}    ${identity?.studioLabel || identity?.studioId || "local"}`);
   console.log(`  ${ansi.dim}Agent${ansi.reset}     ${health.agent || "Agent"} · ${theme.yuan} · ${theme.symbol}`);
   console.log(`  ${ansi.dim}Model${ansi.reset}     ${health.model || "not set"}`);
-  console.log(`  ${ansi.dim}Auth${ansi.reset}      ${identity?.credentialKind || connection.source || "unknown"}`);
+  console.log(`  ${ansi.dim}Auth${ansi.reset}      ${identity?.credentialKind || "unavailable (identity check failed)"}`);
 }
 
 export async function printSessions(client, { limit = 20 } = {}) {
@@ -105,11 +124,14 @@ export async function startChat(client, connection, opts: { session?: any; targe
   const plain = opts.plain === true || !process.stdin.isTTY;
 
   let streaming = false;
+  let pendingPrompt = false;
+  let abortWhenKnown = false;
   let activeStreamId = null;
   let abortRequestedStreamId = null;
   let currentMood = "";
   let thinkingTimer = null;
   let thinkingFrame = 0;
+  let closedIntentionally = false;
 
   const rl = readline.createInterface({
     input: process.stdin,
@@ -165,6 +187,8 @@ export async function startChat(client, connection, opts: { session?: any; targe
     sessionId = session.sessionId || null;
     activeStreamId = null;
     abortRequestedStreamId = null;
+    pendingPrompt = false;
+    abortWhenKnown = false;
     streaming = false;
     await refreshTheme();
     console.log(`${ansi.dim}Continued session:${ansi.reset} ${session.title || session.firstMessage || session.path}`);
@@ -209,6 +233,8 @@ ${paint(theme, "/quit")}              exit
       sessionId = created.sessionId || null;
       activeStreamId = null;
       abortRequestedStreamId = null;
+      pendingPrompt = false;
+      abortWhenKnown = false;
       streaming = false;
       console.log(`${paint(theme, theme.symbol)} New session`);
       prompt();
@@ -224,12 +250,32 @@ ${paint(theme, "/quit")}              exit
   }
 
   function closeAndExit(code) {
+    closedIntentionally = true;
     try { ws.close(); } catch {}
     try { rl.close(); } catch {}
     if (process.stdin.isTTY) {
       try { process.stdin.setRawMode(false); } catch {}
     }
     process.exit(code);
+  }
+
+  function requestAbort() {
+    const plan = planCliInterrupt({
+      sessionId, sessionPath, streamId: activeStreamId,
+      isStreaming: streaming, pendingPrompt, abortRequestedStreamId,
+    });
+    if (plan.kind === "wait") {
+      abortWhenKnown = true;
+      process.stdout.write(`\n${ansi.yellow}Stop queued until the active stream identity is known.${ansi.reset}\n`);
+      return;
+    }
+    if (plan.kind === "already-requested") return;
+    if (plan.kind === "abort") {
+      abortWhenKnown = false;
+      ws.send(JSON.stringify(plan.message));
+      abortRequestedStreamId = plan.message.streamId;
+      process.stdout.write(`\n${ansi.dim}Stop requested…${ansi.reset}\n`);
+    }
   }
 
   ws.on("open", () => {
@@ -257,6 +303,13 @@ ${paint(theme, "/quit")}              exit
     }, msg);
     activeStreamId = tracked.streamId;
     streaming = tracked.isStreaming;
+    if (msg.type === "status" && msg.isStreaming === true) pendingPrompt = false;
+    if (msg.type === "turn_end" || msg.type === "error"
+      || (msg.type === "status" && msg.isStreaming === false)) {
+      pendingPrompt = false;
+      abortWhenKnown = false;
+    }
+    if (abortWhenKnown && streaming && activeStreamId) requestAbort();
     switch (msg.type) {
       case "text_delta":
         stopThinking();
@@ -322,12 +375,13 @@ ${paint(theme, "/quit")}              exit
   ws.on("close", () => {
     stopThinking();
     console.log(`\n${ansi.dim}Disconnected.${ansi.reset}`);
-    closeAndExit(0);
+    closeAndExit(closedIntentionally ? 0 : 1);
   });
 
   ws.on("error", (err) => {
     stopThinking();
     console.error(`\n${ansi.red}${err.message}${ansi.reset}`);
+    closeAndExit(1);
   });
 
   rl.on("line", async (input) => {
@@ -336,7 +390,10 @@ ${paint(theme, "/quit")}              exit
       prompt();
       return;
     }
-    if (streaming) return;
+    if (streaming || pendingPrompt) {
+      process.stdout.write(`${ansi.dim}Wait for the current reply or stop it first.${ansi.reset}\n`);
+      return;
+    }
     try {
       if (line.startsWith("/")) {
         await handleCommand(line);
@@ -345,6 +402,7 @@ ${paint(theme, "/quit")}              exit
       const message = createCliChatPromptMessage({ sessionId, sessionPath }, line);
       if (!message) throw new Error("Session identity unavailable; reconnect or choose another session.");
       ws.send(JSON.stringify(message));
+      pendingPrompt = true;
     } catch (err) {
       console.log(`${ansi.red}${err.message}${ansi.reset}`);
       prompt();
@@ -354,25 +412,13 @@ ${paint(theme, "/quit")}              exit
   readline.emitKeypressEvents(process.stdin, rl);
   if (!plain && process.stdin.isTTY) {
     process.stdin.setRawMode(true);
-    const requestAbort = () => {
-      const message = createCliChatAbortMessage({ sessionId, sessionPath, streamId: activeStreamId });
-      if (!message) {
-        process.stdout.write(`\n${ansi.yellow}Stop unavailable until the active stream identity is known.${ansi.reset}\n`);
-        return false;
-      }
-      if (abortRequestedStreamId === message.streamId) return true;
-      ws.send(JSON.stringify(message));
-      abortRequestedStreamId = message.streamId;
-      process.stdout.write(`\n${ansi.dim}Stop requested…${ansi.reset}\n`);
-      return true;
-    };
     process.stdin.on("keypress", (_str, key) => {
       if (!key) return;
-      if (key.name === "escape" && streaming) {
+      if (key.name === "escape" && (streaming || pendingPrompt)) {
         requestAbort();
       }
       if (key.ctrl && key.name === "c") {
-        if (streaming) {
+        if (streaming || pendingPrompt) {
           requestAbort();
         } else {
           closeAndExit(0);

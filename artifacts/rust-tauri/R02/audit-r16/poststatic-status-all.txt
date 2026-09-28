@@ -1,0 +1,71 @@
+ M docs/rust-tauri/ORCHESTRATOR_PROGRESS.json
+ M docs/rust-tauri/R02/R02_ACCEPTANCE_LEDGER.json
+ M docs/rust-tauri/R02/R02_HANDOFF.json
+ M docs/rust-tauri/R02/R02_IMPLEMENTATION_MAP.json
+ M docs/rust-tauri/R02/R02_REPORT.md
+ M docs/rust-tauri/R02/RISK_REGISTER.json
+ M rust/Cargo.lock
+ M rust/crates/lingxi-adapters/src/storage/migrations.rs
+ M rust/crates/lingxi-adapters/src/storage/mod.rs
+ M rust/crates/lingxi-adapters/src/storage/queue.rs
+ M rust/crates/lingxi-adapters/src/storage/run_store.rs
+ M rust/crates/lingxi-adapters/tests/backup_restore.rs
+ M rust/crates/lingxi-adapters/tests/event_store_reads.rs
+ M rust/crates/lingxi-kernel/src/ports.rs
+ M rust/crates/lingxi-service/Cargo.toml
+ M rust/crates/lingxi-service/src/auth.rs
+ M rust/crates/lingxi-service/src/config.rs
+ M rust/crates/lingxi-service/src/events.rs
+ M rust/crates/lingxi-service/src/inject.rs
+ M rust/crates/lingxi-service/src/lib.rs
+ M rust/crates/lingxi-service/src/limits.rs
+ M rust/crates/lingxi-service/src/main.rs
+ M rust/crates/lingxi-service/src/redaction.rs
+ M rust/crates/lingxi-service/src/sessions.rs
+ M rust/crates/lingxi-service/src/shutdown.rs
+ M rust/crates/lingxi-service/src/ws.rs
+ M rust/crates/lingxi-service/tests/auth_matrix.rs
+ M rust/crates/lingxi-service/tests/event_subscription.rs
+ M rust/crates/lingxi-service/tests/instance_lifecycle.rs
+ M rust/crates/lingxi-service/tests/resource_limits.rs
+ M rust/crates/lingxi-service/tests/service_health.rs
+ M rust/crates/lingxi-service/tests/service_persistence.rs
+ M rust/crates/lingxi-service/tests/shutdown_coordinator.rs
+ M rust/crates/xtask/Cargo.toml
+ M rust/crates/xtask/src/main.rs
+ M rust/crates/xtask/src/stage_map.rs
+ M rust/crates/xtask/src/stage_maps/R02.json
+ M rust/crates/xtask/src/verify.rs
+ M rust/crates/xtask/src/verify/runner_tests.rs
+ M scripts/rust-tauri/r02_t01_boundary_negative.sh
+ M scripts/rust-tauri/r02_t01_service_smoke.sh
+ M scripts/rust-tauri/r02_t02_dual_instance.sh
+ M scripts/rust-tauri/r02_t02_f01_env_token_negative.sh
+ M scripts/rust-tauri/r02_t02_path_priority.sh
+ M scripts/rust-tauri/r02_t03_auth_matrix.sh
+ M scripts/rust-tauri/r02_t04_storage_tx.sh
+ M scripts/rust-tauri/r02_t05_events_matrix.sh
+ M scripts/rust-tauri/r02_t06_backup_restore.sh
+ M scripts/rust-tauri/r02_t06_recovery_drill.sh
+ M scripts/rust-tauri/r02_t07_redaction_scan.sh
+ M scripts/rust-tauri/r02_t07_slow_subscriber.sh
+ M scripts/rust-tauri/r02_t08_full_chain_probe.py
+ M scripts/rust-tauri/r02_t08_full_chain_smoke.sh
+ M scripts/rust-tauri/r02_t08_legacy_entry_regression.sh
+?? artifacts/rust-tauri/R02/audit-r16/contract-matrix-prechange.json
+?? artifacts/rust-tauri/R02/audit-r16/history-stage-report-sha256.txt
+?? artifacts/rust-tauri/R02/audit-r16/poststatic-status-all.txt
+?? artifacts/rust-tauri/R02/audit-r16/prechange-changed-sha256-corrected.txt
+?? artifacts/rust-tauri/R02/audit-r16/prechange-changed-sha256.txt
+?? artifacts/rust-tauri/R02/audit-r16/prechange-full-sha256-corrected.txt
+?? artifacts/rust-tauri/R02/audit-r16/prechange-full-sha256.txt
+?? artifacts/rust-tauri/R02/audit-r16/prechange-head.txt
+?? artifacts/rust-tauri/R02/audit-r16/prechange-remotes.txt
+?? artifacts/rust-tauri/R02/audit-r16/prechange-status-corrected.txt
+?? artifacts/rust-tauri/R02/audit-r16/prechange-status.txt
+?? artifacts/rust-tauri/R02/audit-r16/task-report-sha256.txt
+?? docs/rust-tauri/R02/R02_FULL_SCOPE_AUDIT_PRE_REPAIR.md
+?? rust/crates/lingxi-adapters/tests/run_id_allocator.rs
+?? rust/crates/lingxi-service/src/serve.rs
+?? rust/crates/lingxi-service/tests/config_bounds.rs
+?? rust/crates/lingxi-service/tests/execute_concurrency.rs

@@ -70,6 +70,12 @@ pub enum StorageError {
     /// domain fact (non-terminal "terminal", transition the state machine
     /// forbids...).
     InvalidRequest { detail: String },
+    /// The durable run-id sequence space of a database is fully consumed
+    /// (the stored high-water mark is `u64::MAX`). Allocation refuses
+    /// LOUDLY instead of panicking, wrapping or re-issuing a number that a
+    /// stored run id already owns (R02 stage-repair R5 / F02). Permanent
+    /// and non-retryable for that database.
+    RunIdExhausted { detail: String },
     /// Anything else; carries the SQLite error text for diagnosis.
     Internal { detail: String },
 }
@@ -117,6 +123,9 @@ impl std::fmt::Display for StorageError {
             StorageError::Corrupted { detail } => write!(f, "stored state corrupt: {detail}"),
             StorageError::InvalidRequest { detail } => {
                 write!(f, "illegal storage request: {detail}")
+            }
+            StorageError::RunIdExhausted { detail } => {
+                write!(f, "run id sequence exhausted: {detail}")
             }
             StorageError::Internal { detail } => write!(f, "storage internal error: {detail}"),
         }

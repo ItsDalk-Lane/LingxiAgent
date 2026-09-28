@@ -1,0 +1,102 @@
+{
+  "startedUtc": "2026-09-28T12:39:52.564929+00:00",
+  "endedUtc": "2026-09-28T12:42:46.081612+00:00",
+  "sourceBefore": {
+    "path": "artifacts/rust-tauri/R02/audit-r18/final-noport-2/source-before-sha256.txt",
+    "count": 2803,
+    "sha256": "05d97b45a3e2e13b1acbfa7f03462c156faff87d3621b42ad9e49cc2ccb8404b"
+  },
+  "sourceAfter": {
+    "path": "artifacts/rust-tauri/R02/audit-r18/final-noport-2/source-after-sha256.txt",
+    "count": 2803,
+    "sha256": "05d97b45a3e2e13b1acbfa7f03462c156faff87d3621b42ad9e49cc2ccb8404b"
+  },
+  "sourceUnchanged": true,
+  "platform": "darwin",
+  "node": "v24.16.0",
+  "npm": "11.13.0",
+  "checks": [
+    {
+      "name": "rust-version",
+      "exitCode": 0,
+      "record": "rust-version.json"
+    },
+    {
+      "name": "cargo-fmt",
+      "exitCode": 0,
+      "record": "cargo-fmt.json"
+    },
+    {
+      "name": "cargo-check",
+      "exitCode": 0,
+      "record": "cargo-check.json"
+    },
+    {
+      "name": "cargo-clippy",
+      "exitCode": 0,
+      "record": "cargo-clippy.json"
+    },
+    {
+      "name": "xtask-unit",
+      "exitCode": 0,
+      "record": "xtask-unit.json"
+    },
+    {
+      "name": "management-compile",
+      "exitCode": 0,
+      "record": "management-compile.json"
+    },
+    {
+      "name": "static-web-compile",
+      "exitCode": 0,
+      "record": "static-web-compile.json"
+    },
+    {
+      "name": "npm-typecheck",
+      "exitCode": 0,
+      "record": "npm-typecheck.json"
+    },
+    {
+      "name": "desktop-rust-helper",
+      "exitCode": 0,
+      "record": "desktop-rust-helper.json"
+    },
+    {
+      "name": "targeted-vitest",
+      "exitCode": 0,
+      "record": "targeted-vitest.json"
+    },
+    {
+      "name": "build-client",
+      "exitCode": 0,
+      "record": "build-client.json"
+    },
+    {
+      "name": "local-keygen",
+      "exitCode": 0,
+      "record": "local-keygen.json"
+    },
+    {
+      "name": "build-server-local-sign",
+      "exitCode": 0,
+      "record": "build-server-local-sign.json"
+    },
+    {
+      "name": "build-rust-service",
+      "exitCode": 0,
+      "record": "build-rust-service.json"
+    },
+    {
+      "name": "verify-rust-package",
+      "exitCode": 0,
+      "record": "verify-rust-package.json"
+    },
+    {
+      "name": "build-shell-local-structure",
+      "exitCode": 0,
+      "record": "build-shell-local-structure.json"
+    }
+  ],
+  "temporaryPrivateKeyRemoved": true,
+  "scope": "no real service bind, no full npm test, no A16, no verify-stage R02; local test signing/public keyset and skipped notarization only"
+}

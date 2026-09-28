@@ -1,0 +1,23 @@
+{
+  "command": [
+    "cargo",
+    "test",
+    "--manifest-path",
+    "rust/Cargo.toml",
+    "--locked",
+    "--offline",
+    "-p",
+    "xtask",
+    "--bin",
+    "xtask",
+    "embedded_r02_map",
+    "--",
+    "--nocapture"
+  ],
+  "startUtc": "2026-09-28T10:43:12.861135+00:00",
+  "endUtc": "2026-09-28T10:43:13.772796+00:00",
+  "exitCode": 101,
+  "sourceSha256Before": "032c38a901365a43459c38405c482802893cc25028bcadc4dcfbc106717320af",
+  "sourceSha256After": "032c38a901365a43459c38405c482802893cc25028bcadc4dcfbc106717320af",
+  "sourceChangedDuringCheck": false
+}

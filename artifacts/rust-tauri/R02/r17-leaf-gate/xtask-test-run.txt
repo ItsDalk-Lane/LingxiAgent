@@ -1,0 +1,9 @@
+检查：xtask package full unit tests（本轮中间候选，非最终阶段验收）
+开始 UTC：2026-09-28 06:16:37
+结束 UTC：2026-09-28 06:17:34（结束查询时间；进程实际约 6.21 秒内退出）
+实际命令：env -u all_proxy -u ALL_PROXY -u http_proxy -u HTTP_PROXY -u https_proxy -u HTTPS_PROXY CARGO_NET_OFFLINE=true CARGO_TARGET_DIR=/private/tmp/lingxi-r02-r17-xtask-target /Users/study_superior/.cargo/bin/rustup run 1.98.1 cargo test --manifest-path rust/Cargo.toml --locked -p xtask > artifacts/rust-tauri/R02/r17-leaf-gate/xtask-test.log 2>&1
+退出码：101（FAIL）
+结果：50 passed, 4 failed, 0 ignored。失败：stage_map::map_tests::producer_outside_leaf_refs_is_a_hard_error；verify::runner_tests::timeout_cleanup_kills_the_whole_process_tree；verify::runner_tests::timeout_cleanup_tracks_reparented_descendants_truthfully；verify::runner_tests::timeout_kills_the_command_and_fails。
+原始日志：xtask-test.log（不覆盖；后续复跑使用新文件）。
+本组检查前五文件 SHA：pretest-source-sha256.txt。本轮工作区其他文件由并行任务持续编辑，故此测试不能冒充最终候选全文件绑定或阶段 PASS。
+环境：macOS 本地主机，锁定 Rust 1.98.1，Cargo offline、隔离 target dir。原始日志中的错误照实保留。

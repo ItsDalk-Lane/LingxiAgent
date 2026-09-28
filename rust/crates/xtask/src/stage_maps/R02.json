@@ -3,14 +3,1565 @@
   "resultVersion": "lingxi.xtask.verify-stage.v1",
   "stage": "R02",
   "defaultTimeoutSecs": 1200,
+  "supplementalCoverageNote": "R14-F01（2026-09-28，修复 R14；接替 R13-F01 的门禁形态）：本键为历史注记；本图的可执行门禁现由 commands（R14 时 13，R17 提前纳入客户端后 14）+ scenarios（16 基础 REQUIRED）+ supplementalLeafScenarios（34 项 R00 REQUIRED_SUPPLEMENTAL 补充叶场景，本图正式门禁数据）组成——stage_map.rs 解析该节（空节/未知 basisKind/冲突叶绑证据/非冲突叶无证据命令/非冲突叶缺 assertionContract/镜像字段缺失均为硬解析错误），verify-stage 运行时先与 docs/rust-tauri/R00/ACCEPTANCE_MAP.json 及 docs/rust-tauri/R00/FEATURE_STAGE_ACCEPTANCE.json 按 id 集合与逐叶全字段（featureId/kind/requirement/task_ids/execution_stage_ids/ledger_status/result_ids/test_ids/then/assertions/due 的 r00* 镜像）全等核对（任何缺失、多余或漂移均硬失败），再逐项 roll-up：证据命令未全部通过、必需要证据文件缺失、阶段边界冲突（client_only_stage_boundary_conflict，R14 时 2 项：R00-T02-LA-B8A1AD32A8E1 / R00-T02-LA-32FFEC05BAA7 固定 BLOCKED；R17 用户授权提前实施其完整客户端原行为后改由专属生产者逐案实测）、或 assertionContract 案例实际值与原断言期望不符，都使 overall 不能 PASS。R14-F01 关闭的三条假绿路径：(1) 每叶 r00* 镜像字段由门禁与 R00 两账本逐字核对——错绑 feature/责任/份额在命令运行前即硬失败；(2) 每个非冲突叶必须声明 assertionContract（生产者命令 + 证据文件 + 案例期望值），verify-stage 解析证据 JSON 并核对每个案例的实际值（actual==expect 且文件内 expect 与图钉期望一致）——命令 exit 0 不再是叶 PASS 的充分条件，票据叶 R00-T02-LA-5816DA563ED8 的「无主体 403」原断言由服务侧修复（对齐 incumbent server/routes/ws-auth.ts）+ 脚本断言 403 + 门禁机器消费三重闭环；(3) sessions-list 叶 R00-T02-LA-200D4E5D52C9 的专属矩阵文件现在有注册生产者（r02_t03_auth_matrix.sh sessions-list 段）且门禁核验其内容契约，不再依赖文件存在性。R17 客户端、管理及静态页专属证据当时把 commands 增至 18 个；R18 另登记 CLI sessions 专属生产者，现为 19 个；16 基础 REQUIRED 场景不变；用户已授权把 R07-T09 的原始客户端/UI 完整行为提前纳入 R02；34 项 R02/R07 责任拆账见 docs/rust-tauri/R02/R02_ACCEPTANCE_LEDGER.json supplemental_leaf_coverage。",
+  "supplementalSemanticLimit": "R15 历史缺陷：21 项原本只用通用认证状态码支撑，无法证明各自原行为。R17 当时图有 18 项 full_original_behavior 定义；R18 给 CLI sessions 与 Web 登录新增完整行为专属证据定义后，当前图共 22 项 full_original_behavior、其余 12 叶仍局部 BLOCKED（6 protocol_basis、5 auth_primitive_only、1 route_basis_present_static）。定义不等于阶段 PASS：当前 CLI help/Sharing 独立生产者 7/7 于其运行快照 PASS，但完整 Gate 未执行；管理原 58 案例曾在旧源码快照 PASS；现静态新增审计路径故障负面案例，门禁共 60 案例且新版尚未运行。当前真 TCP 复跑在 bind 时遭 PermissionDenied、0 案例，状态 BLOCKED；静态页真 TCP 同受该平台限制，先前两轮仅案例本体通过而源码摘要漂移、生产者 FAIL。禁止等效重试。CLI 聊天模型/工具流、移动引导权威源等原断言仍未闭合。34 原叶均保持 REQUIRED，R00 合同与 R02/R07 双归属不变；合法全 Gate、独立验收、封印前不得关闭 R02。",
+  "supplementalLeafScenarios": [
+    {
+      "id": "R00-T02-LA-D3710D637C19",
+      "featureId": "F-D20-CLI-CLI-CHAT-D3710D",
+      "requirement": "REQUIRED_SUPPLEMENTAL",
+      "r00Kind": "supplemental",
+      "r00TaskIds": ["R02-T03", "R07-T09"],
+      "r00ExecutionStageIds": ["R02", "R07"],
+      "r00LedgerStatus": "SPECIFIED_NOT_EXECUTED",
+      "r00ResultIds": [],
+      "r00TestIds": [],
+      "r00Then": "选择或创建会话后通过 WS 提交消息，终端流式显示回复和工具进度",
+      "r00Assertions": [
+        "选择或创建会话后通过 WS 提交消息，终端流式显示回复和工具进度",
+        "连接/身份失败返回非零；错会话帧不显示，Ctrl+C 只取消当前 stream"
+      ],
+      "r00Due": "R00-T07 建立正式账本时登记；最迟在所列实施 Task 的阶段验收前完成并执行",
+      "assertionContract": {
+        "producerCommand": "a05_a06_auth_matrix",
+        "evidencePath": "{EVIDENCE}/A05_A06/leaf-cases.json",
+        "cases": [
+          { "case": "a05-positive-control-owner-execute", "expect": 200 },
+          { "case": "a05-no-credential-execute", "expect": 401 },
+          { "case": "ws-ticket-legit-origin-upgrade", "expect": 101 },
+          { "case": "ws-session-read-owner", "expect": 1 }
+        ]
+      },
+      "basisKind": "protocol_basis",
+      "r02Share": "认证 WS/execute 提交与有序事件流协议面（A05/A06/A09/A10/A15 所证家族；当前候选未执行）",
+      "r07Share": "终端聊天客户端：流式显示回复与工具进度、Ctrl+C 只取消当前 stream、连接/身份失败非零退出",
+      "evidenceRequired": "A05/A06 认证矩阵真实执行证据 + WS/exec 认证正负路径执行记录",
+      "evidenceCommandRefs": ["a05_a06_auth_matrix", "a09_a10_events_matrix", "a15_full_chain"]
+    },
+    {
+      "id": "R00-T02-LA-3B86332B042C",
+      "featureId": "F-D20-CLI-CLI-CONTINUE-3B8633",
+      "requirement": "REQUIRED_SUPPLEMENTAL",
+      "r00Kind": "supplemental",
+      "r00TaskIds": ["R02-T03", "R07-T09"],
+      "r00ExecutionStageIds": ["R02", "R07"],
+      "r00LedgerStatus": "SPECIFIED_NOT_EXECUTED",
+      "r00ResultIds": [],
+      "r00TestIds": [],
+      "r00Then": "解析目标会话后恢复其历史并可继续提交，终端显示该会话回复",
+      "r00Assertions": [
+        "解析目标会话后恢复其历史并可继续提交，终端显示该会话回复",
+        "会话不存在或跨权限时拒绝，不悄悄新建或串到其他会话"
+      ],
+      "r00Due": "R00-T07 建立正式账本时登记；最迟在所列实施 Task 的阶段验收前完成并执行",
+      "assertionContract": {
+        "producerCommand": "a05_a06_auth_matrix",
+        "evidencePath": "{EVIDENCE}/A05_A06/leaf-cases.json",
+        "cases": [
+          { "case": "a05-sessions-list-owner", "expect": 200 },
+          { "case": "a05-cross-principal-read", "expect": 403 },
+          { "case": "a05-forged-session-id", "expect": 404 }
+        ]
+      },
+      "basisKind": "protocol_basis",
+      "r02Share": "认证会话身份与历史读取面（sessions 按 principal 作用域；当前候选未执行）",
+      "r07Share": "CLI 续接命令：目标会话解析、历史恢复显示、会话不存在/跨权限拒绝且不悄悄新建",
+      "evidenceRequired": "A05/A06 认证矩阵真实执行证据 + 认证会话读取正负路径执行记录",
+      "evidenceCommandRefs": ["a05_a06_auth_matrix"]
+    },
+    {
+      "id": "R00-T02-LA-B8A1AD32A8E1",
+      "featureId": "F-D20-CLI-CLI-HELP-B8A1AD",
+      "requirement": "REQUIRED_SUPPLEMENTAL",
+      "r00Kind": "supplemental",
+      "r00TaskIds": ["R02-T03", "R07-T09"],
+      "r00ExecutionStageIds": ["R02", "R07"],
+      "r00LedgerStatus": "SPECIFIED_NOT_EXECUTED",
+      "r00ResultIds": [],
+      "r00TestIds": [],
+      "r00Then": "打印命令与参数说明并以 0 退出",
+      "r00Assertions": [
+        "打印命令与参数说明并以 0 退出",
+        "未知参数打印错误和帮助并以 1 退出；不启动服务"
+      ],
+      "r00Due": "R00-T07 建立正式账本时登记；最迟在所列实施 Task 的阶段验收前完成并执行",
+      "assertionContract": {
+        "producerCommand": "supplemental_client_matrix",
+        "evidencePath": "{EVIDENCE}/CLIENT/leaf-cases.json",
+        "cases": [
+          { "case": "cli-help-exit0-no-start", "expect": 1 },
+          { "case": "cli-unknown-arg-exit1-no-start", "expect": 1 },
+          { "case": "cli-serve-unknown-arg-exit1-no-start", "expect": 1 }
+        ]
+      },
+      "originalAssertionCases": [
+        ["cli-help-exit0-no-start"],
+        ["cli-unknown-arg-exit1-no-start", "cli-serve-unknown-arg-exit1-no-start"]
+      ],
+      "basisKind": "full_original_behavior",
+      "r02Share": "用户已授权把 R07 客户端行为提前纳入 R02：本阶段运行真实 CLI 子进程，逐案核帮助/错误/退出码和合成数据根无服务启动；原 R00 双阶段标注不改",
+      "r07Share": "原排 R07-T09 的完整 CLI help 行为在 R02 提前实测；后续 R07 仍须核新客户端集成，不复用旧候选证据",
+      "evidenceRequired": "本轮 supplemental_client_matrix 真子进程原始 stdout/stderr/exit、合成 home 前后清单、无存活服务进程组与 CLI 正反案例；两条 R00 原断言按 originalAssertionCases 全覆盖",
+      "evidenceCommandRefs": ["supplemental_client_matrix"],
+      "evidencePaths": ["{EVIDENCE}/CLIENT/summary.json"]
+    },
+    {
+      "id": "R00-T02-LA-1B09760C2B1C",
+      "featureId": "F-D20-CLI-CLI-SERVE-1B0976",
+      "requirement": "REQUIRED_SUPPLEMENTAL",
+      "r00Kind": "supplemental",
+      "r00TaskIds": ["R02-T03", "R07-T09"],
+      "r00ExecutionStageIds": ["R02", "R07"],
+      "r00LedgerStatus": "SPECIFIED_NOT_EXECUTED",
+      "r00ResultIds": [],
+      "r00TestIds": [],
+      "r00Then": "以前台服务进程运行，保留指定 channel 与数据降级约束",
+      "r00Assertions": [
+        "以前台服务进程运行，保留指定 channel 与数据降级约束",
+        "启动/数据版本失败给错误，不偷偷切换数据目录"
+      ],
+      "r00Due": "R00-T07 建立正式账本时登记；最迟在所列实施 Task 的阶段验收前完成并执行",
+      "assertionContract": {
+        "producerCommand": "supplemental_cli_rust_matrix",
+        "evidencePath": "{EVIDENCE}/CLI_RUST/cli-rust-cases.json",
+        "cases": [
+          { "case": "cli-rust-current-binary-build", "expect": 1 },
+          { "case": "cli-rust-candidate-unchanged-during-probe", "expect": 1 },
+          { "case": "cli-rust-serve-ready", "expect": 1 },
+          { "case": "cli-rust-channel-stable-selected", "expect": 1 },
+          { "case": "cli-rust-serve-sigterm-clean", "expect": 1 },
+          { "case": "cli-rust-serve-beta-no-silent-stable", "expect": 1 },
+          { "case": "cli-rust-serve-downgrade-refused", "expect": 1 },
+          { "case": "cli-rust-serve-startup-error", "expect": 1 },
+          { "case": "cli-rust-serve-newer-epoch-no-root-switch", "expect": 1 }
+        ],
+        "originalAssertionCases": [
+          ["cli-rust-current-binary-build", "cli-rust-serve-ready", "cli-rust-channel-stable-selected", "cli-rust-serve-sigterm-clean", "cli-rust-serve-beta-no-silent-stable", "cli-rust-serve-downgrade-refused"],
+          ["cli-rust-serve-startup-error", "cli-rust-serve-newer-epoch-no-root-switch", "cli-rust-candidate-unchanged-during-probe"]
+        ]
+      },
+      "basisKind": "full_original_behavior",
+      "r02Share": "用户已授权把原排 R07 的 CLI serve 行为提前纳入 R02；本轮专属真实 CLI→Rust 服务检查前台进程、显式 stable channel、缺失 beta 不回落、降级拒绝、启动/数据版本失败与数据根不切换",
+      "r07Share": "原排 R07 的 serve 客户端行为在 R02 提前实施；R07 新客户端集成仍须按届时正式候选重验",
+      "evidenceRequired": "本轮 supplemental_cli_rust_matrix 由当前源码构建隔离 Rust 服务，保留 CLI 原始 stdout/stderr、前后台进程身份和清理、指定 channel 与拒绝分支、原数据及备用根前后摘要；原两条断言由门禁逐项读取，真 TCP 获平台允许并运行前不得 PASS",
+      "evidenceCommandRefs": ["supplemental_cli_rust_matrix", "a01_smoke", "a02_boundary_negative", "a03_dual_instance"],
+      "evidencePaths": ["{EVIDENCE}/CLI_RUST/cli-rust-cases.json"]
+    },
+    {
+      "id": "R00-T02-LA-200D4E5D52C9",
+      "featureId": "F-D20-CLI-CLI-SESSIONS-200D4E",
+      "requirement": "REQUIRED_SUPPLEMENTAL",
+      "r00Kind": "supplemental",
+      "r00TaskIds": ["R02-T03", "R07-T09"],
+      "r00ExecutionStageIds": ["R02", "R07"],
+      "r00LedgerStatus": "SPECIFIED_NOT_EXECUTED",
+      "r00ResultIds": [],
+      "r00TestIds": [],
+      "r00Then": "从已认证服务读取并列出最多 20 个会话；空列表显示 No sessions yet",
+      "r00Assertions": [
+        "从已认证服务读取并列出最多 20 个会话；空列表显示 No sessions yet",
+        "服务未连接或未授权时返回错误，不读取其他主体会话"
+      ],
+      "r00Due": "R00-T07 建立正式账本时登记；最迟在所列实施 Task 的阶段验收前完成并执行",
+      "assertionContract": {
+        "producerCommand": "supplemental_cli_sessions_matrix",
+        "evidencePath": "{EVIDENCE}/CLI_SESSIONS/cli-sessions-cases.json",
+        "cases": [
+          { "case": "a05-sessions-list-owner", "expect": 200 },
+          { "case": "a05-sessions-list-owner-contains-own-session", "expect": 1 },
+          { "case": "a05-sessions-list-foreign-principal", "expect": 200 },
+          { "case": "a05-sessions-list-foreign-excludes-owner-sessions", "expect": 0 },
+          { "case": "a05-sessions-list-empty-shape", "expect": 1 },
+          { "case": "a05-sessions-list-no-credential", "expect": 401 },
+          { "case": "a05-cli-sessions-owner-list", "expect": 1 },
+          { "case": "a05-cli-sessions-foreign-empty", "expect": 1 },
+          { "case": "a05-cli-sessions-unauthorized-error", "expect": 1 },
+          { "case": "a05-cli-sessions-limit-20", "expect": 1 }
+        ]
+      },
+      "originalAssertionCases": [
+        ["a05-sessions-list-owner", "a05-sessions-list-owner-contains-own-session", "a05-sessions-list-foreign-principal", "a05-sessions-list-empty-shape", "a05-cli-sessions-owner-list", "a05-cli-sessions-foreign-empty", "a05-cli-sessions-limit-20"],
+        ["a05-sessions-list-foreign-excludes-owner-sessions", "a05-sessions-list-no-credential", "a05-cli-sessions-unauthorized-error"]
+      ],
+      "basisKind": "full_original_behavior",
+      "r02Share": "提前完成认证会话列表与 CLI 消费者：真实服务 owner/foreign/无凭据隔离和 CLI 显示；最多 20 条另由真实 CLI 入口消费模拟 25 条成功响应核渲染上限，本轮真实运行前仍未验收",
+      "r07Share": "后续 CLI 阶段维持并重新核验会话列表行为，不代替本阶段原始 due",
+      "evidenceRequired": "专属 supplemental_cli_sessions_matrix 本轮真服务与 CLI 的 owner/foreign/无凭据原始输出；最多 20 条由真实 CLI 入口消费模拟 25 条成功响应仅核渲染分支，不冒充服务端 25 条；cli-sessions-cases.json 每案例由门禁核身份和实际值，真实 TCP 未获准前不得 PASS",
+      "evidenceCommandRefs": ["supplemental_cli_sessions_matrix"],
+      "evidencePaths": ["{EVIDENCE}/CLI_SESSIONS/summary.json", "{EVIDENCE}/CLI_SESSIONS/auth/sessions-list-matrix.json"]
+    },
+    {
+      "id": "R00-T02-LA-EEC1A2A5CD04",
+      "featureId": "F-D20-CLI-CLI-STATUS-EEC1A2",
+      "requirement": "REQUIRED_SUPPLEMENTAL",
+      "r00Kind": "supplemental",
+      "r00TaskIds": ["R02-T03", "R07-T09"],
+      "r00ExecutionStageIds": ["R02", "R07"],
+      "r00LedgerStatus": "SPECIFIED_NOT_EXECUTED",
+      "r00ResultIds": [],
+      "r00TestIds": [],
+      "r00Then": "显示 URL、版本、Studio、Agent、模型和认证来源",
+      "r00Assertions": [
+        "显示 URL、版本、Studio、Agent、模型和认证来源",
+        "服务不可达时返回诊断错误；身份读取失败可用健康信息但不伪造认证来源"
+      ],
+      "r00Due": "R00-T07 建立正式账本时登记；最迟在所列实施 Task 的阶段验收前完成并执行",
+      "assertionContract": {
+        "producerCommand": "a05_a06_auth_matrix",
+        "evidencePath": "{EVIDENCE}/A05_A06/leaf-cases.json",
+        "cases": [
+          { "case": "a05-no-credential-me", "expect": 401 },
+          { "case": "a05-me-with-forged-header", "expect": 200 },
+          { "case": "a06-localhost-host-ok", "expect": 200 },
+          { "case": "a06-cli-query-token-local", "expect": 200 }
+        ]
+      },
+      "basisKind": "protocol_basis",
+      "r02Share": "/lingxi/v1/health + /lingxi/v1/me + 本地 token 来源机制（当前候选未执行）",
+      "r07Share": "CLI 状态命令：URL/版本/Studio/Agent/模型/认证来源显示、不可达诊断、身份读取失败不伪造认证来源",
+      "evidenceRequired": "A05/A06 认证矩阵真实执行证据 + /health、/me 认证路径执行记录",
+      "evidenceCommandRefs": ["a05_a06_auth_matrix"]
+    },
+    {
+      "id": "R00-T02-LA-D1BEE19A95BB",
+      "featureId": "F-D20-DESKTOP_BEHAVIOR-DESKTOP-BEHAVIOR-SERVICE-CONNECTION-D1BEE1",
+      "requirement": "REQUIRED_SUPPLEMENTAL",
+      "r00Kind": "supplemental",
+      "r00TaskIds": ["R02-T03", "R07-T09"],
+      "r00ExecutionStageIds": ["R02", "R07"],
+      "r00LedgerStatus": "SPECIFIED_NOT_EXECUTED",
+      "r00ResultIds": [],
+      "r00TestIds": [],
+      "r00Then": "端口/短期令牌传给 renderer 后 HTTP/WS 连接可建立",
+      "r00Assertions": [
+        "端口/短期令牌传给 renderer 后 HTTP/WS 连接可建立",
+        "服务重启需重取端口/令牌；令牌不应当作用户可见设置"
+      ],
+      "r00Due": "R00-T07 建立正式账本时登记；最迟在所列实施 Task 的阶段验收前完成并执行",
+      "assertionContract": {
+        "producerCommand": "a05_a06_auth_matrix",
+        "evidencePath": "{EVIDENCE}/A05_A06/leaf-cases.json",
+        "cases": [
+          { "case": "a05-ws-ticket-issue-owner", "expect": 200 },
+          { "case": "a05-no-credential-ws-ticket", "expect": 403 },
+          { "case": "ws-ticket-legit-origin-upgrade", "expect": 101 }
+        ]
+      },
+      "basisKind": "protocol_basis",
+      "r02Share": "本地 token 引导与 ws-ticket 短期凭证签发原语（当前候选未执行）",
+      "r07Share": "桌面壳 renderer 端口/短期令牌接线、HTTP/WS 连接建立、重启重取、令牌不作用户可见设置",
+      "evidenceRequired": "A05/A06 认证矩阵真实执行证据 + ws-ticket 签发/消费执行记录",
+      "evidenceCommandRefs": ["a05_a06_auth_matrix"]
+    },
+    {
+      "id": "R00-T02-LA-5816DA563ED8",
+      "featureId": "F-D20-SEMANTIC_EFFECT-SEMANTIC-EFFECT-WS-AUTH-WS-TICKET-WEBSOCKET-5816DA",
+      "requirement": "REQUIRED_SUPPLEMENTAL",
+      "r00Kind": "supplemental",
+      "r00TaskIds": ["R02-T03", "R07-T09"],
+      "r00ExecutionStageIds": ["R02", "R07"],
+      "r00LedgerStatus": "SPECIFIED_NOT_EXECUTED",
+      "r00ResultIds": [],
+      "r00TestIds": [],
+      "r00Then": "读取已认证主体并签发绑定连接类型及 /ws 的短期票据；无主体返回 403",
+      "r00Assertions": [
+        "给定目标与相应权限，执行“签发 WebSocket 临时票据”后核对：读取已认证主体并签发绑定连接类型及 /ws 的短期票据；无主体返回 403",
+        "输入无效、权限不足或下游失败时应返回明确错误，不呈现成功结果"
+      ],
+      "r00Due": "R00-T07 建立正式账本时登记；最迟在所列实施 Task 的阶段验收前完成并执行",
+      "assertionContract": {
+        "producerCommand": "a05_a06_auth_matrix",
+        "evidencePath": "{EVIDENCE}/A05_A06/leaf-cases.json",
+        "cases": [
+          { "case": "a05-no-credential-ws-ticket", "expect": 403 },
+          { "case": "a05-ws-ticket-issue-owner", "expect": 200 },
+          { "case": "a05-ws-ticket-insufficient-scope", "expect": 403 },
+          { "case": "ws-ticket-replay", "expect": 401 },
+          { "case": "ws-ticket-expired", "expect": 401 }
+        ]
+      },
+      "basisKind": "route_basis_present_static",
+      "r02Share": "POST /lingxi/v1/ws-ticket：读取已认证主体签发绑定连接类型及 /ws 的短期票据、无主体 403（路由在现行源码静态可见；未执行验收）",
+      "r07Share": "客户端票据消费与端到端连接行为（完整入口）",
+      "evidenceRequired": "该路由认证正负矩阵执行记录（无主体 403、绑定作用域）+ A05/A06 矩阵证据。R14-F01 闭环：服务已按 R00 原断言将无主体 POST /lingxi/v1/ws-ticket 改为 403（incumbent server/routes/ws-auth.ts 同行为），注册脚本 a05-no-credential-ws-ticket 断言 403，且本叶 assertionContract 由 verify-stage 机器消费该案例的实际值（actual==403）——命令 exit 0 本身不再足以判定本叶",
+      "evidenceCommandRefs": ["a05_a06_auth_matrix"]
+    },
+    {
+      "id": "R00-T02-LA-093F22C4FF63",
+      "featureId": "F-D20-SEMANTIC_EFFECT-SEMANTIC-EFFECT-ACCESS-ACCESS-DESKTOP-CREDENTIAL-093F22",
+      "requirement": "REQUIRED_SUPPLEMENTAL",
+      "r00Kind": "supplemental",
+      "r00TaskIds": ["R02-T03", "R07-T09"],
+      "r00ExecutionStageIds": ["R02", "R07"],
+      "r00LedgerStatus": "SPECIFIED_NOT_EXECUTED",
+      "r00ResultIds": [],
+      "r00TestIds": [],
+      "r00Then": "登记设备/凭证并返回一次性 secret 和桌面访问地址",
+      "r00Assertions": [
+        "成功时核对：登记设备/凭证并返回一次性 secret 和桌面访问地址",
+        "拒绝/无效输入时核对：无越权或错误持久化，且错误对用户可见"
+      ],
+      "r00Due": "R00-T07 建立正式账本时登记；最迟在所列实施 Task 的阶段验收前完成并执行",
+      "assertionContract": {
+        "producerCommand": "supplemental_management_matrix",
+        "evidencePath": "{EVIDENCE}/MANAGEMENT/management-cases.json",
+        "cases": [
+          {
+            "case": "management-desktop-credential-secret-address-audit",
+            "expect": 1
+          },
+          {
+            "case": "management-desktop-credential-invalid-unauthorized-unchanged",
+            "expect": 1
+          },
+          {
+            "case": "management-desktop-credential-store-failure-no-secret",
+            "expect": 1
+          },
+          {
+            "case": "management-standard-audit-path-failure-no-write-recovery",
+            "expect": 1
+          },
+          {
+            "case": "management-standard-audit-all-actions-identities-no-secrets",
+            "expect": 1
+          }
+        ]
+      },
+      "originalAssertionCases": [
+        ["management-desktop-credential-secret-address-audit", "management-standard-audit-all-actions-identities-no-secrets"],
+        ["management-desktop-credential-invalid-unauthorized-unchanged", "management-desktop-credential-store-failure-no-secret", "management-standard-audit-path-failure-no-write-recovery"]
+      ],
+      "basisKind": "full_original_behavior",
+      "r02Share": "本轮真服务生产者同时核业务正反、失败副作用与标准安全审计 JSONL 的主体/目标/动作/关联 metadata、无 secret 和重启去重",
+      "r07Share": "原排 R07 的客户端投影仍须在后续客户端阶段按实际候选核验；R02 本叶已提前接入真实服务行为证据",
+      "evidenceRequired": "本轮 supplemental_management_matrix 专属正反案例与标准安全审计 JSONL 全量逐意图对照；原 R00 两条断言按 originalAssertionCases 全覆盖，生产者原始日志/源码摘要/退出状态须有效",
+      "evidenceCommandRefs": ["supplemental_management_matrix"],
+      "evidencePaths": ["{EVIDENCE}/MANAGEMENT/summary.json"]
+    },
+    {
+      "id": "R00-T02-LA-747E0ADC941B",
+      "featureId": "F-D20-SEMANTIC_EFFECT-SEMANTIC-EFFECT-ACCESS-ACCESS-MOBILE-CREDENTIALS-747E0A",
+      "requirement": "REQUIRED_SUPPLEMENTAL",
+      "r00Kind": "supplemental",
+      "r00TaskIds": ["R02-T03", "R07-T09"],
+      "r00ExecutionStageIds": ["R02", "R07"],
+      "r00LedgerStatus": "SPECIFIED_NOT_EXECUTED",
+      "r00ResultIds": [],
+      "r00TestIds": [],
+      "r00Then": "登记设备/凭证并返回一次性 secret 和手机访问地址",
+      "r00Assertions": [
+        "成功时核对：登记设备/凭证并返回一次性 secret 和手机访问地址",
+        "拒绝/无效输入时核对：无越权或错误持久化，且错误对用户可见"
+      ],
+      "r00Due": "R00-T07 建立正式账本时登记；最迟在所列实施 Task 的阶段验收前完成并执行",
+      "assertionContract": {
+        "producerCommand": "supplemental_management_matrix",
+        "evidencePath": "{EVIDENCE}/MANAGEMENT/management-cases.json",
+        "cases": [
+          {
+            "case": "management-mobile-credential-secret-address-audit",
+            "expect": 1
+          },
+          {
+            "case": "management-mobile-credential-invalid-unauthorized-unchanged",
+            "expect": 1
+          },
+          {
+            "case": "management-mobile-credential-store-failure-no-secret",
+            "expect": 1
+          },
+          {
+            "case": "management-standard-audit-path-failure-no-write-recovery",
+            "expect": 1
+          },
+          {
+            "case": "management-standard-audit-all-actions-identities-no-secrets",
+            "expect": 1
+          }
+        ]
+      },
+      "originalAssertionCases": [
+        ["management-mobile-credential-secret-address-audit", "management-standard-audit-all-actions-identities-no-secrets"],
+        ["management-mobile-credential-invalid-unauthorized-unchanged", "management-mobile-credential-store-failure-no-secret", "management-standard-audit-path-failure-no-write-recovery"]
+      ],
+      "basisKind": "full_original_behavior",
+      "r02Share": "本轮真服务生产者同时核业务正反、失败副作用与标准安全审计 JSONL 的主体/目标/动作/关联 metadata、无 secret 和重启去重",
+      "r07Share": "原排 R07 的客户端投影仍须在后续客户端阶段按实际候选核验；R02 本叶已提前接入真实服务行为证据",
+      "evidenceRequired": "本轮 supplemental_management_matrix 专属正反案例与标准安全审计 JSONL 全量逐意图对照；原 R00 两条断言按 originalAssertionCases 全覆盖，生产者原始日志/源码摘要/退出状态须有效",
+      "evidenceCommandRefs": ["supplemental_management_matrix"],
+      "evidencePaths": ["{EVIDENCE}/MANAGEMENT/summary.json"]
+    },
+    {
+      "id": "R00-T02-LA-4BCE8CCFD5DC",
+      "featureId": "F-D20-SEMANTIC_EFFECT-SEMANTIC-EFFECT-SERVER-IDENTITY-SERVER-IDENTITY--4BCE8C",
+      "requirement": "REQUIRED_SUPPLEMENTAL",
+      "r00Kind": "supplemental",
+      "r00TaskIds": ["R02-T03", "R07-T09"],
+      "r00ExecutionStageIds": ["R02", "R07"],
+      "r00LedgerStatus": "SPECIFIED_NOT_EXECUTED",
+      "r00ResultIds": [],
+      "r00TestIds": [],
+      "r00Then": "返回版本、身份及按 principal 投影的能力",
+      "r00Assertions": [
+        "成功时核对：返回版本、身份及按 principal 投影的能力",
+        "拒绝/无效输入时核对：无越权或错误持久化，且错误对用户可见"
+      ],
+      "r00Due": "R00-T07 建立正式账本时登记；最迟在所列实施 Task 的阶段验收前完成并执行",
+      "assertionContract": {
+        "producerCommand": "supplemental_management_matrix",
+        "evidencePath": "{EVIDENCE}/MANAGEMENT/management-cases.json",
+        "cases": [
+          { "case": "management-me-owner-version-identity-capabilities", "expect": 1 },
+          { "case": "management-me-device-version-identity-capabilities", "expect": 1 },
+          { "case": "management-me-forged-header-ignored", "expect": 1 },
+          { "case": "management-me-denied-no-state-change", "expect": 1 }
+        ]
+      },
+      "originalAssertionCases": [
+        ["management-me-owner-version-identity-capabilities", "management-me-device-version-identity-capabilities"],
+        ["management-me-forged-header-ignored", "management-me-denied-no-state-change"]
+      ],
+      "basisKind": "full_original_behavior",
+      "r02Share": "用户授权提前完整实施并验证本叶：真服务 /me 核版本、双主体身份与按 scopes 投影的能力，拒绝时逐字节核凭证库无变化",
+      "r07Share": "原排 R07 的客户端身份呈现仍需在后续客户端阶段按当前候选核验；R02 本叶已提前登记完整真服务正反行为",
+      "evidenceRequired": "supplemental_management_matrix 真服务专属 /me 主人及设备投影、伪身份和无凭证拒绝的逐项结构化证据与管理/凭证存储前后对照，当前候选合法运行后方可通过",
+      "evidenceCommandRefs": ["supplemental_management_matrix", "a05_a06_auth_matrix"],
+      "evidencePaths": ["{EVIDENCE}/MANAGEMENT/management-cases.json", "{EVIDENCE}/MANAGEMENT/summary.json"]
+    },
+    {
+      "id": "R00-T02-LA-D2657E4AB5FF",
+      "featureId": "F-D20-UI_BEHAVIOR-UI-BEHAVIOR-SERVICE-CONNECTIVITY-D2657E",
+      "requirement": "REQUIRED_SUPPLEMENTAL",
+      "r00Kind": "supplemental",
+      "r00TaskIds": ["R02-T03", "R07-T09"],
+      "r00ExecutionStageIds": ["R02", "R07"],
+      "r00LedgerStatus": "SPECIFIED_NOT_EXECUTED",
+      "r00ResultIds": [],
+      "r00TestIds": [],
+      "r00Then": "连接状态、失败原因与重连结果在 UI 可见",
+      "r00Assertions": [
+        "连接状态、失败原因与重连结果在 UI 可见",
+        "端口/令牌无效、服务重启时显示断开并重试；不能静默假在线"
+      ],
+      "r00Due": "R00-T07 建立正式账本时登记；最迟在所列实施 Task 的阶段验收前完成并执行",
+      "assertionContract": {
+        "producerCommand": "a05_a06_auth_matrix",
+        "evidencePath": "{EVIDENCE}/A05_A06/leaf-cases.json",
+        "cases": [
+          { "case": "a06-foreign-host-health", "expect": 403 },
+          { "case": "a06-evil-origin-health", "expect": 403 },
+          { "case": "a06-localhost-host-ok", "expect": 200 },
+          { "case": "a06-evil-origin-with-valid-token", "expect": 403 }
+        ]
+      },
+      "basisKind": "protocol_basis",
+      "r02Share": "/health 与显式拒绝/失败码面（UI 判定连接状态的依据；当前候选未执行）",
+      "r07Share": "连接状态、失败原因与重连结果的完整 UI 行为（断开显示与重试、不静默假在线）",
+      "evidenceRequired": "A05/A06 + /health 执行记录（显式失败码）",
+      "evidenceCommandRefs": ["a05_a06_auth_matrix"]
+    },
+    {
+      "id": "R00-T02-LA-25AB678E7108",
+      "featureId": "F-D20-ROUTE_BEHAVIOR-BEHAVIOR-ACCESS-ACCESS-ACCOUNT-PASSWORD-DELETE-25AB67",
+      "requirement": "REQUIRED_SUPPLEMENTAL",
+      "r00Kind": "supplemental",
+      "r00TaskIds": ["R02-T03", "R07-T09"],
+      "r00ExecutionStageIds": ["R02", "R07"],
+      "r00LedgerStatus": "SPECIFIED_NOT_EXECUTED",
+      "r00ResultIds": [],
+      "r00TestIds": [],
+      "r00Then": "仅本地主人可清除密码；更新账号并记录安全审计，失败时返回错误",
+      "r00Assertions": [
+        "执行“移除本地账号密码”后核对：仅本地主人可清除密码；更新账号并记录安全审计，失败时返回错误",
+        "失败、冲突或拒绝时核对返回的状态与实际副作用一致"
+      ],
+      "r00Due": "R00-T07 建立正式账本时登记；最迟在所列实施 Task 的阶段验收前完成并执行",
+      "assertionContract": {
+        "producerCommand": "supplemental_management_matrix",
+        "evidencePath": "{EVIDENCE}/MANAGEMENT/management-cases.json",
+        "cases": [
+          {
+            "case": "management-password-clear-account-audit",
+            "expect": 1
+          },
+          {
+            "case": "management-password-clear-unauthorized-keeps-prior",
+            "expect": 1
+          },
+          {
+            "case": "management-password-clear-store-failure-unchanged",
+            "expect": 1
+          },
+          {
+            "case": "management-standard-audit-path-failure-no-write-recovery",
+            "expect": 1
+          },
+          {
+            "case": "management-standard-audit-all-actions-identities-no-secrets",
+            "expect": 1
+          }
+        ]
+      },
+      "originalAssertionCases": [
+        ["management-password-clear-account-audit", "management-standard-audit-all-actions-identities-no-secrets"],
+        ["management-password-clear-unauthorized-keeps-prior", "management-password-clear-store-failure-unchanged", "management-standard-audit-path-failure-no-write-recovery"]
+      ],
+      "basisKind": "full_original_behavior",
+      "r02Share": "本轮真服务生产者同时核业务正反、失败副作用与标准安全审计 JSONL 的主体/目标/动作/关联 metadata、无 secret 和重启去重",
+      "r07Share": "原排 R07 的客户端投影仍须在后续客户端阶段按实际候选核验；R02 本叶已提前接入真实服务行为证据",
+      "evidenceRequired": "本轮 supplemental_management_matrix 专属正反案例与标准安全审计 JSONL 全量逐意图对照；原 R00 两条断言按 originalAssertionCases 全覆盖，生产者原始日志/源码摘要/退出状态须有效",
+      "evidenceCommandRefs": ["supplemental_management_matrix"],
+      "evidencePaths": ["{EVIDENCE}/MANAGEMENT/summary.json"]
+    },
+    {
+      "id": "R00-T02-LA-F1754C6F755B",
+      "featureId": "F-D20-ROUTE_BEHAVIOR-BEHAVIOR-ACCESS-ACCESS-ACCOUNT-PASSWORD-PUT-F1754C",
+      "requirement": "REQUIRED_SUPPLEMENTAL",
+      "r00Kind": "supplemental",
+      "r00TaskIds": ["R02-T03", "R07-T09"],
+      "r00ExecutionStageIds": ["R02", "R07"],
+      "r00LedgerStatus": "SPECIFIED_NOT_EXECUTED",
+      "r00ResultIds": [],
+      "r00TestIds": [],
+      "r00Then": "仅本地主人可设置密码；更新账号并记录安全审计，失败时返回错误",
+      "r00Assertions": [
+        "执行“设置本地账号密码”后核对：仅本地主人可设置密码；更新账号并记录安全审计，失败时返回错误",
+        "失败、冲突或拒绝时核对返回的状态与实际副作用一致"
+      ],
+      "r00Due": "R00-T07 建立正式账本时登记；最迟在所列实施 Task 的阶段验收前完成并执行",
+      "assertionContract": {
+        "producerCommand": "supplemental_management_matrix",
+        "evidencePath": "{EVIDENCE}/MANAGEMENT/management-cases.json",
+        "cases": [
+          {
+            "case": "management-password-set-account-audit",
+            "expect": 1
+          },
+          {
+            "case": "management-password-invalid-keeps-prior",
+            "expect": 1
+          },
+          {
+            "case": "management-password-set-store-failure-unchanged",
+            "expect": 1
+          },
+          {
+            "case": "management-standard-audit-path-failure-no-write-recovery",
+            "expect": 1
+          },
+          {
+            "case": "management-standard-audit-all-actions-identities-no-secrets",
+            "expect": 1
+          }
+        ]
+      },
+      "originalAssertionCases": [
+        ["management-password-set-account-audit", "management-standard-audit-all-actions-identities-no-secrets"],
+        ["management-password-invalid-keeps-prior", "management-password-set-store-failure-unchanged", "management-standard-audit-path-failure-no-write-recovery"]
+      ],
+      "basisKind": "full_original_behavior",
+      "r02Share": "本轮真服务生产者同时核业务正反、失败副作用与标准安全审计 JSONL 的主体/目标/动作/关联 metadata、无 secret 和重启去重",
+      "r07Share": "原排 R07 的客户端投影仍须在后续客户端阶段按实际候选核验；R02 本叶已提前接入真实服务行为证据",
+      "evidenceRequired": "本轮 supplemental_management_matrix 专属正反案例与标准安全审计 JSONL 全量逐意图对照；原 R00 两条断言按 originalAssertionCases 全覆盖，生产者原始日志/源码摘要/退出状态须有效",
+      "evidenceCommandRefs": ["supplemental_management_matrix"],
+      "evidencePaths": ["{EVIDENCE}/MANAGEMENT/summary.json"]
+    },
+    {
+      "id": "R00-T02-LA-F006E094F028",
+      "featureId": "F-D20-SEMANTIC_EFFECT-SEMANTIC-EFFECT-ACCESS-ACCESS-ACCOUNT-PROFILE-PU-F006E0",
+      "requirement": "REQUIRED_SUPPLEMENTAL",
+      "r00Kind": "supplemental",
+      "r00TaskIds": ["R02-T03", "R07-T09"],
+      "r00ExecutionStageIds": ["R02", "R07"],
+      "r00LedgerStatus": "SPECIFIED_NOT_EXECUTED",
+      "r00ResultIds": [],
+      "r00TestIds": [],
+      "r00Then": "保存 username/displayName 并返回 account",
+      "r00Assertions": [
+        "成功时核对：保存 username/displayName 并返回 account",
+        "拒绝/无效输入时核对：无越权或错误持久化，且错误对用户可见"
+      ],
+      "r00Due": "R00-T07 建立正式账本时登记；最迟在所列实施 Task 的阶段验收前完成并执行",
+      "assertionContract": {
+        "producerCommand": "supplemental_management_matrix",
+        "evidencePath": "{EVIDENCE}/MANAGEMENT/management-cases.json",
+        "cases": [
+          {
+            "case": "management-profile-success-account-audit",
+            "expect": 1
+          },
+          {
+            "case": "management-profile-invalid-and-unauthorized-unchanged",
+            "expect": 1
+          },
+          {
+            "case": "management-profile-store-failure-unchanged",
+            "expect": 1
+          }
+        ]
+      },
+      "originalAssertionCases": [
+        [
+          "management-profile-success-account-audit"
+        ],
+        [
+          "management-profile-invalid-and-unauthorized-unchanged",
+          "management-profile-store-failure-unchanged"
+        ]
+      ],
+      "basisKind": "full_original_behavior",
+      "r02Share": "用户授权提前完整实施并验证本叶原始 R00 行为；真服务管理入口与负面副作用由专属生产者逐案检查",
+      "r07Share": "原排 R07 的客户端投影仍须在后续客户端阶段按实际候选核验；R02 本叶已提前接入真实服务行为证据",
+      "evidenceRequired": "本轮 supplemental_management_matrix 真服务 TCP 管理入口正反分支、合成数据根前后持久化、源摘要及原始日志；原 R00 两条断言按 originalAssertionCases 全覆盖",
+      "evidenceCommandRefs": ["supplemental_management_matrix"],
+      "evidencePaths": ["{EVIDENCE}/MANAGEMENT/summary.json"]
+    },
+    {
+      "id": "R00-T02-LA-73CDC44696D3",
+      "featureId": "F-D20-SEMANTIC_EFFECT-SEMANTIC-EFFECT-ACCESS-ACCESS-NETWORK-PUT-73CDC4",
+      "requirement": "REQUIRED_SUPPLEMENTAL",
+      "r00Kind": "supplemental",
+      "r00TaskIds": ["R02-T03", "R07-T09"],
+      "r00ExecutionStageIds": ["R02", "R07"],
+      "r00LedgerStatus": "SPECIFIED_NOT_EXECUTED",
+      "r00ResultIds": [],
+      "r00TestIds": [],
+      "r00Then": "保存网络配置、更新运行时摘要与安全审计",
+      "r00Assertions": [
+        "成功时核对：保存网络配置、更新运行时摘要与安全审计",
+        "拒绝/无效输入时核对：无越权或错误持久化，且错误对用户可见"
+      ],
+      "r00Due": "R00-T07 建立正式账本时登记；最迟在所列实施 Task 的阶段验收前完成并执行",
+      "assertionContract": {
+        "producerCommand": "supplemental_management_matrix",
+        "evidencePath": "{EVIDENCE}/MANAGEMENT/management-cases.json",
+        "cases": [
+          {
+            "case": "management-network-success-summary-audit",
+            "expect": 1
+          },
+          {
+            "case": "management-network-invalid-and-unauthorized-unchanged",
+            "expect": 1
+          },
+          {
+            "case": "management-network-store-failure-unchanged",
+            "expect": 1
+          },
+          {
+            "case": "management-standard-audit-path-failure-no-write-recovery",
+            "expect": 1
+          },
+          {
+            "case": "management-standard-audit-all-actions-identities-no-secrets",
+            "expect": 1
+          },
+          {
+            "case": "management-network-saved-restart-real-bind-no-audit-duplicate",
+            "expect": 1
+          },
+          {
+            "case": "management-network-cli-override-real-bind",
+            "expect": 1
+          },
+          {
+            "case": "management-network-corrupt-saved-settings-refused",
+            "expect": 1
+          }
+        ]
+      },
+      "originalAssertionCases": [
+        ["management-network-success-summary-audit", "management-standard-audit-all-actions-identities-no-secrets", "management-network-saved-restart-real-bind-no-audit-duplicate", "management-network-cli-override-real-bind"],
+        ["management-network-invalid-and-unauthorized-unchanged", "management-network-store-failure-unchanged", "management-network-corrupt-saved-settings-refused", "management-standard-audit-path-failure-no-write-recovery"]
+      ],
+      "basisKind": "full_original_behavior",
+      "r02Share": "本轮真服务生产者同时核业务正反、失败副作用与标准安全审计 JSONL 的主体/目标/动作/关联 metadata、无 secret 和重启去重",
+      "r07Share": "原排 R07 的客户端投影仍须在后续客户端阶段按实际候选核验；R02 本叶已提前接入真实服务行为证据",
+      "evidenceRequired": "本轮 supplemental_management_matrix 专属正反案例与标准安全审计 JSONL 全量逐意图对照；原 R00 两条断言按 originalAssertionCases 全覆盖，生产者原始日志/源码摘要/退出状态须有效",
+      "evidenceCommandRefs": ["supplemental_management_matrix"],
+      "evidencePaths": ["{EVIDENCE}/MANAGEMENT/summary.json"]
+    },
+    {
+      "id": "R00-T02-LA-5E4A9CF58BED",
+      "featureId": "F-D20-SEMANTIC_EFFECT-SEMANTIC-EFFECT-ACCESS-ACCESS-MOBILE-QR-SVG-READ-5E4A9C",
+      "requirement": "REQUIRED_SUPPLEMENTAL",
+      "r00Kind": "supplemental",
+      "r00TaskIds": ["R02-T03", "R07-T09"],
+      "r00ExecutionStageIds": ["R02", "R07"],
+      "r00LedgerStatus": "SPECIFIED_NOT_EXECUTED",
+      "r00ResultIds": [],
+      "r00TestIds": [],
+      "r00Then": "返回手机访问地址 SVG，LAN 地址不可用为 400",
+      "r00Assertions": [
+        "成功时核对：返回手机访问地址 SVG，LAN 地址不可用为 400",
+        "拒绝/无效输入时核对：无越权或错误持久化，且错误对用户可见"
+      ],
+      "r00Due": "R00-T07 建立正式账本时登记；最迟在所列实施 Task 的阶段验收前完成并执行",
+      "assertionContract": {
+        "producerCommand": "supplemental_management_matrix",
+        "evidencePath": "{EVIDENCE}/MANAGEMENT/management-cases.json",
+        "cases": [
+          {
+            "case": "management-mobile-qr-svg-present",
+            "expect": 1
+          },
+          {
+            "case": "management-mobile-qr-lan-unavailable-refused",
+            "expect": 1
+          },
+          {
+            "case": "management-mobile-qr-unauthorized-no-svg",
+            "expect": 1
+          }
+        ]
+      },
+      "originalAssertionCases": [
+        [
+          "management-mobile-qr-svg-present",
+          "management-mobile-qr-lan-unavailable-refused"
+        ],
+        [
+          "management-mobile-qr-unauthorized-no-svg"
+        ]
+      ],
+      "basisKind": "full_original_behavior",
+      "r02Share": "用户授权提前完整实施并验证本叶原始 R00 行为；真服务管理入口与负面副作用由专属生产者逐案检查",
+      "r07Share": "原排 R07 的客户端投影仍须在后续客户端阶段按实际候选核验；R02 本叶已提前接入真实服务行为证据",
+      "evidenceRequired": "本轮 supplemental_management_matrix 真服务 TCP 管理入口正反分支、合成数据根前后持久化、源摘要及原始日志；原 R00 两条断言按 originalAssertionCases 全覆盖",
+      "evidenceCommandRefs": ["supplemental_management_matrix"],
+      "evidencePaths": ["{EVIDENCE}/MANAGEMENT/summary.json"]
+    },
+    {
+      "id": "R00-T02-LA-229B77A7BA69",
+      "featureId": "F-D20-SEMANTIC_EFFECT-SEMANTIC-EFFECT-ACCESS-ACCESS-SUMMARY-READ-229B77",
+      "requirement": "REQUIRED_SUPPLEMENTAL",
+      "r00Kind": "supplemental",
+      "r00TaskIds": ["R02-T03", "R07-T09"],
+      "r00ExecutionStageIds": ["R02", "R07"],
+      "r00LedgerStatus": "SPECIFIED_NOT_EXECUTED",
+      "r00ResultIds": [],
+      "r00TestIds": [],
+      "r00Then": "返回网络、设备和账号概况",
+      "r00Assertions": [
+        "成功时核对：返回网络、设备和账号概况",
+        "拒绝/无效输入时核对：无越权或错误持久化，且错误对用户可见"
+      ],
+      "r00Due": "R00-T07 建立正式账本时登记；最迟在所列实施 Task 的阶段验收前完成并执行",
+      "assertionContract": {
+        "producerCommand": "supplemental_management_matrix",
+        "evidencePath": "{EVIDENCE}/MANAGEMENT/management-cases.json",
+        "cases": [
+          {
+            "case": "management-summary-initial-real-state",
+            "expect": 1
+          },
+          {
+            "case": "management-summary-populated-matches-stores",
+            "expect": 1
+          },
+          {
+            "case": "management-summary-unauthorized-no-state-change",
+            "expect": 1
+          },
+          {
+            "case": "management-summary-registry-failure-not-empty",
+            "expect": 1
+          }
+        ]
+      },
+      "originalAssertionCases": [
+        [
+          "management-summary-initial-real-state",
+          "management-summary-populated-matches-stores"
+        ],
+        [
+          "management-summary-unauthorized-no-state-change",
+          "management-summary-registry-failure-not-empty"
+        ]
+      ],
+      "basisKind": "full_original_behavior",
+      "r02Share": "用户授权提前完整实施并验证本叶原始 R00 行为；真服务管理入口与负面副作用由专属生产者逐案检查",
+      "r07Share": "原排 R07 的客户端投影仍须在后续客户端阶段按实际候选核验；R02 本叶已提前接入真实服务行为证据",
+      "evidenceRequired": "本轮 supplemental_management_matrix 真服务 TCP 管理入口正反分支、合成数据根前后持久化、源摘要及原始日志；原 R00 两条断言按 originalAssertionCases 全覆盖",
+      "evidenceCommandRefs": ["supplemental_management_matrix"],
+      "evidencePaths": ["{EVIDENCE}/MANAGEMENT/summary.json"]
+    },
+    {
+      "id": "R00-T02-LA-B8F8CF9E8AF5",
+      "featureId": "F-D20-SEMANTIC_EFFECT-SEMANTIC-EFFECT-DEVICES-DEVICES-B8F8CF",
+      "requirement": "REQUIRED_SUPPLEMENTAL",
+      "r00Kind": "supplemental",
+      "r00TaskIds": ["R02-T03", "R07-T09"],
+      "r00ExecutionStageIds": ["R02", "R07"],
+      "r00LedgerStatus": "SPECIFIED_NOT_EXECUTED",
+      "r00ResultIds": [],
+      "r00TestIds": [],
+      "r00Then": "仅本地主人读取脱敏的设备、凭证与配对会话列表",
+      "r00Assertions": [
+        "给定目标与相应权限，执行“查看已配对设备和凭证”后核对：仅本地主人读取脱敏的设备、凭证与配对会话列表",
+        "输入无效、权限不足或下游失败时应返回明确错误，不呈现成功结果"
+      ],
+      "r00Due": "R00-T07 建立正式账本时登记；最迟在所列实施 Task 的阶段验收前完成并执行",
+      "assertionContract": {
+        "producerCommand": "supplemental_management_matrix",
+        "evidencePath": "{EVIDENCE}/MANAGEMENT/management-cases.json",
+        "cases": [
+          {
+            "case": "management-device-list-redacts-secrets",
+            "expect": 1
+          },
+          {
+            "case": "management-device-list-includes-pending-pairing-redacted",
+            "expect": 1
+          },
+          {
+            "case": "management-device-list-unauthorized-refused",
+            "expect": 1
+          },
+          {
+            "case": "management-device-list-registry-failure-not-empty",
+            "expect": 1
+          }
+        ]
+      },
+      "originalAssertionCases": [
+        [
+          "management-device-list-redacts-secrets",
+          "management-device-list-includes-pending-pairing-redacted"
+        ],
+        [
+          "management-device-list-unauthorized-refused",
+          "management-device-list-registry-failure-not-empty"
+        ]
+      ],
+      "basisKind": "full_original_behavior",
+      "r02Share": "用户授权提前完整实施并验证本叶原始 R00 行为；真服务管理入口与负面副作用由专属生产者逐案检查",
+      "r07Share": "原排 R07 的客户端投影仍须在后续客户端阶段按实际候选核验；R02 本叶已提前接入真实服务行为证据",
+      "evidenceRequired": "本轮 supplemental_management_matrix 真服务 TCP 管理入口正反分支、合成数据根前后持久化、源摘要及原始日志；原 R00 两条断言按 originalAssertionCases 全覆盖",
+      "evidenceCommandRefs": ["supplemental_management_matrix"],
+      "evidencePaths": ["{EVIDENCE}/MANAGEMENT/summary.json"]
+    },
+    {
+      "id": "R00-T02-LA-7498024422D7",
+      "featureId": "F-D20-SEMANTIC_EFFECT-SEMANTIC-EFFECT-DEVICES-DEVICES-DEVICEID-REVOKE-749802",
+      "requirement": "REQUIRED_SUPPLEMENTAL",
+      "r00Kind": "supplemental",
+      "r00TaskIds": ["R02-T03", "R07-T09"],
+      "r00ExecutionStageIds": ["R02", "R07"],
+      "r00LedgerStatus": "SPECIFIED_NOT_EXECUTED",
+      "r00ResultIds": [],
+      "r00TestIds": [],
+      "r00Then": "令设备失效并返回脱敏设备状态，记录安全审计",
+      "r00Assertions": [
+        "给定目标与相应权限，执行“撤销设备”后核对：令设备失效并返回脱敏设备状态，记录安全审计",
+        "输入无效、权限不足或下游失败时应返回明确错误，不呈现成功结果"
+      ],
+      "r00Due": "R00-T07 建立正式账本时登记；最迟在所列实施 Task 的阶段验收前完成并执行",
+      "assertionContract": {
+        "producerCommand": "supplemental_management_matrix",
+        "evidencePath": "{EVIDENCE}/MANAGEMENT/management-cases.json",
+        "cases": [
+          {
+            "case": "management-device-revoke-target-auth-rejected",
+            "expect": 1
+          },
+          {
+            "case": "management-device-revoke-missing-no-side-effect",
+            "expect": 1
+          },
+          {
+            "case": "management-device-revoke-store-failure-target-still-active",
+            "expect": 1
+          },
+          {
+            "case": "management-standard-audit-path-failure-no-write-recovery",
+            "expect": 1
+          },
+          {
+            "case": "management-standard-audit-all-actions-identities-no-secrets",
+            "expect": 1
+          }
+        ]
+      },
+      "originalAssertionCases": [
+        ["management-device-revoke-target-auth-rejected", "management-standard-audit-all-actions-identities-no-secrets"],
+        ["management-device-revoke-missing-no-side-effect", "management-device-revoke-store-failure-target-still-active", "management-standard-audit-path-failure-no-write-recovery"]
+      ],
+      "basisKind": "full_original_behavior",
+      "r02Share": "本轮真服务生产者同时核业务正反、失败副作用与标准安全审计 JSONL 的主体/目标/动作/关联 metadata、无 secret 和重启去重",
+      "r07Share": "原排 R07 的客户端投影仍须在后续客户端阶段按实际候选核验；R02 本叶已提前接入真实服务行为证据",
+      "evidenceRequired": "本轮 supplemental_management_matrix 专属正反案例与标准安全审计 JSONL 全量逐意图对照；原 R00 两条断言按 originalAssertionCases 全覆盖，生产者原始日志/源码摘要/退出状态须有效",
+      "evidenceCommandRefs": ["supplemental_management_matrix"],
+      "evidencePaths": ["{EVIDENCE}/MANAGEMENT/summary.json"]
+    },
+    {
+      "id": "R00-T02-LA-43A126149416",
+      "featureId": "F-D20-SEMANTIC_EFFECT-SEMANTIC-EFFECT-DEVICES-DEVICES-CREDENTIALS-CRED-43A126",
+      "requirement": "REQUIRED_SUPPLEMENTAL",
+      "r00Kind": "supplemental",
+      "r00TaskIds": ["R02-T03", "R07-T09"],
+      "r00ExecutionStageIds": ["R02", "R07"],
+      "r00LedgerStatus": "SPECIFIED_NOT_EXECUTED",
+      "r00ResultIds": [],
+      "r00TestIds": [],
+      "r00Then": "令指定凭证失效并返回脱敏状态，记录安全审计",
+      "r00Assertions": [
+        "给定目标与相应权限，执行“撤销设备凭证”后核对：令指定凭证失效并返回脱敏状态，记录安全审计",
+        "输入无效、权限不足或下游失败时应返回明确错误，不呈现成功结果"
+      ],
+      "r00Due": "R00-T07 建立正式账本时登记；最迟在所列实施 Task 的阶段验收前完成并执行",
+      "assertionContract": {
+        "producerCommand": "supplemental_management_matrix",
+        "evidencePath": "{EVIDENCE}/MANAGEMENT/management-cases.json",
+        "cases": [
+          {
+            "case": "management-credential-revoke-target-only",
+            "expect": 1
+          },
+          {
+            "case": "management-credential-revoke-missing-no-side-effect",
+            "expect": 1
+          },
+          {
+            "case": "management-credential-revoke-store-failure-target-still-active",
+            "expect": 1
+          },
+          {
+            "case": "management-standard-audit-path-failure-no-write-recovery",
+            "expect": 1
+          },
+          {
+            "case": "management-standard-audit-all-actions-identities-no-secrets",
+            "expect": 1
+          }
+        ]
+      },
+      "originalAssertionCases": [
+        ["management-credential-revoke-target-only", "management-standard-audit-all-actions-identities-no-secrets"],
+        ["management-credential-revoke-missing-no-side-effect", "management-credential-revoke-store-failure-target-still-active", "management-standard-audit-path-failure-no-write-recovery"]
+      ],
+      "basisKind": "full_original_behavior",
+      "r02Share": "本轮真服务生产者同时核业务正反、失败副作用与标准安全审计 JSONL 的主体/目标/动作/关联 metadata、无 secret 和重启去重",
+      "r07Share": "原排 R07 的客户端投影仍须在后续客户端阶段按实际候选核验；R02 本叶已提前接入真实服务行为证据",
+      "evidenceRequired": "本轮 supplemental_management_matrix 专属正反案例与标准安全审计 JSONL 全量逐意图对照；原 R00 两条断言按 originalAssertionCases 全覆盖，生产者原始日志/源码摘要/退出状态须有效",
+      "evidenceCommandRefs": ["supplemental_management_matrix"],
+      "evidencePaths": ["{EVIDENCE}/MANAGEMENT/summary.json"]
+    },
+    {
+      "id": "R00-T02-LA-756217C74101",
+      "featureId": "F-D20-SEMANTIC_EFFECT-SEMANTIC-EFFECT-DEVICES-DEVICES-PAIRING-SESSIONS-756217",
+      "requirement": "REQUIRED_SUPPLEMENTAL",
+      "r00Kind": "supplemental",
+      "r00TaskIds": ["R02-T03", "R07-T09"],
+      "r00ExecutionStageIds": ["R02", "R07"],
+      "r00LedgerStatus": "SPECIFIED_NOT_EXECUTED",
+      "r00ResultIds": [],
+      "r00TestIds": [],
+      "r00Then": "仅本地主人得到配对码及到期时间，注册记录并写安全审计",
+      "r00Assertions": [
+        "给定目标与相应权限，执行“创建设备配对会话”后核对：仅本地主人得到配对码及到期时间，注册记录并写安全审计",
+        "输入无效、权限不足或下游失败时应返回明确错误，不呈现成功结果"
+      ],
+      "r00Due": "R00-T07 建立正式账本时登记；最迟在所列实施 Task 的阶段验收前完成并执行",
+      "assertionContract": {
+        "producerCommand": "supplemental_management_matrix",
+        "evidencePath": "{EVIDENCE}/MANAGEMENT/management-cases.json",
+        "cases": [
+          {
+            "case": "management-pairing-create-code-expiry-audit",
+            "expect": 1
+          },
+          {
+            "case": "management-pairing-create-invalid-unauthorized-unchanged",
+            "expect": 1
+          },
+          {
+            "case": "management-pairing-create-store-failure-no-code",
+            "expect": 1
+          },
+          {
+            "case": "management-standard-audit-path-failure-no-write-recovery",
+            "expect": 1
+          },
+          {
+            "case": "management-standard-audit-all-actions-identities-no-secrets",
+            "expect": 1
+          }
+        ]
+      },
+      "originalAssertionCases": [
+        ["management-pairing-create-code-expiry-audit", "management-standard-audit-all-actions-identities-no-secrets"],
+        ["management-pairing-create-invalid-unauthorized-unchanged", "management-pairing-create-store-failure-no-code", "management-standard-audit-path-failure-no-write-recovery"]
+      ],
+      "basisKind": "full_original_behavior",
+      "r02Share": "本轮真服务生产者同时核业务正反、失败副作用与标准安全审计 JSONL 的主体/目标/动作/关联 metadata、无 secret 和重启去重",
+      "r07Share": "原排 R07 的客户端投影仍须在后续客户端阶段按实际候选核验；R02 本叶已提前接入真实服务行为证据",
+      "evidenceRequired": "本轮 supplemental_management_matrix 专属正反案例与标准安全审计 JSONL 全量逐意图对照；原 R00 两条断言按 originalAssertionCases 全覆盖，生产者原始日志/源码摘要/退出状态须有效",
+      "evidenceCommandRefs": ["supplemental_management_matrix"],
+      "evidencePaths": ["{EVIDENCE}/MANAGEMENT/summary.json"]
+    },
+    {
+      "id": "R00-T02-LA-5E1C3363A070",
+      "featureId": "F-D20-SEMANTIC_EFFECT-SEMANTIC-EFFECT-DEVICES-DEVICES-PAIRING-SESSIONS-5E1C33",
+      "requirement": "REQUIRED_SUPPLEMENTAL",
+      "r00Kind": "supplemental",
+      "r00TaskIds": ["R02-T03", "R07-T09"],
+      "r00ExecutionStageIds": ["R02", "R07"],
+      "r00LedgerStatus": "SPECIFIED_NOT_EXECUTED",
+      "r00ResultIds": [],
+      "r00TestIds": [],
+      "r00Then": "仅本地主人用配对码签发设备密钥，返回密钥一次及设备作用域并写安全审计",
+      "r00Assertions": [
+        "给定目标与相应权限，执行“批准设备配对”后核对：仅本地主人用配对码签发设备密钥，返回密钥一次及设备作用域并写安全审计",
+        "输入无效、权限不足或下游失败时应返回明确错误，不呈现成功结果"
+      ],
+      "r00Due": "R00-T07 建立正式账本时登记；最迟在所列实施 Task 的阶段验收前完成并执行",
+      "assertionContract": {
+        "producerCommand": "supplemental_management_matrix",
+        "evidencePath": "{EVIDENCE}/MANAGEMENT/management-cases.json",
+        "cases": [
+          {
+            "case": "management-pairing-approve-once-scope-secret-audit",
+            "expect": 1
+          },
+          {
+            "case": "management-pairing-approve-wrong-code-scope-auth-unchanged",
+            "expect": 1
+          },
+          {
+            "case": "management-pairing-approve-store-failure-still-pending",
+            "expect": 1
+          },
+          {
+            "case": "management-pairing-replay-does-not-sign",
+            "expect": 1
+          },
+          {
+            "case": "management-pairing-concurrent-only-one-credential",
+            "expect": 1
+          },
+          {
+            "case": "management-pairing-expired-code-does-not-sign",
+            "expect": 1
+          },
+          {
+            "case": "management-standard-audit-path-failure-no-write-recovery",
+            "expect": 1
+          },
+          {
+            "case": "management-standard-audit-all-actions-identities-no-secrets",
+            "expect": 1
+          }
+        ]
+      },
+      "originalAssertionCases": [
+        ["management-pairing-approve-once-scope-secret-audit", "management-standard-audit-all-actions-identities-no-secrets"],
+        ["management-pairing-approve-wrong-code-scope-auth-unchanged", "management-pairing-approve-store-failure-still-pending", "management-pairing-replay-does-not-sign", "management-pairing-concurrent-only-one-credential", "management-pairing-expired-code-does-not-sign", "management-standard-audit-path-failure-no-write-recovery"]
+      ],
+      "basisKind": "full_original_behavior",
+      "r02Share": "本轮真服务生产者同时核业务正反、失败副作用与标准安全审计 JSONL 的主体/目标/动作/关联 metadata、无 secret 和重启去重",
+      "r07Share": "原排 R07 的客户端投影仍须在后续客户端阶段按实际候选核验；R02 本叶已提前接入真实服务行为证据",
+      "evidenceRequired": "本轮 supplemental_management_matrix 专属正反案例与标准安全审计 JSONL 全量逐意图对照；原 R00 两条断言按 originalAssertionCases 全覆盖，生产者原始日志/源码摘要/退出状态须有效",
+      "evidenceCommandRefs": ["supplemental_management_matrix"],
+      "evidencePaths": ["{EVIDENCE}/MANAGEMENT/summary.json"]
+    },
+    {
+      "id": "R00-T02-LA-8BC1A036AFAA",
+      "featureId": "F-D20-SEMANTIC_EFFECT-SEMANTIC-EFFECT-MOBILE-STATIC-DESKTOP-8BC1A0",
+      "requirement": "REQUIRED_SUPPLEMENTAL",
+      "r00Kind": "supplemental",
+      "r00TaskIds": ["R02-T03", "R07-T09"],
+      "r00ExecutionStageIds": ["R02", "R07"],
+      "r00LedgerStatus": "SPECIFIED_NOT_EXECUTED",
+      "r00ResultIds": [],
+      "r00TestIds": [],
+      "r00Then": "有桌面构建产物时服务静态页面及资源，否则按路由返回指引或错误",
+      "r00Assertions": [
+        "给定目标与相应权限，执行“打开浏览器桌面界面”后核对：有桌面构建产物时服务静态页面及资源，否则按路由返回指引或错误",
+        "输入无效、权限不足或下游失败时应返回明确错误，不呈现成功结果"
+      ],
+      "r00Due": "R00-T07 建立正式账本时登记；最迟在所列实施 Task 的阶段验收前完成并执行",
+      "assertionContract": {
+        "producerCommand": "supplemental_static_web_matrix",
+        "evidencePath": "{EVIDENCE}/STATIC_WEB/static-web-cases.json",
+        "cases": [
+          { "case": "static-desktop-dist-page-assets", "expect": 1 },
+          { "case": "static-desktop-guide-without-dist", "expect": 1 },
+          { "case": "static-desktop-invalid-explicit-dist-503", "expect": 1 },
+          { "case": "static-web-traversal-secret-refused", "expect": 1 },
+          { "case": "static-web-oversized-asset-explicit-error", "expect": 1 }
+        ]
+      },
+      "originalAssertionCases": [
+        ["static-desktop-dist-page-assets", "static-desktop-guide-without-dist"],
+        ["static-web-traversal-secret-refused", "static-desktop-invalid-explicit-dist-503", "static-web-oversized-asset-explicit-error"]
+      ],
+      "basisKind": "full_original_behavior",
+      "r02Share": "用户已授权把原排 R07 的完整静态服务行为提前纳入 R02；本阶段用真 TCP 核页面、资源、缺构建指引及无效路径/损坏构建的明确失败",
+      "r07Share": "原排 R07 的客户端构建和界面仍须在 R07 对其当时产物重新核验；本轮核的是 R00 静态服务叶",
+      "evidenceRequired": "本轮 supplemental_static_web_matrix 真 TCP 逐叶案例、原始日志及当前源码摘要；原 R00 两条断言按 originalAssertionCases 全覆盖",
+      "evidenceCommandRefs": ["supplemental_static_web_matrix"],
+      "evidencePaths": ["{EVIDENCE}/STATIC_WEB/summary.json"]
+    },
+    {
+      "id": "R00-T02-LA-3291CFD5F7E2",
+      "featureId": "F-D20-SEMANTIC_EFFECT-SEMANTIC-EFFECT-MOBILE-STATIC-MOBILE-3291CF",
+      "requirement": "REQUIRED_SUPPLEMENTAL",
+      "r00Kind": "supplemental",
+      "r00TaskIds": ["R02-T03", "R07-T09"],
+      "r00ExecutionStageIds": ["R02", "R07"],
+      "r00LedgerStatus": "SPECIFIED_NOT_EXECUTED",
+      "r00ResultIds": [],
+      "r00TestIds": [],
+      "r00Then": "有移动端构建产物时服务静态页面及资源，否则按路由返回指引或错误",
+      "r00Assertions": [
+        "给定目标与相应权限，执行“打开移动端界面”后核对：有移动端构建产物时服务静态页面及资源，否则按路由返回指引或错误",
+        "输入无效、权限不足或下游失败时应返回明确错误，不呈现成功结果"
+      ],
+      "r00Due": "R00-T07 建立正式账本时登记；最迟在所列实施 Task 的阶段验收前完成并执行",
+      "assertionContract": {
+        "producerCommand": "supplemental_static_web_matrix",
+        "evidencePath": "{EVIDENCE}/STATIC_WEB/static-web-cases.json",
+        "cases": [
+          { "case": "static-mobile-dist-page-assets", "expect": 1 },
+          { "case": "static-mobile-guide-without-dist", "expect": 1 },
+          { "case": "static-mobile-invalid-explicit-dist-503", "expect": 1 },
+          { "case": "static-web-traversal-secret-refused", "expect": 1 },
+          { "case": "static-web-oversized-asset-explicit-error", "expect": 1 }
+        ]
+      },
+      "originalAssertionCases": [
+        ["static-mobile-dist-page-assets", "static-mobile-guide-without-dist"],
+        ["static-web-traversal-secret-refused", "static-mobile-invalid-explicit-dist-503", "static-web-oversized-asset-explicit-error"]
+      ],
+      "basisKind": "full_original_behavior",
+      "r02Share": "用户已授权把原排 R07 的完整静态服务行为提前纳入 R02；本阶段用真 TCP 核页面、资源、缺构建指引及无效路径/损坏构建的明确失败",
+      "r07Share": "原排 R07 的客户端构建和界面仍须在 R07 对其当时产物重新核验；本轮核的是 R00 静态服务叶",
+      "evidenceRequired": "本轮 supplemental_static_web_matrix 真 TCP 逐叶案例、原始日志及当前源码摘要；原 R00 两条断言按 originalAssertionCases 全覆盖",
+      "evidenceCommandRefs": ["supplemental_static_web_matrix"],
+      "evidencePaths": ["{EVIDENCE}/STATIC_WEB/summary.json"]
+    },
+    {
+      "id": "R00-T02-LA-2A1C298F62FC",
+      "featureId": "F-D20-SEMANTIC_EFFECT-SEMANTIC-EFFECT-MOBILE-WORKBENCH-MOBILE-BOOTSTRA-2A1C29",
+      "requirement": "REQUIRED_SUPPLEMENTAL",
+      "r00Kind": "supplemental",
+      "r00TaskIds": ["R02-T03", "R07-T09"],
+      "r00ExecutionStageIds": ["R02", "R07"],
+      "r00LedgerStatus": "SPECIFIED_NOT_EXECUTED",
+      "r00ResultIds": [],
+      "r00TestIds": [],
+      "r00Then": "返回当前 Agent、语言、头像可用性、工作区和偏好；顺带清理过期持久化",
+      "r00Assertions": [
+        "给定目标与相应权限，执行“初始化移动端界面”后核对：返回当前 Agent、语言、头像可用性、工作区和偏好；顺带清理过期持久化",
+        "输入无效、权限不足或下游失败时应返回明确错误，不呈现成功结果"
+      ],
+      "r00Due": "R00-T07 建立正式账本时登记；最迟在所列实施 Task 的阶段验收前完成并执行",
+      "assertionContract": {
+        "producerCommand": "a05_a06_auth_matrix",
+        "evidencePath": "{EVIDENCE}/A05_A06/leaf-cases.json",
+        "cases": [
+          { "case": "a05-no-credential-read", "expect": 401 },
+          { "case": "a05-forged-principal-headers", "expect": 401 },
+          { "case": "a05-cross-principal-read", "expect": 403 },
+          { "case": "a05-positive-control-owner-execute", "expect": 200 },
+          { "case": "a06-evil-origin-health", "expect": 403 },
+          { "case": "a06-foreign-host-health", "expect": 403 }
+        ]
+      },
+      "basisKind": "auth_primitive_only",
+      "r02Share": "认证原语基础（同 LA-25AB678E7108）；移动端引导路由不在 R02 现行面",
+      "r07Share": "移动端初始化完整入口（Agent/语言/头像/工作区/偏好返回与过期持久化清理）",
+      "evidenceRequired": "A05/A06 认证矩阵真实执行证据；路由实现后另需其认证正负矩阵",
+      "evidenceCommandRefs": ["a05_a06_auth_matrix"]
+    },
+    {
+      "id": "R00-T02-LA-8ED658F9DB9E",
+      "featureId": "F-D20-SEMANTIC_EFFECT-SEMANTIC-EFFECT-SERVER-INDEX-API-SESSION-THINKIN-8ED658",
+      "requirement": "REQUIRED_SUPPLEMENTAL",
+      "r00Kind": "supplemental",
+      "r00TaskIds": ["R02-T03", "R07-T09"],
+      "r00ExecutionStageIds": ["R02", "R07"],
+      "r00LedgerStatus": "SPECIFIED_NOT_EXECUTED",
+      "r00ResultIds": [],
+      "r00TestIds": [],
+      "r00Then": "返回指定会话或新会话默认级别",
+      "r00Assertions": [
+        "成功：执行“查看会话思考级别”后，返回指定会话或新会话默认级别",
+        "拒绝/边界：query.sessionPath 与 pendingNewSession=1 选择范围；不应错误扩大写入或披露范围"
+      ],
+      "r00Due": "R00-T07 建立正式账本时登记；最迟在所列实施 Task 的阶段验收前完成并执行",
+      "assertionContract": {
+        "producerCommand": "a05_a06_auth_matrix",
+        "evidencePath": "{EVIDENCE}/A05_A06/leaf-cases.json",
+        "cases": [
+          { "case": "a05-no-credential-read", "expect": 401 },
+          { "case": "a05-forged-principal-headers", "expect": 401 },
+          { "case": "a05-cross-principal-read", "expect": 403 },
+          { "case": "a05-positive-control-owner-execute", "expect": 200 },
+          { "case": "a06-evil-origin-health", "expect": 403 },
+          { "case": "a06-foreign-host-health", "expect": 403 }
+        ]
+      },
+      "basisKind": "auth_primitive_only",
+      "r02Share": "认证原语基础（同 LA-25AB678E7108）；思考级别读取路由不在 R02 现行面",
+      "r07Share": "查看会话思考级别完整入口（指定会话或新会话默认；query 边界不扩大披露）",
+      "evidenceRequired": "A05/A06 认证矩阵真实执行证据；路由实现后另需其认证正负矩阵",
+      "evidenceCommandRefs": ["a05_a06_auth_matrix"]
+    },
+    {
+      "id": "R00-T02-LA-F8935B6B0221",
+      "featureId": "F-D20-SEMANTIC_EFFECT-SEMANTIC-EFFECT-SESSION-THINKING-LEVEL-SET-F8935B",
+      "requirement": "REQUIRED_SUPPLEMENTAL",
+      "r00Kind": "supplemental",
+      "r00TaskIds": ["R02-T03", "R07-T09"],
+      "r00ExecutionStageIds": ["R02", "R07"],
+      "r00LedgerStatus": "SPECIFIED_NOT_EXECUTED",
+      "r00ResultIds": [],
+      "r00TestIds": [],
+      "r00Then": "有 sessionPath 时只修改该会话，返回解析后的状态",
+      "r00Assertions": [
+        "成功：设置现有会话思考级别后，有 sessionPath 时只修改该会话，返回解析后的状态",
+        "边界：无效 level/冲突 409 不改变默认级别；拒绝时目标状态不变"
+      ],
+      "r00Due": "R00-T07 建立正式账本时登记；最迟在所列实施 Task 的阶段验收前完成并执行",
+      "assertionContract": {
+        "producerCommand": "a05_a06_auth_matrix",
+        "evidencePath": "{EVIDENCE}/A05_A06/leaf-cases.json",
+        "cases": [
+          { "case": "a05-no-credential-read", "expect": 401 },
+          { "case": "a05-forged-principal-headers", "expect": 401 },
+          { "case": "a05-cross-principal-read", "expect": 403 },
+          { "case": "a05-positive-control-owner-execute", "expect": 200 },
+          { "case": "a06-evil-origin-health", "expect": 403 },
+          { "case": "a06-foreign-host-health", "expect": 403 }
+        ]
+      },
+      "basisKind": "auth_primitive_only",
+      "r02Share": "认证原语基础（同 LA-25AB678E7108）；思考级别设置路由不在 R02 现行面",
+      "r07Share": "设置现有会话思考级别完整入口（只改该会话；无效 level/409 不改状态）",
+      "evidenceRequired": "A05/A06 认证矩阵真实执行证据；路由实现后另需其认证正负矩阵",
+      "evidenceCommandRefs": ["a05_a06_auth_matrix"]
+    },
+    {
+      "id": "R00-T02-LA-39AD35E1FD71",
+      "featureId": "F-D20-SEMANTIC_EFFECT-SEMANTIC-EFFECT-SESSION-THINKING-LEVEL-DEFAULT-S-39AD35",
+      "requirement": "REQUIRED_SUPPLEMENTAL",
+      "r00Kind": "supplemental",
+      "r00TaskIds": ["R02-T03", "R07-T09"],
+      "r00ExecutionStageIds": ["R02", "R07"],
+      "r00LedgerStatus": "SPECIFIED_NOT_EXECUTED",
+      "r00ResultIds": [],
+      "r00TestIds": [],
+      "r00Then": "无 sessionPath 时修改默认级别，不追改旧会话",
+      "r00Assertions": [
+        "成功：设置新会话默认思考级别后，无 sessionPath 时修改默认级别，不追改旧会话",
+        "边界：无效 level/冲突 409 不改变已有会话；拒绝时目标状态不变"
+      ],
+      "r00Due": "R00-T07 建立正式账本时登记；最迟在所列实施 Task 的阶段验收前完成并执行",
+      "assertionContract": {
+        "producerCommand": "a05_a06_auth_matrix",
+        "evidencePath": "{EVIDENCE}/A05_A06/leaf-cases.json",
+        "cases": [
+          { "case": "a05-no-credential-read", "expect": 401 },
+          { "case": "a05-forged-principal-headers", "expect": 401 },
+          { "case": "a05-cross-principal-read", "expect": 403 },
+          { "case": "a05-positive-control-owner-execute", "expect": 200 },
+          { "case": "a06-evil-origin-health", "expect": 403 },
+          { "case": "a06-foreign-host-health", "expect": 403 }
+        ]
+      },
+      "basisKind": "auth_primitive_only",
+      "r02Share": "认证原语基础（同 LA-25AB678E7108）；默认思考级别路由不在 R02 现行面",
+      "r07Share": "设置新会话默认思考级别完整入口（不追改旧会话；拒绝时状态不变）",
+      "evidenceRequired": "A05/A06 认证矩阵真实执行证据；路由实现后另需其认证正负矩阵",
+      "evidenceCommandRefs": ["a05_a06_auth_matrix"]
+    },
+    {
+      "id": "R00-T02-LA-066B54983F6A",
+      "featureId": "F-D20-SEMANTIC_EFFECT-SEMANTIC-EFFECT-WEB-AUTH-WEB-AUTH-SESSION-READ-066B54",
+      "requirement": "REQUIRED_SUPPLEMENTAL",
+      "r00Kind": "supplemental",
+      "r00TaskIds": ["R02-T03", "R07-T09"],
+      "r00ExecutionStageIds": ["R02", "R07"],
+      "r00LedgerStatus": "SPECIFIED_NOT_EXECUTED",
+      "r00ResultIds": [],
+      "r00TestIds": [],
+      "r00Then": "有效 cookie 返回净化后的 principal；无效/过期返回 authenticated:false",
+      "r00Assertions": [
+        "成功：执行“查看当前网页登录状态”后，有效 cookie 返回净化后的 principal；无效/过期返回 authenticated:false",
+        "拒绝/边界：cookie 与连接类型决定身份；不披露 session secret；不应错误扩大写入或披露范围"
+      ],
+      "r00Due": "R00-T07 建立正式账本时登记；最迟在所列实施 Task 的阶段验收前完成并执行",
+      "assertionContract": {
+        "producerCommand": "supplemental_management_matrix",
+        "evidencePath": "{EVIDENCE}/MANAGEMENT/management-cases.json",
+        "cases": [
+          { "case": "management-web-session-valid-sanitized", "expect": 1 },
+          { "case": "management-web-session-invalid-false", "expect": 1 },
+          { "case": "management-web-session-expired-false", "expect": 1 },
+          { "case": "management-web-session-mobile-scope-no-write", "expect": 1 },
+          { "case": "management-web-session-connection-mismatch-false", "expect": 1 }
+        ]
+      },
+      "originalAssertionCases": [
+        ["management-web-session-valid-sanitized", "management-web-session-invalid-false", "management-web-session-expired-false"],
+        ["management-web-session-mobile-scope-no-write", "management-web-session-connection-mismatch-false"]
+      ],
+      "basisKind": "full_original_behavior",
+      "r02Share": "真服务逐项检查桌面与手机 cookie 的净化身份、有效/无效/过期状态、LAN 与本机连接类型隔离、最小 scope、secret 不泄漏及读取不改磁盘",
+      "r07Share": "原排 R07 的客户端显示仍需在后续客户端阶段按当前候选核验；R02 本叶提前登记完整真服务行为",
+      "evidenceRequired": "supplemental_management_matrix 本轮真服务专属五项逐条件案例、原始日志、源码摘要与退出状态；当前候选合法执行后才可通过",
+      "evidenceCommandRefs": ["supplemental_management_matrix"],
+      "evidencePaths": ["{EVIDENCE}/MANAGEMENT/management-cases.json", "{EVIDENCE}/MANAGEMENT/summary.json"]
+    },
+    {
+      "id": "R00-T02-LA-C4E6F27D7873",
+      "featureId": "F-D20-SEMANTIC_EFFECT-SEMANTIC-EFFECT-WEB-AUTH-WEB-AUTH-LOGIN-POST-C4E6F2",
+      "requirement": "REQUIRED_SUPPLEMENTAL",
+      "r00Kind": "supplemental",
+      "r00TaskIds": ["R02-T03", "R07-T09"],
+      "r00ExecutionStageIds": ["R02", "R07"],
+      "r00LedgerStatus": "SPECIFIED_NOT_EXECUTED",
+      "r00ResultIds": [],
+      "r00TestIds": [],
+      "r00Then": "校验 token 或本地账号密码，创建 14 日 Web session 并设 HttpOnly cookie",
+      "r00Assertions": [
+        "成功：执行“登录网页/移动端”后，校验 token 或本地账号密码，创建 14 日 Web session 并设 HttpOnly cookie",
+        "拒绝/边界：body.credential 优先 token；否则 username/password；远端密码须 HTTPS；clientKind 决定 scope；不应错误扩大写入或披露范围"
+      ],
+      "r00Due": "R00-T07 建立正式账本时登记；最迟在所列实施 Task 的阶段验收前完成并执行",
+      "assertionContract": {
+        "producerCommand": "supplemental_management_matrix",
+        "evidencePath": "{EVIDENCE}/MANAGEMENT/web-login-cases.json",
+        "cases": [
+          { "case": "management-web-login-password-cookie-14day-desktop-scope", "expect": 1 },
+          { "case": "management-web-login-token-positive-14day-mobile-scope", "expect": 1 },
+          { "case": "web-login-https-password-secure-14day-cookie", "expect": 1 },
+          { "case": "web-login-https-session-logout-revoked", "expect": 1 },
+          { "case": "management-web-login-credential-priority-denies-invalid-token", "expect": 1 },
+          { "case": "management-web-session-mobile-scope-no-write", "expect": 1 },
+          { "case": "management-web-login-store-failure-no-session", "expect": 1 },
+          { "case": "management-lan-browser-origin-login-session-logout", "expect": 1 },
+          { "case": "web-login-foreign-origin-denied", "expect": 1 },
+          { "case": "web-login-http-forwarded-proto-denied", "expect": 1 }
+        ]
+      },
+      "originalAssertionCases": [
+        ["management-web-login-password-cookie-14day-desktop-scope", "management-web-login-token-positive-14day-mobile-scope", "web-login-https-password-secure-14day-cookie", "web-login-https-session-logout-revoked"],
+        ["management-web-login-credential-priority-denies-invalid-token", "management-web-session-mobile-scope-no-write", "management-web-login-store-failure-no-session", "management-lan-browser-origin-login-session-logout", "web-login-foreign-origin-denied", "web-login-http-forwarded-proto-denied"]
+      ],
+      "basisKind": "full_original_behavior",
+      "r02Share": "提前纳入真实 Web 登录完整行为：token/密码、14 日 HttpOnly、实际 HTTPS 与远端 HTTP 拒绝、clientKind 权限和失败副作用；本轮运行前未验收",
+      "r07Share": "后续网页/移动端阶段继续核页面接线与跨设备体验，不代替本阶段原始 due",
+      "evidenceRequired": "supplemental_management_matrix 的真实 TCP 管理案例与 tls_web_login HTTPS 集成案例、web-login-cases.json 原始断言逐项机器消费；平台真 TCP 禁令未解除前不得 PASS",
+      "evidenceCommandRefs": ["supplemental_management_matrix"],
+      "evidencePaths": ["{EVIDENCE}/MANAGEMENT/web-login-cases.json", "{EVIDENCE}/MANAGEMENT/tls-web-login-cases.json", "{EVIDENCE}/MANAGEMENT/tls-cargo.stdout.log", "{EVIDENCE}/MANAGEMENT/tls-cargo.stderr.log"]
+    },
+    {
+      "id": "R00-T02-LA-4C1A9735CF04",
+      "featureId": "F-D20-ROUTE_BEHAVIOR-BEHAVIOR-WEB-AUTH-WEB-AUTH-LOGOUT-POST-4C1A97",
+      "requirement": "REQUIRED_SUPPLEMENTAL",
+      "r00Kind": "supplemental",
+      "r00TaskIds": ["R02-T03", "R07-T09"],
+      "r00ExecutionStageIds": ["R02", "R07"],
+      "r00LedgerStatus": "SPECIFIED_NOT_EXECUTED",
+      "r00ResultIds": [],
+      "r00TestIds": [],
+      "r00Then": "撤销当前 Web 会话并清除会话 Cookie，返回成功",
+      "r00Assertions": [
+        "执行“退出网页登录”后核对：撤销当前 Web 会话并清除会话 Cookie，返回成功",
+        "失败、冲突或拒绝时核对返回的状态与实际副作用一致"
+      ],
+      "r00Due": "R00-T07 建立正式账本时登记；最迟在所列实施 Task 的阶段验收前完成并执行",
+      "assertionContract": {
+        "producerCommand": "supplemental_management_matrix",
+        "evidencePath": "{EVIDENCE}/MANAGEMENT/management-cases.json",
+        "cases": [
+          {
+            "case": "management-web-logout-only-current-cookie",
+            "expect": 1
+          },
+          {
+            "case": "management-lan-browser-origin-login-session-logout",
+            "expect": 1
+          },
+          {
+            "case": "management-web-logout-store-failure-session-alive",
+            "expect": 1
+          },
+          {
+            "case": "management-web-logout-invalid-cookie-no-other-revoke",
+            "expect": 1
+          }
+        ]
+      },
+      "originalAssertionCases": [
+        [
+          "management-web-logout-only-current-cookie",
+          "management-lan-browser-origin-login-session-logout"
+        ],
+        [
+          "management-web-logout-store-failure-session-alive",
+          "management-web-logout-invalid-cookie-no-other-revoke"
+        ]
+      ],
+      "basisKind": "full_original_behavior",
+      "r02Share": "用户授权提前完整实施并验证本叶原始 R00 行为；真服务管理入口与负面副作用由专属生产者逐案检查",
+      "r07Share": "原排 R07 的客户端投影仍须在后续客户端阶段按实际候选核验；R02 本叶已提前接入真实服务行为证据",
+      "evidenceRequired": "本轮 supplemental_management_matrix 真服务 TCP 管理入口正反分支、合成数据根前后持久化、源摘要及原始日志；原 R00 两条断言按 originalAssertionCases 全覆盖",
+      "evidenceCommandRefs": ["supplemental_management_matrix"],
+      "evidencePaths": ["{EVIDENCE}/MANAGEMENT/summary.json"]
+    },
+    {
+      "id": "R00-T02-LA-000E6E1301C0",
+      "featureId": "F-D20-UI-UI-SETTINGS-ACCESS-000E6E",
+      "requirement": "REQUIRED_SUPPLEMENTAL",
+      "r00Kind": "supplemental",
+      "r00TaskIds": ["R02-T03", "R07-T09"],
+      "r00ExecutionStageIds": ["R02", "R07"],
+      "r00LedgerStatus": "SPECIFIED_NOT_EXECUTED",
+      "r00ResultIds": [],
+      "r00TestIds": [],
+      "r00Then": "逐动作核对实际状态与页面投影；失败不伪装成空数据",
+      "r00Assertions": [
+        "打开设置容器自动初始化：连接、语言、助手、快照、模型和供应商摘要（各页共用）：成功核对 冷启动完成后 ready；已有缓存直接显示旧数据并后台刷新；供应商摘要不阻塞 ready；空态/未初始化核对 无缓存时显示 loading mask；15 秒超时强制 ready；供应商摘要可暂缺；错误/无权限核对 初始化异常会 log 并 ready=true，可能展示旧/空数据；供应商摘要失败被 catch 静默，不能当空列表成功",
+        "打开页自动加载访问总览及账号/设备状态：成功核对 打开页只请求 /api/access/summary 并显示地址、模式、设备和凭证摘要；设备详情另由后续操作读取。；mobileUrl 可用且无需重启时二维码图片自动读取并显示。；空态/未初始化核对 尚未配置密钥/无设备显示空列表；无 mobileUrl 或 restartRequired 不渲染二维码图，不发该 GET。；错误/无权限核对 加载错误显示警告，不能当无设备",
+        "局域网开关、端口及公开地址保存：成功核对 保存并显示重启需求；空态/未初始化核对 未加载 summary 禁保存；错误/无权限核对 远端连接仅本机设置提示；失败 toast",
+        "生成手机/桌面连接凭证；同屏有地址时自动显示二维码：成功核对 新密钥/连接地址显示；同屏 mobileUrl 可用且无需重启时二维码自动显示，与生成凭证独立。；凭证生成后重读访问总览；若重读失败，即使生成已持久化仍显示失败 toast。；空态/未初始化核对 未生成凭证显示生成按钮；无 mobileUrl 或需重启时不渲染二维码。；错误/无权限核对 生成失败 toast，旧密钥不清除",
+        "复制地址和密钥、连接远端或返回本机：成功核对 复制按钮在剪贴板 API 存在且写入成功时显示 copied；连接远端成功后切换当前服务。；选择远端或本机连接成功后调用 reloadMainWindow 应用。；空态/未初始化核对 剪贴板 API 缺失时可跳过真实写入却仍显示 copied；远端地址或凭证缺失时连接不可完成。；错误/无权限核对 剪贴板写入 Promise 拒绝未捕获；远端连接失败由连接分支捕获提示且不切活跃服务，两种失败不能混写。；连接失败或本机连接不可用不重载。",
+        "撤销设备或单条凭证：成功核对 设备/凭证从总览移除；撤销成功后重读访问总览；若重读失败，即使撤销已持久化仍显示失败 toast。；空态/未初始化核对 无设备没有撤销控件；错误/无权限核对 失败保留条目并提示",
+        "编辑本地账号资料、设置或清除密码：成功核对 资料/密码状态刷新；空态/未初始化核对 空密码禁保存；错误/无权限核对 失败 toast；无权限不会回写成功态"
+      ],
+      "r00Due": "R00-T07 建立正式账本时登记；最迟在所列实施 Task 的阶段验收前完成并执行",
+      "assertionContract": {
+        "producerCommand": "a05_a06_auth_matrix",
+        "evidencePath": "{EVIDENCE}/A05_A06/leaf-cases.json",
+        "cases": [
+          { "case": "a05-no-credential-read", "expect": 401 },
+          { "case": "a05-forged-principal-headers", "expect": 401 },
+          { "case": "a05-cross-principal-read", "expect": 403 },
+          { "case": "a05-positive-control-owner-execute", "expect": 200 },
+          { "case": "a06-evil-origin-health", "expect": 403 },
+          { "case": "a06-foreign-host-health", "expect": 403 }
+        ]
+      },
+      "basisKind": "auth_primitive_only",
+      "r02Share": "R02 已有 Rust /lingxi/v1/access/* 与 /devices/* 的客户端适配及 AccessTab 局部组件测试；原 7 条设置页动作各成功/空态/错误分支和真实服务联动仍未完整逐条执行",
+      "r07Share": "ui:settings:access 完整页面动作矩阵（自动加载、访问总览、LAN 保存、凭证生成/二维码、复制/连接、撤销、账号资料/密码的成功/空态/错误态逐动作核对）",
+      "evidenceRequired": "本轮访问设置页原 7 条动作的真实组件与 Rust 服务逐项正反证据；初始化、总览、网络、凭证/二维码、连接、撤销、账号的 UI 与服务状态及失败副作用必须对应",
+      "evidenceCommandRefs": ["a05_a06_auth_matrix"]
+    },
+    {
+      "id": "R00-T02-LA-32FFEC05BAA7",
+      "featureId": "F-D20-UI-UI-SETTINGS-SHARING-32FFEC",
+      "requirement": "REQUIRED_SUPPLEMENTAL",
+      "r00Kind": "supplemental",
+      "r00TaskIds": ["R02-T03", "R07-T09"],
+      "r00ExecutionStageIds": ["R02", "R07"],
+      "r00LedgerStatus": "SPECIFIED_NOT_EXECUTED",
+      "r00ResultIds": [],
+      "r00TestIds": [],
+      "r00Then": "逐动作核对实际状态与页面投影；失败不伪装成空数据",
+      "r00Assertions": [
+        "打开设置容器自动初始化：连接、语言、助手、快照、模型和供应商摘要（各页共用）：成功核对 冷启动完成后 ready；已有缓存直接显示旧数据并后台刷新；供应商摘要不阻塞 ready；空态/未初始化核对 无缓存时显示 loading mask；15 秒超时强制 ready；供应商摘要可暂缺；错误/无权限核对 初始化异常会 log 并 ready=true，可能展示旧/空数据；供应商摘要失败被 catch 静默，不能当空列表成功",
+        "截图配色卡（三色）：成功核对 颜色写 localStorage，预览图随即切换；空态/未初始化核对 默认 light；错误/无权限核对 当前同步 localStorage 写入无 catch/提示；浏览器禁止存储时该操作抛错，未观察到成功提示。",
+        "截图宽度卡（手机/桌面）：成功核对 宽度写 localStorage，预览图切换；空态/未初始化核对 默认 mobile；错误/无权限核对 当前同步 localStorage 写入无 catch/提示；浏览器禁止存储时该操作抛错，未观察到成功提示。",
+        "截图字体与分段字符上限：成功核对 字体、上限规范化后写本地存储；空态/未初始化核对 默认跟随阅读字体、默认上限；错误/无权限核对 当前同步 localStorage 写入无 catch/提示；浏览器禁止存储时该操作抛错，未观察到成功提示。"
+      ],
+      "r00Due": "R00-T07 建立正式账本时登记；最迟在所列实施 Task 的阶段验收前完成并执行",
+      "assertionContract": {
+        "producerCommand": "supplemental_client_matrix",
+        "evidencePath": "{EVIDENCE}/CLIENT/leaf-cases.json",
+        "cases": [
+          { "case": "sharing-container-cold-cache-timeout-error", "expect": 1 },
+          { "case": "sharing-color-success-default-denied", "expect": 1 },
+          { "case": "sharing-width-success-default-denied", "expect": 1 },
+          { "case": "sharing-font-limit-success-default-denied", "expect": 1 }
+        ]
+      },
+      "originalAssertionCases": [
+        ["sharing-container-cold-cache-timeout-error"],
+        ["sharing-color-success-default-denied"],
+        ["sharing-width-success-default-denied"],
+        ["sharing-font-limit-success-default-denied"]
+      ],
+      "basisKind": "full_original_behavior",
+      "r02Share": "用户已授权把 R07 客户端行为提前纳入 R02：本阶段直接渲染真实 SettingsContent/SharingTab，逐动作核缓存/空态/错误与 localStorage 写入及拒绝投影；R00 原件不改",
+      "r07Share": "原排 R07-T09 的完整分享设置页在 R02 提前实测；后续 R07 新客户端集成仍须重新验证",
+      "evidenceRequired": "本轮 supplemental_client_matrix 真实组件七项检查的原始 Vitest 输出、四条逐叶结构化案例和 UI/本地存储观察；四条 R00 原断言按 originalAssertionCases 全覆盖",
+      "evidenceCommandRefs": ["supplemental_client_matrix"],
+      "evidencePaths": ["{EVIDENCE}/CLIENT/sharing-cases.json", "{EVIDENCE}/CLIENT/summary.json"]
+    }
+  ],
   "commands": {
+    "supplemental_static_web_matrix": {
+      "argv": ["python3", "scripts/rust-tauri/r02_static_web_leaf_matrix.py", "{EVIDENCE}/STATIC_WEB"],
+      "timeoutSecs": 720,
+      "evidencePaths": [
+        "{EVIDENCE}/STATIC_WEB/summary.json",
+        "{EVIDENCE}/STATIC_WEB/static-web-cases.json",
+        "{EVIDENCE}/STATIC_WEB/cargo.stdout.log",
+        "{EVIDENCE}/STATIC_WEB/cargo.stderr.log"
+      ]
+    },
+    "supplemental_management_matrix": {
+      "argv": ["python3", "scripts/rust-tauri/r02_management_leaf_matrix.py", "{EVIDENCE}/MANAGEMENT"],
+      "timeoutSecs": 1200,
+      "evidencePaths": [
+        "{EVIDENCE}/MANAGEMENT/summary.json",
+        "{EVIDENCE}/MANAGEMENT/management-cases.json",
+        "{EVIDENCE}/MANAGEMENT/web-login-cases.json",
+        "{EVIDENCE}/MANAGEMENT/tls-web-login-cases.json",
+        "{EVIDENCE}/MANAGEMENT/tls-cargo.stdout.log",
+        "{EVIDENCE}/MANAGEMENT/tls-cargo.stderr.log",
+        "{EVIDENCE}/MANAGEMENT/security-audit-sources.json",
+        "{EVIDENCE}/MANAGEMENT/security-audit.jsonl",
+        "{EVIDENCE}/MANAGEMENT/cargo.stdout.log",
+        "{EVIDENCE}/MANAGEMENT/cargo.stderr.log"
+      ]
+    },
+    "supplemental_client_matrix": {
+      "argv": ["python3", "scripts/rust-tauri/r02_client_leaf_matrix.py", "{EVIDENCE}/CLIENT"],
+      "timeoutSecs": 240,
+      "evidencePaths": [
+        "{EVIDENCE}/CLIENT/leaf-cases.json",
+        "{EVIDENCE}/CLIENT/summary.json",
+        "{EVIDENCE}/CLIENT/sharing-cases.json",
+        "{EVIDENCE}/CLIENT/sharing-vitest.stdout.log",
+        "{EVIDENCE}/CLIENT/sharing-vitest.stderr.log",
+        "{EVIDENCE}/CLIENT/cli-help-exit0-no-start/stdout.log",
+        "{EVIDENCE}/CLIENT/cli-help-exit0-no-start/stderr.log",
+        "{EVIDENCE}/CLIENT/cli-unknown-arg-exit1-no-start/stdout.log",
+        "{EVIDENCE}/CLIENT/cli-unknown-arg-exit1-no-start/stderr.log",
+        "{EVIDENCE}/CLIENT/cli-serve-unknown-arg-exit1-no-start/stdout.log",
+        "{EVIDENCE}/CLIENT/cli-serve-unknown-arg-exit1-no-start/stderr.log"
+      ]
+    },
+    "supplemental_cli_sessions_matrix": {
+      "argv": ["python3", "scripts/rust-tauri/r02_cli_sessions_leaf_matrix.py", "{EVIDENCE}/CLI_SESSIONS"],
+      "timeoutSecs": 1620,
+      "evidencePaths": [
+        "{EVIDENCE}/CLI_SESSIONS/summary.json",
+        "{EVIDENCE}/CLI_SESSIONS/cli-sessions-cases.json",
+        "{EVIDENCE}/CLI_SESSIONS/producer.stdout.log",
+        "{EVIDENCE}/CLI_SESSIONS/producer.stderr.log",
+        "{EVIDENCE}/CLI_SESSIONS/auth/sessions-list-matrix.json",
+        "{EVIDENCE}/CLI_SESSIONS/auth/cli-sessions-owner.stdout.log",
+        "{EVIDENCE}/CLI_SESSIONS/auth/cli-sessions-foreign.stdout.log",
+        "{EVIDENCE}/CLI_SESSIONS/auth/cli-sessions-unauthorized.stderr.log",
+        "{EVIDENCE}/CLI_SESSIONS/auth/cli-sessions-limit-case.json"
+      ]
+    },
     "a01_smoke": {
       "argv": ["bash", "scripts/rust-tauri/r02_t01_service_smoke.sh", "{EVIDENCE}/A01"],
       "timeoutSecs": 1800,
       "evidencePaths": [
         "{EVIDENCE}/A01/a01-health-check.log",
         "{EVIDENCE}/A01/a01-shutdown.log",
-        "{EVIDENCE}/A01/a01-deptree-evidence.log"
+        "{EVIDENCE}/A01/a01-deptree-evidence.log",
+        "{EVIDENCE}/A01/a01-leaf-cases.json"
       ]
     },
     "a02_boundary_negative": {
@@ -36,7 +1587,9 @@
       "timeoutSecs": 1800,
       "evidencePaths": [
         "{EVIDENCE}/A05_A06/summary.txt",
-        "{EVIDENCE}/A05_A06/ws-matrix.json"
+        "{EVIDENCE}/A05_A06/ws-matrix.json",
+        "{EVIDENCE}/A05_A06/leaf-cases.json",
+        "{EVIDENCE}/A05_A06/sessions-list-matrix.json"
       ]
     },
     "a07_a08_storage_tx": {
@@ -46,6 +1599,23 @@
         "{EVIDENCE}/A07_A08/s1-counts-after-stop.json",
         "{EVIDENCE}/A07_A08/s4-hashes-after.txt"
       ]
+    },
+    "a07_live_fault_01_test": {
+      "argv": [
+        "env", "CARGO_NET_OFFLINE=true",
+        "R02_A07_LIVE_FAULT_EVIDENCE={EVIDENCE}/A07_LIVE_FAULT/case.json",
+        "cargo", "test", "--manifest-path", "rust/Cargo.toml", "--locked", "--offline",
+        "-p", "lingxi-service", "--test", "execute_concurrency",
+        "http_running_storage_fault_has_no_success_event_or_restart_run",
+        "--", "--exact", "--nocapture"
+      ],
+      "timeoutSecs": 1800,
+      "evidencePaths": ["{EVIDENCE}/A07_LIVE_FAULT/case.json"]
+    },
+    "a07_live_fault_02_check": {
+      "argv": ["python3", "scripts/rust-tauri/r02_t04_live_fault_evidence.py", "{EVIDENCE}"],
+      "timeoutSecs": 60,
+      "evidencePaths": ["{EVIDENCE}/A07_LIVE_FAULT/checked.json"]
     },
     "a09_a10_events_matrix": {
       "argv": ["bash", "scripts/rust-tauri/r02_t05_events_matrix.sh", "{EVIDENCE}/A09_A10"],
@@ -100,7 +1670,7 @@
     { "id": "R02-A04", "requirement": "REQUIRED", "commandRefs": ["a04_path_priority"] },
     { "id": "R02-A05", "requirement": "REQUIRED", "commandRefs": ["a05_a06_auth_matrix"] },
     { "id": "R02-A06", "requirement": "REQUIRED", "commandRefs": ["a05_a06_auth_matrix"] },
-    { "id": "R02-A07", "requirement": "REQUIRED", "commandRefs": ["a07_a08_storage_tx"] },
+    { "id": "R02-A07", "requirement": "REQUIRED", "commandRefs": ["a07_a08_storage_tx", "a07_live_fault_01_test", "a07_live_fault_02_check"] },
     { "id": "R02-A08", "requirement": "REQUIRED", "commandRefs": ["a07_a08_storage_tx"] },
     { "id": "R02-A09", "requirement": "REQUIRED", "commandRefs": ["a09_a10_events_matrix"] },
     { "id": "R02-A10", "requirement": "REQUIRED", "commandRefs": ["a09_a10_events_matrix"] },

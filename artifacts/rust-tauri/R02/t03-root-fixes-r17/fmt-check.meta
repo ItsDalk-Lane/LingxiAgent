@@ -1,0 +1,4 @@
+start_utc=2026-09-28T06:07:58Z
+command=cargo fmt --manifest-path rust/Cargo.toml --all -- --check
+end_utc=2026-09-28T06:07:59Z
+exit_status=1

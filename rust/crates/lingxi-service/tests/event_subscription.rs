@@ -27,7 +27,8 @@ use std::sync::Arc;
 use lingxi_service::ws::WsFrame;
 use lingxi_service::{
     events::{SubscribeOutcome, SubscribeReject},
-    prepare_layout, run, HomeSource, NetworkMode, ServiceConfig, ServiceError, ServiceState,
+    prepare_layout, run, HomeSource, NetworkMode, ServeOutcome, ServiceConfig, ServiceError,
+    ServiceState,
 };
 use tokio::io::{AsyncReadExt as _, AsyncWriteExt as _};
 use tokio::net::TcpStream;
@@ -60,6 +61,7 @@ fn owner_principal() -> lingxi_service::Principal {
         server_node_id: None,
         device_id: None,
         credential_id: None,
+        web_session_id: None,
         connection_kind: lingxi_service::auth::ConnectionKindSerde::Local,
         credential_kind: lingxi_service::CredentialKind::LoopbackToken,
         trust_state: lingxi_service::TrustState::Local,
@@ -77,6 +79,7 @@ fn foreign_principal() -> lingxi_service::Principal {
         server_node_id: None,
         device_id: Some("device_b".to_string()),
         credential_id: Some("cred_b".to_string()),
+        web_session_id: None,
         connection_kind: lingxi_service::auth::ConnectionKindSerde::Lan,
         credential_kind: lingxi_service::CredentialKind::DeviceCredential,
         trust_state: lingxi_service::TrustState::Lan,
@@ -906,7 +909,7 @@ struct TestServer {
     state: Arc<ServiceState>,
     token: String,
     stop: tokio::sync::oneshot::Sender<()>,
-    handle: tokio::task::JoinHandle<Result<(), ServiceError>>,
+    handle: tokio::task::JoinHandle<Result<ServeOutcome, ServiceError>>,
     home: PathBuf,
 }
 
@@ -918,15 +921,20 @@ async fn start_ws_server(tag: &str) -> TestServer {
     let serve_state = Arc::clone(&state);
     let (stop_tx, stop_rx) = tokio::sync::oneshot::channel::<()>();
     let (ready_tx, ready_rx) = tokio::sync::oneshot::channel::<SocketAddr>();
+    let ws_signal = serve_state.ws_shutdown();
     let handle = tokio::spawn(async move {
         run(
             (*serve_state).clone(),
-            async {
+            async move {
                 let _ = stop_rx.await;
+                // Mirror the production signal closure: broadcast the
+                // shutdown to managed WS sessions AT signal time.
+                ws_signal.request_close();
             },
             |addr| {
                 let _ = ready_tx.send(addr);
             },
+            None, // no drain budget: the test drives the stop signal itself
         )
         .await
     });
@@ -1332,4 +1340,208 @@ fn url_encoding_of(raw: &str) -> String {
         }
     }
     out
+}
+
+// ── R02 stage-repair R1 / F02: purge/resume race can never hole a resume ────
+//
+// Pre-fix the resume path read floor and page in separate storage
+// submissions; a purge committing between them produced Started cuts whose
+// first event skipped seqs with NO snapshot directive (review probe: 223
+// holes out of 2304 resume attempts; repair-side pre-fix probe: same
+// signature). The slice read is atomic now, so a Started cut's first event
+// must ALWAYS be exactly `after + 1` — anything else is a hole and fails
+// this test outright.
+/// R02 stage-repair R1 / F03: a WS connection that completed the HTTP
+/// upgrade but never sent its ClientHello races the shutdown broadcast —
+/// it must close (1001) promptly instead of holding the transport drain
+/// until the client goes away.
+#[tokio::test]
+async fn ws_pre_hello_connection_cannot_hold_the_shutdown_drain() {
+    let server = start_ws_server("ws-prehello").await;
+    let mut stream = ws_upgrade_bearer(server.addr, &server.token).await;
+    // Never send the ClientHello. Stop the server: the session must take
+    // the shutdown broadcast and end itself; the drain cannot wait on the
+    // silent client.
+    stop_server(server).await;
+    let frame = tokio::time::timeout(
+        std::time::Duration::from_secs(2),
+        lingxi_service::ws::read_ws_frame(&mut stream),
+    )
+    .await;
+    match frame {
+        // Either the polite close(1001) arrived, or the socket simply
+        // closed (EOF) — both prove the session terminated on the
+        // broadcast without the client's hello.
+        Ok(Ok(Some(WsFrame::Close(1001, _)))) => {}
+        Ok(Ok(None)) => {}
+        other => panic!("expected close(1001) or EOF, got {other:?}"),
+    }
+}
+
+#[tokio::test(flavor = "multi_thread", worker_threads = 4)]
+async fn f02_purge_resume_race_never_produces_a_silent_hole() {
+    let (state, home) = boot("f02-race").await;
+    let mut total_started = 0u32;
+    let mut total_snapshot_required = 0u32;
+    for round in 0..12u64 {
+        for n in 0..6 {
+            execute(&state, "retention-input", 1_000_000 + round * 10 + n).await;
+        }
+        let head = state
+            .events()
+            .stream_head("sess_local_alpha")
+            .await
+            .expect("head")
+            .expect("stream exists")
+            .value();
+        let after = head - 2;
+        let mut tasks = Vec::new();
+        for _ in 0..16 {
+            let events = Arc::clone(state.events());
+            tasks.push(tokio::spawn(async move {
+                let cursor = lingxi_service::events::SubscribeCursor {
+                    stream_id: "sess_local_alpha".to_string(),
+                    seq: lingxi_protocol::Seq::new(after),
+                }
+                .encode();
+                events
+                    .subscribe(&owner_principal(), "sess_local_alpha", Some(cursor))
+                    .await
+            }));
+        }
+        tokio::time::sleep(std::time::Duration::from_millis(round % 12)).await;
+        let purge = {
+            let events = Arc::clone(state.events());
+            tokio::spawn(async move {
+                events
+                    .purge_events_before("sess_local_alpha", lingxi_protocol::Seq::new(head))
+                    .await
+                    .expect("purge")
+            })
+        };
+        for t in tasks {
+            match t.await.unwrap() {
+                Ok(SubscribeOutcome::Started { cut, subscription }) => {
+                    total_started += 1;
+                    if let Some(first) = cut.events.first() {
+                        assert_eq!(
+                            first.seq.value(),
+                            after + 1,
+                            "F02 hole: resume from {after} started at {} with no snapshot \
+                             directive (round {round})",
+                            first.seq.value()
+                        );
+                    }
+                    drop(subscription);
+                }
+                // The explicit rebuild directive is the correct answer when
+                // the purge won the race.
+                Ok(SubscribeOutcome::RequiresSnapshot(_)) => total_snapshot_required += 1,
+                // The bounded registry may refuse some concurrent
+                // subscribers — an explicit rejection, never a hole.
+                Err(SubscribeReject::SubscriberLimit { .. }) => {}
+                Err(other) => panic!("unexpected rejection in race: {other:?}"),
+            }
+        }
+        purge.await.unwrap();
+    }
+    assert!(
+        total_started > 0,
+        "the race must actually produce resume cuts (started={total_started}, \
+         snapshot_required={total_snapshot_required})"
+    );
+    teardown(&state, &home).await;
+}
+
+/// Corruption negative (F02 defense in depth): a MIDDLE row deleted straight
+/// from the database (a state retention can never produce — purge is
+/// prefix-only) must surface as loud corruption on resume, never as a
+/// silently holed cut.
+#[tokio::test]
+async fn f02_intra_page_seq_gap_is_loud_corruption_never_a_silent_skip() {
+    let (state, home) = boot("f02-gap").await;
+    for n in 0..6 {
+        execute(&state, "gap-input", 2_000_000 + n).await; // 12 events, seqs 1..=12
+    }
+    state.storage().close().await.expect("close storage");
+    drop(state);
+
+    let db_path = home.join("lingxi-service").join("data").join("runs.db");
+    {
+        let conn = rusqlite::Connection::open(&db_path).expect("raw open");
+        conn.execute(
+            "DELETE FROM key_events WHERE stream_id = 'sess_local_alpha' AND seq = 7",
+            [],
+        )
+        .expect("delete middle row");
+    }
+
+    let layout = prepare_layout(&home).expect("layout");
+    let state = ServiceState::bootstrap(config_for(&home), &layout)
+        .await
+        .expect("reopen corrupted db");
+    let cursor = lingxi_service::events::SubscribeCursor {
+        stream_id: "sess_local_alpha".to_string(),
+        seq: lingxi_protocol::Seq::new(5),
+    }
+    .encode();
+    match state
+        .events()
+        .subscribe(&owner_principal(), "sess_local_alpha", Some(cursor))
+        .await
+    {
+        Err(SubscribeReject::Storage(lingxi_kernel::ports::StorageError::Corrupted { detail })) => {
+            assert!(
+                detail.contains("not consecutive"),
+                "corruption detail must name the seq jump: {detail}"
+            );
+        }
+        other => panic!("intra-page gap must be loud corruption, got {other:?}"),
+    }
+    teardown(&state, &home).await;
+}
+
+/// First-event-gap negative (F02): when the first retained event after the
+/// cursor is not exactly `after + 1` but the floor did not flag truncation
+/// (again only reachable through direct corruption), the resume becomes the
+/// explicit rebuild directive — never a silent skip.
+#[tokio::test]
+async fn f02_resume_first_event_gap_gets_explicit_snapshot_directive() {
+    let (state, home) = boot("f02-first-gap").await;
+    for n in 0..3 {
+        execute(&state, "first-gap-input", 3_000_000 + n).await; // 6 events, seqs 1..=6
+    }
+    state.storage().close().await.expect("close storage");
+    drop(state);
+
+    let db_path = home.join("lingxi-service").join("data").join("runs.db");
+    {
+        let conn = rusqlite::Connection::open(&db_path).expect("raw open");
+        conn.execute(
+            "DELETE FROM key_events WHERE stream_id = 'sess_local_alpha' AND seq = 4",
+            [],
+        )
+        .expect("delete first-event row");
+    }
+
+    let layout = prepare_layout(&home).expect("layout");
+    let state = ServiceState::bootstrap(config_for(&home), &layout)
+        .await
+        .expect("reopen corrupted db");
+    let cursor = lingxi_service::events::SubscribeCursor {
+        stream_id: "sess_local_alpha".to_string(),
+        seq: lingxi_protocol::Seq::new(3),
+    }
+    .encode();
+    match state
+        .events()
+        .subscribe(&owner_principal(), "sess_local_alpha", Some(cursor))
+        .await
+    {
+        Ok(SubscribeOutcome::RequiresSnapshot(required)) => {
+            assert_eq!(required.reason, "events_truncated");
+        }
+        other => panic!("first-event gap must be the rebuild directive, got {other:?}"),
+    }
+    teardown(&state, &home).await;
 }

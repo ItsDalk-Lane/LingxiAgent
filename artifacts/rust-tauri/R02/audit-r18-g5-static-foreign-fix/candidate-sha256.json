@@ -1,0 +1,12 @@
+{
+  "scripts/rust-tauri/r02_t01_service_smoke.sh": "913ac94085bcde15a49b1f78303636717daa74bf1a9973b1073458330aa795ec",
+  "scripts/rust-tauri/r02_t02_dual_instance.sh": "ed7e7a1c194de2c21ebfc91020c0941f7e847ff881fef339dbceee380e235866",
+  "scripts/rust-tauri/r02_t02_path_priority.sh": "5a748b6627088bfdfe30386225a7cee78099bdb0337738706087032a3d27b3ce",
+  "scripts/rust-tauri/r02_t03_auth_matrix.sh": "6be1d07a90eeff014793b5a5f923abea1f74aa5a62998a2daaf081103932781f",
+  "scripts/rust-tauri/r02_t04_storage_tx.sh": "313fe8b7a18026463d91bb90269ed10e4e6fcae2d34f78ac5efbb1a2f638fa96",
+  "scripts/rust-tauri/r02_t05_events_matrix.sh": "e3a7a5ae64ffd92e083fdfada750623e6e96322d4f8666b9ca0186548444ea9a",
+  "scripts/rust-tauri/r02_t06_backup_restore.sh": "fe78602a7cc47095944f6df88b9f5f79149daa558af5430e3401d29576c1231b",
+  "scripts/rust-tauri/r02_t06_recovery_drill.sh": "c6fd0b8ce49bc47859b5767856bc863609f76e2285d62174ec6f32604e012ba7",
+  "scripts/rust-tauri/r02_t07_redaction_scan.sh": "59876a68d3b3c1a68a889bb4e4739e2710918f23861b822f5bad3eb34d9fb792",
+  "scripts/rust-tauri/r02_t07_slow_subscriber.sh": "d12d8cfa1e5fd41df66d6f6050e7f5c0769596f754aad4041aae41db71acbbcd"
+}

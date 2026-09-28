@@ -49,6 +49,7 @@ type MobileEdgeGesture = {
 
 export function MobileApp(): React.ReactElement {
   const [authState, setAuthState] = useState<AuthState>('checking');
+  const [authBackend, setAuthBackend] = useState<'node' | 'rust' | null>(null);
   const [principal, setPrincipal] = useState<MobilePrincipal | null>(null);
   const [loginMode, setLoginMode] = useState<LoginMode>('device');
   const [loginSecret, setLoginSecret] = useState('');
@@ -60,18 +61,21 @@ export function MobileApp(): React.ReactElement {
   const bootstrap = useCallback(async () => {
     await ensureMobileAuthLocale();
     const session = await readMobileAuthSession();
+    setAuthBackend(session.backend);
     if (!session.authenticated || !session.principal) {
       setAuthState('login');
       return;
     }
     if (!principalHasRequiredScopes(session.principal, MOBILE_REQUIRED_SCOPES)) {
-      await apiJson('/api/web-auth/logout', { method: 'POST' }).catch(() => null);
+      await apiJson(session.backend === 'rust'
+        ? '/lingxi/v1/web-auth/logout'
+        : '/api/web-auth/logout', { method: 'POST' }).catch(() => null);
       setPrincipal(null);
       setLoginError((window.t ?? ((p: string) => p))('mobile.auth.scopeError'));
       setAuthState('login');
       return;
     }
-    await initializeMobileRuntime(session.principal);
+    await initializeMobileRuntime(session.principal, session.backend);
     setPrincipal(session.principal);
     setAuthState('ready');
   }, []);
@@ -80,7 +84,10 @@ export function MobileApp(): React.ReactElement {
     let cancelled = false;
     bootstrap().catch((err) => {
       console.warn('[mobile] bootstrap failed', err);
-      if (!cancelled) setAuthState('login');
+      if (!cancelled) {
+        setLoginError(err instanceof Error ? err.message : String(err));
+        setAuthState('login');
+      }
     });
     return () => {
       cancelled = true;
@@ -105,12 +112,15 @@ export function MobileApp(): React.ReactElement {
     event.preventDefault();
     setLoginError(null);
     try {
+      if (!authBackend) throw new Error('mobile server identity could not be verified');
       const body = loginMode === 'device'
         ? { credential: loginSecret.trim() }
         : { username: loginUsername.trim(), password: loginPassword };
-      await apiJson('/api/web-auth/login', {
+      await apiJson(authBackend === 'rust'
+        ? '/lingxi/v1/web-auth/login'
+        : '/api/web-auth/login', {
         method: 'POST',
-        body: JSON.stringify(body),
+        body: JSON.stringify(authBackend === 'rust' ? { ...body, clientKind: 'mobile' } : body),
       });
       setLoginSecret('');
       setLoginPassword('');

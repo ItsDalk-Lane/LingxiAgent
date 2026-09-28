@@ -233,6 +233,32 @@ describe("build-server-artifact: keyset resolution", () => {
 });
 
 describe("build-server-artifact: packServerArchive (pack-only, no manifest)", () => {
+  it("Windows 签名 server 归档必须带同版本 Rust reader", async () => {
+    const root = makeTempDir("hana-pack-server-win-");
+    const outDir = makeServerTree(root);
+    const opts = { outDir, artifactOutDir: path.join(root, "artifact"),
+      version: "0.381.0", platform: "win32", arch: "x64", log: () => {} };
+    await expect(packServerArchive(opts)).rejects.toThrow(/ENOENT/);
+    const rustDir = path.join(outDir, "rust-service");
+    fs.mkdirSync(rustDir);
+    const bytes = Buffer.alloc(2048);
+    bytes.write("MZ", 0);
+    bytes.writeUInt32LE(128, 0x3c);
+    bytes.write("PE\0\0", 128);
+    bytes.writeUInt16LE(0x8664, 132);
+    const sha256 = createHash("sha256").update(bytes).digest("hex");
+    fs.writeFileSync(path.join(rustDir, "lingxi-service.exe"), bytes);
+    const manifestPath = path.join(rustDir, "build.json");
+    const manifest = { schemaVersion: 1, platform: "win", arch: "x64",
+      binary: "lingxi-service.exe", target: "x86_64-pc-windows-msvc",
+      toolchain: "1.98.1", appVersion: "0.380.0", sha256,
+      contentSha256: sha256, sourceSha256: "a".repeat(64) };
+    fs.writeFileSync(manifestPath, JSON.stringify(manifest));
+    await expect(packServerArchive(opts)).rejects.toThrow(/does not match/);
+    fs.writeFileSync(manifestPath, JSON.stringify({ ...manifest, appVersion: "0.381.0" }));
+    await expect(packServerArchive(opts)).resolves.toMatchObject({ archiveName: "server-0.381.0-win32-x64.tar.gz" });
+  });
+
   it("packs the server tree into an archive without touching manifests", async () => {
     const root = makeTempDir("hana-pack-server-");
     const outDir = makeServerTree(root);

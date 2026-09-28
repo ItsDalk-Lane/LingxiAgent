@@ -1,0 +1,34 @@
+{
+  "schema": "lingxi.r02-management-producer.v1",
+  "command": [
+    "cargo",
+    "test",
+    "--manifest-path",
+    "rust/Cargo.toml",
+    "--locked",
+    "--offline",
+    "-p",
+    "lingxi-service",
+    "--test",
+    "r00_management_leaves",
+    "--",
+    "--nocapture"
+  ],
+  "startUtc": "2026-09-28T07:54:02.114216+00:00",
+  "endUtc": "2026-09-28T07:54:16.627937+00:00",
+  "exitCode": 101,
+  "timedOut": false,
+  "sourceSha256": {
+    "rust/crates/lingxi-service/tests/r00_management_leaves.rs": "95b06a1a11c429c134597958791f055a861b3ae5e2292a152b15aa533c390a46",
+    "rust/crates/lingxi-service/src/management.rs": "fd70b896495ee5d2990745da90043522e64400d98b35cb432cc7b39f45529326",
+    "rust/crates/lingxi-service/src/auth.rs": "45bce455198b5200a6d8e5c283557006aa593742ab3223420643ddf054b2d085",
+    "rust/crates/lingxi-service/src/lib.rs": "9634cf91cf482cf68eff03a04a397458c859d631c1dc74f25b79d80aa622e62e",
+    "scripts/rust-tauri/r02_management_leaf_matrix.py": "76342a702fb66c8903369fbadb9c9cc0a867420ee5c7d5388e68e20b37943614"
+  },
+  "caseCount": 0,
+  "issues": [
+    "management case file missing",
+    "cargo test exited 101"
+  ],
+  "status": "FAIL"
+}

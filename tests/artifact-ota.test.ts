@@ -1236,6 +1236,19 @@ describe("artifact-ota: checkOnce (ETag / not-modified semantics, mutation-check
 //    user clicked something ──────────────────────────────────────────────
 
 describe("artifact-ota: downloadAndApplyArtifacts", () => {
+  it("旧宽权限目录被守卫拒绝时不下载、不激活也不写状态", async () => {
+    const root = makeTempDir("hana-ota-private-reject-");
+    const homeDir = path.join(root, "home");
+    const keys = makeKeys();
+    const result = await downloadAndApplyArtifacts({
+      homeDir, keyset: keys.keyset, currentShellVersion: SHELL_VERSION,
+      platformArch: PLATFORM_ARCH, log: () => {},
+      privateArtifactGuard: async () => { throw new Error("legacy broad ACL"); },
+    });
+    expect(result).toEqual({ ok: false, error: "legacy broad ACL" });
+    expect(fs.existsSync(path.join(homeDir, "artifacts"))).toBe(false);
+  });
+
   it("stages both archives, activates them in order with phase-ordered progress, and clears available/lastError", async () => {
     const root = makeTempDir("hana-ota-e2e-");
     const keys = makeKeys();
@@ -1255,6 +1268,7 @@ describe("artifact-ota: downloadAndApplyArtifacts", () => {
       overallTotalBytes: number;
     };
     const progressEvents: ProgressEvent[] = [];
+    const privateActions: string[] = [];
     const result = await runWithDevOverride(manifestPath, () =>
       downloadAndApplyArtifacts({
         homeDir,
@@ -1263,10 +1277,12 @@ describe("artifact-ota: downloadAndApplyArtifacts", () => {
         platformArch: PLATFORM_ARCH,
         onProgress: (e: ProgressEvent) => progressEvents.push({ ...e }),
         log: () => {},
+        privateArtifactGuard: async (action: string) => { privateActions.push(action); },
       }),
     );
 
     expect(result).toEqual({ ok: true, train: 1, version: "2.0.0" });
+    expect(privateActions).toEqual(["prepare", "prepare", "seal"]);
 
     const serverNext = await pointerStore.readPointer(homeDir, SEED_CHANNEL, "next");
     expect(serverNext).not.toBeNull();

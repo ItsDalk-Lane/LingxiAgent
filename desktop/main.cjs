@@ -107,6 +107,12 @@ const {
   sanitizeWindowState,
 } = require("./src/shared/window-state.cjs");
 const {
+  rustDesktopEnabled,
+  resolveRustBinary,
+  readOwnedRustConnection,
+  readExistingRustConnection,
+} = require('./src/shared/rust-local-service.cjs');
+const {
   normalizeQuickChatPreferences,
 } = require("../shared/quick-chat-preferences.cjs");
 const {
@@ -685,6 +691,8 @@ let serverProcess = null;
 const _intentionalServerStops = new WeakSet();
 let serverPort = null;
 let serverToken = null;
+let serverNodeKind = null;
+let serverNodeTransport = 'http';
 let isQuitting = false;  // 区分关窗口（hide）和真正退出（quit）
 let tray = null;
 let reusedServerPid = null; // 复用已有 server 时记录其 PID，用 owner 字段决定是否关闭
@@ -962,6 +970,9 @@ function hasLegacyProviderConfig() {
 async function migrateSetupCompleteViaServerIfNeeded() {
   if (isSetupComplete()) return false;
   if (!hasLegacyProviderConfig()) return false;
+  if (serverNodeKind === 'lingxi-service') {
+    throw new Error('Rust desktop onboarding migration is unavailable; refusing the legacy Node endpoint');
+  }
   await submitOnboardingCompleteIntent({ serverPort, serverToken });
   console.log("[desktop] 检测到老用户（已有 agent 配置），已通过 server 标记 setupComplete");
   return true;
@@ -1279,7 +1290,157 @@ function isDesktopOwnedServerInfo(info) {
   return info?.ownerKind === "desktop";
 }
 
+async function verifyRustDesktopIdentity(connection) {
+  let response;
+  for (let attempt = 0; attempt < 20; attempt++) {
+    try {
+      response = await fetch(`${connection.baseUrl}/lingxi/v1/server/identity`, {
+        headers: { Authorization: `Bearer ${connection.token}` },
+        signal: AbortSignal.timeout(5000),
+        redirect: 'error',
+      });
+      break;
+    } catch (err) {
+      // READY 与 accept 循环之间可能差几个调度片；仅短暂连接拒绝可重试。
+      const code = err?.cause?.code;
+      if (attempt === 19 || (code !== 'ECONNREFUSED' && code !== 'ECONNRESET')) throw err;
+      await new Promise((resolve) => setTimeout(resolve, 100));
+    }
+  }
+  if (!response.ok) throw new Error(`Rust desktop identity returned ${response.status}`);
+  const identity = await response.json();
+  if (identity?.serverNodeKind !== 'lingxi-service'
+      || identity?.serverNodeTransport !== connection.transport
+      || !identity?.serverId || !identity?.studioId) {
+    throw new Error('Rust desktop identity does not match the local runtime');
+  }
+}
+
+function publishRustDesktopConnection(connection) {
+  serverPort = connection.port;
+  serverToken = connection.token;
+  serverNodeKind = 'lingxi-service';
+  serverNodeTransport = connection.transport;
+}
+
+async function startRustServer() {
+  if (process.env.LINGXI_ALLOW_DATA_DOWNGRADE === '1') {
+    throw new Error('Rust desktop refuses LINGXI_ALLOW_DATA_DOWNGRADE; use an explicit recovery workflow');
+  }
+  // Rust 使用自己的 instance.json 和锁。旧 Node 的 server-info 若还在，
+  // 不能偷偷再开一个同宅内核，也不能擅自删除另一进程的线索。
+  if (fs.existsSync(path.join(lingxiHome, 'server-info.json'))) {
+    throw new Error('RUST_DESKTOP_NODE_SERVER_INFO_PRESENT: resolve the existing Node server before starting Rust');
+  }
+  const binary = resolveRustBinary({
+    root: path.join(__dirname, '..'),
+    packaged: app.isPackaged,
+    resourcesPath: process.resourcesPath,
+    appVersion: app.getVersion(),
+    env: process.env,
+  });
+  // 安装包里的页面由签名 seed 激活；Rust 模式也必须先取得同一份页面。
+  // 这一步同时阻止损坏的 seed 在服务复用后仍显示旧页面。
+  if (app.isPackaged) {
+    await resolvePackagedArtifactBoot();
+    if (_currentContentVersion !== app.getVersion()) {
+      throw new Error(`Rust desktop requires matching installed renderer ${app.getVersion()}; active content is ${_currentContentVersion}. Update the app shell before using Rust mode.`);
+    }
+  }
+  const existing = readExistingRustConnection({ home: lingxiHome, windowsReaderBinary: binary });
+  if (existing) {
+    // 实例文件只是定位线索；只有带本轮令牌取得真实身份才可复用。
+    await verifyRustDesktopIdentity(existing);
+    // 旧进程可能来自上一版安装包；服务的 0.0.0 版本字段不能证明程序字节相同。
+    // 未取得进程可执行文件身份前，安装版拒绝复用且不代用户终止该进程。
+    if (app.isPackaged) {
+      throw new Error('RUST_DESKTOP_EXISTING_INSTANCE_UNVERIFIED: quit the existing Rust service before starting this installed app');
+    }
+    publishRustDesktopConnection(existing);
+    reusedServerPid = existing.pid;
+    reusedServerOwned = false;
+    serverProcess = null;
+    return;
+  }
+  const child = spawn(binary, ['--home', lingxiHome], {
+    cwd: path.dirname(binary),
+    env: { ...process.env, LINGXI_HOME: lingxiHome },
+    detached: process.platform !== 'win32',
+    windowsHide: true,
+    stdio: ['ignore', 'pipe', 'pipe'],
+  });
+  serverProcess = child;
+  _serverLogs = [];
+  _lastServerSpawn = { command: binary, args: ['--home', lingxiHome], pid: child.pid || null, startedAt: new Date().toISOString() };
+  let readyAddr;
+  try {
+    readyAddr = await new Promise((resolve, reject) => {
+      let stdout = '';
+      let settled = false;
+      const finish = (err, addr) => {
+        if (settled) return;
+        settled = true;
+        clearTimeout(timer);
+        child.stdout?.off('data', onStdout);
+        child.off('error', onError);
+        child.off('exit', onExit);
+        if (err) reject(err); else resolve(addr);
+      };
+      const onStdout = (chunk) => {
+        const text = redactMainLogText(chunk.toString());
+        _serverLogs.push(text);
+        stdout += text;
+        if (stdout.length > 65536) return finish(new Error('Rust service READY output exceeded limit'));
+        for (;;) {
+          const newline = stdout.indexOf('\n');
+          if (newline < 0) break;
+          const line = stdout.slice(0, newline).trim();
+          stdout = stdout.slice(newline + 1);
+          const match = /^LINGXI_SERVICE_READY addr=(\S+) home=/.exec(line);
+          if (match) return finish(null, match[1]);
+        }
+      };
+      const onError = (err) => finish(err);
+      const onExit = (code, signal) => finish(new Error(`Rust service exited before READY: ${signal || code}`));
+      const timer = setTimeout(() => finish(new Error('Rust service READY timed out')), SERVER_INFO_FIRST_WAIT_MS);
+      child.stdout?.on('data', onStdout);
+      child.stderr?.on('data', (chunk) => {
+        const text = redactMainLogText(chunk.toString());
+        _serverLogs.push(`[stderr] ${text}`);
+        if (_serverLogs.length > 500) _serverLogs.splice(0, _serverLogs.length - 500);
+      });
+      child.once('error', onError);
+      child.once('exit', onExit);
+    });
+    const connection = readOwnedRustConnection({ home: lingxiHome, pid: child.pid, readyAddr, windowsReaderBinary: binary });
+    await verifyRustDesktopIdentity(connection);
+    publishRustDesktopConnection(connection);
+    child.unref();
+  } catch (err) {
+    try { child.kill('SIGTERM'); } catch {}
+    let exited = await waitForProcessExit(child, child.pid, SERVER_SHUTDOWN_GRACE_MS);
+    if (!exited) {
+      try { child.kill('SIGKILL'); } catch {}
+      exited = await waitForProcessExit(child, child.pid, SERVER_FORCE_KILL_WAIT_MS);
+    }
+    if (serverProcess === child && exited) serverProcess = null;
+    serverPort = null;
+    serverToken = null;
+    serverNodeKind = null;
+    if (!exited) {
+      throw new Error(`Rust desktop startup failed and owned process exit was not confirmed: ${err.message}`);
+    }
+    throw err;
+  }
+}
+
 async function startServer() {
+  if (rustDesktopEnabled()) {
+    await startRustServer();
+    return;
+  }
+  serverNodeKind = null;
+  serverNodeTransport = 'http';
   const serverInfoPath = path.join(lingxiHome, "server-info.json");
 
   // ── 1. 检查是否有已运行的 server（Electron crash 后遗留的守护进程） ──
@@ -1479,6 +1640,7 @@ async function resolvePackagedArtifactBoot() {
   const boot = await artifactBoot.prepareArtifactBoot({
     homeDir: lingxiHome,
     resourcesPath,
+    appVersion: app.getVersion(),
     platformArch,
     keyset: loadPinnedKeyset(),
     // 通道选择驱动的是"这台设备落在哪条列车线上"：OTA 把
@@ -2019,6 +2181,9 @@ async function _spawnServerOnce(serverInfoPath, artifactBootContext) {
 async function settleLegacyGpuPreferenceAfterServerStart() {
   const intent = gpuStartupPolicy?.legacyPreferenceCleanup;
   if (process.platform !== "win32" || !intent) return null;
+  if (serverNodeKind === 'lingxi-service') {
+    throw new Error('Rust desktop cannot complete the pending legacy GPU preference migration');
+  }
   if (!serverPort || !serverToken) {
     throw new Error("Legacy GPU preference migration requires a ready local server");
   }
@@ -2083,11 +2248,11 @@ function monitorServer() {
         monitorServer(); // 重新挂监控
         // 通知前端重连
         if (mainWindow && !mainWindow.isDestroyed()) {
-          mainWindow.webContents.send("server-restarted", { port: serverPort, token: serverToken });
+          mainWindow.webContents.send("server-restarted", { port: serverPort, token: serverToken, serverNodeKind, serverNodeTransport });
         }
         // 设置窗口也需要知道新端口（否则旧端口的 API 全部失败）
         if (settingsWindow && !settingsWindow.isDestroyed()) {
-          settingsWindow.webContents.send("server-restarted", { port: serverPort, token: serverToken });
+          settingsWindow.webContents.send("server-restarted", { port: serverPort, token: serverToken, serverNodeKind, serverNodeTransport });
         }
       } catch (err) {
         console.error("[desktop] Server 重启失败:", err.message);
@@ -4546,6 +4711,10 @@ function _sendBrowserUserActivity(sessionPath) {
 /** 通过 WebSocket 监听 server 的浏览器命令 */
 function setupBrowserCommands() {
   if (!serverPort || !serverToken) return;
+  if (serverNodeKind === 'lingxi-service') {
+    console.warn('[desktop] Rust service has no legacy browser command channel');
+    return;
+  }
 
   const WebSocket = require("ws");
   const url = `ws://127.0.0.1:${serverPort}/internal/browser?token=${serverToken}`;
@@ -5393,6 +5562,12 @@ wrapIpcHandler("get-update-digest-history", () => loadUpdateDigestHistory());
 // ── IPC ──
 wrapIpcHandler("get-server-port", () => serverPort);
 wrapIpcHandler("get-server-token", () => serverToken);
+wrapIpcHandler("get-server-connection-info", () => ({
+  port: serverPort,
+  token: serverToken,
+  serverNodeKind,
+  serverNodeTransport,
+}));
 wrapIpcHandler("run-edit-command", (event, command) => {
   const allowed = new Set(["cut", "copy", "paste", "selectAll"]);
   if (!allowed.has(command)) {
@@ -6296,6 +6471,9 @@ wrapIpcBestEffortHandler("debug-open-onboarding-preview", () => {
 
 // Onboarding 完成后，经 server PreferencesManager 持久化，成功后才创建主窗口。
 wrapIpcHandler("onboarding-complete", async () => {
+  if (serverNodeKind === 'lingxi-service') {
+    throw new Error('Rust desktop onboarding completion is unavailable; the legacy Node setup endpoint is not supported');
+  }
   await completeOnboardingAndOpenMain({
     serverPort,
     serverToken,
@@ -6559,7 +6737,7 @@ async function shutdownServer() {
   let removeServerInfo = true;
   let shutdownReason = null;
   if (serverProcess && hasChildExitObserved(serverProcess)) {
-    if (process.platform === "win32" && !isWindowsServerGuardianShutdownConfirmed(serverProcess, true)) {
+    if (process.platform === "win32" && serverNodeKind !== 'lingxi-service' && !isWindowsServerGuardianShutdownConfirmed(serverProcess, true)) {
       removeServerInfo = false;
       shutdownReason = "Windows server guardian reported Job convergence failure";
     } else {
@@ -6571,7 +6749,7 @@ async function shutdownServer() {
     const pid = proc.pid;
     _intentionalServerStops.add(proc);
     console.log("[desktop] shutdownServer: 正在关闭 owned server...");
-    if (process.platform === "win32") {
+    if (process.platform === "win32" && serverNodeKind !== 'lingxi-service') {
       await requestServerShutdown(serverPort, serverToken);
     } else {
       try { proc.kill("SIGTERM"); } catch {}
@@ -6579,16 +6757,18 @@ async function shutdownServer() {
 
     let exited = await waitForProcessExit(proc, pid, SERVER_SHUTDOWN_GRACE_MS);
     if (!exited && pid) {
-      if (process.platform === "win32") {
+      if (process.platform === "win32" && serverNodeKind !== 'lingxi-service') {
         console.warn(`[desktop] shutdownServer: guardian PID ${pid} 未在 ${SERVER_SHUTDOWN_GRACE_MS}ms 内退出，请求 Job 收敛`);
         requestWindowsServerGuardianStop(proc);
+      } else if (process.platform === 'win32') {
+        try { proc.kill(); } catch {}
       } else {
         console.warn(`[desktop] shutdownServer: server PID ${pid} 未在 ${SERVER_SHUTDOWN_GRACE_MS}ms 内退出，强制终止`);
         signalPidOnPosix(pid, true);
       }
       exited = await waitForProcessExit(proc, pid, SERVER_FORCE_KILL_WAIT_MS);
     }
-    if (process.platform === "win32" && exited && !isWindowsServerGuardianShutdownConfirmed(proc, exited)) {
+    if (process.platform === "win32" && serverNodeKind !== 'lingxi-service' && exited && !isWindowsServerGuardianShutdownConfirmed(proc, exited)) {
       exited = false;
       shutdownReason = "Windows server guardian reported Job convergence failure";
     }

@@ -1,0 +1,25 @@
+{
+  "name": "management-compile",
+  "argv": [
+    "/Users/study_superior/.cargo/bin/rustup",
+    "run",
+    "1.98.1",
+    "cargo",
+    "test",
+    "-p",
+    "lingxi-service",
+    "--test",
+    "r00_management_leaves",
+    "--no-run",
+    "--locked",
+    "--offline"
+  ],
+  "cwd": "/Users/study_superior/Desktop/Code/LingxiAgent/rust",
+  "startedUtc": "2026-09-28T12:40:00.379510+00:00",
+  "endedUtc": "2026-09-28T12:40:01.396712+00:00",
+  "exitCode": 0,
+  "stdout": "artifacts/rust-tauri/R02/audit-r18/final-noport-2/management-compile.stdout.log",
+  "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+  "stderr": "artifacts/rust-tauri/R02/audit-r18/final-noport-2/management-compile.stderr.log",
+  "stderrSha256": "9e54803e20e1a1e02fba6f327d88516a8ff131736ee058293572ce2a3d6e604b"
+}

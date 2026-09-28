@@ -21,6 +21,10 @@ import styles from '../Settings.module.css';
 
 type AccessMode = 'loopback' | 'lan';
 
+function isNonEmptyString(value: unknown): value is string {
+  return typeof value === 'string' && value.trim().length > 0;
+}
+
 interface AccessSummary {
   network: {
     mode: AccessMode;
@@ -69,6 +73,54 @@ interface AccessSummary {
   }>;
 }
 
+function requireAccountResponse(data: any): AccessSummary['account'] {
+  const account = data?.account;
+  if (!account || typeof account.userId !== 'string' || !account.userId
+    || typeof account.username !== 'string'
+    || typeof account.displayName !== 'string'
+    || typeof account.passwordSet !== 'boolean') {
+    throw new Error('account response is incomplete');
+  }
+  return account;
+}
+
+function requireNetworkResponse(data: any): AccessSummary['network'] {
+  const network = data?.network;
+  if (!network || (network.mode !== 'loopback' && network.mode !== 'lan')
+    || !Number.isInteger(network.configuredPort)
+    || !Number.isInteger(network.actualPort)
+    || !isNonEmptyString(network.listenHost)
+    || (network.runtimeMode !== 'loopback' && network.runtimeMode !== 'lan')
+    || !isNonEmptyString(network.runtimeHost)
+    || typeof network.restartRequired !== 'boolean'
+    || !Array.isArray(network.lanAddresses)
+    || !network.lanAddresses.every(isNonEmptyString)
+    || !isNonEmptyString(network.localServerUrl)
+    || !isNonEmptyString(network.localMobileUrl)
+    || !isNonEmptyString(network.localDesktopUrl)
+    || [network.publicBaseUrl, network.publicMobileUrl, network.publicDesktopUrl,
+      network.lanServerUrl, network.lanMobileUrl, network.lanDesktopUrl]
+      .some(value => value != null && !isNonEmptyString(value))) {
+    throw new Error('network response is incomplete');
+  }
+  return network;
+}
+
+function requireAccessSummary(data: any): AccessSummary {
+  const network = requireNetworkResponse(data);
+  const account = requireAccountResponse(data);
+  if (!Array.isArray(data.devices)
+    || !data.devices.every((device: any) => device && isNonEmptyString(device.deviceId)
+      && isNonEmptyString(device.displayName) && (device.status === 'active' || device.status === 'revoked'))
+    || !Array.isArray(data.credentials)
+    || !data.credentials.every((credential: any) => credential && isNonEmptyString(credential.credentialId)
+      && isNonEmptyString(credential.deviceId) && (credential.status === 'active' || credential.status === 'revoked')
+      && Array.isArray(credential.scopes) && credential.scopes.every(isNonEmptyString))) {
+    throw new Error('access summary is incomplete');
+  }
+  return { ...data, network, account };
+}
+
 const MOBILE_ACCESS_SCOPES = [...MOBILE_REMOTE_ACCESS_SCOPES];
 const DESKTOP_ACCESS_SCOPES = [...DESKTOP_REMOTE_ACCESS_SCOPES];
 
@@ -96,6 +148,7 @@ export function AccessTab() {
   const [remoteServerKey, setRemoteServerKey] = useState('');
   const [connectingRemoteServer, setConnectingRemoteServer] = useState(false);
   const [loadingSummary, setLoadingSummary] = useState(true);
+  const [summaryLoadFailed, setSummaryLoadFailed] = useState(false);
   const [savingNetwork, setSavingNetwork] = useState(false);
   const [accountDraft, setAccountDraft] = useState({ username: '', displayName: '' });
   const [passwordDraft, setPasswordDraft] = useState('');
@@ -115,13 +168,15 @@ export function AccessTab() {
   const loadSummary = useCallback(async () => {
     if (!isLocalOwner) {
       setSummary(null);
+      setSummaryLoadFailed(false);
       setLoadingSummary(false);
       return;
     }
     setLoadingSummary(true);
+    setSummaryLoadFailed(false);
     try {
       const res = await lingxiFetch('/api/access/summary');
-      const data = await res.json();
+      const data = requireAccessSummary(await res.json());
       setSummary(data);
       setMode(data.network.mode);
       setPublicBaseDraft(data.network.publicBaseUrl || '');
@@ -130,6 +185,9 @@ export function AccessTab() {
         username: data.account.username || '',
         displayName: data.account.displayName || '',
       });
+    } catch (error) {
+      setSummaryLoadFailed(true);
+      throw error;
     } finally {
       setLoadingSummary(false);
     }
@@ -200,10 +258,11 @@ export function AccessTab() {
         body: JSON.stringify({ mode: nextMode, listenPort, publicBaseUrl: publicBaseDraft.trim() }),
       });
       const data = await res.json();
-      setSummary(prev => prev ? { ...prev, network: data.network } : prev);
-      setMode(data.network.mode);
-      setPublicBaseDraft(data.network.publicBaseUrl || '');
-      setPort(String(data.network.configuredPort));
+      const network = requireNetworkResponse(data);
+      setSummary(prev => prev ? { ...prev, network } : prev);
+      setMode(network.mode);
+      setPublicBaseDraft(network.publicBaseUrl || '');
+      setPort(String(network.configuredPort));
       showToast(t('settings.access.saved'), 'success');
     } catch (err: any) {
       showToast(`${t('settings.saveFailed')}: ${err.message}`, 'error');
@@ -238,8 +297,17 @@ export function AccessTab() {
         }),
       });
       const data = await res.json();
-      setMobileKey(data.secret || '');
-      await loadSummary();
+      if (typeof data?.secret !== 'string' || !data.secret) {
+        throw new Error('mobile credential response missing secret');
+      }
+      // 密钥只会返回一次；摘要刷新失败也必须保留刚返回的密钥供用户保存。
+      setMobileKey(data.secret);
+      try {
+        await loadSummary();
+      } catch (err: any) {
+        showToast(`${t('settings.access.loadFailed')}: ${err.message}`, 'error');
+        return;
+      }
       showToast(t('settings.access.mobileKeyCreated'), 'success');
     } catch (err: any) {
       showToast(`${t('settings.access.mobileKeyFailed')}: ${err.message}`, 'error');
@@ -260,8 +328,16 @@ export function AccessTab() {
         }),
       });
       const data = await res.json();
-      setDesktopKey(data.secret || '');
-      await loadSummary();
+      if (typeof data?.secret !== 'string' || !data.secret) {
+        throw new Error('desktop credential response missing secret');
+      }
+      setDesktopKey(data.secret);
+      try {
+        await loadSummary();
+      } catch (err: any) {
+        showToast(`${t('settings.access.loadFailed')}: ${err.message}`, 'error');
+        return;
+      }
       showToast(t('settings.access.desktopKeyCreated'), 'success');
     } catch (err: any) {
       showToast(`${t('settings.access.desktopKeyFailed')}: ${err.message}`, 'error');
@@ -321,7 +397,8 @@ export function AccessTab() {
         body: JSON.stringify(accountDraft),
       });
       const data = await res.json();
-      setSummary(prev => prev ? { ...prev, account: data.account } : prev);
+      const account = requireAccountResponse(data);
+      setSummary(prev => prev ? { ...prev, account } : prev);
       showToast(t('settings.access.accountSaved'), 'success');
     } catch (err: any) {
       showToast(`${t('settings.saveFailed')}: ${err.message}`, 'error');
@@ -336,7 +413,9 @@ export function AccessTab() {
         body: JSON.stringify({ password: passwordDraft }),
       });
       const data = await res.json();
-      setSummary(prev => prev ? { ...prev, account: data.account } : prev);
+      const account = requireAccountResponse(data);
+      if (!account.passwordSet) throw new Error('password was not set');
+      setSummary(prev => prev ? { ...prev, account } : prev);
       setPasswordDraft('');
       showToast(t('settings.access.passwordSaved'), 'success');
     } catch (err: any) {
@@ -348,7 +427,9 @@ export function AccessTab() {
     try {
       const res = await lingxiFetch('/api/access/account/password', { method: 'DELETE' });
       const data = await res.json();
-      setSummary(prev => prev ? { ...prev, account: data.account } : prev);
+      const account = requireAccountResponse(data);
+      if (account.passwordSet) throw new Error('password was not cleared');
+      setSummary(prev => prev ? { ...prev, account } : prev);
       setPasswordDraft('');
       showToast(t('settings.access.passwordCleared'), 'success');
     } catch (err: any) {
@@ -688,9 +769,12 @@ export function AccessTab() {
 
       <SettingsSection title={t('settings.access.pairedDevices')}>
         <div className={styles['access-device-list']}>
-          {activeDevicesWithoutCredentials.length === 0 && activeCredentials.length === 0 ? (
+          {summaryLoadFailed && (
+            <div className={styles['settings-inline-error']} role="alert">{t('settings.access.loadFailed')}</div>
+          )}
+          {!summaryLoadFailed && !loadingSummary && summary && activeDevicesWithoutCredentials.length === 0 && activeCredentials.length === 0 ? (
             <div className={styles['access-empty']}>{t('settings.access.noDevices')}</div>
-          ) : (
+          ) : summary ? (
             <>
               {activeCredentials.map(credential => {
                 const device = deviceById.get(credential.deviceId);
@@ -724,7 +808,7 @@ export function AccessTab() {
                 </div>
               ))}
             </>
-          )}
+          ) : null}
         </div>
       </SettingsSection>
 

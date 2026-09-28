@@ -165,8 +165,7 @@ fn fsync_file(path: &Path) -> Result<(), StorageError> {
 /// (`queue::tighten_db_file_permissions`, T04 REVIEW F04): the backup is a
 /// full external copy of the run facts, so a future directory-permission
 /// regression must not expose it either. Idempotent (already-tight paths
-/// are left untouched) and loud on failure. Non-unix platforms have no
-/// permission bits to tighten (documented no-op, see the module docs).
+/// are left untouched) and loud on failure. Windows uses protected ACLs.
 fn tighten_owner_only(path: &Path) -> Result<(), StorageError> {
     #[cfg(unix)]
     {
@@ -190,9 +189,25 @@ fn tighten_owner_only(path: &Path) -> Result<(), StorageError> {
             })?;
         }
     }
-    #[cfg(not(unix))]
+    #[cfg(windows)]
     {
-        let _ = path;
+        let result = if path.is_dir() {
+            super::windows_acl::ensure_private_directory(path)
+        } else {
+            super::windows_acl::ensure_private_file(path)
+        };
+        result.map_err(|source| StorageError::Io {
+            detail: format!(
+                "cannot protect backup artifact {}: {source}",
+                path.display()
+            ),
+        })?;
+    }
+    #[cfg(not(any(unix, windows)))]
+    {
+        return Err(StorageError::Io {
+            detail: format!("private backup artifacts unsupported on {}", path.display()),
+        });
     }
     Ok(())
 }
@@ -231,6 +246,28 @@ pub fn backup_database(
     options: BackupOptions,
 ) -> Result<BackupOutcome, StorageError> {
     validate_stem(file_stem)?;
+    #[cfg(windows)]
+    if !dest_dir.exists() {
+        super::windows_acl::ensure_private_directory(dest_dir).map_err(|source| {
+            StorageError::Io {
+                detail: format!(
+                    "cannot create private backup destination {}: {source}",
+                    dest_dir.display()
+                ),
+            }
+        })?;
+    }
+    #[cfg(windows)]
+    let _destination_guard =
+        super::windows_acl::require_private_directory(dest_dir).map_err(|source| {
+            StorageError::Io {
+                detail: format!(
+                    "backup destination is not an owner-only directory {}: {source}",
+                    dest_dir.display()
+                ),
+            }
+        })?;
+    #[cfg(not(windows))]
     std::fs::create_dir_all(dest_dir).map_err(|source| StorageError::Io {
         detail: format!(
             "cannot create backup destination {}: {source}",
@@ -240,6 +277,7 @@ pub fn backup_database(
     // F02 repair: the destination directory (created or pre-existing) is
     // owner-only BEFORE any artifact may land in it. A failure aborts the
     // backup before anything is published.
+    #[cfg(not(windows))]
     tighten_owner_only(dest_dir)?;
 
     if options.pre_checkpoint {
@@ -260,7 +298,23 @@ pub fn backup_database(
     let final_path = dest_dir.join(format!("{file_stem}.db"));
     let manifest_path = dest_dir.join(format!("{file_stem}.manifest.json"));
 
+    #[cfg(windows)]
+    let mut own_partial = false;
     let build = (|| -> Result<(), StorageError> {
+        #[cfg(windows)]
+        {
+            drop(
+                super::windows_acl::create_private_file(&partial_path).map_err(|source| {
+                    StorageError::Io {
+                        detail: format!(
+                            "cannot create private backup staging file {}: {source}",
+                            partial_path.display()
+                        ),
+                    }
+                })?,
+            );
+            own_partial = true;
+        }
         let mut dest = rusqlite::Connection::open(&partial_path).map_err(map_rusqlite)?;
         // Owner-only from the first byte on disk: the staged file keeps its
         // mode through the atomic rename, so the published backup copy is
@@ -321,6 +375,11 @@ pub fn backup_database(
         // behind that could masquerade as a good snapshot. The final name
         // is only taken by the atomic rename AFTER integrity passed, so at
         // most a `.partial-*` can remain — remove it (loudly on failure).
+        #[cfg(windows)]
+        if own_partial {
+            remove_partial_quietly(&partial_path);
+        }
+        #[cfg(not(windows))]
         remove_partial_quietly(&partial_path);
         return Err(err);
     }
@@ -350,6 +409,15 @@ fn write_manifest_atomically(path: &Path, manifest: &BackupManifest) -> Result<(
     let tmp = path.with_extension(format!("json.tmp-{}", std::process::id()));
     {
         use std::io::Write as _;
+        #[cfg(windows)]
+        let mut file =
+            super::windows_acl::create_private_file(&tmp).map_err(|source| StorageError::Io {
+                detail: format!(
+                    "cannot create private manifest temp file {}: {source}",
+                    tmp.display()
+                ),
+            })?;
+        #[cfg(not(windows))]
         let mut file = std::fs::File::create(&tmp).map_err(|source| StorageError::Io {
             detail: format!(
                 "cannot create manifest temp file {}: {source}",
@@ -447,6 +515,28 @@ pub fn restore_backup(
         });
     }
 
+    #[cfg(windows)]
+    if !target_dir.exists() {
+        super::windows_acl::ensure_private_directory(target_dir).map_err(|source| {
+            StorageError::Io {
+                detail: format!(
+                    "cannot create private restore target {}: {source}",
+                    target_dir.display()
+                ),
+            }
+        })?;
+    }
+    #[cfg(windows)]
+    let _target_guard =
+        super::windows_acl::require_private_directory(target_dir).map_err(|source| {
+            StorageError::Io {
+                detail: format!(
+                    "restore target is not an owner-only directory {}: {source}",
+                    target_dir.display()
+                ),
+            }
+        })?;
+    #[cfg(not(windows))]
     std::fs::create_dir_all(target_dir).map_err(|source| StorageError::Io {
         detail: format!(
             "cannot create restore target {}: {source}",
@@ -456,6 +546,7 @@ pub fn restore_backup(
     // F02 repair: the restore target directory (created or pre-existing) is
     // owner-only before the copy lands; the restored db file is tightened
     // immediately after the copy, before it is fsynced or trusted.
+    #[cfg(not(windows))]
     tighten_owner_only(target_dir)?;
     let target_path = target_dir.join(RUNS_DB_FILE_NAME);
     if target_path.exists() {
@@ -468,7 +559,24 @@ pub fn restore_backup(
         });
     }
     // Copy + fsync, then re-verify the copy's hash before declaring success.
-    std::fs::copy(&source_path, &target_path).map_err(|source| {
+    #[cfg(windows)]
+    let mut own_target = false;
+    #[cfg(windows)]
+    let copy_result = (|| -> std::io::Result<()> {
+        let mut source = std::fs::File::open(&source_path)?;
+        let mut target = super::windows_acl::create_private_file(&target_path)?;
+        own_target = true;
+        std::io::copy(&mut source, &mut target)?;
+        target.sync_all()
+    })();
+    #[cfg(not(windows))]
+    let copy_result = std::fs::copy(&source_path, &target_path).map(|_| ());
+    copy_result.map_err(|source| {
+        #[cfg(windows)]
+        if own_target {
+            let _ = std::fs::remove_file(&target_path);
+        }
+        #[cfg(not(windows))]
         let _ = std::fs::remove_file(&target_path);
         StorageError::Io {
             detail: format!(

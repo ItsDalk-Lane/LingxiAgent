@@ -3,16 +3,12 @@
  * scripts/build-shell.mjs — shell-only builder over a checked-in shell
  * surface census (build/shell-surface-manifest.json)
  *
- * Builds *only* the Electron shell: main/preload/splash bundles, the
- * mac-only computer-use helper, then hands the whole tree to
- * `electron-builder --dir`. It deliberately does NOT build the renderer
- * or the server — those ship inside the signed seed kit
- * (dist-server-artifact/{os}-{arch}/), which this script only *verifies*
- * (fail-closed, read-only) via scripts/verify-seed-kit.mjs. A missing or
- * stale seed kit is a hard failure with a message telling the operator to
- * run `npm run build:server` or fetch an already-signed artifact — never
- * a "helpfully" auto-triggered build:server call, and never a reason to
- * fall back to an unsigned/partial seed.
+ * 只构建 Electron 壳：main/preload/splash 与 macOS 辅助程序，再交给
+ * `electron-builder --dir`。页面、Node 服务和 Rust 服务均使用现有产物：
+ * 前两者位于签名 seed，Rust 程序位于 dist-rust-service/{os}-{arch}/。
+ * 此脚本只核对这些输入，不替它们编译；缺失或过期时直接失败。
+ * seed 缺失或过期时提示先运行 `npm run build:server` 或取得已有签名产物；
+ * 不自动构建服务，也不改用未签名的残缺产物。
  *
  * Structural guarantee: LINGXI_SIGN_KEY (the private signing key path) is
  * never read by this script, and is stripped from the environment handed
@@ -31,9 +27,9 @@
  *   3. build:preload (vite.config.preload.js -> desktop/preload.bundle.cjs)
  *   4. build:splash  (vite.config.splash.ts  -> desktop/dist-splash/)
  *   5. verify-seed-kit.mjs against the existing dist-server-artifact/{os}-{arch}/
- *   6. electron-builder --dir
- *   7. structural self-check of the --dir output (asar contents, seed/
- *      resources, renderer absence) — see verifyBuiltShellStructure()
+ *   6. 核对预构建 Rust 程序与当前源和主机身份
+ *   7. electron-builder --dir
+ *   8. 核对装箱后的 asar、seed/、rust-service/ 与页面排除情况
  *
  * build:theme is deliberately absent from this list: its output lands
  * under desktop/dist-renderer/lib/ and is only referenced by renderer
@@ -50,9 +46,14 @@ import fs from "fs";
 import path from "path";
 import { execFileSync } from "child_process";
 import { fileURLToPath, pathToFileURL } from "url";
+import { createRequire } from "module";
 
 import { buildComputerUseHelper, shouldBuildComputerUseHelper } from "./build-computer-use-helper.mjs";
 import { seedManifestFileName } from "./build-server-artifact.mjs";
+import { verifyStage as verifyRustServiceStage } from "./build-rust-desktop-service.mjs";
+
+const require = createRequire(import.meta.url);
+const { verifyRustServiceDirectory } = require('../desktop/src/shared/rust-local-service.cjs');
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -220,7 +221,19 @@ function verifyBuiltShellStructure({ platform, arch, childEnv }) {
   }
   log(`structural check: resources/seed/ carries ${manifestFileName} + .sig`);
 
-  return { asarPath, resourcesDir, seedDir };
+  const stagedRust = verifyRustServiceStage({ platform, arch });
+  const packagedRust = verifyRustServiceDirectory({
+    directory: path.join(resourcesDir, 'rust-service'), platform, arch,
+    allowSignedMacMutation: true,
+    allowSignedWindowsMutation: true,
+  });
+  if (stagedRust.manifest.contentSha256 !== packagedRust.manifest.contentSha256
+      || stagedRust.manifest.sourceSha256 !== packagedRust.manifest.sourceSha256) {
+    throw new Error('[build-shell] structural check failed: packaged Rust service differs from verified stage');
+  }
+  log(`structural check: resources/rust-service/ matches current ${platform}-${arch} Rust release`);
+
+  return { asarPath, resourcesDir, seedDir, rustBinary: packagedRust.binary };
 }
 
 async function main() {
@@ -262,6 +275,10 @@ async function main() {
   if (seedDirMutated) {
     throw new Error(`[build-shell] internal error: ${artifactOutDir} changed during verify-seed-kit.mjs, which must be read-only`);
   }
+
+  // 构壳不编译 Rust，只接受与当前源和当前平台一致的预构建程序。
+  const rustStage = verifyRustServiceStage({ platform, arch });
+  log(`verified prebuilt Rust service ${rustStage.binary}`);
 
   // ── 6. electron-builder --dir ──
   run("electron-builder --dir", ELECTRON_BUILDER_BIN, ["--dir"], { env: childEnv });

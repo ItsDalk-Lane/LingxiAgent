@@ -516,6 +516,7 @@ export interface BrowserViewerOpenTarget {
 export interface PlatformApi {
   getServerPort(): Promise<string>;
   getServerToken(): Promise<string>;
+  getServerConnectionInfo?(): Promise<{ port: number | null; token: string | null; serverNodeKind: string | null; serverNodeTransport: string }>;
   runEditCommand?(command: 'cut' | 'copy' | 'paste' | 'selectAll'): Promise<boolean>;
   openSettings(tab?: string): void;
   openBrowserViewer(target?: string | BrowserViewerOpenTarget): void;
@@ -570,7 +571,7 @@ export interface PlatformApi {
   onSettingsChanged(callback: (event: string, payload: unknown) => void): void | (() => void);
   onOpenSettingsModal?(callback: (tab?: string) => void): void | (() => void);
   onSwitchTab?(callback: (tab: string) => void): void | (() => void);
-  onServerRestarted?(callback: (data: { port: number; token?: string | null }) => void): void | (() => void);
+  onServerRestarted?(callback: (data: { port: number; token?: string | null; serverNodeKind?: string | null; serverNodeTransport?: string | null }) => void): void | (() => void);
   getFilePath?(file: File): string | null;
   startDrag?(filePaths: string | string[]): void;
   appReady(): void;

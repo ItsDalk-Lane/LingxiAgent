@@ -67,6 +67,7 @@ import {
 } from "./build-server-plugin-runtime-deps.mjs";
 import { copyServerRuntimeAssets } from "./build-server-runtime-assets.mjs";
 import { packDualKindSeed } from "./build-server-artifact.mjs";
+import { verifyStage as verifyRustStage } from "./build-rust-desktop-service.mjs";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const ROOT = path.resolve(__dirname, "..");
@@ -197,6 +198,14 @@ finalizeServerPackageJsonVersion({ outDir, version: rootPkg.version });
 
 // ── 10. Wrapper 脚本 ──
 writeServerWrapperScripts({ outDir, isWin });
+
+if (platform === "win32") {
+  // Windows CLI 与其所属的签名 server 归档共用同一版 Rust reader。
+  const staged = verifyRustStage({ root: ROOT, platform, arch });
+  fs.cpSync(path.dirname(staged.binary), path.join(outDir, "rust-service"), {
+    recursive: true, dereference: false,
+  });
+}
 
 // ── 11. server + renderer 树 → 一份签名 seed 归档（双 artifact 管线）──
 // ⚠️ 顺序铁律：先签名，后装箱。Apple notary

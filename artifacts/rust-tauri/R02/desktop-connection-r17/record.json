@@ -1,0 +1,13 @@
+{
+  "command": "npm test -- --run desktop/src/react/__tests__/services/server-connection.test.ts desktop/src/react/__tests__/app-init.test.ts",
+  "exitStatus": 0,
+  "recordedAtUtc": "2026-09-28T09:34:05.226846+00:00",
+  "log": "vitest.log",
+  "sourceSha256": {
+    "desktop/src/react/services/server-connection.ts": "35296c5b6dd596e58330ef2b4d137f4271625f3b99bfa8f4fab8959f3ba07ee4",
+    "desktop/src/react/app-init.ts": "a81b70eaac5f6173b4cd3bc3223c2d9660b09b34bd6fa34dd016ede2939c6f31",
+    "desktop/src/react/__tests__/services/server-connection.test.ts": "4ef4aa28b18fadbd39d51b7b8e40a8420005aa96f1d738bf4f266ea70cda57cb",
+    "desktop/src/react/__tests__/app-init.test.ts": "9ec71610c4f5eefd00bdc9893c8e263ddb7e0ea7a845d22ffdd61133c8ccfb7a"
+  },
+  "head": "9b98c679678888b60ff2e32bd67d3da6fc2f5c4f"
+}

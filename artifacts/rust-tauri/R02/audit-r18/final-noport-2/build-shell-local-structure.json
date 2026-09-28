@@ -1,0 +1,16 @@
+{
+  "name": "build-shell-local-structure",
+  "argv": [
+    "npm",
+    "run",
+    "build:shell"
+  ],
+  "cwd": "/Users/study_superior/Desktop/Code/LingxiAgent",
+  "startedUtc": "2026-09-28T12:42:20.733955+00:00",
+  "endedUtc": "2026-09-28T12:42:45.930457+00:00",
+  "exitCode": 0,
+  "stdout": "artifacts/rust-tauri/R02/audit-r18/final-noport-2/build-shell-local-structure.stdout.log",
+  "stdoutSha256": "ef86ed0206f199ca5eb41057dc9b16ffdff6788f4864864064003b9a29aa81ab",
+  "stderr": "artifacts/rust-tauri/R02/audit-r18/final-noport-2/build-shell-local-structure.stderr.log",
+  "stderrSha256": "b68c94eb49e0b5ff23713362461460c034b1f9d17fcd9fb98a2ce9309a3320a5"
+}

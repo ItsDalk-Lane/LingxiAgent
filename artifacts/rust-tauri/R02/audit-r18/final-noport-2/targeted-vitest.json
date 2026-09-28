@@ -1,0 +1,27 @@
+{
+  "name": "targeted-vitest",
+  "argv": [
+    "node_modules/.bin/vitest",
+    "run",
+    "tests/cli-rust-service.test.ts",
+    "tests/build-standalone-server-artifact.test.ts",
+    "tests/cli-chat-runtime.test.ts",
+    "tests/cli-args.test.ts",
+    "tests/cli-chat.test.ts",
+    "desktop/src/react/__tests__/mobile/MobileApp.test.tsx",
+    "desktop/src/react/settings/__tests__/SettingsContent.test.tsx",
+    "desktop/src/react/__tests__/services/R02RustWebSocket.test.ts",
+    "desktop/src/react/__tests__/components/R02StatusBar.test.tsx",
+    "desktop/src/react/settings/__tests__/R02AccessRoute.test.tsx",
+    "desktop/src/react/settings/__tests__/R02AccessCredentialLeaf.test.tsx",
+    "desktop/src/react/settings/__tests__/R02SharingLeaf.test.tsx"
+  ],
+  "cwd": "/Users/study_superior/Desktop/Code/LingxiAgent",
+  "startedUtc": "2026-09-28T12:40:26.664269+00:00",
+  "endedUtc": "2026-09-28T12:40:30.050508+00:00",
+  "exitCode": 0,
+  "stdout": "artifacts/rust-tauri/R02/audit-r18/final-noport-2/targeted-vitest.stdout.log",
+  "stdoutSha256": "f7303746b1266420323f90b17aeebdcc78844d88900da2616e1c64fa97ad0dbc",
+  "stderr": "artifacts/rust-tauri/R02/audit-r18/final-noport-2/targeted-vitest.stderr.log",
+  "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+}

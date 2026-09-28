@@ -15,21 +15,17 @@
 //! 2. **Device credentials** (incumbent `core/device-registry.ts`):
 //!    `hana_dev_<base64url>` secrets stored as `secretPrefix` +
 //!    salted hash + status + scopes + optional expiry, with real
-//!    create/read/expiry/revocation semantics. Divergence (documented, not
-//!    silent): the incumbent hashes with `scryptSync`; scrypt is not in the
-//!    locked dependency set, so this implementation uses iterated salted
-//!    SHA-256 (`SECRET_HASH_ITERATIONS` rounds) — salted, slow-ish,
-//!    constant-time-verified, with the same prefix fast-path. Field shape
-//!    uses unix-millisecond integers instead of ISO-8601 strings.
+//!    create/read/expiry/revocation semantics. New secrets use the incumbent
+//!    scrypt parameters and base64url encoding; credentials previously
+//!    issued by this Rust implementation with iterated SHA-256 remain valid.
+//!    Registry field shape still uses unix-millisecond integers instead of
+//!    the incumbent ISO-8601 strings.
 //! 3. **Principal model** (incumbent `core/security-principal.ts`): the
 //!    normalized principal vocabulary (`kind`/`credentialKind`/
 //!    `connectionKind`/`trustState`/scopes) with derived principalId.
 //!    Identities are created ONLY here at the trust boundary (token
 //!    verification); request-supplied identity fields are never read.
-//!    The incumbent web-session cookie axis (`core/web-session-store.ts`)
-//!    is NOT wired in R02 — there is no web-login flow yet; bearer/query/
-//!    device credentials cover this stage's surface. Recorded in the task
-//!    report as a deferral, not a silent downgrade.
+//!    Web 会话 Cookie 由管理服务处理，并通过请求守卫进入同一套路由权限表。
 //!
 //! ## Endpoint permission table (deliverable)
 //!
@@ -57,7 +53,7 @@ use std::time::{SystemTime, UNIX_EPOCH};
 use serde::{Deserialize, Serialize};
 use sha2::{Digest as _, Sha256};
 
-use crate::paths::{atomic_write, DataRootLayout};
+use crate::paths::{atomic_write_private, DataRootLayout};
 use crate::transport::ConnectionKind;
 
 /// Schema version of every auth registry file written by this module.
@@ -72,8 +68,7 @@ pub const DEVICE_SECRET_PREFIX: &str = "hana_dev_";
 /// Fast-path prefix length used for candidate narrowing (incumbent
 /// `SECRET_PREFIX_LENGTH`).
 pub const SECRET_PREFIX_MATCH_LENGTH: usize = 18;
-/// Iterated-SHA-256 rounds for credential hashing (documented divergence
-/// from the incumbent scryptSync; see module docs).
+/// Iterated-SHA-256 rounds for credentials issued by earlier R02 candidates.
 pub const SECRET_HASH_ITERATIONS: usize = 4096;
 
 /// Scopes granted to the local owner principal (mirrors the incumbent
@@ -117,6 +112,7 @@ pub enum PrincipalKind {
 pub enum CredentialKind {
     LoopbackToken,
     DeviceCredential,
+    WebSession,
     None,
 }
 
@@ -145,6 +141,10 @@ pub struct Principal {
     pub server_node_id: Option<String>,
     pub device_id: Option<String>,
     pub credential_id: Option<String>,
+    /// 仅供服务端复核 WebSession 撤销状态；不进入身份响应或持久化主体。
+    #[doc(hidden)]
+    #[serde(skip)]
+    pub web_session_id: Option<String>,
     pub connection_kind: ConnectionKindSerde,
     pub credential_kind: CredentialKind,
     pub trust_state: TrustState,
@@ -199,6 +199,7 @@ impl Principal {
             server_node_id: None,
             device_id: None,
             credential_id: None,
+            web_session_id: None,
             connection_kind: ConnectionKindSerde::Local,
             credential_kind: CredentialKind::LoopbackToken,
             trust_state: TrustState::Local,
@@ -240,15 +241,15 @@ pub fn constant_time_eq(a: &[u8], b: &[u8]) -> bool {
     diff == 0
 }
 
-fn secret_matches(candidate: &str, salt: &str, expected_hash_hex: &str) -> bool {
-    let actual = hash_secret(candidate, salt);
+fn legacy_secret_matches(candidate: &str, salt: &str, expected_hash_hex: &str) -> bool {
+    let actual = hash_legacy_secret(candidate, salt);
     // Compare hex digests through byte pairs to stay length-uniform.
     let a = actual.as_bytes();
     let b = expected_hash_hex.as_bytes();
     constant_time_eq(a, b)
 }
 
-fn hash_secret(secret: &str, salt: &str) -> String {
+fn hash_legacy_secret(secret: &str, salt: &str) -> String {
     let mut hasher = Sha256::new();
     hasher.update(salt.as_bytes());
     hasher.update(secret.as_bytes());
@@ -264,6 +265,31 @@ fn hash_secret(secret: &str, salt: &str) -> String {
         let _ = write!(out, "{byte:02x}");
     }
     out
+}
+
+fn hash_device_secret(secret: &str, salt: &str) -> Result<String, AuthSetupError> {
+    use base64::Engine as _;
+    let params = scrypt::Params::new(14, 8, 1).map_err(|_| AuthSetupError::Crypto {
+        detail: "device scrypt parameters invalid".into(),
+    })?;
+    let mut hash = [0u8; 32];
+    scrypt::scrypt(secret.as_bytes(), salt.as_bytes(), &params, &mut hash).map_err(|_| {
+        AuthSetupError::Crypto {
+            detail: "device scrypt derivation failed".into(),
+        }
+    })?;
+    Ok(base64::engine::general_purpose::URL_SAFE_NO_PAD.encode(hash))
+}
+
+fn device_secret_matches(candidate: &str, salt: &str, expected_hash: &str) -> bool {
+    if expected_hash.len() == 43 {
+        return hash_device_secret(candidate, salt)
+            .is_ok_and(|actual| constant_time_eq(actual.as_bytes(), expected_hash.as_bytes()));
+    }
+    if expected_hash.len() == 64 && expected_hash.bytes().all(|b| b.is_ascii_hexdigit()) {
+        return legacy_secret_matches(candidate, salt, expected_hash);
+    }
+    false
 }
 
 // ── Registry file shapes ─────────────────────────────────────────────────────
@@ -319,8 +345,69 @@ struct DevicesRegistry {
 struct CredentialsRegistry {
     schema_version: u32,
     credentials: Vec<DeviceCredentialRecord>,
+    #[serde(default)]
+    audit: Vec<DeviceAuditEntry>,
+    #[serde(default)]
+    pairing_sessions: Vec<PairingRecord>,
     created_at_unix_ms: u64,
     updated_at_unix_ms: u64,
+}
+
+#[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
+struct DeviceAuditEntry {
+    action: String,
+    target: String,
+    at_unix_ms: u64,
+    #[serde(default)]
+    metadata: DeviceAuditMetadata,
+}
+
+#[derive(Debug, Default, Clone, PartialEq, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
+struct DeviceAuditMetadata {
+    #[serde(skip_serializing_if = "Option::is_none")]
+    credential_id: Option<String>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pairing_session_id: Option<String>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    device_id: Option<String>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    device_kind: Option<String>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    scopes: Option<Vec<String>>,
+}
+
+#[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
+struct PairingRecord {
+    pairing_session_id: String,
+    code_salt: String,
+    code_hash: String,
+    #[serde(default)]
+    code_algorithm: Option<String>,
+    requested_device_kind: String,
+    requested_display_name: String,
+    expires_at_unix_ms: u64,
+    status: String,
+    device_id: Option<String>,
+    credential_id: Option<String>,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+#[serde(rename_all = "snake_case")]
+enum RegistryTransactionPhase {
+    Preparing,
+    Committed,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
+struct RegistryJournal {
+    schema_version: u32,
+    phase: RegistryTransactionPhase,
+    previous_devices: DevicesRegistry,
+    previous_credentials: CredentialsRegistry,
 }
 
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
@@ -346,6 +433,17 @@ pub enum AuthSetupError {
         path: PathBuf,
         detail: String,
     },
+    /// The platform's system secure random source failed (R9-F05). No
+    /// credential is EVER issued from a weaker source: issuance refuses.
+    Entropy {
+        detail: String,
+    },
+    Crypto {
+        detail: String,
+    },
+    InvalidInput {
+        detail: String,
+    },
 }
 
 impl fmt::Display for AuthSetupError {
@@ -357,6 +455,15 @@ impl fmt::Display for AuthSetupError {
             Self::RegistryInvalid { path, detail } => {
                 write!(f, "auth registry {} is invalid: {detail}", path.display())
             }
+            Self::Entropy { detail } => {
+                write!(
+                    f,
+                    "cannot issue a security credential: {detail} (refused — no \
+                     weaker fallback source is ever used)"
+                )
+            }
+            Self::Crypto { detail } => write!(f, "cannot derive a security credential: {detail}"),
+            Self::InvalidInput { detail } => write!(f, "invalid auth input: {detail}"),
         }
     }
 }
@@ -407,14 +514,33 @@ pub enum RoutePolicy {
 /// R02, local_only is the strictest available default).
 pub fn classify_route(method: &str, path: &str) -> RoutePolicy {
     let m = method.to_ascii_uppercase();
-    let p = path.trim_end_matches('/');
-    let p = if p.is_empty() { "/" } else { p };
+    // 与 Axum 的实际路由保持精确匹配；不能把未注册的 `/health/` 当作公开路由。
+    let p = path;
 
     if p == "/lingxi/v1/health" && (m == "GET" || m == "HEAD") {
         return RoutePolicy::Public;
     }
-    if p == "/lingxi/v1/me" && m == "GET" {
+    if (m == "GET" || m == "HEAD")
+        && (["/mobile", "/mobile/", "/desktop", "/desktop/"].contains(&p)
+            || p.starts_with("/mobile/")
+            || p.starts_with("/desktop/"))
+    {
+        return RoutePolicy::Public;
+    }
+    if (p == "/lingxi/v1/me" || p == "/lingxi/v1/server/identity") && m == "GET" {
         return RoutePolicy::Authenticated;
+    }
+    if p == "/lingxi/v1/session-thinking-level" && (m == "GET" || m == "POST") {
+        return RoutePolicy::Scope("chat");
+    }
+    if (m == "POST"
+        && matches!(
+            p,
+            "/lingxi/v1/web-auth/login" | "/lingxi/v1/web-auth/logout"
+        ))
+        || (m == "GET" && p == "/lingxi/v1/web-auth/session")
+    {
+        return RoutePolicy::Public;
     }
     if p == "/lingxi/v1/ws-ticket" {
         return if m == "POST" {
@@ -427,7 +553,7 @@ pub fn classify_route(method: &str, path: &str) -> RoutePolicy {
         return RoutePolicy::Scope("chat");
     }
     if let Some(rest) = p.strip_prefix("/lingxi/v1/sessions/") {
-        if !rest.contains('/') && (m == "GET" || m == "HEAD") {
+        if !rest.is_empty() && !rest.contains('/') && (m == "GET" || m == "HEAD") {
             return RoutePolicy::Scope("chat");
         }
         if let Some(id) = rest.strip_suffix("/execute") {
@@ -519,13 +645,18 @@ pub struct AuthService {
     inner: std::sync::Mutex<AuthInner>,
 }
 
+#[derive(Clone)]
 struct AuthInner {
     local_token: String,
+    audit_home: PathBuf,
     token_file: PathBuf,
     devices_path: PathBuf,
     credentials_path: PathBuf,
+    journal_path: PathBuf,
     devices: DevicesRegistry,
     credentials: CredentialsRegistry,
+    base_devices: DevicesRegistry,
+    base_credentials: CredentialsRegistry,
 }
 
 impl fmt::Debug for AuthService {
@@ -544,6 +675,187 @@ pub struct IssuedDeviceCredential {
     pub secret: String,
     pub scopes: Vec<String>,
     pub expires_at_unix_ms: Option<u64>,
+    pub device: DeviceRecord,
+    pub credential: DeviceCredentialView,
+}
+
+#[derive(Debug, Clone, Serialize)]
+#[serde(rename_all = "camelCase")]
+pub struct DeviceAccessSnapshot {
+    pub devices: Vec<DeviceRecord>,
+    pub credentials: Vec<DeviceCredentialView>,
+    pub pairing_sessions: Vec<PairingView>,
+}
+
+#[derive(Debug, Clone, PartialEq, Serialize)]
+#[serde(rename_all = "camelCase")]
+pub struct PairingView {
+    pub pairing_session_id: String,
+    pub requested_device: PairingRequestedDevice,
+    pub expires_at_unix_ms: u64,
+    pub status: String,
+    pub device_id: Option<String>,
+    pub credential_id: Option<String>,
+}
+
+#[derive(Debug, Clone, PartialEq, Serialize)]
+#[serde(rename_all = "camelCase")]
+pub struct PairingRequestedDevice {
+    pub device_kind: String,
+    pub display_name: String,
+}
+
+impl From<&PairingRecord> for PairingView {
+    fn from(value: &PairingRecord) -> Self {
+        Self {
+            pairing_session_id: value.pairing_session_id.clone(),
+            requested_device: PairingRequestedDevice {
+                device_kind: value.requested_device_kind.clone(),
+                display_name: value.requested_display_name.clone(),
+            },
+            expires_at_unix_ms: value.expires_at_unix_ms,
+            status: value.status.clone(),
+            device_id: value.device_id.clone(),
+            credential_id: value.credential_id.clone(),
+        }
+    }
+}
+
+pub struct CreatedPairing {
+    pub pairing: PairingView,
+    pub user_code: String,
+}
+
+pub struct ApprovedPairing {
+    pub pairing: PairingView,
+    pub issued: IssuedDeviceCredential,
+}
+
+pub enum PairingFailure {
+    NotFound,
+    Expired,
+    AlreadyConsumed,
+    InvalidCode,
+    Store(AuthSetupError),
+}
+
+fn normalize_pairing_code(value: &str) -> String {
+    value
+        .chars()
+        .filter(char::is_ascii_alphanumeric)
+        .map(|ch| ch.to_ascii_uppercase())
+        .collect()
+}
+
+fn hash_pairing_code(code: &str, salt: &str) -> Result<String, AuthSetupError> {
+    let params = scrypt::Params::new(14, 8, 1).map_err(|_| AuthSetupError::Crypto {
+        detail: "scrypt parameters invalid".into(),
+    })?;
+    let mut hash = [0u8; 32];
+    scrypt::scrypt(code.as_bytes(), salt.as_bytes(), &params, &mut hash).map_err(|_| {
+        AuthSetupError::Crypto {
+            detail: "scrypt derivation failed".into(),
+        }
+    })?;
+    Ok(hash.iter().map(|byte| format!("{byte:02x}")).collect())
+}
+
+fn new_pairing_code() -> Result<(String, String), AuthSetupError> {
+    const ALPHABET: &[u8; 32] = b"ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
+    let random = random_bytes(8)?;
+    let compact: String = random
+        .iter()
+        .map(|byte| ALPHABET[(byte & 31) as usize] as char)
+        .collect();
+    let display = format!("{}-{}", &compact[..4], &compact[4..]);
+    Ok((display, compact))
+}
+
+#[derive(Debug, Clone, PartialEq, Serialize)]
+#[serde(rename_all = "camelCase")]
+pub struct DeviceCredentialView {
+    pub schema_version: u32,
+    pub credential_id: String,
+    pub device_id: String,
+    pub status: DeviceStatus,
+    pub scopes: Vec<String>,
+    pub created_at_unix_ms: u64,
+    pub expires_at_unix_ms: Option<u64>,
+    pub last_used_at_unix_ms: Option<u64>,
+}
+
+impl From<&DeviceCredentialRecord> for DeviceCredentialView {
+    fn from(value: &DeviceCredentialRecord) -> Self {
+        Self {
+            schema_version: value.schema_version,
+            credential_id: value.credential_id.clone(),
+            device_id: value.device_id.clone(),
+            status: value.status,
+            scopes: value.scopes.clone(),
+            created_at_unix_ms: value.created_at_unix_ms,
+            expires_at_unix_ms: value.expires_at_unix_ms,
+            last_used_at_unix_ms: value.last_used_at_unix_ms,
+        }
+    }
+}
+
+pub(crate) fn valid_device_kind(kind: &str) -> bool {
+    matches!(kind, "desktop" | "mobile" | "browser" | "cli" | "unknown")
+}
+
+fn prepare_device_credential(
+    user_id: &str,
+    scopes: &[&str],
+    expires_at_unix_ms: Option<u64>,
+    device_kind: &str,
+    display_name: &str,
+    now: u64,
+) -> Result<(IssuedDeviceCredential, DeviceCredentialRecord), AuthSetupError> {
+    if !valid_device_kind(device_kind) {
+        return Err(AuthSetupError::InvalidInput {
+            detail: "deviceKind outside allowed values".into(),
+        });
+    }
+    let secret = format!("{DEVICE_SECRET_PREFIX}{}", base64url_random(32)?);
+    let salt = base64url_random(16)?;
+    let device_id = format!("device_{}", uuidish()?);
+    let credential_id = format!("cred_{}", uuidish()?);
+    let record = DeviceCredentialRecord {
+        schema_version: AUTH_SCHEMA_VERSION,
+        credential_id: credential_id.clone(),
+        device_id: device_id.clone(),
+        secret_prefix: secret.chars().take(SECRET_PREFIX_MATCH_LENGTH).collect(),
+        secret_hash: hash_device_secret(&secret, &salt)?,
+        secret_salt: salt,
+        status: DeviceStatus::Active,
+        scopes: scopes.iter().map(|s| s.to_string()).collect(),
+        created_at_unix_ms: now,
+        expires_at_unix_ms,
+        last_used_at_unix_ms: None,
+    };
+    let device = DeviceRecord {
+        schema_version: AUTH_SCHEMA_VERSION,
+        device_id: device_id.clone(),
+        user_id: user_id.to_string(),
+        display_name: display_name.to_string(),
+        device_kind: device_kind.to_string(),
+        status: DeviceStatus::Active,
+        trust_state: TrustState::Lan,
+        created_at_unix_ms: now,
+        last_seen_at_unix_ms: None,
+    };
+    Ok((
+        IssuedDeviceCredential {
+            credential_id,
+            device_id,
+            secret,
+            scopes: scopes.iter().map(|s| s.to_string()).collect(),
+            expires_at_unix_ms,
+            device,
+            credential: DeviceCredentialView::from(&record),
+        },
+        record,
+    ))
 }
 
 impl AuthService {
@@ -555,11 +867,16 @@ impl AuthService {
         let token_file = layout.runtime_dir.join(LOCAL_TOKEN_FILE);
         let devices_path = layout.runtime_dir.join(DEVICES_FILE);
         let credentials_path = layout.runtime_dir.join(DEVICE_CREDENTIALS_FILE);
+        let journal_path = layout.runtime_dir.join("device-registry.journal.json");
+        recover_registry_journal(&devices_path, &credentials_path, &journal_path)?;
 
         // Loopback token: fresh per start (mirrors the incumbent
         // randomBytes(16).toString("hex") SERVER_TOKEN), persisted so other
         // owner-side processes (CLI/desktop harness) can read it — 0600.
-        let token = hex_random(16);
+        // R9-F05: system CSPRNG only — bootstrap REFUSES to start (and no
+        // token is written) when the secure source fails; the old
+        // predictable xorshift fallback is gone.
+        let token = hex_random(16)?;
         let record = LocalTokenFile {
             schema_version: AUTH_SCHEMA_VERSION,
             kind: "local_token".to_string(),
@@ -598,6 +915,8 @@ impl AuthService {
                 let empty = CredentialsRegistry {
                     schema_version: AUTH_SCHEMA_VERSION,
                     credentials: Vec::new(),
+                    audit: Vec::new(),
+                    pairing_sessions: Vec::new(),
                     created_at_unix_ms: now,
                     updated_at_unix_ms: now,
                 };
@@ -617,12 +936,22 @@ impl AuthService {
             });
         }
 
+        crate::security_audit::project(&layout.home, "device-registry", &credentials.audit)
+            .map_err(|detail| AuthSetupError::RegistryInvalid {
+                path: layout.home.join("logs/security-audit.jsonl"),
+                detail,
+            })?;
+
         Ok(Self {
             inner: std::sync::Mutex::new(AuthInner {
                 local_token: token,
+                audit_home: layout.home.clone(),
                 token_file,
                 devices_path,
                 credentials_path,
+                journal_path,
+                base_devices: devices.clone(),
+                base_credentials: credentials.clone(),
                 devices,
                 credentials,
             }),
@@ -649,70 +978,298 @@ impl AuthService {
         scopes: &[&str],
         expires_at_unix_ms: Option<u64>,
     ) -> Result<IssuedDeviceCredential, AuthSetupError> {
+        self.issue_device_credential_for(user_id, scopes, expires_at_unix_ms, "cli", "CLI")
+    }
+
+    pub fn issue_device_credential_for(
+        &self,
+        user_id: &str,
+        scopes: &[&str],
+        expires_at_unix_ms: Option<u64>,
+        device_kind: &str,
+        display_name: &str,
+    ) -> Result<IssuedDeviceCredential, AuthSetupError> {
         let now = now_unix_ms();
-        let secret = format!("{DEVICE_SECRET_PREFIX}{}", base64url_random(32));
-        let salt = base64url_random(16);
-        let device_id = format!("device_{}", uuidish());
-        let credential_id = format!("cred_{}", uuidish());
-        let record = DeviceCredentialRecord {
-            schema_version: AUTH_SCHEMA_VERSION,
-            credential_id: credential_id.clone(),
-            device_id: device_id.clone(),
-            secret_prefix: secret.chars().take(SECRET_PREFIX_MATCH_LENGTH).collect(),
-            secret_hash: hash_secret(&secret, &salt),
-            secret_salt: salt,
-            status: DeviceStatus::Active,
-            scopes: scopes.iter().map(|s| s.to_string()).collect(),
-            created_at_unix_ms: now,
+        // 签发与配对批准共用安全随机材料和脱敏视图，随机源失败时不会落任何记录。
+        let (issued, record) = prepare_device_credential(
+            user_id,
+            scopes,
             expires_at_unix_ms,
-            last_used_at_unix_ms: None,
-        };
-        let device = DeviceRecord {
-            schema_version: AUTH_SCHEMA_VERSION,
-            device_id: device_id.clone(),
-            user_id: user_id.to_string(),
-            display_name: format!("Synthetic device for {user_id}"),
-            device_kind: "cli".to_string(),
-            status: DeviceStatus::Active,
-            trust_state: TrustState::Lan,
-            created_at_unix_ms: now,
-            last_seen_at_unix_ms: None,
-        };
+            device_kind,
+            display_name,
+            now,
+        )?;
 
         let mut inner = self.lock();
-        inner.credentials.credentials.push(record);
-        inner.devices.devices.push(device);
-        inner.credentials.updated_at_unix_ms = now;
-        inner.devices.updated_at_unix_ms = now;
-        persist(&inner)?;
+        refresh_registries(&mut inner)?;
+        let mut next = inner.clone();
+        next.credentials.credentials.push(record.clone());
+        next.devices.devices.push(issued.device.clone());
+        next.credentials.audit.push(DeviceAuditEntry {
+            action: format!("access.{device_kind}_credential.issue"),
+            target: issued.device_id.clone(),
+            at_unix_ms: now,
+            metadata: DeviceAuditMetadata {
+                credential_id: Some(issued.credential_id.clone()),
+                scopes: Some(record.scopes.clone()),
+                ..Default::default()
+            },
+        });
+        next.credentials.updated_at_unix_ms = now;
+        next.devices.updated_at_unix_ms = now;
+        persist(&next)?;
+        *inner = next;
 
-        Ok(IssuedDeviceCredential {
-            credential_id,
-            device_id,
-            secret,
-            scopes: scopes.iter().map(|s| s.to_string()).collect(),
-            expires_at_unix_ms,
+        Ok(issued)
+    }
+
+    pub fn device_access_snapshot(&self) -> Result<DeviceAccessSnapshot, AuthSetupError> {
+        let mut inner = self.lock();
+        refresh_registries(&mut inner)?;
+        Ok(DeviceAccessSnapshot {
+            devices: inner.devices.devices.clone(),
+            credentials: inner
+                .credentials
+                .credentials
+                .iter()
+                .map(DeviceCredentialView::from)
+                .collect(),
+            pairing_sessions: inner
+                .credentials
+                .pairing_sessions
+                .iter()
+                .map(PairingView::from)
+                .collect(),
         })
     }
 
-    /// Revokes a device credential by id (owner/management surface).
-    pub fn revoke_device_credential(&self, credential_id: &str) -> Result<bool, AuthSetupError> {
+    pub fn create_pairing_session(
+        &self,
+        device_kind: &str,
+        display_name: &str,
+        expires_at_unix_ms: u64,
+        now: u64,
+    ) -> Result<CreatedPairing, AuthSetupError> {
+        if !valid_device_kind(device_kind) {
+            return Err(AuthSetupError::InvalidInput {
+                detail: "requestedDevice.deviceKind outside allowed values".into(),
+            });
+        }
+        let (user_code, normalized_code) = new_pairing_code()?;
+        let salt = base64url_random(12)?;
+        let record = PairingRecord {
+            pairing_session_id: format!("pair_{}", base64url_random(16)?),
+            code_hash: hash_pairing_code(&normalized_code, &salt)?,
+            code_salt: salt,
+            code_algorithm: Some("scrypt-sha256".into()),
+            requested_device_kind: device_kind.into(),
+            requested_display_name: display_name.into(),
+            expires_at_unix_ms,
+            status: "pending".into(),
+            device_id: None,
+            credential_id: None,
+        };
+        let mut inner = self.lock();
+        refresh_registries(&mut inner)?;
+        let mut next = inner.clone();
+        next.credentials.pairing_sessions.push(record.clone());
+        next.credentials.audit.push(DeviceAuditEntry {
+            action: "devices.pairing.create".into(),
+            target: record.pairing_session_id.clone(),
+            at_unix_ms: now,
+            metadata: DeviceAuditMetadata {
+                device_kind: Some(record.requested_device_kind.clone()),
+                ..Default::default()
+            },
+        });
+        next.credentials.updated_at_unix_ms = now;
+        persist(&next)?;
+        *inner = next;
+        Ok(CreatedPairing {
+            pairing: PairingView::from(&record),
+            user_code,
+        })
+    }
+
+    pub fn approve_pairing_session(
+        &self,
+        pairing_id: &str,
+        user_code: &str,
+        scopes: &[&str],
+        expires_at_unix_ms: Option<u64>,
+        now: u64,
+    ) -> Result<ApprovedPairing, PairingFailure> {
+        let mut inner = self.lock();
+        refresh_registries(&mut inner).map_err(PairingFailure::Store)?;
+        let Some(pairing) = inner
+            .credentials
+            .pairing_sessions
+            .iter()
+            .find(|p| p.pairing_session_id == pairing_id)
+        else {
+            return Err(PairingFailure::NotFound);
+        };
+        if pairing.status != "pending" {
+            return Err(PairingFailure::AlreadyConsumed);
+        }
+        if pairing.expires_at_unix_ms <= now {
+            let mut next = inner.clone();
+            let expired = next
+                .credentials
+                .pairing_sessions
+                .iter_mut()
+                .find(|p| p.pairing_session_id == pairing_id)
+                .expect("配对记录在同一把锁内仍存在");
+            expired.status = "expired".into();
+            next.credentials.updated_at_unix_ms = now;
+            persist(&next).map_err(PairingFailure::Store)?;
+            *inner = next;
+            return Err(PairingFailure::Expired);
+        }
+        let normalized_code = normalize_pairing_code(user_code);
+        let valid_code = match pairing.code_algorithm.as_deref() {
+            Some("scrypt-sha256") => {
+                let actual = hash_pairing_code(&normalized_code, &pairing.code_salt)
+                    .map_err(PairingFailure::Store)?;
+                constant_time_eq(actual.as_bytes(), pairing.code_hash.as_bytes())
+            }
+            None => legacy_secret_matches(&normalized_code, &pairing.code_salt, &pairing.code_hash),
+            _ => {
+                return Err(PairingFailure::Store(AuthSetupError::Crypto {
+                    detail: "unsupported pairing code algorithm".into(),
+                }))
+            }
+        };
+        if !valid_code {
+            return Err(PairingFailure::InvalidCode);
+        }
+        let (issued, credential) = prepare_device_credential(
+            LOCAL_OWNER_USER_ID,
+            scopes,
+            expires_at_unix_ms,
+            &pairing.requested_device_kind,
+            &pairing.requested_display_name,
+            now,
+        )
+        .map_err(PairingFailure::Store)?;
+        let mut next = inner.clone();
+        let pairing = next
+            .credentials
+            .pairing_sessions
+            .iter_mut()
+            .find(|p| p.pairing_session_id == pairing_id)
+            .expect("配对记录在同一把锁内仍存在");
+        pairing.status = "approved".into();
+        pairing.device_id = Some(issued.device_id.clone());
+        pairing.credential_id = Some(issued.credential_id.clone());
+        let pairing_view = PairingView::from(&*pairing);
+        next.devices.devices.push(issued.device.clone());
+        next.credentials.credentials.push(credential);
+        next.credentials.audit.push(DeviceAuditEntry {
+            action: "devices.pairing.approve".into(),
+            target: issued.device_id.clone(),
+            at_unix_ms: now,
+            metadata: DeviceAuditMetadata {
+                credential_id: Some(issued.credential_id.clone()),
+                pairing_session_id: Some(pairing_id.into()),
+                scopes: Some(issued.scopes.clone()),
+                ..Default::default()
+            },
+        });
+        next.devices.updated_at_unix_ms = now;
+        next.credentials.updated_at_unix_ms = now;
+        persist(&next).map_err(PairingFailure::Store)?;
+        *inner = next;
+        Ok(ApprovedPairing {
+            pairing: pairing_view,
+            issued,
+        })
+    }
+
+    pub fn revoke_device(&self, device_id: &str) -> Result<Option<DeviceRecord>, AuthSetupError> {
         let now = now_unix_ms();
         let mut inner = self.lock();
-        let Some(record) = inner
+        refresh_registries(&mut inner)?;
+        let mut next = inner.clone();
+        let Some(device) = next
+            .devices
+            .devices
+            .iter_mut()
+            .find(|d| d.device_id == device_id)
+        else {
+            return Ok(None);
+        };
+        if device.status == DeviceStatus::Active {
+            device.status = DeviceStatus::Revoked;
+            next.devices.updated_at_unix_ms = now;
+            for credential in
+                next.credentials.credentials.iter_mut().filter(|item| {
+                    item.device_id == device_id && item.status == DeviceStatus::Active
+                })
+            {
+                credential.status = DeviceStatus::Revoked;
+            }
+            next.credentials.audit.push(DeviceAuditEntry {
+                action: "devices.revoke".into(),
+                target: device_id.into(),
+                at_unix_ms: now,
+                metadata: DeviceAuditMetadata::default(),
+            });
+            next.credentials.updated_at_unix_ms = now;
+            persist(&next)?;
+            *inner = next;
+        }
+        Ok(inner
+            .devices
+            .devices
+            .iter()
+            .find(|d| d.device_id == device_id)
+            .cloned())
+    }
+
+    pub fn revoke_device_credential_view(
+        &self,
+        credential_id: &str,
+    ) -> Result<Option<DeviceCredentialView>, AuthSetupError> {
+        let now = now_unix_ms();
+        let mut inner = self.lock();
+        refresh_registries(&mut inner)?;
+        let mut next = inner.clone();
+        let Some(record) = next
             .credentials
             .credentials
             .iter_mut()
             .find(|c| c.credential_id == credential_id)
         else {
-            return Ok(false);
+            return Ok(None);
         };
         if record.status == DeviceStatus::Active {
             record.status = DeviceStatus::Revoked;
-            inner.credentials.updated_at_unix_ms = now;
-            persist(&inner)?;
+            let device_id = record.device_id.clone();
+            next.credentials.updated_at_unix_ms = now;
+            next.credentials.audit.push(DeviceAuditEntry {
+                action: "devices.credential.revoke".into(),
+                target: credential_id.into(),
+                at_unix_ms: now,
+                metadata: DeviceAuditMetadata {
+                    device_id: Some(device_id),
+                    ..Default::default()
+                },
+            });
+            persist(&next)?;
+            *inner = next;
         }
-        Ok(true)
+        Ok(inner
+            .credentials
+            .credentials
+            .iter()
+            .find(|c| c.credential_id == credential_id)
+            .map(DeviceCredentialView::from))
+    }
+
+    /// Revokes a device credential by id (owner/management surface).
+    pub fn revoke_device_credential(&self, credential_id: &str) -> Result<bool, AuthSetupError> {
+        Ok(self.revoke_device_credential_view(credential_id)?.is_some())
     }
 
     /// Authenticates a request. Credential precedence mirrors the incumbent
@@ -768,6 +1325,12 @@ impl AuthService {
         // Device credential path.
         let principal = {
             let mut inner = self.lock();
+            if refresh_registries(&mut inner).is_err() {
+                tracing::error!("device registry reload failed; authentication refused");
+                let mut denial = AuthDenial::new("auth_registry_unavailable", connection_kind);
+                denial.credential_source = Some(source);
+                return Err(denial);
+            }
             let candidate_prefix_ok = |record: &DeviceCredentialRecord| {
                 record.status == DeviceStatus::Active
                     && !record.secret_prefix.is_empty()
@@ -778,7 +1341,9 @@ impl AuthService {
                 .credentials
                 .iter()
                 .filter(|record| candidate_prefix_ok(record))
-                .find(|record| secret_matches(&token, &record.secret_salt, &record.secret_hash))
+                .find(|record| {
+                    device_secret_matches(&token, &record.secret_salt, &record.secret_hash)
+                })
                 .cloned();
             let Some(record) = matched else {
                 drop(inner);
@@ -823,7 +1388,8 @@ impl AuthService {
             }
             // Success: record lastUsedAt (the ONLY registry mutation on the
             // happy path) and persist.
-            if let Some(record_slot) = inner
+            let mut next = inner.clone();
+            if let Some(record_slot) = next
                 .credentials
                 .credentials
                 .iter_mut()
@@ -831,7 +1397,7 @@ impl AuthService {
             {
                 record_slot.last_used_at_unix_ms = Some(now);
             }
-            if let Some(device_slot) = inner
+            if let Some(device_slot) = next
                 .devices
                 .devices
                 .iter_mut()
@@ -839,11 +1405,15 @@ impl AuthService {
             {
                 device_slot.last_seen_at_unix_ms = Some(now);
             }
-            inner.credentials.updated_at_unix_ms = now;
-            inner.devices.updated_at_unix_ms = now;
-            if let Err(err) = persist(&inner) {
-                tracing::warn!(%err, "cannot persist device credential lastUsedAt (auth still succeeds)");
+            next.credentials.updated_at_unix_ms = now;
+            next.devices.updated_at_unix_ms = now;
+            if let Err(err) = persist(&next) {
+                tracing::error!(%err, "cannot persist device credential use; authentication refused");
+                let mut denial = AuthDenial::new("auth_registry_unavailable", connection_kind);
+                denial.credential_source = Some(source);
+                return Err(denial);
             }
+            *inner = next;
             Principal {
                 schema_version: AUTH_SCHEMA_VERSION,
                 principal_id: format!(
@@ -856,6 +1426,7 @@ impl AuthService {
                 server_node_id: None,
                 device_id: Some(device.device_id.clone()),
                 credential_id: Some(record.credential_id.clone()),
+                web_session_id: None,
                 connection_kind: connection_kind.into(),
                 credential_kind: CredentialKind::DeviceCredential,
                 trust_state: device.trust_state,
@@ -863,6 +1434,57 @@ impl AuthService {
             }
         };
         Ok(principal)
+    }
+
+    /// 在使用 WS 票据或已建立连接时重新核对设备身份；撤销、过期及权限变化都让旧身份失效。
+    pub fn validate_principal(&self, principal: &Principal) -> Result<(), AuthDenial> {
+        if principal.kind != PrincipalKind::Device {
+            return Ok(());
+        }
+        let denial = || AuthDenial::new("invalid_credential", ConnectionKind::Local);
+        let mut inner = self.lock();
+        if refresh_registries(&mut inner).is_err() {
+            tracing::error!("device registry reload failed; WS principal refused");
+            return Err(AuthDenial::new(
+                "auth_registry_unavailable",
+                ConnectionKind::Local,
+            ));
+        }
+        let Some(credential_id) = principal.credential_id.as_deref() else {
+            return Err(denial());
+        };
+        let Some(record) = inner
+            .credentials
+            .credentials
+            .iter()
+            .find(|record| record.credential_id == credential_id)
+        else {
+            return Err(denial());
+        };
+        if record.status != DeviceStatus::Active
+            || record
+                .expires_at_unix_ms
+                .is_some_and(|expires| expires <= now_unix_ms())
+            || principal.device_id.as_deref() != Some(record.device_id.as_str())
+            || principal.scopes != record.scopes
+        {
+            return Err(denial());
+        }
+        let Some(device) = inner
+            .devices
+            .devices
+            .iter()
+            .find(|device| device.device_id == record.device_id)
+        else {
+            return Err(denial());
+        };
+        if device.status != DeviceStatus::Active
+            || device.trust_state != principal.trust_state
+            || principal.user_id.as_deref() != Some(device.user_id.as_str())
+        {
+            return Err(denial());
+        }
+        Ok(())
     }
 
     fn lock(&self) -> std::sync::MutexGuard<'_, AuthInner> {
@@ -887,8 +1509,157 @@ pub fn parse_bearer(authorization: Option<&str>) -> Option<String> {
 }
 
 fn persist(inner: &AuthInner) -> Result<(), AuthSetupError> {
-    write_private_json(&inner.devices_path, &inner.devices)?;
-    write_private_json(&inner.credentials_path, &inner.credentials)?;
+    recover_registry_journal(
+        &inner.devices_path,
+        &inner.credentials_path,
+        &inner.journal_path,
+    )?;
+    let old_devices: DevicesRegistry =
+        serde_json::from_value(read_json(&inner.devices_path)?.ok_or_else(|| {
+            AuthSetupError::RegistryInvalid {
+                path: inner.devices_path.clone(),
+                detail: "device registry missing".into(),
+            }
+        })?)
+        .map_err(|err| AuthSetupError::RegistryInvalid {
+            path: inner.devices_path.clone(),
+            detail: err.to_string(),
+        })?;
+    let old_credentials: CredentialsRegistry =
+        serde_json::from_value(read_json(&inner.credentials_path)?.ok_or_else(|| {
+            AuthSetupError::RegistryInvalid {
+                path: inner.credentials_path.clone(),
+                detail: "credential registry missing".into(),
+            }
+        })?)
+        .map_err(|err| AuthSetupError::RegistryInvalid {
+            path: inner.credentials_path.clone(),
+            detail: err.to_string(),
+        })?;
+    if old_devices != inner.base_devices || old_credentials != inner.base_credentials {
+        return Err(AuthSetupError::RegistryInvalid {
+            path: inner.journal_path.clone(),
+            detail: "device registry changed concurrently; refusing stale write".into(),
+        });
+    }
+    // 在改动注册簿前核查并补齐既有审计；日志路径失效时不得先签发或撤销。
+    crate::security_audit::project(&inner.audit_home, "device-registry", &old_credentials.audit)
+        .map_err(|detail| AuthSetupError::RegistryInvalid {
+            path: inner.audit_home.join("logs/security-audit.jsonl"),
+            detail,
+        })?;
+    let mut journal = RegistryJournal {
+        schema_version: AUTH_SCHEMA_VERSION,
+        phase: RegistryTransactionPhase::Preparing,
+        previous_devices: old_devices,
+        previous_credentials: old_credentials,
+    };
+    write_private_json(&inner.journal_path, &journal)?;
+    let writes = write_private_json(&inner.devices_path, &inner.devices)
+        .and_then(|()| write_private_json(&inner.credentials_path, &inner.credentials));
+    if let Err(err) = writes {
+        recover_registry_journal(
+            &inner.devices_path,
+            &inner.credentials_path,
+            &inner.journal_path,
+        )?;
+        return Err(err);
+    }
+    journal.phase = RegistryTransactionPhase::Committed;
+    if let Err(err) = write_private_json(&inner.journal_path, &journal) {
+        recover_registry_journal(
+            &inner.devices_path,
+            &inner.credentials_path,
+            &inner.journal_path,
+        )?;
+        return Err(err);
+    }
+    if let Err(err) = std::fs::remove_file(&inner.journal_path) {
+        tracing::warn!(%err, "committed device registry journal cleanup deferred");
+    }
+    // 注册簿已提交后，日志投影失败不能假称整笔操作未发生；保留持久意图供重启补写。
+    if let Err(err) = crate::security_audit::project(
+        &inner.audit_home,
+        "device-registry",
+        &inner.credentials.audit,
+    ) {
+        tracing::error!(audit_pending = true, %err, "security audit projection pending");
+    }
+    Ok(())
+}
+
+/// 两份注册表的写入以 journal 为恢复边界；未提交事务启动或复读时一律回滚旧状态。
+fn recover_registry_journal(
+    devices: &Path,
+    credentials: &Path,
+    journal_path: &Path,
+) -> Result<(), AuthSetupError> {
+    let Some(value) = read_json(journal_path)? else {
+        return Ok(());
+    };
+    let journal: RegistryJournal =
+        serde_json::from_value(value).map_err(|err| AuthSetupError::RegistryInvalid {
+            path: journal_path.to_path_buf(),
+            detail: err.to_string(),
+        })?;
+    if journal.schema_version != AUTH_SCHEMA_VERSION {
+        return Err(AuthSetupError::RegistryInvalid {
+            path: journal_path.to_path_buf(),
+            detail: "journal schema mismatch".into(),
+        });
+    }
+    if matches!(journal.phase, RegistryTransactionPhase::Preparing) {
+        write_private_json(devices, &journal.previous_devices)?;
+        write_private_json(credentials, &journal.previous_credentials)?;
+    }
+    std::fs::remove_file(journal_path).map_err(|source| AuthSetupError::Io {
+        path: journal_path.to_path_buf(),
+        source,
+    })?;
+    Ok(())
+}
+
+/// 每次设备身份判断前重新读取并校验两份注册表；文件异常时不能沿用旧内存快照。
+fn refresh_registries(inner: &mut AuthInner) -> Result<(), AuthSetupError> {
+    recover_registry_journal(
+        &inner.devices_path,
+        &inner.credentials_path,
+        &inner.journal_path,
+    )?;
+    let load = |path: &Path| -> Result<serde_json::Value, AuthSetupError> {
+        read_json(path)?.ok_or_else(|| AuthSetupError::RegistryInvalid {
+            path: path.to_path_buf(),
+            detail: "registry missing after service startup".to_string(),
+        })
+    };
+    let devices_path = &inner.devices_path;
+    let credentials_path = &inner.credentials_path;
+    let devices: DevicesRegistry = serde_json::from_value(load(devices_path)?).map_err(|err| {
+        AuthSetupError::RegistryInvalid {
+            path: devices_path.clone(),
+            detail: err.to_string(),
+        }
+    })?;
+    let credentials: CredentialsRegistry = serde_json::from_value(load(credentials_path)?)
+        .map_err(|err| AuthSetupError::RegistryInvalid {
+            path: credentials_path.clone(),
+            detail: err.to_string(),
+        })?;
+    if devices.schema_version != AUTH_SCHEMA_VERSION
+        || credentials.schema_version != AUTH_SCHEMA_VERSION
+    {
+        return Err(AuthSetupError::RegistryInvalid {
+            path: devices_path.clone(),
+            detail: format!(
+                "schema version mismatch: devices={}, credentials={} (expected {AUTH_SCHEMA_VERSION})",
+                devices.schema_version, credentials.schema_version
+            ),
+        });
+    }
+    inner.base_devices = devices.clone();
+    inner.base_credentials = credentials.clone();
+    inner.devices = devices;
+    inner.credentials = credentials;
     Ok(())
 }
 
@@ -910,92 +1681,72 @@ fn read_json(path: &Path) -> Result<Option<serde_json::Value>, AuthSetupError> {
     }
 }
 
-/// Atomic write + explicit owner-only permissions (mirrors the incumbent
-/// `writeSecretFileSync`: mode-on-create is umask-dependent, so chmod after).
+/// 临时文件创建时即只给主人读写，替换前后都不暴露凭证材料。
 fn write_private_json<T: Serialize>(path: &Path, value: &T) -> Result<(), AuthSetupError> {
     let bytes =
         serde_json::to_vec_pretty(value).map_err(|err| AuthSetupError::RegistryInvalid {
             path: path.to_path_buf(),
             detail: format!("serialization failed: {err}"),
         })?;
-    atomic_write(path, &bytes).map_err(|source| AuthSetupError::Io {
+    atomic_write_private(path, &bytes).map_err(|source| AuthSetupError::Io {
         path: path.to_path_buf(),
         source,
     })?;
-    #[cfg(unix)]
-    {
-        use std::os::unix::fs::PermissionsExt;
-        if let Ok(meta) = std::fs::metadata(path) {
-            let mut perms = meta.permissions();
-            perms.set_mode(0o600);
-            std::fs::set_permissions(path, perms).map_err(|source| AuthSetupError::Io {
-                path: path.to_path_buf(),
-                source,
-            })?;
-        }
-    }
     Ok(())
 }
 
-// ── Synthetic randomness (no new dependencies) ──────────────────────────────
+// ── System secure randomness (R9-F05: no silent fallback) ───────────────────
 
-/// Reads `n` random bytes from the OS random device (unix), falling back to
-/// the same documented pid+time mix as `instance.rs` (diagnosed through the
-/// same entropy source vocabulary).
-fn random_bytes(n: usize) -> Vec<u8> {
+/// Fills `n` bytes from the platform's SYSTEM secure random source
+/// (`getrandom`: getrandom(2)/getentropy(2) on unix, the OS CSPRNG on
+/// Windows). NEVER falls back and never degrades: any failure is
+/// propagated, and every SECURITY-CREDENTIAL caller REFUSES to issue on
+/// error (R9-F05: the previous implementation silently degraded non-Unix
+/// builds — and any `/dev/urandom` open/read failure — to a predictable
+/// pid+time xorshift sequence feeding the highest-privilege loopback
+/// token, the device secret/salt and the WS tickets; that fallback is
+/// gone). Non-secret correlation ids handle failures with an EXPLICIT
+/// annotated degradation instead (see `inject.rs::RandomRequestIdGen` —
+/// never silently).
+fn random_bytes(n: usize) -> Result<Vec<u8>, AuthSetupError> {
     let mut buf = vec![0u8; n];
-    #[cfg(unix)]
-    {
-        use std::io::Read as _;
-        if let Ok(mut f) = std::fs::File::open("/dev/urandom") {
-            if f.read_exact(&mut buf).is_ok() {
-                return buf;
-            }
-        }
-    }
-    let nanos = SystemTime::now()
-        .duration_since(UNIX_EPOCH)
-        .map(|d| d.as_nanos())
-        .unwrap_or(0);
-    let mut state = (nanos as u64) ^ (u64::from(std::process::id()) << 32) ^ 0x9e37_79b9_7f4a_7c15;
-    for slot in &mut buf {
-        state ^= state << 13;
-        state ^= state >> 7;
-        state ^= state << 17;
-        *slot = (state >> 24) as u8;
-    }
-    buf
+    getrandom::getrandom(&mut buf).map_err(|source| AuthSetupError::Entropy {
+        detail: format!("system secure random source failed: {source}"),
+    })?;
+    Ok(buf)
 }
 
-fn hex_random(n_bytes: usize) -> String {
-    let bytes = random_bytes(n_bytes);
+fn hex_random(n_bytes: usize) -> Result<String, AuthSetupError> {
+    let bytes = random_bytes(n_bytes)?;
     let mut out = String::with_capacity(n_bytes * 2);
     for b in bytes {
         use std::fmt::Write as _;
         let _ = write!(out, "{b:02x}");
     }
-    out
+    Ok(out)
 }
 
-/// Public accessor for the one entropy authority (R02-T07: the request-id
-/// generator shares this source instead of minting a second one).
-pub fn hex_random_public(n_bytes: usize) -> String {
+/// Fallible system-random hex accessor (the one entropy authority,
+/// R02-T07). The request-id generator is the only consumer and handles
+/// the error with an EXPLICIT degraded marker — credentials never take
+/// that path.
+pub fn hex_random_public(n_bytes: usize) -> Result<String, AuthSetupError> {
     hex_random(n_bytes)
 }
 
-/// Generates a synthetic base64url token (OS randomness, documented
-/// fallback); shared with the WS ticket service so every secret on this
-/// surface has one entropy authority.
-pub fn random_base64url(n_bytes: usize) -> String {
+/// System-secure base64url token generator (same entropy authority);
+/// fallible like every credential mint on this surface — the caller
+/// refuses to issue when the OS CSPRNG fails.
+pub fn random_base64url(n_bytes: usize) -> Result<String, AuthSetupError> {
     base64url_random(n_bytes)
 }
 
-fn base64url_random(n_bytes: usize) -> String {
+fn base64url_random(n_bytes: usize) -> Result<String, AuthSetupError> {
     use base64::Engine as _;
-    base64::engine::general_purpose::URL_SAFE_NO_PAD.encode(random_bytes(n_bytes))
+    Ok(base64::engine::general_purpose::URL_SAFE_NO_PAD.encode(random_bytes(n_bytes)?))
 }
 
-fn uuidish() -> String {
+fn uuidish() -> Result<String, AuthSetupError> {
     hex_random(16)
 }
 
@@ -1031,6 +1782,459 @@ mod tests {
         assert_eq!(parse_bearer(Some("Bearer")), None);
         assert_eq!(parse_bearer(Some("Basic xyz")), None);
         assert_eq!(parse_bearer(None), None);
+    }
+
+    #[cfg(unix)]
+    #[test]
+    fn failed_device_registry_write_keeps_live_memory_and_disk_unchanged() {
+        let (home, svc) = setup("failed-registry-write-rollback");
+        let issued = svc
+            .issue_device_credential("user_local", &["chat"], None)
+            .expect("initial credential");
+        let now = now_unix_ms();
+        let pending = svc
+            .create_pairing_session("mobile", "Phone", now + 60_000, now)
+            .unwrap();
+        assert_eq!(pending.user_code.len(), 9);
+        assert_eq!(pending.user_code.as_bytes()[4], b'-');
+        let layout = prepare_layout(&home).unwrap();
+        let before_devices = std::fs::read(layout.runtime_dir.join(DEVICES_FILE)).unwrap();
+        let before_credentials =
+            std::fs::read(layout.runtime_dir.join(DEVICE_CREDENTIALS_FILE)).unwrap();
+        let before_audit = std::fs::read(home.join("logs/security-audit.jsonl")).unwrap();
+        use std::os::unix::fs::PermissionsExt;
+        let original_permissions = std::fs::metadata(&layout.runtime_dir)
+            .unwrap()
+            .permissions();
+        std::fs::set_permissions(&layout.runtime_dir, std::fs::Permissions::from_mode(0o500))
+            .unwrap();
+        let issue_failed = svc
+            .issue_device_credential("user_local", &["chat"], None)
+            .is_err();
+        let (issue_devices, issue_credentials) = {
+            let live = svc.lock();
+            (
+                live.devices.devices.len(),
+                live.credentials.credentials.len(),
+            )
+        };
+        let device_revoke_failed = svc.revoke_device(&issued.device_id).is_err();
+        let credential_revoke_failed = svc
+            .revoke_device_credential_view(&issued.credential_id)
+            .is_err();
+        let pairing_approve_failed = matches!(
+            svc.approve_pairing_session(
+                &pending.pairing.pairing_session_id,
+                &pending.user_code,
+                &["chat"],
+                None,
+                now_unix_ms()
+            ),
+            Err(PairingFailure::Store(_)),
+        );
+        let (device_status, credential_status) = {
+            let live = svc.lock();
+            (
+                live.devices.devices[0].status,
+                live.credentials.credentials[0].status,
+            )
+        };
+        std::fs::set_permissions(&layout.runtime_dir, original_permissions).unwrap();
+        assert!(
+            issue_failed
+                && device_revoke_failed
+                && credential_revoke_failed
+                && pairing_approve_failed
+        );
+        assert_eq!(
+            (issue_devices, issue_credentials),
+            (1, 1),
+            "failed issue must not remain in memory"
+        );
+        assert_eq!(device_status, DeviceStatus::Active);
+        assert_eq!(credential_status, DeviceStatus::Active);
+        assert_eq!(
+            svc.device_access_snapshot().unwrap().pairing_sessions[0].status,
+            "pending"
+        );
+        assert_eq!(
+            std::fs::read(layout.runtime_dir.join(DEVICES_FILE)).unwrap(),
+            before_devices
+        );
+        assert_eq!(
+            std::fs::read(layout.runtime_dir.join(DEVICE_CREDENTIALS_FILE)).unwrap(),
+            before_credentials
+        );
+        assert_eq!(
+            std::fs::read(home.join("logs/security-audit.jsonl")).unwrap(),
+            before_audit,
+            "注册簿提交失败不得写成功审计事件"
+        );
+        let principal = svc
+            .authenticate(
+                Some(&format!("Bearer {}", issued.secret)),
+                None,
+                false,
+                ConnectionKind::Local,
+            )
+            .expect("original credential remains valid");
+        assert_eq!(
+            principal.credential_id.as_deref(),
+            Some(issued.credential_id.as_str())
+        );
+        teardown(&home);
+    }
+
+    #[test]
+    fn concurrent_pairing_approval_issues_once() {
+        // Node crypto.scryptSync("ABCDEFGH", "unit-test-salt", 32, {N:16384,r:8,p:1}) 的独立向量。
+        assert_eq!(
+            hash_pairing_code("ABCDEFGH", "unit-test-salt").unwrap(),
+            "9a25122cf984d90fa97dac2666546b06451d677d6c78853065ee0e908330e9de"
+        );
+        use std::sync::{Arc, Barrier};
+        let (home, svc) = setup("pairing-concurrent");
+        let svc = Arc::new(svc);
+        let now = now_unix_ms();
+        let pending = svc
+            .create_pairing_session("mobile", "Phone", now + 60_000, now)
+            .unwrap();
+        let barrier = Arc::new(Barrier::new(3));
+        let mut workers = Vec::new();
+        for _ in 0..2 {
+            let svc = svc.clone();
+            let barrier = barrier.clone();
+            let id = pending.pairing.pairing_session_id.clone();
+            let code = normalize_pairing_code(&pending.user_code).to_ascii_lowercase();
+            workers.push(std::thread::spawn(move || {
+                barrier.wait();
+                svc.approve_pairing_session(&id, &code, &["chat"], None, now_unix_ms())
+            }));
+        }
+        barrier.wait();
+        let results: Vec<_> = workers
+            .into_iter()
+            .map(|worker| worker.join().unwrap())
+            .collect();
+        assert_eq!(results.iter().filter(|result| result.is_ok()).count(), 1);
+        assert_eq!(
+            results
+                .iter()
+                .filter(|result| matches!(result, Err(PairingFailure::AlreadyConsumed)))
+                .count(),
+            1
+        );
+        let snapshot = svc.device_access_snapshot().unwrap();
+        assert_eq!(snapshot.devices.len(), 1);
+        assert_eq!(snapshot.credentials.len(), 1);
+        assert_eq!(snapshot.pairing_sessions[0].status, "approved");
+        let guard = svc.lock();
+        let audit = &guard.credentials.audit;
+        assert_eq!(
+            audit
+                .iter()
+                .filter(|entry| entry.action == "devices.pairing.create")
+                .count(),
+            1
+        );
+        assert_eq!(
+            audit
+                .iter()
+                .filter(|entry| entry.action == "devices.pairing.approve")
+                .count(),
+            1
+        );
+        let created = audit
+            .iter()
+            .find(|entry| entry.action == "devices.pairing.create")
+            .unwrap();
+        assert_eq!(created.target, pending.pairing.pairing_session_id);
+        assert_eq!(created.metadata.device_kind.as_deref(), Some("mobile"));
+        let approved = audit
+            .iter()
+            .find(|entry| entry.action == "devices.pairing.approve")
+            .unwrap();
+        assert_eq!(approved.target, snapshot.devices[0].device_id);
+        assert_eq!(
+            approved.metadata.pairing_session_id.as_deref(),
+            Some(pending.pairing.pairing_session_id.as_str())
+        );
+        assert_eq!(
+            approved.metadata.credential_id.as_deref(),
+            Some(snapshot.credentials[0].credential_id.as_str())
+        );
+        assert_eq!(
+            approved.metadata.scopes.as_ref(),
+            Some(&vec!["chat".to_string()])
+        );
+        drop(guard);
+        teardown(&home);
+    }
+
+    #[test]
+    fn device_secret_hash_matches_node_and_accepts_earlier_rust_hashes() {
+        // Node crypto.scryptSync(secret, salt, 32).toString("base64url") 的独立向量。
+        let secret = "hana_dev_unit_test_secret";
+        let salt = "unit-test-salt";
+        let node_hash = "RdzXdDv9cb7oKrKZWqWe4RjByXDdrhbl5Y3dYWekN7A";
+        assert_eq!(hash_device_secret(secret, salt).unwrap(), node_hash);
+        assert!(device_secret_matches(secret, salt, node_hash));
+        assert!(!device_secret_matches("wrong", salt, node_hash));
+        let earlier_hash = hash_legacy_secret(secret, salt);
+        assert!(device_secret_matches(secret, salt, &earlier_hash));
+        assert!(!device_secret_matches("wrong", salt, &earlier_hash));
+        assert!(!device_secret_matches(secret, salt, "invalid"));
+    }
+
+    #[test]
+    fn invalid_device_kind_never_issues_or_creates_pairing() {
+        let (home, svc) = setup("device-kind-boundary");
+        let layout = prepare_layout(&home).unwrap();
+        let before_devices = std::fs::read(layout.runtime_dir.join(DEVICES_FILE)).unwrap();
+        let before_credentials =
+            std::fs::read(layout.runtime_dir.join(DEVICE_CREDENTIALS_FILE)).unwrap();
+        let before_audit = std::fs::read(home.join("logs/security-audit.jsonl")).unwrap();
+        assert!(matches!(
+            svc.issue_device_credential_for(
+                LOCAL_OWNER_USER_ID,
+                &["chat"],
+                None,
+                "invalid-kind",
+                "Phone",
+            ),
+            Err(AuthSetupError::InvalidInput { .. })
+        ));
+        let now = now_unix_ms();
+        assert!(matches!(
+            svc.create_pairing_session("invalid-kind", "Phone", now + 60_000, now),
+            Err(AuthSetupError::InvalidInput { .. })
+        ));
+        assert_eq!(
+            std::fs::read(layout.runtime_dir.join(DEVICES_FILE)).unwrap(),
+            before_devices
+        );
+        assert_eq!(
+            std::fs::read(layout.runtime_dir.join(DEVICE_CREDENTIALS_FILE)).unwrap(),
+            before_credentials
+        );
+        assert_eq!(
+            std::fs::read(home.join("logs/security-audit.jsonl")).unwrap(),
+            before_audit
+        );
+        teardown(&home);
+    }
+
+    #[test]
+    fn security_audit_log_failure_rejects_before_issuing_and_replay_is_idempotent() {
+        let (home, svc) = setup("security-audit-outbox");
+        let log = home.join("logs/security-audit.jsonl");
+        std::fs::remove_file(&log).unwrap();
+        std::fs::create_dir(&log).unwrap();
+        let layout = prepare_layout(&home).unwrap();
+        let before_devices = std::fs::read(layout.runtime_dir.join(DEVICES_FILE)).unwrap();
+        let before_credentials =
+            std::fs::read(layout.runtime_dir.join(DEVICE_CREDENTIALS_FILE)).unwrap();
+        assert!(svc
+            .issue_device_credential_for(LOCAL_OWNER_USER_ID, &["chat"], None, "mobile", "Phone")
+            .is_err());
+        assert_eq!(
+            std::fs::read(layout.runtime_dir.join(DEVICES_FILE)).unwrap(),
+            before_devices
+        );
+        assert_eq!(
+            std::fs::read(layout.runtime_dir.join(DEVICE_CREDENTIALS_FILE)).unwrap(),
+            before_credentials
+        );
+        assert!(log.is_dir(), "日志故障不能被伪装成已写入标准审计");
+        std::fs::remove_dir(&log).unwrap();
+        let issued = svc
+            .issue_device_credential_for(LOCAL_OWNER_USER_ID, &["chat"], None, "mobile", "Phone")
+            .unwrap();
+        let restarted = AuthService::bootstrap(&layout, "audit-restart").unwrap();
+        assert_eq!(
+            restarted
+                .device_access_snapshot()
+                .unwrap()
+                .credentials
+                .len(),
+            1
+        );
+        let first = std::fs::read_to_string(&log).unwrap();
+        let lines: Vec<_> = first.lines().collect();
+        assert_eq!(lines.len(), 1);
+        let event: serde_json::Value = serde_json::from_str(lines[0]).unwrap();
+        assert_eq!(event["schemaVersion"], 1);
+        assert!(event["eventId"]
+            .as_str()
+            .is_some_and(|v| v.starts_with("sec_")));
+        assert!(event["timestamp"]
+            .as_str()
+            .is_some_and(|v| chrono::DateTime::parse_from_rfc3339(v).is_ok()));
+        assert_eq!(event["action"], "access.mobile_credential.issue");
+        assert_eq!(event["actor"]["credentialKind"], "loopback_token");
+        assert_eq!(event["target"], issued.device_id);
+        assert_eq!(event["metadata"]["credentialId"], issued.credential_id);
+        assert_eq!(event["metadata"]["scopes"], serde_json::json!(["chat"]));
+        assert_eq!(event["secretFields"], serde_json::json!(["secret"]));
+        assert!(!first.contains(&issued.secret));
+        AuthService::bootstrap(&layout, "audit-restart-again").unwrap();
+        assert_eq!(
+            std::fs::read_to_string(&log).unwrap(),
+            first,
+            "重启不得重复投影审计事件"
+        );
+        teardown(&home);
+    }
+
+    #[test]
+    fn expired_pairing_records_expiry_without_issuing_credential() {
+        let (home, svc) = setup("pairing-expired");
+        let now = now_unix_ms();
+        let pending = svc
+            .create_pairing_session("mobile", "Phone", now + 1, now)
+            .unwrap();
+        assert!(matches!(
+            svc.approve_pairing_session(
+                &pending.pairing.pairing_session_id,
+                &pending.user_code,
+                &["chat"],
+                None,
+                now + 1
+            ),
+            Err(PairingFailure::Expired),
+        ));
+        let snapshot = svc.device_access_snapshot().unwrap();
+        assert_eq!(snapshot.pairing_sessions[0].status, "expired");
+        assert!(snapshot.devices.is_empty() && snapshot.credentials.is_empty());
+        teardown(&home);
+    }
+
+    #[test]
+    fn revoking_device_cascades_to_its_credentials_only() {
+        let (home, svc) = setup("device-cascade");
+        let first = svc
+            .issue_device_credential("user_local", &["chat"], None)
+            .unwrap();
+        let other = svc
+            .issue_device_credential("user_local", &["chat"], None)
+            .unwrap();
+        svc.revoke_device(&first.device_id).unwrap();
+        let snapshot = svc.device_access_snapshot().unwrap();
+        assert_eq!(
+            snapshot
+                .credentials
+                .iter()
+                .find(|item| item.credential_id == first.credential_id)
+                .unwrap()
+                .status,
+            DeviceStatus::Revoked
+        );
+        assert_eq!(
+            snapshot
+                .credentials
+                .iter()
+                .find(|item| item.credential_id == other.credential_id)
+                .unwrap()
+                .status,
+            DeviceStatus::Active
+        );
+        let guard = svc.lock();
+        let issued = guard
+            .credentials
+            .audit
+            .iter()
+            .find(|entry| {
+                entry.target == first.device_id && entry.action.ends_with("credential.issue")
+            })
+            .unwrap();
+        assert_eq!(
+            issued.metadata.credential_id.as_deref(),
+            Some(first.credential_id.as_str())
+        );
+        assert_eq!(
+            issued.metadata.scopes.as_ref(),
+            Some(&vec!["chat".to_string()])
+        );
+        drop(guard);
+        assert!(svc
+            .authenticate(
+                Some(&format!("Bearer {}", other.secret)),
+                None,
+                false,
+                ConnectionKind::Lan
+            )
+            .is_ok());
+        svc.revoke_device_credential_view(&other.credential_id)
+            .unwrap();
+        let guard = svc.lock();
+        let revoked = guard
+            .credentials
+            .audit
+            .iter()
+            .find(|entry| {
+                entry.target == other.credential_id && entry.action == "devices.credential.revoke"
+            })
+            .unwrap();
+        assert_eq!(
+            revoked.metadata.device_id.as_deref(),
+            Some(other.device_id.as_str())
+        );
+        drop(guard);
+        assert!(svc
+            .authenticate(
+                Some(&format!("Bearer {}", first.secret)),
+                None,
+                false,
+                ConnectionKind::Lan
+            )
+            .is_err());
+        assert!(svc
+            .authenticate(
+                Some(&format!("Bearer {}", other.secret)),
+                None,
+                false,
+                ConnectionKind::Lan
+            )
+            .is_err());
+        teardown(&home);
+    }
+
+    #[test]
+    fn pairing_and_issued_device_survive_restart() {
+        let (home, svc) = setup("pairing-restart");
+        let now = now_unix_ms();
+        let pending = svc
+            .create_pairing_session("mobile", "Phone", now + 60_000, now)
+            .unwrap();
+        let layout = prepare_layout(&home).unwrap();
+        let restarted = AuthService::bootstrap(&layout, "inst-pairing-2").unwrap();
+        assert_eq!(
+            restarted.device_access_snapshot().unwrap().pairing_sessions[0].status,
+            "pending"
+        );
+        let approved = restarted
+            .approve_pairing_session(
+                &pending.pairing.pairing_session_id,
+                &pending.user_code,
+                &["chat"],
+                None,
+                now + 1,
+            )
+            .ok()
+            .expect("pending code remains usable after restart");
+        let restarted_again = AuthService::bootstrap(&layout, "inst-pairing-3").unwrap();
+        let snapshot = restarted_again.device_access_snapshot().unwrap();
+        assert_eq!(snapshot.pairing_sessions[0].status, "approved");
+        assert_eq!(snapshot.credentials.len(), 1);
+        assert!(restarted_again
+            .authenticate(
+                Some(&format!("Bearer {}", approved.issued.secret)),
+                None,
+                false,
+                ConnectionKind::Lan,
+            )
+            .is_ok());
+        teardown(&home);
     }
 
     #[test]
@@ -1236,6 +2440,21 @@ mod tests {
         assert_eq!(classify_route("GET", "/lingxi/v1/health"), Public);
         assert_eq!(classify_route("HEAD", "/lingxi/v1/health"), Public);
         assert_eq!(classify_route("GET", "/lingxi/v1/me"), Authenticated);
+        assert_eq!(classify_route("POST", "/lingxi/v1/web-auth/login"), Public);
+        assert_eq!(classify_route("GET", "/lingxi/v1/web-auth/session"), Public);
+        assert_eq!(classify_route("POST", "/lingxi/v1/web-auth/logout"), Public);
+        assert_eq!(
+            classify_route("GET", "/lingxi/v1/web-auth/login"),
+            LocalOnly
+        );
+        assert_eq!(
+            classify_route("POST", "/lingxi/v1/web-auth/session"),
+            LocalOnly
+        );
+        assert_eq!(
+            classify_route("GET", "/lingxi/v1/web-auth/logout"),
+            LocalOnly
+        );
         assert_eq!(
             classify_route("POST", "/lingxi/v1/ws-ticket"),
             Scope("chat")
@@ -1263,6 +2482,18 @@ mod tests {
             LocalOnly
         );
         assert_eq!(classify_route("GET", "/lingxi/v1/ws"), Scope("chat"));
+        for path in [
+            "/lingxi/v1/health/",
+            "/lingxi/v1/me/",
+            "/lingxi/v1/sessions/",
+            "/lingxi/v1/ws/",
+        ] {
+            assert_eq!(
+                classify_route("GET", path),
+                LocalOnly,
+                "unregistered trailing slash must not inherit an endpoint policy"
+            );
+        }
         // Fail-closed defaults.
         assert_eq!(classify_route("GET", "/lingxi/v1/nope"), LocalOnly);
         assert_eq!(classify_route("GET", "/api/sessions"), LocalOnly);
@@ -1366,6 +2597,37 @@ mod tests {
             )
             .unwrap();
         assert_eq!(p.user_id.as_deref(), Some("user_r"));
+        teardown(&home);
+    }
+
+    #[test]
+    fn live_device_revocation_is_visible_to_another_auth_instance() {
+        let (home, issuer) = setup("live-cross-instance-revoke");
+        let issued = issuer
+            .issue_device_credential("user_r", &["chat"], None)
+            .unwrap();
+        let layout = prepare_layout(&home).unwrap();
+        let serving = AuthService::bootstrap(&layout, "inst-serving").unwrap();
+        let authorization = format!("Bearer {}", issued.secret);
+        let principal = serving
+            .authenticate(Some(&authorization), None, false, ConnectionKind::Lan)
+            .unwrap();
+        assert!(serving.validate_principal(&principal).is_ok());
+
+        issuer
+            .revoke_device_credential(&issued.credential_id)
+            .unwrap();
+        assert_eq!(
+            serving
+                .authenticate(Some(&authorization), None, false, ConnectionKind::Lan)
+                .unwrap_err()
+                .reason,
+            "invalid_credential"
+        );
+        assert_eq!(
+            serving.validate_principal(&principal).unwrap_err().reason,
+            "invalid_credential"
+        );
         teardown(&home);
     }
 }

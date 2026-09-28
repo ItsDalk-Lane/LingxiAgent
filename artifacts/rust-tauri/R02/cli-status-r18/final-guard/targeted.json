@@ -1,0 +1,24 @@
+{
+  "command": [
+    "node_modules/.bin/vitest",
+    "run",
+    "tests/cli-rust-service.test.ts"
+  ],
+  "startUtc": "2026-09-28T11:07:26.175907+00:00",
+  "endUtc": "2026-09-28T11:07:26.676665+00:00",
+  "exitCode": 0,
+  "producerAstParse": "PASS",
+  "sourceSha256Before": {
+    "cli/rust-service.ts": "0e97c262bd2b2c1e656c2223a672e20dd3c1e1e519c1a5f0c3af0783c18ff7ba",
+    "cli/entry.ts": "e6022f8df5ae20bbd5236eab5854e60922e337ec57f1f93b24de820da48ed764",
+    "tests/cli-rust-service.test.ts": "7e709932200cc41004bcc972cc79de8d1954af6c8fc90b3aadd23501f69875fb",
+    "scripts/rust-tauri/r02_cli_rust_matrix.py": "53e3697feebb722d7fc15a171db85940f1f0cc41d5fd1433bc8141f5c9e37b31"
+  },
+  "sourceSha256After": {
+    "cli/rust-service.ts": "0e97c262bd2b2c1e656c2223a672e20dd3c1e1e519c1a5f0c3af0783c18ff7ba",
+    "cli/entry.ts": "e6022f8df5ae20bbd5236eab5854e60922e337ec57f1f93b24de820da48ed764",
+    "tests/cli-rust-service.test.ts": "7e709932200cc41004bcc972cc79de8d1954af6c8fc90b3aadd23501f69875fb",
+    "scripts/rust-tauri/r02_cli_rust_matrix.py": "53e3697feebb722d7fc15a171db85940f1f0cc41d5fd1433bc8141f5c9e37b31"
+  },
+  "sourceChangedDuringCheck": false
+}

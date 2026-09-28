@@ -39,14 +39,44 @@ tracing-subscriber = { version = "0.3.23", features = ["fmt", "env-filter"] }
 #     (the same roles they already serve in lingxi-protocol's handshake bins).
 #   - sha2 0.11.0: fixed-length digests so token comparison is length-safe
 #     and constant-time (hash-then-compare).
-hyper = "1.11.1"
+# R02 stage-repair R2 (R2-F04): features made explicit — the transport
+# serving loop (src/serve.rs) names hyper's server builder,
+# TowerToHyperService and rt adapters directly. Every crate and version is
+# ALREADY in rust/Cargo.lock (h2 0.4.19, tower 0.5.3 included — pulled by
+# axum/hyper since R01); feature flags and references change nothing in
+# the lock.
+hyper = { version = "1.11.1", default-features = false, features = ["http1", "server"] }
 sha1 = "0.11.0"
 sha2 = "0.11.0"
 base64 = "0.23.1"
 #   - hyper-util 0.1.21 (axum's own runtime glue, same locked version):
 #     TokioIo adapts hyper's upgraded connection IO to tokio's
-#     AsyncRead/AsyncWrite for the WS frame codec.
-hyper-util = { version = "0.1.21", default-features = false, features = ["tokio"] }
+#     AsyncRead/AsyncWrite for the WS frame codec; service +
+#     http1 serve the connection-level admission loop (R2-F04). R3-F01:
+#     the serving loop uses hyper's EXPLICIT http1 builder, so the
+#     "server"/"server-auto" features (hyper-util's auto version-sniffing
+#     server) are no longer enabled — the untimed ReadVersion state they
+#     provided was the defect.
+hyper-util = { version = "0.1.21", default-features = false, features = ["tokio", "http1", "service"] }
+tower = "0.5.3"
+rustls = "0.23.45"
+tokio-rustls = "0.26.5"
+scrypt = "=0.12.0"
+chrono = "=0.4.45"
+# R9-F05: getrandom 0.2.17 is ALREADY a locked member of the workspace tree
+# (pulled transitively by other crates); this edge adds no new version to
+# rust/Cargo.lock. It is the SYSTEM secure random source for every auth
+# credential (loopback token, device secret/salt, WS tickets): the old
+# hand-rolled reader silently degraded non-Unix builds — and any
+# /dev/urandom failure — to a predictable pid+time xorshift; the system
+# CSPRNG propagates its failures so credential issuance can REFUSE
+# (src/auth.rs).
+getrandom = "0.2"
+# R00 手机访问二维码：qrcodegen 1.8.0（MIT，无传递依赖）只生成标准 QR 模块；SVG 由本服务绘制。
+qrcodegen = "=1.8.0"
+libc = "0.2"
+# 各平台统一枚举实际网卡，供局域网地址与二维码选择使用。
+if-addrs = "=0.15.0"
 # R02-T04 additions — both are workspace members, zero third-party change:
 #   - lingxi-kernel: the StoragePort contract this composition root now
 #     injects (R02-T01 deliberately deferred the edge until a port
@@ -59,6 +89,12 @@ lingxi-adapters = { path = "../lingxi-adapters" }
 # uses tokio's "sync" feature (Notify behind the bounded subscriber
 # mailboxes); same locked tokio version, feature flag only — no new lock
 # entries beyond this crate's existing references.
+
+# N06：Windows 安全审计日志逐层使用目录句柄相对打开，拒绝重解析点。
+# 版本已经存在于工作区锁文件；仅 Windows 目标需要 Native/Win32 声明。
+[target.'cfg(windows)'.dependencies]
+windows-sys = { version = "=0.61.2", features = ["Wdk_Foundation", "Wdk_Storage_FileSystem", "Win32_Foundation", "Win32_Security", "Win32_Security_Authorization", "Win32_Storage_FileSystem", "Win32_System_IO", "Win32_System_Threading", "Win32_System_WindowsProgramming"] }
+
 #
 # R02-T06 dev-only: rusqlite at the SAME locked version + bundled feature as
 # lingxi-adapters (zero new lock entries). Used exclusively by the shutdown
@@ -66,3 +102,5 @@ lingxi-adapters = { path = "../lingxi-adapters" }
 # deadline bounds a blocked DB close.
 [dev-dependencies]
 rusqlite = { version = "0.40.2", features = ["bundled"] }
+# 测试时临时生成证书/密钥，仓库和证据中均不保存私钥。
+rcgen = "=0.14.10"

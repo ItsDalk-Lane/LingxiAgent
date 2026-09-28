@@ -1,0 +1,28 @@
+{
+  "command": [
+    "npm",
+    "run",
+    "typecheck"
+  ],
+  "startUtc": "2026-09-28T10:05:58.547553+00:00",
+  "endUtc": "2026-09-28T10:06:21.617357+00:00",
+  "exitCode": 0,
+  "sourceStable": true,
+  "beforeSha256": {
+    "desktop/src/react/services/server-connection.ts": "40719d4fa066c94f8491d4b207b57b257986522373731e1693824ee2c9c7e82b",
+    "desktop/src/react/services/websocket.ts": "92bcfd8e183840391bd1aa382287e577b87f46b43af904a9e5880adff2052d35",
+    "desktop/src/react/app-init.ts": "8f2bb8219102e789a9f241316391b6e94be552232870745085df3bfc18b4c7f1",
+    "desktop/src/react/settings/SettingsContent.tsx": "e7f47154ae466969642c77c0a80077b92e07ed4147bcd53d85feaa08e89caf7b",
+    "desktop/src/react/stores/connection-slice.ts": "5e85a4321308b8b1a6f8c7cce1e389ffa2b0083df2df281979234e4607227a95",
+    "desktop/src/react/components/StatusBar.tsx": "6774fdea75011a59c70eec9a330c00b1366783ed69d62a0f43379223a7a79ab9"
+  },
+  "afterSha256": {
+    "desktop/src/react/services/server-connection.ts": "40719d4fa066c94f8491d4b207b57b257986522373731e1693824ee2c9c7e82b",
+    "desktop/src/react/services/websocket.ts": "92bcfd8e183840391bd1aa382287e577b87f46b43af904a9e5880adff2052d35",
+    "desktop/src/react/app-init.ts": "8f2bb8219102e789a9f241316391b6e94be552232870745085df3bfc18b4c7f1",
+    "desktop/src/react/settings/SettingsContent.tsx": "e7f47154ae466969642c77c0a80077b92e07ed4147bcd53d85feaa08e89caf7b",
+    "desktop/src/react/stores/connection-slice.ts": "5e85a4321308b8b1a6f8c7cce1e389ffa2b0083df2df281979234e4607227a95",
+    "desktop/src/react/components/StatusBar.tsx": "6774fdea75011a59c70eec9a330c00b1366783ed69d62a0f43379223a7a79ab9"
+  },
+  "kind": "no-port typecheck"
+}

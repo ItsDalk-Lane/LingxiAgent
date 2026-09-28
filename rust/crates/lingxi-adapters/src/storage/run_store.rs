@@ -62,6 +62,23 @@ pub struct RunSummaryRow {
 #[derive(Clone)]
 pub struct RunDatabase {
     queue: Arc<DbQueue>,
+    /// Process-wide atomic run-id allocator (R02 stage-repair R1 / F01,
+    /// reseeded correctly in stage-repair R2 / R2-F01, strict minted-format
+    /// recognition in stage-repair R5 / R5-F02). Seeded at open (AFTER
+    /// migrations) from the durable HIGHEST consumed sequence —
+    /// `max(COUNT(*), max(seq of stored run ids that STRICTLY match this
+    /// allocator's minted shape))` — and shared across clones, so
+    /// concurrent callers can never observe the same sequence value and a
+    /// restart never re-issues a number that a pre-failure attempt already
+    /// consumed (the earlier `COUNT(*)` seed equated "rows present" with
+    /// "highest issued": a run whose commit failed left a gap, the count
+    /// fell below the highest consumed number, and the next request at the
+    /// same clock instant collided with the committed id). Gaps are
+    /// harmless; uniqueness is the contract. Foreign/opaque ids count as
+    /// consumed ROWS (COUNT) but never contribute a sequence value, and a
+    /// genuinely exhausted space surfaces as
+    /// [`StorageError::RunIdExhausted`] instead of a panic.
+    run_id_seq: Arc<std::sync::atomic::AtomicU64>,
 }
 
 impl RunDatabase {
@@ -76,7 +93,10 @@ impl RunDatabase {
     /// recreated as an empty stand-in).
     pub async fn open(path: &Path, options: StoreOptions) -> Result<Self, StorageError> {
         let queue = Arc::new(DbQueue::open(path, options)?);
-        let db = Self { queue };
+        let db = Self {
+            queue,
+            run_id_seq: Arc::new(std::sync::atomic::AtomicU64::new(0)),
+        };
         let applied_by = format!("lingxi-adapters {}", env!("CARGO_PKG_VERSION"));
         let outcome: MigrationOutcome = db
             .queue
@@ -100,7 +120,76 @@ impl RunDatabase {
                 "run database migrated"
             );
         }
+        // Seed the allocator from the durable state AFTER migrations, through
+        // the single-writer queue: the seed is the HIGHEST number already
+        // consumed — max(COUNT(*), highest seq of any stored run id MINTED
+        // BY THIS ALLOCATOR) — so a restart continues above every run id
+        // already committed and above every number a failed commit
+        // consumed, and ids stay unique across process lifetimes even at an
+        // identical millisecond (R2-F01: COUNT(*) alone is the row count,
+        // not the high-water mark; a failure gap made it under-seed).
+        // R5-F02: only ids that STRICTLY match the minted shape contribute
+        // a sequence — opaque/legacy ids (e.g. `…_ffffffffffffffff` tails)
+        // never push the seed; their rows are still counted by COUNT(*).
+        let seed: u64 = db
+            .queue
+            .submit(|conn| {
+                let mut stmt = conn
+                    .prepare("SELECT run_id FROM runs")
+                    .map_err(migrations::map_rusqlite)?;
+                let rows = stmt
+                    .query_map([], |row| row.get::<_, String>(0))
+                    .map_err(migrations::map_rusqlite)?;
+                let mut count = 0u64;
+                let mut highest = 0u64;
+                for run_id in rows {
+                    let run_id = run_id.map_err(migrations::map_rusqlite)?;
+                    count += 1;
+                    if let Some(seq) = run_id_sequence(&run_id) {
+                        highest = highest.max(seq);
+                    }
+                }
+                Ok(count.max(highest))
+            })
+            .await?;
+        db.run_id_seq
+            .store(seed, std::sync::atomic::Ordering::Relaxed);
         Ok(db)
+    }
+
+    /// Allocates the next unique run id for `now_ms` (R02 stage-repair R1 /
+    /// F01). One atomic compare-exchange per call — no read-then-act race,
+    /// no two callers ever receive the same id from this process. The id
+    /// shape (`run_{millis:016x}_{seq:06x}`) is unchanged; only the seq
+    /// source is atomic and seeded from the durable high-water mark at open
+    /// (see [`RunDatabase::open`]).
+    ///
+    /// R02 stage-repair R5 / F02: exhaustion is an explicit, loud
+    /// [`StorageError::RunIdExhausted`] — never a panic, never a wrap to 0
+    /// that would re-issue numbers owned by stored runs. The counter can
+    /// only legitimately sit at `u64::MAX` when a MINTED id of that exact
+    /// sequence is stored (foreign ids no longer seed it), so reaching this
+    /// error means the space really is consumed for this database.
+    pub fn allocate_run_id(&self, now_ms: u64) -> Result<String, StorageError> {
+        let mut current = self.run_id_seq.load(std::sync::atomic::Ordering::Relaxed);
+        loop {
+            let next = current
+                .checked_add(1)
+                .ok_or_else(|| StorageError::RunIdExhausted {
+                    detail: "every u64 sequence value is already consumed by this \
+                             database's stored run ids; refusing to wrap or re-issue"
+                        .to_string(),
+                })?;
+            match self.run_id_seq.compare_exchange_weak(
+                current,
+                next,
+                std::sync::atomic::Ordering::Relaxed,
+                std::sync::atomic::Ordering::Relaxed,
+            ) {
+                Ok(_) => return Ok(format!("run_{now_ms:016x}_{next:06x}")),
+                Err(observed) => current = observed,
+            }
+        }
     }
 
     /// Path of the underlying database file.
@@ -276,15 +365,15 @@ impl RunDatabase {
             .await
     }
 
-    /// Lists every session row (ownership filtering stays in the service's
-    /// domain logic; the row set is tiny).
+    /// 最近会话排前；服务层继续按身份过滤，CLI 读取前 20 项。
     pub async fn list_sessions(&self) -> Result<Vec<SessionRow>, StorageError> {
         self.queue
             .submit(move |conn| {
                 let mut stmt = conn
                     .prepare(
                         "SELECT session_id, agent_id, owner_user_id, title, \
-                         created_at_unix_ms FROM sessions ORDER BY created_at_unix_ms, session_id",
+                         created_at_unix_ms FROM sessions \
+                         ORDER BY created_at_unix_ms DESC, session_id DESC",
                     )
                     .map_err(migrations::map_rusqlite)?;
                 let rows = stmt
@@ -386,6 +475,72 @@ impl RunDatabase {
                         )
                         .map_err(migrations::map_rusqlite)?;
                     Ok(removed as u64)
+                })
+            })
+            .await
+    }
+
+    /// One atomic resume read of a stream (R02 stage-repair R1 / F02):
+    /// floor + head + first page in a SINGLE queue submission. The
+    /// single-writer queue serializes the whole slice against any
+    /// concurrent [`RunDatabase::purge_events_before`], so the truncation
+    /// verdict the subscriber derives from `floor` and the returned `events`
+    /// page are one consistent database state — a purge can no longer
+    /// commit between a separate floor read and page read and turn a
+    /// truncated resume into a silently holed one.
+    pub async fn stream_resume_slice(
+        &self,
+        stream_id: &str,
+        after_seq: lingxi_protocol::Seq,
+        limit: u32,
+    ) -> Result<StreamResumeSlice, StorageError> {
+        let stream_id = stream_id.to_string();
+        let after = after_seq.value() as i64;
+        self.queue
+            .submit(move |conn| {
+                let floor: Option<i64> = conn
+                    .query_row(
+                        "SELECT MIN(seq) FROM key_events WHERE stream_id = ?1",
+                        [&stream_id],
+                        |row| row.get(0),
+                    )
+                    .map_err(migrations::map_rusqlite)?;
+                let head: Option<i64> = conn
+                    .query_row(
+                        "SELECT MAX(seq) FROM key_events WHERE stream_id = ?1",
+                        [&stream_id],
+                        |row| row.get(0),
+                    )
+                    .map_err(migrations::map_rusqlite)?;
+                let mut stmt = conn
+                    .prepare(
+                        "SELECT event_id, stream_id, seq, session_id, run_id, attempt, \
+                         event_type, payload_json FROM key_events \
+                         WHERE stream_id = ?1 AND seq > ?2 ORDER BY seq ASC LIMIT ?3",
+                    )
+                    .map_err(migrations::map_rusqlite)?;
+                let rows = stmt
+                    .query_map(rusqlite::params![stream_id, after, limit as i64], |row| {
+                        Ok((
+                            row.get::<_, String>(0)?,
+                            row.get::<_, String>(1)?,
+                            row.get::<_, i64>(2)?,
+                            row.get::<_, String>(3)?,
+                            row.get::<_, Option<String>>(4)?,
+                            row.get::<_, Option<String>>(5)?,
+                            row.get::<_, String>(6)?,
+                            row.get::<_, String>(7)?,
+                        ))
+                    })
+                    .map_err(migrations::map_rusqlite)?;
+                let mut events = Vec::new();
+                for row in rows {
+                    events.push(envelope_from_parts(row.map_err(migrations::map_rusqlite)?)?);
+                }
+                Ok(StreamResumeSlice {
+                    floor: floor.map(|f| seq_from_i64(f, "MIN(seq)")).transpose()?,
+                    head: head.map(|h| seq_from_i64(h, "MAX(seq)")).transpose()?,
+                    events,
                 })
             })
             .await
@@ -954,6 +1109,24 @@ impl StoragePort for RunDatabase {
 
 // ── EventStorePort (R02-T05 read half) ──────────────────────────────────────
 
+/// One atomic resume read of a stream (R02 stage-repair R1 / F02): the
+/// retention floor, the durable head and the first `limit` events after a
+/// cursor, all from ONE submission to the single-writer queue. Because the
+/// queue serializes this read against any `purge_events_before`, the
+/// truncation verdict and the page can never disagree — the pre-fix
+/// separate floor/page submissions let a purge commit between them and a
+/// resumed subscription silently skipped events without a snapshot
+/// directive.
+#[derive(Debug, Clone, PartialEq)]
+pub struct StreamResumeSlice {
+    /// Lowest retained seq (`None` when the stream has no retained events).
+    pub floor: Option<Seq>,
+    /// Highest committed seq (`None` when the stream has no events).
+    pub head: Option<Seq>,
+    /// Retained events with `seq > after_seq`, ascending, at most `limit`.
+    pub events: Vec<EventEnvelope>,
+}
+
 /// Negative seq columns are corruption (loud), never a sign flip.
 fn seq_from_i64(value: i64, which: &str) -> Result<Seq, StorageError> {
     u64::try_from(value)
@@ -961,6 +1134,42 @@ fn seq_from_i64(value: i64, which: &str) -> Result<Seq, StorageError> {
         .map_err(|_| StorageError::Corrupted {
             detail: format!("key_events {which} value {value} is negative"),
         })
+}
+
+/// Parses the allocator sequence out of a stored run id IF AND ONLY IF the
+/// id was minted by this allocator — the exact shape
+/// `run_{millis:016x}_{seq:06x}`: the literal `run_` prefix, a millis half
+/// of exactly 16 LOWERCASE hex digits (a `u64` millisecond timestamp
+/// formatted `:016x` is never wider), a single `_`, and a seq half of
+/// 6..=16 lowercase hex digits (`:06x` is a MINIMUM width). Anything else
+/// — legacy, imported or opaque ids such as
+/// `opaque_existing_ffffffffffffffff` — yields `None` and MUST NOT seed
+/// the sequence: the previous tail-after-last-`_` heuristic parsed a
+/// foreign id's tail as `u64::MAX`, seeded the allocator to the top of the
+/// space, and the next allocation panicked on the overflowing `+ 1`
+/// (R02 stage-repair R5 / F02). Unrecognized ids stay covered by the
+/// seed's `COUNT(*)` lower bound: their rows count as consumed numbers
+/// without ever contributing a sequence value.
+fn run_id_sequence(run_id: &str) -> Option<u64> {
+    let rest = run_id.strip_prefix("run_")?;
+    let (millis, seq) = rest.split_once('_')?;
+    if millis.contains('_') || seq.contains('_') {
+        return None;
+    }
+    if millis.len() != 16 || !(6..=16).contains(&seq.len()) {
+        return None;
+    }
+    if !is_lower_hex(millis) || !is_lower_hex(seq) {
+        return None;
+    }
+    u64::from_str_radix(seq, 16).ok()
+}
+
+/// Lowercase hex only (`:x` never emits uppercase); the strict half of the
+/// minted-format check above.
+fn is_lower_hex(text: &str) -> bool {
+    text.bytes()
+        .all(|b| b.is_ascii_digit() || matches!(b, b'a'..=b'f'))
 }
 
 /// Column order of the `key_events` SELECT used by
@@ -1089,5 +1298,50 @@ impl lingxi_kernel::ports::EventStorePort for RunDatabase {
         before_seq: Seq,
     ) -> Result<u64, StorageError> {
         RunDatabase::purge_events_before(self, stream_id, before_seq).await
+    }
+}
+
+#[cfg(test)]
+mod run_id_sequence_tests {
+    use super::run_id_sequence;
+
+    #[test]
+    fn recognizes_only_ids_this_allocator_mints() {
+        // Realistic minted shapes (seq padding 6; wider only past 0x100000).
+        assert_eq!(run_id_sequence("run_0000017f3b0e0000_000001"), Some(1));
+        assert_eq!(run_id_sequence("run_0000017f3b0e0000_0000ff"), Some(0xff));
+        assert_eq!(
+            run_id_sequence("run_0000017f3b0e0000_fffffffffffffffe"),
+            Some(u64::MAX - 1)
+        );
+        assert_eq!(
+            run_id_sequence("run_0000017f3b0e0000_ffffffffffffffff"),
+            Some(u64::MAX)
+        );
+        // Full-width millis (a u64::MAX clock) is still exactly 16 digits.
+        assert_eq!(run_id_sequence("run_ffffffffffffffff_000001"), Some(1));
+    }
+
+    #[test]
+    fn foreign_and_malformed_shapes_never_seed() {
+        // The R5-F02 shape: a legal opaque id whose tail parses as u64::MAX.
+        assert_eq!(run_id_sequence("opaque_existing_ffffffffffffffff"), None);
+        // Legacy/imported tails that are NOT this allocator's shape.
+        assert_eq!(run_id_sequence("legacy_ffffffffffffffff"), None);
+        assert_eq!(run_id_sequence("run-0000017f3b0e0000-000001"), None);
+        assert_eq!(run_id_sequence("run_0000017f3b0e0000_000001_extra"), None);
+        assert_eq!(run_id_sequence("run__000001"), None);
+        // Wrong half widths (minted millis is EXACTLY 16, seq AT LEAST 6).
+        assert_eq!(run_id_sequence("run_fff_000001"), None);
+        assert_eq!(run_id_sequence("run_0000017f3b0e00_000001"), None);
+        assert_eq!(run_id_sequence("run_0000017f3b0e0000_0001"), None);
+        assert_eq!(
+            run_id_sequence("run_0000017f3b0e0000_0000010000000000000000"),
+            None
+        );
+        // Uppercase hex / non-hex tails are not minted by `:x`.
+        assert_eq!(run_id_sequence("run_0000017f3b0e0000_0000AB"), None);
+        assert_eq!(run_id_sequence("run_0000017f3b0e0000_0000zz"), None);
+        assert_eq!(run_id_sequence(""), None);
     }
 }

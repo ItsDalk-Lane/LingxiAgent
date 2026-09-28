@@ -139,6 +139,16 @@
       "note": "build:shell never runs build:server and never reads LINGXI_SIGN_KEY. It only runs scripts/verify-seed-kit.mjs (fail-closed) against whatever already exists at dist-server-artifact/{os}-{arch}/; a missing/mismatched kit is a hard build:shell failure with a message pointing at `npm run build:server` or fetching an already-signed artifact."
     },
     {
+      "builderEntry": "dist-rust-service/${os}-${arch}/ -> rust-service/",
+      "platform": "all",
+      "kind": "buildOutput",
+      "producedBy": "build:rust-service (scripts/build-rust-desktop-service.mjs)",
+      "consumedNotBuiltBy": "build:shell",
+      "buildScript": "scripts/build-rust-desktop-service.mjs",
+      "sourcePaths": ["scripts/build-rust-desktop-service.mjs"],
+      "note": "正式 pack/dist 先从当前 Rust 源构建同平台 release 程序并记录摘要；build:shell 只核对已有程序、当前源摘要与平台身份，缺失或过期则拒绝装箱。mac.binaries 签名该裸可执行文件。"
+    },
+    {
       "builderEntry": "bundled-bin/${os}-${arch}/ -> bundled-bin/",
       "platform": "all",
       "kind": "vendoredBinary",
@@ -206,7 +216,7 @@
       "hook": "afterPack",
       "script": "scripts/fix-modules.cjs",
       "readsSignKey": false,
-      "note": "Validates the seed/ four-piece kit landed in extraResources and patches asar production deps / node_modules/.bin symlinks. Does not read LINGXI_SIGN_KEY."
+      "note": "Validates seed/ and rust-service/ resources landed intact, then patches asar production deps / node_modules/.bin symlinks. Does not read LINGXI_SIGN_KEY."
     },
     {
       "hook": "afterSign",
@@ -221,6 +231,7 @@
     "build:preload",
     "build:splash",
     "verify:seed-kit (scripts/verify-seed-kit.mjs; fail-closed against an existing dist-server-artifact/{os}-{arch}/; never triggers build:server)",
+    "verify:rust-service-package (scripts/build-rust-desktop-service.mjs --verify; fail-closed against current source and prebuilt host release; never builds Rust)",
     "electron-builder --dir"
   ],
   "themeAttribution": {

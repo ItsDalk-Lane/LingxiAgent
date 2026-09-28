@@ -23,7 +23,11 @@
 //!   writes a machine-readable result (real exit codes, platform, tested
 //!   SHA, per-command logs) under `--evidence`. Non-zero exit on: unknown
 //!   stage, invalid/empty map, missing evidence files, timeout, or any
-//!   command failure.
+//!   command failure. R13-F01: the map's `supplementalLeafScenarios` set
+//!   is cross-checked for EQUALITY against the R00 acceptance ledger
+//!   before any command runs (dropped/unknown/re-graded R00 leaves are
+//!   hard errors), and each leaf rolls up into `overall` — a stage-
+//!   boundary conflict leaf is BLOCKED and can never be PASS.
 //!
 //! RR-T08-F1 hardening (lesson of the R01 wrong-tree green): the repo root
 //! is resolved from the CURRENT WORKING DIRECTORY at runtime and compared
@@ -34,14 +38,20 @@
 use std::path::{Path, PathBuf};
 use std::process::{Command, ExitCode};
 
+pub mod candidate;
+pub mod runner_identity;
 pub mod stage_map;
 pub mod verify;
 
 pub use stage_map::{parse_stage_map, CommandSpec, Scenario, StageMap};
 pub use verify::{verify_stage, CommandOutcome};
 
-/// Result schema version of `verify-stage` output.
-pub const RESULT_VERSION: &str = "lingxi.xtask.verify-stage.v1";
+/// Result schema version of `verify-stage` output. The constant lives in
+/// `stage_map` (the parser validates a map's declared version against
+/// exactly what this runner emits — R02 stage-repair R1 / F05) and is
+/// re-exported here so `crate::RESULT_VERSION` keeps resolving for
+/// `verify.rs` and for probes importing these modules by path.
+pub use stage_map::RESULT_VERSION;
 
 /// Embedded per-stage implementation-acceptance maps. A later stage (R03+)
 /// adds its own file here in the same PR that registers its scenarios.
@@ -66,7 +76,10 @@ subcommands:
                                  commands (stage map: xtask
                                  src/stage_maps/<STAGE>.json), archive each
                                  command's stdout/stderr under DIR, verify
-                                 declared evidence files exist, and write
+                                 declared evidence files exist, cross-check
+                                 the stage map's REQUIRED_SUPPLEMENTAL leaf
+                                 coverage for equality against the R00
+                                 acceptance ledger (R13-F01), and write
                                  DIR/verify-stage-result.json with real exit
                                  codes, platform and tested SHA. Non-zero on
                                  unknown stage, invalid/empty map, missing
@@ -207,6 +220,12 @@ fn main() -> ExitCode {
             return ExitCode::from(2);
         }
     };
+    if sub != "verify-stage" {
+        if let Err(err) = runner_identity::check(&root) {
+            eprintln!("error: {err}");
+            return ExitCode::from(2);
+        }
+    }
 
     match sub.as_str() {
         "check-contracts" => run_gate(
@@ -319,14 +338,180 @@ fn cmd_verify_stage(root: &Path, rest: &[String]) -> ExitCode {
     };
 
     let evidence_root = root.join(evidence);
-    let started = now_ms();
-    let report = match verify_stage(&map, root, &evidence_root, &tested_sha, dirty, started) {
-        Ok(report) => report,
+    let scope = match candidate::Scope::new(root, &evidence_root) {
+        Ok(scope) => scope,
         Err(err) => {
-            eprintln!("error: verify-stage for {stage} aborted: {err}");
+            eprintln!("error: cannot define candidate binding: {err}");
             return ExitCode::from(1);
         }
     };
+    if evidence_root.exists() {
+        match std::fs::read_dir(&evidence_root) {
+            Ok(mut entries) => {
+                if entries.next().is_some() {
+                    eprintln!(
+                        "error: evidence root {} is not empty; preserving its prior evidence",
+                        evidence_root.display()
+                    );
+                    return ExitCode::from(1);
+                }
+            }
+            Err(err) => {
+                eprintln!(
+                    "error: cannot inspect evidence root {}: {err}",
+                    evidence_root.display()
+                );
+                return ExitCode::from(1);
+            }
+        }
+    }
+    let started = now_ms();
+    let before = match scope.snapshot(root) {
+        Ok(snapshot) => snapshot,
+        Err(err) => {
+            eprintln!("error: cannot snapshot candidate before stage gate: {err}");
+            return ExitCode::from(1);
+        }
+    };
+    let before_at = now_ms();
+    let runner_before = runner_identity::check(root);
+    let mut checkpoints = Vec::<(String, u128, Result<candidate::Snapshot, String>)>::new();
+    let verified = if runner_before.is_ok() {
+        verify::verify_stage_with_checkpoint(
+            &map,
+            root,
+            &evidence_root,
+            &tested_sha,
+            dirty,
+            started,
+            |key| {
+                let snapshot = scope.snapshot(root);
+                checkpoints.push((key.to_string(), now_ms(), snapshot));
+            },
+        )
+    } else {
+        Err(runner_before
+            .as_ref()
+            .expect_err("runner error exists")
+            .clone())
+    };
+    let report = match verified {
+        Ok(report) => report,
+        Err(err) => {
+            eprintln!("error: verify-stage for {stage} aborted: {err}");
+            if let Err(create_err) = std::fs::create_dir_all(&evidence_root) {
+                eprintln!(
+                    "error: cannot create failure evidence {}: {create_err}",
+                    evidence_root.display()
+                );
+                return ExitCode::from(1);
+            }
+            serde_json::json!({
+                "resultVersion": RESULT_VERSION,
+                "stage": stage,
+                "testedSha": tested_sha,
+                "worktreeDirty": dirty,
+                "startedAtUnixMs": started,
+                "commands": [],
+                "commandOutcomesIncomplete": true,
+                "scenarios": [],
+                "supplementalLeafScenarios": [],
+                "gateAbort": {"reason": err, "status": "FAIL"},
+                "overall": "FAIL",
+            })
+        }
+    };
+
+    let after = scope.snapshot(root);
+    let after_at = now_ms();
+    let runner_after = runner_identity::check(root);
+    let head_end = git_head_sha(root);
+    let before_path = evidence_root.join("candidate-source-before.json");
+    let before_file_sha = match candidate::write_manifest(&before_path, &before) {
+        Ok(sha) => sha,
+        Err(err) => {
+            eprintln!("error: {err}");
+            return ExitCode::from(1);
+        }
+    };
+    let after_path = evidence_root.join("candidate-source-after.json");
+    let after_file_sha = if let Ok(snapshot) = &after {
+        match candidate::write_manifest(&after_path, snapshot) {
+            Ok(sha) => Some(sha),
+            Err(err) => {
+                eprintln!("error: {err}");
+                return ExitCode::from(1);
+            }
+        }
+    } else {
+        None
+    };
+    let stable = candidate::snapshots_stable(&before, &checkpoints, &after)
+        && runner_before.is_ok()
+        && runner_after.is_ok()
+        && head_end.as_ref().is_ok_and(|sha| sha == &tested_sha);
+    let checkpoint_json: Vec<_> = checkpoints.iter().map(|(key, at, result)| {
+        match result {
+            Ok(snapshot) => {
+                let changed = candidate::differences(&before, snapshot);
+                serde_json::json!({
+                    "commandKey": key,
+                    "atUnixMs": at,
+                    "digestSha256": snapshot.digest,
+                    "fileCount": snapshot.entries.len(),
+                    "stable": changed.is_empty(),
+                    "changedPathBytesHex": changed,
+                })
+            }
+            Err(err) => {
+                serde_json::json!({"commandKey": key, "atUnixMs": at, "stable": false, "error": err})
+            }
+        }
+    }).collect();
+    let final_changed = after
+        .as_ref()
+        .map(|end| candidate::differences(&before, end))
+        .unwrap_or_default();
+    let mut report = report;
+    report["candidateSourceBinding"] = serde_json::json!({
+        "schema": "lingxi-candidate-source-binding-v1",
+        "stable": stable,
+        "before": {
+            "digestSha256": before.digest,
+            "fileCount": before.entries.len(),
+            "manifestPath": before_path.to_string_lossy(),
+            "manifestSha256": before_file_sha,
+            "atUnixMs": before_at,
+        },
+        "after": after.as_ref().ok().map(|end| serde_json::json!({
+            "digestSha256": end.digest,
+            "fileCount": end.entries.len(),
+            "manifestPath": after_path.to_string_lossy(),
+            "manifestSha256": after_file_sha,
+            "atUnixMs": after_at,
+        })),
+        "afterError": after.as_ref().err(),
+        "checkpointAfterEveryCommand": checkpoint_json,
+        "finalChangedPathBytesHex": final_changed,
+        "testedShaAtEnd": head_end.as_ref().ok(),
+        "headAtEndError": head_end.as_ref().err(),
+        "excluded": scope.exclusion_json(),
+    });
+    report["runnerSourceBinding"] = serde_json::json!({
+        "status": if runner_before.is_ok() && runner_after.is_ok() { "PASS" } else { "FAIL" },
+        "before": runner_before.as_ref().ok(),
+        "beforeError": runner_before.as_ref().err(),
+        "after": runner_after.as_ref().ok(),
+        "afterError": runner_after.as_ref().err(),
+    });
+    if !stable {
+        // 原有命令或场景失败必须保留；身份漂移只会增加失败原因。
+        report["overall"] = serde_json::Value::String("FAIL".into());
+        report["candidateSourceBinding"]["reason"] = serde_json::Value::String(
+            "Candidate file bytes or HEAD changed during the registered stage checks, or a snapshot failed; stage PASS is forbidden.".into()
+        );
+    }
+    report["finishedAtUnixMs"] = serde_json::json!(now_ms());
 
     let overall_pass = report["overall"] == "PASS";
     let result_path = evidence_root.join("verify-stage-result.json");

@@ -1,0 +1,88 @@
+{
+  "frozenAtUtc": "2026-09-28T11:50:16.054056+00:00",
+  "head": "9b98c679678888b60ff2e32bd67d3da6fc2f5c4f",
+  "scopeSourceSha256": {
+    "desktop/main.cjs": "8309c590f752d8caedef869646542297c0386d303afb4482b8b2ec7945700da5",
+    "desktop/src/shared/rust-local-service.cjs": "1fec1b82cb0cdaa0e440e06010d7ceae84120cadb5594e8a079260c46b256f21",
+    "desktop/src/react/app-init.ts": "d7c75bc73d7ab3a03af12aeedaaff1e3ab3c47764adcfede7b9ac071c9f659ad",
+    "desktop/src/react/services/server-connection.ts": "e945156fb2f8803db1fbcf7c3bb729c13bbb8442b39b030aa19c4cd805757563",
+    "desktop/src/react/services/websocket.ts": "19ca78e02415a64ef51dbeef366da074f4896ca356066700132346594535e25a",
+    "desktop/src/react/mobile/MobileApp.tsx": "8cb101a13c8c05e632a86b412f3de2a53dce6209f3b38b93a0a428c52ee3a436",
+    "desktop/src/react/mobile/mobile-init.ts": "5c27748b43b8782d61b6737c763e34f498b2ab32ec729a35d34c6eb07a6245bd",
+    "desktop/src/react/settings/SettingsContent.tsx": "9f15d8430fc9f53c545873c6e453bed6da2620f1217dacbad6f5a7a8a83a189f",
+    "desktop/src/react/settings/store.ts": "5c5b457cb1e4475d113c51ad1112039bf152eeeabcf107c9b0b91a868c8bbfa9",
+    "desktop/src/react/__tests__/app-init.test.ts": "2e6dcfc4cdbff5a51e2f4fb68aab6b5d7d7b0caf1f5c644e9143eb0664a5fb59",
+    "desktop/src/react/__tests__/services/server-connection.test.ts": "e423a17a306c8045d522a642d1d22770b0cb6633cf18e8bb7242dd2a840eae53",
+    "desktop/src/react/__tests__/services/R02RustWebSocket.test.ts": "91fc55ee8a177ed82b4510b4d3a9e59271e7851eca5da0e67e70b3cc4211181f",
+    "desktop/src/react/__tests__/mobile/MobileApp.test.tsx": "f04d2bfca32ad9ef4b50f3112a43cb043f1b0f2a891d889d03c84fb163bfca88",
+    "desktop/src/react/settings/__tests__/SettingsContent.test.tsx": "d8184dd8b0b097bff9b15f6ceb7e08e59d0a8a3e7a9624f90670415a284ae9e7",
+    "desktop/src/locales/zh.json": "4cbb8e534b1a9dac7d64a783975596e28fac374123baa2d4b0686a4f21ce25ba",
+    "desktop/src/locales/en.json": "fd300cb5b842df5d010de179a41508ab9013e535e54fe1a7aba8d579144e4436",
+    "desktop/src/locales/ja.json": "d306978b85241a6b77f0046077cf67ca1738a150cb69489af46a00432d059ae9",
+    "desktop/src/locales/ko.json": "77e9ba552534e53a116d0eb245423b716e730d2e51bd8d8ef8ce5143eae596e2",
+    "desktop/src/locales/zh-TW.json": "6636a2f7d435fa8ca85f6947a6d67cfeebfae35b3c56a442c56790451863bf63",
+    "scripts/build-rust-desktop-service.mjs": "9ab45a59496398811b5758f8d30ab89ba877406b32007be2624051b9621caa85",
+    "scripts/build-shell.mjs": "ad40dc89a04fff8882a6e1f2215bc3251d1ee809070f579e710a96e47725cd03",
+    "scripts/fix-modules.cjs": "76f1139cdf52303cdee84f56b90868269c29cf14dae15fb18a5f8903abaa9a08",
+    "scripts/notarize.cjs": "4f08ead1342a699d20c58c109899c2945a8c8c9374a6d921283ac5865d867211",
+    "tests/desktop-rust-local-service.test.cjs": "377bcc6b4328c573b67d9450f096ed0c500f5217698ce8ca544e15c3b3318768",
+    "package.json": "6c8b5bd6c67bffe1c030a83f16d4ed07d1f702f6fb8ab5612f13f71dfc0b2117"
+  },
+  "leafConclusions": [
+    {
+      "id": "R00-T02-LA-1B09760C2B1C",
+      "originalThen": "以前台服务进程运行，保留指定 channel 与数据降级约束",
+      "staticConclusion": "partial; full leaf FAIL/BLOCKED",
+      "basis": "CLI 前台 Rust serve/channel 与版本拒绝有代码；完整 CLI 真运行在平台端口限制下 BLOCKED，现有 Gate 主要核服务 A01，未覆盖完整客户端叶。"
+    },
+    {
+      "id": "R00-T02-LA-200D4E5D52C9",
+      "originalThen": "从已认证服务读取并列出最多 20 个会话；空列表显示 No sessions yet",
+      "staticConclusion": "partial; full leaf FAIL/BLOCKED",
+      "basis": "CLI 最多20/空态与服务身份隔离有代码；此前真服务探针 11/18 FAIL 属旧候选，当前重新端口验收 BLOCKED；完整叶未闭。"
+    },
+    {
+      "id": "R00-T02-LA-D1BEE19A95BB",
+      "originalThen": "端口/短期令牌传给 renderer 后 HTTP/WS 连接可建立",
+      "staticConclusion": "partial; full leaf FAIL/BLOCKED",
+      "basis": "桌面 Rust 启动、端口/短令牌、HTTP/WS 接线与坏 token/端口显错已改；真连接/正式包未验，聊天核心未迁，完整叶未闭。"
+    },
+    {
+      "id": "R00-T02-LA-5816DA563ED8",
+      "originalThen": "读取已认证主体并签发绑定连接类型及 /ws 的短期票据；无主体返回 403",
+      "staticConclusion": "partial; full leaf FAIL/BLOCKED",
+      "basis": "Rust 票据绑定、无主体403已有服务侧实现；客户端拒空/缺票并核 ServerHello；当前仅无端口测试，真实权限/下游连接与 UI 链缺端口证据。"
+    },
+    {
+      "id": "R00-T02-LA-D2657E4AB5FF",
+      "originalThen": "连接状态、失败原因与重连结果在 UI 可见",
+      "staticConclusion": "partial; full leaf FAIL/BLOCKED",
+      "basis": "桌面连接失败理由和重连 UI 状态已接线；真实断开/重启后连接未获准复测，模型/聊天不可标在线，完整叶未闭。"
+    },
+    {
+      "id": "R00-T02-LA-C4E6F27D7873",
+      "originalThen": "校验 token 或本地账号密码，创建 14 日 Web session 并设 HttpOnly cookie",
+      "staticConclusion": "partial; full leaf FAIL/BLOCKED",
+      "basis": "Rust Web 登录/会话/退出服务侧已有基础，手机现识别 Rust 并切对应路径；Node 未登录200 JSON保留，200 HTML/500 明确拒绝；Rust 缺完整移动 bootstrap/模型流且端到端受阻。"
+    },
+    {
+      "id": "R00-T02-LA-000E6E1301C0",
+      "originalThen": "逐动作核对实际状态与页面投影；失败不伪装成空数据",
+      "staticConclusion": "partial; full leaf FAIL/BLOCKED",
+      "basis": "设置页 Rust 身份验证后清旧 Agent/模型缓存并显示明确不可用，Access 部分入口可操作；Agent/模型/工具等完整七断言缺内核与独立证据，页面 ready 仅壳可见。"
+    }
+  ],
+  "a16E1": "FAIL: 原 E1 固定基线要求 desktop/tests/package 等范围零差异并禁止 desktop/main.cjs 中 lingxi-service 文本；获授权提前客户端实现触及该范围，原门禁未改。",
+  "windowsTokenConsumer": "产品残留：Rust 生产者用 protected owner+SYSTEM DACL 创建 token，Electron 消费者仅核 Windows 句柄/路径身份，不核该已开句柄 ACL owner-only；无 Windows 实机验收。",
+  "macBinding": "已改为签名后正文摘要比对且二进制/应用签名校验；旧预构建清单使用旧算法且旧 Rust 源，须固定 1.98.1 当前源码重新构建；正式 mac 包受 DNS 阻塞，未验收。",
+  "evidence": [
+    "artifacts/rust-tauri/R02/r18-mobile-settings-noport-1/record.json (first FAIL preserved)",
+    "artifacts/rust-tauri/R02/r18-mobile-settings-noport-2/record.json (36/36, tsc0, intermediate client)",
+    "artifacts/rust-tauri/R02/r18-mobile-routing-noport-1/record.json (28/28, tsc0, latest mobile)",
+    "artifacts/rust-tauri/R02/r18-mac-body-binding-noport-1/record.json (8/8 latest mac binding)",
+    "artifacts/rust-tauri/R02/r18-mac-body-binding-real-sign-2/record.json (real temporary re-sign digest equality; source binary intermediate)",
+    "artifacts/rust-tauri/R02/r18-mac-body-binding-real-sign-1/record.json (command display omission, superseded by -2; preserved)",
+    "artifacts/rust-tauri/R02/r17-rust-desktop-package/pinned-candidate-1b-noport/record.json (older source)",
+    "artifacts/rust-tauri/R02/r17-leaf-gate/cli-rust-probe-1 and -2 (old candidate FAIL)"
+  ]
+}

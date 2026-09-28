@@ -1,0 +1,7 @@
+command: cargo check -p lingxi-service
+workdir: /Users/study_superior/Desktop/Code/LingxiAgent/rust
+start_utc: not captured at command start
+end_utc: not captured at command end
+elapsed_seconds: 11.219 (tool result)
+exit_code: 101
+environment: ordinary sandbox; crates.io DNS unavailable

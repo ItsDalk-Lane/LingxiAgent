@@ -1,0 +1,167 @@
+{
+  "platform": "Darwin",
+  "checks": [
+    {
+      "name": "rust-fmt",
+      "argv": [
+        "/Users/study_superior/.cargo/bin/rustup",
+        "run",
+        "1.98.1",
+        "cargo",
+        "fmt",
+        "--all",
+        "--",
+        "--check"
+      ],
+      "cwd": "/Users/study_superior/Desktop/Code/LingxiAgent/rust",
+      "started_utc": "2026-09-28T12:33:58.065502+00:00",
+      "ended_utc": "2026-09-28T12:33:58.379649+00:00",
+      "exit": 0,
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "rust-check",
+      "argv": [
+        "/Users/study_superior/.cargo/bin/rustup",
+        "run",
+        "1.98.1",
+        "cargo",
+        "check",
+        "--workspace",
+        "--all-targets",
+        "--locked",
+        "--offline"
+      ],
+      "cwd": "/Users/study_superior/Desktop/Code/LingxiAgent/rust",
+      "started_utc": "2026-09-28T12:33:58.379972+00:00",
+      "ended_utc": "2026-09-28T12:33:58.733567+00:00",
+      "exit": 0,
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_sha256": "10f6df3b58f442ae908e288ca549ccca1da96eb819f85fa39fbd0d01cef309ce"
+    },
+    {
+      "name": "rust-clippy",
+      "argv": [
+        "/Users/study_superior/.cargo/bin/rustup",
+        "run",
+        "1.98.1",
+        "cargo",
+        "clippy",
+        "-p",
+        "lingxi-service",
+        "-p",
+        "lingxi-adapters",
+        "--all-targets",
+        "--locked",
+        "--offline",
+        "--",
+        "-D",
+        "warnings"
+      ],
+      "cwd": "/Users/study_superior/Desktop/Code/LingxiAgent/rust",
+      "started_utc": "2026-09-28T12:33:58.733996+00:00",
+      "ended_utc": "2026-09-28T12:34:00.717678+00:00",
+      "exit": 0,
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_sha256": "74ad49b0f61de666fbd3e340d7e7b1c4b850267cf0c5404cfb259858fe6ee70d"
+    },
+    {
+      "name": "typecheck",
+      "argv": [
+        "npm",
+        "run",
+        "typecheck"
+      ],
+      "cwd": "/Users/study_superior/Desktop/Code/LingxiAgent",
+      "started_utc": "2026-09-28T12:34:00.718123+00:00",
+      "ended_utc": "2026-09-28T12:34:25.571038+00:00",
+      "exit": 0,
+      "stdout_sha256": "b32daeef2af45d85547f664e7ad68b9dd0c290942ad702592eff35b5cb4a65d8",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "cli-and-standalone-tests",
+      "argv": [
+        "./node_modules/.bin/vitest",
+        "run",
+        "tests/cli-rust-service.test.ts",
+        "tests/build-standalone-server-artifact.test.ts"
+      ],
+      "cwd": "/Users/study_superior/Desktop/Code/LingxiAgent",
+      "started_utc": "2026-09-28T12:34:25.571535+00:00",
+      "ended_utc": "2026-09-28T12:34:26.212993+00:00",
+      "exit": 0,
+      "stdout_sha256": "07084cfc34dce874ad4e643bcba3f2e8394942d52679b0e209cf653ca8eec28c",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "desktop-tests",
+      "argv": [
+        "node",
+        "--test",
+        "tests/desktop-rust-local-service.test.cjs"
+      ],
+      "cwd": "/Users/study_superior/Desktop/Code/LingxiAgent",
+      "started_utc": "2026-09-28T12:34:26.213400+00:00",
+      "ended_utc": "2026-09-28T12:34:26.301017+00:00",
+      "exit": 0,
+      "stdout_sha256": "12949e2c7b54d54fe4e1ab915813f767d1938c0e3159282eaed4716cd7766ea7",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "cli-bundle",
+      "argv": [
+        "./node_modules/.bin/esbuild",
+        "cli/entry.ts",
+        "--bundle",
+        "--platform=node",
+        "--format=esm",
+        "--target=node24",
+        "--external:ws",
+        "--outfile=/tmp/r02-win-consumer-cli-bundle.mjs"
+      ],
+      "cwd": "/Users/study_superior/Desktop/Code/LingxiAgent",
+      "started_utc": "2026-09-28T12:34:26.301418+00:00",
+      "ended_utc": "2026-09-28T12:34:26.314406+00:00",
+      "exit": 0,
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_sha256": "3216db7cb9c92bf7e9e9deea98e3e9e73fc898ed273454384ad889893791734d"
+    },
+    {
+      "name": "diff-check",
+      "argv": [
+        "git",
+        "diff",
+        "--check"
+      ],
+      "cwd": "/Users/study_superior/Desktop/Code/LingxiAgent",
+      "started_utc": "2026-09-28T12:34:26.314695+00:00",
+      "ended_utc": "2026-09-28T12:34:26.398246+00:00",
+      "exit": 0,
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    }
+  ],
+  "source_before": {
+    "rust/crates/lingxi-adapters/src/storage/windows_acl.rs": "ddbada83db0f2539440271dc4c4ec71c56eda395875c1fc8dfa85d52a51f41fd",
+    "rust/crates/lingxi-service/src/main.rs": "47d1423bc34751805734e307ebae159941000f4da22836a434a0e4c1091e8c1d",
+    "desktop/src/shared/rust-local-service.cjs": "fa295d857d3f04a1f252a7c5e7ea285c0a6c52cd15a25cd142eeeb04fb2e6947",
+    "desktop/main.cjs": "2d2ccc09afe699ced21a9f423bb904b7a4eaebab7e1fbf108338b47b91756d4f",
+    "cli/rust-service.ts": "2146ae84936c3387ee8aa9c35f43e2c853a9d80b9a8757bcee2bfc2e05961392",
+    "scripts/build-standalone-server-artifact.mjs": "75be3ee69cf0168af17367115484dea9b3a76ccabaf957b6ee972aa13714667a",
+    "scripts/verify-standalone-server-artifact.mjs": "f35ac8c20c777b2681a8f002ed8afc534a852b17017280488ac69a3e678cb97e",
+    "tests/build-standalone-server-artifact.test.ts": "eac1c91cc8da7f2f7c7d89d112f8e68b9dcb89454a32724cdc443fb03ba6f740"
+  },
+  "source_after": {
+    "rust/crates/lingxi-adapters/src/storage/windows_acl.rs": "ddbada83db0f2539440271dc4c4ec71c56eda395875c1fc8dfa85d52a51f41fd",
+    "rust/crates/lingxi-service/src/main.rs": "47d1423bc34751805734e307ebae159941000f4da22836a434a0e4c1091e8c1d",
+    "desktop/src/shared/rust-local-service.cjs": "fa295d857d3f04a1f252a7c5e7ea285c0a6c52cd15a25cd142eeeb04fb2e6947",
+    "desktop/main.cjs": "2d2ccc09afe699ced21a9f423bb904b7a4eaebab7e1fbf108338b47b91756d4f",
+    "cli/rust-service.ts": "2146ae84936c3387ee8aa9c35f43e2c853a9d80b9a8757bcee2bfc2e05961392",
+    "scripts/build-standalone-server-artifact.mjs": "75be3ee69cf0168af17367115484dea9b3a76ccabaf957b6ee972aa13714667a",
+    "scripts/verify-standalone-server-artifact.mjs": "f35ac8c20c777b2681a8f002ed8afc534a852b17017280488ac69a3e678cb97e",
+    "tests/build-standalone-server-artifact.test.ts": "eac1c91cc8da7f2f7c7d89d112f8e68b9dcb89454a32724cdc443fb03ba6f740"
+  },
+  "source_unchanged": true
+}

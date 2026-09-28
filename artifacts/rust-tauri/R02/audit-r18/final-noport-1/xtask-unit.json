@@ -1,0 +1,22 @@
+{
+  "name": "xtask-unit",
+  "command": [
+    "/Users/study_superior/.cargo/bin/rustup",
+    "run",
+    "1.98.1",
+    "cargo",
+    "test",
+    "-p",
+    "xtask",
+    "--locked",
+    "--offline"
+  ],
+  "cwd": "/Users/study_superior/Desktop/Code/LingxiAgent/rust",
+  "startedUtc": "2026-09-28T11:53:02.728226+00:00",
+  "endedUtc": "2026-09-28T11:53:09.821802+00:00",
+  "exitCode": 0,
+  "stdout": "artifacts/rust-tauri/R02/audit-r18/final-noport-1/xtask-unit.stdout.log",
+  "stdoutSha256": "094fae15f16cff38b53b07359f9f113d068e5d8beff546567b9b2b7e5f5b6835",
+  "stderr": "artifacts/rust-tauri/R02/audit-r18/final-noport-1/xtask-unit.stderr.log",
+  "stderrSha256": "eaaf93826d478b931bf47b444ab343ed5ba8602f8bcc172f01ef77ddf01c9f2d"
+}

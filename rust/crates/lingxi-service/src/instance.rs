@@ -52,7 +52,7 @@ use std::time::{Duration, SystemTime, UNIX_EPOCH};
 
 use serde::{Deserialize, Serialize};
 
-use crate::paths::{atomic_write, DataRootLayout};
+use crate::paths::{atomic_write_private, DataRootLayout};
 
 /// Record schema version (bump on incompatible record changes).
 pub const INSTANCE_RECORD_SCHEMA_VERSION: u32 = 1;
@@ -167,6 +167,8 @@ pub struct InstanceRecord {
     pub pid: u32,
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub bind_addr: Option<String>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub transport: Option<String>,
     pub started_at_unix_ms: u64,
     pub home_path: String,
 }
@@ -175,6 +177,16 @@ impl InstanceRecord {
     /// Builds the record for THIS instance at publish time (after the
     /// listener is bound, so the address is known).
     pub fn for_identity(identity: &InstanceIdentity, bind_addr: SocketAddr, home: &Path) -> Self {
+        Self::for_identity_with_transport(identity, bind_addr, home, "http")
+    }
+
+    /// 将已实际启动的传输方式写进记录，客户端不得猜测端口协议。
+    pub fn for_identity_with_transport(
+        identity: &InstanceIdentity,
+        bind_addr: SocketAddr,
+        home: &Path,
+        transport: &str,
+    ) -> Self {
         InstanceRecord {
             schema_version: INSTANCE_RECORD_SCHEMA_VERSION,
             server_kind: crate::SERVER_KIND.to_string(),
@@ -186,6 +198,7 @@ impl InstanceRecord {
             start_nonce: identity.start_nonce.clone(),
             pid: identity.pid,
             bind_addr: Some(bind_addr.to_string()),
+            transport: Some(transport.to_string()),
             started_at_unix_ms: identity.started_at_unix_ms,
             home_path: home.display().to_string(),
         }
@@ -195,6 +208,12 @@ impl InstanceRecord {
     /// returns a human summary of every mismatch (empty = handshake agrees).
     pub fn handshake_mismatches(&self) -> Vec<String> {
         let mut out = Vec::new();
+        if !matches!(
+            self.transport.as_deref(),
+            None | Some("http") | Some("https")
+        ) {
+            out.push("instance transport is not http or https".to_string());
+        }
         if self.wire_protocol_min != lingxi_protocol::handshake::WIRE_PROTOCOL_MIN_SUPPORTED
             || self.wire_protocol_max != lingxi_protocol::handshake::WIRE_PROTOCOL_MAX_SUPPORTED
         {
@@ -397,6 +416,10 @@ pub const STALE_RECORD_MARKER: &str = "LINGXI_SERVICE_STALE_RECORD_TAKEN_OVER";
 #[derive(Debug)]
 pub struct InstanceGuard {
     lock_file: File,
+    #[cfg(windows)]
+    _home_guard: lingxi_adapters::storage::windows_acl::PrivateDirectoryGuard,
+    #[cfg(windows)]
+    _runtime_guard: lingxi_adapters::storage::windows_acl::PrivateDirectoryGuard,
     layout: DataRootLayout,
     identity: InstanceIdentity,
     published: bool,
@@ -409,6 +432,30 @@ pub struct InstanceGuard {
 pub fn acquire(
     layout: &DataRootLayout,
 ) -> Result<(InstanceGuard, Option<InstanceRecord>), InstanceLockError> {
+    #[cfg(windows)]
+    let home_guard = lingxi_adapters::storage::windows_acl::require_private_directory(&layout.home)
+        .map_err(|source| InstanceLockError::Io {
+            path: layout.home.clone(),
+            source,
+        })?;
+    #[cfg(windows)]
+    let runtime_guard =
+        lingxi_adapters::storage::windows_acl::require_private_directory(&layout.runtime_dir)
+            .map_err(|source| InstanceLockError::Io {
+                path: layout.runtime_dir.clone(),
+                source,
+            })?;
+    #[cfg(windows)]
+    if !layout.lock_path.exists() {
+        drop(
+            lingxi_adapters::storage::windows_acl::create_private_file(&layout.lock_path).map_err(
+                |source| InstanceLockError::Io {
+                    path: layout.lock_path.clone(),
+                    source,
+                },
+            )?,
+        );
+    }
     let lock_file = File::options()
         .read(true)
         .write(true)
@@ -419,6 +466,13 @@ pub fn acquire(
             path: layout.lock_path.clone(),
             source,
         })?;
+    #[cfg(windows)]
+    lingxi_adapters::storage::windows_acl::ensure_private_file(&layout.lock_path).map_err(
+        |source| InstanceLockError::Io {
+            path: layout.lock_path.clone(),
+            source,
+        },
+    )?;
     if let Err(err) = lock_file.try_lock() {
         tracing::debug!(lock_error = %err, "try_lock refused: a live peer holds the lock");
         // A live peer holds the lock. Build the full diagnostic; the lock
@@ -448,7 +502,7 @@ pub fn acquire(
     match read_record(&layout.record_path) {
         Some(Ok(record)) => {
             if let Err(err) =
-                atomic_write(&layout.stale_archive_path, record_json(&record).as_bytes())
+                atomic_write_private(&layout.stale_archive_path, record_json(&record).as_bytes())
             {
                 tracing::warn!(
                     stale_archive = %layout.stale_archive_path.display(),
@@ -470,6 +524,10 @@ pub fn acquire(
     Ok((
         InstanceGuard {
             lock_file,
+            #[cfg(windows)]
+            _home_guard: home_guard,
+            #[cfg(windows)]
+            _runtime_guard: runtime_guard,
             layout: layout.clone(),
             identity: InstanceIdentity::generate(),
             published: false,
@@ -501,8 +559,28 @@ impl InstanceGuard {
     /// Atomically publishes the instance record (called once the listener
     /// is bound and the concrete address is known).
     pub fn publish(&mut self, bind_addr: SocketAddr) -> io::Result<()> {
-        let record = InstanceRecord::for_identity(&self.identity, bind_addr, &self.layout.home);
-        atomic_write(&self.layout.record_path, record_json(&record).as_bytes())?;
+        self.publish_with_transport(bind_addr, "http")
+    }
+
+    /// 记录已绑定监听器使用的真实 HTTP/HTTPS 协议。
+    pub fn publish_with_transport(
+        &mut self,
+        bind_addr: SocketAddr,
+        transport: &str,
+    ) -> io::Result<()> {
+        if !matches!(transport, "http" | "https") {
+            return Err(io::Error::new(
+                io::ErrorKind::InvalidInput,
+                "unsupported instance transport",
+            ));
+        }
+        let record = InstanceRecord::for_identity_with_transport(
+            &self.identity,
+            bind_addr,
+            &self.layout.home,
+            transport,
+        );
+        atomic_write_private(&self.layout.record_path, record_json(&record).as_bytes())?;
         self.published = true;
         Ok(())
     }
@@ -632,6 +710,7 @@ mod tests {
             start_nonce: "cafebabecafebabe".to_string(),
             pid: std::process::id(), // exists right now, unrelated process
             bind_addr: Some("127.0.0.1:1".parse::<SocketAddr>().unwrap().to_string()),
+            transport: Some("http".to_string()),
             started_at_unix_ms: 1,
             home_path: layout.home.display().to_string(),
         };
@@ -681,6 +760,7 @@ mod tests {
             start_nonce: "0011".repeat(4),
             pid: u32::MAX, // effectively never a real pid
             bind_addr: None,
+            transport: Some("http".to_string()),
             started_at_unix_ms: 0,
             home_path: layout.home.display().to_string(),
         };
@@ -749,6 +829,7 @@ mod tests {
             start_nonce: "ee".repeat(8),
             pid: 1,
             bind_addr: None,
+            transport: Some("http".to_string()),
             started_at_unix_ms: 1,
             home_path: layout.home.display().to_string(),
         };
@@ -798,10 +879,25 @@ mod tests {
         assert!(json.get("instanceId").is_some());
         assert!(json.get("startNonce").is_some());
         assert!(json.get("bindAddr").is_some());
+        assert_eq!(
+            json.get("transport").and_then(serde_json::Value::as_str),
+            Some("http")
+        );
         assert!(json.get("startedAtUnixMs").is_some());
         assert!(json.get("wireProtocolMin").is_some());
         let back: InstanceRecord = serde_json::from_value(json).unwrap();
         assert_eq!(back, record);
+        let mut old_json = serde_json::to_value(&record).unwrap();
+        old_json.as_object_mut().unwrap().remove("transport");
+        let old: InstanceRecord = serde_json::from_value(old_json).unwrap();
+        assert_eq!(old.transport, None);
+        let secure = InstanceRecord::for_identity_with_transport(
+            &InstanceIdentity::generate(),
+            "127.0.0.1:9".parse().unwrap(),
+            Path::new("/tmp/x"),
+            "https",
+        );
+        assert_eq!(secure.transport.as_deref(), Some("https"));
     }
 
     #[test]

@@ -28,8 +28,17 @@ cd "$(dirname "$0")/../.."
 
 EVIDENCE_DIR="${1:-artifacts/rust-tauri/R02/T06}"
 EVIDENCE_DIR="$EVIDENCE_DIR/backup-restore"
+# 每轮证据目录必须全新，防止独立直跑时旧日志覆盖或冒充本轮结果。
+if [ -L "$EVIDENCE_DIR" ] || { [ -e "$EVIDENCE_DIR" ] && [ ! -d "$EVIDENCE_DIR" ]; }; then
+  echo "ERROR: evidence path is not a regular directory: $EVIDENCE_DIR" >&2
+  exit 1
+fi
+if [ -d "$EVIDENCE_DIR" ]; then
+  FIRST_ENTRY="$(find "$EVIDENCE_DIR" -mindepth 1 -print -quit)" || exit 1
+  [ -z "$FIRST_ENTRY" ] || { echo "ERROR: evidence directory is not empty: $EVIDENCE_DIR" >&2; exit 1; }
+fi
 mkdir -p "$EVIDENCE_DIR"
-TARGET_DIR="${CARGO_TARGET_DIR:-/tmp/rust-target-r02-t06}"
+TARGET_DIR="${CARGO_TARGET_DIR:-${TMPDIR:-/tmp}/rust-target-r02-t06}"
 
 TOOLCHAIN="$(sed -n 's/^channel[[:space:]]*=[[:space:]]*"\([^"]*\)".*/\1/p' rust-toolchain.toml | head -n 1)"
 if [ -z "$TOOLCHAIN" ]; then
@@ -50,11 +59,142 @@ CARGO="env -u all_proxy -u ALL_PROXY -u http_proxy -u HTTP_PROXY -u https_proxy 
 HOME_DIR=""
 SERVICE_PID=""
 PROBE_PID=""
+# R02 stage-repair R7 / R7-F02: the PID variables are CURRENT handles —
+# set on spawn, RETIRED (cleared) after every wait/reap (the normal paths
+# already did). The trap KILL-9s a pid ONLY while it still proves
+# CURRENT ownership (exists AND ppid is THIS shell): a retired or
+# recycled number is never signalled (R6-F02 A12 pattern — kill -9 on a
+# bare reaped number could hit whoever recycled it).
+# R12-F01: the boolean probe's false branch conflated exited/foreign/
+# unobservable and the trap's owned branch was `kill -9; wait` with NO
+# deadline — KILL cannot be ignored, but an unreapable direct child
+# (D-state) would still hang the trap forever. Four-state probe + a
+# bounded KILL re-check below (≈5 s worst case per handle, ≤2 handles
+# here): residue is reported loudly at expiry, never an unbounded wait.
+# KILL-9 stays the FIRST signal by this script's own contract (the S1
+# crash-stop semantics); no TERM stage is inserted.
+child_state() {
+  # child_state <pid> → exited | owned | foreign | unobservable
+  local ppid
+  if ! kill -0 "$1" 2>/dev/null; then
+    printf 'exited\n'
+    return 0
+  fi
+  ppid="$(ps -o ppid= -p "$1" 2>/dev/null | tr -d '[:space:]')"
+  if [ -z "$ppid" ]; then
+    printf 'unobservable\n'
+  elif [ "$ppid" = "$$" ]; then
+    printf 'owned\n'
+  else
+    printf 'foreign\n'
+  fi
+}
+# R12-F01: bounded crash-stop for ONE provably-owned handle: KILL-9 (the
+# contractual first signal here) → ≤5 s re-check poll. Prints the final
+# state; an unreapable survivor is reported as residue, never waited on.
+bounded_kill_stop_owned() {
+  local pid="$1" state="" i
+  # KILL 前重新确认进程仍属本脚本，未知或已复用的 PID 不得被信号触碰。
+  state="$(child_state "$pid")"
+  if [ "$state" != "owned" ]; then printf '%s\n' "$state"; return 0; fi
+  kill -9 "$pid" 2>/dev/null || true
+  for i in $(seq 1 100); do
+    state="$(child_state "$pid")"
+    case "$state" in
+      exited|foreign) break ;;
+      owned|unobservable) : ;;
+    esac
+    sleep 0.05
+  done
+  printf '%s\n' "${state:-unobservable}"
+}
+# 正常关停先 TERM，超时才对仍属本脚本的子进程升级 KILL。
+bounded_term_stop_owned() {
+  local pid="$1" state="" i
+  state="$(child_state "$pid")"
+  if [ "$state" != "owned" ]; then printf '%s\n' "$state"; return 0; fi
+  kill -TERM "$pid" 2>/dev/null || true
+  for i in $(seq 1 100); do
+    state="$(child_state "$pid")"
+    case "$state" in exited|foreign) break ;; owned|unobservable) : ;; esac
+    sleep 0.05
+  done
+  if [ "${state:-owned}" = "owned" ]; then state="$(bounded_kill_stop_owned "$pid")"; fi
+  printf '%s\n' "${state:-unobservable}"
+}
+stop_service_gracefully() {
+  local state
+  [ "$(child_state "$SERVICE_PID")" = "owned" ] || fail "service not owned before graceful stop"
+  state="$(bounded_term_stop_owned "$SERVICE_PID")"
+  case "$state" in exited) ;; *) fail "service remained or ownership changed after TERM/KILL budget (state=$state)" ;; esac
+  if wait "$SERVICE_PID" 2>/dev/null; then SERVICE_STOP_RC=0; else SERVICE_STOP_RC=$?; fi
+  SERVICE_PID=""
+  [ "$SERVICE_STOP_RC" -eq 0 ] || fail "service shutdown exit=$SERVICE_STOP_RC"
+}
+crash_service_owned() {
+  local state
+  [ "$(child_state "$SERVICE_PID")" = "owned" ] || fail "service not owned before crash signal"
+  state="$(bounded_kill_stop_owned "$SERVICE_PID")"
+  case "$state" in exited) ;; *) fail "service remained or ownership changed after KILL budget (state=$state)" ;; esac
+  if wait "$SERVICE_PID" 2>/dev/null; then CRASH_RC=0; else CRASH_RC=$?; fi
+  SERVICE_PID=""
+  [ "$CRASH_RC" -eq 137 ] || fail "crash signal expected exit 137, got $CRASH_RC"
+}
 cleanup() {
-  [ -n "$SERVICE_PID" ] && kill -9 "$SERVICE_PID" 2>/dev/null || true
-  [ -n "$PROBE_PID" ] && kill -9 "$PROBE_PID" 2>/dev/null || true
-  wait 2>/dev/null || true
-  if [ -n "$HOME_DIR" ] && [ -d "$HOME_DIR" ]; then rm -rf "$HOME_DIR"; fi
+  local cleanup_residue=0 own_dir
+  for pid in "$PROBE_PID" "$SERVICE_PID"; do
+    [ -n "$pid" ] || continue
+    case "$(child_state "$pid")" in
+      owned)
+        case "$(bounded_kill_stop_owned "$pid")" in
+          exited)
+            wait "$pid" 2>/dev/null || true
+            ;;
+          foreign)
+            echo "cleanup: pid $pid 已不属于本脚本，不等待或发信号" >&2
+            cleanup_residue=1
+            ;;
+          owned)
+            echo "cleanup: pid $pid still OWNED after the KILL budget — RESIDUE left behind (unreapable?), no unbounded wait" >&2
+            cleanup_residue=1
+            ;;
+          unobservable)
+            echo "cleanup: pid $pid state UNOBSERVABLE after the KILL budget — not signalled further, no unbounded wait; possible residue" >&2
+            cleanup_residue=1
+            ;;
+        esac
+        ;;
+      exited)
+        wait "$pid" 2>/dev/null || true
+        ;;
+      foreign)
+        echo "cleanup: pid $pid is NOT currently owned by this shell — NOT signalled" >&2
+        cleanup_residue=1
+        ;;
+      unobservable)
+        echo "cleanup: pid $pid ownership UNOBSERVABLE (ps unreadable) — NOT signalled" >&2
+        cleanup_residue=1
+        ;;
+    esac
+  done
+  PROBE_PID=""; SERVICE_PID=""
+  # R12-F01: the parameterless `wait` that used to run here waited for
+  # EVERY outstanding child with NO deadline — including exactly the
+  # owned/unobservable residue the bounded ladder above now reports
+  # instead of hanging on. Each handle was reaped inside its state
+  # branch (exited) or reported as residue (owned/foreign/unobservable);
+  # nothing legitimate is left to wait for.
+  if [ "$cleanup_residue" -eq 0 ]; then
+    if [ -n "$HOME_DIR" ]; then
+      for own_dir in "$HOME_DIR" "$HOME_DIR-backup" "$HOME_DIR-restore" "$HOME_DIR-bkparent"; do
+        [ -d "$own_dir" ] && rm -rf -- "$own_dir"
+      done
+    fi
+  else
+    echo "cleanup: 进程仍存活或归属不明，保留本轮 home=$HOME_DIR 供核查" >&2
+    exit 1
+  fi
+  return 0
 }
 trap cleanup EXIT
 
@@ -110,7 +250,7 @@ PYEOF
 
 # ---- S1 (A11 core): WAL-resident committed data -> backup -> restore --------
 note "== S1 (R02-A11): WAL-resident committed data survives backup+restore =="
-HOME_DIR=$(mktemp -d /tmp/lingxi-r02t06-bk-XXXXXX)
+HOME_DIR=$(mktemp -d "${TMPDIR:-/tmp}/lingxi-r02t06-bk-XXXXXX")
 start_service "$HOME_DIR" s1 || fail "S1 service did not become ready"
 ADDR=$(cat "$EVIDENCE_DIR/service-s1.addr")
 TOKEN=$(token_of "$HOME_DIR")
@@ -126,13 +266,15 @@ echo "wal_bytes=$WAL_SIZE" > "$EVIDENCE_DIR/s1-wal-size.txt"
 note "PASS S1 precondition: WAL non-empty (committed data not yet checkpointed, bytes=$WAL_SIZE)"
 
 # Crash stop: writers stopped abruptly, the WAL is NOT checkpointed away.
-SERVICE_PID=$(cat "$EVIDENCE_DIR/service.pid")
-[ -n "$SERVICE_PID" ] || fail "S1 service pid missing (script bug)"
-kill -9 "$SERVICE_PID" 2>/dev/null || true
-wait "$SERVICE_PID" 2>/dev/null || true
+[ -n "$SERVICE_PID" ] || fail "S1 service handle missing (script bug)"
+crash_service_owned
 sleep 0.3
-SERVICE_PID=""
-kill -0 "$(cat "$EVIDENCE_DIR/service.pid")" 2>/dev/null && fail "S1 the crash did not terminate the service"
+# R7-F02: the reaping wait IS the termination proof — a SIGKILLed child
+# must report exit 137. The old `kill -0 $(cat service.pid)` probe read
+# the RETIRED number back from the file: if the OS recycled it, the
+# probe could succeed on a foreign process and fail the gate spuriously
+# (and would have proven nothing the wait has not already proven).
+[ "$CRASH_RC" -eq 137 ] || fail "S1 the crash did not terminate the service as SIGKILL (wait rc=$CRASH_RC, expected 137)"
 WAL_SIZE_AFTER_CRASH=$(wal_bytes "$HOME_DIR")
 [ "$WAL_SIZE_AFTER_CRASH" -gt 0 ] || fail "S1 crash must keep the WAL (got $WAL_SIZE_AFTER_CRASH)"
 db_hash "$HOME_DIR" > "$EVIDENCE_DIR/s1-source-hash.txt"
@@ -197,12 +339,8 @@ shasum -a 256 "$RESTORE_DIR/runs.db" > "$EVIDENCE_DIR/s1-restored-hash.txt" || t
 # ---- S2: graceful stop with the shutdown coordinator ------------------------
 note "== S2: graceful stop (SIGTERM) exits 0 =="
 start_service "$HOME_DIR" s2 || fail "S2 service did not become ready (restart after crash = WAL recovery applied)"
-SERVICE_PID=$(cat "$EVIDENCE_DIR/service.pid")
-kill -TERM "$SERVICE_PID"
-wait "$SERVICE_PID" 2>/dev/null
-EXIT=$?
-SERVICE_PID=""
-[ "$EXIT" = "0" ] || fail "S2 graceful stop expected exit 0, got $EXIT"
+[ -n "$SERVICE_PID" ] || fail "S2 service handle missing"
+stop_service_gracefully
 note "PASS S2 graceful stop exit 0 (coordinator: drain -> checkpoint -> record removal)"
 
 # ---- S3: interrupted backup leaves no masquerading artifact -----------------
@@ -230,6 +368,7 @@ note "== S4: open WebSocket session + SIGTERM -> close(1001), exit 0 =="
 start_service "$HOME_DIR" s4 || fail "S4 service did not become ready"
 ADDR=$(cat "$EVIDENCE_DIR/service-s4.addr")
 TOKEN=$(token_of "$HOME_DIR")
+rm -f "$EVIDENCE_DIR/s4-ws-probe.json" "$EVIDENCE_DIR/s4-ws-probe.json.probe-done"
 ADDR="$ADDR" TOKEN="$TOKEN" OUT="$EVIDENCE_DIR/s4-ws-probe.json" python3 - <<'PYEOF' &
 import json, os, socket, struct, sys
 
@@ -325,13 +464,23 @@ PYEOF
 PROBE_PID=$!
 # Wait until the probe is subscribed (ServerHello+subscribe processed), then stop.
 sleep 1
-SERVICE_PID=$(cat "$EVIDENCE_DIR/service.pid")
-kill -TERM "$SERVICE_PID"
-wait "$SERVICE_PID" 2>/dev/null
-EXIT=$?
-SERVICE_PID=""
-wait "$PROBE_PID" 2>/dev/null || true
+[ -n "$SERVICE_PID" ] || fail "S4 service handle missing"
+stop_service_gracefully
+EXIT="$SERVICE_STOP_RC"
+PROBE_STATE=""
+for _ in $(seq 1 700); do
+  PROBE_STATE="$(child_state "$PROBE_PID")"
+  case "$PROBE_STATE" in exited|foreign) break ;; owned|unobservable) : ;; esac
+  sleep 0.05
+done
+case "$PROBE_STATE" in
+  exited) ;;
+  *) fail "S4 WS probe did not finish within 35 seconds (state=$PROBE_STATE)" ;;
+esac
+if wait "$PROBE_PID" 2>/dev/null; then PROBE_RC=0; else PROBE_RC=$?; fi
 PROBE_PID=""
+[ "$PROBE_RC" -eq 0 ] || fail "S4 WS probe exited $PROBE_RC"
+[ -f "$EVIDENCE_DIR/s4-ws-probe.json.probe-done" ] || fail "S4 WS probe completion marker missing"
 [ "$EXIT" = "0" ] || fail "S4 graceful stop with an open WS expected exit 0, got $EXIT (open WS must not deadlock the stop)"
 python3 - "$EVIDENCE_DIR/s4-ws-probe.json" <<'PYEOF' || fail "S4 WS session did not receive the shutdown close frame"
 import json, sys

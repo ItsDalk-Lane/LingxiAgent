@@ -1,0 +1,47 @@
+{
+  "command": [
+    "/Users/study_superior/.cargo/bin/rustup",
+    "run",
+    "1.98.1",
+    "cargo",
+    "test",
+    "--manifest-path",
+    "rust/Cargo.toml",
+    "-p",
+    "xtask",
+    "--locked",
+    "--offline"
+  ],
+  "cwd": "/Users/study_superior/Desktop/Code/LingxiAgent",
+  "startedAtUtc": "2026-09-28T13:06:52.895026+00:00",
+  "finishedAtUtc": "2026-09-28T13:06:58.306741+00:00",
+  "exitCode": 0,
+  "sourceSha256Before": {
+    "rust/Cargo.lock": "90111c4b5988531d7a891339b6ee5df8afc9d3ec655e4929747da07d5811bb49",
+    "rust/Cargo.toml": "cec902952a04a6bda6296a0f406f12d59ccdb286c13a99282f1aa808751f1096",
+    "rust-toolchain.toml": "eec3410410647a7d39f25371e73dda3ecfd5e7c10359090fff11e83053e11c37",
+    "rust/crates/xtask/Cargo.toml": "51edb1d897d4fe653e39bc0d92dd3ac7ec2b87bc00a1b9c8433624c196edc776",
+    "rust/crates/xtask/src/main.rs": "f6916b082f879082d6c473d33d59dfcb6c43c8869e155dcb1bc313bad27fa9a8",
+    "rust/crates/xtask/src/verify.rs": "29f453b468c1af5291a5cfebcd70f2ea5ce09a99c8e79bce33b411cfe1a7f661",
+    "rust/crates/xtask/src/candidate.rs": "7a050f16d8558779002196fa0fda0a35aa49e85b0ebcbfb4b6127bfdee479fab",
+    "rust/crates/xtask/src/candidate/tests.rs": "5a81ff0fba2dc6d6e1f742fd413ab7a8b5358248ecd3942d04a4090f1270e505",
+    "rust/crates/xtask/src/runner_identity.rs": "39a2278f79b8cf094e39a9f4963d3d6fd3b440e5b80e07011822e352b3425230",
+    "rust/crates/xtask/src/stage_maps/R02.json": "fce63a75f3118102ab3c0937be82485cd9c9c2d445e40545f6852f9ff8cde4cc",
+    "rust/crates/xtask/src/verify/runner_tests.rs": "76c800612ac22aa4fc23db9ef650d9602e78ca51bc669aff756a7d70facdc08d"
+  },
+  "sourceSha256After": {
+    "rust/Cargo.lock": "90111c4b5988531d7a891339b6ee5df8afc9d3ec655e4929747da07d5811bb49",
+    "rust/Cargo.toml": "cec902952a04a6bda6296a0f406f12d59ccdb286c13a99282f1aa808751f1096",
+    "rust-toolchain.toml": "eec3410410647a7d39f25371e73dda3ecfd5e7c10359090fff11e83053e11c37",
+    "rust/crates/xtask/Cargo.toml": "51edb1d897d4fe653e39bc0d92dd3ac7ec2b87bc00a1b9c8433624c196edc776",
+    "rust/crates/xtask/src/main.rs": "f6916b082f879082d6c473d33d59dfcb6c43c8869e155dcb1bc313bad27fa9a8",
+    "rust/crates/xtask/src/verify.rs": "29f453b468c1af5291a5cfebcd70f2ea5ce09a99c8e79bce33b411cfe1a7f661",
+    "rust/crates/xtask/src/candidate.rs": "7a050f16d8558779002196fa0fda0a35aa49e85b0ebcbfb4b6127bfdee479fab",
+    "rust/crates/xtask/src/candidate/tests.rs": "5a81ff0fba2dc6d6e1f742fd413ab7a8b5358248ecd3942d04a4090f1270e505",
+    "rust/crates/xtask/src/runner_identity.rs": "39a2278f79b8cf094e39a9f4963d3d6fd3b440e5b80e07011822e352b3425230",
+    "rust/crates/xtask/src/stage_maps/R02.json": "fce63a75f3118102ab3c0937be82485cd9c9c2d445e40545f6852f9ff8cde4cc",
+    "rust/crates/xtask/src/verify/runner_tests.rs": "76c800612ac22aa4fc23db9ef650d9602e78ca51bc669aff756a7d70facdc08d"
+  },
+  "stdout": "xtask-test-final-a.stdout.log",
+  "stderr": "xtask-test-final-a.stderr.log"
+}

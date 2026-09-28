@@ -1,0 +1,25 @@
+{
+  "name": "cargo-clippy",
+  "command": [
+    "/Users/study_superior/.cargo/bin/rustup",
+    "run",
+    "1.98.1",
+    "cargo",
+    "clippy",
+    "--workspace",
+    "--all-targets",
+    "--locked",
+    "--offline",
+    "--",
+    "-D",
+    "warnings"
+  ],
+  "cwd": "/Users/study_superior/Desktop/Code/LingxiAgent/rust",
+  "startedUtc": "2026-09-28T11:52:58.552005+00:00",
+  "endedUtc": "2026-09-28T11:53:02.727731+00:00",
+  "exitCode": 0,
+  "stdout": "artifacts/rust-tauri/R02/audit-r18/final-noport-1/cargo-clippy.stdout.log",
+  "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+  "stderr": "artifacts/rust-tauri/R02/audit-r18/final-noport-1/cargo-clippy.stderr.log",
+  "stderrSha256": "aa137ac9873273376027d3ae054437787893a37d42c23d9a5aca3c7c0b8bc3de"
+}

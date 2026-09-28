@@ -611,6 +611,15 @@
     "serverNotReady": "Server not ready",
     "loading": "Loading...",
     "reconnecting": "Reconnecting",
+    "reconnected": "Reconnected",
+    "wsTicketFailed": "Could not get a connection ticket",
+    "wsHandshakeFailed": "Server connection protocol mismatch",
+    "wsHandshakeTimedOut": "Server handshake timed out",
+    "wsConnectionFailed": "Could not connect to the server",
+    "wsConnectionClosed": "Server connection closed",
+    "serverRestartInvalid": "Invalid server restart details. Please retry.",
+    "rustCoreUnavailable": "Rust service connected, but chat is not migrated yet. Messages cannot be sent.",
+    "serverRestarting": "Server is restarting",
     "reconnect": "Reconnect"
   },
   "input": {
@@ -1515,6 +1524,7 @@
     "saved": "Saved ✿",
     "saveFailed": "Failed to save",
     "refreshFailed": "Refresh failed",
+    "rustCoreUnavailable": "Agent, model, and general settings are not available on the Rust service yet. Access settings remain available.",
     "fileChangedOnDisk": "The file changed on disk, so the stale save was skipped",
     "noChanges": "Nothing to save",
     "autoSaved": "Auto-saved ✿",

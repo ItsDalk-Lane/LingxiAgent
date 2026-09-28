@@ -1,0 +1,35 @@
+{
+  "command": [
+    "./node_modules/.bin/vitest",
+    "run",
+    "desktop/src/react/__tests__/services/server-connection.test.ts",
+    "desktop/src/react/__tests__/services/R02RustWebSocket.test.ts",
+    "desktop/src/react/__tests__/app-init.test.ts",
+    "desktop/src/react/__tests__/settings/SettingsContent.test.tsx"
+  ],
+  "startUtc": "2026-09-28T10:06:34.563403+00:00",
+  "endUtc": "2026-09-28T10:06:36.277308+00:00",
+  "exitCode": 1,
+  "sourceStable": true,
+  "beforeSha256": {
+    "desktop/src/react/services/server-connection.ts": "40719d4fa066c94f8491d4b207b57b257986522373731e1693824ee2c9c7e82b",
+    "desktop/src/react/services/websocket.ts": "92bcfd8e183840391bd1aa382287e577b87f46b43af904a9e5880adff2052d35",
+    "desktop/src/react/app-init.ts": "8f2bb8219102e789a9f241316391b6e94be552232870745085df3bfc18b4c7f1",
+    "desktop/src/react/settings/SettingsContent.tsx": "e7f47154ae466969642c77c0a80077b92e07ed4147bcd53d85feaa08e89caf7b",
+    "desktop/src/react/__tests__/services/server-connection.test.ts": "c6442e11194b2c2ce8cd767354a14715263f1850b00abbb6553721ec3e876bf2",
+    "desktop/src/react/__tests__/services/R02RustWebSocket.test.ts": "962f413d9bf30a9eb17bf2595a935953050faf390608ebe85ca4ac8c60650def",
+    "desktop/src/react/__tests__/app-init.test.ts": "9ec71610c4f5eefd00bdc9893c8e263ddb7e0ea7a845d22ffdd61133c8ccfb7a",
+    "desktop/src/react/__tests__/settings/SettingsContent.test.tsx": "b56fd7e789dfaec09944680a04b5ace8ff4b4fb5a9f59cbe878a2ee857d1ae50"
+  },
+  "afterSha256": {
+    "desktop/src/react/services/server-connection.ts": "40719d4fa066c94f8491d4b207b57b257986522373731e1693824ee2c9c7e82b",
+    "desktop/src/react/services/websocket.ts": "92bcfd8e183840391bd1aa382287e577b87f46b43af904a9e5880adff2052d35",
+    "desktop/src/react/app-init.ts": "8f2bb8219102e789a9f241316391b6e94be552232870745085df3bfc18b4c7f1",
+    "desktop/src/react/settings/SettingsContent.tsx": "e7f47154ae466969642c77c0a80077b92e07ed4147bcd53d85feaa08e89caf7b",
+    "desktop/src/react/__tests__/services/server-connection.test.ts": "c6442e11194b2c2ce8cd767354a14715263f1850b00abbb6553721ec3e876bf2",
+    "desktop/src/react/__tests__/services/R02RustWebSocket.test.ts": "962f413d9bf30a9eb17bf2595a935953050faf390608ebe85ca4ac8c60650def",
+    "desktop/src/react/__tests__/app-init.test.ts": "9ec71610c4f5eefd00bdc9893c8e263ddb7e0ea7a845d22ffdd61133c8ccfb7a",
+    "desktop/src/react/__tests__/settings/SettingsContent.test.tsx": "b56fd7e789dfaec09944680a04b5ace8ff4b4fb5a9f59cbe878a2ee857d1ae50"
+  },
+  "kind": "no-port targeted component/unit tests"
+}

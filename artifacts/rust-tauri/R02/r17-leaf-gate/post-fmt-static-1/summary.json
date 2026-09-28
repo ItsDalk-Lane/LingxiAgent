@@ -1,0 +1,58 @@
+{
+  "startUtc": "2026-09-28T09:54:50.397464+00:00",
+  "endUtc": "2026-09-28T09:54:51.701422+00:00",
+  "sourceStable": true,
+  "beforeSha256": {
+    "rust/crates/xtask/src/stage_maps/R02.json": "7df61ead4127e45ef51f5e89b818b7a02504d42457440667daeaaaff471637f0",
+    "rust/crates/xtask/src/stage_map.rs": "38c71c177dfc3e610b8f00acdf58179b0e4b7d38ab73345648dd0f95b6b2dc31",
+    "rust/crates/xtask/src/verify.rs": "af85eec943194dfae5bd71f738410df3e59a077d736380ab37b0f5ac88217619",
+    "rust/crates/xtask/src/verify/runner_tests.rs": "201c676955e80828781bedeb539fa69f653575f8d2ce114a5b1495cee590beea",
+    "rust/crates/lingxi-service/tests/r00_management_leaves.rs": "49a859f36fe15a3077cad952e81bddd0dbf0bbd95706bcead0f72c9ed1c55d37",
+    "scripts/rust-tauri/r02_management_leaf_matrix.py": "91319b9c9c19fdfef6307d42ee50721d5e6cb3430cf5c1ebfee3a5e4c65fb57f"
+  },
+  "afterSha256": {
+    "rust/crates/xtask/src/stage_maps/R02.json": "7df61ead4127e45ef51f5e89b818b7a02504d42457440667daeaaaff471637f0",
+    "rust/crates/xtask/src/stage_map.rs": "38c71c177dfc3e610b8f00acdf58179b0e4b7d38ab73345648dd0f95b6b2dc31",
+    "rust/crates/xtask/src/verify.rs": "af85eec943194dfae5bd71f738410df3e59a077d736380ab37b0f5ac88217619",
+    "rust/crates/xtask/src/verify/runner_tests.rs": "201c676955e80828781bedeb539fa69f653575f8d2ce114a5b1495cee590beea",
+    "rust/crates/lingxi-service/tests/r00_management_leaves.rs": "49a859f36fe15a3077cad952e81bddd0dbf0bbd95706bcead0f72c9ed1c55d37",
+    "scripts/rust-tauri/r02_management_leaf_matrix.py": "91319b9c9c19fdfef6307d42ee50721d5e6cb3430cf5c1ebfee3a5e4c65fb57f"
+  },
+  "checks": [
+    {
+      "name": "xtask_embedded_map",
+      "command": [
+        "cargo",
+        "test",
+        "--offline",
+        "-p",
+        "xtask",
+        "embedded_r02_map",
+        "--",
+        "--nocapture"
+      ],
+      "exitCode": 0
+    },
+    {
+      "name": "management_compile",
+      "command": [
+        "cargo",
+        "check",
+        "--offline",
+        "-p",
+        "lingxi-service",
+        "--test",
+        "r00_management_leaves"
+      ],
+      "exitCode": 0
+    },
+    {
+      "name": "r00_34_and_management_59_identity",
+      "exitCode": 0,
+      "fullDefinitions": 18,
+      "partial": 16,
+      "auditNegativeLeaves": 9
+    }
+  ],
+  "kind": "no-port targeted tests and static checks; true TCP not run"
+}

@@ -1,0 +1,25 @@
+{
+  "argv": [
+    "./node_modules/.bin/vitest",
+    "run",
+    "tests/cli-args.test.ts",
+    "tests/cli-chat.test.ts",
+    "tests/cli-chat-runtime.test.ts",
+    "tests/cli-rust-service.test.ts"
+  ],
+  "started_utc": "2026-09-28T08:52:11.757148+00:00",
+  "ended_utc": "2026-09-28T08:52:12.274858+00:00",
+  "exit": 0,
+  "head": "9b98c679678888b60ff2e32bd67d3da6fc2f5c4f",
+  "files": {
+    "cli/args.ts": "7ea449b5b3a6d0448357d7b23116259aa4d8b71f2ce31cb2f29dca2d90fc04ef",
+    "cli/chat.ts": "ea981a843a94495e63e4b2dfa3e337284329a41b5c3943b7ec80bef4fae34c1f",
+    "cli/entry.ts": "616e2885eeab9a7c05a1593489e0954fbdacef64938d13faf6060979fcbac866",
+    "cli/rust-service.ts": "ed7d22f49c7810435f8bad33ecf1eda65eb3f1a9dd44ddbce9c6d449d5e0a3a5",
+    "cli/server-runner.ts": "357b9b2542eca630c2776525f3457fe5bb7596ca2be620c2f4734c37072d87b3",
+    "tests/cli-args.test.ts": "ba6b7fe7a6d3495768d9afde096e1f0b6c2f4cf4ad208cf695b36342a766a0f2",
+    "tests/cli-chat.test.ts": "09022dae07999fca08c4112e9ea0f8289b0f0f970ce5524bd5f4659a2769dabb",
+    "tests/cli-chat-runtime.test.ts": "798e733b646abaed943fe198270224fd3e0f51bb4a1c9f0d49252b3008c8ff44",
+    "tests/cli-rust-service.test.ts": "6afc34242de2a7fd2e70bc09194c799531ec14573c914ab11a2368c277805116"
+  }
+}

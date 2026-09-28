@@ -544,7 +544,10 @@ fn find_credential_value(rest: &str, from: usize) -> Option<(usize, usize, Strin
     while cursor < rest.len() {
         let c = rest[cursor..].chars().next()?;
         if !is_token_char(c) {
-            cursor += 1;
+            // Advance one full character, not one byte: multi-byte UTF-8
+            // (e.g. an em dash in an ordinary diagnostic) must never leave
+            // the cursor inside a char, or the next slice panics.
+            cursor += c.len_utf8();
             continue;
         }
         let token_end = rest[cursor..]
@@ -590,7 +593,9 @@ fn word_boundaries_in(rest: &str, token_start: usize, token_end: usize) -> Vec<u
     out.push(token_start);
     for (idx, c) in rest[token_start..token_end].char_indices() {
         if !is_word_char(c) {
-            out.push(token_start + idx + 1);
+            // The next word starts after the whole separator character;
+            // idx + 1 would split multi-byte UTF-8.
+            out.push(token_start + idx + c.len_utf8());
         }
     }
     out
@@ -601,7 +606,9 @@ fn find_long_random_token(rest: &str, from: usize) -> Option<(usize, usize, Stri
     while cursor < rest.len() {
         let c = rest[cursor..].chars().next()?;
         if !is_token_char(c) {
-            cursor += 1;
+            // Multi-byte UTF-8 safe advance (same contract as the
+            // credential scan above).
+            cursor += c.len_utf8();
             continue;
         }
         let run_end = rest[cursor..]
@@ -814,5 +821,45 @@ mod tests {
         let line = "sk-config and skip it; note the workstation";
         let red = redact_text(line, None);
         assert_eq!(red, line, "short tails must not count as credential values");
+    }
+
+    // ── R2-F02 regression: multi-byte UTF-8 must never split a char ────────
+
+    #[test]
+    fn unicode_diagnostics_never_panic_and_pass_through_intact() {
+        // The exact shutdown-path line that panicked before the fix
+        // (em dash is 3 bytes; the old byte-wise cursor landed inside it).
+        let line = "run database teardown did not complete — retry required";
+        assert_eq!(redact_line(line), line);
+        // A spread of multi-byte shapes across every scanner pass:
+        // CJK (3 bytes), emoji (4 bytes), accented Latin (2 bytes), mixed
+        // with token-looking runs so every cursor path is exercised.
+        for line in [
+            "关闭超时 — worker 仍繁忙；checkpoint 未完成",
+            "éèê — hana_dev_notasecret tail — 中文混排 sk-notakey",
+            "🙂🙂🙂 c2FtcGxlIHNlY3JldCB2YWx1ZSBmb3IgcmVkbm90IHRlc3Q 🙂",
+            "—c2FtcGxlIHNlY3JldCB2YWx1ZSBmb3IgcmVkbm90IHRlc3Q—",
+        ] {
+            let red = redact_line(line);
+            // Long random tokens embedded between multi-byte separators
+            // must still be redacted; the rest must survive byte-for-byte.
+            if line.contains("c2FtcGxl") {
+                assert!(!red.contains("c2FtcGxl"), "token must be redacted: {red}");
+                assert!(red.contains("[token]"), "{red}");
+            } else {
+                assert_eq!(red, line, "ordinary unicode line must pass through: {red}");
+            }
+        }
+    }
+
+    #[test]
+    fn unicode_adjacent_word_boundaries_do_not_split_chars() {
+        // Multi-byte char directly abutting a credential prefix: the probe
+        // boundary after the separator must start at the char boundary,
+        // and the credential must still be caught.
+        let line = "token—sk-0123456789abcdef—end";
+        let red = redact_line(line);
+        assert!(!red.contains("sk-0123456789abcdef"), "leaked: {red}");
+        assert!(red.contains('—'), "unicode separators survive: {red}");
     }
 }

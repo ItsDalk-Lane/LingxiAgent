@@ -1,0 +1,16 @@
+{
+  "name": "build-rust-service",
+  "command": [
+    "npm",
+    "run",
+    "build:rust-service"
+  ],
+  "cwd": "/Users/study_superior/Desktop/Code/LingxiAgent",
+  "startedUtc": "2026-09-28T11:55:43.507272+00:00",
+  "endedUtc": "2026-09-28T11:56:06.044454+00:00",
+  "exitCode": 0,
+  "stdout": "artifacts/rust-tauri/R02/audit-r18/final-noport-1/build-rust-service.stdout.log",
+  "stdoutSha256": "74afbb145e522b6c3e9f418458f406ddfd6beef141b6ebc1443928b8185001ff",
+  "stderr": "artifacts/rust-tauri/R02/audit-r18/final-noport-1/build-rust-service.stderr.log",
+  "stderrSha256": "ace97be04023ab0bffcda6f2f7d8ff0d771ed7d9bad1aee667d159fac8dc1a51"
+}

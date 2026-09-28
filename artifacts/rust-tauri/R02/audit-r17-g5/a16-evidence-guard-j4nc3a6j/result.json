@@ -1,0 +1,63 @@
+{
+  "script": "/Users/study_superior/Desktop/Code/LingxiAgent/scripts/rust-tauri/r02_t08_legacy_entry_regression.sh",
+  "script_sha256": "7b7c4a4dd400d6fdfc672715e5c073ed85df93405e93cbdf05eef779b8ee3c68",
+  "head": "9b98c679678888b60ff2e32bd67d3da6fc2f5c4f",
+  "log_dir": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R02/audit-r17-g5/a16-evidence-guard-j4nc3a6j",
+  "fixture": "/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/a16-evidence-guard-fixture-r9wym_2t",
+  "cases": [
+    {
+      "name": "existing_root",
+      "command": [
+        "bash",
+        "/Users/study_superior/Desktop/Code/LingxiAgent/scripts/rust-tauri/r02_t08_legacy_entry_regression.sh",
+        "/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/a16-evidence-guard-fixture-r9wym_2t/old"
+      ],
+      "env_override": {
+        "R02_A16_BASE_SHA": "0000000000000000000000000000000000000000"
+      },
+      "started_utc": "2026-09-28T08:01:14.058086+00:00",
+      "ended_utc": "2026-09-28T08:01:14.065787+00:00",
+      "exit": 1,
+      "stdout_log": "existing_root.stdout.log",
+      "stderr_log": "existing_root.stderr.log",
+      "pass": true
+    },
+    {
+      "name": "symlink_root",
+      "command": [
+        "bash",
+        "/Users/study_superior/Desktop/Code/LingxiAgent/scripts/rust-tauri/r02_t08_legacy_entry_regression.sh",
+        "/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/a16-evidence-guard-fixture-r9wym_2t/linked"
+      ],
+      "env_override": {
+        "R02_A16_BASE_SHA": "0000000000000000000000000000000000000000"
+      },
+      "started_utc": "2026-09-28T08:01:14.066179+00:00",
+      "ended_utc": "2026-09-28T08:01:14.074165+00:00",
+      "exit": 1,
+      "stdout_log": "symlink_root.stdout.log",
+      "stderr_log": "symlink_root.stderr.log",
+      "pass": true
+    },
+    {
+      "name": "fresh_root_invalid_base",
+      "command": [
+        "bash",
+        "/Users/study_superior/Desktop/Code/LingxiAgent/scripts/rust-tauri/r02_t08_legacy_entry_regression.sh",
+        "/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/a16-evidence-guard-fixture-r9wym_2t/fresh"
+      ],
+      "env_override": {
+        "R02_A16_BASE_SHA": "0000000000000000000000000000000000000000"
+      },
+      "started_utc": "2026-09-28T08:01:14.074517+00:00",
+      "ended_utc": "2026-09-28T08:01:14.126757+00:00",
+      "exit": 1,
+      "stdout_log": "fresh_root_invalid_base.stdout.log",
+      "stderr_log": "fresh_root_invalid_base.stderr.log",
+      "pass": true
+    }
+  ],
+  "first_failure_sha256_before": "49cff12225fe4134df331c6db11033043279cec430f8498a54795f68c37ffac7",
+  "first_failure_sha256_after": "49cff12225fe4134df331c6db11033043279cec430f8498a54795f68c37ffac7",
+  "all_pass": true
+}

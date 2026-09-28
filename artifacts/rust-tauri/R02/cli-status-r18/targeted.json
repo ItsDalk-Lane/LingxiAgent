@@ -1,0 +1,21 @@
+{
+  "command": [
+    "node_modules/.bin/vitest",
+    "run",
+    "tests/cli-rust-service.test.ts"
+  ],
+  "startUtc": "2026-09-28T11:06:12.940088+00:00",
+  "endUtc": "2026-09-28T11:06:13.467903+00:00",
+  "exitCode": 0,
+  "sourceSha256Before": {
+    "cli/rust-service.ts": "0e97c262bd2b2c1e656c2223a672e20dd3c1e1e519c1a5f0c3af0783c18ff7ba",
+    "cli/entry.ts": "9414af75a3b68eaf5734710676b8c76a9ab0ca34b14ef8ebd48707826250c1e2",
+    "tests/cli-rust-service.test.ts": "04407a516f3472114b0622cc35eb53150234fd76f2fb00157ecc4bedd7faf858"
+  },
+  "sourceSha256After": {
+    "cli/rust-service.ts": "0e97c262bd2b2c1e656c2223a672e20dd3c1e1e519c1a5f0c3af0783c18ff7ba",
+    "cli/entry.ts": "9414af75a3b68eaf5734710676b8c76a9ab0ca34b14ef8ebd48707826250c1e2",
+    "tests/cli-rust-service.test.ts": "04407a516f3472114b0622cc35eb53150234fd76f2fb00157ecc4bedd7faf858"
+  },
+  "sourceChangedDuringCheck": false
+}

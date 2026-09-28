@@ -1,0 +1,18 @@
+{
+  "name": "rust-version",
+  "argv": [
+    "/Users/study_superior/.cargo/bin/rustup",
+    "run",
+    "1.98.1",
+    "rustc",
+    "--version"
+  ],
+  "cwd": "/Users/study_superior/Desktop/Code/LingxiAgent",
+  "startedUtc": "2026-09-28T12:39:52.564929+00:00",
+  "endedUtc": "2026-09-28T12:39:52.598171+00:00",
+  "exitCode": 0,
+  "stdout": "artifacts/rust-tauri/R02/audit-r18/final-noport-2/rust-version.stdout.log",
+  "stdoutSha256": "2073de5abf149185c2f4d7473dc833bc921b99135560d24ae7b2293f33a9c376",
+  "stderr": "artifacts/rust-tauri/R02/audit-r18/final-noport-2/rust-version.stderr.log",
+  "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+}

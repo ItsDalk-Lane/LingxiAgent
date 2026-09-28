@@ -29,8 +29,17 @@ set -euo pipefail
 cd "$(dirname "$0")/../.."
 
 EVIDENCE_DIR="${1:-artifacts/rust-tauri/R02/T02}"
+# 每轮证据目录必须全新，防止独立直跑时旧日志覆盖或冒充本轮结果。
+if [ -L "$EVIDENCE_DIR" ] || { [ -e "$EVIDENCE_DIR" ] && [ ! -d "$EVIDENCE_DIR" ]; }; then
+  echo "ERROR: evidence path is not a regular directory: $EVIDENCE_DIR" >&2
+  exit 1
+fi
+if [ -d "$EVIDENCE_DIR" ]; then
+  FIRST_ENTRY="$(find "$EVIDENCE_DIR" -mindepth 1 -print -quit)" || exit 1
+  [ -z "$FIRST_ENTRY" ] || { echo "ERROR: evidence directory is not empty: $EVIDENCE_DIR" >&2; exit 1; }
+fi
 mkdir -p "$EVIDENCE_DIR"
-TARGET_DIR="${CARGO_TARGET_DIR:-/tmp/rust-target-r02-t02}"
+TARGET_DIR="${CARGO_TARGET_DIR:-${TMPDIR:-/tmp}/rust-target-r02-t02}"
 
 TOOLCHAIN="$(sed -n 's/^channel[[:space:]]*=[[:space:]]*"\([^"]*\)".*/\1/p' rust-toolchain.toml | head -n 1)"
 if [ -z "$TOOLCHAIN" ]; then
@@ -52,17 +61,143 @@ HOME_A=""
 INST1_PID=""
 INST3_PID=""
 INST4_PID=""
+# R02 stage-repair R7 / R7-F02: the INST*_PID handles are the CURRENT
+# owners' handles — set on spawn, RETIRED (cleared) after every
+# wait/reap (the normal stop paths already did). The trap signals a pid
+# ONLY while it still proves CURRENT ownership (exists AND ppid is THIS
+# shell): a retired or recycled number is never signalled (the R6-F02
+# A12 pattern — a wait that returns non-zero can abort under set -e
+# AFTER reaping, so the variable alone is not a safe signal target).
+# R12-F01: the boolean probe's false branch conflated exited/foreign/
+# unobservable — safe for "don't signal", but it cannot tell a REAPABLE
+# object from an UNKNOWN one, and the trap's owned branch did
+# `kill -TERM; wait` with NO deadline: a child ignoring or delaying TERM
+# hung the trap itself. Four-state probe + bounded ladder below; the
+# abnormal-exit budget is explicit (≈10 s worst case per handle, ≤3
+# handles here) and an overdue survivor is reported as residue, never
+# waited on unboundedly.
+child_state() {
+  # child_state <pid> → exited | owned | foreign | unobservable
+  local ppid
+  if ! kill -0 "$1" 2>/dev/null; then
+    printf 'exited\n'
+    return 0
+  fi
+  ppid="$(ps -o ppid= -p "$1" 2>/dev/null | tr -d '[:space:]')"
+  if [ -z "$ppid" ]; then
+    printf 'unobservable\n'
+  elif [ "$ppid" = "$$" ]; then
+    printf 'owned\n'
+  else
+    printf 'foreign\n'
+  fi
+}
+# R12-F01: bounded stop for ONE provably-owned handle under THIS script's
+# contract (TERM first — the graceful-stop signal; the inst1 crash case
+# KILLs deliberately in the normal path, which is untouched): TERM →
+# ≤5 s poll → direct-pid KILL only while still provably ours → ≤5 s
+# re-check. Prints the final state; never waits unboundedly.
+bounded_stop_owned() {
+  local pid="$1" state="" i
+  # 发信号前在函数内再次核实，调用方的先前判断不能替代当前归属。
+  state="$(child_state "$pid")"
+  if [ "$state" != "owned" ]; then printf '%s\n' "$state"; return 0; fi
+  kill -TERM "$pid" 2>/dev/null || true
+  for i in $(seq 1 100); do
+    state="$(child_state "$pid")"
+    case "$state" in
+      exited|foreign) break ;;
+      owned|unobservable) : ;;
+    esac
+    sleep 0.05
+  done
+  if [ "${state:-owned}" = "owned" ]; then
+    state="$(child_state "$pid")"
+  fi
+  if [ "$state" = "owned" ]; then
+    kill -KILL "$pid" 2>/dev/null || true
+    for i in $(seq 1 100); do
+      state="$(child_state "$pid")"
+      case "$state" in
+        exited|foreign) break ;;
+        owned|unobservable) : ;;
+      esac
+      sleep 0.05
+    done
+  fi
+  printf '%s\n' "${state:-unobservable}"
+}
+# 崩溃演练必须先 KILL，不通过 TERM 伪造；回收同样有期限。
+bounded_crash_owned() {
+  local pid="$1" state="" i
+  state="$(child_state "$pid")"
+  if [ "$state" != "owned" ]; then printf '%s\n' "$state"; return 0; fi
+  kill -KILL "$pid" 2>/dev/null || true
+  for i in $(seq 1 100); do
+    state="$(child_state "$pid")"
+    case "$state" in exited|foreign) break ;; owned|unobservable) : ;; esac
+    sleep 0.05
+  done
+  printf '%s\n' "${state:-unobservable}"
+}
+# 正常 TERM 路径也必须限时并先核对当前子进程归属；退出码由调用点核验。
+stop_instance_gracefully() {
+  local pid="$1" state
+  [ "$(child_state "$pid")" = "owned" ] || { echo "ERROR: instance $pid is not an owned live child before TERM" >&2; return 1; }
+  state="$(bounded_stop_owned "$pid")"
+  case "$state" in
+    exited) ;;
+    *) echo "ERROR: instance $pid did not stop within the TERM/KILL budget (state=$state)" >&2; return 1 ;;
+  esac
+  if wait "$pid"; then INSTANCE_STOP_RC=0; else INSTANCE_STOP_RC=$?; fi
+}
 cleanup() {
+  local cleanup_residue=0
   for pid in "$INST1_PID" "$INST3_PID" "$INST4_PID"; do
-    if [ -n "$pid" ] && kill -0 "$pid" 2>/dev/null; then
-      echo "cleanup: service $pid still running, sending SIGTERM" >&2
-      kill -TERM "$pid" 2>/dev/null || true
-      wait "$pid" 2>/dev/null || true
-    fi
+    [ -n "$pid" ] || continue
+    case "$(child_state "$pid")" in
+      owned)
+        case "$(bounded_stop_owned "$pid")" in
+          exited)
+            wait "$pid" 2>/dev/null || true
+            ;;
+          foreign)
+            echo "cleanup: pid $pid 已不属于本脚本，不等待或发信号" >&2
+            cleanup_residue=1
+            ;;
+          owned)
+            echo "cleanup: pid $pid still OWNED after the TERM and KILL budgets — RESIDUE left behind, no unbounded wait" >&2
+            cleanup_residue=1
+            ;;
+          unobservable)
+            echo "cleanup: pid $pid state UNOBSERVABLE after the stop budgets — not signalled further, no unbounded wait; possible residue" >&2
+            cleanup_residue=1
+            ;;
+        esac
+        ;;
+      exited)
+        wait "$pid" 2>/dev/null || true
+        ;;
+      foreign)
+        echo "cleanup: pid $pid is NOT currently owned by this shell — NOT signalled" >&2
+        cleanup_residue=1
+        ;;
+      unobservable)
+        echo "cleanup: pid $pid ownership UNOBSERVABLE (ps unreadable) — NOT signalled" >&2
+        cleanup_residue=1
+        ;;
+    esac
   done
-  for h in "$HOME_A"; do
-    if [ -n "$h" ] && [ -d "$h" ]; then rm -rf "$h"; fi
-  done
+  INST1_PID=""; INST3_PID=""; INST4_PID=""
+  if [ "$cleanup_residue" -eq 0 ]; then
+    for h in "$HOME_A"; do
+      if [ -n "$h" ] && [ -d "$h" ]; then rm -rf "$h"; fi
+    done
+  else
+    echo "cleanup: 进程仍存活或归属不明，保留本轮 home=$HOME_A 供核查" >&2
+    exit 1
+  fi
+  return 0
 }
 trap cleanup EXIT
 
@@ -98,7 +233,7 @@ tail -n 1 "$EVIDENCE_DIR/a03-build.log"
 BIN="$TARGET_DIR/debug/lingxi-service"
 test -x "$BIN"
 
-HOME_A="$(mktemp -d /tmp/lingxi-r02t02-a03-home.XXXXXX)"
+HOME_A=$(mktemp -d "${TMPDIR:-/tmp}/lingxi-r02t02-a03-home.XXXXXX")
 
 echo "== [A] start instance 1 on the synthetic home"
 "$BIN" --home "$HOME_A" \
@@ -162,9 +297,12 @@ grep -q "^LINGXI_SERVICE_SINGLE_WRITER_BLOCKED " "$EVIDENCE_DIR/a03-inst2b-stder
 echo "alias collapsed to the same canonical root: OK"
 
 echo "== [E] SIGKILL crash -> stale record -> takeover restart -> clean stop"
-kill -KILL "$INST1_PID"
-wait "$INST1_PID" 2>/dev/null || true
+[ "$(child_state "$INST1_PID")" = "owned" ] || fail "instance 1 not owned before crash signal"
+CRASH_STATE="$(bounded_crash_owned "$INST1_PID")"
+case "$CRASH_STATE" in exited) ;; *) fail "instance 1 survived KILL budget or ownership changed (state=$CRASH_STATE)" ;; esac
+if wait "$INST1_PID" 2>/dev/null; then CRASH_RC=0; else CRASH_RC=$?; fi
 INST1_PID=""
+[ "$CRASH_RC" -eq 137 ] || fail "instance 1 crash exit=$CRASH_RC instead of 137"
 [ -f "$HOME_A/lingxi-service/instance.json" ] || {
   echo "ERROR: crash should leave the record behind" >&2; exit 1; }
 "$BIN" --home "$HOME_A" \
@@ -183,11 +321,8 @@ ADDR3="$(ready_addr "$EVIDENCE_DIR/a03-inst3-stdout.log")"
 HTTP_CODE="$(curl -sS -o /dev/null -w '%{http_code}' "http://$ADDR3/lingxi/v1/health")"
 [ "$HTTP_CODE" = "200" ] || { echo "ERROR: takeover instance health=$HTTP_CODE" >&2; exit 1; }
 echo "instance 3 took over the stale home and serves: OK"
-kill -TERM "$INST3_PID"
-set +e
-wait "$INST3_PID"
-INST3_RC=$?
-set -e
+stop_instance_gracefully "$INST3_PID" || fail "instance 3 stop was not proven"
+INST3_RC="$INSTANCE_STOP_RC"
 INST3_PID=""
 echo "instance 3 exit after SIGTERM: $INST3_RC"
 [ "$INST3_RC" -eq 0 ] || { echo "ERROR: expected clean exit 0" >&2; exit 1; }
@@ -225,11 +360,8 @@ wait_ready "$INST4_PID" "$EVIDENCE_DIR/a03-inst4-stdout.log" "instance 4 (pid-re
 grep -q "^LINGXI_SERVICE_STALE_RECORD_TAKEN_OVER " "$EVIDENCE_DIR/a03-inst4-stderr.log" || {
   echo "ERROR: forged live-pid record blocked takeover (decision must ignore pid existence)" >&2
   exit 1; }
-kill -TERM "$INST4_PID"
-set +e
-wait "$INST4_PID"
-INST4_RC=$?
-set -e
+stop_instance_gracefully "$INST4_PID" || fail "instance 4 stop was not proven"
+INST4_RC="$INSTANCE_STOP_RC"
 INST4_PID=""
 [ "$INST4_RC" -eq 0 ] || { echo "ERROR: instance 4 clean stop expected" >&2; exit 1; }
 echo "takeover proceeded despite a live recorded pid (lock is the authority): OK"

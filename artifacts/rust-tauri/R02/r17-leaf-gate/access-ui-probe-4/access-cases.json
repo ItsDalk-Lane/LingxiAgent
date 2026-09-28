@@ -1,0 +1,77 @@
+{
+  "schema": "lingxi.leaf-case-results.v1",
+  "cases": [
+    {
+      "case": "access-copy-no-clipboard-original-projection",
+      "expect": 1,
+      "actual": 1,
+      "ok": true,
+      "observed": {
+        "clipboardApiAbsent": true,
+        "copiedToastShown": true
+      }
+    },
+    {
+      "case": "access-summary-error-is-not-empty",
+      "expect": 1,
+      "actual": 1,
+      "ok": true,
+      "observed": {
+        "failureToast": true,
+        "emptyDeviceProjection": false
+      }
+    },
+    {
+      "case": "access-mobile-secret-refresh-failure",
+      "expect": 1,
+      "actual": 1,
+      "ok": true,
+      "observed": {
+        "initialSummaryReads": 1,
+        "summaryReads": 2,
+        "secretVisible": true,
+        "refreshFailureShown": true,
+        "falseSuccess": false,
+        "qrShown": true
+      }
+    },
+    {
+      "case": "access-desktop-secret-refresh-failure",
+      "expect": 1,
+      "actual": 1,
+      "ok": true,
+      "observed": {
+        "initialSummaryReads": 1,
+        "summaryReads": 2,
+        "secretVisible": true,
+        "refreshFailureShown": true,
+        "falseSuccess": false,
+        "qrShown": true
+      }
+    },
+    {
+      "case": "access-mobile-generation-failure-keeps-old-secret",
+      "expect": 1,
+      "actual": 1,
+      "ok": true,
+      "observed": {
+        "malformedResponseRejected": true,
+        "rejectedRequestReported": true,
+        "oldSecretKept": true,
+        "falseSuccess": false
+      }
+    },
+    {
+      "case": "access-desktop-generation-failure-keeps-old-secret",
+      "expect": 1,
+      "actual": 1,
+      "ok": true,
+      "observed": {
+        "malformedResponseRejected": true,
+        "rejectedRequestReported": true,
+        "oldSecretKept": true,
+        "falseSuccess": false
+      }
+    }
+  ]
+}

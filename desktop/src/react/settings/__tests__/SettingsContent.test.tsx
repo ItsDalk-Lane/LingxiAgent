@@ -72,6 +72,7 @@ describe('SettingsContent tab heading', () => {
       activeTab: 'experiments',
       platformName: 'darwin',
       ready: true,
+      rustSettingsUnavailable: false,
     } as never);
   });
 
@@ -216,6 +217,39 @@ describe('SettingsContent tab heading', () => {
 
     await waitFor(() => expect(actionMocks.loadProvidersSummary).toHaveBeenCalledTimes(1));
     await waitFor(() => expect(useSettingsStore.getState().ready).toBe(true));
+  });
+
+  it('verifies Rust identity and keeps unavailable settings visibly unavailable', async () => {
+    window.platform.getServerConnectionInfo = vi.fn(async () => ({
+      port: 63002, token: 'rust-token', serverNodeKind: 'lingxi-service', serverNodeTransport: 'http',
+    }));
+    const { lingxiFetch } = await import('../api');
+    vi.mocked(lingxiFetch).mockImplementation(async (url: string) => {
+      if (url === '/lingxi/v1/server/identity') {
+        return new Response(JSON.stringify({ serverNodeKind: 'lingxi-service' }));
+      }
+      throw new Error(`unexpected settings request: ${url}`);
+    });
+    useSettingsStore.setState({
+      activeTab: 'access', ready: false, rustSettingsUnavailable: false,
+      activeServerConnection: null, activeServerConnectionId: null, serverConnections: {},
+      settingsConfig: { oldNodeData: true }, agents: [{ id: 'old', name: 'Old', yuan: 'old', isPrimary: true }],
+      runtimeModels: [{ id: 'old', name: 'Old', provider: 'old' }],
+    } as never);
+
+    render(React.createElement(SettingsContent, { variant: 'window' }));
+    await waitFor(() => expect(useSettingsStore.getState().ready).toBe(true));
+    expect(lingxiFetch).toHaveBeenCalledWith('/lingxi/v1/server/identity');
+    expect(useSettingsStore.getState()).toMatchObject({
+      activeTab: 'access', rustSettingsUnavailable: true, settingsConfig: null,
+      settingsConfigStatus: 'error', agents: [], runtimeModels: [],
+    });
+    expect(actionMocks.loadAgents).not.toHaveBeenCalled();
+    expect(actionMocks.loadSettingsModels).not.toHaveBeenCalled();
+    useSettingsStore.getState().set({ activeTab: 'agent' });
+    await waitFor(() => expect(screen.getAllByRole('alert').some(
+      alert => alert.textContent?.includes('settings.rustCoreUnavailable'),
+    )).toBe(true));
   });
 
   it('loads the settings snapshot only after agents have resolved the agent id', async () => {

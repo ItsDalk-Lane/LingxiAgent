@@ -1,0 +1,16 @@
+{
+  "name": "verify-rust-package",
+  "argv": [
+    "npm",
+    "run",
+    "verify:rust-service-package"
+  ],
+  "cwd": "/Users/study_superior/Desktop/Code/LingxiAgent",
+  "startedUtc": "2026-09-28T12:42:20.587599+00:00",
+  "endedUtc": "2026-09-28T12:42:20.733429+00:00",
+  "exitCode": 0,
+  "stdout": "artifacts/rust-tauri/R02/audit-r18/final-noport-2/verify-rust-package.stdout.log",
+  "stdoutSha256": "8ca023f9f36eee91d84532e26c9ef3709cca4e55aee57b7a1ef21eac2b0acfa2",
+  "stderr": "artifacts/rust-tauri/R02/audit-r18/final-noport-2/verify-rust-package.stderr.log",
+  "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+}

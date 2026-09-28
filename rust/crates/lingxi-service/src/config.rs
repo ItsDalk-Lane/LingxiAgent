@@ -27,12 +27,48 @@
 //! are explicit errors. All illegal input fails loudly; nothing is silently
 //! overwritten or consumed.
 //!
+//! Every resource-limit flag additionally has a documented INCLUSIVE
+//! supported range with a checked conversion into its consumer's native
+//! type (R02 stage-repair R3 / R3-F02): out-of-range values fail at parse
+//! time with [`ConfigError::InvalidLimit`] (exit 2 in the binary) instead
+//! of truncating (`as u32` made `4294967296` a permanent 429), panicking
+//! (a queue bound above tokio's semaphore maximum died with exit 101
+//! inside `mpsc::channel`), or saturating (the 2x connection-cap
+//! derivation). The numeric bounds live next to each flag arm below and
+//! in the binary's `--help` text.
+//!
 //! This module deliberately takes the environment value and temp base as
 //! *parameters* instead of calling `std::env` itself, so tests inject values
 //! without polluting the outer process environment.
 
 use std::fmt;
 use std::path::{Path, PathBuf};
+
+use lingxi_adapters::storage::{MAX_QUEUE_CAPACITY, MAX_QUEUE_WAIT_TIMEOUT_MS};
+
+/// Inclusive upper bound of every millisecond time-budget flag
+/// (`--shutdown-timeout-ms`, `--http-request-budget-ms`,
+/// `--db-wait-budget-ms`) — R02 stage-repair R3 / R3-F02. 30 days exceeds
+/// any legitimate per-shutdown / per-request / per-queue-wait budget by
+/// orders of magnitude, and keeps every downstream `Instant::now() +
+/// duration` computation unambiguously safe: platform monotonic clocks
+/// overflow for absurd durations (tokio's own docs note ~1000 years
+/// overflows macOS and ~100 years FreeBSD), so an unbounded u64 here was
+/// a latent runtime panic, not a real "feature".
+pub const MAX_TIME_BUDGET_MS: u64 = 30 * 24 * 60 * 60 * 1000;
+
+/// Machine-checked relationship: the CLI time-budget bound must never
+/// exceed the library bound of the DB queue wait (a CLI-accepted value
+/// must always pass `StoreOptions::validate`).
+const _: () = assert!(MAX_TIME_BUDGET_MS <= MAX_QUEUE_WAIT_TIMEOUT_MS);
+
+/// Inclusive upper bound of `--http-max-in-flight` (R02 stage-repair R3 /
+/// R3-F02): the composition root derives the transport CONNECTION cap as
+/// 2× this value, so the flag is only supported up to `usize::MAX / 2` —
+/// the derivation then uses a CHECKED multiplication and the overflow
+/// class is rejected at parse time instead of being masked by a
+/// saturating one.
+pub const MAX_HTTP_MAX_IN_FLIGHT: u64 = (usize::MAX / 2) as u64;
 
 /// Where the effective data root came from (displayed in the safe log and
 /// the readiness line as `source=`).
@@ -66,6 +102,9 @@ pub struct CliOptions {
     /// loopback default. LAN exposure exists ONLY through this flag
     /// (R02-T03).
     pub network_mode: Option<String>,
+    /// 显式 HTTPS 证书与私钥必须成对提供，路径均为绝对路径。
+    pub tls_cert: Option<PathBuf>,
+    pub tls_key: Option<PathBuf>,
     /// Explicit graceful-shutdown deadline in milliseconds
     /// (`--shutdown-timeout-ms`, R02-T06); `None` = the production default.
     pub shutdown_timeout_ms: Option<u64>,
@@ -80,6 +119,13 @@ pub struct CliOptions {
     pub log_max_files: Option<usize>,
     /// Per-peer HTTP request budget per rate window (R02-T07).
     pub http_rate_max: Option<u32>,
+    /// HTTP admission overrides (R02 stage-repair R1 / F07): in-flight cap
+    /// and per-request budget; `None` = the documented production default.
+    pub http_max_in_flight: Option<usize>,
+    pub http_request_budget_ms: Option<u64>,
+    /// DB queue wait budget in milliseconds (F07): how long ONE submission
+    /// may wait for queue capacity before surfacing QueueFull → 503.
+    pub db_wait_budget_ms: Option<u64>,
 }
 
 /// Result of home-source precedence resolution.
@@ -130,6 +176,12 @@ pub enum ConfigError {
     /// `--network-mode` value outside the strict `loopback|lan` vocabulary.
     BadNetworkMode {
         value: String,
+    },
+    BadTlsConfig {
+        detail: String,
+    },
+    StoredNetworkInvalid {
+        detail: String,
     },
     /// `--shutdown-timeout-ms` value that is not a positive decimal integer.
     InvalidShutdownTimeout {
@@ -208,10 +260,17 @@ impl fmt::Display for ConfigError {
                 "invalid --network-mode {value:?}: must be \"loopback\" or \"lan\" \
                  (LAN exposure is an explicit opt-in, the default is loopback)"
             ),
+            ConfigError::BadTlsConfig { detail } => {
+                write!(f, "invalid TLS configuration: {detail}")
+            }
+            ConfigError::StoredNetworkInvalid { detail } => {
+                write!(f, "saved network configuration invalid: {detail}")
+            }
             ConfigError::InvalidShutdownTimeout { value } => write!(
                 f,
                 "invalid --shutdown-timeout-ms {value:?}: must be a positive \
-                 decimal integer (milliseconds; the graceful-shutdown deadline \
+                 decimal integer in the supported range 1..={MAX_TIME_BUDGET_MS} \
+                 (milliseconds, at most 30 days; the graceful-shutdown deadline \
                  for each shutdown phase)"
             ),
             ConfigError::InvalidLimit {
@@ -356,6 +415,23 @@ where
                 }
                 options.network_mode = Some(value);
             }
+            "--tls-cert" | "--tls-key" => {
+                let target = if arg == "--tls-cert" {
+                    &mut options.tls_cert
+                } else {
+                    &mut options.tls_key
+                };
+                if target.is_some() {
+                    return Err(ConfigError::DuplicateArgument { flag: arg });
+                }
+                let value = iter
+                    .next()
+                    .ok_or_else(|| ConfigError::MissingArgumentValue { flag: arg.clone() })?;
+                if is_flag_shaped(&value) {
+                    return Err(ConfigError::FlagShapedValue { flag: arg, value });
+                }
+                *target = Some(PathBuf::from(value));
+            }
             "--shutdown-timeout-ms" => {
                 if options.shutdown_timeout_ms.is_some() {
                     return Err(ConfigError::DuplicateArgument {
@@ -377,23 +453,32 @@ where
                         return Err(ConfigError::InvalidShutdownTimeout { value });
                     }
                 };
-                if parsed == 0 {
+                if parsed == 0 || parsed > MAX_TIME_BUDGET_MS {
                     return Err(ConfigError::InvalidShutdownTimeout { value });
                 }
                 options.shutdown_timeout_ms = Some(parsed);
             }
             // ── Resource-limit flags (R02-T07): strict positive integers ──
+            // R3-F02: every flag has a documented INCLUSIVE supported range
+            // and a checked conversion into its consumer's native type —
+            // an out-of-range value is this same loud InvalidLimit (exit 2),
+            // never a truncation (`as u32`), a wrap (`as i64`), a saturation
+            // (`saturating_mul`), or a panic deep inside tokio.
             "--max-ws-connections" => {
                 if options.max_ws_connections.is_some() {
                     return Err(ConfigError::DuplicateArgument {
                         flag: "--max-ws-connections".to_string(),
                     });
                 }
-                options.max_ws_connections = Some(parse_limit_value(
+                options.max_ws_connections = Some(parse_limit_usize(
                     &mut iter,
                     "--max-ws-connections",
-                    "concurrently-upgraded WebSocket connections",
-                )? as usize);
+                    "concurrently-upgraded WebSocket connections; supported range \
+                     1..=usize::MAX (a pure count ceiling — nothing is allocated \
+                     per configured slot)",
+                    1,
+                    usize::MAX as u64,
+                )?);
             }
             "--db-queue-bound" => {
                 if options.db_queue_bound.is_some() {
@@ -401,11 +486,16 @@ where
                         flag: "--db-queue-bound".to_string(),
                     });
                 }
-                options.db_queue_bound = Some(parse_limit_value(
+                options.db_queue_bound = Some(parse_limit_usize(
                     &mut iter,
                     "--db-queue-bound",
-                    "pending single-writer DB queue jobs",
-                )? as usize);
+                    "pending single-writer DB queue jobs; supported range \
+                     1..=MAX_QUEUE_CAPACITY (tokio's bounded-channel semaphore \
+                     maximum — more would PANIC inside mpsc::channel; mirrored \
+                     by StoreOptions::validate at the library layer)",
+                    1,
+                    MAX_QUEUE_CAPACITY as u64,
+                )?);
             }
             "--event-subscriber-queue" => {
                 if options.event_subscriber_queue.is_some() {
@@ -413,11 +503,16 @@ where
                         flag: "--event-subscriber-queue".to_string(),
                     });
                 }
-                options.event_subscriber_queue = Some(parse_limit_value(
+                options.event_subscriber_queue = Some(parse_limit_usize(
                     &mut iter,
                     "--event-subscriber-queue",
-                    "per-subscriber event mailbox frames (>= 2)",
-                )? as usize);
+                    "per-subscriber event mailbox frames; supported range \
+                     2..=usize::MAX (one event slot + one reserved signal slot; \
+                     the mailbox is a lazily-grown VecDeque, so a large ceiling \
+                     allocates nothing eagerly)",
+                    2,
+                    usize::MAX as u64,
+                )?);
             }
             "--event-reorder-bound" => {
                 if options.event_reorder_bound.is_some() {
@@ -425,11 +520,15 @@ where
                         flag: "--event-reorder-bound".to_string(),
                     });
                 }
-                options.event_reorder_bound = Some(parse_limit_value(
+                options.event_reorder_bound = Some(parse_limit_usize(
                     &mut iter,
                     "--event-reorder-bound",
-                    "per-stream event reorder buffer entries (>= 1)",
-                )? as usize);
+                    "per-stream event reorder buffer entries; supported range \
+                     1..=usize::MAX (entries are allocated per published event, \
+                     not per configured slot)",
+                    1,
+                    usize::MAX as u64,
+                )?);
             }
             "--max-subscribers" => {
                 if options.max_subscribers.is_some() {
@@ -437,11 +536,15 @@ where
                         flag: "--max-subscribers".to_string(),
                     });
                 }
-                options.max_subscribers = Some(parse_limit_value(
+                options.max_subscribers = Some(parse_limit_usize(
                     &mut iter,
                     "--max-subscribers",
-                    "concurrently live event subscribers",
-                )? as usize);
+                    "concurrently live event subscribers; supported range \
+                     1..=usize::MAX (a registry count ceiling — entries are \
+                     allocated per live subscriber)",
+                    1,
+                    usize::MAX as u64,
+                )?);
             }
             "--log-max-bytes" => {
                 if options.log_max_bytes.is_some() {
@@ -455,11 +558,15 @@ where
                 // pass-through that only fails (or silently degrades) later
                 // at log-attach time. The bound mirrors
                 // logging::LogRotationConfig::validate (defense in depth).
-                options.log_max_bytes = Some(parse_limit_value_min(
+                // u64 is the consumer's native type (a file-size ceiling), so
+                // no upper bound is needed beyond the type itself.
+                options.log_max_bytes = Some(parse_limit_u64(
                     &mut iter,
                     "--log-max-bytes",
-                    "bytes per log file before rotation (>= 64)",
+                    "bytes per log file before rotation; supported range \
+                     64..=u64::MAX (one diagnostic line must always fit)",
                     64,
+                    u64::MAX,
                 )?);
             }
             "--log-max-files" => {
@@ -470,12 +577,15 @@ where
                 }
                 // R02-T07 REVIEW_R1 F04: parse-time lower bound (rotation
                 // needs a successor file), same exit-2 semantics.
-                options.log_max_files = Some(parse_limit_value_min(
+                options.log_max_files = Some(parse_limit_usize(
                     &mut iter,
                     "--log-max-files",
-                    "log files kept on disk (>= 2)",
+                    "log files kept on disk; supported range 2..=usize::MAX \
+                     (rotation needs a successor; pruning walks EXISTING files, \
+                     so a large ceiling allocates nothing)",
                     2,
-                )? as usize);
+                    usize::MAX as u64,
+                )?);
             }
             "--http-rate-max" => {
                 if options.http_rate_max.is_some() {
@@ -483,11 +593,67 @@ where
                         flag: "--http-rate-max".to_string(),
                     });
                 }
-                options.http_rate_max = Some(parse_limit_value(
+                // R3-F02: the rate limiter counts in u32 — the pre-fix
+                // `as u32` cast silently truncated 4294967296 to 0 (every
+                // request then 429'd). The range IS the consumer's type.
+                options.http_rate_max = Some(parse_limit_u32(
                     &mut iter,
                     "--http-rate-max",
-                    "per-peer HTTP requests per rate window",
-                )? as u32);
+                    "per-peer HTTP requests per rate window; supported range \
+                     1..=4294967295 (the limiter's native u32 counter)",
+                    1,
+                    u32::MAX as u64,
+                )?);
+            }
+            "--http-max-in-flight" => {
+                if options.http_max_in_flight.is_some() {
+                    return Err(ConfigError::DuplicateArgument {
+                        flag: "--http-max-in-flight".to_string(),
+                    });
+                }
+                options.http_max_in_flight = Some(parse_limit_usize(
+                    &mut iter,
+                    "--http-max-in-flight",
+                    "concurrently in-flight HTTP requests; supported range \
+                     1..=usize::MAX/2 (the composition root derives the \
+                     transport connection cap as 2x this value with a CHECKED \
+                     multiplication — the bound keeps the derivation \
+                     overflow-free instead of saturating silently)",
+                    1,
+                    MAX_HTTP_MAX_IN_FLIGHT,
+                )?);
+            }
+            "--http-request-budget-ms" => {
+                if options.http_request_budget_ms.is_some() {
+                    return Err(ConfigError::DuplicateArgument {
+                        flag: "--http-request-budget-ms".to_string(),
+                    });
+                }
+                options.http_request_budget_ms = Some(parse_limit_u64(
+                    &mut iter,
+                    "--http-request-budget-ms",
+                    "per-request wall-clock budget in ms; supported range \
+                     1..=MAX_TIME_BUDGET_MS (30 days — larger deadlines risk \
+                     overflowing platform monotonic-clock arithmetic)",
+                    1,
+                    MAX_TIME_BUDGET_MS,
+                )?);
+            }
+            "--db-wait-budget-ms" => {
+                if options.db_wait_budget_ms.is_some() {
+                    return Err(ConfigError::DuplicateArgument {
+                        flag: "--db-wait-budget-ms".to_string(),
+                    });
+                }
+                options.db_wait_budget_ms = Some(parse_limit_u64(
+                    &mut iter,
+                    "--db-wait-budget-ms",
+                    "DB queue wait budget in ms; supported range \
+                     1..=MAX_TIME_BUDGET_MS (30 days; never exceeds the \
+                     library StoreOptions bound — compile-time asserted)",
+                    1,
+                    MAX_TIME_BUDGET_MS,
+                )?);
             }
             other => {
                 return Err(ConfigError::UnknownArgument {
@@ -496,15 +662,36 @@ where
             }
         }
     }
+    match (&options.tls_cert, &options.tls_key) {
+        (None, None) => {}
+        (Some(cert), Some(key)) if cert.is_absolute() && key.is_absolute() => {}
+        (Some(_), Some(_)) => {
+            return Err(ConfigError::BadTlsConfig {
+                detail: "--tls-cert and --tls-key must be absolute paths".into(),
+            })
+        }
+        _ => {
+            return Err(ConfigError::BadTlsConfig {
+                detail: "--tls-cert and --tls-key must be provided together".into(),
+            })
+        }
+    }
     Ok(options)
 }
 
-/// Strictly parses one positive-integer limit-flag value (shared by all
-/// R02-T07 resource-limit flags): exactly the next token, not flag-shaped,
-/// a positive decimal integer. Any deviation is a loud
-/// [`ConfigError::InvalidLimit`] (or the shared missing/flag-shaped
-/// errors) — never a silent default.
-fn parse_limit_value<I>(iter: &mut I, flag: &str, constraint: &str) -> Result<u64, ConfigError>
+/// Strictly parses one limit-flag value into u64 within the inclusive
+/// range `[min, max]` (R02 stage-repair R3 / R3-F02 — every resource flag
+/// has a documented supported range): exactly the next token, not
+/// flag-shaped, a decimal integer inside the range. Any deviation is a
+/// loud [`ConfigError::InvalidLimit`] (or the shared missing/flag-shaped
+/// errors) — never a silent default, truncation, wrap or saturation.
+fn parse_limit_u64<I>(
+    iter: &mut I,
+    flag: &str,
+    constraint: &str,
+    min: u64,
+    max: u64,
+) -> Result<u64, ConfigError>
 where
     I: Iterator<Item = String>,
 {
@@ -526,7 +713,7 @@ where
             value: value.clone(),
             constraint: constraint.to_string(),
         })?;
-    if parsed == 0 {
+    if parsed < min || parsed > max {
         return Err(ConfigError::InvalidLimit {
             flag: flag.to_string(),
             value,
@@ -536,28 +723,50 @@ where
     Ok(parsed)
 }
 
-/// Same as [`parse_limit_value`] plus an inclusive lower bound enforced at
-/// parse time (R02-T07 REVIEW_R1 F04): a value below `min` is the same loud
-/// [`ConfigError::InvalidLimit`] the other limit flags produce, instead of
-/// surfacing later (or degrading) at use time.
-fn parse_limit_value_min<I>(
+/// Same as [`parse_limit_u64`] plus a CHECKED conversion into `usize`:
+/// on a 64-bit platform every value up to `usize::MAX as u64` converts
+/// losslessly; on a 32-bit platform values above the 32-bit range are
+/// rejected loudly here (the conversion can never truncate — the 32-bit
+/// behaviour is correct by construction, not by a faked cross-platform
+/// test).
+fn parse_limit_usize<I>(
     iter: &mut I,
     flag: &str,
     constraint: &str,
     min: u64,
-) -> Result<u64, ConfigError>
+    max: u64,
+) -> Result<usize, ConfigError>
 where
     I: Iterator<Item = String>,
 {
-    let parsed = parse_limit_value(iter, flag, constraint)?;
-    if parsed < min {
-        return Err(ConfigError::InvalidLimit {
-            flag: flag.to_string(),
-            value: parsed.to_string(),
-            constraint: constraint.to_string(),
-        });
-    }
-    Ok(parsed)
+    let parsed = parse_limit_u64(iter, flag, constraint, min, max)?;
+    usize::try_from(parsed).map_err(|_| ConfigError::InvalidLimit {
+        flag: flag.to_string(),
+        value: parsed.to_string(),
+        constraint: constraint.to_string(),
+    })
+}
+
+/// Same as [`parse_limit_u64`] plus a CHECKED conversion into `u32` (the
+/// rate limiter's native counter type; the pre-fix `as u32` truncation of
+/// `4294967296` to `0` — a permanent 429 for every peer — is the R3-F02
+/// case this rejects loudly instead).
+fn parse_limit_u32<I>(
+    iter: &mut I,
+    flag: &str,
+    constraint: &str,
+    min: u64,
+    max: u64,
+) -> Result<u32, ConfigError>
+where
+    I: Iterator<Item = String>,
+{
+    let parsed = parse_limit_u64(iter, flag, constraint, min, max)?;
+    u32::try_from(parsed).map_err(|_| ConfigError::InvalidLimit {
+        flag: flag.to_string(),
+        value: parsed.to_string(),
+        constraint: constraint.to_string(),
+    })
 }
 
 /// Reads the `home` value from a strict JSON config file
@@ -836,6 +1045,54 @@ mod tests {
             parse_cli(args(&["--network-mode=lan"])),
             Err(ConfigError::UnknownArgument { .. })
         ));
+    }
+
+    #[test]
+    fn tls_certificate_and_key_are_explicit_absolute_pairs() {
+        assert!(matches!(
+            parse_cli(args(&["--tls-cert", "/tmp/cert.pem"])),
+            Err(ConfigError::BadTlsConfig { .. })
+        ));
+        assert!(matches!(
+            parse_cli(args(&["--tls-key", "/tmp/key.pem"])),
+            Err(ConfigError::BadTlsConfig { .. })
+        ));
+        assert!(matches!(
+            parse_cli(args(&[
+                "--tls-cert",
+                "cert.pem",
+                "--tls-key",
+                "/tmp/key.pem"
+            ])),
+            Err(ConfigError::BadTlsConfig { .. })
+        ));
+        assert!(matches!(
+            parse_cli(args(&[
+                "--tls-cert",
+                "/tmp/cert.pem",
+                "--tls-key",
+                "--bind"
+            ])),
+            Err(ConfigError::FlagShapedValue { .. })
+        ));
+        assert!(matches!(
+            parse_cli(args(&[
+                "--tls-cert",
+                "/tmp/cert.pem",
+                "--tls-cert",
+                "/tmp/other.pem"
+            ])),
+            Err(ConfigError::DuplicateArgument { .. })
+        ));
+        let parsed = parse_cli(args(&[
+            "--tls-cert",
+            "/tmp/cert.pem",
+            "--tls-key",
+            "/tmp/key.pem",
+        ]))
+        .unwrap();
+        assert_eq!(parsed.tls_cert, Some(PathBuf::from("/tmp/cert.pem")));
+        assert_eq!(parsed.tls_key, Some(PathBuf::from("/tmp/key.pem")));
     }
 
     #[test]
@@ -1187,6 +1444,170 @@ mod tests {
         .expect("declared lower bounds are accepted");
         assert_eq!(cli.log_max_bytes, Some(64));
         assert_eq!(cli.log_max_files, Some(2));
+    }
+
+    // ── R3-F02: every resource flag has a documented supported range ───────
+    //
+    // The matrix below is PARSE-ONLY: it proves the boundary values are
+    // accepted and the out-of-range values rejected without ever allocating
+    // a huge resource (parsing only inspects the number).
+
+    #[test]
+    fn limit_flag_ranges_accept_the_documented_boundaries() {
+        let cli = parse_cli([
+            "--home",
+            "/tmp/h",
+            "--max-ws-connections",
+            "1",
+            "--db-queue-bound",
+            &MAX_QUEUE_CAPACITY.to_string(),
+            "--event-subscriber-queue",
+            "2",
+            "--event-reorder-bound",
+            "1",
+            "--max-subscribers",
+            "1",
+            "--log-max-bytes",
+            "64",
+            "--log-max-files",
+            "2",
+            "--http-rate-max",
+            &u32::MAX.to_string(),
+            "--http-max-in-flight",
+            &MAX_HTTP_MAX_IN_FLIGHT.to_string(),
+            "--http-request-budget-ms",
+            &MAX_TIME_BUDGET_MS.to_string(),
+            "--db-wait-budget-ms",
+            "1",
+            "--shutdown-timeout-ms",
+            &MAX_TIME_BUDGET_MS.to_string(),
+        ])
+        .expect("every documented boundary value must parse");
+        assert_eq!(cli.max_ws_connections, Some(1));
+        assert_eq!(cli.db_queue_bound, Some(MAX_QUEUE_CAPACITY));
+        assert_eq!(cli.event_subscriber_queue, Some(2));
+        assert_eq!(cli.event_reorder_bound, Some(1));
+        assert_eq!(cli.max_subscribers, Some(1));
+        assert_eq!(cli.log_max_bytes, Some(64));
+        assert_eq!(cli.log_max_files, Some(2));
+        assert_eq!(cli.http_rate_max, Some(u32::MAX));
+        assert_eq!(
+            cli.http_max_in_flight,
+            Some(MAX_HTTP_MAX_IN_FLIGHT as usize)
+        );
+        assert_eq!(cli.http_request_budget_ms, Some(MAX_TIME_BUDGET_MS));
+        assert_eq!(cli.db_wait_budget_ms, Some(1));
+        assert_eq!(cli.shutdown_timeout_ms, Some(MAX_TIME_BUDGET_MS));
+    }
+
+    #[test]
+    fn limit_flag_ranges_accept_native_maxima_losslessly() {
+        // usize-native count ceilings accept the platform maximum (a pure
+        // count ceiling allocates nothing per configured slot — documented
+        // per flag); the conversion is a checked try_from, so on a 32-bit
+        // platform the same test value would be REJECTED loudly instead of
+        // truncating (32-bit correctness by construction).
+        let native_max = (usize::MAX as u64).to_string();
+        for flag in [
+            "--max-ws-connections",
+            "--event-reorder-bound",
+            "--max-subscribers",
+            "--log-max-files",
+        ] {
+            let cli = parse_cli(["--home", "/tmp/h", flag, &native_max])
+                .unwrap_or_else(|err| panic!("{flag} {native_max}: {err}"));
+            let parsed = match flag {
+                "--max-ws-connections" => cli.max_ws_connections,
+                "--event-reorder-bound" => cli.event_reorder_bound,
+                "--max-subscribers" => cli.max_subscribers,
+                "--log-max-files" => cli.log_max_files,
+                _ => unreachable!(),
+            };
+            assert_eq!(parsed, Some(usize::MAX), "{flag} must convert losslessly");
+        }
+        // u64-native log byte ceiling takes the full u64 range.
+        let cli = parse_cli(["--home", "/tmp/h", "--log-max-bytes", &u64::MAX.to_string()])
+            .expect("u64::MAX is a valid log byte ceiling");
+        assert_eq!(cli.log_max_bytes, Some(u64::MAX));
+        // The event subscriber queue (min 2) also takes usize::MAX.
+        let cli = parse_cli(["--home", "/tmp/h", "--event-subscriber-queue", &native_max])
+            .expect("usize::MAX is a valid mailbox ceiling");
+        assert_eq!(cli.event_subscriber_queue, Some(usize::MAX));
+    }
+
+    #[test]
+    fn limit_flag_ranges_reject_above_the_documented_maxima() {
+        let cases: Vec<(&str, String)> = vec![
+            // The R3-F02 case-1 value: above tokio's semaphore maximum —
+            // pre-fix this PANICKED with exit 101 inside mpsc::channel.
+            (
+                "--db-queue-bound",
+                (MAX_QUEUE_CAPACITY as u64 + 1).to_string(),
+            ),
+            ("--db-queue-bound", u64::MAX.to_string()),
+            // The R3-F02 case-2 value: u32::MAX + 1 — pre-fix `as u32`
+            // truncated it to 0 (permanent 429 for every peer).
+            ("--http-rate-max", "4294967296".to_string()),
+            ("--http-rate-max", u64::MAX.to_string()),
+            // Above usize::MAX/2 the 2x connection-cap derivation could
+            // overflow — pre-fix it saturated silently.
+            (
+                "--http-max-in-flight",
+                (MAX_HTTP_MAX_IN_FLIGHT + 1).to_string(),
+            ),
+            ("--http-max-in-flight", (usize::MAX as u64).to_string()),
+            // Time budgets above 30 days risk overflowing platform
+            // monotonic-clock arithmetic at runtime.
+            (
+                "--http-request-budget-ms",
+                (MAX_TIME_BUDGET_MS + 1).to_string(),
+            ),
+            ("--db-wait-budget-ms", (MAX_TIME_BUDGET_MS + 1).to_string()),
+            ("--db-wait-budget-ms", u64::MAX.to_string()),
+        ];
+        for (flag, value) in cases {
+            let err = parse_cli(["--home", "/tmp/h", flag, &value]).unwrap_err();
+            assert!(
+                matches!(err, ConfigError::InvalidLimit { .. }),
+                "{flag} {value}: expected InvalidLimit, got {err:?}"
+            );
+        }
+        // --shutdown-timeout-ms keeps its dedicated variant, same loudness.
+        let err = parse_cli([
+            "--home",
+            "/tmp/h",
+            "--shutdown-timeout-ms",
+            &(MAX_TIME_BUDGET_MS + 1).to_string(),
+        ])
+        .unwrap_err();
+        assert!(
+            matches!(err, ConfigError::InvalidShutdownTimeout { .. }),
+            "expected InvalidShutdownTimeout, got {err:?}"
+        );
+    }
+
+    #[test]
+    fn limit_flag_ranges_reject_below_the_documented_minima() {
+        for (flag, value) in [
+            ("--max-ws-connections", "0"),
+            ("--db-queue-bound", "0"),
+            // The mailbox needs one event slot + one reserved signal slot.
+            ("--event-subscriber-queue", "1"),
+            ("--event-reorder-bound", "0"),
+            ("--max-subscribers", "0"),
+            ("--log-max-bytes", "63"),
+            ("--log-max-files", "1"),
+            ("--http-rate-max", "0"),
+            ("--http-max-in-flight", "0"),
+            ("--http-request-budget-ms", "0"),
+            ("--db-wait-budget-ms", "0"),
+        ] {
+            let err = parse_cli(["--home", "/tmp/h", flag, value]).unwrap_err();
+            assert!(
+                matches!(err, ConfigError::InvalidLimit { .. }),
+                "{flag} {value:?}: expected InvalidLimit, got {err:?}"
+            );
+        }
     }
 
     #[test]

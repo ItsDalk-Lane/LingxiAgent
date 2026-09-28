@@ -1,0 +1,26 @@
+# Local-only R02 probe data; hashes preserve the originals without publishing their contents.
+# Frozen UTC: 2026-09-28T13:14:46.119017+00:00
+232ee8a4f9f333b39aefd5eb3096568f0bccf307e9e8c5c5cd1c2a9cbea6e048  artifacts/rust-tauri/R02/r17-leaf-gate/cli-rust-probe-1/home-main/data-epoch.json
+86e309f707e9206ce20bef8990037fb60ec6f9cd102a79f0d1477ed4f6de3b77  artifacts/rust-tauri/R02/r17-leaf-gate/cli-rust-probe-1/home-main/lingxi-service/data/runs.db
+f45353c8c538fdad143ad9c05d265bbb78e5b43f7ad7f93ce3ffdece47f6dfe5  artifacts/rust-tauri/R02/r17-leaf-gate/cli-rust-probe-1/home-main/lingxi-service/device-credentials.json
+240cb462a7ceea29e97e7ae18f3569544af90ed4959cc2982cdb1810238b9110  artifacts/rust-tauri/R02/r17-leaf-gate/cli-rust-probe-1/home-main/lingxi-service/devices.json
+e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855  artifacts/rust-tauri/R02/r17-leaf-gate/cli-rust-probe-1/home-main/lingxi-service/instance.lock
+2d2084d4f40307bd5fb4ab44b58141b4764affcc6f8c91ad32e289e54dd60a7a  artifacts/rust-tauri/R02/r17-leaf-gate/cli-rust-probe-1/home-main/lingxi-service/local-token.json
+e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855  artifacts/rust-tauri/R02/r17-leaf-gate/cli-rust-probe-1/home-main/lingxi-service/logs/service-000001.log
+6948e1e6e55dbf18145f4984c02c6ce87660fa95bbd6c3c603700e7ee47af545  artifacts/rust-tauri/R02/r17-leaf-gate/cli-rust-probe-1/home-main/lingxi-service/management.json
+fef1da12458d4f58e5ac150ea8cf9628d7234180c32d4ceed0b3b71d4e83f05e  artifacts/rust-tauri/R02/r17-leaf-gate/cli-rust-probe-1/home-newer/data-epoch.json
+e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855  artifacts/rust-tauri/R02/r17-leaf-gate/cli-rust-probe-1/home-newer/lingxi-service/instance.lock
+f3785abc0962eb40e345672a3db7e4766dcdbda7edd17a7f0517ac42445d27bb  artifacts/rust-tauri/R02/r17-leaf-gate/cli-rust-probe-1/home-newer/lingxi-service/logs/service-000001.log
+9cd66ea9d50677c066abd859efd212ee6fe808a33d4d2929fb0f6c51cc1131e4  artifacts/rust-tauri/R02/r17-leaf-gate/cli-rust-probe-2/home-main/data-epoch.json
+8c165b425bf4f6cb7b6e35355d557e351ef8910fc422e4f215d2168d9190a93b  artifacts/rust-tauri/R02/r17-leaf-gate/cli-rust-probe-2/home-main/lingxi-service/data/runs.db
+e7f12a6b622827831179404d15b3061de031a8421bd015e3c7fd30cafb42d9a1  artifacts/rust-tauri/R02/r17-leaf-gate/cli-rust-probe-2/home-main/lingxi-service/data/runs.db-shm
+e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855  artifacts/rust-tauri/R02/r17-leaf-gate/cli-rust-probe-2/home-main/lingxi-service/data/runs.db-wal
+d89e05bb1bd89fd0723736141b627e17ea6be43f6b1757f4fe7cb07535aea9f0  artifacts/rust-tauri/R02/r17-leaf-gate/cli-rust-probe-2/home-main/lingxi-service/device-credentials.json
+ba448b89b3dc114153a2c67f42bdad274383d6df4757bf68e2fc0a71852e4946  artifacts/rust-tauri/R02/r17-leaf-gate/cli-rust-probe-2/home-main/lingxi-service/devices.json
+e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855  artifacts/rust-tauri/R02/r17-leaf-gate/cli-rust-probe-2/home-main/lingxi-service/instance.lock
+7d01bb00e5ec9c38742a8ee449505ab2aa51c6776238030eb8ab5b8ffc499f3d  artifacts/rust-tauri/R02/r17-leaf-gate/cli-rust-probe-2/home-main/lingxi-service/local-token.json
+e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855  artifacts/rust-tauri/R02/r17-leaf-gate/cli-rust-probe-2/home-main/lingxi-service/logs/service-000001.log
+7673a9ce9ac6775cea5923e45558a4b9b7356a90390091ed68468125fa4bd128  artifacts/rust-tauri/R02/r17-leaf-gate/cli-rust-probe-2/home-main/lingxi-service/management.json
+fef1da12458d4f58e5ac150ea8cf9628d7234180c32d4ceed0b3b71d4e83f05e  artifacts/rust-tauri/R02/r17-leaf-gate/cli-rust-probe-2/home-newer/data-epoch.json
+e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855  artifacts/rust-tauri/R02/r17-leaf-gate/cli-rust-probe-2/home-newer/lingxi-service/instance.lock
+aca46f9c0219544b268c4579aa1adf43025ec2086ac1a9428a090319cad2ddd1  artifacts/rust-tauri/R02/r17-leaf-gate/cli-rust-probe-2/home-newer/lingxi-service/logs/service-000001.log

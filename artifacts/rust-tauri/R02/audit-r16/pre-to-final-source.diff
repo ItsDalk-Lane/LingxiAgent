@@ -1,0 +1,49 @@
+--- prechange-full-sha256-corrected.txt
++++ candidate-final-full-source-sha256.txt
+@@ -7287,7 +7287,7 @@
+ 11dba770972402cbaf569de99a4e702a8fc71ed0004d2d0467d11e201794f211  docs/refactor-2026/independent-fix/SOURCE_MANIFEST.json
+ 8efa932b47ccb284f5a0c7d6a8b55bf9727373e26a7d20d2024b71336552f123  docs/refactor-2026/independent-fix/STRICT_SCOPE.json
+ 2a8e381547417d38f304d81b876fe2bfd03e85c7ef6a8964b33e796aa3992d9e  docs/refactor-2026/independent-fix/WORK_LOG.md
+-688ae645af2a32c2d863af59def164f5c11165d2a4773c723acc3194f7bf26f1  docs/rust-tauri/ORCHESTRATOR_PROGRESS.json
++edf023ac064437df215473be5936a8bee1fb3fb55b70c57673998c57a1907f63  docs/rust-tauri/ORCHESTRATOR_PROGRESS.json
+ bf40009e347df014dba1d2a2ecb7505bf4bdccfdef1992fc99b144749a992331  docs/rust-tauri/PERFORMANCE_THRESHOLDS.json
+ 96f70219d1df88249e8df073f4dfe211f8562cef20f7e45b1c03064feb5362be  docs/rust-tauri/R00/ACCEPTANCE_MAP.json
+ 4b12dd33d7458f50639b4f0000da3d742317338551df9a26033c002bd829858b  docs/rust-tauri/R00/BASELINE.json
+@@ -7507,11 +7507,14 @@
+ 69d94455449c1d589fd8bd7f83c0da2d16750c4449311d176e93cec69091af09  docs/rust-tauri/R02/R02-T07_REVIEW_R1.md
+ 497dfc6b143f495df5c343bdedd1c3bf4c869d0502f0f414f127c31459bd48ce  docs/rust-tauri/R02/R02-T08_REPORT.md
+ 186396650f1568ca4d6403c67ef373e104cd2598e6fa77c6ef4048caa9f5e0f4  docs/rust-tauri/R02/R02-T08_REVIEW_R1.md
+-e3576c4716a3963dd6b2147ed73637bfab5d98fe83e7f09b4d9cf677655831f2  docs/rust-tauri/R02/R02_ACCEPTANCE_LEDGER.json
+-db53036d83c6d709b2d6705e7448c7ef921c0e55db3251f26c057ca6b3233ce3  docs/rust-tauri/R02/R02_HANDOFF.json
+-780669328bb2addf6b888e03a0ad6e8f84a33809dbb46e0512cb8d784ced5111  docs/rust-tauri/R02/R02_IMPLEMENTATION_MAP.json
+-ba6930c9582056c5319d60d6158fd34fb2e3b7fa72248710fe63f5e5f536d20b  docs/rust-tauri/R02/R02_REPORT.md
+-d9bff448bf49006c2f55af527d3d89055f6108e3284645f1f43e758b2e464d82  docs/rust-tauri/R02/RISK_REGISTER.json
++0509553cc5c2a735e801567fff9ac2677fda3c8a41d0a75fc25283b78cbc7bff  docs/rust-tauri/R02/R02_ACCEPTANCE_LEDGER.json
++79a747a56759438c2b0a44b76b79c9cda3ef0e153d0a259feb3a653cdc9c7979  docs/rust-tauri/R02/R02_FULL_SCOPE_AUDIT_PRE_REPAIR.md
++c9cec46bb407a80a8ac3898a6f87e39881ebd5d937b667f84ff59c7f49b6f2a1  docs/rust-tauri/R02/R02_FULL_SCOPE_HANDOFF_R16.md
++0bc211ce310dfb26873f1df50d9c8c93bffd36a0fa8ff008ed826a50edb7a845  docs/rust-tauri/R02/R02_HANDOFF.json
++1aa69eb074505e9bd03ea72caf3aa9318ff915d624ef69133688d6372583d073  docs/rust-tauri/R02/R02_IMPLEMENTATION_MAP.json
++2a69e69f73fe3e263d99c593f5e501ceae01c7b6d92c244cc1f1f17d7ee17e42  docs/rust-tauri/R02/R02_REPORT.md
++d6632e4fa2a5a220d1a7755af2daa4fd00b163d96ffc8d1a5331604e4e551a07  docs/rust-tauri/R02/R02_TASK_FINDINGS_ADDENDUM_R16.md
++96eccdf1b199dbad3838dfc88d2c34de6f8723ce447b9eb236f56d5054940346  docs/rust-tauri/R02/RISK_REGISTER.json
+ b10c650bde2d50368310213e01f7bb8b313104e711bdd93c0be00abc3d77f850  docs/rust-tauri/R02/SERVICE_START_AND_SHUTDOWN.md
+ 85c5ce24c14f60a2a3b667c0a6db58ffbf460aeb1fd7f47ab6102bb915da118d  docs/rust-tauri/R02/r02_t08_worktree_digest.py
+ e6b4d2b2f81ef13884dad9ac592c801575da9696901bd828358411f64d5f44a8  docs/tasks/2026-09-11-todo-experience/ACCEPTANCE.md
+@@ -8090,7 +8093,7 @@
+ 20646189e46734f8d77bf74053261c8b284898814c2dbb4fdce119e376ebd220  rust/crates/lingxi-service/src/lib.rs
+ 81f4acf3de2e76c84b40c75b8c132fd6c4ba046c47b5bc8067f8b408c55ff188  rust/crates/lingxi-service/src/limits.rs
+ 24a1a613d0a7272a3792f7bb8aaaac8b5ed52f596bf7816f9756b074511aa8c9  rust/crates/lingxi-service/src/logging.rs
+-5066380ed713d49ce46377ef99a3e9ba4012217787534420b2284705f0d51c0f  rust/crates/lingxi-service/src/main.rs
++f02f097100b7dddfd13f1ec47f6343270dcd71aed30c081d3c8da2e8cd609b18  rust/crates/lingxi-service/src/main.rs
+ 073d7ee32e0cd63382a03209f9f27a4e08220c627844ba70f6360635c3245c90  rust/crates/lingxi-service/src/paths.rs
+ 70b5b73b218fc43e5d81db6acd2961570b8da4fa0eccf8c9e15c8e172ea36351  rust/crates/lingxi-service/src/redaction.rs
+ 9a5825a08976560df06ec765163e462a0eccec2aae60f0cdbd99a5fff2155d28  rust/crates/lingxi-service/src/serve.rs
+@@ -8104,7 +8107,7 @@
+ d429212112845723ab94d4d4a460fe3d3789c4c8614c8cf7f66dae5a7bd4f667  rust/crates/lingxi-service/tests/execute_concurrency.rs
+ 0eed3931c005bdbc5b5e8ac6c547876cffbd89604cb3d1e99d5f4e41d503b63a  rust/crates/lingxi-service/tests/instance_lifecycle.rs
+ f9711d6647b5682b4d02fe1232a7f38718c42b1cf33f887030c34b138c0ada5b  rust/crates/lingxi-service/tests/resource_limits.rs
+-894b25b5186719f6976ee45bbb52d1ddfd7efe952a2f8583aad90a32c6efa3cf  rust/crates/lingxi-service/tests/service_health.rs
++d3e39cc1e366b79d7baa878143238bdeeb2364dddd769fc5744a45ddaa40c9eb  rust/crates/lingxi-service/tests/service_health.rs
+ 05256bb450d69635a5108bd9721cd9451ba774612fac711bccfd8b91d72bbcc7  rust/crates/lingxi-service/tests/service_persistence.rs
+ aa2a47f0507b695910ac99201fae5884bc4ed3b08763257b2be300aa787a494b  rust/crates/lingxi-service/tests/shutdown_coordinator.rs
+ 6a63f3596f63a2e21735fff068adc228f5ae653dbae206d671df93086282ca48  rust/crates/lingxi-spike/Cargo.toml

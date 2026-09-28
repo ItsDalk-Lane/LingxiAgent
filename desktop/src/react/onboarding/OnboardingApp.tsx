@@ -98,10 +98,18 @@ export function OnboardingApp({ preview, skipToTutorial }: OnboardingAppProps) {
     (async () => {
       let localeLoaded = false;
       try {
-        const port = await window.hana.getServerPort();
-        const token = await window.hana.getServerToken();
-        const connection = createLocalServerConnection({ serverPort: port, serverToken: token });
+        const info = window.hana.getServerConnectionInfo
+          ? await window.hana.getServerConnectionInfo()
+          : await Promise.all([window.hana.getServerPort(), window.hana.getServerToken()])
+            .then(([port, token]) => ({ port, token, serverNodeKind: null, serverNodeTransport: 'http' }));
+        const connection = createLocalServerConnection({
+          serverPort: info.port, serverToken: info.token,
+          serverNodeKind: info.serverNodeKind, serverNodeTransport: info.serverNodeTransport,
+        });
         if (!connection) throw new Error('Local server connection is unavailable');
+        if (connection.serverNodeKind === 'lingxi-service') {
+          throw new Error('Rust onboarding is not migrated; the legacy setup API cannot be used');
+        }
         setServerConnection(connection);
         const splashInfo = await window.hana.getSplashInfo?.();
         const loc = splashInfo?.locale || 'zh-CN';

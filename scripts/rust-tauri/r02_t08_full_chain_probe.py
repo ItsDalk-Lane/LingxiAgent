@@ -12,9 +12,11 @@ Drives the REAL lingxi-service binary over real HTTP and real WebSocket:
                     (subscribed.snapshotSeq) and then LIVE event frames for a
                     second execute committed while the subscription is open;
   phase "readback": after a real process stop + restart on the SAME home, the
-                    pre-restart writes are still there (GET session, events
-                    page contiguous), auth is re-established with the NEW
-                    per-start token, and health is 200 again.
+                    pre-restart head is preserved (GET session runCount>=2,
+                    events page preserves every pre-restart event's identity
+                    and content with exact 1..head continuity), auth is
+                    re-established with the NEW per-start token (the old one
+                    rejected), and health is 200 again.
 
 All expectations are asserted here (a failed assertion exits non-zero, so
 the orchestrating bash script fails loudly). Prints one "PASS <label>" line
@@ -24,13 +26,47 @@ per assertion so the orchestrator's summary is reconstructable.
 import json
 import os
 import socket
+import stat
 import struct
 import sys
 import urllib.error
 import urllib.request
+from pathlib import Path
 
 HOST = "127.0.0.1"
 SESSION = "sess_local_alpha"
+
+
+def ledger_path():
+    # 只允许固定证据目录中的固定文件名，拒绝目录穿越和符号链接。
+    evidence = Path(os.environ["A15_EVIDENCE_DIR"])
+    target = Path(os.environ["A15_HEAD_FILE"])
+    assert evidence.is_absolute() and target.is_absolute(), "A15 ledger path must be absolute"
+    assert ".." not in evidence.parts and ".." not in target.parts, "A15 ledger traversal"
+    assert target.name == "pre-restart-head.json", "A15 ledger filename mismatch"
+    assert not evidence.is_symlink() and evidence.is_dir(), "A15 evidence dir is not a real directory"
+    assert target.parent.resolve(strict=True) == evidence.resolve(strict=True), "A15 ledger outside evidence dir"
+    return target
+
+
+def write_ledger(value):
+    target = ledger_path()
+    flags = os.O_WRONLY | os.O_CREAT | os.O_EXCL | getattr(os, "O_NOFOLLOW", 0)
+    fd = os.open(target, flags, 0o600)
+    with os.fdopen(fd, "w", encoding="utf-8") as fh:
+        json.dump(value, fh, sort_keys=True)
+        fh.flush()
+        os.fsync(fh.fileno())
+
+
+def read_ledger():
+    target = ledger_path()
+    fd = os.open(target, os.O_RDONLY | getattr(os, "O_NOFOLLOW", 0))
+    with os.fdopen(fd, "r", encoding="utf-8") as fh:
+        assert stat.S_ISREG(os.fstat(fh.fileno()).st_mode), "A15 ledger is not a regular file"
+        value = json.load(fh)
+    assert isinstance(value, dict), "A15 ledger is not an object"
+    return value
 
 
 def fail(msg):
@@ -202,19 +238,42 @@ def main():
         status, body = http(port, "POST", f"/lingxi/v1/sessions/{SESSION}/execute",
                             bearer=token, body=json.dumps({"input": "a15-write-while-subscribed"}))
         assert status == 200, f"execute #2: {status} {body[:300]}"
+        run2 = json.loads(body)
+        assert run2.get("runId"), f"no runId on execute #2: {body[:300]}"
+        assert run1["runId"] != run2["runId"], "two executions returned the same runId"
+        ok("execute-write-2-committed", f"runId={run2['runId']}")
         events = read_frames(sock, lambda v: v.get("frameKind") != "control"
                              and int(v.get("seq", -1)) > snapshot_seq)
         live = events[-1]
         assert live.get("eventId") and "seq" in live, f"bad live event: {live}"
         ok("ws-live-event-after-write", f"seq={live['seq']} eventId={live['eventId'][:18]}…")
 
+        # 记录重启前完整的会话与事件，读回时逐项比对。
+        status, body = http(port, "GET", f"/lingxi/v1/sessions/{SESSION}", bearer=token)
+        assert status == 200, f"pre-restart session: {status} {body[:300]}"
+        session_before = json.loads(body)
+        assert session_before["sessionId"] == SESSION, "pre-restart session identity changed"
+        assert session_before["runCount"] == 2, f"pre-restart run count: {body[:300]}"
+        run_ids = [run["runId"] for run in session_before["lastRuns"]]
+        assert len(run_ids) == 2 and set(run_ids) == {run1["runId"], run2["runId"]}, (
+            f"pre-restart run identities missing: {run_ids}")
+
         # durable head as seen over HTTP (read-your-writes)
         status, body = http(port, "GET", f"/lingxi/v1/sessions/{SESSION}/events?limit=500",
                             bearer=token)
         assert status == 200, f"events page: {status} {body[:300]}"
         page = json.loads(body)
-        seqs = [int(e["seq"]) for e in page["items"]]
-        assert seqs == sorted(seqs) and len(seqs) == len(set(seqs)), "page seqs not strictly increasing"
+        before_items = page["items"]
+        seqs = [int(e["seq"]) for e in before_items]
+        assert seqs, "pre-restart events page is empty"
+        assert seqs == list(range(1, seqs[-1] + 1)), "pre-restart events are not exactly 1..head"
+        event_ids = [e["eventId"] for e in before_items]
+        assert len(event_ids) == len(set(event_ids)), "pre-restart event identities duplicated"
+        assert {run1["runId"], run2["runId"]}.issubset(
+            {e.get("runId") for e in before_items}
+        ), "pre-restart events missing one or both runs"
+        assert page["nextCursor"] is None, "pre-restart events page is incomplete"
+        assert int(page["snapshotSeq"]) == seqs[-1], "pre-restart snapshot extends beyond page"
         assert seqs and seqs[-1] >= snapshot_seq, "HTTP head behind WS snapshot boundary"
         ok("http-events-page-contiguous", f"head={seqs[-1]} count={len(seqs)}")
 
@@ -237,15 +296,21 @@ def main():
         sock2.close()
 
         # ---- durable head for the restart check ---------------------------
-        with open(os.environ["A15_HEAD_FILE"], "w", encoding="utf-8") as fh:
-            json.dump({"head_seq": seqs[-1], "runs": 2, "token_before_restart": token}, fh)
+        write_ledger({
+            "head_seq": seqs[-1],
+            "session_before": session_before,
+            "events_before": before_items,
+            "run_ids": [run1["runId"], run2["runId"]],
+        })
         ok("phase-boot-write-subscribe-complete", f"head={seqs[-1]}")
 
     elif mode == "readback":
         # The restart minted a NEW per-start token: the OLD one must no
         # longer authenticate, and the new one must.
-        with open(os.environ["A15_HEAD_FILE"], "r", encoding="utf-8") as fh:
-            old_token = json.load(fh)["token_before_restart"]
+        ledger = read_ledger()
+        # 旧令牌只由编排脚本在内存中传入，不落到可交付的证据目录。
+        old_token = sys.stdin.readline().strip()
+        assert old_token, "pre-restart token was not supplied"
         status, body = http(port, "GET", "/lingxi/v1/me", bearer=old_token)
         assert status == 401, f"pre-restart token still valid: {status} {body[:200]}"
         ok("pre-restart-token-rejected-401")
@@ -258,20 +323,25 @@ def main():
         status, body = http(port, "GET", f"/lingxi/v1/sessions/{SESSION}", bearer=new_token)
         assert status == 200, f"post-restart session: {status} {body[:300]}"
         session = json.loads(body)
-        assert int(session.get("runCount", 0)) >= 2, f"runs lost after restart: {body[:300]}"
-        ok("post-restart-session-readback", f"runCount={session.get('runCount')}")
+        assert session == ledger["session_before"], f"session changed after restart: {body[:300]}"
+        assert session["runCount"] == 2, f"run count changed after restart: {body[:300]}"
+        assert {run["runId"] for run in session["lastRuns"]} == set(ledger["run_ids"]), (
+            "run identities changed after restart")
+        ok("post-restart-session-readback", f"runCount={session['runCount']}")
 
         status, body = http(port, "GET", f"/lingxi/v1/sessions/{SESSION}/events?limit=500",
                             bearer=new_token)
         assert status == 200, f"post-restart events: {status} {body[:300]}"
         page = json.loads(body)
         seqs = [int(e["seq"]) for e in page["items"]]
-        assert seqs == sorted(seqs) and len(seqs) == len(set(seqs)), "post-restart seqs broken"
-        with open(os.environ["A15_HEAD_FILE"], "r", encoding="utf-8") as fh:
-            head_before = json.load(fh)["head_seq"]
-        assert seqs and seqs[-1] >= head_before, (
-            f"post-restart head {seqs[-1]} behind pre-restart head {head_before}")
-        ok("post-restart-events-preserved", f"head_before={head_before} head_after={seqs[-1]}")
+        assert seqs == list(range(1, ledger["head_seq"] + 1)), (
+            f"post-restart events are not exactly 1..{ledger['head_seq']}")
+        assert page["nextCursor"] is None, "post-restart events page is incomplete"
+        assert int(page["snapshotSeq"]) == ledger["head_seq"], (
+            "post-restart snapshot extends beyond page")
+        assert page["items"] == ledger["events_before"], (
+            "post-restart event identity or content changed")
+        ok("post-restart-events-preserved", f"head={ledger['head_seq']} count={len(seqs)}")
 
         status, body = http(port, "GET", "/lingxi/v1/health")
         assert status == 200, f"post-restart health: {status}"

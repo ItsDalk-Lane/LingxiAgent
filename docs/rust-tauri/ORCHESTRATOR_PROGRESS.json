@@ -4,8 +4,8 @@
   "start_branch": "main",
   "implementation_branch": "codex/rust-tauri-migration",
   "start_head": "7d1a0c6bc28062ff455adcf8f68c3a80b117e90d",
-  "current_head": "398fe69765be3f4444e895f286a278cd4c687c4b",
-  "current_head_note": "记录前的真实已验证且已推送R01封印HEAD；本次纯文档收口不能自嵌自身SHA，最终外部checkpoint与PROGRESS正式复验记录共同给出下一坐标。",
+  "current_head": "9b98c679678888b60ff2e32bd67d3da6fc2f5c4f",
+  "current_head_note": "R18 只读核到的真实当前 HEAD；分支 codex/rust-tauri-migration，工作区仍有未提交候选。历史 R01 封印坐标保留在 R01 阶段记录；当前 R02 未封印、未提交、未推送。",
   "remote": "origin",
   "remote_default_branch": "main",
   "taskbook_manifest_sha256": "49968287f564a2a470d55fe4295a26ef70a71ccb4b16e38933567e89076a5c3f",
@@ -165,7 +165,8 @@
     },
     "R02": {
       "title": "Rust独立服务、存储与事件基础",
-      "status": "READY_FOR_STAGE_REVIEW",
+      "status": "R18_FAIL__A16_CONTRACT_CONFLICT__DYNAMIC_BLOCKED",
+      "current_controller_position": "2026-09-28 R18：现行全范围交接见 docs/rust-tauri/R02/R02_FULL_SCOPE_HANDOFF_R18.md，修复前冻结问题表及任务补遗仍保留。A15 旧产品缺陷的探针已按后来授权静态修正，但当前候选真运行 BLOCKED；A16 原 E1 零变更/零 Rust 入口条件与获授权提前接入客户端直接冲突，按原门禁静态 FAIL；34 叶仍无完整合法 Gate，真服务检查、完整独立验收、封印和推送均未完成。R03 禁入。下方 r02_stage_controller_note 是历史滚动记录。",
       "task_ids": [
         "R02-T01",
         "R02-T02",
@@ -177,11 +178,307 @@
         "R02-T08"
       ],
       "stage_base_sha": "201584f2917a7fd96d6ea603bdeddbd420082cfe",
-      "stage_review_round": 0,
-      "stage_verdict": null,
+      "stage_review_round": 15,
+      "stage_verdict": "FAIL",
+      "stage_review_r1": {
+        "reviewer": "根总控另派的全新 Codex 阶段级独立评审（R1）",
+        "report": "/tmp/r02-stage-review-r1.md",
+        "report_sha256": "55f81a02f54d09a07fe28a09cbb3385225fc1a0dad305dbbf1f55bd31f8de6d9",
+        "verdict": "FAIL",
+        "findings": "F01-F08（BLOCKING：F01 并发 execute run-id 坍缩、F02 resume/purge 竞态空洞、F03 关停 drain 预算起锚过晚、F04 xtask 证据新鲜度；MAJOR：F05 resultVersion 未校验+超时孙进程残留、F06 A16 脚本钉 SHA 归因断链、F07 T07 资源边界不全；MINOR：F08 交接/台账/身份字段陈旧）",
+        "note": "阶段级 R1 明确 FAIL；原执行者口径的 16/16 PASS 不能代位阶段验收。原报告与证据 /tmp/r02-stage-review-r1/evidence 全部字节/hash 保留。"
+      },
+      "stage_repair_r1": {
+        "agent": "R02 阶段修复 R1 一次性修复代理（ZCode 会话 sess_37dee91b，无 commit/push/PR/tag/release 授权）",
+        "brief": "/tmp/r02-stage-repair-r1-brief.txt",
+        "brief_sha256": "31e3a5b252ae75c8570f9ce8d0a699d4cb40efbf1ffc08fb100678e57941fe1a",
+        "candidate": "HEAD 9b98c679678888b60ff2e32bd67d3da6fc2f5c4f + 未提交修复工作树（ digest 见 R02_HANDOFF.json repair_r1_candidate ）",
+        "status": "READY_FOR_INDEPENDENT_STAGE_REREVIEW",
+        "report": "/tmp/r02-stage-repair-r1.md",
+        "evidence_root": "/tmp/r02-stage-repair-r1/evidence/",
+        "verify_stage_rerun": "xtask verify-stage R02 overall PASS 13/13 命令（新鲜证据根 /tmp/r02-stage-repair-r1/verify-r02-final/，逐命令 preExistingEvidence 为空；result sha256 120ef0409049e620ef09ee0d9fbb74b6005d27b5dc9ce00b6267549dd4b4960c）",
+        "note": "本行为修复代理自报的可核对状态，不等于阶段 PASS；正式 PASS 与封印归根总控另派的全新完整独立复验。"
+      },
+      "stage_review_r2": {
+        "reviewer": "根总控另派的全新阶段级独立评审（R2）",
+        "report": "/tmp/r02-stage-review-r2.md",
+        "verdict": "BLOCKED",
+        "findings": "R2-F01 重启重播种撞已提交 run id（MAJOR）；R2-F02 Unicode 日志 UTF-8 panic + db-busy 超预算 3s 存活（BLOCKING）；R2-F03 运行器超时孙进程跟踪丢失、误报无残留（MAJOR）；R2-F04 等待头部连接在传输准入数量/时间预算之外（MAJOR）",
+        "note": "R2 评审被平台中止（possible cybersecurity risk），按停止命令仅整理已取输出；报告明示非完整验收、不得据以判 PASS。原报告与证据 /tmp/r02-stage-review-r2/evidence 全部字节/hash 保留。"
+      },
+      "stage_repair_r2": {
+        "agent": "R02 阶段修复 R2 一次性修复代理（ZCode，全新会话，不复用此前总控/T/修复/评审身份；无 commit/push/PR/tag/release 授权）",
+        "brief": "/tmp/r02-stage-repair-r2-brief.txt",
+        "brief_sha256": "d7db98c46ba6557aa324b1d4894f3be70379cc60e2edd5d45fda4cedca6bfbc0",
+        "candidate": "HEAD 9b98c679678888b60ff2e32bd67d3da6fc2f5c4f + 未提交修复工作树（34 修改 + 3 新增；digest 见 R02_HANDOFF.json repair_r2_candidate）",
+        "status": "READY_FOR_INDEPENDENT_STAGE_REREVIEW",
+        "report": "/tmp/r02-stage-repair-r2.md",
+        "evidence_root": "/tmp/r02-stage-repair-r2/evidence/",
+        "verify_stage_rerun": "xtask verify-stage R02 overall PASS 13/13 命令（隔离全量 git 副本 /tmp/r02-stage-repair-r2/stage-run/，全新证据根，逐命令 preExistingEvidence 为空、无 timedOut；result sha256 6952f28920dfe7a278cc6a5768a98fc8944f00d343184c667c4fff2966c40944）",
+        "note": "本行为修复代理自报的可核对状态，不等于阶段 PASS；正式 PASS 与封印归根总控另派的全新完整独立复验。R1 修复报告 §5 计数失实（写 28，实际 30+1）原样保留并在 R02_HANDOFF.json 更正。"
+      },
       "stage_acceptance_commit_sha": null,
-      "blockers": [],
-      "r02_stage_controller_note": "八T全部经全新执行/验收（T05、T06 各一轮修复循环）独立 PASS 并逐任务推送核对；16 个 REQUIRED 验收场景全部由真实 Rust 二进制/真实命令执行判定（xtask verify-stage R02 overall PASS 16/16，非手填统计）；R01 移交项 RR-T08-F1/RR-T02-FINFO1 闭环、PROD-DEFECT-1 新栈侧闭环；RISK_REGISTER R02 版已登记（14 OPEN 全部绑定真实截止阶段）；审计封印族预存在红如实归因（坐标 ab4f2281 落后于已授权提交，0 个 R02 文件，反掩码经 T08 验收独立核验）；完整阶段验收须由根总控另派全新 Codex 子代理独立执行，本总控不宣布阶段 PASS。候选指纹=HEAD（见任务账本 task_commit_sha 链）。"
+      "blockers": [
+        {
+          "id": "R02-R18-LEAF-COVERAGE",
+          "status": "FAIL",
+          "summary": "R00 34 个原始叶中仅 20 个有完整检查定义、14 个仍为局部定义；当前候选 34 个完整合法结果均缺。真实 Agent/模型/工具及其他客户端/服务行为不得用通用认证案例代替。详见 R02_FULL_SCOPE_HANDOFF_R18.md。"
+        },
+        {
+          "id": "R02-R18-A16-E1",
+          "status": "FAIL",
+          "summary": "A16 原 E1 要求旧桌面文件零改和启动路径零 Rust 引用；获授权提前实现原 R00 客户端行为后当前候选静态违反两项，原门禁未放宽。完整 A16 未执行。"
+        },
+        {
+          "id": "R02-R18-WINDOWS-CONSUMERS",
+          "status": "FAIL",
+          "summary": "Windows 本地令牌的桌面与 CLI 新消费者缺同一句柄 ACL/身份闭环，为本轮后修引入、原 R02 多平台合同内的同根漏项；尚需源码修正、Windows 编译和实机负向。"
+        },
+        {
+          "id": "R02-R18-DYNAMIC",
+          "status": "BLOCKED",
+          "summary": "平台先前拒绝真 TCP 及完整动态验收；当前候选未合法运行全 npm、A01–A16 真服务矩阵、34 原叶及完整 verify。A15 探针静态已修，但真重启仍 BLOCKED；Git 隔离夹具已获用户授权并真实通过，仅夹具范围 PASS。"
+        },
+        {
+          "id": "R02-R18-PACKAGE",
+          "status": "FAIL",
+          "summary": "当前默认 Mac 安装包构建 exit 1（缺正式公证凭据）；本地跳过公证结构包 exit 0 只证明结构。Windows target/实机未运行，正式安装和跨平台验收未闭。"
+        },
+        {
+          "id": "R02-R18-SEAL",
+          "status": "BLOCKED",
+          "summary": "完整独立阶段 PASS、当前候选合法门禁和证据尚缺；正式封印、最终检查、提交/普通推送均未执行，R03 禁止启动。"
+        }
+      ],
+      "historical_blockers_r6_r13": [
+        {
+          "id": "R02-STAGE-R6-B01",
+          "status": "BLOCKED",
+          "summary": "必要完整验收链（A16 完整 npm 嵌套链、完整 13 命令 verify-stage）未获用户一次性 Git 测试 fixture 例外批准（嵌套 fixture commit/reset --hard 在禁令内）；解除条件与边界见 RISK_REGISTER 同 id 条目。第 9 轮修复派单仍不赋例外，等待用户明确回复，不重复询问；修复 R8 的八次自动安全审批拒绝及变体已被根总控停止（登记 /tmp/r02-stage-repair-r8/evidence/hook-rejections/registry.json，SHA f1472dc5c04d0df959a9bf1cb605d551dbe8784211019c4f3ae4340c87d317f6；其为修复者转录而非逐件原 tool 输出），受限动态全部 BLOCKED。"
+        },
+        {
+          "id": "R02-STAGE-R9-F09",
+          "status": "BLOCKED",
+          "summary": "R9-F09（A15 重启逐项身份/内容/精确连续核对）的源码修正被 Mimosa 自动安全审批以高危路径穿越拦截，未落盘；修复代理按停令停止该动作及一切等效替代并冻结拒绝记录（/tmp/r02-stage-repair-r9/evidence/hook-rejections/r9-f09-ledger-edit.json，UTC 2026-09-27T23:12:36Z）。A15 探针的既有 run2 断言小幅增强已落盘，台账式逐项核对未实施；解除需根总控另行授权或明确改派。"
+        },
+        {
+          "id": "R02-STAGE-R13-C01",
+          "status": "BLOCKED",
+          "summary": "R13-F01 修复引入的显式登记：R00 两对 REQUIRED_SUPPLEMENTAL 叶场景（R00-T02-LA-B8A1AD32A8E1 CLI help / R00-T02-LA-32FFEC05BAA7 设置页 sharing）原件标注 R02-T03+R07-T09、execution_stage_ids=[R02,R07]、due=最迟在所列实施 Task 的阶段验收前完成并执行，但其行为本体为纯客户端，与 R02 阶段书 §1 边界（无新 UI/无客户端迁移）冲突。修复 R13 不单方改原件、不单方豁免：机器门禁对两项固定 BLOCKED（verify-stage overall 不可能 PASS），处置归根总控/用户三选一：(a) 授权修改 R00 原件双阶段标注（治理变更）；(b) 正式确认 R02 份额为空并登记可审递延依据；(c) 定义 R02 侧可执行证据义务并注册证据生产者。同族另记（R14 更新）：LA-200D4E5D52C9 的认证列表正负路径记录义务在 R13 时期以 {EVIDENCE}/A05_A06/sessions-list-matrix.json 钉住 fail-closed（当时无注册生产者）；R14-F01 修复已为该叶注册生产者（r02_t03_auth_matrix.sh sessions-list 段）并改为内容契约消费，该项不再归根总控处置。"
+        }
+      ],
+      "r02_stage_controller_note": "【历史滚动记录：下列‘现行/下一轮’仅指当时；当前以 current_controller_position/status 为准。】八T全部经全新执行/验收（T05、T06 各一轮修复循环）独立 PASS 并逐任务推送核对；16 个 REQUIRED 验收场景全部由真实 Rust 二进制/真实命令执行判定（xtask verify-stage R02 overall PASS 16/16，非手填统计）；R01 移交项 RR-T08-F1/RR-T02-FINFO1 闭环、PROD-DEFECT-1 新栈侧闭环；RISK_REGISTER R02 版已登记；审计封印族预存在红如实归因（坐标 ab4f2281 落后于已授权提交，属封印滞后预期形态；更正：此前表述“0 个 R02 文件”失实——当前红清单 846 条几乎全部为 R02 已授权交付物，含 744 条 artifacts/rust-tauri/R02/ 证据，逐条清单见 /tmp/r02-stage-repair-r1/evidence/seal-diff-red-files.txt，反掩码经 T08 验收独立核验）；阶段级 R1 独立评审 FAIL（F01-F08）→ 修复 R1 候选；阶段级 R2 独立评审 BLOCKED（R2-F01..F04，平台中止的受阻报告、非完整验收）→ 修复 R2 候选；阶段级 R3 独立评审 FAIL（R3-F01..F03，/tmp/r02-stage-review-r3.md，完整验收）→ 修复 R3 已交候选；阶段级 R4 独立评审 FAIL（R4-F01 SQLite pragma 实际 i32 消费者上界被按 i64 接受、≥2^31 值静默读回 0 取消 busy-wait/auto-checkpoint；R4-F02 A16 基线被候选未跟踪文件污染且外层包装错误被误分类为封印坐标滞后，/tmp/r02-stage-review-r4.md，完整验收）→ 修复 R4 已交候选待全新复验；阶段级 R5 独立评审 FAIL（R5-F01/F02/F03+O01，/tmp/r02-stage-review-r5.md）→ 修复 R5 已交候选；阶段级 R6 独立评审 FAIL（R6-F01/F02+O01，另 B01 BLOCKED，评审者 Codex /root/r02_stage_review_r6，/tmp/r02-stage-review-r6.md）→ 修复 R6 已交候选；阶段级 R7 独立评审 FAIL（R7-F01/F02 MAJOR+R7-F03 MINOR，另 B01 BLOCKED，评审者 Codex /root/r02_stage_review_r7，/tmp/r02-stage-review-r7.md）→ 修复 R7 已交候选（R7-F03/HS-02 更正：本注曾止于 R4 且指向 repair_r4_candidate 为现行——历史叙述保留，现行候选指纹以 R02_HANDOFF.json repair_r7_candidate 为准，repair_r4/r5/r6 块保留为历史）；阶段级 R8 独立评审 FAIL（R8-F01 MAJOR A16 结构类别通行/完成性摘要缺陷、R8-F02 MAJOR xtask 后代归属 pgrep-then-lstart 交错+秒粒 lstart 凭据、R8-F03 MINOR 主导航滞 R6/hash 笔误误称字节漂移/固定 UTC 占位，另 B01 BLOCKED，评审者 Codex /root/r02_stage_review_r8，/tmp/r02-stage-review-r8.md，SHA 5bfe86f39fb773a363a1063725bf234c1bc4a1c56f786167c20a21793c4561ee）→ 修复 R8 已交候选（现行候选指纹以 R02_HANDOFF.json repair_r8_candidate 为准）。修复 R8 期间八次自动安全审批拒绝（functions.sh 生成、cp/patch 拆分、两版 run-gates.py 注入、冻结/源码引用指针 hash/glob/chr 替代）及变体被根总控停止；其 55/55、Rust 344/0、run2/pass3、A12 等自此仅为记录性历史观察，不授权通过；首版修复 R8 报告（UI hash 97dfd82e…dbcb1c92）原始冻结正文缺失，不重建。阶段级 R9 全范围静态独立评审 FAIL（R9-F01 A16 firstDiff 非纯 JSON 吸收+合法含]路径误拒、R9-F02 MAJOR 进程组号不能证明成员归属+非Unix survivors 失真+A14/T05 同族句柄缺口、R9-F04 MAJOR 实例记录清理预算失效、R9-F05 MAJOR 认证随机源静默弱回退、R9-F06 MAJOR A04 自报根断言、R9-F08 MAJOR A13 真实日志未纳入扫描/不可读假clean、R9-F09 MAJOR A15 重启不核身份内容连续性；另 R9-F03/R9-F07 MINOR；评审者 Codex /root/r02_stage_review_r9，/tmp/r02-stage-review-r9.md，SHA 643ae379e44eb8da449aa3614b1959b59219294a5dcfce4caa023272d7edea53，7 MAJOR+2 MINOR，全部必要动态另 BLOCKED）→ 修复 R9 已交候选（F01/F02/F04/F05/F06/F07/F08 静态源码修正已落盘，F03 五文档本登记；F09 因新的 Mimosa 自动安全拒绝 BLOCKED 未落盘；0 动态执行；现行候选指纹以 R02_HANDOFF.json repair_r9_candidate 为准）。该第 10 轮已发生且为独立静态审阅：阶段级 R10 独立静态评审 FAIL（R10-F01 MAJOR A16 文件级失败详情丢失仍可判绿、R10-F02 MAJOR A13 旧日志留存可掩盖本轮无轮转日志、R10-F03 MINOR 清理报告 kill_sent 真值/A14 ps 失败后无界等待、R10-F04 MINOR HANDOFF allowed_next_scope 无条件 R03；已知 R9-F09 仍未修；R9-F01/F02/F08 修复可见但残留缺口未全闭；全部必要动态与 B01 另 BLOCKED，评审者 Codex /root/r02_stage_review_r10，/tmp/r02-stage-review-r10.md，SHA 5123aec0bda213d7357b5d12867e9bea4fad130f30df08a359f3ce7b0851d9d9）→ 修复 R10 已交候选（F01/F02/F03 源码/脚本静态修正已落盘，F04 五文档本登记与 allowed_next_scope 现行化；F09 维持 BLOCKED 未修未重试；0 动态执行；现行候选指纹以 R02_HANDOFF.json repair_r10_candidate 为准）。下一轮为第 11 轮：根总控须另派全新代理（不复用 R1–R10 及任何旧验收者）做允许范围的静态复验；F09 修正、受限动态与 B01 在根总控另行确切授权前保持 BLOCKED。完整阶段验收须由根总控另派全新 Codex 子代理独立执行，本总控不宣布阶段 PASS。T05/T06 的 ORCH repair_agent_id 字段仍为 null 而两任务报告正文声明全新修复代理——身份登记缺口按真实已知证据登记（见 RISK R02-STAGE-R9-RECORDS），不补造未知 UUID。",
+      "stage_review_r3": {
+        "reviewer": "根总控另派的全新阶段级独立评审（R3）",
+        "report": "/tmp/r02-stage-review-r3.md",
+        "report_sha256": "959a5f5210274921ba77dd03d507cc9793bad5bc1d738b6057284b501d60adcd",
+        "verdict": "FAIL",
+        "findings": "R3-F01 首字节等待在 header_read_timeout 之外（MAJOR：hyper-util auto Builder 版本嗅探态无定时器，零字节/H2 前缀客户端无限期占用连接槽）；R3-F02 全部资源配置缺上界与无损转换（MAJOR：db-queue-bound 越 tokio 信号量上限 exit 101 panic、http-rate-max as u32 截断永久 429、2× 连接帽 saturating_mul 掩盖溢出）；R3-F03 交接与风险台账漂移（MINOR）；R3-O01 A16 首轮 ustar 瞬态观察（不归罪 R02 产品缺陷）",
+        "note": "完整验收（非 R2 的平台中止 BLOCKED）；平台 R2 BLOCKED 性质保留为历史。原报告与证据 /tmp/r02-stage-review-r3/evidence 全部字节/hash 保留；A16 首轮 FAIL 15/16 原始日志保留，不把复跑写成首轮绿。"
+      },
+      "stage_repair_r3": {
+        "agent": "R02 阶段修复 R3 一次性修复代理（ZCode，全新会话，不复用此前总控/T/修复/评审身份；无 commit/push/PR/tag/release 授权）",
+        "brief": "/tmp/r02-stage-repair-r3-brief.txt",
+        "brief_sha256": "634acc22edaabb0d3e859af4ae926e7e44434edbcc68c01df28a79a65275a701",
+        "candidate": "HEAD 9b98c679678888b60ff2e32bd67d3da6fc2f5c4f + 未提交修复工作树（35 修改 + 4 新增：在修复 R2 的 34+3 候选上，代码修改 serve.rs/config.rs/lib.rs/main.rs/limits 文档/Cargo.toml、queue.rs/storage mod，新增 tests/config_bounds.rs；digest 见 R02_HANDOFF.json repair_r3_candidate）",
+        "status": "READY_FOR_INDEPENDENT_STAGE_REREVIEW",
+        "report": "/tmp/r02-stage-repair-r3.md",
+        "evidence_root": "/tmp/r02-stage-repair-r3/evidence/",
+        "verify_stage_rerun": "xtask verify-stage R02 overall PASS 13/13 命令（隔离全量 git 副本 /tmp/r02-stage-repair-r3/stage-run/repo，全新证据根 /tmp/r02-stage-repair-r3/stage-run/evidence/，逐命令 preExistingEvidence 为空、missingEvidence 为空、无 timedOut；16/16 场景 PASS；resultVersion lingxi.xtask.verify-stage.v1；result sha256 e7ee3f46d76814850e0529a530ec14accc46603a377fc6b6baa789c0f6933a03；A16 维持封印族预存在红的如实归因，e0 绑定脏工作树 diff sha256 7efa80c04d103a3a501f84f29ae19eeedd9f80f2017df7a206f6ab5faa9b14c4）",
+        "note": "本行为修复代理自报的可核对状态，不等于阶段 PASS；正式 PASS 与封印归根总控另派的全新完整独立复验。修复 R2 报告 §4 「静默吸收」归因失准的更正、PID 31400 由 root 清理的归属、T08 独立 PASS 哈希更正均落在 R02_HANDOFF.json 与 R02_REPORT.md §18（原报告字节不动）。"
+      },
+      "stage_review_r4": {
+        "reviewer": "根总控另派的全新阶段级独立评审（R4）",
+        "report": "/tmp/r02-stage-review-r4.md",
+        "report_sha256": "4cc0dd2445391f82b19a9adb63c069fff997270ea6186ce44ca217e4fd0057fe",
+        "verdict": "FAIL",
+        "findings": "R4-F01 StoreOptions validate 把 SQLite pragma 实际 i32 消费者上界当 i64 接受——rusqlite 绑定面收 i64，但 sqlite3Atoi→sqlite3GetInt32（有符号 32 位）对 ≥2147483648 静默读回 0，busy_timeout 0=移除忙等待、wal_autocheckpoint 0=移除自动检查点（MAJOR）；R4-F02 A16 基线被四个未跟踪候选文件污染（cp 脏树+checkout -f 只恢复跟踪文件），生成器源清单不匹配拒跑被外层 Command failed 包装掩盖、误分类为已知封印坐标滞后（MAJOR）",
+        "note": "完整验收。原报告与证据 /tmp/r02-stage-review-r4/evidence 全部字节/hash 保留。R4-F02 同时证伪了修复 R3 verify_stage_rerun 中「A16 维持封印族预存在红的如实归因」的基线两红 seal-lag 归因（实为基线污染；该历史字符串原样保留，更正落 R02_HANDOFF.json ledger_corrections 与 R02_REPORT.md §19）。"
+      },
+      "stage_repair_r4": {
+        "agent": "R02 阶段修复 R4 一次性修复代理（ZCode，全新会话，不复用此前总控/T/修复/评审身份；无 commit/push/PR/tag/release 授权）",
+        "brief": "/tmp/r02-stage-repair-r4-brief.txt",
+        "brief_sha256": "348bc44441fa29a2fa7ffed78b69b3bc2f123fc63e700ebcef503f1ef453acbe",
+        "candidate": "HEAD 9b98c679678888b60ff2e32bd67d3da6fc2f5c4f + 未提交修复工作树（36 修改 + 4 新增：在修复 R3 的 35+4 候选上，migrations.rs 因 R4-F01 同根因扫掠进入修改集；digest 见 R02_HANDOFF.json repair_r4_candidate）",
+        "status": "READY_FOR_INDEPENDENT_STAGE_REREVIEW",
+        "report": "/tmp/r02-stage-repair-r4.md",
+        "evidence_root": "/tmp/r02-stage-repair-r4/evidence/",
+        "verify_stage_rerun": "xtask verify-stage R02 overall PASS 13/13 命令（隔离全量 git 副本 /tmp/r02-stage-repair-r4/repo，全新证据根 /tmp/r02-stage-repair-r4/verify-r02-final2/，逐命令 preExistingEvidence/missingEvidence 为空、无 timedOut；16/16 场景 PASS；resultVersion lingxi.xtask.verify-stage.v1；result sha256 0a1fbbe88f7a3fb16b6c10157fe48e33cb870770605a041566e881fe8bf590fb；A16 GREEN：纯历史基线 201584f 封印族 exit 0 全绿、候选红全部按实际诊断分类登记；前置 fmt/clippy --locked -D warnings/workspace --locked 337 通过 0 失败/check-contracts/check-boundaries 全绿。首跑证据根 verify-r02-final/ 因 R3-O01 瞬态复现（RISK_REGISTER R02-STAGE-R4-O01）闭失败，字节保留）",
+        "note": "本行为修复代理自报的可核对状态，不等于阶段 PASS；正式 PASS 与封印归根总控另派的全新完整独立复验。R1-F06/R1-F07/R3-F02 在 R4 复验通过前不视为已完全关闭（经 R1..R4 多轮修复后仍待独立确认）。"
+      },
+      "stage_review_r5": {
+        "report": "/tmp/r02-stage-review-r5.md",
+        "report_sha256": "4d47a08dd5761f3443c13c357259664ce459afd8f1a62cbd34883bad2f139805",
+        "verdict": "FAIL",
+        "findings": "R5-F01（A16 逐块分类漏检/泛 guard 前缀）、R5-F02（不透明 run ID 误播种致重开发号 panic，实测 exit101）、R5-F03（A12 全局通配清理越界，源码确认）三项 MAJOR；R5-O01 证据时间/保留表述 MINOR。另附必要步骤 BLOCKED（当轮禁令+公共 /tmp 根）与历史全文审计未完成、R2 平台 BLOCKED 维持，分列不代位。"
+      },
+      "stage_repair_r5": {
+        "agent": "R02 阶段修复 R5 一次性修复代理（ZCode 全新会话）",
+        "report": "/tmp/r02-stage-repair-r5.md",
+        "evidence_root": "/tmp/r02-stage-repair-r5/evidence/",
+        "status": "READY_FOR_INDEPENDENT_STAGE_REREVIEW",
+        "note": "修复 F01/F02/F03 与受限工作流（去 checkout -f/clean -fd/commit、专属临时根、自有清单清理）；Rust 链全绿（workspace 342/0）；verify-stage R02 与 A16 直接运行结果见报告。不宣布阶段 PASS、不进入 R03；R1-F06/R1-F07/R3-F02/R4-F01/R4-F02 在 R5 复验通过前不视为已完全关闭。"
+      },
+      "stage_review_r6": {
+        "reviewer": "根总控另派的全新一次性 Codex 阶段级独立评审（R6，独立角色 /root/r02_stage_review_r6。R7-F03/HS-01 更正：曾误写 ZCode，报告 hash 与原件互证）",
+        "report": "/tmp/r02-stage-review-r6.md",
+        "report_sha256": "54741b5b29bc26b1e61c00264716f6d656769a0c8fcf44bc904c15f32e1f7678",
+        "verdict": "FAIL（另 BLOCKED）",
+        "findings": "R6-F01/R6-F02（MAJOR）、R6-B01（必要 BLOCKED）、R6-O01（MINOR）"
+      },
+      "stage_repair_r6": {
+        "repairer": "全新一次性 ZCode 修复代理（「R02 阶段修复 R6（ZCode）」）",
+        "report": "/tmp/r02-stage-repair-r6.md",
+        "evidence_root": "/tmp/r02-stage-repair-r6/evidence/",
+        "status": "SUPERSEDED_BY_REPAIR_R7（第 7 轮复验 FAIL：A12 修复保持；其余调用族与分类器家族身份未闭，修复 R7 接手）",
+        "note": "F01/F02 已修（待第 7 轮复验关闭）；B01 维持真实 BLOCKED（嵌套 git 禁动作，解除条件见 RISK R02-STAGE-R6-B01）；O01 更正已落。不是阶段 PASS，不进入 R03；无 commit/push。"
+      },
+      "stage_review_r7": {
+        "reviewer": "根总控另派的全新一次性 Codex 阶段级独立评审（R7，独立角色 /root/r02_stage_review_r7；不复用此前任何身份）",
+        "report": "/tmp/r02-stage-review-r7.md",
+        "report_sha256": "4186a7818894422f7dadb1e172558b9912d019fd31e4cf087dfff9134a529a7c",
+        "verdict": "FAIL（必要完整门禁另为 BLOCKED；不能 PASS，也不能进入 R03）",
+        "findings": "R7-F01（MAJOR：A16 家族子串匹配+混合未知未 fail-closed）；R7-F02（MAJOR：活动 PID 所有权修复仅 A12，A01/xtask 仍可信号回收复用数字）；R7-F03（MINOR：现行交接身份/导航/证据指针失实）；R7-B01（必要 BLOCKED：一次性 Git fixture 例外未获用户批准）",
+        "confirmed_green": "342 Rust 测试、独立 A01–A15、Node 四门禁、A12 真实两演练共存；436 项证据索引全 hash/bytes 匹配"
+      },
+      "stage_repair_r7": {
+        "repairer": "全新一次性 ZCode 修复代理（「R02 阶段修复 R7（ZCode）」；不复用此前任何身份；无 commit/push 授权）",
+        "brief": "/tmp/r02-stage-repair-r7-brief.txt",
+        "brief_sha256": "3f0be93d684ef57c7e135979544e84a6b573e0f1fd28a1447c25ac507e965085",
+        "report": "/tmp/r02-stage-repair-r7.md",
+        "evidence_root": "/tmp/r02-stage-repair-r7/evidence/",
+        "status": "READY_FOR_INDEPENDENT_STAGE_REREVIEW（第 8 轮；不是阶段 PASS，不进入 R03）",
+        "note": "F01 家族整行精确身份+逐行完整结构 fail-closed+parseable_run 证据完成性（24 夹具+真实 R01 日志重放全过）；F02 xtask 所有权重写（lstart 出生身份+root 僵尸钉住+信号前复证，纯单测+真树测试全绿）+A01/A04 退休纪律+9 脚本归属证明扫掠+A12 原样保留实测；F03 HS-01..05 全同类更正；B01 维持真实 BLOCKED。隔离复验 Rust 343/0、Node 四门禁、A01–A15 全 PASS、A16 未执行；无 commit/push。"
+      },
+      "stage_review_r8": {
+        "reviewer": "根总控另派的全新一次性 Codex 阶段级独立评审（R8，独立角色 /root/r02_stage_review_r8；不复用此前任何身份）",
+        "report": "/tmp/r02-stage-review-r8.md",
+        "report_sha256": "5bfe86f39fb773a363a1063725bf234c1bc4a1c56f786167c20a21793c4561ee",
+        "verdict": "FAIL（必要完整门禁另为 BLOCKED；不能 PASS，也不能进入 R03）",
+        "findings": "R8-F01（MAJOR：A16 剩余结构载荷宽泛——无空格单 token Error:EACCES 当路径、列表/warning/matcher/wrapper 前缀允许任意尾部混合 Error；exit0 且摘要计数失败或残缺 Test Files 仍 GREEN）；R8-F02（MAJOR：xtask 后代发现 pgrep 快照与 ps_lstart 独立读交错可登记外来对象出生串为自有、秒粒 lstart 字符串作凭据、ps 核对与 kill 非原子）；R8-F03（MINOR：主字段 status/round/blockers 滞 R6、R6 brief hash 登记笔误被误称 brief 字节漂移、固定 UTC 占位被当测量时间）；R8-B01（必要 BLOCKED：一次性 Git fixture 例外未获用户批准）",
+        "confirmed_green": "Rust workspace 42 组 343/0、独立 A01–A15、Node 四门禁、A12 真实两演练共存；460 项证据索引全 hash/bytes 匹配；R8 曾误报 TAB 覆盖后撤回（人工 harness 转义错误），原错误 harness 与更正均保留"
+      },
+      "stage_repair_r8": {
+        "repairer": "全新一次性 ZCode 修复代理（「R02 阶段修复 R8（ZCode）」；不复用此前任何总控/T执行/修复/验收身份；无 commit/push 授权）",
+        "brief": "/tmp/r02-stage-repair-r8-brief.txt",
+        "brief_sha256": "2460ae2abc5bc93a16345a219049db3c946cb36b343012a42b687938008b497e",
+        "report": "/tmp/r02-stage-repair-r8.md",
+        "evidence_root": "/tmp/r02-stage-repair-r8/",
+        "status": "READY_FOR_INDEPENDENT_STAGE_REREVIEW（第 9 轮待全新 Codex 独立复验；不是阶段 PASS，不进入 R03）",
+        "note": "F01 全结构类别绑定真实 producer（wrapper 仅首行仅三真实命令、warning 仅 git 完整句、matcher 两真实形态端点锚定、路径 token 禁冒号、列表/裸路径/diff 体须同块完整 lead 绑定）+parseable_run 完整摘要结构/分量求和/exit 与 FAIL 块计数一致性（独立 harness 55/55）；F02 重写为进程组锚定所有权（spawn process_group(0)、kill -SIG -pgid 组信号、僵尸 root 钉组号、单快照成员判定无跨快照凭据、leaver 如实报 survivor），纯快照交错测试+leaver 真实报告测试+两真树测试保持；F03 主字段/导航至 R8、R6 brief hash 笔误更正登记、新证据真实 UTC+monotonic；B01 维持真实 BLOCKED 未执行完整链。隔离复验 Rust 344/0（42 组）、Node 四门禁、A01–A15 场景与 A12 双真实演练共存；无 commit/push。"
+      },
+      "stage_review_r9": {
+        "reviewer": "根总控另派的全新一次性 Codex 阶段级独立评审（R9，独立角色 /root/r02_stage_review_r9；不复用任何旧身份）",
+        "report": "/tmp/r02-stage-review-r9.md",
+        "report_sha256": "643ae379e44eb8da449aa3614b1959b59219294a5dcfce4caa023272d7edea53",
+        "verdict": "FAIL（7 MAJOR + 2 MINOR 静态；全部必要动态另 BLOCKED；不能 PASS，也不能进入 R03）",
+        "findings": "R9-F01（MAJOR：A16 firstDiff 仅前缀/尾]校验，非 JSON 与混合 Error 仍被纯 uncommitted 吸收、合法含]路径误拒）；R9-F02（MAJOR：process_group(0) 仍同会话、外来进程可 setpgid 加入组而成员全被当自有；非Unix survivors_after=false 且忽略 kill 错误失真；A14 后台 probe 未记 PROBE_PID、服务 TERM 后无 wait/存活判定即清 SERVICE_PID；T05 trap 仅数值 PID 存在即 TERM）；R9-F03（MINOR：五份现行导航未登记八拒绝、根停令、观察降级与首 R8 报告缺原冻结）；R9-F04（MAJOR：实例记录清理 timeout 包 block_in_place 同步文件 IO 首轮询即跑完不可抢占，预算 0 仍可返回 Ok）；R9-F05（MAJOR：auth random_bytes 非 Unix 必然 pid+time xorshift、Unix 读取失败静默回退，供最高权限 loopback token/device secret/salt/ws ticket）；R9-F06（MAJOR：A04 只信 READY 自报 source/home，未独立比较 CLI/env/config 期望赢家，错误第四根可通过）；R9-F07（MINOR：env-token-negative cat>> 真实源码后才置 DIRTY=1，部分写失败跳过恢复且删唯一备份）；R9-F08（MAJOR：A13 只 walk EVIDENCE_DIR，真实 HOME_DIR/lingxi-service/logs 未纳扫描/留存，OSError continue 可假 clean）；R9-F09（MAJOR：A15 重启只 count/head/有序去重，不保存/核对原 run 与事件身份及内容，[1,4] 有序不连续可通过）",
+        "confirmed_green": "无——本轮为全范围静态审阅；必要动态（cargo 链、注册脚本、A16 完整 npm 嵌套链、verify-stage 13 命令/16 REQUIRED、分类 harness、A12 双演练）全部 BLOCKED；修复 R8 的 55/55、Rust 344/0、run2/pass3、A12 已降级为记录性历史观察，不作为独立通过",
+        "evidence_root": "/tmp/r02-stage-review-r9/（artifact-sha256.json 22 项索引 SHA-256 10531ff4598fe07bc51a85705f0db01f403cb5102cb4a1cbd726dec5b6bf6d18，根全 hash/byte 一致复核）"
+      },
+      "stage_repair_r9": {
+        "repairer": "全新一次性 ZCode 修复代理（「R02 阶段修复 R9（ZCode）」；不复用此前任何总控/T执行/修复/验收身份；自身会话 ID 未取得、不猜写；无 commit/push/PR/tag/release 授权）",
+        "brief": "/tmp/r02-stage-repair-r9-brief.txt",
+        "brief_sha256": "16cc0bff0478fd8b5988801a6a49668bdd2ef7721b38077afbab7c45e29a3372",
+        "report": "/tmp/r02-stage-repair-r9.md",
+        "evidence_root": "/tmp/r02-stage-repair-r9/",
+        "status": "READY_FOR_INDEPENDENT_STAGE_REREVIEW（第 10 轮待根总控另派全新 Codex 做允许范围静态复验；不是阶段 PASS，不进入 R03；F09 因自动安全拒绝 BLOCKED，全部动态验证 BLOCKED）",
+        "note": "F01：firstDiff 严格校验为 round2/round3 生产者 json.dumps(diff_paths[:3], ensure_ascii=False) 的真实 JSON 字符串数组语法（引号/转义集/\", \" 分隔/1..3 元素/非空非绝对路径/完整行端点；合法含 ]、逗号、空格、引号、反斜杠、非 ASCII 路径不再误拒；裸 token/混合/截断/[]/>3 元素/尾随文本 fail-closed），新增 9 项 E0s 夹具；parseable_run 改单向证据损失不变式（FAIL header 数 < Tests failed 才 CONTRADICTORY；无箭头 suite 错误 header 与多错误 header 为合法生产者结构，新增 2 项夹具；真实历史日志 6==6/4==4/1==1 取证保留）。F02：spawn 改 libc::setsid 会话边界（私有会话不可加入，组成员证为本轮后代；libc 0.2.17 为 Cargo.lock 既有成员边、零新包）+非Unix 分支 survivors_after 恒 true、kill_sent 只记真实结果 +A14 捕获 PROBE_PID 并 wait 退休、服务停止带存活失败判定与 KILL 升级 +T05 trap 增当前 ppid 归属检查 +A12 cleanup_groupA 特设对照补诚实边界注释（不外推真实清理路径）。F04：实例记录清理移至专用 OS 线程 + oneshot 在真超时下等待（deadline 并行流逝）、零剩余确定性记超时、超时后 detached worker 被确定性进程退出兜底并如实报可能残留；shutdown_coordinator 两条受影响断言改 bounded 观察 + 模块契约注释同步。F05：getrandom 0.2.17（既有 lock 成员边）系统安全随机源；random_bytes 失败显式 AuthSetupError::Entropy 且 bootstrap/设备凭证/WS 票据全部拒发（不再有 xorshift 回退）；请求 ID 失败显式 req-degraded- 前缀降级+warn 日志，绝不静默。F06：A04 增 expect_root——自报根与独立期望赢家经 canonic 物理规范化（含 macOS /private 别名）相等 + 期望根 instance.json 探针，四正例全部改用独立期望；test-mode 保留形态断言并注明设计上无独立赢家。F07：恢复义务在首次可能写入前登记，restore 改纯字节驱动（未修改不写、修改则回写并校验、失败保留备份并显式 exit 1，DIRTY 标志删除）。F08：真实轮转日志在扫描前完整留存入 EVIDENCE_DIR/service-logs（复制失败即 fail）、留存为 0 即 fail、任何不可读目标使整扫描 FAIL（不再 continue）、CORRELATION 改读留存副本（原 evidence/logs 为死 glob）、inventory 对留存日志做内容 sha256。F09：台账式逐项核对方案（保存本轮 runId/输入/完整事件项并重启后精确连续 1..head 逐项相等+精确 runCount）的写入被 Mimosa 自动安全审批以高危路径穿越拦截，未落盘；按停令停止该动作及等效替代，冻结记录 /tmp/r02-stage-repair-r9/evidence/hook-rejections/r9-f09-ledger-edit.json（UTC 2026-09-27T23:12:36Z）；仅早前两项非相关小编辑（readback 文档描述、run2 捕获断言）已落盘且与旧台账格式自洽。全部修改仅经正式 Write/Edit，0 动态执行（无 cargo/npm/脚本/harness/mock/探针/复制候选），不宣称已实测；HEAD/审计坐标/R01 基线不变，无 commit/push。"
+      },
+      "stage_review_r10": {
+        "reviewer": "根总控另派的全新一次性 Codex 阶段级独立静态评审（R10，独立角色 /root/r02_stage_review_r10；不复用任何旧身份）",
+        "report": "/tmp/r02-stage-review-r10.md",
+        "report_sha256": "5123aec0bda213d7357b5d12867e9bea4fad130f30df08a359f3ce7b0851d9d9",
+        "verdict": "FAIL（R10-F01/F02 MAJOR + R10-F03/F04 MINOR，全部静态推导；已知 R9-F09 仍未修；全部必要动态与 B01 另 BLOCKED；不能 PASS，也不能进入 R03）",
+        "findings": "R10-F01（MAJOR：A16 parseable_run 仅 header<Tests failed 一条下界，suite 收集错误 Test Files 1 failed/Tests 0 failed 且详情丢失时零 header 仍 PARSABLE，failed_files 空、覆盖循环空转、仍打 GREEN）；R10-F02（MAJOR：A13 固定 EVIDENCE_DIR 仅 mkdir-p、service-logs 上 cp -R 合并、LOG_COUNT 可由前轮旧 .log 满足，本轮 attach 失败降 stderr 源空仍报 clean）；R10-F03（MINOR：xtask grace 到期 kill_sent 预写 true 丢弃 signal_group 真实结果；A14 pid_owned_by_this_shell ps 失败返回假被当已停止、随后无期限 wait）；R10-F04（MINOR：HANDOFF allowed_next_scope.next_stage 无条件 R03 与主闸冲突）；R9-F09（已知未修 MAJOR：A15 不核身份/载荷/精确连续，[1,4] 可过）",
+        "confirmed_green": "无——本轮为独立静态审阅；必要动态全部 BLOCKED；R9-F01/F02/F08 的 R9 修复静态可见但残留缺口（即 R10-F01/F02/F03）未全闭",
+        "evidence_root": "/tmp/r02-stage-review-r10/（artifact-sha256.json SHA-256 90f30738bcb7fcd54a3606a01d66e9f15037b9c2e58e19df674e73c2025ef3d7；binding.md 终绑定；history-audit.md 历史语义附录 b4dd216c1695fb4fdaa480ffa9619f1b91fb910eec62fcfde547d216f8c693e6）"
+      },
+      "stage_repair_r10": {
+        "repairer": "全新一次性 ZCode 修复代理（「R02 阶段修复 R10（ZCode）」；不复用此前任何总控/T/执行/修复/验收身份；自身会话 ID 未取得、不猜写；无 commit/push/PR/tag/release 授权）",
+        "brief": "/tmp/r02-stage-repair-r10-brief.txt",
+        "brief_sha256": "89fc5b576facc84c816ed7b88583fbf997cf74c92caa08a1756861e24d40425d",
+        "report": "/tmp/r02-stage-repair-r10.md",
+        "evidence_root": "/tmp/r02-stage-repair-r10/",
+        "status": "READY_FOR_INDEPENDENT_STAGE_REREVIEW（第 11 轮待根总控另派全新代理做允许范围静态复验；不是阶段 PASS，不进入 R03；F09 维持 BLOCKED，全部动态验证 BLOCKED）",
+        "note": "F01：parseable_run 增文件级证据下界（fails < files_failed → CONTRADICTORY，封死零 header 的 suite 摘要形态）与摘要一致性下界（Tests failed>0 而 Test Files failed==0 → CONTRADICTORY），counts 旁路记录 fails/distinct_files/files_failed/tests_failed/verdict；E5 两端交叉核验 distinct FAIL-header 文件数 ≥ summary files_failed + shell/awk 归一化漂移断言；+3 负控夹具与 counts 旁路自检，R9 firstDiff 结构修正与既有夹具全部保留。F02：A13 证据根一次性化（非空根拒用、不删任何内容）+留存源目录驱动（本轮 RUN HOME 计数、目标不预存、cp 后集合相等+逐文件 sha256 绑定、不可读源/副本 fail-closed）+retention-manifest.txt 记录 UTC/pid/源目录运行身份。F03：xtask kill_sent 改真实投递结果（grace_expired 控制流与报告字段分离）+CleanupReport 增 survivors_observed/survivors_unobserved 分列（JSON 同步，聚合语义不变）；A14 四态 probe_state（exited/owned/foreign/unobservable）替换布尔归属，停止流程有界 TERM→必要 KILL→有界回收、unobservable 响亮残留不信号不无界 wait；注册族 11 个 r02 脚本静态核验其余 10 个仅 trap 侧布尔归属（fail-closed 方向）。F04：五文档 R10 登记 + allowed_next_scope 现行化（NONE_UNTIL_STAGE_PASS；R03 仅在完整独立阶段 PASS+全部必要合法动态+正式 seal 后允许；历史依赖顺序文本保留但标注非现行放行）。F09：维持 BLOCKED 未修未重试。全部修改仅正式 Write/Edit，0 动态执行（无 cargo/npm/脚本/harness/mock/探针/复制候选/函数提取实跑/语法解析工具），静态修正不称已实测；本轮无新增审批拒绝（仅一条 Mimosa 非阻断建议涉既存 rm -rf 环境变量目录行，按原文登记于修复报告与证据）；HEAD/审计坐标/R01 基线不变，无 commit/push。"
+      },
+      "stage_review_r11": {
+        "reviewer": "根总控另派的全新一次性 Codex 阶段级独立静态评审（R11，独立角色；不复用任何旧身份）",
+        "report": "/tmp/r02-stage-review-r11.md",
+        "report_sha256": "f1545250dbbf87741f46ba530c7384579a48622948f1f68132bbca5cbdf28a25",
+        "verdict": "FAIL（R11-F01/F02/F03/F04；已知 R9-F09 仍未修；全部必要动态与 B01 另 BLOCKED；不能 PASS，也不能进入 R03）",
+        "note": "本条目由修复 R12 轮按已核 SHA 补记（R11 修复轮未改仓库文档）。"
+      },
+      "stage_repair_r11": {
+        "repairer": "全新一次性 ZCode 修复代理（「R02 阶段修复 R11（ZCode）」；不复用此前任何总控/T/执行/修复/验收身份；无 commit/push/PR/tag/release 授权）",
+        "brief": "/tmp/r02-stage-repair-r11-brief.txt",
+        "brief_sha256": "f0513422cbe5cb5af2a271f86498f4d20707da0ab368f87770c0ee47f1925b41",
+        "report": "/tmp/r02-stage-repair-r11.md",
+        "report_sha256": "82847b1d5b46d3685dcd06d6323216b373a29aa43e4f2400aae33dfb8d0fd0fc",
+        "evidence_root": "/tmp/r02-stage-repair-r11/evidence/",
+        "status": "SUPERSEDED_BY_REVIEW_R12（第 12 轮评审 FAIL：R12-F01 同族未闭 + R12-F02 覆盖缺口；F01–F04 静态修正被 R12 评审确认可见但运行未验）",
+        "note": "仅改 3 个脚本路径（A13/A14/A16），其余 53/56 与 R10 终态逐字节一致（含 R9-F09 文件）；0 动态执行；未改仓库文档（其记录由修复 R12 轮补记）。"
+      },
+      "stage_review_r12": {
+        "reviewer": "根总控另派的全新一次性 Codex 阶段级独立静态与证据复验（R12，主审 /root/r02_stage_review_r12，另两名只读材料助手不构成额外验收者；不复用任何旧身份）",
+        "report": "/tmp/r02-stage-review-r12.md",
+        "report_sha256": "6a57ebf75fe9675698284daede43a6e1c4d01f17a0e9bbaebc47288c825476e6",
+        "verdict": "FAIL（现存静态缺陷与必要动作 BLOCKED 并存；R12-F01 MINOR + R12-F02 MAJOR；R9-F09 MAJOR 仍未修且修正动作审批 BLOCKED；R11-F01/F02/F03/F04 静态修正可见但运行未验；不能 PASS，也不能进入 R03）",
+        "note": "R12-F01：其余 10 个注册服务脚本 EXIT trap 归属真值分支 TERM/KILL 后无期限 wait、A11/A13 尾部无参 wait、xtask verify.rs child.wait() 同类极端残留风险。R12-F02：R00 34 对 D20 feature+REQUIRED_SUPPLEMENTAL 场景共同标 R02/R07（原状 SPECIFIED_NOT_EXECUTED），现行 map/LEDGER 仅登记 16 基础 A 而 R02_REPORT §9/§11 断言无未覆盖/无 BLOCKED——覆盖归属与报告断言缺口。56 路径候选开工零漂移核对；主仓未改；无新审批拒绝。"
+      },
+      "stage_repair_r12": {
+        "repairer": "全新一次性 ZCode 修复代理（「R02 阶段修复 R12（ZCode）」；不复用此前任何总控/T/执行/修复/验收身份；自身会话 ID 未取得、不猜写；无 commit/push/PR/tag/release 授权）",
+        "brief": "/tmp/r02-stage-repair-r12-brief.txt",
+        "brief_sha256": "c5fde934256ec7d7454f6520e62efd0021318b601beb53eb1332b7e646c4a2ab",
+        "report": "/tmp/r02-stage-repair-r12.md",
+        "evidence_root": "/tmp/r02-stage-repair-r12/evidence/",
+        "status": "SUPERSEDED_BY_REPAIR_R13（第 13 轮评审 R13-F01 判定其 F02 拆账未被机器门禁消费，由修复 R13 接手；F01 trap 有界化继续有效未回退）",
+        "note": "F01：10 脚本 EXIT trap 有界化（四态 child_state 替换布尔归属；TERM 合同 7 脚本 TERM→≤5s→仅 owned 直达 KILL→≤5s 复查；KILL 合同 3 脚本保持 KILL-9 首信号→≤5s 复查；到期 exited/foreign 才回收 wait，owned/unobservable 响亮报告残留；A11/A13 尾部无参 wait 删除）+ xtask verify.rs 两处 child.wait() 改 ≤2s try_wait 有界回收（reaped=false 即残留上报）；正常路径停止断言与既有测试断言未触碰。F02：R00 34 对补充叶场景逐项拆账入 R02_ACCEPTANCE_LEDGER supplemental_leaf_coverage（4 route_basis_present_static/7 protocol_basis/21 auth_primitive_only/2 client_only；维持 SPECIFIED_NOT_EXECUTED、不写 PASS、不自称执行）+ IMPLEMENTATION_MAP 与 xtask 阶段图非门禁注记（机器门禁保持 13 命令/16 基础 A）+ R02_REPORT §9/§11 更正与 §26 补记 + HANDOFF/ORCH 现行化。R9-F09 保持原字节未触碰（probe.py 与 R9 候选同字节；被拒 Edit 未重试、无等效替代）。0 动态执行（含 bash -n 与自有编辑 JSON 解析验证同族停用）；全部修改仅正式 Write/Edit；无新增审批拒绝（多条 Mimosa 非阻断建议为既存行/误报形态，原文冻结于本轮证据）；HEAD 9b98c679/审计坐标/R01 基线不变，无 commit/push。"
+      },
+      "stage_review_r13": {
+        "reviewer": "根总控另派的全新一次性 Codex 阶段级独立静态/证据复验（第 13 轮，主审 /root/r02_stage_review_r13，只读材料助手仅整理合同/历史、不构成额外验收者；不复用任何旧身份）",
+        "report": "/tmp/r02-stage-review-r13.md",
+        "report_sha256": "96bc4c6bf31b56e7a69d6a8748a78115b9e8858422f954e85017d9bd88367355",
+        "verdict": "FAIL（R13-F01 MAJOR：R12-F02 同根因漏闭——静态清单不能替代必需证据的 Gate；R9-F09 MAJOR 仍未修且修正动作审批 BLOCKED；R12-F01 静态修正可见但运行未验；全部必要动态与 B01 BLOCKED；不能 PASS，也不能进入 R03）",
+        "note": "R13-F01：R12 把 34 对叶场景放入非门禁注记——stage map supplementalCoverageNote 自称不被 verify-stage 消费、stage_map.rs 只提取 commands/scenarios、verify.rs 不读 R00 map/LEDGER，而 R00-T07 账本 §222 预定 R02 xtask 消费该账；16/16 基础场景绿可与 34 个 REQUIRED_SUPPLEMENTAL 的 R02 份额全为 SPECIFIED_NOT_EXECUTED 同时出现。2 个纯客户端项写无 R02 侧证据义务而与原件 R02-T03 标注缺正式处置。58 路径候选与派单/终态 manifest 双向核对；历史24份报告冻结索引核对；主仓未改、无新审批拒绝。"
+      },
+      "stage_repair_r13": {
+        "repairer": "全新一次性 ZCode 修复代理（「R02 阶段修复 R13（ZCode）」；不复用此前任何总控/T/执行/修复/验收身份；自身会话 ID 未取得、不猜写；无 commit/push/PR/tag/release 授权）",
+        "brief": "/tmp/r02-stage-repair-r13-brief.txt",
+        "brief_sha256": "eb0959c5d6978df2df85fdbe0e747a06ea88271c38514c7fac11fb151faf9d2c",
+        "report": "/tmp/r02-stage-repair-r13.md",
+        "evidence_root": "/tmp/r02-stage-repair-r13/",
+        "status": "SUPERSEDED_BY_REPAIR_R14（第 14 轮评审 R14-F01 判定其门禁仅核 ID/requirement/命令退出/文件存在、未核 R00 全字段责任映射与逐叶原断言，由修复 R14 接手；R13 修复面继续有效未回退）",
+        "note": "R13-F01 单组修复：xtask 阶段图 R02.json 新增机器消费 supplementalLeafScenarios 34 项（4 route/7 protocol/21 auth_primitive/2 client_only_stage_boundary_conflict；32 项绑定既有 13 命令为证据、LA-200D4E5D52C9 另钉 sessions-list-matrix.json fail-closed、2 项冲突叶不绑证据）；stage_map.rs 硬校验（空节=过滤必需项/未知 basisKind/冲突叶绑命令/非冲突叶无命令/未知引用/重复 id 均硬错误）；verify.rs 在任何命令前与 docs/rust-tauri/R00/ACCEPTANCE_MAP.json 按 id 集合全等核对（缺失/多余/requirement 漂移/账本不可读硬失败），执行顺序并入叶证据命令，34 项逐项 roll-up（FAIL/BLOCKED/PASS）汇入 overall（结果 JSON 增 supplementalLeafScenarios/supplementalLeafCoverage 段）；2 项冲突叶（LA-B8A1AD32A8E1/LA-32FFEC05BAA7）按原合同登记根总控三选一处置路径，处置前固定 BLOCKED——不单方改 REQUIRED 为可选、不偷偷豁免、不改 R00 原件；LA-5816DA563ED8 附 403/401 断言保真备注；LEDGER/IMPLEMENTATION_MAP/R02_REPORT §27/HANDOFF/ORCH/RISK_REGISTER 表述与机器闸一致。13 命令/16 基础 A/R07 后续责任不变。R9-F09 未触碰；R12-F01 未回退；R11-F03 边界保留。0 动态执行；新增 1 次 Mimosa 拒绝（Bash heredoc 写 /tmp 生成器脚本，按钩子明示 Write 通道补提，原拒冻结于 evidence/hook-rejections/）；JSON/Rust 结构正确性未经编译/解析验证，留待第 14 轮独立复核；HEAD 9b98c679/审计坐标/R01 基线不变，无 commit/push。"
+      },
+      "stage_review_r14": {
+        "reviewer": "根总控另派的全新一次性 Codex 阶段级独立静态/证据复验（第 14 轮，主审 /root/r02_stage_review_r14，只读材料助手整理 gate-findings/contract-matrix/history-findings；不复用任何旧身份；自身会话 UUID 不可核、不猜写）",
+        "report": "/tmp/r02-stage-review-r14.md",
+        "report_sha256": "7c685f8106f587262d4dae4afaaced04a32dc36094853f202439a265afbd89f4",
+        "verdict": "FAIL（R14-F01 MAJOR：R13-F01 同根因漏闭——机器只核 ID/requirement、命令退出与文件存在，无法证明每个补充叶自己的正反断言及正确责任绑定，票据叶原断言无主体 403 而绑定脚本以 401 为通过的具体假绿路径；静态推导未发生候选假 PASS 或外部事故；R9-F09 MAJOR 仍未修且修正 Edit 受旧平台审批拒绝 BLOCKED；全部必要动态、B01 与两冲突叶治理决定 BLOCKED；不能 PASS，也不能进入 R03）",
+        "note": "R14-F01 三子缺口：stage_map.rs 对 featureId/r02Share/r07Share/evidenceRequired 仅检非空、verify.rs 从 R00 只读 ID/requirement（feature/kind/task_ids/双阶段责任/状态/到期未核，错绑可进 roll-up）；verify.rs:213-255 每叶 PASS 判定仅为命令结果全 PASS + evidencePaths 存在（证据义务与原断言文字不消费，31 非冲突叶仅靠通用 a05_a06）；LA-200D4E5D52C9 sessions-list 无注册生产者且 exists() 即翻 PASS（run_command 事前旧证据拒绝只覆盖命令自身 evidencePaths）。58 路径逐路径实算与派单一致（R13 manifest 两项 SHA 转录错误不沿用）；远端任务分支与本地 HEAD 同；无新增审批拒绝。"
+      },
+      "stage_repair_r14": {
+        "repairer": "全新一次性 ZCode 修复代理（「R02 阶段修复 R14（ZCode）」；不复用此前任何总控/T/执行/修复/验收身份；自身会话 ID 未取得、不猜写；无 commit/push/PR/tag/release 授权）",
+        "brief": "/tmp/r02-stage-repair-r14-brief.txt",
+        "brief_sha256": "b9f2cac567f81a3829ed279576a16794da7ee5f4d77941cd4a4b1120695694c1",
+        "report": "/tmp/r02-stage-repair-r14.md",
+        "evidence_root": "/tmp/r02-stage-repair-r14/",
+        "status": "READY_FOR_INDEPENDENT_STAGE_REREVIEW（第 15 轮待根总控另派全新代理做允许范围静态复验；不是阶段 PASS，不进入 R03；R9-F09 维持产品 FAIL+修正动作审批 BLOCKED；2 项阶段边界冲突叶治理决定前维持 BLOCKED；全部必要动态与 B01 维持 BLOCKED）",
+        "note": "R14-F01 单组全族修复：(1) 34 叶 r00* 镜像（kind/taskIds/executionStageIds/ledgerStatus/resultIds/testIds/then/assertions/due）与 R00 双账本（ACCEPTANCE_MAP+FEATURE_STAGE_ACCEPTANCE）逐叶逐字段全等核对，任一漂移命令前硬失败并点名字段；(2) 每非冲突叶必携 assertionContract（producer∈refs+evidencePath+cases 期望），stage_map.rs 硬校验（缺契约/冲突叶带契约/生产者不在 refs/空案例/非整数期望/空责任镜像硬错误），verify-stage 解析生产者 leaf-case-results.v1 案例文件核验每案例 ok 且 actual==图钉期望且文件 expect==图钉期望（防生产者软化），exit 0 不再是叶 PASS 充分条件；(3) 票据叶 403 三重闭环（服务 auth_guard 无主体 POST /lingxi/v1/ws-ticket→403 对齐 incumbent ws-auth.ts/request-principal.ts，tests/auth_matrix.rs 同步，脚本断言 403+新增 200 正路径，门禁机器消费 actual==403）；(4) sessions-list 叶注册生产者（脚本 sessions-list 段：owner 200 含自身会话/foreign 200 排除 owner 会话且空列表形态/无凭据 401，产 sessions-list-matrix.json 内容契约）；(5) 新鲜度（expect_code/host 块逐案例 ndjson、组装 leaf-cases.json 合并 ws-matrix、a01 产 a01-leaf-cases.json、两命令 evidencePaths 增补、开跑前叶证据事前不存在检查）；(6) 21 原语叶按冻结矩阵四维度绑矩阵核心案例集、11 特别叶逐叶绑具体案例；(7) 2 冲突叶维持 BLOCKED 与三选一处置。R9-F09 原字节未触碰（SHA 17c4ace1… 保持）；R12 trap 有界化未回退。0 动态执行；Mimosa 对 a01 脚本组装器 1 条非阻断提示（脚本既有 bash+python heredoc 形态、参数经 argv、非用户输入，不扩范围处理，登记于修复报告）；Rust/JSON 结构正确性未经编译/解析验证（停令），留待第 15 轮独立复核；HEAD 9b98c679/审计坐标/R01 基线不变，无 commit/push。"
+      },
+      "stage_review_r15": {
+        "report": "/tmp/r02-stage-review-r15.md",
+        "report_sha256": "c73d657ff5d5f589874bb916fe491d43e944b98a3bcbdc14041fd57b589a78a5",
+        "verdict": "FAIL（R15-F01：21 项通用认证案例不能证明各叶原行为；R15-F02：交接说明仍指向旧轮次。必要动态、既有审批与 Git fixture 限制另 BLOCKED）",
+        "note": "用户要求根代理停止重复转派并直接修复。旧修复 R15 派单已中断，不重建或续发。"
+      },
+      "root_direct_fix_after_r15": {
+        "status": "STATIC_CHANGE_ONLY_UNVERIFIED",
+        "summary": "verify-stage 对 21 项 auth_primitive_only 通用案例即使全绿也固定 BLOCKED；其余 11 项非冲突叶同时归属 R07，R02 案例全绿也至多支持局部份额，不冒充完整原叶 PASS。2 项客户端边界冲突本已 BLOCKED，34 项原叶保持 REQUIRED，overall 不得 PASS；增加回归检查源文件并同步交接。未执行运行门禁，不宣称阶段 PASS。",
+        "blocked": "R9-F09 被拒编辑、2 项客户端阶段边界冲突、必要动态门禁与一次性 Git fixture 授权仍未解除；不得进入 R03。"
+      }
     },
     "R03": {
       "title": "运行状态机、并发、取消与恢复",

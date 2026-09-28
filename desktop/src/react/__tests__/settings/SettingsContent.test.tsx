@@ -87,6 +87,7 @@ function resetState() {
     activeTab: 'agent',
     ready: true,
     set: vi.fn((patch: Record<string, unknown>) => Object.assign(mockState, patch)),
+    showToast: vi.fn(),
   });
 }
 
@@ -192,11 +193,11 @@ describe('SettingsContent title placement', () => {
   });
 
   it('keeps activeServerConnection in sync when the settings window hears server restart', async () => {
-    let restartHandler: ((data: { port: number }) => void) | null = null;
+    let restartHandler: ((data: { port: number; token?: string }) => void) | null = null;
     window.platform = {
       getServerPort: vi.fn(async () => 62950),
       getServerToken: vi.fn(async () => 'token'),
-      onServerRestarted: vi.fn((handler: (data: { port: number }) => void) => {
+      onServerRestarted: vi.fn((handler: (data: { port: number; token?: string }) => void) => {
         restartHandler = handler;
         return vi.fn();
       }),
@@ -215,14 +216,46 @@ describe('SettingsContent title placement', () => {
     const handler = restartHandler;
     expect(handler).toBeTypeOf('function');
     if (!handler) throw new Error('server restart handler was not registered');
-    (handler as unknown as (data: { port: number }) => void)({ port: 63000 });
+    (handler as unknown as (data: { port: number; token?: string }) => void)({ port: 63000, token: 'new-token' });
 
     expect(mockState.serverPort).toBe(63000);
     expect(mockState.activeServerConnection).toEqual(expect.objectContaining({
       baseUrl: 'http://127.0.0.1:63000',
       wsUrl: 'ws://127.0.0.1:63000',
-      token: 'token',
+      token: 'new-token',
     }));
+    (handler as unknown as (data: { port: number; token?: string }) => void)({ port: 63000, token: 'new-token' });
+    expect(mockState.activeServerConnection).toEqual(expect.objectContaining({
+      baseUrl: 'http://127.0.0.1:63000', token: 'new-token',
+    }));
+    const rustLocal = { ...(mockState.activeServerConnection as Record<string, unknown>), serverNodeKind: 'lingxi-service' };
+    mockState.activeServerConnection = rustLocal;
+    (mockState.serverConnections as Record<string, unknown>).local = rustLocal;
+
+    (handler as unknown as (data: { port: number; token?: string }) => void)({ port: 63001 });
+    expect(mockState.serverPort).toBeNull();
+    expect(mockState.serverToken).toBeNull();
+    expect(mockState.activeServerConnection).toBeNull();
+    expect(mockState.showToast).toHaveBeenCalledWith('status.serverRestartInvalid', 'error');
+
+    (handler as unknown as (data: { port: number; token?: string; serverNodeKind?: string; serverNodeTransport?: string }) => void)({
+      port: 63002, token: 'third-token', serverNodeKind: 'lingxi-service', serverNodeTransport: 'http',
+    });
+    expect(mockState.activeServerConnection).toEqual(expect.objectContaining({
+      baseUrl: 'http://127.0.0.1:63002', token: 'third-token', serverNodeKind: 'lingxi-service',
+    }));
+
+    (handler as unknown as (data: { port: number; token?: string }) => void)({ port: 0, token: 'bad-port-token' });
+    expect(mockState.activeServerConnection).toBeNull();
+
+    (handler as unknown as (data: { port: number; token?: string; serverNodeKind?: string; serverNodeTransport?: string }) => void)({
+      port: 63003, token: 'fourth-token', serverNodeKind: 'lingxi-service', serverNodeTransport: 'http',
+    });
+    expect(mockState.activeServerConnection).toEqual(expect.objectContaining({
+      baseUrl: 'http://127.0.0.1:63003', token: 'fourth-token',
+    }));
+    (handler as unknown as (data: { port: number; token?: string }) => void)({ port: 63004, token: 'fourth-token' });
+    expect(mockState.activeServerConnection).toBeNull();
   });
 
   it('keeps the persisted remote Studio active instead of forcing settings back to local loopback', async () => {

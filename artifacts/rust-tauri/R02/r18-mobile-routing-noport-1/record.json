@@ -1,0 +1,54 @@
+{
+  "candidateBefore": {
+    "desktop/src/react/mobile/mobile-init.ts": "5c27748b43b8782d61b6737c763e34f498b2ab32ec729a35d34c6eb07a6245bd",
+    "desktop/src/react/mobile/MobileApp.tsx": "8cb101a13c8c05e632a86b412f3de2a53dce6209f3b38b93a0a428c52ee3a436",
+    "desktop/src/react/__tests__/mobile/MobileApp.test.tsx": "f04d2bfca32ad9ef4b50f3112a43cb043f1b0f2a891d889d03c84fb163bfca88"
+  },
+  "checks": [
+    {
+      "command": [
+        "./node_modules/.bin/vitest",
+        "run",
+        "desktop/src/react/__tests__/mobile/MobileApp.test.tsx",
+        "--maxWorkers=1"
+      ],
+      "startUtc": "2026-09-28T11:45:19.878223+00:00",
+      "endUtc": "2026-09-28T11:45:22.707445+00:00",
+      "exit": 0,
+      "log": "check-1.log"
+    },
+    {
+      "command": [
+        "./node_modules/.bin/tsc",
+        "-p",
+        "tsconfig.test.json",
+        "--noEmit"
+      ],
+      "startUtc": "2026-09-28T11:45:22.707798+00:00",
+      "endUtc": "2026-09-28T11:45:34.130500+00:00",
+      "exit": 0,
+      "log": "check-2.log"
+    },
+    {
+      "command": [
+        "git",
+        "diff",
+        "--check",
+        "--",
+        "desktop/src/react/mobile/mobile-init.ts",
+        "desktop/src/react/mobile/MobileApp.tsx",
+        "desktop/src/react/__tests__/mobile/MobileApp.test.tsx"
+      ],
+      "startUtc": "2026-09-28T11:45:34.130867+00:00",
+      "endUtc": "2026-09-28T11:45:34.141725+00:00",
+      "exit": 0,
+      "log": "check-3.log"
+    }
+  ],
+  "candidateAfter": {
+    "desktop/src/react/mobile/mobile-init.ts": "5c27748b43b8782d61b6737c763e34f498b2ab32ec729a35d34c6eb07a6245bd",
+    "desktop/src/react/mobile/MobileApp.tsx": "8cb101a13c8c05e632a86b412f3de2a53dce6209f3b38b93a0a428c52ee3a436",
+    "desktop/src/react/__tests__/mobile/MobileApp.test.tsx": "f04d2bfca32ad9ef4b50f3112a43cb043f1b0f2a891d889d03c84fb163bfca88"
+  },
+  "sourceStable": true
+}

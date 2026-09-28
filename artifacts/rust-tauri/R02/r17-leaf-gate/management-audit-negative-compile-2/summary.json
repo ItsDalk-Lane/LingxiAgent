@@ -1,0 +1,28 @@
+{
+  "command": [
+    "cargo",
+    "check",
+    "--offline",
+    "-p",
+    "lingxi-service",
+    "--test",
+    "r00_management_leaves"
+  ],
+  "startUtc": "2026-09-28T09:50:58.834359+00:00",
+  "endUtc": "2026-09-28T09:50:59.814778+00:00",
+  "exitCode": 0,
+  "sourceStable": true,
+  "beforeSha256": {
+    "rust/crates/lingxi-service/tests/r00_management_leaves.rs": "16967cfb0752173907a9dd1bb9365535b0e8fa702aebac8490cef10a92c50198",
+    "rust/crates/lingxi-service/src/auth.rs": "8a281cbc6646b55ecde0ddd81c99904d1d584c2a74c29623e00f28f5072e3970",
+    "rust/crates/lingxi-service/src/management.rs": "02631fd03e6768c10effdee3a515f961d6a3d64b0be9d4fb7ac8a03fd3e1d75e",
+    "rust/crates/lingxi-service/src/security_audit.rs": "9b748bd1211a7ed6c6b1fae3782f8a4cca8efc1cf576a044f496a68b5800297e"
+  },
+  "afterSha256": {
+    "rust/crates/lingxi-service/tests/r00_management_leaves.rs": "16967cfb0752173907a9dd1bb9365535b0e8fa702aebac8490cef10a92c50198",
+    "rust/crates/lingxi-service/src/auth.rs": "8a281cbc6646b55ecde0ddd81c99904d1d584c2a74c29623e00f28f5072e3970",
+    "rust/crates/lingxi-service/src/management.rs": "02631fd03e6768c10effdee3a515f961d6a3d64b0be9d4fb7ac8a03fd3e1d75e",
+    "rust/crates/lingxi-service/src/security_audit.rs": "9b748bd1211a7ed6c6b1fae3782f8a4cca8efc1cf576a044f496a68b5800297e"
+  },
+  "kind": "compile-only; no test execution or TCP"
+}

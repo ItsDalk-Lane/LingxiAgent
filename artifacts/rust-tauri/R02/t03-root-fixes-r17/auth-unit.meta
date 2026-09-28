@@ -1,0 +1,4 @@
+start_utc=2026-09-28T06:13:12Z
+command=CARGO_NET_OFFLINE=true CARGO_TARGET_DIR=/tmp/r02-t03-root-fixes-target cargo test --manifest-path rust/Cargo.toml -p lingxi-service --lib --locked auth::tests
+end_utc=2026-09-28T06:13:15Z
+exit_status=101

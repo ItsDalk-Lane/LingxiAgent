@@ -1,0 +1,106 @@
+[
+  {
+    "argv": [
+      "bash",
+      "-n",
+      "scripts/rust-tauri/r02_t01_service_smoke.sh"
+    ],
+    "startedUtc": "2026-09-28T10:43:04.213166+00:00",
+    "endedUtc": "2026-09-28T10:43:04.217435+00:00",
+    "exitCode": 0,
+    "stdout": "",
+    "stderr": ""
+  },
+  {
+    "argv": [
+      "git",
+      "diff",
+      "--check",
+      "--",
+      "scripts/rust-tauri/r02_t01_service_smoke.sh",
+      "scripts/rust-tauri/r02_owned_process_group.py",
+      "scripts/rust-tauri/r02_client_leaf_matrix.py",
+      "scripts/rust-tauri/r02_management_leaf_matrix.py",
+      "scripts/rust-tauri/r02_static_web_leaf_matrix.py",
+      "scripts/rust-tauri/r02_cli_rust_matrix.py",
+      "rust/crates/xtask/src/stage_maps/R02.json"
+    ],
+    "startedUtc": "2026-09-28T10:43:04.217443+00:00",
+    "endedUtc": "2026-09-28T10:43:04.228923+00:00",
+    "exitCode": 0,
+    "stdout": "",
+    "stderr": ""
+  },
+  {
+    "argv": [
+      "python3",
+      "ast.parse",
+      "scripts/rust-tauri/r02_owned_process_group.py"
+    ],
+    "startedUtc": "2026-09-28T10:43:04.228939+00:00",
+    "endedUtc": "2026-09-28T10:43:04.229212+00:00",
+    "exitCode": 0,
+    "stdout": "",
+    "stderr": ""
+  },
+  {
+    "argv": [
+      "python3",
+      "ast.parse",
+      "scripts/rust-tauri/r02_client_leaf_matrix.py"
+    ],
+    "startedUtc": "2026-09-28T10:43:04.229215+00:00",
+    "endedUtc": "2026-09-28T10:43:04.230239+00:00",
+    "exitCode": 0,
+    "stdout": "",
+    "stderr": ""
+  },
+  {
+    "argv": [
+      "python3",
+      "ast.parse",
+      "scripts/rust-tauri/r02_management_leaf_matrix.py"
+    ],
+    "startedUtc": "2026-09-28T10:43:04.230242+00:00",
+    "endedUtc": "2026-09-28T10:43:04.231029+00:00",
+    "exitCode": 0,
+    "stdout": "",
+    "stderr": ""
+  },
+  {
+    "argv": [
+      "python3",
+      "ast.parse",
+      "scripts/rust-tauri/r02_static_web_leaf_matrix.py"
+    ],
+    "startedUtc": "2026-09-28T10:43:04.231031+00:00",
+    "endedUtc": "2026-09-28T10:43:04.231518+00:00",
+    "exitCode": 0,
+    "stdout": "",
+    "stderr": ""
+  },
+  {
+    "argv": [
+      "python3",
+      "ast.parse",
+      "scripts/rust-tauri/r02_cli_rust_matrix.py"
+    ],
+    "startedUtc": "2026-09-28T10:43:04.231519+00:00",
+    "endedUtc": "2026-09-28T10:43:04.233986+00:00",
+    "exitCode": 0,
+    "stdout": "",
+    "stderr": ""
+  },
+  {
+    "argv": [
+      "python3",
+      "json.loads",
+      "rust/crates/xtask/src/stage_maps/R02.json"
+    ],
+    "startedUtc": "2026-09-28T10:43:04.233988+00:00",
+    "endedUtc": "2026-09-28T10:43:04.234341+00:00",
+    "exitCode": 0,
+    "stdout": "",
+    "stderr": ""
+  }
+]

@@ -611,6 +611,15 @@
     "serverNotReady": "Server 未就緒",
     "loading": "載入中...",
     "reconnecting": "重新連線中",
+    "reconnected": "已重新連線",
+    "wsTicketFailed": "無法取得連線憑證",
+    "wsHandshakeFailed": "伺服器連線協定不相容",
+    "wsHandshakeTimedOut": "伺服器握手逾時",
+    "wsConnectionFailed": "無法連線到伺服器",
+    "wsConnectionClosed": "伺服器連線已中斷",
+    "serverRestartInvalid": "伺服器重新啟動資訊無效，請重試",
+    "rustCoreUnavailable": "Rust 服務已連線，但聊天功能尚未遷移，目前無法傳送訊息",
+    "serverRestarting": "伺服器正在重新啟動",
     "reconnect": "重新連線"
   },
   "input": {
@@ -1516,6 +1525,7 @@
     "saved": "儲存成功 ✿",
     "saveFailed": "儲存失敗",
     "refreshFailed": "重新整理失敗",
+    "rustCoreUnavailable": "Rust 服務的助手、模型與一般設定尚未遷移；目前僅可使用存取設定。",
     "fileChangedOnDisk": "檔案已被外部修改，已略過舊版本儲存",
     "noChanges": "沒有需要儲存的變更",
     "autoSaved": "已自動儲存 ✿",

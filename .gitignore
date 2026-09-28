@@ -39,6 +39,7 @@ dist/
 dist-server/
 dist-server-open/
 dist-server-artifact/
+dist-rust-service/
 bundled-bin/
 dist-renderer-artifact/
 dist-standalone/
@@ -111,6 +112,13 @@ logs/
 # 系统文件
 .DS_Store
 *.db
+
+# R02 真服务试跑的本机数据根含临时令牌、设备记录和 SQLite 辅助文件；
+# 保留原始取证文件在本机，不把凭证或用户态数据库加入提交。
+/artifacts/rust-tauri/R02/r17-leaf-gate/cli-rust-probe-1/home-*/
+/artifacts/rust-tauri/R02/r17-leaf-gate/cli-rust-probe-2/home-*/
+# A13 真实试跑返回的一次性 secret 原文只留本机；远端交付使用摘要与脱敏结果。
+/artifacts/rust-tauri/R02/audit-r17-g5/a13/redaction-scan/p1-issue-credential.body
 
 # Codex reviews
 reviews/

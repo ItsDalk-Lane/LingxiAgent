@@ -1,0 +1,5326 @@
+{
+  "schema": "r02-static-contract-freeze-v1",
+  "source_paths": [
+    "docs/rust-tauri/R00/ACCEPTANCE_MAP.json",
+    "docs/rust-tauri/R00/FEATURE_STAGE_ACCEPTANCE.json",
+    "rust/crates/xtask/src/stage_maps/R02.json"
+  ],
+  "leaves": [
+    {
+      "id": "R00-T02-LA-D3710D637C19",
+      "original_acceptance": {
+        "kind": "supplemental",
+        "stage_id": "R00",
+        "execution_stage_ids": [
+          "R02",
+          "R07"
+        ],
+        "task_ids": [
+          "R02-T03",
+          "R07-T09"
+        ],
+        "requirement": "REQUIRED_SUPPLEMENTAL",
+        "feature_id": "F-D20-CLI-CLI-CHAT-D3710D",
+        "then": "选择或创建会话后通过 WS 提交消息，终端流式显示回复和工具进度",
+        "formalization_task_id": "R00-T07",
+        "ledger_status": "SPECIFIED_NOT_EXECUTED",
+        "result_ids": [],
+        "feature_ids": [
+          "F-D20-CLI-CLI-CHAT-D3710D"
+        ],
+        "test_ids": []
+      },
+      "original_feature_stage": {
+        "id": "R00-T02-LA-D3710D637C19",
+        "feature_id": "F-D20-CLI-CLI-CHAT-D3710D",
+        "task_ids": [
+          "R02-T03",
+          "R07-T09"
+        ],
+        "given": "相应入口已启用，使用有权身份与隔离测试数据；另备拒绝或失败条件",
+        "when": "启动终端聊天",
+        "then": "选择或创建会话后通过 WS 提交消息，终端流式显示回复和工具进度",
+        "assertions": [
+          "选择或创建会话后通过 WS 提交消息，终端流式显示回复和工具进度",
+          "连接/身份失败返回非零；错会话帧不显示，Ctrl+C 只取消当前 stream"
+        ],
+        "existing_acceptance_relations": [
+          {
+            "acceptance_id": "R02-A05",
+            "relation": "GAP",
+            "covers_leaf_result": false,
+            "reason": "该旧场景没有直接操作并检查此入口的具体结果"
+          },
+          {
+            "acceptance_id": "R02-A06",
+            "relation": "GAP",
+            "covers_leaf_result": false,
+            "reason": "该旧场景没有直接操作并检查此入口的具体结果"
+          },
+          {
+            "acceptance_id": "R07-A17",
+            "relation": "INDIRECT",
+            "covers_leaf_result": false,
+            "reason": "该旧场景触及本入口的部分行为或边界，但未逐项验证成功、拒绝与最终副作用"
+          },
+          {
+            "acceptance_id": "R07-A18",
+            "relation": "GAP",
+            "covers_leaf_result": false,
+            "reason": "该旧场景没有直接操作并检查此入口的具体结果"
+          }
+        ],
+        "identity_decision": "INDEPENDENT",
+        "supported_feature_ids": [],
+        "supported_scenario_ids": [],
+        "variant_group": null,
+        "formalization_task_id": "R00-T07",
+        "execution_task_ids": [
+          "R02-T03",
+          "R07-T09"
+        ],
+        "execution_owner": "Rust service＋客户端",
+        "execution_stage_ids": [
+          "R02",
+          "R07"
+        ],
+        "due": "R00-T07 建立正式账本时登记；最迟在所列实施 Task 的阶段验收前完成并执行",
+        "status": "SPECIFIED_NOT_EXECUTED"
+      },
+      "candidate_stage_map": {
+        "id": "R00-T02-LA-D3710D637C19",
+        "featureId": "F-D20-CLI-CLI-CHAT-D3710D",
+        "requirement": "REQUIRED_SUPPLEMENTAL",
+        "r00Kind": "supplemental",
+        "r00TaskIds": [
+          "R02-T03",
+          "R07-T09"
+        ],
+        "r00ExecutionStageIds": [
+          "R02",
+          "R07"
+        ],
+        "r00LedgerStatus": "SPECIFIED_NOT_EXECUTED",
+        "r00ResultIds": [],
+        "r00TestIds": [],
+        "r00Then": "选择或创建会话后通过 WS 提交消息，终端流式显示回复和工具进度",
+        "r00Assertions": [
+          "选择或创建会话后通过 WS 提交消息，终端流式显示回复和工具进度",
+          "连接/身份失败返回非零；错会话帧不显示，Ctrl+C 只取消当前 stream"
+        ],
+        "r00Due": "R00-T07 建立正式账本时登记；最迟在所列实施 Task 的阶段验收前完成并执行",
+        "assertionContract": {
+          "producerCommand": "a05_a06_auth_matrix",
+          "evidencePath": "{EVIDENCE}/A05_A06/leaf-cases.json",
+          "cases": [
+            {
+              "case": "a05-positive-control-owner-execute",
+              "expect": 200
+            },
+            {
+              "case": "a05-no-credential-execute",
+              "expect": 401
+            },
+            {
+              "case": "ws-ticket-legit-origin-upgrade",
+              "expect": 101
+            },
+            {
+              "case": "ws-session-read-owner",
+              "expect": 1
+            }
+          ]
+        },
+        "basisKind": "protocol_basis",
+        "r02Share": "认证 WS/execute 提交与有序事件流协议面（A05/A06/A09/A10/A15 所证家族；当前候选未执行）",
+        "r07Share": "终端聊天客户端：流式显示回复与工具进度、Ctrl+C 只取消当前 stream、连接/身份失败非零退出",
+        "evidenceRequired": "A05/A06 认证矩阵真实执行证据 + WS/exec 认证正负路径执行记录",
+        "evidenceCommandRefs": [
+          "a05_a06_auth_matrix",
+          "a09_a10_events_matrix",
+          "a15_full_chain"
+        ]
+      }
+    },
+    {
+      "id": "R00-T02-LA-3B86332B042C",
+      "original_acceptance": {
+        "kind": "supplemental",
+        "stage_id": "R00",
+        "execution_stage_ids": [
+          "R02",
+          "R07"
+        ],
+        "task_ids": [
+          "R02-T03",
+          "R07-T09"
+        ],
+        "requirement": "REQUIRED_SUPPLEMENTAL",
+        "feature_id": "F-D20-CLI-CLI-CONTINUE-3B8633",
+        "then": "解析目标会话后恢复其历史并可继续提交，终端显示该会话回复",
+        "formalization_task_id": "R00-T07",
+        "ledger_status": "SPECIFIED_NOT_EXECUTED",
+        "result_ids": [],
+        "feature_ids": [
+          "F-D20-CLI-CLI-CONTINUE-3B8633"
+        ],
+        "test_ids": []
+      },
+      "original_feature_stage": {
+        "id": "R00-T02-LA-3B86332B042C",
+        "feature_id": "F-D20-CLI-CLI-CONTINUE-3B8633",
+        "task_ids": [
+          "R02-T03",
+          "R07-T09"
+        ],
+        "given": "相应入口已启用，使用有权身份与隔离测试数据；另备拒绝或失败条件",
+        "when": "从终端续接指定会话",
+        "then": "解析目标会话后恢复其历史并可继续提交，终端显示该会话回复",
+        "assertions": [
+          "解析目标会话后恢复其历史并可继续提交，终端显示该会话回复",
+          "会话不存在或跨权限时拒绝，不悄悄新建或串到其他会话"
+        ],
+        "existing_acceptance_relations": [
+          {
+            "acceptance_id": "R02-A05",
+            "relation": "GAP",
+            "covers_leaf_result": false,
+            "reason": "该旧场景没有直接操作并检查此入口的具体结果"
+          },
+          {
+            "acceptance_id": "R02-A06",
+            "relation": "GAP",
+            "covers_leaf_result": false,
+            "reason": "该旧场景没有直接操作并检查此入口的具体结果"
+          },
+          {
+            "acceptance_id": "R07-A17",
+            "relation": "INDIRECT",
+            "covers_leaf_result": false,
+            "reason": "该旧场景触及本入口的部分行为或边界，但未逐项验证成功、拒绝与最终副作用"
+          },
+          {
+            "acceptance_id": "R07-A18",
+            "relation": "GAP",
+            "covers_leaf_result": false,
+            "reason": "该旧场景没有直接操作并检查此入口的具体结果"
+          }
+        ],
+        "identity_decision": "INDEPENDENT",
+        "supported_feature_ids": [],
+        "supported_scenario_ids": [],
+        "variant_group": null,
+        "formalization_task_id": "R00-T07",
+        "execution_task_ids": [
+          "R02-T03",
+          "R07-T09"
+        ],
+        "execution_owner": "Rust service＋客户端",
+        "execution_stage_ids": [
+          "R02",
+          "R07"
+        ],
+        "due": "R00-T07 建立正式账本时登记；最迟在所列实施 Task 的阶段验收前完成并执行",
+        "status": "SPECIFIED_NOT_EXECUTED"
+      },
+      "candidate_stage_map": {
+        "id": "R00-T02-LA-3B86332B042C",
+        "featureId": "F-D20-CLI-CLI-CONTINUE-3B8633",
+        "requirement": "REQUIRED_SUPPLEMENTAL",
+        "r00Kind": "supplemental",
+        "r00TaskIds": [
+          "R02-T03",
+          "R07-T09"
+        ],
+        "r00ExecutionStageIds": [
+          "R02",
+          "R07"
+        ],
+        "r00LedgerStatus": "SPECIFIED_NOT_EXECUTED",
+        "r00ResultIds": [],
+        "r00TestIds": [],
+        "r00Then": "解析目标会话后恢复其历史并可继续提交，终端显示该会话回复",
+        "r00Assertions": [
+          "解析目标会话后恢复其历史并可继续提交，终端显示该会话回复",
+          "会话不存在或跨权限时拒绝，不悄悄新建或串到其他会话"
+        ],
+        "r00Due": "R00-T07 建立正式账本时登记；最迟在所列实施 Task 的阶段验收前完成并执行",
+        "assertionContract": {
+          "producerCommand": "a05_a06_auth_matrix",
+          "evidencePath": "{EVIDENCE}/A05_A06/leaf-cases.json",
+          "cases": [
+            {
+              "case": "a05-sessions-list-owner",
+              "expect": 200
+            },
+            {
+              "case": "a05-cross-principal-read",
+              "expect": 403
+            },
+            {
+              "case": "a05-forged-session-id",
+              "expect": 404
+            }
+          ]
+        },
+        "basisKind": "protocol_basis",
+        "r02Share": "认证会话身份与历史读取面（sessions 按 principal 作用域；当前候选未执行）",
+        "r07Share": "CLI 续接命令：目标会话解析、历史恢复显示、会话不存在/跨权限拒绝且不悄悄新建",
+        "evidenceRequired": "A05/A06 认证矩阵真实执行证据 + 认证会话读取正负路径执行记录",
+        "evidenceCommandRefs": [
+          "a05_a06_auth_matrix"
+        ]
+      }
+    },
+    {
+      "id": "R00-T02-LA-B8A1AD32A8E1",
+      "original_acceptance": {
+        "kind": "supplemental",
+        "stage_id": "R00",
+        "execution_stage_ids": [
+          "R02",
+          "R07"
+        ],
+        "task_ids": [
+          "R02-T03",
+          "R07-T09"
+        ],
+        "requirement": "REQUIRED_SUPPLEMENTAL",
+        "feature_id": "F-D20-CLI-CLI-HELP-B8A1AD",
+        "then": "打印命令与参数说明并以 0 退出",
+        "formalization_task_id": "R00-T07",
+        "ledger_status": "SPECIFIED_NOT_EXECUTED",
+        "result_ids": [],
+        "feature_ids": [
+          "F-D20-CLI-CLI-HELP-B8A1AD"
+        ],
+        "test_ids": []
+      },
+      "original_feature_stage": {
+        "id": "R00-T02-LA-B8A1AD32A8E1",
+        "feature_id": "F-D20-CLI-CLI-HELP-B8A1AD",
+        "task_ids": [
+          "R02-T03",
+          "R07-T09"
+        ],
+        "given": "相应入口已启用，使用有权身份与隔离测试数据；另备拒绝或失败条件",
+        "when": "请求 CLI 帮助",
+        "then": "打印命令与参数说明并以 0 退出",
+        "assertions": [
+          "打印命令与参数说明并以 0 退出",
+          "未知参数打印错误和帮助并以 1 退出；不启动服务"
+        ],
+        "existing_acceptance_relations": [
+          {
+            "acceptance_id": "R02-A05",
+            "relation": "GAP",
+            "covers_leaf_result": false,
+            "reason": "该旧场景没有直接操作并检查此入口的具体结果"
+          },
+          {
+            "acceptance_id": "R02-A06",
+            "relation": "GAP",
+            "covers_leaf_result": false,
+            "reason": "该旧场景没有直接操作并检查此入口的具体结果"
+          },
+          {
+            "acceptance_id": "R07-A17",
+            "relation": "INDIRECT",
+            "covers_leaf_result": false,
+            "reason": "该旧场景触及本入口的部分行为或边界，但未逐项验证成功、拒绝与最终副作用"
+          },
+          {
+            "acceptance_id": "R07-A18",
+            "relation": "GAP",
+            "covers_leaf_result": false,
+            "reason": "该旧场景没有直接操作并检查此入口的具体结果"
+          }
+        ],
+        "identity_decision": "INDEPENDENT",
+        "supported_feature_ids": [],
+        "supported_scenario_ids": [],
+        "variant_group": null,
+        "formalization_task_id": "R00-T07",
+        "execution_task_ids": [
+          "R02-T03",
+          "R07-T09"
+        ],
+        "execution_owner": "Rust service＋客户端",
+        "execution_stage_ids": [
+          "R02",
+          "R07"
+        ],
+        "due": "R00-T07 建立正式账本时登记；最迟在所列实施 Task 的阶段验收前完成并执行",
+        "status": "SPECIFIED_NOT_EXECUTED"
+      },
+      "candidate_stage_map": {
+        "id": "R00-T02-LA-B8A1AD32A8E1",
+        "featureId": "F-D20-CLI-CLI-HELP-B8A1AD",
+        "requirement": "REQUIRED_SUPPLEMENTAL",
+        "r00Kind": "supplemental",
+        "r00TaskIds": [
+          "R02-T03",
+          "R07-T09"
+        ],
+        "r00ExecutionStageIds": [
+          "R02",
+          "R07"
+        ],
+        "r00LedgerStatus": "SPECIFIED_NOT_EXECUTED",
+        "r00ResultIds": [],
+        "r00TestIds": [],
+        "r00Then": "打印命令与参数说明并以 0 退出",
+        "r00Assertions": [
+          "打印命令与参数说明并以 0 退出",
+          "未知参数打印错误和帮助并以 1 退出；不启动服务"
+        ],
+        "r00Due": "R00-T07 建立正式账本时登记；最迟在所列实施 Task 的阶段验收前完成并执行",
+        "basisKind": "client_only_stage_boundary_conflict",
+        "r02Share": "阶段边界冲突待决（R13-F01）：R00 原件 execution_task_ids=R02-T03+R07-T09、execution_stage_ids=[R02,R07]、due=最迟在所列实施 Task 的阶段验收前完成并执行；行为本体（打印命令/参数说明与退出码、未知参数以 1 退出、不启动服务）为纯客户端行为，按 R02 阶段书 §1 边界（无桌面/无新 UI/无客户端迁移）未识别出服务器侧份额。未获正式处置前 verify-stage 对本叶固定 BLOCKED，不改写 R00 原件、不单方豁免",
+        "r07Share": "完整 CLI help 行为（未知参数打印错误并以 1 退出、不启动服务）",
+        "evidenceRequired": "BLOCKED（不可由本阶段任何命令组合变为 PASS）。处置权限与路径（需根总控/用户决定，修复轮不得单方行使）：(a) 授权修改 R00 原件双阶段标注（治理变更）；(b) 正式确认本叶 R02 份额为空并登记可审递延依据（授权后本阶段图改记豁免依据与授权记录，非静默）；(c) 为本叶定义 R02 侧可执行证据义务并注册证据生产者。完整客户端行为仍归 R07-T09 执行记录",
+        "evidenceCommandRefs": []
+      }
+    },
+    {
+      "id": "R00-T02-LA-1B09760C2B1C",
+      "original_acceptance": {
+        "kind": "supplemental",
+        "stage_id": "R00",
+        "execution_stage_ids": [
+          "R02",
+          "R07"
+        ],
+        "task_ids": [
+          "R02-T03",
+          "R07-T09"
+        ],
+        "requirement": "REQUIRED_SUPPLEMENTAL",
+        "feature_id": "F-D20-CLI-CLI-SERVE-1B0976",
+        "then": "以前台服务进程运行，保留指定 channel 与数据降级约束",
+        "formalization_task_id": "R00-T07",
+        "ledger_status": "SPECIFIED_NOT_EXECUTED",
+        "result_ids": [],
+        "feature_ids": [
+          "F-D20-CLI-CLI-SERVE-1B0976"
+        ],
+        "test_ids": []
+      },
+      "original_feature_stage": {
+        "id": "R00-T02-LA-1B09760C2B1C",
+        "feature_id": "F-D20-CLI-CLI-SERVE-1B0976",
+        "task_ids": [
+          "R02-T03",
+          "R07-T09"
+        ],
+        "given": "相应入口已启用，使用有权身份与隔离测试数据；另备拒绝或失败条件",
+        "when": "从终端启动服务",
+        "then": "以前台服务进程运行，保留指定 channel 与数据降级约束",
+        "assertions": [
+          "以前台服务进程运行，保留指定 channel 与数据降级约束",
+          "启动/数据版本失败给错误，不偷偷切换数据目录"
+        ],
+        "existing_acceptance_relations": [
+          {
+            "acceptance_id": "R02-A05",
+            "relation": "GAP",
+            "covers_leaf_result": false,
+            "reason": "该旧场景没有直接操作并检查此入口的具体结果"
+          },
+          {
+            "acceptance_id": "R02-A06",
+            "relation": "GAP",
+            "covers_leaf_result": false,
+            "reason": "该旧场景没有直接操作并检查此入口的具体结果"
+          },
+          {
+            "acceptance_id": "R07-A17",
+            "relation": "INDIRECT",
+            "covers_leaf_result": false,
+            "reason": "该旧场景触及本入口的部分行为或边界，但未逐项验证成功、拒绝与最终副作用"
+          },
+          {
+            "acceptance_id": "R07-A18",
+            "relation": "GAP",
+            "covers_leaf_result": false,
+            "reason": "该旧场景没有直接操作并检查此入口的具体结果"
+          }
+        ],
+        "identity_decision": "INDEPENDENT",
+        "supported_feature_ids": [],
+        "supported_scenario_ids": [],
+        "variant_group": null,
+        "formalization_task_id": "R00-T07",
+        "execution_task_ids": [
+          "R02-T03",
+          "R07-T09"
+        ],
+        "execution_owner": "Rust service＋客户端",
+        "execution_stage_ids": [
+          "R02",
+          "R07"
+        ],
+        "due": "R00-T07 建立正式账本时登记；最迟在所列实施 Task 的阶段验收前完成并执行",
+        "status": "SPECIFIED_NOT_EXECUTED"
+      },
+      "candidate_stage_map": {
+        "id": "R00-T02-LA-1B09760C2B1C",
+        "featureId": "F-D20-CLI-CLI-SERVE-1B0976",
+        "requirement": "REQUIRED_SUPPLEMENTAL",
+        "r00Kind": "supplemental",
+        "r00TaskIds": [
+          "R02-T03",
+          "R07-T09"
+        ],
+        "r00ExecutionStageIds": [
+          "R02",
+          "R07"
+        ],
+        "r00LedgerStatus": "SPECIFIED_NOT_EXECUTED",
+        "r00ResultIds": [],
+        "r00TestIds": [],
+        "r00Then": "以前台服务进程运行，保留指定 channel 与数据降级约束",
+        "r00Assertions": [
+          "以前台服务进程运行，保留指定 channel 与数据降级约束",
+          "启动/数据版本失败给错误，不偷偷切换数据目录"
+        ],
+        "r00Due": "R00-T07 建立正式账本时登记；最迟在所列实施 Task 的阶段验收前完成并执行",
+        "assertionContract": {
+          "producerCommand": "a01_smoke",
+          "evidencePath": "{EVIDENCE}/A01/a01-leaf-cases.json",
+          "cases": [
+            {
+              "case": "a01-build-locked-offline",
+              "expect": 1
+            },
+            {
+              "case": "a01-deptree-desktop-free",
+              "expect": 1
+            },
+            {
+              "case": "a01-service-start-ready",
+              "expect": 1
+            },
+            {
+              "case": "a01-health-200",
+              "expect": 200
+            },
+            {
+              "case": "a01-sigterm-clean-exit-0",
+              "expect": 0
+            },
+            {
+              "case": "a01-no-leftover-children",
+              "expect": 1
+            },
+            {
+              "case": "a01-port-closed-after-shutdown",
+              "expect": 1
+            }
+          ]
+        },
+        "basisKind": "protocol_basis",
+        "r02Share": "前台服务进程本体与配置/实例边界（A01–A03 家族；当前候选未执行）",
+        "r07Share": "serve 命令包装、channel 与数据降级约束保留、启动/数据版本失败诊断 UX",
+        "evidenceRequired": "A01–A03 真实执行证据（含启动失败负向）",
+        "evidenceCommandRefs": [
+          "a01_smoke",
+          "a02_boundary_negative",
+          "a03_dual_instance"
+        ]
+      }
+    },
+    {
+      "id": "R00-T02-LA-200D4E5D52C9",
+      "original_acceptance": {
+        "kind": "supplemental",
+        "stage_id": "R00",
+        "execution_stage_ids": [
+          "R02",
+          "R07"
+        ],
+        "task_ids": [
+          "R02-T03",
+          "R07-T09"
+        ],
+        "requirement": "REQUIRED_SUPPLEMENTAL",
+        "feature_id": "F-D20-CLI-CLI-SESSIONS-200D4E",
+        "then": "从已认证服务读取并列出最多 20 个会话；空列表显示 No sessions yet",
+        "formalization_task_id": "R00-T07",
+        "ledger_status": "SPECIFIED_NOT_EXECUTED",
+        "result_ids": [],
+        "feature_ids": [
+          "F-D20-CLI-CLI-SESSIONS-200D4E"
+        ],
+        "test_ids": []
+      },
+      "original_feature_stage": {
+        "id": "R00-T02-LA-200D4E5D52C9",
+        "feature_id": "F-D20-CLI-CLI-SESSIONS-200D4E",
+        "task_ids": [
+          "R02-T03",
+          "R07-T09"
+        ],
+        "given": "相应入口已启用，使用有权身份与隔离测试数据；另备拒绝或失败条件",
+        "when": "在终端列出会话",
+        "then": "从已认证服务读取并列出最多 20 个会话；空列表显示 No sessions yet",
+        "assertions": [
+          "从已认证服务读取并列出最多 20 个会话；空列表显示 No sessions yet",
+          "服务未连接或未授权时返回错误，不读取其他主体会话"
+        ],
+        "existing_acceptance_relations": [
+          {
+            "acceptance_id": "R02-A05",
+            "relation": "INDIRECT",
+            "covers_leaf_result": false,
+            "reason": "该旧场景触及本入口的部分行为或边界，但未逐项验证成功、拒绝与最终副作用"
+          },
+          {
+            "acceptance_id": "R02-A06",
+            "relation": "GAP",
+            "covers_leaf_result": false,
+            "reason": "该旧场景没有直接操作并检查此入口的具体结果"
+          },
+          {
+            "acceptance_id": "R07-A17",
+            "relation": "INDIRECT",
+            "covers_leaf_result": false,
+            "reason": "该旧场景触及本入口的部分行为或边界，但未逐项验证成功、拒绝与最终副作用"
+          },
+          {
+            "acceptance_id": "R07-A18",
+            "relation": "GAP",
+            "covers_leaf_result": false,
+            "reason": "该旧场景没有直接操作并检查此入口的具体结果"
+          }
+        ],
+        "identity_decision": "INDEPENDENT",
+        "supported_feature_ids": [],
+        "supported_scenario_ids": [],
+        "variant_group": null,
+        "formalization_task_id": "R00-T07",
+        "execution_task_ids": [
+          "R02-T03",
+          "R07-T09"
+        ],
+        "execution_owner": "Rust service＋客户端",
+        "execution_stage_ids": [
+          "R02",
+          "R07"
+        ],
+        "due": "R00-T07 建立正式账本时登记；最迟在所列实施 Task 的阶段验收前完成并执行",
+        "status": "SPECIFIED_NOT_EXECUTED"
+      },
+      "candidate_stage_map": {
+        "id": "R00-T02-LA-200D4E5D52C9",
+        "featureId": "F-D20-CLI-CLI-SESSIONS-200D4E",
+        "requirement": "REQUIRED_SUPPLEMENTAL",
+        "r00Kind": "supplemental",
+        "r00TaskIds": [
+          "R02-T03",
+          "R07-T09"
+        ],
+        "r00ExecutionStageIds": [
+          "R02",
+          "R07"
+        ],
+        "r00LedgerStatus": "SPECIFIED_NOT_EXECUTED",
+        "r00ResultIds": [],
+        "r00TestIds": [],
+        "r00Then": "从已认证服务读取并列出最多 20 个会话；空列表显示 No sessions yet",
+        "r00Assertions": [
+          "从已认证服务读取并列出最多 20 个会话；空列表显示 No sessions yet",
+          "服务未连接或未授权时返回错误，不读取其他主体会话"
+        ],
+        "r00Due": "R00-T07 建立正式账本时登记；最迟在所列实施 Task 的阶段验收前完成并执行",
+        "assertionContract": {
+          "producerCommand": "a05_a06_auth_matrix",
+          "evidencePath": "{EVIDENCE}/A05_A06/sessions-list-matrix.json",
+          "cases": [
+            {
+              "case": "a05-sessions-list-owner",
+              "expect": 200
+            },
+            {
+              "case": "a05-sessions-list-owner-contains-own-session",
+              "expect": 1
+            },
+            {
+              "case": "a05-sessions-list-foreign-principal",
+              "expect": 200
+            },
+            {
+              "case": "a05-sessions-list-foreign-excludes-owner-sessions",
+              "expect": 0
+            },
+            {
+              "case": "a05-sessions-list-empty-shape",
+              "expect": 1
+            },
+            {
+              "case": "a05-sessions-list-no-credential",
+              "expect": 401
+            }
+          ]
+        },
+        "basisKind": "protocol_basis",
+        "r02Share": "认证会话列表（GET /lingxi/v1/sessions 按 principal 过滤；当前候选未执行）",
+        "r07Share": "CLI 列表命令：≤20 显示、空列表 No sessions yet、未连接/未授权错误且不读其他主体会话",
+        "evidenceRequired": "A05/A06 认证矩阵真实执行证据 + 认证列表正负路径执行记录。R14-F01 闭环：认证列表正负路径（GET /lingxi/v1/sessions 按 principal 过滤的正负两侧）此前无注册证据生产者，现由 r02_t03_auth_matrix.sh 的 sessions-list 段生产 {EVIDENCE}/A05_A06/sessions-list-matrix.json（owner 含自身会话、foreign 主体 200 且排除 owner 会话并呈空列表形态、无凭据 401），本叶 assertionContract 由 verify-stage 机器消费该文件各案例的实际值——文件存在本身不再足以判定本叶",
+        "evidenceCommandRefs": [
+          "a05_a06_auth_matrix"
+        ],
+        "evidencePaths": [
+          "{EVIDENCE}/A05_A06/sessions-list-matrix.json"
+        ]
+      }
+    },
+    {
+      "id": "R00-T02-LA-EEC1A2A5CD04",
+      "original_acceptance": {
+        "kind": "supplemental",
+        "stage_id": "R00",
+        "execution_stage_ids": [
+          "R02",
+          "R07"
+        ],
+        "task_ids": [
+          "R02-T03",
+          "R07-T09"
+        ],
+        "requirement": "REQUIRED_SUPPLEMENTAL",
+        "feature_id": "F-D20-CLI-CLI-STATUS-EEC1A2",
+        "then": "显示 URL、版本、Studio、Agent、模型和认证来源",
+        "formalization_task_id": "R00-T07",
+        "ledger_status": "SPECIFIED_NOT_EXECUTED",
+        "result_ids": [],
+        "feature_ids": [
+          "F-D20-CLI-CLI-STATUS-EEC1A2"
+        ],
+        "test_ids": []
+      },
+      "original_feature_stage": {
+        "id": "R00-T02-LA-EEC1A2A5CD04",
+        "feature_id": "F-D20-CLI-CLI-STATUS-EEC1A2",
+        "task_ids": [
+          "R02-T03",
+          "R07-T09"
+        ],
+        "given": "相应入口已启用，使用有权身份与隔离测试数据；另备拒绝或失败条件",
+        "when": "在终端查看服务状态",
+        "then": "显示 URL、版本、Studio、Agent、模型和认证来源",
+        "assertions": [
+          "显示 URL、版本、Studio、Agent、模型和认证来源",
+          "服务不可达时返回诊断错误；身份读取失败可用健康信息但不伪造认证来源"
+        ],
+        "existing_acceptance_relations": [
+          {
+            "acceptance_id": "R02-A05",
+            "relation": "GAP",
+            "covers_leaf_result": false,
+            "reason": "该旧场景没有直接操作并检查此入口的具体结果"
+          },
+          {
+            "acceptance_id": "R02-A06",
+            "relation": "GAP",
+            "covers_leaf_result": false,
+            "reason": "该旧场景没有直接操作并检查此入口的具体结果"
+          },
+          {
+            "acceptance_id": "R07-A17",
+            "relation": "INDIRECT",
+            "covers_leaf_result": false,
+            "reason": "该旧场景触及本入口的部分行为或边界，但未逐项验证成功、拒绝与最终副作用"
+          },
+          {
+            "acceptance_id": "R07-A18",
+            "relation": "GAP",
+            "covers_leaf_result": false,
+            "reason": "该旧场景没有直接操作并检查此入口的具体结果"
+          }
+        ],
+        "identity_decision": "INDEPENDENT",
+        "supported_feature_ids": [],
+        "supported_scenario_ids": [],
+        "variant_group": null,
+        "formalization_task_id": "R00-T07",
+        "execution_task_ids": [
+          "R02-T03",
+          "R07-T09"
+        ],
+        "execution_owner": "Rust service＋客户端",
+        "execution_stage_ids": [
+          "R02",
+          "R07"
+        ],
+        "due": "R00-T07 建立正式账本时登记；最迟在所列实施 Task 的阶段验收前完成并执行",
+        "status": "SPECIFIED_NOT_EXECUTED"
+      },
+      "candidate_stage_map": {
+        "id": "R00-T02-LA-EEC1A2A5CD04",
+        "featureId": "F-D20-CLI-CLI-STATUS-EEC1A2",
+        "requirement": "REQUIRED_SUPPLEMENTAL",
+        "r00Kind": "supplemental",
+        "r00TaskIds": [
+          "R02-T03",
+          "R07-T09"
+        ],
+        "r00ExecutionStageIds": [
+          "R02",
+          "R07"
+        ],
+        "r00LedgerStatus": "SPECIFIED_NOT_EXECUTED",
+        "r00ResultIds": [],
+        "r00TestIds": [],
+        "r00Then": "显示 URL、版本、Studio、Agent、模型和认证来源",
+        "r00Assertions": [
+          "显示 URL、版本、Studio、Agent、模型和认证来源",
+          "服务不可达时返回诊断错误；身份读取失败可用健康信息但不伪造认证来源"
+        ],
+        "r00Due": "R00-T07 建立正式账本时登记；最迟在所列实施 Task 的阶段验收前完成并执行",
+        "assertionContract": {
+          "producerCommand": "a05_a06_auth_matrix",
+          "evidencePath": "{EVIDENCE}/A05_A06/leaf-cases.json",
+          "cases": [
+            {
+              "case": "a05-no-credential-me",
+              "expect": 401
+            },
+            {
+              "case": "a05-me-with-forged-header",
+              "expect": 200
+            },
+            {
+              "case": "a06-localhost-host-ok",
+              "expect": 200
+            },
+            {
+              "case": "a06-cli-query-token-local",
+              "expect": 200
+            }
+          ]
+        },
+        "basisKind": "protocol_basis",
+        "r02Share": "/lingxi/v1/health + /lingxi/v1/me + 本地 token 来源机制（当前候选未执行）",
+        "r07Share": "CLI 状态命令：URL/版本/Studio/Agent/模型/认证来源显示、不可达诊断、身份读取失败不伪造认证来源",
+        "evidenceRequired": "A05/A06 认证矩阵真实执行证据 + /health、/me 认证路径执行记录",
+        "evidenceCommandRefs": [
+          "a05_a06_auth_matrix"
+        ]
+      }
+    },
+    {
+      "id": "R00-T02-LA-D1BEE19A95BB",
+      "original_acceptance": {
+        "kind": "supplemental",
+        "stage_id": "R00",
+        "execution_stage_ids": [
+          "R02",
+          "R07"
+        ],
+        "task_ids": [
+          "R02-T03",
+          "R07-T09"
+        ],
+        "requirement": "REQUIRED_SUPPLEMENTAL",
+        "feature_id": "F-D20-DESKTOP_BEHAVIOR-DESKTOP-BEHAVIOR-SERVICE-CONNECTION-D1BEE1",
+        "then": "端口/短期令牌传给 renderer 后 HTTP/WS 连接可建立",
+        "formalization_task_id": "R00-T07",
+        "ledger_status": "SPECIFIED_NOT_EXECUTED",
+        "result_ids": [],
+        "feature_ids": [
+          "F-D20-DESKTOP_BEHAVIOR-DESKTOP-BEHAVIOR-SERVICE-CONNECTION-D1BEE1"
+        ],
+        "test_ids": []
+      },
+      "original_feature_stage": {
+        "id": "R00-T02-LA-D1BEE19A95BB",
+        "feature_id": "F-D20-DESKTOP_BEHAVIOR-DESKTOP-BEHAVIOR-SERVICE-CONNECTION-D1BEE1",
+        "task_ids": [
+          "R02-T03",
+          "R07-T09"
+        ],
+        "given": "目标数据、宿主状态及必要权限已准备；同时准备所列失败或拒绝条件",
+        "when": "桌面客户端启动并建立本机业务连接",
+        "then": "端口/短期令牌传给 renderer 后 HTTP/WS 连接可建立",
+        "assertions": [
+          "端口/短期令牌传给 renderer 后 HTTP/WS 连接可建立",
+          "服务重启需重取端口/令牌；令牌不应当作用户可见设置"
+        ],
+        "existing_acceptance_relations": [
+          {
+            "acceptance_id": "R02-A05",
+            "relation": "INDIRECT",
+            "covers_leaf_result": false,
+            "reason": "阶段场景覆盖容器/平台方向，尚未逐项断言该通道变体。"
+          },
+          {
+            "acceptance_id": "R02-A06",
+            "relation": "INDIRECT",
+            "covers_leaf_result": false,
+            "reason": "阶段场景覆盖容器/平台方向，尚未逐项断言该通道变体。"
+          },
+          {
+            "acceptance_id": "R07-A17",
+            "relation": "INDIRECT",
+            "covers_leaf_result": false,
+            "reason": "阶段场景覆盖容器/平台方向，尚未逐项断言该通道变体。"
+          },
+          {
+            "acceptance_id": "R07-A18",
+            "relation": "INDIRECT",
+            "covers_leaf_result": false,
+            "reason": "阶段场景覆盖容器/平台方向，尚未逐项断言该通道变体。"
+          }
+        ],
+        "identity_decision": "SUPPORT",
+        "supported_feature_ids": [
+          "F-D20-UI_BEHAVIOR-UI-BEHAVIOR-SERVICE-CONNECTIVITY-D2657E"
+        ],
+        "supported_scenario_ids": [
+          "R00-T02-LA-D2657E4AB5FF"
+        ],
+        "variant_group": null,
+        "formalization_task_id": "R00-T07",
+        "execution_task_ids": [
+          "R02-T03",
+          "R07-T09"
+        ],
+        "execution_owner": "Rust service＋客户端",
+        "execution_stage_ids": [
+          "R02",
+          "R07"
+        ],
+        "due": "R00-T07 建立正式账本时登记；最迟在所列实施 Task 的阶段验收前完成并执行",
+        "status": "SPECIFIED_NOT_EXECUTED"
+      },
+      "candidate_stage_map": {
+        "id": "R00-T02-LA-D1BEE19A95BB",
+        "featureId": "F-D20-DESKTOP_BEHAVIOR-DESKTOP-BEHAVIOR-SERVICE-CONNECTION-D1BEE1",
+        "requirement": "REQUIRED_SUPPLEMENTAL",
+        "r00Kind": "supplemental",
+        "r00TaskIds": [
+          "R02-T03",
+          "R07-T09"
+        ],
+        "r00ExecutionStageIds": [
+          "R02",
+          "R07"
+        ],
+        "r00LedgerStatus": "SPECIFIED_NOT_EXECUTED",
+        "r00ResultIds": [],
+        "r00TestIds": [],
+        "r00Then": "端口/短期令牌传给 renderer 后 HTTP/WS 连接可建立",
+        "r00Assertions": [
+          "端口/短期令牌传给 renderer 后 HTTP/WS 连接可建立",
+          "服务重启需重取端口/令牌；令牌不应当作用户可见设置"
+        ],
+        "r00Due": "R00-T07 建立正式账本时登记；最迟在所列实施 Task 的阶段验收前完成并执行",
+        "assertionContract": {
+          "producerCommand": "a05_a06_auth_matrix",
+          "evidencePath": "{EVIDENCE}/A05_A06/leaf-cases.json",
+          "cases": [
+            {
+              "case": "a05-ws-ticket-issue-owner",
+              "expect": 200
+            },
+            {
+              "case": "a05-no-credential-ws-ticket",
+              "expect": 403
+            },
+            {
+              "case": "ws-ticket-legit-origin-upgrade",
+              "expect": 101
+            }
+          ]
+        },
+        "basisKind": "protocol_basis",
+        "r02Share": "本地 token 引导与 ws-ticket 短期凭证签发原语（当前候选未执行）",
+        "r07Share": "桌面壳 renderer 端口/短期令牌接线、HTTP/WS 连接建立、重启重取、令牌不作用户可见设置",
+        "evidenceRequired": "A05/A06 认证矩阵真实执行证据 + ws-ticket 签发/消费执行记录",
+        "evidenceCommandRefs": [
+          "a05_a06_auth_matrix"
+        ]
+      }
+    },
+    {
+      "id": "R00-T02-LA-25AB678E7108",
+      "original_acceptance": {
+        "kind": "supplemental",
+        "stage_id": "R00",
+        "execution_stage_ids": [
+          "R02",
+          "R07"
+        ],
+        "task_ids": [
+          "R02-T03",
+          "R07-T09"
+        ],
+        "requirement": "REQUIRED_SUPPLEMENTAL",
+        "feature_id": "F-D20-ROUTE_BEHAVIOR-BEHAVIOR-ACCESS-ACCESS-ACCOUNT-PASSWORD-DELETE-25AB67",
+        "then": "仅本地主人可清除密码；更新账号并记录安全审计，失败时返回错误",
+        "formalization_task_id": "R00-T07",
+        "ledger_status": "SPECIFIED_NOT_EXECUTED",
+        "result_ids": [],
+        "feature_ids": [
+          "F-D20-ROUTE_BEHAVIOR-BEHAVIOR-ACCESS-ACCESS-ACCOUNT-PASSWORD-DELETE-25AB67"
+        ],
+        "test_ids": []
+      },
+      "original_feature_stage": {
+        "id": "R00-T02-LA-25AB678E7108",
+        "feature_id": "F-D20-ROUTE_BEHAVIOR-BEHAVIOR-ACCESS-ACCESS-ACCOUNT-PASSWORD-DELETE-25AB67",
+        "task_ids": [
+          "R02-T03",
+          "R07-T09"
+        ],
+        "given": "该入口所需目标、身份和数据已准备",
+        "when": "用户移除本地账号密码",
+        "then": "仅本地主人可清除密码；更新账号并记录安全审计，失败时返回错误",
+        "assertions": [
+          "执行“移除本地账号密码”后核对：仅本地主人可清除密码；更新账号并记录安全审计，失败时返回错误",
+          "失败、冲突或拒绝时核对返回的状态与实际副作用一致"
+        ],
+        "existing_acceptance_relations": [
+          {
+            "acceptance_id": "R02-A05",
+            "relation": "GAP",
+            "covers_leaf_result": false,
+            "reason": "未找到该 A-ID 对本叶成功、拒绝及副作用的直接检查；保留阶段关联，由逐叶场景补足"
+          },
+          {
+            "acceptance_id": "R02-A06",
+            "relation": "GAP",
+            "covers_leaf_result": false,
+            "reason": "未找到该 A-ID 对本叶成功、拒绝及副作用的直接检查；保留阶段关联，由逐叶场景补足"
+          },
+          {
+            "acceptance_id": "R07-A17",
+            "relation": "GAP",
+            "covers_leaf_result": false,
+            "reason": "未找到该 A-ID 对本叶成功、拒绝及副作用的直接检查；保留阶段关联，由逐叶场景补足"
+          },
+          {
+            "acceptance_id": "R07-A18",
+            "relation": "GAP",
+            "covers_leaf_result": false,
+            "reason": "未找到该 A-ID 对本叶成功、拒绝及副作用的直接检查；保留阶段关联，由逐叶场景补足"
+          }
+        ],
+        "formalization_task_id": "R00-T07",
+        "execution_task_ids": [
+          "R02-T03",
+          "R07-T09"
+        ],
+        "execution_owner": "Rust service＋客户端",
+        "execution_stage_ids": [
+          "R02",
+          "R07"
+        ],
+        "due": "R00-T07 建立正式账本时登记；最迟在所列实施 Task 的阶段验收前完成并执行",
+        "status": "SPECIFIED_NOT_EXECUTED"
+      },
+      "candidate_stage_map": {
+        "id": "R00-T02-LA-25AB678E7108",
+        "featureId": "F-D20-ROUTE_BEHAVIOR-BEHAVIOR-ACCESS-ACCESS-ACCOUNT-PASSWORD-DELETE-25AB67",
+        "requirement": "REQUIRED_SUPPLEMENTAL",
+        "r00Kind": "supplemental",
+        "r00TaskIds": [
+          "R02-T03",
+          "R07-T09"
+        ],
+        "r00ExecutionStageIds": [
+          "R02",
+          "R07"
+        ],
+        "r00LedgerStatus": "SPECIFIED_NOT_EXECUTED",
+        "r00ResultIds": [],
+        "r00TestIds": [],
+        "r00Then": "仅本地主人可清除密码；更新账号并记录安全审计，失败时返回错误",
+        "r00Assertions": [
+          "执行“移除本地账号密码”后核对：仅本地主人可清除密码；更新账号并记录安全审计，失败时返回错误",
+          "失败、冲突或拒绝时核对返回的状态与实际副作用一致"
+        ],
+        "r00Due": "R00-T07 建立正式账本时登记；最迟在所列实施 Task 的阶段验收前完成并执行",
+        "assertionContract": {
+          "producerCommand": "a05_a06_auth_matrix",
+          "evidencePath": "{EVIDENCE}/A05_A06/leaf-cases.json",
+          "cases": [
+            {
+              "case": "a05-no-credential-read",
+              "expect": 401
+            },
+            {
+              "case": "a05-forged-principal-headers",
+              "expect": 401
+            },
+            {
+              "case": "a05-cross-principal-read",
+              "expect": 403
+            },
+            {
+              "case": "a05-positive-control-owner-execute",
+              "expect": 200
+            },
+            {
+              "case": "a06-evil-origin-health",
+              "expect": 403
+            },
+            {
+              "case": "a06-foreign-host-health",
+              "expect": 403
+            }
+          ]
+        },
+        "basisKind": "auth_primitive_only",
+        "r02Share": "认证原语基础（本地主人身份、作用域凭证、显式拒绝、Host/Origin）；该入口服务器路由不在 R02 现行面",
+        "r07Share": "移除本地账号密码完整入口（仅本地主人、账号更新、安全审计、失败/冲突状态与副作用一致）",
+        "evidenceRequired": "A05/A06 认证矩阵真实执行证据；路由实现后另需其认证正负矩阵",
+        "evidenceCommandRefs": [
+          "a05_a06_auth_matrix"
+        ]
+      }
+    },
+    {
+      "id": "R00-T02-LA-5E4A9CF58BED",
+      "original_acceptance": {
+        "kind": "supplemental",
+        "stage_id": "R00",
+        "execution_stage_ids": [
+          "R02",
+          "R07"
+        ],
+        "task_ids": [
+          "R02-T03",
+          "R07-T09"
+        ],
+        "requirement": "REQUIRED_SUPPLEMENTAL",
+        "feature_id": "F-D20-SEMANTIC_EFFECT-SEMANTIC-EFFECT-ACCESS-ACCESS-MOBILE-QR-SVG-READ-5E4A9C",
+        "then": "返回手机访问地址 SVG，LAN 地址不可用为 400",
+        "formalization_task_id": "R00-T07",
+        "ledger_status": "SPECIFIED_NOT_EXECUTED",
+        "result_ids": [],
+        "feature_ids": [
+          "F-D20-SEMANTIC_EFFECT-SEMANTIC-EFFECT-ACCESS-ACCESS-MOBILE-QR-SVG-READ-5E4A9C"
+        ],
+        "test_ids": []
+      },
+      "original_feature_stage": {
+        "id": "R00-T02-LA-5E4A9CF58BED",
+        "feature_id": "F-D20-SEMANTIC_EFFECT-SEMANTIC-EFFECT-ACCESS-ACCESS-MOBILE-QR-SVG-READ-5E4A9C",
+        "task_ids": [
+          "R02-T03",
+          "R07-T09"
+        ],
+        "given": "按已查调用者和 HTTP 返回核对；尚未执行新实现验收",
+        "when": "用户生成手机配对二维码",
+        "then": "返回手机访问地址 SVG，LAN 地址不可用为 400",
+        "assertions": [
+          "成功时核对：返回手机访问地址 SVG，LAN 地址不可用为 400",
+          "拒绝/无效输入时核对：无越权或错误持久化，且错误对用户可见"
+        ],
+        "existing_acceptance_relations": [
+          {
+            "acceptance_id": "R02-A05",
+            "relation": "INDIRECT",
+            "covers_leaf_result": false,
+            "reason": "现有场景只覆盖该叶的部分或横向边界，未检查完整动作及结果"
+          },
+          {
+            "acceptance_id": "R02-A06",
+            "relation": "INDIRECT",
+            "covers_leaf_result": false,
+            "reason": "现有场景只覆盖该叶的部分或横向边界，未检查完整动作及结果"
+          },
+          {
+            "acceptance_id": "R07-A17",
+            "relation": "INDIRECT",
+            "covers_leaf_result": false,
+            "reason": "现有场景只覆盖该叶的部分或横向边界，未检查完整动作及结果"
+          },
+          {
+            "acceptance_id": "R07-A18",
+            "relation": "INDIRECT",
+            "covers_leaf_result": false,
+            "reason": "现有场景只覆盖该叶的部分或横向边界，未检查完整动作及结果"
+          }
+        ],
+        "formalization_task_id": "R00-T07",
+        "execution_task_ids": [
+          "R02-T03",
+          "R07-T09"
+        ],
+        "execution_owner": "Rust service＋客户端",
+        "execution_stage_ids": [
+          "R02",
+          "R07"
+        ],
+        "due": "R00-T07 建立正式账本时登记；最迟在所列实施 Task 的阶段验收前完成并执行",
+        "status": "SPECIFIED_NOT_EXECUTED"
+      },
+      "candidate_stage_map": {
+        "id": "R00-T02-LA-5E4A9CF58BED",
+        "featureId": "F-D20-SEMANTIC_EFFECT-SEMANTIC-EFFECT-ACCESS-ACCESS-MOBILE-QR-SVG-READ-5E4A9C",
+        "requirement": "REQUIRED_SUPPLEMENTAL",
+        "r00Kind": "supplemental",
+        "r00TaskIds": [
+          "R02-T03",
+          "R07-T09"
+        ],
+        "r00ExecutionStageIds": [
+          "R02",
+          "R07"
+        ],
+        "r00LedgerStatus": "SPECIFIED_NOT_EXECUTED",
+        "r00ResultIds": [],
+        "r00TestIds": [],
+        "r00Then": "返回手机访问地址 SVG，LAN 地址不可用为 400",
+        "r00Assertions": [
+          "成功时核对：返回手机访问地址 SVG，LAN 地址不可用为 400",
+          "拒绝/无效输入时核对：无越权或错误持久化，且错误对用户可见"
+        ],
+        "r00Due": "R00-T07 建立正式账本时登记；最迟在所列实施 Task 的阶段验收前完成并执行",
+        "assertionContract": {
+          "producerCommand": "a05_a06_auth_matrix",
+          "evidencePath": "{EVIDENCE}/A05_A06/leaf-cases.json",
+          "cases": [
+            {
+              "case": "a05-no-credential-read",
+              "expect": 401
+            },
+            {
+              "case": "a05-forged-principal-headers",
+              "expect": 401
+            },
+            {
+              "case": "a05-cross-principal-read",
+              "expect": 403
+            },
+            {
+              "case": "a05-positive-control-owner-execute",
+              "expect": 200
+            },
+            {
+              "case": "a06-evil-origin-health",
+              "expect": 403
+            },
+            {
+              "case": "a06-foreign-host-health",
+              "expect": 403
+            }
+          ]
+        },
+        "basisKind": "auth_primitive_only",
+        "r02Share": "认证原语基础（同 LA-25AB678E7108）；该入口服务器路由不在 R02 现行面",
+        "r07Share": "手机配对二维码完整入口（手机访问地址 SVG、LAN 不可用 400、拒绝无越权/错误持久化）",
+        "evidenceRequired": "A05/A06 认证矩阵真实执行证据；路由实现后另需其认证正负矩阵",
+        "evidenceCommandRefs": [
+          "a05_a06_auth_matrix"
+        ]
+      }
+    },
+    {
+      "id": "R00-T02-LA-229B77A7BA69",
+      "original_acceptance": {
+        "kind": "supplemental",
+        "stage_id": "R00",
+        "execution_stage_ids": [
+          "R02",
+          "R07"
+        ],
+        "task_ids": [
+          "R02-T03",
+          "R07-T09"
+        ],
+        "requirement": "REQUIRED_SUPPLEMENTAL",
+        "feature_id": "F-D20-SEMANTIC_EFFECT-SEMANTIC-EFFECT-ACCESS-ACCESS-SUMMARY-READ-229B77",
+        "then": "返回网络、设备和账号概况",
+        "formalization_task_id": "R00-T07",
+        "ledger_status": "SPECIFIED_NOT_EXECUTED",
+        "result_ids": [],
+        "feature_ids": [
+          "F-D20-SEMANTIC_EFFECT-SEMANTIC-EFFECT-ACCESS-ACCESS-SUMMARY-READ-229B77"
+        ],
+        "test_ids": []
+      },
+      "original_feature_stage": {
+        "id": "R00-T02-LA-229B77A7BA69",
+        "feature_id": "F-D20-SEMANTIC_EFFECT-SEMANTIC-EFFECT-ACCESS-ACCESS-SUMMARY-READ-229B77",
+        "task_ids": [
+          "R02-T03",
+          "R07-T09"
+        ],
+        "given": "按已查调用者和 HTTP 返回核对；尚未执行新实现验收",
+        "when": "用户查看接入概况",
+        "then": "返回网络、设备和账号概况",
+        "assertions": [
+          "成功时核对：返回网络、设备和账号概况",
+          "拒绝/无效输入时核对：无越权或错误持久化，且错误对用户可见"
+        ],
+        "existing_acceptance_relations": [
+          {
+            "acceptance_id": "R02-A05",
+            "relation": "INDIRECT",
+            "covers_leaf_result": false,
+            "reason": "现有场景只覆盖该叶的部分或横向边界，未检查完整动作及结果"
+          },
+          {
+            "acceptance_id": "R02-A06",
+            "relation": "INDIRECT",
+            "covers_leaf_result": false,
+            "reason": "现有场景只覆盖该叶的部分或横向边界，未检查完整动作及结果"
+          },
+          {
+            "acceptance_id": "R07-A17",
+            "relation": "INDIRECT",
+            "covers_leaf_result": false,
+            "reason": "现有场景只覆盖该叶的部分或横向边界，未检查完整动作及结果"
+          },
+          {
+            "acceptance_id": "R07-A18",
+            "relation": "INDIRECT",
+            "covers_leaf_result": false,
+            "reason": "现有场景只覆盖该叶的部分或横向边界，未检查完整动作及结果"
+          }
+        ],
+        "formalization_task_id": "R00-T07",
+        "execution_task_ids": [
+          "R02-T03",
+          "R07-T09"
+        ],
+        "execution_owner": "Rust service＋客户端",
+        "execution_stage_ids": [
+          "R02",
+          "R07"
+        ],
+        "due": "R00-T07 建立正式账本时登记；最迟在所列实施 Task 的阶段验收前完成并执行",
+        "status": "SPECIFIED_NOT_EXECUTED"
+      },
+      "candidate_stage_map": {
+        "id": "R00-T02-LA-229B77A7BA69",
+        "featureId": "F-D20-SEMANTIC_EFFECT-SEMANTIC-EFFECT-ACCESS-ACCESS-SUMMARY-READ-229B77",
+        "requirement": "REQUIRED_SUPPLEMENTAL",
+        "r00Kind": "supplemental",
+        "r00TaskIds": [
+          "R02-T03",
+          "R07-T09"
+        ],
+        "r00ExecutionStageIds": [
+          "R02",
+          "R07"
+        ],
+        "r00LedgerStatus": "SPECIFIED_NOT_EXECUTED",
+        "r00ResultIds": [],
+        "r00TestIds": [],
+        "r00Then": "返回网络、设备和账号概况",
+        "r00Assertions": [
+          "成功时核对：返回网络、设备和账号概况",
+          "拒绝/无效输入时核对：无越权或错误持久化，且错误对用户可见"
+        ],
+        "r00Due": "R00-T07 建立正式账本时登记；最迟在所列实施 Task 的阶段验收前完成并执行",
+        "assertionContract": {
+          "producerCommand": "a05_a06_auth_matrix",
+          "evidencePath": "{EVIDENCE}/A05_A06/leaf-cases.json",
+          "cases": [
+            {
+              "case": "a05-no-credential-read",
+              "expect": 401
+            },
+            {
+              "case": "a05-forged-principal-headers",
+              "expect": 401
+            },
+            {
+              "case": "a05-cross-principal-read",
+              "expect": 403
+            },
+            {
+              "case": "a05-positive-control-owner-execute",
+              "expect": 200
+            },
+            {
+              "case": "a06-evil-origin-health",
+              "expect": 403
+            },
+            {
+              "case": "a06-foreign-host-health",
+              "expect": 403
+            }
+          ]
+        },
+        "basisKind": "auth_primitive_only",
+        "r02Share": "认证原语基础（同 LA-25AB678E7108）；该入口服务器路由不在 R02 现行面",
+        "r07Share": "接入概况完整入口（网络、设备和账号概况；拒绝无越权/错误持久化）",
+        "evidenceRequired": "A05/A06 认证矩阵真实执行证据；路由实现后另需其认证正负矩阵",
+        "evidenceCommandRefs": [
+          "a05_a06_auth_matrix"
+        ]
+      }
+    },
+    {
+      "id": "R00-T02-LA-093F22C4FF63",
+      "original_acceptance": {
+        "kind": "supplemental",
+        "stage_id": "R00",
+        "execution_stage_ids": [
+          "R02",
+          "R07"
+        ],
+        "task_ids": [
+          "R02-T03",
+          "R07-T09"
+        ],
+        "requirement": "REQUIRED_SUPPLEMENTAL",
+        "feature_id": "F-D20-SEMANTIC_EFFECT-SEMANTIC-EFFECT-ACCESS-ACCESS-DESKTOP-CREDENTIAL-093F22",
+        "then": "登记设备/凭证并返回一次性 secret 和桌面访问地址",
+        "formalization_task_id": "R00-T07",
+        "ledger_status": "SPECIFIED_NOT_EXECUTED",
+        "result_ids": [],
+        "feature_ids": [
+          "F-D20-SEMANTIC_EFFECT-SEMANTIC-EFFECT-ACCESS-ACCESS-DESKTOP-CREDENTIAL-093F22"
+        ],
+        "test_ids": []
+      },
+      "original_feature_stage": {
+        "id": "R00-T02-LA-093F22C4FF63",
+        "feature_id": "F-D20-SEMANTIC_EFFECT-SEMANTIC-EFFECT-ACCESS-ACCESS-DESKTOP-CREDENTIAL-093F22",
+        "task_ids": [
+          "R02-T03",
+          "R07-T09"
+        ],
+        "given": "按已查调用者和 HTTP 返回核对；尚未执行新实现验收",
+        "when": "用户签发桌面设备凭证",
+        "then": "登记设备/凭证并返回一次性 secret 和桌面访问地址",
+        "assertions": [
+          "成功时核对：登记设备/凭证并返回一次性 secret 和桌面访问地址",
+          "拒绝/无效输入时核对：无越权或错误持久化，且错误对用户可见"
+        ],
+        "existing_acceptance_relations": [
+          {
+            "acceptance_id": "R02-A05",
+            "relation": "INDIRECT",
+            "covers_leaf_result": false,
+            "reason": "现有场景只覆盖该叶的部分或横向边界，未检查完整动作及结果"
+          },
+          {
+            "acceptance_id": "R02-A06",
+            "relation": "INDIRECT",
+            "covers_leaf_result": false,
+            "reason": "现有场景只覆盖该叶的部分或横向边界，未检查完整动作及结果"
+          },
+          {
+            "acceptance_id": "R07-A17",
+            "relation": "INDIRECT",
+            "covers_leaf_result": false,
+            "reason": "现有场景只覆盖该叶的部分或横向边界，未检查完整动作及结果"
+          },
+          {
+            "acceptance_id": "R07-A18",
+            "relation": "INDIRECT",
+            "covers_leaf_result": false,
+            "reason": "现有场景只覆盖该叶的部分或横向边界，未检查完整动作及结果"
+          }
+        ],
+        "formalization_task_id": "R00-T07",
+        "execution_task_ids": [
+          "R02-T03",
+          "R07-T09"
+        ],
+        "execution_owner": "Rust service＋客户端",
+        "execution_stage_ids": [
+          "R02",
+          "R07"
+        ],
+        "due": "R00-T07 建立正式账本时登记；最迟在所列实施 Task 的阶段验收前完成并执行",
+        "status": "SPECIFIED_NOT_EXECUTED"
+      },
+      "candidate_stage_map": {
+        "id": "R00-T02-LA-093F22C4FF63",
+        "featureId": "F-D20-SEMANTIC_EFFECT-SEMANTIC-EFFECT-ACCESS-ACCESS-DESKTOP-CREDENTIAL-093F22",
+        "requirement": "REQUIRED_SUPPLEMENTAL",
+        "r00Kind": "supplemental",
+        "r00TaskIds": [
+          "R02-T03",
+          "R07-T09"
+        ],
+        "r00ExecutionStageIds": [
+          "R02",
+          "R07"
+        ],
+        "r00LedgerStatus": "SPECIFIED_NOT_EXECUTED",
+        "r00ResultIds": [],
+        "r00TestIds": [],
+        "r00Then": "登记设备/凭证并返回一次性 secret 和桌面访问地址",
+        "r00Assertions": [
+          "成功时核对：登记设备/凭证并返回一次性 secret 和桌面访问地址",
+          "拒绝/无效输入时核对：无越权或错误持久化，且错误对用户可见"
+        ],
+        "r00Due": "R00-T07 建立正式账本时登记；最迟在所列实施 Task 的阶段验收前完成并执行",
+        "assertionContract": {
+          "producerCommand": "a05_a06_auth_matrix",
+          "evidencePath": "{EVIDENCE}/A05_A06/leaf-cases.json",
+          "cases": [
+            {
+              "case": "a05-issue-foreign-credential",
+              "expect": 201
+            },
+            {
+              "case": "a05-devices-credentials-empty-user-id",
+              "expect": 400
+            },
+            {
+              "case": "a05-devices-credentials-invalid-json",
+              "expect": 400
+            }
+          ]
+        },
+        "basisKind": "route_basis_present_static",
+        "r02Share": "POST /lingxi/v1/devices/credentials：local_only 路由策略、登记设备/凭证、一次性 secret、作用域/到期、无效输入显式拒绝（静态可见；未执行验收；安全审计记录不在该处理器内）",
+        "r07Share": "桌面访问地址呈现、客户端签发流、安全审计记录与完整入口",
+        "evidenceRequired": "该路由认证/输入正负矩阵执行记录 + A05/A06 矩阵证据",
+        "evidenceCommandRefs": [
+          "a05_a06_auth_matrix"
+        ]
+      }
+    },
+    {
+      "id": "R00-T02-LA-747E0ADC941B",
+      "original_acceptance": {
+        "kind": "supplemental",
+        "stage_id": "R00",
+        "execution_stage_ids": [
+          "R02",
+          "R07"
+        ],
+        "task_ids": [
+          "R02-T03",
+          "R07-T09"
+        ],
+        "requirement": "REQUIRED_SUPPLEMENTAL",
+        "feature_id": "F-D20-SEMANTIC_EFFECT-SEMANTIC-EFFECT-ACCESS-ACCESS-MOBILE-CREDENTIALS-747E0A",
+        "then": "登记设备/凭证并返回一次性 secret 和手机访问地址",
+        "formalization_task_id": "R00-T07",
+        "ledger_status": "SPECIFIED_NOT_EXECUTED",
+        "result_ids": [],
+        "feature_ids": [
+          "F-D20-SEMANTIC_EFFECT-SEMANTIC-EFFECT-ACCESS-ACCESS-MOBILE-CREDENTIALS-747E0A"
+        ],
+        "test_ids": []
+      },
+      "original_feature_stage": {
+        "id": "R00-T02-LA-747E0ADC941B",
+        "feature_id": "F-D20-SEMANTIC_EFFECT-SEMANTIC-EFFECT-ACCESS-ACCESS-MOBILE-CREDENTIALS-747E0A",
+        "task_ids": [
+          "R02-T03",
+          "R07-T09"
+        ],
+        "given": "按已查调用者和 HTTP 返回核对；尚未执行新实现验收",
+        "when": "用户签发手机设备凭证",
+        "then": "登记设备/凭证并返回一次性 secret 和手机访问地址",
+        "assertions": [
+          "成功时核对：登记设备/凭证并返回一次性 secret 和手机访问地址",
+          "拒绝/无效输入时核对：无越权或错误持久化，且错误对用户可见"
+        ],
+        "existing_acceptance_relations": [
+          {
+            "acceptance_id": "R02-A05",
+            "relation": "INDIRECT",
+            "covers_leaf_result": false,
+            "reason": "现有场景只覆盖该叶的部分或横向边界，未检查完整动作及结果"
+          },
+          {
+            "acceptance_id": "R02-A06",
+            "relation": "INDIRECT",
+            "covers_leaf_result": false,
+            "reason": "现有场景只覆盖该叶的部分或横向边界，未检查完整动作及结果"
+          },
+          {
+            "acceptance_id": "R07-A17",
+            "relation": "INDIRECT",
+            "covers_leaf_result": false,
+            "reason": "现有场景只覆盖该叶的部分或横向边界，未检查完整动作及结果"
+          },
+          {
+            "acceptance_id": "R07-A18",
+            "relation": "INDIRECT",
+            "covers_leaf_result": false,
+            "reason": "现有场景只覆盖该叶的部分或横向边界，未检查完整动作及结果"
+          }
+        ],
+        "formalization_task_id": "R00-T07",
+        "execution_task_ids": [
+          "R02-T03",
+          "R07-T09"
+        ],
+        "execution_owner": "Rust service＋客户端",
+        "execution_stage_ids": [
+          "R02",
+          "R07"
+        ],
+        "due": "R00-T07 建立正式账本时登记；最迟在所列实施 Task 的阶段验收前完成并执行",
+        "status": "SPECIFIED_NOT_EXECUTED"
+      },
+      "candidate_stage_map": {
+        "id": "R00-T02-LA-747E0ADC941B",
+        "featureId": "F-D20-SEMANTIC_EFFECT-SEMANTIC-EFFECT-ACCESS-ACCESS-MOBILE-CREDENTIALS-747E0A",
+        "requirement": "REQUIRED_SUPPLEMENTAL",
+        "r00Kind": "supplemental",
+        "r00TaskIds": [
+          "R02-T03",
+          "R07-T09"
+        ],
+        "r00ExecutionStageIds": [
+          "R02",
+          "R07"
+        ],
+        "r00LedgerStatus": "SPECIFIED_NOT_EXECUTED",
+        "r00ResultIds": [],
+        "r00TestIds": [],
+        "r00Then": "登记设备/凭证并返回一次性 secret 和手机访问地址",
+        "r00Assertions": [
+          "成功时核对：登记设备/凭证并返回一次性 secret 和手机访问地址",
+          "拒绝/无效输入时核对：无越权或错误持久化，且错误对用户可见"
+        ],
+        "r00Due": "R00-T07 建立正式账本时登记；最迟在所列实施 Task 的阶段验收前完成并执行",
+        "assertionContract": {
+          "producerCommand": "a05_a06_auth_matrix",
+          "evidencePath": "{EVIDENCE}/A05_A06/leaf-cases.json",
+          "cases": [
+            {
+              "case": "a05-issue-foreign-credential",
+              "expect": 201
+            },
+            {
+              "case": "a05-devices-credentials-empty-user-id",
+              "expect": 400
+            },
+            {
+              "case": "a05-devices-credentials-invalid-json",
+              "expect": 400
+            }
+          ]
+        },
+        "basisKind": "route_basis_present_static",
+        "r02Share": "同 LA-093F22C4FF63 的 /lingxi/v1/devices/credentials 签发机制（静态可见；未执行验收）",
+        "r07Share": "手机访问地址呈现、客户端签发流、安全审计记录与完整入口",
+        "evidenceRequired": "同 LA-093F22C4FF63",
+        "evidenceCommandRefs": [
+          "a05_a06_auth_matrix"
+        ]
+      }
+    },
+    {
+      "id": "R00-T02-LA-F1754C6F755B",
+      "original_acceptance": {
+        "kind": "supplemental",
+        "stage_id": "R00",
+        "execution_stage_ids": [
+          "R02",
+          "R07"
+        ],
+        "task_ids": [
+          "R02-T03",
+          "R07-T09"
+        ],
+        "requirement": "REQUIRED_SUPPLEMENTAL",
+        "feature_id": "F-D20-ROUTE_BEHAVIOR-BEHAVIOR-ACCESS-ACCESS-ACCOUNT-PASSWORD-PUT-F1754C",
+        "then": "仅本地主人可设置密码；更新账号并记录安全审计，失败时返回错误",
+        "formalization_task_id": "R00-T07",
+        "ledger_status": "SPECIFIED_NOT_EXECUTED",
+        "result_ids": [],
+        "feature_ids": [
+          "F-D20-ROUTE_BEHAVIOR-BEHAVIOR-ACCESS-ACCESS-ACCOUNT-PASSWORD-PUT-F1754C"
+        ],
+        "test_ids": []
+      },
+      "original_feature_stage": {
+        "id": "R00-T02-LA-F1754C6F755B",
+        "feature_id": "F-D20-ROUTE_BEHAVIOR-BEHAVIOR-ACCESS-ACCESS-ACCOUNT-PASSWORD-PUT-F1754C",
+        "task_ids": [
+          "R02-T03",
+          "R07-T09"
+        ],
+        "given": "该入口所需目标、身份和数据已准备",
+        "when": "用户设置本地账号密码",
+        "then": "仅本地主人可设置密码；更新账号并记录安全审计，失败时返回错误",
+        "assertions": [
+          "执行“设置本地账号密码”后核对：仅本地主人可设置密码；更新账号并记录安全审计，失败时返回错误",
+          "失败、冲突或拒绝时核对返回的状态与实际副作用一致"
+        ],
+        "existing_acceptance_relations": [
+          {
+            "acceptance_id": "R02-A05",
+            "relation": "GAP",
+            "covers_leaf_result": false,
+            "reason": "未找到该 A-ID 对本叶成功、拒绝及副作用的直接检查；保留阶段关联，由逐叶场景补足"
+          },
+          {
+            "acceptance_id": "R02-A06",
+            "relation": "GAP",
+            "covers_leaf_result": false,
+            "reason": "未找到该 A-ID 对本叶成功、拒绝及副作用的直接检查；保留阶段关联，由逐叶场景补足"
+          },
+          {
+            "acceptance_id": "R07-A17",
+            "relation": "GAP",
+            "covers_leaf_result": false,
+            "reason": "未找到该 A-ID 对本叶成功、拒绝及副作用的直接检查；保留阶段关联，由逐叶场景补足"
+          },
+          {
+            "acceptance_id": "R07-A18",
+            "relation": "GAP",
+            "covers_leaf_result": false,
+            "reason": "未找到该 A-ID 对本叶成功、拒绝及副作用的直接检查；保留阶段关联，由逐叶场景补足"
+          }
+        ],
+        "formalization_task_id": "R00-T07",
+        "execution_task_ids": [
+          "R02-T03",
+          "R07-T09"
+        ],
+        "execution_owner": "Rust service＋客户端",
+        "execution_stage_ids": [
+          "R02",
+          "R07"
+        ],
+        "due": "R00-T07 建立正式账本时登记；最迟在所列实施 Task 的阶段验收前完成并执行",
+        "status": "SPECIFIED_NOT_EXECUTED"
+      },
+      "candidate_stage_map": {
+        "id": "R00-T02-LA-F1754C6F755B",
+        "featureId": "F-D20-ROUTE_BEHAVIOR-BEHAVIOR-ACCESS-ACCESS-ACCOUNT-PASSWORD-PUT-F1754C",
+        "requirement": "REQUIRED_SUPPLEMENTAL",
+        "r00Kind": "supplemental",
+        "r00TaskIds": [
+          "R02-T03",
+          "R07-T09"
+        ],
+        "r00ExecutionStageIds": [
+          "R02",
+          "R07"
+        ],
+        "r00LedgerStatus": "SPECIFIED_NOT_EXECUTED",
+        "r00ResultIds": [],
+        "r00TestIds": [],
+        "r00Then": "仅本地主人可设置密码；更新账号并记录安全审计，失败时返回错误",
+        "r00Assertions": [
+          "执行“设置本地账号密码”后核对：仅本地主人可设置密码；更新账号并记录安全审计，失败时返回错误",
+          "失败、冲突或拒绝时核对返回的状态与实际副作用一致"
+        ],
+        "r00Due": "R00-T07 建立正式账本时登记；最迟在所列实施 Task 的阶段验收前完成并执行",
+        "assertionContract": {
+          "producerCommand": "a05_a06_auth_matrix",
+          "evidencePath": "{EVIDENCE}/A05_A06/leaf-cases.json",
+          "cases": [
+            {
+              "case": "a05-no-credential-read",
+              "expect": 401
+            },
+            {
+              "case": "a05-forged-principal-headers",
+              "expect": 401
+            },
+            {
+              "case": "a05-cross-principal-read",
+              "expect": 403
+            },
+            {
+              "case": "a05-positive-control-owner-execute",
+              "expect": 200
+            },
+            {
+              "case": "a06-evil-origin-health",
+              "expect": 403
+            },
+            {
+              "case": "a06-foreign-host-health",
+              "expect": 403
+            }
+          ]
+        },
+        "basisKind": "auth_primitive_only",
+        "r02Share": "认证原语基础（同 LA-25AB678E7108）；该入口服务器路由不在 R02 现行面",
+        "r07Share": "设置本地账号密码完整入口（仅本地主人、账号更新、安全审计、失败返回错误）",
+        "evidenceRequired": "A05/A06 认证矩阵真实执行证据；路由实现后另需其认证正负矩阵",
+        "evidenceCommandRefs": [
+          "a05_a06_auth_matrix"
+        ]
+      }
+    },
+    {
+      "id": "R00-T02-LA-F006E094F028",
+      "original_acceptance": {
+        "kind": "supplemental",
+        "stage_id": "R00",
+        "execution_stage_ids": [
+          "R02",
+          "R07"
+        ],
+        "task_ids": [
+          "R02-T03",
+          "R07-T09"
+        ],
+        "requirement": "REQUIRED_SUPPLEMENTAL",
+        "feature_id": "F-D20-SEMANTIC_EFFECT-SEMANTIC-EFFECT-ACCESS-ACCESS-ACCOUNT-PROFILE-PU-F006E0",
+        "then": "保存 username/displayName 并返回 account",
+        "formalization_task_id": "R00-T07",
+        "ledger_status": "SPECIFIED_NOT_EXECUTED",
+        "result_ids": [],
+        "feature_ids": [
+          "F-D20-SEMANTIC_EFFECT-SEMANTIC-EFFECT-ACCESS-ACCESS-ACCOUNT-PROFILE-PU-F006E0"
+        ],
+        "test_ids": []
+      },
+      "original_feature_stage": {
+        "id": "R00-T02-LA-F006E094F028",
+        "feature_id": "F-D20-SEMANTIC_EFFECT-SEMANTIC-EFFECT-ACCESS-ACCESS-ACCOUNT-PROFILE-PU-F006E0",
+        "task_ids": [
+          "R02-T03",
+          "R07-T09"
+        ],
+        "given": "按已查调用者和 HTTP 返回核对；尚未执行新实现验收",
+        "when": "用户修改本地账号资料",
+        "then": "保存 username/displayName 并返回 account",
+        "assertions": [
+          "成功时核对：保存 username/displayName 并返回 account",
+          "拒绝/无效输入时核对：无越权或错误持久化，且错误对用户可见"
+        ],
+        "existing_acceptance_relations": [
+          {
+            "acceptance_id": "R02-A05",
+            "relation": "INDIRECT",
+            "covers_leaf_result": false,
+            "reason": "现有场景只覆盖该叶的部分或横向边界，未检查完整动作及结果"
+          },
+          {
+            "acceptance_id": "R02-A06",
+            "relation": "INDIRECT",
+            "covers_leaf_result": false,
+            "reason": "现有场景只覆盖该叶的部分或横向边界，未检查完整动作及结果"
+          },
+          {
+            "acceptance_id": "R07-A17",
+            "relation": "INDIRECT",
+            "covers_leaf_result": false,
+            "reason": "现有场景只覆盖该叶的部分或横向边界，未检查完整动作及结果"
+          },
+          {
+            "acceptance_id": "R07-A18",
+            "relation": "INDIRECT",
+            "covers_leaf_result": false,
+            "reason": "现有场景只覆盖该叶的部分或横向边界，未检查完整动作及结果"
+          }
+        ],
+        "formalization_task_id": "R00-T07",
+        "execution_task_ids": [
+          "R02-T03",
+          "R07-T09"
+        ],
+        "execution_owner": "Rust service＋客户端",
+        "execution_stage_ids": [
+          "R02",
+          "R07"
+        ],
+        "due": "R00-T07 建立正式账本时登记；最迟在所列实施 Task 的阶段验收前完成并执行",
+        "status": "SPECIFIED_NOT_EXECUTED"
+      },
+      "candidate_stage_map": {
+        "id": "R00-T02-LA-F006E094F028",
+        "featureId": "F-D20-SEMANTIC_EFFECT-SEMANTIC-EFFECT-ACCESS-ACCESS-ACCOUNT-PROFILE-PU-F006E0",
+        "requirement": "REQUIRED_SUPPLEMENTAL",
+        "r00Kind": "supplemental",
+        "r00TaskIds": [
+          "R02-T03",
+          "R07-T09"
+        ],
+        "r00ExecutionStageIds": [
+          "R02",
+          "R07"
+        ],
+        "r00LedgerStatus": "SPECIFIED_NOT_EXECUTED",
+        "r00ResultIds": [],
+        "r00TestIds": [],
+        "r00Then": "保存 username/displayName 并返回 account",
+        "r00Assertions": [
+          "成功时核对：保存 username/displayName 并返回 account",
+          "拒绝/无效输入时核对：无越权或错误持久化，且错误对用户可见"
+        ],
+        "r00Due": "R00-T07 建立正式账本时登记；最迟在所列实施 Task 的阶段验收前完成并执行",
+        "assertionContract": {
+          "producerCommand": "a05_a06_auth_matrix",
+          "evidencePath": "{EVIDENCE}/A05_A06/leaf-cases.json",
+          "cases": [
+            {
+              "case": "a05-no-credential-read",
+              "expect": 401
+            },
+            {
+              "case": "a05-forged-principal-headers",
+              "expect": 401
+            },
+            {
+              "case": "a05-cross-principal-read",
+              "expect": 403
+            },
+            {
+              "case": "a05-positive-control-owner-execute",
+              "expect": 200
+            },
+            {
+              "case": "a06-evil-origin-health",
+              "expect": 403
+            },
+            {
+              "case": "a06-foreign-host-health",
+              "expect": 403
+            }
+          ]
+        },
+        "basisKind": "auth_primitive_only",
+        "r02Share": "认证原语基础（同 LA-25AB678E7108）；该入口服务器路由不在 R02 现行面",
+        "r07Share": "修改本地账号资料完整入口（保存 username/displayName 并返回 account；拒绝无越权/错误持久化）",
+        "evidenceRequired": "A05/A06 认证矩阵真实执行证据；路由实现后另需其认证正负矩阵",
+        "evidenceCommandRefs": [
+          "a05_a06_auth_matrix"
+        ]
+      }
+    },
+    {
+      "id": "R00-T02-LA-73CDC44696D3",
+      "original_acceptance": {
+        "kind": "supplemental",
+        "stage_id": "R00",
+        "execution_stage_ids": [
+          "R02",
+          "R07"
+        ],
+        "task_ids": [
+          "R02-T03",
+          "R07-T09"
+        ],
+        "requirement": "REQUIRED_SUPPLEMENTAL",
+        "feature_id": "F-D20-SEMANTIC_EFFECT-SEMANTIC-EFFECT-ACCESS-ACCESS-NETWORK-PUT-73CDC4",
+        "then": "保存网络配置、更新运行时摘要与安全审计",
+        "formalization_task_id": "R00-T07",
+        "ledger_status": "SPECIFIED_NOT_EXECUTED",
+        "result_ids": [],
+        "feature_ids": [
+          "F-D20-SEMANTIC_EFFECT-SEMANTIC-EFFECT-ACCESS-ACCESS-NETWORK-PUT-73CDC4"
+        ],
+        "test_ids": []
+      },
+      "original_feature_stage": {
+        "id": "R00-T02-LA-73CDC44696D3",
+        "feature_id": "F-D20-SEMANTIC_EFFECT-SEMANTIC-EFFECT-ACCESS-ACCESS-NETWORK-PUT-73CDC4",
+        "task_ids": [
+          "R02-T03",
+          "R07-T09"
+        ],
+        "given": "按已查调用者和 HTTP 返回核对；尚未执行新实现验收",
+        "when": "用户设置服务监听和远程地址",
+        "then": "保存网络配置、更新运行时摘要与安全审计",
+        "assertions": [
+          "成功时核对：保存网络配置、更新运行时摘要与安全审计",
+          "拒绝/无效输入时核对：无越权或错误持久化，且错误对用户可见"
+        ],
+        "existing_acceptance_relations": [
+          {
+            "acceptance_id": "R02-A05",
+            "relation": "INDIRECT",
+            "covers_leaf_result": false,
+            "reason": "现有场景只覆盖该叶的部分或横向边界，未检查完整动作及结果"
+          },
+          {
+            "acceptance_id": "R02-A06",
+            "relation": "INDIRECT",
+            "covers_leaf_result": false,
+            "reason": "现有场景只覆盖该叶的部分或横向边界，未检查完整动作及结果"
+          },
+          {
+            "acceptance_id": "R07-A17",
+            "relation": "INDIRECT",
+            "covers_leaf_result": false,
+            "reason": "现有场景只覆盖该叶的部分或横向边界，未检查完整动作及结果"
+          },
+          {
+            "acceptance_id": "R07-A18",
+            "relation": "INDIRECT",
+            "covers_leaf_result": false,
+            "reason": "现有场景只覆盖该叶的部分或横向边界，未检查完整动作及结果"
+          }
+        ],
+        "formalization_task_id": "R00-T07",
+        "execution_task_ids": [
+          "R02-T03",
+          "R07-T09"
+        ],
+        "execution_owner": "Rust service＋客户端",
+        "execution_stage_ids": [
+          "R02",
+          "R07"
+        ],
+        "due": "R00-T07 建立正式账本时登记；最迟在所列实施 Task 的阶段验收前完成并执行",
+        "status": "SPECIFIED_NOT_EXECUTED"
+      },
+      "candidate_stage_map": {
+        "id": "R00-T02-LA-73CDC44696D3",
+        "featureId": "F-D20-SEMANTIC_EFFECT-SEMANTIC-EFFECT-ACCESS-ACCESS-NETWORK-PUT-73CDC4",
+        "requirement": "REQUIRED_SUPPLEMENTAL",
+        "r00Kind": "supplemental",
+        "r00TaskIds": [
+          "R02-T03",
+          "R07-T09"
+        ],
+        "r00ExecutionStageIds": [
+          "R02",
+          "R07"
+        ],
+        "r00LedgerStatus": "SPECIFIED_NOT_EXECUTED",
+        "r00ResultIds": [],
+        "r00TestIds": [],
+        "r00Then": "保存网络配置、更新运行时摘要与安全审计",
+        "r00Assertions": [
+          "成功时核对：保存网络配置、更新运行时摘要与安全审计",
+          "拒绝/无效输入时核对：无越权或错误持久化，且错误对用户可见"
+        ],
+        "r00Due": "R00-T07 建立正式账本时登记；最迟在所列实施 Task 的阶段验收前完成并执行",
+        "assertionContract": {
+          "producerCommand": "a05_a06_auth_matrix",
+          "evidencePath": "{EVIDENCE}/A05_A06/leaf-cases.json",
+          "cases": [
+            {
+              "case": "a05-no-credential-read",
+              "expect": 401
+            },
+            {
+              "case": "a05-forged-principal-headers",
+              "expect": 401
+            },
+            {
+              "case": "a05-cross-principal-read",
+              "expect": 403
+            },
+            {
+              "case": "a05-positive-control-owner-execute",
+              "expect": 200
+            },
+            {
+              "case": "a06-evil-origin-health",
+              "expect": 403
+            },
+            {
+              "case": "a06-foreign-host-health",
+              "expect": 403
+            }
+          ]
+        },
+        "basisKind": "auth_primitive_only",
+        "r02Share": "认证原语基础（同 LA-25AB678E7108）；该入口服务器路由不在 R02 现行面",
+        "r07Share": "设置服务监听与远程地址完整入口（网络配置保存、运行时摘要、安全审计）",
+        "evidenceRequired": "A05/A06 认证矩阵真实执行证据；路由实现后另需其认证正负矩阵",
+        "evidenceCommandRefs": [
+          "a05_a06_auth_matrix"
+        ]
+      }
+    },
+    {
+      "id": "R00-T02-LA-B8F8CF9E8AF5",
+      "original_acceptance": {
+        "kind": "supplemental",
+        "stage_id": "R00",
+        "execution_stage_ids": [
+          "R02",
+          "R07"
+        ],
+        "task_ids": [
+          "R02-T03",
+          "R07-T09"
+        ],
+        "requirement": "REQUIRED_SUPPLEMENTAL",
+        "feature_id": "F-D20-SEMANTIC_EFFECT-SEMANTIC-EFFECT-DEVICES-DEVICES-B8F8CF",
+        "then": "仅本地主人读取脱敏的设备、凭证与配对会话列表",
+        "formalization_task_id": "R00-T07",
+        "ledger_status": "SPECIFIED_NOT_EXECUTED",
+        "result_ids": [],
+        "feature_ids": [
+          "F-D20-SEMANTIC_EFFECT-SEMANTIC-EFFECT-DEVICES-DEVICES-B8F8CF"
+        ],
+        "test_ids": []
+      },
+      "original_feature_stage": {
+        "id": "R00-T02-LA-B8F8CF9E8AF5",
+        "feature_id": "F-D20-SEMANTIC_EFFECT-SEMANTIC-EFFECT-DEVICES-DEVICES-B8F8CF",
+        "task_ids": [
+          "R02-T03",
+          "R07-T09"
+        ],
+        "given": "按已查调用者和 HTTP 返回核对；尚未执行新实现验收",
+        "when": "用户查看已配对设备和凭证",
+        "then": "仅本地主人读取脱敏的设备、凭证与配对会话列表",
+        "assertions": [
+          "给定目标与相应权限，执行“查看已配对设备和凭证”后核对：仅本地主人读取脱敏的设备、凭证与配对会话列表",
+          "输入无效、权限不足或下游失败时应返回明确错误，不呈现成功结果"
+        ],
+        "existing_acceptance_relations": [
+          {
+            "acceptance_id": "R02-A05",
+            "relation": "GAP",
+            "covers_leaf_result": false,
+            "reason": "未找到该 A-ID 对本叶成功、拒绝及副作用的直接检查；保留阶段关联，由逐叶场景补足"
+          },
+          {
+            "acceptance_id": "R02-A06",
+            "relation": "GAP",
+            "covers_leaf_result": false,
+            "reason": "未找到该 A-ID 对本叶成功、拒绝及副作用的直接检查；保留阶段关联，由逐叶场景补足"
+          },
+          {
+            "acceptance_id": "R07-A17",
+            "relation": "GAP",
+            "covers_leaf_result": false,
+            "reason": "未找到该 A-ID 对本叶成功、拒绝及副作用的直接检查；保留阶段关联，由逐叶场景补足"
+          },
+          {
+            "acceptance_id": "R07-A18",
+            "relation": "GAP",
+            "covers_leaf_result": false,
+            "reason": "未找到该 A-ID 对本叶成功、拒绝及副作用的直接检查；保留阶段关联，由逐叶场景补足"
+          }
+        ],
+        "formalization_task_id": "R00-T07",
+        "execution_task_ids": [
+          "R02-T03",
+          "R07-T09"
+        ],
+        "execution_owner": "Rust service＋客户端",
+        "execution_stage_ids": [
+          "R02",
+          "R07"
+        ],
+        "due": "R00-T07 建立正式账本时登记；最迟在所列实施 Task 的阶段验收前完成并执行",
+        "status": "SPECIFIED_NOT_EXECUTED"
+      },
+      "candidate_stage_map": {
+        "id": "R00-T02-LA-B8F8CF9E8AF5",
+        "featureId": "F-D20-SEMANTIC_EFFECT-SEMANTIC-EFFECT-DEVICES-DEVICES-B8F8CF",
+        "requirement": "REQUIRED_SUPPLEMENTAL",
+        "r00Kind": "supplemental",
+        "r00TaskIds": [
+          "R02-T03",
+          "R07-T09"
+        ],
+        "r00ExecutionStageIds": [
+          "R02",
+          "R07"
+        ],
+        "r00LedgerStatus": "SPECIFIED_NOT_EXECUTED",
+        "r00ResultIds": [],
+        "r00TestIds": [],
+        "r00Then": "仅本地主人读取脱敏的设备、凭证与配对会话列表",
+        "r00Assertions": [
+          "给定目标与相应权限，执行“查看已配对设备和凭证”后核对：仅本地主人读取脱敏的设备、凭证与配对会话列表",
+          "输入无效、权限不足或下游失败时应返回明确错误，不呈现成功结果"
+        ],
+        "r00Due": "R00-T07 建立正式账本时登记；最迟在所列实施 Task 的阶段验收前完成并执行",
+        "assertionContract": {
+          "producerCommand": "a05_a06_auth_matrix",
+          "evidencePath": "{EVIDENCE}/A05_A06/leaf-cases.json",
+          "cases": [
+            {
+              "case": "a05-no-credential-read",
+              "expect": 401
+            },
+            {
+              "case": "a05-forged-principal-headers",
+              "expect": 401
+            },
+            {
+              "case": "a05-cross-principal-read",
+              "expect": 403
+            },
+            {
+              "case": "a05-positive-control-owner-execute",
+              "expect": 200
+            },
+            {
+              "case": "a06-evil-origin-health",
+              "expect": 403
+            },
+            {
+              "case": "a06-foreign-host-health",
+              "expect": 403
+            }
+          ]
+        },
+        "basisKind": "auth_primitive_only",
+        "r02Share": "认证原语基础（凭证签发面已在，见 LA-093F22C4FF63）；设备/凭证列表与脱敏路由不在 R02 现行面",
+        "r07Share": "查看已配对设备和凭证完整入口（仅本地主人、脱敏列表、明确错误不呈现成功）",
+        "evidenceRequired": "A05/A06 认证矩阵真实执行证据；列表路由实现后另需其认证正负矩阵",
+        "evidenceCommandRefs": [
+          "a05_a06_auth_matrix"
+        ]
+      }
+    },
+    {
+      "id": "R00-T02-LA-7498024422D7",
+      "original_acceptance": {
+        "kind": "supplemental",
+        "stage_id": "R00",
+        "execution_stage_ids": [
+          "R02",
+          "R07"
+        ],
+        "task_ids": [
+          "R02-T03",
+          "R07-T09"
+        ],
+        "requirement": "REQUIRED_SUPPLEMENTAL",
+        "feature_id": "F-D20-SEMANTIC_EFFECT-SEMANTIC-EFFECT-DEVICES-DEVICES-DEVICEID-REVOKE-749802",
+        "then": "令设备失效并返回脱敏设备状态，记录安全审计",
+        "formalization_task_id": "R00-T07",
+        "ledger_status": "SPECIFIED_NOT_EXECUTED",
+        "result_ids": [],
+        "feature_ids": [
+          "F-D20-SEMANTIC_EFFECT-SEMANTIC-EFFECT-DEVICES-DEVICES-DEVICEID-REVOKE-749802"
+        ],
+        "test_ids": []
+      },
+      "original_feature_stage": {
+        "id": "R00-T02-LA-7498024422D7",
+        "feature_id": "F-D20-SEMANTIC_EFFECT-SEMANTIC-EFFECT-DEVICES-DEVICES-DEVICEID-REVOKE-749802",
+        "task_ids": [
+          "R02-T03",
+          "R07-T09"
+        ],
+        "given": "按已查调用者和 HTTP 返回核对；尚未执行新实现验收",
+        "when": "用户撤销设备",
+        "then": "令设备失效并返回脱敏设备状态，记录安全审计",
+        "assertions": [
+          "给定目标与相应权限，执行“撤销设备”后核对：令设备失效并返回脱敏设备状态，记录安全审计",
+          "输入无效、权限不足或下游失败时应返回明确错误，不呈现成功结果"
+        ],
+        "existing_acceptance_relations": [
+          {
+            "acceptance_id": "R02-A05",
+            "relation": "GAP",
+            "covers_leaf_result": false,
+            "reason": "未找到该 A-ID 对本叶成功、拒绝及副作用的直接检查；保留阶段关联，由逐叶场景补足"
+          },
+          {
+            "acceptance_id": "R02-A06",
+            "relation": "GAP",
+            "covers_leaf_result": false,
+            "reason": "未找到该 A-ID 对本叶成功、拒绝及副作用的直接检查；保留阶段关联，由逐叶场景补足"
+          },
+          {
+            "acceptance_id": "R07-A17",
+            "relation": "GAP",
+            "covers_leaf_result": false,
+            "reason": "未找到该 A-ID 对本叶成功、拒绝及副作用的直接检查；保留阶段关联，由逐叶场景补足"
+          },
+          {
+            "acceptance_id": "R07-A18",
+            "relation": "GAP",
+            "covers_leaf_result": false,
+            "reason": "未找到该 A-ID 对本叶成功、拒绝及副作用的直接检查；保留阶段关联，由逐叶场景补足"
+          }
+        ],
+        "formalization_task_id": "R00-T07",
+        "execution_task_ids": [
+          "R02-T03",
+          "R07-T09"
+        ],
+        "execution_owner": "Rust service＋客户端",
+        "execution_stage_ids": [
+          "R02",
+          "R07"
+        ],
+        "due": "R00-T07 建立正式账本时登记；最迟在所列实施 Task 的阶段验收前完成并执行",
+        "status": "SPECIFIED_NOT_EXECUTED"
+      },
+      "candidate_stage_map": {
+        "id": "R00-T02-LA-7498024422D7",
+        "featureId": "F-D20-SEMANTIC_EFFECT-SEMANTIC-EFFECT-DEVICES-DEVICES-DEVICEID-REVOKE-749802",
+        "requirement": "REQUIRED_SUPPLEMENTAL",
+        "r00Kind": "supplemental",
+        "r00TaskIds": [
+          "R02-T03",
+          "R07-T09"
+        ],
+        "r00ExecutionStageIds": [
+          "R02",
+          "R07"
+        ],
+        "r00LedgerStatus": "SPECIFIED_NOT_EXECUTED",
+        "r00ResultIds": [],
+        "r00TestIds": [],
+        "r00Then": "令设备失效并返回脱敏设备状态，记录安全审计",
+        "r00Assertions": [
+          "给定目标与相应权限，执行“撤销设备”后核对：令设备失效并返回脱敏设备状态，记录安全审计",
+          "输入无效、权限不足或下游失败时应返回明确错误，不呈现成功结果"
+        ],
+        "r00Due": "R00-T07 建立正式账本时登记；最迟在所列实施 Task 的阶段验收前完成并执行",
+        "assertionContract": {
+          "producerCommand": "a05_a06_auth_matrix",
+          "evidencePath": "{EVIDENCE}/A05_A06/leaf-cases.json",
+          "cases": [
+            {
+              "case": "a05-no-credential-read",
+              "expect": 401
+            },
+            {
+              "case": "a05-forged-principal-headers",
+              "expect": 401
+            },
+            {
+              "case": "a05-cross-principal-read",
+              "expect": 403
+            },
+            {
+              "case": "a05-positive-control-owner-execute",
+              "expect": 200
+            },
+            {
+              "case": "a06-evil-origin-health",
+              "expect": 403
+            },
+            {
+              "case": "a06-foreign-host-health",
+              "expect": 403
+            }
+          ]
+        },
+        "basisKind": "auth_primitive_only",
+        "r02Share": "认证原语基础（同 LA-25AB678E7108）；设备撤销路由不在 R02 现行面",
+        "r07Share": "撤销设备完整入口（失效、脱敏状态、安全审计、明确错误）",
+        "evidenceRequired": "A05/A06 认证矩阵真实执行证据；路由实现后另需其认证正负矩阵",
+        "evidenceCommandRefs": [
+          "a05_a06_auth_matrix"
+        ]
+      }
+    },
+    {
+      "id": "R00-T02-LA-43A126149416",
+      "original_acceptance": {
+        "kind": "supplemental",
+        "stage_id": "R00",
+        "execution_stage_ids": [
+          "R02",
+          "R07"
+        ],
+        "task_ids": [
+          "R02-T03",
+          "R07-T09"
+        ],
+        "requirement": "REQUIRED_SUPPLEMENTAL",
+        "feature_id": "F-D20-SEMANTIC_EFFECT-SEMANTIC-EFFECT-DEVICES-DEVICES-CREDENTIALS-CRED-43A126",
+        "then": "令指定凭证失效并返回脱敏状态，记录安全审计",
+        "formalization_task_id": "R00-T07",
+        "ledger_status": "SPECIFIED_NOT_EXECUTED",
+        "result_ids": [],
+        "feature_ids": [
+          "F-D20-SEMANTIC_EFFECT-SEMANTIC-EFFECT-DEVICES-DEVICES-CREDENTIALS-CRED-43A126"
+        ],
+        "test_ids": []
+      },
+      "original_feature_stage": {
+        "id": "R00-T02-LA-43A126149416",
+        "feature_id": "F-D20-SEMANTIC_EFFECT-SEMANTIC-EFFECT-DEVICES-DEVICES-CREDENTIALS-CRED-43A126",
+        "task_ids": [
+          "R02-T03",
+          "R07-T09"
+        ],
+        "given": "按已查调用者和 HTTP 返回核对；尚未执行新实现验收",
+        "when": "用户撤销设备凭证",
+        "then": "令指定凭证失效并返回脱敏状态，记录安全审计",
+        "assertions": [
+          "给定目标与相应权限，执行“撤销设备凭证”后核对：令指定凭证失效并返回脱敏状态，记录安全审计",
+          "输入无效、权限不足或下游失败时应返回明确错误，不呈现成功结果"
+        ],
+        "existing_acceptance_relations": [
+          {
+            "acceptance_id": "R02-A05",
+            "relation": "GAP",
+            "covers_leaf_result": false,
+            "reason": "未找到该 A-ID 对本叶成功、拒绝及副作用的直接检查；保留阶段关联，由逐叶场景补足"
+          },
+          {
+            "acceptance_id": "R02-A06",
+            "relation": "GAP",
+            "covers_leaf_result": false,
+            "reason": "未找到该 A-ID 对本叶成功、拒绝及副作用的直接检查；保留阶段关联，由逐叶场景补足"
+          },
+          {
+            "acceptance_id": "R07-A17",
+            "relation": "GAP",
+            "covers_leaf_result": false,
+            "reason": "未找到该 A-ID 对本叶成功、拒绝及副作用的直接检查；保留阶段关联，由逐叶场景补足"
+          },
+          {
+            "acceptance_id": "R07-A18",
+            "relation": "GAP",
+            "covers_leaf_result": false,
+            "reason": "未找到该 A-ID 对本叶成功、拒绝及副作用的直接检查；保留阶段关联，由逐叶场景补足"
+          }
+        ],
+        "formalization_task_id": "R00-T07",
+        "execution_task_ids": [
+          "R02-T03",
+          "R07-T09"
+        ],
+        "execution_owner": "Rust service＋客户端",
+        "execution_stage_ids": [
+          "R02",
+          "R07"
+        ],
+        "due": "R00-T07 建立正式账本时登记；最迟在所列实施 Task 的阶段验收前完成并执行",
+        "status": "SPECIFIED_NOT_EXECUTED"
+      },
+      "candidate_stage_map": {
+        "id": "R00-T02-LA-43A126149416",
+        "featureId": "F-D20-SEMANTIC_EFFECT-SEMANTIC-EFFECT-DEVICES-DEVICES-CREDENTIALS-CRED-43A126",
+        "requirement": "REQUIRED_SUPPLEMENTAL",
+        "r00Kind": "supplemental",
+        "r00TaskIds": [
+          "R02-T03",
+          "R07-T09"
+        ],
+        "r00ExecutionStageIds": [
+          "R02",
+          "R07"
+        ],
+        "r00LedgerStatus": "SPECIFIED_NOT_EXECUTED",
+        "r00ResultIds": [],
+        "r00TestIds": [],
+        "r00Then": "令指定凭证失效并返回脱敏状态，记录安全审计",
+        "r00Assertions": [
+          "给定目标与相应权限，执行“撤销设备凭证”后核对：令指定凭证失效并返回脱敏状态，记录安全审计",
+          "输入无效、权限不足或下游失败时应返回明确错误，不呈现成功结果"
+        ],
+        "r00Due": "R00-T07 建立正式账本时登记；最迟在所列实施 Task 的阶段验收前完成并执行",
+        "assertionContract": {
+          "producerCommand": "a05_a06_auth_matrix",
+          "evidencePath": "{EVIDENCE}/A05_A06/leaf-cases.json",
+          "cases": [
+            {
+              "case": "a05-no-credential-read",
+              "expect": 401
+            },
+            {
+              "case": "a05-forged-principal-headers",
+              "expect": 401
+            },
+            {
+              "case": "a05-cross-principal-read",
+              "expect": 403
+            },
+            {
+              "case": "a05-positive-control-owner-execute",
+              "expect": 200
+            },
+            {
+              "case": "a06-evil-origin-health",
+              "expect": 403
+            },
+            {
+              "case": "a06-foreign-host-health",
+              "expect": 403
+            }
+          ]
+        },
+        "basisKind": "auth_primitive_only",
+        "r02Share": "认证原语基础（同 LA-25AB678E7108）；凭证撤销路由不在 R02 现行面",
+        "r07Share": "撤销设备凭证完整入口（指定凭证失效、脱敏状态、安全审计、明确错误）",
+        "evidenceRequired": "A05/A06 认证矩阵真实执行证据；路由实现后另需其认证正负矩阵",
+        "evidenceCommandRefs": [
+          "a05_a06_auth_matrix"
+        ]
+      }
+    },
+    {
+      "id": "R00-T02-LA-756217C74101",
+      "original_acceptance": {
+        "kind": "supplemental",
+        "stage_id": "R00",
+        "execution_stage_ids": [
+          "R02",
+          "R07"
+        ],
+        "task_ids": [
+          "R02-T03",
+          "R07-T09"
+        ],
+        "requirement": "REQUIRED_SUPPLEMENTAL",
+        "feature_id": "F-D20-SEMANTIC_EFFECT-SEMANTIC-EFFECT-DEVICES-DEVICES-PAIRING-SESSIONS-756217",
+        "then": "仅本地主人得到配对码及到期时间，注册记录并写安全审计",
+        "formalization_task_id": "R00-T07",
+        "ledger_status": "SPECIFIED_NOT_EXECUTED",
+        "result_ids": [],
+        "feature_ids": [
+          "F-D20-SEMANTIC_EFFECT-SEMANTIC-EFFECT-DEVICES-DEVICES-PAIRING-SESSIONS-756217"
+        ],
+        "test_ids": []
+      },
+      "original_feature_stage": {
+        "id": "R00-T02-LA-756217C74101",
+        "feature_id": "F-D20-SEMANTIC_EFFECT-SEMANTIC-EFFECT-DEVICES-DEVICES-PAIRING-SESSIONS-756217",
+        "task_ids": [
+          "R02-T03",
+          "R07-T09"
+        ],
+        "given": "以具备相应权限的 HTTP 客户端直接请求；不宣称存在现役内置按钮",
+        "when": "用户创建设备配对会话",
+        "then": "仅本地主人得到配对码及到期时间，注册记录并写安全审计",
+        "assertions": [
+          "给定目标与相应权限，执行“创建设备配对会话”后核对：仅本地主人得到配对码及到期时间，注册记录并写安全审计",
+          "输入无效、权限不足或下游失败时应返回明确错误，不呈现成功结果"
+        ],
+        "existing_acceptance_relations": [
+          {
+            "acceptance_id": "R02-A05",
+            "relation": "GAP",
+            "covers_leaf_result": false,
+            "reason": "未找到该 A-ID 对本叶成功、拒绝及副作用的直接检查；保留阶段关联，由逐叶场景补足"
+          },
+          {
+            "acceptance_id": "R02-A06",
+            "relation": "GAP",
+            "covers_leaf_result": false,
+            "reason": "未找到该 A-ID 对本叶成功、拒绝及副作用的直接检查；保留阶段关联，由逐叶场景补足"
+          },
+          {
+            "acceptance_id": "R07-A17",
+            "relation": "GAP",
+            "covers_leaf_result": false,
+            "reason": "未找到该 A-ID 对本叶成功、拒绝及副作用的直接检查；保留阶段关联，由逐叶场景补足"
+          },
+          {
+            "acceptance_id": "R07-A18",
+            "relation": "GAP",
+            "covers_leaf_result": false,
+            "reason": "未找到该 A-ID 对本叶成功、拒绝及副作用的直接检查；保留阶段关联，由逐叶场景补足"
+          }
+        ],
+        "formalization_task_id": "R00-T07",
+        "execution_task_ids": [
+          "R02-T03",
+          "R07-T09"
+        ],
+        "execution_owner": "Rust service＋客户端",
+        "execution_stage_ids": [
+          "R02",
+          "R07"
+        ],
+        "due": "R00-T07 建立正式账本时登记；最迟在所列实施 Task 的阶段验收前完成并执行",
+        "status": "SPECIFIED_NOT_EXECUTED"
+      },
+      "candidate_stage_map": {
+        "id": "R00-T02-LA-756217C74101",
+        "featureId": "F-D20-SEMANTIC_EFFECT-SEMANTIC-EFFECT-DEVICES-DEVICES-PAIRING-SESSIONS-756217",
+        "requirement": "REQUIRED_SUPPLEMENTAL",
+        "r00Kind": "supplemental",
+        "r00TaskIds": [
+          "R02-T03",
+          "R07-T09"
+        ],
+        "r00ExecutionStageIds": [
+          "R02",
+          "R07"
+        ],
+        "r00LedgerStatus": "SPECIFIED_NOT_EXECUTED",
+        "r00ResultIds": [],
+        "r00TestIds": [],
+        "r00Then": "仅本地主人得到配对码及到期时间，注册记录并写安全审计",
+        "r00Assertions": [
+          "给定目标与相应权限，执行“创建设备配对会话”后核对：仅本地主人得到配对码及到期时间，注册记录并写安全审计",
+          "输入无效、权限不足或下游失败时应返回明确错误，不呈现成功结果"
+        ],
+        "r00Due": "R00-T07 建立正式账本时登记；最迟在所列实施 Task 的阶段验收前完成并执行",
+        "assertionContract": {
+          "producerCommand": "a05_a06_auth_matrix",
+          "evidencePath": "{EVIDENCE}/A05_A06/leaf-cases.json",
+          "cases": [
+            {
+              "case": "a05-no-credential-read",
+              "expect": 401
+            },
+            {
+              "case": "a05-forged-principal-headers",
+              "expect": 401
+            },
+            {
+              "case": "a05-cross-principal-read",
+              "expect": 403
+            },
+            {
+              "case": "a05-positive-control-owner-execute",
+              "expect": 200
+            },
+            {
+              "case": "a06-evil-origin-health",
+              "expect": 403
+            },
+            {
+              "case": "a06-foreign-host-health",
+              "expect": 403
+            }
+          ]
+        },
+        "basisKind": "auth_primitive_only",
+        "r02Share": "认证原语基础（同 LA-25AB678E7108）；配对会话创建路由不在 R02 现行面",
+        "r07Share": "创建设备配对会话完整入口（仅本地主人得配对码/到期、注册记录、安全审计）",
+        "evidenceRequired": "A05/A06 认证矩阵真实执行证据；路由实现后另需其认证正负矩阵",
+        "evidenceCommandRefs": [
+          "a05_a06_auth_matrix"
+        ]
+      }
+    },
+    {
+      "id": "R00-T02-LA-5E1C3363A070",
+      "original_acceptance": {
+        "kind": "supplemental",
+        "stage_id": "R00",
+        "execution_stage_ids": [
+          "R02",
+          "R07"
+        ],
+        "task_ids": [
+          "R02-T03",
+          "R07-T09"
+        ],
+        "requirement": "REQUIRED_SUPPLEMENTAL",
+        "feature_id": "F-D20-SEMANTIC_EFFECT-SEMANTIC-EFFECT-DEVICES-DEVICES-PAIRING-SESSIONS-5E1C33",
+        "then": "仅本地主人用配对码签发设备密钥，返回密钥一次及设备作用域并写安全审计",
+        "formalization_task_id": "R00-T07",
+        "ledger_status": "SPECIFIED_NOT_EXECUTED",
+        "result_ids": [],
+        "feature_ids": [
+          "F-D20-SEMANTIC_EFFECT-SEMANTIC-EFFECT-DEVICES-DEVICES-PAIRING-SESSIONS-5E1C33"
+        ],
+        "test_ids": []
+      },
+      "original_feature_stage": {
+        "id": "R00-T02-LA-5E1C3363A070",
+        "feature_id": "F-D20-SEMANTIC_EFFECT-SEMANTIC-EFFECT-DEVICES-DEVICES-PAIRING-SESSIONS-5E1C33",
+        "task_ids": [
+          "R02-T03",
+          "R07-T09"
+        ],
+        "given": "以具备相应权限的 HTTP 客户端直接请求；不宣称存在现役内置按钮",
+        "when": "用户批准设备配对",
+        "then": "仅本地主人用配对码签发设备密钥，返回密钥一次及设备作用域并写安全审计",
+        "assertions": [
+          "给定目标与相应权限，执行“批准设备配对”后核对：仅本地主人用配对码签发设备密钥，返回密钥一次及设备作用域并写安全审计",
+          "输入无效、权限不足或下游失败时应返回明确错误，不呈现成功结果"
+        ],
+        "existing_acceptance_relations": [
+          {
+            "acceptance_id": "R02-A05",
+            "relation": "GAP",
+            "covers_leaf_result": false,
+            "reason": "未找到该 A-ID 对本叶成功、拒绝及副作用的直接检查；保留阶段关联，由逐叶场景补足"
+          },
+          {
+            "acceptance_id": "R02-A06",
+            "relation": "GAP",
+            "covers_leaf_result": false,
+            "reason": "未找到该 A-ID 对本叶成功、拒绝及副作用的直接检查；保留阶段关联，由逐叶场景补足"
+          },
+          {
+            "acceptance_id": "R07-A17",
+            "relation": "GAP",
+            "covers_leaf_result": false,
+            "reason": "未找到该 A-ID 对本叶成功、拒绝及副作用的直接检查；保留阶段关联，由逐叶场景补足"
+          },
+          {
+            "acceptance_id": "R07-A18",
+            "relation": "GAP",
+            "covers_leaf_result": false,
+            "reason": "未找到该 A-ID 对本叶成功、拒绝及副作用的直接检查；保留阶段关联，由逐叶场景补足"
+          }
+        ],
+        "formalization_task_id": "R00-T07",
+        "execution_task_ids": [
+          "R02-T03",
+          "R07-T09"
+        ],
+        "execution_owner": "Rust service＋客户端",
+        "execution_stage_ids": [
+          "R02",
+          "R07"
+        ],
+        "due": "R00-T07 建立正式账本时登记；最迟在所列实施 Task 的阶段验收前完成并执行",
+        "status": "SPECIFIED_NOT_EXECUTED"
+      },
+      "candidate_stage_map": {
+        "id": "R00-T02-LA-5E1C3363A070",
+        "featureId": "F-D20-SEMANTIC_EFFECT-SEMANTIC-EFFECT-DEVICES-DEVICES-PAIRING-SESSIONS-5E1C33",
+        "requirement": "REQUIRED_SUPPLEMENTAL",
+        "r00Kind": "supplemental",
+        "r00TaskIds": [
+          "R02-T03",
+          "R07-T09"
+        ],
+        "r00ExecutionStageIds": [
+          "R02",
+          "R07"
+        ],
+        "r00LedgerStatus": "SPECIFIED_NOT_EXECUTED",
+        "r00ResultIds": [],
+        "r00TestIds": [],
+        "r00Then": "仅本地主人用配对码签发设备密钥，返回密钥一次及设备作用域并写安全审计",
+        "r00Assertions": [
+          "给定目标与相应权限，执行“批准设备配对”后核对：仅本地主人用配对码签发设备密钥，返回密钥一次及设备作用域并写安全审计",
+          "输入无效、权限不足或下游失败时应返回明确错误，不呈现成功结果"
+        ],
+        "r00Due": "R00-T07 建立正式账本时登记；最迟在所列实施 Task 的阶段验收前完成并执行",
+        "assertionContract": {
+          "producerCommand": "a05_a06_auth_matrix",
+          "evidencePath": "{EVIDENCE}/A05_A06/leaf-cases.json",
+          "cases": [
+            {
+              "case": "a05-no-credential-read",
+              "expect": 401
+            },
+            {
+              "case": "a05-forged-principal-headers",
+              "expect": 401
+            },
+            {
+              "case": "a05-cross-principal-read",
+              "expect": 403
+            },
+            {
+              "case": "a05-positive-control-owner-execute",
+              "expect": 200
+            },
+            {
+              "case": "a06-evil-origin-health",
+              "expect": 403
+            },
+            {
+              "case": "a06-foreign-host-health",
+              "expect": 403
+            }
+          ]
+        },
+        "basisKind": "auth_primitive_only",
+        "r02Share": "认证原语基础（同 LA-25AB678E7108）；配对批准路由不在 R02 现行面",
+        "r07Share": "批准设备配对完整入口（配对码签发设备密钥一次、作用域、安全审计）",
+        "evidenceRequired": "A05/A06 认证矩阵真实执行证据；路由实现后另需其认证正负矩阵",
+        "evidenceCommandRefs": [
+          "a05_a06_auth_matrix"
+        ]
+      }
+    },
+    {
+      "id": "R00-T02-LA-8BC1A036AFAA",
+      "original_acceptance": {
+        "kind": "supplemental",
+        "stage_id": "R00",
+        "execution_stage_ids": [
+          "R02",
+          "R07"
+        ],
+        "task_ids": [
+          "R02-T03",
+          "R07-T09"
+        ],
+        "requirement": "REQUIRED_SUPPLEMENTAL",
+        "feature_id": "F-D20-SEMANTIC_EFFECT-SEMANTIC-EFFECT-MOBILE-STATIC-DESKTOP-8BC1A0",
+        "then": "有桌面构建产物时服务静态页面及资源，否则按路由返回指引或错误",
+        "formalization_task_id": "R00-T07",
+        "ledger_status": "SPECIFIED_NOT_EXECUTED",
+        "result_ids": [],
+        "feature_ids": [
+          "F-D20-SEMANTIC_EFFECT-SEMANTIC-EFFECT-MOBILE-STATIC-DESKTOP-8BC1A0"
+        ],
+        "test_ids": []
+      },
+      "original_feature_stage": {
+        "id": "R00-T02-LA-8BC1A036AFAA",
+        "feature_id": "F-D20-SEMANTIC_EFFECT-SEMANTIC-EFFECT-MOBILE-STATIC-DESKTOP-8BC1A0",
+        "task_ids": [
+          "R02-T03",
+          "R07-T09"
+        ],
+        "given": "以具备相应权限的 HTTP 客户端直接请求；不宣称存在现役内置按钮",
+        "when": "用户打开浏览器桌面界面",
+        "then": "有桌面构建产物时服务静态页面及资源，否则按路由返回指引或错误",
+        "assertions": [
+          "给定目标与相应权限，执行“打开浏览器桌面界面”后核对：有桌面构建产物时服务静态页面及资源，否则按路由返回指引或错误",
+          "输入无效、权限不足或下游失败时应返回明确错误，不呈现成功结果"
+        ],
+        "existing_acceptance_relations": [
+          {
+            "acceptance_id": "R02-A05",
+            "relation": "GAP",
+            "covers_leaf_result": false,
+            "reason": "未找到该 A-ID 对本叶成功、拒绝及副作用的直接检查；保留阶段关联，由逐叶场景补足"
+          },
+          {
+            "acceptance_id": "R02-A06",
+            "relation": "GAP",
+            "covers_leaf_result": false,
+            "reason": "未找到该 A-ID 对本叶成功、拒绝及副作用的直接检查；保留阶段关联，由逐叶场景补足"
+          },
+          {
+            "acceptance_id": "R07-A17",
+            "relation": "GAP",
+            "covers_leaf_result": false,
+            "reason": "未找到该 A-ID 对本叶成功、拒绝及副作用的直接检查；保留阶段关联，由逐叶场景补足"
+          },
+          {
+            "acceptance_id": "R07-A18",
+            "relation": "GAP",
+            "covers_leaf_result": false,
+            "reason": "未找到该 A-ID 对本叶成功、拒绝及副作用的直接检查；保留阶段关联，由逐叶场景补足"
+          }
+        ],
+        "formalization_task_id": "R00-T07",
+        "execution_task_ids": [
+          "R02-T03",
+          "R07-T09"
+        ],
+        "execution_owner": "Rust service＋客户端",
+        "execution_stage_ids": [
+          "R02",
+          "R07"
+        ],
+        "due": "R00-T07 建立正式账本时登记；最迟在所列实施 Task 的阶段验收前完成并执行",
+        "status": "SPECIFIED_NOT_EXECUTED"
+      },
+      "candidate_stage_map": {
+        "id": "R00-T02-LA-8BC1A036AFAA",
+        "featureId": "F-D20-SEMANTIC_EFFECT-SEMANTIC-EFFECT-MOBILE-STATIC-DESKTOP-8BC1A0",
+        "requirement": "REQUIRED_SUPPLEMENTAL",
+        "r00Kind": "supplemental",
+        "r00TaskIds": [
+          "R02-T03",
+          "R07-T09"
+        ],
+        "r00ExecutionStageIds": [
+          "R02",
+          "R07"
+        ],
+        "r00LedgerStatus": "SPECIFIED_NOT_EXECUTED",
+        "r00ResultIds": [],
+        "r00TestIds": [],
+        "r00Then": "有桌面构建产物时服务静态页面及资源，否则按路由返回指引或错误",
+        "r00Assertions": [
+          "给定目标与相应权限，执行“打开浏览器桌面界面”后核对：有桌面构建产物时服务静态页面及资源，否则按路由返回指引或错误",
+          "输入无效、权限不足或下游失败时应返回明确错误，不呈现成功结果"
+        ],
+        "r00Due": "R00-T07 建立正式账本时登记；最迟在所列实施 Task 的阶段验收前完成并执行",
+        "assertionContract": {
+          "producerCommand": "a05_a06_auth_matrix",
+          "evidencePath": "{EVIDENCE}/A05_A06/leaf-cases.json",
+          "cases": [
+            {
+              "case": "a05-no-credential-read",
+              "expect": 401
+            },
+            {
+              "case": "a05-forged-principal-headers",
+              "expect": 401
+            },
+            {
+              "case": "a05-cross-principal-read",
+              "expect": 403
+            },
+            {
+              "case": "a05-positive-control-owner-execute",
+              "expect": 200
+            },
+            {
+              "case": "a06-evil-origin-health",
+              "expect": 403
+            },
+            {
+              "case": "a06-foreign-host-health",
+              "expect": 403
+            }
+          ]
+        },
+        "basisKind": "auth_primitive_only",
+        "r02Share": "认证原语基础（同 LA-25AB678E7108）；桌面静态资源服务路由不在 R02 现行面（R02 阶段书禁新 UI）",
+        "r07Share": "浏览器桌面界面完整入口（有构建产物时静态服务，否则按路由指引/错误）",
+        "evidenceRequired": "A05/A06 认证矩阵真实执行证据；静态服务实现后另需其认证正负矩阵",
+        "evidenceCommandRefs": [
+          "a05_a06_auth_matrix"
+        ]
+      }
+    },
+    {
+      "id": "R00-T02-LA-3291CFD5F7E2",
+      "original_acceptance": {
+        "kind": "supplemental",
+        "stage_id": "R00",
+        "execution_stage_ids": [
+          "R02",
+          "R07"
+        ],
+        "task_ids": [
+          "R02-T03",
+          "R07-T09"
+        ],
+        "requirement": "REQUIRED_SUPPLEMENTAL",
+        "feature_id": "F-D20-SEMANTIC_EFFECT-SEMANTIC-EFFECT-MOBILE-STATIC-MOBILE-3291CF",
+        "then": "有移动端构建产物时服务静态页面及资源，否则按路由返回指引或错误",
+        "formalization_task_id": "R00-T07",
+        "ledger_status": "SPECIFIED_NOT_EXECUTED",
+        "result_ids": [],
+        "feature_ids": [
+          "F-D20-SEMANTIC_EFFECT-SEMANTIC-EFFECT-MOBILE-STATIC-MOBILE-3291CF"
+        ],
+        "test_ids": []
+      },
+      "original_feature_stage": {
+        "id": "R00-T02-LA-3291CFD5F7E2",
+        "feature_id": "F-D20-SEMANTIC_EFFECT-SEMANTIC-EFFECT-MOBILE-STATIC-MOBILE-3291CF",
+        "task_ids": [
+          "R02-T03",
+          "R07-T09"
+        ],
+        "given": "按已查调用者和 HTTP 返回核对；尚未执行新实现验收",
+        "when": "用户打开移动端界面",
+        "then": "有移动端构建产物时服务静态页面及资源，否则按路由返回指引或错误",
+        "assertions": [
+          "给定目标与相应权限，执行“打开移动端界面”后核对：有移动端构建产物时服务静态页面及资源，否则按路由返回指引或错误",
+          "输入无效、权限不足或下游失败时应返回明确错误，不呈现成功结果"
+        ],
+        "existing_acceptance_relations": [
+          {
+            "acceptance_id": "R02-A05",
+            "relation": "GAP",
+            "covers_leaf_result": false,
+            "reason": "未找到该 A-ID 对本叶成功、拒绝及副作用的直接检查；保留阶段关联，由逐叶场景补足"
+          },
+          {
+            "acceptance_id": "R02-A06",
+            "relation": "GAP",
+            "covers_leaf_result": false,
+            "reason": "未找到该 A-ID 对本叶成功、拒绝及副作用的直接检查；保留阶段关联，由逐叶场景补足"
+          },
+          {
+            "acceptance_id": "R07-A17",
+            "relation": "GAP",
+            "covers_leaf_result": false,
+            "reason": "未找到该 A-ID 对本叶成功、拒绝及副作用的直接检查；保留阶段关联，由逐叶场景补足"
+          },
+          {
+            "acceptance_id": "R07-A18",
+            "relation": "GAP",
+            "covers_leaf_result": false,
+            "reason": "未找到该 A-ID 对本叶成功、拒绝及副作用的直接检查；保留阶段关联，由逐叶场景补足"
+          }
+        ],
+        "formalization_task_id": "R00-T07",
+        "execution_task_ids": [
+          "R02-T03",
+          "R07-T09"
+        ],
+        "execution_owner": "Rust service＋客户端",
+        "execution_stage_ids": [
+          "R02",
+          "R07"
+        ],
+        "due": "R00-T07 建立正式账本时登记；最迟在所列实施 Task 的阶段验收前完成并执行",
+        "status": "SPECIFIED_NOT_EXECUTED"
+      },
+      "candidate_stage_map": {
+        "id": "R00-T02-LA-3291CFD5F7E2",
+        "featureId": "F-D20-SEMANTIC_EFFECT-SEMANTIC-EFFECT-MOBILE-STATIC-MOBILE-3291CF",
+        "requirement": "REQUIRED_SUPPLEMENTAL",
+        "r00Kind": "supplemental",
+        "r00TaskIds": [
+          "R02-T03",
+          "R07-T09"
+        ],
+        "r00ExecutionStageIds": [
+          "R02",
+          "R07"
+        ],
+        "r00LedgerStatus": "SPECIFIED_NOT_EXECUTED",
+        "r00ResultIds": [],
+        "r00TestIds": [],
+        "r00Then": "有移动端构建产物时服务静态页面及资源，否则按路由返回指引或错误",
+        "r00Assertions": [
+          "给定目标与相应权限，执行“打开移动端界面”后核对：有移动端构建产物时服务静态页面及资源，否则按路由返回指引或错误",
+          "输入无效、权限不足或下游失败时应返回明确错误，不呈现成功结果"
+        ],
+        "r00Due": "R00-T07 建立正式账本时登记；最迟在所列实施 Task 的阶段验收前完成并执行",
+        "assertionContract": {
+          "producerCommand": "a05_a06_auth_matrix",
+          "evidencePath": "{EVIDENCE}/A05_A06/leaf-cases.json",
+          "cases": [
+            {
+              "case": "a05-no-credential-read",
+              "expect": 401
+            },
+            {
+              "case": "a05-forged-principal-headers",
+              "expect": 401
+            },
+            {
+              "case": "a05-cross-principal-read",
+              "expect": 403
+            },
+            {
+              "case": "a05-positive-control-owner-execute",
+              "expect": 200
+            },
+            {
+              "case": "a06-evil-origin-health",
+              "expect": 403
+            },
+            {
+              "case": "a06-foreign-host-health",
+              "expect": 403
+            }
+          ]
+        },
+        "basisKind": "auth_primitive_only",
+        "r02Share": "认证原语基础（同 LA-25AB678E7108）；移动端静态资源服务路由不在 R02 现行面",
+        "r07Share": "移动端界面完整入口（有构建产物时静态服务，否则按路由指引/错误）",
+        "evidenceRequired": "A05/A06 认证矩阵真实执行证据；静态服务实现后另需其认证正负矩阵",
+        "evidenceCommandRefs": [
+          "a05_a06_auth_matrix"
+        ]
+      }
+    },
+    {
+      "id": "R00-T02-LA-2A1C298F62FC",
+      "original_acceptance": {
+        "kind": "supplemental",
+        "stage_id": "R00",
+        "execution_stage_ids": [
+          "R02",
+          "R07"
+        ],
+        "task_ids": [
+          "R02-T03",
+          "R07-T09"
+        ],
+        "requirement": "REQUIRED_SUPPLEMENTAL",
+        "feature_id": "F-D20-SEMANTIC_EFFECT-SEMANTIC-EFFECT-MOBILE-WORKBENCH-MOBILE-BOOTSTRA-2A1C29",
+        "then": "返回当前 Agent、语言、头像可用性、工作区和偏好；顺带清理过期持久化",
+        "formalization_task_id": "R00-T07",
+        "ledger_status": "SPECIFIED_NOT_EXECUTED",
+        "result_ids": [],
+        "feature_ids": [
+          "F-D20-SEMANTIC_EFFECT-SEMANTIC-EFFECT-MOBILE-WORKBENCH-MOBILE-BOOTSTRA-2A1C29"
+        ],
+        "test_ids": []
+      },
+      "original_feature_stage": {
+        "id": "R00-T02-LA-2A1C298F62FC",
+        "feature_id": "F-D20-SEMANTIC_EFFECT-SEMANTIC-EFFECT-MOBILE-WORKBENCH-MOBILE-BOOTSTRA-2A1C29",
+        "task_ids": [
+          "R02-T03",
+          "R07-T09"
+        ],
+        "given": "按已查调用者和 HTTP 返回核对；尚未执行新实现验收",
+        "when": "用户初始化移动端界面",
+        "then": "返回当前 Agent、语言、头像可用性、工作区和偏好；顺带清理过期持久化",
+        "assertions": [
+          "给定目标与相应权限，执行“初始化移动端界面”后核对：返回当前 Agent、语言、头像可用性、工作区和偏好；顺带清理过期持久化",
+          "输入无效、权限不足或下游失败时应返回明确错误，不呈现成功结果"
+        ],
+        "existing_acceptance_relations": [
+          {
+            "acceptance_id": "R02-A05",
+            "relation": "GAP",
+            "covers_leaf_result": false,
+            "reason": "未找到该 A-ID 对本叶成功、拒绝及副作用的直接检查；保留阶段关联，由逐叶场景补足"
+          },
+          {
+            "acceptance_id": "R02-A06",
+            "relation": "GAP",
+            "covers_leaf_result": false,
+            "reason": "未找到该 A-ID 对本叶成功、拒绝及副作用的直接检查；保留阶段关联，由逐叶场景补足"
+          },
+          {
+            "acceptance_id": "R07-A17",
+            "relation": "GAP",
+            "covers_leaf_result": false,
+            "reason": "未找到该 A-ID 对本叶成功、拒绝及副作用的直接检查；保留阶段关联，由逐叶场景补足"
+          },
+          {
+            "acceptance_id": "R07-A18",
+            "relation": "GAP",
+            "covers_leaf_result": false,
+            "reason": "未找到该 A-ID 对本叶成功、拒绝及副作用的直接检查；保留阶段关联，由逐叶场景补足"
+          }
+        ],
+        "formalization_task_id": "R00-T07",
+        "execution_task_ids": [
+          "R02-T03",
+          "R07-T09"
+        ],
+        "execution_owner": "Rust service＋客户端",
+        "execution_stage_ids": [
+          "R02",
+          "R07"
+        ],
+        "due": "R00-T07 建立正式账本时登记；最迟在所列实施 Task 的阶段验收前完成并执行",
+        "status": "SPECIFIED_NOT_EXECUTED"
+      },
+      "candidate_stage_map": {
+        "id": "R00-T02-LA-2A1C298F62FC",
+        "featureId": "F-D20-SEMANTIC_EFFECT-SEMANTIC-EFFECT-MOBILE-WORKBENCH-MOBILE-BOOTSTRA-2A1C29",
+        "requirement": "REQUIRED_SUPPLEMENTAL",
+        "r00Kind": "supplemental",
+        "r00TaskIds": [
+          "R02-T03",
+          "R07-T09"
+        ],
+        "r00ExecutionStageIds": [
+          "R02",
+          "R07"
+        ],
+        "r00LedgerStatus": "SPECIFIED_NOT_EXECUTED",
+        "r00ResultIds": [],
+        "r00TestIds": [],
+        "r00Then": "返回当前 Agent、语言、头像可用性、工作区和偏好；顺带清理过期持久化",
+        "r00Assertions": [
+          "给定目标与相应权限，执行“初始化移动端界面”后核对：返回当前 Agent、语言、头像可用性、工作区和偏好；顺带清理过期持久化",
+          "输入无效、权限不足或下游失败时应返回明确错误，不呈现成功结果"
+        ],
+        "r00Due": "R00-T07 建立正式账本时登记；最迟在所列实施 Task 的阶段验收前完成并执行",
+        "assertionContract": {
+          "producerCommand": "a05_a06_auth_matrix",
+          "evidencePath": "{EVIDENCE}/A05_A06/leaf-cases.json",
+          "cases": [
+            {
+              "case": "a05-no-credential-read",
+              "expect": 401
+            },
+            {
+              "case": "a05-forged-principal-headers",
+              "expect": 401
+            },
+            {
+              "case": "a05-cross-principal-read",
+              "expect": 403
+            },
+            {
+              "case": "a05-positive-control-owner-execute",
+              "expect": 200
+            },
+            {
+              "case": "a06-evil-origin-health",
+              "expect": 403
+            },
+            {
+              "case": "a06-foreign-host-health",
+              "expect": 403
+            }
+          ]
+        },
+        "basisKind": "auth_primitive_only",
+        "r02Share": "认证原语基础（同 LA-25AB678E7108）；移动端引导路由不在 R02 现行面",
+        "r07Share": "移动端初始化完整入口（Agent/语言/头像/工作区/偏好返回与过期持久化清理）",
+        "evidenceRequired": "A05/A06 认证矩阵真实执行证据；路由实现后另需其认证正负矩阵",
+        "evidenceCommandRefs": [
+          "a05_a06_auth_matrix"
+        ]
+      }
+    },
+    {
+      "id": "R00-T02-LA-4BCE8CCFD5DC",
+      "original_acceptance": {
+        "kind": "supplemental",
+        "stage_id": "R00",
+        "execution_stage_ids": [
+          "R02",
+          "R07"
+        ],
+        "task_ids": [
+          "R02-T03",
+          "R07-T09"
+        ],
+        "requirement": "REQUIRED_SUPPLEMENTAL",
+        "feature_id": "F-D20-SEMANTIC_EFFECT-SEMANTIC-EFFECT-SERVER-IDENTITY-SERVER-IDENTITY--4BCE8C",
+        "then": "返回版本、身份及按 principal 投影的能力",
+        "formalization_task_id": "R00-T07",
+        "ledger_status": "SPECIFIED_NOT_EXECUTED",
+        "result_ids": [],
+        "feature_ids": [
+          "F-D20-SEMANTIC_EFFECT-SEMANTIC-EFFECT-SERVER-IDENTITY-SERVER-IDENTITY--4BCE8C"
+        ],
+        "test_ids": []
+      },
+      "original_feature_stage": {
+        "id": "R00-T02-LA-4BCE8CCFD5DC",
+        "feature_id": "F-D20-SEMANTIC_EFFECT-SEMANTIC-EFFECT-SERVER-IDENTITY-SERVER-IDENTITY--4BCE8C",
+        "task_ids": [
+          "R02-T03",
+          "R07-T09"
+        ],
+        "given": "按已查调用者和 HTTP 返回核对；尚未执行新实现验收",
+        "when": "用户查看服务器身份",
+        "then": "返回版本、身份及按 principal 投影的能力",
+        "assertions": [
+          "成功时核对：返回版本、身份及按 principal 投影的能力",
+          "拒绝/无效输入时核对：无越权或错误持久化，且错误对用户可见"
+        ],
+        "existing_acceptance_relations": [
+          {
+            "acceptance_id": "R02-A05",
+            "relation": "INDIRECT",
+            "covers_leaf_result": false,
+            "reason": "现有场景只覆盖该叶的部分或横向边界，未检查完整动作及结果"
+          },
+          {
+            "acceptance_id": "R02-A06",
+            "relation": "INDIRECT",
+            "covers_leaf_result": false,
+            "reason": "现有场景只覆盖该叶的部分或横向边界，未检查完整动作及结果"
+          },
+          {
+            "acceptance_id": "R07-A17",
+            "relation": "INDIRECT",
+            "covers_leaf_result": false,
+            "reason": "现有场景只覆盖该叶的部分或横向边界，未检查完整动作及结果"
+          },
+          {
+            "acceptance_id": "R07-A18",
+            "relation": "INDIRECT",
+            "covers_leaf_result": false,
+            "reason": "现有场景只覆盖该叶的部分或横向边界，未检查完整动作及结果"
+          }
+        ],
+        "formalization_task_id": "R00-T07",
+        "execution_task_ids": [
+          "R02-T03",
+          "R07-T09"
+        ],
+        "execution_owner": "Rust service＋客户端",
+        "execution_stage_ids": [
+          "R02",
+          "R07"
+        ],
+        "due": "R00-T07 建立正式账本时登记；最迟在所列实施 Task 的阶段验收前完成并执行",
+        "status": "SPECIFIED_NOT_EXECUTED"
+      },
+      "candidate_stage_map": {
+        "id": "R00-T02-LA-4BCE8CCFD5DC",
+        "featureId": "F-D20-SEMANTIC_EFFECT-SEMANTIC-EFFECT-SERVER-IDENTITY-SERVER-IDENTITY--4BCE8C",
+        "requirement": "REQUIRED_SUPPLEMENTAL",
+        "r00Kind": "supplemental",
+        "r00TaskIds": [
+          "R02-T03",
+          "R07-T09"
+        ],
+        "r00ExecutionStageIds": [
+          "R02",
+          "R07"
+        ],
+        "r00LedgerStatus": "SPECIFIED_NOT_EXECUTED",
+        "r00ResultIds": [],
+        "r00TestIds": [],
+        "r00Then": "返回版本、身份及按 principal 投影的能力",
+        "r00Assertions": [
+          "成功时核对：返回版本、身份及按 principal 投影的能力",
+          "拒绝/无效输入时核对：无越权或错误持久化，且错误对用户可见"
+        ],
+        "r00Due": "R00-T07 建立正式账本时登记；最迟在所列实施 Task 的阶段验收前完成并执行",
+        "assertionContract": {
+          "producerCommand": "a05_a06_auth_matrix",
+          "evidencePath": "{EVIDENCE}/A05_A06/leaf-cases.json",
+          "cases": [
+            {
+              "case": "a05-me-with-forged-header",
+              "expect": 200
+            },
+            {
+              "case": "a05-no-credential-me",
+              "expect": 401
+            },
+            {
+              "case": "a05-foreign-credential-authenticates",
+              "expect": 200
+            }
+          ]
+        },
+        "basisKind": "route_basis_present_static",
+        "r02Share": "GET /lingxi/v1/me principal 回显（身份由认证链计算，客户端身份字段被拒；静态可见；未执行验收）",
+        "r07Share": "版本与按 principal 投影能力的完整形态及入口呈现",
+        "evidenceRequired": "/me 认证路径执行记录（principal 来源证明）+ A05/A06 矩阵证据",
+        "evidenceCommandRefs": [
+          "a05_a06_auth_matrix"
+        ]
+      }
+    },
+    {
+      "id": "R00-T02-LA-8ED658F9DB9E",
+      "original_acceptance": {
+        "kind": "supplemental",
+        "stage_id": "R00",
+        "execution_stage_ids": [
+          "R02",
+          "R07"
+        ],
+        "task_ids": [
+          "R02-T03",
+          "R07-T09"
+        ],
+        "requirement": "REQUIRED_SUPPLEMENTAL",
+        "feature_id": "F-D20-SEMANTIC_EFFECT-SEMANTIC-EFFECT-SERVER-INDEX-API-SESSION-THINKIN-8ED658",
+        "then": "返回指定会话或新会话默认级别",
+        "formalization_task_id": "R00-T07",
+        "ledger_status": "SPECIFIED_NOT_EXECUTED",
+        "result_ids": [],
+        "feature_ids": [
+          "F-D20-SEMANTIC_EFFECT-SEMANTIC-EFFECT-SERVER-INDEX-API-SESSION-THINKIN-8ED658"
+        ],
+        "test_ids": []
+      },
+      "original_feature_stage": {
+        "id": "R00-T02-LA-8ED658F9DB9E",
+        "feature_id": "F-D20-SEMANTIC_EFFECT-SEMANTIC-EFFECT-SERVER-INDEX-API-SESSION-THINKIN-8ED658",
+        "task_ids": [
+          "R02-T03",
+          "R07-T09"
+        ],
+        "given": "按已查调用者和 HTTP 返回核对；尚未执行新实现验收",
+        "when": "用户查看会话思考级别",
+        "then": "返回指定会话或新会话默认级别",
+        "assertions": [
+          "成功：执行“查看会话思考级别”后，返回指定会话或新会话默认级别",
+          "拒绝/边界：query.sessionPath 与 pendingNewSession=1 选择范围；不应错误扩大写入或披露范围"
+        ],
+        "existing_acceptance_relations": [
+          {
+            "acceptance_id": "R02-A05",
+            "relation": "GAP",
+            "covers_leaf_result": false,
+            "reason": "未找到该 A-ID 对本叶成功、拒绝及副作用的直接检查；保留阶段关联，由逐叶场景补足"
+          },
+          {
+            "acceptance_id": "R02-A06",
+            "relation": "GAP",
+            "covers_leaf_result": false,
+            "reason": "未找到该 A-ID 对本叶成功、拒绝及副作用的直接检查；保留阶段关联，由逐叶场景补足"
+          },
+          {
+            "acceptance_id": "R07-A17",
+            "relation": "GAP",
+            "covers_leaf_result": false,
+            "reason": "未找到该 A-ID 对本叶成功、拒绝及副作用的直接检查；保留阶段关联，由逐叶场景补足"
+          },
+          {
+            "acceptance_id": "R07-A18",
+            "relation": "GAP",
+            "covers_leaf_result": false,
+            "reason": "未找到该 A-ID 对本叶成功、拒绝及副作用的直接检查；保留阶段关联，由逐叶场景补足"
+          }
+        ],
+        "formalization_task_id": "R00-T07",
+        "execution_task_ids": [
+          "R02-T03",
+          "R07-T09"
+        ],
+        "execution_owner": "Rust service＋客户端",
+        "execution_stage_ids": [
+          "R02",
+          "R07"
+        ],
+        "due": "R00-T07 建立正式账本时登记；最迟在所列实施 Task 的阶段验收前完成并执行",
+        "status": "SPECIFIED_NOT_EXECUTED"
+      },
+      "candidate_stage_map": {
+        "id": "R00-T02-LA-8ED658F9DB9E",
+        "featureId": "F-D20-SEMANTIC_EFFECT-SEMANTIC-EFFECT-SERVER-INDEX-API-SESSION-THINKIN-8ED658",
+        "requirement": "REQUIRED_SUPPLEMENTAL",
+        "r00Kind": "supplemental",
+        "r00TaskIds": [
+          "R02-T03",
+          "R07-T09"
+        ],
+        "r00ExecutionStageIds": [
+          "R02",
+          "R07"
+        ],
+        "r00LedgerStatus": "SPECIFIED_NOT_EXECUTED",
+        "r00ResultIds": [],
+        "r00TestIds": [],
+        "r00Then": "返回指定会话或新会话默认级别",
+        "r00Assertions": [
+          "成功：执行“查看会话思考级别”后，返回指定会话或新会话默认级别",
+          "拒绝/边界：query.sessionPath 与 pendingNewSession=1 选择范围；不应错误扩大写入或披露范围"
+        ],
+        "r00Due": "R00-T07 建立正式账本时登记；最迟在所列实施 Task 的阶段验收前完成并执行",
+        "assertionContract": {
+          "producerCommand": "a05_a06_auth_matrix",
+          "evidencePath": "{EVIDENCE}/A05_A06/leaf-cases.json",
+          "cases": [
+            {
+              "case": "a05-no-credential-read",
+              "expect": 401
+            },
+            {
+              "case": "a05-forged-principal-headers",
+              "expect": 401
+            },
+            {
+              "case": "a05-cross-principal-read",
+              "expect": 403
+            },
+            {
+              "case": "a05-positive-control-owner-execute",
+              "expect": 200
+            },
+            {
+              "case": "a06-evil-origin-health",
+              "expect": 403
+            },
+            {
+              "case": "a06-foreign-host-health",
+              "expect": 403
+            }
+          ]
+        },
+        "basisKind": "auth_primitive_only",
+        "r02Share": "认证原语基础（同 LA-25AB678E7108）；思考级别读取路由不在 R02 现行面",
+        "r07Share": "查看会话思考级别完整入口（指定会话或新会话默认；query 边界不扩大披露）",
+        "evidenceRequired": "A05/A06 认证矩阵真实执行证据；路由实现后另需其认证正负矩阵",
+        "evidenceCommandRefs": [
+          "a05_a06_auth_matrix"
+        ]
+      }
+    },
+    {
+      "id": "R00-T02-LA-F8935B6B0221",
+      "original_acceptance": {
+        "kind": "supplemental",
+        "stage_id": "R00",
+        "execution_stage_ids": [
+          "R02",
+          "R07"
+        ],
+        "task_ids": [
+          "R02-T03",
+          "R07-T09"
+        ],
+        "requirement": "REQUIRED_SUPPLEMENTAL",
+        "feature_id": "F-D20-SEMANTIC_EFFECT-SEMANTIC-EFFECT-SESSION-THINKING-LEVEL-SET-F8935B",
+        "then": "有 sessionPath 时只修改该会话，返回解析后的状态",
+        "formalization_task_id": "R00-T07",
+        "ledger_status": "SPECIFIED_NOT_EXECUTED",
+        "result_ids": [],
+        "feature_ids": [
+          "F-D20-SEMANTIC_EFFECT-SEMANTIC-EFFECT-SESSION-THINKING-LEVEL-SET-F8935B"
+        ],
+        "test_ids": []
+      },
+      "original_feature_stage": {
+        "id": "R00-T02-LA-F8935B6B0221",
+        "feature_id": "F-D20-SEMANTIC_EFFECT-SEMANTIC-EFFECT-SESSION-THINKING-LEVEL-SET-F8935B",
+        "task_ids": [
+          "R02-T03",
+          "R07-T09"
+        ],
+        "given": "按已查调用者和 HTTP 返回核对；尚未执行新实现验收",
+        "when": "用户设置现有会话思考级别",
+        "then": "有 sessionPath 时只修改该会话，返回解析后的状态",
+        "assertions": [
+          "成功：设置现有会话思考级别后，有 sessionPath 时只修改该会话，返回解析后的状态",
+          "边界：无效 level/冲突 409 不改变默认级别；拒绝时目标状态不变"
+        ],
+        "existing_acceptance_relations": [
+          {
+            "acceptance_id": "R02-A05",
+            "relation": "GAP",
+            "covers_leaf_result": false,
+            "reason": "未找到该 A-ID 对本叶成功、拒绝及副作用的直接检查；保留阶段关联，由逐叶场景补足"
+          },
+          {
+            "acceptance_id": "R02-A06",
+            "relation": "GAP",
+            "covers_leaf_result": false,
+            "reason": "未找到该 A-ID 对本叶成功、拒绝及副作用的直接检查；保留阶段关联，由逐叶场景补足"
+          },
+          {
+            "acceptance_id": "R07-A17",
+            "relation": "GAP",
+            "covers_leaf_result": false,
+            "reason": "未找到该 A-ID 对本叶成功、拒绝及副作用的直接检查；保留阶段关联，由逐叶场景补足"
+          },
+          {
+            "acceptance_id": "R07-A18",
+            "relation": "GAP",
+            "covers_leaf_result": false,
+            "reason": "未找到该 A-ID 对本叶成功、拒绝及副作用的直接检查；保留阶段关联，由逐叶场景补足"
+          }
+        ],
+        "formalization_task_id": "R00-T07",
+        "execution_task_ids": [
+          "R02-T03",
+          "R07-T09"
+        ],
+        "execution_owner": "Rust service＋客户端",
+        "execution_stage_ids": [
+          "R02",
+          "R07"
+        ],
+        "due": "R00-T07 建立正式账本时登记；最迟在所列实施 Task 的阶段验收前完成并执行",
+        "status": "SPECIFIED_NOT_EXECUTED"
+      },
+      "candidate_stage_map": {
+        "id": "R00-T02-LA-F8935B6B0221",
+        "featureId": "F-D20-SEMANTIC_EFFECT-SEMANTIC-EFFECT-SESSION-THINKING-LEVEL-SET-F8935B",
+        "requirement": "REQUIRED_SUPPLEMENTAL",
+        "r00Kind": "supplemental",
+        "r00TaskIds": [
+          "R02-T03",
+          "R07-T09"
+        ],
+        "r00ExecutionStageIds": [
+          "R02",
+          "R07"
+        ],
+        "r00LedgerStatus": "SPECIFIED_NOT_EXECUTED",
+        "r00ResultIds": [],
+        "r00TestIds": [],
+        "r00Then": "有 sessionPath 时只修改该会话，返回解析后的状态",
+        "r00Assertions": [
+          "成功：设置现有会话思考级别后，有 sessionPath 时只修改该会话，返回解析后的状态",
+          "边界：无效 level/冲突 409 不改变默认级别；拒绝时目标状态不变"
+        ],
+        "r00Due": "R00-T07 建立正式账本时登记；最迟在所列实施 Task 的阶段验收前完成并执行",
+        "assertionContract": {
+          "producerCommand": "a05_a06_auth_matrix",
+          "evidencePath": "{EVIDENCE}/A05_A06/leaf-cases.json",
+          "cases": [
+            {
+              "case": "a05-no-credential-read",
+              "expect": 401
+            },
+            {
+              "case": "a05-forged-principal-headers",
+              "expect": 401
+            },
+            {
+              "case": "a05-cross-principal-read",
+              "expect": 403
+            },
+            {
+              "case": "a05-positive-control-owner-execute",
+              "expect": 200
+            },
+            {
+              "case": "a06-evil-origin-health",
+              "expect": 403
+            },
+            {
+              "case": "a06-foreign-host-health",
+              "expect": 403
+            }
+          ]
+        },
+        "basisKind": "auth_primitive_only",
+        "r02Share": "认证原语基础（同 LA-25AB678E7108）；思考级别设置路由不在 R02 现行面",
+        "r07Share": "设置现有会话思考级别完整入口（只改该会话；无效 level/409 不改状态）",
+        "evidenceRequired": "A05/A06 认证矩阵真实执行证据；路由实现后另需其认证正负矩阵",
+        "evidenceCommandRefs": [
+          "a05_a06_auth_matrix"
+        ]
+      }
+    },
+    {
+      "id": "R00-T02-LA-39AD35E1FD71",
+      "original_acceptance": {
+        "kind": "supplemental",
+        "stage_id": "R00",
+        "execution_stage_ids": [
+          "R02",
+          "R07"
+        ],
+        "task_ids": [
+          "R02-T03",
+          "R07-T09"
+        ],
+        "requirement": "REQUIRED_SUPPLEMENTAL",
+        "feature_id": "F-D20-SEMANTIC_EFFECT-SEMANTIC-EFFECT-SESSION-THINKING-LEVEL-DEFAULT-S-39AD35",
+        "then": "无 sessionPath 时修改默认级别，不追改旧会话",
+        "formalization_task_id": "R00-T07",
+        "ledger_status": "SPECIFIED_NOT_EXECUTED",
+        "result_ids": [],
+        "feature_ids": [
+          "F-D20-SEMANTIC_EFFECT-SEMANTIC-EFFECT-SESSION-THINKING-LEVEL-DEFAULT-S-39AD35"
+        ],
+        "test_ids": []
+      },
+      "original_feature_stage": {
+        "id": "R00-T02-LA-39AD35E1FD71",
+        "feature_id": "F-D20-SEMANTIC_EFFECT-SEMANTIC-EFFECT-SESSION-THINKING-LEVEL-DEFAULT-S-39AD35",
+        "task_ids": [
+          "R02-T03",
+          "R07-T09"
+        ],
+        "given": "按已查调用者和 HTTP 返回核对；尚未执行新实现验收",
+        "when": "用户设置新会话默认思考级别",
+        "then": "无 sessionPath 时修改默认级别，不追改旧会话",
+        "assertions": [
+          "成功：设置新会话默认思考级别后，无 sessionPath 时修改默认级别，不追改旧会话",
+          "边界：无效 level/冲突 409 不改变已有会话；拒绝时目标状态不变"
+        ],
+        "existing_acceptance_relations": [
+          {
+            "acceptance_id": "R02-A05",
+            "relation": "GAP",
+            "covers_leaf_result": false,
+            "reason": "未找到该 A-ID 对本叶成功、拒绝及副作用的直接检查；保留阶段关联，由逐叶场景补足"
+          },
+          {
+            "acceptance_id": "R02-A06",
+            "relation": "GAP",
+            "covers_leaf_result": false,
+            "reason": "未找到该 A-ID 对本叶成功、拒绝及副作用的直接检查；保留阶段关联，由逐叶场景补足"
+          },
+          {
+            "acceptance_id": "R07-A17",
+            "relation": "GAP",
+            "covers_leaf_result": false,
+            "reason": "未找到该 A-ID 对本叶成功、拒绝及副作用的直接检查；保留阶段关联，由逐叶场景补足"
+          },
+          {
+            "acceptance_id": "R07-A18",
+            "relation": "GAP",
+            "covers_leaf_result": false,
+            "reason": "未找到该 A-ID 对本叶成功、拒绝及副作用的直接检查；保留阶段关联，由逐叶场景补足"
+          }
+        ],
+        "formalization_task_id": "R00-T07",
+        "execution_task_ids": [
+          "R02-T03",
+          "R07-T09"
+        ],
+        "execution_owner": "Rust service＋客户端",
+        "execution_stage_ids": [
+          "R02",
+          "R07"
+        ],
+        "due": "R00-T07 建立正式账本时登记；最迟在所列实施 Task 的阶段验收前完成并执行",
+        "status": "SPECIFIED_NOT_EXECUTED"
+      },
+      "candidate_stage_map": {
+        "id": "R00-T02-LA-39AD35E1FD71",
+        "featureId": "F-D20-SEMANTIC_EFFECT-SEMANTIC-EFFECT-SESSION-THINKING-LEVEL-DEFAULT-S-39AD35",
+        "requirement": "REQUIRED_SUPPLEMENTAL",
+        "r00Kind": "supplemental",
+        "r00TaskIds": [
+          "R02-T03",
+          "R07-T09"
+        ],
+        "r00ExecutionStageIds": [
+          "R02",
+          "R07"
+        ],
+        "r00LedgerStatus": "SPECIFIED_NOT_EXECUTED",
+        "r00ResultIds": [],
+        "r00TestIds": [],
+        "r00Then": "无 sessionPath 时修改默认级别，不追改旧会话",
+        "r00Assertions": [
+          "成功：设置新会话默认思考级别后，无 sessionPath 时修改默认级别，不追改旧会话",
+          "边界：无效 level/冲突 409 不改变已有会话；拒绝时目标状态不变"
+        ],
+        "r00Due": "R00-T07 建立正式账本时登记；最迟在所列实施 Task 的阶段验收前完成并执行",
+        "assertionContract": {
+          "producerCommand": "a05_a06_auth_matrix",
+          "evidencePath": "{EVIDENCE}/A05_A06/leaf-cases.json",
+          "cases": [
+            {
+              "case": "a05-no-credential-read",
+              "expect": 401
+            },
+            {
+              "case": "a05-forged-principal-headers",
+              "expect": 401
+            },
+            {
+              "case": "a05-cross-principal-read",
+              "expect": 403
+            },
+            {
+              "case": "a05-positive-control-owner-execute",
+              "expect": 200
+            },
+            {
+              "case": "a06-evil-origin-health",
+              "expect": 403
+            },
+            {
+              "case": "a06-foreign-host-health",
+              "expect": 403
+            }
+          ]
+        },
+        "basisKind": "auth_primitive_only",
+        "r02Share": "认证原语基础（同 LA-25AB678E7108）；默认思考级别路由不在 R02 现行面",
+        "r07Share": "设置新会话默认思考级别完整入口（不追改旧会话；拒绝时状态不变）",
+        "evidenceRequired": "A05/A06 认证矩阵真实执行证据；路由实现后另需其认证正负矩阵",
+        "evidenceCommandRefs": [
+          "a05_a06_auth_matrix"
+        ]
+      }
+    },
+    {
+      "id": "R00-T02-LA-066B54983F6A",
+      "original_acceptance": {
+        "kind": "supplemental",
+        "stage_id": "R00",
+        "execution_stage_ids": [
+          "R02",
+          "R07"
+        ],
+        "task_ids": [
+          "R02-T03",
+          "R07-T09"
+        ],
+        "requirement": "REQUIRED_SUPPLEMENTAL",
+        "feature_id": "F-D20-SEMANTIC_EFFECT-SEMANTIC-EFFECT-WEB-AUTH-WEB-AUTH-SESSION-READ-066B54",
+        "then": "有效 cookie 返回净化后的 principal；无效/过期返回 authenticated:false",
+        "formalization_task_id": "R00-T07",
+        "ledger_status": "SPECIFIED_NOT_EXECUTED",
+        "result_ids": [],
+        "feature_ids": [
+          "F-D20-SEMANTIC_EFFECT-SEMANTIC-EFFECT-WEB-AUTH-WEB-AUTH-SESSION-READ-066B54"
+        ],
+        "test_ids": []
+      },
+      "original_feature_stage": {
+        "id": "R00-T02-LA-066B54983F6A",
+        "feature_id": "F-D20-SEMANTIC_EFFECT-SEMANTIC-EFFECT-WEB-AUTH-WEB-AUTH-SESSION-READ-066B54",
+        "task_ids": [
+          "R02-T03",
+          "R07-T09"
+        ],
+        "given": "按已查调用者和 HTTP 返回核对；尚未执行新实现验收",
+        "when": "用户查看当前网页登录状态",
+        "then": "有效 cookie 返回净化后的 principal；无效/过期返回 authenticated:false",
+        "assertions": [
+          "成功：执行“查看当前网页登录状态”后，有效 cookie 返回净化后的 principal；无效/过期返回 authenticated:false",
+          "拒绝/边界：cookie 与连接类型决定身份；不披露 session secret；不应错误扩大写入或披露范围"
+        ],
+        "existing_acceptance_relations": [
+          {
+            "acceptance_id": "R02-A05",
+            "relation": "GAP",
+            "covers_leaf_result": false,
+            "reason": "未找到该 A-ID 对本叶成功、拒绝及副作用的直接检查；保留阶段关联，由逐叶场景补足"
+          },
+          {
+            "acceptance_id": "R02-A06",
+            "relation": "GAP",
+            "covers_leaf_result": false,
+            "reason": "未找到该 A-ID 对本叶成功、拒绝及副作用的直接检查；保留阶段关联，由逐叶场景补足"
+          },
+          {
+            "acceptance_id": "R07-A17",
+            "relation": "INDIRECT",
+            "covers_leaf_result": false,
+            "reason": "现有场景只覆盖该叶的部分或横向边界，未检查完整动作及结果"
+          },
+          {
+            "acceptance_id": "R07-A18",
+            "relation": "GAP",
+            "covers_leaf_result": false,
+            "reason": "未找到该 A-ID 对本叶成功、拒绝及副作用的直接检查；保留阶段关联，由逐叶场景补足"
+          }
+        ],
+        "formalization_task_id": "R00-T07",
+        "execution_task_ids": [
+          "R02-T03",
+          "R07-T09"
+        ],
+        "execution_owner": "Rust service＋客户端",
+        "execution_stage_ids": [
+          "R02",
+          "R07"
+        ],
+        "due": "R00-T07 建立正式账本时登记；最迟在所列实施 Task 的阶段验收前完成并执行",
+        "status": "SPECIFIED_NOT_EXECUTED"
+      },
+      "candidate_stage_map": {
+        "id": "R00-T02-LA-066B54983F6A",
+        "featureId": "F-D20-SEMANTIC_EFFECT-SEMANTIC-EFFECT-WEB-AUTH-WEB-AUTH-SESSION-READ-066B54",
+        "requirement": "REQUIRED_SUPPLEMENTAL",
+        "r00Kind": "supplemental",
+        "r00TaskIds": [
+          "R02-T03",
+          "R07-T09"
+        ],
+        "r00ExecutionStageIds": [
+          "R02",
+          "R07"
+        ],
+        "r00LedgerStatus": "SPECIFIED_NOT_EXECUTED",
+        "r00ResultIds": [],
+        "r00TestIds": [],
+        "r00Then": "有效 cookie 返回净化后的 principal；无效/过期返回 authenticated:false",
+        "r00Assertions": [
+          "成功：执行“查看当前网页登录状态”后，有效 cookie 返回净化后的 principal；无效/过期返回 authenticated:false",
+          "拒绝/边界：cookie 与连接类型决定身份；不披露 session secret；不应错误扩大写入或披露范围"
+        ],
+        "r00Due": "R00-T07 建立正式账本时登记；最迟在所列实施 Task 的阶段验收前完成并执行",
+        "assertionContract": {
+          "producerCommand": "a05_a06_auth_matrix",
+          "evidencePath": "{EVIDENCE}/A05_A06/leaf-cases.json",
+          "cases": [
+            {
+              "case": "a05-no-credential-read",
+              "expect": 401
+            },
+            {
+              "case": "a05-forged-principal-headers",
+              "expect": 401
+            },
+            {
+              "case": "a05-cross-principal-read",
+              "expect": 403
+            },
+            {
+              "case": "a05-positive-control-owner-execute",
+              "expect": 200
+            },
+            {
+              "case": "a06-evil-origin-health",
+              "expect": 403
+            },
+            {
+              "case": "a06-foreign-host-health",
+              "expect": 403
+            }
+          ]
+        },
+        "basisKind": "auth_primitive_only",
+        "r02Share": "认证原语基础（同 LA-25AB678E7108）；Web session 读取路由不在 R02 现行面",
+        "r07Share": "查看网页登录状态完整入口（有效 cookie 净化 principal；无效/过期 authenticated:false；不披露 secret）",
+        "evidenceRequired": "A05/A06 认证矩阵真实执行证据；路由实现后另需其认证正负矩阵",
+        "evidenceCommandRefs": [
+          "a05_a06_auth_matrix"
+        ]
+      }
+    },
+    {
+      "id": "R00-T02-LA-C4E6F27D7873",
+      "original_acceptance": {
+        "kind": "supplemental",
+        "stage_id": "R00",
+        "execution_stage_ids": [
+          "R02",
+          "R07"
+        ],
+        "task_ids": [
+          "R02-T03",
+          "R07-T09"
+        ],
+        "requirement": "REQUIRED_SUPPLEMENTAL",
+        "feature_id": "F-D20-SEMANTIC_EFFECT-SEMANTIC-EFFECT-WEB-AUTH-WEB-AUTH-LOGIN-POST-C4E6F2",
+        "then": "校验 token 或本地账号密码，创建 14 日 Web session 并设 HttpOnly cookie",
+        "formalization_task_id": "R00-T07",
+        "ledger_status": "SPECIFIED_NOT_EXECUTED",
+        "result_ids": [],
+        "feature_ids": [
+          "F-D20-SEMANTIC_EFFECT-SEMANTIC-EFFECT-WEB-AUTH-WEB-AUTH-LOGIN-POST-C4E6F2"
+        ],
+        "test_ids": []
+      },
+      "original_feature_stage": {
+        "id": "R00-T02-LA-C4E6F27D7873",
+        "feature_id": "F-D20-SEMANTIC_EFFECT-SEMANTIC-EFFECT-WEB-AUTH-WEB-AUTH-LOGIN-POST-C4E6F2",
+        "task_ids": [
+          "R02-T03",
+          "R07-T09"
+        ],
+        "given": "按已查调用者和 HTTP 返回核对；尚未执行新实现验收",
+        "when": "用户登录网页/移动端",
+        "then": "校验 token 或本地账号密码，创建 14 日 Web session 并设 HttpOnly cookie",
+        "assertions": [
+          "成功：执行“登录网页/移动端”后，校验 token 或本地账号密码，创建 14 日 Web session 并设 HttpOnly cookie",
+          "拒绝/边界：body.credential 优先 token；否则 username/password；远端密码须 HTTPS；clientKind 决定 scope；不应错误扩大写入或披露范围"
+        ],
+        "existing_acceptance_relations": [
+          {
+            "acceptance_id": "R02-A05",
+            "relation": "GAP",
+            "covers_leaf_result": false,
+            "reason": "未找到该 A-ID 对本叶成功、拒绝及副作用的直接检查；保留阶段关联，由逐叶场景补足"
+          },
+          {
+            "acceptance_id": "R02-A06",
+            "relation": "GAP",
+            "covers_leaf_result": false,
+            "reason": "未找到该 A-ID 对本叶成功、拒绝及副作用的直接检查；保留阶段关联，由逐叶场景补足"
+          },
+          {
+            "acceptance_id": "R07-A17",
+            "relation": "GAP",
+            "covers_leaf_result": false,
+            "reason": "未找到该 A-ID 对本叶成功、拒绝及副作用的直接检查；保留阶段关联，由逐叶场景补足"
+          },
+          {
+            "acceptance_id": "R07-A18",
+            "relation": "GAP",
+            "covers_leaf_result": false,
+            "reason": "未找到该 A-ID 对本叶成功、拒绝及副作用的直接检查；保留阶段关联，由逐叶场景补足"
+          }
+        ],
+        "formalization_task_id": "R00-T07",
+        "execution_task_ids": [
+          "R02-T03",
+          "R07-T09"
+        ],
+        "execution_owner": "Rust service＋客户端",
+        "execution_stage_ids": [
+          "R02",
+          "R07"
+        ],
+        "due": "R00-T07 建立正式账本时登记；最迟在所列实施 Task 的阶段验收前完成并执行",
+        "status": "SPECIFIED_NOT_EXECUTED"
+      },
+      "candidate_stage_map": {
+        "id": "R00-T02-LA-C4E6F27D7873",
+        "featureId": "F-D20-SEMANTIC_EFFECT-SEMANTIC-EFFECT-WEB-AUTH-WEB-AUTH-LOGIN-POST-C4E6F2",
+        "requirement": "REQUIRED_SUPPLEMENTAL",
+        "r00Kind": "supplemental",
+        "r00TaskIds": [
+          "R02-T03",
+          "R07-T09"
+        ],
+        "r00ExecutionStageIds": [
+          "R02",
+          "R07"
+        ],
+        "r00LedgerStatus": "SPECIFIED_NOT_EXECUTED",
+        "r00ResultIds": [],
+        "r00TestIds": [],
+        "r00Then": "校验 token 或本地账号密码，创建 14 日 Web session 并设 HttpOnly cookie",
+        "r00Assertions": [
+          "成功：执行“登录网页/移动端”后，校验 token 或本地账号密码，创建 14 日 Web session 并设 HttpOnly cookie",
+          "拒绝/边界：body.credential 优先 token；否则 username/password；远端密码须 HTTPS；clientKind 决定 scope；不应错误扩大写入或披露范围"
+        ],
+        "r00Due": "R00-T07 建立正式账本时登记；最迟在所列实施 Task 的阶段验收前完成并执行",
+        "assertionContract": {
+          "producerCommand": "a05_a06_auth_matrix",
+          "evidencePath": "{EVIDENCE}/A05_A06/leaf-cases.json",
+          "cases": [
+            {
+              "case": "a05-no-credential-read",
+              "expect": 401
+            },
+            {
+              "case": "a05-forged-principal-headers",
+              "expect": 401
+            },
+            {
+              "case": "a05-cross-principal-read",
+              "expect": 403
+            },
+            {
+              "case": "a05-positive-control-owner-execute",
+              "expect": 200
+            },
+            {
+              "case": "a06-evil-origin-health",
+              "expect": 403
+            },
+            {
+              "case": "a06-foreign-host-health",
+              "expect": 403
+            }
+          ]
+        },
+        "basisKind": "auth_primitive_only",
+        "r02Share": "认证原语基础（同 LA-25AB678E7108）；Web 登录路由不在 R02 现行面",
+        "r07Share": "网页/移动端登录完整入口（token 或账号密码、14 日 session、HttpOnly cookie、HTTPS/作用域边界）",
+        "evidenceRequired": "A05/A06 认证矩阵真实执行证据；路由实现后另需其认证正负矩阵",
+        "evidenceCommandRefs": [
+          "a05_a06_auth_matrix"
+        ]
+      }
+    },
+    {
+      "id": "R00-T02-LA-4C1A9735CF04",
+      "original_acceptance": {
+        "kind": "supplemental",
+        "stage_id": "R00",
+        "execution_stage_ids": [
+          "R02",
+          "R07"
+        ],
+        "task_ids": [
+          "R02-T03",
+          "R07-T09"
+        ],
+        "requirement": "REQUIRED_SUPPLEMENTAL",
+        "feature_id": "F-D20-ROUTE_BEHAVIOR-BEHAVIOR-WEB-AUTH-WEB-AUTH-LOGOUT-POST-4C1A97",
+        "then": "撤销当前 Web 会话并清除会话 Cookie，返回成功",
+        "formalization_task_id": "R00-T07",
+        "ledger_status": "SPECIFIED_NOT_EXECUTED",
+        "result_ids": [],
+        "feature_ids": [
+          "F-D20-ROUTE_BEHAVIOR-BEHAVIOR-WEB-AUTH-WEB-AUTH-LOGOUT-POST-4C1A97"
+        ],
+        "test_ids": []
+      },
+      "original_feature_stage": {
+        "id": "R00-T02-LA-4C1A9735CF04",
+        "feature_id": "F-D20-ROUTE_BEHAVIOR-BEHAVIOR-WEB-AUTH-WEB-AUTH-LOGOUT-POST-4C1A97",
+        "task_ids": [
+          "R02-T03",
+          "R07-T09"
+        ],
+        "given": "该入口所需目标、身份和数据已准备",
+        "when": "用户退出网页登录",
+        "then": "撤销当前 Web 会话并清除会话 Cookie，返回成功",
+        "assertions": [
+          "执行“退出网页登录”后核对：撤销当前 Web 会话并清除会话 Cookie，返回成功",
+          "失败、冲突或拒绝时核对返回的状态与实际副作用一致"
+        ],
+        "existing_acceptance_relations": [
+          {
+            "acceptance_id": "R02-A05",
+            "relation": "GAP",
+            "covers_leaf_result": false,
+            "reason": "未找到该 A-ID 对本叶成功、拒绝及副作用的直接检查；保留阶段关联，由逐叶场景补足"
+          },
+          {
+            "acceptance_id": "R02-A06",
+            "relation": "GAP",
+            "covers_leaf_result": false,
+            "reason": "未找到该 A-ID 对本叶成功、拒绝及副作用的直接检查；保留阶段关联，由逐叶场景补足"
+          },
+          {
+            "acceptance_id": "R07-A17",
+            "relation": "GAP",
+            "covers_leaf_result": false,
+            "reason": "未找到该 A-ID 对本叶成功、拒绝及副作用的直接检查；保留阶段关联，由逐叶场景补足"
+          },
+          {
+            "acceptance_id": "R07-A18",
+            "relation": "GAP",
+            "covers_leaf_result": false,
+            "reason": "未找到该 A-ID 对本叶成功、拒绝及副作用的直接检查；保留阶段关联，由逐叶场景补足"
+          }
+        ],
+        "formalization_task_id": "R00-T07",
+        "execution_task_ids": [
+          "R02-T03",
+          "R07-T09"
+        ],
+        "execution_owner": "Rust service＋客户端",
+        "execution_stage_ids": [
+          "R02",
+          "R07"
+        ],
+        "due": "R00-T07 建立正式账本时登记；最迟在所列实施 Task 的阶段验收前完成并执行",
+        "status": "SPECIFIED_NOT_EXECUTED"
+      },
+      "candidate_stage_map": {
+        "id": "R00-T02-LA-4C1A9735CF04",
+        "featureId": "F-D20-ROUTE_BEHAVIOR-BEHAVIOR-WEB-AUTH-WEB-AUTH-LOGOUT-POST-4C1A97",
+        "requirement": "REQUIRED_SUPPLEMENTAL",
+        "r00Kind": "supplemental",
+        "r00TaskIds": [
+          "R02-T03",
+          "R07-T09"
+        ],
+        "r00ExecutionStageIds": [
+          "R02",
+          "R07"
+        ],
+        "r00LedgerStatus": "SPECIFIED_NOT_EXECUTED",
+        "r00ResultIds": [],
+        "r00TestIds": [],
+        "r00Then": "撤销当前 Web 会话并清除会话 Cookie，返回成功",
+        "r00Assertions": [
+          "执行“退出网页登录”后核对：撤销当前 Web 会话并清除会话 Cookie，返回成功",
+          "失败、冲突或拒绝时核对返回的状态与实际副作用一致"
+        ],
+        "r00Due": "R00-T07 建立正式账本时登记；最迟在所列实施 Task 的阶段验收前完成并执行",
+        "assertionContract": {
+          "producerCommand": "a05_a06_auth_matrix",
+          "evidencePath": "{EVIDENCE}/A05_A06/leaf-cases.json",
+          "cases": [
+            {
+              "case": "a05-no-credential-read",
+              "expect": 401
+            },
+            {
+              "case": "a05-forged-principal-headers",
+              "expect": 401
+            },
+            {
+              "case": "a05-cross-principal-read",
+              "expect": 403
+            },
+            {
+              "case": "a05-positive-control-owner-execute",
+              "expect": 200
+            },
+            {
+              "case": "a06-evil-origin-health",
+              "expect": 403
+            },
+            {
+              "case": "a06-foreign-host-health",
+              "expect": 403
+            }
+          ]
+        },
+        "basisKind": "auth_primitive_only",
+        "r02Share": "认证原语基础（同 LA-25AB678E7108）；Web 登出路由不在 R02 现行面",
+        "r07Share": "退出网页登录完整入口（撤销当前 Web 会话、清除 cookie、副作用一致）",
+        "evidenceRequired": "A05/A06 认证矩阵真实执行证据；路由实现后另需其认证正负矩阵",
+        "evidenceCommandRefs": [
+          "a05_a06_auth_matrix"
+        ]
+      }
+    },
+    {
+      "id": "R00-T02-LA-5816DA563ED8",
+      "original_acceptance": {
+        "kind": "supplemental",
+        "stage_id": "R00",
+        "execution_stage_ids": [
+          "R02",
+          "R07"
+        ],
+        "task_ids": [
+          "R02-T03",
+          "R07-T09"
+        ],
+        "requirement": "REQUIRED_SUPPLEMENTAL",
+        "feature_id": "F-D20-SEMANTIC_EFFECT-SEMANTIC-EFFECT-WS-AUTH-WS-TICKET-WEBSOCKET-5816DA",
+        "then": "读取已认证主体并签发绑定连接类型及 /ws 的短期票据；无主体返回 403",
+        "formalization_task_id": "R00-T07",
+        "ledger_status": "SPECIFIED_NOT_EXECUTED",
+        "result_ids": [],
+        "feature_ids": [
+          "F-D20-SEMANTIC_EFFECT-SEMANTIC-EFFECT-WS-AUTH-WS-TICKET-WEBSOCKET-5816DA"
+        ],
+        "test_ids": []
+      },
+      "original_feature_stage": {
+        "id": "R00-T02-LA-5816DA563ED8",
+        "feature_id": "F-D20-SEMANTIC_EFFECT-SEMANTIC-EFFECT-WS-AUTH-WS-TICKET-WEBSOCKET-5816DA",
+        "task_ids": [
+          "R02-T03",
+          "R07-T09"
+        ],
+        "given": "按已查调用者和 HTTP 返回核对；尚未执行新实现验收",
+        "when": "用户签发 WebSocket 临时票据",
+        "then": "读取已认证主体并签发绑定连接类型及 /ws 的短期票据；无主体返回 403",
+        "assertions": [
+          "给定目标与相应权限，执行“签发 WebSocket 临时票据”后核对：读取已认证主体并签发绑定连接类型及 /ws 的短期票据；无主体返回 403",
+          "输入无效、权限不足或下游失败时应返回明确错误，不呈现成功结果"
+        ],
+        "existing_acceptance_relations": [
+          {
+            "acceptance_id": "R02-A05",
+            "relation": "GAP",
+            "covers_leaf_result": false,
+            "reason": "未找到该 A-ID 对本叶成功、拒绝及副作用的直接检查；保留阶段关联，由逐叶场景补足"
+          },
+          {
+            "acceptance_id": "R02-A06",
+            "relation": "GAP",
+            "covers_leaf_result": false,
+            "reason": "未找到该 A-ID 对本叶成功、拒绝及副作用的直接检查；保留阶段关联，由逐叶场景补足"
+          },
+          {
+            "acceptance_id": "R07-A17",
+            "relation": "GAP",
+            "covers_leaf_result": false,
+            "reason": "未找到该 A-ID 对本叶成功、拒绝及副作用的直接检查；保留阶段关联，由逐叶场景补足"
+          },
+          {
+            "acceptance_id": "R07-A18",
+            "relation": "GAP",
+            "covers_leaf_result": false,
+            "reason": "未找到该 A-ID 对本叶成功、拒绝及副作用的直接检查；保留阶段关联，由逐叶场景补足"
+          }
+        ],
+        "formalization_task_id": "R00-T07",
+        "execution_task_ids": [
+          "R02-T03",
+          "R07-T09"
+        ],
+        "execution_owner": "Rust service＋客户端",
+        "execution_stage_ids": [
+          "R02",
+          "R07"
+        ],
+        "due": "R00-T07 建立正式账本时登记；最迟在所列实施 Task 的阶段验收前完成并执行",
+        "status": "SPECIFIED_NOT_EXECUTED"
+      },
+      "candidate_stage_map": {
+        "id": "R00-T02-LA-5816DA563ED8",
+        "featureId": "F-D20-SEMANTIC_EFFECT-SEMANTIC-EFFECT-WS-AUTH-WS-TICKET-WEBSOCKET-5816DA",
+        "requirement": "REQUIRED_SUPPLEMENTAL",
+        "r00Kind": "supplemental",
+        "r00TaskIds": [
+          "R02-T03",
+          "R07-T09"
+        ],
+        "r00ExecutionStageIds": [
+          "R02",
+          "R07"
+        ],
+        "r00LedgerStatus": "SPECIFIED_NOT_EXECUTED",
+        "r00ResultIds": [],
+        "r00TestIds": [],
+        "r00Then": "读取已认证主体并签发绑定连接类型及 /ws 的短期票据；无主体返回 403",
+        "r00Assertions": [
+          "给定目标与相应权限，执行“签发 WebSocket 临时票据”后核对：读取已认证主体并签发绑定连接类型及 /ws 的短期票据；无主体返回 403",
+          "输入无效、权限不足或下游失败时应返回明确错误，不呈现成功结果"
+        ],
+        "r00Due": "R00-T07 建立正式账本时登记；最迟在所列实施 Task 的阶段验收前完成并执行",
+        "assertionContract": {
+          "producerCommand": "a05_a06_auth_matrix",
+          "evidencePath": "{EVIDENCE}/A05_A06/leaf-cases.json",
+          "cases": [
+            {
+              "case": "a05-no-credential-ws-ticket",
+              "expect": 403
+            },
+            {
+              "case": "a05-ws-ticket-issue-owner",
+              "expect": 200
+            },
+            {
+              "case": "ws-ticket-replay",
+              "expect": 401
+            },
+            {
+              "case": "ws-ticket-expired",
+              "expect": 401
+            }
+          ]
+        },
+        "basisKind": "route_basis_present_static",
+        "r02Share": "POST /lingxi/v1/ws-ticket：读取已认证主体签发绑定连接类型及 /ws 的短期票据、无主体 403（路由在现行源码静态可见；未执行验收）",
+        "r07Share": "客户端票据消费与端到端连接行为（完整入口）",
+        "evidenceRequired": "该路由认证正负矩阵执行记录（无主体 403、绑定作用域）+ A05/A06 矩阵证据。R14-F01 闭环：服务已按 R00 原断言将无主体 POST /lingxi/v1/ws-ticket 改为 403（incumbent server/routes/ws-auth.ts 同行为），注册脚本 a05-no-credential-ws-ticket 断言 403，且本叶 assertionContract 由 verify-stage 机器消费该案例的实际值（actual==403）——命令 exit 0 本身不再足以判定本叶",
+        "evidenceCommandRefs": [
+          "a05_a06_auth_matrix"
+        ]
+      }
+    },
+    {
+      "id": "R00-T02-LA-D2657E4AB5FF",
+      "original_acceptance": {
+        "kind": "supplemental",
+        "stage_id": "R00",
+        "execution_stage_ids": [
+          "R02",
+          "R07"
+        ],
+        "task_ids": [
+          "R02-T03",
+          "R07-T09"
+        ],
+        "requirement": "REQUIRED_SUPPLEMENTAL",
+        "feature_id": "F-D20-UI_BEHAVIOR-UI-BEHAVIOR-SERVICE-CONNECTIVITY-D2657E",
+        "then": "连接状态、失败原因与重连结果在 UI 可见",
+        "formalization_task_id": "R00-T07",
+        "ledger_status": "SPECIFIED_NOT_EXECUTED",
+        "result_ids": [],
+        "feature_ids": [
+          "F-D20-UI_BEHAVIOR-UI-BEHAVIOR-SERVICE-CONNECTIVITY-D2657E"
+        ],
+        "test_ids": []
+      },
+      "original_feature_stage": {
+        "id": "R00-T02-LA-D2657E4AB5FF",
+        "feature_id": "F-D20-UI_BEHAVIOR-UI-BEHAVIOR-SERVICE-CONNECTIVITY-D2657E",
+        "task_ids": [
+          "R02-T03",
+          "R07-T09"
+        ],
+        "given": "目标数据、宿主状态及必要权限已准备；同时准备所列失败或拒绝条件",
+        "when": "在桌面连接或诊断本地服务",
+        "then": "连接状态、失败原因与重连结果在 UI 可见",
+        "assertions": [
+          "连接状态、失败原因与重连结果在 UI 可见",
+          "端口/令牌无效、服务重启时显示断开并重试；不能静默假在线"
+        ],
+        "existing_acceptance_relations": [
+          {
+            "acceptance_id": "R02-A05",
+            "relation": "GAP",
+            "covers_leaf_result": false,
+            "reason": "旧阶段场景不能直接证明本行成功、失败及权限分支，需逐叶子场景。"
+          },
+          {
+            "acceptance_id": "R02-A06",
+            "relation": "GAP",
+            "covers_leaf_result": false,
+            "reason": "旧阶段场景不能直接证明本行成功、失败及权限分支，需逐叶子场景。"
+          },
+          {
+            "acceptance_id": "R07-A17",
+            "relation": "GAP",
+            "covers_leaf_result": false,
+            "reason": "旧阶段场景不能直接证明本行成功、失败及权限分支，需逐叶子场景。"
+          },
+          {
+            "acceptance_id": "R07-A18",
+            "relation": "GAP",
+            "covers_leaf_result": false,
+            "reason": "旧阶段场景不能直接证明本行成功、失败及权限分支，需逐叶子场景。"
+          }
+        ],
+        "identity_decision": "INDEPENDENT",
+        "supported_feature_ids": [],
+        "supported_scenario_ids": [],
+        "variant_group": null,
+        "formalization_task_id": "R00-T07",
+        "execution_task_ids": [
+          "R02-T03",
+          "R07-T09"
+        ],
+        "execution_owner": "Rust service＋客户端",
+        "execution_stage_ids": [
+          "R02",
+          "R07"
+        ],
+        "due": "R00-T07 建立正式账本时登记；最迟在所列实施 Task 的阶段验收前完成并执行",
+        "status": "SPECIFIED_NOT_EXECUTED"
+      },
+      "candidate_stage_map": {
+        "id": "R00-T02-LA-D2657E4AB5FF",
+        "featureId": "F-D20-UI_BEHAVIOR-UI-BEHAVIOR-SERVICE-CONNECTIVITY-D2657E",
+        "requirement": "REQUIRED_SUPPLEMENTAL",
+        "r00Kind": "supplemental",
+        "r00TaskIds": [
+          "R02-T03",
+          "R07-T09"
+        ],
+        "r00ExecutionStageIds": [
+          "R02",
+          "R07"
+        ],
+        "r00LedgerStatus": "SPECIFIED_NOT_EXECUTED",
+        "r00ResultIds": [],
+        "r00TestIds": [],
+        "r00Then": "连接状态、失败原因与重连结果在 UI 可见",
+        "r00Assertions": [
+          "连接状态、失败原因与重连结果在 UI 可见",
+          "端口/令牌无效、服务重启时显示断开并重试；不能静默假在线"
+        ],
+        "r00Due": "R00-T07 建立正式账本时登记；最迟在所列实施 Task 的阶段验收前完成并执行",
+        "assertionContract": {
+          "producerCommand": "a05_a06_auth_matrix",
+          "evidencePath": "{EVIDENCE}/A05_A06/leaf-cases.json",
+          "cases": [
+            {
+              "case": "a06-foreign-host-health",
+              "expect": 403
+            },
+            {
+              "case": "a06-evil-origin-health",
+              "expect": 403
+            },
+            {
+              "case": "a06-localhost-host-ok",
+              "expect": 200
+            },
+            {
+              "case": "a06-evil-origin-with-valid-token",
+              "expect": 403
+            }
+          ]
+        },
+        "basisKind": "protocol_basis",
+        "r02Share": "/health 与显式拒绝/失败码面（UI 判定连接状态的依据；当前候选未执行）",
+        "r07Share": "连接状态、失败原因与重连结果的完整 UI 行为（断开显示与重试、不静默假在线）",
+        "evidenceRequired": "A05/A06 + /health 执行记录（显式失败码）",
+        "evidenceCommandRefs": [
+          "a05_a06_auth_matrix"
+        ]
+      }
+    },
+    {
+      "id": "R00-T02-LA-000E6E1301C0",
+      "original_acceptance": {
+        "kind": "supplemental",
+        "stage_id": "R00",
+        "execution_stage_ids": [
+          "R02",
+          "R07"
+        ],
+        "task_ids": [
+          "R02-T03",
+          "R07-T09"
+        ],
+        "requirement": "REQUIRED_SUPPLEMENTAL",
+        "feature_id": "F-D20-UI-UI-SETTINGS-ACCESS-000E6E",
+        "then": "逐动作核对实际状态与页面投影；失败不伪装成空数据",
+        "formalization_task_id": "R00-T07",
+        "ledger_status": "SPECIFIED_NOT_EXECUTED",
+        "result_ids": [],
+        "feature_ids": [
+          "F-D20-UI-UI-SETTINGS-ACCESS-000E6E"
+        ],
+        "test_ids": []
+      },
+      "original_feature_stage": {
+        "id": "R00-T02-LA-000E6E1301C0",
+        "feature_id": "F-D20-UI-UI-SETTINGS-ACCESS-000E6E",
+        "task_ids": [
+          "R02-T03",
+          "R07-T09"
+        ],
+        "given": "打开 ui:settings:access，准备成功、空态或未初始化、失败或无权限样本",
+        "when": "逐一执行 UI 动作矩阵记录的自动加载与可见控件",
+        "then": "逐动作核对实际状态与页面投影；失败不伪装成空数据",
+        "assertions": [
+          "打开设置容器自动初始化：连接、语言、助手、快照、模型和供应商摘要（各页共用）：成功核对 冷启动完成后 ready；已有缓存直接显示旧数据并后台刷新；供应商摘要不阻塞 ready；空态/未初始化核对 无缓存时显示 loading mask；15 秒超时强制 ready；供应商摘要可暂缺；错误/无权限核对 初始化异常会 log 并 ready=true，可能展示旧/空数据；供应商摘要失败被 catch 静默，不能当空列表成功",
+          "打开页自动加载访问总览及账号/设备状态：成功核对 打开页只请求 /api/access/summary 并显示地址、模式、设备和凭证摘要；设备详情另由后续操作读取。；mobileUrl 可用且无需重启时二维码图片自动读取并显示。；空态/未初始化核对 尚未配置密钥/无设备显示空列表；无 mobileUrl 或 restartRequired 不渲染二维码图，不发该 GET。；错误/无权限核对 加载错误显示警告，不能当无设备",
+          "局域网开关、端口及公开地址保存：成功核对 保存并显示重启需求；空态/未初始化核对 未加载 summary 禁保存；错误/无权限核对 远端连接仅本机设置提示；失败 toast",
+          "生成手机/桌面连接凭证；同屏有地址时自动显示二维码：成功核对 新密钥/连接地址显示；同屏 mobileUrl 可用且无需重启时二维码自动显示，与生成凭证独立。；凭证生成后重读访问总览；若重读失败，即使生成已持久化仍显示失败 toast。；空态/未初始化核对 未生成凭证显示生成按钮；无 mobileUrl 或需重启时不渲染二维码。；错误/无权限核对 生成失败 toast，旧密钥不清除",
+          "复制地址和密钥、连接远端或返回本机：成功核对 复制按钮在剪贴板 API 存在且写入成功时显示 copied；连接远端成功后切换当前服务。；选择远端或本机连接成功后调用 reloadMainWindow 应用。；空态/未初始化核对 剪贴板 API 缺失时可跳过真实写入却仍显示 copied；远端地址或凭证缺失时连接不可完成。；错误/无权限核对 剪贴板写入 Promise 拒绝未捕获；远端连接失败由连接分支捕获提示且不切活跃服务，两种失败不能混写。；连接失败或本机连接不可用不重载。",
+          "撤销设备或单条凭证：成功核对 设备/凭证从总览移除；撤销成功后重读访问总览；若重读失败，即使撤销已持久化仍显示失败 toast。；空态/未初始化核对 无设备没有撤销控件；错误/无权限核对 失败保留条目并提示",
+          "编辑本地账号资料、设置或清除密码：成功核对 资料/密码状态刷新；空态/未初始化核对 空密码禁保存；错误/无权限核对 失败 toast；无权限不会回写成功态"
+        ],
+        "existing_acceptance_relations": [
+          {
+            "acceptance_id": "R02-A05",
+            "relation": "INDIRECT",
+            "covers_leaf_result": false,
+            "reason": "阶段场景覆盖容器/平台方向，尚未逐项断言该通道变体。"
+          },
+          {
+            "acceptance_id": "R02-A06",
+            "relation": "INDIRECT",
+            "covers_leaf_result": false,
+            "reason": "阶段场景覆盖容器/平台方向，尚未逐项断言该通道变体。"
+          },
+          {
+            "acceptance_id": "R07-A17",
+            "relation": "INDIRECT",
+            "covers_leaf_result": false,
+            "reason": "阶段场景覆盖容器/平台方向，尚未逐项断言该通道变体。"
+          },
+          {
+            "acceptance_id": "R07-A18",
+            "relation": "INDIRECT",
+            "covers_leaf_result": false,
+            "reason": "阶段场景覆盖容器/平台方向，尚未逐项断言该通道变体。"
+          }
+        ],
+        "ui_action_checks": [
+          {
+            "action_id": "ui:settings:access#00",
+            "trigger": "打开设置容器自动初始化：连接、语言、助手、快照、模型和供应商摘要（各页共用）",
+            "call_chain": [
+              "desktop/src/react/settings/SettingsContent.tsx:137",
+              "desktop/src/react/settings/SettingsContent.tsx:323",
+              "desktop/src/react/settings/SettingsContent.tsx:341",
+              "desktop/src/react/settings/SettingsContent.tsx:369",
+              "desktop/src/react/settings/SettingsContent.tsx:382",
+              "desktop/src/react/settings/SettingsContent.tsx:396",
+              "desktop/src/react/settings/actions.ts:1",
+              "desktop/src/react/settings/store.ts:1",
+              "desktop/preload.cjs:165",
+              "desktop/src/react/settings/SettingsContent.tsx:187",
+              "desktop/main.cjs:2086",
+              "desktop/main.cjs:2090",
+              "desktop/preload.cjs:34",
+              "desktop/main.cjs:5394",
+              "desktop/src/react/settings/SettingsContent.tsx:343",
+              "desktop/preload.cjs:35",
+              "desktop/main.cjs:5395",
+              "desktop/src/react/settings/SettingsContent.tsx:344",
+              "server/routes/config.ts:190",
+              "server/routes/agents.ts:274",
+              "server/routes/settings-snapshot.ts:185",
+              "server/composition/open-root.ts:35",
+              "server/routes/models.ts:201",
+              "server/composition/open-root.ts:23",
+              "server/routes/providers.ts:122"
+            ],
+            "target_feature_ids": [
+              "F-D20-DESKTOP_BEHAVIOR-DESKTOP-BEHAVIOR-SERVICE-CONNECTION-D1BEE1",
+              "F-D10-SEMANTIC_EFFECT-SEMANTIC-EFFECT-CONFIG-CONFIG-READ-A524D3",
+              "F-D06-SEMANTIC_EFFECT-SEMANTIC-EFFECT-AGENTS-AGENTS-READ-26AE36",
+              "F-D23-SEMANTIC_EFFECT-SEMANTIC-EFFECT-SETTINGS-SNAPSHOT-SETTINGS-SNAPS-F62357",
+              "F-D10-SEMANTIC_EFFECT-SEMANTIC-EFFECT-MODELS-MODELS-EB0746",
+              "F-D10-SEMANTIC_EFFECT-SEMANTIC-EFFECT-PROVIDERS-PROVIDERS-SUMMARY-READ-766F5F"
+            ],
+            "target_scenario_ids": [
+              "R00-T02-LA-D1BEE19A95BB",
+              "R00-T02-LA-A524D3723654",
+              "R00-T02-LA-26AE3688B8DE",
+              "R00-T02-LA-F6235778F816",
+              "R00-T02-LA-EB074679FAE5",
+              "R00-T02-LA-766F5F3C47C3"
+            ],
+            "success": "冷启动完成后 ready；已有缓存直接显示旧数据并后台刷新；供应商摘要不阻塞 ready",
+            "empty_or_uninitialized": "无缓存时显示 loading mask；15 秒超时强制 ready；供应商摘要可暂缺",
+            "failure_or_forbidden": "初始化异常会 log 并 ready=true，可能展示旧/空数据；供应商摘要失败被 catch 静默，不能当空列表成功",
+            "resolution": "MAPPED",
+            "gap_reason": "",
+            "suggested_task_ids": [],
+            "shared_container_action": true,
+            "control_variants": [
+              {
+                "effect_entry_id": "desktop-behavior:service-connection",
+                "visible_or_automatic_action": "桌面客户端启动并建立本机业务连接",
+                "target_feature_id": "F-D20-DESKTOP_BEHAVIOR-DESKTOP-BEHAVIOR-SERVICE-CONNECTION-D1BEE1",
+                "target_scenario_id": "R00-T02-LA-D1BEE19A95BB",
+                "effect_source_refs": [
+                  "desktop/preload.cjs:165",
+                  "desktop/src/react/settings/SettingsContent.tsx:187",
+                  "desktop/main.cjs:2086",
+                  "desktop/main.cjs:2090",
+                  "desktop/preload.cjs:34",
+                  "desktop/main.cjs:5394",
+                  "desktop/src/react/settings/SettingsContent.tsx:343",
+                  "desktop/preload.cjs:35",
+                  "desktop/main.cjs:5395",
+                  "desktop/src/react/settings/SettingsContent.tsx:344"
+                ]
+              },
+              {
+                "effect_entry_id": "semantic-effect:config.config.read",
+                "visible_or_automatic_action": "用户查看全局配置",
+                "target_feature_id": "F-D10-SEMANTIC_EFFECT-SEMANTIC-EFFECT-CONFIG-CONFIG-READ-A524D3",
+                "target_scenario_id": "R00-T02-LA-A524D3723654",
+                "effect_source_refs": [
+                  "server/routes/config.ts:190"
+                ]
+              },
+              {
+                "effect_entry_id": "semantic-effect:agents./agents.read",
+                "visible_or_automatic_action": "用户列出助手",
+                "target_feature_id": "F-D06-SEMANTIC_EFFECT-SEMANTIC-EFFECT-AGENTS-AGENTS-READ-26AE36",
+                "target_scenario_id": "R00-T02-LA-26AE3688B8DE",
+                "effect_source_refs": [
+                  "server/routes/agents.ts:274"
+                ]
+              },
+              {
+                "effect_entry_id": "semantic-effect:settings-snapshot.settings_snapshot.read",
+                "visible_or_automatic_action": "用户查看智能体设置快照",
+                "target_feature_id": "F-D23-SEMANTIC_EFFECT-SEMANTIC-EFFECT-SETTINGS-SNAPSHOT-SETTINGS-SNAPS-F62357",
+                "target_scenario_id": "R00-T02-LA-F6235778F816",
+                "effect_source_refs": [
+                  "server/routes/settings-snapshot.ts:185",
+                  "server/composition/open-root.ts:35"
+                ]
+              },
+              {
+                "effect_entry_id": "semantic-effect:models:/models:查看可用模型",
+                "visible_or_automatic_action": "用户查看可用模型",
+                "target_feature_id": "F-D10-SEMANTIC_EFFECT-SEMANTIC-EFFECT-MODELS-MODELS-EB0746",
+                "target_scenario_id": "R00-T02-LA-EB074679FAE5",
+                "effect_source_refs": [
+                  "server/routes/models.ts:201",
+                  "server/composition/open-root.ts:23"
+                ]
+              },
+              {
+                "effect_entry_id": "semantic-effect:providers.providers_summary.read",
+                "visible_or_automatic_action": "用户查看供应商概况",
+                "target_feature_id": "F-D10-SEMANTIC_EFFECT-SEMANTIC-EFFECT-PROVIDERS-PROVIDERS-SUMMARY-READ-766F5F",
+                "target_scenario_id": "R00-T02-LA-766F5F3C47C3",
+                "effect_source_refs": [
+                  "server/routes/providers.ts:122"
+                ]
+              }
+            ],
+            "ui_result_scenario_id": "R00-T02-LA-000E6E1301C0"
+          },
+          {
+            "action_id": "ui:settings:access#01",
+            "trigger": "打开页自动加载访问总览及账号/设备状态",
+            "call_chain": [
+              "desktop/src/react/settings/tabs/AccessTab.tsx:103",
+              "desktop/src/react/settings/tabs/AccessTab.tsx:123",
+              "server/routes/access.ts:60",
+              "desktop/src/react/settings/tabs/AccessTab.tsx:158",
+              "desktop/src/react/settings/tabs/AccessTab.tsx:567",
+              "server/routes/access.ts:66"
+            ],
+            "target_feature_ids": [
+              "F-D20-SEMANTIC_EFFECT-SEMANTIC-EFFECT-ACCESS-ACCESS-SUMMARY-READ-229B77",
+              "F-D20-SEMANTIC_EFFECT-SEMANTIC-EFFECT-ACCESS-ACCESS-MOBILE-QR-SVG-READ-5E4A9C"
+            ],
+            "target_scenario_ids": [
+              "R00-T02-LA-229B77A7BA69",
+              "R00-T02-LA-5E4A9CF58BED"
+            ],
+            "success": "打开页只请求 /api/access/summary 并显示地址、模式、设备和凭证摘要；设备详情另由后续操作读取。；mobileUrl 可用且无需重启时二维码图片自动读取并显示。",
+            "empty_or_uninitialized": "尚未配置密钥/无设备显示空列表；无 mobileUrl 或 restartRequired 不渲染二维码图，不发该 GET。",
+            "failure_or_forbidden": "加载错误显示警告，不能当无设备",
+            "resolution": "MAPPED",
+            "gap_reason": "",
+            "suggested_task_ids": [],
+            "control_variants": [
+              {
+                "effect_entry_id": "semantic-effect:access.access_summary.read",
+                "visible_or_automatic_action": "用户查看接入概况",
+                "target_feature_id": "F-D20-SEMANTIC_EFFECT-SEMANTIC-EFFECT-ACCESS-ACCESS-SUMMARY-READ-229B77",
+                "target_scenario_id": "R00-T02-LA-229B77A7BA69",
+                "effect_source_refs": [
+                  "server/routes/access.ts:60"
+                ]
+              },
+              {
+                "visible_or_automatic_action": "有 mobileUrl 且无需重启时二维码 img 自动 GET SVG",
+                "effect_entry_id": "semantic-effect:access.access_mobile_qr_svg.read",
+                "target_feature_id": "F-D20-SEMANTIC_EFFECT-SEMANTIC-EFFECT-ACCESS-ACCESS-MOBILE-QR-SVG-READ-5E4A9C",
+                "target_scenario_id": "R00-T02-LA-5E4A9CF58BED",
+                "effect_source_refs": [
+                  "desktop/src/react/settings/tabs/AccessTab.tsx:158",
+                  "desktop/src/react/settings/tabs/AccessTab.tsx:567",
+                  "server/routes/access.ts:66"
+                ]
+              }
+            ],
+            "ui_result_scenario_id": "R00-T02-LA-000E6E1301C0"
+          },
+          {
+            "action_id": "ui:settings:access#02",
+            "trigger": "局域网开关、端口及公开地址保存",
+            "call_chain": [
+              "desktop/src/react/settings/tabs/AccessTab.tsx:197",
+              "desktop/src/react/settings/tabs/AccessTab.tsx:430",
+              "desktop/src/react/settings/tabs/AccessTab.tsx:538",
+              "server/routes/access.ts:86"
+            ],
+            "target_feature_ids": [
+              "F-D20-SEMANTIC_EFFECT-SEMANTIC-EFFECT-ACCESS-ACCESS-NETWORK-PUT-73CDC4"
+            ],
+            "target_scenario_ids": [
+              "R00-T02-LA-73CDC44696D3"
+            ],
+            "success": "保存并显示重启需求",
+            "empty_or_uninitialized": "未加载 summary 禁保存",
+            "failure_or_forbidden": "远端连接仅本机设置提示；失败 toast",
+            "resolution": "MAPPED",
+            "gap_reason": "",
+            "suggested_task_ids": [],
+            "ui_result_scenario_id": "R00-T02-LA-000E6E1301C0"
+          },
+          {
+            "action_id": "ui:settings:access#03",
+            "trigger": "生成手机/桌面连接凭证；同屏有地址时自动显示二维码",
+            "call_chain": [
+              "desktop/src/react/settings/tabs/AccessTab.tsx:232",
+              "desktop/src/react/settings/tabs/AccessTab.tsx:254",
+              "desktop/src/react/settings/tabs/AccessTab.tsx:574",
+              "desktop/src/react/settings/tabs/AccessTab.tsx:619",
+              "server/routes/access.ts:128",
+              "server/routes/access.ts:132",
+              "desktop/src/react/settings/tabs/AccessTab.tsx:158",
+              "desktop/src/react/settings/tabs/AccessTab.tsx:567",
+              "server/routes/access.ts:66",
+              "desktop/src/react/settings/tabs/AccessTab.tsx:117",
+              "server/routes/access.ts:60"
+            ],
+            "target_feature_ids": [
+              "F-D20-SEMANTIC_EFFECT-SEMANTIC-EFFECT-ACCESS-ACCESS-MOBILE-CREDENTIALS-747E0A",
+              "F-D20-SEMANTIC_EFFECT-SEMANTIC-EFFECT-ACCESS-ACCESS-DESKTOP-CREDENTIAL-093F22",
+              "F-D20-SEMANTIC_EFFECT-SEMANTIC-EFFECT-ACCESS-ACCESS-MOBILE-QR-SVG-READ-5E4A9C",
+              "F-D20-SEMANTIC_EFFECT-SEMANTIC-EFFECT-ACCESS-ACCESS-SUMMARY-READ-229B77"
+            ],
+            "target_scenario_ids": [
+              "R00-T02-LA-747E0ADC941B",
+              "R00-T02-LA-093F22C4FF63",
+              "R00-T02-LA-5E4A9CF58BED",
+              "R00-T02-LA-229B77A7BA69"
+            ],
+            "success": "新密钥/连接地址显示；同屏 mobileUrl 可用且无需重启时二维码自动显示，与生成凭证独立。；凭证生成后重读访问总览；若重读失败，即使生成已持久化仍显示失败 toast。",
+            "empty_or_uninitialized": "未生成凭证显示生成按钮；无 mobileUrl 或需重启时不渲染二维码。",
+            "failure_or_forbidden": "生成失败 toast，旧密钥不清除",
+            "resolution": "MAPPED",
+            "gap_reason": "",
+            "suggested_task_ids": [],
+            "control_variants": [
+              {
+                "effect_entry_id": "semantic-effect:access.access_mobile_credentials.post",
+                "visible_or_automatic_action": "用户签发手机设备凭证",
+                "target_feature_id": "F-D20-SEMANTIC_EFFECT-SEMANTIC-EFFECT-ACCESS-ACCESS-MOBILE-CREDENTIALS-747E0A",
+                "target_scenario_id": "R00-T02-LA-747E0ADC941B",
+                "effect_source_refs": [
+                  "server/routes/access.ts:128"
+                ]
+              },
+              {
+                "effect_entry_id": "semantic-effect:access.access_desktop_credentials.post",
+                "visible_or_automatic_action": "用户签发桌面设备凭证",
+                "target_feature_id": "F-D20-SEMANTIC_EFFECT-SEMANTIC-EFFECT-ACCESS-ACCESS-DESKTOP-CREDENTIAL-093F22",
+                "target_scenario_id": "R00-T02-LA-093F22C4FF63",
+                "effect_source_refs": [
+                  "server/routes/access.ts:132"
+                ]
+              },
+              {
+                "visible_or_automatic_action": "同屏 mobileUrl 可用且无需重启时浏览器加载二维码 SVG；与生成密钥请求独立",
+                "effect_entry_id": "semantic-effect:access.access_mobile_qr_svg.read",
+                "target_feature_id": "F-D20-SEMANTIC_EFFECT-SEMANTIC-EFFECT-ACCESS-ACCESS-MOBILE-QR-SVG-READ-5E4A9C",
+                "target_scenario_id": "R00-T02-LA-5E4A9CF58BED",
+                "effect_source_refs": [
+                  "desktop/src/react/settings/tabs/AccessTab.tsx:158",
+                  "desktop/src/react/settings/tabs/AccessTab.tsx:567",
+                  "server/routes/access.ts:66"
+                ]
+              },
+              {
+                "visible_or_automatic_action": "生成手机或桌面凭证成功后调用 loadSummary 重新读取访问总览",
+                "effect_entry_id": "semantic-effect:access.access_summary.read",
+                "target_feature_id": "F-D20-SEMANTIC_EFFECT-SEMANTIC-EFFECT-ACCESS-ACCESS-SUMMARY-READ-229B77",
+                "target_scenario_id": "R00-T02-LA-229B77A7BA69",
+                "effect_source_refs": [
+                  "desktop/src/react/settings/tabs/AccessTab.tsx:232",
+                  "desktop/src/react/settings/tabs/AccessTab.tsx:254",
+                  "desktop/src/react/settings/tabs/AccessTab.tsx:117",
+                  "server/routes/access.ts:60"
+                ]
+              }
+            ],
+            "ui_result_scenario_id": "R00-T02-LA-000E6E1301C0"
+          },
+          {
+            "action_id": "ui:settings:access#04",
+            "trigger": "复制地址和密钥、连接远端或返回本机",
+            "call_chain": [
+              "desktop/src/react/settings/tabs/AccessTab.tsx:462",
+              "desktop/src/react/settings/tabs/AccessTab.tsx:587",
+              "desktop/src/react/settings/tabs/AccessTab.tsx:632",
+              "desktop/src/react/settings/tabs/AccessTab.tsx:681",
+              "desktop/src/react/settings/tabs/AccessTab.tsx:409",
+              "desktop/src/react/services/server-connection.ts:169",
+              "desktop/preload.cjs:165",
+              "desktop/src/react/settings/SettingsContent.tsx:187",
+              "desktop/main.cjs:2086",
+              "desktop/main.cjs:2090",
+              "desktop/preload.cjs:34",
+              "desktop/main.cjs:5394",
+              "desktop/src/react/settings/SettingsContent.tsx:343",
+              "desktop/preload.cjs:35",
+              "desktop/main.cjs:5395",
+              "desktop/src/react/settings/SettingsContent.tsx:344",
+              "desktop/src/react/settings/tabs/AccessTab.tsx:286",
+              "desktop/preload.cjs:138",
+              "desktop/main.cjs:6239"
+            ],
+            "target_feature_ids": [
+              "F-D20-DESKTOP_BEHAVIOR-DESKTOP-BEHAVIOR-SERVICE-CONNECTION-D1BEE1",
+              "F-D23-DESKTOP_BEHAVIOR-DESKTOP-BEHAVIOR-RELOAD-MAIN-WINDOW-322E02"
+            ],
+            "target_scenario_ids": [
+              "R00-T02-LA-D1BEE19A95BB",
+              "R00-T02-LA-322E02C7F2F9"
+            ],
+            "success": "复制按钮在剪贴板 API 存在且写入成功时显示 copied；连接远端成功后切换当前服务。；选择远端或本机连接成功后调用 reloadMainWindow 应用。",
+            "empty_or_uninitialized": "剪贴板 API 缺失时可跳过真实写入却仍显示 copied；远端地址或凭证缺失时连接不可完成。",
+            "failure_or_forbidden": "剪贴板写入 Promise 拒绝未捕获；远端连接失败由连接分支捕获提示且不切活跃服务，两种失败不能混写。；连接失败或本机连接不可用不重载。",
+            "resolution": "MAPPED",
+            "gap_reason": "",
+            "suggested_task_ids": [],
+            "ui_result_scenario_id": "R00-T02-LA-000E6E1301C0",
+            "control_variants": [
+              {
+                "visible_or_automatic_action": "远端连接成功或返回本机成功后重载主窗口",
+                "effect_entry_id": "desktop-behavior:reload-main-window",
+                "target_feature_id": "F-D23-DESKTOP_BEHAVIOR-DESKTOP-BEHAVIOR-RELOAD-MAIN-WINDOW-322E02",
+                "target_scenario_id": "R00-T02-LA-322E02C7F2F9",
+                "effect_source_refs": [
+                  "desktop/src/react/settings/tabs/AccessTab.tsx:286",
+                  "desktop/preload.cjs:138",
+                  "desktop/main.cjs:6239"
+                ]
+              },
+              {
+                "visible_or_automatic_action": "复制地址和密钥、连接远端或返回本机：连接本地服务",
+                "effect_entry_id": "desktop-behavior:service-connection",
+                "target_feature_id": "F-D20-DESKTOP_BEHAVIOR-DESKTOP-BEHAVIOR-SERVICE-CONNECTION-D1BEE1",
+                "target_scenario_id": "R00-T02-LA-D1BEE19A95BB",
+                "effect_source_refs": [
+                  "desktop/preload.cjs:165",
+                  "desktop/src/react/app-init.ts:102"
+                ]
+              }
+            ]
+          },
+          {
+            "action_id": "ui:settings:access#05",
+            "trigger": "撤销设备或单条凭证",
+            "call_chain": [
+              "desktop/src/react/settings/tabs/AccessTab.tsx:361",
+              "desktop/src/react/settings/tabs/AccessTab.tsx:371",
+              "desktop/src/react/settings/tabs/AccessTab.tsx:708",
+              "desktop/src/react/settings/tabs/AccessTab.tsx:721",
+              "server/routes/devices.ts:98",
+              "server/routes/devices.ts:113",
+              "desktop/src/react/settings/tabs/AccessTab.tsx:117",
+              "server/routes/access.ts:60"
+            ],
+            "target_feature_ids": [
+              "F-D20-SEMANTIC_EFFECT-SEMANTIC-EFFECT-DEVICES-DEVICES-DEVICEID-REVOKE-749802",
+              "F-D20-SEMANTIC_EFFECT-SEMANTIC-EFFECT-DEVICES-DEVICES-CREDENTIALS-CRED-43A126",
+              "F-D20-SEMANTIC_EFFECT-SEMANTIC-EFFECT-ACCESS-ACCESS-SUMMARY-READ-229B77"
+            ],
+            "target_scenario_ids": [
+              "R00-T02-LA-7498024422D7",
+              "R00-T02-LA-43A126149416",
+              "R00-T02-LA-229B77A7BA69"
+            ],
+            "success": "设备/凭证从总览移除；撤销成功后重读访问总览；若重读失败，即使撤销已持久化仍显示失败 toast。",
+            "empty_or_uninitialized": "无设备没有撤销控件",
+            "failure_or_forbidden": "失败保留条目并提示",
+            "resolution": "MAPPED",
+            "gap_reason": "",
+            "suggested_task_ids": [],
+            "control_variants": [
+              {
+                "effect_entry_id": "semantic-effect:devices:/devices/:deviceId/revoke:撤销设备",
+                "visible_or_automatic_action": "用户撤销设备",
+                "target_feature_id": "F-D20-SEMANTIC_EFFECT-SEMANTIC-EFFECT-DEVICES-DEVICES-DEVICEID-REVOKE-749802",
+                "target_scenario_id": "R00-T02-LA-7498024422D7",
+                "effect_source_refs": [
+                  "server/routes/devices.ts:98"
+                ]
+              },
+              {
+                "effect_entry_id": "semantic-effect:devices:/devices/credentials/:credentialId/revoke:撤销设备凭证",
+                "visible_or_automatic_action": "用户撤销设备凭证",
+                "target_feature_id": "F-D20-SEMANTIC_EFFECT-SEMANTIC-EFFECT-DEVICES-DEVICES-CREDENTIALS-CRED-43A126",
+                "target_scenario_id": "R00-T02-LA-43A126149416",
+                "effect_source_refs": [
+                  "server/routes/devices.ts:113"
+                ]
+              },
+              {
+                "visible_or_automatic_action": "撤销设备或凭证成功后调用 loadSummary 重新读取访问总览",
+                "effect_entry_id": "semantic-effect:access.access_summary.read",
+                "target_feature_id": "F-D20-SEMANTIC_EFFECT-SEMANTIC-EFFECT-ACCESS-ACCESS-SUMMARY-READ-229B77",
+                "target_scenario_id": "R00-T02-LA-229B77A7BA69",
+                "effect_source_refs": [
+                  "desktop/src/react/settings/tabs/AccessTab.tsx:361",
+                  "desktop/src/react/settings/tabs/AccessTab.tsx:371",
+                  "desktop/src/react/settings/tabs/AccessTab.tsx:117",
+                  "server/routes/access.ts:60"
+                ]
+              }
+            ],
+            "ui_result_scenario_id": "R00-T02-LA-000E6E1301C0"
+          },
+          {
+            "action_id": "ui:settings:access#06",
+            "trigger": "编辑本地账号资料、设置或清除密码",
+            "call_chain": [
+              "desktop/src/react/settings/tabs/AccessTab.tsx:318",
+              "desktop/src/react/settings/tabs/AccessTab.tsx:333",
+              "desktop/src/react/settings/tabs/AccessTab.tsx:349",
+              "desktop/src/react/settings/tabs/AccessTab.tsx:765",
+              "desktop/src/react/settings/tabs/AccessTab.tsx:791",
+              "desktop/src/react/settings/tabs/AccessTab.tsx:795",
+              "server/routes/access.ts:178",
+              "server/routes/access.ts:198",
+              "server/routes/access.ts:218",
+              "server/composition/open-root.ts:55"
+            ],
+            "target_feature_ids": [
+              "F-D20-SEMANTIC_EFFECT-SEMANTIC-EFFECT-ACCESS-ACCESS-ACCOUNT-PROFILE-PU-F006E0",
+              "F-D20-ROUTE_BEHAVIOR-BEHAVIOR-ACCESS-ACCESS-ACCOUNT-PASSWORD-PUT-F1754C",
+              "F-D20-ROUTE_BEHAVIOR-BEHAVIOR-ACCESS-ACCESS-ACCOUNT-PASSWORD-DELETE-25AB67"
+            ],
+            "target_scenario_ids": [
+              "R00-T02-LA-F006E094F028",
+              "R00-T02-LA-F1754C6F755B",
+              "R00-T02-LA-25AB678E7108"
+            ],
+            "success": "资料/密码状态刷新",
+            "empty_or_uninitialized": "空密码禁保存",
+            "failure_or_forbidden": "失败 toast；无权限不会回写成功态",
+            "resolution": "MAPPED",
+            "gap_reason": "",
+            "suggested_task_ids": [],
+            "control_variants": [
+              {
+                "effect_entry_id": "semantic-effect:access.access_account_profile.put",
+                "visible_or_automatic_action": "用户修改本地账号资料",
+                "target_feature_id": "F-D20-SEMANTIC_EFFECT-SEMANTIC-EFFECT-ACCESS-ACCESS-ACCOUNT-PROFILE-PU-F006E0",
+                "target_scenario_id": "R00-T02-LA-F006E094F028",
+                "effect_source_refs": [
+                  "server/routes/access.ts:178"
+                ]
+              },
+              {
+                "effect_entry_id": "behavior:access:/access/account/password:PUT",
+                "visible_or_automatic_action": "用户设置本地账号密码",
+                "target_feature_id": "F-D20-ROUTE_BEHAVIOR-BEHAVIOR-ACCESS-ACCESS-ACCOUNT-PASSWORD-PUT-F1754C",
+                "target_scenario_id": "R00-T02-LA-F1754C6F755B",
+                "effect_source_refs": [
+                  "server/routes/access.ts:198"
+                ]
+              },
+              {
+                "effect_entry_id": "behavior:access:/access/account/password:DELETE",
+                "visible_or_automatic_action": "用户移除本地账号密码",
+                "target_feature_id": "F-D20-ROUTE_BEHAVIOR-BEHAVIOR-ACCESS-ACCESS-ACCOUNT-PASSWORD-DELETE-25AB67",
+                "target_scenario_id": "R00-T02-LA-25AB678E7108",
+                "effect_source_refs": [
+                  "server/routes/access.ts:218",
+                  "server/composition/open-root.ts:55"
+                ]
+              }
+            ],
+            "ui_result_scenario_id": "R00-T02-LA-000E6E1301C0"
+          }
+        ],
+        "identity_decision": "SUPPORT",
+        "supported_feature_ids": [
+          "F-D20-DESKTOP_BEHAVIOR-DESKTOP-BEHAVIOR-SERVICE-CONNECTION-D1BEE1",
+          "F-D10-SEMANTIC_EFFECT-SEMANTIC-EFFECT-CONFIG-CONFIG-READ-A524D3",
+          "F-D06-SEMANTIC_EFFECT-SEMANTIC-EFFECT-AGENTS-AGENTS-READ-26AE36",
+          "F-D23-SEMANTIC_EFFECT-SEMANTIC-EFFECT-SETTINGS-SNAPSHOT-SETTINGS-SNAPS-F62357",
+          "F-D10-SEMANTIC_EFFECT-SEMANTIC-EFFECT-MODELS-MODELS-EB0746",
+          "F-D10-SEMANTIC_EFFECT-SEMANTIC-EFFECT-PROVIDERS-PROVIDERS-SUMMARY-READ-766F5F",
+          "F-D20-SEMANTIC_EFFECT-SEMANTIC-EFFECT-ACCESS-ACCESS-SUMMARY-READ-229B77",
+          "F-D20-SEMANTIC_EFFECT-SEMANTIC-EFFECT-ACCESS-ACCESS-MOBILE-QR-SVG-READ-5E4A9C",
+          "F-D20-SEMANTIC_EFFECT-SEMANTIC-EFFECT-ACCESS-ACCESS-NETWORK-PUT-73CDC4",
+          "F-D20-SEMANTIC_EFFECT-SEMANTIC-EFFECT-ACCESS-ACCESS-MOBILE-CREDENTIALS-747E0A",
+          "F-D20-SEMANTIC_EFFECT-SEMANTIC-EFFECT-ACCESS-ACCESS-DESKTOP-CREDENTIAL-093F22",
+          "F-D23-DESKTOP_BEHAVIOR-DESKTOP-BEHAVIOR-RELOAD-MAIN-WINDOW-322E02",
+          "F-D20-SEMANTIC_EFFECT-SEMANTIC-EFFECT-DEVICES-DEVICES-DEVICEID-REVOKE-749802",
+          "F-D20-SEMANTIC_EFFECT-SEMANTIC-EFFECT-DEVICES-DEVICES-CREDENTIALS-CRED-43A126",
+          "F-D20-SEMANTIC_EFFECT-SEMANTIC-EFFECT-ACCESS-ACCESS-ACCOUNT-PROFILE-PU-F006E0",
+          "F-D20-ROUTE_BEHAVIOR-BEHAVIOR-ACCESS-ACCESS-ACCOUNT-PASSWORD-PUT-F1754C",
+          "F-D20-ROUTE_BEHAVIOR-BEHAVIOR-ACCESS-ACCESS-ACCOUNT-PASSWORD-DELETE-25AB67"
+        ],
+        "supported_scenario_ids": [
+          "R00-T02-LA-D1BEE19A95BB",
+          "R00-T02-LA-A524D3723654",
+          "R00-T02-LA-26AE3688B8DE",
+          "R00-T02-LA-F6235778F816",
+          "R00-T02-LA-EB074679FAE5",
+          "R00-T02-LA-766F5F3C47C3",
+          "R00-T02-LA-229B77A7BA69",
+          "R00-T02-LA-5E4A9CF58BED",
+          "R00-T02-LA-73CDC44696D3",
+          "R00-T02-LA-747E0ADC941B",
+          "R00-T02-LA-093F22C4FF63",
+          "R00-T02-LA-322E02C7F2F9",
+          "R00-T02-LA-7498024422D7",
+          "R00-T02-LA-43A126149416",
+          "R00-T02-LA-F006E094F028",
+          "R00-T02-LA-F1754C6F755B",
+          "R00-T02-LA-25AB678E7108"
+        ],
+        "variant_group": null,
+        "formalization_task_id": "R00-T07",
+        "execution_task_ids": [
+          "R02-T03",
+          "R07-T09"
+        ],
+        "execution_owner": "Rust service＋客户端",
+        "execution_stage_ids": [
+          "R02",
+          "R07"
+        ],
+        "due": "R00-T07 建立正式账本时登记；最迟在所列实施 Task 的阶段验收前完成并执行",
+        "status": "SPECIFIED_NOT_EXECUTED"
+      },
+      "candidate_stage_map": {
+        "id": "R00-T02-LA-000E6E1301C0",
+        "featureId": "F-D20-UI-UI-SETTINGS-ACCESS-000E6E",
+        "requirement": "REQUIRED_SUPPLEMENTAL",
+        "r00Kind": "supplemental",
+        "r00TaskIds": [
+          "R02-T03",
+          "R07-T09"
+        ],
+        "r00ExecutionStageIds": [
+          "R02",
+          "R07"
+        ],
+        "r00LedgerStatus": "SPECIFIED_NOT_EXECUTED",
+        "r00ResultIds": [],
+        "r00TestIds": [],
+        "r00Then": "逐动作核对实际状态与页面投影；失败不伪装成空数据",
+        "r00Assertions": [
+          "打开设置容器自动初始化：连接、语言、助手、快照、模型和供应商摘要（各页共用）：成功核对 冷启动完成后 ready；已有缓存直接显示旧数据并后台刷新；供应商摘要不阻塞 ready；空态/未初始化核对 无缓存时显示 loading mask；15 秒超时强制 ready；供应商摘要可暂缺；错误/无权限核对 初始化异常会 log 并 ready=true，可能展示旧/空数据；供应商摘要失败被 catch 静默，不能当空列表成功",
+          "打开页自动加载访问总览及账号/设备状态：成功核对 打开页只请求 /api/access/summary 并显示地址、模式、设备和凭证摘要；设备详情另由后续操作读取。；mobileUrl 可用且无需重启时二维码图片自动读取并显示。；空态/未初始化核对 尚未配置密钥/无设备显示空列表；无 mobileUrl 或 restartRequired 不渲染二维码图，不发该 GET。；错误/无权限核对 加载错误显示警告，不能当无设备",
+          "局域网开关、端口及公开地址保存：成功核对 保存并显示重启需求；空态/未初始化核对 未加载 summary 禁保存；错误/无权限核对 远端连接仅本机设置提示；失败 toast",
+          "生成手机/桌面连接凭证；同屏有地址时自动显示二维码：成功核对 新密钥/连接地址显示；同屏 mobileUrl 可用且无需重启时二维码自动显示，与生成凭证独立。；凭证生成后重读访问总览；若重读失败，即使生成已持久化仍显示失败 toast。；空态/未初始化核对 未生成凭证显示生成按钮；无 mobileUrl 或需重启时不渲染二维码。；错误/无权限核对 生成失败 toast，旧密钥不清除",
+          "复制地址和密钥、连接远端或返回本机：成功核对 复制按钮在剪贴板 API 存在且写入成功时显示 copied；连接远端成功后切换当前服务。；选择远端或本机连接成功后调用 reloadMainWindow 应用。；空态/未初始化核对 剪贴板 API 缺失时可跳过真实写入却仍显示 copied；远端地址或凭证缺失时连接不可完成。；错误/无权限核对 剪贴板写入 Promise 拒绝未捕获；远端连接失败由连接分支捕获提示且不切活跃服务，两种失败不能混写。；连接失败或本机连接不可用不重载。",
+          "撤销设备或单条凭证：成功核对 设备/凭证从总览移除；撤销成功后重读访问总览；若重读失败，即使撤销已持久化仍显示失败 toast。；空态/未初始化核对 无设备没有撤销控件；错误/无权限核对 失败保留条目并提示",
+          "编辑本地账号资料、设置或清除密码：成功核对 资料/密码状态刷新；空态/未初始化核对 空密码禁保存；错误/无权限核对 失败 toast；无权限不会回写成功态"
+        ],
+        "r00Due": "R00-T07 建立正式账本时登记；最迟在所列实施 Task 的阶段验收前完成并执行",
+        "assertionContract": {
+          "producerCommand": "a05_a06_auth_matrix",
+          "evidencePath": "{EVIDENCE}/A05_A06/leaf-cases.json",
+          "cases": [
+            {
+              "case": "a05-no-credential-read",
+              "expect": 401
+            },
+            {
+              "case": "a05-forged-principal-headers",
+              "expect": 401
+            },
+            {
+              "case": "a05-cross-principal-read",
+              "expect": 403
+            },
+            {
+              "case": "a05-positive-control-owner-execute",
+              "expect": 200
+            },
+            {
+              "case": "a06-evil-origin-health",
+              "expect": 403
+            },
+            {
+              "case": "a06-foreign-host-health",
+              "expect": 403
+            }
+          ]
+        },
+        "basisKind": "auth_primitive_only",
+        "r02Share": "认证原语基础（同 LA-25AB678E7108）；设置页动作矩阵依赖的 /api/access/* 路由不在 R02 现行面（R02 阶段书禁新 UI）",
+        "r07Share": "ui:settings:access 完整页面动作矩阵（自动加载、访问总览、LAN 保存、凭证生成/二维码、复制/连接、撤销、账号资料/密码的成功/空态/错误态逐动作核对）",
+        "evidenceRequired": "A05/A06 认证矩阵真实执行证据；R07 路由实现后另需逐路由认证正负矩阵 + 页面动作矩阵执行记录",
+        "evidenceCommandRefs": [
+          "a05_a06_auth_matrix"
+        ]
+      }
+    },
+    {
+      "id": "R00-T02-LA-32FFEC05BAA7",
+      "original_acceptance": {
+        "kind": "supplemental",
+        "stage_id": "R00",
+        "execution_stage_ids": [
+          "R02",
+          "R07"
+        ],
+        "task_ids": [
+          "R02-T03",
+          "R07-T09"
+        ],
+        "requirement": "REQUIRED_SUPPLEMENTAL",
+        "feature_id": "F-D20-UI-UI-SETTINGS-SHARING-32FFEC",
+        "then": "逐动作核对实际状态与页面投影；失败不伪装成空数据",
+        "formalization_task_id": "R00-T07",
+        "ledger_status": "SPECIFIED_NOT_EXECUTED",
+        "result_ids": [],
+        "feature_ids": [
+          "F-D20-UI-UI-SETTINGS-SHARING-32FFEC"
+        ],
+        "test_ids": []
+      },
+      "original_feature_stage": {
+        "id": "R00-T02-LA-32FFEC05BAA7",
+        "feature_id": "F-D20-UI-UI-SETTINGS-SHARING-32FFEC",
+        "task_ids": [
+          "R02-T03",
+          "R07-T09"
+        ],
+        "given": "打开 ui:settings:sharing，准备成功、空态或未初始化、失败或无权限样本",
+        "when": "逐一执行 UI 动作矩阵记录的自动加载与可见控件",
+        "then": "逐动作核对实际状态与页面投影；失败不伪装成空数据",
+        "assertions": [
+          "打开设置容器自动初始化：连接、语言、助手、快照、模型和供应商摘要（各页共用）：成功核对 冷启动完成后 ready；已有缓存直接显示旧数据并后台刷新；供应商摘要不阻塞 ready；空态/未初始化核对 无缓存时显示 loading mask；15 秒超时强制 ready；供应商摘要可暂缺；错误/无权限核对 初始化异常会 log 并 ready=true，可能展示旧/空数据；供应商摘要失败被 catch 静默，不能当空列表成功",
+          "截图配色卡（三色）：成功核对 颜色写 localStorage，预览图随即切换；空态/未初始化核对 默认 light；错误/无权限核对 当前同步 localStorage 写入无 catch/提示；浏览器禁止存储时该操作抛错，未观察到成功提示。",
+          "截图宽度卡（手机/桌面）：成功核对 宽度写 localStorage，预览图切换；空态/未初始化核对 默认 mobile；错误/无权限核对 当前同步 localStorage 写入无 catch/提示；浏览器禁止存储时该操作抛错，未观察到成功提示。",
+          "截图字体与分段字符上限：成功核对 字体、上限规范化后写本地存储；空态/未初始化核对 默认跟随阅读字体、默认上限；错误/无权限核对 当前同步 localStorage 写入无 catch/提示；浏览器禁止存储时该操作抛错，未观察到成功提示。"
+        ],
+        "existing_acceptance_relations": [
+          {
+            "acceptance_id": "R02-A05",
+            "relation": "INDIRECT",
+            "covers_leaf_result": false,
+            "reason": "阶段场景覆盖容器/平台方向，尚未逐项断言该通道变体。"
+          },
+          {
+            "acceptance_id": "R02-A06",
+            "relation": "INDIRECT",
+            "covers_leaf_result": false,
+            "reason": "阶段场景覆盖容器/平台方向，尚未逐项断言该通道变体。"
+          },
+          {
+            "acceptance_id": "R07-A17",
+            "relation": "INDIRECT",
+            "covers_leaf_result": false,
+            "reason": "阶段场景覆盖容器/平台方向，尚未逐项断言该通道变体。"
+          },
+          {
+            "acceptance_id": "R07-A18",
+            "relation": "INDIRECT",
+            "covers_leaf_result": false,
+            "reason": "阶段场景覆盖容器/平台方向，尚未逐项断言该通道变体。"
+          }
+        ],
+        "ui_action_checks": [
+          {
+            "action_id": "ui:settings:sharing#00",
+            "trigger": "打开设置容器自动初始化：连接、语言、助手、快照、模型和供应商摘要（各页共用）",
+            "call_chain": [
+              "desktop/src/react/settings/SettingsContent.tsx:137",
+              "desktop/src/react/settings/SettingsContent.tsx:323",
+              "desktop/src/react/settings/SettingsContent.tsx:341",
+              "desktop/src/react/settings/SettingsContent.tsx:369",
+              "desktop/src/react/settings/SettingsContent.tsx:382",
+              "desktop/src/react/settings/SettingsContent.tsx:396",
+              "desktop/src/react/settings/actions.ts:1",
+              "desktop/src/react/settings/store.ts:1",
+              "desktop/preload.cjs:165",
+              "desktop/src/react/settings/SettingsContent.tsx:187",
+              "desktop/main.cjs:2086",
+              "desktop/main.cjs:2090",
+              "desktop/preload.cjs:34",
+              "desktop/main.cjs:5394",
+              "desktop/src/react/settings/SettingsContent.tsx:343",
+              "desktop/preload.cjs:35",
+              "desktop/main.cjs:5395",
+              "desktop/src/react/settings/SettingsContent.tsx:344",
+              "server/routes/config.ts:190",
+              "server/routes/agents.ts:274",
+              "server/routes/settings-snapshot.ts:185",
+              "server/composition/open-root.ts:35",
+              "server/routes/models.ts:201",
+              "server/composition/open-root.ts:23",
+              "server/routes/providers.ts:122"
+            ],
+            "target_feature_ids": [
+              "F-D20-DESKTOP_BEHAVIOR-DESKTOP-BEHAVIOR-SERVICE-CONNECTION-D1BEE1",
+              "F-D10-SEMANTIC_EFFECT-SEMANTIC-EFFECT-CONFIG-CONFIG-READ-A524D3",
+              "F-D06-SEMANTIC_EFFECT-SEMANTIC-EFFECT-AGENTS-AGENTS-READ-26AE36",
+              "F-D23-SEMANTIC_EFFECT-SEMANTIC-EFFECT-SETTINGS-SNAPSHOT-SETTINGS-SNAPS-F62357",
+              "F-D10-SEMANTIC_EFFECT-SEMANTIC-EFFECT-MODELS-MODELS-EB0746",
+              "F-D10-SEMANTIC_EFFECT-SEMANTIC-EFFECT-PROVIDERS-PROVIDERS-SUMMARY-READ-766F5F"
+            ],
+            "target_scenario_ids": [
+              "R00-T02-LA-D1BEE19A95BB",
+              "R00-T02-LA-A524D3723654",
+              "R00-T02-LA-26AE3688B8DE",
+              "R00-T02-LA-F6235778F816",
+              "R00-T02-LA-EB074679FAE5",
+              "R00-T02-LA-766F5F3C47C3"
+            ],
+            "success": "冷启动完成后 ready；已有缓存直接显示旧数据并后台刷新；供应商摘要不阻塞 ready",
+            "empty_or_uninitialized": "无缓存时显示 loading mask；15 秒超时强制 ready；供应商摘要可暂缺",
+            "failure_or_forbidden": "初始化异常会 log 并 ready=true，可能展示旧/空数据；供应商摘要失败被 catch 静默，不能当空列表成功",
+            "resolution": "MAPPED",
+            "gap_reason": "",
+            "suggested_task_ids": [],
+            "shared_container_action": true,
+            "control_variants": [
+              {
+                "effect_entry_id": "desktop-behavior:service-connection",
+                "visible_or_automatic_action": "桌面客户端启动并建立本机业务连接",
+                "target_feature_id": "F-D20-DESKTOP_BEHAVIOR-DESKTOP-BEHAVIOR-SERVICE-CONNECTION-D1BEE1",
+                "target_scenario_id": "R00-T02-LA-D1BEE19A95BB",
+                "effect_source_refs": [
+                  "desktop/preload.cjs:165",
+                  "desktop/src/react/settings/SettingsContent.tsx:187",
+                  "desktop/main.cjs:2086",
+                  "desktop/main.cjs:2090",
+                  "desktop/preload.cjs:34",
+                  "desktop/main.cjs:5394",
+                  "desktop/src/react/settings/SettingsContent.tsx:343",
+                  "desktop/preload.cjs:35",
+                  "desktop/main.cjs:5395",
+                  "desktop/src/react/settings/SettingsContent.tsx:344"
+                ]
+              },
+              {
+                "effect_entry_id": "semantic-effect:config.config.read",
+                "visible_or_automatic_action": "用户查看全局配置",
+                "target_feature_id": "F-D10-SEMANTIC_EFFECT-SEMANTIC-EFFECT-CONFIG-CONFIG-READ-A524D3",
+                "target_scenario_id": "R00-T02-LA-A524D3723654",
+                "effect_source_refs": [
+                  "server/routes/config.ts:190"
+                ]
+              },
+              {
+                "effect_entry_id": "semantic-effect:agents./agents.read",
+                "visible_or_automatic_action": "用户列出助手",
+                "target_feature_id": "F-D06-SEMANTIC_EFFECT-SEMANTIC-EFFECT-AGENTS-AGENTS-READ-26AE36",
+                "target_scenario_id": "R00-T02-LA-26AE3688B8DE",
+                "effect_source_refs": [
+                  "server/routes/agents.ts:274"
+                ]
+              },
+              {
+                "effect_entry_id": "semantic-effect:settings-snapshot.settings_snapshot.read",
+                "visible_or_automatic_action": "用户查看智能体设置快照",
+                "target_feature_id": "F-D23-SEMANTIC_EFFECT-SEMANTIC-EFFECT-SETTINGS-SNAPSHOT-SETTINGS-SNAPS-F62357",
+                "target_scenario_id": "R00-T02-LA-F6235778F816",
+                "effect_source_refs": [
+                  "server/routes/settings-snapshot.ts:185",
+                  "server/composition/open-root.ts:35"
+                ]
+              },
+              {
+                "effect_entry_id": "semantic-effect:models:/models:查看可用模型",
+                "visible_or_automatic_action": "用户查看可用模型",
+                "target_feature_id": "F-D10-SEMANTIC_EFFECT-SEMANTIC-EFFECT-MODELS-MODELS-EB0746",
+                "target_scenario_id": "R00-T02-LA-EB074679FAE5",
+                "effect_source_refs": [
+                  "server/routes/models.ts:201",
+                  "server/composition/open-root.ts:23"
+                ]
+              },
+              {
+                "effect_entry_id": "semantic-effect:providers.providers_summary.read",
+                "visible_or_automatic_action": "用户查看供应商概况",
+                "target_feature_id": "F-D10-SEMANTIC_EFFECT-SEMANTIC-EFFECT-PROVIDERS-PROVIDERS-SUMMARY-READ-766F5F",
+                "target_scenario_id": "R00-T02-LA-766F5F3C47C3",
+                "effect_source_refs": [
+                  "server/routes/providers.ts:122"
+                ]
+              }
+            ],
+            "ui_result_scenario_id": "R00-T02-LA-32FFEC05BAA7"
+          },
+          {
+            "action_id": "ui:settings:sharing#01",
+            "trigger": "截图配色卡（三色）",
+            "call_chain": [
+              "desktop/src/react/settings/tabs/SharingTab.tsx:35",
+              "desktop/src/react/settings/tabs/SharingTab.tsx:81",
+              "desktop/src/react/settings/tabs/SharingTab.tsx:92",
+              "desktop/src/react/utils/screenshot-segments.ts:8"
+            ],
+            "target_feature_ids": [
+              "F-D20-UI-UI-SETTINGS-SHARING-32FFEC"
+            ],
+            "target_scenario_ids": [
+              "R00-T02-LA-32FFEC05BAA7"
+            ],
+            "success": "颜色写 localStorage，预览图随即切换",
+            "empty_or_uninitialized": "默认 light",
+            "failure_or_forbidden": "当前同步 localStorage 写入无 catch/提示；浏览器禁止存储时该操作抛错，未观察到成功提示。",
+            "resolution": "MAPPED",
+            "gap_reason": "",
+            "suggested_task_ids": [],
+            "scenario_gap": "旧场景 service-connectivity 与四项截图本地偏好无关；需逐项检查重新打开读回、默认值和不可写时未成功。",
+            "ui_result_scenario_id": "R00-T02-LA-32FFEC05BAA7"
+          },
+          {
+            "action_id": "ui:settings:sharing#02",
+            "trigger": "截图宽度卡（手机/桌面）",
+            "call_chain": [
+              "desktop/src/react/settings/tabs/SharingTab.tsx:38",
+              "desktop/src/react/settings/tabs/SharingTab.tsx:101",
+              "desktop/src/react/settings/tabs/SharingTab.tsx:113"
+            ],
+            "target_feature_ids": [
+              "F-D20-UI-UI-SETTINGS-SHARING-32FFEC"
+            ],
+            "target_scenario_ids": [
+              "R00-T02-LA-32FFEC05BAA7"
+            ],
+            "success": "宽度写 localStorage，预览图切换",
+            "empty_or_uninitialized": "默认 mobile",
+            "failure_or_forbidden": "当前同步 localStorage 写入无 catch/提示；浏览器禁止存储时该操作抛错，未观察到成功提示。",
+            "resolution": "MAPPED",
+            "gap_reason": "",
+            "suggested_task_ids": [],
+            "scenario_gap": "旧场景 service-connectivity 与四项截图本地偏好无关；需逐项检查重新打开读回、默认值和不可写时未成功。",
+            "ui_result_scenario_id": "R00-T02-LA-32FFEC05BAA7"
+          },
+          {
+            "action_id": "ui:settings:sharing#03",
+            "trigger": "截图字体与分段字符上限",
+            "call_chain": [
+              "desktop/src/react/settings/tabs/SharingTab.tsx:41",
+              "desktop/src/react/settings/tabs/SharingTab.tsx:52",
+              "desktop/src/react/settings/tabs/SharingTab.tsx:130",
+              "desktop/src/react/settings/tabs/SharingTab.tsx:144",
+              "desktop/src/react/utils/font-presets.ts:36",
+              "desktop/src/react/utils/screenshot-segments.ts:8"
+            ],
+            "target_feature_ids": [
+              "F-D20-UI-UI-SETTINGS-SHARING-32FFEC"
+            ],
+            "target_scenario_ids": [
+              "R00-T02-LA-32FFEC05BAA7"
+            ],
+            "success": "字体、上限规范化后写本地存储",
+            "empty_or_uninitialized": "默认跟随阅读字体、默认上限",
+            "failure_or_forbidden": "当前同步 localStorage 写入无 catch/提示；浏览器禁止存储时该操作抛错，未观察到成功提示。",
+            "resolution": "MAPPED",
+            "gap_reason": "",
+            "suggested_task_ids": [],
+            "scenario_gap": "旧场景 service-connectivity 与四项截图本地偏好无关；需逐项检查重新打开读回、默认值和不可写时未成功。",
+            "ui_result_scenario_id": "R00-T02-LA-32FFEC05BAA7"
+          }
+        ],
+        "identity_decision": "INDEPENDENT",
+        "supported_feature_ids": [
+          "F-D20-DESKTOP_BEHAVIOR-DESKTOP-BEHAVIOR-SERVICE-CONNECTION-D1BEE1",
+          "F-D10-SEMANTIC_EFFECT-SEMANTIC-EFFECT-CONFIG-CONFIG-READ-A524D3",
+          "F-D06-SEMANTIC_EFFECT-SEMANTIC-EFFECT-AGENTS-AGENTS-READ-26AE36",
+          "F-D23-SEMANTIC_EFFECT-SEMANTIC-EFFECT-SETTINGS-SNAPSHOT-SETTINGS-SNAPS-F62357",
+          "F-D10-SEMANTIC_EFFECT-SEMANTIC-EFFECT-MODELS-MODELS-EB0746",
+          "F-D10-SEMANTIC_EFFECT-SEMANTIC-EFFECT-PROVIDERS-PROVIDERS-SUMMARY-READ-766F5F"
+        ],
+        "supported_scenario_ids": [
+          "R00-T02-LA-D1BEE19A95BB",
+          "R00-T02-LA-A524D3723654",
+          "R00-T02-LA-26AE3688B8DE",
+          "R00-T02-LA-F6235778F816",
+          "R00-T02-LA-EB074679FAE5",
+          "R00-T02-LA-766F5F3C47C3"
+        ],
+        "variant_group": null,
+        "formalization_task_id": "R00-T07",
+        "execution_task_ids": [
+          "R02-T03",
+          "R07-T09"
+        ],
+        "execution_owner": "Rust service＋客户端",
+        "execution_stage_ids": [
+          "R02",
+          "R07"
+        ],
+        "due": "R00-T07 建立正式账本时登记；最迟在所列实施 Task 的阶段验收前完成并执行",
+        "status": "SPECIFIED_NOT_EXECUTED"
+      },
+      "candidate_stage_map": {
+        "id": "R00-T02-LA-32FFEC05BAA7",
+        "featureId": "F-D20-UI-UI-SETTINGS-SHARING-32FFEC",
+        "requirement": "REQUIRED_SUPPLEMENTAL",
+        "r00Kind": "supplemental",
+        "r00TaskIds": [
+          "R02-T03",
+          "R07-T09"
+        ],
+        "r00ExecutionStageIds": [
+          "R02",
+          "R07"
+        ],
+        "r00LedgerStatus": "SPECIFIED_NOT_EXECUTED",
+        "r00ResultIds": [],
+        "r00TestIds": [],
+        "r00Then": "逐动作核对实际状态与页面投影；失败不伪装成空数据",
+        "r00Assertions": [
+          "打开设置容器自动初始化：连接、语言、助手、快照、模型和供应商摘要（各页共用）：成功核对 冷启动完成后 ready；已有缓存直接显示旧数据并后台刷新；供应商摘要不阻塞 ready；空态/未初始化核对 无缓存时显示 loading mask；15 秒超时强制 ready；供应商摘要可暂缺；错误/无权限核对 初始化异常会 log 并 ready=true，可能展示旧/空数据；供应商摘要失败被 catch 静默，不能当空列表成功",
+          "截图配色卡（三色）：成功核对 颜色写 localStorage，预览图随即切换；空态/未初始化核对 默认 light；错误/无权限核对 当前同步 localStorage 写入无 catch/提示；浏览器禁止存储时该操作抛错，未观察到成功提示。",
+          "截图宽度卡（手机/桌面）：成功核对 宽度写 localStorage，预览图切换；空态/未初始化核对 默认 mobile；错误/无权限核对 当前同步 localStorage 写入无 catch/提示；浏览器禁止存储时该操作抛错，未观察到成功提示。",
+          "截图字体与分段字符上限：成功核对 字体、上限规范化后写本地存储；空态/未初始化核对 默认跟随阅读字体、默认上限；错误/无权限核对 当前同步 localStorage 写入无 catch/提示；浏览器禁止存储时该操作抛错，未观察到成功提示。"
+        ],
+        "r00Due": "R00-T07 建立正式账本时登记；最迟在所列实施 Task 的阶段验收前完成并执行",
+        "basisKind": "client_only_stage_boundary_conflict",
+        "r02Share": "阶段边界冲突待决（R13-F01）：R00 原件 execution_task_ids=R02-T03+R07-T09、execution_stage_ids=[R02,R07]、due=最迟在所列实施 Task 的阶段验收前完成并执行；行为本体（截图配色/宽度/字体/分段上限的 localStorage 读写与页面投影）为纯客户端行为，按 R02 阶段书 §1 边界（无新 UI）未识别出独立服务器份额。未获正式处置前 verify-stage 对本叶固定 BLOCKED，不改写 R00 原件、不单方豁免",
+        "r07Share": "ui:settings:sharing 完整页面动作矩阵（含 localStorage 写失败路径逐动作核对）",
+        "evidenceRequired": "BLOCKED（不可由本阶段任何命令组合变为 PASS）。处置权限与路径（需根总控/用户决定，修复轮不得单方行使）：(a) 授权修改 R00 原件双阶段标注（治理变更）；(b) 正式确认本叶 R02 份额为空并登记可审递延依据（授权后本阶段图改记豁免依据与授权记录，非静默）；(c) 为本叶定义 R02 侧可执行证据义务并注册证据生产者。完整客户端行为仍归 R07-T09 执行记录",
+        "evidenceCommandRefs": []
+      }
+    }
+  ]
+}

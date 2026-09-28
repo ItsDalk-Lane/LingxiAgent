@@ -1,0 +1,57 @@
+{
+  "environment": {
+    "CSC_IDENTITY_AUTO_DISCOVERY": "false",
+    "SKIP_NOTARIZE": "true"
+  },
+  "output": "dist/r02-rust-package-probe-1",
+  "checks": [
+    {
+      "command": [
+        "npm",
+        "run",
+        "build:preload"
+      ],
+      "startUtc": "2026-09-28T11:07:29Z",
+      "endUtc": "2026-09-28T11:07:30Z",
+      "exit": 0,
+      "rawLog": "check-00.log"
+    },
+    {
+      "command": [
+        "npm",
+        "run",
+        "build:splash"
+      ],
+      "startUtc": "2026-09-28T11:07:30Z",
+      "endUtc": "2026-09-28T11:07:30Z",
+      "exit": 0,
+      "rawLog": "check-01.log"
+    },
+    {
+      "command": [
+        "node_modules/.bin/electron-builder",
+        "--dir",
+        "--config.directories.output=dist/r02-rust-package-probe-1"
+      ],
+      "startUtc": "2026-09-28T11:07:30Z",
+      "endUtc": "2026-09-28T11:08:13Z",
+      "exit": 1,
+      "rawLog": "check-02.log"
+    }
+  ],
+  "sourceAtRecordUtc": "2026-09-28T11:09:00Z",
+  "sourceAtRecord": {
+    "package.json": "6c8b5bd6c67bffe1c030a83f16d4ed07d1f702f6fb8ab5612f13f71dfc0b2117",
+    "build/shell-surface-manifest.json": "7f7d46dd74c7ab6f3617c0fe6e66073a396e69c4ab9ae96283abc1f1acb0ee73",
+    "scripts/build-rust-desktop-service.mjs": "a99deffc02e71109c9824abd7052dbda7f2c2b1a5e7026ad43ff49fcef89206a",
+    "scripts/build-shell.mjs": "fa5898ea1ec19fa228ab6d9918178cf8aa31659ed6ca18b3084bda839c065122",
+    "scripts/fix-modules.cjs": "2b511eac712ea2bfe9263e49341b835200efb0acf52bf36a691c28a0cf4e4767",
+    "scripts/notarize.cjs": "15e5a409a5cedfe3a1ebf35e9993d22fd82b24f5d016f2b7c2dd45a813388e63",
+    "scripts/resign-adhoc.cjs": "4b62fdd38f7f04bdcc6c3879fe1715ed719679f0ad9858250adbdd0f17a044e3",
+    "desktop/main.cjs": "cfe506d5999fb9cd8e44cc026d2abd497e3afaa214bb0d140829c6a95c64926b",
+    "desktop/src/shared/rust-local-service.cjs": "bf2dc5f4dcfcf3e5d2f2f2fac2e46ee6c0ddb29e81a4059944b43a3fa743b205",
+    "tests/desktop-rust-local-service.test.cjs": "5d9bf82140b4dff7a56107e49c08fb3baf39e7cfb91dbdb688fa7a5d63aae497",
+    "desktop/main.bundle.cjs": "bef9733f8569c7bf2a20df465f3f00fdc454b5c0299a21ea57b0d1f79342897a",
+    "desktop/preload.bundle.cjs": "43e9be38be6abf847e6e01609de62a6bdfa7909fac624c96b81703d010918389"
+  }
+}

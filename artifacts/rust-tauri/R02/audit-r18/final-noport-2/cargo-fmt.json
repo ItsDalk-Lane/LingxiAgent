@@ -1,0 +1,21 @@
+{
+  "name": "cargo-fmt",
+  "argv": [
+    "/Users/study_superior/.cargo/bin/rustup",
+    "run",
+    "1.98.1",
+    "cargo",
+    "fmt",
+    "--all",
+    "--",
+    "--check"
+  ],
+  "cwd": "/Users/study_superior/Desktop/Code/LingxiAgent/rust",
+  "startedUtc": "2026-09-28T12:39:52.598589+00:00",
+  "endedUtc": "2026-09-28T12:39:52.916470+00:00",
+  "exitCode": 0,
+  "stdout": "artifacts/rust-tauri/R02/audit-r18/final-noport-2/cargo-fmt.stdout.log",
+  "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+  "stderr": "artifacts/rust-tauri/R02/audit-r18/final-noport-2/cargo-fmt.stderr.log",
+  "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+}

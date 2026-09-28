@@ -57,6 +57,7 @@ const pointerStore = require("../../../shared/artifact-core/pointer-store.cjs");
 const manifestModule = require("../../../shared/artifact-core/manifest.cjs");
 const pointerChannels = require("../../../shared/artifact-core/pointer-channels.cjs");
 const releaseOrder = require("../../../shared/artifact-core/release-order.cjs");
+const { createPrivateServerArtifactGuard } = require("./private-server-artifact.cjs");
 
 const { SEED_CHANNEL, rendererPointerChannel } = pointerChannels;
 /**
@@ -186,11 +187,13 @@ function decideBootAction({ resolved, seedEntry, seedManifest, crashFallback }) 
 async function prepareArtifactServerBoot({
   homeDir,
   resourcesPath,
+  appVersion,
   platformArch,
   keyset,
   channel = SEED_CHANNEL,
   onProgress,
   log = console.log,
+  privateArtifactGuard = createPrivateServerArtifactGuard({ resourcesPath, appVersion }),
 }) {
   if (!homeDir) throw new Error("artifact-boot: homeDir is required");
 
@@ -201,6 +204,8 @@ async function prepareArtifactServerBoot({
   // freshly-written `next` pointer. See pointer-store.cjs's
   // `withPointerMutex` doc comment for the full rationale.
   return pointerStore.withPointerMutex(homeDir, async () => {
+    // 指针读取和版本选择之前，由安装壳的受信程序核既有目录；旧宽权限目录拒绝。
+    if (privateArtifactGuard) await privateArtifactGuard("prepare", homeDir);
     // 激活发生在下一次 boot —— 先把 next 顶成 current。
     await pointerStore.promote(homeDir, channel);
 
@@ -270,6 +275,7 @@ async function prepareArtifactServerBoot({
         platformArch,
         allowReplaceProtected: true,
         source: "seed",
+        privateArtifactGuard,
       });
       await pointerStore.promote(homeDir, channel);
       resolved = await activation.resolveBoot(channel, homeDir);
@@ -278,6 +284,9 @@ async function prepareArtifactServerBoot({
       }
       activatedSeed = true;
     }
+
+    // 包括 current、previous 回退与刚解压的 seed；未核全树不得返回给 spawn。
+    if (privateArtifactGuard) await privateArtifactGuard("verify", homeDir, resolved.pointer.versionDir);
 
     return {
       versionDir: resolved.pointer.versionDir,
@@ -460,6 +469,7 @@ async function prepareArtifactRendererBoot({
 async function prepareArtifactBoot({
   homeDir,
   resourcesPath,
+  appVersion,
   platformArch,
   keyset,
   channel = SEED_CHANNEL,
@@ -485,7 +495,7 @@ async function prepareArtifactBoot({
     requiredKinds: ["server", "renderer"],
   });
 
-  const server = await prepareArtifactServerBoot({ homeDir, resourcesPath, platformArch, keyset, channel, onProgress, log });
+  const server = await prepareArtifactServerBoot({ homeDir, resourcesPath, appVersion, platformArch, keyset, channel, onProgress, log });
   const renderer = await prepareArtifactRendererBoot({ homeDir, resourcesPath, platformArch, keyset, channel, onProgress, log });
   const compatibility = releaseOrder.assessRuntimeCompatibility(server, renderer);
   if (compatibility.status !== "compatible") {

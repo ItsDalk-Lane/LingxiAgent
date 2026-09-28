@@ -16,8 +16,8 @@ use std::time::Duration;
 
 use lingxi_service::instance::InstanceLockError;
 use lingxi_service::{
-    acquire, prepare_layout, run, HomeSource, InstanceGuard, InstanceRecord, ServiceConfig,
-    ServiceError, ServiceState,
+    acquire, prepare_layout, run, HomeSource, InstanceGuard, InstanceRecord, ServeOutcome,
+    ServiceConfig, ServiceError, ServiceState,
 };
 use tokio::io::{AsyncReadExt, AsyncWriteExt};
 
@@ -47,7 +47,7 @@ struct TestInstance {
     record: PathBuf,
     stale_archive: PathBuf,
     stop: tokio::sync::oneshot::Sender<()>,
-    handle: tokio::task::JoinHandle<Result<(), ServiceError>>,
+    handle: tokio::task::JoinHandle<Result<ServeOutcome, ServiceError>>,
 }
 
 struct Started {
@@ -95,6 +95,7 @@ async fn start_on(tag: &str, wipe: bool) -> Started {
                 guard.publish(addr).expect("publish instance record");
                 let _ = ready_tx.send(addr);
             },
+            None, // no drain budget: the test drives the stop signal itself
         )
         .await
     });

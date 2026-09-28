@@ -1,0 +1,2 @@
+2026-09-28T06:48:50.713726Z ERROR lingxi_service::events: subscription detached with explicit snapshot_required signal stream=sess_local_alpha subscriber=0 reason="slow_consumer" queue_capacity=4 dropped_deltas=0 last_enqueued_seq=1437
+2026-09-28T06:49:21.927261Z  WARN lingxi_service: ws session read failed err=Connection reset by peer (os error 54)

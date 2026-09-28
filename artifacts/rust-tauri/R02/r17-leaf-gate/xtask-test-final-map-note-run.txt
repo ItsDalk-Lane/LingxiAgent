@@ -1,0 +1,7 @@
+Check: current R17 xtask package after R02 stage-map note correction.
+Command: env -u all_proxy -u ALL_PROXY -u http_proxy -u HTTP_PROXY -u https_proxy -u HTTPS_PROXY CARGO_NET_OFFLINE=true CARGO_TARGET_DIR=/private/tmp/lingxi-r02-r17-xtask-target /Users/study_superior/.cargo/bin/rustup run 1.98.1 cargo test --manifest-path rust/Cargo.toml --locked -p xtask
+Started: 2026-09-28 06:59:25 UTC (log file birth time)
+Ended: 2026-09-28 06:59:30 UTC (log file modification time)
+Exit: 0; 56 passed, 0 failed.
+Raw log: xtask-test-final-map-note.log
+Environment: macOS host, platform-approved elevated command for ps-based cleanup checks; offline Rust dependencies; isolated target directory; repository working tree. The current source digest is in latest-client-gate-sha256.txt. This package PASS is not full R02 acceptance.

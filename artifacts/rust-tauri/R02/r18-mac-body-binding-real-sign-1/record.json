@@ -1,0 +1,60 @@
+{
+  "sourceBinary": "dist-rust-service/mac-arm64/lingxi-service",
+  "sourceSha256": "8c8a3a00666506f9927b943f7a00d3494c1e8597e04869ad2d28941566209fa1",
+  "helperSha256": "1fec1b82cb0cdaa0e440e06010d7ceae84120cadb5594e8a079260c46b256f21",
+  "checks": [
+    {
+      "command": [
+        "node",
+        "-e",
+        "const fs=require('fs');const {rustServiceContentDigest}=require(process.argv[1]);console.log(rustServiceContentDigest(fs.readFileSync(process.argv[2]),'darwin'));",
+        "<temporary binary>"
+      ],
+      "startUtc": "2026-09-28T11:46:13.889702+00:00",
+      "endUtc": "2026-09-28T11:46:13.923905+00:00",
+      "exit": 0,
+      "log": "check-1.log"
+    },
+    {
+      "command": [
+        "codesign",
+        "--force",
+        "--sign",
+        "<temporary binary>"
+      ],
+      "startUtc": "2026-09-28T11:46:13.924209+00:00",
+      "endUtc": "2026-09-28T11:46:13.944725+00:00",
+      "exit": 0,
+      "log": "check-2.log"
+    },
+    {
+      "command": [
+        "node",
+        "-e",
+        "const fs=require('fs');const {rustServiceContentDigest}=require(process.argv[1]);console.log(rustServiceContentDigest(fs.readFileSync(process.argv[2]),'darwin'));",
+        "<temporary binary>"
+      ],
+      "startUtc": "2026-09-28T11:46:13.944980+00:00",
+      "endUtc": "2026-09-28T11:46:13.979823+00:00",
+      "exit": 0,
+      "log": "check-3.log"
+    },
+    {
+      "command": [
+        "codesign",
+        "--verify",
+        "--strict",
+        "<temporary binary>"
+      ],
+      "startUtc": "2026-09-28T11:46:13.980162+00:00",
+      "endUtc": "2026-09-28T11:46:13.996200+00:00",
+      "exit": 0,
+      "log": "check-4.log"
+    }
+  ],
+  "beforeContentSha256": "87a827dad85635e3481e01b6982d6d48ca2f22e76e92035c8bc2d15a7d2dd320",
+  "afterContentSha256": "87a827dad85635e3481e01b6982d6d48ca2f22e76e92035c8bc2d15a7d2dd320",
+  "signedBinarySha256": "36e6b72b9d7724932239de65d4d6314777184c232fe62e5b71d013f1e4acb2f7",
+  "contentBound": true,
+  "helperStable": true
+}

@@ -1,0 +1,16 @@
+{
+  "name": "build-server",
+  "command": [
+    "npm",
+    "run",
+    "build:server"
+  ],
+  "cwd": "/Users/study_superior/Desktop/Code/LingxiAgent",
+  "startedUtc": "2026-09-28T11:54:02.318368+00:00",
+  "endedUtc": "2026-09-28T11:55:43.506594+00:00",
+  "exitCode": 1,
+  "stdout": "artifacts/rust-tauri/R02/audit-r18/final-noport-1/build-server.stdout.log",
+  "stdoutSha256": "42f6379ffedb2fcf37485e3fdb850cae2a96d4d73378a09db2d6754d145a9684",
+  "stderr": "artifacts/rust-tauri/R02/audit-r18/final-noport-1/build-server.stderr.log",
+  "stderrSha256": "5186556d59b2a2590032313b79352a5dca7d2746d546c37d7956c865d6363a59"
+}

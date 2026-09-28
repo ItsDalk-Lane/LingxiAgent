@@ -1,0 +1,37 @@
+{
+  "schemaVersion": 1,
+  "credentials": [
+    {
+      "schemaVersion": 1,
+      "credentialId": "cred_349d9da2fd56ba83a01381ff0102df51",
+      "deviceId": "device_a5fc1dd6e804086f8481a927fdcc8f54",
+      "secretPrefix": "hana_dev_N6_SFt878",
+      "secretHash": "be56aadad58e75f2af6c844c7643db6ad6af99e5d8ccb2e90e4d76f81ead9f1c",
+      "secretSalt": "rBNFK50pL1IQYYUoSBrtfQ",
+      "status": "active",
+      "scopes": [
+        "chat"
+      ],
+      "createdAtUnixMs": 1790576990881,
+      "expiresAtUnixMs": 1,
+      "lastUsedAtUnixMs": null
+    },
+    {
+      "schemaVersion": 1,
+      "credentialId": "cred_d235a27631d9f641aadf32a81885d3cb",
+      "deviceId": "device_5c5eaf87227158a411b605ef83ac321d",
+      "secretPrefix": "hana_dev_IBI0IeiPP",
+      "secretHash": "4b9f535fc135d785ff997570ed022e140f111f0e9dc19be47e3a04316ea5f4d1",
+      "secretSalt": "hvjOtRwYqy2EmhB1UFkOqw",
+      "status": "active",
+      "scopes": [
+        "chat"
+      ],
+      "createdAtUnixMs": 1790576991073,
+      "expiresAtUnixMs": null,
+      "lastUsedAtUnixMs": 1790576991152
+    }
+  ],
+  "createdAtUnixMs": 1790576990309,
+  "updatedAtUnixMs": 1790576991152
+}

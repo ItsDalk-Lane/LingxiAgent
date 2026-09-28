@@ -1,0 +1,26 @@
+{
+  "command": [
+    "cargo",
+    "test",
+    "--manifest-path",
+    "rust/Cargo.toml",
+    "--locked",
+    "--offline",
+    "-p",
+    "xtask"
+  ],
+  "startUtc": "2026-09-28T09:27:06.648392+00:00",
+  "endUtc": "2026-09-28T09:27:11.086000+00:00",
+  "exitCode": 0,
+  "timedOut": false,
+  "sourceSha256": {
+    "rust/crates/xtask/src/main.rs": "80781727cd4d1a2748d53084343c4b37b368ea76093f538d421a800e8c707afd",
+    "rust/crates/xtask/src/stage_map.rs": "d4f26b837393c50d78c3abfdfd6252d1e7d8ee9166ace1ba0e63f57e6f0f8885",
+    "rust/crates/xtask/src/verify/runner_tests.rs": "624e69017c160629ba8d00365f20ccc760da639c323e9383cff5a341b884a7c7",
+    "rust/crates/xtask/src/verify.rs": "8e71ef231b0fa928d89543e7f37c492cd43cf103ba6fdf9b815b997e79c440f5",
+    "rust/crates/xtask/src/stage_maps/R02.json": "a13d62b55d4e2101631cf6cd38b789d8a76c2bb917e56be76438a0d360af7eb6",
+    "rust/Cargo.lock": "af34845f58995d0267daf8bcfadeb6c6c3349bbeea2d7f138553b23c87251e9f"
+  },
+  "sourceStable": true,
+  "status": "PASS"
+}

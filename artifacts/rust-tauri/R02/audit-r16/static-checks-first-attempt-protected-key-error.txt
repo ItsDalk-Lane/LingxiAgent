@@ -1,0 +1,46 @@
+COMMAND: jq empty docs/rust-tauri/R02/R02_HANDOFF.json docs/rust-tauri/R02/R02_ACCEPTANCE_LEDGER.json docs/rust-tauri/R02/RISK_REGISTER.json docs/rust-tauri/R02/R02_IMPLEMENTATION_MAP.json docs/rust-tauri/ORCHESTRATOR_PROGRESS.json rust/crates/xtask/src/stage_maps/R02.json
+START_UTC: 2026-09-28T05:52:16.291217+00:00
+END_UTC: 2026-09-28T05:52:16.300624+00:00
+EXIT: 0
+STDOUT:
+(empty)
+STDERR:
+(empty)
+
+COMMAND: git diff --check
+START_UTC: 2026-09-28T05:52:16.300640+00:00
+END_UTC: 2026-09-28T05:52:16.356541+00:00
+EXIT: 0
+STDOUT:
+(empty)
+STDERR:
+(empty)
+
+COMMAND: git merge-base --is-ancestor 201584f2917a7fd96d6ea603bdeddbd420082cfe HEAD
+START_UTC: 2026-09-28T05:52:16.356561+00:00
+END_UTC: 2026-09-28T05:52:16.366094+00:00
+EXIT: 0
+STDOUT:
+(empty)
+STDERR:
+(empty)
+
+COMMAND: static SHA-256 recheck of artifacts/rust-tauri/R02/audit-r16/candidate-final-full-source-sha256.txt
+START_UTC: 2026-09-28T05:52:16.366109+00:00
+END_UTC: 2026-09-28T05:52:17.260592+00:00
+EXIT: 0
+PATHS: 9719
+MISMATCHES: 0
+
+
+COMMAND: static protected-source comparison to prechange manifest
+START_UTC: 2026-09-28T05:52:17.262239+00:00
+END_UTC: 2026-09-28T05:52:17.266275+00:00
+EXIT: 1
+docs/rust-tauri/R00/ACCEPTANCE_MAP.json	pre=None	current=96f70219d1df88249e8df073f4dfe211f8562cef20f7e45b1c03064feb5362be	unchanged=False
+docs/rust-tauri/R00/FEATURE_STAGE_ACCEPTANCE.json	pre=None	current=699ef808d35d0185681e712372cf6d6585caf0e3958daab646586f0b355072a9	unchanged=False
+scripts/rust-tauri/r02_t08_full_chain_probe.py	pre=None	current=17c4ace1b9df0351fac1b28da4903c273939765e7a1340816a42d20ebd2a6ee1	unchanged=False
+.sync-audit/verified-source-sha.txt	pre=None	current=bf3893f89b1f9d7739419feb77f981f646384e95f55c87f9078820dd4798e50b	unchanged=False
+.sync-audit/verify-post-verification-diff.mjs	pre=None	current=f53088951c569a6df2708f4751692b3f0114d932a37b53e169c6da7f1f2e26de	unchanged=False
+tests/post-verification-audit-seal.test.ts	pre=None	current=1489e53bdd139ea0fcc1a83edb841ba248e07c5a26f10e6cbb7febbe9eba2a34	unchanged=False
+rust/crates/xtask/src/stage_maps/R02.json	pre=None	current=26f5e0215bace355140714b0113efc9652d14ed92737e9ff3f08b01b4131281a	unchanged=False

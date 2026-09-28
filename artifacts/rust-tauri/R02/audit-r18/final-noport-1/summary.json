@@ -1,0 +1,89 @@
+{
+  "candidateBefore": {
+    "path": "artifacts/rust-tauri/R02/audit-r18/final-noport-1/source-before-sha256.txt",
+    "count": 2801,
+    "sha256": "96a6ec4cb441a7ef3c689308d87a6d6d28b9c977795a413bb7ff3c131a87f948"
+  },
+  "candidateAfter": {
+    "path": "artifacts/rust-tauri/R02/audit-r18/final-noport-1/source-after-sha256.txt",
+    "count": 2801,
+    "sha256": "96a6ec4cb441a7ef3c689308d87a6d6d28b9c977795a413bb7ff3c131a87f948"
+  },
+  "sourceUnchanged": true,
+  "platform": "darwin",
+  "node": "v24.16.0",
+  "npm": "11.13.0",
+  "checks": [
+    {
+      "name": "rust-version",
+      "exitCode": 0,
+      "record": "rust-version.json"
+    },
+    {
+      "name": "cargo-fmt",
+      "exitCode": 0,
+      "record": "cargo-fmt.json"
+    },
+    {
+      "name": "cargo-check",
+      "exitCode": 0,
+      "record": "cargo-check.json"
+    },
+    {
+      "name": "cargo-clippy",
+      "exitCode": 0,
+      "record": "cargo-clippy.json"
+    },
+    {
+      "name": "xtask-unit",
+      "exitCode": 0,
+      "record": "xtask-unit.json"
+    },
+    {
+      "name": "management-compile",
+      "exitCode": 0,
+      "record": "management-compile.json"
+    },
+    {
+      "name": "static-web-compile",
+      "exitCode": 0,
+      "record": "static-web-compile.json"
+    },
+    {
+      "name": "npm-typecheck",
+      "exitCode": 0,
+      "record": "npm-typecheck.json"
+    },
+    {
+      "name": "desktop-rust-helper",
+      "exitCode": 0,
+      "record": "desktop-rust-helper.json"
+    },
+    {
+      "name": "targeted-vitest",
+      "exitCode": 0,
+      "record": "targeted-vitest.json"
+    },
+    {
+      "name": "build-client",
+      "exitCode": 0,
+      "record": "build-client.json"
+    },
+    {
+      "name": "build-server",
+      "exitCode": 1,
+      "record": "build-server.json"
+    },
+    {
+      "name": "build-rust-service",
+      "exitCode": 0,
+      "record": "build-rust-service.json"
+    },
+    {
+      "name": "verify-rust-package",
+      "exitCode": 0,
+      "record": "verify-rust-package.json"
+    }
+  ],
+  "scope": "no true service bind, no full npm test, no verify-stage R02"
+}

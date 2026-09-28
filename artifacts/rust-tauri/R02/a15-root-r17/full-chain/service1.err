@@ -1,0 +1,2 @@
+LINGXI_AUTH_REJECTED request_id=req-5dea1ef74ddeb4fec367a5e836f8eddd method=GET path=/lingxi/v1/me status=401 Unauthorized reason=missing_credential remote=127.0.0.1:56350
+2026-09-28T06:17:18.736274Z  WARN lingxi_service: ws session read failed err=Connection reset by peer (os error 54)

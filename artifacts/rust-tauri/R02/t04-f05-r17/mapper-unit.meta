@@ -1,0 +1,4 @@
+start_utc=2026-09-28T06:25:05Z
+command=CARGO_NET_OFFLINE=true CARGO_TARGET_DIR=/tmp/r02-t03-root-fixes-target cargo test --manifest-path rust/Cargo.toml -p lingxi-service --lib --locked storage_http_errors_keep_status_reason_and_retryability
+end_utc=2026-09-28T06:25:06Z
+exit_status=0

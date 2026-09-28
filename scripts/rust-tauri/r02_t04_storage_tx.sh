@@ -29,8 +29,17 @@ set -euo pipefail
 cd "$(dirname "$0")/../.."
 
 EVIDENCE_DIR="${1:-artifacts/rust-tauri/R02/T04}"
+# 每轮证据目录必须全新，防止独立直跑时旧日志覆盖或冒充本轮结果。
+if [ -L "$EVIDENCE_DIR" ] || { [ -e "$EVIDENCE_DIR" ] && [ ! -d "$EVIDENCE_DIR" ]; }; then
+  echo "ERROR: evidence path is not a regular directory: $EVIDENCE_DIR" >&2
+  exit 1
+fi
+if [ -d "$EVIDENCE_DIR" ]; then
+  FIRST_ENTRY="$(find "$EVIDENCE_DIR" -mindepth 1 -print -quit)" || exit 1
+  [ -z "$FIRST_ENTRY" ] || { echo "ERROR: evidence directory is not empty: $EVIDENCE_DIR" >&2; exit 1; }
+fi
 mkdir -p "$EVIDENCE_DIR"
-TARGET_DIR="${CARGO_TARGET_DIR:-/tmp/rust-target-r02-t04}"
+TARGET_DIR="${CARGO_TARGET_DIR:-${TMPDIR:-/tmp}/rust-target-r02-t04}"
 
 TOOLCHAIN="$(sed -n 's/^channel[[:space:]]*=[[:space:]]*"\([^"]*\)".*/\1/p' rust-toolchain.toml | head -n 1)"
 if [ -z "$TOOLCHAIN" ]; then
@@ -50,12 +59,134 @@ CARGO="env -u all_proxy -u ALL_PROXY -u http_proxy -u HTTP_PROXY -u https_proxy 
 
 HOME_DIR=""
 SERVICE_PID=""
-cleanup() {
-  if [ -n "$SERVICE_PID" ] && kill -0 "$SERVICE_PID" 2>/dev/null; then
-    kill -9 "$SERVICE_PID" 2>/dev/null || true
-    wait "$SERVICE_PID" 2>/dev/null || true
+# R02 stage-repair R7 / R7-F02: SERVICE_PID is the CURRENT handle — set on
+# spawn/reload, RETIRED (cleared) after every wait/reap (the normal stop
+# paths already did; a wait returning non-zero can abort under set -e
+# AFTER reaping). The trap KILL-9s it ONLY while it still proves CURRENT
+# ownership (exists AND ppid is THIS shell): a retired or recycled number
+# is never signalled (R6-F02 A12 pattern).
+# R12-F01: the boolean probe's false branch conflated exited/foreign/
+# unobservable, and the trap's owned branch was `kill -9; wait` with NO
+# deadline — KILL cannot be ignored, but an unreapable direct child
+# (D-state) would still hang the trap forever. Four-state probe + a
+# bounded KILL re-check below (≈5 s worst case per handle): residue is
+# reported loudly at expiry, never an unbounded wait. KILL-9 stays the
+# FIRST signal by this script's own contract (the S2 crash-stop
+# semantics); no TERM stage is inserted.
+child_state() {
+  # child_state <pid> → exited | owned | foreign | unobservable
+  local ppid
+  if ! kill -0 "$1" 2>/dev/null; then
+    printf 'exited\n'
+    return 0
   fi
-  if [ -n "$HOME_DIR" ] && [ -d "$HOME_DIR" ]; then rm -rf "$HOME_DIR"; fi
+  ppid="$(ps -o ppid= -p "$1" 2>/dev/null | tr -d '[:space:]')"
+  if [ -z "$ppid" ]; then
+    printf 'unobservable\n'
+  elif [ "$ppid" = "$$" ]; then
+    printf 'owned\n'
+  else
+    printf 'foreign\n'
+  fi
+}
+# R12-F01: bounded crash-stop for ONE provably-owned handle: KILL-9 (the
+# contractual first signal here — there is no gentler stage to try and
+# KILL cannot be ignored) → ≤5 s re-check poll. Prints the final state;
+# an unreapable survivor is reported as residue, never waited on.
+bounded_kill_stop_owned() {
+  local pid="$1" state="" i
+  # KILL 前重新确认进程仍属本脚本，未知或已复用的 PID 不得被信号触碰。
+  state="$(child_state "$pid")"
+  if [ "$state" != "owned" ]; then printf '%s\n' "$state"; return 0; fi
+  kill -9 "$pid" 2>/dev/null || true
+  for i in $(seq 1 100); do
+    state="$(child_state "$pid")"
+    case "$state" in
+      exited|foreign) break ;;
+      owned|unobservable) : ;;
+    esac
+    sleep 0.05
+  done
+  printf '%s\n' "${state:-unobservable}"
+}
+# 数据路径的正常停机须先 TERM，并在有限时间后仅对仍属本脚本的子进程 KILL。
+bounded_term_stop_owned() {
+  local pid="$1" state="" i
+  state="$(child_state "$pid")"
+  if [ "$state" != "owned" ]; then printf '%s\n' "$state"; return 0; fi
+  kill -TERM "$pid" 2>/dev/null || true
+  for i in $(seq 1 100); do
+    state="$(child_state "$pid")"
+    case "$state" in exited|foreign) break ;; owned|unobservable) : ;; esac
+    sleep 0.05
+  done
+  if [ "${state:-owned}" = "owned" ]; then
+    state="$(bounded_kill_stop_owned "$pid")"
+  fi
+  printf '%s\n' "${state:-unobservable}"
+}
+stop_service_gracefully() {
+  local state
+  [ "$(child_state "$SERVICE_PID")" = "owned" ] || fail "service not owned before graceful stop"
+  state="$(bounded_term_stop_owned "$SERVICE_PID")"
+  case "$state" in exited) ;; *) fail "service remained or ownership changed after TERM/KILL budget (state=$state)" ;; esac
+  if wait "$SERVICE_PID" 2>/dev/null; then SERVICE_STOP_RC=0; else SERVICE_STOP_RC=$?; fi
+  SERVICE_PID=""
+  [ "$SERVICE_STOP_RC" -eq 0 ] || fail "service did not stop cleanly (exit=$SERVICE_STOP_RC)"
+}
+crash_service_owned() {
+  local state
+  [ "$(child_state "$SERVICE_PID")" = "owned" ] || fail "service not owned before crash signal"
+  state="$(bounded_kill_stop_owned "$SERVICE_PID")"
+  case "$state" in exited) ;; *) fail "service remained or ownership changed after KILL budget (state=$state)" ;; esac
+  if wait "$SERVICE_PID" 2>/dev/null; then SERVICE_STOP_RC=0; else SERVICE_STOP_RC=$?; fi
+  SERVICE_PID=""
+  [ "$SERVICE_STOP_RC" -eq 137 ] || fail "crash signal expected exit 137, got $SERVICE_STOP_RC"
+}
+cleanup() {
+  local cleanup_residue=0
+  if [ -n "$SERVICE_PID" ]; then
+    case "$(child_state "$SERVICE_PID")" in
+      owned)
+        case "$(bounded_kill_stop_owned "$SERVICE_PID")" in
+          exited)
+            wait "$SERVICE_PID" 2>/dev/null || true
+            ;;
+          foreign)
+            echo "cleanup: pid $SERVICE_PID 已不属于本脚本，不等待或发信号" >&2
+            cleanup_residue=1
+            ;;
+          owned)
+            echo "cleanup: pid $SERVICE_PID still OWNED after the KILL budget — RESIDUE left behind (unreapable?), no unbounded wait" >&2
+            cleanup_residue=1
+            ;;
+          unobservable)
+            echo "cleanup: pid $SERVICE_PID state UNOBSERVABLE after the KILL budget — not signalled further, no unbounded wait; possible residue" >&2
+            cleanup_residue=1
+            ;;
+        esac
+        ;;
+      exited)
+        wait "$SERVICE_PID" 2>/dev/null || true
+        ;;
+      foreign)
+        echo "cleanup: pid $SERVICE_PID is NOT currently owned by this shell — NOT signalled" >&2
+        cleanup_residue=1
+        ;;
+      unobservable)
+        echo "cleanup: pid $SERVICE_PID ownership UNOBSERVABLE (ps unreadable) — NOT signalled" >&2
+        cleanup_residue=1
+        ;;
+    esac
+    SERVICE_PID=""
+  fi
+  if [ "$cleanup_residue" -eq 0 ]; then
+    if [ -n "$HOME_DIR" ] && [ -d "$HOME_DIR" ]; then rm -rf "$HOME_DIR"; fi
+  else
+    echo "cleanup: 进程仍存活或归属不明，保留本轮 home=$HOME_DIR 供核查" >&2
+    exit 1
+  fi
+  return 0
 }
 trap cleanup EXIT
 
@@ -123,17 +254,9 @@ db_files_sha() { # $1=home -> stable digest of the db file set
   (cd "$1/lingxi-service/data" && cat runs.db* 2>/dev/null | shasum -a 256)
 }
 
-wait_exit() { # $1=pid $2=timeout-50ms-ticks
-  for _ in $(seq 1 "$2"); do
-    kill -0 "$1" 2>/dev/null || wait "$1" 2>/dev/null && return 0
-    sleep 0.05
-  done
-  return 1
-}
-
 # ---- S1: startup -> execute -> graceful stop -> restart ---------------------
 note "== S1: full lifecycle over the real database =="
-HOME_DIR=$(mktemp -d /tmp/lingxi-r02t04-bin-XXXXXX)
+HOME_DIR=$(mktemp -d "${TMPDIR:-/tmp}/lingxi-r02t04-bin-XXXXXX")
 DB="$HOME_DIR/lingxi-service/data/runs.db"
 start_service "$HOME_DIR" s1 || fail "service did not become ready"
 ADDR=$(cat "$EVIDENCE_DIR/service.addr")
@@ -143,11 +266,8 @@ CODE=$(http "$ADDR" POST /lingxi/v1/sessions/sess_local_alpha/execute "$TOKEN" '
 [ "$CODE" = "200" ] || fail "S1 execute expected 200, got $CODE"
 note "PASS S1 execute accepted (http=200)"
 
-SERVICE_PID=$(cat "$EVIDENCE_DIR/service.pid")
-kill -TERM "$SERVICE_PID"; wait "$SERVICE_PID" 2>/dev/null
-EXIT=$?
-[ "$EXIT" = "0" ] || fail "S1 graceful stop expected exit 0, got $EXIT"
-SERVICE_PID=""
+[ -n "$SERVICE_PID" ] || fail "S1 service handle missing"
+stop_service_gracefully
 note "PASS S1 graceful stop (exit 0, WAL checkpointed)"
 
 "$INSPECT_BIN" "$DB" counts > "$EVIDENCE_DIR/s1-counts-after-stop.json"
@@ -164,8 +284,8 @@ TOKEN=$(token_of "$HOME_DIR")   # the loopback token rotates per start
 RUN_COUNT=$(get_json "$ADDR" /lingxi/v1/sessions/sess_local_alpha "$TOKEN" \
   | python3 -c 'import json,sys; print(json.load(sys.stdin)["runCount"])')
 [ "$RUN_COUNT" = "1" ] || fail "S1 restart expected runCount=1, got $RUN_COUNT"
-SERVICE_PID=$(cat "$EVIDENCE_DIR/service.pid")
-kill -TERM "$SERVICE_PID"; wait "$SERVICE_PID" 2>/dev/null; SERVICE_PID=""
+[ -n "$SERVICE_PID" ] || fail "S1 restart service handle missing"
+stop_service_gracefully
 note "PASS S1 restart reads runCount=1 from the database"
 
 # ---- S2: crash (kill -9) after a committed execute --------------------------
@@ -175,8 +295,8 @@ ADDR=$(cat "$EVIDENCE_DIR/service.addr")
 TOKEN=$(token_of "$HOME_DIR")
 CODE=$(http "$ADDR" POST /lingxi/v1/sessions/sess_local_beta/execute "$TOKEN" '{"input":"crash window run"}')
 [ "$CODE" = "200" ] || fail "S2 execute expected 200, got $CODE"
-SERVICE_PID=$(cat "$EVIDENCE_DIR/service.pid")
-kill -9 "$SERVICE_PID"; wait "$SERVICE_PID" 2>/dev/null || true; SERVICE_PID=""
+[ -n "$SERVICE_PID" ] || fail "S2 service handle missing"
+crash_service_owned
 note "PASS S2 crash delivered (kill -9 right after the committed execute)"
 
 "$INSPECT_BIN" "$DB" dump --table runs > "$EVIDENCE_DIR/s2-runs-dump.jsonl"
@@ -198,13 +318,13 @@ TOKEN=$(token_of "$HOME_DIR")   # rotated per start
 BETA=$(get_json "$ADDR" /lingxi/v1/sessions/sess_local_beta "$TOKEN" \
   | python3 -c 'import json,sys; print(json.load(sys.stdin)["runCount"])')
 [ "$BETA" = "1" ] || fail "S2 restart expected beta runCount=1, got $BETA"
-SERVICE_PID=$(cat "$EVIDENCE_DIR/service.pid")
-kill -TERM "$SERVICE_PID"; wait "$SERVICE_PID" 2>/dev/null; SERVICE_PID=""
+[ -n "$SERVICE_PID" ] || fail "S2 restart service handle missing"
+stop_service_gracefully
 note "PASS S2 restart recovers the committed-but-crashed run (runCount=1)"
 
 # ---- S3: unwritable data dir -> loud startup refusal ------------------------
 note "== S3: real IO fault at startup — loud refusal, no fallback =="
-FAULT_HOME=$(mktemp -d /tmp/lingxi-r02t04-fault-XXXXXX)
+FAULT_HOME=$(mktemp -d "${TMPDIR:-/tmp}/lingxi-r02t04-fault-XXXXXX")
 chmod 0555 "$FAULT_HOME"
 set +e
 "$SERVICE_BIN" --home "$FAULT_HOME" --bind 127.0.0.1:0 \
@@ -226,7 +346,7 @@ BASE_COUNTS="$("$INSPECT_BIN" "$DB" counts)"
 for round in 1 2 3; do
   # each start re-runs the open-time migration pass
   start_service "$HOME_DIR" "s4-$round" || fail "s4 round $round service did not become ready"
-  kill -TERM "$SERVICE_PID"; wait "$SERVICE_PID" 2>/dev/null; SERVICE_PID=""
+  stop_service_gracefully
   MIG="$("$INSPECT_BIN" "$DB" migrations)"
   echo "$MIG" > "$EVIDENCE_DIR/s4-migrations-round$round.json"
   echo "$BASE_COUNTS" | diff -q - <("$INSPECT_BIN" "$DB" counts) >/dev/null \

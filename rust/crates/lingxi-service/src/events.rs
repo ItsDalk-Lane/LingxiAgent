@@ -1141,6 +1141,17 @@ impl EventService {
     ///
     /// Snapshot/cursor join (module docs guarantee #1): register (hold) →
     /// durable read → release hold at the read boundary.
+    ///
+    /// R02 stage-repair R1 / F02: the durable read is ONE atomic
+    /// [`RunDatabase::stream_resume_slice`] submission (floor + head + page)
+    /// taken AFTER the hold registers. The pre-fix separate floor and page
+    /// submissions let a retention purge commit between them: the floor
+    /// verdict said "intact" while the page was already missing events —
+    /// a silent hole with no `snapshot_required`. The single-writer queue
+    /// serializes the slice against any purge, so the verdict and the page
+    /// are one consistent database state; a first-event gap or an
+    /// intra-page jump is now an explicit rebuild directive / a loud
+    /// corruption error respectively, never a silent skip.
     pub async fn subscribe(
         &self,
         principal: &Principal,
@@ -1165,18 +1176,9 @@ impl EventService {
             Err(err) => return Err(SubscribeReject::Storage(err)),
         }
 
-        // 2. Durable head (always read: cursor bounds AND the hub's
-        //    restart baseline alignment both need it).
-        let head = self
-            .storage
-            .stream_head(stream_id)
-            .await
-            .map_err(SubscribeReject::Storage)?
-            .unwrap_or(Seq::new(0));
-
-        // 3. Cursor validation against the durable facts.
-        let after = match &cursor {
-            None => Seq::new(0),
+        // 2. Cursor decode + stream match (pure validation, no storage).
+        let decoded = match &cursor {
+            None => None,
             Some(cursor) => {
                 let decoded = SubscribeCursor::decode(cursor)
                     .map_err(|detail| SubscribeReject::MalformedCursor { detail })?;
@@ -1186,52 +1188,23 @@ impl EventService {
                         cursor_stream: decoded.stream_id,
                     });
                 }
-                let floor = self
-                    .storage
-                    .stream_floor(stream_id)
-                    .await
-                    .map_err(SubscribeReject::Storage)?;
-                // Truncation is checked against the RETAINED facts before
-                // the future bound. Gap = events the cursor expects were
-                // truncated: the explicit rebuild directive, not an empty
-                // stream, not a replay from the wrong offset. A collapsed
-                // stream (no floor at all — retention purged it empty) with
-                // a non-zero cursor is the same condition: its events are
-                // gone, so the client gets the rebuild directive with no
-                // floor instead of a "future cursor" rejection that would
-                // send it down the wrong recovery path (REVIEW-R1 F03 —
-                // R02-A10 recovery vocabulary).
-                match floor {
-                    Some(floor) if floor.value() > decoded.seq.value().saturating_add(1) => {
-                        return Ok(SubscribeOutcome::RequiresSnapshot(SnapshotRequired {
-                            stream_id: stream_id.to_string(),
-                            floor: Some(floor),
-                            reason: "events_truncated",
-                        }));
-                    }
-                    // No retained events at all, cursor expects some.
-                    None if decoded.seq.value() > 0 => {
-                        return Ok(SubscribeOutcome::RequiresSnapshot(SnapshotRequired {
-                            stream_id: stream_id.to_string(),
-                            floor: None,
-                            reason: "events_truncated",
-                        }));
-                    }
-                    _ => {}
-                }
-                if decoded.seq > head {
-                    return Err(SubscribeReject::FutureCursor {
-                        stream_id: stream_id.to_string(),
-                        seq: decoded.seq,
-                        head,
-                    });
-                }
-                decoded.seq
+                Some(decoded)
             }
         };
+        let after = decoded.as_ref().map_or(Seq::new(0), |d| d.seq);
 
-        // 4. Register (hold) BEFORE the durable page read: events published
-        //    from now on buffer in the hold instead of racing the cut. The
+        // 3. Durable head for the hub's restart baseline alignment. The
+        //    resume verdicts below do NOT use this value — they read the
+        //    atomic slice taken under the hold.
+        let head = self
+            .storage
+            .stream_head(stream_id)
+            .await
+            .map_err(SubscribeReject::Storage)?
+            .unwrap_or(Seq::new(0));
+
+        // 4. Register (hold) BEFORE the durable read: events published from
+        //    now on buffer in the hold instead of racing the cut. The
         //    subscriber registry is bounded (R02-T07): over a cap the
         //    subscribe is explicitly rejected.
         let mut subscription = self
@@ -1245,20 +1218,129 @@ impl EventService {
                     SubscriberCapKind::PerStream => self.limits.max_subscribers_per_stream,
                 },
             })?;
-        let page_limit = u64::from(self.limits.page_limit_max);
-        let events = match self
+
+        // Every rejection past this point must undo the registration
+        // explicitly (the guard alone would only close the mailbox; the hub
+        // entry must not linger).
+        let reject_with_unregister =
+            |service: &Self,
+             subscription: &SubscriptionGuard,
+             outcome: Result<SubscribeOutcome, SubscribeReject>| {
+                service.hub.unregister(subscription.subscriber_id());
+                outcome
+            };
+
+        // 5. THE atomic resume slice: floor + head + first page in ONE
+        //    storage submission, serialized against purge by the
+        //    single-writer queue (F02).
+        let slice = match self
             .storage
-            .stream_events_after(stream_id, after, self.limits.page_limit_max)
+            .stream_resume_slice(stream_id, after, self.limits.page_limit_max)
             .await
         {
-            Ok(events) => events,
+            Ok(slice) => slice,
             Err(err) => {
-                // Undo the registration explicitly (the guard alone would
-                // only close the mailbox; the hub entry must not linger).
-                self.hub.unregister(subscription.subscriber_id());
-                return Err(SubscribeReject::Storage(err));
+                return reject_with_unregister(
+                    self,
+                    &subscription,
+                    Err(SubscribeReject::Storage(err)),
+                )
             }
         };
+
+        // 6. Cursor validation against the atomic slice. Truncation is
+        //    checked against the RETAINED facts before the future bound.
+        //    Gap = events the cursor expects were truncated: the explicit
+        //    rebuild directive, not an empty stream, not a replay from the
+        //    wrong offset. A collapsed stream (no floor at all — retention
+        //    purged it empty) with a non-zero cursor is the same condition:
+        //    its events are gone, so the client gets the rebuild directive
+        //    with no floor instead of a "future cursor" rejection that would
+        //    send it down the wrong recovery path (REVIEW-R1 F03 —
+        //    R02-A10 recovery vocabulary).
+        if decoded.is_some() {
+            match slice.floor {
+                Some(floor) if floor.value() > after.value().saturating_add(1) => {
+                    return reject_with_unregister(
+                        self,
+                        &subscription,
+                        Ok(SubscribeOutcome::RequiresSnapshot(SnapshotRequired {
+                            stream_id: stream_id.to_string(),
+                            floor: Some(floor),
+                            reason: "events_truncated",
+                        })),
+                    );
+                }
+                // No retained events at all, cursor expects some.
+                None if after.value() > 0 => {
+                    return reject_with_unregister(
+                        self,
+                        &subscription,
+                        Ok(SubscribeOutcome::RequiresSnapshot(SnapshotRequired {
+                            stream_id: stream_id.to_string(),
+                            floor: None,
+                            reason: "events_truncated",
+                        })),
+                    );
+                }
+                _ => {}
+            }
+        }
+        let slice_head = slice.head.unwrap_or(Seq::new(0));
+        if after > slice_head {
+            return reject_with_unregister(
+                self,
+                &subscription,
+                Err(SubscribeReject::FutureCursor {
+                    stream_id: stream_id.to_string(),
+                    seq: after,
+                    head: slice_head,
+                }),
+            );
+        }
+
+        // 7. Continuity validation of the slice page (F02, defense in
+        //    depth). The slice is atomic against purge and the store
+        //    assigns consecutive seqs, so a violation means the retention
+        //    facts themselves disagree with the page:
+        //    - resume mode, first event beyond `after + 1`: a truncation the
+        //      floor did not flag — the explicit rebuild directive (never a
+        //      silent skip);
+        //    - an intra-page jump: the consecutive-seq invariant is broken
+        //      — loud corruption, never a guess.
+        let events = slice.events;
+        if decoded.is_some() && !events.is_empty() {
+            let first = events[0].seq.value();
+            if first != after.value().saturating_add(1) {
+                return reject_with_unregister(
+                    self,
+                    &subscription,
+                    Ok(SubscribeOutcome::RequiresSnapshot(SnapshotRequired {
+                        stream_id: stream_id.to_string(),
+                        floor: slice.floor,
+                        reason: "events_truncated",
+                    })),
+                );
+            }
+        }
+        for pair in events.windows(2) {
+            let (prev, next) = (pair[0].seq.value(), pair[1].seq.value());
+            if next != prev + 1 {
+                return reject_with_unregister(
+                    self,
+                    &subscription,
+                    Err(SubscribeReject::Storage(StorageError::Corrupted {
+                        detail: format!(
+                            "stream {stream_id} page is not consecutive: seq {prev} followed by \
+                             {next}; the single-writer seq invariant is broken, refusing to \
+                             guess a resume point"
+                        ),
+                    })),
+                );
+            }
+        }
+
+        let page_limit = u64::from(self.limits.page_limit_max);
         let snapshot_seq = events.last().map_or(after, |e| e.seq);
         let next_cursor = if events.len() as u64 >= page_limit {
             Some(
@@ -1276,7 +1358,7 @@ impl EventService {
         } else {
             "snapshot"
         };
-        // 4. Release the hold AT the cut boundary (module docs guarantee).
+        // 8. Release the hold AT the cut boundary (module docs guarantee).
         self.hub
             .release_hold(subscription.subscriber_id(), snapshot_seq.value());
         subscription.hub = Some(Arc::clone(&self.hub));

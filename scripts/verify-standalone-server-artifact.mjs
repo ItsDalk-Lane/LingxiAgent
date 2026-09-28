@@ -28,6 +28,7 @@ import {
 const require = createRequire(import.meta.url);
 const ustar = require("../shared/artifact-core/ustar.cjs");
 const activation = require("../shared/artifact-core/activation.cjs");
+const { verifyRustServiceDirectory } = require("../desktop/src/shared/rust-local-service.cjs");
 const __filename = fileURLToPath(import.meta.url);
 
 function assertFile(filePath, label) {
@@ -50,7 +51,7 @@ function expectEqual(actual, expected, label) {
   }
 }
 
-function assertExtractedLayout(layoutRoot) {
+function assertExtractedLayout(layoutRoot, version) {
   assertKnowledgeVectorRuntime(path.join(layoutRoot, "server"), STANDALONE_PLATFORM, STANDALONE_ARCH);
   const expectedRootEntries = ["git", "hana-server.cmd", "hana.cmd", "sandbox", "server"];
   const actualRootEntries = fs.readdirSync(layoutRoot).sort();
@@ -59,6 +60,13 @@ function assertExtractedLayout(layoutRoot) {
   for (const relative of REQUIRED_STANDALONE_SERVER_FILES) {
     assertFile(path.join(layoutRoot, "server", ...relative.split("/")), `packaged server file ${relative}`);
   }
+  // 解包后再次核对 Node 服务版本，防止只靠外层清单与 Rust 清单自洽。
+  const bundledVersion = JSON.parse(fs.readFileSync(path.join(layoutRoot, "server", "package.json"), "utf8")).version;
+  expectEqual(bundledVersion, version, "packaged server version");
+  verifyRustServiceDirectory({
+    directory: path.join(layoutRoot, "server", "rust-service"),
+    platform: STANDALONE_PLATFORM, arch: STANDALONE_ARCH, appVersion: version,
+  });
   assertFile(
     path.join(layoutRoot, "sandbox", "windows", "lingxi-win-sandbox.exe"),
     "Windows sandbox helper",
@@ -397,6 +405,7 @@ export async function verifyWindowsStandaloneArtifact(opts = {}) {
   expectEqual(manifest.layout?.root, STANDALONE_LAYOUT_ROOT, "manifest layout root");
   expectEqual(manifest.layout?.server, `${STANDALONE_LAYOUT_ROOT}/server`, "manifest server layout");
   expectEqual(manifest.layout?.git, `${STANDALONE_LAYOUT_ROOT}/git`, "manifest Git layout");
+  expectEqual(manifest.layout?.rustService, `${STANDALONE_LAYOUT_ROOT}/server/rust-service`, "manifest Rust service layout");
   expectEqual(
     manifest.layout?.sandboxHelper,
     `${STANDALONE_LAYOUT_ROOT}/sandbox/windows/lingxi-win-sandbox.exe`,
@@ -417,7 +426,7 @@ export async function verifyWindowsStandaloneArtifact(opts = {}) {
     if (!rootStat.isDirectory()) {
       throw new Error(`[verify-standalone] archive layout root must be a directory: ${layoutRoot}`);
     }
-    assertExtractedLayout(layoutRoot);
+    assertExtractedLayout(layoutRoot, version);
     if (opts.smoke) {
       smokeExtractedRuntime({ rootDir, layoutRoot });
       await runPackagedKnowledgeVectorSmoke({ serverDir: path.join(layoutRoot, "server"), platform: STANDALONE_PLATFORM, arch });

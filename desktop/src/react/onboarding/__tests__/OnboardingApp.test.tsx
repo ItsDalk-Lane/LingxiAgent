@@ -132,6 +132,16 @@ describe('OnboardingApp locale switching', () => {
     });
   });
 
+  it('shows Rust onboarding is unavailable instead of calling legacy setup routes', async () => {
+    (window.hana as unknown as Record<string, unknown>).getServerConnectionInfo = vi.fn(async () => ({
+      port: 34001, token: 'rust-token', serverNodeKind: 'lingxi-service', serverNodeTransport: 'https',
+    }));
+    const fetchMock = vi.mocked(globalThis.fetch);
+    render(<OnboardingApp preview={false} skipToTutorial={false} />);
+    expect(await screen.findByText(/Rust onboarding is not migrated/)).toBeInTheDocument();
+    expect(fetchMock).not.toHaveBeenCalled();
+  });
+
   it('lets first-run users connect to an existing LAN server from the welcome page', async () => {
     const fetchMock = vi.fn(async (url: string) => {
       if (url === 'http://127.0.0.1:62950/api/agents?fresh=1') {

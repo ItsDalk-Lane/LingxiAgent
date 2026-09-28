@@ -1,0 +1,20 @@
+{
+  "command": [
+    "npm",
+    "run",
+    "build:shell"
+  ],
+  "cwd": "/Users/study_superior/Desktop/Code/LingxiAgent",
+  "environmentOverrides": {
+    "LINGXI_SIGN_KEYSET": "temporary public-only keyset",
+    "CSC_IDENTITY_AUTO_DISCOVERY": "false",
+    "SKIP_NOTARIZE": "true"
+  },
+  "startedUtc": "2026-09-28T12:00:05.591514+00:00",
+  "endedUtc": "2026-09-28T12:02:16.005036+00:00",
+  "exitCode": 0,
+  "stdoutSha256": "8255de8d38d4e9a1c9eae22cfa122eddd5453bd61a737a322d2216eb74a8cf2f",
+  "stderrSha256": "a821e0eeddb2e306dbbdb8e3cf5beddfb367a45d9a086c948db71e631d161499",
+  "sourceManifest": "../source-after-sha256.txt",
+  "scope": "local package structure, no notarization, no installed app runtime"
+}

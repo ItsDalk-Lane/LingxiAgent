@@ -1,0 +1,41 @@
+/Users/study_superior/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/windows-sys-0.61.2/src/Windows/Win32/System/Threading/mod.rs:432:pub const CREATE_NEW_CONSOLE: PROCESS_CREATION_FLAGS = 16u32;
+/Users/study_superior/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/windows-sys-0.61.2/src/Windows/Win32/System/Threading/mod.rs:433:pub const CREATE_NEW_PROCESS_GROUP: PROCESS_CREATION_FLAGS = 512u32;
+/Users/study_superior/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/windows-sys-0.61.2/src/Windows/Win32/Security/Authorization/mod.rs:1086:pub const SDDL_REVISION_1: u32 = 1u32;
+/Users/study_superior/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/windows-sys-0.61.2/src/Windows/Win32/Security/Authorization/mod.rs:1111:pub const SE_FILE_OBJECT: SE_OBJECT_TYPE = 1i32;
+/Users/study_superior/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/windows-sys-0.61.2/src/Windows/Win32/Security/mod.rs:164:pub struct ACCESS_ALLOWED_ACE {
+/Users/study_superior/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/windows-sys-0.61.2/src/Windows/Win32/Security/mod.rs:243:pub struct ACE_HEADER {
+/Users/study_superior/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/windows-sys-0.61.2/src/Windows/Win32/Security/mod.rs:270:pub struct ACL_SIZE_INFORMATION {
+/Users/study_superior/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/windows-sys-0.61.2/src/Windows/Win32/Security/mod.rs:278:pub const AclSizeInformation: ACL_INFORMATION_CLASS = 2i32;
+/Users/study_superior/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/windows-sys-0.61.2/src/Windows/Win32/Security/mod.rs:403:pub const DACL_SECURITY_INFORMATION: OBJECT_SECURITY_INFORMATION = 4u32;
+/Users/study_superior/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/windows-sys-0.61.2/src/Windows/Win32/Security/mod.rs:496:pub const OWNER_SECURITY_INFORMATION: OBJECT_SECURITY_INFORMATION = 1u32;
+/Users/study_superior/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/windows-sys-0.61.2/src/Windows/Win32/Security/mod.rs:510:pub const PROTECTED_DACL_SECURITY_INFORMATION: OBJECT_SECURITY_INFORMATION = 2147483648u32;
+/Users/study_superior/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/windows-sys-0.61.2/src/Windows/Win32/Security/mod.rs:531:pub struct SECURITY_ATTRIBUTES {
+/Users/study_superior/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/windows-sys-0.61.2/src/Windows/Win32/Security/mod.rs:663:pub const SE_DACL_PROTECTED: SECURITY_DESCRIPTOR_CONTROL = 4096u16;
+/Users/study_superior/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/windows-sys-0.61.2/src/Windows/Win32/Security/mod.rs:1033:pub type TOKEN_INFORMATION_CLASS = i32;
+/Users/study_superior/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/windows-sys-0.61.2/src/Windows/Win32/Security/mod.rs:1066:pub struct TOKEN_OWNER {
+/Users/study_superior/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/windows-sys-0.61.2/src/Windows/Win32/Security/mod.rs:1096:pub const TOKEN_QUERY: TOKEN_ACCESS_MASK = 8u32;
+/Users/study_superior/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/windows-sys-0.61.2/src/Windows/Win32/Security/mod.rs:1097:pub const TOKEN_QUERY_SOURCE: TOKEN_ACCESS_MASK = 16u32;
+/Users/study_superior/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/windows-sys-0.61.2/src/Windows/Win32/Security/mod.rs:1129:pub struct TOKEN_USER {
+/Users/study_superior/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/windows-sys-0.61.2/src/Windows/Win32/Security/mod.rs:1134:pub struct TOKEN_USER_CLAIMS {
+/Users/study_superior/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/windows-sys-0.61.2/src/Windows/Win32/Security/mod.rs:1175:pub const TokenOwner: TOKEN_INFORMATION_CLASS = 4i32;
+/Users/study_superior/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/windows-sys-0.61.2/src/Windows/Win32/Security/mod.rs:1194:pub const TokenUser: TOKEN_INFORMATION_CLASS = 1i32;
+/Users/study_superior/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/windows-sys-0.61.2/src/Windows/Win32/Security/mod.rs:1195:pub const TokenUserClaimAttributes: TOKEN_INFORMATION_CLASS = 33i32;
+/Users/study_superior/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/windows-sys-0.61.2/src/Windows/Win32/Storage/FileSystem/mod.rs:1049:pub const CREATE_NEW: FILE_CREATION_DISPOSITION = 1u32;
+/Users/study_superior/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/windows-sys-0.61.2/src/Windows/Win32/Storage/FileSystem/mod.rs:1396:pub const FILE_ALL_ACCESS: FILE_ACCESS_RIGHTS = 2032127u32;
+/Users/study_superior/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/windows-sys-0.61.2/src/Windows/Win32/Storage/FileSystem/mod.rs:1406:pub const FILE_ATTRIBUTE_NORMAL: FILE_FLAGS_AND_ATTRIBUTES = 128u32;
+/Users/study_superior/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/windows-sys-0.61.2/src/Windows/Win32/Storage/FileSystem/mod.rs:1414:pub const FILE_ATTRIBUTE_REPARSE_POINT: FILE_FLAGS_AND_ATTRIBUTES = 1024u32;
+/Users/study_superior/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/windows-sys-0.61.2/src/Windows/Win32/Storage/FileSystem/mod.rs:1496:pub const FILE_FLAG_BACKUP_SEMANTICS: FILE_FLAGS_AND_ATTRIBUTES = 33554432u32;
+/Users/study_superior/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/windows-sys-0.61.2/src/Windows/Win32/Storage/FileSystem/mod.rs:1501:pub const FILE_FLAG_OPEN_REPARSE_POINT: FILE_FLAGS_AND_ATTRIBUTES = 2097152u32;
+/Users/study_superior/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/windows-sys-0.61.2/src/Windows/Win32/Storage/FileSystem/mod.rs:1725:pub const FILE_READ_ATTRIBUTES: FILE_ACCESS_RIGHTS = 128u32;
+/Users/study_superior/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/windows-sys-0.61.2/src/Windows/Win32/Storage/FileSystem/mod.rs:1823:pub const FILE_SHARE_READ: FILE_SHARE_MODE = 1u32;
+/Users/study_superior/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/windows-sys-0.61.2/src/Windows/Win32/Storage/FileSystem/mod.rs:1824:pub const FILE_SHARE_WRITE: FILE_SHARE_MODE = 2u32;
+/Users/study_superior/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/windows-sys-0.61.2/src/Windows/Win32/Storage/FileSystem/mod.rs:1859:pub const FILE_TRAVERSE: FILE_ACCESS_RIGHTS = 32u32;
+/Users/study_superior/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/windows-sys-0.61.2/src/Windows/Win32/Storage/FileSystem/mod.rs:3310:pub const OPEN_EXISTING: FILE_CREATION_DISPOSITION = 3u32;
+/Users/study_superior/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/windows-sys-0.61.2/src/Windows/Win32/Storage/FileSystem/mod.rs:3360:pub const READ_CONTROL: FILE_ACCESS_RIGHTS = 131072u32;
+/Users/study_superior/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/windows-sys-0.61.2/src/Windows/Win32/Storage/FileSystem/mod.rs:4363:pub const WRITE_DAC: FILE_ACCESS_RIGHTS = 262144u32;
+/Users/study_superior/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/windows-sys-0.61.2/src/Windows/Win32/Foundation/mod.rs:5119:pub type HANDLE = *mut core::ffi::c_void;
+/Users/study_superior/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/windows-sys-0.61.2/src/Windows/Win32/Foundation/mod.rs:5120:pub type HANDLE_FLAGS = u32;
+/Users/study_superior/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/windows-sys-0.61.2/src/Windows/Win32/Foundation/mod.rs:5121:pub const HANDLE_FLAG_INHERIT: HANDLE_FLAGS = 1u32;
+/Users/study_superior/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/windows-sys-0.61.2/src/Windows/Win32/Foundation/mod.rs:5122:pub const HANDLE_FLAG_PROTECT_FROM_CLOSE: HANDLE_FLAGS = 2u32;
+/Users/study_superior/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/windows-sys-0.61.2/src/Windows/Win32/Foundation/mod.rs:5123:pub type HANDLE_PTR = usize;
+/Users/study_superior/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/windows-sys-0.61.2/src/Windows/Win32/Foundation/mod.rs:5291:pub const INVALID_HANDLE_VALUE: HANDLE = -1i32 as _;

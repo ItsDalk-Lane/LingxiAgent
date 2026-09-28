@@ -611,6 +611,15 @@
     "serverNotReady": "サーバーの準備ができていません",
     "loading": "読み込み中...",
     "reconnecting": "再接続中",
+    "reconnected": "再接続しました",
+    "wsTicketFailed": "接続用チケットを取得できません",
+    "wsHandshakeFailed": "サーバーの接続プロトコルが一致しません",
+    "wsHandshakeTimedOut": "サーバーとの接続確認がタイムアウトしました",
+    "wsConnectionFailed": "サーバーに接続できません",
+    "wsConnectionClosed": "サーバーとの接続が切れました",
+    "serverRestartInvalid": "サーバーの再起動情報が無効です。再試行してください",
+    "rustCoreUnavailable": "Rust サービスには接続しましたが、チャット機能は未移行のため送信できません",
+    "serverRestarting": "サーバーを再起動しています",
     "reconnect": "再接続"
   },
   "input": {
@@ -1516,6 +1525,7 @@
     "saved": "保存しました ✿",
     "saveFailed": "保存に失敗しました",
     "refreshFailed": "更新に失敗しました",
+    "rustCoreUnavailable": "Rust サービスではエージェント、モデル、一般設定はまだ利用できません。アクセス設定のみ利用できます。",
     "fileChangedOnDisk": "ファイルが外部で変更されたため、古い保存をスキップしました",
     "noChanges": "変更はありません",
     "autoSaved": "自動保存しました ✿",

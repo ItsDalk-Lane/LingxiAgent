@@ -17,6 +17,7 @@
 const { execSync } = require("child_process");
 const fs = require("fs");
 const path = require("path");
+const { rustServicePlatformTag, verifyRustServiceDirectory } = require('../desktop/src/shared/rust-local-service.cjs');
 
 /**
  * 目录内定位平台化命名的 seed manifest（seed-train-<platform>-<arch>.json，
@@ -196,6 +197,18 @@ exports.default = async function (context) {
   // ── seed 四件套校验（renderer + server 树以签名归档进箱，双 artifact 管线）──
   assertSeedResourcesReady(resourcesDir);
   console.log("[fix-modules] seed resources verified (renderer archive + server archive + manifest + sig)");
+  const stagedRust = verifyRustServiceDirectory({
+    directory: path.join(__dirname, '..', 'dist-rust-service', `${rustServicePlatformTag()}-${process.arch}`),
+  });
+  const packagedRust = verifyRustServiceDirectory({
+    directory: path.join(resourcesDir, 'rust-service'),
+    allowSignedWindowsMutation: true,
+  });
+  if (stagedRust.manifest.contentSha256 !== packagedRust.manifest.contentSha256
+      || stagedRust.manifest.sourceSha256 !== packagedRust.manifest.sourceSha256) {
+    throw new Error('[fix-modules] packaged Rust service differs from staged host release');
+  }
+  console.log(`[fix-modules] Rust service verified (${packagedRust.manifest.platform}-${packagedRust.manifest.arch})`);
 
   if (!fs.existsSync(distModules)) return;
 

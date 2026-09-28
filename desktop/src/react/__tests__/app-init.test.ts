@@ -17,8 +17,10 @@ const mockPendingNewSessionIdentityPatch = vi.fn(() => ({
   pendingDraftId: 'test-pending-draft-id',
 }));
 const mockConnectWebSocket = vi.fn();
+const mockDisconnectWebSocketForRestart = vi.fn();
 const mockGetWebSocket = vi.fn<() => WebSocket | null>(() => null);
 const mockSetStatus = vi.fn();
+const mockShowError = vi.fn();
 const mockLoadModels = vi.fn(async () => {});
 const mockInitJian = vi.fn();
 const mockLoadStudioWorkspaces = vi.fn(async () => []);
@@ -70,11 +72,13 @@ vi.mock('../stores/session-project-actions', () => ({
 
 vi.mock('../services/websocket', () => ({
   connectWebSocket: mockConnectWebSocket,
+  disconnectWebSocketForRestart: mockDisconnectWebSocketForRestart,
   getWebSocket: mockGetWebSocket,
 }));
 
 vi.mock('../utils/ui-helpers', () => ({
   setStatus: mockSetStatus,
+  showError: mockShowError,
   loadModels: mockLoadModels,
 }));
 
@@ -136,12 +140,13 @@ function serverIdentityResponse(partial: Record<string, unknown> = {}): Response
   });
 }
 
-function persistedLanConnectionJson() {
+function persistedLanConnectionJson(serverNodeKind?: string) {
   const connection = {
     connectionId: 'lan:node_lan:studio_lan',
     kind: 'lan',
     serverId: 'server_lan',
     serverNodeId: 'node_lan',
+    ...(serverNodeKind ? { serverNodeKind } : {}),
     userId: 'user_lan',
     studioId: 'studio_lan',
     label: 'LAN Studio',
@@ -177,8 +182,10 @@ describe('initApp bridge indicator', () => {
     });
     mockSwitchSession.mockReset();
     mockConnectWebSocket.mockReset();
+    mockDisconnectWebSocketForRestart.mockReset();
     mockGetWebSocket.mockReset();
     mockSetStatus.mockReset();
+    mockShowError.mockReset();
     mockLoadModels.mockReset();
     mockInitJian.mockReset();
     mockActivateWorkspaceDesk.mockReset();
@@ -376,6 +383,118 @@ describe('initApp bridge indicator', () => {
     expect(mockLingxiFetch).toHaveBeenCalledWith('/api/server/identity');
     expect(mockSetStatus).toHaveBeenCalledWith('status.serverNotReady', false);
     expect(mockLoadModels).not.toHaveBeenCalled();
+    expect(mockConnectWebSocket).not.toHaveBeenCalled();
+    expect((window.platform.appReady as ReturnType<typeof vi.fn>)).toHaveBeenCalledTimes(1);
+  });
+
+  it('reconnects a saved Rust server through its own login and identity routes', async () => {
+    (globalThis as Record<string, unknown>).window = {
+      addEventListener: vi.fn(),
+      localStorage: {
+        getItem: vi.fn((key: string) => key === 'hana-server-connections-v1'
+          ? persistedLanConnectionJson('lingxi-service') : null),
+        setItem: vi.fn(),
+        removeItem: vi.fn(),
+      },
+      platform: {
+        getServerPort: vi.fn(async () => 62950),
+        getServerToken: vi.fn(async () => 'local-token'),
+        appReady: vi.fn(),
+        onSettingsChanged: vi.fn(),
+        openSettings: vi.fn(),
+      },
+      dispatchEvent: vi.fn(),
+    };
+    (globalThis as Record<string, unknown>).document = { addEventListener: vi.fn() };
+    (globalThis as Record<string, unknown>).i18n = { locale: 'zh-CN', defaultName: 'Hanako', load: vi.fn(async () => {}) };
+    (globalThis as Record<string, unknown>).t = vi.fn((key: string) => key);
+    mockLingxiFetch.mockResolvedValueOnce(jsonResponse({ ok: true }))
+      .mockRejectedValueOnce(new Error('identity offline'));
+
+    const { initApp } = await import('../app-init');
+    await initApp();
+
+    expect(mockLingxiFetch).toHaveBeenNthCalledWith(1, '/lingxi/v1/web-auth/login', expect.objectContaining({
+      method: 'POST', credentials: 'include', body: JSON.stringify({ credential: 'fixture-key' }),
+    }));
+    expect(mockLingxiFetch).toHaveBeenNthCalledWith(2, '/lingxi/v1/server/identity');
+    expect(mockState.activeServerConnection).toEqual(expect.objectContaining({ serverNodeKind: 'lingxi-service' }));
+    expect(mockConnectWebSocket).not.toHaveBeenCalled();
+  });
+
+  it('uses the cold local Rust identity and does not call legacy bootstrap endpoints', async () => {
+    (globalThis as Record<string, unknown>).window = {
+      addEventListener: vi.fn(),
+      localStorage: { getItem: vi.fn(() => null), setItem: vi.fn(), removeItem: vi.fn() },
+      platform: {
+        getServerConnectionInfo: vi.fn(async () => ({
+          port: 34001, token: 'rust-token', serverNodeKind: 'lingxi-service', serverNodeTransport: 'https',
+        })),
+        getServerPort: vi.fn(), getServerToken: vi.fn(), appReady: vi.fn(),
+        onSettingsChanged: vi.fn(), openSettings: vi.fn(),
+      },
+      dispatchEvent: vi.fn(),
+    };
+    (globalThis as Record<string, unknown>).document = { addEventListener: vi.fn() };
+    (globalThis as Record<string, unknown>).i18n = { locale: 'zh-CN', load: vi.fn(async () => {}) };
+    (globalThis as Record<string, unknown>).t = vi.fn((key: string) => key);
+    mockLingxiFetch.mockResolvedValueOnce(jsonResponse({
+      serverId: 'rust-server', studioId: 'rust-studio', label: 'Rust',
+      serverNodeKind: 'lingxi-service', serverNodeTransport: 'https',
+    }));
+
+    const { initApp } = await import('../app-init');
+    await initApp();
+
+    expect(mockLingxiFetch).toHaveBeenCalledTimes(1);
+    expect(mockLingxiFetch).toHaveBeenCalledWith('/lingxi/v1/server/identity');
+    expect(mockState.activeServerConnection).toMatchObject({
+      baseUrl: 'https://127.0.0.1:34001', wsUrl: 'wss://127.0.0.1:34001',
+      serverNodeKind: 'lingxi-service', serverNodeTransport: 'https',
+    });
+    expect(mockConnectWebSocket).toHaveBeenCalledTimes(1);
+    expect(mockLoadAgents).not.toHaveBeenCalled();
+    expect(mockSetStatus).toHaveBeenCalledWith('status.rustCoreUnavailable', false);
+    expect((window.platform.appReady as ReturnType<typeof vi.fn>)).toHaveBeenCalledTimes(1);
+  });
+
+  it('keeps a failed remote connection selected and shows its failure without exposing its key', async () => {
+    (globalThis as Record<string, unknown>).window = {
+      addEventListener: vi.fn(),
+      localStorage: {
+        getItem: vi.fn((key: string) => key === 'hana-server-connections-v1' ? persistedLanConnectionJson() : null),
+        setItem: vi.fn(),
+        removeItem: vi.fn(),
+      },
+      platform: {
+        getServerPort: vi.fn(async () => 62950),
+        getServerToken: vi.fn(async () => 'local-token'),
+        appReady: vi.fn(),
+        onSettingsChanged: vi.fn(),
+        openSettings: vi.fn(),
+      },
+      dispatchEvent: vi.fn(),
+    };
+    (globalThis as Record<string, unknown>).document = { addEventListener: vi.fn() };
+    (globalThis as Record<string, unknown>).i18n = {
+      locale: 'zh-CN',
+      defaultName: 'Hanako',
+      load: vi.fn(async () => {}),
+    };
+    (globalThis as Record<string, unknown>).t = vi.fn((key: string) => key);
+    mockLingxiFetch.mockRejectedValueOnce(new Error('credential denied fixture-key'));
+
+    const { initApp } = await import('../app-init');
+    await initApp();
+
+    expect(mockLingxiFetch).toHaveBeenCalledTimes(1);
+    expect(mockState.activeServerConnectionId).toBe('lan:node_lan:studio_lan');
+    expect(mockState.activeServerConnection).toEqual(expect.objectContaining({
+      connectionId: 'lan:node_lan:studio_lan',
+      token: 'fixture-key',
+    }));
+    expect(mockSetStatus).toHaveBeenCalledWith('status.serverNotReady', false);
+    expect(mockShowError).toHaveBeenCalledWith('status.serverNotReady: credential denied [redacted]');
     expect(mockConnectWebSocket).not.toHaveBeenCalled();
     expect((window.platform.appReady as ReturnType<typeof vi.fn>)).toHaveBeenCalledTimes(1);
   });
@@ -584,6 +703,39 @@ describe('initApp bridge indicator', () => {
       token: 'new-token',
     }));
     expect(mockConnectWebSocket).toHaveBeenCalledTimes(1);
+    expect(mockDisconnectWebSocketForRestart).toHaveBeenCalledTimes(1);
+    (restartHandler as unknown as (data: { port: number; token?: string }) => void)({ port: 63001, token: 'new-token' });
+    expect(mockConnectWebSocket).toHaveBeenCalledTimes(1);
+    expect(mockDisconnectWebSocketForRestart).toHaveBeenCalledTimes(1);
+    const rustLocal = { ...(mockState.activeServerConnection as Record<string, unknown>), serverNodeKind: 'lingxi-service' };
+    mockState.activeServerConnection = rustLocal;
+    (mockState.serverConnections as Record<string, unknown>).local = rustLocal;
+
+    (restartHandler as unknown as (data: { port: number; token?: string }) => void)({ port: 63002 });
+    expect(mockState.serverPort).toBeNull();
+    expect(mockState.serverToken).toBeNull();
+    expect(mockState.activeServerConnection).toBeNull();
+    expect(mockState.wsFailureReasonKey).toBe('status.serverRestartInvalid');
+    expect(mockConnectWebSocket).toHaveBeenCalledTimes(1);
+
+    (restartHandler as unknown as (data: { port: number; token?: string }) => void)({ port: 0, token: 'invalid-port-token' });
+    expect(mockState.activeServerConnection).toBeNull();
+    expect(mockConnectWebSocket).toHaveBeenCalledTimes(1);
+
+    (restartHandler as unknown as (data: { port: number; token?: string; serverNodeKind?: string; serverNodeTransport?: string }) => void)({
+      port: 63003, token: 'third-token', serverNodeKind: 'lingxi-service', serverNodeTransport: 'http',
+    });
+    expect(mockState.activeServerConnection).toEqual(expect.objectContaining({
+      baseUrl: 'http://127.0.0.1:63003', token: 'third-token', serverNodeKind: 'lingxi-service',
+    }));
+    expect(mockConnectWebSocket).toHaveBeenCalledTimes(2);
+
+    (restartHandler as unknown as (data: { port: number; token?: string; serverNodeKind?: string; serverNodeTransport?: string }) => void)({
+      port: 63004, token: 'third-token', serverNodeKind: 'lingxi-service', serverNodeTransport: 'http',
+    });
+    expect(mockState.activeServerConnection).toBeNull();
+    expect(mockState.wsFailureReasonKey).toBe('status.serverRestartInvalid');
+    expect(mockConnectWebSocket).toHaveBeenCalledTimes(2);
   });
 
   it('refreshes local restart credentials without stealing an active remote connection', async () => {
@@ -656,6 +808,14 @@ describe('initApp bridge indicator', () => {
     }));
     expect(mockState.activeServerConnectionId).toBe(remote.connectionId);
     expect(mockState.activeServerConnection).toBe(remote);
+    expect(mockConnectWebSocket).not.toHaveBeenCalled();
+    expect(mockDisconnectWebSocketForRestart).not.toHaveBeenCalled();
+
+    (restartHandler as unknown as (data: { port: number; token?: string }) => void)({ port: 0 });
+    expect(mockState.activeServerConnectionId).toBe(remote.connectionId);
+    expect(mockState.activeServerConnection).toBe(remote);
+    expect((mockState.serverConnections as Record<string, unknown>).local).toBeUndefined();
+    expect(mockDisconnectWebSocketForRestart).not.toHaveBeenCalled();
     expect(mockConnectWebSocket).not.toHaveBeenCalled();
   });
 

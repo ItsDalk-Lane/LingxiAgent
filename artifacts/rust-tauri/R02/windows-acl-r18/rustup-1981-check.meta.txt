@@ -1,0 +1,4 @@
+start=2026-09-28T11:17:09.640063+00:00
+command=/Users/study_superior/.cargo/bin/cargo check --offline --locked --manifest-path rust/Cargo.toml -p lingxi-service -p lingxi-adapters
+end=2026-09-28T11:17:20.760857+00:00
+exit=0

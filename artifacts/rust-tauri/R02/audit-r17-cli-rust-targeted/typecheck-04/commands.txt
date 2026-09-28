@@ -1,0 +1,2 @@
+node_modules/.bin/tsc --noEmit -p tsconfig.node.json
+node_modules/.bin/tsc --noEmit -p tsconfig.test.json

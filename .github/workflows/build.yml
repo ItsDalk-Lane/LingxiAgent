@@ -290,6 +290,19 @@ jobs:
           echo "LINGXI_PREBUILT_RENDERER_BOX=$BOX_DIR/$BOX" >> "$GITHUB_ENV"
           echo "Using shared renderer box: $BOX_DIR/$BOX"
 
+      # Windows 服务归档包含同版本 Rust reader；须先构建当前源码对应的程序。
+      - name: Build Windows Rust service reader
+        if: runner.os == 'Windows'
+        shell: pwsh
+        run: |
+          $toolchainLine = Get-Content rust-toolchain.toml | Select-String '^\s*channel\s*=\s*"([^"]+)"' | Select-Object -First 1
+          if (-not $toolchainLine) { throw 'Pinned Rust toolchain is missing' }
+          $toolchain = $toolchainLine.Matches.Groups[1].Value
+          rustup toolchain install $toolchain --profile minimal
+          if ($LASTEXITCODE -ne 0) { throw 'Pinned Rust toolchain installation failed' }
+          node scripts/build-rust-desktop-service.mjs
+          if ($LASTEXITCODE -ne 0) { throw 'Windows Rust service reader build failed' }
+
       - name: Build server bundle
         shell: bash
         run: |

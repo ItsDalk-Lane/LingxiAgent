@@ -1,0 +1,45 @@
+{
+  "head": "9b98c679678888b60ff2e32bd67d3da6fc2f5c4f",
+  "files": {
+    "cli/rust-service.ts": "ed7d22f49c7810435f8bad33ecf1eda65eb3f1a9dd44ddbce9c6d449d5e0a3a5",
+    "cli/entry.ts": "616e2885eeab9a7c05a1593489e0954fbdacef64938d13faf6060979fcbac866",
+    "tests/cli-rust-service.test.ts": "6afc34242de2a7fd2e70bc09194c799531ec14573c914ab11a2368c277805116"
+  },
+  "commands": [
+    {
+      "name": "vitest",
+      "argv": [
+        "./node_modules/.bin/vitest",
+        "run",
+        "tests/cli-rust-service.test.ts"
+      ],
+      "started_utc": "2026-09-28T08:47:31.596429+00:00",
+      "ended_utc": "2026-09-28T08:47:32.024005+00:00",
+      "exit": 0
+    },
+    {
+      "name": "node-tsc",
+      "argv": [
+        "./node_modules/.bin/tsc",
+        "--noEmit",
+        "-p",
+        "tsconfig.node.json"
+      ],
+      "started_utc": "2026-09-28T08:47:32.024377+00:00",
+      "ended_utc": "2026-09-28T08:47:36.801882+00:00",
+      "exit": 0
+    },
+    {
+      "name": "test-tsc",
+      "argv": [
+        "./node_modules/.bin/tsc",
+        "--noEmit",
+        "-p",
+        "tsconfig.test.json"
+      ],
+      "started_utc": "2026-09-28T08:47:36.802278+00:00",
+      "ended_utc": "2026-09-28T08:47:47.062961+00:00",
+      "exit": 0
+    }
+  ]
+}

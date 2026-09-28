@@ -1,0 +1,106 @@
+{
+  "recorded_at_utc": "2026-09-28T10:56:09.813413+00:00",
+  "head": "9b98c679678888b60ff2e32bd67d3da6fc2f5c4f",
+  "files": [
+    {
+      "path": "desktop/main.cjs",
+      "sha256": "594951307c62b1111a74f8e9a319a8622250bc03d708eed24ac43c8bdb22a668"
+    },
+    {
+      "path": "desktop/preload.cjs",
+      "sha256": "a39d002e01d7f16d8df913ece2e98c980102d3e2c7213fb4fd02dd2e30c9664b"
+    },
+    {
+      "path": "desktop/src/shared/rust-local-service.cjs",
+      "sha256": "5e173712e66ed01e0298a2fdbad99962a87912911e14694656e2a2afd3950050"
+    },
+    {
+      "path": "desktop/src/react/types.ts",
+      "sha256": "27262febbe020c7cfe7227fede5f6821a6e4234bd3b26ff956dfe64560425465"
+    },
+    {
+      "path": "desktop/src/react/app-init.ts",
+      "sha256": "d7c75bc73d7ab3a03af12aeedaaff1e3ab3c47764adcfede7b9ac071c9f659ad"
+    },
+    {
+      "path": "desktop/src/react/services/server-connection.ts",
+      "sha256": "e945156fb2f8803db1fbcf7c3bb729c13bbb8442b39b030aa19c4cd805757563"
+    },
+    {
+      "path": "desktop/src/react/services/websocket.ts",
+      "sha256": "19ca78e02415a64ef51dbeef366da074f4896ca356066700132346594535e25a"
+    },
+    {
+      "path": "desktop/src/react/components/StatusBar.tsx",
+      "sha256": "cef7d82577034ceb657cee29de195cbd98c5935738ae263ee1ad00522a23f33d"
+    },
+    {
+      "path": "desktop/src/react/components/input/composer-send.ts",
+      "sha256": "21350d8926f88163e6f5dd106b4501ec5bc534cb1ed36c7743eefe0b7099c5ec"
+    },
+    {
+      "path": "desktop/src/react/settings/SettingsContent.tsx",
+      "sha256": "ed132e88d38eb745dd808b9ff6028a64310c55f0d3abc5e2521f605d569f19f9"
+    },
+    {
+      "path": "desktop/src/react/quick-chat/QuickChatApp.tsx",
+      "sha256": "02a419d2a5add046ade6da4a8122a5339b4c7b2c3bb0b877ed34f4bd7bff75d5"
+    },
+    {
+      "path": "desktop/src/react/onboarding/OnboardingApp.tsx",
+      "sha256": "e00c9abe8d98e205a93a2374babd2a36e1bb898cd37185a84769c8bef27d06ed"
+    },
+    {
+      "path": "desktop/src/react/__tests__/app-init.test.ts",
+      "sha256": "2e6dcfc4cdbff5a51e2f4fb68aab6b5d7d7b0caf1f5c644e9143eb0664a5fb59"
+    },
+    {
+      "path": "desktop/src/react/__tests__/services/server-connection.test.ts",
+      "sha256": "e423a17a306c8045d522a642d1d22770b0cb6633cf18e8bb7242dd2a840eae53"
+    },
+    {
+      "path": "desktop/src/react/__tests__/settings/SettingsContent.test.tsx",
+      "sha256": "56adca70a192a4f1772efea4f0fb178991a63db947635a18ad304c413b0394ad"
+    },
+    {
+      "path": "desktop/src/react/__tests__/components/R02StatusBar.test.tsx",
+      "sha256": "e0a18347671d5b5c94c683b39d1d9878b6df562e37ad59ab3bc8e76516a0f654"
+    },
+    {
+      "path": "desktop/src/react/__tests__/components/composer-send.transaction.test.ts",
+      "sha256": "0ef258ee240ec5986b556d3ca51ef1c6dda42cae6d749a75c9fc0616a3359e19"
+    },
+    {
+      "path": "desktop/src/react/onboarding/__tests__/OnboardingApp.test.tsx",
+      "sha256": "d85a0297bee7a918e4e756c6ff526168100b9dc837285a749d111a1610f83970"
+    },
+    {
+      "path": "tests/desktop-rust-local-service.test.cjs",
+      "sha256": "83cc3255a44858c407adcaeabd932655589959fd7113f47924be25cdaf96b93f"
+    },
+    {
+      "path": "docs/rust-tauri/R02/R02_34_LEAF_CLOSURE_MATRIX_R17.md",
+      "sha256": "c4e7bf97b8510cb38f7cb604707de436d54c974bf19b67b00df341cd240f6893"
+    },
+    {
+      "path": "desktop/src/locales/zh.json",
+      "sha256": "9da323685abe1c62dcfe0acdfdf69a86e488e4efaf26f55a9a1b8465cd37513f"
+    },
+    {
+      "path": "desktop/src/locales/zh-TW.json",
+      "sha256": "fc37cd259579b3ed9c00644f6dd5c88181abb4c86af192d1317edafe1907fdfa"
+    },
+    {
+      "path": "desktop/src/locales/en.json",
+      "sha256": "7ae2bf291d737468bfe59550ba962d0f2e84823b185910ee61490b54010d1be3"
+    },
+    {
+      "path": "desktop/src/locales/ja.json",
+      "sha256": "a1e70951b2d48e76d7e652a167bd7b5e5fd00d4da849388bf0cda5d02eeeffcb"
+    },
+    {
+      "path": "desktop/src/locales/ko.json",
+      "sha256": "4e9d88c767b8a4c86b0e04acecbf956a9f90304b7ae3cdca2d3f83c56eaecde6"
+    }
+  ]
+}

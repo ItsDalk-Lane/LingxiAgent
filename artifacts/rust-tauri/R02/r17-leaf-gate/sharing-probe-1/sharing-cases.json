@@ -1,0 +1,24 @@
+{
+  "schema": "lingxi.leaf-case-results.v1",
+  "cases": [
+    {
+      "case": "sharing-container-cold-cache-timeout-error",
+      "expect": 1,
+      "actual": 0,
+      "ok": false,
+      "observed": {
+        "timeout": {
+          "waitedMs": 15000,
+          "forcedReady": true
+        },
+        "error": {
+          "logged": true,
+          "ready": true
+        },
+        "providers": {
+          "failureDidNotBlockReady": true
+        }
+      }
+    }
+  ]
+}

@@ -1,0 +1,169 @@
+{
+  "schema": "lingxi.leaf-case-results.v1",
+  "cases": [
+    {
+      "case": "cli-help-exit0-no-start",
+      "expect": 1,
+      "actual": 1,
+      "ok": true,
+      "observed": {
+        "argv": [
+          "/Users/study_superior/.nvm/versions/node/v24.16.0/bin/node",
+          "cli/entry.ts",
+          "help"
+        ],
+        "exitCode": 0,
+        "expectedExit": 0,
+        "stdoutFile": "cli-help-exit0-no-start/stdout.log",
+        "stderrFile": "cli-help-exit0-no-start/stderr.log",
+        "stdoutSha256": "7726afa25c7f566cbdeb14023a3ec0477953d2f5125fb88a6af173193031c0e6",
+        "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "syntheticHome": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R02/r17-leaf-gate/client-probe-1/cli-help-exit0-no-start/home",
+        "homeBefore": [],
+        "homeAfter": [],
+        "checks": {
+          "expectedExit": true,
+          "helpPrinted": true,
+          "errorPrinted": true,
+          "homeUnchanged": true,
+          "serverInfoAbsent": true,
+          "noReadyMarker": true,
+          "noOwnedProcessGroupLeft": true,
+          "notTimedOut": true
+        }
+      }
+    },
+    {
+      "case": "cli-unknown-arg-exit1-no-start",
+      "expect": 1,
+      "actual": 1,
+      "ok": true,
+      "observed": {
+        "argv": [
+          "/Users/study_superior/.nvm/versions/node/v24.16.0/bin/node",
+          "cli/entry.ts",
+          "--r02-unknown-argument"
+        ],
+        "exitCode": 1,
+        "expectedExit": 1,
+        "stdoutFile": "cli-unknown-arg-exit1-no-start/stdout.log",
+        "stderrFile": "cli-unknown-arg-exit1-no-start/stderr.log",
+        "stdoutSha256": "7726afa25c7f566cbdeb14023a3ec0477953d2f5125fb88a6af173193031c0e6",
+        "stderrSha256": "92b82da6727d934bbc2a31192e5126f788aa5616688058a27ffda6b3d5662215",
+        "syntheticHome": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R02/r17-leaf-gate/client-probe-1/cli-unknown-arg-exit1-no-start/home",
+        "homeBefore": [],
+        "homeAfter": [],
+        "checks": {
+          "expectedExit": true,
+          "helpPrinted": true,
+          "errorPrinted": true,
+          "homeUnchanged": true,
+          "serverInfoAbsent": true,
+          "noReadyMarker": true,
+          "noOwnedProcessGroupLeft": true,
+          "notTimedOut": true
+        }
+      }
+    },
+    {
+      "case": "cli-serve-unknown-arg-exit1-no-start",
+      "expect": 1,
+      "actual": 1,
+      "ok": true,
+      "observed": {
+        "argv": [
+          "/Users/study_superior/.nvm/versions/node/v24.16.0/bin/node",
+          "cli/entry.ts",
+          "serve",
+          "--r02-unknown-argument"
+        ],
+        "exitCode": 1,
+        "expectedExit": 1,
+        "stdoutFile": "cli-serve-unknown-arg-exit1-no-start/stdout.log",
+        "stderrFile": "cli-serve-unknown-arg-exit1-no-start/stderr.log",
+        "stdoutSha256": "7726afa25c7f566cbdeb14023a3ec0477953d2f5125fb88a6af173193031c0e6",
+        "stderrSha256": "92b82da6727d934bbc2a31192e5126f788aa5616688058a27ffda6b3d5662215",
+        "syntheticHome": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R02/r17-leaf-gate/client-probe-1/cli-serve-unknown-arg-exit1-no-start/home",
+        "homeBefore": [],
+        "homeAfter": [],
+        "checks": {
+          "expectedExit": true,
+          "helpPrinted": true,
+          "errorPrinted": true,
+          "homeUnchanged": true,
+          "serverInfoAbsent": true,
+          "noReadyMarker": true,
+          "noOwnedProcessGroupLeft": true,
+          "notTimedOut": true
+        }
+      }
+    },
+    {
+      "case": "sharing-color-success-default-denied",
+      "expect": 1,
+      "actual": 1,
+      "ok": true,
+      "observed": {
+        "defaultColor": "light",
+        "persistedColor": "dark",
+        "previewChanged": true,
+        "deniedThrows": true,
+        "selectedAfterDenial": "dark"
+      }
+    },
+    {
+      "case": "sharing-width-success-default-denied",
+      "expect": 1,
+      "actual": 1,
+      "ok": true,
+      "observed": {
+        "defaultWidth": "mobile",
+        "persistedWidth": "desktop",
+        "previewChanged": true,
+        "deniedThrows": true,
+        "selectedAfterDenial": "desktop"
+      }
+    },
+    {
+      "case": "sharing-font-limit-success-default-denied",
+      "expect": 1,
+      "actual": 1,
+      "ok": true,
+      "observed": {
+        "defaultFont": "settings.fonts.followReading",
+        "persistedFont": "serif",
+        "defaultLimit": 10000,
+        "persistedLimit": "1500",
+        "deniedThrows": true,
+        "visibleLimitAfterDenial": "1500"
+      }
+    },
+    {
+      "case": "sharing-container-cold-cache-timeout-error",
+      "expect": 1,
+      "actual": 1,
+      "ok": true,
+      "observed": {
+        "cold": {
+          "maskBefore": true,
+          "readyAfter": true
+        },
+        "cached": {
+          "oldContentVisible": true,
+          "backgroundRefresh": true
+        },
+        "timeout": {
+          "waitedMs": 15000,
+          "forcedReady": true
+        },
+        "error": {
+          "logged": true,
+          "ready": true
+        },
+        "providers": {
+          "failureDidNotBlockReady": true
+        }
+      }
+    }
+  ]
+}

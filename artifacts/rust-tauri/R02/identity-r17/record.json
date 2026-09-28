@@ -1,0 +1,13 @@
+{
+  "command": "cargo test --manifest-path rust/Cargo.toml -p lingxi-service --test service_health locked_instance_and_local_token_share_one_start_identity -- --nocapture",
+  "exitStatus": 0,
+  "recordedAtUtc": "2026-09-28T09:47:07.654794+00:00",
+  "log": "cargo-test.log",
+  "sourceSha256": {
+    "rust/crates/lingxi-service/src/lib.rs": "cda3c1686b9f4fb07b1f81c8dff8954f6a6e362d3b2940bb82a817117e5b4665",
+    "rust/crates/lingxi-service/src/main.rs": "6c2b4fca0c46696b0b76b74f9b71392ced812d62fc5eb6e0555b834ce4ad514f",
+    "rust/crates/lingxi-service/tests/service_health.rs": "c611ce894fb5dbaa15412bb6d0bcd7974ffd8ef8a7991b56741017b2dc6c0eb8"
+  },
+  "head": "9b98c679678888b60ff2e32bd67d3da6fc2f5c4f",
+  "scope": "no TCP bind; compares token and instance record from the same guard"
+}

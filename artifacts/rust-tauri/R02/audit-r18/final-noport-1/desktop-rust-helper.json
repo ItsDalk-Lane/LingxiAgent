@@ -1,0 +1,16 @@
+{
+  "name": "desktop-rust-helper",
+  "command": [
+    "node",
+    "--test",
+    "tests/desktop-rust-local-service.test.cjs"
+  ],
+  "cwd": "/Users/study_superior/Desktop/Code/LingxiAgent",
+  "startedUtc": "2026-09-28T11:53:49.036303+00:00",
+  "endedUtc": "2026-09-28T11:53:49.130357+00:00",
+  "exitCode": 0,
+  "stdout": "artifacts/rust-tauri/R02/audit-r18/final-noport-1/desktop-rust-helper.stdout.log",
+  "stdoutSha256": "1362c586319c2c8762b9d6d976b52493ba1084320f520fe78e9c1af8cfba4e93",
+  "stderr": "artifacts/rust-tauri/R02/audit-r18/final-noport-1/desktop-rust-helper.stderr.log",
+  "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+}

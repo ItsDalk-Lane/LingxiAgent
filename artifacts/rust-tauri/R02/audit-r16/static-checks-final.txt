@@ -1,0 +1,47 @@
+COMMAND: jq empty docs/rust-tauri/R02/R02_HANDOFF.json docs/rust-tauri/R02/R02_ACCEPTANCE_LEDGER.json docs/rust-tauri/R02/RISK_REGISTER.json docs/rust-tauri/R02/R02_IMPLEMENTATION_MAP.json docs/rust-tauri/ORCHESTRATOR_PROGRESS.json rust/crates/xtask/src/stage_maps/R02.json
+START_UTC: 2026-09-28T05:53:56.272110+00:00
+END_UTC: 2026-09-28T05:53:56.281169+00:00
+EXIT: 0
+STDOUT:
+(empty)
+STDERR:
+(empty)
+
+COMMAND: git diff --check
+START_UTC: 2026-09-28T05:53:56.281183+00:00
+END_UTC: 2026-09-28T05:53:56.335672+00:00
+EXIT: 0
+STDOUT:
+(empty)
+STDERR:
+(empty)
+
+COMMAND: git merge-base --is-ancestor 201584f2917a7fd96d6ea603bdeddbd420082cfe HEAD
+START_UTC: 2026-09-28T05:53:56.335701+00:00
+END_UTC: 2026-09-28T05:53:56.344700+00:00
+EXIT: 0
+STDOUT:
+(empty)
+STDERR:
+(empty)
+
+COMMAND: static SHA-256 recheck of artifacts/rust-tauri/R02/audit-r16/candidate-final-full-source-sha256.txt
+START_UTC: 2026-09-28T05:53:56.344712+00:00
+END_UTC: 2026-09-28T05:53:57.239339+00:00
+EXIT: 0
+PATHS: 9719
+MISMATCHES: 0
+
+
+COMMAND: static protected-source comparison to prechange manifest
+START_UTC: 2026-09-28T05:53:57.241014+00:00
+END_UTC: 2026-09-28T05:53:57.244815+00:00
+EXIT: 0
+NOTE: earlier first attempt used newline-bearing filename keys and is preserved in static-checks-first-attempt-protected-key-error.txt
+docs/rust-tauri/R00/ACCEPTANCE_MAP.json	pre=96f70219d1df88249e8df073f4dfe211f8562cef20f7e45b1c03064feb5362be	current=96f70219d1df88249e8df073f4dfe211f8562cef20f7e45b1c03064feb5362be	unchanged=True
+docs/rust-tauri/R00/FEATURE_STAGE_ACCEPTANCE.json	pre=699ef808d35d0185681e712372cf6d6585caf0e3958daab646586f0b355072a9	current=699ef808d35d0185681e712372cf6d6585caf0e3958daab646586f0b355072a9	unchanged=True
+scripts/rust-tauri/r02_t08_full_chain_probe.py	pre=17c4ace1b9df0351fac1b28da4903c273939765e7a1340816a42d20ebd2a6ee1	current=17c4ace1b9df0351fac1b28da4903c273939765e7a1340816a42d20ebd2a6ee1	unchanged=True
+.sync-audit/verified-source-sha.txt	pre=bf3893f89b1f9d7739419feb77f981f646384e95f55c87f9078820dd4798e50b	current=bf3893f89b1f9d7739419feb77f981f646384e95f55c87f9078820dd4798e50b	unchanged=True
+.sync-audit/verify-post-verification-diff.mjs	pre=f53088951c569a6df2708f4751692b3f0114d932a37b53e169c6da7f1f2e26de	current=f53088951c569a6df2708f4751692b3f0114d932a37b53e169c6da7f1f2e26de	unchanged=True
+tests/post-verification-audit-seal.test.ts	pre=1489e53bdd139ea0fcc1a83edb841ba248e07c5a26f10e6cbb7febbe9eba2a34	current=1489e53bdd139ea0fcc1a83edb841ba248e07c5a26f10e6cbb7febbe9eba2a34	unchanged=True
+rust/crates/xtask/src/stage_maps/R02.json	pre=26f5e0215bace355140714b0113efc9652d14ed92737e9ff3f08b01b4131281a	current=26f5e0215bace355140714b0113efc9652d14ed92737e9ff3f08b01b4131281a	unchanged=True

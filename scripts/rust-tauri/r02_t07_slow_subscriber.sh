@@ -31,8 +31,17 @@ cd "$(dirname "$0")/../.."
 
 EVIDENCE_DIR="${1:-artifacts/rust-tauri/R02/T07}"
 EVIDENCE_DIR="$EVIDENCE_DIR/slow-subscriber"
+# 每轮证据目录必须全新，防止独立直跑时旧日志覆盖或冒充本轮结果。
+if [ -L "$EVIDENCE_DIR" ] || { [ -e "$EVIDENCE_DIR" ] && [ ! -d "$EVIDENCE_DIR" ]; }; then
+  echo "ERROR: evidence path is not a regular directory: $EVIDENCE_DIR" >&2
+  exit 1
+fi
+if [ -d "$EVIDENCE_DIR" ]; then
+  FIRST_ENTRY="$(find "$EVIDENCE_DIR" -mindepth 1 -print -quit)" || exit 1
+  [ -z "$FIRST_ENTRY" ] || { echo "ERROR: evidence directory is not empty: $EVIDENCE_DIR" >&2; exit 1; }
+fi
 mkdir -p "$EVIDENCE_DIR"
-TARGET_DIR="${CARGO_TARGET_DIR:-/tmp/rust-target-r02-t07}"
+TARGET_DIR="${CARGO_TARGET_DIR:-${TMPDIR:-/tmp}/rust-target-r02-t07}"
 
 TOOLCHAIN="$(sed -n 's/^channel[[:space:]]*=[[:space:]]*"\([^"]*\)".*/\1/p' rust-toolchain.toml | head -n 1)"
 [ -n "$TOOLCHAIN" ] || { echo "ERROR: no toolchain in rust-toolchain.toml" >&2; exit 1; }
@@ -47,12 +56,155 @@ HOME_DIR=""
 SERVICE_PID=""
 RSS_PID=""
 PROBE_PID=""
+# R02 stage-repair R7 / R7-F02: the PID variables are CURRENT handles —
+# set on spawn, RETIRED (cleared) after every wait/reap (the normal stop
+# paths already did). The trap signals a pid ONLY while it still proves
+# CURRENT ownership (exists AND ppid is THIS shell): a retired or
+# recycled number is never signalled (R6-F02 A12 pattern).
+# R10-F03: the boolean probe `pid_owned_by_this_shell` had a dangerous
+# false value — `ps` failing or returning an unreadable ppid ALSO
+# returned false, and the stop flow read that as "STOPPED", skipped the
+# KILL escalation, and fell into an UNBOUNDED `wait` on a possibly-alive
+# child. It is REPLACED by the four-state `probe_state` below, and every
+# consumer (stop flow + trap) now decides per state.
+# R11-F04: the EXIT trap's `owned` branch used to be `kill TERM; wait`
+# with NO deadline — a child that ignores TERM (or an unreapable
+# survivor of the normal chain's KILL) hung the trap itself, defeating
+# the R10-F03 deadlines. Both the trap and any other abnormal stop now
+# use `bounded_stop` below: bounded TERM budget → KILL escalation ONLY
+# while the object provably remains ours → bounded re-check → reap or
+# LOUD residue. Nothing ever falls back into an unbounded wait.
+probe_state() {
+  # probe_state <pid> → one of:
+  #   exited        — kill -0 says no such object: an unreaped-child
+  #                   handle at this point means bash already collected
+  #                   it; the stop flow may wait-and-retire safely.
+  #   owned         — the object exists AND its ppid is THIS shell
+  #                   (alive, or a not-yet-collected child): ours to
+  #                   signal and wait.
+  #   foreign       — exists but its ppid is ANOTHER process: the number
+  #                   left our ownership (child exited, number possibly
+  #                   recycled). NEVER signalled; not waited as a child.
+  #   unobservable  — the object EXISTS (kill -0 succeeded) but its ppid
+  #                   cannot be read (ps failure / unreadable output):
+  #                   the state is UNKNOWN — never counted as stopped,
+  #                   never signalled, never waited unboundedly.
+  local ppid
+  if ! kill -0 "$1" 2>/dev/null; then
+    printf 'exited\n'
+    return 0
+  fi
+  ppid="$(ps -o ppid= -p "$1" 2>/dev/null | tr -d '[:space:]')"
+  if [ -z "$ppid" ]; then
+    printf 'unobservable\n'
+    return 0
+  fi
+  if [ "$ppid" = "$$" ]; then
+    printf 'owned\n'
+  else
+    printf 'foreign\n'
+  fi
+}
+# R11-F04: bounded stop ladder for ONE owned handle — the same deadline
+# shape the normal stop chain uses, so an EXIT trap (or any abnormal
+# stop) can never hang on a child that ignores TERM. TERM now → poll
+# probe_state under a ≤5 s budget → escalate to a direct-pid KILL ONLY
+# if the object is still provably ours at that instant (never a group,
+# never an unattributable number) → bounded ≤5 s re-check. Prints the
+# final four-state verdict; NEVER waits unboundedly.
+bounded_stop() {
+  # bounded_stop <pid>
+  local pid="$1" state="" i
+  # 异常清理和正常停止都只对本脚本当前拥有的子进程发信号。
+  state="$(probe_state "$pid")"
+  if [ "$state" != "owned" ]; then printf '%s\n' "$state"; return 0; fi
+  kill "$pid" 2>/dev/null || true
+  for i in $(seq 1 100); do
+    state="$(probe_state "$pid")"
+    case "$state" in
+      exited|foreign) break ;;
+      owned|unobservable) : ;;
+    esac
+    sleep 0.05
+  done
+  if [ "${state:-owned}" = "owned" ]; then
+    state="$(probe_state "$pid")"
+  fi
+  if [ "$state" = "owned" ]; then
+    kill -9 "$pid" 2>/dev/null || true
+    for i in $(seq 1 100); do
+      state="$(probe_state "$pid")"
+      case "$state" in
+        exited|foreign) break ;;
+        owned|unobservable) : ;;
+      esac
+      sleep 0.05
+    done
+  fi
+  printf '%s\n' "${state:-unobservable}"
+}
 cleanup() {
-  [ -n "$RSS_PID" ] && kill "$RSS_PID" 2>/dev/null || true
-  [ -n "$PROBE_PID" ] && kill "$PROBE_PID" 2>/dev/null || true
-  [ -n "$SERVICE_PID" ] && kill "$SERVICE_PID" 2>/dev/null || true
-  wait 2>/dev/null || true
-  if [ -n "$HOME_DIR" ] && [ -d "$HOME_DIR" ]; then rm -rf "$HOME_DIR"; fi
+  local cleanup_residue=0
+  for pid in "$RSS_PID" "$PROBE_PID" "$SERVICE_PID"; do
+    [ -n "$pid" ] || continue
+    case "$(probe_state "$pid")" in
+      owned)
+        # R11-F04: the old `kill TERM; wait` had NO deadline — a child
+        # ignoring TERM (or an unreapable survivor of the normal chain's
+        # KILL, which is exactly the `fail` path that keeps the handle
+        # for this trap) hung the trap in an unbounded wait. Bounded
+        # ladder, then reap or report residue loudly — never wait
+        # unboundedly.
+        tstate="$(bounded_stop "$pid")"
+        case "$tstate" in
+          exited)
+            wait "$pid" 2>/dev/null || true
+            ;;
+          foreign)
+            echo "cleanup: pid $pid 已不属于本脚本，不等待或发信号" >&2
+            cleanup_residue=1
+            ;;
+          owned)
+            echo "cleanup: pid $pid still OWNED after the TERM and KILL budgets — RESIDUE left behind, no unbounded wait" >&2
+            cleanup_residue=1
+            ;;
+          unobservable)
+            echo "cleanup: pid $pid state UNOBSERVABLE after the stop budgets — not signalled (unattributable), no unbounded wait; possible residue" >&2
+            cleanup_residue=1
+            ;;
+        esac
+        ;;
+      unobservable)
+        # Exists but ownership unreadable: NOT signalled (never signal
+        # an unattributable object) — reported loudly, fail-closed.
+        echo "cleanup: pid $pid ownership UNOBSERVABLE (ps unreadable) — NOT signalled" >&2
+        cleanup_residue=1
+        ;;
+      foreign)
+        echo "cleanup: pid $pid is NOT currently owned by this shell (number left our ownership) — NOT signalled" >&2
+        cleanup_residue=1
+        ;;
+      exited)
+        # Already gone; a wait here would just collect bash's job-table
+        # entry — do it best-effort.
+        wait "$pid" 2>/dev/null || true
+        ;;
+    esac
+  done
+  RSS_PID=""; PROBE_PID=""; SERVICE_PID=""
+  # R11-F04: the parameterless `wait` that used to run here was itself
+  # an unbounded wait over whatever survived above — exactly the owned /
+  # unobservable residue the bounded ladder now reports instead of
+  # hanging on. Every handle was reaped inside its state branch
+  # (exited) or reported as residue (owned/foreign/unobservable);
+  # nothing legitimate is left to wait for.
+  if [ "$cleanup_residue" -eq 0 ]; then
+    if [ -n "$HOME_DIR" ] && [ -d "$HOME_DIR" ]; then rm -rf "$HOME_DIR"; fi
+  else
+    echo "cleanup: 进程仍存活或归属不明，保留本轮 home=$HOME_DIR 供核查" >&2
+    exit 1
+  fi
+  return 0
 }
 trap cleanup EXIT
 
@@ -73,7 +225,7 @@ SERVICE_BIN="$TARGET_DIR/debug/lingxi-service"
 note "PASS build"
 
 note "== starting service (event-subscriber-queue=4, max-ws-connections=8) =="
-HOME_DIR="$(mktemp -d /tmp/lingxi-r02t07-a14.XXXXXX)"
+HOME_DIR=$(mktemp -d "${TMPDIR:-/tmp}/lingxi-r02t07-a14.XXXXXX")
 "$SERVICE_BIN" --home "$HOME_DIR" --bind 127.0.0.1:0 \
   --event-subscriber-queue 4 --max-ws-connections 8 --http-rate-max 100000 \
   > "$EVIDENCE_DIR/service.out" 2> "$EVIDENCE_DIR/service.err" &
@@ -399,6 +551,8 @@ with open(os.path.join(evidence, "storm-results.json"), "w") as f:
     }, f, indent=2)
 print("STORM COMPLETE", flush=True)
 PYEOF
+# 后台 Python 的 PID 必须在 Shell 的 heredoc 结束后记录，不能放进 Python 源码。
+PROBE_PID=$!
 # The probe runs in background; poll for its completion marker.
 for _ in $(seq 1 300); do
   grep -qE "STORM COMPLETE|Traceback|AssertionError" "$EVIDENCE_DIR/ws-probe.log" 2>/dev/null && break
@@ -407,6 +561,22 @@ for _ in $(seq 1 300); do
 done
 tail -14 "$EVIDENCE_DIR/ws-probe.log"
 grep -q "STORM COMPLETE" "$EVIDENCE_DIR/ws-probe.log" || fail "S1/S2 storm probe did not complete cleanly (see ws-probe.log)"
+# R9-F02: completion marker seen — REAP the probe (our background child)
+# and only then retire the handle. A failure above leaves the handle set
+# so the EXIT trap can TERM/wait the probe by CURRENT ownership.
+PROBE_FINAL_STATE=""
+for _ in $(seq 1 100); do
+  PROBE_FINAL_STATE="$(probe_state "$PROBE_PID")"
+  case "$PROBE_FINAL_STATE" in exited|foreign) break ;; owned|unobservable) : ;; esac
+  sleep 0.05
+done
+case "$PROBE_FINAL_STATE" in
+  exited) ;;
+  *) fail "storm probe wrote a completion marker but did not exit within 5 seconds (state=$PROBE_FINAL_STATE)" ;;
+esac
+if wait "$PROBE_PID" 2>/dev/null; then PROBE_RC=0; else PROBE_RC=$?; fi
+PROBE_PID=""
+[ "$PROBE_RC" -eq 0 ] || fail "storm probe exited $PROBE_RC despite its completion marker"
 EXECUTES_DONE="$(python3 -c "import json;print(json.load(open('$EVIDENCE_DIR/storm-results.json'))['executes_concurrent'])")"
 note "PASS S1: all $EXECUTES_DONE concurrent executes answered 200 (writers not stalled by the slow subscriber; count read from storm-results.json)"
 note "PASS S1: healthy subscriber B's merged view equals the durable head (no silent loss)"
@@ -450,13 +620,70 @@ grep -q "queue_capacity=4" "$EVIDENCE_DIR/detach-lines.txt" \
   || fail "detach line must carry the real queue capacity"
 note "PASS S4: server logged the detach with queue_capacity=4 and the slow_consumer reason"
 
-note "== stopping service (graceful) =="
+note "== stopping service (graceful; R9-F02: no silent handle retirement; R10-F03: four-state ownership probe) =="
+# 紧贴 TERM 再核归属，不能只依赖上方较早的判断。
+[ "$(probe_state "$SERVICE_PID")" = "owned" ] || fail "service ownership changed before TERM"
 kill "$SERVICE_PID" 2>/dev/null || true
-for _ in $(seq 1 100); do
-  kill -0 "$SERVICE_PID" 2>/dev/null || break
+SERVICE_FINAL_STATE=""
+# ≤15 s TERM budget. R10-F03: the loop consumes the FOUR STATES —
+# `exited` (object gone — bash already collected the child: stop,
+# wait-and-retire), `foreign` (number left our ownership: stop managing
+# it loudly, never signal), `owned` (still ours: keep waiting), and
+# `unobservable` (ps cannot attribute it: UNKNOWN — the deadline alone
+# governs; NEVER counted as stopped — the previous boolean probe read a
+# ps failure as "stopped", skipped the KILL escalation, and fell into an
+# unbounded `wait` on a possibly-alive child).
+for _ in $(seq 1 300); do
+  SERVICE_FINAL_STATE="$(probe_state "$SERVICE_PID")"
+  case "$SERVICE_FINAL_STATE" in
+    exited|foreign) break ;;
+    owned|unobservable) : ;;
+  esac
   sleep 0.05
 done
-SERVICE_PID=""
+if [ "$SERVICE_FINAL_STATE" = "owned" ]; then
+  note "service still OWNED and alive after the TERM budget — escalating to KILL (graceful stop did NOT complete)"
+  # The object is provably ours at this instant (exists, ppid == this
+  # shell, never waited since spawn): a direct-pid KILL targets exactly
+  # it, never an unknown object and never a group.
+  SERVICE_FINAL_STATE="$(probe_state "$SERVICE_PID")"
+  if [ "$SERVICE_FINAL_STATE" = "owned" ]; then kill -9 "$SERVICE_PID" 2>/dev/null || true; fi
+  # ≤10 s bounded re-check with the same state machine.
+  for _ in $(seq 1 200); do
+    SERVICE_FINAL_STATE="$(probe_state "$SERVICE_PID")"
+    case "$SERVICE_FINAL_STATE" in
+      exited|foreign) break ;;
+      owned|unobservable) : ;;
+    esac
+    sleep 0.05
+  done
+fi
+case "$SERVICE_FINAL_STATE" in
+  exited)
+    # Confirm-stop path: reap bash's job-table entry and retire the
+    # handle (R9-F02: no silent retirement).
+    if wait "$SERVICE_PID" 2>/dev/null; then SERVICE_STOP_RC=0; else SERVICE_STOP_RC=$?; fi
+    SERVICE_PID=""
+    [ "$SERVICE_STOP_RC" -eq 0 ] || fail "service shutdown exit=$SERVICE_STOP_RC"
+    ;;
+  foreign)
+    # 归属已改变时无法证明这是本轮子进程完成关停；保留句柄与现场供 trap 报错。
+    fail "service pid $SERVICE_PID left this shell's ownership before shutdown proof; not signalled or waited"
+    ;;
+  owned)
+    fail "service pid $SERVICE_PID still OWNED and alive after TERM and KILL — residue remains; handle kept for the trap"
+    ;;
+  unobservable)
+    # UNKNOWN state: not stopped, not signalled (the object cannot be
+    # attributed), and NO unbounded wait — loud residue, handle kept for
+    # the trap (whose ownership guard will likewise refuse to signal an
+    # unattributable object).
+    fail "service pid $SERVICE_PID state UNOBSERVABLE after the stop budgets (ps cannot attribute it; exists per kill -0) — cannot prove stop, not signalling an unattributable object, no unbounded wait; handle kept for the trap"
+    ;;
+  *)
+    fail "internal: unknown probe_state result '$SERVICE_FINAL_STATE' for service pid $SERVICE_PID"
+    ;;
+esac
 
 note "== R02-A14 evidence complete =="
 exit 0

@@ -27,8 +27,17 @@ set -euo pipefail
 cd "$(dirname "$0")/../.."
 
 EVIDENCE_DIR="${1:-artifacts/rust-tauri/R02/T03}"
+# 每轮证据目录必须全新，防止独立直跑时旧日志覆盖或冒充本轮结果。
+if [ -L "$EVIDENCE_DIR" ] || { [ -e "$EVIDENCE_DIR" ] && [ ! -d "$EVIDENCE_DIR" ]; }; then
+  echo "ERROR: evidence path is not a regular directory: $EVIDENCE_DIR" >&2
+  exit 1
+fi
+if [ -d "$EVIDENCE_DIR" ]; then
+  FIRST_ENTRY="$(find "$EVIDENCE_DIR" -mindepth 1 -print -quit)" || exit 1
+  [ -z "$FIRST_ENTRY" ] || { echo "ERROR: evidence directory is not empty: $EVIDENCE_DIR" >&2; exit 1; }
+fi
 mkdir -p "$EVIDENCE_DIR"
-TARGET_DIR="${CARGO_TARGET_DIR:-/tmp/rust-target-r02-t03}"
+TARGET_DIR="${CARGO_TARGET_DIR:-${TMPDIR:-/tmp}/rust-target-r02-t03}"
 
 TOOLCHAIN="$(sed -n 's/^channel[[:space:]]*=[[:space:]]*"\([^"]*\)".*/\1/p' rust-toolchain.toml | head -n 1)"
 if [ -z "$TOOLCHAIN" ]; then
@@ -48,22 +57,138 @@ CARGO="env -u all_proxy -u ALL_PROXY -u http_proxy -u HTTP_PROXY -u https_proxy 
 
 HOME_DIR=""
 SERVICE_PID=""
-cleanup() {
-  if [ -n "$SERVICE_PID" ] && kill -0 "$SERVICE_PID" 2>/dev/null; then
-    kill -TERM "$SERVICE_PID" 2>/dev/null || true
-    wait "$SERVICE_PID" 2>/dev/null || true
+# R02 stage-repair R7 / R7-F02: SERVICE_PID is the CURRENT handle of this
+# run's service child — retired (cleared) after every wait/reap (the
+# shutdown-hygiene path already did). The trap signals it ONLY while it
+# still proves CURRENT ownership (exists AND ppid is THIS shell): a
+# retired or recycled number is never signalled (R6-F02 A12 pattern).
+# R12-F01: the boolean probe's false branch conflated exited/foreign/
+# unobservable and the trap's owned branch was `kill -TERM; wait` with
+# NO deadline — a child ignoring TERM hung the trap itself. Four-state
+# probe + bounded ladder below (≈10 s worst case per handle); residue is
+# reported loudly at expiry, never an unbounded wait.
+child_state() {
+  # child_state <pid> → exited | owned | foreign | unobservable
+  local ppid
+  if ! kill -0 "$1" 2>/dev/null; then
+    printf 'exited\n'
+    return 0
   fi
-  if [ -n "$HOME_DIR" ] && [ -d "$HOME_DIR" ]; then rm -rf "$HOME_DIR"; fi
+  ppid="$(ps -o ppid= -p "$1" 2>/dev/null | tr -d '[:space:]')"
+  if [ -z "$ppid" ]; then
+    printf 'unobservable\n'
+  elif [ "$ppid" = "$$" ]; then
+    printf 'owned\n'
+  else
+    printf 'foreign\n'
+  fi
+}
+# R12-F01: bounded stop for ONE provably-owned handle under THIS script's
+# contract (TERM first — the normal shutdown-hygiene stop asserts the
+# graceful path and stays untouched): TERM → ≤5 s poll → direct-pid KILL
+# only while still provably ours → ≤5 s re-check. Prints the final state.
+bounded_stop_owned() {
+  local pid="$1" state="" i
+  # 发信号前在函数内再次核实，调用方的先前判断不能替代当前归属。
+  state="$(child_state "$pid")"
+  if [ "$state" != "owned" ]; then printf '%s\n' "$state"; return 0; fi
+  kill -TERM "$pid" 2>/dev/null || true
+  for i in $(seq 1 100); do
+    state="$(child_state "$pid")"
+    case "$state" in
+      exited|foreign) break ;;
+      owned|unobservable) : ;;
+    esac
+    sleep 0.05
+  done
+  if [ "${state:-owned}" = "owned" ]; then
+    state="$(child_state "$pid")"
+  fi
+  if [ "$state" = "owned" ]; then
+    kill -KILL "$pid" 2>/dev/null || true
+    for i in $(seq 1 100); do
+      state="$(child_state "$pid")"
+      case "$state" in
+        exited|foreign) break ;;
+        owned|unobservable) : ;;
+      esac
+      sleep 0.05
+    done
+  fi
+  printf '%s\n' "${state:-unobservable}"
+}
+cleanup() {
+  local cleanup_residue=0
+  if [ -n "$SERVICE_PID" ]; then
+    case "$(child_state "$SERVICE_PID")" in
+      owned)
+        case "$(bounded_stop_owned "$SERVICE_PID")" in
+          exited)
+            wait "$SERVICE_PID" 2>/dev/null || true
+            ;;
+          foreign)
+            echo "cleanup: pid $SERVICE_PID 已不属于本脚本，不等待或发信号" >&2
+            cleanup_residue=1
+            ;;
+          owned)
+            echo "cleanup: pid $SERVICE_PID still OWNED after the TERM and KILL budgets — RESIDUE left behind, no unbounded wait" >&2
+            cleanup_residue=1
+            ;;
+          unobservable)
+            echo "cleanup: pid $SERVICE_PID state UNOBSERVABLE after the stop budgets — not signalled further, no unbounded wait; possible residue" >&2
+            cleanup_residue=1
+            ;;
+        esac
+        ;;
+      exited)
+        wait "$SERVICE_PID" 2>/dev/null || true
+        ;;
+      foreign)
+        echo "cleanup: pid $SERVICE_PID is NOT currently owned by this shell — NOT signalled" >&2
+        cleanup_residue=1
+        ;;
+      unobservable)
+        echo "cleanup: pid $SERVICE_PID ownership UNOBSERVABLE (ps unreadable) — NOT signalled" >&2
+        cleanup_residue=1
+        ;;
+    esac
+    SERVICE_PID=""
+  fi
+  if [ "$cleanup_residue" -eq 0 ]; then
+    if [ -n "$HOME_DIR" ] && [ -d "$HOME_DIR" ]; then rm -rf "$HOME_DIR"; fi
+  else
+    echo "cleanup: 进程仍存活或归属不明，保留本轮 home=$HOME_DIR 供核查" >&2
+    exit 1
+  fi
+  return 0
 }
 trap cleanup EXIT
 
 fail() { echo "FAIL: $*" >&2; exit 1; }
 note() { printf '%s\n' "$*" | tee -a "$EVIDENCE_DIR/summary.txt"; }
 
+# R14-F01 (R02 stage-repair R14): per-case structured records for the R00
+# supplemental-leaf gate. Every expect_code assertion appends one ndjson line
+# here; the assembler at the end of the script merges these with the WS
+# matrix and the host-tampering records into leaf-cases.json — the machine
+# contract the stage gate consumes per leaf (verify-stage checks the ACTUAL
+# value of each declared case against the leaf's original assertion, so a
+# green command exit alone can never pass a leaf whose assertion failed).
+CASES_NDJSON="$EVIDENCE_DIR/leaf-cases.ndjson"
+: > "$CASES_NDJSON"
+record_case() { # $1=case $2=expect $3=actual $4=ok(1/0)
+  python3 -c 'import json,sys
+print(json.dumps({"case": sys.argv[1], "expect": int(sys.argv[2]),
+                  "actual": int(sys.argv[3]), "ok": sys.argv[4] == "1"}))' \
+    "$1" "$2" "$3" "$4" >> "$CASES_NDJSON"
+}
+
 expect_code() { # $1=expected $2=actual $3=label
   if [ "$1" = "$2" ]; then
     note "PASS $3 (http=$2)"
+    record_case "$3" "$1" "$2" 1
   else
+    record_case "$3" "$1" "$2" 0
     fail "$3: expected HTTP $1, got $2"
   fi
 }
@@ -76,6 +201,37 @@ expect_body() { # $1=needle $2=body $3=label
   fi
 }
 
+# /me 的原始叶项要求版本、身份和按主体投影的能力都真实对应。
+assert_me_projection() { # $1=case $2=kind $3=user $4=credential
+  local case_name="$1" expected_kind="$2" expected_user="$3" expected_credential="$4" actual=0
+  if printf '%s' "$BODY" | python3 -c 'import json,sys
+value=json.load(sys.stdin)
+kind,user,credential=sys.argv[1:]
+principal=value["principal"]
+scopes=principal["scopes"]
+assert isinstance(scopes,list) and all(isinstance(s,str) and s for s in scopes)
+assert value["kind"] == kind and value["userId"] == user
+assert value["credentialKind"] == credential
+assert value["principalId"] == principal["principalId"]
+assert value["kind"] == principal["kind"] and value["userId"] == principal["userId"]
+assert value["credentialKind"] == principal["credentialKind"]
+assert value["scopes"] == scopes
+assert isinstance(value["serverVersion"],str) and value["serverVersion"]
+assert value["version"] == value["serverVersion"]
+assert value["serverNodeKind"] == "lingxi-service"
+assert isinstance(value["serverId"],str) and value["serverId"]
+assert value["serverNodeId"] == value["serverId"]
+assert isinstance(value["studioId"],str) and value["studioId"]
+assert set(value["capabilities"]) == set(scopes) | {s.split(".")[0] for s in scopes}
+assert "secret" not in value and "token" not in value
+' "$expected_kind" "$expected_user" "$expected_credential" 2>/dev/null; then
+    actual=1
+  fi
+  record_case "$case_name" 1 "$actual" "$actual"
+  [ "$actual" -eq 1 ] || fail "$case_name: /me version, identity, or scoped capability projection mismatch"
+  note "PASS $case_name (version, identity, scoped capabilities)"
+}
+
 # ---- build the real binary -------------------------------------------------
 note "== building lingxi-service (rustup $TOOLCHAIN, $TARGET_DIR, --locked) =="
 $CARGO build --manifest-path rust/Cargo.toml --locked -p lingxi-service \
@@ -85,7 +241,7 @@ BIN="$TARGET_DIR/debug/lingxi-service"
 [ -x "$BIN" ] || fail "binary not found at $BIN"
 
 # ---- start the service on a synthetic home ---------------------------------
-HOME_DIR="$(mktemp -d /tmp/lingxi-r02t03-home-XXXXXX)"
+HOME_DIR=$(mktemp -d "${TMPDIR:-/tmp}/lingxi-r02t03-home-XXXXXX")
 "$BIN" --home "$HOME_DIR" >"$EVIDENCE_DIR/server-stdout.log" 2>"$EVIDENCE_DIR/server-stderr.log" &
 SERVICE_PID=$!
 
@@ -143,10 +299,23 @@ expect_code 401 "$REPLY" "a05-no-credential-read"
 expect_body "missing_credential" "$BODY" "a05-no-credential-read-reason"
 req POST "/lingxi/v1/sessions/sess_local_alpha/execute" -H 'Content-Type: application/json' -d '{"input":"forged"}'
 expect_code 401 "$REPLY" "a05-no-credential-execute"
+# R14-F01: R00 leaf R00-T02-LA-5816DA563ED8 pins the ORIGINAL assertion for
+# this route — "无主体返回 403" (incumbent server/routes/ws-auth.ts). The
+# service now honors it (auth_guard answers an unauthenticated POST
+# /lingxi/v1/ws-ticket with 403); the read/execute/me routes above keep 401.
 req POST "/lingxi/v1/ws-ticket"
-expect_code 401 "$REPLY" "a05-no-credential-ws-ticket"
+expect_code 403 "$REPLY" "a05-no-credential-ws-ticket"
+expect_body "missing_credential" "$BODY" "a05-no-credential-ws-ticket-reason"
+registry_hashes "$EVIDENCE_DIR/me-denied-before.sha256"
 req GET "/lingxi/v1/me"
 expect_code 401 "$REPLY" "a05-no-credential-me"
+registry_hashes "$EVIDENCE_DIR/me-denied-after.sha256"
+ME_DENIED_UNCHANGED=0
+if cmp -s "$EVIDENCE_DIR/me-denied-before.sha256" "$EVIDENCE_DIR/me-denied-after.sha256"; then
+  ME_DENIED_UNCHANGED=1
+fi
+record_case "a05-me-denied-no-registry-write" 1 "$ME_DENIED_UNCHANGED" "$ME_DENIED_UNCHANGED"
+[ "$ME_DENIED_UNCHANGED" -eq 1 ] || fail "/me denial changed credential registries"
 
 # 2. forged principal headers do not authenticate...
 req GET "/lingxi/v1/sessions/sess_local_alpha" \
@@ -156,6 +325,7 @@ expect_code 401 "$REPLY" "a05-forged-principal-headers"
 req GET "/lingxi/v1/me" -H "$BEARER" -H 'X-Lingxi-Principal: principal_device_forged'
 expect_code 200 "$REPLY" "a05-me-with-forged-header"
 expect_body '"kind":"local_user"' "$BODY" "a05-me-server-computed"
+assert_me_projection "a05-me-owner-full-projection" local_user user_local loopback_token
 FORGED_CHECK="$(printf '%s' "$BODY" | grep -c 'forged' || true)"
 [ "$FORGED_CHECK" = "0" ] || fail "forged principal echoed in /me: $BODY"
 note "PASS a05-me-never-echoes-forged-values"
@@ -186,6 +356,21 @@ req POST "/lingxi/v1/devices/credentials" -H "$BEARER" -H 'Content-Type: applica
 expect_code 201 "$REPLY" "a05-issue-expired-credential"
 EXPIRED_SECRET="$(printf '%s' "$BODY" | python3 -c 'import json,sys;print(json.load(sys.stdin)["secret"])')"
 
+# 6b. R14-F01 leaf cases: ws-ticket positive issuance (R00-T02-LA-5816DA563ED8
+#     "读取已认证主体并签发…短期票据") and devices/credentials invalid-input
+#     negative (R00-T02-LA-093F22C4FF63 "无效输入显式拒绝" — 400, no secret in
+#     the body, no registry write).
+req POST "/lingxi/v1/ws-ticket" -H "$BEARER" -H 'Content-Type: application/json' -d '{}'
+expect_code 200 "$REPLY" "a05-ws-ticket-issue-owner"
+expect_body '"ticket":"' "$BODY" "a05-ws-ticket-issue-owner-shape"
+req POST "/lingxi/v1/devices/credentials" -H "$BEARER" -H 'Content-Type: application/json' \
+  -d '{"userId":"   ","scopes":[]}'
+expect_code 400 "$REPLY" "a05-devices-credentials-empty-user-id"
+req POST "/lingxi/v1/devices/credentials" -H "$BEARER" -H 'Content-Type: application/json' \
+  -d 'not-json]'
+expect_code 400 "$REPLY" "a05-devices-credentials-invalid-json"
+expect_body "invalid_message" "$BODY" "a05-devices-credentials-invalid-json-reason"
+
 # 7. cross-principal: valid device credential for ANOTHER user; warm its
 #    (authorized) lastUsedAt write BEFORE the invariance snapshot.
 req POST "/lingxi/v1/devices/credentials" -H "$BEARER" -H 'Content-Type: application/json' \
@@ -195,6 +380,15 @@ FOREIGN_SECRET="$(printf '%s' "$BODY" | python3 -c 'import json,sys;print(json.l
 req GET "/lingxi/v1/me" -H "Authorization: Bearer $FOREIGN_SECRET"
 expect_code 200 "$REPLY" "a05-foreign-credential-authenticates"
 expect_body '"kind":"device"' "$BODY" "a05-foreign-principal-kind"
+assert_me_projection "a05-me-device-full-projection" device user_remote_b device_credential
+req POST "/lingxi/v1/devices/credentials" -H "$BEARER" -H 'Content-Type: application/json' \
+  -d '{"userId":"user_no_chat","scopes":["resources.read"]}'
+expect_code 201 "$REPLY" "a05-issue-no-chat-credential"
+NO_CHAT_SECRET="$(printf '%s' "$BODY" | python3 -c 'import json,sys;print(json.load(sys.stdin)["secret"])')"
+req POST "/lingxi/v1/ws-ticket" -H "Authorization: Bearer $NO_CHAT_SECRET" \
+  -H 'Content-Type: application/json' -d '{}'
+expect_code 403 "$REPLY" "a05-ws-ticket-insufficient-scope"
+expect_body "insufficient_scope" "$BODY" "a05-ws-ticket-insufficient-scope-reason"
 
 # ---- state snapshot: everything below this line must be DENIALS only ----
 # Two invariance classes (documented in the task report):
@@ -287,6 +481,143 @@ ALPHA_AFTER="$(printf '%s' "$COUNTS_CONTROL" | cut -d' ' -f1)"
 [ "$((ALPHA_AFTER - ALPHA_BEFORE))" = 1 ] || fail "positive control did not advance runCount by 1"
 note "PASS a05-positive-control-advanced-run-count (owner execute works, denied ones did not)"
 
+# 10. R14-F01 sessions-list leaf cases (R00-T02-LA-200D4E5D52C9): the
+#     principal-scoped list route GET /lingxi/v1/sessions had NO registered
+#     producer before — this section is that producer. Positive: the owner
+#     lists its own session; the foreign device principal gets a 200 whose
+#     list excludes the owner's sessions and is the empty-list shape (the
+#     server-side share of "空列表"); negative: no credential -> 401.
+#     Runs AFTER the invariance snapshots (the foreign read legitimately
+#     touches that credential's audit fields).
+req GET "/lingxi/v1/sessions" -H "$BEARER"
+expect_code 200 "$REPLY" "a05-sessions-list-owner"
+OWNER_SESS_HITS="$(printf '%s' "$BODY" | grep -c 'sess_local_alpha' || true)"
+[ "$OWNER_SESS_HITS" -ge 1 ] || fail "owner sessions list does not contain sess_local_alpha: $BODY"
+record_case "a05-sessions-list-owner-contains-own-session" 1 1
+note "PASS a05-sessions-list-owner-contains-own-session"
+req GET "/lingxi/v1/sessions" -H "Authorization: Bearer $FOREIGN_SECRET"
+expect_code 200 "$REPLY" "a05-sessions-list-foreign-principal"
+FOREIGN_SESS_HITS="$(printf '%s' "$BODY" | grep -c 'sess_local_alpha' || true)"
+[ "$FOREIGN_SESS_HITS" = 0 ] || fail "foreign principal sees the owner's sessions: $BODY"
+record_case "a05-sessions-list-foreign-excludes-owner-sessions" 0 "$FOREIGN_SESS_HITS"
+note "PASS a05-sessions-list-foreign-excludes-owner-sessions"
+EMPTY_SHAPE_HITS="$(printf '%s' "$BODY" | grep -c '"sessions":\[\]' || true)"
+[ "$EMPTY_SHAPE_HITS" -ge 1 ] || fail "foreign principal list is not the empty-list shape: $BODY"
+record_case "a05-sessions-list-empty-shape" 1 "$EMPTY_SHAPE_HITS"
+note "PASS a05-sessions-list-empty-shape"
+req GET "/lingxi/v1/sessions"
+expect_code 401 "$REPLY" "a05-sessions-list-no-credential"
+expect_body "missing_credential" "$BODY" "a05-sessions-list-no-credential-reason"
+# Leaf-dedicated matrix file (pinned by the stage map as the leaf's own
+# evidence artifact; the gate checks content, not just existence).
+python3 - "$CASES_NDJSON" "$EVIDENCE_DIR/sessions-list-matrix.json" << 'PYEOF'
+import json, sys
+cases = [json.loads(line) for line in open(sys.argv[1]) if line.strip()]
+leaf_cases = [c for c in cases if c["case"].startswith("a05-sessions-list-")
+              and not c["case"].endswith("-reason")]
+matrix = {
+    "schema": "lingxi.leaf-case-results.v1",
+    "leafId": "R00-T02-LA-200D4E5D52C9",
+    "route": "GET /lingxi/v1/sessions",
+    "cases": leaf_cases,
+}
+with open(sys.argv[2], "w") as fh:
+    json.dump(matrix, fh, ensure_ascii=False, indent=1)
+print(f"sessions-list-matrix.json: {len(leaf_cases)} cases")
+PYEOF
+
+# 11. 同一真实服务的 CLI 消费者。服务端列表成功不能证明 CLI 的空态、
+#     错误出口或主体隔离；每种身份都从独立 CLI 进程读取，并保留原始输出。
+command -v node >/dev/null 2>&1 || fail "Node is required for the CLI sessions leaf"
+CLI_URL="http://$ADDR"
+if node cli/entry.ts sessions --runtime rust --url "$CLI_URL" --token "$TOKEN" \
+  >"$EVIDENCE_DIR/cli-sessions-owner.stdout.log" 2>"$EVIDENCE_DIR/cli-sessions-owner.stderr.log"; then
+  CLI_OWNER_RC=0
+else
+  CLI_OWNER_RC=$?
+fi
+python3 - "$EVIDENCE_DIR/cli-sessions-owner.stdout.log" "$CLI_OWNER_RC" "$CASES_NDJSON" << 'PYEOF'
+import json, re, sys
+lines = [line.strip() for line in open(sys.argv[1], encoding="utf-8") if line.strip()]
+numbered = [line for line in lines if re.match(r"^\d+\. ", line)]
+actual = int(sys.argv[2] == "0" and len(lines) == 2 and len(numbered) == 2
+             and any("Synthetic session alpha" in line for line in numbered)
+             and any("Synthetic session beta" in line for line in numbered))
+with open(sys.argv[3], "a", encoding="utf-8") as out:
+    out.write(json.dumps({"case": "a05-cli-sessions-owner-list", "expect": 1,
+                          "actual": actual, "ok": bool(actual),
+                          "observed": {"exit": int(sys.argv[2]), "lineCount": len(lines),
+                                       "numberedCount": len(numbered)}}) + "\n")
+if not actual: raise SystemExit("CLI owner sessions output does not match the real owner's two sessions")
+PYEOF
+note "PASS a05-cli-sessions-owner-list"
+
+if node cli/entry.ts sessions --runtime rust --url "$CLI_URL" --token "$FOREIGN_SECRET" \
+  >"$EVIDENCE_DIR/cli-sessions-foreign.stdout.log" 2>"$EVIDENCE_DIR/cli-sessions-foreign.stderr.log"; then
+  CLI_FOREIGN_RC=0
+else
+  CLI_FOREIGN_RC=$?
+fi
+python3 - "$EVIDENCE_DIR/cli-sessions-foreign.stdout.log" "$CLI_FOREIGN_RC" "$CASES_NDJSON" << 'PYEOF'
+import json, sys
+text = open(sys.argv[1], encoding="utf-8").read().strip()
+actual = int(sys.argv[2] == "0" and text == "No sessions yet." and "Synthetic session" not in text)
+with open(sys.argv[3], "a", encoding="utf-8") as out:
+    out.write(json.dumps({"case": "a05-cli-sessions-foreign-empty", "expect": 1,
+                          "actual": actual, "ok": bool(actual),
+                          "observed": {"exit": int(sys.argv[2]), "emptyMessage": text == "No sessions yet."}}) + "\n")
+if not actual: raise SystemExit("CLI foreign principal did not show the real empty list")
+PYEOF
+note "PASS a05-cli-sessions-foreign-empty"
+
+if node cli/entry.ts sessions --runtime rust --url "$CLI_URL" \
+  >"$EVIDENCE_DIR/cli-sessions-unauthorized.stdout.log" 2>"$EVIDENCE_DIR/cli-sessions-unauthorized.stderr.log"; then
+  CLI_UNAUTH_RC=0
+else
+  CLI_UNAUTH_RC=$?
+fi
+python3 - "$EVIDENCE_DIR/cli-sessions-unauthorized.stdout.log" \
+  "$EVIDENCE_DIR/cli-sessions-unauthorized.stderr.log" "$CLI_UNAUTH_RC" "$CASES_NDJSON" << 'PYEOF'
+import json, sys
+stdout = open(sys.argv[1], encoding="utf-8").read()
+stderr = open(sys.argv[2], encoding="utf-8").read()
+actual = int(sys.argv[3] == "1" and not stdout.strip() and "HTTP 401" in stderr
+             and "Synthetic session" not in stderr)
+with open(sys.argv[4], "a", encoding="utf-8") as out:
+    out.write(json.dumps({"case": "a05-cli-sessions-unauthorized-error", "expect": 1,
+                          "actual": actual, "ok": bool(actual),
+                          "observed": {"exit": int(sys.argv[3]), "http401": "HTTP 401" in stderr,
+                                       "stdoutEmpty": not stdout.strip()}}) + "\n")
+if not actual: raise SystemExit("CLI without credential did not show an error without session data")
+PYEOF
+note "PASS a05-cli-sessions-unauthorized-error"
+node scripts/rust-tauri/r02_cli_sessions_limit.mjs \
+  >"$EVIDENCE_DIR/cli-sessions-limit-case.json" \
+  2>"$EVIDENCE_DIR/cli-sessions-limit.stderr.log" \
+  || fail "CLI failed to cap a 25-session response at 20 rendered sessions"
+python3 - "$EVIDENCE_DIR/cli-sessions-limit-case.json" "$CASES_NDJSON" << 'PYEOF'
+import json, sys
+case = json.load(open(sys.argv[1], encoding="utf-8"))
+if case.get("case") != "a05-cli-sessions-limit-20" or case.get("ok") is not True \
+        or case.get("expect") != 1 or case.get("actual") != 1:
+    raise SystemExit("CLI sessions limit producer returned an incomplete case")
+with open(sys.argv[2], "a", encoding="utf-8") as out:
+    out.write(json.dumps(case) + "\n")
+PYEOF
+python3 - "$CASES_NDJSON" "$EVIDENCE_DIR/sessions-list-matrix.json" << 'PYEOF'
+import json, sys
+cases = [json.loads(line) for line in open(sys.argv[1], encoding="utf-8") if line.strip()]
+matrix = json.load(open(sys.argv[2], encoding="utf-8"))
+client = [case for case in cases if case["case"].startswith("a05-cli-sessions-")]
+expected = {"a05-cli-sessions-owner-list", "a05-cli-sessions-foreign-empty",
+            "a05-cli-sessions-unauthorized-error", "a05-cli-sessions-limit-20"}
+if len(client) != len(expected) or {case["case"] for case in client} != expected:
+    raise SystemExit("CLI sessions evidence identities are incomplete or duplicated")
+matrix["cases"].extend(client)
+with open(sys.argv[2], "w", encoding="utf-8") as out:
+    json.dump(matrix, out, ensure_ascii=False, indent=1)
+PYEOF
+
 # =========================================================================
 note "== A06: malicious web page cannot ride loopback =="
 # =========================================================================
@@ -311,9 +642,11 @@ for ORIGIN in "http://sub.localhost:1" "http://127.0.0.1.evil.example"; do
 done
 
 # 4. Host tampering (raw sockets; curl cannot send an arbitrary Host easily).
-python3 - "$HOST" "$PORT" "$TOKEN" << 'PYEOF' | tee -a "$EVIDENCE_DIR/summary.txt"
-import socket, sys
-host, port, token = sys.argv[1], int(sys.argv[2]), sys.argv[3]
+#    R14-F01: each case is also appended to leaf-cases.ndjson (host-cases)
+#    so the leaf gate consumes the ACTUAL status, not the script's exit.
+python3 - "$HOST" "$PORT" "$TOKEN" "$CASES_NDJSON" << 'PYEOF' | tee -a "$EVIDENCE_DIR/summary.txt"
+import json, socket, sys
+host, port, token, ndjson_path = sys.argv[1], int(sys.argv[2]), sys.argv[3], sys.argv[4]
 def raw(request):
     s = socket.create_connection((host, port), timeout=5)
     s.sendall(request.encode())
@@ -337,14 +670,17 @@ cases = [
      200, None),
 ]
 failed = False
-for name, request, expected, needle in cases:
-    text = raw(request)
-    status = int(text.split()[1]) if len(text.split()) > 1 else 0
-    ok = status == expected and (needle is None or needle in text)
-    print(("PASS" if ok else "FAIL"), name, f"(http={status})")
-    if not ok:
-        failed = True
-        print(text[:300])
+with open(ndjson_path, "a") as nd:
+    for name, request, expected, needle in cases:
+        text = raw(request)
+        status = int(text.split()[1]) if len(text.split()) > 1 else 0
+        ok = status == expected and (needle is None or needle in text)
+        nd.write(json.dumps({"case": name, "expect": expected,
+                             "actual": status, "ok": ok}) + "\n")
+        print(("PASS" if ok else "FAIL"), name, f"(http={status})")
+        if not ok:
+            failed = True
+            print(text[:300])
 sys.exit(1 if failed else 0)
 PYEOF
 
@@ -430,10 +766,51 @@ grep -q "network-mode lan" "$EVIDENCE_DIR/neg-startup.log" \
 note "PASS a06-non-loopback-bind-requires-explicit-lan-mode (exit 2)"
 rm -rf "$HOME_DIR-startup-neg"
 
+# R14-F01: assemble leaf-cases.json — the per-leaf machine contract the
+# stage gate consumes. Runs AFTER every expect_code case (including the CLI
+# shape and startup negatives below would-be positions). Merges every
+# recorded case (expect_code assertions, host-tampering raw cases,
+# sessions-list leaf cases) with the WS-matrix probe results (booleans
+# normalized to 1/0). The file is written even when cases failed
+# (diagnosability), and the assembler exits non-zero so the command itself
+# fails — a leaf can never ride a green exit on red cases.
+python3 - "$CASES_NDJSON" "$EVIDENCE_DIR/ws-matrix.json" "$EVIDENCE_DIR/leaf-cases.json" << 'PYEOF'
+import json, sys
+ndjson_path, ws_path, out_path = sys.argv[1:4]
+cases = [json.loads(line) for line in open(ndjson_path) if line.strip()]
+def norm(value):
+    if isinstance(value, bool):
+        return int(value)
+    return int(value) if isinstance(value, int) else 0
+for r in json.load(open(ws_path))["results"]:
+    cases.append({"case": r["case"], "expect": norm(r["expected"]),
+                  "actual": norm(r["actual"]), "ok": bool(r["ok"])})
+seen = set()
+deduped = []
+for c in cases:
+    if c["case"] not in seen:
+        seen.add(c["case"])
+        deduped.append(c)
+bad = [c for c in deduped if not c["ok"]]
+doc = {"schema": "lingxi.leaf-case-results.v1", "cases": deduped}
+with open(out_path, "w") as fh:
+    json.dump(doc, fh, ensure_ascii=False, indent=1)
+print(f"leaf-cases.json: {len(deduped)} cases, {len(bad)} failing")
+sys.exit(1 if bad else 0)
+PYEOF
+note "PASS leaf-cases-json-assembled"
+
 # ---- shutdown hygiene -------------------------------------------------------
-kill -TERM "$SERVICE_PID"
-wait "$SERVICE_PID" 2>/dev/null || true
+# 认证检查全绿也不能掩盖关停失败；归属、期限和退出码同样是本轮结果。
+[ "$(child_state "$SERVICE_PID")" = "owned" ] || fail "service is not an owned live child before shutdown"
+STOP_STATE="$(bounded_stop_owned "$SERVICE_PID")"
+case "$STOP_STATE" in
+  exited) ;;
+  *) fail "service did not stop within the TERM/KILL budget (state=$STOP_STATE)" ;;
+esac
+if wait "$SERVICE_PID" 2>/dev/null; then STOP_RC=0; else STOP_RC=$?; fi
 SERVICE_PID=""
+[ "$STOP_RC" -eq 0 ] || fail "service shutdown was not clean (exit=$STOP_RC)"
 MARKERS="$(grep -c "LINGXI_AUTH_REJECTED\|LINGXI_TRANSPORT_REJECTED" "$EVIDENCE_DIR/server-stderr.log" || true)"
 note "negative protocol log markers on stderr: ${MARKERS} lines"
 note "== ALL CASES PASSED =="

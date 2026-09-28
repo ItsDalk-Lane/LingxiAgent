@@ -1,0 +1,17 @@
+{
+  "name": "local-keygen",
+  "argv": [
+    "node",
+    "scripts/artifact-keygen.mjs",
+    "--out",
+    "/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-r02-r18-local-sign-vnqekq8i/private.pem"
+  ],
+  "cwd": "/Users/study_superior/Desktop/Code/LingxiAgent",
+  "startedUtc": "2026-09-28T12:40:39.847875+00:00",
+  "endedUtc": "2026-09-28T12:40:39.880030+00:00",
+  "exitCode": 0,
+  "stdout": "artifacts/rust-tauri/R02/audit-r18/final-noport-2/local-keygen.stdout.log",
+  "stdoutSha256": "c20d1ce1f2303106f654633e4313d42afef1085581fe121708d2847f0c641051",
+  "stderr": "artifacts/rust-tauri/R02/audit-r18/final-noport-2/local-keygen.stderr.log",
+  "stderrSha256": "807b6b03fc7e2f58b15bc94a20fb4a0640e2fdfdc994f86cd3cd9c195638d257"
+}

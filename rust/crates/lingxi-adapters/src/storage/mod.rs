@@ -16,6 +16,8 @@ pub mod backup;
 pub mod migrations;
 pub mod queue;
 pub mod run_store;
+#[cfg(windows)]
+pub mod windows_acl;
 
 pub use backup::{
     backup_database, restore_backup, BackupManifest, BackupOptions, BackupOutcome, RestoreOutcome,
@@ -24,5 +26,8 @@ pub use backup::{
 pub use migrations::{
     fingerprint_sql, supported_version, verify_integrity, Migration, MigrationOutcome, MIGRATIONS,
 };
-pub use queue::{checkpoint_truncate, DbQueue, StoreOptions};
+pub use queue::{
+    checkpoint_truncate, DbQueue, StoreOptions, MAX_BUSY_TIMEOUT_MS, MAX_CHECKPOINT_PAGES,
+    MAX_QUEUE_CAPACITY, MAX_QUEUE_WAIT_TIMEOUT_MS,
+};
 pub use run_store::{wal_sidecar_path, RunDatabase, RunSummaryRow, SessionRow, RUNS_DB_FILE_NAME};

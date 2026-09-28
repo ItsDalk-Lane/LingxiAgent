@@ -1,0 +1,38 @@
+{
+  "command": [
+    "/Users/study_superior/.cargo/bin/rustup",
+    "run",
+    "1.98.1",
+    "cargo",
+    "fmt",
+    "--manifest-path",
+    "rust/Cargo.toml",
+    "--all"
+  ],
+  "cwd": "/Users/study_superior/Desktop/Code/LingxiAgent",
+  "startedAtUtc": "2026-09-28T12:57:28.659114+00:00",
+  "finishedAtUtc": "2026-09-28T12:57:28.976552+00:00",
+  "exitCode": 0,
+  "sourceSha256Before": {
+    "rust/Cargo.lock": "fe630f5c1261340dc734ee4c3b1e4fe79db4fd877c2d3dc71721d073f3b8e9f5",
+    "rust/crates/xtask/Cargo.toml": "cc4c24d030d581311bf177f3ce3910bef7c3882c3d279a135d2749fdf0850009",
+    "rust/crates/xtask/src/main.rs": "1126e5dd175a9806723c17978fd71280d0630ac15700e564af16b8d08b763645",
+    "rust/crates/xtask/src/verify.rs": "d0d7f98b034ef8bb8d5936432b9805f7322403fcd3e9b872fd36f47f68122ca6",
+    "rust/crates/xtask/src/candidate.rs": "02505d2b53c1e320f97bbce3a9b19f097eab6d02797254e07f1c20bf8e1bed51",
+    "rust/crates/xtask/src/candidate/tests.rs": "dff457df49cd14890e02b4b2867ce56fc0968021c28f05956aed005a6d4d22a0",
+    "rust/crates/xtask/src/runner_identity.rs": "0248b352646d0e32bda687f822b0dbfebf5c7ec6ad3140a388191164ce82ed32",
+    "rust/crates/xtask/src/verify/runner_tests.rs": "f51a97610bfce1d9a93cf04a3978733cbaecd584db27aebc1202b1cd2a831f26"
+  },
+  "sourceSha256After": {
+    "rust/Cargo.lock": "fe630f5c1261340dc734ee4c3b1e4fe79db4fd877c2d3dc71721d073f3b8e9f5",
+    "rust/crates/xtask/Cargo.toml": "cc4c24d030d581311bf177f3ce3910bef7c3882c3d279a135d2749fdf0850009",
+    "rust/crates/xtask/src/main.rs": "b7eb53e1d6435927c41690bc482bffa591c09f625ffa0189937f259b617bb2cd",
+    "rust/crates/xtask/src/verify.rs": "d0d7f98b034ef8bb8d5936432b9805f7322403fcd3e9b872fd36f47f68122ca6",
+    "rust/crates/xtask/src/candidate.rs": "331320a58960b7b37e2c6e86d370b2178337095bfed4e7766656ebde0ca18654",
+    "rust/crates/xtask/src/candidate/tests.rs": "dff457df49cd14890e02b4b2867ce56fc0968021c28f05956aed005a6d4d22a0",
+    "rust/crates/xtask/src/runner_identity.rs": "c560f940b625764b58f8a936a3985c1a44defa115956df21a9360e1d6fb19138",
+    "rust/crates/xtask/src/verify/runner_tests.rs": "f51a97610bfce1d9a93cf04a3978733cbaecd584db27aebc1202b1cd2a831f26"
+  },
+  "stdout": "fmt-apply-1.stdout.log",
+  "stderr": "fmt-apply-1.stderr.log"
+}

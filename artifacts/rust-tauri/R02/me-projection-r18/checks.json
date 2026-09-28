@@ -1,0 +1,41 @@
+{
+  "schema": "lingxi.r02-static-check.v1",
+  "records": [
+    {
+      "name": "bash-syntax",
+      "command": [
+        "bash",
+        "-n",
+        "scripts/rust-tauri/r02_t03_auth_matrix.sh"
+      ],
+      "startUtc": "2026-09-28T10:42:53.216076+00:00",
+      "endUtc": "2026-09-28T10:42:53.221192+00:00",
+      "exitCode": 0,
+      "stdoutFile": "bash-syntax.stdout.log",
+      "stderrFile": "bash-syntax.stderr.log"
+    },
+    {
+      "name": "stage-map-json",
+      "command": [
+        "python3",
+        "-m",
+        "json.tool",
+        "rust/crates/xtask/src/stage_maps/R02.json"
+      ],
+      "startUtc": "2026-09-28T10:42:53.221506+00:00",
+      "endUtc": "2026-09-28T10:42:53.266400+00:00",
+      "exitCode": 0,
+      "stdoutFile": "stage-map-json.stdout.log",
+      "stderrFile": "stage-map-json.stderr.log"
+    }
+  ],
+  "sourceSha256Before": {
+    "scripts/rust-tauri/r02_t03_auth_matrix.sh": "ddef8a32a095b6369556e12c388acc0587d913844544d85e4b9f7d2b127e048e",
+    "rust/crates/xtask/src/stage_maps/R02.json": "032c38a901365a43459c38405c482802893cc25028bcadc4dcfbc106717320af"
+  },
+  "sourceSha256After": {
+    "scripts/rust-tauri/r02_t03_auth_matrix.sh": "ddef8a32a095b6369556e12c388acc0587d913844544d85e4b9f7d2b127e048e",
+    "rust/crates/xtask/src/stage_maps/R02.json": "032c38a901365a43459c38405c482802893cc25028bcadc4dcfbc106717320af"
+  },
+  "sourceChangedDuringCheck": false
+}

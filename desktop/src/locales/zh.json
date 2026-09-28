@@ -611,6 +611,15 @@
     "serverNotReady": "Server 未就绪",
     "loading": "加载中...",
     "reconnecting": "重连中",
+    "reconnected": "已重新连接",
+    "wsTicketFailed": "连接凭证获取失败",
+    "wsHandshakeFailed": "服务连接协议不匹配",
+    "wsHandshakeTimedOut": "服务握手超时",
+    "wsConnectionFailed": "无法建立服务连接",
+    "wsConnectionClosed": "服务连接已断开",
+    "serverRestartInvalid": "服务重启信息无效，请重试",
+    "rustCoreUnavailable": "Rust 服务已连接，但聊天功能尚未迁移，暂不可发送消息",
+    "serverRestarting": "服务正在重启",
     "reconnect": "重新连接"
   },
   "input": {
@@ -1516,6 +1525,7 @@
     "saved": "保存成功 ✿",
     "saveFailed": "保存失败",
     "refreshFailed": "刷新失败",
+    "rustCoreUnavailable": "Rust 服务的助手、模型和通用设置尚未迁移；目前仅可使用访问设置。",
     "fileChangedOnDisk": "文件已被外部修改，已跳过旧版本保存",
     "noChanges": "没有需要保存的更改",
     "autoSaved": "已自动保存 ✿",

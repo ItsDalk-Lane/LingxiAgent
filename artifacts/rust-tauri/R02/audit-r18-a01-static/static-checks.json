@@ -1,0 +1,44 @@
+[
+  {
+    "argv": [
+      "bash",
+      "-n",
+      "scripts/rust-tauri/r02_t01_service_smoke.sh"
+    ],
+    "start_utc": "2026-09-28T10:37:44.737534+00:00",
+    "end_utc": "2026-09-28T10:37:44.741972+00:00",
+    "exit_code": 0,
+    "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout": "",
+    "stderr": ""
+  },
+  {
+    "argv": [
+      "git",
+      "diff",
+      "--check",
+      "--",
+      "scripts/rust-tauri/r02_t01_service_smoke.sh"
+    ],
+    "start_utc": "2026-09-28T10:37:44.742009+00:00",
+    "end_utc": "2026-09-28T10:37:44.752871+00:00",
+    "exit_code": 0,
+    "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout": "",
+    "stderr": ""
+  },
+  {
+    "argv": [
+      "python3",
+      "-m",
+      "json.tool",
+      "rust/crates/xtask/src/stage_maps/R02.json"
+    ],
+    "start_utc": "2026-09-28T10:37:44.752892+00:00",
+    "end_utc": "2026-09-28T10:37:44.792338+00:00",
+    "exit_code": 0,
+    "stdout_sha256": "06d9000c7f28fd3acb6b7c3332b048f8732e056eacbfdb492c96031e974cf7ad",
+    "stdout": "<valid JSON output omitted; sha256 retained>",
+    "stderr": ""
+  }
+]

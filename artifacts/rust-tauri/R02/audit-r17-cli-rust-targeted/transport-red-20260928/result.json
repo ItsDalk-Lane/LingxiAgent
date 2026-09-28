@@ -1,0 +1,13 @@
+{
+  "phase": "red-before-fix",
+  "startedUtc": "2026-09-28T09:18:04Z",
+  "endedUtc": "2026-09-28T09:18:14Z",
+  "command": "./node_modules/.bin/vitest run tests/cli-rust-service.test.ts -t 'uses the recorded transport'",
+  "exit": 1,
+  "rawLog": "vitest.log",
+  "sourceSha256": {
+    "cli/rust-service.ts": "ed7d22f49c7810435f8bad33ecf1eda65eb3f1a9dd44ddbce9c6d449d5e0a3a5",
+    "tests/cli-rust-service.test.ts": "71043de8e67b8952603764e7a06b5f63c8cd0cb301838c56fafb7acfc7b31c10"
+  },
+  "head": "9b98c679678888b60ff2e32bd67d3da6fc2f5c4f"
+}

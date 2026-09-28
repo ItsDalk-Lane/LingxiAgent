@@ -1,0 +1,25 @@
+{
+  "name": "static-web-compile",
+  "command": [
+    "/Users/study_superior/.cargo/bin/rustup",
+    "run",
+    "1.98.1",
+    "cargo",
+    "test",
+    "-p",
+    "lingxi-service",
+    "--test",
+    "r00_static_web_leaves",
+    "--no-run",
+    "--locked",
+    "--offline"
+  ],
+  "cwd": "/Users/study_superior/Desktop/Code/LingxiAgent/rust",
+  "startedUtc": "2026-09-28T11:53:23.435977+00:00",
+  "endedUtc": "2026-09-28T11:53:24.217718+00:00",
+  "exitCode": 0,
+  "stdout": "artifacts/rust-tauri/R02/audit-r18/final-noport-1/static-web-compile.stdout.log",
+  "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+  "stderr": "artifacts/rust-tauri/R02/audit-r18/final-noport-1/static-web-compile.stderr.log",
+  "stderrSha256": "afaa79ed2cdf5becaeb0f08f72a1d34f0d63465ccb3a868fb6787e5371ba1a47"
+}

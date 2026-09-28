@@ -108,6 +108,10 @@ async function resignAdhoc(context) {
     sign(speechPermissionsBridge);
   }
 
+  const rustService = path.join(appDir, "Contents", "Resources", "rust-service", "lingxi-service");
+  if (!fs.existsSync(rustService)) throw new Error(`[resign-adhoc] Rust service missing: ${rustService}`);
+  sign(rustService);
+
   // 2. Frameworks：.framework(--deep 递归内部 dylib/Helpers) + Helper.app(带 entitlements)
   const frameworksDir = path.join(appDir, "Contents", "Frameworks");
   for (const entry of fs.readdirSync(frameworksDir)) {
@@ -130,4 +134,3 @@ async function resignAdhoc(context) {
 exports.resignAdhoc = resignAdhoc;
 // 保留 default 以便单独作为 hook 测试/兼容（electron-builder 读取 default）。
 exports.default = resignAdhoc;
-

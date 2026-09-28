@@ -14,6 +14,8 @@ export interface ConnectionSlice {
   bridgeDotConnected: boolean;
   wsState: 'connected' | 'reconnecting' | 'disconnected';
   wsReconnectAttempt: number;
+  wsFailureReasonKey: string | null;
+  wsRecoveryNotice: boolean;
   setServerPort: (port: string | number | null) => void;
   setServerToken: (token: string | null) => void;
   setActiveServerConnection: (connection: ServerConnection | null) => void;
@@ -38,6 +40,8 @@ export const createConnectionSlice = (
   bridgeDotConnected: false,
   wsState: 'disconnected',
   wsReconnectAttempt: 0,
+  wsFailureReasonKey: null,
+  wsRecoveryNotice: false,
   setServerPort: (port) => {
     const serverPort = port === null || port === undefined ? null : String(port);
     const serverToken = get?.().serverToken ?? null;

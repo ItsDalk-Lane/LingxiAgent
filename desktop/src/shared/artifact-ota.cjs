@@ -32,6 +32,7 @@
 
 const artifactBoot = require("./artifact-boot.cjs");
 const otaCore = require("../../../shared/artifact-core/ota-core.cjs");
+const { createPrivateServerArtifactGuard } = require("./private-server-artifact.cjs");
 // Static specifier on purpose — see artifact-ota-dev-bypass.cjs's header
 // comment; vite.config.main.js's alias keys off this exact literal.
 const devBypass = require("./artifact-ota-dev-bypass.cjs");
@@ -113,7 +114,14 @@ module.exports = {
   downloadToFile: otaCore.downloadToFile,
   fetchChannelManifest: (opts) => otaCore.fetchChannelManifest({ ...opts, devBypass }),
   checkOnce: (opts) => otaCore.checkOnce({ ...opts, devBypass }),
-  downloadAndApplyArtifacts: (opts) => otaCore.downloadAndApplyArtifacts({ ...opts, devBypass }),
+  downloadAndApplyArtifacts: (opts) => otaCore.downloadAndApplyArtifacts({
+    ...opts,
+    devBypass,
+    privateArtifactGuard: createPrivateServerArtifactGuard({
+      resourcesPath: process.resourcesPath,
+      appVersion: opts.currentShellVersion,
+    }) || opts.privateArtifactGuard || null,
+  }),
   scheduleBackgroundOtaChecks,
   hasDevOverrideConfigured,
   bothNextPointersReady: otaCore.bothNextPointersReady,

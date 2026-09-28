@@ -109,6 +109,114 @@ export async function resolveServerSpawnSpec({
   };
 }
 
+export async function resolveRustServerSpawnSpec({
+  projectRoot,
+  env = process.env,
+  extraArgs = [],
+  channel = "stable",
+}: { projectRoot?: string; env?: NodeJS.ProcessEnv; extraArgs?: string[]; channel?: string } = {}) {
+  const root = projectRoot || path.resolve(import.meta.dirname, "..");
+  const binary = env.LINGXI_SERVICE_BIN || path.join(root, "rust", "target", "debug", "lingxi-service");
+  if (!path.isAbsolute(binary)) throw new Error("LINGXI_SERVICE_BIN must be an absolute path");
+  try {
+    fs.accessSync(binary, fs.constants.X_OK);
+    if (!fs.statSync(binary).isFile()) throw new Error("not a regular file");
+  } catch {
+    throw new Error(`Rust service binary is unavailable at ${binary}; build lingxi-service or set LINGXI_SERVICE_BIN`);
+  }
+  if (env.LINGXI_ALLOW_DATA_DOWNGRADE === "1") {
+    throw new Error("Rust service refuses LINGXI_ALLOW_DATA_DOWNGRADE; use an explicit recovery workflow");
+  }
+
+  let home = env.LINGXI_HOME;
+  for (let i = 0; i < extraArgs.length; i++) {
+    if (extraArgs[i] === "--home") home = extraArgs[i + 1];
+  }
+  if (!home) {
+    const configIndex = extraArgs.indexOf("--config");
+    if (configIndex >= 0 && extraArgs[configIndex + 1]) {
+      try {
+        const config = JSON.parse(fs.readFileSync(extraArgs[configIndex + 1], "utf8"));
+        if (config && typeof config.home === "string") home = config.home;
+      } catch {
+        // 配置格式与读取错误由 Rust 服务的严格解析器给出最终诊断。
+      }
+    }
+  }
+  if (!home && !extraArgs.includes("--test-mode") && !extraArgs.includes("--config")) {
+    throw new Error("Rust service needs an explicit --home, LINGXI_HOME, --config, or --test-mode");
+  }
+  if (channel !== "stable" && (!home || extraArgs.includes("--test-mode"))) {
+    throw new Error("Rust service cannot resolve the selected frontend channel without a fixed data home");
+  }
+  const spawnEnv: NodeJS.ProcessEnv = { ...env };
+  delete spawnEnv.LINGXI_RENDERER_DIST;
+  const pointerHome = extraArgs.includes("--test-mode") ? null : home;
+  const rendererDist = pointerHome && path.isAbsolute(pointerHome)
+    ? await resolveRendererDistPointer({ lingxiHome: pointerHome, channel })
+    : null;
+  if (channel !== "stable" && !rendererDist) {
+    throw new Error(`No activated ${channel} frontend is available in the selected data home`);
+  }
+  if (rendererDist) spawnEnv.LINGXI_RENDERER_DIST = rendererDist.distDir;
+  return { mode: "rust" as const, command: binary, args: extraArgs, env: spawnEnv, rendererDist, dataHome: pointerHome };
+}
+
+export async function spawnRustServerForeground({
+  projectRoot,
+  extraArgs = [],
+  env = process.env,
+  channel = "stable",
+  allowDataDowngrade = false,
+}: {
+  projectRoot?: string;
+  extraArgs?: string[];
+  env?: NodeJS.ProcessEnv;
+  channel?: string;
+  allowDataDowngrade?: boolean;
+} = {}): Promise<number> {
+  if (allowDataDowngrade) {
+    throw new Error("Rust service does not support --allow-data-downgrade; data-version refusal is mandatory");
+  }
+  const spec = await resolveRustServerSpawnSpec({ projectRoot, env, extraArgs, channel });
+  if (spec.dataHome && path.isAbsolute(spec.dataHome)) {
+    const incumbent = readLocalServerInfo({ lingxiHome: spec.dataHome, checkProcess: false });
+    if (!incumbent.ok && incumbent.reason !== "missing_server_info") {
+      throw new Error(`Cannot rule out an existing Node server in this data home: ${incumbent.message}`);
+    }
+    if (incumbent.ok) {
+      const guard = await guardAgainstForeignServer({ lingxiHome: spec.dataHome });
+      if (guard.blocked) throw new Error(guard.message || "A Node server already owns this data home");
+    }
+  }
+  if (spec.rendererDist?.valid) console.log(`serving web frontend ${spec.rendererDist.version}`);
+  return new Promise((resolve) => {
+    const child = spawn(spec.command, spec.args, { stdio: "inherit", env: spec.env });
+    let settled = false;
+    const forward = (signal: NodeJS.Signals) => {
+      if (!settled) child.kill(signal);
+    };
+    const onInt = () => forward("SIGINT");
+    const onTerm = () => forward("SIGTERM");
+    process.on("SIGINT", onInt);
+    process.on("SIGTERM", onTerm);
+    const finish = (code: number) => {
+      if (settled) return;
+      settled = true;
+      process.off("SIGINT", onInt);
+      process.off("SIGTERM", onTerm);
+      resolve(code);
+    };
+    child.once("error", (err) => {
+      console.error(`Rust service failed to start: ${err.message}`);
+      finish(1);
+    });
+    child.once("close", (code, signal) => {
+      finish(code ?? (signal === "SIGINT" ? 130 : signal === "SIGTERM" ? 143 : 1));
+    });
+  });
+}
+
 /**
  * Pre-spawn check for the "同宅互斥" gate's CLI-side entry point. Reads
  * whatever server-info.json is on disk for `lingxiHome` (regardless of

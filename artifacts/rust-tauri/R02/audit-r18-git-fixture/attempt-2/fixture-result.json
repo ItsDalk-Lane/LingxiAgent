@@ -1,0 +1,28 @@
+{
+  "scope": "isolated Git fixture only; not R02-A16 acceptance",
+  "started_utc": "2026-09-28T11:30:08.515+00:00",
+  "ended_utc": "2026-09-28T11:30:08.693+00:00",
+  "main_repo_read_only": "/Users/study_superior/Desktop/Code/LingxiAgent",
+  "main_head": "9b98c679678888b60ff2e32bd67d3da6fc2f5c4f",
+  "a16_script_sha256": "7b7c4a4dd400d6fdfc672715e5c073ed85df93405e93cbdf05eef779b8ee3c68",
+  "fixture_root": "/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/r02-a16-git-fixture-pe9agblc",
+  "base_sha": "45f62b5bbcec602d480a87d507fb59150ccc424a",
+  "candidate_sha": "1b1cb48a872ffc217c4f005c4989d7c05acd0d69",
+  "candidate_status": [
+    " M src/tracked.rs",
+    "?? src/new_candidate.rs"
+  ],
+  "candidate_tracked_sha256": "fdc25e2cb7377c3d1183cc08452a33fbc3533323ac823fe4cd349609d63cdd3e",
+  "candidate_untracked_sha256": "c9f99cbdfab033a8b10290f9028d0328a521b2eaf2ba4202fe27c7ffc0c93a10",
+  "old_copy_untracked_sha256_before": "c9f99cbdfab033a8b10290f9028d0328a521b2eaf2ba4202fe27c7ffc0c93a10",
+  "old_copy_untracked_sha256_after_force_checkout": "c9f99cbdfab033a8b10290f9028d0328a521b2eaf2ba4202fe27c7ffc0c93a10",
+  "old_copy_status_after_force_checkout": [
+    "?? src/new_candidate.rs"
+  ],
+  "old_copy_status_after_clean": [],
+  "fresh_base_head": "45f62b5bbcec602d480a87d507fb59150ccc424a",
+  "fresh_base_status": [],
+  "fresh_base_tracked_sha256": "cfe421a6cd123c0781eea7fb04b0f78e3e44e1ae9d56638e75333b60ddae954a",
+  "outcome": "PASS fixture: old force checkout retains untracked candidate; clean deletes it; fresh construction is pristine",
+  "command_count": 19
+}

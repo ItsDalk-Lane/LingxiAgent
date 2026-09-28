@@ -1,0 +1,56 @@
+{
+  "candidateBefore": {
+    "desktop/src/react/mobile/mobile-init.ts": "3ed3a3ad9348efa3921b8613d86e48fe720c93389130201fa90a2445d246a47d",
+    "desktop/src/react/mobile/MobileApp.tsx": "8cb101a13c8c05e632a86b412f3de2a53dce6209f3b38b93a0a428c52ee3a436",
+    "desktop/src/react/__tests__/mobile/MobileApp.test.tsx": "1f3b5c39e32fa941b2ce10df83a185b8e44c927b7dbaeebde71b98e334adeaaf",
+    "desktop/src/react/settings/SettingsContent.tsx": "9f15d8430fc9f53c545873c6e453bed6da2620f1217dacbad6f5a7a8a83a189f",
+    "desktop/src/react/settings/store.ts": "5c5b457cb1e4475d113c51ad1112039bf152eeeabcf107c9b0b91a868c8bbfa9",
+    "desktop/src/react/settings/__tests__/SettingsContent.test.tsx": "1bb54303c5ec43fdb17693f854c139b7685bc5d213215247039cfd746d817849",
+    "desktop/src/locales/zh.json": "4cbb8e534b1a9dac7d64a783975596e28fac374123baa2d4b0686a4f21ce25ba",
+    "desktop/src/locales/en.json": "fd300cb5b842df5d010de179a41508ab9013e535e54fe1a7aba8d579144e4436",
+    "desktop/src/locales/ja.json": "d306978b85241a6b77f0046077cf67ca1738a150cb69489af46a00432d059ae9",
+    "desktop/src/locales/ko.json": "77e9ba552534e53a116d0eb245423b716e730d2e51bd8d8ef8ce5143eae596e2",
+    "desktop/src/locales/zh-TW.json": "6636a2f7d435fa8ca85f6947a6d67cfeebfae35b3c56a442c56790451863bf63"
+  },
+  "candidateAfter": {
+    "desktop/src/react/mobile/mobile-init.ts": "3ed3a3ad9348efa3921b8613d86e48fe720c93389130201fa90a2445d246a47d",
+    "desktop/src/react/mobile/MobileApp.tsx": "8cb101a13c8c05e632a86b412f3de2a53dce6209f3b38b93a0a428c52ee3a436",
+    "desktop/src/react/__tests__/mobile/MobileApp.test.tsx": "1f3b5c39e32fa941b2ce10df83a185b8e44c927b7dbaeebde71b98e334adeaaf",
+    "desktop/src/react/settings/SettingsContent.tsx": "9f15d8430fc9f53c545873c6e453bed6da2620f1217dacbad6f5a7a8a83a189f",
+    "desktop/src/react/settings/store.ts": "5c5b457cb1e4475d113c51ad1112039bf152eeeabcf107c9b0b91a868c8bbfa9",
+    "desktop/src/react/settings/__tests__/SettingsContent.test.tsx": "1bb54303c5ec43fdb17693f854c139b7685bc5d213215247039cfd746d817849",
+    "desktop/src/locales/zh.json": "4cbb8e534b1a9dac7d64a783975596e28fac374123baa2d4b0686a4f21ce25ba",
+    "desktop/src/locales/en.json": "fd300cb5b842df5d010de179a41508ab9013e535e54fe1a7aba8d579144e4436",
+    "desktop/src/locales/ja.json": "d306978b85241a6b77f0046077cf67ca1738a150cb69489af46a00432d059ae9",
+    "desktop/src/locales/ko.json": "77e9ba552534e53a116d0eb245423b716e730d2e51bd8d8ef8ce5143eae596e2",
+    "desktop/src/locales/zh-TW.json": "6636a2f7d435fa8ca85f6947a6d67cfeebfae35b3c56a442c56790451863bf63"
+  },
+  "sourceStable": true,
+  "checks": [
+    {
+      "command": [
+        "./node_modules/.bin/vitest",
+        "run",
+        "desktop/src/react/__tests__/mobile/MobileApp.test.tsx",
+        "desktop/src/react/settings/__tests__/SettingsContent.test.tsx",
+        "--maxWorkers=1"
+      ],
+      "startUtc": "2026-09-28T11:37:09.238238+00:00",
+      "endUtc": "2026-09-28T11:37:16.563804+00:00",
+      "exit": 1,
+      "log": "check-1.log"
+    },
+    {
+      "command": [
+        "./node_modules/.bin/tsc",
+        "-p",
+        "tsconfig.test.json",
+        "--noEmit"
+      ],
+      "startUtc": "2026-09-28T11:37:16.564202+00:00",
+      "endUtc": "2026-09-28T11:37:28.049605+00:00",
+      "exit": 0,
+      "log": "check-2.log"
+    }
+  ]
+}

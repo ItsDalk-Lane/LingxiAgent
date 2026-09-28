@@ -1,0 +1,31 @@
+{
+  "command": [
+    "cargo",
+    "test",
+    "--manifest-path",
+    "rust/Cargo.toml",
+    "--locked",
+    "--offline",
+    "-p",
+    "xtask",
+    "--bin",
+    "xtask",
+    "dual_stage_leaf_passes_only_with_complete_original_behavior_cases",
+    "--",
+    "--nocapture"
+  ],
+  "startUtc": "2026-09-28T11:01:46.018272+00:00",
+  "endUtc": "2026-09-28T11:01:46.083943+00:00",
+  "exitCode": 0,
+  "sourceSha256Before": {
+    "rust/crates/xtask/src/verify.rs": "dcba8787e06cc2b6314c507b13687d4dc5b703833bd4123779c69cda0f765544",
+    "rust/crates/xtask/src/verify/runner_tests.rs": "201c676955e80828781bedeb539fa69f653575f8d2ce114a5b1495cee590beea",
+    "rust/crates/xtask/src/stage_maps/R02.json": "fce63a75f3118102ab3c0937be82485cd9c9c2d445e40545f6852f9ff8cde4cc"
+  },
+  "sourceSha256After": {
+    "rust/crates/xtask/src/verify.rs": "dcba8787e06cc2b6314c507b13687d4dc5b703833bd4123779c69cda0f765544",
+    "rust/crates/xtask/src/verify/runner_tests.rs": "201c676955e80828781bedeb539fa69f653575f8d2ce114a5b1495cee590beea",
+    "rust/crates/xtask/src/stage_maps/R02.json": "fce63a75f3118102ab3c0937be82485cd9c9c2d445e40545f6852f9ff8cde4cc"
+  },
+  "sourceChangedDuringCheck": false
+}

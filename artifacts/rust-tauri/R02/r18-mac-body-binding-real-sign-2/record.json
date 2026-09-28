@@ -1,0 +1,64 @@
+{
+  "sourceBinary": "/Users/study_superior/Desktop/Code/LingxiAgent/dist-rust-service/mac-arm64/lingxi-service",
+  "sourceSha256": "8c8a3a00666506f9927b943f7a00d3494c1e8597e04869ad2d28941566209fa1",
+  "helperSha256": "1fec1b82cb0cdaa0e440e06010d7ceae84120cadb5594e8a079260c46b256f21",
+  "checks": [
+    {
+      "command": [
+        "node",
+        "-e",
+        "const fs=require('fs');const {rustServiceContentDigest}=require(process.argv[1]);console.log(rustServiceContentDigest(fs.readFileSync(process.argv[2]),'darwin'));",
+        "/Users/study_superior/Desktop/Code/LingxiAgent/desktop/src/shared/rust-local-service.cjs",
+        "/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-r02-mac-sign-dar7hn3c/lingxi-service"
+      ],
+      "startUtc": "2026-09-28T11:46:34.629991+00:00",
+      "endUtc": "2026-09-28T11:46:34.665814+00:00",
+      "exit": 0,
+      "log": "check-1.log"
+    },
+    {
+      "command": [
+        "codesign",
+        "--force",
+        "--sign",
+        "-",
+        "/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-r02-mac-sign-dar7hn3c/lingxi-service"
+      ],
+      "startUtc": "2026-09-28T11:46:34.666143+00:00",
+      "endUtc": "2026-09-28T11:46:34.688172+00:00",
+      "exit": 0,
+      "log": "check-2.log"
+    },
+    {
+      "command": [
+        "node",
+        "-e",
+        "const fs=require('fs');const {rustServiceContentDigest}=require(process.argv[1]);console.log(rustServiceContentDigest(fs.readFileSync(process.argv[2]),'darwin'));",
+        "/Users/study_superior/Desktop/Code/LingxiAgent/desktop/src/shared/rust-local-service.cjs",
+        "/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-r02-mac-sign-dar7hn3c/lingxi-service"
+      ],
+      "startUtc": "2026-09-28T11:46:34.688454+00:00",
+      "endUtc": "2026-09-28T11:46:34.723364+00:00",
+      "exit": 0,
+      "log": "check-3.log"
+    },
+    {
+      "command": [
+        "codesign",
+        "--verify",
+        "--strict",
+        "/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-r02-mac-sign-dar7hn3c/lingxi-service"
+      ],
+      "startUtc": "2026-09-28T11:46:34.723700+00:00",
+      "endUtc": "2026-09-28T11:46:34.738305+00:00",
+      "exit": 0,
+      "log": "check-4.log"
+    }
+  ],
+  "predecessorNote": "real-sign-1/record.json \u6709\u547d\u4ee4\u5c55\u793a\u9057\u6f0f\uff0c\u672c\u8f6e\u4fdd\u7559\u5b8c\u6574\u5b9e\u9645 argv\uff1b\u65e7\u6587\u4ef6\u539f\u6837\u4fdd\u7559",
+  "beforeContentSha256": "87a827dad85635e3481e01b6982d6d48ca2f22e76e92035c8bc2d15a7d2dd320",
+  "afterContentSha256": "87a827dad85635e3481e01b6982d6d48ca2f22e76e92035c8bc2d15a7d2dd320",
+  "signedBinarySha256": "36e6b72b9d7724932239de65d4d6314777184c232fe62e5b71d013f1e4acb2f7",
+  "contentBound": true,
+  "helperStable": true
+}

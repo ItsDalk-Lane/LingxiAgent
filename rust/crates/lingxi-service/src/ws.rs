@@ -94,6 +94,7 @@ struct TicketBook {
 struct TicketRecord {
     principal: crate::auth::Principal,
     connection_kind: ConnectionKind,
+    secure_transport: bool,
     path: String,
     expires_at_unix_ms: u64,
 }
@@ -118,14 +119,19 @@ impl WsTicketService {
     }
 
     /// Issues a ticket bound to (principal, connection kind, path).
+    /// R9-F05: the ticket material comes from the system secure random
+    /// source ONLY — when it fails, NO ticket is issued and the error is
+    /// propagated (the caller answers 5xx; the old predictable xorshift
+    /// fallback is gone).
     pub fn issue(
         &self,
         principal: crate::auth::Principal,
         connection_kind: ConnectionKind,
+        secure_transport: bool,
         path: &str,
         now_ms: u64,
-    ) -> IssuedTicket {
-        let ticket = format!("{WS_TICKET_PREFIX}{}", crate::auth::random_base64url(32));
+    ) -> Result<IssuedTicket, crate::auth::AuthSetupError> {
+        let ticket = format!("{WS_TICKET_PREFIX}{}", crate::auth::random_base64url(32)?);
         let mut inner = self
             .inner
             .lock()
@@ -151,14 +157,15 @@ impl WsTicketService {
             TicketRecord {
                 principal,
                 connection_kind,
+                secure_transport,
                 path: path.to_string(),
                 expires_at_unix_ms: expires_at,
             },
         );
-        IssuedTicket {
+        Ok(IssuedTicket {
             ticket,
             expires_at_unix_ms: expires_at,
-        }
+        })
     }
 
     /// Consumes a ticket (single use — removed whether or not it validates).
@@ -168,6 +175,7 @@ impl WsTicketService {
         &self,
         ticket: &str,
         connection_kind: ConnectionKind,
+        secure_transport: bool,
         path: &str,
         now_ms: u64,
     ) -> Option<crate::auth::Principal> {
@@ -188,6 +196,9 @@ impl WsTicketService {
             return None;
         }
         if record.connection_kind != connection_kind {
+            return None;
+        }
+        if record.secure_transport != secure_transport {
             return None;
         }
         Some(record.principal)
@@ -218,7 +229,7 @@ impl axum::response::IntoResponse for WsUpgradeRejection {
             axum::http::StatusCode::from_u16(self.status)
                 .unwrap_or(axum::http::StatusCode::BAD_REQUEST),
             axum::Json(serde_json::json!({
-                "code": "forbidden",
+                "code": "invalid_message",
                 "message": self.reason,
                 "retryable": false,
                 "details": { "reason": self.reason }
@@ -238,7 +249,7 @@ where
         parts: &mut axum::http::request::Parts,
         _state: &S,
     ) -> Result<Self, Self::Rejection> {
-        use axum::http::{header, HeaderValue};
+        use axum::http::header;
 
         let header_eq = |name: header::HeaderName, expected: &str| -> bool {
             parts
@@ -246,11 +257,11 @@ where
                 .get(&name)
                 .is_some_and(|value| value.as_bytes().eq_ignore_ascii_case(expected.as_bytes()))
         };
-        let header_contains = |name: header::HeaderName, expected: &str| -> bool {
-            parts.headers.get(&name).is_some_and(|value| {
-                std::str::from_utf8(value.as_bytes()).is_ok_and(|text| {
-                    text.to_ascii_lowercase()
-                        .contains(&expected.to_ascii_lowercase())
+        let header_has_token = |name: header::HeaderName, expected: &str| -> bool {
+            parts.headers.get_all(name).iter().any(|value| {
+                value.to_str().is_ok_and(|text| {
+                    text.split(',')
+                        .any(|token| token.trim().eq_ignore_ascii_case(expected))
                 })
             })
         };
@@ -261,7 +272,7 @@ where
                 reason: "ws upgrade requires GET",
             });
         }
-        if !header_contains(header::CONNECTION, "upgrade") {
+        if !header_has_token(header::CONNECTION, "upgrade") {
             return Err(WsUpgradeRejection {
                 status: 400,
                 reason: "missing Connection: upgrade",
@@ -279,17 +290,19 @@ where
                 reason: "unsupported Sec-WebSocket-Version",
             });
         }
-        let key = parts
-            .headers
-            .get(header::SEC_WEBSOCKET_KEY)
-            .and_then(|value: &HeaderValue| value.to_str().ok())
-            .map(str::to_string);
-        let Some(sec_websocket_key) = key else {
+        let mut keys = parts.headers.get_all(header::SEC_WEBSOCKET_KEY).iter();
+        let key = keys.next().and_then(|value| value.to_str().ok());
+        let sec_websocket_key = key.map(str::trim).unwrap_or_default();
+        let key_is_valid = keys.next().is_none()
+            && base64::engine::general_purpose::STANDARD
+                .decode(sec_websocket_key)
+                .is_ok_and(|bytes| bytes.len() == 16);
+        if !key_is_valid {
             return Err(WsUpgradeRejection {
                 status: 400,
-                reason: "missing Sec-WebSocket-Key",
+                reason: "missing or invalid Sec-WebSocket-Key",
             });
-        };
+        }
         let on_upgrade = parts
             .extensions
             .remove::<OnUpgrade>()
@@ -298,7 +311,7 @@ where
                 reason: "connection not upgradable",
             })?;
         Ok(Self {
-            sec_websocket_key,
+            sec_websocket_key: sec_websocket_key.to_string(),
             on_upgrade,
         })
     }
@@ -330,20 +343,91 @@ pub enum WsFrame {
     Pong,
 }
 
-/// Reads one frame. `None` = clean EOF before any byte. Frames larger than
-/// [`crate::limits::WS_FRAME_LIMIT_BYTES`] are protocol errors.
+/// 单一读任务保留帧的中间读取状态；主循环选择事件或定时检查时只会
+/// 取消队列接收，不会取消已读取一半的帧。队列容量 1，不能无限预读。
+pub(crate) struct ClientFrameReader {
+    frames: tokio::sync::mpsc::Receiver<std::io::Result<Option<WsFrame>>>,
+    tasks: tokio::task::JoinSet<()>,
+}
+
+impl ClientFrameReader {
+    pub(crate) fn new<IO>(mut reader: IO) -> Self
+    where
+        IO: AsyncRead + Unpin + Send + 'static,
+    {
+        let (sender, frames) = tokio::sync::mpsc::channel(1);
+        let mut tasks = tokio::task::JoinSet::new();
+        tasks.spawn(async move {
+            loop {
+                let frame = read_client_ws_frame(&mut reader).await;
+                let terminal = !matches!(frame, Ok(Some(_)));
+                if sender.send(frame).await.is_err() || terminal {
+                    break;
+                }
+            }
+        });
+        Self { frames, tasks }
+    }
+
+    pub(crate) async fn recv(&mut self) -> std::io::Result<Option<WsFrame>> {
+        self.frames
+            .recv()
+            .await
+            .unwrap_or_else(|| Err(std::io::Error::other("ws frame reader stopped")))
+    }
+
+    pub(crate) async fn shutdown(&mut self) {
+        self.tasks.shutdown().await;
+    }
+}
+
+/// 读取服务端帧；服务端允许未掩码。首字节前结束返回 `None`，超限帧报协议错误。
 pub async fn read_ws_frame<IO>(io: &mut IO) -> std::io::Result<Option<WsFrame>>
 where
     IO: AsyncRead + Unpin,
 {
+    read_frame(io, false).await
+}
+
+/// 读取已建立连接的客户端帧；RFC 6455 §5.1 要求所有客户端帧（含 ping/close）都掩码。
+pub async fn read_client_ws_frame<IO>(io: &mut IO) -> std::io::Result<Option<WsFrame>>
+where
+    IO: AsyncRead + Unpin,
+{
+    read_frame(io, true).await
+}
+
+async fn read_frame<IO>(io: &mut IO, require_mask: bool) -> std::io::Result<Option<WsFrame>>
+where
+    IO: AsyncRead + Unpin,
+{
     let mut header = [0u8; 2];
-    match io.read_exact(&mut header).await {
+    match io.read_exact(&mut header[..1]).await {
         Ok(_) => {}
         Err(err) if err.kind() == std::io::ErrorKind::UnexpectedEof => return Ok(None),
         Err(err) => return Err(err),
     }
+    io.read_exact(&mut header[1..]).await.map_err(|err| {
+        if err.kind() == std::io::ErrorKind::UnexpectedEof {
+            std::io::Error::new(std::io::ErrorKind::InvalidData, "incomplete frame header")
+        } else {
+            err
+        }
+    })?;
+    if header[0] & 0x70 != 0 || header[0] & 0x80 == 0 {
+        return Err(std::io::Error::new(
+            std::io::ErrorKind::InvalidData,
+            "unsupported fragmented or RSV frame",
+        ));
+    }
     let opcode = header[0] & 0x0f;
     let masked = header[1] & 0x80 != 0;
+    if require_mask && !masked {
+        return Err(std::io::Error::new(
+            std::io::ErrorKind::InvalidData,
+            "unmasked client frame",
+        ));
+    }
     let mut len = u64::from(header[1] & 0x7f);
     if len == 126 {
         let mut ext = [0u8; 2];
@@ -360,7 +444,12 @@ where
             "frame too large",
         ));
     }
-    // Clients MUST mask; an unmasked client frame is a protocol violation.
+    if matches!(opcode, 0x8..=0xA) && len > 125 {
+        return Err(std::io::Error::new(
+            std::io::ErrorKind::InvalidData,
+            "control frame too large",
+        ));
+    }
     let mask = if masked {
         let mut m = [0u8; 4];
         io.read_exact(&mut m).await?;
@@ -378,12 +467,21 @@ where
     Ok(Some(match opcode {
         0x1 => WsFrame::Text(payload),
         0x8 => {
+            if payload.len() == 1 {
+                return Err(std::io::Error::new(
+                    std::io::ErrorKind::InvalidData,
+                    "invalid close frame",
+                ));
+            }
             let code = if payload.len() >= 2 {
                 u16::from_be_bytes([payload[0], payload[1]])
             } else {
                 1005
             };
-            let reason = String::from_utf8_lossy(&payload[2.min(payload.len())..]).into_owned();
+            let reason =
+                String::from_utf8(payload[2.min(payload.len())..].to_vec()).map_err(|_| {
+                    std::io::Error::new(std::io::ErrorKind::InvalidData, "invalid close reason")
+                })?;
             WsFrame::Close(code, reason)
         }
         0x9 => WsFrame::Ping(payload),
@@ -520,20 +618,37 @@ pub fn parse_query_pairs(query: &str) -> Vec<(String, String)> {
 }
 
 fn percent_decode(input: &str) -> String {
+    fn hex_value(b: u8) -> Option<u8> {
+        match b {
+            b'0'..=b'9' => Some(b - b'0'),
+            b'a'..=b'f' => Some(b - b'a' + 10),
+            b'A'..=b'F' => Some(b - b'A' + 10),
+            _ => None,
+        }
+    }
     let bytes = input.as_bytes();
     let mut out = Vec::with_capacity(bytes.len());
     let mut i = 0;
     while i < bytes.len() {
         match bytes[i] {
-            b'%' if i + 2 < bytes.len() => {
-                if let Ok(byte) = u8::from_str_radix(&input[i + 1..i + 3], 16) {
-                    out.push(byte);
-                    i += 3;
-                } else {
+            // Decode on raw bytes instead of slicing &str: '%' followed by
+            // multi-byte UTF-8 must never be sliced mid-char (that panics).
+            b'%' => match (bytes.get(i + 1), bytes.get(i + 2)) {
+                (Some(&hi), Some(&lo)) => match (hex_value(hi), hex_value(lo)) {
+                    (Some(hi), Some(lo)) => {
+                        out.push(hi << 4 | lo);
+                        i += 3;
+                    }
+                    _ => {
+                        out.push(b'%');
+                        i += 1;
+                    }
+                },
+                _ => {
                     out.push(b'%');
                     i += 1;
                 }
-            }
+            },
             b'+' => {
                 out.push(b' ');
                 i += 1;
@@ -579,6 +694,7 @@ mod tests {
             server_node_id: None,
             device_id: Some("device_t".to_string()),
             credential_id: Some("cred_t".to_string()),
+            web_session_id: None,
             connection_kind: ConnectionKindSerde::Lan,
             credential_kind: CredentialKind::DeviceCredential,
             trust_state: TrustState::Lan,
@@ -599,39 +715,93 @@ mod tests {
     fn ticket_lifecycle_single_use_expiry_and_binding() {
         let svc = WsTicketService::new(1000, 8);
         let p = principal("user_a");
-        let issued = svc.issue(p.clone(), ConnectionKind::Local, "/lingxi/v1/ws", 0);
+        // R9-F05: issue() is system-CSPRNG-only and fallible; this machine
+        // has a working source, so issuance succeeds.
+        let issued = svc
+            .issue(p.clone(), ConnectionKind::Local, false, "/lingxi/v1/ws", 0)
+            .expect("system CSPRNG available");
         assert!(issued.ticket.starts_with("hana_ws_"));
 
         // Consume with the right binding → principal.
         let got = svc
-            .consume(&issued.ticket, ConnectionKind::Local, "/lingxi/v1/ws", 500)
+            .consume(
+                &issued.ticket,
+                ConnectionKind::Local,
+                false,
+                "/lingxi/v1/ws",
+                500,
+            )
             .unwrap();
         assert_eq!(got, p);
 
         // Replay: already consumed.
         assert!(svc
-            .consume(&issued.ticket, ConnectionKind::Local, "/lingxi/v1/ws", 600)
+            .consume(
+                &issued.ticket,
+                ConnectionKind::Local,
+                false,
+                "/lingxi/v1/ws",
+                600
+            )
             .is_none());
 
         // Expired ticket.
-        let exp = svc.issue(p.clone(), ConnectionKind::Local, "/lingxi/v1/ws", 0);
+        let exp = svc
+            .issue(p.clone(), ConnectionKind::Local, false, "/lingxi/v1/ws", 0)
+            .expect("system CSPRNG available");
         assert!(svc
-            .consume(&exp.ticket, ConnectionKind::Local, "/lingxi/v1/ws", 2000)
+            .consume(
+                &exp.ticket,
+                ConnectionKind::Local,
+                false,
+                "/lingxi/v1/ws",
+                2000
+            )
             .is_none());
 
         // Wrong connection kind / wrong path.
-        let bound = svc.issue(p.clone(), ConnectionKind::Local, "/lingxi/v1/ws", 0);
+        let bound = svc
+            .issue(p.clone(), ConnectionKind::Local, false, "/lingxi/v1/ws", 0)
+            .expect("system CSPRNG available");
         assert!(svc
-            .consume(&bound.ticket, ConnectionKind::Lan, "/lingxi/v1/ws", 100)
+            .consume(
+                &bound.ticket,
+                ConnectionKind::Lan,
+                false,
+                "/lingxi/v1/ws",
+                100
+            )
             .is_none());
-        let bound2 = svc.issue(p, ConnectionKind::Local, "/lingxi/v1/ws", 0);
+        let bound2 = svc
+            .issue(p, ConnectionKind::Local, false, "/lingxi/v1/ws", 0)
+            .expect("system CSPRNG available");
         assert!(svc
-            .consume(&bound2.ticket, ConnectionKind::Local, "/other", 100)
+            .consume(&bound2.ticket, ConnectionKind::Local, false, "/other", 100)
             .is_none());
 
         // Empty ticket string.
         assert!(svc
-            .consume("", ConnectionKind::Local, "/lingxi/v1/ws", 100)
+            .consume("", ConnectionKind::Local, false, "/lingxi/v1/ws", 100)
+            .is_none());
+
+        // 同一连接类型但安全传输属性不同也不能复用票据。
+        let secure = svc
+            .issue(
+                principal("user_b"),
+                ConnectionKind::Lan,
+                true,
+                "/lingxi/v1/ws",
+                0,
+            )
+            .unwrap();
+        assert!(svc
+            .consume(
+                &secure.ticket,
+                ConnectionKind::Lan,
+                false,
+                "/lingxi/v1/ws",
+                100
+            )
             .is_none());
     }
 
@@ -640,7 +810,8 @@ mod tests {
         let svc = WsTicketService::new(1000, 4);
         let p = principal("user_a");
         for i in 0..10 {
-            svc.issue(p.clone(), ConnectionKind::Local, "/lingxi/v1/ws", i);
+            svc.issue(p.clone(), ConnectionKind::Local, false, "/lingxi/v1/ws", i)
+                .expect("system CSPRNG available");
         }
         let inner = svc.inner.lock().unwrap();
         assert!(
@@ -662,6 +833,86 @@ mod tests {
         let frame = read_ws_frame(&mut server).await.unwrap();
         handle.await.unwrap();
         assert_eq!(frame, Some(WsFrame::Text(payload.to_vec())));
+    }
+
+    #[tokio::test]
+    async fn client_frames_require_mask_for_text_and_control_opcodes() {
+        for opcode in [0x1u8, 0x8, 0x9, 0xA] {
+            let mut unmasked = std::io::Cursor::new(vec![0x80 | opcode, 0]);
+            let err = read_client_ws_frame(&mut unmasked).await.unwrap_err();
+            assert_eq!(err.kind(), std::io::ErrorKind::InvalidData);
+            assert_eq!(err.to_string(), "unmasked client frame");
+        }
+
+        let payload = b"hello";
+        let mask = [0x11, 0x22, 0x33, 0x44];
+        let mut masked = vec![0x81, 0x80 | payload.len() as u8];
+        masked.extend_from_slice(&mask);
+        masked.extend(
+            payload
+                .iter()
+                .enumerate()
+                .map(|(i, byte)| byte ^ mask[i % 4]),
+        );
+        let mut cursor = std::io::Cursor::new(masked);
+        assert_eq!(
+            read_client_ws_frame(&mut cursor).await.unwrap(),
+            Some(WsFrame::Text(payload.to_vec()))
+        );
+    }
+
+    #[tokio::test]
+    async fn malformed_client_frames_fail_closed() {
+        for frame in [
+            vec![0x81],                      // 半截帧头不是正常断开
+            vec![0x01, 0x80],                // 此子集不支持分片
+            vec![0xC1, 0x80],                // 未协商的 RSV 位
+            vec![0x88, 0x81, 0, 0, 0, 0, 0], // close 长度 1 非法
+        ] {
+            let mut cursor = std::io::Cursor::new(frame);
+            assert_eq!(
+                read_client_ws_frame(&mut cursor).await.unwrap_err().kind(),
+                std::io::ErrorKind::InvalidData,
+            );
+        }
+    }
+
+    #[tokio::test]
+    async fn client_reader_keeps_partial_frame_across_other_select_branches() {
+        let (mut client, server) = tokio::io::duplex(128);
+        let (reader, _writer) = tokio::io::split(server);
+        let mut framed = ClientFrameReader::new(reader);
+        let mask = [1_u8, 2, 3, 4];
+        client.write_all(&[0x81, 0x80 | 5, mask[0]]).await.unwrap();
+        tokio::select! {
+            _ = tokio::time::sleep(std::time::Duration::from_millis(5)) => {},
+            frame = framed.recv() => panic!("partial frame was delivered: {frame:?}"),
+        }
+        let payload = b"hello";
+        let mut remainder = mask[1..].to_vec();
+        remainder.extend(
+            payload
+                .iter()
+                .enumerate()
+                .map(|(i, byte)| byte ^ mask[i % 4]),
+        );
+        client.write_all(&remainder).await.unwrap();
+        assert_eq!(
+            framed.recv().await.unwrap(),
+            Some(WsFrame::Text(payload.to_vec()))
+        );
+        framed.shutdown().await;
+    }
+
+    #[test]
+    fn upgrade_rejection_preserves_its_status() {
+        use axum::response::IntoResponse as _;
+        let response = WsUpgradeRejection {
+            status: 400,
+            reason: "missing Upgrade: websocket",
+        }
+        .into_response();
+        assert_eq!(response.status(), axum::http::StatusCode::BAD_REQUEST);
     }
 
     #[tokio::test]
@@ -703,6 +954,21 @@ mod tests {
                 ("empty".to_string(), String::new()),
             ]
         );
+    }
+
+    #[test]
+    fn query_pair_parsing_unicode_and_bad_escapes_never_panic() {
+        // R2-F02 same-root regression: '%' adjacent to multi-byte UTF-8
+        // used to be sliced mid-char and panic. Bad escapes pass through
+        // verbatim; valid ones still decode.
+        let pairs = parse_query_pairs("wsTicket=%zz&x=%e2%80%94&raw=%—&half=%2");
+        assert_eq!(pairs[0], ("wsTicket".to_string(), "%zz".to_string()));
+        assert_eq!(pairs[1], ("x".to_string(), "—".to_string()));
+        assert_eq!(pairs[2], ("raw".to_string(), "%—".to_string()));
+        assert_eq!(pairs[3], ("half".to_string(), "%2".to_string()));
+        // A bare non-ASCII query never panics and round-trips.
+        let pairs = parse_query_pairs("note=中文—é🙂");
+        assert_eq!(pairs, vec![("note".to_string(), "中文—é🙂".to_string())]);
     }
 
     #[test]

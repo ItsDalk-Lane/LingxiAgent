@@ -1,0 +1,4 @@
+start=2026-09-28T11:01:43.395600+00:00
+command=cargo test --offline --locked -p lingxi-service paths::tests --lib
+end=2026-09-28T11:01:43.432255+00:00
+exit=101

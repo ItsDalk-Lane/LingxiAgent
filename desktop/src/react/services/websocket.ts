@@ -24,6 +24,8 @@ import {
 } from './server-connection';
 import { AppError } from '../../../../shared/errors.ts';
 import { errorBus } from '../../../../shared/error-bus.ts';
+import { version as desktopVersion } from '../../../../package.json';
+import { DATA_EPOCH } from '../../../../shared/contract-versions.ts';
 import {
   configureTerminalClientWebSocketGetter,
   requestTerminalSnapshot,
@@ -39,6 +41,11 @@ import {
 
 // ── 模块级 WS 实例 ──
 let _ws: WebSocket | null = null;
+let _wsConnectionIsRust = false;
+let _wsConnectAttempt = 0;
+let _wsHandshakeTimer: ReturnType<typeof setTimeout> | null = null;
+const RUST_WIRE_PROTOCOL = 1;
+const RUST_HANDSHAKE_TIMEOUT_MS = 10_000;
 
 // ── WS 重连状态 ──
 let _wsRetryDelay = 1000;
@@ -88,6 +95,55 @@ export function requestTerminalSnapshotForCurrentSession(state: {
   });
 }
 
+export function isRustWireServerHello(value: unknown): boolean {
+  if (!value || typeof value !== 'object') return false;
+  const hello = value as Record<string, unknown>;
+  return hello.protocol === 'lingxi.wire'
+    && hello.selectedProtocol === RUST_WIRE_PROTOCOL
+    && Number.isInteger(hello.wireProtocolMin)
+    && Number.isInteger(hello.wireProtocolMax)
+    && (hello.wireProtocolMin as number) >= 1
+    && (hello.wireProtocolMin as number) <= RUST_WIRE_PROTOCOL
+    && (hello.wireProtocolMax as number) >= RUST_WIRE_PROTOCOL
+    && (hello.wireProtocolMax as number) >= (hello.wireProtocolMin as number)
+    && hello.dataEpoch === DATA_EPOCH
+    && hello.serverKind === 'lingxi-service'
+    && typeof hello.serverVersion === 'string'
+    && hello.serverVersion.trim().length > 0
+    && (hello.rejectedCaps === undefined
+      || (Array.isArray(hello.rejectedCaps)
+        && hello.rejectedCaps.every((cap) => typeof cap === 'string')));
+}
+
+function clearRustHandshakeTimer(): void {
+  if (_wsHandshakeTimer) clearTimeout(_wsHandshakeTimer);
+  _wsHandshakeTimer = null;
+}
+
+function noteWsFailure(reasonKey: string): void {
+  setStatus('status.disconnected', false);
+  useStore.setState({ wsFailureReasonKey: reasonKey, wsRecoveryNotice: false });
+}
+
+/** 服务重启时先废弃旧连接；等待本轮有效端口和令牌后再重新连接。 */
+export function disconnectWebSocketForRestart(): void {
+  _wsConnectAttempt++;
+  clearRustHandshakeTimer();
+  if (_wsRetryTimer) clearTimeout(_wsRetryTimer);
+  _wsRetryTimer = null;
+  if (_ws) {
+    const previous = _ws;
+    _ws = null;
+    previous.onclose = null;
+    try { previous.close(); } catch { /* 已关闭的旧连接 */ }
+    if (!_wsConnectionIsRust) noteComposerConnectionClosed();
+  }
+  _wsRetryCount = 0;
+  _wsRetryDelay = 1000;
+  noteWsFailure('status.serverRestarting');
+  useStore.setState({ wsState: 'disconnected', wsReconnectAttempt: 0 });
+}
+
 /** 获取当前 WebSocket 实例 */
 export function getWebSocket(): WebSocket | null {
   return _ws;
@@ -95,22 +151,40 @@ export function getWebSocket(): WebSocket | null {
 
 /** 发起 WebSocket 连接 */
 export function connectWebSocket(port?: string, token?: string): void {
+  const attempt = ++_wsConnectAttempt;
   // 如果没有传参，从 Zustand store 获取
   const storeState = useStore.getState();
-  const connection = port !== undefined || token !== undefined
-    ? createLocalServerConnection({
-        serverPort: port || storeState.serverPort,
-        serverToken: token ?? storeState.serverToken,
-      })
-    : resolveServerConnection(storeState);
+  let connection: ServerConnection | null;
+  try {
+    connection = port !== undefined || token !== undefined
+      ? createLocalServerConnection({
+          serverPort: port !== undefined ? port : storeState.serverPort,
+          serverToken: token !== undefined ? token : storeState.serverToken,
+        })
+      : resolveServerConnection(storeState);
+  } catch {
+    disconnectWebSocketForRestart();
+    noteWsFailure('status.wsConnectionFailed');
+    return;
+  }
 
-  if (!connection) return;
+  if (!connection) {
+    disconnectWebSocketForRestart();
+    noteWsFailure('status.wsConnectionFailed');
+    useStore.setState({ wsState: 'disconnected' });
+    return;
+  }
+  if (connection.serverNodeKind === 'lingxi-service') {
+    setStatus('status.disconnected', false);
+    useStore.setState({ wsState: 'reconnecting', wsRecoveryNotice: false });
+  }
   ensureResourceForegroundCatchUp();
 
-  void openConnectionWebSocket(connection).catch((err) => {
+  void openConnectionWebSocket(connection, attempt).catch((err) => {
+    if (attempt !== _wsConnectAttempt) return;
     console.error('[ws] connection setup failed:', err);
     errorBus.report(new AppError('WS_DISCONNECTED'));
-    setStatus('status.disconnected', false);
+    if (!useStore.getState().wsFailureReasonKey) noteWsFailure('status.wsConnectionFailed');
     scheduleReconnect();
   });
 }
@@ -120,32 +194,65 @@ function ensureResourceForegroundCatchUp(): void {
   _resourceForegroundCatchUpCleanup = bindResourceEventForegroundCatchUp((event) => handleServerMessage(event));
 }
 
-async function openConnectionWebSocket(connection: ServerConnection): Promise<void> {
-  const wsTicket = await requestConnectionWsTicket(connection);
+async function openConnectionWebSocket(connection: ServerConnection, attempt: number): Promise<void> {
+  const isRustService = connection.serverNodeKind === 'lingxi-service';
+  let rustHandshakeComplete = false;
 
   if (_wsRetryTimer) { clearTimeout(_wsRetryTimer); _wsRetryTimer = null; }
+  clearRustHandshakeTimer();
   if (_ws) {
-    try { _ws.onclose = null; _ws.close(); } catch { /* silent */ }
+    try { _ws.onclose = null; _ws.close(); } catch { /* 已失效的旧连接 */ }
+    if (!_wsConnectionIsRust) noteComposerConnectionClosed();
+    _ws = null;
   }
+  if (connection.kind === 'local' && connection.credentialKind === 'loopback_token' && !connection.token) {
+    noteWsFailure('status.wsTicketFailed');
+    throw new Error('local server token missing');
+  }
+  let wsTicket: string | null;
+  try {
+    wsTicket = await requestConnectionWsTicket(connection);
+    if (isRustService && connection.kind !== 'local' && !wsTicket) {
+      throw new Error('Rust remote WebSocket ticket missing');
+    }
+  } catch (err) {
+    if (attempt === _wsConnectAttempt) noteWsFailure('status.wsTicketFailed');
+    throw err;
+  }
+  if (attempt !== _wsConnectAttempt) return;
 
-  const url = buildConnectionWsUrl(connection, '/ws', { wsTicket });
+  const url = buildConnectionWsUrl(connection, isRustService ? '/lingxi/v1/ws' : '/ws', { wsTicket });
   _ws = new WebSocket(url);
+  _wsConnectionIsRust = isRustService;
   const socket = _ws;
 
-  _ws.onopen = () => {
+  const failRustSocket = (reasonKey: string, code: number, reason: string) => {
     if (_ws !== socket) return;
+    clearRustHandshakeTimer();
+    noteWsFailure(reasonKey);
+    try { socket.close(code, reason); } catch { /* 浏览器会继续走重连 */ }
+    scheduleReconnect();
+  };
+
+  const markConnectionReady = () => {
+    if (_ws !== socket) return;
+    clearRustHandshakeTimer();
+    const recovered = _wsRetryCount > 0 || Boolean(useStore.getState().wsFailureReasonKey);
     _wsRetryDelay = 1000;
     _wsRetryCount = 0;
-    // 连接代次递增：旧代次上准备中的发送在提交复核时会被拒绝（F2）。
-    noteComposerConnectionOpened();
-    setStatus('status.connected', true);
+    setStatus(isRustService ? 'status.rustCoreUnavailable' : 'status.connected', !isRustService);
     useStore.setState({
       wsState: 'connected',
       wsReconnectAttempt: 0,
+      wsFailureReasonKey: isRustService ? 'status.rustCoreUnavailable' : null,
+      wsRecoveryNotice: recovered,
       compactingSessions: [],
       compactionModeBySession: {},
     });
 
+    if (isRustService) return;
+    // 只有旧服务协议可接收当前桌面聊天发送，Rust 仅声明其 wire 连接已就绪。
+    noteComposerConnectionOpened();
     const s = useStore.getState();
     requestTerminalSnapshotForCurrentSession(s);
     const streamingPaths = [...new Set([...resolveStreamingSessionResumeTargets(s), ...unresolvedComposerSessionPaths(composerOriginConnectionKey(connection))])];
@@ -178,31 +285,78 @@ async function openConnectionWebSocket(connection: ServerConnection): Promise<vo
     });
   };
 
+  _ws.onopen = () => {
+    if (_ws !== socket) return;
+    if (!isRustService) {
+      markConnectionReady();
+      return;
+    }
+    try {
+      socket.send(JSON.stringify({
+        protocol: 'lingxi.wire',
+        clientKind: 'desktop',
+        clientVersion: desktopVersion,
+        protocolMin: RUST_WIRE_PROTOCOL,
+        protocolMax: RUST_WIRE_PROTOCOL,
+        caps: [],
+      }));
+    } catch {
+      failRustSocket('status.wsConnectionFailed', 4400, 'Rust handshake send failed');
+      return;
+    }
+    _wsHandshakeTimer = setTimeout(() => {
+      if (!rustHandshakeComplete) {
+        failRustSocket('status.wsHandshakeTimedOut', 4408, 'Rust wire handshake timeout');
+      }
+    }, RUST_HANDSHAKE_TIMEOUT_MS);
+    (_wsHandshakeTimer as unknown as { unref?: () => void }).unref?.();
+  };
+
   _ws.onmessage = (event: MessageEvent) => {
     if (_ws !== socket) return;
     try {
       const msg = JSON.parse(event.data);
+      if (isRustService && !rustHandshakeComplete) {
+        if (!isRustWireServerHello(msg)) {
+          failRustSocket('status.wsHandshakeFailed', 4409, 'incompatible Rust wire handshake');
+          return;
+        }
+        rustHandshakeComplete = true;
+        markConnectionReady();
+        return;
+      }
+      if (isRustService) return;
       recordResourceEventCursor(msg);
       handleServerMessage(msg, composerOriginConnectionKey(connection));
     } catch (err) {
       console.error('[ws] message parse error:', err);
+      if (isRustService && !rustHandshakeComplete) {
+        failRustSocket('status.wsHandshakeFailed', 4409, 'invalid Rust wire handshake');
+      }
     }
   };
 
   _ws.onclose = () => {
     if (_ws !== socket) return;
-    setStatus('status.disconnected', false);
+    clearRustHandshakeTimer();
+    if (!useStore.getState().wsFailureReasonKey) noteWsFailure('status.wsConnectionClosed');
+    else setStatus('status.disconnected', false);
     // 断连后再不会有后续事件来清「等待助手」pending；streamingSessions 保留
     // （重连 resume 靠它圈目标），pending 必须就地全清，否则挂出永久指示器。
     useStore.getState().clearAllTurnPending?.();
     // 在途发送的回执随连接消失：标记 delivery_unknown（禁止自动重发），
     // 连接代次递增使旧代次的准备任务在提交时被拒绝。
-    noteComposerConnectionClosed();
+    if (!isRustService) noteComposerConnectionClosed();
     scheduleReconnect();
   };
 
   _ws.onerror = () => {
     errorBus.report(new AppError('WS_DISCONNECTED'));
+    if (isRustService) {
+      failRustSocket('status.wsConnectionFailed', 4400, 'Rust connection error');
+    } else {
+      noteWsFailure('status.wsConnectionFailed');
+    }
   };
 }
 

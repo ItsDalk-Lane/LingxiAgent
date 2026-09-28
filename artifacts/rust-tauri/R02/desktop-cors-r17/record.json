@@ -1,0 +1,13 @@
+{
+  "command": "cargo test --manifest-path rust/Cargo.toml -p lingxi-service --test service_health browser_cors_preflight_and_response_keep_origin_boundary -- --nocapture",
+  "exitStatus": 0,
+  "recordedAtUtc": "2026-09-28T09:37:38.851068+00:00",
+  "log": "cargo-test.log",
+  "sourceSha256": {
+    "rust/Cargo.lock": "8dda9f29eb2abe9676f223c82b8d622692ba3dd0747ee8b06f24011444ad4cb9",
+    "rust/crates/lingxi-service/Cargo.toml": "831e105509a3161e26b08dec807dbefb7a66fb32c67fca5e1642d07a5c71d9a7",
+    "rust/crates/lingxi-service/src/lib.rs": "e7074638ea18e302081e68ca7b812eab3bcc1d1f7342f2ff50ce3b2cda99188a",
+    "rust/crates/lingxi-service/tests/service_health.rs": "5018631d7fdf852c643a8aab44e40fdbbfc1732af779763326a5d5f8878c0314"
+  },
+  "head": "9b98c679678888b60ff2e32bd67d3da6fc2f5c4f"
+}

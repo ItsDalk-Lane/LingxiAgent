@@ -14,26 +14,33 @@
 //! - One machine-readable readiness line goes to stdout
 //!   (`LINGXI_SERVICE_READY addr=... home=... source=...`); everything else
 //!   logs to stderr via tracing, so harnesses can wait deterministically.
-//! - SIGINT/SIGTERM trigger graceful shutdown; the instance record is
-//!   removed only if it is still ours; exit code 0 on clean stop, 4 if
-//!   shutdown record-cleanup failed, 5 if the run-database shutdown
-//!   (drain/checkpoint) failed, and 1 on serve failure. Nothing swallowed.
+//! - SIGINT/SIGTERM trigger graceful shutdown under ONE from-signal budget
+//!   (`--shutdown-timeout-ms`; the budget covers transport drain, WS drain,
+//!   DB close and record cleanup — R02 stage-repair R1 / F03). The instance
+//!   record is removed only if it is still ours. Exit codes: 0 = clean stop,
+//!   4 = shutdown record-cleanup failure, 5 = run-database shutdown
+//!   (drain/checkpoint) failure, 6 = a phase exceeded the budget, and
+//!   1 = serve failure. Nothing swallowed.
 
+#[cfg(windows)]
+use std::io::Write;
 use std::process::ExitCode;
 
 use lingxi_service::epoch;
 use lingxi_service::instance::InstanceLockError;
 use lingxi_service::shutdown;
 use lingxi_service::{
-    acquire, parse_cli, prepare_layout, run, InstanceRecord, ServiceConfig, ServiceState,
+    acquire, parse_cli, prepare_layout, run_with_tls, InstanceRecord, ServiceConfig, ServiceState,
     HOME_ENV_VAR, SINGLE_WRITER_BLOCKED_MARKER, STALE_RECORD_MARKER,
 };
 
 const USAGE: &str = r#"usage: lingxi-service [--bind <SOCKADDR>] [--home <DIR>] \
 [--config <FILE>] [--test-mode] [--network-mode <loopback|lan>] \
+[--tls-cert <ABS_PEM>] [--tls-key <ABS_PEM>] \
 [--shutdown-timeout-ms <MS>] [--max-ws-connections <N>] [--db-queue-bound <N>] \
 [--event-subscriber-queue <N>] [--event-reorder-bound <N>] [--max-subscribers <N>] \
-[--log-max-bytes <N>] [--log-max-files <N>] [--http-rate-max <N>]
+[--log-max-bytes <N>] [--log-max-files <N>] [--http-rate-max <N>] \
+[--http-max-in-flight <N>] [--http-request-budget-ms <MS>] [--db-wait-budget-ms <MS>]
 
 Options:
   --bind <SOCKADDR>       Listen address (default 127.0.0.1:0, loopback + ephemeral).
@@ -45,45 +52,124 @@ Options:
                           opt-in: a non-loopback --bind without --network-mode lan
                           is a startup error, and even loopback requests require
                           authentication (no loopback-trust exemption).
-  --shutdown-timeout-ms <MS>  Graceful-shutdown deadline per shutdown phase
-                          (default 10000). A phase that exceeds it prints the
-                          LINGXI_SERVICE_SHUTDOWN_TIMEOUT marker and the shutdown
-                          continues; the exit code reports it.
+  --tls-cert <ABS_PEM>    TLS certificate chain; requires --tls-key.
+  --tls-key <ABS_PEM>     Matching private key; requires --tls-cert. Both paths
+                          must be absolute and are checked before binding.
+  --shutdown-timeout-ms <MS>  TOTAL graceful-shutdown budget, anchored at the
+                          moment the exit signal arrives (default 10000;
+                          supported range 1..=2592000000 = 30 days). One
+                          budget bounds every phase — transport drain, WS drain,
+                          database close, instance-record cleanup — each limited
+                          to what remains. A phase that exceeds the remaining
+                          budget prints the LINGXI_SERVICE_SHUTDOWN_TIMEOUT
+                          marker and the shutdown continues; the exit code
+                          reports it (6), and the process then exits
+                          deterministically even if a foreign thread is wedged.
   --max-ws-connections <N>    Concurrently-upgraded WebSocket connection ceiling
-                          (default 16). Also bounds the managed-task registry:
+                          (default 16; supported range 1..=usize::MAX — a pure
+                          count ceiling, nothing is allocated per configured
+                          slot). Also bounds the managed-task registry:
                           a session task is spawned only after a slot was
                           acquired. Over the ceiling the upgrade is rejected
                           with 503 budget_exceeded (reason=ws_connection_limit).
   --db-queue-bound <N>        Pending jobs of the bounded single-writer DB
-                          queue (default 64). Full = explicit 503 backpressure
+                          queue (default 64; supported range
+                          1..=2305843009213693951 = tokio's bounded-channel
+                          semaphore maximum — more cannot be served by the
+                          channel and is a parse-time exit-2 error, mirrored by
+                          the library's StoreOptions::validate). Full =
+                          explicit 503 backpressure
                           (reason=db_queue_full, retryable=true); nothing is
                           silently buffered without bound.
-  --event-subscriber-queue <N> Per-subscriber event mailbox frames (default 128).
+  --event-subscriber-queue <N> Per-subscriber event mailbox frames (default 128;
+                          supported range 2..=usize::MAX — one event slot plus
+                          one reserved signal slot; the mailbox grows lazily,
+                          so a large ceiling allocates nothing eagerly).
                           A key event that cannot fit detaches the subscription
                           with an explicit snapshot_required (slow_consumer) —
                           key events are never silently dropped.
-  --event-reorder-bound <N>   Per-stream event reorder buffer (default 64).
+  --event-reorder-bound <N>   Per-stream event reorder buffer (default 64;
+                          supported range 1..=usize::MAX; entries are allocated
+                          per published event, not per configured slot).
                           Overflow marks the stream broken and detaches its
                           subscribers with snapshot_required (publication_gap).
   --max-subscribers <N>       Live event subscribers accepted before explicit
-                          rejection (default 256; per-stream default 32). Over
+                          rejection (default 256; per-stream default 32;
+                          supported range 1..=usize::MAX). Over
                           the cap a subscribe is rejected (503 / budget_exceeded,
                           reason=subscriber_limit).
   --log-max-bytes <N>         Bytes per log file before rotation (default
-                          5242880 = 5 MiB; minimum 64). Log files live under
+                          5242880 = 5 MiB; supported range 64..=u64::MAX).
+                          Log files live under
                           {home}/lingxi-service/logs/ and every line is
                           redacted before it reaches stderr or the file.
                           A value below the minimum is a parse-time startup
                           error (exit 2), like every other limit flag.
   --log-max-files <N>         Log files kept on disk, oldest pruned (default 7;
-                          minimum 2 — rotation needs a successor). Below the
+                          supported range 2..=usize::MAX — rotation needs a
+                          successor). Below the
                           minimum is a parse-time startup error (exit 2).
   --http-rate-max <N>         Per-peer HTTP request budget per 10 s window
-                          (default 240). Over the budget a request is
+                          (default 240; supported range 1..=4294967295 — the
+                          limiter's native u32 counter; a larger value is a
+                          parse-time exit-2 error, never a truncation).
+                          Over the budget a request is
                           explicitly rejected with 429
-                          (reason=rate_limited, retryable=true).
+                          (reason=rate_limited, retryable=true). The peer
+                          registry itself is hard-capped (4096 distinct
+                          peers); a stranger beyond the cap is rejected 503
+                          (reason=rate_registry_full) — the registry cannot
+                          grow without bound under a peer flood.
+  --http-max-in-flight <N>  Hard cap of concurrently in-flight HTTP
+                          requests (default 64; supported range
+                          1..=usize::MAX/2 — the 2x connection-cap derivation
+                          below uses a CHECKED multiplication and the bound
+                          keeps it overflow-free). Beyond the cap, admission
+                          rejects with 503 (reason=http_in_flight_limit)
+                          instead of letting requests pile up at the
+                          accept/handler boundary. The same knob also
+                          derives the transport CONNECTION cap (R2-F04):
+                          at most 2×N sockets may be open at once
+                          (in-flight requests each hold one; the equal
+                          margin covers arriving/header-wait and
+                          keep-alive-idle sockets, keeping the
+                          request-level 503 reachable). A socket over the
+                          connection cap — including one that has not sent
+                          a header byte — is closed immediately with the
+                          LINGXI_TRANSPORT_REJECTED marker logged.
+  --http-request-budget-ms <MS>
+                          Per-request wall-clock budget (default 30000;
+                          supported range 1..=2592000000 = 30 days — larger
+                          deadlines risk overflowing platform monotonic-clock
+                          timer arithmetic).
+                          A request whose handling — the body read
+                          included — exceeds the budget is cancelled and
+                          answered 408 (reason=request_timeout): a
+                          slow-body client cannot hold a connection and an
+                          admission slot past the deadline. The SAME budget
+                          also bounds the HEADER WAIT of every accepted
+                          connection (R2-F04): complete headers must
+                          arrive inside the budget or the connection is
+                          closed — a slow- or never-headers client is
+                          inside the transport time budget too. R3-F01: the
+                          budget applies from the ACCEPT moment, before the
+                          first byte — connections are served by hyper's
+                          explicit HTTP/1 builder, so no untimed
+                          protocol-version sniffing state sits between the
+                          accept and the timer.
+  --db-wait-budget-ms <MS>  How long ONE DB submission may wait for queue
+                          capacity (default 10000; supported range
+                          1..=2592000000 = 30 days). On expiry the
+                          submission fails with the same explicit 503
+                          (reason=db_queue_full) as a full queue — the
+                          WAITERS are bounded too, not just the channel.
   --help                  Print this help and exit 0.
   --version               Print server identity/version and exit 0.
+
+Every limit flag has a documented inclusive supported range (R3-F02): an
+out-of-range, zero, duplicate, non-numeric or flag-shaped value is a
+parse-time startup error (exit 2). Conversions are checked — nothing
+truncates, wraps, saturates, or panics deep inside a library.
 
 Data-root precedence: --test-mode > --home > LINGXI_HOME (env) > --config home.
 Every explicitly given source is validated even when it loses precedence.
@@ -112,6 +198,70 @@ fn print_version() {
 
 #[tokio::main]
 async fn main() -> ExitCode {
+    // Windows 客户端的私有记录读取必须先于服务初始化，且失败不得打印凭证。
+    let raw_args: Vec<_> = std::env::args_os().skip(1).collect();
+    if raw_args
+        .first()
+        .is_some_and(|arg| arg == "--read-private-runtime-json")
+    {
+        #[cfg(windows)]
+        {
+            if raw_args.len() != 3 {
+                return ExitCode::from(2);
+            }
+            let Some(name) = raw_args[2].to_str() else {
+                return ExitCode::from(2);
+            };
+            let home = std::path::Path::new(&raw_args[1]);
+            match lingxi_adapters::storage::windows_acl::read_private_runtime_json(home, name) {
+                Ok(bytes) if std::io::stdout().write_all(&bytes).is_ok() => {
+                    return ExitCode::SUCCESS
+                }
+                _ => return ExitCode::from(2),
+            }
+        }
+        #[cfg(not(windows))]
+        return ExitCode::from(2);
+    }
+    // 安装壳的私有产物检查必须早于服务初始化；命令不接收任意执行路径。
+    if let Some(command) = raw_args.first().and_then(|arg| arg.to_str()) {
+        if matches!(
+            command,
+            "--prepare-private-artifacts"
+                | "--seal-private-artifact-tree"
+                | "--verify-private-artifact-tree"
+        ) {
+            #[cfg(windows)]
+            {
+                use lingxi_adapters::storage::windows_acl;
+                let result = match command {
+                    "--prepare-private-artifacts" if raw_args.len() == 2 => {
+                        windows_acl::prepare_private_artifacts(std::path::Path::new(&raw_args[1]))
+                    }
+                    "--seal-private-artifact-tree" if raw_args.len() == 3 => {
+                        windows_acl::seal_private_artifact_tree(
+                            std::path::Path::new(&raw_args[1]),
+                            std::path::Path::new(&raw_args[2]),
+                        )
+                    }
+                    "--verify-private-artifact-tree" if raw_args.len() == 3 => {
+                        windows_acl::verify_private_artifact_tree(
+                            std::path::Path::new(&raw_args[1]),
+                            std::path::Path::new(&raw_args[2]),
+                        )
+                    }
+                    _ => return ExitCode::from(2),
+                };
+                return if result.is_ok() {
+                    ExitCode::SUCCESS
+                } else {
+                    ExitCode::from(2)
+                };
+            }
+            #[cfg(not(windows))]
+            return ExitCode::from(2);
+        }
+    }
     // R02-T07 logging pipeline: ONE global subscriber whose writer redacts
     // every event line (mirror of the incumbent log-redactor semantics)
     // and fans out to stderr plus (once the data home is known) a
@@ -124,14 +274,30 @@ async fn main() -> ExitCode {
         return ExitCode::from(2);
     }
 
+    // Install the OS-level SIGINT/SIGTERM handlers at the EARLIEST point
+    // (R2-F02 follow-up / the once-observed exit -15 with a leftover
+    // instance record): signal-hook registration is synchronous, so after
+    // this call the default kill action is already replaced — a stop signal
+    // can no longer slip through the READY→first-serve-poll window and
+    // leave the instance record behind. Waiting on the signals happens in
+    // the shutdown future below.
+    let shutdown_signals = install_shutdown_signals();
+
     let argv: Vec<String> = std::env::args().skip(1).collect();
-    if argv.iter().any(|a| a == "--help" || a == "-h") {
-        print!("{USAGE}");
-        return ExitCode::SUCCESS;
-    }
-    if argv.iter().any(|a| a == "--version") {
-        print_version();
-        return ExitCode::SUCCESS;
+    // 帮助和版本仅作为独立命令成功退出；其他组合仍须经过严格参数解析。
+    // 否则 `--home --help` 会把缺少目录值的错误伪装成成功。
+    if let [arg] = argv.as_slice() {
+        match arg.as_str() {
+            "--help" | "-h" => {
+                print!("{USAGE}");
+                return ExitCode::SUCCESS;
+            }
+            "--version" => {
+                print_version();
+                return ExitCode::SUCCESS;
+            }
+            _ => {}
+        }
     }
 
     // ---- configuration resolution (R02-T02 step 1) ----
@@ -155,13 +321,22 @@ async fn main() -> ExitCode {
         rate_max: cli
             .http_rate_max
             .unwrap_or(lingxi_service::limits::DEFAULT_HTTP_RATE_MAX),
-        store_options: match cli.db_queue_bound {
-            Some(capacity) => lingxi_service::StoreOptions {
-                queue_capacity: capacity,
-                ..lingxi_service::StoreOptions::default()
-            },
-            None => lingxi_service::StoreOptions::default(),
+        store_options: {
+            let mut options = lingxi_service::StoreOptions::default();
+            if let Some(capacity) = cli.db_queue_bound {
+                options.queue_capacity = capacity;
+            }
+            if let Some(budget) = cli.db_wait_budget_ms {
+                options.queue_wait_timeout_ms = budget;
+            }
+            options
         },
+        http_max_in_flight: cli
+            .http_max_in_flight
+            .unwrap_or(lingxi_service::limits::DEFAULT_HTTP_MAX_IN_FLIGHT),
+        http_request_budget_ms: cli
+            .http_request_budget_ms
+            .unwrap_or(lingxi_service::limits::DEFAULT_HTTP_REQUEST_BUDGET_MS),
         event_limits: lingxi_service::EventLimits {
             subscriber_queue_capacity: cli
                 .event_subscriber_queue
@@ -190,6 +365,17 @@ async fn main() -> ExitCode {
             eprintln!("error: {err}");
             return ExitCode::from(2);
         }
+    };
+    // 证书/私钥错误必须在绑定端口和写入实例记录之前暴露。
+    let tls_acceptor = match cli.tls_cert.as_deref().zip(cli.tls_key.as_deref()) {
+        Some((cert, key)) => match lingxi_service::serve::load_tls_acceptor(cert, key) {
+            Ok(acceptor) => Some(acceptor),
+            Err(err) => {
+                eprintln!("error: TLS startup refused: {err}");
+                return ExitCode::from(2);
+            }
+        },
+        None => None,
     };
 
     // ---- safe log: the effective path and why (before anything is written) ----
@@ -340,13 +526,14 @@ async fn main() -> ExitCode {
     // startup error (exit 2), never an auth-less serve.
     let home_display = layout.home.display().to_string();
     let source_display = config.home_source.to_string();
-    let state = match ServiceState::bootstrap_with_deps(config, &layout, deps).await {
-        Ok(state) => state,
-        Err(err) => {
-            eprintln!("error: {err}");
-            return ExitCode::from(2);
-        }
-    };
+    let state =
+        match ServiceState::bootstrap_with_locked_instance(config, &layout, deps, &guard).await {
+            Ok(state) => state,
+            Err(err) => {
+                eprintln!("error: {err}");
+                return ExitCode::from(2);
+            }
+        };
     tracing::info!(
         local_token_file = %state.auth().local_token_path().display(),
         run_database = %state.storage().db_path().display(),
@@ -360,8 +547,16 @@ async fn main() -> ExitCode {
     let guard = std::sync::Arc::new(std::sync::Mutex::new(guard));
     let ready_guard = std::sync::Arc::clone(&guard);
     let ws_signal = state.ws_shutdown();
+    // R02 stage-repair R1 / F03: record the exact signal moment — the ONE
+    // shutdown budget (transport drain + WS drain + storage close + record
+    // cleanup) is anchored here, not whenever an earlier wait returns.
+    let signal_at = std::sync::Arc::new(std::sync::Mutex::new(None::<std::time::Instant>));
+    let signal_at_writer = std::sync::Arc::clone(&signal_at);
     let shutdown = async move {
-        shutdown_signal().await;
+        wait_shutdown_signal(shutdown_signals).await;
+        *signal_at_writer
+            .lock()
+            .unwrap_or_else(|poisoned| poisoned.into_inner()) = Some(std::time::Instant::now());
         // R02-T06: broadcast the shutdown to the managed WS sessions at
         // SIGNAL time, before the transport's own graceful wait — axum
         // waits for upgraded connections to finish, so the sessions must
@@ -371,42 +566,80 @@ async fn main() -> ExitCode {
     let storage = std::sync::Arc::clone(state.storage());
     let ws_shutdown = state.ws_shutdown();
     let shutdown_timeout_ms = state.config().shutdown_timeout_ms;
-    let result = run(state, shutdown, move |addr| {
-        let mut guard = ready_guard
-            .lock()
-            .unwrap_or_else(|poisoned| poisoned.into_inner());
-        if let Err(err) = guard.publish(addr) {
-            // Startup-critical state cannot be persisted: fail loudly
-            // instead of serving without a published instance record.
-            eprintln!("error: cannot publish instance record: {err}");
-            std::process::exit(3);
-        }
-        tracing::info!(
-            record = %layout.record_path.display(),
-            bind_addr = %addr,
-            "instance record published (atomic write)"
-        );
-        // Readiness contract: exactly one stdout line, machine-parseable.
-        println!("LINGXI_SERVICE_READY addr={addr} home={home_display} source={source_display}");
-        use std::io::Write as _;
-        let _ = std::io::stdout().flush();
-    })
+    let transport = if tls_acceptor.is_some() {
+        "https"
+    } else {
+        "http"
+    };
+    let result = run_with_tls(
+        state,
+        shutdown,
+        move |addr| {
+            let mut guard = ready_guard
+                .lock()
+                .unwrap_or_else(|poisoned| poisoned.into_inner());
+            if let Err(err) = guard.publish_with_transport(addr, transport) {
+                // Startup-critical state cannot be persisted: fail loudly
+                // instead of serving without a published instance record.
+                eprintln!("error: cannot publish instance record: {err}");
+                std::process::exit(3);
+            }
+            tracing::info!(
+                record = %layout.record_path.display(),
+                bind_addr = %addr,
+                "instance record published (atomic write)"
+            );
+            // Readiness contract: exactly one stdout line, machine-parseable.
+            println!(
+                "LINGXI_SERVICE_READY addr={addr} home={home_display} source={source_display}"
+            );
+            use std::io::Write as _;
+            let _ = std::io::stdout().flush();
+        },
+        // The transport drain shares the SAME from-signal budget (F03).
+        Some(std::time::Duration::from_millis(shutdown_timeout_ms)),
+        tls_acceptor,
+    )
     .await;
 
     match result {
-        Ok(()) => {
-            // R02-T06 shutdown coordinator: stop serving (already drained by
-            // the transport above) -> wait/cancel managed WS tasks -> close
-            // the run database (event flush = queue drain + WAL TRUNCATE
-            // checkpoint + worker join) -> remove OUR record -> unlock.
-            // Every phase is bounded by --shutdown-timeout-ms; timeouts are
-            // loud (LINGXI_SERVICE_SHUTDOWN_TIMEOUT) and reported through a
+        Ok(serve) => {
+            // R02-T06 shutdown coordinator: the transport already drained
+            // (or explicitly timed out) above -> wait/cancel managed WS
+            // tasks -> close the run database (event flush = queue drain +
+            // WAL TRUNCATE checkpoint + worker join) -> remove OUR record
+            // -> unlock. ONE budget anchored at the signal moment bounds
+            // every phase (F03); timeouts are loud
+            // (LINGXI_SERVICE_SHUTDOWN_TIMEOUT) and reported through a
             // dedicated exit code.
-            let deadline = std::time::Duration::from_millis(shutdown_timeout_ms);
+            let signalled_at = {
+                let observed = signal_at
+                    .lock()
+                    .unwrap_or_else(|poisoned| poisoned.into_inner());
+                match *observed {
+                    Some(at) => at,
+                    None => {
+                        // run() only returns Ok after the shutdown future
+                        // resolved, and the future records the instant before
+                        // it resolves — a missing stamp is a bug; anchor
+                        // loudly instead of silently restarting the clock.
+                        eprintln!(
+                            "error: shutdown signal time was not recorded; anchoring the \
+                             shutdown budget at transport return (budget accounting degraded)"
+                        );
+                        std::time::Instant::now()
+                    }
+                }
+            };
+            let budget = shutdown::ShutdownBudget::new(
+                signalled_at,
+                std::time::Duration::from_millis(shutdown_timeout_ms),
+            );
             // After `run` returned, the on_ready closure is gone: the Arc is
-            // uniquely ours. Unwrap it so the shutdown coordinator holds the
-            // InstanceGuard directly (a std MutexGuard must not be held
-            // across the coordinator's awaits).
+            // uniquely ours. Unwrap it so the shutdown coordinator owns the
+            // InstanceGuard by value (R9-F04: the record-cleanup phase moves
+            // the guard onto a dedicated cleanup thread so the unified
+            // deadline is real; the guard is not used again after this).
             let guard_mutex = match std::sync::Arc::try_unwrap(guard) {
                 Ok(mutex) => mutex,
                 Err(_) => {
@@ -417,29 +650,28 @@ async fn main() -> ExitCode {
                     return ExitCode::FAILURE;
                 }
             };
-            let mut guard = match guard_mutex.into_inner() {
+            let guard = match guard_mutex.into_inner() {
                 Ok(guard) => guard,
                 Err(poisoned) => poisoned.into_inner(),
             };
             let report = shutdown::graceful_shutdown(
                 &storage,
                 &ws_shutdown,
-                &mut guard,
-                deadline,
-                shutdown_timeout_ms,
+                guard,
+                serve.drain_timed_out,
+                budget,
             )
             .await;
-            match report.exit_code() {
+            let code = report.exit_code();
+            match code {
                 0 => {
                     tracing::info!("lingxi-service stopped cleanly (run database closed, own record removed, lock released)");
-                    ExitCode::SUCCESS
                 }
                 4 => {
                     eprintln!(
                         "error: shutdown instance-record cleanup failed: {}",
                         report.record_error.unwrap_or_else(|| "unknown".to_string())
                     );
-                    ExitCode::from(4)
                 }
                 5 => {
                     eprintln!(
@@ -450,14 +682,30 @@ async fn main() -> ExitCode {
                             .map(|e| e.to_string())
                             .unwrap_or_else(|| "unknown".to_string())
                     );
-                    ExitCode::from(5)
                 }
-                6 => ExitCode::from(6),
+                6 => {
+                    eprintln!(
+                        "error: shutdown exceeded the unified {}ms from-signal budget \
+                         (transport_drain_timed_out={} ws_drain_timed_out={} \
+                         storage_close_timed_out={} record_cleanup_timed_out={})",
+                        shutdown_timeout_ms,
+                        report.transport_drain_timed_out,
+                        report.ws_drain_timed_out,
+                        report.storage_close_timed_out,
+                        report.record_cleanup_timed_out
+                    );
+                }
                 other => {
                     eprintln!("error: unexpected shutdown report exit code {other}");
-                    ExitCode::FAILURE
                 }
             }
+            // F03: deterministic exit — a wedged foreign thread (an
+            // abandoned connection task, a blocking DB join that outlived
+            // its budget) must never hold the process past the budget.
+            use std::io::Write as _;
+            let _ = std::io::stdout().flush();
+            let _ = std::io::stderr().flush();
+            std::process::exit(i32::from(code));
         }
         Err(err) => {
             eprintln!("error: {err}");
@@ -538,32 +786,71 @@ fn config_ignored_summary(cli: &lingxi_service::CliOptions, env_home: Option<&st
     }
 }
 
-/// Resolves on SIGINT or SIGTERM. Logging the received signal keeps the
-/// shutdown path diagnosable without swallowing the shutdown itself.
-async fn shutdown_signal() {
-    let ctrl_c = tokio::signal::ctrl_c();
-    #[cfg(unix)]
-    {
-        let mut term =
-            match tokio::signal::unix::signal(tokio::signal::unix::SignalKind::terminate()) {
-                Ok(term) => term,
-                Err(err) => {
-                    tracing::warn!(%err, "cannot install SIGTERM handler; Ctrl-C still works");
-                    if ctrl_c.await.is_ok() {
-                        tracing::info!("shutdown signal: SIGINT");
-                    }
-                    return;
-                }
-            };
-        tokio::select! {
-            _ = ctrl_c => tracing::info!("shutdown signal: SIGINT"),
-            _ = term.recv() => tracing::info!("shutdown signal: SIGTERM"),
+/// Pre-installed OS signal handlers (installed at process start, awaited at
+/// shutdown). `None` means installation failed loudly at startup and that
+/// signal simply never fires the shutdown path.
+#[cfg(unix)]
+struct ShutdownSignals {
+    interrupt: Option<tokio::signal::unix::Signal>,
+    terminate: Option<tokio::signal::unix::Signal>,
+}
+
+/// Registers the SIGINT/SIGTERM handlers synchronously (signal-hook
+/// registration takes effect immediately — this closes the
+/// READY→first-poll window where a SIGTERM used to hit the default kill
+/// action). Failures are loud, never silent.
+#[cfg(unix)]
+fn install_shutdown_signals() -> ShutdownSignals {
+    use tokio::signal::unix::{signal, SignalKind};
+    let interrupt = match signal(SignalKind::interrupt()) {
+        Ok(sig) => Some(sig),
+        Err(err) => {
+            tracing::warn!(%err, "cannot install SIGINT handler");
+            None
+        }
+    };
+    let terminate = match signal(SignalKind::terminate()) {
+        Ok(sig) => Some(sig),
+        Err(err) => {
+            tracing::warn!(%err, "cannot install SIGTERM handler");
+            None
+        }
+    };
+    ShutdownSignals {
+        interrupt,
+        terminate,
+    }
+}
+
+#[cfg(not(unix))]
+struct ShutdownSignals;
+
+#[cfg(not(unix))]
+fn install_shutdown_signals() -> ShutdownSignals {
+    ShutdownSignals
+}
+
+/// Awaits one of the pre-installed signals; an uninstalled signal never
+/// resolves (it does NOT spuriously trigger the shutdown).
+#[cfg(unix)]
+async fn wait_shutdown_signal(mut signals: ShutdownSignals) {
+    async fn wait_one(sig: &mut Option<tokio::signal::unix::Signal>) {
+        match sig {
+            Some(sig) => {
+                let _ = sig.recv().await;
+            }
+            None => std::future::pending::<()>().await,
         }
     }
-    #[cfg(not(unix))]
-    {
-        if ctrl_c.await.is_ok() {
-            tracing::info!("shutdown signal: Ctrl-C");
-        }
+    tokio::select! {
+        _ = wait_one(&mut signals.interrupt) => tracing::info!("shutdown signal: SIGINT"),
+        _ = wait_one(&mut signals.terminate) => tracing::info!("shutdown signal: SIGTERM"),
+    }
+}
+
+#[cfg(not(unix))]
+async fn wait_shutdown_signal(_signals: ShutdownSignals) {
+    if tokio::signal::ctrl_c().await.is_ok() {
+        tracing::info!("shutdown signal: Ctrl-C");
     }
 }

@@ -319,6 +319,29 @@ describe("artifact-boot: decideBootAction (pure)", () => {
 });
 
 describe("artifact-boot: prepareArtifactServerBoot", () => {
+  it("受信目录守卫覆盖首启、复用和启动前拒绝", async () => {
+    const root = makeTempDir("hana-boot-private-");
+    const keys = makeKeys();
+    const { resourcesPath } = await makeSeedResources(root, keys);
+    const homeDir = path.join(root, "home");
+    const actions: string[] = [];
+    const guard = async (action: string) => { actions.push(action); };
+    const opts = { homeDir, resourcesPath, platformArch: PLATFORM_ARCH,
+      keyset: keys.keyset, log: () => {}, privateArtifactGuard: guard };
+    const first = await prepareArtifactServerBoot(opts);
+    expect(actions).toContain("seal");
+    expect(actions.at(-1)).toBe("verify");
+    actions.length = 0;
+    const second = await prepareArtifactServerBoot(opts);
+    expect(second.versionDir).toBe(first.versionDir);
+    expect(actions).toEqual(["prepare", "verify"]);
+    await expect(prepareArtifactServerBoot({ ...opts,
+      privateArtifactGuard: async (action: string) => {
+        if (action === "verify") throw new Error("unsafe server tree");
+      },
+    })).rejects.toThrow("unsafe server tree");
+  });
+
   it("first run extracts the seed, promotes it to current, and returns its versioned dir", async () => {
     const root = makeTempDir("hana-boot-");
     const keys = makeKeys();

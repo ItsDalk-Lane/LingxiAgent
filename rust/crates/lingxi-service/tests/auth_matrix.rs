@@ -25,10 +25,31 @@ use std::time::Duration;
 
 use lingxi_service::ws::WsFrame;
 use lingxi_service::{
-    prepare_layout, run, HomeSource, NetworkMode, ServiceConfig, ServiceError, ServiceState,
+    prepare_layout, run, HomeSource, NetworkMode, ServeOutcome, ServiceConfig, ServiceError,
+    ServiceState,
 };
 use tokio::io::{AsyncReadExt as _, AsyncWriteExt as _};
 use tokio::net::TcpStream;
+
+fn externally_revoke_credential(home: &std::path::Path, credential_id: &str) -> PathBuf {
+    let layout = prepare_layout(home).expect("existing auth layout");
+    let path = layout
+        .runtime_dir
+        .join(lingxi_service::auth::DEVICE_CREDENTIALS_FILE);
+    let mut registry: serde_json::Value =
+        serde_json::from_slice(&std::fs::read(&path).expect("read credentials registry"))
+            .expect("valid credentials registry");
+    let credential = registry["credentials"]
+        .as_array_mut()
+        .expect("credentials array")
+        .iter_mut()
+        .find(|record| record["credentialId"] == credential_id)
+        .expect("issued credential exists");
+    credential["status"] = serde_json::Value::String("revoked".to_string());
+    std::fs::write(&path, serde_json::to_vec_pretty(&registry).unwrap())
+        .expect("external registry update");
+    path
+}
 
 // ── harness ────────────────────────────────────────────────────────────────
 
@@ -36,8 +57,9 @@ struct TestServer {
     addr: SocketAddr,
     home: PathBuf,
     token: String,
+    storage: std::sync::Arc<lingxi_adapters::storage::RunDatabase>,
     stop: tokio::sync::oneshot::Sender<()>,
-    handle: tokio::task::JoinHandle<Result<(), ServiceError>>,
+    handle: tokio::task::JoinHandle<Result<ServeOutcome, ServiceError>>,
 }
 
 fn synthetic_home(tag: &str) -> PathBuf {
@@ -71,6 +93,7 @@ async fn start_server(tag: &str, ticket_ttl_ms: u64, rate_max: u32, ws_max: usiz
     .await
     .expect("bootstrap");
     let token = state.auth().local_token();
+    let storage = std::sync::Arc::clone(state.storage());
 
     let (stop_tx, stop_rx) = tokio::sync::oneshot::channel::<()>();
     let (ready_tx, ready_rx) = tokio::sync::oneshot::channel::<SocketAddr>();
@@ -83,14 +106,19 @@ async fn start_server(tag: &str, ticket_ttl_ms: u64, rate_max: u32, ws_max: usiz
             |addr| {
                 let _ = ready_tx.send(addr);
             },
+            None, // no drain budget: the test drives the stop signal itself
         )
         .await
     });
-    let addr = ready_rx.await.expect("readiness");
+    let addr = match ready_rx.await {
+        Ok(addr) => addr,
+        Err(err) => panic!("readiness: {err}; service result: {:?}", handle.await),
+    };
     TestServer {
         addr,
         home,
         token,
+        storage,
         stop: stop_tx,
         handle,
     }
@@ -113,6 +141,16 @@ impl TestServer {
 
     fn bearer(&self) -> String {
         format!("Bearer {}", self.token)
+    }
+
+    async fn stop_and_keep_home(self) -> PathBuf {
+        self.stop.send(()).expect("server still listening");
+        tokio::time::timeout(Duration::from_secs(10), self.handle)
+            .await
+            .expect("server shuts down within timeout")
+            .expect("server task join")
+            .expect("clean serve result");
+        self.home
     }
 
     /// Observable server-state snapshot: the run counts of both seeded
@@ -450,9 +488,12 @@ async fn a05_no_credential_is_rejected_without_side_effects() {
     .await;
     assert_eq!(status, 401, "unauthenticated execute must be 401: {body}");
 
-    // Ticket issuance endpoint.
-    let (status, _body) = http(server.addr, "POST", "/lingxi/v1/ws-ticket", &[], None).await;
-    assert_eq!(status, 401);
+    // Ticket issuance endpoint. R14-F01: the R00 leaf scenario
+    // R00-T02-LA-5816DA563ED8 pins the original assertion "无主体返回 403"
+    // (incumbent `server/routes/ws-auth.ts`), so this route denies an
+    // unauthenticated caller with 403, unlike the 401 read/execute paths.
+    let (status, body) = http(server.addr, "POST", "/lingxi/v1/ws-ticket", &[], None).await;
+    assert_eq!(status, 403, "unauthenticated ws-ticket must be 403: {body}");
 
     // WS upgrade without any credential.
     let denied = ws_upgrade(server.addr, "/lingxi/v1/ws", &[])
@@ -593,11 +634,6 @@ async fn a05_expired_and_revoked_device_credentials_are_rejected_without_side_ef
         .as_str()
         .unwrap()
         .to_string();
-    let credential_id = serde_json::from_str::<serde_json::Value>(&body).unwrap()["credentialId"]
-        .as_str()
-        .unwrap()
-        .to_string();
-
     let (status, body) = http(
         server.addr,
         "POST",
@@ -611,6 +647,20 @@ async fn a05_expired_and_revoked_device_credentials_are_rejected_without_side_ef
         .as_str()
         .unwrap()
         .to_string();
+    let revocable_id = serde_json::from_str::<serde_json::Value>(&body).unwrap()["credentialId"]
+        .as_str()
+        .unwrap()
+        .to_string();
+
+    let (status, body) = http(
+        server.addr,
+        "GET",
+        "/lingxi/v1/me",
+        &[("Authorization", &format!("Bearer {revocable_secret}"))],
+        None,
+    )
+    .await;
+    assert_eq!(status, 200, "active device credential must work: {body}");
 
     let before = server.run_counts().await;
 
@@ -635,23 +685,24 @@ async fn a05_expired_and_revoked_device_credentials_are_rejected_without_side_ef
     .await;
     assert_eq!(status, 401);
 
-    // REVOKED credential: denied. (Revocation through the auth service —
-    // the management route has no revoke verb in R02; the registry is the
-    // same store the service authenticates against.)
-    {
-        let layout = prepare_layout(&server.home).unwrap();
-        let svc = lingxi_service::AuthService::bootstrap(&layout, "revoke-helper").unwrap();
-        assert!(svc.revoke_device_credential(&credential_id).unwrap());
-    }
+    // 模拟另一个进程在服务运行期间撤销凭证；下一次 HTTP 请求必须读到磁盘变更。
+    let registry_path = externally_revoke_credential(&server.home, &revocable_id);
+    let revoked_bytes = std::fs::read(&registry_path).unwrap();
+    let (status, body) = http(
+        server.addr,
+        "GET",
+        "/lingxi/v1/me",
+        &[("Authorization", &format!("Bearer {revocable_secret}"))],
+        None,
+    )
+    .await;
+    assert_eq!(
+        status, 401,
+        "externally revoked credential must fail: {body}"
+    );
+    assert!(body.contains("invalid_credential"), "body: {body}");
+    assert_eq!(std::fs::read(&registry_path).unwrap(), revoked_bytes);
 
-    // Wait: the running server loaded its registries at bootstrap; the
-    // revoke above wrote a DIFFERENT process's view. The running server
-    // will NOT see it — authenticating with the expired one is the live
-    // check; for the REVOKED path use the server's own view: issue a
-    // credential bound to a user, then revoke through a second bootstrap
-    // is wrong. Instead: verify revocation at the library layer (already
-    // covered by unit test device_credential_lifecycle) and here verify
-    // the wire effect of the EXPIRED credential + a tampered secret.
     let tampered = format!(
         "{}{}",
         &revocable_secret[..18],
@@ -673,6 +724,266 @@ async fn a05_expired_and_revoked_device_credentials_are_rejected_without_side_ef
         before, after,
         "denied device credentials must not mutate state"
     );
+    server.stop_and_assert_clean().await;
+}
+
+#[tokio::test]
+async fn a05_unreadable_registry_fails_closed_and_recovers() {
+    let server = default_server("a05-registry-reload").await;
+    let (status, body) = http(
+        server.addr,
+        "POST",
+        "/lingxi/v1/devices/credentials",
+        &[("Authorization", &server.bearer())],
+        Some(r#"{"userId":"user_remote","scopes":["chat"]}"#),
+    )
+    .await;
+    assert_eq!(status, 201, "issue device credential: {body}");
+    let secret = serde_json::from_str::<serde_json::Value>(&body).unwrap()["secret"]
+        .as_str()
+        .unwrap()
+        .to_string();
+    let bearer = format!("Bearer {secret}");
+    let (status, _) = http(
+        server.addr,
+        "GET",
+        "/lingxi/v1/me",
+        &[("Authorization", &bearer)],
+        None,
+    )
+    .await;
+    assert_eq!(status, 200);
+
+    let layout = prepare_layout(&server.home).unwrap();
+    let path = layout
+        .runtime_dir
+        .join(lingxi_service::auth::DEVICE_CREDENTIALS_FILE);
+    let valid = std::fs::read(&path).unwrap();
+    std::fs::write(&path, b"{invalid json").unwrap();
+    let (status, body) = http(
+        server.addr,
+        "GET",
+        "/lingxi/v1/me",
+        &[("Authorization", &bearer)],
+        None,
+    )
+    .await;
+    assert_eq!(status, 401, "invalid registry must deny: {body}");
+    assert!(body.contains("auth_registry_unavailable"), "body: {body}");
+    assert_eq!(std::fs::read(&path).unwrap(), b"{invalid json");
+
+    std::fs::remove_file(&path).unwrap();
+    let (status, body) = http(
+        server.addr,
+        "GET",
+        "/lingxi/v1/me",
+        &[("Authorization", &bearer)],
+        None,
+    )
+    .await;
+    assert_eq!(status, 401, "missing registry must deny: {body}");
+    assert!(body.contains("auth_registry_unavailable"), "body: {body}");
+    assert!(
+        !path.exists(),
+        "denied request must not recreate the registry"
+    );
+
+    std::fs::write(&path, valid).unwrap();
+    let (status, body) = http(
+        server.addr,
+        "GET",
+        "/lingxi/v1/me",
+        &[("Authorization", &bearer)],
+        None,
+    )
+    .await;
+    assert_eq!(status, 200, "repaired registry must restore access: {body}");
+
+    let devices_path = layout.runtime_dir.join(lingxi_service::auth::DEVICES_FILE);
+    let valid_devices = std::fs::read(&devices_path).unwrap();
+    std::fs::remove_file(&devices_path).unwrap();
+    let (status, body) = http(
+        server.addr,
+        "GET",
+        "/lingxi/v1/me",
+        &[("Authorization", &bearer)],
+        None,
+    )
+    .await;
+    assert_eq!(status, 401, "missing device registry must deny: {body}");
+    assert!(body.contains("auth_registry_unavailable"), "body: {body}");
+    std::fs::write(&devices_path, valid_devices).unwrap();
+    server.stop_and_assert_clean().await;
+}
+
+#[tokio::test]
+async fn a05_live_device_status_and_expiry_changes_take_effect() {
+    let server = default_server("a05-live-device-state").await;
+    let (status, body) = http(
+        server.addr,
+        "POST",
+        "/lingxi/v1/devices/credentials",
+        &[("Authorization", &server.bearer())],
+        Some(r#"{"userId":"user_remote","scopes":["chat"]}"#),
+    )
+    .await;
+    assert_eq!(status, 201, "issue device credential: {body}");
+    let issued: serde_json::Value = serde_json::from_str(&body).unwrap();
+    let bearer = format!("Bearer {}", issued["secret"].as_str().unwrap());
+    let credential_id = issued["credentialId"].as_str().unwrap();
+    let device_id = issued["deviceId"].as_str().unwrap();
+    let (status, body) = http(
+        server.addr,
+        "GET",
+        "/lingxi/v1/me",
+        &[("Authorization", &bearer)],
+        None,
+    )
+    .await;
+    assert_eq!(status, 200, "active device credential must work: {body}");
+    let layout = prepare_layout(&server.home).unwrap();
+    let credentials_path = layout
+        .runtime_dir
+        .join(lingxi_service::auth::DEVICE_CREDENTIALS_FILE);
+    let mut credentials: serde_json::Value =
+        serde_json::from_slice(&std::fs::read(&credentials_path).unwrap()).unwrap();
+    let record = credentials["credentials"]
+        .as_array_mut()
+        .unwrap()
+        .iter_mut()
+        .find(|record| record["credentialId"] == credential_id)
+        .unwrap();
+    record["expiresAtUnixMs"] = serde_json::json!(1);
+    std::fs::write(
+        &credentials_path,
+        serde_json::to_vec_pretty(&credentials).unwrap(),
+    )
+    .unwrap();
+    let (status, body) = http(
+        server.addr,
+        "GET",
+        "/lingxi/v1/me",
+        &[("Authorization", &bearer)],
+        None,
+    )
+    .await;
+    assert_eq!(status, 401, "external expiry must deny: {body}");
+
+    credentials["credentials"]
+        .as_array_mut()
+        .unwrap()
+        .iter_mut()
+        .find(|record| record["credentialId"] == credential_id)
+        .unwrap()["expiresAtUnixMs"] = serde_json::Value::Null;
+    std::fs::write(
+        &credentials_path,
+        serde_json::to_vec_pretty(&credentials).unwrap(),
+    )
+    .unwrap();
+    let (status, body) = http(
+        server.addr,
+        "GET",
+        "/lingxi/v1/me",
+        &[("Authorization", &bearer)],
+        None,
+    )
+    .await;
+    assert_eq!(status, 200, "restored expiry must restore access: {body}");
+
+    let devices_path = layout.runtime_dir.join(lingxi_service::auth::DEVICES_FILE);
+    let mut devices: serde_json::Value =
+        serde_json::from_slice(&std::fs::read(&devices_path).unwrap()).unwrap();
+    let device = devices["devices"]
+        .as_array_mut()
+        .unwrap()
+        .iter_mut()
+        .find(|record| record["deviceId"] == device_id)
+        .unwrap();
+    device["status"] = serde_json::Value::String("revoked".to_string());
+    std::fs::write(&devices_path, serde_json::to_vec_pretty(&devices).unwrap()).unwrap();
+    let (status, body) = http(
+        server.addr,
+        "GET",
+        "/lingxi/v1/me",
+        &[("Authorization", &bearer)],
+        None,
+    )
+    .await;
+    assert_eq!(status, 401, "external device revoke must deny: {body}");
+    server.stop_and_assert_clean().await;
+}
+
+#[tokio::test]
+async fn a05_ws_ticket_and_live_socket_observe_external_revocation() {
+    let server = default_server("a05-ws-revocation").await;
+    let issue = |server: &TestServer| {
+        let addr = server.addr;
+        let bearer = server.bearer();
+        async move {
+            let (status, body) = http(
+                addr,
+                "POST",
+                "/lingxi/v1/devices/credentials",
+                &[("Authorization", &bearer)],
+                Some(r#"{"userId":"user_remote","scopes":["chat"]}"#),
+            )
+            .await;
+            assert_eq!(status, 201, "issue device credential: {body}");
+            let value: serde_json::Value = serde_json::from_str(&body).unwrap();
+            (
+                value["credentialId"].as_str().unwrap().to_string(),
+                value["secret"].as_str().unwrap().to_string(),
+            )
+        }
+    };
+
+    let (ticket_id, ticket_secret) = issue(&server).await;
+    let (status, body) = http(
+        server.addr,
+        "POST",
+        "/lingxi/v1/ws-ticket",
+        &[("Authorization", &format!("Bearer {ticket_secret}"))],
+        None,
+    )
+    .await;
+    assert_eq!(status, 200, "issue device ticket: {body}");
+    let ticket = serde_json::from_str::<serde_json::Value>(&body).unwrap()["ticket"]
+        .as_str()
+        .unwrap()
+        .to_string();
+    externally_revoke_credential(&server.home, &ticket_id);
+    let denied = ws_upgrade(
+        server.addr,
+        &format!("/lingxi/v1/ws?wsTicket={ticket}"),
+        &[],
+    )
+    .await
+    .expect_err("revoked ticket principal must not upgrade");
+    assert!(denied.starts_with("HTTP/1.1 401"), "ticket: {denied}");
+
+    let (live_id, live_secret) = issue(&server).await;
+    let mut ws = ws_upgrade(
+        server.addr,
+        "/lingxi/v1/ws",
+        &[("Authorization", &format!("Bearer {live_secret}"))],
+    )
+    .await
+    .expect("active device socket upgrades");
+    let hello = serde_json::json!({
+        "protocol": "lingxi.wire", "clientKind": "test", "clientVersion": "0",
+        "protocolMin": 1, "protocolMax": 1,
+    });
+    client_ws_send(&mut ws, hello.to_string().as_bytes()).await;
+    let _ = frame_text(&client_ws_read(&mut ws).await);
+    externally_revoke_credential(&server.home, &live_id);
+    client_ws_send(
+        &mut ws,
+        br#"{"type":"session_read","sessionId":"sess_local_alpha"}"#,
+    )
+    .await;
+    let error = frame_text(&client_ws_read(&mut ws).await);
+    assert!(error.contains("invalid_credential"), "error: {error}");
+    assert_eq!(close_code(&client_ws_read(&mut ws).await), Some(4401));
     server.stop_and_assert_clean().await;
 }
 
@@ -1020,6 +1331,87 @@ async fn a06_ws_origin_and_host_matrix() {
 }
 
 #[tokio::test]
+async fn a06_invalid_ws_upgrade_keeps_its_protocol_status() {
+    let server = default_server("a06-upgrade-status").await;
+    let bearer = server.bearer();
+    let key = client_ws_key();
+    for headers in [
+        format!("Upgrade: websocket\r\nConnection: Upgrade, close\r\nSec-WebSocket-Key: {key}\r\n"),
+        "Upgrade: websocket\r\nConnection: Upgrade, close\r\nSec-WebSocket-Version: 13\r\n"
+            .to_string(),
+    ] {
+        let raw = format!(
+            "GET /lingxi/v1/ws HTTP/1.1\r\nHost: {}\r\nAuthorization: {bearer}\r\n{headers}\r\n",
+            server.addr
+        );
+        let response = http_raw(server.addr, &raw).await;
+        assert!(
+            response.starts_with("HTTP/1.1 400"),
+            "invalid upgrade shape must be 400: {response}"
+        );
+        assert!(response.contains("invalid_message"), "response: {response}");
+    }
+    server.stop_and_assert_clean().await;
+}
+
+#[tokio::test]
+async fn a06_unmasked_client_frame_closes_with_protocol_error() {
+    let server = default_server("a06-unmasked-frame").await;
+    let mut ws = ws_upgrade(
+        server.addr,
+        "/lingxi/v1/ws",
+        &[("Authorization", &server.bearer())],
+    )
+    .await
+    .expect("owner socket upgrades");
+    ws.write_all(&[0x81, 0x00]).await.unwrap();
+    let close = tokio::time::timeout(Duration::from_secs(2), client_ws_read(&mut ws))
+        .await
+        .expect("server closes unmasked client frame");
+    assert_eq!(close_code(&close), Some(1002));
+
+    // 错误连接不能影响下一条合法连接。
+    let mut fresh = ws_upgrade(
+        server.addr,
+        "/lingxi/v1/ws",
+        &[("Authorization", &server.bearer())],
+    )
+    .await
+    .expect("fresh owner socket upgrades");
+    let hello = serde_json::json!({
+        "protocol": "lingxi.wire", "clientKind": "test", "clientVersion": "0",
+        "protocolMin": 1, "protocolMax": 1,
+    });
+    client_ws_send(&mut fresh, hello.to_string().as_bytes()).await;
+    assert!(frame_text(&client_ws_read(&mut fresh).await).contains("selectedProtocol"));
+    server.stop_and_assert_clean().await;
+}
+
+#[tokio::test]
+async fn a06_trailing_slashes_do_not_inherit_registered_route_permissions() {
+    let server = default_server("a06-route-exactness").await;
+    for path in [
+        "/lingxi/v1/health/",
+        "/lingxi/v1/me/",
+        "/lingxi/v1/sessions/",
+        "/lingxi/v1/ws/",
+    ] {
+        let (status, body) = http(server.addr, "GET", path, &[], None).await;
+        assert_eq!(status, 401, "stranger {path}: {body}");
+        let (status, body) = http(
+            server.addr,
+            "GET",
+            path,
+            &[("Authorization", &server.bearer())],
+            None,
+        )
+        .await;
+        assert_eq!(status, 404, "owner unknown route {path}: {body}");
+    }
+    server.stop_and_assert_clean().await;
+}
+
+#[tokio::test]
 async fn a06_expired_and_replayed_ws_tickets_are_rejected() {
     // Ticket TTL is 80ms in this server instance.
     let server = start_server("a06-ticket", 80, 10_000, 4).await;
@@ -1156,6 +1548,93 @@ async fn a06_cli_shape_full_business_roundtrip() {
 }
 
 #[tokio::test]
+async fn a07_closed_storage_returns_http_error_without_run_or_completion_event() {
+    let server = default_server("a07-http-storage-error").await;
+    let bearer = server.bearer();
+    let (status, body) = http(
+        server.addr,
+        "GET",
+        "/lingxi/v1/sessions",
+        &[("Authorization", &bearer)],
+        None,
+    )
+    .await;
+    assert_eq!(status, 200, "正常存储应能读取会话: {body}");
+
+    server
+        .storage
+        .close()
+        .await
+        .expect("close test database queue");
+    for (method, path, request_body) in [
+        ("GET", "/lingxi/v1/sessions", None),
+        ("GET", "/lingxi/v1/sessions/sess_local_alpha", None),
+        ("GET", "/lingxi/v1/sessions/sess_local_alpha/events", None),
+        (
+            "POST",
+            "/lingxi/v1/sessions/sess_local_alpha/execute",
+            Some(r#"{"input":"must not commit"}"#),
+        ),
+    ] {
+        let (status, body) = http(
+            server.addr,
+            method,
+            path,
+            &[("Authorization", &bearer)],
+            request_body,
+        )
+        .await;
+        assert_eq!(status, 500, "存储关闭后 {method} {path}: {body}");
+        let error: serde_json::Value = serde_json::from_str(&body).expect("structured error");
+        assert_eq!(error["code"], "internal", "{path}: {error}");
+        assert_eq!(error["details"]["reason"], "db_failure", "{path}: {error}");
+        assert_eq!(error["details"]["retryable"], false, "{path}: {error}");
+        assert_eq!(
+            error["details"]["causeId"], "storage.queue_closed",
+            "{path}: {error}"
+        );
+        assert!(error.get("runId").is_none(), "失败响应不能携带成功 runId");
+    }
+
+    let home = server.stop_and_keep_home().await;
+    let layout = prepare_layout(&home).expect("restart layout");
+    let config = ServiceConfig {
+        bind_addr: "127.0.0.1:0".parse().unwrap(),
+        data_home: home.clone(),
+        home_source: HomeSource::Cli,
+        network_mode: NetworkMode::Loopback,
+        shutdown_timeout_ms: lingxi_service::DEFAULT_SHUTDOWN_TIMEOUT_MS,
+    };
+    let restarted = ServiceState::bootstrap(config, &layout)
+        .await
+        .expect("restart database");
+    assert_eq!(
+        restarted
+            .storage()
+            .count_runs("sess_local_alpha")
+            .await
+            .expect("reloaded run count"),
+        0,
+        "重启后不得出现失败请求的 run"
+    );
+    assert_eq!(
+        restarted
+            .storage()
+            .query_one_text(
+                "SELECT COUNT(*) FROM key_events WHERE event_id LIKE '%-done'",
+                Vec::new(),
+            )
+            .await
+            .expect("completion event query")
+            .as_deref(),
+        Some("0"),
+        "重启后不得出现完成事件"
+    );
+    restarted.storage().close().await.expect("close restart DB");
+    let _ = std::fs::remove_dir_all(home);
+}
+
+#[tokio::test]
 async fn limits_body_size_and_rate_and_ws_ceiling() {
     // Dedicated instance: tiny rate budget (5/window), 1 WS connection.
     let server = start_server("limits", 80, 5, 1).await;
@@ -1233,4 +1712,545 @@ async fn a05_loopback_mode_refuses_non_loopback_bind_at_config_layer() {
     ])
     .unwrap();
     assert_eq!(ok.network_mode, NetworkMode::Lan);
+}
+
+#[tokio::test]
+async fn r00_account_password_web_cookie_and_logout_have_real_state() {
+    let server = default_server("r00-account-web-cookie").await;
+    let owner = server.bearer();
+    let path = prepare_layout(&server.home)
+        .unwrap()
+        .runtime_dir
+        .join("management.json");
+    let before = std::fs::read(&path).unwrap();
+    let (status, _) = http(
+        server.addr,
+        "PUT",
+        "/lingxi/v1/access/account/profile",
+        &[("Authorization", &owner)],
+        Some(r#"{"username":"bad/name"}"#),
+    )
+    .await;
+    assert_eq!(status, 400);
+    assert_eq!(
+        before,
+        std::fs::read(&path).unwrap(),
+        "无效资料不能改状态或审计"
+    );
+
+    let (status, body) = http(
+        server.addr,
+        "PUT",
+        "/lingxi/v1/access/account/profile",
+        &[("Authorization", &owner)],
+        Some(r#"{"username":"alice","displayName":"Alice"}"#),
+    )
+    .await;
+    assert_eq!(status, 200, "{body}");
+    let account: serde_json::Value = serde_json::from_str(&body).unwrap();
+    assert_eq!(account["account"]["username"], "alice");
+    let (status, body) = http(
+        server.addr,
+        "PUT",
+        "/lingxi/v1/access/account/password",
+        &[("Authorization", &owner)],
+        Some(r#"{"password":"correct horse battery staple"}"#),
+    )
+    .await;
+    assert_eq!(status, 200, "{body}");
+    assert_eq!(
+        serde_json::from_str::<serde_json::Value>(&body).unwrap()["account"]["passwordSet"],
+        true
+    );
+    let login_body =
+        r#"{"username":"alice","password":"correct horse battery staple","clientKind":"mobile"}"#;
+    let raw = http_raw(server.addr, &format!("POST /lingxi/v1/web-auth/login HTTP/1.1\r\nHost: {}\r\nContent-Type: application/json\r\nContent-Length: {}\r\nConnection: close\r\n\r\n{}", server.addr, login_body.len(), login_body)).await;
+    assert!(raw.starts_with("HTTP/1.1 200"), "登录应成功: {raw}");
+    let cookie_line = raw
+        .lines()
+        .find(|line| line.to_ascii_lowercase().starts_with("set-cookie:"))
+        .unwrap();
+    assert!(
+        cookie_line.contains("HttpOnly")
+            && cookie_line.contains("SameSite=Strict")
+            && cookie_line.contains("Max-Age=1209600")
+    );
+    assert!(
+        !cookie_line.contains("; Secure"),
+        "plain HTTP must not advertise a TLS cookie"
+    );
+    let cookie = cookie_line
+        .split_once(':')
+        .unwrap()
+        .1
+        .trim()
+        .split(';')
+        .next()
+        .unwrap()
+        .to_string();
+    assert!(cookie.starts_with("hana_session=hana_web_"));
+    let (status, body) = http(
+        server.addr,
+        "GET",
+        "/lingxi/v1/web-auth/session",
+        &[("Cookie", &cookie)],
+        None,
+    )
+    .await;
+    assert_eq!(status, 200);
+    let web: serde_json::Value = serde_json::from_str(&body).unwrap();
+    assert_eq!(web["authenticated"], true);
+    assert_eq!(web["principal"]["credentialKind"], "web_session");
+    assert!(
+        !web["principal"]["scopes"]
+            .as_array()
+            .unwrap()
+            .contains(&serde_json::json!("settings.write")),
+        "mobile profile must have restricted scopes"
+    );
+    assert!(
+        !body.contains("hana_web_"),
+        "session secret must not appear in JSON"
+    );
+    let priority = r#"{"credential":"invalid-device-secret","username":"alice","password":"correct horse battery staple"}"#;
+    let (status, _) = http(
+        server.addr,
+        "POST",
+        "/lingxi/v1/web-auth/login",
+        &[],
+        Some(priority),
+    )
+    .await;
+    assert_eq!(
+        status, 403,
+        "present credential must take precedence over password fallback"
+    );
+    let desktop_login =
+        r#"{"username":"alice","password":"correct horse battery staple","clientKind":"desktop"}"#;
+    let desktop_raw = http_raw(server.addr, &format!("POST /lingxi/v1/web-auth/login HTTP/1.1\r\nHost: {}\r\nX-Forwarded-Proto: https\r\nContent-Type: application/json\r\nContent-Length: {}\r\nConnection: close\r\n\r\n{}", server.addr, desktop_login.len(), desktop_login)).await;
+    assert!(
+        desktop_raw.starts_with("HTTP/1.1 200"),
+        "desktop login should succeed locally: {desktop_raw}"
+    );
+    let desktop_cookie_line = desktop_raw
+        .lines()
+        .find(|line| line.to_ascii_lowercase().starts_with("set-cookie:"))
+        .unwrap();
+    assert!(
+        !desktop_cookie_line.contains("; Secure"),
+        "forwarded header cannot spoof TLS"
+    );
+    let desktop_cookie = desktop_cookie_line
+        .split_once(':')
+        .unwrap()
+        .1
+        .trim()
+        .split(';')
+        .next()
+        .unwrap()
+        .to_string();
+    let (status, body) = http(
+        server.addr,
+        "GET",
+        "/lingxi/v1/web-auth/session",
+        &[("Cookie", &desktop_cookie)],
+        None,
+    )
+    .await;
+    assert_eq!(status, 200);
+    assert!(
+        serde_json::from_str::<serde_json::Value>(&body).unwrap()["principal"]["scopes"]
+            .as_array()
+            .unwrap()
+            .contains(&serde_json::json!("studio.owner"))
+    );
+    let (status, body) = http(
+        server.addr,
+        "GET",
+        "/lingxi/v1/me",
+        &[("Cookie", &cookie)],
+        None,
+    )
+    .await;
+    assert_eq!(status, 200, "{body}");
+    let me: serde_json::Value = serde_json::from_str(&body).unwrap();
+    assert_eq!(me["serverNodeKind"], "lingxi-service");
+    assert!(me["capabilities"]
+        .as_array()
+        .unwrap()
+        .contains(&serde_json::json!("chat")));
+    let raw = http_raw(server.addr, &format!("POST /lingxi/v1/web-auth/logout HTTP/1.1\r\nHost: {}\r\nCookie: {cookie}\r\nContent-Length: 0\r\nConnection: close\r\n\r\n", server.addr)).await;
+    assert!(raw.starts_with("HTTP/1.1 200") && raw.contains("Max-Age=0"));
+    let (status, body) = http(
+        server.addr,
+        "GET",
+        "/lingxi/v1/web-auth/session",
+        &[("Cookie", &cookie)],
+        None,
+    )
+    .await;
+    assert_eq!(status, 200);
+    assert_eq!(
+        serde_json::from_str::<serde_json::Value>(&body).unwrap()["authenticated"],
+        false
+    );
+    let (status, _) = http(
+        server.addr,
+        "GET",
+        "/lingxi/v1/me",
+        &[("Cookie", &cookie)],
+        None,
+    )
+    .await;
+    assert_eq!(status, 401);
+    let (status, _) = http(
+        server.addr,
+        "GET",
+        "/lingxi/v1/me",
+        &[("Cookie", &desktop_cookie)],
+        None,
+    )
+    .await;
+    assert_eq!(
+        status, 200,
+        "logging out one session must preserve other sessions"
+    );
+    let (status, body) = http(
+        server.addr,
+        "DELETE",
+        "/lingxi/v1/access/account/password",
+        &[("Authorization", &owner)],
+        None,
+    )
+    .await;
+    assert_eq!(status, 200, "{body}");
+    assert_eq!(
+        serde_json::from_str::<serde_json::Value>(&body).unwrap()["account"]["passwordSet"],
+        false
+    );
+    let (status, _) = http(
+        server.addr,
+        "POST",
+        "/lingxi/v1/web-auth/login",
+        &[],
+        Some(login_body),
+    )
+    .await;
+    assert_eq!(status, 403, "removed password must reject fresh login");
+    server.stop_and_assert_clean().await;
+}
+
+#[tokio::test]
+async fn r00_access_devices_pairing_thinking_qr_and_static_boundaries() {
+    let server = default_server("r00-management-boundaries").await;
+    let owner = server.bearer();
+    let (status, body) = http(
+        server.addr,
+        "GET",
+        "/lingxi/v1/access/summary",
+        &[("Authorization", &owner)],
+        None,
+    )
+    .await;
+    assert_eq!(status, 200, "{body}");
+    let summary: serde_json::Value = serde_json::from_str(&body).unwrap();
+    assert_eq!(summary["network"]["actualPort"], server.addr.port());
+    assert_eq!(summary["account"]["passwordSet"], false);
+    let (status, _) = http(server.addr, "GET", "/lingxi/v1/access/summary", &[], None).await;
+    assert_eq!(status, 401);
+    let (status, body) = http(
+        server.addr,
+        "GET",
+        "/lingxi/v1/access/mobile-qr.svg",
+        &[("Authorization", &owner)],
+        None,
+    )
+    .await;
+    assert_eq!(status, 400, "LAN unavailable must be explicit: {body}");
+    let manager_file = prepare_layout(&server.home)
+        .unwrap()
+        .runtime_dir
+        .join("management.json");
+    let before_invalid_network = std::fs::read(&manager_file).unwrap();
+    let (status, _) = http(
+        server.addr,
+        "PUT",
+        "/lingxi/v1/access/network",
+        &[("Authorization", &owner)],
+        Some(r#"{"mode":"lan","listenPort":80}"#),
+    )
+    .await;
+    assert_eq!(status, 400);
+    assert_eq!(
+        std::fs::read(&manager_file).unwrap(),
+        before_invalid_network,
+        "invalid network request must not write state or audit"
+    );
+    let (status, body) = http(
+        server.addr,
+        "PUT",
+        "/lingxi/v1/access/network",
+        &[("Authorization", &owner)],
+        Some(r#"{"mode":"loopback","listenPort":14500,"publicBaseUrl":"https://example.test"}"#),
+    )
+    .await;
+    assert_eq!(status, 200, "{body}");
+    let (status, body) = http(
+        server.addr,
+        "GET",
+        "/lingxi/v1/access/mobile-qr.svg",
+        &[("Authorization", &owner)],
+        None,
+    )
+    .await;
+    assert_eq!(status, 200);
+    assert!(body.starts_with("<svg ") && body.contains("<path fill=\"#000\""));
+    let (status, body) = http(
+        server.addr,
+        "POST",
+        "/lingxi/v1/access/mobile-credentials",
+        &[("Authorization", &owner)],
+        Some("{}"),
+    )
+    .await;
+    assert_eq!(status, 200, "{body}");
+    let issued: serde_json::Value = serde_json::from_str(&body).unwrap();
+    assert_eq!(issued["accessUrl"], "https://example.test/mobile/");
+    let (status, body) = http(
+        server.addr,
+        "PUT",
+        "/lingxi/v1/access/network",
+        &[("Authorization", &owner)],
+        Some(r#"{"mode":"loopback","listenPort":14500}"#),
+    )
+    .await;
+    assert_eq!(status, 200, "{body}");
+    assert_eq!(
+        serde_json::from_str::<serde_json::Value>(&body).unwrap()["network"]["publicBaseUrl"],
+        "https://example.test",
+        "omitted public URL must preserve the saved value"
+    );
+    let (status, body) = http(
+        server.addr,
+        "PUT",
+        "/lingxi/v1/access/network",
+        &[("Authorization", &owner)],
+        Some(r#"{"mode":"loopback","listenPort":14500,"publicBaseUrl":null}"#),
+    )
+    .await;
+    assert_eq!(status, 200, "{body}");
+    assert!(
+        serde_json::from_str::<serde_json::Value>(&body).unwrap()["network"]["publicBaseUrl"]
+            .is_null()
+    );
+    let (status, body) = http(
+        server.addr,
+        "GET",
+        "/lingxi/v1/access/mobile-qr.svg",
+        &[("Authorization", &owner)],
+        None,
+    )
+    .await;
+    assert_eq!(
+        status, 400,
+        "cleared public URL and unavailable LAN must not reuse the old URL: {body}"
+    );
+    let secret = issued["secret"].as_str().unwrap();
+    let cred_id = issued["credential"]["credentialId"].as_str().unwrap();
+    let (status, body) = http(
+        server.addr,
+        "GET",
+        "/lingxi/v1/devices",
+        &[("Authorization", &owner)],
+        None,
+    )
+    .await;
+    assert_eq!(status, 200);
+    assert!(!body.contains(secret) && !body.contains("secretHash") && !body.contains("secretSalt"));
+    let (status, _) = http(
+        server.addr,
+        "GET",
+        "/lingxi/v1/devices",
+        &[("Authorization", &format!("Bearer {secret}"))],
+        None,
+    )
+    .await;
+    assert_eq!(status, 403, "device cannot read management list");
+    let (status, body) = http(
+        server.addr,
+        "POST",
+        "/lingxi/v1/devices/pairing-sessions",
+        &[("Authorization", &owner)],
+        Some(r#"{"requestedDevice":{"deviceKind":"mobile","displayName":"Phone"}}"#),
+    )
+    .await;
+    assert_eq!(status, 200, "{body}");
+    let pairing: serde_json::Value = serde_json::from_str(&body).unwrap();
+    let pair_id = pairing["pairingSessionId"].as_str().unwrap();
+    let code = pairing["userCode"].as_str().unwrap();
+    let approve_body = serde_json::json!({"userCode": code}).to_string();
+    let (status, body) = http(
+        server.addr,
+        "POST",
+        &format!("/lingxi/v1/devices/pairing-sessions/{pair_id}/approve"),
+        &[("Authorization", &owner)],
+        Some(&approve_body),
+    )
+    .await;
+    assert_eq!(status, 200, "{body}");
+    let paired: serde_json::Value = serde_json::from_str(&body).unwrap();
+    assert!(paired["secret"].as_str().unwrap().starts_with("hana_dev_"));
+    let (status, _) = http(
+        server.addr,
+        "POST",
+        &format!("/lingxi/v1/devices/pairing-sessions/{pair_id}/approve"),
+        &[("Authorization", &owner)],
+        Some(&approve_body),
+    )
+    .await;
+    assert_eq!(status, 400, "pairing code must be one-time");
+    let (status, _) = http(
+        server.addr,
+        "POST",
+        &format!("/lingxi/v1/devices/credentials/{cred_id}/revoke"),
+        &[("Authorization", &owner)],
+        Some("{}"),
+    )
+    .await;
+    assert_eq!(status, 200);
+    let (status, _) = http(
+        server.addr,
+        "GET",
+        "/lingxi/v1/me",
+        &[("Authorization", &format!("Bearer {secret}"))],
+        None,
+    )
+    .await;
+    assert_eq!(status, 401);
+    let (status, body) = http(
+        server.addr,
+        "GET",
+        "/lingxi/v1/session-thinking-level?pendingNewSession=1",
+        &[("Authorization", &owner)],
+        None,
+    )
+    .await;
+    assert_eq!(status, 503);
+    assert_eq!(
+        serde_json::from_str::<serde_json::Value>(&body).unwrap()["details"]["reason"],
+        "model_state_unavailable"
+    );
+    let (status, _) = http(
+        server.addr,
+        "POST",
+        "/lingxi/v1/session-thinking-level",
+        &[("Authorization", &owner)],
+        Some(r#"{"sessionPath":"sess_local_alpha","level":"high"}"#),
+    )
+    .await;
+    assert_eq!(status, 503);
+    let (status, _) = http(
+        server.addr,
+        "GET",
+        "/lingxi/v1/session-thinking-level?sessionPath=sess_local_alpha",
+        &[("Authorization", &owner)],
+        None,
+    )
+    .await;
+    assert_eq!(status, 503);
+    let (status, _) = http(
+        server.addr,
+        "POST",
+        "/lingxi/v1/session-thinking-level",
+        &[("Authorization", &owner)],
+        Some(r#"{"sessionPath":"sess_local_alpha","level":"nonsense"}"#),
+    )
+    .await;
+    assert_eq!(status, 400);
+    let (status, _) = http(server.addr, "GET", "/mobile/assets/missing.js", &[], None).await;
+    assert_eq!(status, 404);
+    let (status, body) = http(server.addr, "GET", "/mobile", &[], None).await;
+    assert_eq!(status, 200);
+    assert!(body.contains("网页界面"));
+    server.stop_and_assert_clean().await;
+}
+
+#[tokio::test]
+async fn device_registry_failure_is_not_reported_as_bad_credentials() {
+    let server = default_server("device-registry-error-status").await;
+    let (status, body) = http(
+        server.addr,
+        "POST",
+        "/lingxi/v1/devices/credentials",
+        &[("Authorization", &server.bearer())],
+        Some("{}"),
+    )
+    .await;
+    assert_eq!(status, 200, "{body}");
+    let secret = serde_json::from_str::<serde_json::Value>(&body).unwrap()["secret"]
+        .as_str()
+        .unwrap()
+        .to_string();
+    let credential_login = serde_json::json!({"credential": secret}).to_string();
+    let raw = http_raw(server.addr, &format!("POST /lingxi/v1/web-auth/login HTTP/1.1\r\nHost: {}\r\nContent-Type: application/json\r\nContent-Length: {}\r\nConnection: close\r\n\r\n{}", server.addr, credential_login.len(), credential_login)).await;
+    assert!(raw.starts_with("HTTP/1.1 200"), "{raw}");
+    let cookie = raw
+        .lines()
+        .find(|line| line.to_ascii_lowercase().starts_with("set-cookie:"))
+        .unwrap()
+        .split_once(':')
+        .unwrap()
+        .1
+        .trim()
+        .split(';')
+        .next()
+        .unwrap()
+        .to_string();
+    let registry_path = prepare_layout(&server.home)
+        .unwrap()
+        .runtime_dir
+        .join(lingxi_service::auth::DEVICE_CREDENTIALS_FILE);
+    let original = std::fs::read(&registry_path).unwrap();
+    std::fs::write(&registry_path, b"{corrupt").unwrap();
+    let (status, body) = http(
+        server.addr,
+        "GET",
+        "/lingxi/v1/me",
+        &[("Authorization", &format!("Bearer {secret}"))],
+        None,
+    )
+    .await;
+    assert_eq!(status, 500, "bearer registry failure: {body}");
+    let (status, body) = http(
+        server.addr,
+        "POST",
+        "/lingxi/v1/web-auth/login",
+        &[],
+        Some(&credential_login),
+    )
+    .await;
+    assert_eq!(status, 500, "web login registry failure: {body}");
+    let (status, body) = http(
+        server.addr,
+        "GET",
+        "/lingxi/v1/web-auth/session",
+        &[("Cookie", &cookie)],
+        None,
+    )
+    .await;
+    assert_eq!(status, 500, "cookie registry failure: {body}");
+    std::fs::write(&registry_path, original).unwrap();
+    let (status, body) = http(
+        server.addr,
+        "GET",
+        "/lingxi/v1/me",
+        &[("Authorization", &format!("Bearer {secret}"))],
+        None,
+    )
+    .await;
+    assert_eq!(
+        status, 200,
+        "valid registry should restore device auth: {body}"
+    );
+    server.stop_and_assert_clean().await;
 }

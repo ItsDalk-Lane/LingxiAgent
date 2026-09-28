@@ -40,6 +40,7 @@ fn temp_db(tag: &str) -> (RunDatabase, std::path::PathBuf) {
 /// zero).
 fn tokio_block_on<F: std::future::Future>(fut: F) -> F::Output {
     tokio::runtime::Builder::new_current_thread()
+        .enable_all()
         .build()
         .expect("test runtime")
         .block_on(fut)

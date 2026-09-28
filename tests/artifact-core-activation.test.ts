@@ -167,6 +167,24 @@ function serverKindRoot(homeDir: string) {
 }
 
 describe("activation: activateFromArchive", () => {
+  it("受信守卫封闭新树失败时不写指针，也不留下临时树", async () => {
+    const root = makeTempDir("hana-activation-private-");
+    const homeDir = path.join(root, "home");
+    const archivePath = await makeServerArchiveFixture(root);
+    const manifest = manifestFor(await sha256File(archivePath), 1);
+    const actions: string[] = [];
+    await expect(activateFromArchive(archivePath, manifest, {
+      homeDir, channel: "stable", kind: "server", platformArch: "darwin-arm64",
+      privateArtifactGuard: async (action: string) => {
+        actions.push(action);
+        if (action === "seal") throw new Error("unsafe extracted tree");
+      },
+    })).rejects.toThrow("unsafe extracted tree");
+    expect(actions).toEqual(["prepare", "seal"]);
+    expect(await readPointer(homeDir, "stable", "next")).toBeNull();
+    expect(fs.readdirSync(serverKindRoot(homeDir))).toEqual([]);
+  });
+
   it("verifies sha256, extracts, writes .verified receipt and the next pointer", async () => {
     const root = makeTempDir("hana-activation-");
     const homeDir = path.join(root, "home");
@@ -340,6 +358,26 @@ describe("activation: activateFromArchive — directory protection & atomic swap
     expect(fs.readdirSync(serverKindRoot(homeDir))).toEqual([`${version}-darwin-arm64`]); // no tmp/old dirs created
 
     expect(await readPointer(homeDir, "stable", "next")).toEqual(second);
+  });
+
+  it("受保护旧目录即使归档摘要相同，守卫拒绝后也不得改指针", async () => {
+    const root = makeTempDir("hana-activation-private-claim-");
+    const homeDir = path.join(root, "home");
+    const archivePath = await makeServerArchiveFixture(root);
+    const manifest = manifestFor(await sha256File(archivePath), 2);
+    const first = await activateFromArchive(archivePath, manifest, {
+      homeDir, channel: "stable", kind: "server", platformArch: "darwin-arm64",
+    });
+    await writePointer(homeDir, "stable", "current", first);
+    await clearPointer(homeDir, "stable", "next");
+    await expect(activateFromArchive(archivePath, manifest, {
+      homeDir, channel: "stable", kind: "server", platformArch: "darwin-arm64",
+      privateArtifactGuard: async (action: string) => {
+        if (action === "verify") throw new Error("legacy broad ACL");
+      },
+    })).rejects.toThrow("legacy broad ACL");
+    expect(await readPointer(homeDir, "stable", "next")).toBeNull();
+    expect(await readPointer(homeDir, "stable", "current")).toEqual(first);
   });
 
   it("refuses to replace a directory a pointer references when the incoming sha256 does not match", async () => {

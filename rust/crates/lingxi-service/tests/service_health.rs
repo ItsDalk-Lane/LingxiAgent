@@ -10,12 +10,76 @@
 
 use std::net::SocketAddr;
 use std::path::PathBuf;
+use std::process::Command;
 use std::time::Duration;
 
 use lingxi_service::{
-    prepare_layout, run, HomeSource, NetworkMode, ServiceConfig, ServiceError, ServiceState,
+    acquire, prepare_layout, run, HomeSource, NetworkMode, ServeOutcome, ServiceConfig,
+    ServiceDeps, ServiceError, ServiceState,
 };
 use tokio::io::{AsyncReadExt, AsyncWriteExt};
+
+#[test]
+fn help_and_version_do_not_hide_invalid_arguments() {
+    let binary = env!("CARGO_BIN_EXE_lingxi-service");
+    for arg in ["--help", "-h", "--version"] {
+        let output = Command::new(binary)
+            .arg(arg)
+            .output()
+            .expect("run service binary");
+        assert_eq!(output.status.code(), Some(0), "standalone {arg}");
+    }
+
+    // 所有取值选项都不能把帮助或版本参数当作自己的值后伪装成成功。
+    for flag in [
+        "--bind",
+        "--home",
+        "--config",
+        "--network-mode",
+        "--shutdown-timeout-ms",
+        "--max-ws-connections",
+        "--db-queue-bound",
+        "--event-subscriber-queue",
+        "--event-reorder-bound",
+        "--max-subscribers",
+        "--log-max-bytes",
+        "--log-max-files",
+        "--http-rate-max",
+        "--http-max-in-flight",
+        "--http-request-budget-ms",
+        "--db-wait-budget-ms",
+    ] {
+        for control in ["--help", "--version"] {
+            let output = Command::new(binary)
+                .args([flag, control])
+                .output()
+                .expect("run service binary");
+            assert_eq!(output.status.code(), Some(2), "{flag} {control}");
+            assert!(
+                String::from_utf8_lossy(&output.stderr).contains("error:"),
+                "missing error diagnostic: {flag} {control}"
+            );
+        }
+    }
+
+    // 其他无效组合也应在读写数据目录之前以配置错误退出。
+    for args in [
+        vec!["--help", "--home", "/tmp/unused"],
+        vec!["--home", "/tmp/unused", "--version"],
+        vec!["--test-mode", "--help"],
+        vec!["--help", "--help"],
+    ] {
+        let output = Command::new(binary)
+            .args(&args)
+            .output()
+            .expect("run service binary");
+        assert_eq!(output.status.code(), Some(2), "invalid arguments: {args:?}");
+        assert!(
+            String::from_utf8_lossy(&output.stderr).contains("error:"),
+            "missing error diagnostic: {args:?}"
+        );
+    }
+}
 
 /// Unique synthetic home under the system temp dir for this test run.
 fn synthetic_home(tag: &str) -> PathBuf {
@@ -58,6 +122,19 @@ async fn http_get(addr: SocketAddr, path: &str) -> (String, String) {
     (head.to_string(), body.to_string())
 }
 
+async fn http_raw(addr: SocketAddr, request: &str) -> String {
+    let mut stream = tokio::net::TcpStream::connect(addr)
+        .await
+        .expect("connect service");
+    stream
+        .write_all(request.as_bytes())
+        .await
+        .expect("write request");
+    let mut raw = Vec::new();
+    stream.read_to_end(&mut raw).await.expect("read response");
+    String::from_utf8(raw).expect("ASCII/UTF-8 response")
+}
+
 fn cleanup(path: &std::path::Path) {
     // Best-effort removal of this test's own synthetic temp dir only.
     if path.exists() {
@@ -71,7 +148,7 @@ struct TestServer {
     addr: SocketAddr,
     home: PathBuf,
     stop: tokio::sync::oneshot::Sender<()>,
-    handle: tokio::task::JoinHandle<Result<(), ServiceError>>,
+    handle: tokio::task::JoinHandle<Result<ServeOutcome, ServiceError>>,
 }
 
 async fn start_test_server(tag: &str) -> TestServer {
@@ -95,6 +172,7 @@ async fn start_test_server(tag: &str) -> TestServer {
             |addr| {
                 let _ = ready_tx.send(addr);
             },
+            None, // no drain budget: the test drives the stop signal itself
         )
         .await
     });
@@ -155,6 +233,127 @@ async fn health_check_over_real_loopback() {
     assert!(refused.is_ok(), "port must stop accepting after shutdown");
 
     cleanup(&synthetic_home("health"));
+}
+
+#[tokio::test]
+async fn browser_cors_preflight_and_response_keep_origin_boundary() {
+    let server = start_test_server("cors").await;
+    let addr = server.addr;
+    let home = server.home.clone();
+    let preflight = http_raw(addr, &format!(
+        "OPTIONS /lingxi/v1/web-auth/login HTTP/1.1\r\nHost: {addr}\r\nOrigin: null\r\nAccess-Control-Request-Method: POST\r\nAccess-Control-Request-Headers: content-type,authorization\r\nConnection: close\r\n\r\n"
+    )).await;
+    assert!(preflight.starts_with("HTTP/1.1 204 "), "{preflight}");
+    assert!(
+        preflight.contains("access-control-allow-origin: null\r\n"),
+        "{preflight}"
+    );
+    assert!(
+        preflight.contains("access-control-allow-credentials: true\r\n"),
+        "{preflight}"
+    );
+    assert!(
+        preflight.contains(
+            "access-control-allow-headers: Content-Type, Authorization, If-None-Match\r\n"
+        ),
+        "{preflight}"
+    );
+
+    let allowed = http_raw(addr, &format!(
+        "GET /lingxi/v1/health HTTP/1.1\r\nHost: {addr}\r\nOrigin: null\r\nConnection: close\r\n\r\n"
+    )).await;
+    assert!(allowed.starts_with("HTTP/1.1 200 "), "{allowed}");
+    assert!(
+        allowed.contains("access-control-allow-origin: null\r\n"),
+        "{allowed}"
+    );
+
+    let denied = http_raw(
+        addr,
+        &format!(
+        "GET /lingxi/v1/me HTTP/1.1\r\nHost: {addr}\r\nOrigin: null\r\nConnection: close\r\n\r\n"
+    ),
+    )
+    .await;
+    assert!(denied.starts_with("HTTP/1.1 401 "), "{denied}");
+    assert!(
+        denied.contains("access-control-allow-origin: null\r\n"),
+        "{denied}"
+    );
+    assert!(denied.contains("\"requestId\""), "{denied}");
+
+    let foreign = http_raw(addr, &format!(
+        "OPTIONS /lingxi/v1/web-auth/login HTTP/1.1\r\nHost: {addr}\r\nOrigin: https://foreign.example\r\nAccess-Control-Request-Method: POST\r\nConnection: close\r\n\r\n"
+    )).await;
+    assert!(foreign.starts_with("HTTP/1.1 403 "), "{foreign}");
+    assert!(
+        !foreign.contains("access-control-allow-origin"),
+        "{foreign}"
+    );
+
+    server.stop_and_assert_clean().await;
+    cleanup(&home);
+}
+
+#[tokio::test]
+async fn locked_instance_and_local_token_share_one_start_identity() {
+    let config = test_config("locked-identity");
+    cleanup(&config.data_home);
+    let layout = prepare_layout(&config.data_home).expect("private home");
+    let (mut guard, stale) = acquire(&layout).expect("exclusive instance lock");
+    assert!(stale.is_none());
+    let other_home = synthetic_home("identity-other-home");
+    cleanup(&other_home);
+    std::fs::create_dir_all(&other_home).expect("other isolated home");
+    let mut mismatched = config.clone();
+    mismatched.data_home = other_home.clone();
+    let mismatch = ServiceState::bootstrap_with_locked_instance(
+        mismatched,
+        &layout,
+        ServiceDeps::default(),
+        &guard,
+    )
+    .await;
+    assert!(
+        mismatch.is_err(),
+        "a guard for a different home cannot write a token"
+    );
+    assert!(
+        !state_token_path(&layout).exists(),
+        "mismatch wrote a local token"
+    );
+    cleanup(&other_home);
+    let state = ServiceState::bootstrap_with_locked_instance(
+        config,
+        &layout,
+        ServiceDeps::default(),
+        &guard,
+    )
+    .await
+    .expect("boot with locked identity");
+    let token_file: serde_json::Value = serde_json::from_slice(
+        &std::fs::read(state.auth().local_token_path()).expect("local token file"),
+    )
+    .expect("local token JSON");
+    assert_eq!(token_file["instanceId"], guard.identity().instance_id);
+
+    guard
+        .publish("127.0.0.1:14777".parse().unwrap())
+        .expect("publish record without listening");
+    let instance = lingxi_service::instance::read_record(&layout.record_path)
+        .expect("instance record exists")
+        .expect("instance record is valid");
+    assert_eq!(instance.instance_id, guard.identity().instance_id);
+    assert_eq!(token_file["instanceId"], instance.instance_id);
+    state.storage().close().await.expect("close storage");
+    guard.release().expect("release instance record and lock");
+    cleanup(&layout.home);
+}
+
+fn state_token_path(layout: &lingxi_service::DataRootLayout) -> PathBuf {
+    layout
+        .runtime_dir
+        .join(lingxi_service::auth::LOCAL_TOKEN_FILE)
 }
 
 #[tokio::test]

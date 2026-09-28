@@ -12,3 +12,14 @@ publish = false
 # hand-written on purpose (the 05-protocol interface is three fixed
 # subcommands — a CLI framework would be a new dependency for nothing).
 serde_json = "1"
+# R9-F02, same rule: libc 0.2.x is already in Cargo.lock (workspace graph
+# via the tokio stack); xtask adds only the member dependency edge.
+# libc::setsid() gives the gate runner its SESSION boundary so the timeout
+# cleanup's group signals are provably addressed only at this run's own
+# processes (see src/verify.rs); no other libc use.
+libc = "0.2"
+# 使用仓库锁文件中已有的 SHA-256 实现，绑定候选文件的实际字节。
+sha2 = "0.11"
+
+[target.'cfg(windows)'.dependencies]
+windows-sys = { version = "0.61.2", features = ["Win32_Foundation", "Win32_Storage_FileSystem"] }

@@ -1,0 +1,6 @@
+start=2026-09-28T11:19:40.874268+00:00
+commands=rustup cargo 1.98.1 offline locked check service/adapters; rustup cargo 1.98.1 offline locked service paths tests; rustup cargo 1.98.1 offline locked adapters backup_restore tests
+end=2026-09-28T11:19:42.156840+00:00
+check_exit=0
+paths_exit=0
+backup_exit=0

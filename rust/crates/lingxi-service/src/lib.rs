@@ -29,10 +29,14 @@ pub mod inject;
 pub mod instance;
 pub mod limits;
 pub mod logging;
+mod management;
 pub mod paths;
 pub mod redaction;
+mod security_audit;
+pub mod serve;
 pub mod sessions;
 pub mod shutdown;
+mod static_web;
 pub mod transport;
 pub mod ws;
 
@@ -89,7 +93,7 @@ use std::net::SocketAddr;
 use std::sync::Arc;
 
 use axum::extract::{ConnectInfo, Path, Request, State};
-use axum::http::{header, StatusCode};
+use axum::http::{header, HeaderValue, StatusCode};
 use axum::middleware::{self, Next};
 use axum::response::{IntoResponse, Response};
 use axum::routing::{get, post};
@@ -158,21 +162,15 @@ impl ServiceConfig {
         temp_base: &std::path::Path,
     ) -> Result<Self, ConfigError> {
         let resolved = resolve_effective_home(cli, env_home, temp_base)?;
-        let bind_raw = cli
-            .bind
-            .clone()
-            .unwrap_or_else(|| Self::DEFAULT_BIND.to_string());
-        let bind_addr: SocketAddr =
-            bind_raw
-                .parse::<SocketAddr>()
-                .map_err(|source| ConfigError::BadBind {
-                    value: bind_raw.clone(),
-                    source: source.to_string(),
-                })?;
         let data_home = resolved.path;
         if !data_home.is_absolute() {
             return Err(ConfigError::RelativeHome { value: data_home });
         }
+        let stored_network = management::read_persisted_network(&data_home)
+            .map_err(|detail| ConfigError::StoredNetworkInvalid { detail })?;
+        let stored_mode = stored_network
+            .as_ref()
+            .and_then(|network| NetworkMode::parse(&network.mode));
         let network_mode = cli
             .network_mode
             .as_deref()
@@ -182,7 +180,36 @@ impl ServiceConfig {
                 })
             })
             .transpose()?
+            .or(stored_mode)
             .unwrap_or(NetworkMode::Loopback);
+        let stored_bind = stored_network
+            .as_ref()
+            .map(|network| {
+                network
+                    .listen_host
+                    .parse::<std::net::IpAddr>()
+                    .map(|ip| SocketAddr::new(ip, network.listen_port).to_string())
+                    .map_err(|err| ConfigError::StoredNetworkInvalid {
+                        detail: format!("invalid saved listenHost: {err}"),
+                    })
+            })
+            .transpose()?;
+        let bind_raw = cli.bind.clone().unwrap_or_else(|| {
+            match stored_bind
+                .as_ref()
+                .filter(|_| cli.network_mode.is_none() || stored_mode == Some(network_mode))
+            {
+                Some(bind) => bind.clone(),
+                None => Self::DEFAULT_BIND.to_string(),
+            }
+        });
+        let bind_addr: SocketAddr =
+            bind_raw
+                .parse::<SocketAddr>()
+                .map_err(|source| ConfigError::BadBind {
+                    value: bind_raw.clone(),
+                    source: source.to_string(),
+                })?;
         if network_mode == NetworkMode::Loopback && !bind_addr.ip().is_loopback() {
             return Err(ConfigError::NetworkModeBindMismatch {
                 bind: bind_addr,
@@ -216,18 +243,49 @@ impl ServiceConfig {
     /// path exists as a non-directory or cannot be created — never a silent
     /// fallback to some other location.
     pub fn prepare_data_home(&self) -> Result<(), ConfigError> {
+        if self.data_home.parent().is_none() {
+            return Err(ConfigError::HomeIsFilesystemRoot {
+                value: self.data_home.clone(),
+            });
+        }
         if self.data_home.exists() && !self.data_home.is_dir() {
             return Err(ConfigError::HomeIsNotADirectory {
                 value: self.data_home.clone(),
             });
         }
-        if !self.data_home.exists() {
+        let new_home = !self.data_home.exists();
+        if new_home {
+            #[cfg(windows)]
+            paths::ensure_private_dir(&self.data_home)?;
+            #[cfg(not(windows))]
             std::fs::create_dir_all(&self.data_home).map_err(|source| {
                 ConfigError::HomeCreateFailed {
                     value: self.data_home.clone(),
                     source: source.to_string(),
                 }
             })?;
+        }
+        #[cfg(windows)]
+        {
+            let canonical = std::fs::canonicalize(&self.data_home).map_err(|source| {
+                ConfigError::HomeCreateFailed {
+                    value: self.data_home.clone(),
+                    source: source.to_string(),
+                }
+            })?;
+            if canonical.parent().is_none() {
+                return Err(ConfigError::HomeIsFilesystemRoot { value: canonical });
+            }
+            if new_home {
+                paths::ensure_private_dir(&canonical)?;
+            } else {
+                let _guard =
+                    lingxi_adapters::storage::windows_acl::require_private_directory(&canonical)
+                        .map_err(|source| ConfigError::HomeCreateFailed {
+                            value: canonical.clone(),
+                            source: source.to_string(),
+                        })?;
+            }
         }
         Ok(())
     }
@@ -254,12 +312,24 @@ pub struct HealthResponse {
 pub struct ServiceState {
     config: Arc<ServiceConfig>,
     auth: Arc<AuthService>,
+    management: Arc<management::ManagementState>,
+    static_web: Arc<static_web::StaticWebConfig>,
+    bound_addr: Arc<std::sync::RwLock<Option<SocketAddr>>>,
     tickets: Arc<WsTicketService>,
     storage: Arc<RunDatabase>,
     sessions: Arc<sessions::SessionStore>,
     events: Arc<events::EventService>,
     rate: Arc<limits::RateLimiter>,
     ws_conns: Arc<limits::WsConnectionCounter>,
+    /// HTTP admission gate (R02 stage-repair R1 / F07): hard in-flight cap
+    /// + per-request budget at the outer edge.
+    admission: Arc<limits::HttpAdmission>,
+    /// CONNECTION admission gate (R02 stage-repair R2 / R2-F04): the hard
+    /// cap enforced at the accept edge, so sockets waiting for their
+    /// request headers are counted too (the request-level gate only runs
+    /// after complete headers arrived). The cap is 2× the request
+    /// in-flight cap — see bootstrap for the layering argument.
+    conn_admission: Arc<limits::ConnectionAdmission>,
     /// Managed-task shutdown broadcast for active WS sessions (R02-T06).
     ws_shutdown: Arc<shutdown::WsShutdown>,
     /// Injectable clock (R02-T07): rate limiting, ticket expiry, execute
@@ -320,11 +390,22 @@ pub struct ServiceDeps {
     pub ws_max_connections: usize,
     /// Pending WS ticket registry bound (R02-T03).
     pub ws_max_tickets: usize,
-    /// Bounded single-writer DB queue knobs (R02-T04; `queue_capacity` is
-    /// the DB-request cap: full = explicit 503 backpressure).
+    /// Bounded single-writer DB queue knobs (R02-T04). `queue_capacity`
+    /// bounds pending jobs and `queue_wait_timeout_ms` bounds how long one
+    /// submission may WAIT for capacity (R02 stage-repair R1 / F07): both
+    /// edges surface `StorageError::QueueFull` → explicit 503
+    /// backpressure; no unbounded waiter exists anywhere.
     pub store_options: StoreOptions,
     /// Event-surface flow control and registry caps (R02-T05 + R02-T07).
     pub event_limits: EventLimits,
+    /// Hard cap of concurrently in-flight HTTP requests (R02 stage-repair
+    /// R1 / F07): beyond it, admission rejects with 503 instead of letting
+    /// requests pile up at the accept/handler boundary.
+    pub http_max_in_flight: usize,
+    /// Per-request wall-clock budget in milliseconds (F07): a request whose
+    /// handling (body read included) exceeds it is cancelled and answered
+    /// 408 — a slow-body client cannot hold a slot past the deadline.
+    pub http_request_budget_ms: u64,
     /// Injectable clock (R02-T07).
     pub clock: std::sync::Arc<dyn ServiceClock>,
     /// Injectable per-request id source (R02-T07).
@@ -341,6 +422,8 @@ impl Default for ServiceDeps {
             ws_max_tickets: ws::DEFAULT_WS_MAX_TICKETS,
             store_options: StoreOptions::default(),
             event_limits: EventLimits::default(),
+            http_max_in_flight: limits::DEFAULT_HTTP_MAX_IN_FLIGHT,
+            http_request_budget_ms: limits::DEFAULT_HTTP_REQUEST_BUDGET_MS,
             clock: std::sync::Arc::new(SystemClock),
             request_ids: std::sync::Arc::new(RandomRequestIdGen),
         }
@@ -357,10 +440,85 @@ impl std::fmt::Debug for ServiceDeps {
             .field("ws_max_tickets", &self.ws_max_tickets)
             .field("store_options", &self.store_options)
             .field("event_limits", &self.event_limits)
+            .field("http_max_in_flight", &self.http_max_in_flight)
+            .field("http_request_budget_ms", &self.http_request_budget_ms)
             .field("clock", &"Arc<dyn ServiceClock>")
             .field("request_ids", &"Arc<dyn RequestIdGen>")
             .finish()
     }
+}
+
+/// Validates the injected resource knobs of the composition root (R02
+/// stage-repair R3 / R3-F02): the binary's CLI layer rejects out-of-range
+/// values at parse time, and THIS layer rejects them for every other
+/// caller of `bootstrap_with_deps` with the same loudness (the binary maps
+/// a startup error to exit 2). Nothing downstream may clamp, wrap,
+/// truncate or saturate a degenerate value silently — the pre-fix
+/// constructors' `.max(1)` fallbacks and the `saturating_mul(2)`
+/// connection-cap derivation are exactly the failure modes this replaces.
+fn validate_resource_deps(deps: &ServiceDeps) -> Result<(), ServiceStartupError> {
+    fn invalid(detail: String) -> ServiceStartupError {
+        ServiceStartupError::Storage(StorageError::InvalidRequest { detail })
+    }
+    if deps.rate_window_ms == 0 {
+        // RateLimiter compares elapsed >= window: a 0 window resets on
+        // every request (fail-open, unlimited) — never a real config.
+        return Err(invalid(
+            "rate_window_ms must be >= 1 (0 would reset the rate window on \
+             every request, silently disabling the limit)"
+                .to_string(),
+        ));
+    }
+    if deps.rate_max == 0 {
+        return Err(invalid(
+            "rate_max must be >= 1 (0 would answer every request 429 — the \
+             exact state the pre-fix `as u32` truncation of 4294967296 \
+             produced)"
+                .to_string(),
+        ));
+    }
+    if deps.ws_max_connections == 0 {
+        return Err(invalid(
+            "ws_max_connections must be >= 1 (0 would reject every WebSocket \
+             upgrade)"
+                .to_string(),
+        ));
+    }
+    if deps.ws_max_tickets == 0 {
+        return Err(invalid(
+            "ws_max_tickets must be >= 1 (0 would reject every ticket issue)".to_string(),
+        ));
+    }
+    if deps.ws_ticket_ttl_ms == 0 {
+        return Err(invalid(
+            "ws_ticket_ttl_ms must be >= 1 (0 would expire every ticket at \
+             issue)"
+                .to_string(),
+        ));
+    }
+    if deps.http_max_in_flight == 0
+        || deps.http_max_in_flight as u64 > crate::config::MAX_HTTP_MAX_IN_FLIGHT
+    {
+        return Err(invalid(format!(
+            "http_max_in_flight must be in 1..={} (the connection cap is \
+             derived as 2x this value; the bound keeps that CHECKED \
+             multiplication overflow-free), got {}",
+            crate::config::MAX_HTTP_MAX_IN_FLIGHT,
+            deps.http_max_in_flight
+        )));
+    }
+    if deps.http_request_budget_ms == 0
+        || deps.http_request_budget_ms > crate::config::MAX_TIME_BUDGET_MS
+    {
+        return Err(invalid(format!(
+            "http_request_budget_ms must be in 1..={} (30 days — larger \
+             deadlines risk overflowing platform monotonic-clock arithmetic \
+             in the header/request timers), got {}",
+            crate::config::MAX_TIME_BUDGET_MS,
+            deps.http_request_budget_ms
+        )));
+    }
+    Ok(())
 }
 
 impl ServiceState {
@@ -443,15 +601,53 @@ impl ServiceState {
         layout: &DataRootLayout,
         deps: ServiceDeps,
     ) -> Result<Self, ServiceStartupError> {
+        Self::bootstrap_with_instance_identity(
+            config,
+            layout,
+            deps,
+            instance::InstanceIdentity::generate(),
+        )
+        .await
+    }
+
+    /// 二进制入口必须沿用已取得独占锁的实例身份，令实例记录和本机令牌指向同一次启动。
+    pub async fn bootstrap_with_locked_instance(
+        config: ServiceConfig,
+        layout: &DataRootLayout,
+        deps: ServiceDeps,
+        guard: &InstanceGuard,
+    ) -> Result<Self, ServiceStartupError> {
+        let configured_home = std::fs::canonicalize(&config.data_home).map_err(|err| {
+            ServiceStartupError::Storage(StorageError::Io {
+                detail: format!("cannot resolve service data home: {err}"),
+            })
+        })?;
+        if guard.layout().home != layout.home || configured_home != layout.home {
+            return Err(ServiceStartupError::Storage(StorageError::InvalidRequest {
+                detail: "instance guard, service config and layout refer to different data homes"
+                    .into(),
+            }));
+        }
+        Self::bootstrap_with_instance_identity(config, layout, deps, guard.identity().clone()).await
+    }
+
+    async fn bootstrap_with_instance_identity(
+        config: ServiceConfig,
+        layout: &DataRootLayout,
+        deps: ServiceDeps,
+        identity: InstanceIdentity,
+    ) -> Result<Self, ServiceStartupError> {
         deps.event_limits
             .validate()
             .map_err(ServiceStartupError::Storage)?;
         deps.store_options
             .validate()
             .map_err(ServiceStartupError::Storage)?;
-        let identity = instance::InstanceIdentity::generate();
+        validate_resource_deps(&deps)?;
         let auth = AuthService::bootstrap(layout, &identity.instance_id)
             .map_err(ServiceStartupError::Auth)?;
+        let management = management::ManagementState::open(layout, &config)
+            .map_err(|detail| ServiceStartupError::Storage(StorageError::Io { detail }))?;
         // R02-T04: open the run/message database inside the private runtime
         // dir ({home}/lingxi-service/data/runs.db — fixed names, never
         // user-derived), run migrations and seed the synthetic sessions.
@@ -485,9 +681,28 @@ impl ServiceState {
             deps.event_limits.clone(),
         )
         .map_err(ServiceStartupError::Storage)?;
+        // R3-F02: the 2x connection-cap derivation is a CHECKED
+        // multiplication. The CLI parse bound (1..=usize::MAX/2) and
+        // validate_resource_deps above make the overflow branch unreachable
+        // from any supported input — but if it ever were reached, the
+        // failure is loud HERE instead of the pre-fix `saturating_mul(2)`
+        // silently pinning the cap at usize::MAX.
+        let connection_cap = deps.http_max_in_flight.checked_mul(2).ok_or_else(|| {
+            ServiceStartupError::Storage(StorageError::InvalidRequest {
+                detail: format!(
+                    "http_max_in_flight {} overflows the 2x connection-cap \
+                     derivation (supported range 1..={})",
+                    deps.http_max_in_flight,
+                    crate::config::MAX_HTTP_MAX_IN_FLIGHT
+                ),
+            })
+        })?;
         Ok(Self {
             config: Arc::new(config),
             auth: Arc::new(auth),
+            management: Arc::new(management),
+            static_web: Arc::new(static_web::StaticWebConfig::resolve()),
+            bound_addr: Arc::new(std::sync::RwLock::new(None)),
             tickets: Arc::new(WsTicketService::new(
                 deps.ws_ticket_ttl_ms,
                 deps.ws_max_tickets,
@@ -497,6 +712,21 @@ impl ServiceState {
             events: Arc::new(events),
             rate: Arc::new(limits::RateLimiter::new(deps.rate_window_ms, deps.rate_max)),
             ws_conns: Arc::new(limits::WsConnectionCounter::new(deps.ws_max_connections)),
+            admission: Arc::new(limits::HttpAdmission::new(
+                deps.http_max_in_flight,
+                deps.http_request_budget_ms,
+            )),
+            // R2-F04: the CONNECTION cap must be strictly larger than the
+            // request in-flight cap — admission layers only work when the
+            // outer layer is looser. Every in-flight request holds one
+            // connection, so an EQUAL cap lets N slow-body holders consume
+            // every connection slot: the request-level 503 would become
+            // unreachable and new connections would die at the accept edge
+            // instead. 2× leaves exactly the in-flight set's worth of room
+            // for arriving (header-wait) and keep-alive-idle sockets, so
+            // the request gate stays the policy voice while the transport
+            // still hard-bounds every open socket.
+            conn_admission: Arc::new(limits::ConnectionAdmission::new(connection_cap)),
             ws_shutdown: Arc::new(shutdown::WsShutdown::new()),
             clock: deps.clock,
             request_ids: deps.request_ids,
@@ -505,6 +735,14 @@ impl ServiceState {
 
     pub fn config(&self) -> &ServiceConfig {
         &self.config
+    }
+
+    fn actual_port(&self) -> u16 {
+        self.bound_addr
+            .read()
+            .unwrap_or_else(|poisoned| poisoned.into_inner())
+            .map(|addr| addr.port())
+            .unwrap_or(self.config.bind_addr.port())
     }
 
     pub fn auth(&self) -> &AuthService {
@@ -551,6 +789,18 @@ impl ServiceState {
 
     pub fn ws_connection_count(&self) -> usize {
         self.ws_conns.current()
+    }
+
+    /// The HTTP admission gate (F07): tests observe the in-flight count
+    /// through the same instance the router serves.
+    pub fn admission(&self) -> &Arc<limits::HttpAdmission> {
+        &self.admission
+    }
+
+    /// The CONNECTION admission gate (R2-F04): tests observe the open
+    /// connection count through the same instance the serve loop enforces.
+    pub fn connection_admission(&self) -> &Arc<limits::ConnectionAdmission> {
+        &self.conn_admission
     }
 
     /// Arc handle to the WS connection counter (needed to acquire a
@@ -683,6 +933,43 @@ impl EndpointError {
         .with_cause("transport.rate_limited")
     }
 
+    /// The rate-limiter peer REGISTRY is at its hard cap and this peer is
+    /// not tracked (F07): a distinct-peer flood is a service-protection
+    /// condition (503, retryable), not the peer's own window budget (429).
+    pub fn rate_registry_full() -> Self {
+        Self::new(
+            StatusCode::SERVICE_UNAVAILABLE,
+            ErrorCode::BudgetExceeded,
+            "rate-limiter peer registry is full",
+        )
+        .with_reason("rate_registry_full")
+        .with_cause("transport.rate_registry_full")
+    }
+
+    /// HTTP admission cap reached (F07): too many in-flight requests.
+    pub fn http_in_flight_limit() -> Self {
+        Self::new(
+            StatusCode::SERVICE_UNAVAILABLE,
+            ErrorCode::BudgetExceeded,
+            "too many in-flight requests",
+        )
+        .with_reason("http_in_flight_limit")
+        .with_cause("transport.http_in_flight_limit")
+    }
+
+    /// The request exceeded its wall-clock budget (F07): the handler
+    /// (including the body read) was cancelled instead of holding the
+    /// connection/admission slot without a bound.
+    pub fn request_timeout() -> Self {
+        Self::new(
+            StatusCode::REQUEST_TIMEOUT,
+            ErrorCode::BudgetExceeded,
+            "request exceeded its time budget",
+        )
+        .with_reason("request_timeout")
+        .with_cause("transport.request_timeout")
+    }
+
     pub fn payload_too_large(detail: String) -> Self {
         Self::new(
             StatusCode::PAYLOAD_TOO_LARGE,
@@ -725,6 +1012,7 @@ impl EndpointError {
                 StorageError::SchemaTampered { .. } => "schema_tampered",
                 StorageError::Corrupted { .. } => "corrupted",
                 StorageError::InvalidRequest { .. } => "invalid_request",
+                StorageError::RunIdExhausted { .. } => "run_id_exhausted",
                 StorageError::Internal { .. } => "internal",
             }
         )
@@ -816,6 +1104,82 @@ pub const LOG_WRITE_FAILED_MARKER: &str = "LINGXI_SERVICE_LOG_WRITE_FAILED";
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub struct RequestId(pub String);
 
+/// HTTP admission gate (R02 stage-repair R1 / F07): runs just inside the
+/// request-id middleware so every request — public or authenticated — is
+/// bounded BEFORE any further work:
+/// 1. hard in-flight cap: beyond `http_max_in_flight` the request is
+///    rejected 503 `http_in_flight_limit` instead of piling up at the
+///    accept/handler boundary;
+/// 2. per-request wall-clock budget: handling (the body read included) is
+///    wrapped in a timeout — on expiry the handler future is cancelled
+///    (dropped) and the client gets 408 `request_timeout`, so a slow-body
+///    client cannot occupy a connection/slot past the deadline.
+///
+/// Both rejections carry the transport marker line (evidence contract) and
+/// ride through error enrichment for requestId + redaction like any other
+/// rejection.
+async fn http_admission(
+    State(state): State<ServiceState>,
+    ConnectInfo(remote): ConnectInfo<SocketAddr>,
+    req: Request,
+    next: Next,
+) -> Response {
+    let request_id = req
+        .extensions()
+        .get::<RequestId>()
+        .map(|r| r.0.clone())
+        .unwrap_or_default();
+    let method = req.method().to_string();
+    let path = req.uri().path().to_string();
+    let host = req
+        .headers()
+        .get(header::HOST)
+        .and_then(|v| v.to_str().ok())
+        .unwrap_or("")
+        .to_string();
+    let origin = req
+        .headers()
+        .get(header::ORIGIN)
+        .and_then(|v| v.to_str().ok())
+        .map(|v| v.to_string());
+    let reject = |status: StatusCode, reason: &'static str, err: EndpointError| {
+        eprintln!(
+            "{}",
+            redact_line(&format!(
+                "{TRANSPORT_REJECTED_MARKER} request_id={request_id} method={method} path={path} \
+                 status={} reason={reason} origin={} host={host} remote={remote}",
+                status.as_u16(),
+                origin.as_deref().unwrap_or("absent"),
+            ))
+        );
+        err.into_response()
+    };
+    let Some(slot) = state.admission.acquire() else {
+        return reject(
+            StatusCode::SERVICE_UNAVAILABLE,
+            "http_in_flight_limit",
+            EndpointError::http_in_flight_limit(),
+        );
+    };
+    let budget = state.admission.request_budget();
+    match tokio::time::timeout(budget, next.run(req)).await {
+        Ok(response) => {
+            drop(slot);
+            response
+        }
+        Err(_elapsed) => {
+            // The handler future was dropped = the request work (body read
+            // included) is cancelled; the slot releases here.
+            drop(slot);
+            reject(
+                StatusCode::REQUEST_TIMEOUT,
+                "request_timeout",
+                EndpointError::request_timeout(),
+            )
+        }
+    }
+}
+
 /// Outermost middleware (R02-T07): mints the request id, logs one
 /// structured completion line per request, and enriches every error
 /// response body with `details.requestId` plus the REDACTED message (the
@@ -848,7 +1212,7 @@ async fn error_enrichment(
         );
     }
     if status.is_client_error() || status.is_server_error() {
-        let (parts, body) = response.into_parts();
+        let (mut parts, body) = response.into_parts();
         let bytes = match axum::body::to_bytes(body, limits::DEFAULT_BODY_LIMIT_BYTES).await {
             Ok(bytes) => bytes,
             Err(err) => {
@@ -866,12 +1230,15 @@ async fn error_enrichment(
                         "requestId": request_id,
                     }
                 });
-                return (
-                    status,
-                    [(header::CONTENT_TYPE, "application/json")],
-                    serde_json::to_string(&fallback).unwrap_or_default(),
-                )
-                    .into_response();
+                parts.headers.remove(header::CONTENT_LENGTH);
+                parts.headers.insert(
+                    header::CONTENT_TYPE,
+                    HeaderValue::from_static("application/json"),
+                );
+                return Response::from_parts(
+                    parts,
+                    axum::body::Body::from(serde_json::to_string(&fallback).unwrap_or_default()),
+                );
             }
         };
         match serde_json::from_slice::<serde_json::Value>(&bytes) {
@@ -899,12 +1266,12 @@ async fn error_enrichment(
                         serialization failed\",\"retryable\":false}",
                     )
                 });
-                response = (
-                    status,
-                    [(header::CONTENT_TYPE, "application/json")],
-                    serialized,
-                )
-                    .into_response();
+                parts.headers.remove(header::CONTENT_LENGTH);
+                parts.headers.insert(
+                    header::CONTENT_TYPE,
+                    HeaderValue::from_static("application/json"),
+                );
+                response = Response::from_parts(parts, axum::body::Body::from(serialized));
             }
             _ => {
                 // Not a protocol-error body (e.g. a plain axum rejection):
@@ -913,6 +1280,39 @@ async fn error_enrichment(
             }
         }
     }
+    response
+}
+
+fn browser_cors_response(
+    mut response: Response,
+    origin: Option<&str>,
+    origin_allowed: bool,
+) -> Response {
+    let Some(origin) = origin else {
+        return response;
+    };
+    if !origin_allowed {
+        return response;
+    }
+    // transport_guard 只在来源通过白名单后调用这里；凭据响应不允许通配来源。
+    let Ok(origin_value) = HeaderValue::from_str(origin) else {
+        return response;
+    };
+    let headers = response.headers_mut();
+    headers.insert(header::ACCESS_CONTROL_ALLOW_ORIGIN, origin_value);
+    headers.insert(
+        header::ACCESS_CONTROL_ALLOW_CREDENTIALS,
+        HeaderValue::from_static("true"),
+    );
+    headers.insert(
+        header::ACCESS_CONTROL_ALLOW_METHODS,
+        HeaderValue::from_static("GET, POST, PUT, PATCH, DELETE, OPTIONS"),
+    );
+    headers.insert(
+        header::ACCESS_CONTROL_ALLOW_HEADERS,
+        HeaderValue::from_static("Content-Type, Authorization, If-None-Match"),
+    );
+    headers.insert(header::VARY, HeaderValue::from_static("Origin"));
     response
 }
 
@@ -940,6 +1340,39 @@ async fn transport_guard(
         .get(header::ORIGIN)
         .and_then(|v| v.to_str().ok())
         .map(|v| v.to_string());
+    let secure = req
+        .extensions()
+        .get::<serve::SecureTransport>()
+        .is_some_and(|value| value.0);
+    // 只有实际运行中的本机网卡地址可作为局域网页面来源；网卡枚举失败时拒绝该来源。
+    let local_ips = if state.config.network_mode == NetworkMode::Lan
+        && check_origin(origin.as_deref()) == transport::OriginVerdict::Forbidden
+    {
+        if_addrs::get_if_addrs()
+            .map(|interfaces| {
+                interfaces
+                    .into_iter()
+                    .filter(|interface| interface.is_oper_up() && !interface.is_link_local())
+                    .map(|interface| interface.ip())
+                    .collect::<Vec<_>>()
+            })
+            .unwrap_or_default()
+    } else {
+        Vec::new()
+    };
+    let public_base_url = state.management.public_base_url();
+    let origin_verdict = transport::check_service_origin(
+        origin.as_deref(),
+        &host,
+        transport::ServiceOriginContext {
+            mode: state.config.network_mode,
+            actual_port: state.actual_port(),
+            secure,
+            bind_ip: state.config.bind_addr.ip(),
+            local_ips: &local_ips,
+            public_base_url: public_base_url.as_deref(),
+        },
+    );
 
     let reject = |status: StatusCode, reason: &str, resp: EndpointError| {
         // The marker line passes the redactor before printing: the marker
@@ -954,20 +1387,23 @@ async fn transport_guard(
                 origin.as_deref().unwrap_or("absent"),
             ))
         );
-        resp
+        browser_cors_response(
+            resp.into_response(),
+            origin.as_deref(),
+            origin_verdict == transport::OriginVerdict::Allowed,
+        )
     };
 
     // Origin policy runs for EVERY route (public included): a browser that
     // speaks a foreign origin may not touch even the health surface.
-    match check_origin(origin.as_deref()) {
+    match origin_verdict {
         transport::OriginVerdict::Allowed | transport::OriginVerdict::Absent => {}
         transport::OriginVerdict::Forbidden => {
             return reject(
                 StatusCode::FORBIDDEN,
                 "bad_origin",
                 EndpointError::invalid_transport("bad_origin"),
-            )
-            .into_response();
+            );
         }
     }
 
@@ -981,26 +1417,74 @@ async fn transport_guard(
                     StatusCode::FORBIDDEN,
                     reason,
                     EndpointError::invalid_transport(reason),
-                )
-                .into_response();
+                );
             }
         };
 
     // Rate limit (per remote peer, fixed window) — driven by the injected
-    // clock (R02-T07).
-    if !state.rate.check(remote.ip(), state.clock.now_unix_ms()) {
-        return reject(
-            StatusCode::TOO_MANY_REQUESTS,
-            "rate_limited",
-            EndpointError::rate_limited(),
-        )
-        .into_response();
+    // clock (R02-T07). The verdict distinguishes the peer's own window
+    // budget (429) from the peer-REGISTRY hard cap (503, F07).
+    match state.rate.check(remote.ip(), state.clock.now_unix_ms()) {
+        limits::RateVerdict::Allowed => {}
+        limits::RateVerdict::OverBudget => {
+            return reject(
+                StatusCode::TOO_MANY_REQUESTS,
+                "rate_limited",
+                EndpointError::rate_limited(),
+            );
+        }
+        limits::RateVerdict::RegistryFull => {
+            return reject(
+                StatusCode::SERVICE_UNAVAILABLE,
+                "rate_registry_full",
+                EndpointError::rate_registry_full(),
+            );
+        }
+    }
+
+    // 浏览器的跨域预检必须在身份认证前结束，实际请求仍走完整鉴权链。
+    if method == "OPTIONS" && origin.is_some() {
+        return browser_cors_response(
+            StatusCode::NO_CONTENT.into_response(),
+            origin.as_deref(),
+            true,
+        );
     }
 
     let mut req = req;
     req.extensions_mut().insert(connection_kind);
     req.extensions_mut().insert(remote);
-    next.run(req).await
+    browser_cors_response(next.run(req).await, origin.as_deref(), true)
+}
+
+/// 设备凭证与浏览器会话共用一处“仍有效”判断。WebSession 的内部会话号
+/// 只留在服务内存；退出、过期或存储不可读都不能沿用已经签发的 WS 票据。
+fn validate_live_principal(
+    state: &ServiceState,
+    principal: &Principal,
+    secure_transport: bool,
+) -> Result<(), AuthDenial> {
+    state.auth.validate_principal(principal)?;
+    if principal.credential_kind != CredentialKind::WebSession {
+        return Ok(());
+    }
+    let reason = match state.management.web_session_current(
+        principal,
+        state.clock.now_unix_ms(),
+        secure_transport,
+    ) {
+        Ok(true) => return Ok(()),
+        Ok(false) => "invalid_credential",
+        Err(_) => "web_session_registry_unavailable",
+    };
+    Err(AuthDenial {
+        reason,
+        credential_source: Some("web_session"),
+        connection_kind: match principal.connection_kind {
+            auth::ConnectionKindSerde::Local => ConnectionKind::Local,
+            auth::ConnectionKindSerde::Lan => ConnectionKind::Lan,
+        },
+    })
 }
 
 async fn auth_guard(State(state): State<ServiceState>, req: Request, next: Next) -> Response {
@@ -1021,6 +1505,10 @@ async fn auth_guard(State(state): State<ServiceState>, req: Request, next: Next)
         .and_then(|v| v.to_str().ok())
         .map(|v| v.to_string());
     let query = req.uri().query().unwrap_or("").to_string();
+    let secure_transport = req
+        .extensions()
+        .get::<serve::SecureTransport>()
+        .is_some_and(|value| value.0);
     let Some(connection_kind) = req.extensions().get::<ConnectionKind>().copied() else {
         // Unreachable when the transport guard is layered (it always
         // inserts the kind); fail closed rather than guess.
@@ -1053,13 +1541,22 @@ async fn auth_guard(State(state): State<ServiceState>, req: Request, next: Next)
         let auth_result = match ws::ws_credential_from(authorization.as_deref(), &query) {
             Some(ws::WsCredential::Ticket(ticket)) => state
                 .tickets
-                .consume(&ticket, connection_kind, "/lingxi/v1/ws", now_ms)
+                .consume(
+                    &ticket,
+                    connection_kind,
+                    secure_transport,
+                    "/lingxi/v1/ws",
+                    now_ms,
+                )
                 .ok_or(AuthDenial {
                     reason: "invalid_ws_ticket",
                     credential_source: Some("ws_ticket"),
                     connection_kind,
                 })
-                .map(|principal| (principal, "ws_ticket")),
+                .and_then(|principal| {
+                    validate_live_principal(&state, &principal, secure_transport)?;
+                    Ok((principal, "ws_ticket"))
+                }),
             Some(ws::WsCredential::Bearer(token)) => state
                 .auth
                 .authenticate(
@@ -1085,14 +1582,37 @@ async fn auth_guard(State(state): State<ServiceState>, req: Request, next: Next)
                 principal
             }
             Err(denial) => {
+                let registry_failure = matches!(
+                    denial.reason,
+                    "auth_registry_unavailable" | "web_session_registry_unavailable"
+                );
                 eprintln!(
                     "{}",
                     redact_line(&format!(
                         "{AUTH_REJECTED_MARKER} request_id={request_id} method={method} path={path} \
-                         status=401 reason={} remote={remote}",
+                         status={} reason={} remote={remote}",
+                        if registry_failure { 500 } else { 401 },
                         denial.reason
                     ))
                 );
+                if registry_failure {
+                    return EndpointError::new(
+                        StatusCode::INTERNAL_SERVER_ERROR,
+                        ErrorCode::Internal,
+                        "credential registry unavailable",
+                    )
+                    .with_reason(if denial.reason == "web_session_registry_unavailable" {
+                        "web_session_registry_failure"
+                    } else {
+                        "device_registry_failure"
+                    })
+                    .with_cause(if denial.reason == "web_session_registry_unavailable" {
+                        "auth.web_session_registry_failure"
+                    } else {
+                        "auth.device_registry_failure"
+                    })
+                    .into_response();
+                }
                 return EndpointError::unauthorized(denial.reason).into_response();
             }
         }
@@ -1101,19 +1621,87 @@ async fn auth_guard(State(state): State<ServiceState>, req: Request, next: Next)
             .into_iter()
             .find(|(key, _)| key == "token")
             .map(|(_, value)| value);
-        match state.auth.authenticate(
-            authorization.as_deref(),
-            query_token.as_deref(),
-            true,
-            connection_kind,
-        ) {
+        let cookie_principal = if authorization.is_none() && query_token.is_none() {
+            let cookie = req
+                .headers()
+                .get(header::COOKIE)
+                .and_then(|v| v.to_str().ok());
+            match state
+                .management
+                .authenticate_cookie(cookie, now_ms, secure_transport)
+            {
+                Ok(Some(principal)) if principal.connection_kind == connection_kind.into() => {
+                    match validate_live_principal(&state, &principal, secure_transport) {
+                        Ok(()) => Some(principal),
+                        Err(denial) if denial.reason == "web_session_registry_unavailable" => {
+                            return EndpointError::new(
+                                StatusCode::INTERNAL_SERVER_ERROR,
+                                ErrorCode::Internal,
+                                "credential registry unavailable",
+                            )
+                            .with_reason("web_session_registry_failure")
+                            .with_cause("auth.web_session_registry_failure")
+                            .into_response()
+                        }
+                        Err(_) => None,
+                    }
+                }
+                Ok(_) => None,
+                Err(err) => return err.into_response(),
+            }
+        } else {
+            None
+        };
+        let authentication = match cookie_principal {
+            Some(principal) => Ok(principal),
+            None => state.auth.authenticate(
+                authorization.as_deref(),
+                query_token.as_deref(),
+                true,
+                connection_kind,
+            ),
+        };
+        match authentication {
             Ok(principal) => principal,
             Err(denial) => {
+                if denial.reason == "auth_registry_unavailable" {
+                    return EndpointError::new(
+                        StatusCode::INTERNAL_SERVER_ERROR,
+                        ErrorCode::Internal,
+                        "credential registry unavailable",
+                    )
+                    .with_reason("device_registry_failure")
+                    .with_cause("auth.device_registry_failure")
+                    .into_response();
+                }
+                // R14-F01 (R02 stage-repair R14): the R00 supplemental leaf
+                // R00-T02-LA-5816DA563ED8 pins the ORIGINAL assertion for
+                // POST /lingxi/v1/ws-ticket — "无主体返回 403", captured from
+                // the incumbent (`server/routes/ws-auth.ts` answers a missing
+                // principal with 403 missing_principal; `server/http/
+                // request-principal.ts` denies failed authentication with
+                // 403). The ticket-issuance route keeps that
+                // authorization-shaped denial (403) for an unauthenticated
+                // caller so the R00 leaf assertion holds verbatim; every
+                // other route keeps the 401 authentication semantics the
+                // R02 stage matrix (A05) asserts.
+                let ticket_route = path == "/lingxi/v1/ws-ticket" && method == "POST";
+                let (status, err) = if ticket_route {
+                    (
+                        StatusCode::FORBIDDEN,
+                        EndpointError::forbidden(denial.reason),
+                    )
+                } else {
+                    (
+                        StatusCode::UNAUTHORIZED,
+                        EndpointError::unauthorized(denial.reason),
+                    )
+                };
                 eprintln!(
                     "{}",
                     redact_line(&format!(
                         "{AUTH_REJECTED_MARKER} request_id={request_id} method={method} path={path} \
-                         status=401 reason={} remote={}",
+                         status={status} reason={} remote={}",
                         denial.reason,
                         req.extensions()
                             .get::<SocketAddr>()
@@ -1121,7 +1709,7 @@ async fn auth_guard(State(state): State<ServiceState>, req: Request, next: Next)
                             .unwrap_or_else(|| "unknown".to_string())
                     ))
                 );
-                return EndpointError::unauthorized(denial.reason).into_response();
+                return err.into_response();
             }
         }
     };
@@ -1159,11 +1747,30 @@ async fn health() -> Json<HealthResponse> {
     Json(health_payload())
 }
 
-async fn me(axum::Extension(principal): axum::Extension<Principal>) -> Response {
-    // Server-computed identity echo: proves the principal comes from the
-    // auth chain. Any client-supplied identity fields were already ignored
-    // (the ExecuteRequest parser rejects unknown fields outright).
-    (StatusCode::OK, Json(principal)).into_response()
+async fn me(
+    State(state): State<ServiceState>,
+    axum::Extension(mut principal): axum::Extension<Principal>,
+) -> Response {
+    let (server_id, studio_id) = state.management.identity_ids();
+    principal.server_node_id.get_or_insert(server_id.clone());
+    principal.studio_id.get_or_insert(studio_id.clone());
+    let mut capabilities = std::collections::BTreeSet::new();
+    for scope in &principal.scopes {
+        capabilities.insert(scope.as_str());
+        if let Some(namespace) = scope.split('.').next() {
+            capabilities.insert(namespace);
+        }
+    }
+    let mut view = serde_json::to_value(&principal).expect("Principal serialization is infallible");
+    if let Some(object) = view.as_object_mut() {
+        object.insert("version".into(), serde_json::json!(server_version()));
+        object.insert("serverVersion".into(), serde_json::json!(server_version()));
+        object.insert("serverNodeKind".into(), serde_json::json!(SERVER_KIND));
+        object.insert("serverId".into(), serde_json::json!(server_id));
+        object.insert("capabilities".into(), serde_json::json!(capabilities));
+        object.insert("principal".into(), serde_json::json!(principal));
+    }
+    (StatusCode::OK, Json(view)).into_response()
 }
 
 async fn list_sessions(
@@ -1471,14 +2078,28 @@ async fn issue_device_credential(
 async fn ws_ticket(
     axum::Extension(principal): axum::Extension<Principal>,
     axum::Extension(connection_kind): axum::Extension<ConnectionKind>,
+    axum::Extension(secure_transport): axum::Extension<serve::SecureTransport>,
     State(state): State<ServiceState>,
 ) -> Response {
-    let issued = state.tickets.issue(
+    // R9-F05: ticket material is system-CSPRNG-only; when the secure
+    // source fails, NO ticket is issued (5xx) — never a weaker fallback.
+    let issued = match state.tickets.issue(
         principal,
         connection_kind,
+        secure_transport.0,
         "/lingxi/v1/ws",
         state.clock.now_unix_ms(),
-    );
+    ) {
+        Ok(issued) => issued,
+        Err(err) => {
+            return EndpointError::new(
+                StatusCode::INTERNAL_SERVER_ERROR,
+                ErrorCode::Internal,
+                format!("cannot mint ws ticket — secure random source refused: {err}"),
+            )
+            .into_response()
+        }
+    };
     #[derive(Serialize)]
     #[serde(rename_all = "camelCase")]
     struct Body {
@@ -1498,6 +2119,7 @@ async fn ws_ticket(
 async fn ws_handler(
     State(state): State<ServiceState>,
     axum::Extension(principal): axum::Extension<Principal>,
+    axum::Extension(secure_transport): axum::Extension<serve::SecureTransport>,
     request_id: Option<axum::Extension<RequestId>>,
     ws_upgrade: Result<ws::WsUpgrade, ws::WsUpgradeRejection>,
 ) -> Response {
@@ -1515,7 +2137,14 @@ async fn ws_handler(
                     rejection.status, rejection.reason
                 ))
             );
-            return EndpointError::invalid_transport(rejection.reason).into_response();
+            return EndpointError::new(
+                StatusCode::from_u16(rejection.status).unwrap_or(StatusCode::BAD_REQUEST),
+                ErrorCode::InvalidMessage,
+                "invalid WebSocket upgrade request",
+            )
+            .with_reason(rejection.reason)
+            .with_cause("transport.invalid_ws_upgrade")
+            .into_response();
         }
     };
     // Connection ceiling BEFORE the 101: a refused upgrade must not count.
@@ -1539,7 +2168,7 @@ async fn ws_handler(
         match upgrade.on_upgrade.await {
             Ok(io) => {
                 let io = hyper_util::rt::tokio::TokioIo::new(io);
-                run_ws_session(io, state_for_task, principal, slot).await;
+                run_ws_session(io, state_for_task, principal, secure_transport.0, slot).await;
             }
             Err(err) => {
                 tracing::warn!(%err, "websocket upgrade failed after 101");
@@ -1549,22 +2178,100 @@ async fn ws_handler(
     response
 }
 
+/// 每次向已建立的 WS 连接收发业务数据前，以及空闲连接的定时检查中，
+/// 重新确认设备凭证。注册簿读不到时明确报内部错误，不能伪装成凭证撤销。
+async fn ensure_ws_principal_current<IO>(
+    io: &mut IO,
+    state: &ServiceState,
+    principal: &Principal,
+    secure_transport: bool,
+) -> bool
+where
+    IO: tokio::io::AsyncWrite + Unpin,
+{
+    let Err(denial) = validate_live_principal(state, principal, secure_transport) else {
+        return true;
+    };
+    let registry_failure = matches!(
+        denial.reason,
+        "auth_registry_unavailable" | "web_session_registry_unavailable"
+    );
+    let registry_cause = if denial.reason == "web_session_registry_unavailable" {
+        "auth.web_session_registry_failure"
+    } else {
+        "auth.device_registry_failure"
+    };
+    let (code, message, cause, close_code, close_reason) = if registry_failure {
+        (
+            ErrorCode::Internal,
+            "credential registry unavailable",
+            registry_cause,
+            1011,
+            "internal",
+        )
+    } else {
+        (
+            ErrorCode::Unauthorized,
+            "device credential is no longer valid",
+            "auth.invalid_credential",
+            WS_CLOSE_UNAUTHORIZED,
+            "unauthorized",
+        )
+    };
+    let error =
+        ProtocolError::new(code, message, false).with_details(error_details(denial.reason, cause));
+    let _ = ws::write_ws_text(io, &canon::canonical_bytes(&error)).await;
+    let _ = ws::write_ws_close(io, close_code, close_reason).await;
+    false
+}
+
 async fn run_ws_session<IO>(
-    mut io: IO,
+    io: IO,
     state: ServiceState,
     principal: Principal,
+    secure_transport: bool,
     _slot: limits::WsConnectionGuard,
 ) where
-    IO: tokio::io::AsyncRead + tokio::io::AsyncWrite + Unpin,
+    IO: tokio::io::AsyncRead + tokio::io::AsyncWrite + Unpin + Send + 'static,
 {
     // R02-T06: this session is a MANAGED TASK of the shutdown coordinator —
     // register it (open count) and watch the shutdown broadcast. The guard
     // decrements the count on every exit path of this loop.
     let mut shutdown_rx = state.ws_shutdown().subscribe();
     let _session_guard = shutdown::WsSessionGuard::new(state.ws_shutdown());
+    let (reader, mut writer) = tokio::io::split(io);
+    let mut frame_reader = ws::ClientFrameReader::new(reader);
+    async {
+    // 撤销可能发生在客户端静默期间，或订阅尚无新事件时；定时复核可让
+    // 已升级连接在没有下一帧的情况下失效。跳过积压 tick，避免突发重读。
+    let mut auth_tick = tokio::time::interval(std::time::Duration::from_secs(1));
+    auth_tick.set_missed_tick_behavior(tokio::time::MissedTickBehavior::Skip);
 
     // 1. lingxi.wire handshake: first text frame must be a ClientHello.
-    match ws::read_ws_frame(&mut io).await {
+    //    R02 stage-repair R1 / F03: the handshake read races the shutdown
+    //    broadcast — a client that upgrades but never sends ClientHello
+    //    must not hold the transport drain past the budget.
+    let first_frame = loop {
+        tokio::select! {
+            shutdown = shutdown_rx.changed() => {
+                let _ = shutdown;
+                let _ = ws::write_ws_close(&mut writer, 1001, "server_shutdown").await;
+                return;
+            }
+            _ = auth_tick.tick() => {
+                if !ensure_ws_principal_current(&mut writer, &state, &principal, secure_transport).await {
+                    return;
+                }
+            }
+            frame = frame_reader.recv() => break frame,
+        }
+    };
+    if matches!(first_frame, Ok(Some(_)))
+        && !ensure_ws_principal_current(&mut writer, &state, &principal, secure_transport).await
+    {
+        return;
+    }
+    match first_frame {
         Ok(Some(ws::WsFrame::Text(bytes))) => {
             let hello: ClientHello = match serde_json::from_slice(&bytes) {
                 Ok(hello) => hello,
@@ -1574,9 +2281,9 @@ async fn run_ws_session<IO>(
                         format!("first frame is not a valid ClientHello: {err}"),
                         false,
                     );
-                    let _ = ws::write_ws_text(&mut io, &canon::canonical_bytes(&error)).await;
+                    let _ = ws::write_ws_text(&mut writer, &canon::canonical_bytes(&error)).await;
                     let _ = ws::write_ws_close(
-                        &mut io,
+                        &mut writer,
                         ws::WS_CLOSE_INVALID_MESSAGE,
                         "invalid_message",
                     )
@@ -1597,16 +2304,16 @@ async fn run_ws_session<IO>(
                         rejected_caps: Vec::new(),
                     };
                     if let Err(err) =
-                        ws::write_ws_text(&mut io, &canon::canonical_bytes(&server_hello)).await
+                        ws::write_ws_text(&mut writer, &canon::canonical_bytes(&server_hello)).await
                     {
                         tracing::warn!(%err, "cannot send ServerHello");
                         return;
                     }
                 }
                 Err(error) => {
-                    let _ = ws::write_ws_text(&mut io, &canon::canonical_bytes(&error)).await;
+                    let _ = ws::write_ws_text(&mut writer, &canon::canonical_bytes(&error)).await;
                     let _ = ws::write_ws_close(
-                        &mut io,
+                        &mut writer,
                         ws::WS_CLOSE_INVALID_MESSAGE,
                         "version_incompatible",
                     )
@@ -1617,7 +2324,7 @@ async fn run_ws_session<IO>(
         }
         Ok(Some(_)) => {
             let _ = ws::write_ws_close(
-                &mut io,
+                &mut writer,
                 ws::WS_CLOSE_INVALID_MESSAGE,
                 "first frame must be a text ClientHello",
             )
@@ -1627,6 +2334,9 @@ async fn run_ws_session<IO>(
         Ok(None) => return,
         Err(err) => {
             tracing::warn!(%err, "ws handshake read failed");
+            if err.kind() == std::io::ErrorKind::InvalidData {
+                let _ = ws::write_ws_close(&mut writer, 1002, "protocol_error").await;
+            }
             return;
         }
     }
@@ -1651,10 +2361,20 @@ async fn run_ws_session<IO>(
                 // polite close(1001) and end the session so the drain can
                 // complete within the deadline.
                 let _ = shutdown;
-                let _ = ws::write_ws_close(&mut io, 1001, "server_shutdown").await;
+                let _ = ws::write_ws_close(&mut writer, 1001, "server_shutdown").await;
                 return;
             }
-            incoming = ws::read_ws_frame(&mut io) => {
+            _ = auth_tick.tick() => {
+                if !ensure_ws_principal_current(&mut writer, &state, &principal, secure_transport).await {
+                    return;
+                }
+            }
+            incoming = frame_reader.recv() => {
+                if matches!(incoming, Ok(Some(_)))
+                    && !ensure_ws_principal_current(&mut writer, &state, &principal, secure_transport).await
+                {
+                    return;
+                }
                 match incoming {
                     Ok(Some(ws::WsFrame::Text(bytes))) => {
                         let request: ws::WsClientRequest = match serde_json::from_slice(&bytes) {
@@ -1665,9 +2385,9 @@ async fn run_ws_session<IO>(
                                     format!("frame is not a valid ws request: {err}"),
                                     false,
                                 );
-                                let _ = ws::write_ws_text(&mut io, &canon::canonical_bytes(&error)).await;
+                                let _ = ws::write_ws_text(&mut writer, &canon::canonical_bytes(&error)).await;
                                 let _ = ws::write_ws_close(
-                                    &mut io,
+                                    &mut writer,
                                     ws::WS_CLOSE_INVALID_MESSAGE,
                                     "invalid_message",
                                 )
@@ -1678,6 +2398,16 @@ async fn run_ws_session<IO>(
                         match request {
                             ws::WsClientRequest::SessionRead { session_id } => {
                                 let access = state.sessions.get_for(&principal, &session_id).await;
+                                if !ensure_ws_principal_current(
+                                    &mut writer,
+                                    &state,
+                                    &principal,
+                                    secure_transport,
+                                )
+                                .await
+                                {
+                                    return;
+                                }
                                 match access {
                                     Ok(sessions::SessionAccess::Ok(facts)) => {
                                         let message = ws::WsServerMessage::SessionReadResult {
@@ -1685,7 +2415,7 @@ async fn run_ws_session<IO>(
                                             run_count: facts.run_count,
                                         };
                                         if let Err(err) =
-                                            ws::write_ws_text(&mut io, &canon::canonical_bytes(&message)).await
+                                            ws::write_ws_text(&mut writer, &canon::canonical_bytes(&message)).await
                                         {
                                             tracing::warn!(%err, "cannot send ws reply");
                                             return;
@@ -1694,9 +2424,9 @@ async fn run_ws_session<IO>(
                                     Ok(sessions::SessionAccess::NotFound) => {
                                         let error =
                                             ProtocolError::new(ErrorCode::NotFound, "session not found", false);
-                                        let _ = ws::write_ws_text(&mut io, &canon::canonical_bytes(&error)).await;
+                                        let _ = ws::write_ws_text(&mut writer, &canon::canonical_bytes(&error)).await;
                                         let _ =
-                                            ws::write_ws_close(&mut io, ws::WS_CLOSE_NOT_FOUND, "not_found").await;
+                                            ws::write_ws_close(&mut writer, ws::WS_CLOSE_NOT_FOUND, "not_found").await;
                                         return;
                                     }
                                     Ok(sessions::SessionAccess::Forbidden) => {
@@ -1709,9 +2439,9 @@ async fn run_ws_session<IO>(
                                             "reason".to_string(),
                                             serde_json::Value::String("cross_principal_access".to_string()),
                                         )]));
-                                        let _ = ws::write_ws_text(&mut io, &canon::canonical_bytes(&error)).await;
+                                        let _ = ws::write_ws_text(&mut writer, &canon::canonical_bytes(&error)).await;
                                         let _ =
-                                            ws::write_ws_close(&mut io, ws::WS_CLOSE_FORBIDDEN, "forbidden").await;
+                                            ws::write_ws_close(&mut writer, ws::WS_CLOSE_FORBIDDEN, "forbidden").await;
                                         return;
                                     }
                                     Err(err) => {
@@ -1720,8 +2450,8 @@ async fn run_ws_session<IO>(
                                             format!("run database read failed: {err}"),
                                             false,
                                         );
-                                        let _ = ws::write_ws_text(&mut io, &canon::canonical_bytes(&error)).await;
-                                        let _ = ws::write_ws_close(&mut io, 1011, "internal").await;
+                                        let _ = ws::write_ws_text(&mut writer, &canon::canonical_bytes(&error)).await;
+                                        let _ = ws::write_ws_close(&mut writer, 1011, "internal").await;
                                         return;
                                     }
                                 }
@@ -1737,9 +2467,9 @@ async fn run_ws_session<IO>(
                                         "reason".to_string(),
                                         serde_json::Value::String("already_subscribed".to_string()),
                                     )]));
-                                    let _ = ws::write_ws_text(&mut io, &canon::canonical_bytes(&error)).await;
+                                    let _ = ws::write_ws_text(&mut writer, &canon::canonical_bytes(&error)).await;
                                     let _ = ws::write_ws_close(
-                                        &mut io,
+                                        &mut writer,
                                         ws::WS_CLOSE_INVALID_MESSAGE,
                                         "invalid_message",
                                     )
@@ -1748,10 +2478,20 @@ async fn run_ws_session<IO>(
                                 }
                                 match state.events.subscribe(&principal, &stream_id, cursor).await {
                                     Ok(events::SubscribeOutcome::Started { cut, subscription: sub }) => {
+                                        if !ensure_ws_principal_current(
+                                            &mut writer,
+                                            &state,
+                                            &principal,
+                                            secure_transport,
+                                        )
+                                        .await
+                                        {
+                                            return;
+                                        }
                                         // Control frame first (explicit boundary), then the
                                         // snapshot cut, then live frames from the mailbox.
                                         if let Err(err) = ws::write_ws_text(
-                                            &mut io,
+                                            &mut writer,
                                             events::control_subscribed_json(&cut).as_bytes(),
                                         )
                                         .await
@@ -1760,8 +2500,18 @@ async fn run_ws_session<IO>(
                                             return;
                                         }
                                         for envelope in &cut.events {
+                                            if !ensure_ws_principal_current(
+                                                &mut writer,
+                                                &state,
+                                                &principal,
+                                                secure_transport,
+                                            )
+                                            .await
+                                            {
+                                                return;
+                                            }
                                             if let Err(err) =
-                                                ws::write_ws_text(&mut io, &canon::canonical_bytes(envelope)).await
+                                                ws::write_ws_text(&mut writer, &canon::canonical_bytes(envelope)).await
                                             {
                                                 tracing::warn!(%err, "cannot send snapshot event");
                                                 return;
@@ -1770,10 +2520,20 @@ async fn run_ws_session<IO>(
                                         subscription = Some(sub);
                                     }
                                     Ok(events::SubscribeOutcome::RequiresSnapshot(required)) => {
+                                        if !ensure_ws_principal_current(
+                                            &mut writer,
+                                            &state,
+                                            &principal,
+                                            secure_transport,
+                                        )
+                                        .await
+                                        {
+                                            return;
+                                        }
                                         // Explicit rebuild directive: NOT an error close — the
                                         // connection stays for the resubscribe-after-snapshot.
                                         if let Err(err) = ws::write_ws_text(
-                                            &mut io,
+                                            &mut writer,
                                             events::control_snapshot_required_json(
                                                 &required.stream_id,
                                                 required.floor,
@@ -1872,9 +2632,9 @@ async fn run_ws_session<IO>(
                                                 "internal",
                                             ),
                                         };
-                                        let _ = ws::write_ws_text(&mut io, &canon::canonical_bytes(&error)).await;
+                                        let _ = ws::write_ws_text(&mut writer, &canon::canonical_bytes(&error)).await;
                                         let _ =
-                                            ws::write_ws_close(&mut io, close_code, close_reason).await;
+                                            ws::write_ws_close(&mut writer, close_code, close_reason).await;
                                         return;
                                     }
                                 }
@@ -1882,19 +2642,22 @@ async fn run_ws_session<IO>(
                         }
                     }
                     Ok(Some(ws::WsFrame::Ping(payload))) => {
-                        if let Err(err) = ws::write_ws_frame(&mut io, 0xA, &payload).await {
+                        if let Err(err) = ws::write_ws_frame(&mut writer, 0xA, &payload).await {
                             tracing::warn!(%err, "cannot send pong");
                             return;
                         }
                     }
                     Ok(Some(ws::WsFrame::Pong)) => {}
                     Ok(Some(ws::WsFrame::Close(code, reason))) => {
-                        let _ = ws::write_ws_close(&mut io, code, &reason).await;
+                        let _ = ws::write_ws_close(&mut writer, code, &reason).await;
                         return;
                     }
                     Ok(None) => return,
                     Err(err) => {
                         tracing::warn!(%err, "ws session read failed");
+                        if err.kind() == std::io::ErrorKind::InvalidData {
+                            let _ = ws::write_ws_close(&mut writer, 1002, "protocol_error").await;
+                        }
                         return;
                     }
                 }
@@ -1905,6 +2668,9 @@ async fn run_ws_session<IO>(
                     subscription = None;
                     continue;
                 };
+                if !ensure_ws_principal_current(&mut writer, &state, &principal, secure_transport).await {
+                    return;
+                }
                 let payload_bytes = match &frame {
                     events::SubscriptionFrame::Event(envelope) => {
                         canon::canonical_bytes(envelope.as_ref())
@@ -1923,7 +2689,7 @@ async fn run_ws_session<IO>(
                         .into_bytes()
                     }
                 };
-                if let Err(err) = ws::write_ws_text(&mut io, &payload_bytes).await {
+                if let Err(err) = ws::write_ws_text(&mut writer, &payload_bytes).await {
                     tracing::warn!(%err, "cannot deliver subscription frame");
                     return;
                 }
@@ -1935,6 +2701,11 @@ async fn run_ws_session<IO>(
             }
         }
     }
+    }
+    .await;
+    // 所有 return 分支先离开内部会话，再中止并等待读半边。管理层的
+    // 会话计数 guard 此时仍在，故关停不会把未回收的读任务误判为已排空。
+    frame_reader.shutdown().await;
 }
 
 /// Machine reason detail block for subscribe rejections, with the
@@ -1954,8 +2725,9 @@ fn error_details(reason: &str, cause_id: &str) -> serde_json::Map<String, serde_
 
 /// Builds the full HTTP router with all injected state: public health plus
 /// the authenticated business surface. Layer order (outermost last):
-/// request-id/error enrichment → transport guard → auth guard → routes,
-/// with the body limit applied at the extraction boundary.
+/// request-id/error enrichment → HTTP admission (F07 in-flight cap +
+/// per-request budget) → transport guard → auth guard → routes, with the
+/// body limit applied at the extraction boundary.
 pub fn build_router(state: ServiceState) -> Router {
     Router::new()
         .route("/lingxi/v1/health", get(health))
@@ -1976,6 +2748,8 @@ pub fn build_router(state: ServiceState) -> Router {
             post(issue_device_credential),
         )
         .route("/lingxi/v1/ws", get(ws_handler))
+        .merge(management::routes())
+        .merge(static_web::routes())
         .layer(axum::extract::DefaultBodyLimit::max(
             limits::DEFAULT_BODY_LIMIT_BYTES,
         ))
@@ -1983,6 +2757,10 @@ pub fn build_router(state: ServiceState) -> Router {
         .layer(middleware::from_fn_with_state(
             state.clone(),
             transport_guard,
+        ))
+        .layer(middleware::from_fn_with_state(
+            state.clone(),
+            http_admission,
         ))
         .layer(middleware::from_fn_with_state(
             state.clone(),
@@ -2016,9 +2794,28 @@ impl fmt::Display for ServiceError {
 
 impl std::error::Error for ServiceError {}
 
+/// Outcome of the serving loop (R02 stage-repair R1 / F03).
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub struct ServeOutcome {
+    /// The transport drain exceeded the caller's budget: in-flight
+    /// connections were abandoned instead of draining (the shutdown
+    /// coordinator records the timeout; the binary's deterministic
+    /// `process::exit` bounds whatever wedged). `false` = every connection
+    /// drained cleanly within the budget.
+    pub drain_timed_out: bool,
+}
+
 /// Binds, reports the concrete local address through `on_ready`, and serves
 /// until `shutdown` resolves (SIGINT/SIGTERM in the binary; a test-controlled
-/// future in the harness). In-flight requests drain before returning.
+/// future in the harness). In-flight requests drain before returning —
+/// bounded by `drain_budget` when one is given (R02 stage-repair R1 / F03:
+/// the pre-fix drain had NO deadline, so a single stuck connection — e.g. a
+/// partial request body — held the process past every configured shutdown
+/// timeout before any coordinator phase even started). The serve future is
+/// LAZY, so the signal is consumed by the graceful-shutdown future itself
+/// (which records the signal instant); a watchdog armed at that instant races
+/// the drain and abandons it loudly when the budget expires — the accept loop
+/// keeps polling normally while serving.
 ///
 /// Note (R02-T02): single-writer locking and the instance record are owned
 /// by the CALLER (`instance::acquire` + `InstanceGuard::publish` inside
@@ -2029,7 +2826,22 @@ pub async fn run<F>(
     state: ServiceState,
     shutdown: F,
     on_ready: impl FnOnce(SocketAddr),
-) -> Result<(), ServiceError>
+    drain_budget: Option<std::time::Duration>,
+) -> Result<ServeOutcome, ServiceError>
+where
+    F: Future<Output = ()> + Send + 'static,
+{
+    run_with_tls(state, shutdown, on_ready, drain_budget, None).await
+}
+
+/// 通过真实 TLS 握手服务请求；未配置时保持原有 HTTP 行为。
+pub async fn run_with_tls<F>(
+    state: ServiceState,
+    shutdown: F,
+    on_ready: impl FnOnce(SocketAddr),
+    drain_budget: Option<std::time::Duration>,
+    tls_acceptor: Option<tokio_rustls::TlsAcceptor>,
+) -> Result<ServeOutcome, ServiceError>
 where
     F: Future<Output = ()> + Send + 'static,
 {
@@ -2044,22 +2856,143 @@ where
         addr: bind_addr,
         source,
     })?;
+    *state
+        .bound_addr
+        .write()
+        .unwrap_or_else(|poisoned| poisoned.into_inner()) = Some(local);
     on_ready(local);
 
-    let server = axum::serve(
+    // R2-F04: the serving loop enforces CONNECTION-level admission at the
+    // accept edge (count cap) and a header-read budget per connection
+    // (time cap) — axum's `serve` exposes neither, so the loop lives in
+    // `crate::serve` with the axum graceful-drain semantics preserved.
+    // Both budgets come from the SAME knobs as the request-level gate
+    // (`--http-max-in-flight` / `--http-request-budget-ms`).
+    let conn_admission = Arc::clone(state.connection_admission());
+    let header_budget = state.admission().request_budget();
+    let router = build_router(state);
+    // The graceful-shutdown future consumes the stop signal and records the
+    // signal instant; the drain budget watchdog is armed at THAT instant (the
+    // unified from-signal budget — F03) and races the drain. Serving therefore
+    // polls the accept loop from the start; dropping the serve future on a
+    // watchdog win abandons whatever the drain could not finish.
+    let (signal_tx, signal_rx) = tokio::sync::oneshot::channel::<std::time::Instant>();
+    let graceful = async move {
+        shutdown.await;
+        let _ = signal_tx.send(std::time::Instant::now());
+    };
+    let server = serve::serve_with_connection_admission(
         listener,
-        build_router(state).into_make_service_with_connect_info::<SocketAddr>(),
-    )
-    .with_graceful_shutdown(shutdown);
-    server
-        .await
-        .map_err(|source| ServiceError::Serve { source })
+        router,
+        graceful,
+        conn_admission,
+        header_budget,
+        tls_acceptor,
+    );
+    tokio::pin!(server);
+    match drain_budget {
+        None => server
+            .await
+            .map(|()| ServeOutcome {
+                drain_timed_out: false,
+            })
+            .map_err(|source| ServiceError::Serve { source }),
+        Some(budget) => {
+            let watchdog = async {
+                let _ = signal_rx.await;
+                tokio::time::sleep(budget).await;
+            };
+            tokio::select! {
+                biased;
+                result = &mut server => result
+                    .map(|()| ServeOutcome {
+                        drain_timed_out: false,
+                    })
+                    .map_err(|source| ServiceError::Serve { source }),
+                () = watchdog => {
+                    eprintln!(
+                        "{} phase=transport_drain budget_ms={}",
+                        shutdown::SHUTDOWN_TIMEOUT_MARKER,
+                        budget.as_millis()
+                    );
+                    tracing::error!(
+                        phase = "transport_drain",
+                        budget_ms = budget.as_millis() as u64,
+                        "shutdown drain exceeded its budget; abandoning in-flight \
+                         connections (bounded at process level by the deterministic exit)"
+                    );
+                    Ok(ServeOutcome {
+                        drain_timed_out: true,
+                    })
+                }
+            }
+        }
+    }
 }
 
 #[cfg(test)]
 mod tests {
     use super::*;
     use std::path::PathBuf;
+
+    #[tokio::test]
+    async fn storage_http_errors_keep_status_reason_and_retryability() {
+        for (failure, status, reason, retryable, cause) in [
+            (
+                StorageError::QueueFull,
+                StatusCode::SERVICE_UNAVAILABLE,
+                "db_queue_full",
+                true,
+                "storage.queue_full",
+            ),
+            (
+                StorageError::Busy { timeout_ms: 20 },
+                StatusCode::SERVICE_UNAVAILABLE,
+                "db_busy",
+                true,
+                "storage.busy",
+            ),
+            (
+                StorageError::DiskFull {
+                    detail: "injected write failure".to_string(),
+                },
+                StatusCode::SERVICE_UNAVAILABLE,
+                "db_disk_full",
+                true,
+                "storage.disk_full",
+            ),
+            (
+                StorageError::QueueClosed,
+                StatusCode::INTERNAL_SERVER_ERROR,
+                "db_failure",
+                false,
+                "storage.queue_closed",
+            ),
+            (
+                StorageError::Io {
+                    detail: "injected write failure".to_string(),
+                },
+                StatusCode::INTERNAL_SERVER_ERROR,
+                "db_failure",
+                false,
+                "storage.io",
+            ),
+        ] {
+            let response = EndpointError::storage(&failure).into_response();
+            assert_eq!(response.status(), status, "{failure:?}");
+            let bytes = axum::body::to_bytes(response.into_body(), 4096)
+                .await
+                .expect("read error response");
+            let body: serde_json::Value = serde_json::from_slice(&bytes).unwrap();
+            assert_eq!(body["code"], "internal", "{failure:?}: {body}");
+            assert_eq!(body["details"]["reason"], reason, "{failure:?}: {body}");
+            assert_eq!(
+                body["details"]["retryable"], retryable,
+                "{failure:?}: {body}"
+            );
+            assert_eq!(body["details"]["causeId"], cause, "{failure:?}: {body}");
+        }
+    }
 
     fn args(list: &[&str]) -> Vec<String> {
         list.iter().map(|s| s.to_string()).collect()
@@ -2172,5 +3105,99 @@ mod tests {
                 "dataEpoch": 1
             })
         );
+    }
+
+    /// R3-F02: the composition root rejects degenerate resource knobs
+    /// loudly (the same exit-2 class the CLI parse layer produces) instead
+    /// of clamping/saturating them silently — the pre-fix `saturating_mul`
+    /// and `.max(1)` fallbacks are unreachable from any validated input.
+    #[test]
+    fn resource_deps_validation_is_loud_for_degenerate_knobs() {
+        let base = ServiceDeps::default();
+        let cases: Vec<(&str, ServiceDeps)> = vec![
+            (
+                "rate_window_ms 0 (would disable the limit silently)",
+                ServiceDeps {
+                    rate_window_ms: 0,
+                    ..base.clone()
+                },
+            ),
+            (
+                "rate_max 0 (the pre-fix truncated-4294967296 state)",
+                ServiceDeps {
+                    rate_max: 0,
+                    ..base.clone()
+                },
+            ),
+            (
+                "ws_max_connections 0",
+                ServiceDeps {
+                    ws_max_connections: 0,
+                    ..base.clone()
+                },
+            ),
+            (
+                "ws_max_tickets 0",
+                ServiceDeps {
+                    ws_max_tickets: 0,
+                    ..base.clone()
+                },
+            ),
+            (
+                "ws_ticket_ttl_ms 0",
+                ServiceDeps {
+                    ws_ticket_ttl_ms: 0,
+                    ..base.clone()
+                },
+            ),
+            (
+                "http_max_in_flight 0",
+                ServiceDeps {
+                    http_max_in_flight: 0,
+                    ..base.clone()
+                },
+            ),
+            (
+                "http_max_in_flight above the 2x derivation bound",
+                ServiceDeps {
+                    http_max_in_flight: usize::MAX,
+                    ..base.clone()
+                },
+            ),
+            (
+                "http_request_budget_ms 0",
+                ServiceDeps {
+                    http_request_budget_ms: 0,
+                    ..base.clone()
+                },
+            ),
+            (
+                "http_request_budget_ms above the 30-day platform-safe bound",
+                ServiceDeps {
+                    http_request_budget_ms: crate::config::MAX_TIME_BUDGET_MS + 1,
+                    ..base.clone()
+                },
+            ),
+        ];
+        for (name, deps) in cases {
+            let err = validate_resource_deps(&deps)
+                .expect_err(&format!("{name} must be a loud startup error"));
+            assert!(
+                matches!(
+                    err,
+                    ServiceStartupError::Storage(StorageError::InvalidRequest { .. })
+                ),
+                "{name}: unexpected error class: {err}"
+            );
+        }
+        // The production defaults are (and must stay) valid.
+        validate_resource_deps(&base).expect("the production defaults are valid");
+        // The boundary of the 2x derivation is valid (checked_mul cannot
+        // overflow at usize::MAX/2).
+        let boundary = ServiceDeps {
+            http_max_in_flight: usize::MAX / 2,
+            ..base.clone()
+        };
+        validate_resource_deps(&boundary).expect("usize::MAX/2 is the valid boundary");
     }
 }

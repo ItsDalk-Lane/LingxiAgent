@@ -64,6 +64,7 @@ const manifestModule = require("../shared/artifact-core/manifest.cjs");
 const { loadPinnedKeyset } = require("../shared/artifact-core/keyset.cjs");
 const { PRELOAD_API_VERSION, SERVER_PROTOCOL_VERSION } = require("../shared/contract-versions.cjs");
 const { assertOfficePdfFontAssets } = require("../desktop/src/office-pdf-fonts.cjs");
+const { verifyRustServiceDirectory } = require("../desktop/src/shared/rust-local-service.cjs");
 
 /**
  * Per-platform seed manifest file name. Each CI platform-arch job produces
@@ -365,6 +366,11 @@ function requireSignKeyPath(env) {
  */
 export async function packServerArchive({ outDir, artifactOutDir, version, platform, arch, env = process.env, log = console.log, deps = {} }) {
   assertKnowledgeVectorRuntime(outDir, platform, arch);
+  if (platform === "win32") {
+    verifyRustServiceDirectory({
+      directory: path.join(outDir, "rust-service"), platform, arch, appVersion: version,
+    });
+  }
   const {
     signMachOFiles = defaultSignMachOFiles,
     smokeTestNodeStartup = defaultSmokeTestNodeStartup,

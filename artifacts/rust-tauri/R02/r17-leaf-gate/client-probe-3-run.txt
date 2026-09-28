@@ -1,0 +1,5 @@
+R02/R00 supplemental client leaves, after final G5 CLI beta-channel refusal update.
+Command: python3 scripts/rust-tauri/r02_client_leaf_matrix.py artifacts/rust-tauri/R02/r17-leaf-gate/client-probe-3
+Started: 2026-09-28 07:35:58 UTC; ended: 2026-09-28 07:36:00 UTC (wrapper log birth/modification times); exit: 0.
+Raw wrapper output: client-probe-3-run.log. Seven structured cases and actual process/UI records: client-probe-3/leaf-cases.json, summary.json, CLI stdout/stderr, synthetic-home trees, Sharing Vitest stdout/stderr and sharing-cases.json. Candidate source digest: client-probe-3-source-sha256.txt.
+Local producer result: 7/7 PASS. Only CLI help/unknown arguments and Sharing UI original leaves have complete dedicated cases. The other 32 R00 leaves remain BLOCKED or FAIL pending their original behaviors; this result is not full-stage verification.

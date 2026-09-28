@@ -13,12 +13,20 @@ import { normalizeSessionRouteError } from '../../../../shared/error-user-messag
 
 const DEFAULT_TIMEOUT = 30_000;
 
+function routeForConnection(connection: { serverNodeKind?: string }, path: string): string {
+  if (connection.serverNodeKind !== 'lingxi-service') return path;
+  if (path.startsWith('/api/access/') || path.startsWith('/api/devices/')) {
+    return `/lingxi/v1${path.slice('/api'.length)}`;
+  }
+  return path;
+}
+
 export function lingxiUrl(path: string): string {
   const connection = requireServerConnection(
     useSettingsStore.getState(),
     `settings lingxiUrl ${path}: server connection not ready`,
   );
-  return buildConnectionUrl(connection, path, { includeTokenQuery: true });
+  return buildConnectionUrl(connection, routeForConnection(connection, path), { includeTokenQuery: true });
 }
 
 export async function lingxiFetch(
@@ -42,7 +50,7 @@ export async function lingxiFetch(
   }
 
   try {
-    const res = await fetch(buildConnectionUrl(connection, path), {
+    const res = await fetch(buildConnectionUrl(connection, routeForConnection(connection, path)), {
       ...fetchOpts,
       headers,
       signal: controller.signal,

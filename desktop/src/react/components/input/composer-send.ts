@@ -202,6 +202,12 @@ export async function prepareComposerSend(
   const { loadVisionAuxiliaryConfig, t } = options;
   const sessionRef = bundle.sessionRef;
 
+  if (useStore.getState().activeServerConnection?.serverNodeKind === 'lingxi-service') {
+    useStore.getState().addToast(t('status.rustCoreUnavailable'), 'warning', 6000,
+      { dedupeKey: 'rust-core-unavailable' });
+    return { ok: false, result: { kind: 'blocked', code: 'rust_core_unavailable', retryable: false } };
+  }
+
   // WebSocket 不存在/非 OPEN：连准备都不必做，明确 blocked（输入保留）。
   if (webSocketOpenOrMissing() !== 'open') {
     return { ok: false, result: { kind: 'blocked', code: 'websocket_unavailable', retryable: true } };
@@ -556,6 +562,10 @@ export async function commitPreparedComposerSend(
 ): Promise<ComposerCommitResult> {
   const sessionPathForSend = prepared.sessionPathForSend;
   const clientMessageId = prepared.clientMessageId;
+
+  if (useStore.getState().activeServerConnection?.serverNodeKind === 'lingxi-service') {
+    return { kind: 'blocked', code: 'rust_core_unavailable', retryable: false };
+  }
 
   const rejection = runtime.revalidate?.() ?? null;
   if (rejection) return rejection;

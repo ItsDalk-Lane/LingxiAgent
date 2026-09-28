@@ -1161,17 +1161,21 @@ async function downloadAndApplyArtifacts(opts) {
     log = () => {},
     fetchOnce,
     devBypass = NO_DEV_OVERRIDE,
+    privateArtifactGuard = null,
   } = opts || {};
   if (!homeDir) throw new Error("artifact-ota: homeDir is required");
   if (!Array.isArray(keyset) || keyset.length === 0) throw new Error("artifact-ota: keyset is required");
   if (!currentShellVersion) throw new Error("artifact-ota: currentShellVersion is required");
   if (!platformArch) throw new Error("artifact-ota: platformArch is required");
 
-  // The apply fetch itself bypasses ETag, but keep the last GitHub token in
-  // bookkeeping if this manually triggered round does not return a new one.
-  const priorCachedEtags = cachedGithubEtags((await readOtaState(homeDir))[channel] || {});
-
+  let privateRootReady = !privateArtifactGuard;
   try {
+    // Windows 的签名桌面入口须先封闭产物根，防止下载与激活期间其他账户换包。
+    if (privateArtifactGuard) await privateArtifactGuard("prepare", homeDir);
+    privateRootReady = true;
+    // The apply fetch itself bypasses ETag, but keep the last GitHub token in
+    // bookkeeping if this manually triggered round does not return a new one.
+    const priorCachedEtags = cachedGithubEtags((await readOtaState(homeDir))[channel] || {});
     // Bypass the ETag cache on purpose: the point of a click-triggered
     // download is to get the latest shelf state, not whatever checkOnce
     // last cached.
@@ -1342,6 +1346,7 @@ async function downloadAndApplyArtifacts(opts) {
           channel,
           kind: "server",
           platformArch,
+          privateArtifactGuard,
         });
         emitProgress({ phase: "activating", kind: "renderer", receivedBytes: rendererEntry.size, totalBytes: rendererEntry.size });
         try {
@@ -1375,7 +1380,9 @@ async function downloadAndApplyArtifacts(opts) {
     }
   } catch (err) {
     log(`[ota] download/apply failed: ${err.message}`);
-    await writeOtaChannelState(homeDir, channel, { lastCheckedAt: nowIso(), lastError: err.message }).catch(() => {});
+    if (privateRootReady) {
+      await writeOtaChannelState(homeDir, channel, { lastCheckedAt: nowIso(), lastError: err.message }).catch(() => {});
+    }
     return { ok: false, error: err.message };
   }
 }

@@ -1,0 +1,23 @@
+{
+  "checks": [
+    {
+      "command": "npm run typecheck",
+      "exitStatus": 0,
+      "log": "typecheck.log"
+    },
+    {
+      "command": "npm test -- --run desktop/src/react/__tests__/services/server-connection.test.ts desktop/src/react/__tests__/services/websocket.test.ts desktop/src/react/__tests__/services/R02RustWebSocket.test.ts desktop/src/react/__tests__/app-init.test.ts",
+      "exitStatus": 0,
+      "log": "vitest.log"
+    }
+  ],
+  "recordedAtUtc": "2026-09-28T09:51:34.352898+00:00",
+  "sourceSha256": {
+    "desktop/src/react/services/server-connection.ts": "274b686e670346b5d7974cb81086f2f957579105921b5eea2388381405d8fe12",
+    "desktop/src/react/services/websocket.ts": "98f628dd770e2677a2c0691e26e666559138b8e399e3b958d77ca846c4abf970",
+    "desktop/src/react/app-init.ts": "a81b70eaac5f6173b4cd3bc3223c2d9660b09b34bd6fa34dd016ede2939c6f31",
+    "desktop/src/react/__tests__/services/server-connection.test.ts": "0c243c9533eebe6d7fc404db22860bb4ab53fe2a122385bd969b7f4dc808a535",
+    "desktop/src/react/__tests__/services/R02RustWebSocket.test.ts": "962f413d9bf30a9eb17bf2595a935953050faf390608ebe85ca4ac8c60650def",
+    "desktop/src/react/__tests__/app-init.test.ts": "9ec71610c4f5eefd00bdc9893c8e263ddb7e0ea7a845d22ffdd61133c8ccfb7a"
+  }
+}

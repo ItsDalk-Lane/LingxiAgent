@@ -33,6 +33,7 @@ function normalizeBrowserViewerOpenTarget(target) {
 contextBridge.exposeInMainWorld("hana", {
   getServerPort: () => ipcRenderer.invoke("get-server-port"),
   getServerToken: () => ipcRenderer.invoke("get-server-token"),
+  getServerConnectionInfo: () => ipcRenderer.invoke('get-server-connection-info'),
   runEditCommand: (command) => ipcRenderer.invoke("run-edit-command", command),
   getAppVersion: () => ipcRenderer.invoke("get-app-version"),
   // 系统语音识别授权（macOS Speech 框架）：status 只读不弹窗；request 由用户手势触发。

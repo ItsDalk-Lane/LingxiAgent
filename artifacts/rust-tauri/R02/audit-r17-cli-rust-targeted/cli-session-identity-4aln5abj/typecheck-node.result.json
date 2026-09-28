@@ -1,0 +1,12 @@
+{
+  "command": [
+    "./node_modules/.bin/tsc",
+    "--noEmit",
+    "-p",
+    "tsconfig.node.json"
+  ],
+  "started_utc": "2026-09-28T08:07:22.820461+00:00",
+  "ended_utc": "2026-09-28T08:07:27.787391+00:00",
+  "exit": 0,
+  "source_sha256": "ea981a843a94495e63e4b2dfa3e337284329a41b5c3943b7ec80bef4fae34c1f"
+}

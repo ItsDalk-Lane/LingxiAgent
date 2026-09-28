@@ -5,6 +5,7 @@
   "stage_id": "R02",
   "generated_by": "EXECUTOR-R02-T08（2026-09-26；一次性执行代理，无 commit/push 授权）",
   "purpose": "R02-T08 步骤 5：把 R00 的 stores/entrypoints/acceptance map 更新为实际实现路径并交接 R03。采用『冻结原件 + 本覆盖层』方式：R00 三份 map 是 R00 阶段封存交付（哈希钉在 R00_HANDOFF.json，逐项 0 失配），本文件不改写它们，而是叠加登记 R01/R02 已落盘的新栈实际实现路径；R03 以『R00 原件（旧栈现役事实）+ 本覆盖层（新栈已验证事实）』为输入。",
+  "current_candidate_note": "2026-09-28 R18：本文件原 T08 的零改动、R03 交接和已验证语句只代表旧候选，不能代表当前工作区。现行合同/证据见 docs/rust-tauri/R02/R02_FULL_SCOPE_HANDOFF_R18.md；本轮获授权提前实现客户端行为，已修改 desktop/ 与 package.json，原 A16 E1 必然 FAIL；34 叶没有完整合法 Gate，R03 不得启动。",
   "source_maps_frozen": {
     "note": "登记时点（TASK_BASE_SHA 5741989165fe7e04c9a58a9d35c7747d3599d274 工作树）的 SHA-256；校验失败说明 R00 交付被动过，先查封印再消费本覆盖层",
     "hashes": {
@@ -94,7 +95,9 @@
   "acceptance_map_overlay": {
     "note": "R02 的 16 个基础场景→真实证据命令映射已机器化为 xtask 阶段图（verify-stage 消费）；R00 ACCEPTANCE_MAP 中 R02-A01..A16 的 NOT_STARTED 状态由以下执行记录取代（状态与证据指针见 docs/rust-tauri/R02/R02_ACCEPTANCE_LEDGER.json）",
     "machine_map": "rust/crates/xtask/src/stage_maps/R02.json（xtask verify-stage R02 --evidence <dir> 执行并产出真实退出码/平台/SHA/日志）",
-    "scenario_command_binds": "见 rust/crates/xtask/src/stage_maps/R02.json scenarios[]（R02-A01..R02-A16 全 REQUIRED）"
+    "scenario_command_binds": "见 rust/crates/xtask/src/stage_maps/R02.json scenarios[]（R02-A01..R02-A16 全 REQUIRED）",
+    "supplemental_leaf_note": "R12-F02（2026-09-28 补记）：R00 FEATURE_STAGE_ACCEPTANCE.json 另有 34 对 D20 feature + REQUIRED_SUPPLEMENTAL 补充场景共同标注 R02/R07（execution_task_ids = R02-T03 + R07-T09），R00 原状 SPECIFIED_NOT_EXECUTED。按 R02 阶段书 §1 边界（无桌面/无新 UI/无真实供应商），完整叶子行为（CLI 客户端、桌面/移动/Web UI、静态资源、配对、access 路由产品化）归 R07-T09 及后续客户端迁移，不提前塞入 R02。R13-F01（2026-09-28，修复 R13）更新：这 34 对现已由机器门禁正式消费——xtask 阶段图 rust/crates/xtask/src/stage_maps/R02.json supplementalLeafScenarios 为门禁数据，verify-stage 运行时与 docs/rust-tauri/R00/ACCEPTANCE_MAP.json 按 id 集合全等核对（缺失/多余/requirement 漂移硬失败）并逐项 roll-up 汇入 overall（32 项绑定既有 13 命令真实执行结果；LA-200D4E5D52C9 另钉会话列表正负路径记录证据文件 fail-closed；2 项纯客户端冲突 LA-B8A1AD32A8E1/LA-32FFEC05BAA7 固定 BLOCKED 待根总控处置）；R02-T03 认证基础份额与 R07 责任的逐对拆账见 R02_ACCEPTANCE_LEDGER.json supplemental_leaf_coverage（含现行面已有的服务器侧基础：/lingxi/v1/ws-ticket、/lingxi/v1/devices/credentials、/lingxi/v1/me——静态可见、未执行验收）。该 34 对原对象本覆盖层不接手、不改写 R00 原件。",
+    "current_supplemental_leaf_status": "R18 当前候选：34 项原叶没有完整合法阶段 Gate。机器图有 20 项原行为专属检查定义、14 项仍局部；专属定义不能代替真实运行，当前候选仍需真服务/完整 verify。原报告所述 21/11/2 分组仅是 R15 后旧时点，R18 逐项实况见 R02_FULL_SCOPE_HANDOFF_R18.md；真实失败须 FAIL，证据缺失须 BLOCKED。"
   },
   "not_replaced": {
     "claim": "R02 零改动 Node/Electron 生产面（core/ server/ desktop/ shared/ tests/ package.json），默认入口未指向 rust 栈",

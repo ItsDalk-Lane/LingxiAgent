@@ -1,0 +1,301 @@
+{
+  "recordedUtc": "2026-09-28T12:08:12.608835+00:00",
+  "head": "9b98c679678888b60ff2e32bd67d3da6fc2f5c4f",
+  "runnerSha256": "d2343f95037d8d7666e1df8f9a9410d742bdac16e1f60e223716fa64761fdff1",
+  "checks": [
+    {
+      "argv": [
+        "bash",
+        "-n",
+        "/Users/study_superior/Desktop/Code/LingxiAgent/scripts/rust-tauri/r02_t01_boundary_negative.sh"
+      ],
+      "startedUtc": "2026-09-28T12:08:12.455180+00:00",
+      "endedUtc": "2026-09-28T12:08:12.459571+00:00",
+      "exitCode": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "argv": [
+        "bash",
+        "-n",
+        "/Users/study_superior/Desktop/Code/LingxiAgent/scripts/rust-tauri/r02_t01_service_smoke.sh"
+      ],
+      "startedUtc": "2026-09-28T12:08:12.459594+00:00",
+      "endedUtc": "2026-09-28T12:08:12.463628+00:00",
+      "exitCode": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "argv": [
+        "bash",
+        "-n",
+        "/Users/study_superior/Desktop/Code/LingxiAgent/scripts/rust-tauri/r02_t02_dual_instance.sh"
+      ],
+      "startedUtc": "2026-09-28T12:08:12.463646+00:00",
+      "endedUtc": "2026-09-28T12:08:12.467190+00:00",
+      "exitCode": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "argv": [
+        "bash",
+        "-n",
+        "/Users/study_superior/Desktop/Code/LingxiAgent/scripts/rust-tauri/r02_t02_f01_env_token_negative.sh"
+      ],
+      "startedUtc": "2026-09-28T12:08:12.467211+00:00",
+      "endedUtc": "2026-09-28T12:08:12.470653+00:00",
+      "exitCode": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "argv": [
+        "bash",
+        "-n",
+        "/Users/study_superior/Desktop/Code/LingxiAgent/scripts/rust-tauri/r02_t02_path_priority.sh"
+      ],
+      "startedUtc": "2026-09-28T12:08:12.470679+00:00",
+      "endedUtc": "2026-09-28T12:08:12.474232+00:00",
+      "exitCode": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "argv": [
+        "bash",
+        "-n",
+        "/Users/study_superior/Desktop/Code/LingxiAgent/scripts/rust-tauri/r02_t03_auth_matrix.sh"
+      ],
+      "startedUtc": "2026-09-28T12:08:12.474256+00:00",
+      "endedUtc": "2026-09-28T12:08:12.478234+00:00",
+      "exitCode": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "argv": [
+        "bash",
+        "-n",
+        "/Users/study_superior/Desktop/Code/LingxiAgent/scripts/rust-tauri/r02_t04_storage_tx.sh"
+      ],
+      "startedUtc": "2026-09-28T12:08:12.478266+00:00",
+      "endedUtc": "2026-09-28T12:08:12.482269+00:00",
+      "exitCode": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "argv": [
+        "bash",
+        "-n",
+        "/Users/study_superior/Desktop/Code/LingxiAgent/scripts/rust-tauri/r02_t05_events_matrix.sh"
+      ],
+      "startedUtc": "2026-09-28T12:08:12.482307+00:00",
+      "endedUtc": "2026-09-28T12:08:12.485884+00:00",
+      "exitCode": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "argv": [
+        "bash",
+        "-n",
+        "/Users/study_superior/Desktop/Code/LingxiAgent/scripts/rust-tauri/r02_t06_backup_restore.sh"
+      ],
+      "startedUtc": "2026-09-28T12:08:12.485902+00:00",
+      "endedUtc": "2026-09-28T12:08:12.489496+00:00",
+      "exitCode": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "argv": [
+        "bash",
+        "-n",
+        "/Users/study_superior/Desktop/Code/LingxiAgent/scripts/rust-tauri/r02_t06_recovery_drill.sh"
+      ],
+      "startedUtc": "2026-09-28T12:08:12.489521+00:00",
+      "endedUtc": "2026-09-28T12:08:12.493356+00:00",
+      "exitCode": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "argv": [
+        "bash",
+        "-n",
+        "/Users/study_superior/Desktop/Code/LingxiAgent/scripts/rust-tauri/r02_t07_redaction_scan.sh"
+      ],
+      "startedUtc": "2026-09-28T12:08:12.493382+00:00",
+      "endedUtc": "2026-09-28T12:08:12.497063+00:00",
+      "exitCode": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "argv": [
+        "bash",
+        "-n",
+        "/Users/study_superior/Desktop/Code/LingxiAgent/scripts/rust-tauri/r02_t07_slow_subscriber.sh"
+      ],
+      "startedUtc": "2026-09-28T12:08:12.497095+00:00",
+      "endedUtc": "2026-09-28T12:08:12.501004+00:00",
+      "exitCode": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "argv": [
+        "bash",
+        "-n",
+        "/Users/study_superior/Desktop/Code/LingxiAgent/scripts/rust-tauri/r02_t08_full_chain_smoke.sh"
+      ],
+      "startedUtc": "2026-09-28T12:08:12.501032+00:00",
+      "endedUtc": "2026-09-28T12:08:12.504245+00:00",
+      "exitCode": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "argv": [
+        "bash",
+        "-n",
+        "/Users/study_superior/Desktop/Code/LingxiAgent/scripts/rust-tauri/r02_t08_legacy_entry_regression.sh"
+      ],
+      "startedUtc": "2026-09-28T12:08:12.504271+00:00",
+      "endedUtc": "2026-09-28T12:08:12.509461+00:00",
+      "exitCode": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "path": "scripts/rust-tauri/r02_cli_rust_matrix.py",
+      "kind": "python-ast",
+      "exitCode": 0
+    },
+    {
+      "path": "scripts/rust-tauri/r02_client_leaf_matrix.py",
+      "kind": "python-ast",
+      "exitCode": 0
+    },
+    {
+      "path": "scripts/rust-tauri/r02_management_leaf_matrix.py",
+      "kind": "python-ast",
+      "exitCode": 0
+    },
+    {
+      "path": "scripts/rust-tauri/r02_owned_process_group.py",
+      "kind": "python-ast",
+      "exitCode": 0
+    },
+    {
+      "path": "scripts/rust-tauri/r02_static_web_leaf_matrix.py",
+      "kind": "python-ast",
+      "exitCode": 0
+    },
+    {
+      "path": "scripts/rust-tauri/r02_t03_ws_probe.py",
+      "kind": "python-ast",
+      "exitCode": 0
+    },
+    {
+      "path": "scripts/rust-tauri/r02_t04_live_fault_evidence.py",
+      "kind": "python-ast",
+      "exitCode": 0
+    },
+    {
+      "path": "scripts/rust-tauri/r02_t05_events_probe.py",
+      "kind": "python-ast",
+      "exitCode": 0
+    },
+    {
+      "path": "scripts/rust-tauri/r02_t08_full_chain_probe.py",
+      "kind": "python-ast",
+      "exitCode": 0
+    },
+    {
+      "path": "docs/rust-tauri/R02/R02_HANDOFF.json",
+      "kind": "json-parse",
+      "exitCode": 0
+    },
+    {
+      "path": "docs/rust-tauri/R02/R02_ACCEPTANCE_LEDGER.json",
+      "kind": "json-parse",
+      "exitCode": 0
+    },
+    {
+      "path": "docs/rust-tauri/R02/R02_IMPLEMENTATION_MAP.json",
+      "kind": "json-parse",
+      "exitCode": 0
+    },
+    {
+      "path": "docs/rust-tauri/R02/RISK_REGISTER.json",
+      "kind": "json-parse",
+      "exitCode": 0
+    },
+    {
+      "path": "docs/rust-tauri/ORCHESTRATOR_PROGRESS.json",
+      "kind": "json-parse",
+      "exitCode": 0
+    },
+    {
+      "argv": [
+        "git",
+        "diff",
+        "--check"
+      ],
+      "startedUtc": "2026-09-28T12:08:12.522542+00:00",
+      "endedUtc": "2026-09-28T12:08:12.608204+00:00",
+      "exitCode": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "kind": "report-local-links",
+      "exitCode": 0,
+      "links": [
+        {
+          "target": "R02_FULL_SCOPE_AUDIT_PRE_REPAIR.md",
+          "exists": true
+        },
+        {
+          "target": "R02_TASK_FINDINGS_ADDENDUM_R16.md",
+          "exists": true
+        },
+        {
+          "target": "../../../artifacts/rust-tauri/R02/audit-r16/contract-matrix-prechange.json",
+          "exists": true
+        },
+        {
+          "target": "../../../artifacts/rust-tauri/R02/audit-r16/prechange-full-sha256-corrected.txt",
+          "exists": true
+        },
+        {
+          "target": "../../../artifacts/rust-tauri/R02/audit-r16/prechange-status-corrected.txt",
+          "exists": true
+        },
+        {
+          "target": "R02_FULL_SCOPE_AUDIT_PRE_REPAIR.md",
+          "exists": true
+        },
+        {
+          "target": "R02_UNIFIED_ISSUES_R18.md",
+          "exists": true
+        },
+        {
+          "target": "R02_TASK_FINDINGS_ADDENDUM_R16.md",
+          "exists": true
+        },
+        {
+          "target": "../../../artifacts/rust-tauri/R02/audit-r18-git-fixture/RESULT.md",
+          "exists": true
+        }
+      ]
+    }
+  ],
+  "exitCode": 0,
+  "scope": "static syntax, JSON, whitespace and local links only"
+}
