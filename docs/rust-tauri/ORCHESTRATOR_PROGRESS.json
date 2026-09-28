@@ -507,8 +507,8 @@
         "review_verdict": "PASS",
         "review_findings": "NONE",
         "production_default": "Node/Electron",
-        "stage_acceptance_commit_sha": null,
-        "stage_acceptance_commit_note": "验收通过后的修复提交 SHA 于 accept 提交回填真实值"
+        "stage_acceptance_commit_sha": "ac6ada32061cb91e3e675a29382eca569f6b69e0",
+        "stage_acceptance_commit_note": "fix(rust-tauri): close R02 final stage findings（已推送，远程含此提交）"
       }
     },
     "R03": {
