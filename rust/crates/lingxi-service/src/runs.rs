@@ -30,7 +30,8 @@ use lingxi_kernel::ports::{
     ToolRequest, TurnProviderPort,
 };
 use lingxi_kernel::{
-    attempt_id, model_call_id, tool_call_id, FailureCause, NoFinalCause, RunFinish, RunStateMachine,
+    attempt_id, model_call_id, tool_call_id, FailureCause, NoFinalCause, QuotaResource, RunFinish,
+    RunStateMachine,
 };
 use lingxi_protocol::{
     ContentBlock, ErrorCode, EventId, EventPayload, KnownEventPayload, ModelCallCompletedPayload,
@@ -40,6 +41,8 @@ use lingxi_protocol::{
 };
 
 use crate::events::EventService;
+use crate::quotas::QuotaManager;
+use crate::session_supervisor::SteeringInbox;
 
 /// Hard bounds of one driven run (R03-T01; injected through `ServiceDeps`).
 /// Both bounds are loud: hitting `max_model_turns` FAILS the run with
@@ -111,13 +114,14 @@ impl From<StorageError> for DriveError {
     }
 }
 
-/// The supervisor: injected provider/tool doubles plus the drive bounds.
-/// Stateless per run — all per-run state lives in [`Drive`] locals, so
-/// concurrent executes share one supervisor safely.
+/// The supervisor: injected provider/tool doubles plus the drive bounds
+/// and the admission quotas. Stateless per run — all per-run state lives in
+/// [`Drive`] locals, so concurrent executes share one supervisor safely.
 pub struct RunSupervisor {
     provider: Option<Arc<dyn TurnProviderPort>>,
     tools: Option<Arc<dyn ToolExecutorPort>>,
     limits: RunDriveLimits,
+    quotas: QuotaManager,
 }
 
 impl std::fmt::Debug for RunSupervisor {
@@ -126,6 +130,7 @@ impl std::fmt::Debug for RunSupervisor {
             .field("provider", &self.provider.as_ref().map(|_| "injected"))
             .field("tools", &self.tools.as_ref().map(|_| "injected"))
             .field("limits", &self.limits)
+            .field("quotas", &self.quotas)
             .finish()
     }
 }
@@ -134,27 +139,33 @@ impl RunSupervisor {
     /// Production wiring until R05 registers real providers: no provider,
     /// no tools. Runs driven by this supervisor complete WITHOUT model
     /// content (`completed.no_final.no_provider_configured`) — an explicit
-    /// outcome, never a fabricated reply.
+    /// outcome, never a fabricated reply. The default (bounded, loud)
+    /// quota policy applies.
     pub fn without_provider() -> Self {
         Self {
             provider: None,
             tools: None,
             limits: RunDriveLimits::default(),
+            quotas: QuotaManager::new(crate::quotas::QuotaLimits::default()),
         }
     }
 
     /// Full injection (tests drive deterministic doubles through the REAL
-    /// chain; R05/R04 replace the doubles with real adapters).
+    /// chain; R05/R04 replace the doubles with real adapters). Degenerate
+    /// drive bounds AND degenerate quota limits are loud errors.
     pub fn new(
         provider: Option<Arc<dyn TurnProviderPort>>,
         tools: Option<Arc<dyn ToolExecutorPort>>,
         limits: RunDriveLimits,
+        quotas: QuotaManager,
     ) -> Result<Self, StorageError> {
         limits.validate()?;
+        quotas.limits().validate()?;
         Ok(Self {
             provider,
             tools,
             limits,
+            quotas,
         })
     }
 
@@ -162,8 +173,38 @@ impl RunSupervisor {
         &self.limits
     }
 
+    /// The admission-quota manager (observability / acceptance assertions).
+    pub fn quotas(&self) -> &QuotaManager {
+        &self.quotas
+    }
+
     pub fn provider_configured(&self) -> bool {
         self.provider.is_some()
+    }
+
+    /// One layered admission acquisition; `None` = the run must fail loudly
+    /// with `failed.quota_exhausted.{model,tool}` (the failure is logged
+    /// with its layer/kind for diagnosis before the caller settles).
+    async fn acquire_or_break(
+        &self,
+        resource: &QuotaResource,
+        agent_id: &str,
+        session_id: &str,
+        run_id: &RunId,
+    ) -> Option<crate::quotas::QuotaPermit> {
+        match self.quotas.acquire(*resource, agent_id, session_id).await {
+            Ok(permit) => Some(permit),
+            Err(failure) => {
+                tracing::warn!(
+                    run_id = %run_id,
+                    resource = ?resource,
+                    error = %failure,
+                    "admission quota refused the call: the run will settle as \
+                     failed.quota_exhausted (never an unbounded wait, never a fake success)"
+                );
+                None
+            }
+        }
     }
 
     /// Drives ONE run from creation to its single finalize (R03-T01).
@@ -171,6 +212,15 @@ impl RunSupervisor {
     /// Callers (the session execute surface) have already done the session
     /// lookup and ownership check; `run_id` was allocated by the storage
     /// backend's atomic allocator (fixed at task creation).
+    ///
+    /// R03-T02 wiring: `agent_id` scopes the per-agent quota lanes,
+    /// `steering` is the session's steering channel (drained BEFORE each
+    /// provider turn — steered text reaches the NEXT model call and never
+    /// interrupts the loop; frozen incumbent semantics). Every model/tool
+    /// call acquires its global/agent/session admission permit for the
+    /// duration of the I/O only — never while holding any supervisor lock,
+    /// and never waiting without a bound (quota failures settle the run
+    /// LOUDLY with `failed.quota_exhausted.*`).
     ///
     /// The chain:
     /// 1. validate the creation transition queued→running through the
@@ -188,10 +238,12 @@ impl RunSupervisor {
         events: &EventService,
         principal: &lingxi_kernel::Principal,
         session_id: &str,
+        agent_id: &str,
         run_id: &str,
         input: &str,
         generation: u64,
         now_ms: u64,
+        steering: Option<&SteeringInbox>,
     ) -> Result<RunFinish, DriveError> {
         let run_id = RunId::new(run_id.to_string());
         // 1) Creation transition: the kernel state machine is consulted on
@@ -234,7 +286,7 @@ impl RunSupervisor {
         let mut tool_call_seq: u32 = 0;
         let mut saw_tool_failure = false;
         let mut saw_process_content = false;
-        let finish = loop {
+        let finish = 'turns: loop {
             turn += 1;
             if turn > self.limits.max_model_turns {
                 break RunFinish::Failed {
@@ -243,8 +295,35 @@ impl RunSupervisor {
                     },
                 };
             }
+            // Steering (frozen incumbent semantics): drain the session's
+            // steering channel BEFORE the turn — steered text reaches this
+            // model call's input; the loop itself is never interrupted.
+            let mut turn_input = input.to_string();
+            if let Some(inbox) = steering {
+                if let Some(steered) = inbox.drain_joined() {
+                    turn_input = format!("{input}\n\n[steering]\n{steered}");
+                }
+            }
             let call = model_call_id(&run_id, turn);
-            let provider_turn = provider.next_turn(&ctx, &call, turn, input).await;
+            // Admission (R03-T02): one model-call permit (global → agent →
+            // session) held across the model I/O only. A quota failure is
+            // a LOUD run failure — never an unbounded wait, never a fake
+            // success.
+            let model_permit = match self
+                .acquire_or_break(&QuotaResource::Model, agent_id, session_id, &run_id)
+                .await
+            {
+                Some(permit) => permit,
+                None => {
+                    break RunFinish::Failed {
+                        cause: FailureCause::QuotaExhausted {
+                            resource: QuotaResource::Model,
+                        },
+                    };
+                }
+            };
+            let provider_turn = provider.next_turn(&ctx, &call, turn, &turn_input).await;
+            drop(model_permit);
             match provider_turn {
                 lingxi_kernel::ports::ProviderTurn::Final { message } => {
                     if message.content.is_empty() {
@@ -294,11 +373,27 @@ impl RunSupervisor {
                     for request in &requests {
                         tool_call_seq += 1;
                         let call_id = tool_call_id(&run_id, tool_call_seq);
+                        // Admission (R03-T02): one tool-call permit per
+                        // call, held across the tool I/O only.
+                        let tool_permit = match self
+                            .acquire_or_break(&QuotaResource::Tool, agent_id, session_id, &run_id)
+                            .await
+                        {
+                            Some(permit) => permit,
+                            None => {
+                                break 'turns RunFinish::Failed {
+                                    cause: FailureCause::QuotaExhausted {
+                                        resource: QuotaResource::Tool,
+                                    },
+                                };
+                            }
+                        };
                         self.persist_tool_event(
                             port, events, &ctx, &call_id, request, None, now_ms,
                         )
                         .await?;
                         let outcome = tools.execute(&ctx, &call_id, request).await;
+                        drop(tool_permit);
                         if matches!(
                             outcome,
                             ToolOutcome::Failed { .. }

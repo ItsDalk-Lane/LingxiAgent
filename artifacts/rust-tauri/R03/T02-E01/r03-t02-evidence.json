@@ -1,0 +1,74 @@
+{
+  "r03_a03": {
+    "acceptedRuns": 1,
+    "busyRejections": 1,
+    "durableEventsOfWinner": [
+      "run_state_changed",
+      "model_call_started",
+      "model_call_completed",
+      "model_call_started",
+      "model_call_completed",
+      "run_state_changed",
+      "final_message_committed"
+    ],
+    "postSettleAcceptance": {
+      "runId": "run_000001a0dcba6c00_000002",
+      "status": "failed"
+    },
+    "steering": {
+      "accepted": 1,
+      "reachedTurn": 2
+    },
+    "totalKeyEvents": 7,
+    "totalRuns": 1,
+    "winnerTerminal": {
+      "reason": "completed.with_final",
+      "status": "completed"
+    }
+  },
+  "r03_a04": {
+    "aRunRowHonest": {
+      "runId": "run_000001a0dcba6c00_000001",
+      "status": "running",
+      "terminalReason": null
+    },
+    "afterCancel": {
+      "alphaBusy": false,
+      "modelInUse": 0,
+      "toolInUse": 0
+    },
+    "bCompletedWhileAParked": {
+      "reason": "completed.with_final",
+      "runId": "run_000001a0dcba6c00_000002",
+      "status": "completed"
+    },
+    "cancellationPrimitive": "tokio task abort (drop at await point); user cancel tree = R03-T03",
+    "toolInUseWhileParked": 1
+  },
+  "r03_a04_error_path": {
+    "modelInUse": 0,
+    "reason": "completed.no_final.tool_partial_failure",
+    "runId": "run_000001a0dcba6c00_000001",
+    "sessionBusy": false,
+    "status": "completed",
+    "toolInUse": 0
+  },
+  "r03_leftover_steering": {
+    "firstRun": "run_000001a0dcba6c00_000001",
+    "secondRun": "run_000001a0dcba6c00_000002",
+    "secondRunFirstInputCarriesSteering": true
+  },
+  "r03_quota_exhaustion": {
+    "alpha": {
+      "reason": "completed.with_final",
+      "runId": "run_000001a0dcba6c00_000001",
+      "status": "completed"
+    },
+    "beta": {
+      "reason": "failed.quota_exhausted.tool",
+      "runId": "run_000001a0dcba6c00_000002",
+      "status": "failed"
+    },
+    "toolInUseAfterAll": 0
+  }
+}

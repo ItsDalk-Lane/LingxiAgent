@@ -1,0 +1,20 @@
+R03-T02-E01 candidate summary
+TASK_BASE_SHA: 8b2f2cd595625e17b4153af072efc8484b79d5b6
+HEAD: 8b2f2cd595625e17b4153af072efc8484b79d5b6 (no commit; working-tree candidate)
+UTC: 2026-09-29T02:50:19Z
+
+== modified ==
+2b41294eeee3f00341c1b96f59d9f325cb31e4a43a1b26a8fbdc1f36441fe18e  rust/crates/lingxi-kernel/src/lib.rs
+9402a684286a7b4ea43190c56294328d23d5087b84a49d1b58fee64dbb5bab7f  rust/crates/lingxi-service/src/lib.rs
+252f4037b40db908cfa95302d4f18e87d9ce67ebcb45ccc67440ccdf7c528aee  rust/crates/lingxi-service/src/runs.rs
+7b6d827f131b9b22faee936c8d0b244336d5209d335e673f06877f21ffab9d08  rust/crates/lingxi-service/src/sessions.rs
+02d1e5c83cb813b4789d5a360b34d9291d136a54acd0253432cbbcc6ae041ee6  rust/crates/lingxi-service/tests/event_subscription.rs
+ce0ce2e28212ad17b39287a1b9f649864a772d80b814a09b8894335d83f8f17e  rust/crates/lingxi-service/tests/execute_concurrency.rs
+
+== added (untracked, this task) ==
+5830926c2c1f61792c5269e622680b78f146d50997a4b609ffdf214a446b48cc  rust/crates/lingxi-service/src/quotas.rs
+3f46acbb8ab8aacf176297f064d05297c59694f610c34a0cbbe2c64e07263db1  rust/crates/lingxi-service/src/session_supervisor.rs
+934c4425d30bccdf9f6445d0d42d7a240773b5792c4bf49fe78d476ec5b9fbb9  rust/crates/lingxi-service/tests/session_serialization.rs
+
+rust/Cargo.lock: 90111c4b5988531d7a891339b6ee5df8afc9d3ec655e4929747da07d5811bb49 (unchanged vs R02_HANDOFF 90111c4b…)
+rust/crates/lingxi-service/Cargo.toml: unchanged (git diff empty)

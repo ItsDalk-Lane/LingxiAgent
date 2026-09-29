@@ -31,10 +31,12 @@ pub mod limits;
 pub mod logging;
 mod management;
 pub mod paths;
+pub mod quotas;
 pub mod redaction;
 pub mod runs;
 mod security_audit;
 pub mod serve;
+pub mod session_supervisor;
 pub mod sessions;
 pub mod shutdown;
 mod static_web;
@@ -74,8 +76,16 @@ pub use logging::{
     init_tracing, LogRotationConfig, LogRouter, DEFAULT_LOG_MAX_BYTES, DEFAULT_LOG_MAX_FILES,
 };
 pub use paths::{prepare_layout, DataRootLayout};
+pub use quotas::{
+    LayeredQuotaLimits, QuotaFailure, QuotaFailureKind, QuotaLayer, QuotaLimits, QuotaManager,
+    QuotaPermit, QuotaResource,
+};
 pub use redaction::{redact_line, redact_text};
 pub use runs::{DriveError, RunDriveLimits, RunSupervisor};
+pub use session_supervisor::{
+    BusyGateError, SessionConcurrencyLimits, SessionLease, SessionSupervisor, SteerError,
+    SteerOutcome, SteeringInbox, SubmissionKind,
+};
 pub use sessions::{
     ExecuteAccepted, ExecuteRequest, RunSummary, SessionAccess, SessionBackend,
     SessionExecuteError, SessionFacts, SessionStore, SessionView,
@@ -428,6 +438,12 @@ pub struct ServiceDeps {
     /// Run lifecycle bounds (R03-T01): hard, loud limits on model turns
     /// and attempts per run.
     pub run_limits: runs::RunDriveLimits,
+    /// Global/agent/session model & tool admission quotas (R03-T02): a
+    /// degenerate value is a loud startup error, never a silent clamp.
+    pub quota_limits: quotas::QuotaLimits,
+    /// Session serialization policy (R03-T02): busy-gate registry cap and
+    /// the bounded steering inbox.
+    pub session_concurrency: session_supervisor::SessionConcurrencyLimits,
 }
 
 impl Default for ServiceDeps {
@@ -447,6 +463,8 @@ impl Default for ServiceDeps {
             turn_provider: None,
             tool_executor: None,
             run_limits: runs::RunDriveLimits::default(),
+            quota_limits: quotas::QuotaLimits::default(),
+            session_concurrency: session_supervisor::SessionConcurrencyLimits::default(),
         }
     }
 }
@@ -474,6 +492,8 @@ impl std::fmt::Debug for ServiceDeps {
                 &self.tool_executor.as_ref().map(|_| "injected"),
             )
             .field("run_limits", &self.run_limits)
+            .field("quota_limits", &self.quota_limits)
+            .field("session_concurrency", &self.session_concurrency)
             .finish()
     }
 }
@@ -548,6 +568,15 @@ fn validate_resource_deps(deps: &ServiceDeps) -> Result<(), ServiceStartupError>
             deps.http_request_budget_ms
         )));
     }
+    // R03-T02: the admission quotas and the session concurrency policy
+    // validate with the same loudness (their own validators name the
+    // exact degenerate knob).
+    deps.quota_limits
+        .validate()
+        .map_err(ServiceStartupError::Storage)?;
+    deps.session_concurrency
+        .validate()
+        .map_err(ServiceStartupError::Storage)?;
     Ok(())
 }
 
@@ -698,7 +727,11 @@ impl ServiceState {
             .await
             .map_err(ServiceStartupError::Storage)?;
         let storage = Arc::new(storage);
-        let session_store = sessions::SessionStore::new((*storage).clone());
+        // R03-T02: the session surface owns the per-session serialization
+        // gate (busy `session_busy` rejection + bounded steering inbox);
+        // the policy comes from the deps.
+        let session_store =
+            sessions::SessionStore::with_concurrency((*storage).clone(), deps.session_concurrency);
         let session_arc = Arc::new(session_store);
         // R02-T05: the event subscription service over the same durable
         // log (snapshot/cursor protocol + post-commit publication hub).
@@ -730,10 +763,13 @@ impl ServiceState {
         // R03-T01: the run lifecycle supervisor. Degenerate bounds are a
         // loud startup error (never clamped silently); a missing provider is
         // EXPLICIT (no-provider outcome), never a fabricated reply.
+        // R03-T02: the same construction now takes the admission-quota
+        // manager (global/agent/session model & tool lanes).
         let runs = runs::RunSupervisor::new(
             deps.turn_provider.clone(),
             deps.tool_executor.clone(),
             deps.run_limits,
+            quotas::QuotaManager::new(deps.quota_limits),
         )
         .map_err(ServiceStartupError::Storage)?;
         Ok(Self {
@@ -1039,6 +1075,34 @@ impl EndpointError {
     pub fn invalid_message(message: impl Into<String>) -> Self {
         Self::new(StatusCode::BAD_REQUEST, ErrorCode::InvalidMessage, message)
             .with_cause("request.invalid_message")
+    }
+
+    /// The session already owns a running task (R03-T02, frozen incumbent
+    /// `session_busy` gate): 409 + the stable `session_busy` reason and
+    /// `retryable: true` — the adopted queueing behavior is the CLIENT's
+    /// retry (or steering the running turn), never a server-side queue of
+    /// normal inputs.
+    pub fn session_busy() -> Self {
+        let mut out = Self::new(
+            StatusCode::CONFLICT,
+            ErrorCode::Conflict,
+            "session is already running a task",
+        );
+        out.error.retryable = true;
+        out.with_reason("session_busy")
+            .with_cause("session.session_busy")
+    }
+
+    /// The tracked-session registry is at its hard cap (R03-T02 service
+    /// protection; distinct from the session's own busy state).
+    pub fn session_registry_full() -> Self {
+        Self::new(
+            StatusCode::SERVICE_UNAVAILABLE,
+            ErrorCode::BudgetExceeded,
+            "session concurrency registry is full",
+        )
+        .with_reason("session_registry_full")
+        .with_cause("session.registry_full")
     }
 
     /// Stable `storage.<cause>` identifier for a storage-port failure.
@@ -2052,6 +2116,23 @@ async fn execute_session(
         Err(sessions::SessionExecuteError::NotFound) => EndpointError::not_found().into_response(),
         Err(sessions::SessionExecuteError::Forbidden) => {
             EndpointError::forbidden("cross_principal_access").into_response()
+        }
+        Err(sessions::SessionExecuteError::Busy) => EndpointError::session_busy().into_response(),
+        Err(sessions::SessionExecuteError::SessionRegistryFull) => {
+            EndpointError::session_registry_full().into_response()
+        }
+        Err(sessions::SessionExecuteError::SteeringInboxFull) => {
+            // Not reachable from the execute route (steering is a separate
+            // service-surface call); mapped anyway so the surface stays
+            // closed and loud if a future route wires it.
+            EndpointError::new(
+                StatusCode::CONFLICT,
+                ErrorCode::BudgetExceeded,
+                "session steering inbox is full",
+            )
+            .with_reason("steering_inbox_full")
+            .with_cause("session.steering_inbox_full")
+            .into_response()
         }
         Err(sessions::SessionExecuteError::Storage(err)) => {
             EndpointError::storage(&err).into_response()
@@ -3268,6 +3349,74 @@ mod tests {
                 "http_request_budget_ms above the 30-day platform-safe bound",
                 ServiceDeps {
                     http_request_budget_ms: crate::config::MAX_TIME_BUDGET_MS + 1,
+                    ..base.clone()
+                },
+            ),
+            (
+                "quota model global limit 0 (would disable admission silently)",
+                ServiceDeps {
+                    quota_limits: quotas::QuotaLimits {
+                        model: quotas::LayeredQuotaLimits {
+                            global: 0,
+                            per_agent: 1,
+                            per_session: 1,
+                        },
+                        ..base.quota_limits
+                    },
+                    ..base.clone()
+                },
+            ),
+            (
+                "quota tool per-session limit 0 (would deadlock the first tool call)",
+                ServiceDeps {
+                    quota_limits: quotas::QuotaLimits {
+                        tool: quotas::LayeredQuotaLimits {
+                            global: 1,
+                            per_agent: 1,
+                            per_session: 0,
+                        },
+                        ..base.quota_limits
+                    },
+                    ..base.clone()
+                },
+            ),
+            (
+                "quota wait_queue_capacity 0 (unbounded-wait disguise)",
+                ServiceDeps {
+                    quota_limits: quotas::QuotaLimits {
+                        wait_queue_capacity: 0,
+                        ..base.quota_limits
+                    },
+                    ..base.clone()
+                },
+            ),
+            (
+                "quota wait_timeout_ms above the platform-safe bound",
+                ServiceDeps {
+                    quota_limits: quotas::QuotaLimits {
+                        wait_timeout_ms: crate::config::MAX_TIME_BUDGET_MS + 1,
+                        ..base.quota_limits
+                    },
+                    ..base.clone()
+                },
+            ),
+            (
+                "session steering_inbox_capacity 0 (would silently disable steering)",
+                ServiceDeps {
+                    session_concurrency: session_supervisor::SessionConcurrencyLimits {
+                        steering_inbox_capacity: 0,
+                        registry_cap: 8,
+                    },
+                    ..base.clone()
+                },
+            ),
+            (
+                "session registry_cap 0 (would reject every session)",
+                ServiceDeps {
+                    session_concurrency: session_supervisor::SessionConcurrencyLimits {
+                        steering_inbox_capacity: 8,
+                        registry_cap: 0,
+                    },
                     ..base.clone()
                 },
             ),

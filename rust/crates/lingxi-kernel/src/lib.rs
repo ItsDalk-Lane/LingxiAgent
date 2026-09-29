@@ -351,6 +351,27 @@ impl NoFinalCause {
     }
 }
 
+/// Which admission lane a run could not enter (R03-T02: global/agent/session
+/// model & tool quotas). Part of the failure cause so a quota-exhausted run
+/// settles LOUDLY through the single finalize path — never as a fake success
+/// and never conflated with a provider failure.
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
+pub enum QuotaResource {
+    /// Concurrent model-call admission slots.
+    Model,
+    /// Concurrent tool-call admission slots.
+    Tool,
+}
+
+impl QuotaResource {
+    pub fn code(&self) -> &'static str {
+        match self {
+            QuotaResource::Model => "model",
+            QuotaResource::Tool => "tool",
+        }
+    }
+}
+
 /// Why a run failed.
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub enum FailureCause {
@@ -362,6 +383,11 @@ pub enum FailureCause {
     /// The provider requested tool calls while no tool executor is wired
     /// (loud failure — never silently skipping the tools).
     ToolExecutorUnavailable,
+    /// A global/agent/session admission quota could not be acquired within
+    /// its bounded wait (R03-T02): the run fails loudly instead of waiting
+    /// without bound or pretending the call happened. `resource` names the
+    /// lane family; the layer (global/agent/session) rides in the message.
+    QuotaExhausted { resource: QuotaResource },
 }
 
 impl FailureCause {
@@ -370,6 +396,20 @@ impl FailureCause {
             FailureCause::ProviderFailed { .. } => "provider_error",
             FailureCause::TurnBudgetExceeded { .. } => "turn_budget_exceeded",
             FailureCause::ToolExecutorUnavailable => "tool_executor_unavailable",
+            FailureCause::QuotaExhausted { .. } => "quota_exhausted",
+        }
+    }
+
+    /// Full stable reason segment (the caller prefixes the status), e.g.
+    /// `provider_error`, `quota_exhausted.tool`. Quota failures carry the
+    /// resource so `runs.terminal_reason` distinguishes model-slot from
+    /// tool-slot exhaustion diagnostically.
+    pub fn reason_segment(&self) -> String {
+        match self {
+            FailureCause::QuotaExhausted { resource } => {
+                format!("quota_exhausted.{}", resource.code())
+            }
+            other => other.cause_code().to_string(),
         }
     }
 }
@@ -419,7 +459,7 @@ impl RunFinish {
             RunFinish::CompletedWithoutFinal { cause } => {
                 format!("completed.no_final.{}", cause.cause_code())
             }
-            RunFinish::Failed { cause } => format!("failed.{}", cause.cause_code()),
+            RunFinish::Failed { cause } => format!("failed.{}", cause.reason_segment()),
             RunFinish::Cancelled { .. } => "cancelled.requested".to_string(),
             RunFinish::InterruptedNeedsAttention { .. } => {
                 "interrupted_needs_attention.recovery_unsafe".to_string()
@@ -826,6 +866,24 @@ mod tests {
                 },
                 RunStatus::Failed,
                 "failed.tool_executor_unavailable",
+            ),
+            (
+                RunFinish::Failed {
+                    cause: FailureCause::QuotaExhausted {
+                        resource: QuotaResource::Model,
+                    },
+                },
+                RunStatus::Failed,
+                "failed.quota_exhausted.model",
+            ),
+            (
+                RunFinish::Failed {
+                    cause: FailureCause::QuotaExhausted {
+                        resource: QuotaResource::Tool,
+                    },
+                },
+                RunStatus::Failed,
+                "failed.quota_exhausted.tool",
             ),
             (
                 RunFinish::Cancelled {

@@ -103,7 +103,7 @@ async fn teardown(state: &ServiceState, home: &std::path::Path) {
 }
 
 /// One real execute through the running state (real port + real hub).
-async fn execute(state: &ServiceState, input: &str, now_ms: u64) -> String {
+async fn execute_on(state: &ServiceState, session: &str, input: &str, now_ms: u64) -> String {
     let storage = Arc::clone(state.storage());
     state
         .sessions()
@@ -112,13 +112,17 @@ async fn execute(state: &ServiceState, input: &str, now_ms: u64) -> String {
             state.events(),
             state.runs(),
             &owner_principal(),
-            "sess_local_alpha",
+            session,
             input,
             now_ms,
         )
         .await
         .expect("execute")
         .run_id
+}
+
+async fn execute(state: &ServiceState, input: &str, now_ms: u64) -> String {
+    execute_on(state, "sess_local_alpha", input, now_ms).await
 }
 
 use lingxi_kernel::ports::EventStorePort;
@@ -139,11 +143,18 @@ async fn authority(state: &ServiceState, stream: &str) -> Vec<lingxi_protocol::E
 /// the run (k = observed durable head when the subscribe begins), with
 /// real concurrent writers on a single-thread runtime (deterministic task
 /// interleaving driven by explicit yields; no sleeps anywhere).
+///
+/// R03-T02 note: the two writers write TWO DIFFERENT sessions (the frozen
+/// serialization gate rejects a second normal submission to a BUSY
+/// session); the alpha stream's commits race the subscriber exactly as
+/// before — the protected property (snapshot + live tail has no gap at
+/// every boundary under real concurrent commits) is unchanged.
 #[tokio::test(flavor = "current_thread")]
 async fn a09_snapshot_and_subscription_have_no_gap_at_every_commit_boundary() {
     const WRITERS: usize = 2;
     const RUNS_PER_WRITER: usize = 2;
-    const TOTAL_EVENTS: u64 = (WRITERS * RUNS_PER_WRITER * 2) as u64; // 2 events per run
+    // Only writer 0 commits to the subscribed stream (sess_local_alpha).
+    const TOTAL_EVENTS: u64 = (RUNS_PER_WRITER * 2) as u64; // 2 events per run
 
     for k in 0..=TOTAL_EVENTS {
         let (state, home) = boot(&format!("a09-k{k}")).await;
@@ -153,9 +164,17 @@ async fn a09_snapshot_and_subscription_have_no_gap_at_every_commit_boundary() {
         for w in 0..WRITERS {
             let ws = Arc::clone(&writer_state);
             writers.push(tokio::spawn(async move {
+                // Each writer owns ONE session: concurrent commits, no
+                // session_busy collisions (R03-T02 frozen gate).
+                let session = if w == 0 {
+                    "sess_local_alpha"
+                } else {
+                    "sess_local_beta"
+                };
                 for r in 0..RUNS_PER_WRITER {
-                    let run = execute(
+                    let run = execute_on(
                         &ws,
+                        session,
                         &format!("w{w}-r{r}"),
                         5_000 + (w as u64) * 10 + r as u64,
                     )

@@ -1,9 +1,19 @@
 //! R02 stage-repair R1 / F01 regression (stage-level review finding):
 //! concurrent executes with DISTINCT inputs at the SAME millisecond must
 //! each commit their own run — never collapse into one shared run id with
-//! multiple success receipts. Covered on both levels that collapsed
-//! pre-fix: the in-process service composition (fixed clock) and the real
-//! HTTP transport (real loopback TCP, real router, real SQLite).
+//! multiple success receipts.
+//!
+//! R03-T02 update (semantics change, protection kept): the session surface
+//! now owns the frozen incumbent serialization gate — a busy session
+//! REJECTS further normal submissions (`session_busy`, retryable, zero
+//! side effects) instead of accepting them all. Therefore:
+//! - the CONCURRENT same-session burst now proves: exactly ONE winner
+//!   (service level, deterministic single-thread scheduling), the rest
+//!   rejected with zero durable side effects;
+//! - the F01 public invariant itself is asserted unchanged right after the
+//!   burst (every ACCEPTED execute mints its own, never-collapsing run id
+//!   — including rapid sequential submits at one fixed millisecond, and
+//!   across a restart reseeding).
 //!
 //! Also covered: allocator reseed across a restart (same home, same fixed
 //! millisecond — ids must still be unique), and the durable fact counts
@@ -17,7 +27,7 @@ use std::time::Duration;
 use lingxi_service::inject::{ManualClock, SequentialRequestIdGen};
 use lingxi_service::{
     prepare_layout, run, HomeSource, NetworkMode, ServeOutcome, ServiceConfig, ServiceDeps,
-    ServiceError, ServiceState, StoreOptions, SubscribeOutcome,
+    ServiceError, ServiceState, SessionExecuteError, StoreOptions, SubscribeOutcome,
 };
 use tokio::io::{AsyncReadExt as _, AsyncWriteExt as _};
 
@@ -61,9 +71,12 @@ fn test_config(home: PathBuf) -> ServiceConfig {
     }
 }
 
-/// 64 concurrent distinct-input executes through the in-process composition
-/// return 64 distinct, newly committed runs.
-async fn execute_64_concurrent(state: &ServiceState, tag: &str) -> Vec<String> {
+/// 64 concurrent distinct-input executes through the in-process
+/// composition: exactly ONE wins the session (deterministic on the
+/// single-thread runtime — every submission's session lookup queues ahead
+/// of the winner's writes), the other 63 hit the frozen `session_busy`
+/// gate and write NOTHING.
+async fn execute_64_concurrent_one_winner(state: &ServiceState, tag: &str) -> (String, usize) {
     let owner = owner_principal();
     let mut tasks = Vec::new();
     for n in 0..64u32 {
@@ -71,10 +84,11 @@ async fn execute_64_concurrent(state: &ServiceState, tag: &str) -> Vec<String> {
         let owner = owner.clone();
         let tag = tag.to_string();
         tasks.push(tokio::spawn(async move {
+            let storage = Arc::clone(state.storage());
             state
                 .sessions()
                 .execute_for(
-                    state.storage().as_ref(),
+                    storage.as_ref(),
                     state.events(),
                     state.runs(),
                     &owner,
@@ -83,19 +97,28 @@ async fn execute_64_concurrent(state: &ServiceState, tag: &str) -> Vec<String> {
                     FIXED_NOW_MS,
                 )
                 .await
-                .expect("execute accepted")
-                .run_id
         }));
     }
-    let mut ids = Vec::new();
+    let mut accepted = Vec::new();
+    let mut busy = 0usize;
     for t in tasks {
-        ids.push(t.await.unwrap());
+        match t.await.unwrap() {
+            Ok(accepted_result) => accepted.push(accepted_result.run_id),
+            Err(SessionExecuteError::Busy) => busy += 1,
+            other => panic!("expected accept or session_busy, got {other:?}"),
+        }
     }
-    ids
+    assert_eq!(
+        accepted.len(),
+        1,
+        "exactly one submission owns the session (frozen serialization gate)"
+    );
+    assert_eq!(busy, 63);
+    (accepted.remove(0), busy)
 }
 
-#[tokio::test]
-async fn in_process_concurrent_executes_mint_distinct_runs_and_reseed_on_restart() {
+#[tokio::test(flavor = "current_thread")]
+async fn in_process_concurrent_executes_serialize_then_mint_distinct_runs_across_restart() {
     let home = synthetic_home("inproc");
     cleanup(&home);
     let layout = prepare_layout(&home).expect("prepare layout");
@@ -107,14 +130,52 @@ async fn in_process_concurrent_executes_mint_distinct_runs_and_reseed_on_restart
     .await
     .expect("bootstrap");
 
-    let ids_first = execute_64_concurrent(&state, "first").await;
-    let unique: std::collections::HashSet<_> = ids_first.iter().collect();
+    // Phase A: the concurrent burst — one winner, 63 frozen rejections
+    // with zero durable side effects beyond the winner's own run.
+    let (winner, busy) = execute_64_concurrent_one_winner(&state, "burst").await;
+    assert_eq!(busy, 63);
     assert_eq!(
-        unique.len(),
-        64,
-        "64 distinct submissions => 64 distinct run ids, got {} ids: {:?}",
-        unique.len(),
-        ids_first
+        state
+            .sessions()
+            .run_count("sess_local_alpha")
+            .await
+            .unwrap(),
+        1,
+        "rejected submissions leave no run rows"
+    );
+    let (runs, key_events, _) = state.storage().run_fact_summary().await.unwrap();
+    assert_eq!(runs, 1, "one run row for the single winner");
+    assert_eq!(key_events, 2, "start + terminal for the winner only");
+
+    // Phase B (the F01 invariant itself, kept): every ACCEPTED execute
+    // mints its own id — 64 rapid sequential submits at the SAME fixed
+    // millisecond, never collapsing.
+    let owner = owner_principal();
+    let mut ids_first = vec![winner];
+    for n in 0..64u32 {
+        let storage = Arc::clone(state.storage());
+        let accepted = state
+            .sessions()
+            .execute_for(
+                storage.as_ref(),
+                state.events(),
+                state.runs(),
+                &owner,
+                "sess_local_alpha",
+                &format!("first-sequential-{n}"),
+                FIXED_NOW_MS,
+            )
+            .await
+            .expect("sequential submit on the idle session")
+            .run_id;
+        ids_first.push(accepted);
+    }
+    let unique_first: std::collections::HashSet<_> = ids_first.iter().collect();
+    assert_eq!(
+        unique_first.len(),
+        65,
+        "every accepted execute is its own run: {} ids",
+        unique_first.len()
     );
     assert_eq!(
         state
@@ -122,19 +183,19 @@ async fn in_process_concurrent_executes_mint_distinct_runs_and_reseed_on_restart
             .run_count("sess_local_alpha")
             .await
             .unwrap(),
-        64,
+        65,
         "every accepted execute commits its own durable run"
     );
     let (runs, key_events, _) = state.storage().run_fact_summary().await.unwrap();
-    assert_eq!(runs, 64, "one run row per accepted execute");
+    assert_eq!(runs, 65, "one run row per accepted execute");
     assert_eq!(
-        key_events, 128,
+        key_events, 130,
         "two key events per run (start + terminal outcome)"
     );
 
     // Restart against the SAME home: the allocator reseeds from durable
-    // state, so another 64 executes at the SAME fixed millisecond still
-    // mint ids never used before.
+    // state, so further accepted executes at the SAME fixed millisecond
+    // still mint ids never used before.
     state.storage().close().await.expect("close storage");
     drop(state);
     let layout = prepare_layout(&home).expect("prepare layout");
@@ -146,7 +207,25 @@ async fn in_process_concurrent_executes_mint_distinct_runs_and_reseed_on_restart
     .await
     .expect("bootstrap after restart");
 
-    let ids_second = execute_64_concurrent(&state, "second").await;
+    let mut ids_second = Vec::new();
+    for n in 0..64u32 {
+        let storage = Arc::clone(state.storage());
+        let accepted = state
+            .sessions()
+            .execute_for(
+                storage.as_ref(),
+                state.events(),
+                state.runs(),
+                &owner,
+                "sess_local_alpha",
+                &format!("second-sequential-{n}"),
+                FIXED_NOW_MS,
+            )
+            .await
+            .expect("sequential submit after restart")
+            .run_id;
+        ids_second.push(accepted);
+    }
     let unique_second: std::collections::HashSet<_> = ids_second.iter().collect();
     assert_eq!(unique_second.len(), 64, "post-restart ids are distinct");
     let first_set: std::collections::HashSet<_> = ids_first.iter().collect();
@@ -161,7 +240,7 @@ async fn in_process_concurrent_executes_mint_distinct_runs_and_reseed_on_restart
             .run_count("sess_local_alpha")
             .await
             .unwrap(),
-        128
+        129
     );
     state.storage().close().await.expect("close storage");
     cleanup(&home);
@@ -226,10 +305,16 @@ async fn http_post_execute(addr: SocketAddr, token: &str, input: &str) -> (u16, 
 }
 
 #[tokio::test]
-async fn http_concurrent_executes_at_one_fixed_millisecond_mint_distinct_runs() {
-    // The F01 kill condition through the REAL transport: the injected clock
-    // never advances, so every request shares now_ms — pre-fix the racy
-    // count read collapsed these into a handful of shared run ids.
+async fn http_concurrent_executes_surface_the_busy_gate_and_mint_distinct_runs() {
+    // The F01 kill condition through the REAL transport, under the R03-T02
+    // frozen semantics: the concurrent burst yields SOME accepted count
+    // (the transport's arrival order decides the exact split; the exact
+    // one-winner serialization is proven deterministically at the service
+    // level above and in session_serialization.rs) — every 200 carries a
+    // DISTINCT run id, every other request is the 409 session_busy
+    // rejection, and the durable facts match the accepted set exactly.
+    // Sequential submits afterwards are all accepted with distinct ids
+    // (F01 invariant through the transport).
     let home = synthetic_home("http");
     cleanup(&home);
     let clock = Arc::new(ManualClock::new(FIXED_NOW_MS));
@@ -277,18 +362,44 @@ async fn http_concurrent_executes_at_one_fixed_millisecond_mint_distinct_runs() 
         }));
     }
     let mut ids = std::collections::HashSet::new();
+    let mut accepted = 0usize;
+    let mut busy = 0usize;
     for t in tasks {
         let (status, body) = t.await.unwrap();
-        assert_eq!(status, 200, "execute accepted: {body}");
-        let json: serde_json::Value =
-            serde_json::from_str(&body).unwrap_or_else(|_| panic!("body not json: {body:?}"));
-        ids.insert(json["runId"].as_str().expect("runId").to_string());
+        match status {
+            200 => {
+                let json: serde_json::Value = serde_json::from_str(&body)
+                    .unwrap_or_else(|_| panic!("body not json: {body:?}"));
+                ids.insert(json["runId"].as_str().expect("runId").to_string());
+                accepted += 1;
+            }
+            409 => {
+                assert!(
+                    body.contains("session_busy"),
+                    "the busy rejection carries the frozen stable reason: {body}"
+                );
+                assert!(
+                    body.contains("\"retryable\":true"),
+                    "the busy rejection is retryable (frozen semantics): {body}"
+                );
+                busy += 1;
+            }
+            other => panic!("unexpected status {other}: {body}"),
+        }
     }
     assert_eq!(
-        ids.len(),
+        accepted + busy,
         64,
-        "64 concurrent HTTP executes => 64 distinct run ids, got {}",
-        ids.len()
+        "every request is either accepted or gated"
+    );
+    assert_eq!(
+        ids.len(),
+        accepted,
+        "every accepted execute mints a DISTINCT run id (F01 invariant)"
+    );
+    assert!(
+        accepted >= 1,
+        "the burst's first arrival must be accepted (gate is per-session, not global)"
     );
     assert_eq!(
         test_view
@@ -296,10 +407,22 @@ async fn http_concurrent_executes_at_one_fixed_millisecond_mint_distinct_runs() 
             .run_count("sess_local_alpha")
             .await
             .unwrap(),
-        64
+        accepted as u64
     );
     let (runs, key_events, _) = test_view.storage().run_fact_summary().await.unwrap();
-    assert_eq!((runs, key_events), (64, 128));
+    assert_eq!((runs, key_events), (accepted as i64, (accepted * 2) as i64));
+
+    // Sequential submits through the transport: all accepted, all distinct
+    // (F01 through the real router at one fixed millisecond).
+    for n in 0..8u32 {
+        let (status, body) =
+            http_post_execute(server.addr, &token, &format!("http-sequential-{n}")).await;
+        assert_eq!(status, 200, "idle session accepts: {body}");
+        let json: serde_json::Value =
+            serde_json::from_str(&body).unwrap_or_else(|_| panic!("body not json: {body:?}"));
+        ids.insert(json["runId"].as_str().expect("runId").to_string());
+    }
+    assert_eq!(ids.len(), accepted + 8);
 
     server.stop_and_assert_clean().await;
     cleanup(&home);

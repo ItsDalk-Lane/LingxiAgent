@@ -2468,10 +2468,12 @@
         "R03-A01": "PASS",
         "R03-A02": "PASS"
       },
-      "task_commit_sha": null,
+      "task_commit_sha": "8b2f2cd595625e17b4153af072efc8484b79d5b6",
       "push_result": {
-        "status": "PENDING_BACKFILL",
-        "note": "本账本提交一并携带任务提交；SHA 与远程回执由下一账本提交补登（沿用 R02 惯例）"
+        "status": "CONFIRMED",
+        "remote_branch": "origin/codex/rust-tauri-migration",
+        "remote_head": "8b2f2cd595625e17b4153af072efc8484b79d5b6",
+        "note": "ls-remote verified after push"
       },
       "blockers": [],
       "evidence": {
@@ -2485,23 +2487,69 @@
     "R03-T02": {
       "name": "会话串行化和全局限流",
       "stage_id": "R03",
-      "status": "PENDING",
-      "task_base_sha": null,
-      "executor_id": null,
-      "execution_result": null,
-      "review_round": 0,
-      "reviewer_id": null,
-      "review_verdict": null,
-      "findings": [],
+      "status": "DONE",
+      "task_base_sha": "8b2f2cd595625e17b4153af072efc8484b79d5b6",
+      "executor_id": "ZCode:R03-T02-exec-e1 (agent_19228790-9ae3-4981-9766-e79dca4ffb41)",
+      "execution_result": "READY_FOR_REVIEW",
+      "review_round": 1,
+      "reviewer_id": "ZCode:R03-T02-review-r1 (agent_3c417d71-c0bb-49df-9b3a-23ab2dadc91d)",
+      "review_verdict": "PASS",
+      "findings": [
+        {
+          "id": "R1-O1",
+          "severity": "ADVISORY",
+          "summary": "agent-lane 注册表驱逐窄 TOCTOU 建议 R04/R05 加固",
+          "review_report": "docs/rust-tauri/R03/R03-T02_REVIEW_R1.md",
+          "resolution": "登记观察项"
+        },
+        {
+          "id": "R1-O2",
+          "severity": "ADVISORY",
+          "summary": "递延登记（真实用户取消传播=T03、steer WS 传输面=R07、runSplit 投影=R06）",
+          "review_report": "docs/rust-tauri/R03/R03-T02_REVIEW_R1.md",
+          "resolution": "按责任矩阵递延"
+        },
+        {
+          "id": "R1-O3",
+          "severity": "ADVISORY",
+          "summary": "abort 后 run 行停留 running 的恢复收束归 T07",
+          "review_report": "docs/rust-tauri/R03/R03-T02_REVIEW_R1.md",
+          "resolution": "T07 恢复分类覆盖"
+        },
+        {
+          "id": "R1-O4",
+          "severity": "ADVISORY",
+          "summary": "HTTP 非确定切分如实标注",
+          "review_report": "docs/rust-tauri/R03/R03-T02_REVIEW_R1.md",
+          "resolution": "观察项"
+        },
+        {
+          "id": "R1-O5",
+          "severity": "ADVISORY",
+          "summary": "tokio test-util feature 会破坏 r00_management_leaves LAN 自连用例（环境干扰，执行者已用无 feature 等价方案）",
+          "review_report": "docs/rust-tauri/R03/R03-T02_REVIEW_R1.md",
+          "resolution": "环境事实登记，后续 Task 测试避免该 feature"
+        }
+      ],
       "repair_agent_id": null,
       "root_cause_agent_id": null,
       "acceptance_results": {
-        "R03-A03": "NOT_STARTED",
-        "R03-A04": "NOT_STARTED"
+        "R03-A03": "PASS",
+        "R03-A04": "PASS"
       },
       "task_commit_sha": null,
-      "push_result": null,
-      "blockers": []
+      "push_result": {
+        "status": "PENDING_BACKFILL",
+        "note": "SHA 与远程回执由下一账本提交补登"
+      },
+      "blockers": [],
+      "evidence": {
+        "executor_report": "docs/rust-tauri/R03/R03-T02_REPORT.md",
+        "executor_evidence": "artifacts/rust-tauri/R03/T02-E01/",
+        "review_report": "docs/rust-tauri/R03/R03-T02_REVIEW_R1.md",
+        "review_evidence": "artifacts/rust-tauri/R03/T02-R01-review/",
+        "candidate_diff_digest_16": "7af03d804b5c1736"
+      }
     },
     "R03-T03": {
       "name": "取消树和子任务监督",
@@ -4058,7 +4106,7 @@
       "blockers": []
     }
   },
-  "current_task": "R03-T02",
+  "current_task": "R03-T03",
   "orchestration_mode": {
     "effective_from": "R00-T03 R2 repair",
     "task_executor": "new ZCode task per Rxx-Tyy",

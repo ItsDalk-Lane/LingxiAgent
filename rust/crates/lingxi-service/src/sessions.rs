@@ -27,6 +27,7 @@ use lingxi_kernel::Principal as KernelPrincipal;
 
 use crate::auth::{Principal, PrincipalKind, LOCAL_OWNER_USER_ID};
 use crate::events::EventService;
+use crate::session_supervisor::{SessionConcurrencyLimits, SessionSupervisor, SteerOutcome};
 
 /// Summary shape returned by the read endpoint (runs carry only committed
 /// facts; no echo of failed attempts).
@@ -89,6 +90,16 @@ pub struct SessionFacts {
 pub enum SessionExecuteError {
     NotFound,
     Forbidden,
+    /// The session already owns a running task: the FROZEN incumbent
+    /// `session_busy` gate (R03-T02). The submission was NOT accepted and
+    /// wrote NOTHING — retry later or steer the running turn instead.
+    Busy,
+    /// The tracked-session registry is at its hard cap (service
+    /// protection; nothing was written).
+    SessionRegistryFull,
+    /// A steering submission overflowed the bounded steering inbox
+    /// (nothing was accepted).
+    SteeringInboxFull,
     /// The storage port refused or failed: no visible success was produced
     /// (R02-A07). Carries the domain storage error for the endpoint's
     /// error surface.
@@ -217,6 +228,10 @@ impl SessionBackend for RunDatabase {
 
 pub struct SessionStore {
     backend: Box<dyn SessionBackendErased>,
+    /// R03-T02: the session serialization owner — one explicit owner per
+    /// session; busy sessions reject further normal submissions (frozen
+    /// incumbent `session_busy` gate) and accept steering instead.
+    gate: std::sync::Arc<SessionSupervisor>,
 }
 
 impl std::fmt::Debug for SessionStore {
@@ -226,11 +241,29 @@ impl std::fmt::Debug for SessionStore {
 }
 
 impl SessionStore {
-    /// Wraps a real storage backend.
+    /// Wraps a real storage backend with the production-default session
+    /// concurrency policy.
     pub fn new(backend: impl SessionBackend + 'static) -> Self {
+        Self::with_concurrency(backend, SessionConcurrencyLimits::default())
+    }
+
+    /// Full injection: the session concurrency policy is explicit (the
+    /// composition root passes the `ServiceDeps` value; tests inject small
+    /// caps through the same path — the gate semantics are identical).
+    pub fn with_concurrency(
+        backend: impl SessionBackend + 'static,
+        limits: SessionConcurrencyLimits,
+    ) -> Self {
         Self {
             backend: Box::new(backend),
+            gate: SessionSupervisor::new(limits),
         }
+    }
+
+    /// The session serialization owner (observability; also lets callers
+    /// submit steering for a running turn).
+    pub fn session_supervisor(&self) -> &std::sync::Arc<SessionSupervisor> {
+        &self.gate
     }
 
     /// The synthetic sessions seeded into a fresh database (owned by the
@@ -301,9 +334,13 @@ impl SessionStore {
     /// wiring of the T04 authority chain). Storage failures surface as
     /// [`SessionExecuteError::Storage`] — no visible success (R02-A07).
     ///
-    /// The R02 "immediate success" inline execution is REPLACED by this
-    /// lifecycle: there is exactly one owner of a run's terminal state
-    /// (the supervisor's single finalize path), never two.
+    /// R03-T02 session serialization: the submission first reserves the
+    /// session's ONE owner slot ([`SessionSupervisor`]). A busy session
+    /// rejects the submission with [`SessionExecuteError::Busy`] — the
+    /// frozen incumbent `session_busy` gate — BEFORE any durable side
+    /// effect (no run id is allocated, nothing is written). The lease is
+    /// RAII: normal settle, error, timeout or cancellation of the drive
+    /// all free the session for the next submission.
     // Port/events are passed explicitly (R02 style: the session surface
     // does not own them); adding the supervisor keeps the same shape.
     #[allow(clippy::too_many_arguments)]
@@ -326,6 +363,22 @@ impl SessionStore {
             return Err(SessionExecuteError::Forbidden);
         }
 
+        // R03-T02: reserve the session's single owner slot. Rejection
+        // happens before ANY durable side effect.
+        let lease = match self.gate.try_begin_run(session_id) {
+            Ok(lease) => lease,
+            Err(crate::session_supervisor::BusyGateError::Busy) => {
+                tracing::info!(
+                    session_id = session_id,
+                    "normal submission to a busy session rejected (session_busy; retryable)"
+                );
+                return Err(SessionExecuteError::Busy);
+            }
+            Err(crate::session_supervisor::BusyGateError::RegistryFull) => {
+                return Err(SessionExecuteError::SessionRegistryFull);
+            }
+        };
+
         // Bound what we record (defense in depth; the body limit already
         // bounds the request).
         let recorded_input: String = input.chars().take(2000).collect();
@@ -338,24 +391,28 @@ impl SessionStore {
             .allocate_run_id_erased(now_ms)
             .map_err(SessionExecuteError::Storage)?;
 
-        // Drive the full lifecycle (start → turns → single finalize).
+        // Drive the full lifecycle (start → turns → single finalize); the
+        // run drains the session's steering channel before each provider
+        // turn. `lease` frees the session on EVERY exit path below.
         let finish = supervisor
             .drive_run(
                 port,
                 events,
                 &kernel_principal_of(principal),
                 session_id,
+                &row.agent_id,
                 &run_id,
                 &recorded_input,
                 1,
                 now_ms,
+                Some(lease.steering_inbox()),
             )
             .await
             .map_err(SessionExecuteError::from)?;
 
         tracing::info!(
             run_id = %run_id,
-            session_id = %session_id,
+            session_id = session_id,
             outcome = %finish.terminal_reason(),
             input_chars = recorded_input.chars().count(),
             "run settled through the single finalize path"
@@ -367,6 +424,36 @@ impl SessionStore {
             .await
             .map_err(SessionExecuteError::Storage)?;
         Ok(ExecuteAccepted { run_id, run_count })
+    }
+
+    /// Submits a STEERING / follow-up input for the session's RUNNING turn
+    /// (R03-T02 step 2: normal submissions and steering stay distinct).
+    ///
+    /// Frozen incumbent semantics (`session-coordinator.steerSession` /
+    /// chat steer route): steering NEVER interrupts the running loop — the
+    /// text reaches the run's NEXT model call through the session's
+    /// steering channel; when the session is idle the outcome is
+    /// [`SteerOutcome::Miss`] and the caller falls back to a normal
+    /// submission ("steer missed, falling back to prompt"). The durable
+    /// user-message projection of a steered commit (runSplit) is R06.
+    pub async fn steer_for(
+        &self,
+        principal: &Principal,
+        session_id: &str,
+        text: &str,
+    ) -> Result<SteerOutcome, SessionExecuteError> {
+        let row = match self.backend.get_session_erased(session_id).await {
+            Ok(Some(row)) => row,
+            Ok(None) => return Err(SessionExecuteError::NotFound),
+            Err(err) => return Err(SessionExecuteError::Storage(err)),
+        };
+        if !Self::can_access(principal, &row.owner_user_id) {
+            return Err(SessionExecuteError::Forbidden);
+        }
+        match self.gate.steering_submit(session_id, text) {
+            Ok(outcome) => Ok(outcome),
+            Err(_) => Err(SessionExecuteError::SteeringInboxFull),
+        }
     }
 
     /// Test/evidence helper: observable run count for a session.
@@ -588,6 +675,14 @@ mod tests {
             ctx: &RunContext,
             _now_unix_ms: u64,
         ) -> Result<CommittedOutcome, StorageError> {
+            // R03-T02 fixture: one await point inside the drive, modeling
+            // the real storage round trip the RunDatabase always has.
+            // Without it the fake is fully synchronous and the session's
+            // busy window would be zero-width — the serialization gate
+            // could never be observed by a concurrent submission. (The
+            // real-backend concurrency matrix lives in
+            // tests/execute_concurrency.rs.)
+            tokio::task::yield_now().await;
             self.runs
                 .lock()
                 .expect("runs lock")
@@ -794,11 +889,17 @@ mod tests {
     }
 
     #[tokio::test]
-    async fn concurrent_executes_never_collapse_into_one_run_id() {
-        // R02 stage-repair R1 / F01 regression: 64 distinct-input executes
-        // at the SAME millisecond must produce 64 distinct run ids. Pre-fix
-        // the `total_runs + 1` read raced and 64 concurrent submissions
-        // collapsed into 2 runs with 64 success receipts.
+    async fn concurrent_executes_serialize_one_accepted_and_no_run_id_collapse() {
+        // R02 stage-repair R1 / F01 regression + R03-T02 frozen semantics.
+        // Pre-R03-T02, 64 distinct-input executes on ONE session at the
+        // same millisecond had to all be accepted with distinct run ids
+        // (the F01 fix). R03-T02 adopts the incumbent Node gate: a busy
+        // session REJECTS further normal submissions (`session_busy`,
+        // retryable) — so exactly ONE of the 64 wins the session and the
+        // other 63 are rejected with zero durable side effects. The F01
+        // public invariant itself (every ACCEPTED execute mints its own,
+        // never-collapsing run id — including rapid sequential submits at
+        // one fixed millisecond) is asserted right after.
         let (store, runs) = store_with_runs();
         let port = std::sync::Arc::new(FakePort {
             fail_outcome: false,
@@ -827,21 +928,137 @@ mod tests {
                         4242,
                     )
                     .await
-                    .expect("execute")
-                    .run_id
             }));
         }
-        let mut ids = std::collections::HashSet::new();
+        let mut accepted_ids = Vec::new();
+        let mut busy_rejections = 0;
         for t in tasks {
-            ids.insert(t.await.unwrap());
+            match t.await.unwrap() {
+                Ok(accepted) => accepted_ids.push(accepted.run_id),
+                Err(SessionExecuteError::Busy) => busy_rejections += 1,
+                other => panic!("expected accept or Busy, got {other:?}"),
+            }
         }
         assert_eq!(
-            ids.len(),
-            64,
-            "every distinct submission is its own run: {} ids",
-            ids.len()
+            accepted_ids.len(),
+            1,
+            "exactly one submission owns the session"
         );
-        assert_eq!(store.run_count("sess_local_alpha").await.unwrap(), 64);
+        assert_eq!(
+            busy_rejections, 63,
+            "the rest are the frozen session_busy gate"
+        );
+        assert_eq!(store.run_count("sess_local_alpha").await.unwrap(), 1);
+
+        // F01 protection preserved: rapid sequential submits at the SAME
+        // millisecond still mint distinct, never-collapsing run ids.
+        let mut sequential_ids = Vec::new();
+        for n in 0..8 {
+            let accepted = store
+                .execute_for(
+                    port.as_ref(),
+                    events.as_ref(),
+                    &supervisor(),
+                    &owner,
+                    "sess_local_alpha",
+                    &format!("sequential-{n}"),
+                    4242,
+                )
+                .await
+                .expect("idle session accepts");
+            sequential_ids.push(accepted.run_id);
+        }
+        let all: std::collections::HashSet<_> =
+            accepted_ids.iter().chain(sequential_ids.iter()).collect();
+        assert_eq!(
+            all.len(),
+            9,
+            "every accepted execute is its own run: {all:?}"
+        );
+        assert_eq!(store.run_count("sess_local_alpha").await.unwrap(), 9);
+        drop(events);
+        let _ = std::fs::remove_dir_all(dir);
+    }
+
+    #[tokio::test]
+    async fn busy_rejection_writes_nothing_and_steering_is_distinct() {
+        // R03-T02 step 2: normal submission vs steering stay distinct on
+        // the session surface. A busy session rejects a NORMAL submission
+        // (zero side effects) but ACCEPTS steering for the running turn;
+        // an idle session reports a steering MISS (the frozen fallback).
+        let (store, runs) = store_with_runs();
+        let port = FakePort {
+            fail_outcome: false,
+            runs,
+            outcomes: StdMutex::new(Vec::new()),
+        };
+        let (events, dir) = event_service_for_test().await;
+        let owner = owner_principal();
+
+        // Hold the session busy through the supervisor directly (the same
+        // reservation execute_for makes).
+        let lease = store
+            .session_supervisor()
+            .try_begin_run("sess_local_alpha")
+            .expect("reserve the session");
+        match store
+            .execute_for(
+                &port,
+                &events,
+                &supervisor(),
+                &owner,
+                "sess_local_alpha",
+                "second",
+                1,
+            )
+            .await
+        {
+            Err(SessionExecuteError::Busy) => {}
+            other => panic!("busy session must reject a normal submission, got {other:?}"),
+        }
+        assert!(
+            port.outcomes.lock().unwrap().is_empty(),
+            "the rejected submission committed nothing"
+        );
+        // Steering is NOT a new submission: accepted for the running turn.
+        assert_eq!(
+            store
+                .steer_for(&owner, "sess_local_alpha", "focus on the file")
+                .await
+                .unwrap(),
+            SteerOutcome::Accepted
+        );
+        // Cross-principal steering stays Forbidden (zero side effects).
+        let foreign = device_principal("user_remote_b");
+        assert_eq!(
+            store
+                .steer_for(&foreign, "sess_local_alpha", "inject")
+                .await,
+            Err(SessionExecuteError::Forbidden)
+        );
+        drop(lease);
+        // Idle session: steering MISSES (the caller falls back to a normal
+        // submission — frozen incumbent behavior).
+        assert_eq!(
+            store
+                .steer_for(&owner, "sess_local_alpha", "after the run")
+                .await
+                .unwrap(),
+            SteerOutcome::Miss
+        );
+        // And an idle session accepts a normal submission again.
+        assert!(store
+            .execute_for(
+                &port,
+                &events,
+                &supervisor(),
+                &owner,
+                "sess_local_alpha",
+                "next",
+                2
+            )
+            .await
+            .is_ok());
         drop(events);
         let _ = std::fs::remove_dir_all(dir);
     }
