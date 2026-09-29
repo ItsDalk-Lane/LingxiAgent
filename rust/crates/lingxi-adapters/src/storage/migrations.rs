@@ -152,6 +152,51 @@ CREATE TABLE stale_result_audit (
 CREATE INDEX idx_stale_result_audit_run ON stale_result_audit(run_id);
 "#;
 
+/// R03-T05 side-effect invocation receipts (version 3): the
+/// InvocationJournal. One row per tool invocation (journal_id = the tool
+/// call id the run driver minted), carrying the full receipt binding
+/// (owner facts, run/attempt/generation, target, args digest, idempotency
+/// key) and the receipt lifecycle `phase`
+/// prepared→authorized→started→succeeded/failed/unknown.
+///
+/// Write-order contract (enforced by the driver, witnessed by the row):
+/// the intent phases are durable BEFORE the external execution; the
+/// receipt columns (`receipt_outcome`/`receipt_detail`/`dedup_id`/
+/// `dispatched`) land AFTER it. No cross-system atomicity is claimed.
+///
+/// The FK to `runs` is deliberate here (unlike the T04 audit table): the
+/// journal is written by the live driver of a real run, never as a record
+/// of an untrusted claim. The unique partial index on `idempotency_key`
+/// mechanically prevents two invocations from ever presenting the same
+/// key.
+pub const V3_NAME: &str = "invocation_journal";
+pub const V3_SQL: &str = r#"
+CREATE TABLE invocation_journal (
+    journal_id           TEXT PRIMARY KEY,
+    session_id           TEXT NOT NULL,
+    run_id               TEXT NOT NULL REFERENCES runs(run_id),
+    attempt              TEXT NOT NULL,
+    generation           INTEGER NOT NULL,
+    owner_kind           TEXT NOT NULL,
+    owner_subject        TEXT NOT NULL,
+    target               TEXT NOT NULL,
+    args_digest          TEXT NOT NULL,
+    args_summary         TEXT,
+    idempotency_key      TEXT,
+    phase                TEXT NOT NULL,
+    receipt_outcome      TEXT,
+    receipt_detail       TEXT,
+    dedup_id             TEXT,
+    dispatched           INTEGER,
+    prepared_at_unix_ms  INTEGER NOT NULL,
+    updated_at_unix_ms   INTEGER NOT NULL
+);
+CREATE INDEX idx_invocation_journal_run ON invocation_journal(run_id);
+CREATE UNIQUE INDEX idx_invocation_journal_idem
+    ON invocation_journal(idempotency_key)
+    WHERE idempotency_key IS NOT NULL;
+"#;
+
 /// The full ordered migration list. Appending a migration is a deliberate,
 /// reviewed act; editing an existing entry changes its fingerprint and is
 /// rejected on every already-migrated database.
@@ -165,6 +210,11 @@ pub const MIGRATIONS: &[Migration] = &[
         version: 2,
         name: V2_NAME,
         sql: V2_SQL,
+    },
+    Migration {
+        version: 3,
+        name: V3_NAME,
+        sql: V3_SQL,
     },
 ];
 

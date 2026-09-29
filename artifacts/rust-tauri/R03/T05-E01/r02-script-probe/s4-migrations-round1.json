@@ -1,0 +1,45 @@
+{
+  "compiledIn": [
+    {
+      "fingerprint": "479b0321494269fca85d9f973b01a8f9d1aa57dc08fc3cf8fddbafeace461bb8",
+      "name": "initial_run_message_schema",
+      "version": 1
+    },
+    {
+      "fingerprint": "64d7edfdab74e13e623a9d8d5f2381dad4803f545fa126d8eda8cc02c3dc889c",
+      "name": "stale_result_audit",
+      "version": 2
+    },
+    {
+      "fingerprint": "3bd5388f090ab0ae0e137d91d59a8e48f82f409bbd0de657abf29b897a4252c1",
+      "name": "invocation_journal",
+      "version": 3
+    }
+  ],
+  "dbPath": "withheld-from-evidence",
+  "receipts": [
+    {
+      "appliedAtUnixMs": 1790664881005,
+      "appliedBy": "lingxi-adapters 0.0.0",
+      "fingerprint": "479b0321494269fca85d9f973b01a8f9d1aa57dc08fc3cf8fddbafeace461bb8",
+      "name": "initial_run_message_schema",
+      "version": 1
+    },
+    {
+      "appliedAtUnixMs": 1790664881005,
+      "appliedBy": "lingxi-adapters 0.0.0",
+      "fingerprint": "64d7edfdab74e13e623a9d8d5f2381dad4803f545fa126d8eda8cc02c3dc889c",
+      "name": "stale_result_audit",
+      "version": 2
+    },
+    {
+      "appliedAtUnixMs": 1790664881005,
+      "appliedBy": "lingxi-adapters 0.0.0",
+      "fingerprint": "3bd5388f090ab0ae0e137d91d59a8e48f82f409bbd0de657abf29b897a4252c1",
+      "name": "invocation_journal",
+      "version": 3
+    }
+  ],
+  "supportedVersion": 3,
+  "userVersion": 3
+}

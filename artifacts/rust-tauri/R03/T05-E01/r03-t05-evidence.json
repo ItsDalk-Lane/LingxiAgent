@@ -1,0 +1,46 @@
+{
+  "r03_a09_unknown_receipt": {
+    "decision": "needs_attention",
+    "external_executed_count": 1,
+    "external_request_count": 1,
+    "journal_phase_before_kill": "started",
+    "receipt_outcome_after_recovery": "unknown",
+    "run_id": "run_000001a0dcba6c00_000001",
+    "run_status_after_restart": "running",
+    "target": "notify.double"
+  },
+  "r03_a10_idempotent_resume": {
+    "decision": "unknown_resume_with_idempotency_key",
+    "external_executed_count": 1,
+    "external_request_count": 2,
+    "final_phase": "succeeded",
+    "idempotency_key": "run_000001a0dcba6c00_000001-tc0001",
+    "run_id": "run_000001a0dcba6c00_000001",
+    "target": "ledger.double",
+    "verified_digest": "digest-1-run_000001a0dcba6c00_000001-tc0001"
+  },
+  "r03_t05_lifecycle": {
+    "entries": [
+      {
+        "dispatched": true,
+        "journal_id": "run_000001a0dcba6c00_000001-tc0001",
+        "outcome": "succeeded",
+        "phase": "succeeded"
+      },
+      {
+        "dispatched": true,
+        "journal_id": "run_000001a0dcba6c00_000001-tc0002",
+        "outcome": "failed",
+        "phase": "failed"
+      },
+      {
+        "dispatched": false,
+        "journal_id": "run_000001a0dcba6c00_000001-tc0003",
+        "outcome": "failed",
+        "phase": "failed"
+      }
+    ],
+    "external_executed_count": 2,
+    "run_id": "run_000001a0dcba6c00_000001"
+  }
+}

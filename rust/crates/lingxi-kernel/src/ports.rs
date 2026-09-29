@@ -331,6 +331,88 @@ pub trait StoragePort: Send + Sync {
         reason: Option<String>,
         now_unix_ms: u64,
     ) -> impl std::future::Future<Output = Result<CommittedOutcome, StorageError>> + Send;
+
+    // ── R03-T05: the InvocationJournal ─────────────────────────────────────
+    //
+    // One journal entry per tool invocation (journal id = tool call id).
+    // Write order is the contract:
+    //   1. `record_invocation_intent` (prepared) and
+    //      `advance_invocation` (authorized, started) are durable BEFORE
+    //      the external execution is dispatched;
+    //   2. `record_invocation_receipt` / `record_invocation_unknown` close
+    //      the entry AFTER the external execution.
+    // No method claims an atomic transaction across the external system.
+
+    /// Durably records the invocation INTENT (phase `prepared`) before
+    /// anything external is dispatched. Binding: owner facts, run /
+    /// attempt / generation, target, argument digest and (when present)
+    /// the idempotency key — all from `ctx` plus [`InvocationIntent`].
+    ///
+    /// Idempotent: re-recording the IDENTICAL intent is a replay; a
+    /// conflicting intent under the same journal id is a loud
+    /// [`StorageError::Conflict`].
+    fn record_invocation_intent(
+        &self,
+        ctx: &RunContext,
+        intent: InvocationIntent,
+        now_unix_ms: u64,
+    ) -> impl std::future::Future<Output = Result<(), StorageError>> + Send;
+
+    /// Advances the entry to `authorized` or `started` (the run-layer
+    /// authorization context decides when each is true). `started` MUST be
+    /// durable before the external execution is dispatched — that write is
+    /// what makes a crash between execution and receipt classifiable as
+    /// UNKNOWN.
+    ///
+    /// The phase ladder is enforced in order (`prepared → authorized →
+    /// started`); re-advancing to the CURRENT phase is an idempotent
+    /// no-op; skipping or regressing is [`StorageError::InvalidRequest`].
+    fn advance_invocation(
+        &self,
+        ctx: &RunContext,
+        journal_id: &ToolCallId,
+        to: InvocationPhase,
+        now_unix_ms: u64,
+    ) -> impl std::future::Future<Output = Result<(), StorageError>> + Send;
+
+    /// Closes the entry with the external receipt (succeeded / failed /
+    /// unknown + dedup identifier). Legal from `started` (the live path),
+    /// from an intent-only phase when the call never dispatched
+    /// (`dispatched: false`, e.g. a rejected approval), and from `unknown`
+    /// (a VERIFIED receipt settles an unconfirmed outcome). Closing an
+    /// already-closed (`succeeded`/`failed`) entry replays only when the
+    /// receipt is completely identical; anything else is a loud Conflict.
+    fn record_invocation_receipt(
+        &self,
+        ctx: &RunContext,
+        journal_id: &ToolCallId,
+        receipt: InvocationReceipt,
+        now_unix_ms: u64,
+    ) -> impl std::future::Future<Output = Result<(), StorageError>> + Send;
+
+    /// Recovery-surface close: marks a `started` (or already-`unknown`)
+    /// entry as [`InvocationPhase::Unknown`] — the durable statement that
+    /// the external outcome could not be determined from local state
+    /// (crash between the external execution and the receipt commit).
+    ///
+    /// Deliberately identity-free beyond the journal id: the entry's own
+    /// bound identity (owner/run/attempt/generation) is the authority —
+    /// this writes NO new identity facts, only the honest classification
+    /// of the entry it names. A later verified receipt may still settle
+    /// the entry.
+    fn record_invocation_unknown(
+        &self,
+        journal_id: &ToolCallId,
+        detail: String,
+        now_unix_ms: u64,
+    ) -> impl std::future::Future<Output = Result<(), StorageError>> + Send;
+
+    /// Loads one run's journal entries (oldest first) — the recovery
+    /// classification read.
+    fn load_invocation_journal(
+        &self,
+        run_id: &RunId,
+    ) -> impl std::future::Future<Output = Result<Vec<InvocationJournalEntry>, StorageError>> + Send;
 }
 
 /// Read/maintenance surface over the durable key-event log (R02-T05).
@@ -553,6 +635,152 @@ pub struct StaleResultFact {
     /// The event types of the refused delivery (empty when the fenced
     /// result was refused before any event was staged).
     pub refused_event_types: Vec<String>,
+}
+
+// ── R03-T05: side-effect invocation receipts (InvocationJournal) ─────────────
+
+/// The receipt lifecycle of one tool invocation (R03-T05 怎么做 1):
+/// `prepared → authorized → started → succeeded | failed | unknown`.
+///
+/// - `prepared` / `authorized` are intent-only phases: the external call
+///   was never dispatched, so recovery classifies them as 未执行.
+/// - `started` is durably recorded BEFORE the external execution is
+///   dispatched; an entry left here by a crash is exactly the
+///   "已执行但回执未持久化" window and recovers as UNKNOWN.
+/// - `succeeded` / `failed` are closed receipts (definitive).
+/// - `unknown` is the honest closure when the external outcome cannot be
+///   determined — either recorded from an unobserved/fenced result or by
+///   recovery classification. It is NOT final: a later VERIFIED receipt
+///   may settle it.
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum InvocationPhase {
+    Prepared,
+    Authorized,
+    Started,
+    Succeeded,
+    Failed,
+    Unknown,
+}
+
+impl InvocationPhase {
+    /// Stable storage/evidence vocabulary (the `invocation_journal.phase`
+    /// column). Changing a value is a data migration, not a rename.
+    pub fn wire_name(self) -> &'static str {
+        match self {
+            InvocationPhase::Prepared => "prepared",
+            InvocationPhase::Authorized => "authorized",
+            InvocationPhase::Started => "started",
+            InvocationPhase::Succeeded => "succeeded",
+            InvocationPhase::Failed => "failed",
+            InvocationPhase::Unknown => "unknown",
+        }
+    }
+
+    /// Parses the storage vocabulary (unknown values are corruption, never
+    /// a guess).
+    pub fn parse(name: &str) -> Option<Self> {
+        match name {
+            "prepared" => Some(InvocationPhase::Prepared),
+            "authorized" => Some(InvocationPhase::Authorized),
+            "started" => Some(InvocationPhase::Started),
+            "succeeded" => Some(InvocationPhase::Succeeded),
+            "failed" => Some(InvocationPhase::Failed),
+            "unknown" => Some(InvocationPhase::Unknown),
+            _ => None,
+        }
+    }
+
+    /// Whether the entry holds a CLOSED receipt (`succeeded`/`failed`).
+    /// `unknown` is deliberately NOT closed: a verified receipt may still
+    /// settle it.
+    pub fn is_closed(&self) -> bool {
+        matches!(self, InvocationPhase::Succeeded | InvocationPhase::Failed)
+    }
+}
+
+/// The durable intent of one tool invocation, recorded BEFORE anything
+/// external is dispatched (R03-T05 阶段书怎么做 2: 副作用执行前持久化开始
+/// 意图). The journal id is the tool call id the run driver minted, so the
+/// receipt binds to exactly one dispatch of exactly one call.
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct InvocationIntent {
+    /// Tool call id (the journal identity; minted by the run driver).
+    pub journal_id: ToolCallId,
+    /// Registry target of the tool (R04 owns the real registry).
+    pub target: String,
+    /// Digest of the normalized arguments (the value approvals and
+    /// receipts bind to).
+    pub args_digest: String,
+    /// Human-readable argument summary (bounded; diagnostic only).
+    pub args_summary: Option<String>,
+    /// The idempotency key this invocation presents to the external
+    /// system, when one exists. Whether the external system HONORS the key
+    /// is a per-tool capability
+    /// (`crate::invocation::ToolRecoveryCapability`); the key itself is a
+    /// durable fact of the receipt.
+    pub idempotency_key: Option<String>,
+}
+
+/// The closed outcome half of a receipt: `unknown` is a first-class value —
+/// the honest statement that the external outcome could not be determined.
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum ReceiptOutcome {
+    Succeeded,
+    Failed,
+    Unknown,
+}
+
+impl ReceiptOutcome {
+    pub fn wire_name(self) -> &'static str {
+        match self {
+            ReceiptOutcome::Succeeded => "succeeded",
+            ReceiptOutcome::Failed => "failed",
+            ReceiptOutcome::Unknown => "unknown",
+        }
+    }
+}
+
+/// The receipt recorded AFTER the external execution (R03-T05 怎么做 2:
+/// 执行后持久化外部响应/可用去重标识). There is no cross-system atomic
+/// transaction: this row records what the external system returned (or that
+/// it returned nothing provable — [`ReceiptOutcome::Unknown`]).
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct InvocationReceipt {
+    pub outcome: ReceiptOutcome,
+    /// Bounded diagnostic (external response summary / error code / why
+    /// the outcome is unknown).
+    pub detail: String,
+    /// The dedup identifier the external system provided or that the
+    /// invocation's idempotency key resolved to (`None` when unavailable).
+    pub dedup_id: Option<String>,
+    /// Whether the external execution was dispatched at all. `false` for
+    /// closures that never dispatched (e.g. a rejected approval); `true`
+    /// for any outcome observed after dispatch.
+    pub dispatched: bool,
+}
+
+/// One durable journal entry (the read view used by recovery
+/// classification). Carries everything the receipt is bound to: owner
+/// facts, run/attempt/generation, target, argument digest, idempotency key
+/// and the phase/receipt.
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct InvocationJournalEntry {
+    pub journal_id: String,
+    pub session_id: String,
+    pub run_id: String,
+    pub attempt: String,
+    pub generation: u64,
+    pub owner_kind: String,
+    pub owner_subject: String,
+    pub target: String,
+    pub args_digest: String,
+    pub args_summary: Option<String>,
+    pub idempotency_key: Option<String>,
+    pub phase: InvocationPhase,
+    /// The closed receipt, once one exists.
+    pub receipt: Option<InvocationReceipt>,
+    pub prepared_at_unix_ms: u64,
+    pub updated_at_unix_ms: u64,
 }
 
 /// One tool call a provider requested. Identity (`ToolCallId`) is minted by
@@ -812,6 +1040,63 @@ mod tests {
             // Audit-only bookkeeping has no kernel rule to simulate (the
             // durable behavior is proven against the real adapter).
             Ok(())
+        }
+
+        async fn record_invocation_intent(
+            &self,
+            _ctx: &RunContext,
+            _intent: InvocationIntent,
+            _now_unix_ms: u64,
+        ) -> Result<(), StorageError> {
+            // Journal durability is proven against the real adapter; the
+            // kernel-trait half has no additional rule to simulate.
+            Ok(())
+        }
+
+        async fn advance_invocation(
+            &self,
+            _ctx: &RunContext,
+            _journal_id: &ToolCallId,
+            to: InvocationPhase,
+            _now_unix_ms: u64,
+        ) -> Result<(), StorageError> {
+            if !matches!(to, InvocationPhase::Authorized | InvocationPhase::Started) {
+                return Err(StorageError::InvalidRequest {
+                    detail: "advance_invocation only targets authorized/started".to_string(),
+                });
+            }
+            Ok(())
+        }
+
+        async fn record_invocation_receipt(
+            &self,
+            _ctx: &RunContext,
+            _journal_id: &ToolCallId,
+            receipt: InvocationReceipt,
+            _now_unix_ms: u64,
+        ) -> Result<(), StorageError> {
+            if receipt.outcome == ReceiptOutcome::Succeeded && !receipt.dispatched {
+                return Err(StorageError::InvalidRequest {
+                    detail: "a succeeded receipt must have dispatched the execution".to_string(),
+                });
+            }
+            Ok(())
+        }
+
+        async fn record_invocation_unknown(
+            &self,
+            _journal_id: &ToolCallId,
+            _detail: String,
+            _now_unix_ms: u64,
+        ) -> Result<(), StorageError> {
+            Ok(())
+        }
+
+        async fn load_invocation_journal(
+            &self,
+            _run_id: &RunId,
+        ) -> Result<Vec<InvocationJournalEntry>, StorageError> {
+            Ok(Vec::new())
         }
     }
 

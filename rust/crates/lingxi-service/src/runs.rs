@@ -31,13 +31,24 @@
 //! refused for state purposes and recorded as an audit-only stale fact
 //! (`record_stale_result`); old results never pollute the next attempt,
 //! the next run or a settled session.
+//!
+//! R03-T05 invocation journal (this stage): every tool call is journaled
+//! as a receipt bound to the owner facts, run/attempt/generation, target,
+//! argument digest and idempotency key. The write ORDER is the contract:
+//! the intent (`prepared` → `authorized` → `started`) is durable BEFORE
+//! the external execution is dispatched; the receipt (external response /
+//! dedup identifier) lands AFTER it. A crash between the two leaves the
+//! entry at `started` with no receipt — the recovery classification
+//! (R03-T05) reads exactly that as UNKNOWN and never lets a non-idempotent
+//! side effect be blindly retried.
 
 use std::sync::Arc;
 use std::time::Duration;
 
 use lingxi_kernel::ports::{
-    CommittedOutcome, KeyEvent, LateResultReason, ResultFence, StaleResultFact, StorageError,
-    StoragePort, ToolExecutionResult, ToolExecutorPort, ToolOutcome, ToolRequest, TurnProviderPort,
+    CommittedOutcome, InvocationIntent, InvocationPhase, InvocationReceipt, KeyEvent,
+    LateResultReason, ReceiptOutcome, ResultFence, StaleResultFact, StorageError, StoragePort,
+    ToolExecutionResult, ToolExecutorPort, ToolOutcome, ToolRequest, TurnProviderPort,
 };
 use lingxi_kernel::{
     attempt_id, model_call_id, tool_call_id, FailureCause, NoFinalCause, QuotaResource, RunFinish,
@@ -788,10 +799,44 @@ impl RunSupervisor {
                                 return Ok(finish);
                             }
                         };
+                        // R03-T05: the invocation INTENT is durable BEFORE
+                        // anything else — no external execution may ever be
+                        // dispatched without its prepared receipt on disk.
+                        // The idempotency key is derived from the durable
+                        // call identity (stable across restarts); whether
+                        // the external system HONORS it is a per-tool
+                        // recovery capability, not a claim made here.
+                        port.record_invocation_intent(
+                            &ctx,
+                            InvocationIntent {
+                                journal_id: call_id.clone(),
+                                target: request.target.clone(),
+                                args_digest: request.args_digest.hex.clone(),
+                                args_summary: request.args_summary.clone(),
+                                idempotency_key: Some(call_id.to_string()),
+                            },
+                            now_ms,
+                        )
+                        .await
+                        .map_err(DriveError::Storage)?;
                         self.persist_tool_event(
                             port, events, &ctx, &call_id, request, None, now_ms,
                         )
                         .await?;
+                        // No approval gate configured: the R03 run-layer
+                        // authorization context itself authorizes the call
+                        // (quota-admitted, authenticated run). R04's policy
+                        // gateway replaces this decision point.
+                        if self.approval.is_none() {
+                            port.advance_invocation(
+                                &ctx,
+                                &call_id,
+                                InvocationPhase::Authorized,
+                                now_ms,
+                            )
+                            .await
+                            .map_err(DriveError::Storage)?;
+                        }
                         // ── approval wait (R03-T03 minimal interface) ──
                         if let Some(gate) = self.approval.clone() {
                             live_status = RunStatus::WaitingApproval;
@@ -872,12 +917,26 @@ impl RunSupervisor {
                             )
                             .await?;
                             match decision {
-                                ApprovalDecision::Approved => { /* execute below */ }
+                                ApprovalDecision::Approved => {
+                                    // R03-T05: the approval RESOLVED — the
+                                    // receipt advances to authorized (still
+                                    // before any external execution).
+                                    port.advance_invocation(
+                                        &ctx,
+                                        &call_id,
+                                        InvocationPhase::Authorized,
+                                        now_ms,
+                                    )
+                                    .await
+                                    .map_err(DriveError::Storage)?;
+                                }
                                 ApprovalDecision::Rejected { .. } | ApprovalDecision::Aborted => {
                                     // ZERO executions — the rejection is a
                                     // recorded tool failure, not a silent
                                     // skip (frozen incumbent: the wrapper
-                                    // returns toolError with 执行 0 次).
+                                    // returns toolError with 执行 0 次). The
+                                    // journal closes the invocation as a
+                                    // never-dispatched failure.
                                     let reason = match decision {
                                         ApprovalDecision::Rejected { reason } => reason,
                                         ApprovalDecision::Aborted => "approval aborted".to_string(),
@@ -892,6 +951,19 @@ impl RunSupervisor {
                                             false,
                                         ),
                                     };
+                                    port.record_invocation_receipt(
+                                        &ctx,
+                                        &call_id,
+                                        InvocationReceipt {
+                                            outcome: ReceiptOutcome::Failed,
+                                            detail: format!("not dispatched: {reason}"),
+                                            dedup_id: None,
+                                            dispatched: false,
+                                        },
+                                        now_ms,
+                                    )
+                                    .await
+                                    .map_err(DriveError::Storage)?;
                                     self.persist_tool_event(
                                         port,
                                         events,
@@ -907,6 +979,15 @@ impl RunSupervisor {
                                 }
                             }
                         }
+                        // R03-T05: `started` is durable BEFORE the external
+                        // execution is dispatched. This write is what makes
+                        // a crash between the external execution and the
+                        // receipt commit classifiable as UNKNOWN (已执行但
+                        // 回执未持久化) — never as "not executed", never as
+                        // "succeeded".
+                        port.advance_invocation(&ctx, &call_id, InvocationPhase::Started, now_ms)
+                            .await
+                            .map_err(DriveError::Storage)?;
                         // ── supervised tool execution ──
                         let tool_scope = root.child(
                             format!("tool_call:{}", call_id.as_str()),
@@ -1030,6 +1111,19 @@ impl RunSupervisor {
                             saw_tool_failure = true;
                         }
                         saw_process_content = true;
+                        // R03-T05: the receipt (external response / dedup
+                        // identifier) is durable AFTER the execution — no
+                        // cross-system atomic transaction is claimed. This
+                        // lands BEFORE the stream event: a crash between
+                        // them leaves the receipt as the recovery evidence.
+                        port.record_invocation_receipt(
+                            &ctx,
+                            &call_id,
+                            journal_receipt_of(&outcome),
+                            now_ms,
+                        )
+                        .await
+                        .map_err(DriveError::Storage)?;
                         self.persist_tool_event(
                             port,
                             events,
@@ -1404,6 +1498,42 @@ fn finish_no_final(saw_tool_failure: bool, saw_process_content: bool) -> RunFini
     RunFinish::CompletedWithoutFinal { cause }
 }
 
+/// Maps a tool outcome onto the durable invocation RECEIPT (R03-T05). The
+/// content digest a healthy double/adapter returns is the dedup identifier
+/// the external system made available; a cancelled outcome says the
+/// executor STOPPED WAITING — it does not prove the external operation did
+/// not complete, so it journals as Unknown (never a fabricated failure);
+/// a fenced/unobserved result is Unknown by construction. The receipt
+/// records what the external system returned — no cross-system atomicity.
+fn journal_receipt_of(outcome: &ToolOutcome) -> InvocationReceipt {
+    match outcome {
+        ToolOutcome::Success { content_digest } => InvocationReceipt {
+            outcome: ReceiptOutcome::Succeeded,
+            detail: format!("external content digest {content_digest}"),
+            dedup_id: Some(content_digest.clone()),
+            dispatched: true,
+        },
+        ToolOutcome::Failed { error } => InvocationReceipt {
+            outcome: ReceiptOutcome::Failed,
+            detail: format!("{}: {}", error.code.wire_name(), error.message),
+            dedup_id: None,
+            dispatched: true,
+        },
+        ToolOutcome::Cancelled => InvocationReceipt {
+            outcome: ReceiptOutcome::Unknown,
+            detail: "executor stopped waiting (cancelled); external outcome unobserved".to_string(),
+            dedup_id: None,
+            dispatched: true,
+        },
+        ToolOutcome::Unknown { reason } => InvocationReceipt {
+            outcome: ReceiptOutcome::Unknown,
+            detail: reason.clone(),
+            dedup_id: None,
+            dispatched: true,
+        },
+    }
+}
+
 /// Maps the kernel [`ToolOutcome`] onto the wire tool-result shape. The
 /// T01 mapping is minimal and honest: a double's success carries its
 /// content digest as the only content block; R04's gateway owns real tool
@@ -1533,6 +1663,50 @@ mod tests {
             reason: "receipt lost".to_string(),
         });
         assert_eq!(wire.status, ToolResultStatus::Unknown);
+    }
+
+    /// R03-T05: the durable receipt mapping. Success carries the external
+    /// dedup identifier; a CANCELLED outcome journals as Unknown (stopping
+    /// the wait does not prove the external operation did not complete);
+    /// fenced/unobserved results are Unknown by construction.
+    #[test]
+    fn journal_receipt_maps_outcomes_onto_the_durable_receipt() {
+        let receipt = journal_receipt_of(&ToolOutcome::Success {
+            content_digest: "dd-1".to_string(),
+        });
+        assert_eq!(
+            receipt.outcome,
+            lingxi_kernel::ports::ReceiptOutcome::Succeeded
+        );
+        assert_eq!(receipt.dedup_id.as_deref(), Some("dd-1"));
+        assert!(receipt.dispatched);
+
+        let receipt = journal_receipt_of(&ToolOutcome::Failed {
+            error: ProtocolError::new(ErrorCode::Forbidden, "denied", false),
+        });
+        assert_eq!(
+            receipt.outcome,
+            lingxi_kernel::ports::ReceiptOutcome::Failed
+        );
+        assert!(!receipt.detail.is_empty());
+        assert!(receipt.dispatched);
+
+        let receipt = journal_receipt_of(&ToolOutcome::Cancelled);
+        assert_eq!(
+            receipt.outcome,
+            lingxi_kernel::ports::ReceiptOutcome::Unknown
+        );
+        assert!(receipt.detail.contains("unobserved"), "{}", receipt.detail);
+        assert!(receipt.dispatched);
+
+        let receipt = journal_receipt_of(&ToolOutcome::Unknown {
+            reason: "receipt lost".to_string(),
+        });
+        assert_eq!(
+            receipt.outcome,
+            lingxi_kernel::ports::ReceiptOutcome::Unknown
+        );
+        assert_eq!(receipt.detail, "receipt lost");
     }
 
     /// R03-T04 write-side fence logic (the driver's `fence_verdict`): a

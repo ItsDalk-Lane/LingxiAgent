@@ -793,7 +793,7 @@ mod tests {
     use crate::runs::RunSupervisor;
     use lingxi_kernel::ports::{CommittedOutcome, KeyEvent};
     use lingxi_kernel::RunContext;
-    use lingxi_protocol::RunId;
+    use lingxi_protocol::{RunId, ToolCallId};
     use std::sync::Mutex as StdMutex;
 
     /// R03-T01: the no-provider supervisor is the production default wiring
@@ -1041,6 +1041,52 @@ mod tests {
         ) -> Result<(), StorageError> {
             // Audit-only (durable behavior is covered against the adapter).
             Ok(())
+        }
+
+        async fn record_invocation_intent(
+            &self,
+            _ctx: &RunContext,
+            _intent: lingxi_kernel::ports::InvocationIntent,
+            _now_unix_ms: u64,
+        ) -> Result<(), StorageError> {
+            // Journal durability is covered against the real adapter.
+            Ok(())
+        }
+
+        async fn advance_invocation(
+            &self,
+            _ctx: &RunContext,
+            _journal_id: &ToolCallId,
+            _to: lingxi_kernel::ports::InvocationPhase,
+            _now_unix_ms: u64,
+        ) -> Result<(), StorageError> {
+            Ok(())
+        }
+
+        async fn record_invocation_receipt(
+            &self,
+            _ctx: &RunContext,
+            _journal_id: &ToolCallId,
+            _receipt: lingxi_kernel::ports::InvocationReceipt,
+            _now_unix_ms: u64,
+        ) -> Result<(), StorageError> {
+            Ok(())
+        }
+
+        async fn record_invocation_unknown(
+            &self,
+            _journal_id: &ToolCallId,
+            _detail: String,
+            _now_unix_ms: u64,
+        ) -> Result<(), StorageError> {
+            Ok(())
+        }
+
+        async fn load_invocation_journal(
+            &self,
+            _run_id: &RunId,
+        ) -> Result<Vec<lingxi_kernel::ports::InvocationJournalEntry>, StorageError> {
+            Ok(Vec::new())
         }
     }
 

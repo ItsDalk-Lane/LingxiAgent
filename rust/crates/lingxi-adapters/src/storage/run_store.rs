@@ -20,14 +20,16 @@ use std::path::{Path, PathBuf};
 use std::sync::Arc;
 
 use lingxi_kernel::ports::{
-    CommittedOutcome, KeyEvent, LateResultReason, RunOutcome, RunRecord, StaleResultFact,
-    StorageError, StoragePort,
+    CommittedOutcome, InvocationJournalEntry, InvocationPhase, InvocationReceipt, KeyEvent,
+    LateResultReason, ReceiptOutcome, RunOutcome, RunRecord, StaleResultFact, StorageError,
+    StoragePort,
 };
 use lingxi_kernel::{FinalizeSettlement, FinalizeVerdict, Principal, RunContext, RunStateMachine};
 use lingxi_protocol::canon;
 use lingxi_protocol::{
     AttemptId, EventEnvelope, EventId, EventPayload, FinalMessageCommittedPayload,
-    KnownEventPayload, RunStateChangedPayload, RunStatus, Seq, SessionId, StreamId,
+    KnownEventPayload, RunId, RunStateChangedPayload, RunStatus, Seq, SessionId, StreamId,
+    ToolCallId,
 };
 
 use super::migrations::{self, MigrationOutcome};
@@ -797,6 +799,220 @@ fn event_type_summary(events: &[KeyEvent]) -> Vec<String> {
         .iter()
         .map(|e| e.payload.event_type().to_string())
         .collect()
+}
+
+// ── R03-T05: invocation-journal helpers ──────────────────────────────────────
+
+/// One raw `invocation_journal` row (the write-path view; the read path
+/// rebuilds the public [`InvocationJournalEntry`] via
+/// [`journal_entry_from_row`]).
+struct JournalRow {
+    session_id: String,
+    run_id: String,
+    attempt: String,
+    generation: u64,
+    owner_kind: String,
+    owner_subject: String,
+    target: String,
+    args_digest: String,
+    args_summary: Option<String>,
+    idempotency_key: Option<String>,
+    phase: InvocationPhase,
+    receipt: Option<InvocationReceipt>,
+}
+
+/// Loads one journal row by id (`None` when no such entry).
+fn load_journal_row(
+    conn: &rusqlite::Connection,
+    journal_id: &str,
+) -> Result<Option<JournalRow>, StorageError> {
+    let mut stmt = conn
+        .prepare(
+            "SELECT session_id, run_id, attempt, generation, owner_kind, owner_subject, target, \
+             args_digest, args_summary, idempotency_key, phase, receipt_outcome, receipt_detail, \
+             dedup_id, dispatched \
+             FROM invocation_journal WHERE journal_id = ?1",
+        )
+        .map_err(migrations::map_rusqlite)?;
+    let mut rows = stmt.query([journal_id]).map_err(migrations::map_rusqlite)?;
+    match rows.next().map_err(migrations::map_rusqlite)? {
+        Some(row) => {
+            let cell = |index: usize| -> Result<String, StorageError> {
+                row.get::<_, String>(index)
+                    .map_err(migrations::map_rusqlite)
+            };
+            Ok(Some(JournalRow {
+                session_id: cell(0)?,
+                run_id: cell(1)?,
+                attempt: cell(2)?,
+                generation: u64::try_from(row.get::<_, i64>(3).map_err(migrations::map_rusqlite)?)
+                    .map_err(|_| StorageError::Corrupted {
+                        detail: format!(
+                            "invocation_journal {journal_id} holds a negative generation"
+                        ),
+                    })?,
+                owner_kind: cell(4)?,
+                owner_subject: cell(5)?,
+                target: cell(6)?,
+                args_digest: cell(7)?,
+                args_summary: row.get(8).map_err(migrations::map_rusqlite)?,
+                idempotency_key: row.get(9).map_err(migrations::map_rusqlite)?,
+                phase: InvocationPhase::parse(&cell(10)?).ok_or_else(|| {
+                    StorageError::Corrupted {
+                        detail: format!(
+                            "invocation_journal {journal_id} holds an unknown phase value"
+                        ),
+                    }
+                })?,
+                receipt: receipt_from_columns(
+                    row.get::<_, Option<String>>(12)
+                        .map_err(migrations::map_rusqlite)?,
+                    row.get::<_, Option<String>>(11)
+                        .map_err(migrations::map_rusqlite)?,
+                    row.get(13).map_err(migrations::map_rusqlite)?,
+                    row.get(14).map_err(migrations::map_rusqlite)?,
+                )?,
+            }))
+        }
+        None => Ok(None),
+    }
+}
+
+/// Rebuilds the receipt columns into the public receipt (a receipt_outcome
+/// without its detail/dedup/dispatched siblings is corruption — they commit
+/// together in one UPDATE).
+fn receipt_from_columns(
+    detail: Option<String>,
+    outcome_name: Option<String>,
+    dedup_id: Option<String>,
+    dispatched: Option<i64>,
+) -> Result<Option<InvocationReceipt>, StorageError> {
+    match (outcome_name, detail) {
+        (None, None) => Ok(None),
+        (Some(outcome_name), Some(detail)) => {
+            let outcome = match outcome_name.as_str() {
+                "succeeded" => ReceiptOutcome::Succeeded,
+                "failed" => ReceiptOutcome::Failed,
+                "unknown" => ReceiptOutcome::Unknown,
+                _ => {
+                    return Err(StorageError::Corrupted {
+                        detail: format!(
+                            "invocation_journal holds an unknown receipt outcome {outcome_name:?}"
+                        ),
+                    })
+                }
+            };
+            let dispatched = match dispatched {
+                Some(0) => false,
+                Some(_) => true,
+                None => {
+                    return Err(StorageError::Corrupted {
+                        detail: "invocation_journal receipt row is missing its dispatched flag"
+                            .to_string(),
+                    })
+                }
+            };
+            Ok(Some(InvocationReceipt {
+                outcome,
+                detail,
+                dedup_id,
+                dispatched,
+            }))
+        }
+        _ => Err(StorageError::Corrupted {
+            detail: "invocation_journal holds a half-written receipt (outcome without detail)"
+                .to_string(),
+        }),
+    }
+}
+
+/// Row mapper producing the public journal entry (read path). A row whose
+/// phase/receipt vocabulary or generation/timestamp columns are not legal
+/// is a LOUD error (corruption is never guessed into a value).
+fn journal_entry_from_row(row: &rusqlite::Row<'_>) -> Result<InvocationJournalEntry, StorageError> {
+    let corrupt = |what: &str| StorageError::Corrupted {
+        detail: format!("invocation_journal row is corrupt: {what}"),
+    };
+    let phase_name: String = row.get(11).map_err(migrations::map_rusqlite)?;
+    let phase = InvocationPhase::parse(&phase_name)
+        .ok_or_else(|| corrupt(&format!("unknown phase value {phase_name:?}")))?;
+    let receipt_outcome: Option<String> = row.get(12).map_err(migrations::map_rusqlite)?;
+    let receipt_detail: Option<String> = row.get(13).map_err(migrations::map_rusqlite)?;
+    let dedup_id: Option<String> = row.get(14).map_err(migrations::map_rusqlite)?;
+    let dispatched: Option<i64> = row.get(15).map_err(migrations::map_rusqlite)?;
+    let receipt = match (receipt_outcome, receipt_detail, dispatched) {
+        (None, None, None) => None,
+        (Some(outcome_name), Some(detail), Some(dispatched)) => {
+            let outcome = match outcome_name.as_str() {
+                "succeeded" => ReceiptOutcome::Succeeded,
+                "failed" => ReceiptOutcome::Failed,
+                "unknown" => ReceiptOutcome::Unknown,
+                _ => {
+                    return Err(corrupt(&format!(
+                        "unknown receipt outcome {outcome_name:?}"
+                    )))
+                }
+            };
+            Some(InvocationReceipt {
+                outcome,
+                detail,
+                dedup_id,
+                dispatched: dispatched != 0,
+            })
+        }
+        _ => return Err(corrupt("half-written receipt columns")),
+    };
+    let generation = u64::try_from(row.get::<_, i64>(4).map_err(migrations::map_rusqlite)?)
+        .map_err(|_| corrupt("negative generation"))?;
+    let prepared_at_unix_ms =
+        u64::try_from(row.get::<_, i64>(16).map_err(migrations::map_rusqlite)?)
+            .map_err(|_| corrupt("negative prepared_at"))?;
+    let updated_at_unix_ms =
+        u64::try_from(row.get::<_, i64>(17).map_err(migrations::map_rusqlite)?)
+            .map_err(|_| corrupt("negative updated_at"))?;
+    Ok(InvocationJournalEntry {
+        journal_id: row.get(0).map_err(migrations::map_rusqlite)?,
+        session_id: row.get(1).map_err(migrations::map_rusqlite)?,
+        run_id: row.get(2).map_err(migrations::map_rusqlite)?,
+        attempt: row.get(3).map_err(migrations::map_rusqlite)?,
+        generation,
+        owner_kind: row.get(5).map_err(migrations::map_rusqlite)?,
+        owner_subject: row.get(6).map_err(migrations::map_rusqlite)?,
+        target: row.get(7).map_err(migrations::map_rusqlite)?,
+        args_digest: row.get(8).map_err(migrations::map_rusqlite)?,
+        args_summary: row.get(9).map_err(migrations::map_rusqlite)?,
+        idempotency_key: row.get(10).map_err(migrations::map_rusqlite)?,
+        phase,
+        receipt,
+        prepared_at_unix_ms,
+        updated_at_unix_ms,
+    })
+}
+
+/// The owner-triple check every ctx-carrying journal mutation performs (a
+/// journal write under a foreign owner is a boundary violation).
+fn check_journal_owner(
+    entry: &JournalRow,
+    run_id: &str,
+    session_id: &str,
+    owner_kind: &str,
+    owner_subject: &str,
+    verb: &str,
+) -> Result<(), StorageError> {
+    if entry.run_id != run_id
+        || entry.session_id != session_id
+        || entry.owner_kind != owner_kind
+        || entry.owner_subject != owner_subject
+    {
+        return Err(StorageError::Conflict {
+            detail: format!(
+                "cannot {verb} invocation: the journal entry belongs to run {}/{}/{}/{} but the \
+                 caller claims run {run_id}/{session_id}/{owner_kind}/{owner_subject}",
+                entry.run_id, entry.session_id, entry.owner_kind, entry.owner_subject
+            ),
+        });
+    }
+    Ok(())
 }
 
 /// BEGIN IMMEDIATE + f + COMMIT/ROLLBACK with busy-error decoration.
@@ -1656,6 +1872,365 @@ impl StoragePort for RunDatabase {
                         events: vec![envelope],
                     })
                 })
+            })
+            .await
+    }
+
+    // ── R03-T05: the InvocationJournal ───────────────────────────────────
+
+    async fn record_invocation_intent(
+        &self,
+        ctx: &RunContext,
+        intent: lingxi_kernel::ports::InvocationIntent,
+        now_unix_ms: u64,
+    ) -> Result<(), StorageError> {
+        let (run_id, session_id, owner_kind, owner_subject, _principal_id, generation) =
+            ctx_facts(ctx);
+        let attempt = ctx.attempt.to_string();
+        let journal_id = intent.journal_id.to_string();
+        let busy = self.queue.options().busy_timeout_ms;
+        self.queue
+            .submit(move |conn| {
+                with_write_txn(conn, busy, |conn| {
+                    let run = load_run_row(conn, &run_id)?.ok_or_else(|| {
+                        StorageError::InvalidRequest {
+                            detail: format!(
+                                "cannot journal invocation {journal_id}: run {run_id} has no row"
+                            ),
+                        }
+                    })?;
+                    if run.session_id != session_id
+                        || run.owner_kind != owner_kind
+                        || run.owner_subject != owner_subject
+                    {
+                        return Err(StorageError::Conflict {
+                            detail: format!(
+                                "run {run_id} belongs to session {}/{}/{}; the journal context \
+                                 claims {session_id}/{owner_kind}/{owner_subject}",
+                                run.session_id, run.owner_kind, run.owner_subject
+                            ),
+                        });
+                    }
+                    if let Some(existing) = load_journal_row(conn, &journal_id)? {
+                        // Idempotent replay: the IDENTICAL intent (same
+                        // binding, still intent-only) is a no-op; anything
+                        // else under this journal id is a loud conflict.
+                        let identical = existing.run_id == run_id
+                            && existing.attempt == attempt
+                            && existing.generation == generation
+                            && existing.session_id == session_id
+                            && existing.owner_kind == owner_kind
+                            && existing.owner_subject == owner_subject
+                            && existing.target == intent.target
+                            && existing.args_digest == intent.args_digest
+                            && existing.args_summary == intent.args_summary
+                            && existing.idempotency_key == intent.idempotency_key
+                            && !existing.phase.is_closed()
+                            && existing.phase != InvocationPhase::Unknown;
+                        if identical {
+                            return Ok(());
+                        }
+                        return Err(StorageError::Conflict {
+                            detail: format!(
+                                "journal id {journal_id} already holds a {} entry for run {} \
+                                 (attempt {}); a conflicting intent is refused",
+                                existing.phase.wire_name(),
+                                existing.run_id,
+                                existing.attempt
+                            ),
+                        });
+                    }
+                    conn.execute(
+                        "INSERT INTO invocation_journal \
+                         (journal_id, session_id, run_id, attempt, generation, owner_kind, \
+                          owner_subject, target, args_digest, args_summary, idempotency_key, \
+                          phase, prepared_at_unix_ms, updated_at_unix_ms) \
+                         VALUES (?1, ?2, ?3, ?4, ?5, ?6, ?7, ?8, ?9, ?10, ?11, 'prepared', \
+                          ?12, ?12)",
+                        rusqlite::params![
+                            journal_id,
+                            session_id,
+                            run_id,
+                            attempt,
+                            generation as i64,
+                            owner_kind,
+                            owner_subject,
+                            intent.target,
+                            intent.args_digest,
+                            intent.args_summary,
+                            intent.idempotency_key,
+                            now_unix_ms as i64
+                        ],
+                    )
+                    .map_err(migrations::map_rusqlite)?;
+                    Ok(())
+                })
+            })
+            .await
+    }
+
+    async fn advance_invocation(
+        &self,
+        ctx: &RunContext,
+        journal_id: &ToolCallId,
+        to: InvocationPhase,
+        now_unix_ms: u64,
+    ) -> Result<(), StorageError> {
+        if !matches!(to, InvocationPhase::Authorized | InvocationPhase::Started) {
+            return Err(StorageError::InvalidRequest {
+                detail: format!(
+                    "advance_invocation only moves an entry to authorized/started, not {}",
+                    to.wire_name()
+                ),
+            });
+        }
+        let (run_id, session_id, owner_kind, owner_subject, _principal_id, _generation) =
+            ctx_facts(ctx);
+        let journal_id = journal_id.to_string();
+        let busy = self.queue.options().busy_timeout_ms;
+        self.queue
+            .submit(move |conn| {
+                with_write_txn(conn, busy, |conn| {
+                    let entry = load_journal_row(conn, &journal_id)?.ok_or_else(|| {
+                        StorageError::InvalidRequest {
+                            detail: format!(
+                                "cannot advance invocation {journal_id}: no journal entry exists"
+                            ),
+                        }
+                    })?;
+                    check_journal_owner(
+                        &entry,
+                        &run_id,
+                        &session_id,
+                        &owner_kind,
+                        &owner_subject,
+                        "advance",
+                    )?;
+                    let current = entry.phase;
+                    if current == to {
+                        // Idempotent re-advance to the current phase (a
+                        // retry after a lost response, for example).
+                        return Ok(());
+                    }
+                    let legal = matches!(
+                        (current, to),
+                        (InvocationPhase::Prepared, InvocationPhase::Authorized)
+                            | (InvocationPhase::Authorized, InvocationPhase::Started)
+                            | (InvocationPhase::Prepared, InvocationPhase::Started)
+                    );
+                    if !legal {
+                        return Err(StorageError::InvalidRequest {
+                            detail: format!(
+                                "invocation {journal_id} cannot advance {} → {} (ladder is \
+                                 prepared → authorized → started; closed entries never move)",
+                                current.wire_name(),
+                                to.wire_name()
+                            ),
+                        });
+                    }
+                    conn.execute(
+                        "UPDATE invocation_journal SET phase = ?1, updated_at_unix_ms = ?2 \
+                         WHERE journal_id = ?3",
+                        rusqlite::params![to.wire_name(), now_unix_ms as i64, journal_id],
+                    )
+                    .map_err(migrations::map_rusqlite)?;
+                    Ok(())
+                })
+            })
+            .await
+    }
+
+    async fn record_invocation_receipt(
+        &self,
+        ctx: &RunContext,
+        journal_id: &ToolCallId,
+        receipt: InvocationReceipt,
+        now_unix_ms: u64,
+    ) -> Result<(), StorageError> {
+        let (run_id, session_id, owner_kind, owner_subject, _principal_id, _generation) =
+            ctx_facts(ctx);
+        let journal_id = journal_id.to_string();
+        let busy = self.queue.options().busy_timeout_ms;
+        self.queue
+            .submit(move |conn| {
+                with_write_txn(conn, busy, |conn| {
+                    let entry = load_journal_row(conn, &journal_id)?.ok_or_else(|| {
+                        StorageError::InvalidRequest {
+                            detail: format!(
+                                "cannot close invocation {journal_id}: no journal entry exists"
+                            ),
+                        }
+                    })?;
+                    check_journal_owner(
+                        &entry,
+                        &run_id,
+                        &session_id,
+                        &owner_kind,
+                        &owner_subject,
+                        "close",
+                    )?;
+                    if let Some(existing) = &entry.receipt {
+                        if entry.phase.is_closed() {
+                            // Closed entries replay only the COMPLETELY
+                            // identical receipt (mirrors the run-finalize
+                            // idempotency rule).
+                            if existing.outcome == receipt.outcome
+                                && existing.detail == receipt.detail
+                                && existing.dedup_id == receipt.dedup_id
+                                && existing.dispatched == receipt.dispatched
+                            {
+                                return Ok(());
+                            }
+                            return Err(StorageError::Conflict {
+                                detail: format!(
+                                    "invocation {journal_id} already holds a {} receipt ({:?}); \
+                                     a conflicting receipt is refused",
+                                    entry.phase.wire_name(),
+                                    existing.outcome.wire_name()
+                                ),
+                            });
+                        }
+                        // The entry sits at `unknown` with a placeholder
+                        // receipt (a recovery verdict or an unobserved
+                        // result). `unknown` is NOT a settlement: an
+                        // identical re-close replays, and a VERIFIED
+                        // receipt settles it (falls through to the close
+                        // below — exactly the resume-with-key shape of
+                        // R03-A10).
+                        if entry.phase == InvocationPhase::Unknown
+                            && receipt.outcome == ReceiptOutcome::Unknown
+                            && existing.detail == receipt.detail
+                        {
+                            return Ok(());
+                        }
+                    }
+                    // A SUCCESS receipt proves external execution happened:
+                    // it is only legal from `started` (the live path) or
+                    // from `unknown` (a verified settlement of a formerly
+                    // unconfirmed outcome). Failed/Unknown receipts are
+                    // legal from any not-yet-closed phase (a rejected
+                    // approval closes from `prepared` with
+                    // dispatched=false, for example).
+                    if receipt.outcome == ReceiptOutcome::Succeeded
+                        && !matches!(
+                            entry.phase,
+                            InvocationPhase::Started | InvocationPhase::Unknown
+                        )
+                    {
+                        return Err(StorageError::InvalidRequest {
+                            detail: format!(
+                                "invocation {journal_id} cannot record a succeeded receipt from \
+                                 phase {} (success proves the external execution happened; it is \
+                                 only legal from started or a verified-unknown settlement)",
+                                entry.phase.wire_name()
+                            ),
+                        });
+                    }
+                    let phase = match receipt.outcome {
+                        ReceiptOutcome::Succeeded => InvocationPhase::Succeeded,
+                        ReceiptOutcome::Failed => InvocationPhase::Failed,
+                        ReceiptOutcome::Unknown => InvocationPhase::Unknown,
+                    };
+                    conn.execute(
+                        "UPDATE invocation_journal SET phase = ?1, receipt_outcome = ?2, \
+                         receipt_detail = ?3, dedup_id = ?4, dispatched = ?5, \
+                         updated_at_unix_ms = ?6 WHERE journal_id = ?7",
+                        rusqlite::params![
+                            phase.wire_name(),
+                            receipt.outcome.wire_name(),
+                            receipt.detail,
+                            receipt.dedup_id,
+                            receipt.dispatched,
+                            now_unix_ms as i64,
+                            journal_id
+                        ],
+                    )
+                    .map_err(migrations::map_rusqlite)?;
+                    Ok(())
+                })
+            })
+            .await
+    }
+
+    async fn record_invocation_unknown(
+        &self,
+        journal_id: &ToolCallId,
+        detail: String,
+        now_unix_ms: u64,
+    ) -> Result<(), StorageError> {
+        let journal_id = journal_id.to_string();
+        let busy = self.queue.options().busy_timeout_ms;
+        self.queue
+            .submit(move |conn| {
+                with_write_txn(conn, busy, |conn| {
+                    let entry = load_journal_row(conn, &journal_id)?.ok_or_else(|| {
+                        StorageError::InvalidRequest {
+                            detail: format!(
+                                "cannot mark invocation {journal_id} unknown: no journal entry \
+                                 exists"
+                            ),
+                        }
+                    })?;
+                    match entry.phase {
+                        // The recovery window: started without a receipt.
+                        InvocationPhase::Started => {}
+                        // Already classified unknown: idempotent replay of
+                        // the same honest verdict.
+                        InvocationPhase::Unknown if entry.receipt.is_some() => return Ok(()),
+                        // Anything else (intent-only, closed) is not an
+                        // unknown-outcome entry — refusing loudly beats
+                        // papering over a caller bug.
+                        other => {
+                            return Err(StorageError::InvalidRequest {
+                                detail: format!(
+                                    "invocation {journal_id} is {} (receipt: {}); only a \
+                                     started entry without a receipt can be marked unknown at \
+                                     recovery",
+                                    other.wire_name(),
+                                    if entry.receipt.is_some() {
+                                        "present"
+                                    } else {
+                                        "absent"
+                                    }
+                                ),
+                            })
+                        }
+                    }
+                    conn.execute(
+                        "UPDATE invocation_journal SET phase = 'unknown', receipt_outcome = \
+                         'unknown', receipt_detail = ?1, dedup_id = NULL, dispatched = 1, \
+                         updated_at_unix_ms = ?2 WHERE journal_id = ?3",
+                        rusqlite::params![detail, now_unix_ms as i64, journal_id],
+                    )
+                    .map_err(migrations::map_rusqlite)?;
+                    Ok(())
+                })
+            })
+            .await
+    }
+
+    async fn load_invocation_journal(
+        &self,
+        run_id: &RunId,
+    ) -> Result<Vec<InvocationJournalEntry>, StorageError> {
+        let run_id = run_id.to_string();
+        self.queue
+            .submit(move |conn| {
+                let mut stmt = conn
+                    .prepare(
+                        "SELECT journal_id, session_id, run_id, attempt, generation, owner_kind, \
+                         owner_subject, target, args_digest, args_summary, idempotency_key, \
+                         phase, receipt_outcome, receipt_detail, dedup_id, dispatched, \
+                         prepared_at_unix_ms, updated_at_unix_ms \
+                         FROM invocation_journal WHERE run_id = ?1 ORDER BY rowid",
+                    )
+                    .map_err(migrations::map_rusqlite)?;
+                let mut rows = stmt.query([&run_id]).map_err(migrations::map_rusqlite)?;
+                let mut out = Vec::new();
+                while let Some(row) = rows.next().map_err(migrations::map_rusqlite)? {
+                    out.push(journal_entry_from_row(row)?);
+                }
+                Ok(out)
             })
             .await
     }

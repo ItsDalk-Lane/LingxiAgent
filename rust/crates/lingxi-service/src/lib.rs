@@ -30,6 +30,7 @@ pub mod epoch;
 pub mod events;
 pub mod inject;
 pub mod instance;
+pub mod invocations;
 pub mod limits;
 pub mod logging;
 mod management;

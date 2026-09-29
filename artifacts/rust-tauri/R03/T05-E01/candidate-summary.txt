@@ -1,0 +1,35 @@
+# R03-T05 candidate summary (EXECUTOR-R03-T05-E01)
+TASK_BASE_SHA: 0bf067d9ec329108408f04b00f37f2635fc4a55d
+HEAD: 0bf067d9ec329108408f04b00f37f2635fc4a55d (no commit; working-tree candidate)
+branch: codex/rust-tauri-migration
+generated_utc: 2026-09-29T06:55:06Z
+
+## modified
+6248469ba712d4f5250f9ca7e36b4e2e8bb39eb4976216aa1e7b5777d0b60377  rust/crates/lingxi-adapters/src/storage/migrations.rs
+584eb125f6e6f32289582439a2c929509cbc8c89b60bc9151ef7ad8b9f647d37  rust/crates/lingxi-adapters/src/storage/run_store.rs
+df60c6f1f55dc2ad605f38e71a0eaea535d557d12ed79915d941ad2f5fffb512  rust/crates/lingxi-kernel/src/lib.rs
+9b541277fe87708d3dbb381c804ad0e048160c1c5fe5b50f6c5e5b158fbdaa03  rust/crates/lingxi-kernel/src/ports.rs
+87f6cac41b4993f98f1e794601ee8b954cacf1a3a47c4bb40b52768b619c4637  rust/crates/lingxi-service/src/lib.rs
+250257dc630b5e8724387f05aded52253b74d90d2ed84c2a095d138b831f6084  rust/crates/lingxi-service/src/runs.rs
+66a667cf6ad3e948551eedd6d73c1e4879b3f44a61b606af412a523df92ab44b  rust/crates/lingxi-service/src/sessions.rs
+
+## new
+a964426e6d70bd9213a6475e7ca817193d32a22a3cc0630a0648adcdfa522292  rust/crates/lingxi-kernel/src/invocation.rs
+48617d72e6b2b5bac1439896d5933559ed48ae80d1404a71e002b249c2815441  rust/crates/lingxi-service/src/invocations.rs
+a2ad122a7d1c44620df5af96d6a064edc4b66eba3a876c0872eca2af83f3744a  rust/crates/lingxi-adapters/tests/invocation_journal_store.rs
+11184c2e888539851cfc94ecef0cf9376d7682a811b34d1e3eb94e6a411f3dee  rust/crates/lingxi-service/tests/invocation_journal.rs
+
+## untouched contracts
+rust/Cargo.lock 90111c4b5988531d7a891339b6ee5df8afc9d3ec655e4929747da07d5811bb49 (expected 90111c4b5988531d7a891339b6ee5df8afc9d3ec655e4929747da07d5811bb49 = R02_HANDOFF)
+rust/Cargo.toml cec902952a04a6bda6296a0f406f12d59ccdb286c13a99282f1aa808751f1096
+rust/crates/lingxi-kernel/Cargo.toml 604e27758d4b9e07d52e6526bc8adc2e0eaaed71fa6128857fb41956a64a33ca
+rust/crates/lingxi-adapters/Cargo.toml b5e055214a775e0506be2dc4dc70a942a6abd6f28ce05bfa875bd6006e029f53
+rust/crates/lingxi-service/Cargo.toml a49cc279e9a254111ca493778850bcb184d481cb1f7c8d506dbbddf0384a4a84
+
+## migration fingerprints (sha256 over SQL text; V1/V2 unchanged vs published)
+V1 479b0321494269fca85d9f973b01a8f9d1aa57dc08fc3cf8fddbafeace461bb8 (= R02-T04_STORAGE_REGISTRY published)
+V2 64d7edfdab74e13e623a9d8d5f2381dad4803f545fa126d8eda8cc02c3dc889c (= T04 review published)
+V3 3bd5388f090ab0ae0e137d91d59a8e48f82f409bbd0de657abf29b897a4252c1 (new; registration deferred to T08 with T04 F-1)
+
+## tracked-diff binding
+tracked_diff_sha256_16: e78df59386ebe190
