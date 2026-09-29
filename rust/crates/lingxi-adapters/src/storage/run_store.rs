@@ -20,7 +20,8 @@ use std::path::{Path, PathBuf};
 use std::sync::Arc;
 
 use lingxi_kernel::ports::{
-    CommittedOutcome, KeyEvent, RunOutcome, RunRecord, StorageError, StoragePort,
+    CommittedOutcome, KeyEvent, LateResultReason, RunOutcome, RunRecord, StaleResultFact,
+    StorageError, StoragePort,
 };
 use lingxi_kernel::{FinalizeSettlement, FinalizeVerdict, Principal, RunContext, RunStateMachine};
 use lingxi_protocol::canon;
@@ -738,6 +739,66 @@ fn principal_audit_id(principal: &Principal) -> String {
     }
 }
 
+/// The run's CURRENT attempt id: the most recently OPENED attempt (single
+/// writer ⇒ insertion order = opening order; `rowid` is the monotonic
+/// witness). `None` when the run has no attempt rows at all (a run started
+/// through `record_run_started` always has attempt #1).
+fn current_attempt_of(
+    conn: &rusqlite::Connection,
+    run_id: &str,
+) -> Result<Option<String>, StorageError> {
+    conn.query_row(
+        "SELECT attempt FROM run_attempts WHERE run_id = ?1 ORDER BY rowid DESC LIMIT 1",
+        [run_id],
+        |row| row.get(0),
+    )
+    .map(Some)
+    .or_else(|err| match err {
+        rusqlite::Error::QueryReturnedNoRows => Ok(None),
+        other => Err(migrations::map_rusqlite(other)),
+    })
+}
+
+/// Inserts one audit-only stale-result row inside the caller's transaction
+/// (the R03-T04 fence's durable trace). NEVER touches key_events, runs or
+/// messages — a refused write leaves exactly this trace and nothing else.
+fn insert_stale_audit(
+    conn: &rusqlite::Connection,
+    ctx: &RunContext,
+    reason: LateResultReason,
+    refused_event_types: &[String],
+    now_ms: u64,
+) -> Result<(), StorageError> {
+    conn.execute(
+        "INSERT INTO stale_result_audit \
+         (run_id, session_id, attempt, generation, owner_kind, owner_subject, reason, \
+          refused_event_types, recorded_at_unix_ms) \
+         VALUES (?1, ?2, ?3, ?4, ?5, ?6, ?7, ?8, ?9)",
+        rusqlite::params![
+            ctx.run_id.as_str(),
+            ctx.session_id.as_str(),
+            ctx.attempt.as_str(),
+            ctx.generation as i64,
+            ctx.principal.storage_kind(),
+            ctx.principal.storage_subject(),
+            reason.name(),
+            refused_event_types.join(","),
+            now_ms as i64
+        ],
+    )
+    .map(|_| ())
+    .map_err(migrations::map_rusqlite)
+}
+
+/// The event-type summary of a refused delivery (audit payload: types only,
+/// never full payloads — refused content is not run state).
+fn event_type_summary(events: &[KeyEvent]) -> Vec<String> {
+    events
+        .iter()
+        .map(|e| e.payload.event_type().to_string())
+        .collect()
+}
+
 /// BEGIN IMMEDIATE + f + COMMIT/ROLLBACK with busy-error decoration.
 fn with_write_txn<T>(
     conn: &rusqlite::Connection,
@@ -1170,63 +1231,147 @@ impl StoragePort for RunDatabase {
             ctx_facts(ctx);
         let attempt = ctx.attempt.to_string();
         let stream_id = session_id.clone();
+        // The audit legs below record the CLAIMED identity facts; the
+        // queue closure must own them ('static).
+        let audit_ctx = ctx.clone();
         let busy = self.queue.options().busy_timeout_ms;
         self.queue
             .submit(move |conn| {
-                with_write_txn(conn, busy, |conn| {
-                    let Some(run) = load_run_row(conn, &run_id)? else {
-                        return Err(StorageError::InvalidRequest {
-                            detail: format!(
-                                "cannot attach events to run {run_id}: no run row exists"
-                            ),
-                        });
-                    };
-                    if run.session_id != session_id
-                        || run.owner_kind != owner_kind
-                        || run.owner_subject != owner_subject
-                    {
-                        return Err(StorageError::Conflict {
-                            detail: format!(
-                                "run {run_id} belongs to session {}/{}/{}; the event context \
-                                 claims {session_id}/{owner_kind}/{owner_subject}",
-                                run.session_id, run.owner_kind, run.owner_subject
-                            ),
-                        });
-                    }
-                    let stored_status = parse_status(&run.status)?;
-                    if stored_status.is_terminal() {
-                        // Late events after a terminal run are rejected
-                        // loudly here. The audit-only stale-event record is
-                        // the R03-T04 fence's job — this is the identity
-                        // floor, not a silent drop and not a resurrection.
-                        return Err(StorageError::Conflict {
-                            detail: format!(
-                                "run {run_id} is already terminal as {}; mid-run events \
-                                 for a settled run are refused (late-result audit arrives \
-                                 with the R03-T04 fence)",
-                                run.status
-                            ),
-                        });
-                    }
-                    // Attempt floor: the attempt the context claims must be
-                    // one that was actually OPENED on this run. A result
-                    // carrying an attempt id that never started cannot pose
-                    // as run output; the full generation fence is R03-T04.
-                    let attempt_open: bool = conn
-                        .query_row(
-                            "SELECT 1 FROM run_attempts WHERE run_id = ?1 AND attempt = ?2",
-                            rusqlite::params![run_id, attempt],
-                            |_| Ok(()),
+                // Validation reads run inside this single-writer job: the
+                // bounded queue is one worker, so no other storage job can
+                // interleave between these reads and the committed outcome
+                // below (the same serialization a BEGIN IMMEDIATE would
+                // rely on). A REFUSED delivery commits its audit-only
+                // trace in its own small transaction first — a rollback of
+                // a refusing transaction must never swallow the audit
+                // ("拒写但留审计痕迹").
+                let Some(run) = load_run_row(conn, &run_id)? else {
+                    return Err(StorageError::InvalidRequest {
+                        detail: format!("cannot attach events to run {run_id}: no run row exists"),
+                    });
+                };
+                if run.session_id != session_id
+                    || run.owner_kind != owner_kind
+                    || run.owner_subject != owner_subject
+                {
+                    // A cross-owner write is a boundary violation, not a
+                    // late result of this run's own work: loud conflict,
+                    // no audit row (the security-audit surfaces own that
+                    // class of probe).
+                    return Err(StorageError::Conflict {
+                        detail: format!(
+                            "run {run_id} belongs to session {}/{}/{}; the event context \
+                             claims {session_id}/{owner_kind}/{owner_subject}",
+                            run.session_id, run.owner_kind, run.owner_subject
+                        ),
+                    });
+                }
+                let stored_status = parse_status(&run.status)?;
+                if stored_status.is_terminal() {
+                    // R03-T04 full fence: a late result for a settled run
+                    // is REFUSED for state purposes but its arrival is
+                    // committed as an audit-only stale fact — a durable,
+                    // diagnosable trace, never a resurrection and never a
+                    // silent drop.
+                    let refused = event_type_summary(&events);
+                    with_write_txn(conn, busy, |conn| {
+                        insert_stale_audit(
+                            conn,
+                            &audit_ctx,
+                            LateResultReason::RunTerminal,
+                            &refused,
+                            now_unix_ms,
                         )
-                        .is_ok();
-                    if !attempt_open {
-                        return Err(StorageError::Conflict {
-                            detail: format!(
-                                "attempt {attempt} was never opened on run {run_id}; results \
-                                 cannot attach to an attempt that never started"
-                            ),
-                        });
-                    }
+                    })?;
+                    tracing::warn!(
+                        run_id = %run_id,
+                        attempt = %attempt,
+                        status = %run.status,
+                        refused_types = ?refused,
+                        "late result for a terminal run refused and audited \
+                         (stale_result_audit reason=run_terminal)"
+                    );
+                    return Err(StorageError::Conflict {
+                        detail: format!(
+                            "run {run_id} is already terminal as {}; mid-run events \
+                             for a settled run are refused and audited as a stale result \
+                             (stale_result_audit reason=run_terminal)",
+                            run.status
+                        ),
+                    });
+                }
+                // Attempt fence (R03-T04, upgrading the T01 floor): the
+                // claimed attempt must be the run's CURRENT attempt — the
+                // most recently opened one. An attempt that never started
+                // cannot pose as run output; an OPENED attempt that a
+                // retry superseded is a late result from the old attempt:
+                // refused + audited, so old results can never pollute the
+                // current attempt's stream.
+                let attempt_open: bool = conn
+                    .query_row(
+                        "SELECT 1 FROM run_attempts WHERE run_id = ?1 AND attempt = ?2",
+                        rusqlite::params![run_id, attempt],
+                        |_| Ok(()),
+                    )
+                    .is_ok();
+                if !attempt_open {
+                    let refused = event_type_summary(&events);
+                    with_write_txn(conn, busy, |conn| {
+                        insert_stale_audit(
+                            conn,
+                            &audit_ctx,
+                            LateResultReason::AttemptNeverOpened,
+                            &refused,
+                            now_unix_ms,
+                        )
+                    })?;
+                    tracing::warn!(
+                        run_id = %run_id,
+                        attempt = %attempt,
+                        refused_types = ?refused,
+                        "result for an attempt that never opened refused and audited \
+                         (stale_result_audit reason=attempt_never_opened)"
+                    );
+                    return Err(StorageError::Conflict {
+                        detail: format!(
+                            "attempt {attempt} was never opened on run {run_id}; results \
+                             cannot attach to an attempt that never started (refused and \
+                             audited: stale_result_audit reason=attempt_never_opened)"
+                        ),
+                    });
+                }
+                let current_attempt = current_attempt_of(conn, &run_id)?;
+                if current_attempt.as_deref() != Some(attempt.as_str()) {
+                    let superseding = current_attempt
+                        .clone()
+                        .unwrap_or_else(|| "<none>".to_string());
+                    let refused = event_type_summary(&events);
+                    with_write_txn(conn, busy, |conn| {
+                        insert_stale_audit(
+                            conn,
+                            &audit_ctx,
+                            LateResultReason::AttemptStale,
+                            &refused,
+                            now_unix_ms,
+                        )
+                    })?;
+                    tracing::warn!(
+                        run_id = %run_id,
+                        attempt = %attempt,
+                        current_attempt = %superseding,
+                        refused_types = ?refused,
+                        "late result from a superseded attempt refused and audited \
+                         (stale_result_audit reason=attempt_stale)"
+                    );
+                    return Err(StorageError::Conflict {
+                        detail: format!(
+                            "attempt {attempt} is no longer the current attempt of run \
+                             {run_id} (current: {superseding}); the late result is refused \
+                             and audited (stale_result_audit reason=attempt_stale)"
+                        ),
+                    });
+                }
+                with_write_txn(conn, busy, |conn| {
                     if events.is_empty() {
                         // Nothing to stage; still a legal no-op read-only
                         // fact (the validation above ran).
@@ -1260,6 +1405,34 @@ impl StoragePort for RunDatabase {
                         newly_committed: true,
                         events: envelopes,
                     })
+                })
+            })
+            .await
+    }
+
+    /// Audit-only stale-result record (R03-T04 fence): the durable trace of
+    /// a refused late result. Writes exactly one `stale_result_audit` row —
+    /// never the run's stream, status or messages. Legal whatever the run's
+    /// state (the audited CLAIM may be bogus; the audit proves what
+    /// arrived).
+    async fn record_stale_result(
+        &self,
+        ctx: &RunContext,
+        refused: StaleResultFact,
+        now_unix_ms: u64,
+    ) -> Result<(), StorageError> {
+        let ctx = ctx.clone();
+        let busy = self.queue.options().busy_timeout_ms;
+        self.queue
+            .submit(move |conn| {
+                with_write_txn(conn, busy, |conn| {
+                    insert_stale_audit(
+                        conn,
+                        &ctx,
+                        refused.reason,
+                        &refused.refused_event_types,
+                        now_unix_ms,
+                    )
                 })
             })
             .await

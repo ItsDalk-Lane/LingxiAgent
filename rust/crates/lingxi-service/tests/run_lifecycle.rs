@@ -16,7 +16,8 @@ use std::pin::Pin;
 use std::sync::Arc;
 
 use lingxi_kernel::ports::{
-    ProviderDescriptor, ProviderTurn, ToolExecutorPort, ToolOutcome, ToolRequest, TurnProviderPort,
+    ProviderDescriptor, ProviderTurn, ProviderTurnResult, ToolExecutionResult, ToolExecutorPort,
+    ToolOutcome, ToolRequest, TurnProviderPort,
 };
 use lingxi_protocol::{
     AttemptId, ContentBlock, ErrorCode, ModelCallId, NormalizedMessage, ProtocolError, RunId,
@@ -80,11 +81,12 @@ impl TurnProviderPort for ScriptedProvider {
         call: &'a ModelCallId,
         _turn: u32,
         _input: &'a str,
-    ) -> Pin<Box<dyn std::future::Future<Output = ProviderTurn> + Send + 'a>> {
+    ) -> Pin<Box<dyn std::future::Future<Output = ProviderTurnResult> + Send + 'a>> {
         self.observed
             .lock()
             .unwrap()
             .push((ctx.attempt.to_string(), call.to_string()));
+        let ctx_at_issue = ctx.clone();
         let turn =
             self.script
                 .lock()
@@ -98,7 +100,7 @@ impl TurnProviderPort for ScriptedProvider {
                     ),
                     retryable: false,
                 });
-        Box::pin(async move { turn })
+        Box::pin(async move { ProviderTurnResult::of_ctx(&ctx_at_issue, turn) })
     }
 }
 
@@ -134,13 +136,14 @@ impl ToolExecutorPort for ToolDouble {
         ctx: &'a lingxi_kernel::RunContext,
         call: &'a ToolCallId,
         _request: &'a ToolRequest,
-    ) -> Pin<Box<dyn std::future::Future<Output = ToolOutcome> + Send + 'a>> {
+    ) -> Pin<Box<dyn std::future::Future<Output = ToolExecutionResult> + Send + 'a>> {
         self.calls
             .lock()
             .unwrap()
             .push((ctx.attempt.to_string(), call.to_string()));
+        let ctx_at_issue = ctx.clone();
         let outcome = self.outcome.clone();
-        Box::pin(async move { outcome })
+        Box::pin(async move { ToolExecutionResult::of_ctx(&ctx_at_issue, outcome) })
     }
 }
 

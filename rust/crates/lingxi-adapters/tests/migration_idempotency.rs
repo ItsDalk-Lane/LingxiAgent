@@ -89,7 +89,13 @@ async fn repeated_migration_checks_are_idempotent() {
             .await
             .expect("query version")
             .expect("receipt row");
-        assert_eq!(version, "1", "round {round}: version must not move");
+        // The version stays at whatever this build's migration list ends
+        // with (never re-applied, never moved by a re-open).
+        assert_eq!(
+            version,
+            lingxi_adapters::storage::supported_version().to_string(),
+            "round {round}: version must not move"
+        );
         // Close WITHOUT new writes; counts must be byte-stable.
         db.close().await.expect("close");
         assert_eq!(

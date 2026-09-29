@@ -25,6 +25,7 @@ pub mod approval;
 pub mod auth;
 pub mod cancel;
 pub mod config;
+pub mod dedup;
 pub mod epoch;
 pub mod events;
 pub mod inject;
@@ -59,6 +60,10 @@ pub use cancel::{
 pub use config::{
     parse_cli, read_config_home, resolve_effective_home, CliOptions, ConfigError, HomeSource,
     IgnoredHomeSource, ResolvedHome, HOME_ENV_VAR,
+};
+pub use dedup::{
+    DedupDecision, DedupKey, DedupRegistryFull, SubmissionDedup, DEFAULT_DEDUP_CAP,
+    MAX_REQUEST_ID_LEN,
 };
 pub use epoch::{
     coordinate_data_epoch_startup, read_journal, read_stamp, render_block, EpochGateBlock,
@@ -95,8 +100,8 @@ pub use session_supervisor::{
     SteerOutcome, SteeringInbox, SubmissionKind,
 };
 pub use sessions::{
-    CancelRunOutcome, ExecuteAccepted, ExecuteRequest, RunSummary, SessionAccess, SessionBackend,
-    SessionExecuteError, SessionFacts, SessionStore, SessionView,
+    CancelRunOutcome, ExecuteAccepted, ExecuteRequest, ExecuteSubmission, RunSummary,
+    SessionAccess, SessionBackend, SessionExecuteError, SessionFacts, SessionStore, SessionView,
 };
 pub use shutdown::{
     graceful_shutdown, WsSessionGuard, WsShutdown, DEFAULT_SHUTDOWN_TIMEOUT_MS,
@@ -1142,6 +1147,33 @@ impl EndpointError {
         .with_cause("session.registry_full")
     }
 
+    /// R03-A08: an explicit requestId was resubmitted with CHANGED content.
+    /// The recorded execution is not reused and no new execution started —
+    /// the client must resolve the conflict (new id, or the original
+    /// content); retrying the same id/content change cannot succeed.
+    pub fn request_id_conflict(request_id: &str) -> Self {
+        Self::new(
+            StatusCode::CONFLICT,
+            ErrorCode::Conflict,
+            format!("requestId was already accepted with different content: {request_id}"),
+        )
+        .with_reason("request_id_conflict")
+        .with_cause("session.request_id_conflict")
+    }
+
+    /// The idempotency-key registry is at its hard cap (R03-T04 service
+    /// protection; retryable backpressure).
+    pub fn idempotency_registry_full() -> Self {
+        let mut out = Self::new(
+            StatusCode::SERVICE_UNAVAILABLE,
+            ErrorCode::BudgetExceeded,
+            "idempotency-key registry is full",
+        );
+        out.error.retryable = true;
+        out.with_reason("idempotency_registry_full")
+            .with_cause("session.idempotency_registry_full")
+    }
+
     /// Stable `storage.<cause>` identifier for a storage-port failure.
     /// Part of the R02-T07 structured-error vocabulary (shared with the WS
     /// surface), never carries a path or SQLite text on its own.
@@ -2136,15 +2168,32 @@ async fn execute_session(
         }
     };
     let storage = Arc::clone(state.storage());
+    // R03-T04/A08: the submission carries the OPTIONAL explicit requestId
+    // (idempotency key). Validation of its SHAPE happens here (a 400 is a
+    // client error); the service surface re-validates on its own path.
+    let validated_request_id = match &request.request_id {
+        None => None,
+        Some(raw) => match crate::dedup::validate_request_id(raw) {
+            Ok(validated) => Some(validated),
+            Err(detail) => {
+                return EndpointError::invalid_message(format!("requestId invalid: {detail}"))
+                    .into_response();
+            }
+        },
+    };
+    let submission = sessions::ExecuteSubmission {
+        input: &request.input,
+        request_id: validated_request_id.as_deref(),
+    };
     match state
         .sessions
-        .execute_for(
+        .execute_submission_for(
             storage.as_ref(),
             state.events(),
             state.runs(),
             &principal,
             &session_id,
-            &request.input,
+            &submission,
             state.clock.now_unix_ms(),
         )
         .await
@@ -2157,6 +2206,15 @@ async fn execute_session(
         Err(sessions::SessionExecuteError::Busy) => EndpointError::session_busy().into_response(),
         Err(sessions::SessionExecuteError::SessionRegistryFull) => {
             EndpointError::session_registry_full().into_response()
+        }
+        Err(sessions::SessionExecuteError::DuplicateRequestConflict { request_id, .. }) => {
+            EndpointError::request_id_conflict(&request_id).into_response()
+        }
+        Err(sessions::SessionExecuteError::IdempotencyRegistryFull { .. }) => {
+            EndpointError::idempotency_registry_full().into_response()
+        }
+        Err(sessions::SessionExecuteError::InvalidRequestId { detail }) => {
+            EndpointError::invalid_message(format!("requestId invalid: {detail}")).into_response()
         }
         Err(sessions::SessionExecuteError::SteeringInboxFull) => {
             // Not reachable from the execute route (steering is a separate

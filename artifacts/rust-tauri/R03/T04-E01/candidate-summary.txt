@@ -1,0 +1,26 @@
+candidate summary — R03-T04-E01
+base: 9e319d64836d5a1656908a81e23ab5edf8370515 (TASK_BASE_SHA)
+head: 9e319d64836d5a1656908a81e23ab5edf8370515 (no commit/push; working-tree candidate)
+
+== modified ==
+0432e17b9f2c1b3e84c07675f9faec6e54c18c9fe939f1272bd2c40b3474ef45  rust/crates/lingxi-adapters/src/storage/migrations.rs
+a18b3061e305884c1bb8f8a79441df14319e63b0a2b7261d24f1a7378e25db6a  rust/crates/lingxi-adapters/src/storage/run_store.rs
+70ca3682ca23ffa0848f4f3ca3f26dae3d72e4e9150cf33ced58e1b2d394c4e1  rust/crates/lingxi-adapters/tests/migration_idempotency.rs
+7341bbaca1a76f3f93e6ddef7c4d1ff0a0b4025e9d388a4397a5e3b2d5c5357b  rust/crates/lingxi-kernel/src/ports.rs
+fb08aaecfc77fda21468f30adb9a9e0355bfbff888e8ea25f421d55b32840dac  rust/crates/lingxi-service/src/lib.rs
+a6c1249d3f148cd8a7eb0fee9af90683492ae4c1aa8a68af3405665d9c4af22c  rust/crates/lingxi-service/src/runs.rs
+f6a949489022575093d45ad6e3b2e2350e244362cd86db36155cb78f479c3c5d  rust/crates/lingxi-service/src/sessions.rs
+4098b0a5f93e9db39f08b6104bd94ff18653717f0715d7a4caed346c22ae4970  rust/crates/lingxi-service/tests/cancellation_tree.rs
+6c72f9839a751befb423e75c9db81bd76f441300cf634857a79cbbb2d868c37a  rust/crates/lingxi-service/tests/run_lifecycle.rs
+97b52eb6d4f1409a3217c5a9edb1826b4300a10cd266636b215f49eab17570ad  rust/crates/lingxi-service/tests/session_serialization.rs
+
+== new ==
+31ad5e8e2e47317b7fa9a41a4fd54eb74f2a9576ed52d340976ab15d2b3fcbeb  rust/crates/lingxi-service/src/dedup.rs
+a35ff3411ccaabb6b006c5abccc5067b966fd1df797bcfa74e0ed0fdadb9d49b  rust/crates/lingxi-service/tests/late_result_fence.rs
+0eed4984400b1a45852fc147bf03ff070db9c2d43ceda9f88a4674cc09011a35  rust/crates/lingxi-service/tests/request_dedup.rs
+3cda07a2d6cb45f5c97abb8507a8c5834d9d54b3df68bd10064163a9185db06c  rust/crates/lingxi-adapters/tests/late_result_fencing_property.rs
+
+rust/Cargo.lock: 90111c4b5988531d7a891339b6ee5df8afc9d3ec655e4929747da07d5811bb49
+rust/crates/lingxi-service/Cargo.toml: a49cc279e9a254111ca493778850bcb184d481cb1f7c8d506dbbddf0384a4a84
+rust/crates/lingxi-adapters/Cargo.toml: b5e055214a775e0506be2dc4dc70a942a6abd6f28ce05bfa875bd6006e029f53
+rust/crates/lingxi-kernel/Cargo.toml: 604e27758d4b9e07d52e6526bc8adc2e0eaaed71fa6128857fb41956a64a33ca

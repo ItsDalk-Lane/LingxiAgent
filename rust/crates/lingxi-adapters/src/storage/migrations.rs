@@ -127,14 +127,46 @@ CREATE INDEX idx_key_events_run ON key_events(run_id);
 CREATE INDEX idx_key_events_session ON key_events(session_id, seq);
 "#;
 
+/// R03-T04 fence audit table (version 2): the audit-only trace of refused
+/// LATE results. Rows are written when `record_run_events` refuses a stale
+/// delivery (terminal run / superseded attempt / never-opened attempt) and
+/// when the run driver fences an in-flight result
+/// (`record_stale_result`). The table deliberately has NO foreign keys to
+/// `runs`/`run_attempts`: an audited claim may name a run that never
+/// existed — the audit proves WHAT ARRIVED, not that the claim was
+/// legitimate.
+pub const V2_NAME: &str = "stale_result_audit";
+pub const V2_SQL: &str = r#"
+CREATE TABLE stale_result_audit (
+    audit_id             INTEGER PRIMARY KEY AUTOINCREMENT,
+    run_id               TEXT NOT NULL,
+    session_id           TEXT NOT NULL,
+    attempt              TEXT,
+    generation           INTEGER NOT NULL,
+    owner_kind           TEXT NOT NULL,
+    owner_subject        TEXT NOT NULL,
+    reason               TEXT NOT NULL,
+    refused_event_types  TEXT NOT NULL,
+    recorded_at_unix_ms  INTEGER NOT NULL
+);
+CREATE INDEX idx_stale_result_audit_run ON stale_result_audit(run_id);
+"#;
+
 /// The full ordered migration list. Appending a migration is a deliberate,
 /// reviewed act; editing an existing entry changes its fingerprint and is
 /// rejected on every already-migrated database.
-pub const MIGRATIONS: &[Migration] = &[Migration {
-    version: 1,
-    name: V1_NAME,
-    sql: V1_SQL,
-}];
+pub const MIGRATIONS: &[Migration] = &[
+    Migration {
+        version: 1,
+        name: V1_NAME,
+        sql: V1_SQL,
+    },
+    Migration {
+        version: 2,
+        name: V2_NAME,
+        sql: V2_SQL,
+    },
+];
 
 /// Highest schema version this build understands.
 pub fn supported_version() -> u64 {
@@ -523,12 +555,13 @@ mod tests {
     fn apply_then_verify_is_idempotent() {
         let conn = in_memory();
         let out = apply_all(&conn, "test", 1_000).unwrap();
-        assert_eq!(out.applied, vec![1]);
-        assert_eq!(out.current_version, 1);
+        let expected: Vec<u64> = (1..=supported_version()).collect();
+        assert_eq!(out.applied, expected);
+        assert_eq!(out.current_version, supported_version());
         // Re-run: nothing applied, no error.
         let again = apply_all(&conn, "test", 2_000).unwrap();
         assert!(again.applied.is_empty());
-        assert_eq!(again.current_version, 1);
+        assert_eq!(again.current_version, supported_version());
         assert!(verify_receipts(&conn).is_ok());
     }
 
@@ -537,8 +570,11 @@ mod tests {
         let conn = in_memory();
         apply_all(&conn, "test", 1_000).unwrap();
         // Direct tampering with the receipt version (down to 0).
-        conn.execute("UPDATE schema_migrations SET version = 0", [])
-            .unwrap();
+        conn.execute(
+            "UPDATE schema_migrations SET version = 0 WHERE version = 1",
+            [],
+        )
+        .unwrap();
         match apply_all(&conn, "test", 2_000) {
             Err(StorageError::SchemaTampered { detail }) => {
                 // Either check fires: the pragma/receipt disagreement (the
@@ -600,22 +636,25 @@ mod tests {
     fn newer_database_is_rejected_not_downgraded() {
         let conn = in_memory();
         apply_all(&conn, "test", 1_000).unwrap();
-        // Simulate a database from a newer build: receipt v2 + user_version 2.
+        // Simulate a database from a newer build: one version beyond what
+        // this build carries.
+        let future = supported_version() + 1;
         conn.execute(
             "INSERT INTO schema_migrations \
              (version, name, fingerprint, applied_at_unix_ms, applied_by) \
-             VALUES (2, 'future', 'fp', 1, 'future-build')",
-            [],
+             VALUES (?1, 'future', 'fp', 1, 'future-build')",
+            [i64::try_from(future).unwrap()],
         )
         .unwrap();
-        conn.pragma_update(None, "user_version", 2).unwrap();
+        conn.pragma_update(None, "user_version", i64::try_from(future).unwrap())
+            .unwrap();
         match apply_all(&conn, "test", 2_000) {
             Err(StorageError::DatabaseTooNew {
                 found_version,
                 supported_version,
             }) => {
-                assert_eq!(found_version, 2);
-                assert_eq!(supported_version, 1);
+                assert_eq!(found_version, future);
+                assert_eq!(supported_version, super::supported_version());
             }
             other => panic!("expected DatabaseTooNew, got {other:?}"),
         }

@@ -22,13 +22,22 @@
 //! made HERE against the kernel state machine, and every durable fact is
 //! written through [`StoragePort`]. Doubles never write state and never
 //! finalize a run.
+//!
+//! R03-T04 result fence (this stage): every asynchronous return carries a
+//! [`ResultFence`](lingxi_kernel::ports::ResultFence) (run/attempt/
+//! generation) and the driver verifies it BEFORE writing state — not only
+//! when the request was issued. A result naming a superseded attempt,
+//! another run/generation, or one whose cancellation was observed first, is
+//! refused for state purposes and recorded as an audit-only stale fact
+//! (`record_stale_result`); old results never pollute the next attempt,
+//! the next run or a settled session.
 
 use std::sync::Arc;
 use std::time::Duration;
 
 use lingxi_kernel::ports::{
-    CommittedOutcome, KeyEvent, StorageError, StoragePort, ToolExecutorPort, ToolOutcome,
-    ToolRequest, TurnProviderPort,
+    CommittedOutcome, KeyEvent, LateResultReason, ResultFence, StaleResultFact, StorageError,
+    StoragePort, ToolExecutionResult, ToolExecutorPort, ToolOutcome, ToolRequest, TurnProviderPort,
 };
 use lingxi_kernel::{
     attempt_id, model_call_id, tool_call_id, FailureCause, NoFinalCause, QuotaResource, RunFinish,
@@ -119,6 +128,17 @@ impl From<StorageError> for DriveError {
     fn from(err: StorageError) -> Self {
         DriveError::Storage(err)
     }
+}
+
+/// The R03-T04 result fence: the write-side verdict for every asynchronous
+/// provider/tool return. `Current` admits the result into the state
+/// machine; `Stale` refuses it for state purposes (audit-only) — a late
+/// result never pollutes the current attempt, a later run or a settled
+/// session.
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+enum FenceVerdict {
+    Current,
+    Stale(LateResultReason),
 }
 
 /// RAII registration of one live run against the cancellation registry
@@ -329,6 +349,75 @@ impl RunSupervisor {
                     }
                 }
             }
+        }
+    }
+
+    /// The R03-T04 write-side fence verdict for one asynchronous return.
+    fn fence_verdict(
+        &self,
+        root: &CancelScope,
+        fence: &ResultFence,
+        ctx: &lingxi_kernel::RunContext,
+    ) -> FenceVerdict {
+        if !fence.matches_ctx(ctx) {
+            FenceVerdict::Stale(LateResultReason::FenceMismatch)
+        } else if root.is_cancelled() {
+            // "在写状态前核对": the result carries the right identity, but
+            // the cancellation was observed before the state write — the
+            // completed content is stale for a run that is stopping.
+            FenceVerdict::Stale(LateResultReason::CancelledBeforeWrite)
+        } else {
+            FenceVerdict::Current
+        }
+    }
+
+    /// Records one refused late result as an AUDIT-ONLY durable fact
+    /// (R03-T04: 拒写但留审计痕迹). The audit context carries the CLAIMED
+    /// identity triple from the fence plus the driving principal/session —
+    /// it proves WHAT ARRIVED LATE, never that the claim was legitimate,
+    /// and it never advances any run's state.
+    ///
+    /// An audit-write failure is an explicit, loudly-logged degradation:
+    /// the fence itself already held (the result is refused either way);
+    /// the run's own state writes surface their own storage errors.
+    async fn audit_late_result<P: StoragePort>(
+        &self,
+        port: &P,
+        ctx: &lingxi_kernel::RunContext,
+        fence: &ResultFence,
+        reason: LateResultReason,
+        refused_event_types: Vec<String>,
+        now_ms: u64,
+    ) {
+        let audit_ctx = lingxi_kernel::RunContext {
+            principal: ctx.principal.clone(),
+            session_id: ctx.session_id.clone(),
+            run_id: fence.run_id.clone(),
+            attempt: fence.attempt.clone(),
+            generation: fence.generation,
+        };
+        tracing::warn!(
+            run_id = %audit_ctx.run_id,
+            attempt = %audit_ctx.attempt,
+            current_attempt = %ctx.attempt,
+            reason = reason.name(),
+            refused = ?refused_event_types,
+            "late asynchronous result fenced: refused for state purposes, audited only \
+             (never appended to the current attempt, never resurrecting a settled run)"
+        );
+        let fact = StaleResultFact {
+            reason,
+            refused_event_types,
+        };
+        if let Err(err) = port.record_stale_result(&audit_ctx, fact, now_ms).await {
+            tracing::error!(
+                run_id = %audit_ctx.run_id,
+                attempt = %audit_ctx.attempt,
+                error = %err,
+                "stale-result AUDIT write failed (explicit degradation: the fence itself \
+                 held — the result stays refused — but the durable audit trace for this \
+                 late result is missing)"
+            );
         }
     }
 
@@ -561,6 +650,55 @@ impl RunSupervisor {
                 },
             };
             drop(model_permit);
+            // R03-T04 result fence: verify the asynchronous return's
+            // identity BEFORE writing any state (not only when the request
+            // was issued). A result naming another run/attempt/generation,
+            // or one whose cancellation was observed first, is audited as a
+            // stale fact and never appended to the run's stream.
+            let provider_result = match self.fence_verdict(&root, &provider_turn.fence, &ctx) {
+                FenceVerdict::Current => provider_turn,
+                FenceVerdict::Stale(reason) => {
+                    self.audit_late_result(
+                        port,
+                        &ctx,
+                        &provider_turn.fence,
+                        reason,
+                        vec!["model_call_result".to_string()],
+                        now_ms,
+                    )
+                    .await;
+                    if root.is_cancelled() {
+                        // The cancellation won the write race: the completed
+                        // turn is stale, the run settles through the cancel
+                        // path and the turn's content never lands.
+                        let cancel_reason =
+                            root.reason().unwrap_or_else(|| "cancelled".to_string());
+                        let finish = self
+                            .settle_cancellation(
+                                port,
+                                events,
+                                &ctx,
+                                &entry,
+                                live_status,
+                                cancel_reason,
+                                now_ms,
+                            )
+                            .await?;
+                        guard.disarm();
+                        return Ok(finish);
+                    }
+                    // Fence mismatch on a live run = an adapter delivering a
+                    // result under the WRONG identity: a loud provider
+                    // failure, never a silent skip.
+                    break RunFinish::Failed {
+                        cause: FailureCause::ProviderFailed {
+                            code: format!("late_result_fenced.{}", reason.name()),
+                            retryable: false,
+                        },
+                    };
+                }
+            };
+            let provider_turn = provider_result.turn;
             match provider_turn {
                 lingxi_kernel::ports::ProviderTurn::Final { message } => {
                     if message.content.is_empty() {
@@ -812,7 +950,7 @@ impl RunSupervisor {
                                 return Ok(finish);
                             }
                             exit = tool_child.wait() => match exit {
-                                Ok(outcome) => outcome,
+                                Ok(result) => result,
                                 Err(task_exit) => {
                                     // Supervision return: a panicking/aborted
                                     // tool child is a recorded tool failure
@@ -824,18 +962,64 @@ impl RunSupervisor {
                                         exit = task_exit.name(),
                                         "supervised tool child ended without an outcome"
                                     );
-                                    ToolOutcome::Failed {
-                                        error: ProtocolError::new(
-                                            ErrorCode::Internal,
-                                            format!(
-                                                "tool child {} without an outcome",
-                                                task_exit.name()
+                                    ToolExecutionResult::of_ctx(
+                                        &ctx,
+                                        ToolOutcome::Failed {
+                                            error: ProtocolError::new(
+                                                ErrorCode::Internal,
+                                                format!(
+                                                    "tool child {} without an outcome",
+                                                    task_exit.name()
+                                                ),
+                                                false,
                                             ),
-                                            false,
-                                        ),
-                                    }
+                                        },
+                                    )
                                 }
                             },
+                        };
+                        // R03-T04 result fence: same write-side identity
+                        // check as model calls. A fenced tool result is
+                        // audited; a live run records the started call as
+                        // Unknown (the receipt is not trustworthy — never
+                        // retried blindly, never a success).
+                        let outcome = match self.fence_verdict(&root, &outcome.fence, &ctx) {
+                            FenceVerdict::Current => outcome.outcome,
+                            FenceVerdict::Stale(reason) => {
+                                self.audit_late_result(
+                                    port,
+                                    &ctx,
+                                    &outcome.fence,
+                                    reason,
+                                    vec!["tool_call_result".to_string()],
+                                    now_ms,
+                                )
+                                .await;
+                                if root.is_cancelled() {
+                                    drop(tool_permit);
+                                    let cancel_reason =
+                                        root.reason().unwrap_or_else(|| "cancelled".to_string());
+                                    let finish = self
+                                        .settle_cancellation(
+                                            port,
+                                            events,
+                                            &ctx,
+                                            &entry,
+                                            live_status,
+                                            cancel_reason,
+                                            now_ms,
+                                        )
+                                        .await?;
+                                    guard.disarm();
+                                    return Ok(finish);
+                                }
+                                ToolOutcome::Unknown {
+                                    reason: format!(
+                                        "tool result fenced as stale ({})",
+                                        reason.name()
+                                    ),
+                                }
+                            }
                         };
                         if matches!(
                             outcome,
@@ -1349,5 +1533,44 @@ mod tests {
             reason: "receipt lost".to_string(),
         });
         assert_eq!(wire.status, ToolResultStatus::Unknown);
+    }
+
+    /// R03-T04 write-side fence logic (the driver's `fence_verdict`): a
+    /// result is Current only when BOTH the identity triple matches the
+    /// live context AND no cancellation was observed first.
+    #[tokio::test]
+    async fn fence_verdict_requires_identity_and_no_cancellation() {
+        let supervisor = RunSupervisor::without_provider();
+        let root = crate::cancel::CancelScope::run_root("run_fence_unit");
+        let run_id = RunId::new("run_fence_unit".to_string());
+        let ctx = lingxi_kernel::RunContext {
+            principal: lingxi_kernel::Principal::LocalUser,
+            session_id: lingxi_protocol::SessionId::new("s".to_string()),
+            attempt: lingxi_kernel::attempt_id(&run_id, 2),
+            run_id: run_id.clone(),
+            generation: 1,
+        };
+        // Matching fence, live run → Current.
+        let fence = ResultFence::of_ctx(&ctx);
+        assert_eq!(
+            supervisor.fence_verdict(&root, &fence, &ctx),
+            FenceVerdict::Current
+        );
+        // Older attempt → FenceMismatch.
+        let old = lingxi_kernel::RunContext {
+            attempt: lingxi_kernel::attempt_id(&run_id, 1),
+            ..ctx.clone()
+        };
+        assert_eq!(
+            supervisor.fence_verdict(&root, &ResultFence::of_ctx(&old), &ctx),
+            FenceVerdict::Stale(LateResultReason::FenceMismatch)
+        );
+        // Matching identity but the cancellation fired first →
+        // CancelledBeforeWrite (the write side of the biased race).
+        root.cancel("user");
+        assert_eq!(
+            supervisor.fence_verdict(&root, &fence, &ctx),
+            FenceVerdict::Stale(LateResultReason::CancelledBeforeWrite)
+        );
     }
 }

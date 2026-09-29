@@ -57,6 +57,11 @@ pub struct RunSummary {
 pub struct ExecuteAccepted {
     pub run_id: String,
     pub run_count: u64,
+    /// R03-T04/A08: `true` when this response is an idempotent REPLAY of an
+    /// earlier accepted submission with the same explicit requestId and the
+    /// same normalized content — nothing was re-executed.
+    #[serde(default, skip_serializing_if = "std::ops::Not::not")]
+    pub replayed: bool,
 }
 
 /// Outcome of an authorized cancellation request against one run
@@ -93,6 +98,34 @@ pub struct ExecuteRequest {
     /// are structurally rejected here (deny_unknown_fields) — principal
     /// comes from the auth chain, never from the payload.
     pub input: String,
+    /// OPTIONAL explicit idempotency key (R03-T04/A08). When present, the
+    /// submission is deduplicated against the recorded normalized-content
+    /// digest: same id + same content → idempotent replay of the original
+    /// acceptance; same id + changed content → an explicit conflict (the
+    /// old execution is not reused, a new one does not start). The key is
+    /// bound to the CALLING principal and THIS session — never a global
+    /// namespace. Absent (the default) keeps the plain submission path.
+    #[serde(default)]
+    pub request_id: Option<String>,
+}
+
+/// One execute submission as the service surface consumes it (R03-T04):
+/// the input plus the OPTIONAL explicit idempotency key.
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub struct ExecuteSubmission<'a> {
+    pub input: &'a str,
+    pub request_id: Option<&'a str>,
+}
+
+impl<'a> ExecuteSubmission<'a> {
+    /// The plain (non-idempotent) submission shape — the exact pre-T04
+    /// behavior.
+    pub fn plain(input: &'a str) -> Self {
+        Self {
+            input,
+            request_id: None,
+        }
+    }
 }
 
 /// Outcome of a store lookup.
@@ -129,6 +162,25 @@ pub enum SessionExecuteError {
     /// A steering submission overflowed the bounded steering inbox
     /// (nothing was accepted).
     SteeringInboxFull,
+    /// R03-A08: this explicit requestId was already accepted with DIFFERENT
+    /// normalized content. The recorded execution is NOT reused for the new
+    /// content and NO new execution starts — an explicit conflict the
+    /// client must resolve (new id, or the original content).
+    DuplicateRequestConflict {
+        request_id: String,
+        recorded_digest: String,
+        submitted_digest: String,
+    },
+    /// The idempotency-key registry is at its hard cap (service protection;
+    /// nothing was written, nothing was executed).
+    IdempotencyRegistryFull {
+        cap: usize,
+    },
+    /// The explicit requestId failed validation (empty / over-long). The
+    /// submission was refused before any side effect.
+    InvalidRequestId {
+        detail: String,
+    },
     /// The storage port refused or failed: no visible success was produced
     /// (R02-A07). Carries the domain storage error for the endpoint's
     /// error surface.
@@ -261,6 +313,10 @@ pub struct SessionStore {
     /// session; busy sessions reject further normal submissions (frozen
     /// incumbent `session_busy` gate) and accept steering instead.
     gate: std::sync::Arc<SessionSupervisor>,
+    /// R03-T04: the submission-surface requestId dedup (bounded,
+    /// principal+session-scoped). Only submissions carrying an explicit id
+    /// touch it — the plain path is byte-identical to the pre-T04 flow.
+    dedup: crate::dedup::SubmissionDedup,
 }
 
 impl std::fmt::Debug for SessionStore {
@@ -286,6 +342,7 @@ impl SessionStore {
         Self {
             backend: Box::new(backend),
             gate: SessionSupervisor::new(limits),
+            dedup: crate::dedup::SubmissionDedup::default(),
         }
     }
 
@@ -383,6 +440,49 @@ impl SessionStore {
         input: &str,
         now_ms: u64,
     ) -> Result<ExecuteAccepted, SessionExecuteError> {
+        self.execute_submission_for(
+            port,
+            events,
+            supervisor,
+            principal,
+            session_id,
+            &ExecuteSubmission::plain(input),
+            now_ms,
+        )
+        .await
+    }
+
+    /// The execute surface with the OPTIONAL explicit requestId (R03-T04 /
+    /// A08). Submissions WITHOUT an id take the exact pre-T04 path;
+    /// submissions WITH an id are deduplicated against the recorded
+    /// normalized-content digest, scoped to the CALLING principal and THIS
+    /// session:
+    /// - same id + same digest → idempotent REPLAY of the original
+    ///   acceptance (the original run id is returned, `replayed: true`,
+    ///   nothing re-executed — legal even while the original run is still
+    ///   driving, which is precisely the lost-response retry a client
+    ///   performs);
+    /// - same id + changed digest → [`SessionExecuteError::DuplicateRequestConflict`]:
+    ///   the recorded execution is NOT reused for the new content and NO
+    ///   new execution starts;
+    /// - fresh id → the admission (busy gate + run-id allocation + the
+    ///   id→run binding) is serialized per key, so a concurrent duplicate
+    ///   cannot slip a second admission in between.
+    ///
+    /// The idempotency registry is process-memory and bounded (restart
+    /// semantics belong to R03-T07; a post-restart retry is a fully
+    /// validated fresh submission).
+    #[allow(clippy::too_many_arguments)]
+    pub async fn execute_submission_for<P: StoragePort>(
+        &self,
+        port: &P,
+        events: &EventService,
+        supervisor: &crate::runs::RunSupervisor,
+        principal: &Principal,
+        session_id: &str,
+        submission: &ExecuteSubmission<'_>,
+        now_ms: u64,
+    ) -> Result<ExecuteAccepted, SessionExecuteError> {
         let row = match self.backend.get_session_erased(session_id).await {
             Ok(Some(row)) => row,
             Ok(None) => return Err(SessionExecuteError::NotFound),
@@ -392,33 +492,103 @@ impl SessionStore {
             return Err(SessionExecuteError::Forbidden);
         }
 
-        // R03-T02: reserve the session's single owner slot. Rejection
-        // happens before ANY durable side effect.
-        let lease = match self.gate.try_begin_run(session_id) {
-            Ok(lease) => lease,
-            Err(crate::session_supervisor::BusyGateError::Busy) => {
-                tracing::info!(
-                    session_id = session_id,
-                    "normal submission to a busy session rejected (session_busy; retryable)"
-                );
-                return Err(SessionExecuteError::Busy);
-            }
-            Err(crate::session_supervisor::BusyGateError::RegistryFull) => {
-                return Err(SessionExecuteError::SessionRegistryFull);
+        // R03-T04 admission. The synchronous admission closure acquires the
+        // session's single owner slot (R03-T02 busy gate) and allocates the
+        // run id; for explicit-id submissions the closure runs UNDER the
+        // dedup registry's key lock, so a concurrent same-id duplicate can
+        // neither slip a second admission in between nor observe a
+        // half-admitted binding — it replays or conflicts once this
+        // admission settles. A failed admission records NOTHING (no sticky
+        // id); a successful one permanently binds the id to the run.
+        let admission = || -> Result<(String, _), SessionExecuteError> {
+            let lease = match self.gate.try_begin_run(session_id) {
+                Ok(lease) => lease,
+                Err(crate::session_supervisor::BusyGateError::Busy) => {
+                    tracing::info!(
+                        session_id = session_id,
+                        "normal submission to a busy session rejected (session_busy; retryable)"
+                    );
+                    return Err(SessionExecuteError::Busy);
+                }
+                Err(crate::session_supervisor::BusyGateError::RegistryFull) => {
+                    return Err(SessionExecuteError::SessionRegistryFull);
+                }
+            };
+            // R02 stage-repair R1 / F01 + R03-T01 step 2: the run id comes
+            // from the backend's atomic allocator and is FIXED at task
+            // creation; retries open new attempts on this same run, and
+            // provider reconnects never mint a second user task.
+            let run_id = self
+                .backend
+                .allocate_run_id_erased(now_ms)
+                .map_err(SessionExecuteError::Storage)?;
+            Ok((run_id, lease))
+        };
+
+        let (run_id, lease) = match submission.request_id {
+            None => admission()?,
+            Some(raw) => {
+                let request_id = crate::dedup::validate_request_id(raw)
+                    .map_err(|detail| SessionExecuteError::InvalidRequestId { detail })?;
+                let kernel_principal = kernel_principal_of(principal);
+                let key = crate::dedup::DedupKey {
+                    owner_kind: kernel_principal.storage_kind().to_string(),
+                    owner_subject: kernel_principal.storage_subject(),
+                    session_id: session_id.to_string(),
+                    request_id,
+                };
+                let digest = crate::dedup::normalized_request_digest_hex(submission.input);
+                match self.dedup.admit(key, digest, admission) {
+                    Err(full) => {
+                        return Err(SessionExecuteError::IdempotencyRegistryFull { cap: full.cap })
+                    }
+                    Ok(Err(rejection)) => return Err(rejection),
+                    Ok(Ok(crate::dedup::DedupDecision::Replay { run_id })) => {
+                        tracing::info!(
+                            run_id = %run_id,
+                            session_id = session_id,
+                            "idempotent submission replayed: same explicit requestId with the \
+                             same normalized content — the original acceptance is returned, \
+                             nothing is re-executed"
+                        );
+                        let run_count = self
+                            .backend
+                            .count_runs_erased(session_id)
+                            .await
+                            .map_err(SessionExecuteError::Storage)?;
+                        return Ok(ExecuteAccepted {
+                            run_id,
+                            run_count,
+                            replayed: true,
+                        });
+                    }
+                    Ok(Ok(crate::dedup::DedupDecision::Conflict {
+                        request_id,
+                        recorded_digest,
+                        submitted_digest,
+                    })) => {
+                        tracing::warn!(
+                            session_id = session_id,
+                            request_id = %request_id,
+                            "duplicate requestId with CHANGED content refused: the recorded \
+                             execution is not reused and no new execution starts (conflict)"
+                        );
+                        return Err(SessionExecuteError::DuplicateRequestConflict {
+                            request_id,
+                            recorded_digest,
+                            submitted_digest,
+                        });
+                    }
+                    Ok(Ok(crate::dedup::DedupDecision::Fresh { run_id, admitted })) => {
+                        (run_id, admitted)
+                    }
+                }
             }
         };
 
         // Bound what we record (defense in depth; the body limit already
         // bounds the request).
-        let recorded_input: String = input.chars().take(2000).collect();
-        // R02 stage-repair R1 / F01 + R03-T01 step 2: the run id comes from
-        // the backend's atomic allocator and is FIXED at task creation;
-        // retries open new attempts on this same run, and provider
-        // reconnects never mint a second user task.
-        let run_id = self
-            .backend
-            .allocate_run_id_erased(now_ms)
-            .map_err(SessionExecuteError::Storage)?;
+        let recorded_input: String = submission.input.chars().take(2000).collect();
 
         // Drive the full lifecycle (start → turns → single finalize); the
         // run drains the session's steering channel before each provider
@@ -452,7 +622,11 @@ impl SessionStore {
             .count_runs_erased(session_id)
             .await
             .map_err(SessionExecuteError::Storage)?;
-        Ok(ExecuteAccepted { run_id, run_count })
+        Ok(ExecuteAccepted {
+            run_id,
+            run_count,
+            replayed: false,
+        })
     }
 
     /// Submits a STEERING / follow-up input for the session's RUNNING turn
@@ -857,6 +1031,16 @@ mod tests {
                 newly_committed: true,
                 events: Vec::new(),
             })
+        }
+
+        async fn record_stale_result(
+            &self,
+            _ctx: &RunContext,
+            _refused: lingxi_kernel::ports::StaleResultFact,
+            _now_unix_ms: u64,
+        ) -> Result<(), StorageError> {
+            // Audit-only (durable behavior is covered against the adapter).
+            Ok(())
         }
     }
 

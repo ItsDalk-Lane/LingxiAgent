@@ -2585,10 +2585,12 @@
         "R03-A05": "PASS",
         "R03-A06": "PASS"
       },
-      "task_commit_sha": null,
+      "task_commit_sha": "9e319d64836d5a1656908a81e23ab5edf8370515",
       "push_result": {
-        "status": "PENDING_BACKFILL",
-        "note": "SHA 与远程回执由下一账本提交补登"
+        "status": "CONFIRMED",
+        "remote_branch": "origin/codex/rust-tauri-migration",
+        "remote_head": "9e319d64836d5a1656908a81e23ab5edf8370515",
+        "note": "ls-remote verified after push"
       },
       "blockers": [],
       "evidence": {
@@ -2602,23 +2604,48 @@
     "R03-T04": {
       "name": "attempt/stream 栅栏处理迟到结果",
       "stage_id": "R03",
-      "status": "PENDING",
-      "task_base_sha": null,
-      "executor_id": null,
-      "execution_result": null,
-      "review_round": 0,
-      "reviewer_id": null,
-      "review_verdict": null,
-      "findings": [],
+      "status": "DONE",
+      "task_base_sha": "9e319d64836d5a1656908a81e23ab5edf8370515",
+      "executor_id": "ZCode:R03-T04-exec-e1 (agent_727e6d98-9cef-4927-a956-43ccd11d86f4)",
+      "execution_result": "READY_FOR_REVIEW",
+      "review_round": 1,
+      "reviewer_id": "ZCode:R03-T04-review-r1 (agent_44bc54c8-dfd8-47d1-a40f-e63133e22d55)",
+      "review_verdict": "PASS",
+      "findings": [
+        {
+          "id": "R1-F1",
+          "severity": "MINOR",
+          "summary": "migration V2 未同步两处 R02-T04 记录资产：R02-T04_STORAGE_REGISTRY.json 仍只登记 V1；scripts/rust-tauri/r02_t04_storage_tx.sh S4 硬编码 version==1 当前树上 exit 1（该脚本在 R02 stage map 中，T08 R02 回归链必红）",
+          "review_report": "docs/rust-tauri/R03/R03-T04_REVIEW_R1.md",
+          "resolution": "强制递延 R03-T08：登记 V2 指纹（64d7edfd…，V1 已发布值 479b0321… 不动）+修脚本 S4，并重跑 R02 回归链（见审查报告矩阵）"
+        },
+        {
+          "id": "R1-OBS",
+          "severity": "ADVISORY",
+          "summary": "O-1..O-5 建议性观察（详见审查报告）",
+          "review_report": "docs/rust-tauri/R03/R03-T04_REVIEW_R1.md",
+          "resolution": "登记观察"
+        }
+      ],
       "repair_agent_id": null,
       "root_cause_agent_id": null,
       "acceptance_results": {
-        "R03-A07": "NOT_STARTED",
-        "R03-A08": "NOT_STARTED"
+        "R03-A07": "PASS",
+        "R03-A08": "PASS"
       },
       "task_commit_sha": null,
-      "push_result": null,
-      "blockers": []
+      "push_result": {
+        "status": "PENDING_BACKFILL",
+        "note": "SHA 与远程回执由下一账本提交补登"
+      },
+      "blockers": [],
+      "evidence": {
+        "executor_report": "docs/rust-tauri/R03/R03-T04_REPORT.md",
+        "executor_evidence": "artifacts/rust-tauri/R03/T04-E01/",
+        "review_report": "docs/rust-tauri/R03/R03-T04_REVIEW_R1.md",
+        "review_evidence": "artifacts/rust-tauri/R03/T04-R01-review/",
+        "candidate_diff_digest_16": "35111570638b82b9"
+      }
     },
     "R03-T05": {
       "name": "运行日志与副作用收据",
@@ -4133,7 +4160,7 @@
       "blockers": []
     }
   },
-  "current_task": "R03-T04",
+  "current_task": "R03-T05",
   "orchestration_mode": {
     "effective_from": "R00-T03 R2 repair",
     "task_executor": "new ZCode task per Rxx-Tyy",

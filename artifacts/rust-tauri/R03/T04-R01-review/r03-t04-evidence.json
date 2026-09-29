@@ -1,0 +1,72 @@
+{
+  "r03_a07_attempt_stale": {
+    "audit_reason": "attempt_stale",
+    "final_reason": "completed.with_final",
+    "late_attempt": "run_000001a0dcba6c00_000001#a1",
+    "late_event_leak_count": "0",
+    "run_id": "run_000001a0dcba6c00_000001"
+  },
+  "r03_a07_fence_mismatch_model": {
+    "audit_reason": "fence_mismatch",
+    "fenced_attempt": "run_000001a0dcba6c00_000001#a1",
+    "run_id": "run_000001a0dcba6c00_000001",
+    "stale_turn_events_written": "0",
+    "status": "failed"
+  },
+  "r03_a07_fence_mismatch_tool": {
+    "audit_reason": "fence_mismatch",
+    "run_id": "run_000001a0dcba6c00_000001",
+    "status": "completed",
+    "unknown_recorded": "1"
+  },
+  "r03_a07_run_terminal": {
+    "audit_reason": "run_terminal",
+    "cancelled_run": "run_000001a0dcba6c00_000001",
+    "cross_run_leak_count": "0",
+    "next_run": "run_000001a0dcba6c00_000002",
+    "run1_status_after": "cancelled",
+    "run2_status": "completed"
+  },
+  "r03_a08_conflict": {
+    "first_run": "run_000001a0dcba6c00_000001",
+    "request_id": "client-req-0001",
+    "runs_after_conflict": 1,
+    "runs_after_first": 1
+  },
+  "r03_a08_invalid_and_plain": {
+    "invalid_refused_runs": 0,
+    "plain_runs": 3
+  },
+  "r03_a08_namespace": {
+    "alpha_run": "run_000001a0dcba6c00_000001",
+    "alpha_runs_total": 2,
+    "beta_run": "run_000001a0dcba6c00_000002",
+    "device_run": "run_000001a0dcba6c00_000003",
+    "owner_replay_run": "run_000001a0dcba6c00_000001"
+  },
+  "r03_a08_replay": {
+    "first_run": "run_000001a0dcba6c00_000001",
+    "replayed_run": "run_000001a0dcba6c00_000001",
+    "request_id": "req-r1",
+    "runs_total": 1,
+    "same_run": true
+  },
+  "r03_t04_fencing_property": {
+    "current_attempt_ok": 36,
+    "ghost_attempt_refused": 26,
+    "illegal_rejections": 120,
+    "post_terminal_refused": 167,
+    "rounds": 60,
+    "seed": "0x5eed0000a07df00d",
+    "settlement_conflicts": 110,
+    "settlement_replays": 10,
+    "settlements_first": 60,
+    "superseded_attempt_refused": 23
+  },
+  "reconnect_read_only": {
+    "provider_calls_after_reconnect": 0,
+    "run_id": "run_000001a0dcba6c00_000001",
+    "runs_after": 1,
+    "runs_before": 1
+  }
+}

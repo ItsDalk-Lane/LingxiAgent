@@ -244,13 +244,16 @@ pub trait StoragePort: Send + Sync {
     /// Contract:
     /// - The run must exist, belong to the same owner facts as `ctx`, and
     ///   still be ACTIVE — events for a terminal run are rejected loudly
-    ///   (the audit-only stale-event path arrives with R03-T04's fence).
-    /// - `ctx.attempt` must be an attempt that was actually opened for the
-    ///   run (via [`StoragePort::record_run_started`] or
+    ///   AND recorded as audit-only stale facts
+    ///   ([`StoragePort::record_stale_result`]); a settled run never
+    ///   resurrects and its stream never grows (R03-T04 full fence).
+    /// - `ctx.attempt` must be the run's CURRENT attempt (the most recently
+    ///   opened one, via [`StoragePort::record_run_started`] or
     ///   [`StoragePort::record_attempt_started`]): results never attach to
     ///   an attempt that never started, and a late result carrying an older
-    ///   attempt id can never silently pose as the current attempt (the
-    ///   full generation fence is R03-T04; this is the identity floor).
+    ///   attempt id is refused for state purposes and audited as stale —
+    ///   old results never pose as the current attempt's output (the
+    ///   R03-T04 attempt/generation fence).
     /// - The run's `last_event_seq` advances inside the same transaction;
     ///   events are returned for publication strictly after commit.
     fn record_run_events(
@@ -259,6 +262,30 @@ pub trait StoragePort: Send + Sync {
         events: Vec<KeyEvent>,
         now_unix_ms: u64,
     ) -> impl std::future::Future<Output = Result<CommittedOutcome, StorageError>> + Send;
+
+    /// Audit-only bookkeeping of one refused LATE result (the R03-T04
+    /// fence). NEVER writes the run's key-event stream, its status or any
+    /// message — the whole point is that a refused write still leaves a
+    /// diagnosable durable trace ("拒写但留审计痕迹").
+    ///
+    /// Contract:
+    /// - ALWAYS legal, whatever the run's state: the audited claim may name
+    ///   a terminal run, a superseded attempt, an attempt that never
+    ///   opened, or even a run row that does not exist — the audit row
+    ///   records the CLAIM as received (it proves what arrived late, not
+    ///   that the claim was ever legitimate).
+    /// - Called by the run driver when it fences an in-flight result, and
+    ///   by implementations of [`StoragePort::record_run_events`] when they
+    ///   refuse a stale delivery (the audit write joins the refusing
+    ///   transaction there).
+    /// - Failures are real storage failures (loud); nothing about the
+    ///   audited run changes on either path.
+    fn record_stale_result(
+        &self,
+        ctx: &RunContext,
+        refused: StaleResultFact,
+        now_unix_ms: u64,
+    ) -> impl std::future::Future<Output = Result<(), StorageError>> + Send;
 
     /// Opens a NEW attempt on an EXISTING run (R03-T01 step 2: retries
     /// increment the attempt on the same run; the run id is fixed at
@@ -405,6 +432,129 @@ pub enum ProviderTurn {
     },
 }
 
+/// The identity triple EVERY asynchronous result must carry (R03-T04
+/// fence): the writer verifies these against the CURRENT context right
+/// before writing state — not only when the request was issued.
+///
+/// A result whose fence names an older attempt, another run or another
+/// generation is a LATE result: it is refused for state purposes and only
+/// its audit trace survives ([`StoragePort::record_stale_result`]). Old
+/// results can never pollute the next attempt, the next run or a session
+/// that has switched away.
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct ResultFence {
+    pub run_id: RunId,
+    pub attempt: lingxi_protocol::AttemptId,
+    pub generation: u64,
+}
+
+impl ResultFence {
+    /// The fence of the context a call was issued under — what a healthy
+    /// adapter echoes back with its result.
+    pub fn of_ctx(ctx: &RunContext) -> Self {
+        Self {
+            run_id: ctx.run_id.clone(),
+            attempt: ctx.attempt.clone(),
+            generation: ctx.generation,
+        }
+    }
+
+    /// The fence check the writer performs before ANY state write: the
+    /// result belongs to the current run, the current attempt and the
+    /// current registry generation.
+    pub fn matches_ctx(&self, ctx: &RunContext) -> bool {
+        self.run_id == ctx.run_id
+            && self.attempt == ctx.attempt
+            && self.generation == ctx.generation
+    }
+}
+
+/// What `TurnProviderPort::next_turn` resolves with (R03-T04): the provider
+/// turn PLUS the identity fence the driver verifies before using it. A real
+/// adapter (R05) echoes the context it was called with; a deferred/raced
+/// delivery carries the identity of the ORIGINAL request and is fenced.
+#[derive(Debug, Clone, PartialEq)]
+pub struct ProviderTurnResult {
+    pub fence: ResultFence,
+    pub turn: ProviderTurn,
+}
+
+impl ProviderTurnResult {
+    /// A result echoing the context it was issued under (the honest default
+    /// every adapter uses unless it is delivering a late/raced result).
+    pub fn of_ctx(ctx: &RunContext, turn: ProviderTurn) -> Self {
+        Self {
+            fence: ResultFence::of_ctx(ctx),
+            turn,
+        }
+    }
+}
+
+/// What `ToolExecutorPort::execute` resolves with (R03-T04): the structured
+/// outcome PLUS the identity fence the driver verifies before persisting.
+#[derive(Debug, Clone, PartialEq)]
+pub struct ToolExecutionResult {
+    pub fence: ResultFence,
+    pub outcome: ToolOutcome,
+}
+
+impl ToolExecutionResult {
+    /// A result echoing the context it was issued under.
+    pub fn of_ctx(ctx: &RunContext, outcome: ToolOutcome) -> Self {
+        Self {
+            fence: ResultFence::of_ctx(ctx),
+            outcome,
+        }
+    }
+}
+
+/// Why one asynchronous result was fenced as stale (the R03-T04 fence
+/// vocabulary — machine-diagnosable, never a silent drop).
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum LateResultReason {
+    /// The run already holds a terminal state: a settled run is never
+    /// resurrected by a late result.
+    RunTerminal,
+    /// The result names an attempt that WAS opened but is no longer the
+    /// run's current attempt (a retry or a later attempt superseded it).
+    AttemptStale,
+    /// The result names an attempt that never started on this run (the
+    /// T01 identity floor).
+    AttemptNeverOpened,
+    /// The result's identity fence does not match the context the writer
+    /// currently holds (another run / another generation).
+    FenceMismatch,
+    /// The result carried the right identity but the run's cancellation
+    /// was observed before the state write ("在写状态前核对" — the write
+    /// side of the biased cancellation race).
+    CancelledBeforeWrite,
+}
+
+impl LateResultReason {
+    /// Stable machine-readable name (audit vocabulary, evidence output).
+    pub fn name(self) -> &'static str {
+        match self {
+            LateResultReason::RunTerminal => "run_terminal",
+            LateResultReason::AttemptStale => "attempt_stale",
+            LateResultReason::AttemptNeverOpened => "attempt_never_opened",
+            LateResultReason::FenceMismatch => "fence_mismatch",
+            LateResultReason::CancelledBeforeWrite => "cancelled_before_write",
+        }
+    }
+}
+
+/// The audit-only fact of one refused late result (payload of
+/// [`StoragePort::record_stale_result`]). Deliberately summary-shaped: the
+/// event TYPES are recorded, never full payloads — the refused content is
+/// not run state and must not become unbounded bookkeeping.
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct StaleResultFact {
+    pub reason: LateResultReason,
+    /// The event types of the refused delivery (empty when the fenced
+    /// result was refused before any event was staged).
+    pub refused_event_types: Vec<String>,
+}
+
 /// One tool call a provider requested. Identity (`ToolCallId`) is minted by
 /// the run driver, never by the provider — and never derived from the run
 /// or attempt id.
@@ -434,14 +584,16 @@ pub trait TurnProviderPort: Send + Sync {
 
     /// Produces the next model turn for the run. `input` is the user
     /// submission that started the run (the full context assembly is R06;
-    /// the port stays minimal here).
+    /// the port stays minimal here). The result carries the identity fence
+    /// of the request it answers; the driver verifies it against the
+    /// CURRENT context before any state write (R03-T04).
     fn next_turn<'a>(
         &'a self,
         ctx: &'a RunContext,
         call: &'a ModelCallId,
         turn: u32,
         input: &'a str,
-    ) -> std::pin::Pin<Box<dyn std::future::Future<Output = ProviderTurn> + Send + 'a>>;
+    ) -> std::pin::Pin<Box<dyn std::future::Future<Output = ProviderTurnResult> + Send + 'a>>;
 }
 
 /// Minimal tool execution port for the R03 run driver (the R04 handoff
@@ -450,13 +602,16 @@ pub trait TurnProviderPort: Send + Sync {
 pub trait ToolExecutorPort: Send + Sync {
     /// Executes one authorized tool request. The outcome is the structured
     /// [`ToolOutcome`] — `Unknown` is mandatory so an externally completed
-    /// side effect is never retried blindly nor reported as success.
+    /// side effect is never retried blindly nor reported as success. The
+    /// result carries the identity fence of the request it answers; the
+    /// driver verifies it against the CURRENT context before persisting
+    /// (R03-T04).
     fn execute<'a>(
         &'a self,
         ctx: &'a RunContext,
         call: &'a ToolCallId,
         request: &'a ToolRequest,
-    ) -> std::pin::Pin<Box<dyn std::future::Future<Output = ToolOutcome> + Send + 'a>>;
+    ) -> std::pin::Pin<Box<dyn std::future::Future<Output = ToolExecutionResult> + Send + 'a>>;
 }
 
 /// Result of one tool call. `Unknown` is mandatory: an externally
@@ -647,6 +802,17 @@ mod tests {
                 events: Vec::new(),
             })
         }
+
+        async fn record_stale_result(
+            &self,
+            _ctx: &RunContext,
+            _refused: StaleResultFact,
+            _now_unix_ms: u64,
+        ) -> Result<(), StorageError> {
+            // Audit-only bookkeeping has no kernel rule to simulate (the
+            // durable behavior is proven against the real adapter).
+            Ok(())
+        }
     }
 
     #[test]
@@ -769,6 +935,70 @@ mod tests {
         // …and so is every illegal active leg.
         assert!(change(RunStatus::Cancelling, RunStatus::Running).is_err());
         assert!(change(RunStatus::Completed, RunStatus::Cancelling).is_err());
+    }
+
+    /// R03-T04: the identity fence every asynchronous result carries. The
+    /// writer-side check (`matches_ctx`) admits only the CURRENT run,
+    /// attempt and generation — an older attempt, another run or another
+    /// generation is stale by construction.
+    #[test]
+    fn result_fence_admits_only_the_current_identity_triple() {
+        let ctx = ctx(); // run r-1, attempt a-1, generation 7
+        assert!(
+            ResultFence::of_ctx(&ctx).matches_ctx(&ctx),
+            "an echoed fence matches its own context"
+        );
+        // Older attempt (the retry fence): stale.
+        let retry = RunContext {
+            attempt: lingxi_protocol::AttemptId::new("a-0".to_string()),
+            ..ctx.clone()
+        };
+        assert!(!ResultFence::of_ctx(&retry).matches_ctx(&ctx));
+        // Newer attempt than the writer holds: also stale (the fence must
+        // name the writer's CURRENT attempt, not merely any later one).
+        let newer = RunContext {
+            attempt: lingxi_protocol::AttemptId::new("a-2".to_string()),
+            ..ctx.clone()
+        };
+        assert!(!ResultFence::of_ctx(&newer).matches_ctx(&ctx));
+        // Another run entirely: stale.
+        let other_run = RunContext {
+            run_id: RunId::new("r-2".to_string()),
+            ..ctx.clone()
+        };
+        assert!(!ResultFence::of_ctx(&other_run).matches_ctx(&ctx));
+        // Another registry generation: stale (R04's tool-registry fence
+        // rides the same triple).
+        let other_gen = RunContext {
+            generation: 8,
+            ..ctx.clone()
+        };
+        assert!(!ResultFence::of_ctx(&other_gen).matches_ctx(&ctx));
+        // The convenience carriers echo the context they wrap.
+        let turn = ProviderTurnResult::of_ctx(
+            &ctx,
+            ProviderTurn::Continue {
+                process_note: "x".to_string(),
+            },
+        );
+        assert!(turn.fence.matches_ctx(&ctx));
+        let tool = ToolExecutionResult::of_ctx(&ctx, ToolOutcome::Cancelled);
+        assert!(tool.fence.matches_ctx(&ctx));
+    }
+
+    #[test]
+    fn late_result_reason_vocabulary_is_stable() {
+        assert_eq!(LateResultReason::RunTerminal.name(), "run_terminal");
+        assert_eq!(LateResultReason::AttemptStale.name(), "attempt_stale");
+        assert_eq!(
+            LateResultReason::AttemptNeverOpened.name(),
+            "attempt_never_opened"
+        );
+        assert_eq!(LateResultReason::FenceMismatch.name(), "fence_mismatch");
+        assert_eq!(
+            LateResultReason::CancelledBeforeWrite.name(),
+            "cancelled_before_write"
+        );
     }
 
     /// Minimal block_on for the trait-level tests (no runtime dependency in

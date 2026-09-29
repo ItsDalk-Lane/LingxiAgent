@@ -44,8 +44,8 @@ use std::sync::Arc;
 use std::time::Duration;
 
 use lingxi_kernel::ports::{
-    ProviderDescriptor, ProviderTurn, StoragePort, ToolExecutorPort, ToolOutcome, ToolRequest,
-    TurnProviderPort,
+    ProviderDescriptor, ProviderTurn, ProviderTurnResult, StoragePort, ToolExecutionResult,
+    ToolExecutorPort, ToolOutcome, ToolRequest, TurnProviderPort,
 };
 use lingxi_kernel::RunContext;
 use lingxi_protocol::{
@@ -106,7 +106,7 @@ impl TurnProviderPort for GatedProvider {
         _call: &'a ModelCallId,
         _turn: u32,
         _input: &'a str,
-    ) -> Pin<Box<dyn std::future::Future<Output = ProviderTurn> + Send + 'a>> {
+    ) -> Pin<Box<dyn std::future::Future<Output = ProviderTurnResult> + Send + 'a>> {
         let session = ctx.session_id.to_string();
         let pop = {
             let mut counters = self.next_pop.lock().unwrap();
@@ -117,6 +117,7 @@ impl TurnProviderPort for GatedProvider {
         self.arrivals
             .send((session.clone(), pop))
             .expect("test holds the arrivals receiver");
+        let ctx_at_issue = ctx.clone();
         let gate = self.gates.get(&(session.clone(), pop)).cloned();
         let turn = self
             .scripts
@@ -137,7 +138,7 @@ impl TurnProviderPort for GatedProvider {
                 // Park mid-"stream": the run is reading the network.
                 let _permit = gate.acquire().await.expect("gate semaphore closed");
             }
-            turn
+            ProviderTurnResult::of_ctx(&ctx_at_issue, turn)
         })
     }
 }
@@ -205,14 +206,15 @@ impl ToolExecutorPort for GatedTool {
         ctx: &'a RunContext,
         call: &'a ToolCallId,
         _request: &'a ToolRequest,
-    ) -> Pin<Box<dyn std::future::Future<Output = ToolOutcome> + Send + 'a>> {
+    ) -> Pin<Box<dyn std::future::Future<Output = ToolExecutionResult> + Send + 'a>> {
         self.arrivals
             .send((ctx.session_id.to_string(), call.to_string()))
             .expect("test holds the tool arrivals receiver");
+        let ctx_at_issue = ctx.clone();
         let behavior = self.drain_behavior();
         let gate = self.gate.clone();
         Box::pin(async move {
-            match behavior {
+            let outcome = match behavior {
                 ToolBehavior::ParkedUntilReleased => {
                     let gate = gate.expect("parked behavior implies a gate");
                     let _permit = gate.acquire().await.expect("tool gate closed");
@@ -232,7 +234,8 @@ impl ToolExecutorPort for GatedTool {
                         content_digest: "blocked-through".to_string(),
                     }
                 }
-            }
+            };
+            ToolExecutionResult::of_ctx(&ctx_at_issue, outcome)
         })
     }
 }
