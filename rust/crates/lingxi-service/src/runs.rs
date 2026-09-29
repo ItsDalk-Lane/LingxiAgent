@@ -67,7 +67,7 @@ use lingxi_protocol::{
 use crate::approval::{ApprovalDecision, ApprovalGate, ApprovalRequest};
 use crate::cancel::{
     CancelBudget, CancelPhase, CancelPolicy, CancelRegistry, CancelScope, FireOutcome,
-    RunCancelEntry,
+    RunCancelEntry, TerminalAdjudication,
 };
 use crate::events::EventService;
 use crate::quotas::QuotaManager;
@@ -612,13 +612,23 @@ impl RunSupervisor {
             .map_err(DriveError::Storage)?;
 
         // 2) Model turns. No provider configured: explicit no-content
-        //    completion (never a fake reply).
+        //    completion (never a fake reply). The early close goes through
+        //    the SAME adjudicated finalize as every other terminal (R03
+        //    repair G02/F03: a cancellation accepted at the boundary wins).
         let Some(provider) = self.provider.clone() else {
             let finish = RunFinish::CompletedWithoutFinal {
                 cause: NoFinalCause::NoProviderConfigured,
             };
             let finish = self
-                .finalize_settlement(port, events, &ctx, RunStatus::Running, finish, now_ms)
+                .adjudicated_finalize(
+                    port,
+                    events,
+                    &ctx,
+                    &entry,
+                    RunStatus::Running,
+                    finish,
+                    now_ms,
+                )
                 .await?;
             guard.disarm();
             return Ok(finish);
@@ -633,15 +643,38 @@ impl RunSupervisor {
         // waiting_approval round trip; the cancelling entry uses it as the
         // `from` of the two-phase cancellation).
         let mut live_status = RunStatus::Running;
+        // R03 repair G02/F03 (C04): the dispatch-boundary gate. Every
+        // point below where the driver RESUMES from an await and is about
+        // to start a NEW external operation (model call, tool execution,
+        // subagent dispatch — or the writes that lead into them) re-checks
+        // the tree: a cancellation accepted while the driver was parked
+        // must result in the four-phase cancellation settle, never in a
+        // new external call. This is NOT the terminal-race fix — the
+        // cancel-vs-terminal adjudication is the atomic
+        // [`Self::adjudicated_finalize`] claim — it is the 执行前重检撤销
+        // leg of the taskbook §5 tool contract.
+        macro_rules! gate_cancel {
+            () => {
+                if root.is_cancelled() {
+                    let reason = root.reason().unwrap_or_else(|| "cancelled".to_string());
+                    let finish = self
+                        .settle_cancellation(
+                            port,
+                            events,
+                            &ctx,
+                            &entry,
+                            live_status,
+                            reason,
+                            now_ms,
+                        )
+                        .await?;
+                    guard.disarm();
+                    return Ok(finish);
+                }
+            };
+        }
         let finish = 'turns: loop {
-            if root.is_cancelled() {
-                let reason = root.reason().unwrap_or_else(|| "cancelled".to_string());
-                let finish = self
-                    .settle_cancellation(port, events, &ctx, &entry, live_status, reason, now_ms)
-                    .await?;
-                guard.disarm();
-                return Ok(finish);
-            }
+            gate_cancel!();
             turn += 1;
             if turn > self.limits.max_model_turns {
                 break RunFinish::Failed {
@@ -702,6 +735,10 @@ impl RunSupervisor {
             // R03-T03: the model call (a network-stream read in R05
             // terms) runs as a SUPERVISED child of the run's tree —
             // cancellation drops the provider future at its await point.
+            // F03-C04: re-check the tree before the dispatch itself — a
+            // cancellation accepted while the driver waited for the
+            // admission permit must not turn into a new provider call.
+            gate_cancel!();
             let call_scope = root.child(
                 format!("model_call:{}", call.as_str()),
                 crate::cancel::ScopeKind::ModelCall,
@@ -850,12 +887,21 @@ impl RunSupervisor {
                         now_ms,
                     )
                     .await?;
+                    // F03-C04: the model-event storage boundary — a
+                    // cancellation accepted during the persist ends the
+                    // turn loop here (no tool admission, no intent write).
+                    gate_cancel!();
                     let Some(tools) = self.tools.clone() else {
                         break RunFinish::Failed {
                             cause: FailureCause::ToolExecutorUnavailable,
                         };
                     };
                     for request in &requests {
+                        // F03-C04: each tool-loop iteration re-checks — a
+                        // cancellation accepted during the previous
+                        // iteration's receipt/event writes stops the loop
+                        // before any new admission or intent.
+                        gate_cancel!();
                         tool_call_seq += 1;
                         let call_id = tool_call_id(&run_id, tool_call_seq);
                         // Admission (R03-T02): one tool-call permit per
@@ -898,6 +944,10 @@ impl RunSupervisor {
                                 return Ok(finish);
                             }
                         };
+                        // F03-C04: re-check after the admission wait — a
+                        // cancellation accepted while queued for the tool
+                        // permit must not write a new invocation intent.
+                        gate_cancel!();
                         // R03-T05: the invocation INTENT is durable BEFORE
                         // anything else — no external execution may ever be
                         // dispatched without its prepared receipt on disk.
@@ -922,6 +972,12 @@ impl RunSupervisor {
                             port, events, &ctx, &call_id, request, None, now_ms,
                         )
                         .await?;
+                        // F03-C04: the storage/authorization boundary —
+                        // the writes above are durable audit facts, but a
+                        // cancellation accepted while they committed ends
+                        // the loop here: no authorization, no approval
+                        // round trip, no dispatch.
+                        gate_cancel!();
                         // ── R03-T06: the run-layer authorization boundary ──
                         // For a user run (Full grant) the T05 semantics
                         // stand unchanged: the run-layer context itself
@@ -1010,6 +1066,11 @@ impl RunSupervisor {
                         }
                         // ── approval wait (R03-T03 minimal interface) ──
                         if let Some(gate) = self.approval.clone() {
+                            // F03-C04: asking a human is an external
+                            // interaction too — a cancellation accepted at
+                            // the authorization boundary must not open a
+                            // new approval round trip.
+                            gate_cancel!();
                             live_status = RunStatus::WaitingApproval;
                             self.persist_state_change(
                                 port,
@@ -1161,6 +1222,11 @@ impl RunSupervisor {
                         // channel (the incumbent's deferred-result
                         // "trigger_parent_turn" delivery, at the R03
                         // fidelity).
+                        // F03-C04: the child-run dispatch boundary — a
+                        // cancellation accepted at the authorization or
+                        // approval boundary above must not spawn a new
+                        // child run.
+                        gate_cancel!();
                         if let Some(delegation) = request.delegation.clone() {
                             // The dispatch IS the side effect: `started`
                             // is durable before it (same write-order
@@ -1280,6 +1346,12 @@ impl RunSupervisor {
                         port.advance_invocation(&ctx, &call_id, InvocationPhase::Started, now_ms)
                             .await
                             .map_err(DriveError::Storage)?;
+                        // F03-C04: the dispatch boundary itself — a
+                        // cancellation accepted during the `started` write
+                        // must not become an external tool execution (the
+                        // journal entry stays at `started`; recovery
+                        // classifies it as unobserved).
+                        gate_cancel!();
                         // ── supervised tool execution ──
                         let tool_scope = root.child(
                             format!("tool_call:{}", call_id.as_str()),
@@ -1487,12 +1559,74 @@ impl RunSupervisor {
             }
         };
 
-        // 3) Exactly one finalize, through the single settlement path.
+        // 3) Exactly one finalize, through the single settlement path —
+        //    ADJUDICATED against any cancellation accepted while the loop
+        //    was driving (R03 repair G02/F03): the claim and the commit
+        //    happen in that order with no re-check gap in between.
         let finish = self
-            .finalize_settlement(port, events, &ctx, live_status, finish, now_ms)
+            .adjudicated_finalize(port, events, &ctx, &entry, live_status, finish, now_ms)
             .await?;
         guard.disarm();
         Ok(finish)
+    }
+
+    /// R03 repair G02/F03 — the UNIFIED cancel-vs-terminal adjudication
+    /// for every NON-cancellation terminal a driver can settle
+    /// (completed/failed, including the no-provider early close). This is
+    /// the one place the race is decided, and it is atomic:
+    ///
+    /// - [`TerminalAdjudication::Claimed`] — no cancellation had been
+    ///   accepted when the claim was taken (the entry's phase mutex is
+    ///   the linearization point; the claim is recorded BEFORE the
+    ///   finalize's first await). The finalize then commits exactly once
+    ///   and a cancellation arriving during it reads
+    ///   [`FireOutcome::TooLate`] — never an Accepted-with-stop-promise.
+    /// - [`TerminalAdjudication::CancelledBy`] — a cancellation was
+    ///   accepted first: the intended terminal is DIVERTED to the
+    ///   four-phase cancellation settle. No `completed`/`failed` and no
+    ///   final message commit after an accepted cancellation, whatever
+    ///   awaits sat between the last fence check and here (the fix is
+    ///   deliberately NOT "one more is_cancelled before the last await" —
+    ///   that would still leave the check→commit window open).
+    // Same explicit-dependency-passing shape as `drive_run`.
+    #[allow(clippy::too_many_arguments)]
+    async fn adjudicated_finalize<P: StoragePort>(
+        &self,
+        port: &P,
+        events: &EventService,
+        ctx: &lingxi_kernel::RunContext,
+        entry: &Arc<RunCancelEntry>,
+        live_status: RunStatus,
+        finish: RunFinish,
+        now_ms: u64,
+    ) -> Result<RunFinish, DriveError> {
+        let superseded = finish.terminal_reason();
+        match entry.claim_terminal(&superseded) {
+            TerminalAdjudication::Claimed => {
+                self.finalize_settlement(port, events, ctx, live_status, finish, now_ms)
+                    .await
+            }
+            TerminalAdjudication::CancelledBy { reason } => {
+                tracing::info!(
+                    run_id = %ctx.run_id,
+                    superseded_terminal = %superseded,
+                    cancel_reason = %reason,
+                    "cancellation accepted before the terminal claim: the intended terminal \
+                     is diverted to the four-phase cancellation settle (no completed/failed \
+                     and no final message commit after an accepted cancellation)"
+                );
+                let mut settled = self
+                    .settle_cancellation(port, events, ctx, entry, live_status, reason, now_ms)
+                    .await?;
+                if let RunFinish::Cancelled { detail } = &mut settled {
+                    // The superseded in-flight terminal stays diagnosable
+                    // in the returned verdict (audit note, never a second
+                    // terminal — the durable terminal is `cancelled`).
+                    detail.push_str(&format!("; superseded in-flight terminal: {superseded}"));
+                }
+                Ok(settled)
+            }
+        }
     }
 
     /// The R03-T03 cancellation flow, phases 2–4 + the single finalize:

@@ -409,12 +409,34 @@ pub enum CancelPhase {
     /// durable run row honestly stays active and its recovery
     /// classification belongs to R03-T07's startup scan.
     Abandoned { reason: String },
+    /// R03 repair G02/F03 — the driver's IRREVOCABLE TERMINAL CLAIM: the
+    /// single finalize transaction for a NON-cancellation terminal
+    /// (completed/failed) has begun and no cancellation request had been
+    /// accepted when it was claimed. This is the frozen linearization
+    /// point of the cancel-vs-terminal race: a cancellation arriving now
+    /// is honestly TOO LATE ([`FireOutcome::TooLate`]) — it is never
+    /// reported Accepted (that would promise a stop that will not
+    /// happen) and it does not fire the tree of a run that is already
+    /// settling. `terminal` carries the claimed terminal-reason
+    /// vocabulary (e.g. `completed.with_final`) for diagnosis.
+    ///
+    /// This is NOT a cancellation phase: `cancel_requested()` stays
+    /// `false` for it and a normally-settled run leaves no verdict
+    /// record, exactly like [`CancelPhase::Active`].
+    Settling { terminal: String },
 }
 
 impl CancelPhase {
     /// True once a cancellation was requested at all.
     pub fn cancel_requested(&self) -> bool {
-        !matches!(self, CancelPhase::Active)
+        matches!(
+            self,
+            CancelPhase::Requested { .. }
+                | CancelPhase::Cleaning { .. }
+                | CancelPhase::ConfirmedTerminated { .. }
+                | CancelPhase::StopUnconfirmed { .. }
+                | CancelPhase::Abandoned { .. }
+        )
     }
 
     /// A short machine-readable phase name (evidence vocabulary).
@@ -426,6 +448,7 @@ impl CancelPhase {
             CancelPhase::ConfirmedTerminated { .. } => "confirmed_terminated",
             CancelPhase::StopUnconfirmed { .. } => "stop_unconfirmed",
             CancelPhase::Abandoned { .. } => "abandoned",
+            CancelPhase::Settling { .. } => "settling",
         }
     }
 }
@@ -461,6 +484,138 @@ impl RunCancelEntry {
     pub fn registered_at(&self) -> Instant {
         self.registered_at
     }
+
+    /// Fires one cancellation request against this run (R03-T03 phase 1).
+    ///
+    /// R03 repair G02/F03: the whole decision is ONE critical section on
+    /// the phase mutex — the read of the current phase, the scope-tree
+    /// cancellation and the `Active → Requested` write can no longer
+    /// interleave with (a) another `fire` (which could otherwise observe
+    /// `Active` twice, double-report `Fired` and overwrite the first
+    /// reason) or (b) the driver's phase legs (which could otherwise be
+    /// regressed from `Cleaning` back to `Requested`). The first reason
+    /// is additionally protected by the scope tree's own first-writer
+    /// rule ([`CancelScope::cancel`]); the retained phase reason is READ
+    /// BACK from the scope so the two can never disagree.
+    ///
+    /// Lock order (deadlock freedom): the only nested acquisition this
+    /// makes is `phase → scope.*`; no code path acquires a scope lock and
+    /// then a phase lock (the driver's legs take them sequentially).
+    pub fn fire(&self, reason: &str) -> FireOutcome {
+        let mut phase = self
+            .phase
+            .lock()
+            .unwrap_or_else(|poisoned| poisoned.into_inner());
+        // The frozen irrevocable point: a terminal that was already
+        // claimed wins. Honest answer, no tree fire, no acceptance.
+        if matches!(&*phase, CancelPhase::Settling { .. }) {
+            return FireOutcome::TooLate;
+        }
+        // First-writer rule lives in the scope tree: the reason recorded
+        // here is whatever the tree's FIRST cancellation carried.
+        self.scope.cancel(reason);
+        match &*phase {
+            CancelPhase::Active => {
+                *phase = CancelPhase::Requested {
+                    reason: self.scope.reason().unwrap_or_else(|| reason.to_string()),
+                };
+                FireOutcome::Fired
+            }
+            // A cancellation is already in flight (Requested/Cleaning/
+            // Confirmed/Unconfirmed/Abandoned): idempotent no-op.
+            _ => FireOutcome::AlreadyCancelling,
+        }
+    }
+
+    /// R03 repair G02/F03 — the driver-side half of the unified
+    /// cancel-vs-terminal adjudication. Atomically (against
+    /// [`Self::fire`]) claims the right to settle a NON-cancellation
+    /// terminal, or observes that an accepted cancellation already won:
+    ///
+    /// - [`TerminalAdjudication::Claimed`] — no cancellation had been
+    ///   requested; the entry records [`CancelPhase::Settling`] (the
+    ///   irrevocable point) and the caller proceeds into the single
+    ///   finalize. Any `fire` from now on reports
+    ///   [`FireOutcome::TooLate`].
+    /// - [`TerminalAdjudication::CancelledBy`] — a cancellation request
+    ///   was accepted first (its FIRST reason is returned); the caller
+    ///   MUST divert its intended terminal through the four-phase
+    ///   cancellation settle instead of committing completed/failed.
+    ///
+    /// The cancellation settle itself (`RunFinish::Cancelled`) does NOT
+    /// pass through here — by construction the cancellation already won.
+    pub fn claim_terminal(&self, terminal: &str) -> TerminalAdjudication {
+        let mut phase = self
+            .phase
+            .lock()
+            .unwrap_or_else(|poisoned| poisoned.into_inner());
+        match (*phase).clone() {
+            CancelPhase::Active => {
+                // A PARENT-tree cancellation can have fired this scope
+                // through the G01 traversal WITHOUT any local fire — the
+                // scope flag is the monotonic fact, the phase lags. The
+                // claim honors it: a run under a cancelled tree never
+                // completes, and the phase is brought to the `requested`
+                // leg it should have had. (The reverse order — a parent
+                // traversal landing between this claim and the commit —
+                // leaves the child's already-claimed terminal standing,
+                // symmetric to the run's own frozen linearization rule.)
+                if self.scope.is_cancelled() {
+                    let reason = self
+                        .scope
+                        .reason()
+                        .unwrap_or_else(|| "cancelled".to_string());
+                    *phase = CancelPhase::Requested {
+                        reason: reason.clone(),
+                    };
+                    return TerminalAdjudication::CancelledBy { reason };
+                }
+                *phase = CancelPhase::Settling {
+                    terminal: terminal.to_string(),
+                };
+                TerminalAdjudication::Claimed
+            }
+            CancelPhase::Settling { .. } => {
+                // A healthy driver claims exactly once per run. A second
+                // claim is a driver invariant violation — keep the FIRST
+                // claimed terminal (never rewrite it) and surface the
+                // anomaly loudly.
+                tracing::error!(
+                    run_id = %self.run_id,
+                    second_terminal = %terminal,
+                    "run driver claimed the terminal right twice; the first claim stands"
+                );
+                TerminalAdjudication::Claimed
+            }
+            other => TerminalAdjudication::CancelledBy {
+                reason: first_reason_of(&other).unwrap_or_else(|| "cancelled".to_string()),
+            },
+        }
+    }
+}
+
+/// The FIRST cancellation reason carried by a cancel-requested phase.
+fn first_reason_of(phase: &CancelPhase) -> Option<String> {
+    match phase {
+        CancelPhase::Requested { reason }
+        | CancelPhase::Cleaning { reason }
+        | CancelPhase::Abandoned { reason } => Some(reason.clone()),
+        CancelPhase::ConfirmedTerminated { reason, .. }
+        | CancelPhase::StopUnconfirmed { reason, .. } => Some(reason.clone()),
+        CancelPhase::Active | CancelPhase::Settling { .. } => None,
+    }
+}
+
+/// The driver-side verdict of [`RunCancelEntry::claim_terminal`] — the
+/// unified cancel-vs-terminal adjudication (R03 repair G02/F03).
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub enum TerminalAdjudication {
+    /// No cancellation was accepted: the caller irrevocably owns the
+    /// terminal settlement (recorded as [`CancelPhase::Settling`]).
+    Claimed,
+    /// A cancellation request was accepted FIRST (with its first reason):
+    /// the caller must settle through the cancellation path.
+    CancelledBy { reason: String },
 }
 
 /// Outcome of a cancellation request against the registry.
@@ -470,6 +625,12 @@ pub enum FireOutcome {
     Fired,
     /// The run is live but a cancellation was already in flight.
     AlreadyCancelling,
+    /// The run's driver already irrevocably claimed its terminal
+    /// settlement (R03 repair G02/F03): the single finalize transaction
+    /// for a completed/failed terminal is in flight. Nothing was
+    /// cancelled and nothing stopped on this request — reporting
+    /// `Fired`/acceptance would promise a stop that will not happen.
+    TooLate,
     /// No live run with this id is registered in this process.
     NotLive,
 }
@@ -687,20 +848,13 @@ impl CancelRegistry {
 
     /// Fires one cancellation request: flips the phase to
     /// [`CancelPhase::Requested`] and cancels the run's scope tree (every
-    /// live descendant wakes). First request wins.
+    /// live descendant wakes). First request wins. The decision is one
+    /// critical section on the entry (see [`RunCancelEntry::fire`]).
     pub fn fire(&self, run_id: &str, reason: &str) -> FireOutcome {
         let Some(entry) = self.get(run_id) else {
             return FireOutcome::NotLive;
         };
-        let already_requested = entry.phase().cancel_requested();
-        entry.scope.cancel(reason);
-        if already_requested {
-            return FireOutcome::AlreadyCancelling;
-        }
-        entry.advance_phase(CancelPhase::Requested {
-            reason: reason.to_string(),
-        });
-        FireOutcome::Fired
+        entry.fire(reason)
     }
 }
 
@@ -884,5 +1038,170 @@ mod tests {
         }
         .validate()
         .is_err());
+    }
+
+    // ── R03 repair G02/F03: the unified cancel-vs-terminal adjudication ──
+
+    /// A terminal claim taken BEFORE any cancellation makes every later
+    /// fire honestly TooLate — the tree is never fired for a run that is
+    /// already irrevocably settling.
+    #[tokio::test]
+    async fn fire_after_the_terminal_claim_is_too_late_and_never_fires_the_tree() {
+        let registry = CancelRegistry::new();
+        let entry = registry.register("run_f03_claim_first");
+        assert_eq!(
+            entry.claim_terminal("completed.with_final"),
+            TerminalAdjudication::Claimed
+        );
+        assert_eq!(
+            entry.phase(),
+            CancelPhase::Settling {
+                terminal: "completed.with_final".to_string()
+            }
+        );
+        assert!(
+            !entry.scope.is_cancelled(),
+            "no tree fire for a settling run"
+        );
+        assert_eq!(
+            registry.fire("run_f03_claim_first", "user"),
+            FireOutcome::TooLate
+        );
+        assert!(
+            !entry.scope.is_cancelled(),
+            "a TooLate fire must not cancel the tree either"
+        );
+        // Settling is NOT a cancellation verdict: the phase machine reports
+        // "no cancellation requested" and deregistration keeps the
+        // normally-settled run out of the verdict record.
+        assert!(!entry.phase().cancel_requested());
+        registry.deregister("run_f03_claim_first");
+        assert_eq!(registry.recent_verdict("run_f03_claim_first"), None);
+    }
+
+    /// A cancellation accepted BEFORE the terminal claim wins the
+    /// adjudication: the claim returns the cancellation's FIRST reason
+    /// and a later duplicate fire keeps it.
+    #[tokio::test]
+    async fn claim_after_an_accepted_cancel_diverts_with_the_first_reason() {
+        let registry = CancelRegistry::new();
+        let entry = registry.register("run_f03_cancel_first");
+        assert_eq!(
+            registry.fire("run_f03_cancel_first", "user"),
+            FireOutcome::Fired
+        );
+        assert_eq!(
+            registry.fire("run_f03_cancel_first", "second caller"),
+            FireOutcome::AlreadyCancelling
+        );
+        assert_eq!(
+            entry.claim_terminal("completed.with_final"),
+            TerminalAdjudication::CancelledBy {
+                reason: "user".to_string()
+            }
+        );
+        // The diversion never regressed the phase machine.
+        match entry.phase() {
+            CancelPhase::Requested { reason } => assert_eq!(reason, "user"),
+            other => panic!("expected Requested, got {other:?}"),
+        }
+    }
+
+    /// A PARENT-tree cancellation that traversed into a linked run root
+    /// (scope flag set, local phase still Active) also wins the claim:
+    /// the child never completes under a cancelled tree, and the phase is
+    /// brought to the `requested` leg with the tree's first reason.
+    #[tokio::test]
+    async fn claim_honors_a_parent_tree_cancellation_the_phase_has_not_seen() {
+        let registry = CancelRegistry::new();
+        let parent = registry.register("run_f03_parent");
+        // The child registers while the parent is still live, then the
+        // parent's tree fires — the traversal sets the child's scope flag
+        // without any local fire.
+        let child = registry.register_linked("run_f03_child", &parent.scope);
+        assert!(parent.scope.cancel("parent user"));
+        assert!(child.scope.is_cancelled());
+        assert_eq!(child.phase(), CancelPhase::Active);
+        assert_eq!(
+            child.claim_terminal("completed.with_final"),
+            TerminalAdjudication::CancelledBy {
+                reason: "parent user".to_string()
+            }
+        );
+        match child.phase() {
+            CancelPhase::Requested { reason } => assert_eq!(reason, "parent user"),
+            other => panic!("expected Requested, got {other:?}"),
+        }
+    }
+
+    /// The phase machine never regresses: a fire landing while the driver
+    /// is already cleaning reports AlreadyCancelling and writes nothing.
+    #[tokio::test]
+    async fn fire_landing_after_the_cleaning_leg_writes_nothing_back() {
+        let registry = CancelRegistry::new();
+        let entry = registry.register("run_f03_mono");
+        assert_eq!(registry.fire("run_f03_mono", "user"), FireOutcome::Fired);
+        entry.advance_phase(CancelPhase::Cleaning {
+            reason: "user".to_string(),
+        });
+        assert_eq!(
+            registry.fire("run_f03_mono", "late duplicate"),
+            FireOutcome::AlreadyCancelling
+        );
+        match entry.phase() {
+            CancelPhase::Cleaning { reason } => assert_eq!(reason, "user"),
+            other => panic!("phase regressed: {other:?}"),
+        }
+    }
+
+    /// The adjudication serializes consistently under REAL concurrency:
+    /// per round exactly one side wins — either the terminal is claimed
+    /// and the concurrent fire reads TooLate (tree untouched), or the
+    /// cancellation is accepted and the concurrent claim reads
+    /// CancelledBy with the first reason. No interleaving may produce a
+    /// pair where both sides believe they won.
+    #[test]
+    fn claim_and_fire_serialize_consistently_under_real_concurrency() {
+        const ROUNDS: usize = 1_000;
+        for round in 0..ROUNDS {
+            let registry = CancelRegistry::new();
+            let entry = registry.register(&format!("run_f03_race_{round}"));
+            let barrier = Arc::new(std::sync::Barrier::new(2));
+            let claimer = {
+                let entry = Arc::clone(&entry);
+                let barrier = Arc::clone(&barrier);
+                std::thread::spawn(move || {
+                    barrier.wait();
+                    entry.claim_terminal("completed.with_final")
+                })
+            };
+            let firer = {
+                let entry = Arc::clone(&entry);
+                let barrier = Arc::clone(&barrier);
+                std::thread::spawn(move || {
+                    barrier.wait();
+                    entry.fire("user")
+                })
+            };
+            let claim = claimer.join().expect("claimer");
+            let fire = firer.join().expect("firer");
+            match (claim, fire) {
+                (TerminalAdjudication::Claimed, FireOutcome::TooLate) => {
+                    assert!(
+                        !entry.scope.is_cancelled(),
+                        "round {round}: the losing fire must not touch the tree"
+                    );
+                }
+                (
+                    TerminalAdjudication::CancelledBy { reason },
+                    FireOutcome::Fired | FireOutcome::AlreadyCancelling,
+                ) => {
+                    assert_eq!(reason, "user", "round {round}: first reason preserved");
+                }
+                inconsistent => {
+                    panic!("round {round}: inconsistent adjudication {inconsistent:?}")
+                }
+            }
+        }
     }
 }

@@ -27,7 +27,7 @@
         "F01",
         "F02"
       ],
-      "status": "PASSED_PENDING_PUSH",
+      "status": "DONE",
       "executor": "EXECUTOR-REPAIR-R03-G01-E01",
       "rounds": [
         {
@@ -39,7 +39,12 @@
           "gates": "fmt 零 diff；clippy -D warnings 零告警；check-contracts 626 entries 零漂移；check-boundaries exit 0；Cargo.lock 未变",
           "report": "docs/rust-tauri/R03/repair-current/G01-E01_REPORT.md",
           "reviewer": "REVIEWER-REPAIR-R03-G01-R1",
-          "review_verdict": "PASS"
+          "review_verdict": "PASS",
+          "commits": [
+            "385ff2940 docs(rust-tauri): reopen R03 pending adversarial repair; register unified issue ledger",
+            "520bb75b9 fix(rust-tauri): R03 adversarial repair G01 - cancel tree linking (F01) and in-process subagent closeout (F02)"
+          ],
+          "remote_receipt": "origin/codex/rust-tauri-migration=520bb75b9906120c78b0d10036577fd911a5a81c (push cd3fb19e6..520bb75b9 confirmed, branch -r --contains OK)"
         }
       ]
     },
@@ -47,9 +52,21 @@
       "covers": [
         "F03"
       ],
-      "status": "NOT_STARTED",
-      "executor": null,
-      "rounds": []
+      "status": "PASSED_PENDING_PUSH",
+      "executor": "EXECUTOR-REPAIR-R03-G02-E01",
+      "rounds": [
+        {
+          "round": 1,
+          "executor": "EXECUTOR-REPAIR-R03-G02-E01",
+          "result": "READY_FOR_REVIEW",
+          "candidate": "HEAD 520bb75b9 + 未提交工作树（cancel.rs/runs.rs/sessions.rs + 新测试 cancel_terminal_race.rs）",
+          "workspace_tests": "66 suites / 666 passed / 0 failed（G01 后 65/648/0，+1/+18）",
+          "gates": "fmt 零 diff；clippy 零告警；check-contracts 626 零漂移；check-boundaries exit 0；Cargo.lock 不变",
+          "report": "docs/rust-tauri/R03/repair-current/G02-E01_REPORT.md",
+          "reviewer": "REVIEWER-REPAIR-R03-G02-R1",
+          "review_verdict": "PASS"
+        }
+      ]
     },
     "G03": {
       "covers": [
@@ -191,11 +208,11 @@
       ],
       "fact_type": "SOURCE_CONFIRMED",
       "fact_type_note": "固定提交静态源码反例分析，尚未动态复现；状态推进须以执行端真实命令/退出码/日志为准，不得倒填为已复现。",
-      "implementation_status": "NOT_STARTED",
+      "implementation_status": "CLOSED_BY_INDEPENDENT_REVIEW_R1",
       "repair_commits": [],
-      "normal_selfcheck_status": "NOT_RUN",
-      "adversarial_selfcheck_status": "NOT_RUN",
-      "independent_review_status": "NOT_RUN",
+      "normal_selfcheck_status": "PASS_EXECUTOR",
+      "adversarial_selfcheck_status": "PASS_EXECUTOR",
+      "independent_review_status": "PASS_R1",
       "case_ids": [
         "R03-FIX-F03-C01",
         "R03-FIX-F03-C02",
@@ -756,27 +773,36 @@
       "issue_id": "F03",
       "workorder": "G02",
       "audit_runtime_status": "NOT_RUN_THIS_AUDIT",
-      "implementation_status": "NOT_STARTED",
+      "implementation_status": "CLOSED_BY_INDEPENDENT_REVIEW_R1",
       "normal_selfcheck": {
-        "status": "NOT_RUN",
+        "status": "PASS",
         "commands": [],
         "exit_codes": [],
-        "evidence": [],
-        "notes": null
+        "evidence": [
+          "artifacts/rust-tauri/R03/repair-current/G02-E01/normal-selfcheck/",
+          "docs/rust-tauri/R03/repair-current/G02-E01_NORMAL_SELFCHECK.md"
+        ],
+        "notes": "执行者 EXECUTOR-REPAIR-R03-G02-E01 自查报告。"
       },
       "adversarial_selfcheck": {
-        "status": "NOT_RUN",
+        "status": "PASS",
         "commands": [],
         "exit_codes": [],
-        "evidence": [],
-        "notes": null
+        "evidence": [
+          "artifacts/rust-tauri/R03/repair-current/G02-E01/adversarial-selfcheck/",
+          "docs/rust-tauri/R03/repair-current/G02-E01_ADVERSARIAL_SELFCHECK.md"
+        ],
+        "notes": "GatedStorage 真实存储边界泊车；三序交错×5 稳定性；1000 轮 claim-fire 并发。"
       },
       "independent_review": {
-        "status": "NOT_RUN",
-        "reviewer_id": null,
-        "round": null,
-        "evidence": [],
-        "verdict": null
+        "status": "PASS",
+        "reviewer_id": "REVIEWER-REPAIR-R03-G02-R1",
+        "round": 1,
+        "evidence": [
+          "docs/rust-tauri/R03/repair-current/G02-R1_REVIEW.md",
+          "artifacts/rust-tauri/R03/repair-current/G02-R1/"
+        ],
+        "verdict": "PASS"
       },
       "repair_commit": null
     },
@@ -785,27 +811,36 @@
       "issue_id": "F03",
       "workorder": "G02",
       "audit_runtime_status": "NOT_RUN_THIS_AUDIT",
-      "implementation_status": "NOT_STARTED",
+      "implementation_status": "CLOSED_BY_INDEPENDENT_REVIEW_R1",
       "normal_selfcheck": {
-        "status": "NOT_RUN",
+        "status": "PASS",
         "commands": [],
         "exit_codes": [],
-        "evidence": [],
-        "notes": null
+        "evidence": [
+          "artifacts/rust-tauri/R03/repair-current/G02-E01/normal-selfcheck/",
+          "docs/rust-tauri/R03/repair-current/G02-E01_NORMAL_SELFCHECK.md"
+        ],
+        "notes": "执行者 EXECUTOR-REPAIR-R03-G02-E01 自查报告。"
       },
       "adversarial_selfcheck": {
-        "status": "NOT_RUN",
+        "status": "PASS",
         "commands": [],
         "exit_codes": [],
-        "evidence": [],
-        "notes": null
+        "evidence": [
+          "artifacts/rust-tauri/R03/repair-current/G02-E01/adversarial-selfcheck/",
+          "docs/rust-tauri/R03/repair-current/G02-E01_ADVERSARIAL_SELFCHECK.md"
+        ],
+        "notes": "GatedStorage 真实存储边界泊车；三序交错×5 稳定性；1000 轮 claim-fire 并发。"
       },
       "independent_review": {
-        "status": "NOT_RUN",
-        "reviewer_id": null,
-        "round": null,
-        "evidence": [],
-        "verdict": null
+        "status": "PASS",
+        "reviewer_id": "REVIEWER-REPAIR-R03-G02-R1",
+        "round": 1,
+        "evidence": [
+          "docs/rust-tauri/R03/repair-current/G02-R1_REVIEW.md",
+          "artifacts/rust-tauri/R03/repair-current/G02-R1/"
+        ],
+        "verdict": "PASS"
       },
       "repair_commit": null
     },
@@ -814,27 +849,36 @@
       "issue_id": "F03",
       "workorder": "G02",
       "audit_runtime_status": "NOT_RUN_THIS_AUDIT",
-      "implementation_status": "NOT_STARTED",
+      "implementation_status": "CLOSED_BY_INDEPENDENT_REVIEW_R1",
       "normal_selfcheck": {
-        "status": "NOT_RUN",
+        "status": "PASS",
         "commands": [],
         "exit_codes": [],
-        "evidence": [],
-        "notes": null
+        "evidence": [
+          "artifacts/rust-tauri/R03/repair-current/G02-E01/normal-selfcheck/",
+          "docs/rust-tauri/R03/repair-current/G02-E01_NORMAL_SELFCHECK.md"
+        ],
+        "notes": "执行者 EXECUTOR-REPAIR-R03-G02-E01 自查报告。"
       },
       "adversarial_selfcheck": {
-        "status": "NOT_RUN",
+        "status": "PASS",
         "commands": [],
         "exit_codes": [],
-        "evidence": [],
-        "notes": null
+        "evidence": [
+          "artifacts/rust-tauri/R03/repair-current/G02-E01/adversarial-selfcheck/",
+          "docs/rust-tauri/R03/repair-current/G02-E01_ADVERSARIAL_SELFCHECK.md"
+        ],
+        "notes": "GatedStorage 真实存储边界泊车；三序交错×5 稳定性；1000 轮 claim-fire 并发。"
       },
       "independent_review": {
-        "status": "NOT_RUN",
-        "reviewer_id": null,
-        "round": null,
-        "evidence": [],
-        "verdict": null
+        "status": "PASS",
+        "reviewer_id": "REVIEWER-REPAIR-R03-G02-R1",
+        "round": 1,
+        "evidence": [
+          "docs/rust-tauri/R03/repair-current/G02-R1_REVIEW.md",
+          "artifacts/rust-tauri/R03/repair-current/G02-R1/"
+        ],
+        "verdict": "PASS"
       },
       "repair_commit": null
     },
@@ -843,27 +887,36 @@
       "issue_id": "F03",
       "workorder": "G02",
       "audit_runtime_status": "NOT_RUN_THIS_AUDIT",
-      "implementation_status": "NOT_STARTED",
+      "implementation_status": "CLOSED_BY_INDEPENDENT_REVIEW_R1",
       "normal_selfcheck": {
-        "status": "NOT_RUN",
+        "status": "PASS",
         "commands": [],
         "exit_codes": [],
-        "evidence": [],
-        "notes": null
+        "evidence": [
+          "artifacts/rust-tauri/R03/repair-current/G02-E01/normal-selfcheck/",
+          "docs/rust-tauri/R03/repair-current/G02-E01_NORMAL_SELFCHECK.md"
+        ],
+        "notes": "执行者 EXECUTOR-REPAIR-R03-G02-E01 自查报告。"
       },
       "adversarial_selfcheck": {
-        "status": "NOT_RUN",
+        "status": "PASS",
         "commands": [],
         "exit_codes": [],
-        "evidence": [],
-        "notes": null
+        "evidence": [
+          "artifacts/rust-tauri/R03/repair-current/G02-E01/adversarial-selfcheck/",
+          "docs/rust-tauri/R03/repair-current/G02-E01_ADVERSARIAL_SELFCHECK.md"
+        ],
+        "notes": "GatedStorage 真实存储边界泊车；三序交错×5 稳定性；1000 轮 claim-fire 并发。"
       },
       "independent_review": {
-        "status": "NOT_RUN",
-        "reviewer_id": null,
-        "round": null,
-        "evidence": [],
-        "verdict": null
+        "status": "PASS",
+        "reviewer_id": "REVIEWER-REPAIR-R03-G02-R1",
+        "round": 1,
+        "evidence": [
+          "docs/rust-tauri/R03/repair-current/G02-R1_REVIEW.md",
+          "artifacts/rust-tauri/R03/repair-current/G02-R1/"
+        ],
+        "verdict": "PASS"
       },
       "repair_commit": null
     },

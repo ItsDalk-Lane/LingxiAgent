@@ -90,6 +90,16 @@ pub enum CancelRunOutcome {
         status: RunStatus,
         detail: String,
     },
+    /// R03 repair G02/F03 — the run's driver had already IRREVOCABLY
+    /// claimed its terminal settlement when this request arrived (the
+    /// frozen linearization point of the cancel-vs-terminal race): the
+    /// single finalize transaction for the run's completed/failed
+    /// terminal is in flight. Nothing was cancelled and nothing stopped
+    /// on this request — reporting `Accepted` would promise a stop that
+    /// will not happen. The durable terminal (query the run row) is the
+    /// answer; once it is durable a later request reads
+    /// [`CancelRunOutcome::AlreadyTerminal`].
+    TooLate { run_id: String, detail: String },
 }
 
 #[derive(Debug, Clone, PartialEq, Deserialize)]
@@ -893,14 +903,42 @@ impl SessionStore {
                         .unwrap_or(CancelPhase::Active),
                 })
             }
-            crate::cancel::FireOutcome::NotLive => Ok(CancelRunOutcome::DanglingActive {
+            crate::cancel::FireOutcome::TooLate => Ok(CancelRunOutcome::TooLate {
                 run_id: run_id.to_string(),
-                status: record.status,
-                detail: "durable run row is active but no live driver exists in this \
-                             process (restart or abandoned drive); recovery classification \
-                             belongs to the R03-T07 startup scan"
+                detail: "the run's terminal settlement was already irrevocably claimed \
+                         (the single finalize transaction is in flight or just committed); \
+                         nothing was cancelled and nothing stopped on this request — query \
+                         the run row for the durable terminal"
                     .to_string(),
             }),
+            crate::cancel::FireOutcome::NotLive => {
+                // R03 repair G02/F03: the driver may have settled and
+                // deregistered between the row load above and the fire —
+                // reload before reporting the dangling state so a run
+                // that just completed is answered AlreadyTerminal, never
+                // misreported as an active-but-driverless row.
+                match port
+                    .load_run(&lingxi_protocol::RunId::new(run_id.to_string()))
+                    .await
+                {
+                    Ok(Some(fresh)) if fresh.status.is_terminal() => {
+                        Ok(CancelRunOutcome::AlreadyTerminal {
+                            run_id: run_id.to_string(),
+                            status: fresh.status,
+                        })
+                    }
+                    Ok(Some(fresh)) => Ok(CancelRunOutcome::DanglingActive {
+                        run_id: run_id.to_string(),
+                        status: fresh.status,
+                        detail: "durable run row is active but no live driver exists in this \
+                                 process (restart or abandoned drive); recovery classification \
+                                 belongs to the R03-T07 startup scan"
+                            .to_string(),
+                    }),
+                    Ok(None) => Err(SessionExecuteError::NotFound),
+                    Err(err) => Err(SessionExecuteError::Storage(err)),
+                }
+            }
         }
     }
 

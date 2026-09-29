@@ -1,0 +1,30 @@
+{
+  "schema_version": "1.0",
+  "round": "R03_ADVERSARIAL_REPAIR_2026_09_30",
+  "fix_base_sha": "cd3fb19e651f763afc6c75cb3163064fb54ca3fe",
+  "workorders": {
+    "G01": {
+      "status": "DONE",
+      "review": "REVIEWER-REPAIR-R03-G01-R1 PASS (10/10 C-ID)",
+      "commits": [
+        {
+          "sha": "385ff2940",
+          "kind": "round-bookkeeping",
+          "note": "REOPENED 标注 + 统一问题账 + G01 派单"
+        },
+        {
+          "sha": "520bb75b9",
+          "kind": "repair",
+          "note": "F01+F02 产品修复/测试/证据（14 files, 3674+/139-）"
+        }
+      ],
+      "remote_confirmed": "origin/codex/rust-tauri-migration=520bb75b9906120c78b0d10036577fd911a5a81c"
+    },
+    "G02": {
+      "status": "PASSED_PENDING_PUSH",
+      "review": "REVIEWER-REPAIR-R03-G02-R1 PASS (4/4 C-ID)",
+      "commits": [],
+      "remote_confirmed": null
+    }
+  }
+}
