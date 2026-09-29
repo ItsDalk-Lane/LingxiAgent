@@ -1,0 +1,75 @@
+R03-T06-E01 candidate summary (FINAL — binds the certified bytes)
+generated: 2026-09-29T08:46:13Z
+TASK_BASE_SHA: 6465395cf8e84121ea55b1481afc5711a4d707e8 (=HEAD at start; no commit/push)
+HEAD: 6465395cf8e84121ea55b1481afc5711a4d707e8
+branch: codex/rust-tauri-migration
+final certification: fmt --check clean; clippy -D warnings clean; cargo test --workspace --locked EXIT=0, 580 passed / 0 failed / 0 ignored
+
+== modified (18) ==
+rust/crates/lingxi-adapters/src/storage/migrations.rs
+rust/crates/lingxi-adapters/src/storage/run_store.rs
+rust/crates/lingxi-kernel/src/lib.rs
+rust/crates/lingxi-kernel/src/ports.rs
+rust/crates/lingxi-service/src/cancel.rs
+rust/crates/lingxi-service/src/lib.rs
+rust/crates/lingxi-service/src/main.rs
+rust/crates/lingxi-service/src/runs.rs
+rust/crates/lingxi-service/src/session_supervisor.rs
+rust/crates/lingxi-service/src/sessions.rs
+rust/crates/lingxi-service/src/shutdown.rs
+rust/crates/lingxi-service/src/task_supervisor.rs
+rust/crates/lingxi-service/tests/cancellation_tree.rs
+rust/crates/lingxi-service/tests/invocation_journal.rs
+rust/crates/lingxi-service/tests/late_result_fence.rs
+rust/crates/lingxi-service/tests/run_lifecycle.rs
+rust/crates/lingxi-service/tests/session_serialization.rs
+rust/crates/lingxi-service/tests/shutdown_coordinator.rs
+
+== added rust paths (7) ==
+?? rust/crates/lingxi-adapters/tests/run_lineage_store.rs
+?? rust/crates/lingxi-kernel/src/subagent.rs
+?? rust/crates/lingxi-service/src/background.rs
+?? rust/crates/lingxi-service/src/subagents.rs
+?? rust/crates/lingxi-service/tests/background_disconnect_recovery.rs
+?? rust/crates/lingxi-service/tests/subagent_lifecycle.rs
+?? rust/crates/lingxi-service/tests/subagent_permission_inheritance.rs
+
+== per-file sha256 ==
+765026def21e1067bdb5742e9931d134ea5e2f5b585ee976aa68ef28349e9642  rust/crates/lingxi-adapters/src/storage/migrations.rs
+afdfa8ecbf4d98b3e7413af463fbb12db97bfcae0085ac291d481e8808d9ee1e  rust/crates/lingxi-adapters/src/storage/run_store.rs
+95f4800701aa9e27189999cd5d146bdf129e71d60a50a6da5ec80dc00e4bf580  rust/crates/lingxi-kernel/src/lib.rs
+3923b40637b5e4e8f5bb322909f91ba487c77680856c15efa92e783347985c3c  rust/crates/lingxi-kernel/src/ports.rs
+1e81ac16732213ea479afd912c423cac7f10b0ff36962d2dd48d0d08f22ed3ea  rust/crates/lingxi-service/src/cancel.rs
+9b1a4f5b339959a6127b97db2584a0fefc6d292ae078543860f712a0ed9fb4c4  rust/crates/lingxi-service/src/lib.rs
+b1c3a9105f158721d28179ea5737996a6593ee30c0407629391b60c22f085897  rust/crates/lingxi-service/src/main.rs
+dc06a5250d8e99f944fe59794247480177b56c4aa35768a6606cc339196ec272  rust/crates/lingxi-service/src/runs.rs
+fcf0822ceef2000057b41d3a0a7d67581815db0aef2908629f146d0a44e8ef74  rust/crates/lingxi-service/src/session_supervisor.rs
+36ebf266c592e5a1e4953cf4bc9504162fe0118bfd12199ec9ba5fcd0e1bb3a6  rust/crates/lingxi-service/src/sessions.rs
+bf0b8b7039bf60a22ca0b118eac93b5531beb1dfb5d85e3ef48efa982bea3e07  rust/crates/lingxi-service/src/shutdown.rs
+fa8a1233e2efed3fe742ef2259918edb08545e66be4652b67613207fd6ae5593  rust/crates/lingxi-service/src/task_supervisor.rs
+8362f754d8624e30aedc9857a2a8dddef093c3dffef10bc4fd39830d794f93cd  rust/crates/lingxi-service/tests/cancellation_tree.rs
+ace8cbb966464b2dada19afaf1dea462e6ad56697dda31877f80b2fb2235d1cd  rust/crates/lingxi-service/tests/invocation_journal.rs
+6c12a04024fea1c5e891f0518b60d251d01f182f77c1036737402439385feee3  rust/crates/lingxi-service/tests/late_result_fence.rs
+fd1b4f01e2c688943732b8389ddffda0aa42000eb78905326886cc77c440abfa  rust/crates/lingxi-service/tests/run_lifecycle.rs
+156b45bbc222221f61f665b66fc9d5ed6153a856b29fb0b5dc68d60360310141  rust/crates/lingxi-service/tests/session_serialization.rs
+f308c5705b4ee7d6758b45eabbe60c3b6738f899444cd076a29f320d9390f203  rust/crates/lingxi-service/tests/shutdown_coordinator.rs
+966d7756a5c9f26c627f21b27c5c3234cf3f329b1c9bd6c8416acae83dbcb8d5  rust/crates/lingxi-adapters/tests/run_lineage_store.rs
+8f82956433cb35d0833c2e6c8279c2efeac958e504c9c5dc433036ae00f6d9e5  rust/crates/lingxi-kernel/src/subagent.rs
+0adf19f3d714b056c16256f44edde36b6e208bf87831b9484c34ec7a3ddda17c  rust/crates/lingxi-service/src/background.rs
+365c7b78b80b16f1f5c9d7a34b44cb5722b79ddc316308b2300430a35d929e76  rust/crates/lingxi-service/src/subagents.rs
+761f155b971aae4bb6b5b540c93825578771afce04915e554b8ebf6ff6261cc5  rust/crates/lingxi-service/tests/background_disconnect_recovery.rs
+2823c568d63e85d2d7a1d1c562c1af4b5f8c86bb03ba8e6102659313a7eb77a5  rust/crates/lingxi-service/tests/subagent_lifecycle.rs
+f199ca14d62af07aa72d041b1e2fc27e98562db5a0c76305eeca91bfc5bb6eb9  rust/crates/lingxi-service/tests/subagent_permission_inheritance.rs
+
+== Cargo.lock ==
+90111c4b5988531d7a891339b6ee5df8afc9d3ec655e4929747da07d5811bb49  rust/Cargo.lock
+(R02_HANDOFF dependency_locks: 90111c4b5988531d7a891339b6ee5df8afc9d3ec655e4929747da07d5811bb49 — unchanged, zero diff)
+
+== migration fingerprints (fingerprint_sql of the const text) ==
+V1 479b0321494269fca85d9f973b01a8f9d1aa57dc08fc3cf8fddbafeace461bb8 (=published, byte-identical)
+V2 64d7edfdab74e13e623a9d8d5f2381dad4803f545fa126d8eda8cc02c3dc889c (=T04 published)
+V3 3bd5388f090ab0ae0e137d91d59a8e48f82f409bbd0de657abf29b897a4252c1 (=T05 published)
+V4 371d415462b7e8d698693f50a7b9c9f493fbb4e653ee30e5d3e8930f77e161b5 (NEW — run_lineage)
+
+== tracked-diff sha256 ==
+27010f53cfb3dce882bf0145d46ac583ebe806a27fe100b7ad26e1ea11343d14  -

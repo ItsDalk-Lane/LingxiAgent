@@ -197,6 +197,34 @@ CREATE UNIQUE INDEX idx_invocation_journal_idem
     WHERE idempotency_key IS NOT NULL;
 "#;
 
+/// R03-T06 run lineage (version 4): the four-part identity that ties every
+/// run to what caused it — `parent_run_id` (the run whose delegation tool
+/// call dispatched this child; NULL for user submissions), `origin` (the
+/// entry-surface vocabulary: user / subagent / cron / heartbeat / bridge
+/// — the R07 Bridge/cron integrations reuse THIS table, no second
+/// scheduler), `source_message_id` (the message that sourced the run —
+/// for a child, the parent's model call that emitted the delegation
+/// request) and `cause_id` (the precise causal anchor — for a child, the
+/// parent's tool call id; for a user submission, the explicit requestId).
+///
+/// Lineage is IMMUTABLE once recorded (enforced by the writer: identical
+/// re-record = idempotent replay, different lineage = loud Conflict). The
+/// FK to `runs` is deliberate, same as the T05 journal: lineage rows are
+/// written by the live driver of a real run.
+pub const V4_NAME: &str = "run_lineage";
+pub const V4_SQL: &str = r#"
+CREATE TABLE run_lineage (
+    run_id               TEXT PRIMARY KEY REFERENCES runs(run_id),
+    parent_run_id        TEXT,
+    origin               TEXT NOT NULL,
+    source_message_id    TEXT,
+    cause_id             TEXT,
+    recorded_at_unix_ms  INTEGER NOT NULL
+);
+CREATE INDEX idx_run_lineage_parent ON run_lineage(parent_run_id)
+    WHERE parent_run_id IS NOT NULL;
+"#;
+
 /// The full ordered migration list. Appending a migration is a deliberate,
 /// reviewed act; editing an existing entry changes its fingerprint and is
 /// rejected on every already-migrated database.
@@ -215,6 +243,11 @@ pub const MIGRATIONS: &[Migration] = &[
         version: 3,
         name: V3_NAME,
         sql: V3_SQL,
+    },
+    Migration {
+        version: 4,
+        name: V4_NAME,
+        sql: V4_SQL,
     },
 ];
 

@@ -2234,6 +2234,154 @@ impl StoragePort for RunDatabase {
             })
             .await
     }
+
+    async fn record_run_lineage(
+        &self,
+        ctx: &RunContext,
+        lineage: lingxi_kernel::subagent::RunLineage,
+        now_unix_ms: u64,
+    ) -> Result<(), StorageError> {
+        let (run_id, session_id, owner_kind, owner_subject, _principal_id, _generation) =
+            ctx_facts(ctx);
+        let parent_run_id = lineage.parent_run_id.as_ref().map(|p| p.to_string());
+        let origin = lineage.origin.wire_name().to_string();
+        let source_message_id = lineage.source_message_id.clone();
+        let cause_id = lineage.cause_id.clone();
+        let busy = self.queue.options().busy_timeout_ms;
+        self.queue
+            .submit(move |conn| {
+                with_write_txn(conn, busy, |conn| {
+                    let run = load_run_row(conn, &run_id)?.ok_or_else(|| {
+                        StorageError::InvalidRequest {
+                            detail: format!("cannot record lineage: run {run_id} has no row"),
+                        }
+                    })?;
+                    if run.session_id != session_id
+                        || run.owner_kind != owner_kind
+                        || run.owner_subject != owner_subject
+                    {
+                        return Err(StorageError::Conflict {
+                            detail: format!(
+                                "run {run_id} belongs to session {}/{}/{}; the lineage context \
+                                 claims {session_id}/{owner_kind}/{owner_subject}",
+                                run.session_id, run.owner_kind, run.owner_subject
+                            ),
+                        });
+                    }
+                    if parse_status(&run.status)?.is_terminal() {
+                        return Err(StorageError::InvalidRequest {
+                            detail: format!(
+                                "cannot record lineage for run {run_id}: already terminal \
+                                 ({}); lineage is a creation fact, never a post-mortem \
+                                 annotation",
+                                run.status
+                            ),
+                        });
+                    }
+                    if let Some(existing) = load_lineage_row(conn, &run_id)? {
+                        // Lineage is IMMUTABLE: the identical four-part
+                        // identity is an idempotent replay; a different one
+                        // is a loud conflict (a run's parentage is never
+                        // rewritten).
+                        let identical = existing.parent_run_id == parent_run_id
+                            && existing.origin == origin
+                            && existing.source_message_id == source_message_id
+                            && existing.cause_id == cause_id;
+                        if identical {
+                            return Ok(());
+                        }
+                        return Err(StorageError::Conflict {
+                            detail: format!(
+                                "run {run_id} already holds lineage (parent {:?}, origin {}, \
+                                 source {:?}, cause {:?}); refusing to rewrite it to (parent \
+                                 {parent_run_id:?}, origin {origin}, source \
+                                 {source_message_id:?}, cause {cause_id:?})",
+                                existing.parent_run_id,
+                                existing.origin,
+                                existing.source_message_id,
+                                existing.cause_id
+                            ),
+                        });
+                    }
+                    conn.execute(
+                        "INSERT INTO run_lineage \
+                         (run_id, parent_run_id, origin, source_message_id, cause_id, \
+                          recorded_at_unix_ms) \
+                         VALUES (?1, ?2, ?3, ?4, ?5, ?6)",
+                        rusqlite::params![
+                            run_id,
+                            parent_run_id,
+                            origin,
+                            source_message_id,
+                            cause_id,
+                            now_unix_ms as i64
+                        ],
+                    )
+                    .map_err(migrations::map_rusqlite)?;
+                    Ok(())
+                })
+            })
+            .await
+    }
+
+    async fn load_run_lineage(
+        &self,
+        run_id: &RunId,
+    ) -> Result<Option<lingxi_kernel::subagent::RunLineage>, StorageError> {
+        let run_id = run_id.to_string();
+        self.queue
+            .submit(move |conn| {
+                let Some(row) = load_lineage_row(conn, &run_id)? else {
+                    return Ok(None);
+                };
+                let origin =
+                    lingxi_kernel::subagent::RunOrigin::parse(&row.origin).ok_or_else(|| {
+                        StorageError::Corrupted {
+                            detail: format!(
+                                "run {run_id} lineage origin {:?} is not in the known vocabulary",
+                                row.origin
+                            ),
+                        }
+                    })?;
+                Ok(Some(lingxi_kernel::subagent::RunLineage {
+                    parent_run_id: row.parent_run_id.map(lingxi_protocol::RunId::new),
+                    origin,
+                    source_message_id: row.source_message_id,
+                    cause_id: row.cause_id,
+                }))
+            })
+            .await
+    }
+}
+
+/// One `run_lineage` row (R03-T06).
+struct LineageRow {
+    parent_run_id: Option<String>,
+    origin: String,
+    source_message_id: Option<String>,
+    cause_id: Option<String>,
+}
+
+fn load_lineage_row(
+    conn: &rusqlite::Connection,
+    run_id: &str,
+) -> Result<Option<LineageRow>, StorageError> {
+    let mut stmt = conn
+        .prepare(
+            "SELECT parent_run_id, origin, source_message_id, cause_id FROM run_lineage \
+             WHERE run_id = ?1",
+        )
+        .map_err(migrations::map_rusqlite)?;
+    let mut rows = stmt.query([run_id]).map_err(migrations::map_rusqlite)?;
+    match rows.next().map_err(migrations::map_rusqlite)? {
+        Some(row) => Ok(Some(LineageRow {
+            parent_run_id: row.get(0).map_err(migrations::map_rusqlite)?,
+            origin: row.get(1).map_err(migrations::map_rusqlite)?,
+            source_message_id: row.get(2).map_err(migrations::map_rusqlite)?,
+            cause_id: row.get(3).map_err(migrations::map_rusqlite)?,
+        })),
+        None => Ok(None),
+    }
 }
 
 // ── EventStorePort (R02-T05 read half) ──────────────────────────────────────

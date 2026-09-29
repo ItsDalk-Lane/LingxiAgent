@@ -203,6 +203,7 @@ fn read_tool_request() -> ToolRequest {
         target: "read".to_string(),
         args_digest: lingxi_protocol::digest_arguments(&serde_json::json!({"path": "/tmp/x"})),
         args_summary: Some("read /tmp/x".to_string()),
+        delegation: None,
     }
 }
 

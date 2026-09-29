@@ -316,9 +316,10 @@ fn tool_request(target: &str) -> ToolRequest {
     ToolRequest {
         target: target.to_string(),
         args_digest: lingxi_protocol::digest_arguments(&serde_json::json!({
-            "target": target, "payload": "fixed"
+            "target": target, "payload": "fixed",
         })),
         args_summary: Some(format!("{target} fixed payload")),
+        delegation: None,
     }
 }
 
@@ -799,6 +800,7 @@ async fn r03_a10_idempotent_key_resume_does_not_duplicate_the_external_operation
             hex: entry.args_digest.clone(),
         },
         args_summary: entry.args_summary.clone(),
+        delegation: None,
     };
     let resumed = tools.execute(&recovered_ctx, &call, &request).await;
     assert!(resumed.fence.matches_ctx(&recovered_ctx));

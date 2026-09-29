@@ -413,6 +413,39 @@ pub trait StoragePort: Send + Sync {
         &self,
         run_id: &RunId,
     ) -> impl std::future::Future<Output = Result<Vec<InvocationJournalEntry>, StorageError>> + Send;
+
+    // ── R03-T06: run lineage (parentRunId / origin / sourceMessageId /
+    //    causeId) ─────────────────────────────────────────────────────────
+    //
+    // The four-part identity that ties every run to what caused it. Child
+    // runs (origin=subagent) fill all four anchors; user submissions carry
+    // their submission anchors. Bridge/cron entries reuse THIS surface in
+    // R07 — there is no second scheduler.
+
+    /// Durably records the LINEAGE of one run. Contract:
+    /// - the run must exist, belong to the same owner facts as `ctx`, and
+    ///   be NON-TERMINAL (lineage is a creation fact, not a post-mortem
+    ///   annotation);
+    /// - one transaction;
+    /// - lineage is IMMUTABLE once recorded: re-recording the IDENTICAL
+    ///   lineage is an idempotent replay; a DIFFERENT lineage for the same
+    ///   run is a loud [`StorageError::Conflict`] (a run's parentage is
+    ///   never rewritten).
+    fn record_run_lineage(
+        &self,
+        ctx: &RunContext,
+        lineage: crate::subagent::RunLineage,
+        now_unix_ms: u64,
+    ) -> impl std::future::Future<Output = Result<(), StorageError>> + Send;
+
+    /// Loads one run's recorded lineage (None when the run is unknown).
+    /// An origin value this build cannot parse surfaces as
+    /// [`StorageError::Corrupted`] — never a guess.
+    fn load_run_lineage(
+        &self,
+        run_id: &RunId,
+    ) -> impl std::future::Future<Output = Result<Option<crate::subagent::RunLineage>, StorageError>>
+           + Send;
 }
 
 /// Read/maintenance surface over the durable key-event log (R02-T05).
@@ -795,6 +828,42 @@ pub struct ToolRequest {
     /// Digest of the normalized arguments (the value approvals bind to).
     pub args_digest: lingxi_protocol::ArgsDigest,
     pub args_summary: Option<String>,
+    /// The structured delegation payload when (and only when) the target
+    /// is a `subagent`-family tool — `subagent` (fresh dispatch),
+    /// `subagent_reply` (continuation) or `subagent_close` (R03-T06).
+    /// Carries WHAT the model asked for (task text, explicit access,
+    /// label, agent, model, thread id) — never an authorization: the
+    /// child's grant is resolved by the run layer against the parent's
+    /// facts ([`crate::subagent`]), so neither this payload nor a later
+    /// model/executor swap can widen permissions.
+    pub delegation: Option<DelegationRequest>,
+}
+
+/// The delegation request of a `subagent`-family tool call (R03-T06).
+/// The incumbent's tool parameters (`task` / `access` / `label` / `agent`
+/// / `model`, plus `threadId` for reply/close), as a kernel type so the
+/// driver never parses provider JSON.
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct DelegationRequest {
+    /// Complete instructions and required context for the child. The
+    /// child CANNOT see the parent conversation history unless it is in
+    /// here (the incumbent's visibility rule). For a `subagent_close`
+    /// call this carries the optional closing reason instead.
+    pub task: String,
+    /// Explicit access tier request (`read` / `write`); `None` = inherit
+    /// the parent session's current mode (for a reply: the explicit tier,
+    /// else the thread's recorded tier, else inherit — resolved by the
+    /// run layer).
+    pub access: Option<crate::subagent::AccessRequest>,
+    /// Display-only label.
+    pub label: Option<String>,
+    /// Target agent id (`None` = the parent's agent).
+    pub agent_id: Option<String>,
+    /// Optional model override — changing it NEVER changes the grant.
+    pub model: Option<String>,
+    /// The thread to continue (`subagent_reply`) or close
+    /// (`subagent_close`); `None` for a fresh `subagent` dispatch.
+    pub thread_id: Option<String>,
 }
 
 /// Provider access for the run driver (R03-T01; the R05 handoff surface).
@@ -1097,6 +1166,23 @@ mod tests {
             _run_id: &RunId,
         ) -> Result<Vec<InvocationJournalEntry>, StorageError> {
             Ok(Vec::new())
+        }
+
+        async fn record_run_lineage(
+            &self,
+            _ctx: &RunContext,
+            _lineage: crate::subagent::RunLineage,
+            _now_unix_ms: u64,
+        ) -> Result<(), StorageError> {
+            // Lineage durability is covered against the real adapter.
+            Ok(())
+        }
+
+        async fn load_run_lineage(
+            &self,
+            _run_id: &RunId,
+        ) -> Result<Option<crate::subagent::RunLineage>, StorageError> {
+            Ok(None)
         }
     }
 

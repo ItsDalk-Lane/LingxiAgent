@@ -50,6 +50,9 @@ use lingxi_kernel::ports::{
     LateResultReason, ReceiptOutcome, ResultFence, StaleResultFact, StorageError, StoragePort,
     ToolExecutionResult, ToolExecutorPort, ToolOutcome, ToolRequest, TurnProviderPort,
 };
+use lingxi_kernel::subagent::{
+    authorize_child_tool, RunLineage, ToolAccessTier, ToolAuthorization,
+};
 use lingxi_kernel::{
     attempt_id, model_call_id, tool_call_id, FailureCause, NoFinalCause, QuotaResource, RunFinish,
     RunStateMachine,
@@ -120,6 +123,44 @@ impl Default for RunDriveLimits {
         Self {
             max_model_turns: Self::DEFAULT_MAX_MODEL_TURNS,
             max_attempts: Self::DEFAULT_MAX_ATTEMPTS,
+        }
+    }
+}
+
+/// The R03-T06 drive authorization: WHAT this run's tool calls may do,
+/// plus the run's four-part lineage identity. Set at submission/dispatch
+/// time by the REAL surfaces (the session execute path for user runs, the
+/// subagent runtime for child runs) and bound to the run for its whole
+/// lifetime — neither a model swap nor an executor swap can widen it.
+#[derive(Debug, Clone, PartialEq)]
+pub struct DriveAuthorization {
+    /// parentRunId / origin / sourceMessageId / causeId — durably recorded
+    /// right after the run row is created.
+    pub lineage: RunLineage,
+    pub grant: RunGrant,
+}
+
+/// The grant shape of one driven run.
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum RunGrant {
+    /// A user-submitted run: the run-layer authorization context itself
+    /// authorizes every target (quota-admitted, authenticated — the T05
+    /// semantics; R04's policy gateway replaces this decision point).
+    Full,
+    /// A subagent child run: EVERY tool target is authorized against the
+    /// ATTENUATED tier (parent grant ∩ subagent tool scope — the real
+    /// authorization boundary of R03-A11). The tier is fixed at dispatch;
+    /// the blocklist applies regardless of tier.
+    Subagent { tier: ToolAccessTier },
+}
+
+impl DriveAuthorization {
+    /// The authorization of a plain user submission (origin=user; the
+    /// cause anchor is the explicit requestId when present).
+    pub fn user_submission(request_id: Option<&str>) -> Self {
+        Self {
+            lineage: RunLineage::user_submission(request_id),
+            grant: RunGrant::Full,
         }
     }
 }
@@ -212,6 +253,12 @@ pub struct RunSupervisor {
     tasks: Arc<TaskSupervisor>,
     cancel_policy: CancelPolicy,
     approval: Option<Arc<dyn ApprovalGate>>,
+    /// R03-T06: the subagent launcher (child-run dispatch/reply/close),
+    /// held as a weak TRAIT OBJECT — see `subagents::SubagentLauncher`
+    /// for why the indirection exists. `None` (the no-provider test
+    /// wiring) makes a delegation request a loud tool failure, never a
+    /// silent no-op.
+    subagents: Option<std::sync::Weak<dyn crate::subagents::SubagentLauncher>>,
 }
 
 impl std::fmt::Debug for RunSupervisor {
@@ -223,6 +270,10 @@ impl std::fmt::Debug for RunSupervisor {
             .field("quotas", &self.quotas)
             .field("cancel_policy", &self.cancel_policy)
             .field("approval_gate", &self.approval.as_ref().map(|_| "injected"))
+            .field(
+                "subagent_launcher",
+                &self.subagents.as_ref().map(|_| "bound"),
+            )
             .finish()
     }
 }
@@ -244,6 +295,7 @@ impl RunSupervisor {
             tasks: Arc::new(TaskSupervisor::new(cancel_policy.supervised_task_cap)),
             cancel_policy,
             approval: None,
+            subagents: None,
         }
     }
 
@@ -257,6 +309,7 @@ impl RunSupervisor {
         quotas: QuotaManager,
         cancel_policy: CancelPolicy,
         approval: Option<Arc<dyn ApprovalGate>>,
+        subagent_launcher: Option<std::sync::Weak<dyn crate::subagents::SubagentLauncher>>,
     ) -> Result<Self, StorageError> {
         limits.validate()?;
         quotas.limits().validate()?;
@@ -270,6 +323,7 @@ impl RunSupervisor {
             tasks: Arc::new(TaskSupervisor::new(cancel_policy.supervised_task_cap)),
             cancel_policy,
             approval,
+            subagents: subagent_launcher,
         })
     }
 
@@ -307,6 +361,11 @@ impl RunSupervisor {
     /// production default until R04: none).
     pub fn approval_gate_configured(&self) -> bool {
         self.approval.is_some()
+    }
+
+    /// Whether the subagent launcher is wired (R03-T06 observability).
+    pub fn subagent_launcher_configured(&self) -> bool {
+        self.subagents.is_some()
     }
 
     /// The user-facing cancellation entry (R03-T03): fires the run's
@@ -439,6 +498,14 @@ impl RunSupervisor {
     /// lookup and ownership check; `run_id` was allocated by the storage
     /// backend's atomic allocator (fixed at task creation).
     ///
+    /// R03-T06 wiring: `quota_session_lane` separates the CONCURRENCY
+    /// lane from the durable session binding — user submissions pass the
+    /// session id itself (identical semantics); a subagent child run
+    /// passes its own isolated lane (the incumbent isolates subagents in
+    /// their own sessions, so a parked parent holding the session's model
+    /// lane can never starve its child, and vice versa). The durable
+    /// facts still bind to `session_id`.
+    ///
     /// R03-T02 wiring: `agent_id` scopes the per-agent quota lanes,
     /// `steering` is the session's steering channel (drained BEFORE each
     /// provider turn — steered text reaches the NEXT model call and never
@@ -482,11 +549,21 @@ impl RunSupervisor {
         generation: u64,
         now_ms: u64,
         steering: Option<&SteeringInbox>,
+        parent_scope: Option<&CancelScope>,
+        authorization: DriveAuthorization,
+        quota_session_lane: &str,
     ) -> Result<RunFinish, DriveError> {
         let run_id = RunId::new(run_id.to_string());
         // R03-T03: register the run's root scope + phase; the guard covers
         // EVERY exit path below (finalize disarm, error, drop).
-        let entry = self.cancel.register(run_id.as_str());
+        // R03-T06: a subagent child run registers its root UNDER the
+        // parent's scope — cancelling the parent propagates into this
+        // run's own tree (abortByParentSession semantics), never the
+        // reverse.
+        let entry = match parent_scope {
+            None => self.cancel.register(run_id.as_str()),
+            Some(parent) => self.cancel.register_linked(run_id.as_str(), parent),
+        };
         let mut guard = RegistrationGuard {
             registry: &self.cancel,
             run_id: run_id.clone(),
@@ -517,6 +594,13 @@ impl RunSupervisor {
             .await
             .map_err(DriveError::Storage)?;
         events.publish_committed(&started.events);
+        // R03-T06: the four-part lineage (parentRunId/origin/
+        // sourceMessageId/causeId) is durably recorded right after the run
+        // row exists — the parent-child relationship survives every later
+        // state of the run, including refusals and crashes.
+        port.record_run_lineage(&ctx, authorization.lineage.clone(), now_ms)
+            .await
+            .map_err(DriveError::Storage)?;
 
         // 2) Model turns. No provider configured: explicit no-content
         //    completion (never a fake reply).
@@ -572,7 +656,13 @@ impl RunSupervisor {
             // a LOUD run failure — never an unbounded wait, never a fake
             // success. R03-T03: the QUEUED wait itself exits on cancel.
             let model_permit = match self
-                .acquire_or_break(&QuotaResource::Model, agent_id, session_id, &run_id, &root)
+                .acquire_or_break(
+                    &QuotaResource::Model,
+                    agent_id,
+                    quota_session_lane,
+                    &run_id,
+                    &root,
+                )
                 .await
             {
                 Ok(Some(permit)) => permit,
@@ -767,7 +857,7 @@ impl RunSupervisor {
                             .acquire_or_break(
                                 &QuotaResource::Tool,
                                 agent_id,
-                                session_id,
+                                quota_session_lane,
                                 &run_id,
                                 &root,
                             )
@@ -823,6 +913,78 @@ impl RunSupervisor {
                             port, events, &ctx, &call_id, request, None, now_ms,
                         )
                         .await?;
+                        // ── R03-T06: the run-layer authorization boundary ──
+                        // For a user run (Full grant) the T05 semantics
+                        // stand unchanged: the run-layer context itself
+                        // authorizes. For a subagent child run EVERY
+                        // target is authorized against the attenuated
+                        // grant — the refusal below is produced by THIS
+                        // real boundary (not by any executor double), so
+                        // the executor is never invoked (zero dispatch),
+                        // the journal closes the invocation as a
+                        // never-dispatched failure carrying the reason,
+                        // and the model sees the structured refusal.
+                        let authorization_decision = match authorization.grant {
+                            RunGrant::Full => ToolAuthorization::Allowed,
+                            RunGrant::Subagent { tier } => {
+                                authorize_child_tool(tier, &request.target)
+                            }
+                        };
+                        if let ToolAuthorization::Denied {
+                            code,
+                            layer,
+                            message,
+                        } = authorization_decision
+                        {
+                            tracing::warn!(
+                                run_id = %run_id,
+                                tool_call = %call_id,
+                                target = %request.target,
+                                code = code,
+                                layer = layer,
+                                grant = ?authorization.grant,
+                                "tool target refused by the run-layer authorization boundary: \
+                                 never dispatched (parent-child relationship and reason are \
+                                 preserved in the lineage row and the receipt)"
+                            );
+                            saw_tool_failure = true;
+                            saw_process_content = true;
+                            let outcome = ToolOutcome::Failed {
+                                error: ProtocolError::new(
+                                    ErrorCode::Forbidden,
+                                    format!("{code} [{layer}]: {message}"),
+                                    false,
+                                ),
+                            };
+                            port.record_invocation_receipt(
+                                &ctx,
+                                &call_id,
+                                InvocationReceipt {
+                                    outcome: ReceiptOutcome::Failed,
+                                    detail: format!(
+                                        "not dispatched: authorization denied ({code} \
+                                         [{layer}]): {message}"
+                                    ),
+                                    dedup_id: None,
+                                    dispatched: false,
+                                },
+                                now_ms,
+                            )
+                            .await
+                            .map_err(DriveError::Storage)?;
+                            self.persist_tool_event(
+                                port,
+                                events,
+                                &ctx,
+                                &call_id,
+                                request,
+                                Some(&outcome),
+                                now_ms,
+                            )
+                            .await?;
+                            drop(tool_permit);
+                            continue;
+                        }
                         // No approval gate configured: the R03 run-layer
                         // authorization context itself authorizes the call
                         // (quota-admitted, authenticated run). R04's policy
@@ -978,6 +1140,127 @@ impl RunSupervisor {
                                     continue;
                                 }
                             }
+                        }
+                        // ── R03-T06: subagent-family delegation targets ──
+                        // A delegation dispatches a CHILD RUN through the
+                        // SAME supervisor (linked to this run's
+                        // cancellation tree; fire-and-forget for the
+                        // parent) instead of an external tool execution.
+                        // The parent's tool call returns the child
+                        // identity immediately; the child's result is
+                        // delivered back through the session's steering
+                        // channel (the incumbent's deferred-result
+                        // "trigger_parent_turn" delivery, at the R03
+                        // fidelity).
+                        if let Some(delegation) = request.delegation.clone() {
+                            // The dispatch IS the side effect: `started`
+                            // is durable before it (same write-order
+                            // contract as any external execution).
+                            port.advance_invocation(
+                                &ctx,
+                                &call_id,
+                                InvocationPhase::Started,
+                                now_ms,
+                            )
+                            .await
+                            .map_err(DriveError::Storage)?;
+                            let parent = crate::subagents::ParentRunFacts {
+                                principal: ctx.principal.clone(),
+                                session_id: ctx.session_id.to_string(),
+                                agent_id: agent_id.to_string(),
+                                parent_run_id: run_id.clone(),
+                                parent_scope: root.clone(),
+                                source_model_call: call.clone(),
+                                cause_tool_call: call_id.clone(),
+                                now_ms,
+                            };
+                            let launcher =
+                                self.subagents.as_ref().and_then(std::sync::Weak::upgrade);
+                            // `subagent_close` creates no run: its success
+                            // carries the closed thread id as the content
+                            // digest, its refusals take the shared failure
+                            // shape below.
+                            let launched: Result<
+                                Option<String>,
+                                crate::subagents::SubagentDispatchError,
+                            > = if request.target == "subagent_close" {
+                                match launcher
+                                    .as_ref()
+                                    .map(|launcher| launcher.close(&parent, &delegation))
+                                {
+                                    Some(Ok(closed)) => Ok(Some(closed.thread_id)),
+                                    Some(Err(err)) => Err(err),
+                                    None => Err(crate::subagents::SubagentDispatchError::NotBound),
+                                }
+                            } else {
+                                let Some(launcher) = launcher else {
+                                    return Err(DriveError::Internal(
+                                        "subagent launcher not bound in this supervisor"
+                                            .to_string(),
+                                    ));
+                                };
+                                match request.target.as_str() {
+                                    "subagent" => launcher
+                                        .dispatch(parent, delegation)
+                                        .await
+                                        .map(|child| Some(child.child_run_id)),
+                                    "subagent_reply" => launcher
+                                        .reply(parent, delegation)
+                                        .await
+                                        .map(|child| Some(child.child_run_id)),
+                                    // A delegation payload on a
+                                    // non-subagent-family target is a
+                                    // protocol violation of the
+                                    // double/adapter: loud, never executed.
+                                    other => {
+                                        Err(crate::subagents::SubagentDispatchError::InvalidTarget(
+                                            other.to_string(),
+                                        ))
+                                    }
+                                }
+                            };
+                            let outcome = match launched {
+                                Ok(Some(content_digest)) => ToolOutcome::Success { content_digest },
+                                Ok(None) => unreachable!("every delegation success carries an id"),
+                                Err(err) => {
+                                    tracing::warn!(
+                                        run_id = %run_id,
+                                        tool_call = %call_id,
+                                        target = %request.target,
+                                        error = %err,
+                                        "subagent delegation refused; recorded as a tool \
+                                         failure (zero child runs created on refusal paths)"
+                                    );
+                                    ToolOutcome::Failed {
+                                        error: err.tool_error(),
+                                    }
+                                }
+                            };
+                            let failed = matches!(outcome, ToolOutcome::Failed { .. });
+                            port.record_invocation_receipt(
+                                &ctx,
+                                &call_id,
+                                journal_receipt_of(&outcome),
+                                now_ms,
+                            )
+                            .await
+                            .map_err(DriveError::Storage)?;
+                            self.persist_tool_event(
+                                port,
+                                events,
+                                &ctx,
+                                &call_id,
+                                request,
+                                Some(&outcome),
+                                now_ms,
+                            )
+                            .await?;
+                            if failed {
+                                saw_tool_failure = true;
+                            }
+                            saw_process_content = true;
+                            drop(tool_permit);
+                            continue;
                         }
                         // R03-T05: `started` is durable BEFORE the external
                         // execution is dispatched. This write is what makes

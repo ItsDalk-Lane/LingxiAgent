@@ -23,6 +23,7 @@
 
 pub mod approval;
 pub mod auth;
+pub mod background;
 pub mod cancel;
 pub mod config;
 pub mod dedup;
@@ -44,6 +45,7 @@ pub mod session_supervisor;
 pub mod sessions;
 pub mod shutdown;
 mod static_web;
+pub mod subagents;
 pub mod task_supervisor;
 pub mod transport;
 pub mod ws;
@@ -369,6 +371,12 @@ pub struct ServiceState {
     /// Run lifecycle supervisor (R03-T01): drives every execute through
     /// the real queued→running→…→single-finalize chain.
     runs: Arc<runs::RunSupervisor>,
+    /// Subagent runtime (R03-T06): child-run dispatch/reply/close through
+    /// the same run supervisor.
+    subagents: Arc<subagents::SubagentRuntime>,
+    /// Background-drive registry (R03-T06): submissions whose runs outlive
+    /// the client connection + the minimal service-exit hook.
+    background: Arc<background::BackgroundDriveRegistry>,
 }
 
 impl std::fmt::Debug for ServiceState {
@@ -468,9 +476,13 @@ pub struct ServiceDeps {
     /// Minimal approval-wait gate (R03-T03): `None` (the production
     /// default until R04 ships the full tool-policy gateway) means no
     /// run ever parks in `waiting_approval`. Tests inject a deterministic
-    /// double to drive the REAL waiting_approval legs; the double only
+    /// double to decide the REAL waiting_approval legs; the double only
     /// decides approvals and never owns run state.
     pub approval_gate: Option<std::sync::Arc<dyn approval::ApprovalGate>>,
+    /// Subagent policy (R03-T06): attenuation/concurrency/timeout knobs
+    /// with the incumbent defaults (intercept strategy, proactive
+    /// delegation experiment OFF, 10/20 caps, 30-minute child timeout).
+    pub subagent_policy: lingxi_kernel::subagent::SubagentPolicy,
 }
 
 impl Default for ServiceDeps {
@@ -494,6 +506,7 @@ impl Default for ServiceDeps {
             session_concurrency: session_supervisor::SessionConcurrencyLimits::default(),
             cancel_policy: cancel::CancelPolicy::default(),
             approval_gate: None,
+            subagent_policy: lingxi_kernel::subagent::SubagentPolicy::default(),
         }
     }
 }
@@ -528,6 +541,7 @@ impl std::fmt::Debug for ServiceDeps {
                 "approval_gate",
                 &self.approval_gate.as_ref().map(|_| "injected"),
             )
+            .field("subagent_policy", &self.subagent_policy)
             .finish()
     }
 }
@@ -614,6 +628,11 @@ fn validate_resource_deps(deps: &ServiceDeps) -> Result<(), ServiceStartupError>
     // R03-T03: the cancellation cleanup policy (bounded budget +
     // supervised-task registry cap) validates the same way.
     deps.cancel_policy
+        .validate()
+        .map_err(ServiceStartupError::Storage)?;
+    // R03-T06: the subagent policy (attenuation surface defaults +
+    // concurrency caps + child timeout) validates the same way.
+    deps.subagent_policy
         .validate()
         .map_err(ServiceStartupError::Storage)?;
     Ok(())
@@ -783,6 +802,7 @@ impl ServiceState {
             deps.event_limits.clone(),
         )
         .map_err(ServiceStartupError::Storage)?;
+        let events = Arc::new(events);
         // R3-F02: the 2x connection-cap derivation is a CHECKED
         // multiplication. The CLI parse bound (1..=usize::MAX/2) and
         // validate_resource_deps above make the overflow branch unreachable
@@ -806,6 +826,16 @@ impl ServiceState {
         // manager (global/agent/session model & tool lanes).
         // R03-T03: plus the cancellation runtime (registry + task
         // supervisor + cleanup policy) and the minimal approval gate.
+        // R03-T06: plus the subagent runtime (child-run dispatch/reply/
+        // close through the SAME supervisor; the supervisor back-reference
+        // is bound right after construction — a Weak, so child tasks never
+        // form a reference cycle keeping a supervisor alive).
+        let subagent_runtime = subagents::SubagentRuntime::new(
+            Arc::clone(&storage),
+            Arc::clone(&events),
+            Arc::clone(session_arc.session_supervisor()),
+            deps.subagent_policy.clone(),
+        );
         let runs = runs::RunSupervisor::new(
             deps.turn_provider.clone(),
             deps.tool_executor.clone(),
@@ -813,8 +843,16 @@ impl ServiceState {
             quotas::QuotaManager::new(deps.quota_limits),
             deps.cancel_policy,
             deps.approval_gate.clone(),
+            Some(std::sync::Arc::downgrade(
+                &(Arc::clone(&subagent_runtime) as Arc<dyn subagents::SubagentLauncher>),
+            )),
         )
         .map_err(ServiceStartupError::Storage)?;
+        let runs = Arc::new(runs);
+        subagent_runtime.bind_supervisor(Arc::downgrade(&runs));
+        // R03-T06: the background-drive registry (submission surface whose
+        // runs outlive the client connection + the minimal exit hook).
+        let background = background::BackgroundDriveRegistry::new();
         Ok(Self {
             config: Arc::new(config),
             auth: Arc::new(auth),
@@ -827,7 +865,7 @@ impl ServiceState {
             )),
             storage,
             sessions: session_arc,
-            events: Arc::new(events),
+            events: Arc::clone(&events),
             rate: Arc::new(limits::RateLimiter::new(deps.rate_window_ms, deps.rate_max)),
             ws_conns: Arc::new(limits::WsConnectionCounter::new(deps.ws_max_connections)),
             admission: Arc::new(limits::HttpAdmission::new(
@@ -848,7 +886,9 @@ impl ServiceState {
             ws_shutdown: Arc::new(shutdown::WsShutdown::new()),
             clock: deps.clock,
             request_ids: deps.request_ids,
-            runs: Arc::new(runs),
+            runs,
+            subagents: subagent_runtime,
+            background,
         })
     }
 
@@ -910,6 +950,17 @@ impl ServiceState {
     /// queued→running→…→finalize chain behind every execute.
     pub fn runs(&self) -> &Arc<runs::RunSupervisor> {
         &self.runs
+    }
+
+    /// The subagent runtime (R03-T06).
+    pub fn subagents(&self) -> &Arc<subagents::SubagentRuntime> {
+        &self.subagents
+    }
+
+    /// The background-drive registry (R03-T06): live background drives +
+    /// the minimal exit hook.
+    pub fn background(&self) -> &Arc<background::BackgroundDriveRegistry> {
+        &self.background
     }
 
     pub fn ws_connection_count(&self) -> usize {
@@ -2216,6 +2267,19 @@ async fn execute_session(
         }
         Err(sessions::SessionExecuteError::InvalidRequestId { detail }) => {
             EndpointError::invalid_message(format!("requestId invalid: {detail}")).into_response()
+        }
+        Err(sessions::SessionExecuteError::BackgroundRegistryFull { .. }) => {
+            // Not reachable from the execute route (background submission
+            // is a service-layer surface in R03); mapped anyway so the
+            // surface stays closed and loud if a future route wires it.
+            EndpointError::new(
+                StatusCode::SERVICE_UNAVAILABLE,
+                ErrorCode::BudgetExceeded,
+                "background-drive registry is full",
+            )
+            .with_reason("background_registry_full")
+            .with_cause("session.background_registry_full")
+            .into_response()
         }
         Err(sessions::SessionExecuteError::SteeringInboxFull) => {
             // Not reachable from the execute route (steering is a separate

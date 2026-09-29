@@ -117,6 +117,16 @@ pub enum SteerError {
     InboxFull,
 }
 
+impl std::fmt::Display for SteerError {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        match self {
+            SteerError::InboxFull => {
+                write!(f, "the session's steering inbox is full (bounded)")
+            }
+        }
+    }
+}
+
 /// Outcome of a steering submission.
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum SteerOutcome {
@@ -172,9 +182,40 @@ impl SteeringInbox {
 
 struct SteerOverflow;
 
+/// The parent session's current permission mode (R03-T06): the fact the
+/// subagent attenuation inherits from — the incumbent engine's
+/// `getSessionPermissionMode(sessionPath)` (operate/ask/read_only), held
+/// per session in the run layer. Persisting the mode as session state is
+/// R06; the service surface sets it through an ownership-checked API.
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub struct SessionPermissionState {
+    mode: lingxi_kernel::subagent::SessionPermissionMode,
+}
+
+impl Default for SessionPermissionState {
+    fn default() -> Self {
+        // The incumbent's null-parent default: OPERATE.
+        Self {
+            mode: lingxi_kernel::subagent::SessionPermissionMode::Operate,
+        }
+    }
+}
+
+impl SessionPermissionState {
+    pub fn mode(&self) -> lingxi_kernel::subagent::SessionPermissionMode {
+        self.mode
+    }
+
+    /// Whether this slot still carries the default (evictable) mode.
+    fn is_default(&self) -> bool {
+        self.mode == lingxi_kernel::subagent::SessionPermissionMode::Operate
+    }
+}
+
 struct SessionSlot {
     busy: bool,
     inbox: Arc<SteeringInbox>,
+    permission: SessionPermissionState,
 }
 
 /// The session supervisor: the registry of per-session owners. The internal
@@ -232,8 +273,9 @@ impl Drop for SessionLease {
         if let Some(slot) = slots.get_mut(&self.session_id) {
             slot.busy = false;
             // A slot stays TRACKED while it still holds steering for the
-            // session's next run; otherwise it may be evicted at the cap.
-            if slot.inbox.len() == 0 {
+            // session's next run or a non-default permission mode;
+            // otherwise it may be evicted at the cap.
+            if slot.inbox.len() == 0 && slot.permission.is_default() {
                 slots.remove(&self.session_id);
             }
         }
@@ -276,8 +318,10 @@ impl SessionSupervisor {
             });
         }
         if slots.len() >= self.limits.registry_cap {
-            // Evict idle, steering-free slots before refusing.
-            slots.retain(|_, slot| slot.busy || slot.inbox.len() > 0);
+            // Evict idle, steering-free, default-mode slots before refusing.
+            slots.retain(|_, slot| {
+                slot.busy || slot.inbox.len() > 0 || !slot.permission.is_default()
+            });
             if slots.len() >= self.limits.registry_cap {
                 return Err(BusyGateError::RegistryFull);
             }
@@ -288,6 +332,7 @@ impl SessionSupervisor {
             SessionSlot {
                 busy: true,
                 inbox: Arc::clone(&inbox),
+                permission: SessionPermissionState::default(),
             },
         );
         Ok(SessionLease {
@@ -321,6 +366,100 @@ impl SessionSupervisor {
             Ok(()) => Ok(SteerOutcome::Accepted),
             Err(SteerOverflow) => Err(SteerError::InboxFull),
         }
+    }
+
+    /// Sets the session's current permission mode (R03-T06): the fact the
+    /// subagent attenuation inherits from. Ownership is checked by the
+    /// caller (the session surface); persisting the mode as durable
+    /// session state is R06 — this registry keeps it for the process
+    /// lifetime, bounded by the session registry cap.
+    pub fn set_permission_mode(
+        self: &Arc<Self>,
+        session_id: &str,
+        mode: lingxi_kernel::subagent::SessionPermissionMode,
+    ) -> Result<(), BusyGateError> {
+        let mut slots = self
+            .slots
+            .lock()
+            .unwrap_or_else(|poisoned| poisoned.into_inner());
+        if let Some(slot) = slots.get_mut(session_id) {
+            slot.permission = SessionPermissionState { mode };
+            return Ok(());
+        }
+        if slots.len() >= self.limits.registry_cap {
+            slots.retain(|_, slot| {
+                slot.busy || slot.inbox.len() > 0 || !slot.permission.is_default()
+            });
+            if slots.len() >= self.limits.registry_cap {
+                return Err(BusyGateError::RegistryFull);
+            }
+        }
+        slots.insert(
+            session_id.to_string(),
+            SessionSlot {
+                busy: false,
+                inbox: Arc::new(SteeringInbox::default()),
+                permission: SessionPermissionState { mode },
+            },
+        );
+        Ok(())
+    }
+
+    /// Reads the session's current permission mode (the incumbent's
+    /// `getSessionPermissionMode`; a session without a recorded mode is
+    /// OPERATE — the null-parent default).
+    pub fn permission_mode(
+        &self,
+        session_id: &str,
+    ) -> lingxi_kernel::subagent::SessionPermissionMode {
+        self.slots
+            .lock()
+            .unwrap_or_else(|poisoned| poisoned.into_inner())
+            .get(session_id)
+            .map(|slot| slot.permission.mode())
+            .unwrap_or(lingxi_kernel::subagent::SessionPermissionMode::Operate)
+    }
+
+    /// Delivers a text into the session's steering channel WITHOUT the
+    /// busy requirement (R03-T06 subagent result delivery): a BUSY
+    /// session's running turn drains it before its next model call; an
+    /// IDLE session RETAINS it for the next run's first model call (the
+    /// incumbent's deferred-result delivery intent, at the fidelity the
+    /// R03 run layer has — actively triggering a new parent turn is R06/
+    /// R07). Bounded like steering; never silently dropped.
+    pub fn deliver_retained(
+        self: &Arc<Self>,
+        session_id: &str,
+        text: &str,
+    ) -> Result<(), SteerError> {
+        let mut slots = self
+            .slots
+            .lock()
+            .unwrap_or_else(|poisoned| poisoned.into_inner());
+        if let Some(slot) = slots.get(session_id) {
+            return slot
+                .inbox
+                .push_bounded(text.to_string(), self.limits.steering_inbox_capacity)
+                .map_err(|_| SteerError::InboxFull);
+        }
+        if slots.len() >= self.limits.registry_cap {
+            slots.retain(|_, slot| {
+                slot.busy || slot.inbox.len() > 0 || !slot.permission.is_default()
+            });
+            if slots.len() >= self.limits.registry_cap {
+                return Err(SteerError::InboxFull);
+            }
+        }
+        let inbox = Arc::new(SteeringInbox::default());
+        let slot = SessionSlot {
+            busy: false,
+            inbox: Arc::clone(&inbox),
+            permission: SessionPermissionState::default(),
+        };
+        slots.insert(session_id.to_string(), slot);
+        inbox
+            .push_bounded(text.to_string(), self.limits.steering_inbox_capacity)
+            .map_err(|_| SteerError::InboxFull)
     }
 
     /// Observability: how many sessions currently own a run.

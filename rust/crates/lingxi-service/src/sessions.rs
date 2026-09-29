@@ -29,6 +29,7 @@ use lingxi_protocol::RunStatus;
 use crate::auth::{Principal, PrincipalKind, LOCAL_OWNER_USER_ID};
 use crate::cancel::CancelPhase;
 use crate::events::EventService;
+use crate::runs::DriveAuthorization;
 use crate::session_supervisor::{SessionConcurrencyLimits, SessionSupervisor, SteerOutcome};
 
 /// Summary shape returned by the read endpoint (runs carry only committed
@@ -181,10 +182,29 @@ pub enum SessionExecuteError {
     InvalidRequestId {
         detail: String,
     },
+    /// R03-T06: the background-drive registry is at its hard cap (service
+    /// protection; nothing was written, nothing was executed).
+    BackgroundRegistryFull {
+        cap: usize,
+    },
     /// The storage port refused or failed: no visible success was produced
     /// (R02-A07). Carries the domain storage error for the endpoint's
     /// error surface.
     Storage(StorageError),
+}
+
+/// The shared admission outcome of the two submission surfaces
+/// (R03-T06): a freshly admitted run (holding its session lease), or an
+/// idempotent REPLAY of an earlier acceptance.
+enum AdmissionOutcome {
+    Admitted {
+        run_id: String,
+        lease: crate::session_supervisor::SessionLease,
+        agent_id: String,
+    },
+    Replayed {
+        accepted: ExecuteAccepted,
+    },
 }
 
 /// Storage reads the session surface needs. Implemented by
@@ -483,6 +503,148 @@ impl SessionStore {
         submission: &ExecuteSubmission<'_>,
         now_ms: u64,
     ) -> Result<ExecuteAccepted, SessionExecuteError> {
+        let (run_id, lease, agent_id) = match self
+            .admit_submission(principal, session_id, submission, now_ms)
+            .await?
+        {
+            AdmissionOutcome::Replayed { accepted } => return Ok(accepted),
+            AdmissionOutcome::Admitted {
+                run_id,
+                lease,
+                agent_id,
+            } => (run_id, lease, agent_id),
+        };
+
+        // Bound what we record (defense in depth; the body limit already
+        // bounds the request).
+        let recorded_input: String = submission.input.chars().take(2000).collect();
+
+        // Drive the full lifecycle (start → turns → single finalize); the
+        // run drains the session's steering channel before each provider
+        // turn. `lease` frees the session on EVERY exit path below.
+        let finish = supervisor
+            .drive_run(
+                port,
+                events,
+                &kernel_principal_of(principal),
+                session_id,
+                &agent_id,
+                &run_id,
+                &recorded_input,
+                1,
+                now_ms,
+                Some(lease.steering_inbox()),
+                None,
+                DriveAuthorization::user_submission(submission.request_id),
+                session_id,
+            )
+            .await
+            .map_err(SessionExecuteError::from)?;
+
+        tracing::info!(
+            run_id = %run_id,
+            session_id = session_id,
+            outcome = %finish.terminal_reason(),
+            input_chars = recorded_input.chars().count(),
+            "run settled through the single finalize path"
+        );
+
+        let run_count = self
+            .backend
+            .count_runs_erased(session_id)
+            .await
+            .map_err(SessionExecuteError::Storage)?;
+        Ok(ExecuteAccepted {
+            run_id,
+            run_count,
+            replayed: false,
+        })
+    }
+
+    /// The BACKGROUND submission surface (R03-T06 deliverable 后台提交接
+    /// 口): the SAME admission chain (ownership → busy gate → requestId
+    /// dedup), but the drive is spawned as a DETACHED supervised task of
+    /// the same run supervisor — the run's lifetime is DECOUPLED from the
+    /// caller's connection. A client disconnect (or a closed desktop
+    /// window — the desktop is just another client) cannot cancel the
+    /// run; reconnecting with the same requestId replays idempotently
+    /// (nothing re-executed) and the run stays queryable through the
+    /// session/events surfaces. The service-exit difference is bounded by
+    /// the registry's exit hook (drain + honest unconfirmed report).
+    #[allow(clippy::too_many_arguments)]
+    pub async fn execute_background_for(
+        &self,
+        storage: &std::sync::Arc<lingxi_adapters::storage::RunDatabase>,
+        events: &std::sync::Arc<EventService>,
+        supervisor: &std::sync::Arc<crate::runs::RunSupervisor>,
+        background: &std::sync::Arc<crate::background::BackgroundDriveRegistry>,
+        principal: &Principal,
+        session_id: &str,
+        submission: &ExecuteSubmission<'_>,
+        now_ms: u64,
+    ) -> Result<ExecuteAccepted, SessionExecuteError> {
+        let (run_id, lease, _agent_id) = match self
+            .admit_submission(principal, session_id, submission, now_ms)
+            .await?
+        {
+            AdmissionOutcome::Replayed { accepted } => return Ok(accepted),
+            AdmissionOutcome::Admitted {
+                run_id,
+                lease,
+                agent_id,
+            } => (run_id, lease, agent_id),
+        };
+        let recorded_input: String = submission.input.chars().take(2000).collect();
+        // The session lease moves INTO the detached drive: the session
+        // stays honestly busy until the background run settles (every
+        // exit path of the drive).
+        crate::background::spawn_background_drive(
+            supervisor,
+            storage,
+            events,
+            background,
+            kernel_principal_of(principal),
+            session_id.to_string(),
+            _agent_id,
+            run_id.clone(),
+            recorded_input,
+            DriveAuthorization::user_submission(submission.request_id),
+            now_ms,
+            lease,
+        )
+        .map_err(|rejected| SessionExecuteError::BackgroundRegistryFull { cap: rejected.cap })?;
+
+        tracing::info!(
+            run_id = %run_id,
+            session_id = session_id,
+            "background submission accepted: the drive is decoupled from this caller's \
+             connection (disconnect ≠ cancel)"
+        );
+        let run_count = self
+            .backend
+            .count_runs_erased(session_id)
+            .await
+            .map_err(SessionExecuteError::Storage)?;
+        Ok(ExecuteAccepted {
+            run_id,
+            run_count,
+            replayed: false,
+        })
+    }
+
+    /// The shared admission chain of the foreground and background
+    /// submission surfaces: session lookup + ownership, the busy gate,
+    /// run-id allocation and (for explicit-id submissions) the T04
+    /// idempotency decision — the admission of a fresh run happens under
+    /// the dedup key lock, so a concurrent duplicate can never slip a
+    /// second admission in between.
+    async fn admit_submission(
+        &self,
+        principal: &Principal,
+        session_id: &str,
+        submission: &ExecuteSubmission<'_>,
+        now_ms: u64,
+    ) -> Result<AdmissionOutcome, SessionExecuteError> {
         let row = match self.backend.get_session_erased(session_id).await {
             Ok(Some(row)) => row,
             Ok(None) => return Err(SessionExecuteError::NotFound),
@@ -491,6 +653,7 @@ impl SessionStore {
         if !Self::can_access(principal, &row.owner_user_id) {
             return Err(SessionExecuteError::Forbidden);
         }
+        let agent_id = row.agent_id;
 
         // R03-T04 admission. The synchronous admission closure acquires the
         // session's single owner slot (R03-T02 busy gate) and allocates the
@@ -556,10 +719,12 @@ impl SessionStore {
                             .count_runs_erased(session_id)
                             .await
                             .map_err(SessionExecuteError::Storage)?;
-                        return Ok(ExecuteAccepted {
-                            run_id,
-                            run_count,
-                            replayed: true,
+                        return Ok(AdmissionOutcome::Replayed {
+                            accepted: ExecuteAccepted {
+                                run_id,
+                                run_count,
+                                replayed: true,
+                            },
                         });
                     }
                     Ok(Ok(crate::dedup::DedupDecision::Conflict {
@@ -585,47 +750,10 @@ impl SessionStore {
                 }
             }
         };
-
-        // Bound what we record (defense in depth; the body limit already
-        // bounds the request).
-        let recorded_input: String = submission.input.chars().take(2000).collect();
-
-        // Drive the full lifecycle (start → turns → single finalize); the
-        // run drains the session's steering channel before each provider
-        // turn. `lease` frees the session on EVERY exit path below.
-        let finish = supervisor
-            .drive_run(
-                port,
-                events,
-                &kernel_principal_of(principal),
-                session_id,
-                &row.agent_id,
-                &run_id,
-                &recorded_input,
-                1,
-                now_ms,
-                Some(lease.steering_inbox()),
-            )
-            .await
-            .map_err(SessionExecuteError::from)?;
-
-        tracing::info!(
-            run_id = %run_id,
-            session_id = session_id,
-            outcome = %finish.terminal_reason(),
-            input_chars = recorded_input.chars().count(),
-            "run settled through the single finalize path"
-        );
-
-        let run_count = self
-            .backend
-            .count_runs_erased(session_id)
-            .await
-            .map_err(SessionExecuteError::Storage)?;
-        Ok(ExecuteAccepted {
+        Ok(AdmissionOutcome::Admitted {
             run_id,
-            run_count,
-            replayed: false,
+            lease,
+            agent_id,
         })
     }
 
@@ -722,6 +850,61 @@ impl SessionStore {
                     .to_string(),
             }),
         }
+    }
+
+    /// Sets the session's current permission mode (R03-T06): the parent
+    /// fact the subagent attenuation inherits from (the incumbent's
+    /// per-session `operate/ask/read_only` mode). Ownership-checked like
+    /// every other session mutation; persisting the mode as durable
+    /// session state is R06 — this sets the run-layer registry.
+    pub async fn set_permission_mode_for(
+        &self,
+        principal: &Principal,
+        session_id: &str,
+        mode: lingxi_kernel::subagent::SessionPermissionMode,
+    ) -> Result<(), SessionExecuteError> {
+        let row = match self.backend.get_session_erased(session_id).await {
+            Ok(Some(row)) => row,
+            Ok(None) => return Err(SessionExecuteError::NotFound),
+            Err(err) => return Err(SessionExecuteError::Storage(err)),
+        };
+        if !Self::can_access(principal, &row.owner_user_id) {
+            return Err(SessionExecuteError::Forbidden);
+        }
+        self.gate
+            .set_permission_mode(session_id, mode)
+            .map_err(|_| SessionExecuteError::SessionRegistryFull)
+    }
+
+    /// Reads the lineage of one run under the SAME ownership rule as every
+    /// other session surface (R03-T06: the parent-child relationship is
+    /// queryable — including after refusals and crashes).
+    pub async fn run_lineage_for<P: StoragePort>(
+        &self,
+        port: &P,
+        principal: &Principal,
+        run_id: &str,
+    ) -> Result<Option<lingxi_kernel::subagent::RunLineage>, SessionExecuteError> {
+        let record = match port
+            .load_run(&lingxi_protocol::RunId::new(run_id.to_string()))
+            .await
+        {
+            Ok(Some(record)) => record,
+            Ok(None) => return Ok(None),
+            Err(err) => return Err(SessionExecuteError::Storage(err)),
+        };
+        let session_id = record.session_id.to_string();
+        let row = match self.backend.get_session_erased(&session_id).await {
+            Ok(Some(row)) => row,
+            Ok(None) => return Err(SessionExecuteError::NotFound),
+            Err(err) => return Err(SessionExecuteError::Storage(err)),
+        };
+        if !Self::can_access(principal, &row.owner_user_id) {
+            return Err(SessionExecuteError::Forbidden);
+        }
+        port.load_run_lineage(&lingxi_protocol::RunId::new(run_id.to_string()))
+            .await
+            .map_err(SessionExecuteError::Storage)
     }
 
     /// Test/evidence helper: observable run count for a session.
@@ -1087,6 +1270,23 @@ mod tests {
             _run_id: &RunId,
         ) -> Result<Vec<lingxi_kernel::ports::InvocationJournalEntry>, StorageError> {
             Ok(Vec::new())
+        }
+
+        async fn record_run_lineage(
+            &self,
+            _ctx: &RunContext,
+            _lineage: lingxi_kernel::subagent::RunLineage,
+            _now_unix_ms: u64,
+        ) -> Result<(), StorageError> {
+            // Lineage durability is covered against the real adapter.
+            Ok(())
+        }
+
+        async fn load_run_lineage(
+            &self,
+            _run_id: &RunId,
+        ) -> Result<Option<lingxi_kernel::subagent::RunLineage>, StorageError> {
+            Ok(None)
         }
     }
 

@@ -127,6 +127,10 @@ pub struct ShutdownReport {
     /// serving loop; wedged connections are bounded at process level).
     pub transport_drain_timed_out: bool,
     pub ws_drain_timed_out: bool,
+    /// R03-T06: the background-drive exit drain expired with live drives
+    /// (reported unconfirmed; their durable run rows stay active for the
+    /// R03-T07 recovery scan).
+    pub background_drain_timed_out: bool,
     pub storage_close_timed_out: bool,
     pub storage_error: Option<StorageError>,
     pub record_cleanup_timed_out: bool,
@@ -150,6 +154,7 @@ impl ShutdownReport {
     pub fn any_timeout(&self) -> bool {
         self.transport_drain_timed_out
             || self.ws_drain_timed_out
+            || self.background_drain_timed_out
             || self.storage_close_timed_out
             || self.record_cleanup_timed_out
     }
@@ -249,6 +254,7 @@ impl Drop for WsSessionGuard {
 pub async fn graceful_shutdown(
     storage: &RunDatabase,
     ws: &WsShutdown,
+    background: &crate::background::BackgroundDriveRegistry,
     guard: InstanceGuard,
     transport_drain_timed_out: bool,
     budget: ShutdownBudget,
@@ -282,6 +288,23 @@ pub async fn graceful_shutdown(
             open_sessions = ws.open_count(),
             "shutdown phase exceeded the remaining budget; continuing with the \
              remaining phases (sessions are force-abandoned)"
+        );
+    }
+
+    // Phase 2.5 (R03-T06 minimal exit hook): join the live BACKGROUND
+    // drives under the remaining budget. The transport and WS drains
+    // already abandoned the CLIENTS — the background runs are the ones
+    // that must NOT be silently dropped: whatever cannot confirm within
+    // the budget is REPORTED (their durable run rows stay active for the
+    // R03-T07 recovery scan; no fabricated terminals). The full exit
+    // strategy (per-task cancel/wait policy) is R03-T07.
+    let background_report = background.drain_within(budget.remaining()).await;
+    if !background_report.unconfirmed.is_empty() {
+        report.background_drain_timed_out = true;
+        eprintln!(
+            "{SHUTDOWN_TIMEOUT_MARKER} phase=background_drain budget_ms={budget_ms} \
+             unconfirmed={}",
+            background_report.unconfirmed.join(",")
         );
     }
 

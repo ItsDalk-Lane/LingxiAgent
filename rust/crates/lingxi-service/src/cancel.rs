@@ -109,6 +109,17 @@ impl CancelScope {
         Self::new(format!("run:{run_id}"), ScopeKind::Run, None)
     }
 
+    /// The root scope of one run that is a CHILD of `parent` (R03-T06):
+    /// cancelling the parent propagates into this run's tree; this run's
+    /// own cancellation still never ascends.
+    pub fn run_root_under(run_id: &str, parent: &CancelScope) -> Self {
+        Self::new(
+            format!("run:{run_id}"),
+            ScopeKind::Run,
+            Some(Arc::clone(&parent.inner)),
+        )
+    }
+
     fn new(label: String, kind: ScopeKind, parent: Option<Arc<ScopeInner>>) -> Self {
         Self {
             inner: Arc::new(ScopeInner {
@@ -482,9 +493,23 @@ impl CancelRegistry {
 
     /// Registers one live run and returns its entry (root scope + phase).
     pub fn register(&self, run_id: &str) -> Arc<RunCancelEntry> {
+        self.register_scope(run_id, CancelScope::run_root(run_id))
+    }
+
+    /// Registers one live run whose ROOT is a CHILD of `parent_scope`
+    /// (R03-T06 subagent child runs): cancelling the parent propagates
+    /// down into this run's own tree (the incumbent's
+    /// `abortByParentSession` semantics — STATE_TRANSITIONS T8), while
+    /// this run's own cancellation never ascends. Everything else
+    /// (phases, verdict retention) is identical to [`Self::register`].
+    pub fn register_linked(&self, run_id: &str, parent_scope: &CancelScope) -> Arc<RunCancelEntry> {
+        self.register_scope(run_id, CancelScope::run_root_under(run_id, parent_scope))
+    }
+
+    fn register_scope(&self, run_id: &str, scope: CancelScope) -> Arc<RunCancelEntry> {
         let entry = Arc::new(RunCancelEntry {
             run_id: run_id.to_string(),
-            scope: CancelScope::run_root(run_id),
+            scope,
             phase: Mutex::new(CancelPhase::Active),
             registered_at: Instant::now(),
         });

@@ -68,7 +68,20 @@ async fn clean_shutdown_reports_zero_and_removes_the_own_record() {
     assert!(layout.record_path.exists());
 
     let ws = WsShutdown::new();
-    let report = graceful_shutdown(&db, &ws, guard, false, budget(Duration::from_secs(10))).await;
+    // R03-T06: the graceful-shutdown coordinator now carries the
+    // background-drive exit hook (empty registry here — no background
+    // drives are spawned by these fixtures; the drain phase is exercised
+    // in the R03-T06 acceptance tests).
+    let background = lingxi_service::background::BackgroundDriveRegistry::new();
+    let report = graceful_shutdown(
+        &db,
+        &ws,
+        &background,
+        guard,
+        false,
+        budget(Duration::from_secs(10)),
+    )
+    .await;
 
     assert_eq!(report.exit_code(), 0, "{report:?}");
     assert!(!report.any_timeout());
@@ -112,10 +125,22 @@ async fn storage_close_timeout_is_recorded_and_record_cleanup_still_runs() {
         .publish("127.0.0.1:2".parse().unwrap())
         .expect("publish");
     let ws = WsShutdown::new();
+    // R03-T06: the graceful-shutdown coordinator now carries the
+    // background-drive exit hook (empty registry here — no background
+    // drives are spawned by these fixtures; the drain phase is exercised
+    // in the R03-T06 acceptance tests).
+    let background = lingxi_service::background::BackgroundDriveRegistry::new();
 
     let started = std::time::Instant::now();
-    let report =
-        graceful_shutdown(&db, &ws, guard, false, budget(Duration::from_millis(120))).await;
+    let report = graceful_shutdown(
+        &db,
+        &ws,
+        &background,
+        guard,
+        false,
+        budget(Duration::from_millis(120)),
+    )
+    .await;
     let elapsed = started.elapsed();
 
     assert!(report.storage_close_timed_out, "{report:?}");
@@ -159,7 +184,20 @@ async fn storage_close_failure_maps_to_exit_five() {
         .publish("127.0.0.1:3".parse().unwrap())
         .expect("publish");
     let ws = WsShutdown::new();
-    let report = graceful_shutdown(&db, &ws, guard, false, budget(Duration::from_secs(5))).await;
+    // R03-T06: the graceful-shutdown coordinator now carries the
+    // background-drive exit hook (empty registry here — no background
+    // drives are spawned by these fixtures; the drain phase is exercised
+    // in the R03-T06 acceptance tests).
+    let background = lingxi_service::background::BackgroundDriveRegistry::new();
+    let report = graceful_shutdown(
+        &db,
+        &ws,
+        &background,
+        guard,
+        false,
+        budget(Duration::from_secs(5)),
+    )
+    .await;
 
     assert!(report.storage_error.is_some(), "{report:?}");
     assert_eq!(report.exit_code(), 5, "{report:?}");
@@ -183,7 +221,20 @@ async fn record_cleanup_failure_maps_to_exit_four() {
     std::fs::write(&layout.record_path, b"{ not json").unwrap();
 
     let ws = WsShutdown::new();
-    let report = graceful_shutdown(&db, &ws, guard, false, budget(Duration::from_secs(5))).await;
+    // R03-T06: the graceful-shutdown coordinator now carries the
+    // background-drive exit hook (empty registry here — no background
+    // drives are spawned by these fixtures; the drain phase is exercised
+    // in the R03-T06 acceptance tests).
+    let background = lingxi_service::background::BackgroundDriveRegistry::new();
+    let report = graceful_shutdown(
+        &db,
+        &ws,
+        &background,
+        guard,
+        false,
+        budget(Duration::from_secs(5)),
+    )
+    .await;
 
     assert!(report.record_error.is_some(), "{report:?}");
     assert_eq!(report.exit_code(), 4, "{report:?}");
@@ -232,6 +283,11 @@ async fn exhausted_budget_bounds_every_remaining_phase() {
         .expect("publish");
 
     let ws = WsShutdown::new();
+    // R03-T06: the graceful-shutdown coordinator now carries the
+    // background-drive exit hook (empty registry here — no background
+    // drives are spawned by these fixtures; the drain phase is exercised
+    // in the R03-T06 acceptance tests).
+    let background = lingxi_service::background::BackgroundDriveRegistry::new();
     ws.connection_opened(); // a session that never closes on its own
 
     // The signal arrived 150ms ago; the total budget is 100ms — it is
@@ -242,7 +298,7 @@ async fn exhausted_budget_bounds_every_remaining_phase() {
         Duration::from_millis(100),
     );
     assert_eq!(spent.remaining(), Duration::ZERO);
-    let report = graceful_shutdown(&db, &ws, guard, false, spent).await;
+    let report = graceful_shutdown(&db, &ws, &background, guard, false, spent).await;
     let elapsed = started.elapsed();
 
     assert!(report.ws_drain_timed_out, "{report:?}");

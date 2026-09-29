@@ -19,16 +19,18 @@
 //!   child can never kill the request task silently.
 //! - **Bounded cleanup** (`drain_run`): after a run's tree fired, the
 //!   drain waits for the run's live children under the remaining
-//!   [`CancelBudget`](crate::cancel::CancelBudget); at expiry the rest
-//!   are ABORTED (the last-resort real primitive) and reported as
-//!   `unconfirmed` — the report never claims quiet it did not observe
-//!   (R03-T03 step 2/5).
+//!   [`CancelBudget`](crate::cancel::CancelBudget); at expiry an ABORT is
+//!   REQUESTED through an [`tokio::task::AbortHandle`] saved before the
+//!   join (real last-resort primitive — effective at the child's next
+//!   yield point) and the child is reported as `unconfirmed` — the report
+//!   never claims quiet it did not observe (R03-T03 step 2/5).
 //!
 //! Boundary honesty: `abort()` (and the wrapper's scope-drop) take effect
 //! at the child's NEXT yield point. A child that never yields (a truly
 //! non-cooperating busy loop) cannot confirm its stop within any budget —
-//! it is reported unconfirmed, exactly the "无法确认停止" the taskbook
-//! requires; no false quiet is produced.
+//! its abort stays merely requested and it is reported unconfirmed,
+//! exactly the "无法确认停止" the taskbook requires; no false quiet is
+//! produced.
 
 use std::collections::HashMap;
 use std::sync::atomic::{AtomicU64, Ordering};
@@ -416,6 +418,12 @@ impl TaskSupervisor {
                 }
                 continue;
             };
+            // R03-T03 review R1-D1 fix: the JoinHandle is about to be
+            // MOVED into the timeout future (and dropped with it when the
+            // budget expires), so the abort capability is saved BEFORE the
+            // timeout — the expiry branch below now performs a REAL abort
+            // instead of reading an always-empty handle slot.
+            let abort_handle = join.abort_handle();
             let remaining = budget.remaining();
             match tokio::time::timeout(remaining, join).await {
                 Ok(Ok(())) => {
@@ -441,23 +449,23 @@ impl TaskSupervisor {
                     self.reap(entry.id);
                 }
                 Err(_elapsed) => {
-                    // Budget expired: abort (last-resort real primitive —
-                    // effective at the child's next yield point) and
-                    // REPORT the un-confirmed child. Never a fake quiet.
-                    if let Some(handle) = entry
-                        .handle
-                        .lock()
-                        .unwrap_or_else(|poisoned| poisoned.into_inner())
-                        .as_ref()
-                    {
-                        handle.abort();
-                    }
+                    // Budget expired: abort through the handle saved BEFORE
+                    // the timeout consumed the JoinHandle (R1-D1 fix — the
+                    // previous read of `entry.handle` here was dead code:
+                    // always `None`). The abort is the last-resort real
+                    // primitive: REQUESTED here, effective at the wrapper's
+                    // next yield point. The child is still REPORTED as
+                    // unconfirmed — an abort that was requested is not a
+                    // stop that was observed.
+                    abort_handle.abort();
                     tracing::warn!(
                         task = %entry.label,
                         run_id = %run_id,
                         budget_ms = budget.total().as_millis() as u64,
                         "cleanup budget expired before this child confirmed its exit — \
-                         reported unconfirmed (abort sent; no false quiet)"
+                         reported unconfirmed (abort requested through the saved \
+                         AbortHandle; it takes effect at the child's next yield point; \
+                         no false quiet)"
                     );
                     report.unconfirmed.push(TaskRef {
                         id: entry.id,
@@ -749,6 +757,62 @@ mod tests {
         );
         assert_eq!(report.unconfirmed.len(), 1);
         assert_eq!(report.unconfirmed[0].label, "child_run:noncooperating");
+    }
+
+    /// R03-T03 review R1-D1 regression: the drain's expiry branch must
+    /// REALLY abort. Before the fix, the `JoinHandle` was moved into the
+    /// timeout future and the expiry branch re-read `entry.handle` —
+    /// always `None` after the take — so the claimed "abort sent" was dead
+    /// code. A yielding child parked mid-future (no tree cancellation —
+    /// the drain runs here purely on its own budget) proves the fix: when
+    /// the budget expires, the saved AbortHandle drops the wrapper and the
+    /// child future observes its own Drop.
+    #[tokio::test]
+    async fn drain_expiry_branch_really_aborts_a_yielding_child() {
+        let supervisor = Arc::new(TaskSupervisor::new(16));
+        let root = CancelScope::run_root("run_d1");
+        let scope = root.child("run_d1-child".to_string(), ScopeKind::ToolCall);
+        struct DropProbe(Arc<std::sync::atomic::AtomicBool>);
+        impl Drop for DropProbe {
+            fn drop(&mut self) {
+                self.0.store(true, Ordering::Release);
+            }
+        }
+        let future_dropped = Arc::new(std::sync::atomic::AtomicBool::new(false));
+        let probe = Arc::clone(&future_dropped);
+        let handle = supervisor
+            .spawn_linked(
+                "run_d1",
+                &scope,
+                "tool_call:yielding-parked".to_string(),
+                async move {
+                    let _probe = DropProbe(probe);
+                    // A yielding child that would otherwise run for a long
+                    // time: it parks at await points, so an abort lands.
+                    tokio::time::sleep(std::time::Duration::from_secs(30)).await;
+                },
+            )
+            .expect("spawn");
+        let _ = handle; // dropped: the drain owns the reaping from here
+                        // NO tree cancellation — only the drain's own small budget expiring.
+        let budget = CancelBudget::new(
+            std::time::Instant::now(),
+            std::time::Duration::from_millis(20),
+        );
+        let report = supervisor.drain_run("run_d1", budget).await;
+        assert!(!report.all_quiet(), "expiry must report unconfirmed");
+        assert_eq!(report.unconfirmed.len(), 1);
+        // The regression assertion: the saved AbortHandle REALLY aborted
+        // the wrapper, which dropped the child future (observed through the
+        // Drop probe) — not just a reported-unconfirmed no-op.
+        let deadline = std::time::Instant::now() + std::time::Duration::from_millis(500);
+        while !future_dropped.load(Ordering::Acquire) {
+            assert!(
+                std::time::Instant::now() < deadline,
+                "expiry abort never dropped the child future (R1-D1 regression)"
+            );
+            tokio::time::sleep(std::time::Duration::from_millis(1)).await;
+        }
     }
 
     #[tokio::test]

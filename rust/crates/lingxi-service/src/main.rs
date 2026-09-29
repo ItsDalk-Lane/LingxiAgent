@@ -565,6 +565,7 @@ async fn main() -> ExitCode {
     };
     let storage = std::sync::Arc::clone(state.storage());
     let ws_shutdown = state.ws_shutdown();
+    let background = std::sync::Arc::clone(state.background());
     let shutdown_timeout_ms = state.config().shutdown_timeout_ms;
     let transport = if tls_acceptor.is_some() {
         "https"
@@ -657,6 +658,7 @@ async fn main() -> ExitCode {
             let report = shutdown::graceful_shutdown(
                 &storage,
                 &ws_shutdown,
+                &background,
                 guard,
                 serve.drain_timed_out,
                 budget,

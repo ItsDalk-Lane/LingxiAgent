@@ -2681,10 +2681,12 @@
         "R03-A09": "PASS",
         "R03-A10": "PASS"
       },
-      "task_commit_sha": null,
+      "task_commit_sha": "6465395cf8e84121ea55b1481afc5711a4d707e8",
       "push_result": {
-        "status": "PENDING_BACKFILL",
-        "note": "SHA 与远程回执由下一账本提交补登"
+        "status": "CONFIRMED",
+        "remote_branch": "origin/codex/rust-tauri-migration",
+        "remote_head": "6465395cf8e84121ea55b1481afc5711a4d707e8",
+        "note": "ls-remote verified after push"
       },
       "blockers": [],
       "evidence": {
@@ -2698,23 +2700,70 @@
     "R03-T06": {
       "name": "子代理、后台运行与权限继承",
       "stage_id": "R03",
-      "status": "PENDING",
-      "task_base_sha": null,
-      "executor_id": null,
-      "execution_result": null,
-      "review_round": 0,
-      "reviewer_id": null,
-      "review_verdict": null,
-      "findings": [],
+      "status": "DONE",
+      "task_base_sha": "6465395cf8e84121ea55b1481afc5711a4d707e8",
+      "executor_id": "ZCode:R03-T06-exec-e1 (agent_0900d441-b4d3-485f-990e-27b16deef4b8)",
+      "execution_result": "READY_FOR_REVIEW",
+      "review_round": 1,
+      "reviewer_id": "ZCode:R03-T06-review-r1 (agent_c3e52847-a78a-43fa-8e62-7e665d9b5d62)",
+      "review_verdict": "PASS",
+      "findings": [
+        {
+          "id": "R1-D1",
+          "severity": "MINOR",
+          "summary": "报告口径：称 7 处 delegation:None 补齐，diff 实测 6 处（候选绑定与测试不受影响）",
+          "review_report": "docs/rust-tauri/R03/R03-T06_REVIEW_R1.md",
+          "resolution": "报告再版时更正；不影响验收"
+        },
+        {
+          "id": "R1-O1",
+          "severity": "ADVISORY_DEFERRED",
+          "summary": "父会话 ask 档继承时 Rust 两态衰减坍缩为 Operate（写放行），现役栈执行层经 deny_on_prompt 拒；两态模型与 isReadOnlyPermissionMode 一致、A11 只读场景完全正确；残余差距属审批策略面",
+          "review_report": "docs/rust-tauri/R03/R03-T06_REVIEW_R1.md",
+          "resolution": "登记为 R04 工具策略网关（approvalPolicy 面）交接义务，写入 R03_HANDOFF"
+        },
+        {
+          "id": "R1-V4REG",
+          "severity": "MINOR",
+          "summary": "migration V4 run_lineage 登记递延 T08（V4=371d4154…，V1/V2/V3 已发布指纹不动）",
+          "review_report": "docs/rust-tauri/R03/R03-T06_REVIEW_R1.md",
+          "resolution": "T08 一并登记 V2/V3/V4 并修 r02 脚本，重跑 R02 回归链"
+        },
+        {
+          "id": "R1-OBS",
+          "severity": "ADVISORY",
+          "summary": "O-2..O-5 建议性观察（详见审查报告）",
+          "review_report": "docs/rust-tauri/R03/R03-T06_REVIEW_R1.md",
+          "resolution": "登记观察"
+        }
+      ],
+      "carried_fixes": [
+        {
+          "id": "T03-R1-D1",
+          "status": "FIXED",
+          "summary": "task_supervisor.rs drain_run 到期分支 abort 死代码修复（timeout 前保存 abort_handle，到期真实 abort，文档/注释/tracing 更正，Drop 探针回归）",
+          "evidence": "T06 报告 §7 + task_supervisor 7/0 + cancellation_tree 8/0 复跑"
+        }
+      ],
       "repair_agent_id": null,
       "root_cause_agent_id": null,
       "acceptance_results": {
-        "R03-A11": "NOT_STARTED",
-        "R03-A12": "NOT_STARTED"
+        "R03-A11": "PASS",
+        "R03-A12": "PASS"
       },
       "task_commit_sha": null,
-      "push_result": null,
-      "blockers": []
+      "push_result": {
+        "status": "PENDING_BACKFILL",
+        "note": "SHA 与远程回执由下一账本提交补登"
+      },
+      "blockers": [],
+      "evidence": {
+        "executor_report": "docs/rust-tauri/R03/R03-T06_REPORT.md",
+        "executor_evidence": "artifacts/rust-tauri/R03/T06-E01/",
+        "review_report": "docs/rust-tauri/R03/R03-T06_REVIEW_R1.md",
+        "review_evidence": "artifacts/rust-tauri/R03/T06-R01-review/",
+        "candidate_diff_digest_16": "27010f53cfb3dce8"
+      }
     },
     "R03-T07": {
       "name": "故障恢复与服务退出策略",
@@ -4187,7 +4236,7 @@
       "blockers": []
     }
   },
-  "current_task": "R03-T06",
+  "current_task": "R03-T07",
   "orchestration_mode": {
     "effective_from": "R00-T03 R2 repair",
     "task_executor": "new ZCode task per Rxx-Tyy",
