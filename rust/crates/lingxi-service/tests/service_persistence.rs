@@ -66,6 +66,7 @@ async fn execute_persists_runs_that_survive_a_full_restart() {
         .execute_for(
             storage.as_ref(),
             state.events(),
+            state.runs(),
             &principal,
             "sess_local_alpha",
             "hello persistence",

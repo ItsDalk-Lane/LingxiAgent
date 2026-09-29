@@ -23,11 +23,7 @@ use serde::{Deserialize, Serialize};
 
 use lingxi_adapters::storage::{RunDatabase, RunSummaryRow, SessionRow};
 use lingxi_kernel::ports::{StorageError, StoragePort};
-use lingxi_kernel::{Principal as KernelPrincipal, RunContext};
-use lingxi_protocol::{AttemptId, RunId};
-use lingxi_protocol::{
-    EventPayload, KnownEventPayload, RunStateChangedPayload, RunStatus, SessionId as WireSessionId,
-};
+use lingxi_kernel::Principal as KernelPrincipal;
 
 use crate::auth::{Principal, PrincipalKind, LOCAL_OWNER_USER_ID};
 use crate::events::EventService;
@@ -297,21 +293,25 @@ impl SessionStore {
         }
     }
 
-    /// Executes: persists a run (start + terminal outcome with its key
-    /// events, each as one storage-port transaction) bound to the
-    /// authenticated principal, and publishes each commit's events
-    /// strictly AFTER the commit returned Ok (R02-T05 wiring of the T04
-    /// authority chain). Storage failures surface as
+    /// Executes: drives ONE run of the session through the real run
+    /// lifecycle (R03-T01) — durable start (queued→running) → model/tool
+    /// turns under the [`RunSupervisor`] → exactly one finalize through the
+    /// storage port's single settlement transaction — and publishes each
+    /// commit's events strictly AFTER the commit returned Ok (R02-T05
+    /// wiring of the T04 authority chain). Storage failures surface as
     /// [`SessionExecuteError::Storage`] — no visible success (R02-A07).
     ///
-    /// The R02 representative run completes WITHOUT a final assistant
-    /// message on purpose: completion state and delivery quality are
-    /// separate facts (contract 02 §4) and a final message must never be
-    /// fabricated; real model turns arrive with R05.
+    /// The R02 "immediate success" inline execution is REPLACED by this
+    /// lifecycle: there is exactly one owner of a run's terminal state
+    /// (the supervisor's single finalize path), never two.
+    // Port/events are passed explicitly (R02 style: the session surface
+    // does not own them); adding the supervisor keeps the same shape.
+    #[allow(clippy::too_many_arguments)]
     pub async fn execute_for<P: StoragePort>(
         &self,
         port: &P,
         events: &EventService,
+        supervisor: &crate::runs::RunSupervisor,
         principal: &Principal,
         session_id: &str,
         input: &str,
@@ -329,72 +329,36 @@ impl SessionStore {
         // Bound what we record (defense in depth; the body limit already
         // bounds the request).
         let recorded_input: String = input.chars().take(2000).collect();
-        // R02 stage-repair R1 / F01: the run id comes from the backend's
-        // atomic allocator, never from a `total_runs + 1` read — under
-        // concurrency that read races and distinct submissions collapsed
-        // into one run id (the idempotent-start path then reported success
-        // for work it never recorded). Every execute of an accepted request
-        // now mints its own run; storage-level idempotent replay remains
-        // for genuine same-`RunContext` retries only.
+        // R02 stage-repair R1 / F01 + R03-T01 step 2: the run id comes from
+        // the backend's atomic allocator and is FIXED at task creation;
+        // retries open new attempts on this same run, and provider
+        // reconnects never mint a second user task.
         let run_id = self
             .backend
             .allocate_run_id_erased(now_ms)
             .map_err(SessionExecuteError::Storage)?;
 
-        let ctx = RunContext {
-            principal: kernel_principal_of(principal),
-            session_id: WireSessionId::new(session_id.to_string()),
-            run_id: RunId::new(run_id.clone()),
-            attempt: AttemptId::new(format!("{run_id}#a1")),
-            generation: 1,
-        };
-
-        // 1) Durable run start (one transaction: run row + attempt row +
-        //    run_state_changed queued→running key event).
-        let started = port
-            .record_run_started(&ctx, now_ms)
+        // Drive the full lifecycle (start → turns → single finalize).
+        let finish = supervisor
+            .drive_run(
+                port,
+                events,
+                &kernel_principal_of(principal),
+                session_id,
+                &run_id,
+                &recorded_input,
+                1,
+                now_ms,
+            )
             .await
-            .map_err(SessionExecuteError::Storage)?;
-        // Publication happens HERE, strictly after the commit returned Ok:
-        // the hub only ever sees events that are already durable (slow or
-        // absent subscribers catch up from the storage authority).
-        events.publish_committed(&started.events);
+            .map_err(SessionExecuteError::from)?;
 
-        // 2) Terminal outcome in one transaction with its key event.
-        //    Failed -> no success response, no completion event visible.
-        let outcome = lingxi_kernel::ports::RunOutcome {
-            status: RunStatus::Completed,
-            reason: None,
-            key_events: vec![lingxi_kernel::ports::KeyEvent {
-                event_id: lingxi_protocol::EventId::new(format!("{run_id}-done")),
-                payload: EventPayload::Known(KnownEventPayload::RunStateChanged(
-                    RunStateChangedPayload {
-                        from: RunStatus::Running,
-                        to: RunStatus::Completed,
-                        reason: None,
-                    },
-                )),
-            }],
-            final_message: None,
-        };
-        let committed = port
-            .commit_run_outcome(&ctx, outcome, now_ms)
-            .await
-            .map_err(SessionExecuteError::Storage)?;
-        events.publish_committed(&committed.events);
-        // Post-commit audit trail (the durable log remains the authority;
-        // live delivery is the event service's job now).
         tracing::info!(
             run_id = %run_id,
             session_id = %session_id,
-            events = %committed
-                .events
-                .iter()
-                .map(|e| e.event_id.to_string())
-                .collect::<Vec<_>>()
-                .join(","),
+            outcome = %finish.terminal_reason(),
             input_chars = recorded_input.chars().count(),
-            "run committed and published (post-commit)"
+            "run settled through the single finalize path"
         );
 
         let run_count = self
@@ -471,8 +435,18 @@ mod tests {
     use super::*;
     use crate::auth::{ConnectionKindSerde, CredentialKind, PrincipalKind as Pk, TrustState};
     use crate::events::EventLimits;
+    use crate::runs::RunSupervisor;
     use lingxi_kernel::ports::{CommittedOutcome, KeyEvent};
+    use lingxi_kernel::RunContext;
+    use lingxi_protocol::RunId;
     use std::sync::Mutex as StdMutex;
+
+    /// R03-T01: the no-provider supervisor is the production default wiring
+    /// until R05 registers real providers; these ownership-logic unit tests
+    /// drive the REAL lifecycle through it.
+    fn supervisor() -> RunSupervisor {
+        RunSupervisor::without_provider()
+    }
 
     /// Real event service over a real (temp) run database: the publication
     /// path in these unit tests runs the SAME code as production, never a
@@ -649,6 +623,27 @@ mod tests {
         ) -> Result<Option<lingxi_kernel::ports::RunRecord>, StorageError> {
             Ok(None)
         }
+        async fn record_run_events(
+            &self,
+            _ctx: &RunContext,
+            _events: Vec<KeyEvent>,
+            _now_unix_ms: u64,
+        ) -> Result<CommittedOutcome, StorageError> {
+            Ok(CommittedOutcome {
+                newly_committed: true,
+                events: Vec::new(),
+            })
+        }
+        async fn record_attempt_started(
+            &self,
+            _ctx: &RunContext,
+            _now_unix_ms: u64,
+        ) -> Result<CommittedOutcome, StorageError> {
+            Ok(CommittedOutcome {
+                newly_committed: true,
+                events: Vec::new(),
+            })
+        }
     }
 
     fn store_with_runs() -> (SessionStore, SharedRuns) {
@@ -680,7 +675,15 @@ mod tests {
         assert_eq!(store.list_for(&owner).await.unwrap().len(), 2);
 
         let accepted = store
-            .execute_for(&port, &events, &owner, "sess_local_alpha", "hello", 1234)
+            .execute_for(
+                &port,
+                &events,
+                &supervisor(),
+                &owner,
+                "sess_local_alpha",
+                "hello",
+                1234,
+            )
             .await
             .unwrap();
         assert_eq!(accepted.run_count, 1);
@@ -718,7 +721,15 @@ mod tests {
             other => panic!("cross-principal read must be Forbidden, got {other:?}"),
         }
         match store
-            .execute_for(&port, &events, &foreign, "sess_local_alpha", "inject", 1500)
+            .execute_for(
+                &port,
+                &events,
+                &supervisor(),
+                &foreign,
+                "sess_local_alpha",
+                "inject",
+                1500,
+            )
             .await
         {
             Err(SessionExecuteError::Forbidden) => {}
@@ -758,7 +769,15 @@ mod tests {
         let (events, dir) = event_service_for_test().await;
         let owner = owner_principal();
         match store
-            .execute_for(&port, &events, &owner, "sess_local_alpha", "hello", 1234)
+            .execute_for(
+                &port,
+                &events,
+                &supervisor(),
+                &owner,
+                "sess_local_alpha",
+                "hello",
+                1234,
+            )
             .await
         {
             Err(SessionExecuteError::Storage(StorageError::Io { detail })) => {
@@ -801,6 +820,7 @@ mod tests {
                     .execute_for(
                         port.as_ref(),
                         events.as_ref(),
+                        &supervisor(),
                         &owner,
                         "sess_local_alpha",
                         &format!("distinct-input-{n}"),

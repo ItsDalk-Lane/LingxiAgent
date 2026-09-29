@@ -76,6 +76,7 @@ async fn execute_64_concurrent(state: &ServiceState, tag: &str) -> Vec<String> {
                 .execute_for(
                     state.storage().as_ref(),
                     state.events(),
+                    state.runs(),
                     &owner,
                     "sess_local_alpha",
                     &format!("{tag}-distinct-input-{n}"),

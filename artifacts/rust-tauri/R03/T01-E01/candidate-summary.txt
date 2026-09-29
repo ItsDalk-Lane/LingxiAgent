@@ -1,0 +1,24 @@
+candidate_id: r03-t01-e01
+task_base_sha: 526f7770f1eff6be289b8c34faeccc1b95e181fd
+head_at_execution: 526f7770f1eff6be289b8c34faeccc1b95e181fd (no commit; working tree candidate)
+branch: codex/rust-tauri-migration
+generated_utc: 2026-09-29T01:20:55Z
+
+## Modified files (tracked)
+dd7bf84e1139eb679ee9fdf55299f2d7b5d7362583b79eaf58123fb84d284405  rust/crates/lingxi-adapters/src/storage/run_store.rs
+202a0a61beb99df7a287d74fcdaac29e4f10d7449cfbe16d5ab72214f7b569b3  rust/crates/lingxi-kernel/src/lib.rs
+457d09541bdc1a71f1b73a69a51df861fbba4c07ce7ea54652e6851f13830ac5  rust/crates/lingxi-kernel/src/ports.rs
+7dc6fe93e4c9aa29da6ca4690e039f647c23938599557c374d185f047c62fce2  rust/crates/lingxi-protocol/src/lib.rs
+50c980c5d78f2a96d24780b6a406fe1eb84af671c0ba2cb3541a81e240d323ce  rust/crates/lingxi-service/src/lib.rs
+abc2e7dd248c233bcef52c09edae60be8eaef94d41348b36f7fc0784fc359f54  rust/crates/lingxi-service/src/sessions.rs
+aa9026d7c7d4da92aee073b482497cc66a9d82e0d24a88b9277c2219799a6ad8  rust/crates/lingxi-service/tests/event_subscription.rs
+c384d5faee1cd77c820303ec83c8856bb80aedcdd5931e9c5087a38144e955f9  rust/crates/lingxi-service/tests/execute_concurrency.rs
+d894ad0a7f65458bb2a3417d43c49cb7227ddd48425d8aba484c2762711e0194  rust/crates/lingxi-service/tests/service_persistence.rs
+
+## New files (untracked, this task)
+fdf92e8a26db6a6fe3acc43b65ffc615f817f9f9d508449109c6a0027a7ecb4a  rust/crates/lingxi-service/src/runs.rs
+3e2403961e3fec0e1eba4e4111776fdf56723fc6f54927748746ce0e0eebde57  rust/crates/lingxi-service/tests/run_lifecycle.rs
+1561cb77f2f24f64416044b5ce7c9eb8ca8086c012b90820fe39a7dff72e3478  rust/crates/lingxi-adapters/tests/run_finalize_property.rs
+
+## Cargo.lock
+90111c4b5988531d7a891339b6ee5df8afc9d3ec655e4929747da07d5811bb49  rust/Cargo.lock (unchanged: no new dependencies)

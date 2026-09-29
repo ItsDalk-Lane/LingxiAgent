@@ -14,8 +14,8 @@ use lingxi_protocol::{
     EventEnvelope, EventId, EventPayload, ModelCallId, NormalizedMessage, ProtocolError, RunId,
     RunStatus, Seq, SessionId, ToolCallId,
 };
-// ProtocolError is still the error surface of the model/tool/credential
-// ports below; StoragePort deliberately uses the richer StorageError.
+// ProtocolError is the error surface of the provider/tool ports below;
+// StoragePort deliberately uses the richer StorageError.
 
 use crate::RunContext;
 
@@ -237,6 +237,46 @@ pub trait StoragePort: Send + Sync {
         &self,
         run_id: &RunId,
     ) -> impl std::future::Future<Output = Result<Option<RunRecord>, StorageError>> + Send;
+
+    /// Persists mid-run key events (model-call / tool-call facts) bound to
+    /// `ctx`'s run and CURRENT attempt in ONE transaction (R03-T01 step 2).
+    ///
+    /// Contract:
+    /// - The run must exist, belong to the same owner facts as `ctx`, and
+    ///   still be ACTIVE — events for a terminal run are rejected loudly
+    ///   (the audit-only stale-event path arrives with R03-T04's fence).
+    /// - `ctx.attempt` must be an attempt that was actually opened for the
+    ///   run (via [`StoragePort::record_run_started`] or
+    ///   [`StoragePort::record_attempt_started`]): results never attach to
+    ///   an attempt that never started, and a late result carrying an older
+    ///   attempt id can never silently pose as the current attempt (the
+    ///   full generation fence is R03-T04; this is the identity floor).
+    /// - The run's `last_event_seq` advances inside the same transaction;
+    ///   events are returned for publication strictly after commit.
+    fn record_run_events(
+        &self,
+        ctx: &RunContext,
+        events: Vec<KeyEvent>,
+        now_unix_ms: u64,
+    ) -> impl std::future::Future<Output = Result<CommittedOutcome, StorageError>> + Send;
+
+    /// Opens a NEW attempt on an EXISTING run (R03-T01 step 2: retries
+    /// increment the attempt on the same run; the run id is fixed at
+    /// creation and a provider reconnect never mints a new user task).
+    ///
+    /// Contract:
+    /// - The run must exist, match `ctx`'s owner facts, and be in a
+    ///   non-terminal state (retry from `running`; `waiting_approval`
+    ///   retries arrive with R04).
+    /// - `ctx.attempt` must NOT already exist for the run — each retry is
+    ///   a fresh attempt identity.
+    /// - One transaction: new `run_attempts` row + `attempt_count`
+    ///   increment. The run's STATUS does not change (still `running`).
+    fn record_attempt_started(
+        &self,
+        ctx: &RunContext,
+        now_unix_ms: u64,
+    ) -> impl std::future::Future<Output = Result<CommittedOutcome, StorageError>> + Send;
 }
 
 /// Read/maintenance surface over the durable key-event log (R02-T05).
@@ -298,32 +338,98 @@ pub trait EventStorePort: Send + Sync {
     ) -> impl std::future::Future<Output = Result<u64, StorageError>> + Send;
 }
 
-/// Model provider access. Every request is pinned to
-/// principal/run/attempt/modelCall/purpose/provider/model/operation/
-/// budget/deadline by the kernel; credentials are resolved server-side
-/// through [`CredentialPort`], never by callers and never by workers.
-pub trait ModelPort {
-    fn complete(
-        &self,
-        ctx: &RunContext,
-        call: ModelCallId,
-        request_digest: &str,
-    ) -> Result<String, ProtocolError>;
+/// Stable identity facts of a turn provider (R03-T01). A deterministic test
+/// double reports what it simulates; a real provider (R05) reports its own
+/// provider/model pair — provider+model is one identity unit, two providers
+/// may share a model id without being the same model.
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct ProviderDescriptor {
+    pub provider: String,
+    pub model: String,
+    pub operation: String,
 }
 
-/// Execution of one prepared, authorized tool invocation.
+/// One provider turn, as the run driver consumes it (R03-T01 step 2/4).
 ///
-/// The kernel produces a `PreparedInvocation` internally; it is not
-/// forgeable from model output. Cross-worker transfer uses short-lived
-/// authorization tickets verified by the host — a JSON field saying
-/// `"approved": true` is never an authorization.
-pub trait ToolPort {
-    fn execute_prepared(
-        &self,
-        ctx: &RunContext,
-        call: ToolCallId,
-        prepared_digest: &str,
-    ) -> Result<ToolOutcome, ProtocolError>;
+/// Test-double boundary: a double only DECIDES what to reply; the kernel /
+/// run driver owns every state decision — which turn ends the run, what the
+/// outcome contract is, and the single finalize path. A double never writes
+/// state and never finalizes a run.
+#[derive(Debug, Clone, PartialEq)]
+pub enum ProviderTurn {
+    /// The provider's final assistant reply for the user. An empty-content
+    /// message is NOT a final (the driver maps it to an explicit empty
+    /// outcome instead of committing an empty final message).
+    Final { message: NormalizedMessage },
+    /// The provider requested tool calls; the RUN continues after they
+    /// execute (a model call ending here does NOT end the run).
+    ToolRequests { requests: Vec<ToolRequest> },
+    /// Process-only content (reasoning / partial output): this model call
+    /// ended, the run continues with another turn.
+    Continue { process_note: String },
+    /// The provider finished with zero usable content (empty reply).
+    Empty { detail: String },
+    /// The provider call failed. `retryable` marks transient failures where
+    /// a NEW ATTEMPT on the SAME run is legitimate — a provider reconnect
+    /// never mints a new user task (run id stays fixed).
+    Failed {
+        error: ProtocolError,
+        retryable: bool,
+    },
+}
+
+/// One tool call a provider requested. Identity (`ToolCallId`) is minted by
+/// the run driver, never by the provider — and never derived from the run
+/// or attempt id.
+// NOTE: not `Eq` — `ArgsDigest` follows the wire digest struct.
+#[derive(Debug, Clone, PartialEq)]
+pub struct ToolRequest {
+    /// Registry target id (R04 owns the real registry; T01 doubles carry a
+    /// stable target name).
+    pub target: String,
+    /// Digest of the normalized arguments (the value approvals bind to).
+    pub args_digest: lingxi_protocol::ArgsDigest,
+    pub args_summary: Option<String>,
+}
+
+/// Provider access for the run driver (R03-T01; the R05 handoff surface).
+///
+/// R03 wires deterministic doubles through the REAL run chain; R05 replaces
+/// the double with real protocol adapters behind this same port. Every call
+/// is pinned to its run/attempt context and its own `ModelCallId`.
+///
+/// The futures are boxed so the trait is object-safe: the supervisor holds
+/// `Arc<dyn TurnProviderPort>` (one injection point, doubles in tests /
+/// real adapters in R05).
+pub trait TurnProviderPort: Send + Sync {
+    /// Stable identity of what this provider simulates / serves.
+    fn descriptor(&self) -> ProviderDescriptor;
+
+    /// Produces the next model turn for the run. `input` is the user
+    /// submission that started the run (the full context assembly is R06;
+    /// the port stays minimal here).
+    fn next_turn<'a>(
+        &'a self,
+        ctx: &'a RunContext,
+        call: &'a ModelCallId,
+        turn: u32,
+        input: &'a str,
+    ) -> std::pin::Pin<Box<dyn std::future::Future<Output = ProviderTurn> + Send + 'a>>;
+}
+
+/// Minimal tool execution port for the R03 run driver (the R04 handoff
+/// surface: the unified ToolInvocationGateway replaces T01 doubles behind
+/// this port shape, under the same identity, permission and cancel rules).
+pub trait ToolExecutorPort: Send + Sync {
+    /// Executes one authorized tool request. The outcome is the structured
+    /// [`ToolOutcome`] — `Unknown` is mandatory so an externally completed
+    /// side effect is never retried blindly nor reported as success.
+    fn execute<'a>(
+        &'a self,
+        ctx: &'a RunContext,
+        call: &'a ToolCallId,
+        request: &'a ToolRequest,
+    ) -> std::pin::Pin<Box<dyn std::future::Future<Output = ToolOutcome> + Send + 'a>>;
 }
 
 /// Result of one tool call. `Unknown` is mandatory: an externally
@@ -450,6 +556,42 @@ mod tests {
 
         async fn load_run(&self, _run_id: &RunId) -> Result<Option<RunRecord>, StorageError> {
             Ok(None)
+        }
+
+        async fn record_run_events(
+            &self,
+            _ctx: &RunContext,
+            events: Vec<KeyEvent>,
+            _now_unix_ms: u64,
+        ) -> Result<CommittedOutcome, StorageError> {
+            Ok(CommittedOutcome {
+                newly_committed: true,
+                events: events
+                    .into_iter()
+                    .map(|event| {
+                        EventEnvelope::new(
+                            event.event_id,
+                            StreamId::new("stream-1"),
+                            Seq::new(1),
+                            SessionId::new("s-1"),
+                            None,
+                            None,
+                            event.payload,
+                        )
+                    })
+                    .collect(),
+            })
+        }
+
+        async fn record_attempt_started(
+            &self,
+            _ctx: &RunContext,
+            _now_unix_ms: u64,
+        ) -> Result<CommittedOutcome, StorageError> {
+            Ok(CommittedOutcome {
+                newly_committed: true,
+                events: Vec::new(),
+            })
         }
     }
 

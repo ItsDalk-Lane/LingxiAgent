@@ -261,6 +261,29 @@ impl RunStatus {
     pub fn is_active(self) -> bool {
         !self.is_terminal()
     }
+
+    /// Compatibility mapping from the incumbent (pre-Rust) external status
+    /// vocabulary onto [`RunStatus`] (R03-T01 step 1: "外部协议保持兼容
+    /// 映射"). Grounded in the incumbent surfaces observed at R00/R03
+    /// (`server/ws-protocol.ts` assistant_run_end `completed|failed|aborted`,
+    /// `server/block-extractors.ts` `success|failed|aborted`):
+    ///
+    /// - `completed`/`success` → [`RunStatus::Completed`]
+    /// - `failed` → [`RunStatus::Failed`]
+    /// - `aborted` → [`RunStatus::Cancelled`] (user-initiated stop)
+    ///
+    /// The NEW wire names (see [`RunStatus::wire_name`]) stay stable; legacy
+    /// names are translated only at a compat boundary (the old-client
+    /// transport in R08), never by renaming the enum. Unknown legacy names
+    /// return `None` — loud at the caller, never a guess.
+    pub fn from_legacy_wire_name(name: &str) -> Option<Self> {
+        match name {
+            "completed" | "success" => Some(RunStatus::Completed),
+            "failed" => Some(RunStatus::Failed),
+            "aborted" => Some(RunStatus::Cancelled),
+            _ => None,
+        }
+    }
 }
 
 /// Machine-diagnosable error code for the protocol error envelope.
@@ -464,6 +487,37 @@ mod tests {
                 server_protocol: 1,
                 data_epoch: 1
             }
+        );
+    }
+
+    #[test]
+    fn legacy_status_names_map_without_renaming_the_wire_vocabulary() {
+        // R03-T01 compat mapping: incumbent names translate onto the new
+        // enum; the new wire names themselves never change.
+        assert_eq!(
+            RunStatus::from_legacy_wire_name("completed"),
+            Some(RunStatus::Completed)
+        );
+        assert_eq!(
+            RunStatus::from_legacy_wire_name("success"),
+            Some(RunStatus::Completed)
+        );
+        assert_eq!(
+            RunStatus::from_legacy_wire_name("failed"),
+            Some(RunStatus::Failed)
+        );
+        assert_eq!(
+            RunStatus::from_legacy_wire_name("aborted"),
+            Some(RunStatus::Cancelled)
+        );
+        // Unknown legacy names are None (loud at the caller), never a guess.
+        assert_eq!(RunStatus::from_legacy_wire_name("sorta-done"), None);
+        assert_eq!(RunStatus::from_legacy_wire_name("completed "), None);
+        // The new vocabulary is untouched by the mapping.
+        assert_eq!(RunStatus::Cancelled.wire_name(), "cancelled");
+        assert_eq!(
+            RunStatus::InterruptedNeedsAttention.wire_name(),
+            "interrupted_needs_attention"
         );
     }
 }

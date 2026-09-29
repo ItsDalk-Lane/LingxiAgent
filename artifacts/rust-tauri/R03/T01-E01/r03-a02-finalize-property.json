@@ -1,0 +1,11 @@
+{
+  "diagnosedConflicts": 1450,
+  "firstCommits": 200,
+  "idempotentReplays": 350,
+  "iterations": 200,
+  "runsSettled": 200,
+  "schema": "lingxi.r03-a02-finalize-property.v1",
+  "seed": 6840123412283649537,
+  "submissionsPerRun": 10,
+  "unexpectedResults": 0
+}

@@ -32,6 +32,7 @@ pub mod logging;
 mod management;
 pub mod paths;
 pub mod redaction;
+pub mod runs;
 mod security_audit;
 pub mod serve;
 pub mod sessions;
@@ -74,6 +75,7 @@ pub use logging::{
 };
 pub use paths::{prepare_layout, DataRootLayout};
 pub use redaction::{redact_line, redact_text};
+pub use runs::{DriveError, RunDriveLimits, RunSupervisor};
 pub use sessions::{
     ExecuteAccepted, ExecuteRequest, RunSummary, SessionAccess, SessionBackend,
     SessionExecuteError, SessionFacts, SessionStore, SessionView,
@@ -337,6 +339,9 @@ pub struct ServiceState {
     clock: Arc<dyn ServiceClock>,
     /// Injectable per-request id source (R02-T07).
     request_ids: Arc<dyn RequestIdGen>,
+    /// Run lifecycle supervisor (R03-T01): drives every execute through
+    /// the real queued→running→…→single-finalize chain.
+    runs: Arc<runs::RunSupervisor>,
 }
 
 impl std::fmt::Debug for ServiceState {
@@ -410,6 +415,19 @@ pub struct ServiceDeps {
     pub clock: std::sync::Arc<dyn ServiceClock>,
     /// Injectable per-request id source (R02-T07).
     pub request_ids: std::sync::Arc<dyn RequestIdGen>,
+    /// Injectable model-turn source (R03-T01). `None` (the production
+    /// default until R05 registers real providers) means runs complete
+    /// with the explicit `completed.no_final.no_provider_configured`
+    /// outcome — never a fabricated model reply. Deterministic doubles are
+    /// injected by tests through the REAL chain; they produce responses
+    /// only and never own run state.
+    pub turn_provider: Option<std::sync::Arc<dyn lingxi_kernel::ports::TurnProviderPort>>,
+    /// Injectable tool executor (R03-T01 minimal port; R04's unified
+    /// gateway replaces doubles behind the same shape).
+    pub tool_executor: Option<std::sync::Arc<dyn lingxi_kernel::ports::ToolExecutorPort>>,
+    /// Run lifecycle bounds (R03-T01): hard, loud limits on model turns
+    /// and attempts per run.
+    pub run_limits: runs::RunDriveLimits,
 }
 
 impl Default for ServiceDeps {
@@ -426,6 +444,9 @@ impl Default for ServiceDeps {
             http_request_budget_ms: limits::DEFAULT_HTTP_REQUEST_BUDGET_MS,
             clock: std::sync::Arc::new(SystemClock),
             request_ids: std::sync::Arc::new(RandomRequestIdGen),
+            turn_provider: None,
+            tool_executor: None,
+            run_limits: runs::RunDriveLimits::default(),
         }
     }
 }
@@ -444,6 +465,15 @@ impl std::fmt::Debug for ServiceDeps {
             .field("http_request_budget_ms", &self.http_request_budget_ms)
             .field("clock", &"Arc<dyn ServiceClock>")
             .field("request_ids", &"Arc<dyn RequestIdGen>")
+            .field(
+                "turn_provider",
+                &self.turn_provider.as_ref().map(|_| "injected"),
+            )
+            .field(
+                "tool_executor",
+                &self.tool_executor.as_ref().map(|_| "injected"),
+            )
+            .field("run_limits", &self.run_limits)
             .finish()
     }
 }
@@ -697,6 +727,15 @@ impl ServiceState {
                 ),
             })
         })?;
+        // R03-T01: the run lifecycle supervisor. Degenerate bounds are a
+        // loud startup error (never clamped silently); a missing provider is
+        // EXPLICIT (no-provider outcome), never a fabricated reply.
+        let runs = runs::RunSupervisor::new(
+            deps.turn_provider.clone(),
+            deps.tool_executor.clone(),
+            deps.run_limits,
+        )
+        .map_err(ServiceStartupError::Storage)?;
         Ok(Self {
             config: Arc::new(config),
             auth: Arc::new(auth),
@@ -730,6 +769,7 @@ impl ServiceState {
             ws_shutdown: Arc::new(shutdown::WsShutdown::new()),
             clock: deps.clock,
             request_ids: deps.request_ids,
+            runs: Arc::new(runs),
         })
     }
 
@@ -785,6 +825,12 @@ impl ServiceState {
     /// The injected request-id source (R02-T07).
     pub fn request_ids(&self) -> &Arc<dyn RequestIdGen> {
         &self.request_ids
+    }
+
+    /// The run lifecycle supervisor (R03-T01): the single owner of the
+    /// queued→running→…→finalize chain behind every execute.
+    pub fn runs(&self) -> &Arc<runs::RunSupervisor> {
+        &self.runs
     }
 
     pub fn ws_connection_count(&self) -> usize {
@@ -1994,6 +2040,7 @@ async fn execute_session(
         .execute_for(
             storage.as_ref(),
             state.events(),
+            state.runs(),
             &principal,
             &session_id,
             &request.input,

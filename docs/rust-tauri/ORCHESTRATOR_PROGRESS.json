@@ -513,7 +513,7 @@
     },
     "R03": {
       "title": "运行状态机、并发、取消与恢复",
-      "status": "PENDING",
+      "status": "IN_PROGRESS",
       "task_ids": [
         "R03-T01",
         "R03-T02",
@@ -524,7 +524,7 @@
         "R03-T07",
         "R03-T08"
       ],
-      "stage_base_sha": null,
+      "stage_base_sha": "526f7770f1eff6be289b8c34faeccc1b95e181fd",
       "stage_review_round": 0,
       "stage_verdict": null,
       "stage_acceptance_commit_sha": null,
@@ -2425,23 +2425,62 @@
     "R03-T01": {
       "name": "实现运行与尝试状态机",
       "stage_id": "R03",
-      "status": "PENDING",
-      "task_base_sha": null,
-      "executor_id": null,
-      "execution_result": null,
-      "review_round": 0,
-      "reviewer_id": null,
-      "review_verdict": null,
-      "findings": [],
+      "status": "DONE",
+      "task_base_sha": "526f7770f1eff6be289b8c34faeccc1b95e181fd",
+      "executor_id": "ZCode:R03-T01-exec-e1 (agent_8d16e938-1f29-4e94-8f84-25f62ba6d852)",
+      "execution_result": "READY_FOR_REVIEW",
+      "review_round": 1,
+      "reviewer_id": "ZCode:R03-T01-review-r1 (agent_5e60651a-dc48-4ddf-9d80-c219c08a4e09)",
+      "review_verdict": "PASS",
+      "findings": [
+        {
+          "id": "R1-O1",
+          "severity": "ADVISORY",
+          "summary": "空 ToolRequests 列表分支该 turn 的 model_call 事件对未落库（outcome 仍响亮可诊断）",
+          "review_report": "docs/rust-tauri/R03/R03-T01_REVIEW_R1.md",
+          "resolution": "登记为观察项，后续 Task/T08 组合验收覆盖时复核"
+        },
+        {
+          "id": "R1-O2",
+          "severity": "ADVISORY",
+          "summary": "属性测试 total_unexpected 为化妆性常量计数（真实保护是 panic）",
+          "review_report": "docs/rust-tauri/R03/R03-T01_REVIEW_R1.md",
+          "resolution": "登记为观察项"
+        },
+        {
+          "id": "R1-O3",
+          "severity": "ADVISORY",
+          "summary": "一次 drive 内事件共用单一时间戳",
+          "review_report": "docs/rust-tauri/R03/R03-T01_REVIEW_R1.md",
+          "resolution": "登记为观察项，事件序由序列号保证"
+        },
+        {
+          "id": "R1-O4",
+          "severity": "ADVISORY",
+          "summary": "waiting_approval 仅表级验证（R04 前无触发路径，执行者已如实声明）",
+          "review_report": "docs/rust-tauri/R03/R03-T01_REVIEW_R1.md",
+          "resolution": "R04 审批触发路径接入后验收"
+        }
+      ],
       "repair_agent_id": null,
       "root_cause_agent_id": null,
       "acceptance_results": {
-        "R03-A01": "NOT_STARTED",
-        "R03-A02": "NOT_STARTED"
+        "R03-A01": "PASS",
+        "R03-A02": "PASS"
       },
       "task_commit_sha": null,
-      "push_result": null,
-      "blockers": []
+      "push_result": {
+        "status": "PENDING_BACKFILL",
+        "note": "本账本提交一并携带任务提交；SHA 与远程回执由下一账本提交补登（沿用 R02 惯例）"
+      },
+      "blockers": [],
+      "evidence": {
+        "executor_report": "docs/rust-tauri/R03/R03-T01_REPORT.md",
+        "executor_evidence": "artifacts/rust-tauri/R03/T01-E01/",
+        "review_report": "docs/rust-tauri/R03/R03-T01_REVIEW_R1.md",
+        "review_evidence": "artifacts/rust-tauri/R03/T01-R01-review/",
+        "candidate_diff_digest_16": "90e0e442353606f7"
+      }
     },
     "R03-T02": {
       "name": "会话串行化和全局限流",
@@ -4019,7 +4058,7 @@
       "blockers": []
     }
   },
-  "current_task": null,
+  "current_task": "R03-T02",
   "orchestration_mode": {
     "effective_from": "R00-T03 R2 repair",
     "task_executor": "new ZCode task per Rxx-Tyy",

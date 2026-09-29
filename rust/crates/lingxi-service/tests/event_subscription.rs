@@ -110,6 +110,7 @@ async fn execute(state: &ServiceState, input: &str, now_ms: u64) -> String {
         .execute_for(
             storage.as_ref(),
             state.events(),
+            state.runs(),
             &owner_principal(),
             "sess_local_alpha",
             input,

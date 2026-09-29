@@ -22,7 +22,7 @@ use std::sync::Arc;
 use lingxi_kernel::ports::{
     CommittedOutcome, KeyEvent, RunOutcome, RunRecord, StorageError, StoragePort,
 };
-use lingxi_kernel::{Principal, RunContext, RunStateMachine};
+use lingxi_kernel::{FinalizeSettlement, FinalizeVerdict, Principal, RunContext, RunStateMachine};
 use lingxi_protocol::canon;
 use lingxi_protocol::{
     AttemptId, EventEnvelope, EventId, EventPayload, FinalMessageCommittedPayload,
@@ -811,6 +811,30 @@ fn read_run_events(
     Ok(out)
 }
 
+/// Loads the final message a terminal run committed (`{run_id}-final` row),
+/// if any — the comparison half of the strengthened idempotency check
+/// (R03-T01 step 3: only COMPLETELY identical settlements replay).
+fn read_stored_final_message(
+    conn: &rusqlite::Connection,
+    run_id: &str,
+) -> Result<Option<lingxi_protocol::NormalizedMessage>, StorageError> {
+    let mut stmt = conn
+        .prepare("SELECT content_json FROM messages WHERE message_id = ?1")
+        .map_err(migrations::map_rusqlite)?;
+    let mut rows = stmt
+        .query([format!("{run_id}-final")])
+        .map_err(migrations::map_rusqlite)?;
+    match rows.next().map_err(migrations::map_rusqlite)? {
+        Some(row) => {
+            let content_json: String = row.get(0).map_err(migrations::map_rusqlite)?;
+            serde_json::from_str(&content_json).map_err(|err| StorageError::Corrupted {
+                detail: format!("final message of run {run_id} is not valid JSON: {err}"),
+            })
+        }
+        None => Ok(None),
+    }
+}
+
 impl StoragePort for RunDatabase {
     async fn record_run_started(
         &self,
@@ -968,36 +992,66 @@ impl StoragePort for RunDatabase {
                         });
                     }
                     let stored_status = parse_status(&run.status)?;
-                    if stored_status.is_terminal() {
-                        // Idempotent when identical, conflict otherwise.
-                        if stored_status == parse_status(&target_status)? {
+                    // R03-T01 step 3: the kernel's finalize decision is the
+                    // single authority. When the run is already terminal,
+                    // the STORED settlement (status + reason + final
+                    // message) is loaded and compared — only a COMPLETELY
+                    // identical re-submission replays idempotently; a
+                    // same-status settlement with a different reason or a
+                    // different final message is a diagnosed conflict, never
+                    // a silent merge.
+                    let stored_settlement: Option<FinalizeSettlement> = if stored_status
+                        .is_terminal()
+                    {
+                        Some(FinalizeSettlement {
+                            status: stored_status,
+                            reason: run.terminal_reason.clone(),
+                            final_message: read_stored_final_message(conn, &run_id)?,
+                        })
+                    } else {
+                        None
+                    };
+                    let requested = FinalizeSettlement {
+                        status: parse_status(&target_status)?,
+                        reason: reason.clone(),
+                        final_message: final_message.clone(),
+                    };
+                    match RunStateMachine::finalize(
+                        stored_status,
+                        stored_settlement.as_ref(),
+                        &requested,
+                    ) {
+                        Ok(FinalizeVerdict::IdempotentReplay { .. }) => {
                             let events = read_run_events(conn, &run_id)?;
                             return Ok(CommittedOutcome {
                                 newly_committed: false,
                                 events,
                             });
                         }
-                        return Err(StorageError::Conflict {
-                            detail: format!(
-                                "run {run_id} is already terminal as {} (recorded reason \
-                                 {:?}); refusing to overwrite with {target_status}",
-                                run.status, run.terminal_reason
-                            ),
-                        });
-                    }
-                    // The kernel state machine is the single transition
-                    // authority, enforced again at the storage boundary.
-                    let to = parse_status(&target_status)?;
-                    RunStateMachine::transition(stored_status, to).map_err(|err| {
-                        StorageError::InvalidRequest {
-                            detail: format!(
-                                "illegal transition {} -> {}: {}",
-                                stored_status.wire_name(),
-                                to.wire_name(),
-                                err.reason
-                            ),
+                        Ok(FinalizeVerdict::Commit { .. }) => {
+                            // Legal first finalize: fall through to stage the
+                            // events, the final message and the status in
+                            // this same transaction.
                         }
-                    })?;
+                        Err(rejection) => {
+                            return Err(if rejection.is_conflict() {
+                                StorageError::Conflict {
+                                    detail: format!("run {run_id}: {rejection}"),
+                                }
+                            } else if matches!(
+                                rejection.kind,
+                                lingxi_kernel::FinalizeRejectionKind::CorruptSettlement
+                            ) {
+                                StorageError::Corrupted {
+                                    detail: format!("run {run_id}: {rejection}"),
+                                }
+                            } else {
+                                StorageError::InvalidRequest {
+                                    detail: format!("run {run_id}: {rejection}"),
+                                }
+                            });
+                        }
+                    }
 
                     let mut events = Vec::new();
                     let mut last_seq = run.last_event_seq;
@@ -1102,6 +1156,205 @@ impl StoragePort for RunDatabase {
                     status: parse_status(&run.status)?,
                     last_event_seq: Seq::new(run.last_event_seq as u64),
                 }))
+            })
+            .await
+    }
+
+    async fn record_run_events(
+        &self,
+        ctx: &RunContext,
+        events: Vec<KeyEvent>,
+        now_unix_ms: u64,
+    ) -> Result<CommittedOutcome, StorageError> {
+        let (run_id, session_id, owner_kind, owner_subject, _principal_id, _generation) =
+            ctx_facts(ctx);
+        let attempt = ctx.attempt.to_string();
+        let stream_id = session_id.clone();
+        let busy = self.queue.options().busy_timeout_ms;
+        self.queue
+            .submit(move |conn| {
+                with_write_txn(conn, busy, |conn| {
+                    let Some(run) = load_run_row(conn, &run_id)? else {
+                        return Err(StorageError::InvalidRequest {
+                            detail: format!(
+                                "cannot attach events to run {run_id}: no run row exists"
+                            ),
+                        });
+                    };
+                    if run.session_id != session_id
+                        || run.owner_kind != owner_kind
+                        || run.owner_subject != owner_subject
+                    {
+                        return Err(StorageError::Conflict {
+                            detail: format!(
+                                "run {run_id} belongs to session {}/{}/{}; the event context \
+                                 claims {session_id}/{owner_kind}/{owner_subject}",
+                                run.session_id, run.owner_kind, run.owner_subject
+                            ),
+                        });
+                    }
+                    let stored_status = parse_status(&run.status)?;
+                    if stored_status.is_terminal() {
+                        // Late events after a terminal run are rejected
+                        // loudly here. The audit-only stale-event record is
+                        // the R03-T04 fence's job — this is the identity
+                        // floor, not a silent drop and not a resurrection.
+                        return Err(StorageError::Conflict {
+                            detail: format!(
+                                "run {run_id} is already terminal as {}; mid-run events \
+                                 for a settled run are refused (late-result audit arrives \
+                                 with the R03-T04 fence)",
+                                run.status
+                            ),
+                        });
+                    }
+                    // Attempt floor: the attempt the context claims must be
+                    // one that was actually OPENED on this run. A result
+                    // carrying an attempt id that never started cannot pose
+                    // as run output; the full generation fence is R03-T04.
+                    let attempt_open: bool = conn
+                        .query_row(
+                            "SELECT 1 FROM run_attempts WHERE run_id = ?1 AND attempt = ?2",
+                            rusqlite::params![run_id, attempt],
+                            |_| Ok(()),
+                        )
+                        .is_ok();
+                    if !attempt_open {
+                        return Err(StorageError::Conflict {
+                            detail: format!(
+                                "attempt {attempt} was never opened on run {run_id}; results \
+                                 cannot attach to an attempt that never started"
+                            ),
+                        });
+                    }
+                    if events.is_empty() {
+                        // Nothing to stage; still a legal no-op read-only
+                        // fact (the validation above ran).
+                        return Ok(CommittedOutcome {
+                            newly_committed: false,
+                            events: Vec::new(),
+                        });
+                    }
+                    let mut envelopes = Vec::with_capacity(events.len());
+                    let mut last_seq = run.last_event_seq;
+                    for event in &events {
+                        let (envelope, seq) = stage_event(
+                            conn,
+                            &stream_id,
+                            &session_id,
+                            now_unix_ms as i64,
+                            event,
+                            Some(&run_id),
+                            Some(&attempt),
+                        )?;
+                        last_seq = seq;
+                        envelopes.push(envelope);
+                    }
+                    conn.execute(
+                        "UPDATE runs SET last_event_seq = ?1, updated_at_unix_ms = ?2 \
+                         WHERE run_id = ?3",
+                        rusqlite::params![last_seq, now_unix_ms as i64, run_id],
+                    )
+                    .map_err(migrations::map_rusqlite)?;
+                    Ok(CommittedOutcome {
+                        newly_committed: true,
+                        events: envelopes,
+                    })
+                })
+            })
+            .await
+    }
+
+    async fn record_attempt_started(
+        &self,
+        ctx: &RunContext,
+        now_unix_ms: u64,
+    ) -> Result<CommittedOutcome, StorageError> {
+        let (run_id, session_id, owner_kind, owner_subject, _principal_id, generation) =
+            ctx_facts(ctx);
+        let attempt = ctx.attempt.to_string();
+        let busy = self.queue.options().busy_timeout_ms;
+        self.queue
+            .submit(move |conn| {
+                with_write_txn(conn, busy, |conn| {
+                    let Some(run) = load_run_row(conn, &run_id)? else {
+                        return Err(StorageError::InvalidRequest {
+                            detail: format!(
+                                "cannot start an attempt on run {run_id}: no run row exists"
+                            ),
+                        });
+                    };
+                    if run.session_id != session_id
+                        || run.owner_kind != owner_kind
+                        || run.owner_subject != owner_subject
+                    {
+                        return Err(StorageError::Conflict {
+                            detail: format!(
+                                "run {run_id} belongs to session {}/{}/{}; the attempt context \
+                                 claims {session_id}/{owner_kind}/{owner_subject}",
+                                run.session_id, run.owner_kind, run.owner_subject
+                            ),
+                        });
+                    }
+                    let stored_status = parse_status(&run.status)?;
+                    if stored_status.is_terminal() {
+                        return Err(StorageError::Conflict {
+                            detail: format!(
+                                "run {run_id} is already terminal as {}; a finished run never \
+                                 gains attempts — re-execution is a NEW run",
+                                run.status
+                            ),
+                        });
+                    }
+                    if stored_status != RunStatus::Running {
+                        // T01 opens attempts on running runs; waiting-
+                        // approval attempts arrive with the R04 approval
+                        // gateway.
+                        return Err(StorageError::InvalidRequest {
+                            detail: format!(
+                                "attempt can only start on a running run; {run_id} is {}",
+                                stored_status.wire_name()
+                            ),
+                        });
+                    }
+                    let exists: bool = conn
+                        .query_row(
+                            "SELECT 1 FROM run_attempts WHERE run_id = ?1 AND attempt = ?2",
+                            rusqlite::params![run_id, attempt],
+                            |_| Ok(()),
+                        )
+                        .is_ok();
+                    if exists {
+                        return Err(StorageError::Conflict {
+                            detail: format!(
+                                "attempt {attempt} already exists on run {run_id}; each retry \
+                                 is a FRESH attempt identity"
+                            ),
+                        });
+                    }
+                    conn.execute(
+                        "INSERT INTO run_attempts \
+                         (run_id, attempt, generation, started_at_unix_ms) \
+                         VALUES (?1, ?2, ?3, ?4)",
+                        rusqlite::params![run_id, attempt, generation as i64, now_unix_ms as i64],
+                    )
+                    .map_err(migrations::map_rusqlite)?;
+                    conn.execute(
+                        "UPDATE runs SET attempt_count = attempt_count + 1, \
+                         updated_at_unix_ms = ?1 WHERE run_id = ?2",
+                        rusqlite::params![now_unix_ms as i64, run_id],
+                    )
+                    .map_err(migrations::map_rusqlite)?;
+                    // The run's STATUS does not change (still running); the
+                    // durable attempt row is the fact. No key event: the
+                    // known vocabulary has no attempt_started type, and
+                    // model-call/tool events carry their attempt id in the
+                    // envelope.
+                    Ok(CommittedOutcome {
+                        newly_committed: true,
+                        events: Vec::new(),
+                    })
+                })
             })
             .await
     }
