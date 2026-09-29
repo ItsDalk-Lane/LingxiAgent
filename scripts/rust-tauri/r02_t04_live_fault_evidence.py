@@ -27,7 +27,18 @@ def main() -> int:
             "busy": {"http": 503, "reason": "db_busy", "liveEvents": 0, "runs": 0, "keyEvents": 0},
             "terminal": {"http": 500, "reason": "db_failure", "liveEvents": 1, "storedStatus": "running"},
             "disk": {"runs": 1, "keyEvents": 1, "status": "running"},
-            "restart": {"runs": 1, "keyEvents": 1},
+            # R03 STAGE-REPAIR-G01-F01 (FINDING-2 equivalence, adjudicated in
+            # R03-T08_REVIEW_R1 §6): the R03-T07 startup recovery scan honestly
+            # finalizes the faulted dangling run through the single finalize
+            # path (interrupted_needs_attention + its terminal key event), so
+            # the restart section gains exactly ONE key event. This mirrors the
+            # already-reviewed in-library assertion change in
+            # execute_concurrency.rs (R03-T07_REPORT §4 夹具改动 2: (1,1)->(1,2)
+            # + the no-fake-success state assertion): runs stays 1 (no new
+            # run), keyEvents 1->2, and the run state is pinned to
+            # interrupted_needs_attention — strictly STRONGER than the old
+            # bare count (a fabricated completion or a blank row now fails).
+            "restart": {"runs": 1, "keyEvents": 2, "status": "interrupted_needs_attention"},
         }.items():
             actual = case.get(section)
             if not isinstance(actual, dict):

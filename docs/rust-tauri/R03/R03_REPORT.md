@@ -56,7 +56,7 @@ macOS darwin 27.0.0 arm64；rustup 锁定 1.98.1（全部经 rustup 代理+`--lo
 
 ## 已知缺陷
 
-- **R03-T08-FINDING-1（MINOR，T08 组合矩阵发现，未修复——如实登记）**：父取消路径 subagent child run durable 行不就地收口（spawn_linked 包装器 biased select 先丢弃 drive future），由下一进程启动扫描诚实收口为 interrupted_needs_attention（矩阵实测+重启闭环已证）；child 自身超时路径正常落 cancelled。T06 报告对应表述在父取消路径不成立。影响域：子代理父取消场景的行级即时终态（监督层 A06 判定成立）；修复归属 R04/R06 触碰或总控另派。关联：R03-A06（判定成立不受影响）。
+- **R03-T08-FINDING-1（MINOR，T08 组合矩阵发现，未修复——如实登记）**：父取消路径 subagent child run durable 行不就地收口（spawn_linked 包装器 biased select 先丢弃 drive future），由下一进程启动扫描诚实收口为 interrupted_needs_attention（矩阵实测+重启闭环已证）；child 自身超时路径正常落 cancelled。T06 报告对应表述在父取消路径不成立。影响域：子代理父取消场景的行级即时终态（监督层 A06 判定成立）；修复归属 R04/R06 触碰或总控另派。关联：R03-A06（判定成立不受影响）。**【G01-F01 文档更正执行记录 2026-09-29】**T06 报告该表述已由 STAGE-REPAIR-R03-G01-F01 按本裁决语义更正（原句删除线保留，见 repairs/R03_STAGE_REPAIR_G01_F01.md）；产线修复归属不变（R04/R06 或总控另派），本条不因此自标关闭。
 - **R03-T08-FINDING-2（MINOR，R02 资产过期，非 R03 语义回退）**：`r02_t04_live_fault_evidence.py` 重启 keyEvents 精确计数（=1）未计入 R03-T07 恢复扫描对 active run 的诚实 finalize 事件；全量 verify-stage R02 中 a07_live_fault_02_check 红、live_fault_01_test 绿。R02 资产断言更新归独立审阅授权（本 Task 不改已验收阶段门禁断言）。
 - **R03-T08-FINDING-3（MINOR，R02 资产过期，非 R03 语义回退）**：`r02_t07_slow_subscriber.sh` 并发同会话风暴「全部 200」断言先于 R03-T02 冻结 busy 闸（409 session_busy retryable=现役 Node 同语义）存在；1000 并发出现 1 个 409 触发该单条断言。同上归属。
 - T03 D1/D2（MINOR）：D1 已于 T06 强制修复闭环；D2 为报告文档项，随下次触碰修正。

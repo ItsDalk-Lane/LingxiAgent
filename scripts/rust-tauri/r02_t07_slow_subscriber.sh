@@ -6,8 +6,12 @@
 #
 # Proves (binary level):
 #   S1  a subscriber (A) that stops reading does NOT stall the writers:
-#       all execute requests answer 200 and the healthy subscriber (B)
-#       receives EVERY key event in seq order (no silent loss anywhere);
+#       every execute request is ANSWERED — 200, or the frozen 409
+#       session_busy (retryable:true) busy-gate refusal (R03-T02 frozen
+#       incumbent semantics; a SERVED legal rejection, not a stall) with
+#       zero 5xx / zero timeouts / zero hangs — and the healthy
+#       subscriber (B) receives EVERY key event in seq order (no silent
+#       loss anywhere);
 #   S2  when the configured cap is reached (--event-subscriber-queue 4),
 #       the slow subscription is detached with an EXPLICIT
 #       snapshot_required control frame (reason=slow_consumer) — the
@@ -252,6 +256,7 @@ note "== S1/S2: subscriber A stops reading; B keeps reading; writers commit key 
 ADDR="$ADDR" TOKEN="$TOKEN" SERVICE_PID="$SERVICE_PID" EVIDENCE_DIR="$EVIDENCE_DIR" \
 python3 - > "$EVIDENCE_DIR/ws-probe.log" 2>&1 <<'PYEOF' &
 import base64, json, os, socket, struct, threading, time
+import urllib.error
 import urllib.request
 
 addr = os.environ["ADDR"]
@@ -414,14 +419,33 @@ thread_b = threading.Thread(target=reader_b, daemon=True)
 thread_b.start()
 
 # Writer storm: REAL concurrent HTTP writers committing key events.
-statuses = []
+# R03 STAGE-REPAIR-G01-F01 (FINDING-3 equivalence, adjudicated in
+# R03-T08_REVIEW_R1 §6): the W1 no-stall invariant is "every execute is
+# ANSWERED" — 200, or the R03-T02 frozen 409 session_busy (retryable)
+# busy-gate rejection (same incumbent semantics). A 409 is a served legal
+# refusal, NOT a stall and NOT a fake success; zero 5xx / zero timeouts /
+# zero hangs and the served-409 body contract stay hard failures. The W2
+# sequential phase below keeps its all-200 assertion verbatim.
+answers = []
 def writer(k):
     try:
-        status, _ = http("POST", f"/lingxi/v1/sessions/{STREAM}/execute",
+        status, body = http("POST", f"/lingxi/v1/sessions/{STREAM}/execute",
                          {"input": f"a14 storm run {k}"})
-        statuses.append(status)
+        answers.append((status, body))
+    except urllib.error.HTTPError as exc:
+        # A non-2xx response is still an ANSWER (the connection served it);
+        # capture the body so the 409 contract can be verified per-answer.
+        try:
+            raw = exc.read()
+        except Exception:
+            raw = b""
+        try:
+            body = json.loads(raw.decode("utf-8", "replace"))
+        except Exception:
+            body = None
+        answers.append((exc.code, body))
     except Exception as exc:
-        statuses.append(repr(exc))
+        answers.append((None, repr(exc)))
 
 threads = [threading.Thread(target=writer, args=(k,)) for k in range(EXECUTES)]
 i = 0
@@ -432,8 +456,23 @@ while i < EXECUTES:
     for t in batch:
         t.join()
     i += 24
-print(f"writer storm done: {len(statuses)} requests, statuses {sorted(set(map(str, statuses)))}", flush=True)
-assert statuses == [200] * EXECUTES, "every execute must answer 200 (no stall, no fake success)"
+print(f"writer storm done: {len(answers)} requests, statuses {sorted(set(str(a[0]) for a in answers))}", flush=True)
+assert len(answers) == EXECUTES, "every execute must be accounted for (no lost request)"
+unanswered = [a for a in answers if a[0] is None]
+assert not unanswered, \
+    f"every execute must be ANSWERED (no stall, no timeout, no hang): {unanswered[:3]}"
+bad_codes = sorted({a[0] for a in answers} - {200, 409})
+assert not bad_codes, \
+    f"execute answers must be 200 or 409 (zero 5xx, zero other): {bad_codes}"
+for code, body in answers:
+    if code == 409:
+        details = (body or {}).get("details") or {}
+        assert details.get("reason") == "session_busy", \
+            f"a 409 must be the frozen busy gate (session_busy): {body}"
+        assert (body or {}).get("retryable") is True, \
+            f"a 409 must carry retryable:true (served refusal, not a failure): {body}"
+executes_200 = sum(1 for a in answers if a[0] == 200)
+executes_409 = sum(1 for a in answers if a[0] == 409)
 
 # Phase W2 (deterministic volume): sequential writers commit enough key
 # events that subscriber A's TCP pipeline (kernel-buffered) FILLS and the
@@ -538,7 +577,14 @@ with open(os.path.join(evidence, "storm-results.json"), "w") as f:
         "executes_concurrent": EXECUTES,
         "executes_sequential": SEQUENTIAL,
         "durable_key_events": TOTAL,
-        "all_executes_200": statuses == [200] * EXECUTES,
+        # R03 STAGE-REPAIR-G01-F01: W1 no-stall invariant is "every execute
+        # ANSWERED" — 200 or the frozen 409 session_busy (retryable) busy
+        # gate; the fields below replace the old all-200-only record so the
+        # evidence matches the adjudicated assertion honestly.
+        "executes_answered_200": executes_200,
+        "executes_answered_409_session_busy": executes_409,
+        "all_executes_answered_200_or_busy_409": executes_200 + executes_409 == EXECUTES,
+        "zero_5xx_zero_timeout_zero_hang": True,
         "b_complete": merged_b == list(range(1, TOTAL + 1)),
         "b_needed_explicit_rebuild": bool(b_detached),
         "a_buffered_before_detach": a_frames,
@@ -578,7 +624,8 @@ if wait "$PROBE_PID" 2>/dev/null; then PROBE_RC=0; else PROBE_RC=$?; fi
 PROBE_PID=""
 [ "$PROBE_RC" -eq 0 ] || fail "storm probe exited $PROBE_RC despite its completion marker"
 EXECUTES_DONE="$(python3 -c "import json;print(json.load(open('$EVIDENCE_DIR/storm-results.json'))['executes_concurrent'])")"
-note "PASS S1: all $EXECUTES_DONE concurrent executes answered 200 (writers not stalled by the slow subscriber; count read from storm-results.json)"
+S1_BREAKDOWN="$(python3 -c "import json; r=json.load(open('$EVIDENCE_DIR/storm-results.json')); print(str(r['executes_answered_200'])+'x200 + '+str(r['executes_answered_409_session_busy'])+'x409(session_busy retryable)')")"
+note "PASS S1: all $EXECUTES_DONE concurrent executes were ANSWERED ($S1_BREAKDOWN) — 409 is the R03-T02 frozen busy-gate refusal (served, retryable; not a stall, not a fake success; zero 5xx/timeout/hang); counts read from storm-results.json"
 note "PASS S1: healthy subscriber B's merged view equals the durable head (no silent loss)"
 note "PASS S2: slow subscriber A got the EXPLICIT snapshot_required (reason=slow_consumer) and resubscribed"
 

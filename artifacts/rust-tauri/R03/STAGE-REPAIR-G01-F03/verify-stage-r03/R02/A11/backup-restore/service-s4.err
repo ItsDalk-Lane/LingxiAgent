@@ -1,0 +1,11 @@
+2026-09-29T13:56:01.042126Z  INFO lingxi_service: data root resolved effective_home=/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T//lingxi-r02t06-bk-iOn5K8 source=cli ignored_sources=none
+2026-09-29T13:56:01.042292Z  INFO lingxi_service: data root prepared (canonicalized; runtime dir private 0700) canonical_home=/private/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-r02t06-bk-iOn5K8 runtime_dir=/private/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-r02t06-bk-iOn5K8/lingxi-service
+2026-09-29T13:56:01.042449Z  INFO lingxi_service: single-writer lock acquired instance_id=613e2cbc860523a7519dad04ff2a6772 start_nonce=cbdb626b6fa3d0e8 pid=46377 entropy="os-random-device" lock=/private/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-r02t06-bk-iOn5K8/lingxi-service/instance.lock network_mode=loopback
+2026-09-29T13:56:01.042725Z  INFO lingxi_service: data-epoch gate passed home=/private/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-r02t06-bk-iOn5K8 decision=ProceedSteady(EpochStamp { format: V2, minimum_reader_epoch: 1, committed_data_epoch: 1, last_version: Some("0.0.0") })
+2026-09-29T13:56:01.054696Z  INFO lingxi_service: auth service bootstrapped (per-start loopback token, owner-only); run database migrated and seeded local_token_file=/private/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-r02t06-bk-iOn5K8/lingxi-service/local-token.json run_database=/private/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-r02t06-bk-iOn5K8/lingxi-service/data/runs.db
+2026-09-29T13:56:01.064420Z  INFO lingxi_service: instance record published (atomic write) record=/private/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-r02t06-bk-iOn5K8/lingxi-service/instance.json bind_addr=127.0.0.1:51006
+2026-09-29T13:56:01.164795Z  INFO lingxi_service: request handled request_id=req-0d6b247e3663345f377571fef35cd5bd method=GET path=/lingxi/v1/ws status=101
+2026-09-29T13:56:02.179221Z  INFO lingxi_service: shutdown signal: SIGTERM
+2026-09-29T13:56:02.180964Z  INFO lingxi_service::shutdown: run database closed (drained, WAL truncated) phase=storage_close
+2026-09-29T13:56:02.181503Z  INFO lingxi_service::shutdown: own instance record removed, lock released phase=record_cleanup
+2026-09-29T13:56:02.181631Z  INFO lingxi_service: lingxi-service stopped cleanly (run database closed, own record removed, lock released)

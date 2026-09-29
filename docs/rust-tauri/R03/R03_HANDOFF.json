@@ -115,7 +115,7 @@
   {
    "id": "R03-T08-FINDING-1",
    "severity": "MINOR（如实登记，不阻塞 A06/A15 判定）",
-   "summary": "父取消路径的 subagent child run durable 行不就地收口：spawn_linked 包装器的 biased select 在树取消时先于 child drive 的自身取消结算丢弃 drive future，行保持 active，由下一进程启动扫描收口为 interrupted_needs_attention（组合矩阵实测+恢复闭环已证）；线程登记 busy 标志同样只在 drive 完成尾清除。T06 报告「child 由自身 drive 观测并经唯一 finalize 落 cancelled」的表述在父取消路径不成立（child 自身超时路径成立）。修复归属：R04/R06 触碰 task_supervisor/subagents 时按根因收口或由总控另派修复（本 Task 不越权改产线代码）"
+   "summary": "父取消路径的 subagent child run durable 行不就地收口：spawn_linked 包装器的 biased select 在树取消时先于 child drive 的自身取消结算丢弃 drive future，行保持 active，由下一进程启动扫描收口为 interrupted_needs_attention（组合矩阵实测+恢复闭环已证）；线程登记 busy 标志同样只在 drive 完成尾清除。T06 报告「child 由自身 drive 观测并经唯一 finalize 落 cancelled」的表述在父取消路径不成立（child 自身超时路径成立）。修复归属：R04/R06 触碰 task_supervisor/subagents 时按根因收口或由总控另派修复（本 Task 不越权改产线代码）。G01-F01 文档更正执行记录（2026-09-29）：T06 报告该表述已由 STAGE-REPAIR-R03-G01-F01 按裁决语义更正（原句删除线保留，见 docs/rust-tauri/R03/repairs/R03_STAGE_REPAIR_G01_F01.md）；产线修复归属不变，本条不因此自标关闭"
   },
   {
    "id": "R03-T08-FINDING-2",

@@ -1,0 +1,180 @@
+diff --git a/docs/rust-tauri/R03/R03-T06_REPORT.md b/docs/rust-tauri/R03/R03-T06_REPORT.md
+index 003468f15..0354bd420 100644
+--- a/docs/rust-tauri/R03/R03-T06_REPORT.md
++++ b/docs/rust-tauri/R03/R03-T06_REPORT.md
+@@ -27,7 +27,7 @@
+ | **消息可见性：子只看 task 文本；子可读父会话文件** | `subagent-tool.ts:257`（task 参数描述明示「cannot see the current conversation history unless you include it here」）+ `:482` `fileReadSessionPaths:[parentSessionPath]`（session-coordinator.ts:8286 落地） | child run 的 input=delegation.task **原文**（无父历史注入；测试替身按 input marker 区分父子证明）；文件读取面=R04/R06 工具，R03 如实递延；父子关系由 lineage 持久化承载 |
+ | **实验开关默认值** | `lib/experiments/registry.ts:15` `PROACTIVE_SUBAGENT_EXPERIMENT_ID="subagent.proactive_delegation"`，`defaultValue:false` | kernel `SubagentPolicy{proactive_delegation:false, tool_strategy:Intercept}`（`LINGXI_SUBAGENT_TOOL_STRATEGY` 默认甲 intercept 同 :36-38）；经 `ServiceDeps.subagent_policy` 注入，退化值响亮拒启 |
+ | **并发 10/会话、20 全局、30 分钟超时（开跑才计时）** | `subagent-tool.ts:228-229`（MAX_PER_SESSION/MAX_GLOBAL）、:27（30min）、:429-431/:461（timer 在 executeForAgent 开跑时起） | `SubagentPolicy{per_session_limit:10, global_limit:20, timeout_ms:30*60*1000}`：dispatch 时 per-session+global 计数闸（超限 SessionLimit/GlobalLimit 响亮）；child drive 包 `timeout_at(开跑锚点)`，到期 cancel child scope → child 走自身四相取消结算（不 drop future） |
+-| **父取消传播到子（abortByParentSession）** | `docs/refactor-2026/P02/STATE_TRANSITIONS.md:42`（T8：该父下全部活跃→aborted） | `CancelRegistry::register_linked(run_id, parent_scope)`（cancel.rs 新）：child run 的取消根挂父 scope 之下——父取消向下急切传播、子取消不反向；child 由自身 drive 观测并经唯一 finalize 落 cancelled（T03 机制不动） |
++| **父取消传播到子（abortByParentSession）** | `docs/refactor-2026/P02/STATE_TRANSITIONS.md:42`（T8：该父下全部活跃→aborted） | `CancelRegistry::register_linked(run_id, parent_scope)`（cancel.rs 新）：child run 的取消根挂父 scope 之下——父取消向下急切传播、子取消不反向。~~child 由自身 drive 观测并经唯一 finalize 落 cancelled（T03 机制不动）~~ **【更正 2026-09-29，STAGE-REPAIR-R03-G01-F01，依 R03-T08_REVIEW_R1 §7 FINDING-1 裁决】**原表述在父取消路径不成立：spawn_linked 包装器的 biased select 在树取消分支先就绪时**丢弃 child drive future**——监督层子任务立即停止（A06 成立：live_children_of(parent) 为空、child 永不 completed、无 final message），drive 不会经自身 finalize 落 cancelled；child run 的 durable 行保持 active，由下一进程启动扫描按 T07 两阶段闭环诚实收口为 interrupted_needs_attention（重启闭环已实测，T08 组合矩阵崩溃恢复案例）。child **自身超时路径**（上行 timeout_at 锚点）仍正常经自身四相取消落 cancelled。原句以删除线保留供追溯，产线修复归属见 R03_HANDOFF known_gaps（R04/R06 触碰或总控另派）。 |
+ | **结果回流父会话（trigger_parent_turn）** | `subagent-tool.ts:389`（deliveryIntent）+ DeferredResultStore | child 结束 → `SessionSupervisor::deliver_retained`（session_supervisor.rs 新）：忙会话的当前 run 下一模型轮 drain；闲会话**保留**给下一 run 首轮（T02 leftover 语义）；主动触发新父轮=R06/R07（R03 无自动提交循环，如实边界） |
+ | **子并发车道与父隔离（隔离会话语义）** | Node：child 跑在隔离 session（`prepareIsolatedSession`），不与父会话争流控 | drive_run 新 `quota_session_lane` 参数（runs.rs）：用户提交传 session 本身（语义不变）；child 传 `{session}::subagent::{thread}` + 独立 agent lane `subagent:{agent}`——父停在模型读时占住会话唯一 model 车道不会饿死 child（反之亦然）；总量另受 10/20 闸约束 |
+ 
+diff --git a/docs/rust-tauri/R03/R03_HANDOFF.json b/docs/rust-tauri/R03/R03_HANDOFF.json
+index 75bb7b579..dfd4d22b7 100644
+--- a/docs/rust-tauri/R03/R03_HANDOFF.json
++++ b/docs/rust-tauri/R03/R03_HANDOFF.json
+@@ -115,7 +115,7 @@
+   {
+    "id": "R03-T08-FINDING-1",
+    "severity": "MINOR（如实登记，不阻塞 A06/A15 判定）",
+-   "summary": "父取消路径的 subagent child run durable 行不就地收口：spawn_linked 包装器的 biased select 在树取消时先于 child drive 的自身取消结算丢弃 drive future，行保持 active，由下一进程启动扫描收口为 interrupted_needs_attention（组合矩阵实测+恢复闭环已证）；线程登记 busy 标志同样只在 drive 完成尾清除。T06 报告「child 由自身 drive 观测并经唯一 finalize 落 cancelled」的表述在父取消路径不成立（child 自身超时路径成立）。修复归属：R04/R06 触碰 task_supervisor/subagents 时按根因收口或由总控另派修复（本 Task 不越权改产线代码）"
++   "summary": "父取消路径的 subagent child run durable 行不就地收口：spawn_linked 包装器的 biased select 在树取消时先于 child drive 的自身取消结算丢弃 drive future，行保持 active，由下一进程启动扫描收口为 interrupted_needs_attention（组合矩阵实测+恢复闭环已证）；线程登记 busy 标志同样只在 drive 完成尾清除。T06 报告「child 由自身 drive 观测并经唯一 finalize 落 cancelled」的表述在父取消路径不成立（child 自身超时路径成立）。修复归属：R04/R06 触碰 task_supervisor/subagents 时按根因收口或由总控另派修复（本 Task 不越权改产线代码）。G01-F01 文档更正执行记录（2026-09-29）：T06 报告该表述已由 STAGE-REPAIR-R03-G01-F01 按裁决语义更正（原句删除线保留，见 docs/rust-tauri/R03/repairs/R03_STAGE_REPAIR_G01_F01.md）；产线修复归属不变，本条不因此自标关闭"
+   },
+   {
+    "id": "R03-T08-FINDING-2",
+diff --git a/docs/rust-tauri/R03/R03_REPORT.md b/docs/rust-tauri/R03/R03_REPORT.md
+index d3b53b528..74367a033 100644
+--- a/docs/rust-tauri/R03/R03_REPORT.md
++++ b/docs/rust-tauri/R03/R03_REPORT.md
+@@ -56,7 +56,7 @@ macOS darwin 27.0.0 arm64；rustup 锁定 1.98.1（全部经 rustup 代理+`--lo
+ 
+ ## 已知缺陷
+ 
+-- **R03-T08-FINDING-1（MINOR，T08 组合矩阵发现，未修复——如实登记）**：父取消路径 subagent child run durable 行不就地收口（spawn_linked 包装器 biased select 先丢弃 drive future），由下一进程启动扫描诚实收口为 interrupted_needs_attention（矩阵实测+重启闭环已证）；child 自身超时路径正常落 cancelled。T06 报告对应表述在父取消路径不成立。影响域：子代理父取消场景的行级即时终态（监督层 A06 判定成立）；修复归属 R04/R06 触碰或总控另派。关联：R03-A06（判定成立不受影响）。
++- **R03-T08-FINDING-1（MINOR，T08 组合矩阵发现，未修复——如实登记）**：父取消路径 subagent child run durable 行不就地收口（spawn_linked 包装器 biased select 先丢弃 drive future），由下一进程启动扫描诚实收口为 interrupted_needs_attention（矩阵实测+重启闭环已证）；child 自身超时路径正常落 cancelled。T06 报告对应表述在父取消路径不成立。影响域：子代理父取消场景的行级即时终态（监督层 A06 判定成立）；修复归属 R04/R06 触碰或总控另派。关联：R03-A06（判定成立不受影响）。**【G01-F01 文档更正执行记录 2026-09-29】**T06 报告该表述已由 STAGE-REPAIR-R03-G01-F01 按本裁决语义更正（原句删除线保留，见 repairs/R03_STAGE_REPAIR_G01_F01.md）；产线修复归属不变（R04/R06 或总控另派），本条不因此自标关闭。
+ - **R03-T08-FINDING-2（MINOR，R02 资产过期，非 R03 语义回退）**：`r02_t04_live_fault_evidence.py` 重启 keyEvents 精确计数（=1）未计入 R03-T07 恢复扫描对 active run 的诚实 finalize 事件；全量 verify-stage R02 中 a07_live_fault_02_check 红、live_fault_01_test 绿。R02 资产断言更新归独立审阅授权（本 Task 不改已验收阶段门禁断言）。
+ - **R03-T08-FINDING-3（MINOR，R02 资产过期，非 R03 语义回退）**：`r02_t07_slow_subscriber.sh` 并发同会话风暴「全部 200」断言先于 R03-T02 冻结 busy 闸（409 session_busy retryable=现役 Node 同语义）存在；1000 并发出现 1 个 409 触发该单条断言。同上归属。
+ - T03 D1/D2（MINOR）：D1 已于 T06 强制修复闭环；D2 为报告文档项，随下次触碰修正。
+diff --git a/scripts/rust-tauri/r02_t04_live_fault_evidence.py b/scripts/rust-tauri/r02_t04_live_fault_evidence.py
+index ba2cc6ab1..738cc62be 100644
+--- a/scripts/rust-tauri/r02_t04_live_fault_evidence.py
++++ b/scripts/rust-tauri/r02_t04_live_fault_evidence.py
+@@ -27,7 +27,18 @@ def main() -> int:
+             "busy": {"http": 503, "reason": "db_busy", "liveEvents": 0, "runs": 0, "keyEvents": 0},
+             "terminal": {"http": 500, "reason": "db_failure", "liveEvents": 1, "storedStatus": "running"},
+             "disk": {"runs": 1, "keyEvents": 1, "status": "running"},
+-            "restart": {"runs": 1, "keyEvents": 1},
++            # R03 STAGE-REPAIR-G01-F01 (FINDING-2 equivalence, adjudicated in
++            # R03-T08_REVIEW_R1 §6): the R03-T07 startup recovery scan honestly
++            # finalizes the faulted dangling run through the single finalize
++            # path (interrupted_needs_attention + its terminal key event), so
++            # the restart section gains exactly ONE key event. This mirrors the
++            # already-reviewed in-library assertion change in
++            # execute_concurrency.rs (R03-T07_REPORT §4 夹具改动 2: (1,1)->(1,2)
++            # + the no-fake-success state assertion): runs stays 1 (no new
++            # run), keyEvents 1->2, and the run state is pinned to
++            # interrupted_needs_attention — strictly STRONGER than the old
++            # bare count (a fabricated completion or a blank row now fails).
++            "restart": {"runs": 1, "keyEvents": 2, "status": "interrupted_needs_attention"},
+         }.items():
+             actual = case.get(section)
+             if not isinstance(actual, dict):
+diff --git a/scripts/rust-tauri/r02_t07_slow_subscriber.sh b/scripts/rust-tauri/r02_t07_slow_subscriber.sh
+index bdf233d61..141fa48b4 100755
+--- a/scripts/rust-tauri/r02_t07_slow_subscriber.sh
++++ b/scripts/rust-tauri/r02_t07_slow_subscriber.sh
+@@ -6,8 +6,12 @@
+ #
+ # Proves (binary level):
+ #   S1  a subscriber (A) that stops reading does NOT stall the writers:
+-#       all execute requests answer 200 and the healthy subscriber (B)
+-#       receives EVERY key event in seq order (no silent loss anywhere);
++#       every execute request is ANSWERED — 200, or the frozen 409
++#       session_busy (retryable:true) busy-gate refusal (R03-T02 frozen
++#       incumbent semantics; a SERVED legal rejection, not a stall) with
++#       zero 5xx / zero timeouts / zero hangs — and the healthy
++#       subscriber (B) receives EVERY key event in seq order (no silent
++#       loss anywhere);
+ #   S2  when the configured cap is reached (--event-subscriber-queue 4),
+ #       the slow subscription is detached with an EXPLICIT
+ #       snapshot_required control frame (reason=slow_consumer) — the
+@@ -252,6 +256,7 @@ note "== S1/S2: subscriber A stops reading; B keeps reading; writers commit key
+ ADDR="$ADDR" TOKEN="$TOKEN" SERVICE_PID="$SERVICE_PID" EVIDENCE_DIR="$EVIDENCE_DIR" \
+ python3 - > "$EVIDENCE_DIR/ws-probe.log" 2>&1 <<'PYEOF' &
+ import base64, json, os, socket, struct, threading, time
++import urllib.error
+ import urllib.request
+ 
+ addr = os.environ["ADDR"]
+@@ -414,14 +419,33 @@ thread_b = threading.Thread(target=reader_b, daemon=True)
+ thread_b.start()
+ 
+ # Writer storm: REAL concurrent HTTP writers committing key events.
+-statuses = []
++# R03 STAGE-REPAIR-G01-F01 (FINDING-3 equivalence, adjudicated in
++# R03-T08_REVIEW_R1 §6): the W1 no-stall invariant is "every execute is
++# ANSWERED" — 200, or the R03-T02 frozen 409 session_busy (retryable)
++# busy-gate rejection (same incumbent semantics). A 409 is a served legal
++# refusal, NOT a stall and NOT a fake success; zero 5xx / zero timeouts /
++# zero hangs and the served-409 body contract stay hard failures. The W2
++# sequential phase below keeps its all-200 assertion verbatim.
++answers = []
+ def writer(k):
+     try:
+-        status, _ = http("POST", f"/lingxi/v1/sessions/{STREAM}/execute",
++        status, body = http("POST", f"/lingxi/v1/sessions/{STREAM}/execute",
+                          {"input": f"a14 storm run {k}"})
+-        statuses.append(status)
++        answers.append((status, body))
++    except urllib.error.HTTPError as exc:
++        # A non-2xx response is still an ANSWER (the connection served it);
++        # capture the body so the 409 contract can be verified per-answer.
++        try:
++            raw = exc.read()
++        except Exception:
++            raw = b""
++        try:
++            body = json.loads(raw.decode("utf-8", "replace"))
++        except Exception:
++            body = None
++        answers.append((exc.code, body))
+     except Exception as exc:
+-        statuses.append(repr(exc))
++        answers.append((None, repr(exc)))
+ 
+ threads = [threading.Thread(target=writer, args=(k,)) for k in range(EXECUTES)]
+ i = 0
+@@ -432,8 +456,23 @@ while i < EXECUTES:
+     for t in batch:
+         t.join()
+     i += 24
+-print(f"writer storm done: {len(statuses)} requests, statuses {sorted(set(map(str, statuses)))}", flush=True)
+-assert statuses == [200] * EXECUTES, "every execute must answer 200 (no stall, no fake success)"
++print(f"writer storm done: {len(answers)} requests, statuses {sorted(set(str(a[0]) for a in answers))}", flush=True)
++assert len(answers) == EXECUTES, "every execute must be accounted for (no lost request)"
++unanswered = [a for a in answers if a[0] is None]
++assert not unanswered, \
++    f"every execute must be ANSWERED (no stall, no timeout, no hang): {unanswered[:3]}"
++bad_codes = sorted({a[0] for a in answers} - {200, 409})
++assert not bad_codes, \
++    f"execute answers must be 200 or 409 (zero 5xx, zero other): {bad_codes}"
++for code, body in answers:
++    if code == 409:
++        details = (body or {}).get("details") or {}
++        assert details.get("reason") == "session_busy", \
++            f"a 409 must be the frozen busy gate (session_busy): {body}"
++        assert (body or {}).get("retryable") is True, \
++            f"a 409 must carry retryable:true (served refusal, not a failure): {body}"
++executes_200 = sum(1 for a in answers if a[0] == 200)
++executes_409 = sum(1 for a in answers if a[0] == 409)
+ 
+ # Phase W2 (deterministic volume): sequential writers commit enough key
+ # events that subscriber A's TCP pipeline (kernel-buffered) FILLS and the
+@@ -538,7 +577,14 @@ with open(os.path.join(evidence, "storm-results.json"), "w") as f:
+         "executes_concurrent": EXECUTES,
+         "executes_sequential": SEQUENTIAL,
+         "durable_key_events": TOTAL,
+-        "all_executes_200": statuses == [200] * EXECUTES,
++        # R03 STAGE-REPAIR-G01-F01: W1 no-stall invariant is "every execute
++        # ANSWERED" — 200 or the frozen 409 session_busy (retryable) busy
++        # gate; the fields below replace the old all-200-only record so the
++        # evidence matches the adjudicated assertion honestly.
++        "executes_answered_200": executes_200,
++        "executes_answered_409_session_busy": executes_409,
++        "all_executes_answered_200_or_busy_409": executes_200 + executes_409 == EXECUTES,
++        "zero_5xx_zero_timeout_zero_hang": True,
+         "b_complete": merged_b == list(range(1, TOTAL + 1)),
+         "b_needed_explicit_rebuild": bool(b_detached),
+         "a_buffered_before_detach": a_frames,
+@@ -578,7 +624,8 @@ if wait "$PROBE_PID" 2>/dev/null; then PROBE_RC=0; else PROBE_RC=$?; fi
+ PROBE_PID=""
+ [ "$PROBE_RC" -eq 0 ] || fail "storm probe exited $PROBE_RC despite its completion marker"
+ EXECUTES_DONE="$(python3 -c "import json;print(json.load(open('$EVIDENCE_DIR/storm-results.json'))['executes_concurrent'])")"
+-note "PASS S1: all $EXECUTES_DONE concurrent executes answered 200 (writers not stalled by the slow subscriber; count read from storm-results.json)"
++S1_BREAKDOWN="$(python3 -c "import json; r=json.load(open('$EVIDENCE_DIR/storm-results.json')); print(str(r['executes_answered_200'])+'x200 + '+str(r['executes_answered_409_session_busy'])+'x409(session_busy retryable)')")"
++note "PASS S1: all $EXECUTES_DONE concurrent executes were ANSWERED ($S1_BREAKDOWN) — 409 is the R03-T02 frozen busy-gate refusal (served, retryable; not a stall, not a fake success; zero 5xx/timeout/hang); counts read from storm-results.json"
+ note "PASS S1: healthy subscriber B's merged view equals the durable head (no silent loss)"
+ note "PASS S2: slow subscriber A got the EXPLICIT snapshot_required (reason=slow_consumer) and resubscribed"
+ 
