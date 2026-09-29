@@ -1,0 +1,84 @@
+{
+  "schema": "lingxi.r03-repair-g01-e01-evidence.v1",
+  "executor": "EXECUTOR-REPAIR-R03-G01-E01",
+  "fix_base_sha": "cd3fb19e651f763afc6c75cb3163064fb54ca3fe",
+  "candidate": "cd3fb19e651f763afc6c75cb3163064fb54ca3fe + uncommitted repair worktree (no commit authorized this round)",
+  "toolchain": "rustup cargo/rustc 1.98.1 (48a229cea 2026-09-01) via ~/.cargo/bin/cargo, --locked everywhere",
+  "cargo_lock_sha1": "3b659f41eb262eaf42efc2f91ec93f9989d42934 (unchanged vs HEAD; zero dependency changes)",
+  "commands": [
+    {
+      "phase": "RED (defect reproduction on the pre-fix code at the same worktree, before the repair edits were applied)",
+      "cmd": "cargo test --manifest-path rust/Cargo.toml --locked -p lingxi-service --test cancel_link_inheritance",
+      "exit": 101,
+      "result": "1 passed; 6 failed (linked-run-root cancel / inheritance / race / 3 timeout variants)",
+      "log": "adversarial-selfcheck/red-baseline-cancel_link_inheritance.log"
+    },
+    {
+      "phase": "RED",
+      "cmd": "cargo test --manifest-path rust/Cargo.toml --locked -p lingxi-service --test subagent_closeout",
+      "exit": 101,
+      "result": "2 passed; 5 failed (in-process closeout / pre-provider cancel / drain ghost / panic capacity / two-registry leak)",
+      "log": "adversarial-selfcheck/red-baseline-subagent_closeout.log"
+    },
+    {
+      "phase": "GREEN (per-suite, post-fix)",
+      "cmd": "cargo test --manifest-path rust/Cargo.toml --locked -p lingxi-service --test <suite>",
+      "exit": 0,
+      "suites": {
+        "cancel_link_inheritance": "7 passed / 0 failed",
+        "subagent_closeout": "8 passed / 0 failed",
+        "cancellation_tree": "8 passed / 0 failed",
+        "subagent_lifecycle": "3 passed / 0 failed",
+        "background_disconnect_recovery": "3 passed / 0 failed",
+        "recovery_startup_scan": "7 passed / 0 failed",
+        "exit_race_rejections": "2 passed / 0 failed",
+        "r03_t08_acceptance_matrix": "17 passed / 0 failed",
+        "lib units": "229 passed / 0 failed"
+      },
+      "log_dir": "normal-selfcheck/"
+    },
+    {
+      "phase": "GREEN adversarial re-runs (attack windows, fixed code)",
+      "cmd": "cargo test ... late_and_duplicate / parent_cancel_before / registration_racing / run_level_child* / tree_firing_before",
+      "exit": 0,
+      "logs": [
+        "adversarial-selfcheck/adv-fence.log",
+        "adversarial-selfcheck/adv-preprovider.log",
+        "adversarial-selfcheck/adv-race.log",
+        "adversarial-selfcheck/adv-window.log",
+        "adversarial-selfcheck/adv-prepoll.log"
+      ]
+    },
+    {
+      "phase": "STANDARDS",
+      "cmd": "cargo fmt --manifest-path rust/Cargo.toml --all -- --check",
+      "exit": 0,
+      "log": "logs/fmt-check.log"
+    },
+    {
+      "phase": "STANDARDS",
+      "cmd": "cargo clippy --manifest-path rust/Cargo.toml --workspace --all-targets --locked -- -D warnings",
+      "exit": 0,
+      "log": "logs/clippy-check.log"
+    },
+    {
+      "phase": "STANDARDS",
+      "cmd": "cargo test --manifest-path rust/Cargo.toml --workspace --locked",
+      "exit": 0,
+      "result": "65 suites / 648 passed / 0 failed (baseline 63 / 626 / 0 — no regression, +2 suites, +22 tests)",
+      "log": "logs/green-workspace-final.log"
+    },
+    {
+      "phase": "EXTRA REGRESSION",
+      "cmd": "cargo run --manifest-path rust/Cargo.toml --locked -p xtask -- check-contracts",
+      "exit": 0,
+      "result": "626 entries drift-free"
+    },
+    {
+      "phase": "EXTRA REGRESSION",
+      "cmd": "cargo run --manifest-path rust/Cargo.toml --locked -p xtask -- check-boundaries",
+      "exit": 0,
+      "result": "ownership + dependency rules OK"
+    }
+  ]
+}

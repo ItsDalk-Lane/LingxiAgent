@@ -6,26 +6,47 @@
 //! - **Linked children** (`spawn_linked`): a child task bound to a run id
 //!   AND a [`CancelScope`] of the run's cancellation tree. The wrapper
 //!   races the child future against the scope's cancellation
-//!   (`biased` — cancellation wins ties): when the tree fires, the child
-//!   future is DROPPED at its await point (the real Rust cancellation
-//!   primitive; the same drop a dropped HTTP request performs on its
-//!   handler) and the exit is recorded as [`TaskExit::Aborted`].
+//!   (`biased` — cancellation wins ties).
+//!   R03 repair G01/F02 distinguishes TWO shapes here:
+//!   - *Call-level children* (model calls, tool calls, approval waits):
+//!     when the tree fires the child future is DROPPED at its await point
+//!     (the real Rust cancellation primitive; the same drop a dropped
+//!     HTTP request performs on its handler) and the exit is recorded as
+//!     [`TaskExit::Aborted`].
+//!   - *Run-level children* ([`TaskKind::ChildRun`] — subagent child
+//!     runs): a tree cancellation OPENS A BOUNDED COOPERATIVE WINDOW
+//!     instead of dropping immediately. The child future keeps running
+//!     so its own drive can walk the LEGAL cancellation path (durable
+//!     `cancelling` leg, child cleanup, receipt finalize, single
+//!     `cancelled` finalize, bookkeeping tail) — the drop becomes the
+//!     LAST RESORT at the window's expiry (anchored at the scope's first
+//!     cancellation moment plus the supervisor's cleanup grace). A
+//!     healthy child closes itself out in milliseconds; only a child
+//!     that ignores its cancellation is force-dropped, exactly the
+//!     "先协作、后强制" the audit requires.
 //! - **Detached background** (`spawn_detached`): owned and reaped the
 //!   same way, but linked to NO run scope — cancelling any run never
 //!   touches it (R03-A06: 独立任务不被误杀).
-//! - **Supervised exits**: panics are contained at the task boundary and
-//!   returned as [`TaskExit::Panicked`] to whoever awaits the child
-//!   (the driver or the bounded cleanup drain) — a panicking tool/model
-//!   child can never kill the request task silently.
+//! - **Supervised exits**: panics are CONTAINED at the task boundary by
+//!   the wrapper itself (a `catch_unwind` around every poll — R03
+//!   repair G01/F02: the exit is recorded IN-BAND as
+//!   [`TaskExit::Panicked`] and is queryable even when NOBODY ever
+//!   awaits the handle; a panicking child can never kill the request
+//!   task silently, and a fire-and-forget handle can never lose the
+//!   panic diagnosis).
 //! - **Bounded cleanup** (`drain_run`): after a run's tree fired, the
 //!   drain waits for the run's live children under the remaining
 //!   [`CancelBudget`](crate::cancel::CancelBudget); at expiry an ABORT is
 //!   REQUESTED through an [`tokio::task::AbortHandle`] saved before the
 //!   join (real last-resort primitive — effective at the child's next
 //!   yield point) and the child is reported as `unconfirmed` — the report
-//!   never claims quiet it did not observe (R03-T03 step 2/5).
+//!   never claims quiet it did not observe. R03 repair G01/F02: the
+//!   expiry branch also leaves a detached COMPLETION OBSERVER that owns
+//!   the JoinHandle and records the exit once the abort actually lands —
+//!   "requested an abort" is never conflated with "observed the exit",
+//!   and the entry can never stay a handle-less Running ghost forever.
 //!
-//! Boundary honesty: `abort()` (and the wrapper's scope-drop) take effect
+//! Boundary honesty: `abort()` (and the last-resort drop) take effect
 //! at the child's NEXT yield point. A child that never yields (a truly
 //! non-cooperating busy loop) cannot confirm its stop within any budget —
 //! its abort stays merely requested and it is reported unconfirmed,
@@ -33,8 +54,11 @@
 //! produced.
 
 use std::collections::HashMap;
+use std::future::Future;
+use std::pin::Pin;
 use std::sync::atomic::{AtomicU64, Ordering};
 use std::sync::{Arc, Mutex, Weak};
+use std::time::Duration;
 
 use lingxi_kernel::ports::StorageError;
 
@@ -211,6 +235,14 @@ pub struct TaskSupervisor {
     cap: usize,
     tasks: Mutex<HashMap<u64, Arc<TaskEntry>>>,
     next_id: AtomicU64,
+    /// The cooperative-cancel window granted to RUN-LEVEL children
+    /// (`ChildRun`) when their scope's tree fires (R03 repair G01/F02):
+    /// the child keeps running its own cancellation path for this long,
+    /// anchored at the scope's first cancellation moment, before the
+    /// last-resort drop. The composition root passes the run's cleanup
+    /// policy grace so a child's window and its owner's drain share ONE
+    /// budget anchor.
+    cooperative_grace: Duration,
 }
 
 impl Default for TaskSupervisor {
@@ -221,10 +253,21 @@ impl Default for TaskSupervisor {
 
 impl TaskSupervisor {
     pub fn new(cap: usize) -> Self {
+        Self::with_cooperative_grace(
+            cap,
+            Duration::from_millis(crate::cancel::CancelPolicy::DEFAULT_CLEANUP_GRACE_MS),
+        )
+    }
+
+    /// Constructs the supervisor with an explicit cooperative-cancel
+    /// window for run-level children (tests inject small windows; the
+    /// composition root passes the cancel policy's cleanup grace).
+    pub fn with_cooperative_grace(cap: usize, cooperative_grace: Duration) -> Self {
         Self {
             cap,
             tasks: Mutex::new(HashMap::new()),
             next_id: AtomicU64::new(1),
+            cooperative_grace,
         }
     }
 
@@ -244,8 +287,9 @@ impl TaskSupervisor {
             .unwrap_or_else(|poisoned| poisoned.into_inner());
         if tasks.len() >= self.cap {
             // Reap ended entries first (their exit results were already
-            // observed by their owner through wait/drain); only a registry
-            // that is genuinely full of LIVE work refuses.
+            // observed by their owner through wait/drain — or recorded
+            // in-band by the supervised wrapper); only a registry that is
+            // genuinely full of LIVE work refuses.
             tasks.retain(|_, entry| entry.is_live());
             if tasks.len() >= self.cap {
                 return Err(SpawnRejected { cap: self.cap });
@@ -265,10 +309,21 @@ impl TaskSupervisor {
     }
 
     /// Spawns one LINKED child: owned by `run_id`, cancelled through
-    /// `scope` (a scope of the run's cancellation tree). The child future
-    /// is dropped at its await point when the scope fires — biased select
+    /// `scope` (a scope of the run's cancellation tree) — biased select
     /// so a cancellation that lands together with completion wins (取消后
     /// 不得启动新模型调用/新工具).
+    ///
+    /// R03 repair G01/F02 — the TWO shapes of tree cancellation:
+    /// - CALL-level children (model/tool/approval): the child future is
+    ///   dropped at its await point when the scope fires (the real Rust
+    ///   cancellation primitive) — recorded [`TaskExit::Aborted`].
+    /// - RUN-level children (`ChildRun`, e.g. subagent child runs): a
+    ///   bounded COOPERATIVE WINDOW opens instead — the child future
+    ///   keeps being polled so its own drive can finish its durable
+    ///   cancellation path and its bookkeeping tail; at window expiry
+    ///   the future is dropped as the LAST RESORT (then `Aborted`).
+    ///
+    /// Panics are contained in BOTH shapes and recorded in-band.
     pub fn spawn_linked<F>(
         self: &Arc<Self>,
         run_id: &str,
@@ -277,7 +332,7 @@ impl TaskSupervisor {
         fut: F,
     ) -> Result<ChildHandle<F::Output>, SpawnRejected>
     where
-        F: std::future::Future + Send + 'static,
+        F: Future + Send + 'static,
         F::Output: Send + 'static,
     {
         let kind = TaskKind::from(scope.kind());
@@ -285,16 +340,67 @@ impl TaskSupervisor {
         let (tx, rx) = tokio::sync::oneshot::channel();
         let cancel_scope = scope.clone();
         let task_entry = Arc::clone(&entry);
+        let grace = self.cooperative_grace;
         let join = tokio::spawn(async move {
-            tokio::select! {
+            let mut fut = Box::pin(fut);
+            if !matches!(kind, TaskKind::ChildRun) {
+                // CALL-level: the scope's cancellation drops the child at
+                // its await point (biased — cancel wins ties).
+                tokio::select! {
+                    biased;
+                    _ = cancel_scope.cancelled() => {
+                        task_entry.record_exit(TaskExit::Aborted);
+                        let _ = tx.send(Err(TaskExit::Aborted));
+                    }
+                    exit = PanicGuard { fut: fut.as_mut() } => {
+                        deliver_supervised_exit(&task_entry, tx, exit);
+                    }
+                }
+                return;
+            }
+            // RUN-level: completion, or the tree fires and a bounded
+            // cooperative window opens.
+            let tree_fired = tokio::select! {
                 biased;
-                _ = cancel_scope.cancelled() => {
+                _ = cancel_scope.cancelled() => true,
+                exit = PanicGuard { fut: fut.as_mut() } => {
+                    deliver_supervised_exit(&task_entry, tx, exit);
+                    return;
+                }
+            };
+            if !tree_fired {
+                return;
+            }
+            // The window is anchored at the scope's FIRST cancellation
+            // moment (the same anchor the owning run's cleanup budget
+            // uses): a child that reached cleanup late keeps only the
+            // remainder — never a fresh full budget.
+            let deadline = cancel_scope
+                .cancelled_at()
+                .map(|at| tokio::time::Instant::from_std(at) + grace)
+                .unwrap_or_else(|| tokio::time::Instant::now() + grace);
+            let outcome = {
+                // Scoped so the guarded borrow (and the child future it
+                // guards, on expiry) ends BEFORE the exit is recorded.
+                let guarded = PanicGuard { fut: fut.as_mut() };
+                tokio::time::timeout_at(deadline, guarded).await
+            };
+            match outcome {
+                Ok(exit) => deliver_supervised_exit(&task_entry, tx, exit),
+                Err(_elapsed) => {
+                    // Last resort: the timeout consumed (and dropped) the
+                    // guarded future above — the child's own Drop cleanup
+                    // (guards, permit releases) ran with it. Record the
+                    // honest supervised abort; its durable run row stays
+                    // whatever it last honestly wrote (recovery
+                    // classification is R03-T07).
+                    tracing::warn!(
+                        task = %task_entry.label,
+                        grace_ms = grace.as_millis() as u64,
+                        "run-level child ignored its cooperative cancellation window —                          last-resort drop applied"
+                    );
                     task_entry.record_exit(TaskExit::Aborted);
                     let _ = tx.send(Err(TaskExit::Aborted));
-                }
-                outcome = fut => {
-                    task_entry.record_exit(TaskExit::Completed);
-                    let _ = tx.send(Ok(outcome));
                 }
             }
         });
@@ -312,23 +418,25 @@ impl TaskSupervisor {
 
     /// Spawns one DETACHED background task: supervised (owner = `None`,
     /// recoverable handle, exit result) but linked to NO cancellation
-    /// scope — run cancellations never touch it (R03-A06).
+    /// scope — run cancellations never touch it (R03-A06). Panics are
+    /// contained at the wrapper and recorded IN-BAND (R03 repair
+    /// G01/F02: a fire-and-forget handle never loses the diagnosis).
     pub fn spawn_detached<F>(
         self: &Arc<Self>,
         label: String,
         fut: F,
     ) -> Result<ChildHandle<F::Output>, SpawnRejected>
     where
-        F: std::future::Future + Send + 'static,
+        F: Future + Send + 'static,
         F::Output: Send + 'static,
     {
         let (id, entry) = self.register(label, TaskKind::Background, None)?;
         let (tx, rx) = tokio::sync::oneshot::channel();
         let task_entry = Arc::clone(&entry);
         let join = tokio::spawn(async move {
-            let outcome = fut.await;
-            task_entry.record_exit(TaskExit::Completed);
-            let _ = tx.send(Ok(outcome));
+            let mut fut = Box::pin(fut);
+            let exit = PanicGuard { fut: fut.as_mut() }.await;
+            deliver_supervised_exit(&task_entry, tx, exit);
         });
         *entry
             .handle
@@ -409,7 +517,7 @@ impl TaskSupervisor {
                 .lock()
                 .unwrap_or_else(|poisoned| poisoned.into_inner())
                 .take();
-            let Some(join) = join else {
+            let Some(mut join) = join else {
                 // No handle to join (another reaper owns it): report the
                 // OBSERVED state honestly.
                 match entry.state() {
@@ -418,18 +526,21 @@ impl TaskSupervisor {
                 }
                 continue;
             };
-            // R03-T03 review R1-D1 fix: the JoinHandle is about to be
-            // MOVED into the timeout future (and dropped with it when the
-            // budget expires), so the abort capability is saved BEFORE the
-            // timeout — the expiry branch below now performs a REAL abort
-            // instead of reading an always-empty handle slot.
+            // R03-T03 review R1-D1 fix: the abort capability is saved
+            // BEFORE the join. R03 repair G01/F02: the JoinHandle itself
+            // now stays owned by THIS frame (the timeout polls `&mut
+            // join`), so an expired budget hands it to a detached
+            // completion OBSERVER below instead of dropping it into the
+            // detached void — the abort can be requested AND the actual
+            // exit later observed.
             let abort_handle = join.abort_handle();
             let remaining = budget.remaining();
-            match tokio::time::timeout(remaining, join).await {
+            match tokio::time::timeout(remaining, &mut join).await {
                 Ok(Ok(())) => {
-                    // The wrapper recorded its exit (Completed/Aborted);
-                    // an unrecorded finish is an internal anomaly — record
-                    // it loudly instead of guessing a success.
+                    // The wrapper recorded its exit in-band
+                    // (Completed/Aborted/Panicked); an unrecorded finish is
+                    // an internal anomaly — record it loudly instead of
+                    // guessing a success.
                     if entry.is_live() {
                         entry.record_exit(TaskExit::Failed(
                             "child join finished without an exit record".to_string(),
@@ -449,14 +560,11 @@ impl TaskSupervisor {
                     self.reap(entry.id);
                 }
                 Err(_elapsed) => {
-                    // Budget expired: abort through the handle saved BEFORE
-                    // the timeout consumed the JoinHandle (R1-D1 fix — the
-                    // previous read of `entry.handle` here was dead code:
-                    // always `None`). The abort is the last-resort real
-                    // primitive: REQUESTED here, effective at the wrapper's
-                    // next yield point. The child is still REPORTED as
-                    // unconfirmed — an abort that was requested is not a
-                    // stop that was observed.
+                    // Budget expired: abort through the saved handle — the
+                    // last-resort real primitive, REQUESTED here and
+                    // effective at the wrapper's next yield point. The
+                    // child is still REPORTED as unconfirmed — an abort
+                    // that was requested is not a stop that was observed.
                     abort_handle.abort();
                     tracing::warn!(
                         task = %entry.label,
@@ -464,9 +572,27 @@ impl TaskSupervisor {
                         budget_ms = budget.total().as_millis() as u64,
                         "cleanup budget expired before this child confirmed its exit — \
                          reported unconfirmed (abort requested through the saved \
-                         AbortHandle; it takes effect at the child's next yield point; \
-                         no false quiet)"
+                         AbortHandle; a detached completion observer will record the \
+                         exit when it actually lands; no false quiet)"
                     );
+                    // R03 repair G01/F02 (F02-C04): keep a recoverable
+                    // completion observation — the observer owns the
+                    // JoinHandle and records the exit once the abort
+                    // actually lands (or the task finishes on its own),
+                    // so the entry can never stay a handle-less Running
+                    // ghost forever; the registry reaps it at pressure.
+                    let observer_entry = Arc::clone(&entry);
+                    tokio::spawn(async move {
+                        let exit = match join.await {
+                            Ok(()) if observer_entry.is_live() => TaskExit::Failed(
+                                "child join finished without an exit record".to_string(),
+                            ),
+                            Ok(()) => return, // already recorded in-band
+                            Err(join_err) if join_err.is_cancelled() => TaskExit::Aborted,
+                            Err(join_err) => TaskExit::Panicked(panic_payload(join_err)),
+                        };
+                        observer_entry.record_exit(exit);
+                    });
                     report.unconfirmed.push(TaskRef {
                         id: entry.id,
                         label: entry.label.clone(),
@@ -478,6 +604,82 @@ impl TaskSupervisor {
             }
         }
         report
+    }
+}
+
+/// The supervised outcome of one polled child future: its value, or the
+/// contained panic payload.
+enum SupervisedPoll<T> {
+    Completed(T),
+    Panicked(String),
+}
+
+/// A poll-level panic guard (R03 repair G01/F02): wraps a pinned child
+/// future and CATCHES panics at every poll — the supervised wrapper task
+/// itself never panics, so the exit is always recorded IN-BAND and
+/// queryable even when nobody ever awaits the handle. The guard only
+/// BORROWS the future (a `Pin<&mut F>`), so the wrapper's `select!`
+/// branches can drop the guard without dropping the child (the
+/// cooperative-window shape depends on exactly that).
+struct PanicGuard<'a, F: Future> {
+    fut: Pin<&'a mut F>,
+}
+
+impl<F: Future> Future for PanicGuard<'_, F> {
+    type Output = SupervisedPoll<F::Output>;
+
+    fn poll(
+        self: Pin<&mut Self>,
+        cx: &mut std::task::Context<'_>,
+    ) -> std::task::Poll<Self::Output> {
+        let PanicGuard { fut } = self.get_mut();
+        let poll_result =
+            std::panic::catch_unwind(std::panic::AssertUnwindSafe(|| fut.as_mut().poll(cx)));
+        match poll_result {
+            Ok(std::task::Poll::Ready(value)) => {
+                std::task::Poll::Ready(SupervisedPoll::Completed(value))
+            }
+            Ok(std::task::Poll::Pending) => std::task::Poll::Pending,
+            Err(payload) => {
+                std::task::Poll::Ready(SupervisedPoll::Panicked(panic_message_of(&payload)))
+            }
+        }
+    }
+}
+
+/// Best-effort panic payload rendering (the same vocabulary
+/// `ChildHandle::wait` uses for uncaught wrapper panics).
+fn panic_message_of(payload: &Box<dyn std::any::Any + Send>) -> String {
+    if let Some(message) = payload.downcast_ref::<String>() {
+        return message.clone();
+    }
+    if let Some(message) = payload.downcast_ref::<&str>() {
+        return (*message).to_string();
+    }
+    "opaque panic payload".to_string()
+}
+
+/// Records one supervised poll outcome and delivers it to the handle
+/// (consumes the one-shot sender — exactly one delivery per child).
+fn deliver_supervised_exit<T>(
+    entry: &Arc<TaskEntry>,
+    tx: tokio::sync::oneshot::Sender<Result<T, TaskExit>>,
+    exit: SupervisedPoll<T>,
+) {
+    match exit {
+        SupervisedPoll::Completed(value) => {
+            entry.record_exit(TaskExit::Completed);
+            let _ = tx.send(Ok(value));
+        }
+        SupervisedPoll::Panicked(detail) => {
+            tracing::error!(
+                task = %entry.label,
+                panic = %detail,
+                "supervised child PANICKED — contained at the task boundary and recorded                  in-band (never a silent loss, never a crashed waiter)"
+            );
+            entry.record_exit(TaskExit::Panicked(detail.clone()));
+            let _ = tx.send(Err(TaskExit::Panicked(detail)));
+        }
     }
 }
 
@@ -813,6 +1015,135 @@ mod tests {
             );
             tokio::time::sleep(std::time::Duration::from_millis(1)).await;
         }
+    }
+
+    /// R03 repair G01/F02: a RUN-LEVEL child (ChildRun) whose scope fires
+    /// gets a bounded COOPERATIVE WINDOW — the child future is NOT
+    /// dropped while it finishes its own cancellation path; only a child
+    /// that ignores the window is force-dropped at expiry (Aborted).
+    #[tokio::test]
+    async fn run_level_child_finishes_its_own_cancellation_within_the_window() {
+        let supervisor = Arc::new(TaskSupervisor::with_cooperative_grace(
+            8,
+            Duration::from_millis(300),
+        ));
+        let root = CancelScope::run_root("run_coop");
+        let scope = root.child("child_run:coop".to_string(), ScopeKind::ChildRun);
+        let observed_cancel = Arc::new(std::sync::atomic::AtomicBool::new(false));
+        let flag = Arc::clone(&observed_cancel);
+        let handle = supervisor
+            .spawn_linked(
+                "run_coop",
+                &scope,
+                "child_run:coop".to_string(),
+                async move {
+                    // The child's own cancellation path: it observes the
+                    // scope, does a little work, and completes on its own
+                    // (exactly what a drive's settle_cancellation does).
+                    let mut ticks = 0u32;
+                    loop {
+                        if flag.load(std::sync::atomic::Ordering::Acquire) {
+                            break;
+                        }
+                        ticks += 1;
+                        tokio::time::sleep(Duration::from_millis(5)).await;
+                    }
+                    format!("settled after {ticks} ticks")
+                },
+            )
+            .expect("spawn");
+        // Start the child, then fire the tree: the cooperative window
+        // opens and the child KEEPS RUNNING until it observes the flag.
+        tokio::time::sleep(Duration::from_millis(10)).await;
+        root.cancel("user");
+        tokio::time::sleep(Duration::from_millis(40)).await;
+        // The window is still open: the child future is alive, NOT yet
+        // aborted (it is mid-own-cancellation).
+        assert!(
+            !handle.is_finished(),
+            "the cooperative window keeps the run-level child alive while it \
+             finishes its own cancellation path"
+        );
+        observed_cancel.store(true, std::sync::atomic::Ordering::Release);
+        // The child completes NORMALLY through its own tail.
+        let value = handle.wait().await.expect("cooperative completion");
+        assert!(value.starts_with("settled after"));
+    }
+
+    /// R03 repair G01/F02: a run-level child that IGNORES its cooperative
+    /// window (never finishes) is force-dropped at expiry — Aborted, the
+    /// honest last resort (never an unbounded wait).
+    #[tokio::test]
+    async fn run_level_child_ignoring_the_window_is_dropped_at_expiry() {
+        let supervisor = Arc::new(TaskSupervisor::with_cooperative_grace(
+            8,
+            Duration::from_millis(80),
+        ));
+        let root = CancelScope::run_root("run_coop2");
+        let scope = root.child("child_run:stubborn".to_string(), ScopeKind::ChildRun);
+        struct DropProbe(Arc<std::sync::atomic::AtomicBool>);
+        impl Drop for DropProbe {
+            fn drop(&mut self) {
+                self.0.store(true, std::sync::atomic::Ordering::Release);
+            }
+        }
+        let future_dropped = Arc::new(std::sync::atomic::AtomicBool::new(false));
+        let probe = Arc::clone(&future_dropped);
+        let handle = supervisor
+            .spawn_linked(
+                "run_coop2",
+                &scope,
+                "child_run:stubborn".to_string(),
+                async move {
+                    let _probe = DropProbe(probe);
+                    std::future::pending::<()>().await;
+                },
+            )
+            .expect("spawn");
+        let task_id = handle.task_id();
+        root.cancel("user");
+        // The window expires (80ms) and the future is REALLY dropped
+        // (the Drop probe fires) — the last resort is a real drop.
+        let exit = handle.wait().await.expect_err("last-resort abort");
+        assert_eq!(exit, TaskExit::Aborted);
+        assert!(
+            future_dropped.load(std::sync::atomic::Ordering::Acquire),
+            "the expiry drop ran the child's Drop cleanup"
+        );
+        assert_eq!(supervisor.exit_of(task_id), None, "reaped by wait");
+    }
+
+    /// R03 repair G01/F02: the never-first-polled window — a tree that
+    /// fires BEFORE the wrapper task polls the child still records the
+    /// supervised abort (deterministic on the current-thread runtime:
+    /// the cancel lands synchronously before any yield).
+    #[tokio::test(flavor = "current_thread")]
+    async fn tree_firing_before_the_first_poll_still_records_the_abort() {
+        let supervisor = Arc::new(TaskSupervisor::new(8));
+        let root = CancelScope::run_root("run_prepoll");
+        let scope = root.child("tool_call:never-polled".to_string(), ScopeKind::ToolCall);
+        let polled = Arc::new(std::sync::atomic::AtomicBool::new(false));
+        let flag = Arc::clone(&polled);
+        let handle = supervisor
+            .spawn_linked(
+                "run_prepoll",
+                &scope,
+                "tool_call:never-polled".to_string(),
+                async move {
+                    flag.store(true, std::sync::atomic::Ordering::Release);
+                    std::future::pending::<()>().await;
+                },
+            )
+            .expect("spawn");
+        // Synchronous cancel BEFORE any yield: the wrapper task has not
+        // polled the child future yet.
+        root.cancel("user");
+        let exit = handle.wait().await.expect_err("aborted before first poll");
+        assert_eq!(exit, TaskExit::Aborted);
+        assert!(
+            !polled.load(std::sync::atomic::Ordering::Acquire),
+            "the child future was never polled (the pre-poll window)"
+        );
     }
 
     #[tokio::test]

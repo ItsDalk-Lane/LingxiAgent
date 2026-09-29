@@ -33,16 +33,21 @@ use lingxi_kernel::Principal as KernelPrincipal;
 use crate::events::EventService;
 use crate::runs::{DriveAuthorization, RunSupervisor};
 use crate::session_supervisor::SessionLease;
+use crate::task_supervisor::{ChildHandle, TaskExit};
 
 /// Hard cap of concurrently tracked background drives (service
 /// protection; full is a loud refusal — never an unbounded backlog).
 pub const BACKGROUND_DRIVE_CAP: usize = 1024;
 
+/// Bound of the recent-exit diagnostic ring (the same bounded-vocabulary
+/// as the other registries).
+const RECENT_EXITS_CAP: usize = 256;
+
 /// One tracked background drive (the recoverable handle of the detached
 /// supervised task).
 struct BackgroundDrive {
     run_id: String,
-    handle: crate::task_supervisor::ChildHandle<()>,
+    handle: ChildHandle<()>,
 }
 
 /// The bounded registry of live background drives + the minimal
@@ -50,6 +55,11 @@ struct BackgroundDrive {
 #[derive(Default)]
 pub struct BackgroundDriveRegistry {
     drives: Mutex<HashMap<String, BackgroundDrive>>,
+    /// Finished drives' observed exits (R03 repair G01/F02: a finished or
+    /// PANICKING drive's TaskExit stays diagnosable after its slot was
+    /// reclaimed — a bounded ring, never unbounded growth). Shared with
+    /// the detached reclamation waiters.
+    recent_exits: Arc<Mutex<Vec<(String, TaskExit)>>>,
 }
 
 impl std::fmt::Debug for BackgroundDriveRegistry {
@@ -100,22 +110,70 @@ impl BackgroundDriveRegistry {
         Arc::new(Self::default())
     }
 
-    /// Live background drives (queries/evidence).
-    pub fn live_ids(&self) -> Vec<String> {
-        let mut drives = self
-            .drives
-            .lock()
-            .unwrap_or_else(|poisoned| poisoned.into_inner());
-        // Finished entries leave the registry before answering.
-        let finished: Vec<String> = drives
-            .iter()
-            .filter(|(_, drive)| drive.handle.is_finished())
-            .map(|(run_id, _)| run_id.clone())
-            .collect();
-        for run_id in finished {
-            drives.remove(&run_id);
+    /// Reclaims every FINISHED drive entry: each finished handle is
+    /// CONSUMED by a detached waiter task (`ChildHandle::wait` records the
+    /// exit into the supervised registry AND reaps its entry), and the
+    /// observed exit lands in the bounded recent-exit ring (R03 repair
+    /// G01/F02: neither registry leaks — a finished drive leaves BOTH the
+    /// drive map and the task supervisor's entry set, and a panicking
+    /// drive's [`TaskExit`] stays diagnosable).
+    fn reclaim_finished(&self) {
+        let finished: Vec<(String, ChildHandle<()>)> = {
+            let mut drives = self
+                .drives
+                .lock()
+                .unwrap_or_else(|poisoned| poisoned.into_inner());
+            let ids: Vec<String> = drives
+                .iter()
+                .filter(|(_, drive)| drive.handle.is_finished())
+                .map(|(run_id, _)| run_id.clone())
+                .collect();
+            ids.into_iter()
+                .filter_map(|run_id| drives.remove(&run_id).map(|drive| (run_id, drive.handle)))
+                .collect()
+        };
+        for (run_id, handle) in finished {
+            // Consume the exit: wait() records/reaps the SUPERVISED entry;
+            // the observed exit (Completed / Panicked / ...) is preserved
+            // in this registry's bounded ring for diagnosis.
+            let ring = Arc::clone(&self.recent_exits);
+            tokio::spawn(async move {
+                let exit = match handle.wait().await {
+                    Ok(()) => TaskExit::Completed,
+                    Err(exit) => exit,
+                };
+                record_recent_exit(&ring, run_id.clone(), exit.clone());
+                if let TaskExit::Panicked(detail) = exit {
+                    tracing::error!(
+                        run_id = %run_id,
+                        panic = %detail,
+                        "background drive PANICKED — contained at the supervised boundary; \
+                         the durable run row stays honest (recovery classification is R03-T07)"
+                    );
+                }
+            });
         }
-        drives.keys().cloned().collect()
+    }
+
+    /// The observed exits of recently finished drives (diagnosis surface:
+    /// panics included), most recent last.
+    pub fn recent_exits(&self) -> Vec<(String, TaskExit)> {
+        self.recent_exits
+            .lock()
+            .unwrap_or_else(|poisoned| poisoned.into_inner())
+            .clone()
+    }
+
+    /// Live background drives (queries/evidence). Finished entries are
+    /// reclaimed (both registries) before answering.
+    pub fn live_ids(&self) -> Vec<String> {
+        self.reclaim_finished();
+        self.drives
+            .lock()
+            .unwrap_or_else(|poisoned| poisoned.into_inner())
+            .keys()
+            .cloned()
+            .collect()
     }
 
     /// The minimal service-exit hook (R03-T06): join the live background
@@ -152,6 +210,16 @@ impl BackgroundDriveRegistry {
     }
 }
 
+/// Appends one observed drive exit to the bounded ring (oldest dropped).
+fn record_recent_exit(ring: &Arc<Mutex<Vec<(String, TaskExit)>>>, run_id: String, exit: TaskExit) {
+    let mut ring = ring.lock().unwrap_or_else(|poisoned| poisoned.into_inner());
+    if ring.len() >= RECENT_EXITS_CAP {
+        let overflow = ring.len() + 1 - RECENT_EXITS_CAP;
+        ring.drain(..overflow);
+    }
+    ring.push((run_id, exit));
+}
+
 /// Spawns ONE background drive: the run's lifecycle runs to its single
 /// finalize on the SAME supervisor, owned by a DETACHED supervised task
 /// (owner `None` — no client connection and no other run's cancellation
@@ -173,13 +241,14 @@ pub fn spawn_background_drive(
     now_ms: u64,
     lease: SessionLease,
 ) -> Result<(), BackgroundSpawnRejected> {
+    // Finished entries are reclaimed (BOTH registries — R03 repair
+    // G01/F02) before the cap is consulted.
+    registry.reclaim_finished();
     {
-        let mut drives = registry
+        let drives = registry
             .drives
             .lock()
             .unwrap_or_else(|poisoned| poisoned.into_inner());
-        // Finished entries are reaped before the cap is consulted.
-        drives.retain(|_, drive| !drive.handle.is_finished());
         if drives.len() >= BACKGROUND_DRIVE_CAP {
             return Err(BackgroundSpawnRejected {
                 cap: BACKGROUND_DRIVE_CAP,

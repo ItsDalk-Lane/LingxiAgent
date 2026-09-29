@@ -366,7 +366,17 @@ struct RuntimeState {
     active_per_session: HashMap<String, usize>,
     active_global: usize,
     threads: HashMap<String, SubagentThread>,
+    /// Child runs whose completion bookkeeping already ran (R03 repair
+    /// G01/F02: exactly-once accounting — a late or duplicated completion
+    /// callback for an already-accounted run is a diagnosable no-op, never
+    /// a second cap decrement and never a busy-clear for a newer run).
+    /// Bounded (the oldest id drops first — a diagnostic ring, not state).
+    accounted_children: std::collections::VecDeque<String>,
 }
+
+/// Bound of the accounted-completion ring (matches the other bounded
+/// registries' vocabulary).
+const ACCOUNTED_CHILDREN_CAP: usize = 1024;
 
 /// The subagent runtime. Constructed by the composition root with the
 /// single storage/events/session-state instances; the run supervisor is
@@ -686,10 +696,26 @@ impl SubagentRuntime {
             cause_id: Some(parent.cause_tool_call.to_string()),
         };
 
-        // 5) The supervisor (bound by the composition root).
+        // 5) The closeout guard (R03 repair G01/F02): from HERE to the
+        //    end of the child's lifetime, exactly one completion
+        //    accounting exists — the normal tail disarms it; every other
+        //    ending (drop at a cancellation last resort, panic, never
+        //    first-polled) closes out abnormally through Drop.
+        let closeout = ChildCloseout::new(
+            Arc::clone(self),
+            session_id_for_rollback.clone(),
+            thread_id.clone(),
+            child_run_id.clone(),
+        );
+        // A clone travels into the child future; this frame's clone covers
+        // the pre-spawn refusal branch below (both share ONE done flag).
+        let closeout_for_spawn = Arc::clone(&closeout);
+
+        // 6) The supervisor (bound by the composition root).
         let supervisor = match self.supervisor.get().and_then(Weak::upgrade) {
             Some(supervisor) => supervisor,
             None => {
+                closeout.disarm();
                 rollback_caps(self);
                 self.rollback_thread(&thread_id, &existing_thread);
                 return Err(SubagentDispatchError::NotBound);
@@ -711,7 +737,6 @@ impl SubagentRuntime {
         let storage = Arc::clone(&self.storage);
         let events = Arc::clone(&self.events);
         let sessions = Arc::clone(&self.sessions);
-        let runtime = Arc::clone(self);
         let principal = parent.principal.clone();
         let session_id = parent.session_id.clone();
         // The child's concurrency lanes are its OWN (the incumbent's
@@ -740,6 +765,7 @@ impl SubagentRuntime {
             &child_scope,
             format!("child_run:{child_run_id}"),
             async move {
+                let closeout = closeout_for_spawn;
                 let drive = drive_supervisor.drive_run(
                     storage.as_ref(),
                     events.as_ref(),
@@ -773,8 +799,11 @@ impl SubagentRuntime {
                         drive.await
                     }
                 };
-                // Delivery + bookkeeping (every finish path).
-                runtime.note_child_finished(&session_id, &thread_delivery, &child_run, &finish);
+                // Delivery + bookkeeping (every finish path). The closeout
+                // guard is disarmed by `complete`; a panic or drop before
+                // this point closes out abnormally instead (exactly-once
+                // either way).
+                closeout.complete(&finish);
                 if let Err(err) = sessions.deliver_retained(
                     &session_id,
                     &delivery_text(&thread_delivery, &child_run, &finish),
@@ -803,6 +832,7 @@ impl SubagentRuntime {
                 drop(handle);
             }
             Err(rejected) => {
+                closeout.disarm();
                 rollback_caps(self);
                 self.rollback_thread(&thread_id, &existing_thread);
                 return Err(SubagentDispatchError::SpawnRefused { cap: rejected.cap });
@@ -831,7 +861,16 @@ impl SubagentRuntime {
     /// The child task's completion bookkeeping: caps decrement, thread
     /// busy=false + last status, thread stays OPEN for continuation
     /// (`finishRun {close: false}`).
-    fn note_child_finished(
+    ///
+    /// R03 repair G01/F02 hardening:
+    /// - **Exactly-once**: a completion is accounted ONCE per child run id
+    ///   (the bounded `accounted_children` ring) — a duplicated or late
+    ///   re-delivery is a logged no-op, never a second cap decrement.
+    /// - **Identity fence**: only the thread's CURRENT child run may clear
+    ///   its busy flag and record its status — a late completion carrying
+    ///   a SUPERSEDED child_run_id can never clear the busy of a newer
+    ///   run on the same thread.
+    pub fn note_child_finished(
         &self,
         session_id: &str,
         thread_id: &str,
@@ -846,6 +885,24 @@ impl SubagentRuntime {
             .state
             .lock()
             .unwrap_or_else(|poisoned| poisoned.into_inner());
+        if state
+            .accounted_children
+            .iter()
+            .any(|accounted| accounted == child_run_id)
+        {
+            tracing::warn!(
+                session_id = %session_id,
+                thread_id = %thread_id,
+                child_run_id = %child_run_id,
+                "duplicate child completion callback ignored (already accounted — exactly-once \
+                 bookkeeping)"
+            );
+            return;
+        }
+        if state.accounted_children.len() >= ACCOUNTED_CHILDREN_CAP {
+            state.accounted_children.pop_front();
+        }
+        state.accounted_children.push_back(child_run_id.to_string());
         if let Some(count) = state.active_per_session.get_mut(session_id) {
             *count = count.saturating_sub(1);
             if *count == 0 {
@@ -854,9 +911,109 @@ impl SubagentRuntime {
         }
         state.active_global = state.active_global.saturating_sub(1);
         if let Some(thread) = state.threads.get_mut(thread_id) {
-            thread.busy = false;
-            thread.last_run_status = Some(status_word);
-            let _ = child_run_id;
+            if thread.child_run_id.as_deref() == Some(child_run_id) {
+                thread.busy = false;
+                thread.last_run_status = Some(status_word);
+            } else {
+                tracing::warn!(
+                    session_id = %session_id,
+                    thread_id = %thread_id,
+                    stale_child_run_id = %child_run_id,
+                    current_child_run_id = ?thread.child_run_id,
+                    "late completion for a SUPERSEDED child run: caps returned, the current \
+                     run's busy is untouched (identity fence)"
+                );
+            }
+        }
+    }
+}
+
+/// The exactly-once closeout guard of one dispatched child run (R03
+/// repair G01/F02): created in `spawn_child` BEFORE the supervised spawn
+/// (so it exists even if the child future is never first-polled) and
+/// moved INTO the child future, which disarms it on its own completion
+/// tail. EVERY other ending — the future dropped at a cancellation last
+/// resort, a panic anywhere in the drive or the delivery tail, an abrupt
+/// task teardown — runs the abnormal closeout through `Drop`: caps
+/// decrement, busy cleared, an honest `failed` status recorded. Double
+/// firing is impossible (the `done` flag) and the runtime-side
+/// `note_child_finished` is itself exactly-once per child run id.
+struct ChildCloseout {
+    runtime: Arc<SubagentRuntime>,
+    session_id: String,
+    thread_id: String,
+    child_run_id: String,
+    done: std::sync::atomic::AtomicBool,
+}
+
+impl ChildCloseout {
+    fn new(
+        runtime: Arc<SubagentRuntime>,
+        session_id: String,
+        thread_id: String,
+        child_run_id: String,
+    ) -> Arc<Self> {
+        Arc::new(Self {
+            runtime,
+            session_id,
+            thread_id,
+            child_run_id,
+            done: std::sync::atomic::AtomicBool::new(false),
+        })
+    }
+
+    fn done(&self) -> bool {
+        self.done.load(std::sync::atomic::Ordering::Acquire)
+    }
+
+    fn mark_done(&self) {
+        self.done.store(true, std::sync::atomic::Ordering::Release);
+    }
+
+    /// The normal completion tail (the drive delivered a finish): disarm
+    /// the drop path and run the bookkeeping with the REAL outcome.
+    fn complete(&self, finish: &Result<RunFinish, DriveError>) {
+        if self.done() {
+            return;
+        }
+        self.mark_done();
+        self.runtime.note_child_finished(
+            &self.session_id,
+            &self.thread_id,
+            &self.child_run_id,
+            finish,
+        );
+    }
+
+    /// Disarm WITHOUT bookkeeping — exclusively for the pre-spawn refusal
+    /// paths whose explicit rollbacks (caps + thread record) already ran.
+    fn disarm(&self) {
+        self.mark_done();
+    }
+}
+
+impl Drop for ChildCloseout {
+    fn drop(&mut self) {
+        if !self.done() {
+            self.mark_done();
+            tracing::error!(
+                session_id = %self.session_id,
+                thread_id = %self.thread_id,
+                child_run_id = %self.child_run_id,
+                "subagent child ended WITHOUT delivering a result (dropped at a cancellation \
+                 last resort, panicked, or never polled) — abnormal closeout: caps returned, \
+                 busy cleared, honest failed status recorded"
+            );
+            self.runtime.note_child_finished(
+                &self.session_id,
+                &self.thread_id,
+                &self.child_run_id,
+                &Err(DriveError::Internal(
+                    "child run ended without delivering a result (dropped or panicked before \
+                     its completion tail)"
+                        .to_string(),
+                )),
+            );
         }
     }
 }

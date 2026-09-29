@@ -53,7 +53,7 @@ use lingxi_protocol::{
 };
 use lingxi_service::{
     approval, cancel, prepare_layout, CancelPolicy, HomeSource, LayeredQuotaLimits, NetworkMode,
-    QuotaLimits, QuotaResource, ServiceConfig, ServiceDeps, ServiceState, TaskExit,
+    QuotaLimits, QuotaResource, ServiceConfig, ServiceDeps, ServiceState,
 };
 
 // ── deterministic doubles ────────────────────────────────────────────────────
@@ -1211,11 +1211,14 @@ async fn r03_a06_cancel_parent_spares_unrelated_background() {
 
     // Demonstrative CHILD RUN linked to the parent's tree (the real
     // subagent surface is R03-T06; this is the supervised child-run link
-    // of the cancellation tree). It parks on pending work until the tree
-    // (or its own completion) ends it.
+    // of the cancellation tree). R03 repair G01/F02: run-level children
+    // observe the tree cooperatively — this one parks until the tree
+    // fires, then finishes its own teardown (the exact shape a child
+    // run's drive presents today).
     let child_scope = parent_scope.child("child_run:demo".to_string(), cancel::ScopeKind::ChildRun);
     let child_started = Arc::new(std::sync::atomic::AtomicBool::new(false));
     let child_flag = Arc::clone(&child_started);
+    let child_wait_scope = child_scope.clone();
     let child_handle = state
         .runs()
         .task_supervisor()
@@ -1225,7 +1228,9 @@ async fn r03_a06_cancel_parent_spares_unrelated_background() {
             "child_run:demo".to_string(),
             async move {
                 child_flag.store(true, std::sync::atomic::Ordering::Release);
-                std::future::pending::<()>().await;
+                // Parks until the tree fires, then completes its own
+                // teardown (bounded by the cooperative window).
+                child_wait_scope.cancelled().await;
             },
         )
         .expect("child run spawn");
@@ -1315,8 +1320,10 @@ async fn r03_a06_cancel_parent_spares_unrelated_background() {
         live_after.is_empty(),
         "all parent children stopped: {live_after:?}"
     );
-    let child_exit = child_handle.wait().await.expect_err("child ended");
-    assert_eq!(child_exit, TaskExit::Aborted);
+    child_handle
+        .wait()
+        .await
+        .expect("child finished its own teardown");
     println!("R03_A06_TRACE 2: parent cancelled, child_run stopped through the tree");
 
     // The UNRELATED background CONTINUES: it is still running right now
@@ -1363,7 +1370,7 @@ async fn r03_a06_cancel_parent_spares_unrelated_background() {
         serde_json::json!({
             "parentRun": {"runId": parent_run, "status": status, "reason": reason},
             "childrenConfirmed": 2,
-            "childRunExit": child_exit.name(),
+            "childRunExit": "completed (cooperative teardown)",
             "background": {"survivedCancel": background_still_running,
                            "ticksAtCancel": ticks_at_cancel,
                            "ticksTotal": ticks.load(std::sync::atomic::Ordering::Acquire)},

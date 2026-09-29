@@ -112,12 +112,13 @@ impl CancelScope {
     /// The root scope of one run that is a CHILD of `parent` (R03-T06):
     /// cancelling the parent propagates into this run's tree; this run's
     /// own cancellation still never ascends.
+    ///
+    /// R03 repair G01/F01: the link is now built as a PAIR — the child
+    /// carries the parent reference AND is registered in the parent's
+    /// children under the no-miss linking protocol of [`link_under`] (a
+    /// parent that is already cancelled is INHERITED, never escaped).
     pub fn run_root_under(run_id: &str, parent: &CancelScope) -> Self {
-        Self::new(
-            format!("run:{run_id}"),
-            ScopeKind::Run,
-            Some(Arc::clone(&parent.inner)),
-        )
+        Self::new_child_scope(format!("run:{run_id}"), ScopeKind::Run, parent)
     }
 
     fn new(label: String, kind: ScopeKind, parent: Option<Arc<ScopeInner>>) -> Self {
@@ -136,15 +137,21 @@ impl CancelScope {
     }
 
     /// Derives a CHILD scope: it inherits the parent's cancellation (the
-    /// parent's `cancel` reaches it through the tree) while keeping its
-    /// own label/kind for supervision and cleanup reporting.
+    /// parent's `cancel` reaches it through the tree — including a
+    /// cancellation that already fired BEFORE this call, which is
+    /// inherited at link time) while keeping its own label/kind for
+    /// supervision and cleanup reporting.
     pub fn child(&self, label: String, kind: ScopeKind) -> CancelScope {
-        let scope = Self::new(label, kind, Some(Arc::clone(&self.inner)));
-        self.inner
-            .children
-            .lock()
-            .unwrap_or_else(|poisoned| poisoned.into_inner())
-            .push(Arc::downgrade(&scope.inner));
+        Self::new_child_scope(label, kind, self)
+    }
+
+    /// The shared construction path of EVERY parented node (`child` and
+    /// `run_root_under`): the child-side parent reference and the
+    /// parent-side registration are established together in
+    /// [`link_under`].
+    fn new_child_scope(label: String, kind: ScopeKind, parent: &CancelScope) -> CancelScope {
+        let scope = Self::new(label, kind, Some(Arc::clone(&parent.inner)));
+        link_under(&parent.inner, &scope.inner);
         scope
     }
 
@@ -167,15 +174,27 @@ impl CancelScope {
         first_anywhere
     }
 
+    /// Whether THIS scope or any of its ANCESTORS was cancelled. The walk
+    /// is monotonic (a cancellation never un-happens), so a `true` answer
+    /// is stable; a scope whose ancestor fired is observably cancelled
+    /// even in the instant before its own inherited flag lands (R03
+    /// repair G01/F01: `is_cancelled` no longer reads only this node).
     pub fn is_cancelled(&self) -> bool {
-        self.inner
-            .cancelled
-            .load(std::sync::atomic::Ordering::Acquire)
+        let mut current = Some(Arc::clone(&self.inner));
+        while let Some(node) = current {
+            if node.cancelled.load(std::sync::atomic::Ordering::Acquire) {
+                return true;
+            }
+            current = node.parent.clone();
+        }
+        false
     }
 
-    /// The first cancellation reason recorded on this scope (ancestors are
-    /// not consulted — a cancelled ancestor means `is_cancelled` is true
-    /// via propagation, and the ancestor's own reason is queryable there).
+    /// The first cancellation reason recorded on THIS scope. A scope
+    /// linked under an already-cancelled parent inherits that parent's
+    /// first reason at link time ([`link_under`]); a scope reached by a
+    /// later traversal records the reason its own first cancellation
+    /// carried. Ancestors' reasons are queryable on the ancestors.
     pub fn reason(&self) -> Option<String> {
         self.inner
             .reason
@@ -227,26 +246,98 @@ impl CancelScope {
     }
 }
 
-fn cancel_recursive(inner: &Arc<ScopeInner>, reason: &str, first_anywhere: &mut bool) {
-    let already = inner
-        .cancelled
-        .swap(true, std::sync::atomic::Ordering::AcqRel);
-    if !already {
-        *inner
+/// Links `child` under `parent` — the no-miss protocol every parented
+/// node construction shares (R03 repair G01/F01).
+///
+/// The parent's `children` lock is the linearization point on BOTH sides:
+/// - a cancellation traversal (`cancel_recursive`) holds this lock while
+///   visiting the registered children;
+/// - a registration holds this lock while pushing the new child AND while
+///   re-checking the parent's cancelled flag.
+///
+/// Therefore the child is either (a) pushed before the traversal takes
+/// the lock — the traversal then reaches it — or (b) linked after/below a
+/// traversal already in flight — the flag re-check under the lock observes
+/// the parent's cancellation and the child INHERITS it right here (first
+/// reason and first MOMENT of the parent's own cancellation). No window
+/// exists in which a successfully attributed node escapes cancellation.
+///
+/// Deadlock safety: the inheritance path only locks the CHILD's own
+/// mutexes (a freshly constructed child has no other holders), matching
+/// the traversal's parent.children → child.* lock order exactly; the
+/// parent's `reason`/`cancelled_at` are read WITHOUT their locks being
+/// held anywhere else — the first-writer leg of `cancel_recursive` fills
+/// and RELEASES both before storing the cancelled flag, so a reader that
+/// observes the flag `true` (Acquire) always sees complete facts.
+fn link_under(parent: &Arc<ScopeInner>, child: &Arc<ScopeInner>) {
+    let mut guard = parent
+        .children
+        .lock()
+        .unwrap_or_else(|poisoned| poisoned.into_inner());
+    if parent.cancelled.load(std::sync::atomic::Ordering::Acquire)
+        && !child.cancelled.load(std::sync::atomic::Ordering::Acquire)
+    {
+        let reason = parent
             .reason
             .lock()
-            .unwrap_or_else(|poisoned| poisoned.into_inner()) = Some(reason.to_string());
-        *inner
+            .unwrap_or_else(|poisoned| poisoned.into_inner())
+            .clone()
+            .unwrap_or_else(|| "cancelled (reason unrecorded)".to_string());
+        let inherited_at = *parent
             .cancelled_at
             .lock()
-            .unwrap_or_else(|poisoned| poisoned.into_inner()) = Some(Instant::now());
-        *first_anywhere = true;
+            .unwrap_or_else(|poisoned| poisoned.into_inner());
+        // Cancel the CHILD (its own mutexes only — nobody else holds them).
+        let mut first = false;
+        cancel_recursive(child, &reason, &mut first);
+        // The inherited MOMENT is the parent's first cancellation moment
+        // (the tree's first cancellation, not the linking instant).
+        if let Some(at) = inherited_at {
+            *child
+                .cancelled_at
+                .lock()
+                .unwrap_or_else(|poisoned| poisoned.into_inner()) = Some(at);
+        }
+    }
+    guard.push(Arc::downgrade(child));
+    drop(guard);
+}
+
+fn cancel_recursive(inner: &Arc<ScopeInner>, reason: &str, first_anywhere: &mut bool) {
+    // First-writer leg (R03 repair G01/F01 ordering): the reason and the
+    // moment are filled and their locks RELEASED before the cancelled
+    // flag is stored. Readers that observe the flag (Acquire) therefore
+    // always see complete first-cancellation facts — the inheritance read
+    // in `link_under` depends on exactly this ordering. A concurrent
+    // writer that loses the reason race simply skips (the winner stores
+    // the flag before reaching the children below).
+    if !inner.cancelled.load(std::sync::atomic::Ordering::Acquire) {
+        let mut reason_guard = inner
+            .reason
+            .lock()
+            .unwrap_or_else(|poisoned| poisoned.into_inner());
+        if reason_guard.is_none() {
+            *reason_guard = Some(reason.to_string());
+            drop(reason_guard);
+            let mut at_guard = inner
+                .cancelled_at
+                .lock()
+                .unwrap_or_else(|poisoned| poisoned.into_inner());
+            if at_guard.is_none() {
+                *at_guard = Some(Instant::now());
+            }
+            drop(at_guard);
+            inner
+                .cancelled
+                .store(true, std::sync::atomic::Ordering::Release);
+            *first_anywhere = true;
+        }
     }
     inner.notify.notify_waiters();
     // Children are taken and RESTORED under the same lock hold so a
-    // concurrent `child()` registration on this scope can never be lost;
-    // the recursion locks only descendant mutexes (a tree has no cycles,
-    // and no path ascends), so holding this lock is deadlock-free.
+    // concurrent registration on this scope can never be lost; the
+    // recursion locks only descendant mutexes (a tree has no cycles, and
+    // no path ascends), so holding this lock is deadlock-free.
     let mut guard = inner
         .children
         .lock()
@@ -502,6 +593,11 @@ impl CancelRegistry {
     /// `abortByParentSession` semantics — STATE_TRANSITIONS T8), while
     /// this run's own cancellation never ascends. Everything else
     /// (phases, verdict retention) is identical to [`Self::register`].
+    ///
+    /// R03 repair G01/F01: when the parent's tree is ALREADY cancelled at
+    /// registration time, the linked root INHERITS the cancellation at
+    /// construction and the entry starts at the `requested` phase with
+    /// the inherited first reason (never Active-under-a-cancelled-scope).
     pub fn register_linked(&self, run_id: &str, parent_scope: &CancelScope) -> Arc<RunCancelEntry> {
         self.register_scope(run_id, CancelScope::run_root_under(run_id, parent_scope))
     }
@@ -513,6 +609,18 @@ impl CancelRegistry {
             phase: Mutex::new(CancelPhase::Active),
             registered_at: Instant::now(),
         });
+        // A scope that arrived already cancelled (inherited at link time)
+        // starts the four-phase machine at Requested with the inherited
+        // first reason — a driver registering under a cancelled parent
+        // observes a live cancellation, not a fresh Active run.
+        if entry.scope.is_cancelled() {
+            entry.advance_phase(CancelPhase::Requested {
+                reason: entry
+                    .scope
+                    .reason()
+                    .unwrap_or_else(|| "inherited cancellation".to_string()),
+            });
+        }
         self.runs
             .lock()
             .unwrap_or_else(|poisoned| poisoned.into_inner())
@@ -676,6 +784,75 @@ mod tests {
         drop(normal);
         registry.deregister("run_normal");
         assert_eq!(registry.recent_verdict("run_normal"), None);
+    }
+
+    /// R03 repair G01/F01: `run_root_under` links BOTH ways — the linked
+    /// root receives the parent's cancellation through the traversal.
+    #[tokio::test]
+    async fn linked_run_root_receives_the_parent_cancellation() {
+        let parent = CancelScope::run_root("run_linked_p");
+        let child = CancelScope::run_root_under("run_linked_c", &parent);
+        let grand = CancelScope::run_root_under("run_linked_g", &child);
+        let call = grand.child("mc".to_string(), ScopeKind::ModelCall);
+        assert!(!child.is_cancelled());
+        parent.cancel("user");
+        assert!(child.is_cancelled());
+        assert!(grand.is_cancelled());
+        assert!(call.is_cancelled());
+        assert_eq!(child.reason().as_deref(), Some("user"));
+        // The linked root is enumerable from the parent (supervision).
+        assert!(parent
+            .live_descendant_labels()
+            .iter()
+            .any(|label| label.contains("run_linked_c")));
+    }
+
+    /// R03 repair G01/F01: `register_linked` under an ALREADY-cancelled
+    /// parent inherits the cancellation (first reason + moment) and the
+    /// registry entry starts at the `requested` phase.
+    #[tokio::test]
+    async fn register_linked_under_cancelled_parent_inherits() {
+        let registry = CancelRegistry::new();
+        let parent = registry.register("run_inh_p");
+        assert!(parent.scope.cancel("first-reason"));
+        let first_at = parent.scope.cancelled_at().unwrap();
+        let child = registry.register_linked("run_inh_c", &parent.scope);
+        assert!(child.scope.is_cancelled());
+        assert_eq!(child.scope.reason().as_deref(), Some("first-reason"));
+        assert_eq!(child.scope.cancelled_at(), Some(first_at));
+        match child.phase() {
+            CancelPhase::Requested { reason } => assert_eq!(reason, "first-reason"),
+            other => panic!("expected Requested, got {other:?}"),
+        }
+        // A late different-reason cancel of the parent never rewrites the
+        // inherited first reason.
+        parent.scope.cancel("second-reason");
+        assert_eq!(child.scope.reason().as_deref(), Some("first-reason"));
+    }
+
+    /// R03 repair G01/F01: nodes created AFTER the traversal still
+    /// inherit (the registration-vs-cancellation window misses nothing).
+    #[test]
+    fn late_children_of_a_cancelled_scope_inherit_without_new_reason() {
+        let parent = CancelScope::run_root("run_late_p");
+        parent.cancel("only-reason");
+        for kind in [ScopeKind::ToolCall, ScopeKind::ChildRun] {
+            let late = parent.child(format!("{kind:?}").to_lowercase(), kind);
+            assert!(late.is_cancelled());
+            assert_eq!(late.reason().as_deref(), Some("only-reason"));
+        }
+    }
+
+    /// R03 repair G01/F01: `is_cancelled` consults ANCESTORS — a node
+    /// whose ancestor fired reads as cancelled even in the instant before
+    /// its own inherited flag would be observed by a single-node read.
+    #[test]
+    fn is_cancelled_walks_the_ancestor_chain() {
+        let root = CancelScope::run_root("run_walk");
+        let mid = CancelScope::run_root_under("run_walk_mid", &root);
+        assert!(!mid.is_cancelled());
+        assert!(root.cancel("ancestor"));
+        assert!(mid.is_cancelled(), "the ancestor's cancellation is visible");
     }
 
     #[tokio::test]

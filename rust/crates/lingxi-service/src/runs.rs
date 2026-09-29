@@ -292,7 +292,10 @@ impl RunSupervisor {
             limits: RunDriveLimits::default(),
             quotas: QuotaManager::new(crate::quotas::QuotaLimits::default()),
             cancel: CancelRegistry::new(),
-            tasks: Arc::new(TaskSupervisor::new(cancel_policy.supervised_task_cap)),
+            tasks: Arc::new(TaskSupervisor::with_cooperative_grace(
+                cancel_policy.supervised_task_cap,
+                Duration::from_millis(cancel_policy.cleanup_grace_ms),
+            )),
             cancel_policy,
             approval: None,
             subagents: None,
@@ -320,7 +323,13 @@ impl RunSupervisor {
             limits,
             quotas,
             cancel: CancelRegistry::new(),
-            tasks: Arc::new(TaskSupervisor::new(cancel_policy.supervised_task_cap)),
+            // R03 repair G01/F02: run-level children share the cleanup
+            // policy's grace as their cooperative-cancel window (one
+            // anchor with the owner's drain budget).
+            tasks: Arc::new(TaskSupervisor::with_cooperative_grace(
+                cancel_policy.supervised_task_cap,
+                Duration::from_millis(cancel_policy.cleanup_grace_ms),
+            )),
             cancel_policy,
             approval,
             subagents: subagent_launcher,

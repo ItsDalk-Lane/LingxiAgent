@@ -1447,24 +1447,38 @@ async fn leaf_parent_cancel_stops_child() {
     assert_eq!(run_status(&state, &parent).await, "cancelled");
 
     // The child TASK stopped with the parent (the supervision tree
-    // aborted it) — but its DURABLE row may stay honestly ACTIVE: the
-    // spawn-linked wrapper drops the drive future at tree cancel, so the
-    // row-level closure goes through the SAME recovery path the shutdown
-    // coordinator documented (dangling active rows are closed by the next
-    // process's startup scan — never faked, never completed). Prove BOTH
-    // halves: the child never completes here, and a fresh bootstrap's
-    // REAL recovery scan closes it as interrupted_needs_attention.
-    let child_before_restart = run_status(&state, &child).await;
-    assert_ne!(
-        child_before_restart, "completed",
-        "a tree-cancelled child run can NEVER complete"
-    );
+    // aborted it) — and since R03 repair G01/F02 its DURABLE row settles
+    // `cancelled` IN THIS PROCESS: the linked wrapper opens a bounded
+    // cooperative window so the child's own drive walks its four-phase
+    // cancellation and its single finalize (no restart, no startup scan
+    // needed for an ordinary parent cancellation).
+    let deadline = std::time::Instant::now() + std::time::Duration::from_secs(5);
+    loop {
+        let observed = run_status(&state, &child).await;
+        if observed == "cancelled" {
+            break;
+        }
+        assert!(
+            std::time::Instant::now() < deadline,
+            "the tree-cancelled child must settle cancelled in-process (last: {observed})"
+        );
+        tokio::time::sleep(std::time::Duration::from_millis(1)).await;
+    }
     assert!(final_message_of(&state, &child).await.is_none());
+    // The thread registry's busy flag cleared and the concurrency lanes
+    // returned to baseline in the same process.
+    wait_until("the child's thread frees", || {
+        state
+            .subagents()
+            .threads_of("sess_local_alpha")
+            .iter()
+            .all(|thread| !thread.busy)
+    })
+    .await;
+    let (per_session, global) = state.subagents().active_counts("sess_local_alpha");
+    assert_eq!((per_session, global), (0, 0));
     // The child TASK stopped: the parent's bounded cleanup confirmed all
-    // of its supervised children (the A06 supervision signal). The
-    // in-memory thread registry's `busy` flag is only cleared by the
-    // child drive's own bookkeeping tail, which the tree-cancel drop
-    // skips — recorded honestly below instead of asserted.
+    // of its supervised children (the A06 supervision signal).
     let live_children = state.runs().task_supervisor().live_children_of(&parent);
     assert!(
         live_children.is_empty(),
@@ -1472,8 +1486,9 @@ async fn leaf_parent_cancel_stops_child() {
     );
     record_case("parent-cancel-stops-child-run", 1, 1);
 
-    // Storage closes without a graceful shutdown; a fresh production-form
-    // bootstrap runs the REAL startup scan over the surviving facts.
+    // A fresh bootstrap's REAL recovery scan must NOT touch the already
+    // terminal row (终态不复活): the same-process closeout made the
+    // restart path a pure observer of an existing terminal.
     state.storage().close().await.expect("close storage");
     let layout2 = prepare_layout(&home).expect("layout again");
     let state2 =
@@ -1482,22 +1497,21 @@ async fn leaf_parent_cancel_stops_child() {
             .expect("restart bootstrap with recovery scan");
     let child_after = run_status(&state2, &child).await;
     assert_eq!(
-        child_after, "interrupted_needs_attention",
-        "the dangling active child row is closed HONESTLY by the recovery scan \
-            (observed before restart: {child_before_restart})"
+        child_after, "cancelled",
+        "the in-process cancelled child row is respected by the recovery scan \
+            (observed before restart: cancelled)"
     );
     assert!(final_message_of(&state2, &child).await.is_none());
     record_combo_counts(
         "leaf-parent-cancel",
         serde_json::json!({
             "parent_final_status": "cancelled",
-            "child_status_before_restart": child_before_restart,
+            "child_status_before_restart": "cancelled",
             "child_status_after_recovery_scan": child_after,
             "child_final_message_rows": 0,
-            "note": "child TASK stopped by the tree cancel (supervision confirmed; the \
-                thread registry busy flag only clears via the drive's own bookkeeping, which \
-                the tree-cancel drop skips); the durable row is closed by the real recovery \
-                scan (the documented dangling-active closure path), never faked",
+            "note": "child run closed out IN-PROCESS by the cooperative-cancel window \
+                (durable cancelled + busy cleared + lanes returned); the restart scan only \
+                observes the existing terminal — ordinary cancellation never needs a restart",
         }),
     );
     teardown(&state2, &home).await;
