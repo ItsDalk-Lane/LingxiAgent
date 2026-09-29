@@ -72,7 +72,7 @@ use crate::cancel::{
 use crate::events::EventService;
 use crate::quotas::QuotaManager;
 use crate::session_supervisor::SteeringInbox;
-use crate::task_supervisor::TaskSupervisor;
+use crate::task_supervisor::{TaskExit, TaskSupervisor};
 
 /// Hard bounds of one driven run (R03-T01; injected through `ServiceDeps`).
 /// Both bounds are loud: hitting `max_model_turns` FAILS the run with
@@ -1312,14 +1312,33 @@ impl RunSupervisor {
                                 }
                             };
                             let failed = matches!(outcome, ToolOutcome::Failed { .. });
-                            port.record_invocation_receipt(
-                                &ctx,
-                                &call_id,
-                                journal_receipt_of(&outcome),
-                                now_ms,
-                            )
-                            .await
-                            .map_err(DriveError::Storage)?;
+                            // R03 repair G03/F04 (same family): a delegation
+                            // REFUSAL is a known never-dispatched negative
+                            // fact — every `SubagentDispatchError` leaves
+                            // ZERO child runs created. The receipt keeps
+                            // `dispatched=false` so the three fact classes
+                            // (never dispatched / trusted external failure /
+                            // runner failure without an external result)
+                            // stay distinguishable in the journal.
+                            let receipt = match &outcome {
+                                ToolOutcome::Success { .. } => journal_receipt_of(&outcome),
+                                ToolOutcome::Failed { error } => InvocationReceipt {
+                                    outcome: ReceiptOutcome::Failed,
+                                    detail: format!(
+                                        "not dispatched: {}: {}",
+                                        error.code.wire_name(),
+                                        error.message
+                                    ),
+                                    dedup_id: None,
+                                    dispatched: false,
+                                },
+                                ToolOutcome::Cancelled | ToolOutcome::Unknown { .. } => {
+                                    unreachable!("delegation maps success or a refusal only")
+                                }
+                            };
+                            port.record_invocation_receipt(&ctx, &call_id, receipt, now_ms)
+                                .await
+                                .map_err(DriveError::Storage)?;
                             self.persist_tool_event(
                                 port,
                                 events,
@@ -1397,28 +1416,35 @@ impl RunSupervisor {
                             exit = tool_child.wait() => match exit {
                                 Ok(result) => result,
                                 Err(task_exit) => {
-                                    // Supervision return: a panicking/aborted
-                                    // tool child is a recorded tool failure
-                                    // (the run continues — tool partial
-                                    // failure vocabulary settles it).
+                                    // Supervision return (R03 repair
+                                    // G03/F04): the invocation WAS
+                                    // dispatched (`started` is durable) and
+                                    // the supervised child ended WITHOUT
+                                    // delivering an outcome. A panic, a
+                                    // forced abort or a lost supervision
+                                    // channel proves NOTHING about the
+                                    // external operation — the runner-level
+                                    // failure is recorded separately
+                                    // (log + receipt detail, never
+                                    // masquerading as an external result)
+                                    // and the invocation journals as
+                                    // UNKNOWN: never a fabricated confirmed
+                                    // failure, never a success. The run
+                                    // continues; the tool partial-failure
+                                    // vocabulary settles it.
+                                    let reason =
+                                        unobserved_tool_exit_reason(&task_exit);
                                     tracing::error!(
                                         run_id = %run_id,
                                         tool_call = %call_id,
                                         exit = task_exit.name(),
-                                        "supervised tool child ended without an outcome"
+                                        "supervised tool child ended without an outcome; \
+                                         the external outcome is unobserved — journaling \
+                                         unknown, never a fabricated failure"
                                     );
                                     ToolExecutionResult::of_ctx(
                                         &ctx,
-                                        ToolOutcome::Failed {
-                                            error: ProtocolError::new(
-                                                ErrorCode::Internal,
-                                                format!(
-                                                    "tool child {} without an outcome",
-                                                    task_exit.name()
-                                                ),
-                                                false,
-                                            ),
-                                        },
+                                        ToolOutcome::Unknown { reason },
                                     )
                                 }
                             },
@@ -1924,6 +1950,31 @@ fn finish_no_final(saw_tool_failure: bool, saw_process_content: bool) -> RunFini
     RunFinish::CompletedWithoutFinal { cause }
 }
 
+/// Renders one supervised tool-child exit that arrived WITHOUT a tool
+/// outcome into the diagnosable reason of the honest UNKNOWN receipt
+/// (R03 repair G03/F04). Consumes the REAL [`TaskExit`] variant (never a
+/// string guess — the G01 supervision vocabulary is the source of
+/// truth): every runner-level anomaly class keeps its own diagnostic,
+/// and none of them pretends to be an external result.
+fn unobserved_tool_exit_reason(exit: &TaskExit) -> String {
+    match exit {
+        TaskExit::Panicked(payload) => format!(
+            "tool executor panicked after dispatch (panic: {payload}); the external \
+             outcome is unobserved"
+        ),
+        TaskExit::Aborted => "tool executor dropped at an await point after dispatch \
+             (supervised abort); the external outcome is unobserved"
+            .to_string(),
+        TaskExit::Failed(detail) => format!(
+            "tool supervision channel lost after dispatch ({detail}); the external \
+             outcome is unobserved"
+        ),
+        TaskExit::Completed => "supervision reported completion without delivering an \
+             outcome (internal anomaly); the external outcome is unobserved"
+            .to_string(),
+    }
+}
+
 /// Maps a tool outcome onto the durable invocation RECEIPT (R03-T05). The
 /// content digest a healthy double/adapter returns is the dedup identifier
 /// the external system made available; a cancelled outcome says the
@@ -1931,6 +1982,12 @@ fn finish_no_final(saw_tool_failure: bool, saw_process_content: bool) -> RunFini
 /// not complete, so it journals as Unknown (never a fabricated failure);
 /// a fenced/unobserved result is Unknown by construction. The receipt
 /// records what the external system returned — no cross-system atomicity.
+///
+/// R03 repair G03/F04: the `Failed` arm is only reachable from outcomes
+/// the EXECUTOR returned (a trustworthy external failure receipt). A
+/// supervised child that ended WITHOUT an outcome never reaches this
+/// mapping as `Failed` — the driver journals it through
+/// [`unobserved_tool_exit_reason`] as Unknown instead.
 fn journal_receipt_of(outcome: &ToolOutcome) -> InvocationReceipt {
     match outcome {
         ToolOutcome::Success { content_digest } => InvocationReceipt {
@@ -2133,6 +2190,40 @@ mod tests {
             lingxi_kernel::ports::ReceiptOutcome::Unknown
         );
         assert_eq!(receipt.detail, "receipt lost");
+    }
+
+    /// R03 repair G03/F04: EVERY supervised tool-child exit that arrives
+    /// WITHOUT an outcome maps to an UNKNOWN reason that (a) names the
+    /// real `TaskExit` variant's anomaly class, (b) states the external
+    /// outcome is unobserved, and (c) never claims an external result.
+    /// No anomaly variant — panic, forced abort, lost supervision
+    /// channel, or the internal completion anomaly — leaks into a
+    /// confirmed-failure/success vocabulary.
+    #[test]
+    fn every_unobserved_tool_exit_variant_journals_unknown_diagnosably() {
+        let cases: Vec<(TaskExit, &str)> = vec![
+            (
+                TaskExit::Panicked("tool double exploded".to_string()),
+                "tool double exploded",
+            ),
+            (TaskExit::Aborted, "supervised abort"),
+            (
+                TaskExit::Failed("child ended without delivering a result".to_string()),
+                "supervision channel lost",
+            ),
+            (TaskExit::Completed, "internal anomaly"),
+        ];
+        for (exit, marker) in cases {
+            let reason = unobserved_tool_exit_reason(&exit);
+            assert!(
+                reason.contains("unobserved"),
+                "every variant says the external outcome is unobserved: {reason}"
+            );
+            assert!(
+                reason.contains(marker),
+                "the variant's own anomaly class is diagnosable ({marker}): {reason}"
+            );
+        }
     }
 
     /// R03-T04 write-side fence logic (the driver's `fence_verdict`): a

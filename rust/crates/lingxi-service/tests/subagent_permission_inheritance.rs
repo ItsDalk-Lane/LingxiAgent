@@ -723,6 +723,21 @@ async fn readonly_parent_write_access_request_is_refused_at_dispatch() {
         journal.contains("SUBAGENT_WRITE_DENIED_BY_PARENT_READ_ONLY"),
         "{journal}"
     );
+    // R03 repair G03/F04 (same family): a delegation REFUSAL is a known
+    // never-dispatched negative fact — the receipt's `dispatched` flag
+    // must say so (zero child runs were created by every refusal path).
+    let dispatched = query_text(
+        &state,
+        "SELECT dispatched FROM invocation_journal WHERE run_id = ?1 AND target = 'subagent'",
+        &parent_run,
+    )
+    .await
+    .expect("dispatched column");
+    assert_eq!(
+        dispatched.as_str(),
+        "0",
+        "a refused delegation journals dispatched=false (fact classes stay distinct)"
+    );
     // And the thread registry holds nothing.
     assert!(state.subagents().threads_of("sess_local_alpha").is_empty());
     teardown(&state, &home).await;

@@ -21,10 +21,16 @@
       "remote_confirmed": "origin/codex/rust-tauri-migration=520bb75b9906120c78b0d10036577fd911a5a81c"
     },
     "G02": {
-      "status": "PASSED_PENDING_PUSH",
+      "status": "DONE",
       "review": "REVIEWER-REPAIR-R03-G02-R1 PASS (4/4 C-ID)",
-      "commits": [],
-      "remote_confirmed": null
+      "commits": [
+        {
+          "sha": "ccb09fde6",
+          "kind": "repair",
+          "note": "F03 产品修复/测试/证据（12 files, 2453+/86-）"
+        }
+      ],
+      "remote_confirmed": "origin/codex/rust-tauri-migration=ccb09fde679b4cd96e2ba2f5f51e53bce564710f"
     }
   }
 }

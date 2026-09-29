@@ -1,0 +1,52 @@
+{
+  "f04_c02_classification_table": {
+    "entries": [
+      {
+        "detail": "tool executor panicked after dispatch (panic: F04 controlled fault: runner died AFTER the external action (target lost.after, key run_000001a0dcba6c00_000001-tc0001, digest digest-1-run_000001a0dcba6c00_000001-tc0001)); the external outcome is unobserved",
+        "dispatched": true,
+        "journal_id": "run_000001a0dcba6c00_000001-tc0001",
+        "outcome": "unknown",
+        "phase": "unknown",
+        "target": "lost.after"
+      },
+      {
+        "detail": "tool executor panicked after dispatch (panic: F04 controlled fault: runner died BEFORE the external action (target lost.before, key run_000001a0dcba6c00_000001-tc0002)); the external outcome is unobserved",
+        "dispatched": true,
+        "journal_id": "run_000001a0dcba6c00_000001-tc0002",
+        "outcome": "unknown",
+        "phase": "unknown",
+        "target": "lost.before"
+      }
+    ],
+    "external_executed_count": 1,
+    "run_id": "run_000001a0dcba6c00_000001"
+  },
+  "f04_c03_three_classes": {
+    "entries": [
+      {
+        "dispatched": false,
+        "journal_id": "run_000001a0dcba6c00_000001-tc0001",
+        "outcome": "failed",
+        "phase": "failed",
+        "target": "reject.me"
+      },
+      {
+        "dispatched": true,
+        "journal_id": "run_000001a0dcba6c00_000001-tc0002",
+        "outcome": "failed",
+        "phase": "failed",
+        "target": "fail.external"
+      },
+      {
+        "dispatched": true,
+        "journal_id": "run_000001a0dcba6c00_000001-tc0003",
+        "outcome": "unknown",
+        "phase": "unknown",
+        "target": "panic.fault"
+      }
+    ],
+    "external_executed_count": 2,
+    "external_request_count": 2,
+    "run_id": "run_000001a0dcba6c00_000001"
+  }
+}
