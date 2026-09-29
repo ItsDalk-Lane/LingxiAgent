@@ -24,8 +24,10 @@ use serde::{Deserialize, Serialize};
 use lingxi_adapters::storage::{RunDatabase, RunSummaryRow, SessionRow};
 use lingxi_kernel::ports::{StorageError, StoragePort};
 use lingxi_kernel::Principal as KernelPrincipal;
+use lingxi_protocol::RunStatus;
 
 use crate::auth::{Principal, PrincipalKind, LOCAL_OWNER_USER_ID};
+use crate::cancel::CancelPhase;
 use crate::events::EventService;
 use crate::session_supervisor::{SessionConcurrencyLimits, SessionSupervisor, SteerOutcome};
 
@@ -55,6 +57,33 @@ pub struct RunSummary {
 pub struct ExecuteAccepted {
     pub run_id: String,
     pub run_count: u64,
+}
+
+/// Outcome of an authorized cancellation request against one run
+/// (R03-T03). Every leg is explicit — the frozen incumbent
+/// `abortSession` shape (pre-prompt abort / streaming force-release /
+/// no-op `false`) maps onto: live run → [`CancelRunOutcome::Accepted`],
+/// settled run → [`CancelRunOutcome::AlreadyTerminal`], active-but-
+/// driverless row → [`CancelRunOutcome::DanglingActive`].
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub enum CancelRunOutcome {
+    /// The cancellation fired on the live run's tree (first request
+    /// wins; the durable `cancelling` leg, the bounded child cleanup and
+    /// the single `cancelled` finalize are driven by the run's driver).
+    Accepted { run_id: String, phase: CancelPhase },
+    /// The run already holds a terminal state: nothing was cancelled
+    /// (mirrors the incumbent's no-op `false` — diagnosable, not busy).
+    AlreadyTerminal { run_id: String, status: RunStatus },
+    /// The durable row is ACTIVE but NO live driver exists in this
+    /// process (e.g. the process restarted, or the driving future
+    /// disappeared before finalize). The explainable state is reported
+    /// honestly; classifying/recovering such rows is R03-T07's startup
+    /// scan — nothing here fabricates a terminal.
+    DanglingActive {
+        run_id: String,
+        status: RunStatus,
+        detail: String,
+    },
 }
 
 #[derive(Debug, Clone, PartialEq, Deserialize)]
@@ -456,6 +485,71 @@ impl SessionStore {
         }
     }
 
+    /// Requests the cancellation of ONE run (R03-T03): resolves the run
+    /// through the durable store, checks the SAME session-ownership rule
+    /// as execute, then fires the run supervisor's cancellation tree.
+    ///
+    /// Four-phase honesty: `Accepted` returns the phase SNAPSHOT at the
+    /// request moment (`requested`); the durable `cancelling` leg, the
+    /// bounded child cleanup and the single `cancelled` finalize are
+    /// performed by the run's own driver — query
+    /// [`crate::runs::RunSupervisor::cancel_phase`] for the live phase
+    /// or the run row for the durable terminal. An already-terminal run
+    /// is a diagnosable no-op; an active row without a live driver in
+    /// this process is reported as the explainable dangling state
+    /// (recovery classification = R03-T07).
+    pub async fn cancel_run_for<P: StoragePort>(
+        &self,
+        port: &P,
+        supervisor: &crate::runs::RunSupervisor,
+        principal: &Principal,
+        run_id: &str,
+    ) -> Result<CancelRunOutcome, SessionExecuteError> {
+        let record = match port
+            .load_run(&lingxi_protocol::RunId::new(run_id.to_string()))
+            .await
+        {
+            Ok(Some(record)) => record,
+            Ok(None) => return Err(SessionExecuteError::NotFound),
+            Err(err) => return Err(SessionExecuteError::Storage(err)),
+        };
+        // Ownership: the same rule as every other session surface — the
+        // run's session decides who may cancel it.
+        let session_id = record.session_id.to_string();
+        let row = match self.backend.get_session_erased(&session_id).await {
+            Ok(Some(row)) => row,
+            Ok(None) => return Err(SessionExecuteError::NotFound),
+            Err(err) => return Err(SessionExecuteError::Storage(err)),
+        };
+        if !Self::can_access(principal, &row.owner_user_id) {
+            return Err(SessionExecuteError::Forbidden);
+        }
+        if record.status.is_terminal() {
+            return Ok(CancelRunOutcome::AlreadyTerminal {
+                run_id: run_id.to_string(),
+                status: record.status,
+            });
+        }
+        match supervisor.cancel_run(run_id, "user") {
+            crate::cancel::FireOutcome::Fired | crate::cancel::FireOutcome::AlreadyCancelling => {
+                Ok(CancelRunOutcome::Accepted {
+                    run_id: run_id.to_string(),
+                    phase: supervisor
+                        .cancel_phase(run_id)
+                        .unwrap_or(CancelPhase::Active),
+                })
+            }
+            crate::cancel::FireOutcome::NotLive => Ok(CancelRunOutcome::DanglingActive {
+                run_id: run_id.to_string(),
+                status: record.status,
+                detail: "durable run row is active but no live driver exists in this \
+                             process (restart or abandoned drive); recovery classification \
+                             belongs to the R03-T07 startup scan"
+                    .to_string(),
+            }),
+        }
+    }
+
     /// Test/evidence helper: observable run count for a session.
     pub async fn run_count(&self, session_id: &str) -> Result<u64, StorageError> {
         self.backend.count_runs_erased(session_id).await
@@ -734,6 +828,31 @@ mod tests {
             _ctx: &RunContext,
             _now_unix_ms: u64,
         ) -> Result<CommittedOutcome, StorageError> {
+            Ok(CommittedOutcome {
+                newly_committed: true,
+                events: Vec::new(),
+            })
+        }
+        async fn record_run_state_change(
+            &self,
+            _ctx: &RunContext,
+            from: lingxi_protocol::RunStatus,
+            to: lingxi_protocol::RunStatus,
+            _reason: Option<String>,
+            _now_unix_ms: u64,
+        ) -> Result<CommittedOutcome, StorageError> {
+            // Kernel-gated shape only (the transactional behavior of the
+            // real store is covered against the adapter).
+            lingxi_kernel::RunStateMachine::transition(from, to).map_err(|err| {
+                StorageError::InvalidRequest {
+                    detail: err.reason.to_string(),
+                }
+            })?;
+            if to.is_terminal() {
+                return Err(StorageError::InvalidRequest {
+                    detail: "record_run_state_change requires a non-terminal target".to_string(),
+                });
+            }
             Ok(CommittedOutcome {
                 newly_committed: true,
                 events: Vec::new(),

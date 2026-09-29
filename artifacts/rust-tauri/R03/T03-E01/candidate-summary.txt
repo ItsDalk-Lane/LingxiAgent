@@ -1,0 +1,21 @@
+R03-T03-E01 candidate summary
+TASK_BASE_SHA: d075ec8a62bdd9e8346c450b9a4b62668554d9cd (branch codex/rust-tauri-migration, no commit/push)
+HEAD: d075ec8a62bdd9e8346c450b9a4b62668554d9cd
+generated_utc: 2026-09-29T04:13:23Z
+tracked diff vs BASE: 5 modified + 4 new rust paths (below); untracked: dispatch + this evidence dir
+
+## modified (sha256)
+46389e1d568c5891f35f26e917d93b4ddb49940f3061dca6501d1499fa6f3550  rust/crates/lingxi-adapters/src/storage/run_store.rs
+8c5b05dad244f0d2ce0c709c06135adeaf4053c4ff8d9e6b284d215226d8c1d0  rust/crates/lingxi-kernel/src/ports.rs
+1c0858da4fa2d45746ccb9cb34a106d3ed36d8f8a298c9702d35a136544a11cd  rust/crates/lingxi-service/src/lib.rs
+3b5213046236292699e15de5ab609c47f80d392c78ab06cdc0badb1582634d06  rust/crates/lingxi-service/src/runs.rs
+bd3023f38998a2e07c9a99168218ef9fe749ebfec82cff0c701940d168a2d38e  rust/crates/lingxi-service/src/sessions.rs
+
+## new (sha256)
+17ed1c4dcd9dcd94c2f499cd64348cf8c886cf597d58c902e4f9fecbb5168adc  rust/crates/lingxi-service/src/approval.rs
+d682ba491a89fdff6e8123baeda86d02b357c361c42e26c2ada1a6a66490aefc  rust/crates/lingxi-service/src/cancel.rs
+e5d3ec2259d15f8dab84ec1da183100f763d426f2e2ebfbd11fc3cf087a6a34f  rust/crates/lingxi-service/src/task_supervisor.rs
+7210a09961c9b9a9cab9b5e38e8b20252c90935412236fe15d43d349b6c079a9  rust/crates/lingxi-service/tests/cancellation_tree.rs
+
+rust/Cargo.lock sha256: 90111c4b5988531d7a891339b6ee5df8afc9d3ec655e4929747da07d5811bb49 (unchanged vs R02_HANDOFF 90111c4b...)
+# end

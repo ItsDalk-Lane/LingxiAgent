@@ -1358,6 +1358,134 @@ impl StoragePort for RunDatabase {
             })
             .await
     }
+
+    async fn record_run_state_change(
+        &self,
+        ctx: &RunContext,
+        from: RunStatus,
+        to: RunStatus,
+        reason: Option<String>,
+        now_unix_ms: u64,
+    ) -> Result<CommittedOutcome, StorageError> {
+        let (run_id, session_id, owner_kind, owner_subject, _principal_id, _generation) =
+            ctx_facts(ctx);
+        let attempt = ctx.attempt.to_string();
+        let stream_id = session_id.clone();
+        let busy = self.queue.options().busy_timeout_ms;
+        self.queue
+            .submit(move |conn| {
+                with_write_txn(conn, busy, |conn| {
+                    let Some(run) = load_run_row(conn, &run_id)? else {
+                        return Err(StorageError::InvalidRequest {
+                            detail: format!(
+                                "cannot change the phase of run {run_id}: no run row exists"
+                            ),
+                        });
+                    };
+                    if run.session_id != session_id
+                        || run.owner_kind != owner_kind
+                        || run.owner_subject != owner_subject
+                    {
+                        return Err(StorageError::Conflict {
+                            detail: format!(
+                                "run {run_id} belongs to session {}/{}/{}; the phase-change \
+                                 context claims {session_id}/{owner_kind}/{owner_subject}",
+                                run.session_id, run.owner_kind, run.owner_subject
+                            ),
+                        });
+                    }
+                    // Terminal targets belong to commit_run_outcome alone —
+                    // this surface owns the NON-terminal legs only (the
+                    // durable `cancelling` entry and `waiting_approval`
+                    // round trips).
+                    if to.is_terminal() {
+                        return Err(StorageError::InvalidRequest {
+                            detail: format!(
+                                "record_run_state_change only persists non-terminal targets; {} \
+                                 is terminal and must go through commit_run_outcome",
+                                to.wire_name()
+                            ),
+                        });
+                    }
+                    let stored_status = parse_status(&run.status)?;
+                    if stored_status.is_terminal() {
+                        return Err(StorageError::Conflict {
+                            detail: format!(
+                                "run {run_id} is already terminal as {}; an active phase change \
+                                 on a settled run is refused",
+                                run.status
+                            ),
+                        });
+                    }
+                    if stored_status != from {
+                        // The caller operated on a stale view of the run:
+                        // diagnosed loudly, never silently absorbed (the
+                        // run may legitimately already sit in the target
+                        // phase — the caller then re-observes and proceeds).
+                        return Err(StorageError::Conflict {
+                            detail: format!(
+                                "phase change {}->{} claimed the run was {}, but the \
+                                 durable row holds {}; stale-view callers are diagnosed, never \
+                                 silently absorbed",
+                                from.wire_name(),
+                                to.wire_name(),
+                                from.wire_name(),
+                                stored_status.wire_name()
+                            ),
+                        });
+                    }
+                    // The kernel state machine is the single transition
+                    // authority (same as every other write of this port).
+                    RunStateMachine::transition(stored_status, to).map_err(|err| {
+                        StorageError::InvalidRequest {
+                            detail: format!(
+                                "phase change {}->{} rejected by the kernel state \
+                                 machine: {}",
+                                from.wire_name(),
+                                to.wire_name(),
+                                err.reason
+                            ),
+                        }
+                    })?;
+                    // One transaction: the status update + a
+                    // `run_state_changed` key event (+ last_event_seq). The
+                    // event id derives from the seq it will occupy inside
+                    // this transaction (unique within the stream).
+                    let seq = next_seq(conn, &stream_id)?;
+                    let event = KeyEvent {
+                        event_id: EventId::new(format!("{run_id}-sc{seq}")),
+                        payload: EventPayload::Known(KnownEventPayload::RunStateChanged(
+                            RunStateChangedPayload {
+                                from,
+                                to,
+                                reason: reason.clone(),
+                            },
+                        )),
+                    };
+                    let (envelope, last_seq) = stage_event(
+                        conn,
+                        &stream_id,
+                        &session_id,
+                        now_unix_ms as i64,
+                        &event,
+                        Some(&run_id),
+                        Some(&attempt),
+                    )?;
+                    debug_assert_eq!(seq, last_seq);
+                    conn.execute(
+                        "UPDATE runs SET status = ?1, last_event_seq = ?2, \
+                         updated_at_unix_ms = ?3 WHERE run_id = ?4",
+                        rusqlite::params![to.wire_name(), last_seq, now_unix_ms as i64, run_id],
+                    )
+                    .map_err(migrations::map_rusqlite)?;
+                    Ok(CommittedOutcome {
+                        newly_committed: true,
+                        events: vec![envelope],
+                    })
+                })
+            })
+            .await
+    }
 }
 
 // ── EventStorePort (R02-T05 read half) ──────────────────────────────────────

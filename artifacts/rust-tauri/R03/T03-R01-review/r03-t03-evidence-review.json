@@ -1,0 +1,136 @@
+{
+  "r03_a05_approval_wait": {
+    "durableEvents": [
+      "run_state_changed",
+      "model_call_started",
+      "model_call_completed",
+      "tool_call_started",
+      "run_state_changed",
+      "run_state_changed",
+      "run_state_changed"
+    ],
+    "lateApproveRefused": true,
+    "quotaInUseEnd": {
+      "model": 0,
+      "tool": 0
+    },
+    "runId": "run_000001a0dcba6c00_000001",
+    "terminal": {
+      "reason": "cancelled.requested",
+      "status": "cancelled"
+    },
+    "toolExecutionsAfterCancel": 0,
+    "waitState": "approval_wait"
+  },
+  "r03_a05_queue_companion": {
+    "cancelledRun": {
+      "reason": "cancelled.requested",
+      "runId": "run_000001a0dcba6c00_000002",
+      "status": "cancelled"
+    },
+    "toolInUseAfterAll": 0,
+    "unrelatedHolder": {
+      "reason": "completed.with_final",
+      "runId": "run_000001a0dcba6c00_000001",
+      "status": "completed"
+    }
+  },
+  "r03_a05_queue_wait": {
+    "durableEvents": [
+      "run_state_changed",
+      "model_call_started",
+      "model_call_completed",
+      "run_state_changed",
+      "run_state_changed"
+    ],
+    "quotaInUseEnd": {
+      "model": 0,
+      "tool": 0
+    },
+    "runId": "run_000001a0dcba6c00_000002",
+    "terminal": {
+      "reason": "cancelled.requested",
+      "status": "cancelled"
+    },
+    "toolExecutionsAfterCancel": 0,
+    "unrelatedHolder": {
+      "reason": "completed.with_final",
+      "runId": "run_000001a0dcba6c00_000001",
+      "status": "completed"
+    },
+    "waitState": "queue_wait"
+  },
+  "r03_a05_stream_read": {
+    "durableEvents": [
+      "run_state_changed",
+      "run_state_changed",
+      "run_state_changed"
+    ],
+    "quotaInUseEnd": {
+      "model": 0,
+      "tool": 0
+    },
+    "runId": "run_000001a0dcba6c00_000001",
+    "terminal": {
+      "reason": "cancelled.requested",
+      "status": "cancelled"
+    },
+    "toolExecutionsAfterCancel": 0,
+    "waitState": "stream_read"
+  },
+  "r03_a06": {
+    "background": {
+      "survivedCancel": true,
+      "ticksAtCancel": 2,
+      "ticksTotal": 20
+    },
+    "childRunExit": "aborted",
+    "childrenConfirmed": 2,
+    "parentRun": {
+      "reason": "cancelled.requested",
+      "runId": "run_000001a0dcba6c00_000001",
+      "status": "cancelled"
+    }
+  },
+  "r03_t03_approval_legs": {
+    "approved": {
+      "executed": true,
+      "reason": "completed.with_final",
+      "runId": "run_000001a0dcba6c00_000001"
+    },
+    "rejected": {
+      "executed": false,
+      "reason": "completed.no_final.tool_partial_failure",
+      "runId": "run_000001a0dcba6c00_000001"
+    }
+  },
+  "r03_t03_cancel_surface": {
+    "danglingActive": {
+      "durableStatus": "running",
+      "recoveryOwner": "R03-T07",
+      "runId": "run_000001a0dcba6c00_000002",
+      "verdict": "abandoned"
+    },
+    "foreignPrincipal": "Forbidden",
+    "terminalRun": "AlreadyTerminal(completed)",
+    "unknownRun": "NotFound"
+  },
+  "r03_t03_panic_supervision": {
+    "contained": true,
+    "runId": "run_000001a0dcba6c00_000001",
+    "terminal": {
+      "reason": "completed.no_final.tool_partial_failure",
+      "status": "completed"
+    }
+  },
+  "r03_t03_unconfirmed": {
+    "cleanupBudgetMs": 50,
+    "runId": "run_000001a0dcba6c00_000001",
+    "terminal": {
+      "reason": "cancelled.requested",
+      "status": "cancelled"
+    },
+    "unconfirmedChildren": 1,
+    "verdict": "stop_unconfirmed"
+  }
+}

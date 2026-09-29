@@ -277,6 +277,33 @@ pub trait StoragePort: Send + Sync {
         ctx: &RunContext,
         now_unix_ms: u64,
     ) -> impl std::future::Future<Output = Result<CommittedOutcome, StorageError>> + Send;
+
+    /// Persists one NON-TERMINAL run phase change (R03-T03): the durable
+    /// legs of `running ↔ waiting_approval` and every active state's entry
+    /// into `cancelling` (the two-phase cancellation contract — a
+    /// `cancelled` finalize is only legal from a durably `cancelling` run).
+    ///
+    /// Contract:
+    /// - The run must exist and match `ctx`'s owner facts (same as every
+    ///   other write of this port).
+    /// - The run's durably stored status must EQUAL `from` — a caller
+    ///   operating on a stale view of the run is diagnosed loudly
+    ///   (Conflict), never silently absorbed.
+    /// - `from` must be a legal non-terminal source of the transition and
+    ///   `to` a legal NON-TERMINAL target per [`crate::RunStateMachine`];
+    ///   terminal targets belong to [`StoragePort::commit_run_outcome`]
+    ///   and are rejected here with [`StorageError::InvalidRequest`].
+    /// - One transaction: `runs.status` update + a `run_state_changed` key
+    ///   event (+ `last_event_seq` advance); events are returned for
+    ///   publication strictly after the commit.
+    fn record_run_state_change(
+        &self,
+        ctx: &RunContext,
+        from: lingxi_protocol::RunStatus,
+        to: lingxi_protocol::RunStatus,
+        reason: Option<String>,
+        now_unix_ms: u64,
+    ) -> impl std::future::Future<Output = Result<CommittedOutcome, StorageError>> + Send;
 }
 
 /// Read/maintenance surface over the durable key-event log (R02-T05).
@@ -593,6 +620,33 @@ mod tests {
                 events: Vec::new(),
             })
         }
+
+        async fn record_run_state_change(
+            &self,
+            _ctx: &RunContext,
+            from: lingxi_protocol::RunStatus,
+            to: lingxi_protocol::RunStatus,
+            _reason: Option<String>,
+            _now_unix_ms: u64,
+        ) -> Result<CommittedOutcome, StorageError> {
+            // The kernel-trait half: only the state machine's authority is
+            // simulated here (the real store's transactional behavior is
+            // tested against the adapter).
+            crate::RunStateMachine::transition(from, to).map_err(|err| {
+                StorageError::InvalidRequest {
+                    detail: err.reason.to_string(),
+                }
+            })?;
+            if to.is_terminal() {
+                return Err(StorageError::InvalidRequest {
+                    detail: "record_run_state_change requires a non-terminal target".to_string(),
+                });
+            }
+            Ok(CommittedOutcome {
+                newly_committed: true,
+                events: Vec::new(),
+            })
+        }
     }
 
     #[test]
@@ -672,6 +726,49 @@ mod tests {
             supported_version: 1
         }
         .retryable());
+    }
+
+    /// R03-T03: the non-terminal state-change port surface only accepts
+    /// transitions the kernel state machine permits, and never a terminal
+    /// target (terminals belong to `commit_run_outcome` alone).
+    #[test]
+    fn non_terminal_state_change_surface_is_kernel_gated() {
+        let port = FakePort {
+            fail_commits: false,
+            committed: std::sync::Mutex::new(Vec::new()),
+        };
+        let ctx = ctx();
+        let change = |from: RunStatus, to: RunStatus| {
+            futures_block_on(port.record_run_state_change(&ctx, from, to, None, 1))
+        };
+        // Legal active legs: running <-> waiting_approval and both into
+        // cancelling (the durable first half of two-phase cancellation).
+        for (from, to) in [
+            (RunStatus::Running, RunStatus::WaitingApproval),
+            (RunStatus::WaitingApproval, RunStatus::Running),
+            (RunStatus::Running, RunStatus::Cancelling),
+            (RunStatus::WaitingApproval, RunStatus::Cancelling),
+            (RunStatus::Queued, RunStatus::Cancelling),
+        ] {
+            assert!(
+                change(from, to).is_ok(),
+                "{from:?}->{to:?} must be a legal non-terminal phase change"
+            );
+        }
+        // Terminal targets are refused on THIS surface…
+        for to in [
+            RunStatus::Cancelled,
+            RunStatus::Completed,
+            RunStatus::Failed,
+        ] {
+            assert!(
+                change(RunStatus::Cancelling, to).is_err(),
+                "terminal target {to:?} belongs to commit_run_outcome"
+            );
+        }
+        // …and so is every illegal active leg.
+        assert!(change(RunStatus::Cancelling, RunStatus::Running).is_err());
+        assert!(change(RunStatus::Completed, RunStatus::Cancelling).is_err());
     }
 
     /// Minimal block_on for the trait-level tests (no runtime dependency in

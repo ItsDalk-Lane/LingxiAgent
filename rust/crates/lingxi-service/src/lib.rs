@@ -21,7 +21,9 @@
 //! - 版本事实单一来源：wire 协议版本与 data epoch 取自 lingxi-protocol
 //!   常量，本 crate 不复制第二份（实例记录快照同一来源）。
 
+pub mod approval;
 pub mod auth;
+pub mod cancel;
 pub mod config;
 pub mod epoch;
 pub mod events;
@@ -40,13 +42,19 @@ pub mod session_supervisor;
 pub mod sessions;
 pub mod shutdown;
 mod static_web;
+pub mod task_supervisor;
 pub mod transport;
 pub mod ws;
 
+pub use approval::{ApprovalDecision, ApprovalGate, ApprovalRequest};
 pub use auth::{
     authorize as authorize_route, classify_route, scope_allows, AuthDenial, AuthService,
     AuthSetupError, AuthzDenial, CredentialKind, IssuedDeviceCredential, Principal, PrincipalKind,
     RoutePolicy, TrustState, LOCAL_OWNER_USER_ID,
+};
+pub use cancel::{
+    CancelBudget, CancelPhase, CancelPolicy, CancelRegistry, CancelScope, FireOutcome,
+    RunCancelEntry, ScopeKind,
 };
 pub use config::{
     parse_cli, read_config_home, resolve_effective_home, CliOptions, ConfigError, HomeSource,
@@ -87,12 +95,15 @@ pub use session_supervisor::{
     SteerOutcome, SteeringInbox, SubmissionKind,
 };
 pub use sessions::{
-    ExecuteAccepted, ExecuteRequest, RunSummary, SessionAccess, SessionBackend,
+    CancelRunOutcome, ExecuteAccepted, ExecuteRequest, RunSummary, SessionAccess, SessionBackend,
     SessionExecuteError, SessionFacts, SessionStore, SessionView,
 };
 pub use shutdown::{
     graceful_shutdown, WsSessionGuard, WsShutdown, DEFAULT_SHUTDOWN_TIMEOUT_MS,
     SHUTDOWN_TIMEOUT_MARKER,
+};
+pub use task_supervisor::{
+    ChildHandle, CleanupReport, SpawnRejected, TaskExit, TaskKind, TaskRef, TaskSupervisor,
 };
 pub use transport::{check_origin, infer_connection_kind, ConnectionKind, NetworkMode};
 pub use ws::{
@@ -444,6 +455,16 @@ pub struct ServiceDeps {
     /// Session serialization policy (R03-T02): busy-gate registry cap and
     /// the bounded steering inbox.
     pub session_concurrency: session_supervisor::SessionConcurrencyLimits,
+    /// Cancellation cleanup policy (R03-T03): the bounded cleanup budget
+    /// anchored at the cancel request plus the supervised-task registry
+    /// cap. Degenerate values are loud startup errors.
+    pub cancel_policy: cancel::CancelPolicy,
+    /// Minimal approval-wait gate (R03-T03): `None` (the production
+    /// default until R04 ships the full tool-policy gateway) means no
+    /// run ever parks in `waiting_approval`. Tests inject a deterministic
+    /// double to drive the REAL waiting_approval legs; the double only
+    /// decides approvals and never owns run state.
+    pub approval_gate: Option<std::sync::Arc<dyn approval::ApprovalGate>>,
 }
 
 impl Default for ServiceDeps {
@@ -465,6 +486,8 @@ impl Default for ServiceDeps {
             run_limits: runs::RunDriveLimits::default(),
             quota_limits: quotas::QuotaLimits::default(),
             session_concurrency: session_supervisor::SessionConcurrencyLimits::default(),
+            cancel_policy: cancel::CancelPolicy::default(),
+            approval_gate: None,
         }
     }
 }
@@ -494,6 +517,11 @@ impl std::fmt::Debug for ServiceDeps {
             .field("run_limits", &self.run_limits)
             .field("quota_limits", &self.quota_limits)
             .field("session_concurrency", &self.session_concurrency)
+            .field("cancel_policy", &self.cancel_policy)
+            .field(
+                "approval_gate",
+                &self.approval_gate.as_ref().map(|_| "injected"),
+            )
             .finish()
     }
 }
@@ -575,6 +603,11 @@ fn validate_resource_deps(deps: &ServiceDeps) -> Result<(), ServiceStartupError>
         .validate()
         .map_err(ServiceStartupError::Storage)?;
     deps.session_concurrency
+        .validate()
+        .map_err(ServiceStartupError::Storage)?;
+    // R03-T03: the cancellation cleanup policy (bounded budget +
+    // supervised-task registry cap) validates the same way.
+    deps.cancel_policy
         .validate()
         .map_err(ServiceStartupError::Storage)?;
     Ok(())
@@ -765,11 +798,15 @@ impl ServiceState {
         // EXPLICIT (no-provider outcome), never a fabricated reply.
         // R03-T02: the same construction now takes the admission-quota
         // manager (global/agent/session model & tool lanes).
+        // R03-T03: plus the cancellation runtime (registry + task
+        // supervisor + cleanup policy) and the minimal approval gate.
         let runs = runs::RunSupervisor::new(
             deps.turn_provider.clone(),
             deps.tool_executor.clone(),
             deps.run_limits,
             quotas::QuotaManager::new(deps.quota_limits),
+            deps.cancel_policy,
+            deps.approval_gate.clone(),
         )
         .map_err(ServiceStartupError::Storage)?;
         Ok(Self {

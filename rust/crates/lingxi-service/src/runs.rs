@@ -24,6 +24,7 @@
 //! finalize a run.
 
 use std::sync::Arc;
+use std::time::Duration;
 
 use lingxi_kernel::ports::{
     CommittedOutcome, KeyEvent, StorageError, StoragePort, ToolExecutorPort, ToolOutcome,
@@ -40,9 +41,15 @@ use lingxi_protocol::{
     ToolResultWire,
 };
 
+use crate::approval::{ApprovalDecision, ApprovalGate, ApprovalRequest};
+use crate::cancel::{
+    CancelBudget, CancelPhase, CancelPolicy, CancelRegistry, CancelScope, FireOutcome,
+    RunCancelEntry,
+};
 use crate::events::EventService;
 use crate::quotas::QuotaManager;
 use crate::session_supervisor::SteeringInbox;
+use crate::task_supervisor::TaskSupervisor;
 
 /// Hard bounds of one driven run (R03-T01; injected through `ServiceDeps`).
 /// Both bounds are loud: hitting `max_model_turns` FAILS the run with
@@ -114,14 +121,66 @@ impl From<StorageError> for DriveError {
     }
 }
 
-/// The supervisor: injected provider/tool doubles plus the drive bounds
-/// and the admission quotas. Stateless per run — all per-run state lives in
-/// [`Drive`] locals, so concurrent executes share one supervisor safely.
+/// RAII registration of one live run against the cancellation registry
+/// (R03-T03): covers EVERY exit path of the drive. `disarm()` is called
+/// exactly when the single finalize committed (or the no-provider early
+/// finalize returned) — every other exit (storage error, dropped driving
+/// future, panic unwind) fires the cancellation TREE so linked children
+/// never outlive an abandoned run, marks the phase `Abandoned` and leaves
+/// the durable run row honest (active; recovery classification R03-T07).
+struct RegistrationGuard<'a> {
+    registry: &'a CancelRegistry,
+    run_id: RunId,
+    entry: Arc<RunCancelEntry>,
+    disarmed: bool,
+}
+
+impl RegistrationGuard<'_> {
+    fn disarm(&mut self) {
+        self.disarmed = true;
+    }
+}
+
+impl Drop for RegistrationGuard<'_> {
+    fn drop(&mut self) {
+        if !self.disarmed {
+            // The driving future is going away WITHOUT a finalize: cancel
+            // the tree (linked children drop at their await points) and
+            // record the honest abandoned phase. The durable run row keeps
+            // its last durable state — nothing fabricates a terminal.
+            self.entry.scope.cancel("driver exited without finalize");
+            self.entry.advance_phase(CancelPhase::Abandoned {
+                reason: "driver exited without a finalize (dropped request, error or \
+                         crash); linked children were cancelled through the tree; the \
+                         durable run row stays active — recovery classification is \
+                         R03-T07"
+                    .to_string(),
+            });
+            tracing::warn!(
+                run_id = %self.run_id,
+                "run driver exited without a finalize; cancellation tree fired, \
+                 registry entry removed, durable row left honest (R03-T07 owns recovery)"
+            );
+        }
+        self.registry.deregister(self.run_id.as_str());
+    }
+}
+
+/// The supervisor: injected provider/tool doubles plus the drive bounds,
+/// the admission quotas and the R03-T03 cancellation runtime (the run
+/// registry of the cancellation tree, the task supervisor and the cleanup
+/// deadline policy). Stateless per run — all per-run state lives in
+/// [`Drive`] locals and the registry entry, so concurrent executes share
+/// one supervisor safely.
 pub struct RunSupervisor {
     provider: Option<Arc<dyn TurnProviderPort>>,
     tools: Option<Arc<dyn ToolExecutorPort>>,
     limits: RunDriveLimits,
     quotas: QuotaManager,
+    cancel: CancelRegistry,
+    tasks: Arc<TaskSupervisor>,
+    cancel_policy: CancelPolicy,
+    approval: Option<Arc<dyn ApprovalGate>>,
 }
 
 impl std::fmt::Debug for RunSupervisor {
@@ -131,41 +190,55 @@ impl std::fmt::Debug for RunSupervisor {
             .field("tools", &self.tools.as_ref().map(|_| "injected"))
             .field("limits", &self.limits)
             .field("quotas", &self.quotas)
+            .field("cancel_policy", &self.cancel_policy)
+            .field("approval_gate", &self.approval.as_ref().map(|_| "injected"))
             .finish()
     }
 }
 
 impl RunSupervisor {
     /// Production wiring until R05 registers real providers: no provider,
-    /// no tools. Runs driven by this supervisor complete WITHOUT model
-    /// content (`completed.no_final.no_provider_configured`) — an explicit
-    /// outcome, never a fabricated reply. The default (bounded, loud)
-    /// quota policy applies.
+    /// no tools, no approval gate. Runs driven by this supervisor complete
+    /// WITHOUT model content (`completed.no_final.no_provider_configured`)
+    /// — an explicit outcome, never a fabricated reply. The default
+    /// (bounded, loud) quota and cancellation policies apply.
     pub fn without_provider() -> Self {
+        let cancel_policy = CancelPolicy::default();
         Self {
             provider: None,
             tools: None,
             limits: RunDriveLimits::default(),
             quotas: QuotaManager::new(crate::quotas::QuotaLimits::default()),
+            cancel: CancelRegistry::new(),
+            tasks: Arc::new(TaskSupervisor::new(cancel_policy.supervised_task_cap)),
+            cancel_policy,
+            approval: None,
         }
     }
 
     /// Full injection (tests drive deterministic doubles through the REAL
     /// chain; R05/R04 replace the doubles with real adapters). Degenerate
-    /// drive bounds AND degenerate quota limits are loud errors.
+    /// drive bounds AND degenerate quota/cancel policies are loud errors.
     pub fn new(
         provider: Option<Arc<dyn TurnProviderPort>>,
         tools: Option<Arc<dyn ToolExecutorPort>>,
         limits: RunDriveLimits,
         quotas: QuotaManager,
+        cancel_policy: CancelPolicy,
+        approval: Option<Arc<dyn ApprovalGate>>,
     ) -> Result<Self, StorageError> {
         limits.validate()?;
         quotas.limits().validate()?;
+        cancel_policy.validate()?;
         Ok(Self {
             provider,
             tools,
             limits,
             quotas,
+            cancel: CancelRegistry::new(),
+            tasks: Arc::new(TaskSupervisor::new(cancel_policy.supervised_task_cap)),
+            cancel_policy,
+            approval,
         })
     }
 
@@ -182,32 +255,85 @@ impl RunSupervisor {
         self.provider.is_some()
     }
 
-    /// One layered admission acquisition; `None` = the run must fail loudly
-    /// with `failed.quota_exhausted.{model,tool}` (the failure is logged
-    /// with its layer/kind for diagnosis before the caller settles).
+    /// The cancellation-tree registry (R03-T03): resolves live runs and
+    /// their phases.
+    pub fn cancel_registry(&self) -> &CancelRegistry {
+        &self.cancel
+    }
+
+    /// The task supervisor (R03-T03): supervised children, recoverable
+    /// handles and exit results.
+    pub fn task_supervisor(&self) -> &Arc<TaskSupervisor> {
+        &self.tasks
+    }
+
+    /// The cleanup deadline policy in force.
+    pub fn cancel_policy(&self) -> &CancelPolicy {
+        &self.cancel_policy
+    }
+
+    /// Whether an approval gate is wired (the minimal R03-T03 interface;
+    /// production default until R04: none).
+    pub fn approval_gate_configured(&self) -> bool {
+        self.approval.is_some()
+    }
+
+    /// The user-facing cancellation entry (R03-T03): fires the run's
+    /// cancellation TREE — the durable `cancelling` leg, the child
+    /// cleanup and the single `cancelled` finalize are driven by the
+    /// run's own driver when it observes the request.
+    pub fn cancel_run(&self, run_id: &str, reason: &str) -> FireOutcome {
+        self.cancel.fire(run_id, reason)
+    }
+
+    /// The live cancellation phase of one run (`None` when no live run is
+    /// registered — query the durable status separately).
+    pub fn cancel_phase(&self, run_id: &str) -> Option<CancelPhase> {
+        self.cancel.get(run_id).map(|entry| entry.phase())
+    }
+
+    /// The ROOT cancellation scope of one live run (supervision queries —
+    /// e.g. linking a demonstrative child run to the parent's tree).
+    pub fn run_scope(&self, run_id: &str) -> Option<CancelScope> {
+        self.cancel.get(run_id).map(|entry| entry.scope.clone())
+    }
+
+    /// One layered admission acquisition racing the run's cancellation
+    /// (R03-T03: a queued wait must EXIT on cancel — the T02 WaitGuard
+    /// returns the queue place on drop). `Err(())` = cancelled;
+    /// `Ok(None)` = quota refused (the run fails loudly with
+    /// `failed.quota_exhausted.*`).
     async fn acquire_or_break(
         &self,
         resource: &QuotaResource,
         agent_id: &str,
         session_id: &str,
         run_id: &RunId,
-    ) -> Option<crate::quotas::QuotaPermit> {
-        match self.quotas.acquire(*resource, agent_id, session_id).await {
-            Ok(permit) => Some(permit),
-            Err(failure) => {
-                tracing::warn!(
-                    run_id = %run_id,
-                    resource = ?resource,
-                    error = %failure,
-                    "admission quota refused the call: the run will settle as \
-                     failed.quota_exhausted (never an unbounded wait, never a fake success)"
-                );
-                None
+        scope: &CancelScope,
+    ) -> Result<Option<crate::quotas::QuotaPermit>, ()> {
+        tokio::select! {
+            biased;
+            _ = scope.cancelled() => Err(()),
+            admitted = self.quotas.acquire(*resource, agent_id, session_id) => {
+                match admitted {
+                    Ok(permit) => Ok(Some(permit)),
+                    Err(failure) => {
+                        tracing::warn!(
+                            run_id = %run_id,
+                            resource = ?resource,
+                            error = %failure,
+                            "admission quota refused the call: the run will settle as \
+                             failed.quota_exhausted (never an unbounded wait, never a fake success)"
+                        );
+                        Ok(None)
+                    }
+                }
             }
         }
     }
 
-    /// Drives ONE run from creation to its single finalize (R03-T01).
+    /// Drives ONE run from creation to its single finalize (R03-T01) under
+    /// the R03-T03 cancellation tree.
     ///
     /// Callers (the session execute surface) have already done the session
     /// lookup and ownership check; `run_id` was allocated by the storage
@@ -221,6 +347,18 @@ impl RunSupervisor {
     /// duration of the I/O only — never while holding any supervisor lock,
     /// and never waiting without a bound (quota failures settle the run
     /// LOUDLY with `failed.quota_exhausted.*`).
+    ///
+    /// R03-T03 wiring: the run registers a ROOT scope in the cancellation
+    /// registry; every model call, approval wait and tool call is a
+    /// SUPERVISED child of that scope (owner + recoverable handle + exit
+    /// result — no fire-and-forget), so a cancellation request fires the
+    /// tree and the driver then walks the four phases (requested →
+    /// cleaning → confirmed / unconfirmed), persists the durable
+    /// `cancelling` leg and settles `cancelled` through the SAME single
+    /// finalize. If the driving future itself disappears before any
+    /// finalize (dropped request, crash), the guard cancels the tree,
+    /// marks the entry `Abandoned` and leaves the durable run row honest
+    /// (its recovery classification is R03-T07).
     ///
     /// The chain:
     /// 1. validate the creation transition queued→running through the
@@ -246,6 +384,16 @@ impl RunSupervisor {
         steering: Option<&SteeringInbox>,
     ) -> Result<RunFinish, DriveError> {
         let run_id = RunId::new(run_id.to_string());
+        // R03-T03: register the run's root scope + phase; the guard covers
+        // EVERY exit path below (finalize disarm, error, drop).
+        let entry = self.cancel.register(run_id.as_str());
+        let mut guard = RegistrationGuard {
+            registry: &self.cancel,
+            run_id: run_id.clone(),
+            entry: Arc::clone(&entry),
+            disarmed: false,
+        };
+        let root = entry.scope.clone();
         // 1) Creation transition: the kernel state machine is consulted on
         //    the live chain (the storage transaction re-checks it under the
         //    write lock — this is the early, diagnosable half).
@@ -276,9 +424,11 @@ impl RunSupervisor {
             let finish = RunFinish::CompletedWithoutFinal {
                 cause: NoFinalCause::NoProviderConfigured,
             };
-            return self
+            let finish = self
                 .finalize_settlement(port, events, &ctx, RunStatus::Running, finish, now_ms)
-                .await;
+                .await?;
+            guard.disarm();
+            return Ok(finish);
         };
 
         let descriptor = provider.descriptor();
@@ -286,7 +436,19 @@ impl RunSupervisor {
         let mut tool_call_seq: u32 = 0;
         let mut saw_tool_failure = false;
         let mut saw_process_content = false;
+        // The driver-observed live status (the durable leg of the
+        // waiting_approval round trip; the cancelling entry uses it as the
+        // `from` of the two-phase cancellation).
+        let mut live_status = RunStatus::Running;
         let finish = 'turns: loop {
+            if root.is_cancelled() {
+                let reason = root.reason().unwrap_or_else(|| "cancelled".to_string());
+                let finish = self
+                    .settle_cancellation(port, events, &ctx, &entry, live_status, reason, now_ms)
+                    .await?;
+                guard.disarm();
+                return Ok(finish);
+            }
             turn += 1;
             if turn > self.limits.max_model_turns {
                 break RunFinish::Failed {
@@ -308,21 +470,96 @@ impl RunSupervisor {
             // Admission (R03-T02): one model-call permit (global → agent →
             // session) held across the model I/O only. A quota failure is
             // a LOUD run failure — never an unbounded wait, never a fake
-            // success.
+            // success. R03-T03: the QUEUED wait itself exits on cancel.
             let model_permit = match self
-                .acquire_or_break(&QuotaResource::Model, agent_id, session_id, &run_id)
+                .acquire_or_break(&QuotaResource::Model, agent_id, session_id, &run_id, &root)
                 .await
             {
-                Some(permit) => permit,
-                None => {
+                Ok(Some(permit)) => permit,
+                Ok(None) => {
                     break RunFinish::Failed {
                         cause: FailureCause::QuotaExhausted {
                             resource: QuotaResource::Model,
                         },
                     };
                 }
+                Err(()) => {
+                    let reason = root.reason().unwrap_or_else(|| "cancelled".to_string());
+                    let finish = self
+                        .settle_cancellation(
+                            port,
+                            events,
+                            &ctx,
+                            &entry,
+                            live_status,
+                            reason,
+                            now_ms,
+                        )
+                        .await?;
+                    guard.disarm();
+                    return Ok(finish);
+                }
             };
-            let provider_turn = provider.next_turn(&ctx, &call, turn, &turn_input).await;
+            // R03-T03: the model call (a network-stream read in R05
+            // terms) runs as a SUPERVISED child of the run's tree —
+            // cancellation drops the provider future at its await point.
+            let call_scope = root.child(
+                format!("model_call:{}", call.as_str()),
+                crate::cancel::ScopeKind::ModelCall,
+            );
+            let call_ctx = ctx.clone();
+            let call_id = call.clone();
+            let stream_input = turn_input.clone();
+            let provider_clone = Arc::clone(&provider);
+            let model_child = self
+                .tasks
+                .spawn_linked(
+                    run_id.as_str(),
+                    &call_scope,
+                    format!("model_call:{}", call.as_str()),
+                    async move {
+                        provider_clone
+                            .next_turn(&call_ctx, &call_id, turn, &stream_input)
+                            .await
+                    },
+                )
+                .map_err(|rejected| DriveError::Storage(rejected.into()))?;
+            let provider_turn = tokio::select! {
+                biased;
+                _ = root.cancelled() => {
+                    drop(model_permit);
+                    let reason = root.reason().unwrap_or_else(|| "cancelled".to_string());
+                    let finish = self
+                        .settle_cancellation(port, events, &ctx, &entry, live_status, reason, now_ms)
+                        .await?;
+                    guard.disarm();
+                    return Ok(finish);
+                }
+                exit = model_child.wait() => match exit {
+                    Ok(turn) => turn,
+                    Err(task_exit) => {
+                        drop(model_permit);
+                        // Supervision return (R03-T03 step 4): a child
+                        // panic/abort/error is a LOUD provider failure —
+                        // never a silent drop, never a fake reply.
+                        tracing::error!(
+                            run_id = %run_id,
+                            model_call = %call,
+                            exit = task_exit.name(),
+                            "supervised model-call child ended without a turn; failing loudly"
+                        );
+                        break RunFinish::Failed {
+                            cause: FailureCause::ProviderFailed {
+                                code: format!(
+                                    "model_call_child_{}",
+                                    task_exit.name()
+                                ),
+                                retryable: false,
+                            },
+                        };
+                    }
+                },
+            };
             drop(model_permit);
             match provider_turn {
                 lingxi_kernel::ports::ProviderTurn::Final { message } => {
@@ -374,26 +611,232 @@ impl RunSupervisor {
                         tool_call_seq += 1;
                         let call_id = tool_call_id(&run_id, tool_call_seq);
                         // Admission (R03-T02): one tool-call permit per
-                        // call, held across the tool I/O only.
+                        // call, held across the approval wait AND the tool
+                        // I/O (the incumbent registers the execution for
+                        // its whole lifetime, approval wait included).
                         let tool_permit = match self
-                            .acquire_or_break(&QuotaResource::Tool, agent_id, session_id, &run_id)
+                            .acquire_or_break(
+                                &QuotaResource::Tool,
+                                agent_id,
+                                session_id,
+                                &run_id,
+                                &root,
+                            )
                             .await
                         {
-                            Some(permit) => permit,
-                            None => {
+                            Ok(Some(permit)) => permit,
+                            Ok(None) => {
                                 break 'turns RunFinish::Failed {
                                     cause: FailureCause::QuotaExhausted {
                                         resource: QuotaResource::Tool,
                                     },
                                 };
                             }
+                            Err(()) => {
+                                let reason =
+                                    root.reason().unwrap_or_else(|| "cancelled".to_string());
+                                let finish = self
+                                    .settle_cancellation(
+                                        port,
+                                        events,
+                                        &ctx,
+                                        &entry,
+                                        live_status,
+                                        reason,
+                                        now_ms,
+                                    )
+                                    .await?;
+                                guard.disarm();
+                                return Ok(finish);
+                            }
                         };
                         self.persist_tool_event(
                             port, events, &ctx, &call_id, request, None, now_ms,
                         )
                         .await?;
-                        let outcome = tools.execute(&ctx, &call_id, request).await;
-                        drop(tool_permit);
+                        // ── approval wait (R03-T03 minimal interface) ──
+                        if let Some(gate) = self.approval.clone() {
+                            live_status = RunStatus::WaitingApproval;
+                            self.persist_state_change(
+                                port,
+                                events,
+                                &ctx,
+                                RunStatus::Running,
+                                RunStatus::WaitingApproval,
+                                Some("approval_required".to_string()),
+                                now_ms,
+                            )
+                            .await?;
+                            let gate_scope = root.child(
+                                format!("approval:{}", call_id.as_str()),
+                                crate::cancel::ScopeKind::ToolCall,
+                            );
+                            let gate_req = ApprovalRequest {
+                                tool_call_id: call_id.clone(),
+                                target: request.target.clone(),
+                                args_digest: request.args_digest.hex.clone(),
+                            };
+                            let gate_ctx = ctx.clone();
+                            let gate_child = self
+                                .tasks
+                                .spawn_linked(
+                                    run_id.as_str(),
+                                    &gate_scope,
+                                    format!("approval:{}", call_id.as_str()),
+                                    async move { gate.request(&gate_ctx, &gate_req).await },
+                                )
+                                .map_err(|rejected| DriveError::Storage(rejected.into()))?;
+                            let decision = tokio::select! {
+                                biased;
+                                _ = root.cancelled() => {
+                                    drop(tool_permit);
+                                    let reason =
+                                        root.reason().unwrap_or_else(|| "cancelled".to_string());
+                                    let finish = self
+                                        .settle_cancellation(
+                                            port,
+                                            events,
+                                            &ctx,
+                                            &entry,
+                                            live_status,
+                                            reason,
+                                            now_ms,
+                                        )
+                                        .await?;
+                                    guard.disarm();
+                                    return Ok(finish);
+                                }
+                                exit = gate_child.wait() => match exit {
+                                    Ok(decision) => decision,
+                                    Err(task_exit) => {
+                                        tracing::error!(
+                                            run_id = %run_id,
+                                            tool_call = %call_id,
+                                            exit = task_exit.name(),
+                                            "approval gate child ended without a decision; \
+                                             treating as rejected (zero executions)"
+                                        );
+                                        ApprovalDecision::Aborted
+                                    }
+                                },
+                            };
+                            // Back to running BEFORE any tool execution (or
+                            // rejection): the approval wait is over.
+                            live_status = RunStatus::Running;
+                            self.persist_state_change(
+                                port,
+                                events,
+                                &ctx,
+                                RunStatus::WaitingApproval,
+                                RunStatus::Running,
+                                Some("approval_resolved".to_string()),
+                                now_ms,
+                            )
+                            .await?;
+                            match decision {
+                                ApprovalDecision::Approved => { /* execute below */ }
+                                ApprovalDecision::Rejected { .. } | ApprovalDecision::Aborted => {
+                                    // ZERO executions — the rejection is a
+                                    // recorded tool failure, not a silent
+                                    // skip (frozen incumbent: the wrapper
+                                    // returns toolError with 执行 0 次).
+                                    let reason = match decision {
+                                        ApprovalDecision::Rejected { reason } => reason,
+                                        ApprovalDecision::Aborted => "approval aborted".to_string(),
+                                        ApprovalDecision::Approved => unreachable!(),
+                                    };
+                                    saw_tool_failure = true;
+                                    saw_process_content = true;
+                                    let outcome = ToolOutcome::Failed {
+                                        error: ProtocolError::new(
+                                            ErrorCode::Forbidden,
+                                            format!("tool request not approved: {reason}"),
+                                            false,
+                                        ),
+                                    };
+                                    self.persist_tool_event(
+                                        port,
+                                        events,
+                                        &ctx,
+                                        &call_id,
+                                        request,
+                                        Some(&outcome),
+                                        now_ms,
+                                    )
+                                    .await?;
+                                    drop(tool_permit);
+                                    continue;
+                                }
+                            }
+                        }
+                        // ── supervised tool execution ──
+                        let tool_scope = root.child(
+                            format!("tool_call:{}", call_id.as_str()),
+                            crate::cancel::ScopeKind::ToolCall,
+                        );
+                        let tool_ctx = ctx.clone();
+                        let tool_request = request.clone();
+                        let exec_call_id = call_id.clone();
+                        let tools_clone = Arc::clone(&tools);
+                        let tool_child = self
+                            .tasks
+                            .spawn_linked(
+                                run_id.as_str(),
+                                &tool_scope,
+                                format!("tool_call:{}", call_id.as_str()),
+                                async move {
+                                    tools_clone
+                                        .execute(&tool_ctx, &exec_call_id, &tool_request)
+                                        .await
+                                },
+                            )
+                            .map_err(|rejected| DriveError::Storage(rejected.into()))?;
+                        let outcome = tokio::select! {
+                            biased;
+                            _ = root.cancelled() => {
+                                drop(tool_permit);
+                                let reason =
+                                    root.reason().unwrap_or_else(|| "cancelled".to_string());
+                                let finish = self
+                                    .settle_cancellation(
+                                        port,
+                                        events,
+                                        &ctx,
+                                        &entry,
+                                        live_status,
+                                        reason,
+                                        now_ms,
+                                    )
+                                    .await?;
+                                guard.disarm();
+                                return Ok(finish);
+                            }
+                            exit = tool_child.wait() => match exit {
+                                Ok(outcome) => outcome,
+                                Err(task_exit) => {
+                                    // Supervision return: a panicking/aborted
+                                    // tool child is a recorded tool failure
+                                    // (the run continues — tool partial
+                                    // failure vocabulary settles it).
+                                    tracing::error!(
+                                        run_id = %run_id,
+                                        tool_call = %call_id,
+                                        exit = task_exit.name(),
+                                        "supervised tool child ended without an outcome"
+                                    );
+                                    ToolOutcome::Failed {
+                                        error: ProtocolError::new(
+                                            ErrorCode::Internal,
+                                            format!(
+                                                "tool child {} without an outcome",
+                                                task_exit.name()
+                                            ),
+                                            false,
+                                        ),
+                                    }
+                                }
+                            },
+                        };
                         if matches!(
                             outcome,
                             ToolOutcome::Failed { .. }
@@ -413,6 +856,7 @@ impl RunSupervisor {
                             now_ms,
                         )
                         .await?;
+                        drop(tool_permit);
                     }
                 }
                 lingxi_kernel::ports::ProviderTurn::Continue { .. } => {
@@ -474,8 +918,135 @@ impl RunSupervisor {
         };
 
         // 3) Exactly one finalize, through the single settlement path.
-        self.finalize_settlement(port, events, &ctx, RunStatus::Running, finish, now_ms)
+        let finish = self
+            .finalize_settlement(port, events, &ctx, live_status, finish, now_ms)
+            .await?;
+        guard.disarm();
+        Ok(finish)
+    }
+
+    /// The R03-T03 cancellation flow, phases 2–4 + the single finalize:
+    /// persist the durable `cancelling` leg, drain the run's supervised
+    /// children under the anchored cleanup budget, then settle
+    /// `cancelled` through the ONE finalize path (from `cancelling`, per
+    /// the kernel's two-phase contract). Quotas return by RAII as the
+    /// caller's permits drop on the way out.
+    // Same explicit-dependency-passing shape as `drive_run` (port/events
+    // are caller-owned); the parameter set is inherent to it.
+    #[allow(clippy::too_many_arguments)]
+    async fn settle_cancellation<P: StoragePort>(
+        &self,
+        port: &P,
+        events: &EventService,
+        ctx: &lingxi_kernel::RunContext,
+        entry: &Arc<RunCancelEntry>,
+        live_status: RunStatus,
+        reason: String,
+        now_ms: u64,
+    ) -> Result<RunFinish, DriveError> {
+        // Phase 2 — 开始清理. The budget is anchored at the REQUEST
+        // moment (a late-observed cancellation keeps only what remains).
+        let requested_at = entry
+            .scope
+            .cancelled_at()
+            .unwrap_or_else(std::time::Instant::now);
+        entry.advance_phase(CancelPhase::Cleaning {
+            reason: reason.clone(),
+        });
+        self.persist_state_change(
+            port,
+            events,
+            ctx,
+            live_status,
+            RunStatus::Cancelling,
+            Some(format!("cancelled:{reason}")),
+            now_ms,
+        )
+        .await?;
+        let budget = CancelBudget::new(
+            requested_at,
+            Duration::from_millis(self.cancel_policy.cleanup_grace_ms),
+        );
+        // Confirmed-stopped children = the ones the TREE already ended
+        // (observed exits in the registry — they self-confirmed through
+        // the scope drop) UNION the ones the bounded drain joined in
+        // time. The drain reaps its own confirms, so the snapshot is
+        // taken BEFORE it runs.
+        let tree_confirmed: Vec<String> = self
+            .tasks
+            .tasks()
+            .iter()
+            .filter(|task| {
+                task.run_id.as_deref() == Some(ctx.run_id.as_str()) && task.exit.is_some()
+            })
+            .map(|task| task.describe())
+            .collect();
+        let report = self.tasks.drain_run(ctx.run_id.as_str(), budget).await;
+        let mut confirmed = tree_confirmed;
+        confirmed.extend(report.confirmed.iter().map(|t| t.describe()));
+        let unconfirmed: Vec<String> = report.unconfirmed.iter().map(|t| t.describe()).collect();
+        let finish = if report.all_quiet() {
+            entry.advance_phase(CancelPhase::ConfirmedTerminated {
+                reason: reason.clone(),
+                confirmed: confirmed.clone(),
+            });
+            RunFinish::Cancelled {
+                detail: format!(
+                    "{reason}; all {} supervised children confirmed exit within the \
+                     cleanup budget",
+                    confirmed.len()
+                ),
+            }
+        } else {
+            // Phase 4 — 无法确认停止: report the un-cleaned items; never
+            // claim quiet. External actions the children already performed
+            // are NOT promised rolled back.
+            tracing::warn!(
+                run_id = %ctx.run_id,
+                unconfirmed = ?unconfirmed,
+                budget_ms = self.cancel_policy.cleanup_grace_ms,
+                "cancellation cleanup deadline reached with live children — \
+                 reporting them; already-performed external actions are not \
+                 promised rolled back"
+            );
+            entry.advance_phase(CancelPhase::StopUnconfirmed {
+                reason: reason.clone(),
+                confirmed: confirmed.clone(),
+                unconfirmed: unconfirmed.clone(),
+            });
+            RunFinish::Cancelled {
+                detail: format!(
+                    "{reason}; cleanup budget expired with {} unconfirmed children: {}; \
+                     external actions already performed are not promised rolled back",
+                    unconfirmed.len(),
+                    unconfirmed.join(", ")
+                ),
+            }
+        };
+        // Phase 3 — the single finalize from the durable `cancelling` leg.
+        self.finalize_settlement(port, events, ctx, RunStatus::Cancelling, finish, now_ms)
             .await
+    }
+
+    /// Persists one NON-TERMINAL run phase change (waiting_approval round
+    /// trips and the durable cancelling leg) and publishes after commit.
+    #[allow(clippy::too_many_arguments)]
+    async fn persist_state_change<P: StoragePort>(
+        &self,
+        port: &P,
+        events: &EventService,
+        ctx: &lingxi_kernel::RunContext,
+        from: RunStatus,
+        to: RunStatus,
+        reason: Option<String>,
+        now_ms: u64,
+    ) -> Result<(), DriveError> {
+        let committed = port
+            .record_run_state_change(ctx, from, to, reason, now_ms)
+            .await
+            .map_err(DriveError::Storage)?;
+        events.publish_committed(&committed.events);
+        Ok(())
     }
 
     /// The single finalize path (R03-T01 step 3). Builds the terminal
