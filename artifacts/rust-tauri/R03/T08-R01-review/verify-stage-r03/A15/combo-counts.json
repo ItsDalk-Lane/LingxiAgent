@@ -1,0 +1,122 @@
+{
+ "schema": "lingxi.r03-t08-combo-matrix.v1",
+ "combos": [
+  {
+   "combo": "cancel-approval-wait",
+   "counts": {
+    "final_status": "cancelled",
+    "model_calls": 1,
+    "runs": 1,
+    "terminal_events": 1,
+    "tool_calls": 0
+   }
+  },
+  {
+   "combo": "cancel-stream-read",
+   "counts": {
+    "final_status": "cancelled",
+    "late_result_audit_rows": 0,
+    "model_call_completed_after_cancel": 0,
+    "model_calls": 1,
+    "runs": 1,
+    "terminal_events": 1,
+    "tool_calls": 0
+   }
+  },
+  {
+   "combo": "crash-recovery",
+   "counts": {
+    "final_message_rows": 0,
+    "final_status": "interrupted_needs_attention",
+    "form": "drive-lost + real startup scan (SIGKILL form: recovery_crash_points.rs)",
+    "model_calls": 1,
+    "runs_scanned": 1,
+    "tool_calls": 0
+   }
+  },
+  {
+   "combo": "cross-session-parallel",
+   "counts": {
+    "final_status_alpha": "completed",
+    "final_status_beta": "completed",
+    "model_calls": 2,
+    "runs": 2,
+    "tool_calls": 0
+   }
+  },
+  {
+   "combo": "duplicate-submission",
+   "counts": {
+    "diagnosed_conflicts": 1,
+    "final_status": "completed",
+    "idempotent_replays": 1,
+    "model_calls": 1,
+    "runs": 1,
+    "terminal_events": 1,
+    "tool_calls": 0
+   }
+  },
+  {
+   "combo": "leaf-parent-cancel",
+   "counts": {
+    "child_final_message_rows": 0,
+    "child_status_after_recovery_scan": "interrupted_needs_attention",
+    "child_status_before_restart": "running",
+    "note": "child TASK stopped by the tree cancel (supervision confirmed; the thread registry busy flag only clears via the drive's own bookkeeping, which the tree-cancel drop skips); the durable row is closed by the real recovery scan (the documented dangling-active closure path), never faked",
+    "parent_final_status": "cancelled"
+   }
+  },
+  {
+   "combo": "leaf-steer",
+   "counts": {
+    "final_status": "completed",
+    "model_calls": 2,
+    "runs": 1,
+    "tool_calls": 0
+   }
+  },
+  {
+   "combo": "multi-tool",
+   "counts": {
+    "final_status": "completed",
+    "model_calls": 2,
+    "runs": 1,
+    "terminal_events": 1,
+    "tool_calls": 3
+   }
+  },
+  {
+   "combo": "multi-turn-model",
+   "counts": {
+    "final_status": "completed",
+    "model_calls": 3,
+    "runs": 1,
+    "terminal_events": 1,
+    "tool_calls": 1
+   }
+  },
+  {
+   "combo": "normal",
+   "counts": {
+    "final_status": "completed",
+    "model_calls": 1,
+    "runs": 1,
+    "terminal_events": 2,
+    "tool_calls": 0
+   }
+  },
+  {
+   "combo": "timeout-budget",
+   "counts": {
+    "final_reason": "failed.turn_budget_exceeded",
+    "final_status": "failed",
+    "model_calls": 3,
+    "runs": 1,
+    "terminal_events": 1,
+    "tool_calls": 0
+   }
+  }
+ ],
+ "caseCount": 28,
+ "allCasesOk": true
+}

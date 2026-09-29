@@ -147,11 +147,62 @@ const SEED: u64 = 0x5EED_0000_C0FF_EE01;
 const ITERATIONS: u64 = 200;
 const SUBMISSIONS_PER_RUN: usize = 10;
 
+// ── R03-T08 / A16: replayable-failure machinery (long-term regression) ──────
+//
+// Same contract as the T04 fencing property: `R03_A02_PROPERTY_SEED`
+// (hex `0x…` or decimal) overrides the seed for verbatim replay of a
+// captured failing schedule; a thread-local-aware panic hook prints the
+// machine-greppable `R03_A02_PROPERTY_FAILURE seed=0x…` line (stdout AND
+// stderr) and records the seed to `R03_A02_PROPERTY_SEED_FILE` when set.
+// No natural anomaly has ever been observed under the default seed; the
+// mechanism is proven by an isolated mutation probe (T08 evidence).
+
+thread_local! {
+    static PROPERTY_SEED: std::cell::Cell<u64> = const { std::cell::Cell::new(0) };
+}
+
+fn effective_seed() -> u64 {
+    let seed = match std::env::var("R03_A02_PROPERTY_SEED") {
+        Ok(raw) => {
+            let trimmed = raw.trim();
+            let parsed = if let Some(hex) = trimmed.strip_prefix("0x") {
+                u64::from_str_radix(hex, 16)
+            } else {
+                trimmed.parse::<u64>()
+            };
+            parsed.unwrap_or_else(|err| panic!("invalid R03_A02_PROPERTY_SEED {raw:?}: {err}"))
+        }
+        Err(_) => SEED,
+    };
+    PROPERTY_SEED.with(|cell| cell.set(seed));
+    install_seed_capture_hook();
+    seed
+}
+
+fn install_seed_capture_hook() {
+    let previous = std::panic::take_hook();
+    std::panic::set_hook(Box::new(move |info| {
+        let seed = PROPERTY_SEED.with(std::cell::Cell::get);
+        let location = info
+            .location()
+            .map(|l| format!("{}:{}", l.file(), l.line()))
+            .unwrap_or_else(|| "<unknown>".to_string());
+        let line = format!("R03_A02_PROPERTY_FAILURE seed={seed:#x} location={location}");
+        println!("{line}");
+        eprintln!("{line}");
+        if let Ok(out) = std::env::var("R03_A02_PROPERTY_SEED_FILE") {
+            let _ = std::fs::write(&out, format!("{seed:#x}\n"));
+        }
+        previous(info);
+    }));
+}
+
 #[tokio::test]
 async fn r03_a02_duplicate_and_out_of_order_settlements_settle_exactly_once() {
+    let seed = effective_seed();
     let path = temp_db("property");
     let db = seeded_store(&path).await;
-    let mut rng = Rng(SEED);
+    let mut rng = Rng(seed);
 
     // Aggregated result counts over the whole property run (the acceptance
     // evidence: "只持久一次终态/结算" + "冲突记录可诊断").
@@ -306,7 +357,7 @@ async fn r03_a02_duplicate_and_out_of_order_settlements_settle_exactly_once() {
 
     assert_eq!(total_unexpected, 0);
     println!(
-        "R03_A02_PROPERTY seed={SEED:#x} iterations={ITERATIONS} runs_settled={runs_settled} \
+        "R03_A02_PROPERTY seed={seed:#x} iterations={ITERATIONS} runs_settled={runs_settled} \
          first_commits={total_first_commits} idempotent_replays={total_replays} \
          diagnosed_conflicts={total_conflicts} unexpected={total_unexpected}"
     );
@@ -329,7 +380,7 @@ async fn r03_a02_duplicate_and_out_of_order_settlements_settle_exactly_once() {
             path,
             serde_json::to_vec_pretty(&serde_json::json!({
                 "schema": "lingxi.r03-a02-finalize-property.v1",
-                "seed": SEED,
+                "seed": seed,
                 "iterations": ITERATIONS,
                 "submissionsPerRun": SUBMISSIONS_PER_RUN,
                 "runsSettled": runs_settled,

@@ -92,9 +92,10 @@ use std::time::{Duration, Instant};
 use serde_json::{json, Value};
 
 use crate::stage_map::{
-    LeafDeferredCase, StageMap, SupplementalLeaf, BASIS_AUTH_PRIMITIVE_ONLY,
-    BASIS_CLIENT_ONLY_STAGE_CONFLICT, BASIS_DEFERRED_TO_R07, BASIS_FULL_ORIGINAL_BEHAVIOR,
-    BASIS_PROTOCOL, BASIS_R02_SHARE_SATISFIED, BASIS_ROUTE_PRESENT_STATIC,
+    is_stage_neutral_kind, LeafDeferredCase, StageMap, SupplementalLeaf, BASIS_AUTH_PRIMITIVE_ONLY,
+    BASIS_CLIENT_ONLY_STAGE_CONFLICT, BASIS_DEFERRED_TO_LATER_STAGE, BASIS_DEFERRED_TO_R07,
+    BASIS_FULL_ORIGINAL_BEHAVIOR, BASIS_PROTOCOL, BASIS_R02_SHARE_SATISFIED,
+    BASIS_ROUTE_PRESENT_STATIC, BASIS_STAGE_SHARE_SATISFIED,
 };
 use crate::RESULT_VERSION;
 
@@ -687,6 +688,16 @@ fn observe_deferred_case(
     })
 }
 
+/// The stages after `stage` this leaf's acceptance also belongs to
+/// (derived from the mirrored R00 execution_stage_ids — never invented).
+fn later_stages_of(leaf: &SupplementalLeaf, stage: &str) -> Vec<String> {
+    leaf.r00_execution_stage_ids
+        .iter()
+        .filter(|id| id.as_str() != stage)
+        .cloned()
+        .collect()
+}
+
 fn roll_up_supplemental_leaf(
     leaf: &SupplementalLeaf,
     stage: &str,
@@ -711,6 +722,46 @@ fn roll_up_supplemental_leaf(
     // 递延叶：固定 DEFERRED_TO_R07，附 r07Share 义务文本与 earlyEvidence
     // 观察。提前实现命令未通过不改叶状态（验收不归本门禁），但命令
     // FAIL 由 overall 的全命令通过条件拦下，绝不静默变绿。
+    if leaf.basis_kind == BASIS_DEFERRED_TO_LATER_STAGE {
+        let deferred_case_results = leaf
+            .deferred_r07_cases
+            .iter()
+            .map(|record| observe_deferred_case(record, outcomes, repo_root, evidence_root))
+            .collect::<Vec<_>>();
+        let early_not_passing: Vec<&str> = leaf
+            .early_evidence_command_refs
+            .iter()
+            .filter(|key| !outcomes.iter().any(|o| o.key == **key && o.passed()))
+            .map(|key| key.as_str())
+            .collect();
+        let later_stages = later_stages_of(leaf, stage);
+        let mut reason = format!(
+            "deferred to later stage(s) {later_stages:?}: this R00 leaf is still REQUIRED but \
+             has no {stage} gating share; its acceptance belongs to those stages, which must \
+             consume the remainder: {}",
+            leaf.later_share
+        );
+        if !early_not_passing.is_empty() {
+            reason.push_str(&format!(
+                " (early-evidence commands not passing this run (still command FAILs, health \
+                 of the pre-implemented code is mandatory): {early_not_passing:?})"
+            ));
+        }
+        let early_evidence = json!({
+            "commandRefs": leaf.early_evidence_command_refs,
+            "commandsNotPassing": early_not_passing,
+            "note": "non-gating: producers of pre-implemented later-stage behavior stay \
+                     registered and run every gate; their failures are command FAILs but never \
+                     gate this leaf here",
+        });
+        return LeafRollUp {
+            status: "DEFERRED_TO_LATER_STAGE".to_string(),
+            reason,
+            assertion_results: Vec::new(),
+            deferred_case_results,
+            early_evidence: Some(early_evidence),
+        };
+    }
     if leaf.basis_kind == BASIS_DEFERRED_TO_R07 {
         let deferred_case_results = leaf
             .deferred_r07_cases
@@ -864,6 +915,13 @@ fn roll_up_supplemental_leaf(
                 "R02 share satisfied: all share pins held; the R07 remainder stays REQUIRED \
                  and moves with deferredToStage=R07: {}",
                 leaf.r07_share
+            )
+        } else if leaf.basis_kind == BASIS_STAGE_SHARE_SATISFIED {
+            format!(
+                "{stage} share satisfied: all share pins held; the remainder stays REQUIRED \
+                 and moves with deferredToStages={:?}: {}",
+                later_stages_of(leaf, stage),
+                leaf.later_share
             )
         } else {
             String::new()
@@ -1851,7 +1909,7 @@ where
         );
         match status.as_str() {
             "PASS" => supplemental_pass += 1,
-            "DEFERRED_TO_R07" => {
+            "DEFERRED_TO_R07" | "DEFERRED_TO_LATER_STAGE" => {
                 supplemental_deferred += 1;
                 status_deferred_ids.push(leaf.id.clone());
             }
@@ -1865,15 +1923,23 @@ where
         // remainder cases with the observed (non-gating) values.
         let carries_r07_remainder = leaf.basis_kind == BASIS_R02_SHARE_SATISFIED
             || leaf.basis_kind == BASIS_DEFERRED_TO_R07;
+        let stage_neutral = is_stage_neutral_kind(&leaf.basis_kind);
         supplemental_json.push(json!({
             "id": leaf.id,
             "featureId": leaf.feature_id,
             "requirement": leaf.requirement,
             "basisKind": leaf.basis_kind,
             "deferredToStage": if carries_r07_remainder { json!("R07") } else { Value::Null },
+            "deferredToStages": if stage_neutral {
+                json!(later_stages_of(leaf, &map.stage))
+            } else {
+                Value::Null
+            },
             "r00Mirror": mirror_json,
             "r02Share": leaf.r02_share,
             "r07Share": leaf.r07_share,
+            "stageShare": leaf.stage_share,
+            "laterShare": leaf.later_share,
             "evidenceRequired": leaf.evidence_required,
             "evidenceCommandRefs": leaf.evidence_command_refs,
             "earlyEvidenceCommandRefs": leaf.early_evidence_command_refs,
@@ -1915,7 +1981,10 @@ where
     let mut declared_deferred_ids: Vec<String> = map
         .supplemental_leaves
         .iter()
-        .filter(|leaf| leaf.basis_kind == BASIS_DEFERRED_TO_R07)
+        .filter(|leaf| {
+            leaf.basis_kind == BASIS_DEFERRED_TO_R07
+                || leaf.basis_kind == BASIS_DEFERRED_TO_LATER_STAGE
+        })
         .map(|leaf| leaf.id.clone())
         .collect();
     status_deferred_ids.sort();
@@ -1982,14 +2051,26 @@ where
             "expectedFromR00Ledger": r00_expected.len(),
             "declaredInStageMap": map.supplemental_leaves.len(),
             "pass": supplemental_pass,
-            "deferredToR07": supplemental_deferred,
+            "deferredToR07": map
+                .supplemental_leaves
+                .iter()
+                .filter(|leaf| leaf.basis_kind == BASIS_DEFERRED_TO_R07)
+                .count(),
+            "deferredToLaterStage": map
+                .supplemental_leaves
+                .iter()
+                .filter(|leaf| leaf.basis_kind == BASIS_DEFERRED_TO_LATER_STAGE)
+                .count(),
             "fail": supplemental_fail,
             "blocked": supplemental_blocked,
             "deferredLeafIds": declared_deferred_ids,
             "shareSatisfiedLeafIds": map
                 .supplemental_leaves
                 .iter()
-                .filter(|leaf| leaf.basis_kind == BASIS_R02_SHARE_SATISFIED)
+                .filter(|leaf| {
+                    leaf.basis_kind == BASIS_R02_SHARE_SATISFIED
+                        || leaf.basis_kind == BASIS_STAGE_SHARE_SATISFIED
+                })
                 .map(|leaf| leaf.id.as_str())
                 .collect::<Vec<_>>(),
             "commandsNotPassing": commands_not_passing,

@@ -1,0 +1,1081 @@
+diff --git a/docs/rust-tauri/R02/R02-T04_STORAGE_REGISTRY.json b/docs/rust-tauri/R02/R02-T04_STORAGE_REGISTRY.json
+index 9fb14ee7d..6a6e938d5 100644
+--- a/docs/rust-tauri/R02/R02-T04_STORAGE_REGISTRY.json
++++ b/docs/rust-tauri/R02/R02-T04_STORAGE_REGISTRY.json
+@@ -2,7 +2,7 @@
+  "schema_version": "1.0",
+  "task_id": "R02-T04",
+  "stage_id": "R02",
+- "generated_by": "ZCode:R02-T04 (EXECUTOR-R02-T04, 2026-09-26); fingerprints = sha256 over the migration SQL text, cross-checked against the on-disk receipt produced by lingxi-storage-inspect in artifacts/rust-tauri/R02/T04/s4-migrations-round1.json",
++ "generated_by": "ZCode:R02-T04 (EXECUTOR-R02-T04, 2026-09-26); fingerprints = sha256 over the migration SQL text, cross-checked against the on-disk receipt produced by lingxi-storage-inspect in artifacts/rust-tauri/R02/T04/s4-migrations-round1.json; V2/V3/V4 fingerprints registered by ZCode:EXECUTOR-R03-T08-E01 (2026-09-29), independently recomputed on disk via lingxi-storage-inspect over a fresh service-created runs.db (userVersion=4, receipts==compiledIn), matching the T04/T05/T06 report prefixes; V1 kept byte-for-byte.",
+  "deterministic": "no timestamps/randomness; identical migration SQL produces identical fingerprints",
+  "new_persistence_points": [
+   {
+@@ -19,7 +19,10 @@
+     "invocations": "kernel.tool-gateway (rows arrive R04; schema present)",
+     "messages": "kernel.session (normalized messages; rows arrive R05+; schema present)",
+     "key_events": "kernel.run-supervisor / kernel.session (key events for recovery; consumed by R02-T05)",
+-    "schema_migrations": "adapters.storage (migration receipts)"
++    "schema_migrations": "adapters.storage (migration receipts)",
++    "stale_result_audit": "kernel.run-supervisor (R03-T04 fence audit; audit-only, never key_events/status)",
++    "invocation_journal": "kernel.tool-gateway semantics via R03-T05 InvocationJournal (prepared→authorized→started→succeeded/failed/unknown receipts)",
++    "run_lineage": "kernel.run-supervisor (R03-T06 RunLineage: parentRunId/origin/sourceMessageId/causeId)"
+    },
+    "pragmas": {
+     "journal_mode": "WAL (verified at open; refusal if not negotiated)",
+@@ -33,6 +36,24 @@
+      "version": 1,
+      "name": "initial_run_message_schema",
+      "fingerprint_sha256": "479b0321494269fca85d9f973b01a8f9d1aa57dc08fc3cf8fddbafeace461bb8"
++    },
++    {
++     "version": 2,
++     "name": "stale_result_audit",
++     "fingerprint_sha256": "64d7edfdab74e13e623a9d8d5f2381dad4803f545fa126d8eda8cc02c3dc889c",
++     "registered_by_task": "R03-T04 (late-result fence audit table; registered by R03-T08 per the T04-R1-F1/T05/T06 deferred item)"
++    },
++    {
++     "version": 3,
++     "name": "invocation_journal",
++     "fingerprint_sha256": "3bd5388f090ab0ae0e137d91d59a8e48f82f409bbd0de657abf29b897a4252c1",
++     "registered_by_task": "R03-T05 (side-effect invocation journal; registered by R03-T08 per the same deferred item)"
++    },
++    {
++     "version": 4,
++     "name": "run_lineage",
++     "fingerprint_sha256": "371d415462b7e8d698693f50a7b9c9f493fbb4e653ee30e5d3e8930f77e161b5",
++     "registered_by_task": "R03-T06 (run lineage four-part identity; registered by R03-T08 per the same deferred item)"
+     }
+    ],
+    "cutover_strategy": "switch-to-new-authority (new isolated database under the new rust data root; no incumbent store is written by this task)",
+diff --git a/rust/crates/lingxi-adapters/tests/late_result_fencing_property.rs b/rust/crates/lingxi-adapters/tests/late_result_fencing_property.rs
+index 581e59c16..d44ba8bbc 100644
+--- a/rust/crates/lingxi-adapters/tests/late_result_fencing_property.rs
++++ b/rust/crates/lingxi-adapters/tests/late_result_fencing_property.rs
+@@ -44,6 +44,59 @@ const SEED: u64 = 0x5EED_0000_A07D_F00D;
+ /// Rounds (each against a fresh real database).
+ const ROUNDS: u32 = 60;
+ 
++// ── R03-T08 / A16: replayable-failure machinery (long-term regression) ──────
++//
++// The seed is the test's identity, but a FAILURE must be reproducible:
++// - `R03_T04_PROPERTY_SEED` (hex `0x…` or decimal) overrides the seed so a
++//   captured failing schedule can be replayed verbatim;
++// - every panic in this test is observed by a thread-local-aware panic
++//   hook that prints a machine-greppable `R03_T04_PROPERTY_FAILURE
++//   seed=0x…` line (stdout AND stderr) and, when
++//   `R03_T04_PROPERTY_SEED_FILE` is set, records the seed to that file —
++//   a failing schedule can never be lost to a truncated panic message.
++// No natural anomaly has ever been observed under the default seed; the
++// mechanism is proven by an isolated mutation probe (T08 evidence).
++
++thread_local! {
++    static PROPERTY_SEED: std::cell::Cell<u64> = const { std::cell::Cell::new(0) };
++}
++
++fn effective_seed() -> u64 {
++    let seed = match std::env::var("R03_T04_PROPERTY_SEED") {
++        Ok(raw) => {
++            let trimmed = raw.trim();
++            let parsed = if let Some(hex) = trimmed.strip_prefix("0x") {
++                u64::from_str_radix(hex, 16)
++            } else {
++                trimmed.parse::<u64>()
++            };
++            parsed.unwrap_or_else(|err| panic!("invalid R03_T04_PROPERTY_SEED {raw:?}: {err}"))
++        }
++        Err(_) => SEED,
++    };
++    PROPERTY_SEED.with(|cell| cell.set(seed));
++    install_seed_capture_hook();
++    seed
++}
++
++fn install_seed_capture_hook() {
++    let previous = std::panic::take_hook();
++    std::panic::set_hook(Box::new(move |info| {
++        let seed = PROPERTY_SEED.with(std::cell::Cell::get);
++        let location = info
++            .location()
++            .map(|l| format!("{}:{}", l.file(), l.line()))
++            .unwrap_or_else(|| "<unknown>".to_string());
++        let line = format!("R03_T04_PROPERTY_FAILURE seed={seed:#x} location={location}");
++        println!("{line}");
++        eprintln!("{line}");
++        if let Ok(out) = std::env::var("R03_T04_PROPERTY_SEED_FILE") {
++            let _ = std::fs::write(&out, format!("{seed:#x}\n"));
++        }
++        previous(info);
++    }));
++}
++
+ fn xorshift64(state: &mut u64) -> u64 {
+     let mut x = *state;
+     x ^= x << 13;
+@@ -576,7 +629,8 @@ async fn round(db: &RunDatabase, round_index: u32, rng: &mut u64) -> RoundCounte
+ 
+ #[tokio::test(flavor = "current_thread")]
+ async fn duplicate_out_of_order_and_delayed_results_fence_exactly_once() {
+-    let mut rng = SEED;
++    let seed = effective_seed();
++    let mut rng = seed;
+     let mut totals = RoundCounters::default();
+     for round_index in 0..ROUNDS {
+         let path = temp_db(&format!("r{round_index}"));
+@@ -631,7 +685,7 @@ async fn duplicate_out_of_order_and_delayed_results_fence_exactly_once() {
+         totals.illegal_rejected >= ROUNDS * 2,
+         "every illegal state request was rejected"
+     );
+-    println!("R03_T04_PROPERTY totals: {totals:?} (seed={SEED:#x}, rounds={ROUNDS})");
++    println!("R03_T04_PROPERTY totals: {totals:?} (seed={seed:#x}, rounds={ROUNDS})");
+ 
+     // Machine-readable evidence (the established env-var pattern).
+     if let Ok(path) = std::env::var("R03_T04_EVIDENCE") {
+@@ -647,7 +701,7 @@ async fn duplicate_out_of_order_and_delayed_results_fence_exactly_once() {
+             map.insert(
+                 "r03_t04_fencing_property".to_string(),
+                 serde_json::json!({
+-                    "seed": format!("{SEED:#x}"),
++                    "seed": format!("{seed:#x}"),
+                     "rounds": ROUNDS,
+                     "current_attempt_ok": totals.current_ok,
+                     "superseded_attempt_refused": totals.stale_refused,
+diff --git a/rust/crates/lingxi-adapters/tests/run_finalize_property.rs b/rust/crates/lingxi-adapters/tests/run_finalize_property.rs
+index 74717c82d..c645fa2d0 100644
+--- a/rust/crates/lingxi-adapters/tests/run_finalize_property.rs
++++ b/rust/crates/lingxi-adapters/tests/run_finalize_property.rs
+@@ -147,11 +147,62 @@ const SEED: u64 = 0x5EED_0000_C0FF_EE01;
+ const ITERATIONS: u64 = 200;
+ const SUBMISSIONS_PER_RUN: usize = 10;
+ 
++// ── R03-T08 / A16: replayable-failure machinery (long-term regression) ──────
++//
++// Same contract as the T04 fencing property: `R03_A02_PROPERTY_SEED`
++// (hex `0x…` or decimal) overrides the seed for verbatim replay of a
++// captured failing schedule; a thread-local-aware panic hook prints the
++// machine-greppable `R03_A02_PROPERTY_FAILURE seed=0x…` line (stdout AND
++// stderr) and records the seed to `R03_A02_PROPERTY_SEED_FILE` when set.
++// No natural anomaly has ever been observed under the default seed; the
++// mechanism is proven by an isolated mutation probe (T08 evidence).
++
++thread_local! {
++    static PROPERTY_SEED: std::cell::Cell<u64> = const { std::cell::Cell::new(0) };
++}
++
++fn effective_seed() -> u64 {
++    let seed = match std::env::var("R03_A02_PROPERTY_SEED") {
++        Ok(raw) => {
++            let trimmed = raw.trim();
++            let parsed = if let Some(hex) = trimmed.strip_prefix("0x") {
++                u64::from_str_radix(hex, 16)
++            } else {
++                trimmed.parse::<u64>()
++            };
++            parsed.unwrap_or_else(|err| panic!("invalid R03_A02_PROPERTY_SEED {raw:?}: {err}"))
++        }
++        Err(_) => SEED,
++    };
++    PROPERTY_SEED.with(|cell| cell.set(seed));
++    install_seed_capture_hook();
++    seed
++}
++
++fn install_seed_capture_hook() {
++    let previous = std::panic::take_hook();
++    std::panic::set_hook(Box::new(move |info| {
++        let seed = PROPERTY_SEED.with(std::cell::Cell::get);
++        let location = info
++            .location()
++            .map(|l| format!("{}:{}", l.file(), l.line()))
++            .unwrap_or_else(|| "<unknown>".to_string());
++        let line = format!("R03_A02_PROPERTY_FAILURE seed={seed:#x} location={location}");
++        println!("{line}");
++        eprintln!("{line}");
++        if let Ok(out) = std::env::var("R03_A02_PROPERTY_SEED_FILE") {
++            let _ = std::fs::write(&out, format!("{seed:#x}\n"));
++        }
++        previous(info);
++    }));
++}
++
+ #[tokio::test]
+ async fn r03_a02_duplicate_and_out_of_order_settlements_settle_exactly_once() {
++    let seed = effective_seed();
+     let path = temp_db("property");
+     let db = seeded_store(&path).await;
+-    let mut rng = Rng(SEED);
++    let mut rng = Rng(seed);
+ 
+     // Aggregated result counts over the whole property run (the acceptance
+     // evidence: "只持久一次终态/结算" + "冲突记录可诊断").
+@@ -306,7 +357,7 @@ async fn r03_a02_duplicate_and_out_of_order_settlements_settle_exactly_once() {
+ 
+     assert_eq!(total_unexpected, 0);
+     println!(
+-        "R03_A02_PROPERTY seed={SEED:#x} iterations={ITERATIONS} runs_settled={runs_settled} \
++        "R03_A02_PROPERTY seed={seed:#x} iterations={ITERATIONS} runs_settled={runs_settled} \
+          first_commits={total_first_commits} idempotent_replays={total_replays} \
+          diagnosed_conflicts={total_conflicts} unexpected={total_unexpected}"
+     );
+@@ -329,7 +380,7 @@ async fn r03_a02_duplicate_and_out_of_order_settlements_settle_exactly_once() {
+             path,
+             serde_json::to_vec_pretty(&serde_json::json!({
+                 "schema": "lingxi.r03-a02-finalize-property.v1",
+-                "seed": SEED,
++                "seed": seed,
+                 "iterations": ITERATIONS,
+                 "submissionsPerRun": SUBMISSIONS_PER_RUN,
+                 "runsSettled": runs_settled,
+diff --git a/rust/crates/xtask/src/main.rs b/rust/crates/xtask/src/main.rs
+index fae90d746..f59f5259a 100644
+--- a/rust/crates/xtask/src/main.rs
++++ b/rust/crates/xtask/src/main.rs
+@@ -55,7 +55,10 @@ pub use stage_map::RESULT_VERSION;
+ 
+ /// Embedded per-stage implementation-acceptance maps. A later stage (R03+)
+ /// adds its own file here in the same PR that registers its scenarios.
+-pub const STAGE_MAPS: &[(&str, &str)] = &[("R02", include_str!("stage_maps/R02.json"))];
++pub const STAGE_MAPS: &[(&str, &str)] = &[
++    ("R02", include_str!("stage_maps/R02.json")),
++    ("R03", include_str!("stage_maps/R03.json")),
++];
+ 
+ const USAGE: &str = r#"xtask — Lingxi Rust verification orchestrator (R02-T08)
+ 
+diff --git a/rust/crates/xtask/src/runner_identity.rs b/rust/crates/xtask/src/runner_identity.rs
+index dad4326bc..844f6cf1c 100644
+--- a/rust/crates/xtask/src/runner_identity.rs
++++ b/rust/crates/xtask/src/runner_identity.rs
+@@ -27,6 +27,10 @@ const EMBEDDED: &[(&str, &[u8])] = &[
+         "rust/crates/xtask/src/stage_maps/R02.json",
+         include_bytes!("stage_maps/R02.json"),
+     ),
++    (
++        "rust/crates/xtask/src/stage_maps/R03.json",
++        include_bytes!("stage_maps/R03.json"),
++    ),
+     (
+         "rust/crates/xtask/Cargo.toml",
+         include_bytes!("../Cargo.toml"),
+@@ -45,6 +49,7 @@ const SOURCE_INVENTORY: &[&str] = &[
+     "candidate.rs",
+     "runner_identity.rs",
+     "stage_maps/R02.json",
++    "stage_maps/R03.json",
+     "verify/runner_tests.rs",
+     "candidate/tests.rs",
+ ];
+diff --git a/rust/crates/xtask/src/stage_map.rs b/rust/crates/xtask/src/stage_map.rs
+index adf12198b..6b838da39 100644
+--- a/rust/crates/xtask/src/stage_map.rs
++++ b/rust/crates/xtask/src/stage_map.rs
+@@ -74,6 +74,18 @@ pub const BASIS_R02_SHARE_SATISFIED: &str = "r02_share_satisfied";
+ /// NOT_APPLICABLE/optional，最终产品要求不变）。仅 r00_execution_stage_ids
+ /// 含后续阶段的叶允许声明；不得带门禁 assertionContract/门禁 commandRefs。
+ pub const BASIS_DEFERRED_TO_R07: &str = "deferred_to_r07";
++/// R03-T08 阶段中立份额类（语义与 r02_share_satisfied 同构）：本阶段钉住
++/// 的案例即本阶段份额全部内容（`stageShare` 写明份额边界），份额图钉全
++/// 过即本阶段份额 PASS；余款仍 REQUIRED，随结果以 `laterShare` 文本 +
++/// `deferredToStages`（由 r00_execution_stage_ids 去本阶段派生）输出，不
++/// 作为本阶段门禁。必须带 assertionContract（R14-F01 反假绿规则同构）。
++pub const BASIS_STAGE_SHARE_SATISFIED: &str = "stage_share_satisfied";
++/// 阶段中立递延类（语义与 deferred_to_r07 同构，递延目标不限于 R07）：
++/// 无本阶段门禁份额，仍 REQUIRED，验收归属 r00_execution_stage_ids 中的
++/// 后续阶段（R06/R07/R08…）。仅含后续阶段的叶允许声明；不得带门禁
++/// assertionContract/门禁 commandRefs/可过 evidencePaths；可带非门禁
++/// earlyEvidenceCommandRefs（提前实现代码的健康照跑）。
++pub const BASIS_DEFERRED_TO_LATER_STAGE: &str = "deferred_to_later_stage";
+ pub const SUPPLEMENTAL_BASIS_KINDS: &[&str] = &[
+     BASIS_ROUTE_PRESENT_STATIC,
+     BASIS_PROTOCOL,
+@@ -82,8 +94,19 @@ pub const SUPPLEMENTAL_BASIS_KINDS: &[&str] = &[
+     BASIS_FULL_ORIGINAL_BEHAVIOR,
+     BASIS_R02_SHARE_SATISFIED,
+     BASIS_DEFERRED_TO_R07,
++    BASIS_STAGE_SHARE_SATISFIED,
++    BASIS_DEFERRED_TO_LATER_STAGE,
+ ];
+ 
++/// The stage-neutral share kinds (R03+): their share text lives in the
++/// `stageShare`/`laterShare` fields instead of the R02-named
++/// `r02Share`/`r07Share` pair. Both pairs are carried in the struct so
++/// the legacy R02 map and the stage-neutral maps share one parser; each
++/// branch only ever reads its own pair.
++pub fn is_stage_neutral_kind(basis_kind: &str) -> bool {
++    basis_kind == BASIS_STAGE_SHARE_SATISFIED || basis_kind == BASIS_DEFERRED_TO_LATER_STAGE
++}
++
+ /// One machine-checked case expectation of a leaf's `assertionContract`
+ /// (R14-F01). `expect` is the ORIGINAL R00 assertion value the gate must
+ /// observe in the producer's structured evidence file (an HTTP status, a
+@@ -152,6 +175,10 @@ pub struct SupplementalLeaf {
+     pub basis_kind: String,
+     pub r02_share: String,
+     pub r07_share: String,
++    /// Stage-neutral share texts (stage_share_satisfied /
++    /// deferred_to_later_stage). Empty for the R02-named kinds.
++    pub stage_share: String,
++    pub later_share: String,
+     pub evidence_required: String,
+     pub evidence_command_refs: Vec<String>,
+     pub evidence_paths: Vec<String>,
+@@ -475,18 +502,39 @@ pub fn parse_stage_map(text: &str) -> Result<StageMap, String> {
+                          (known kinds: {SUPPLEMENTAL_BASIS_KINDS:?})"
+                     )));
+                 }
+-                let r02_share = non_empty_string(
+-                    entry.get("r02Share").ok_or_else(|| {
+-                        err(&format!("supplemental leaf {id:?} missing r02Share"))
+-                    })?,
+-                    &format!("supplemental leaf {id:?} r02Share"),
+-                )?;
+-                let r07_share = non_empty_string(
+-                    entry.get("r07Share").ok_or_else(|| {
+-                        err(&format!("supplemental leaf {id:?} missing r07Share"))
+-                    })?,
+-                    &format!("supplemental leaf {id:?} r07Share"),
+-                )?;
++                let (r02_share, r07_share, stage_share, later_share) =
++                    if is_stage_neutral_kind(&basis_kind) {
++                        let stage_share = non_empty_string(
++                            entry.get("stageShare").ok_or_else(|| {
++                                err(&format!(
++                                "supplemental leaf {id:?} missing stageShare (the stage-neutral \
++                                 share kinds declare their share here, not r02Share)"
++                            ))
++                            })?,
++                            &format!("supplemental leaf {id:?} stageShare"),
++                        )?;
++                        let later_share = non_empty_string(
++                            entry.get("laterShare").ok_or_else(|| {
++                                err(&format!("supplemental leaf {id:?} missing laterShare"))
++                            })?,
++                            &format!("supplemental leaf {id:?} laterShare"),
++                        )?;
++                        (String::new(), String::new(), stage_share, later_share)
++                    } else {
++                        let r02_share = non_empty_string(
++                            entry.get("r02Share").ok_or_else(|| {
++                                err(&format!("supplemental leaf {id:?} missing r02Share"))
++                            })?,
++                            &format!("supplemental leaf {id:?} r02Share"),
++                        )?;
++                        let r07_share = non_empty_string(
++                            entry.get("r07Share").ok_or_else(|| {
++                                err(&format!("supplemental leaf {id:?} missing r07Share"))
++                            })?,
++                            &format!("supplemental leaf {id:?} r07Share"),
++                        )?;
++                        (r02_share, r07_share, String::new(), String::new())
++                    };
+                 let evidence_required = non_empty_string(
+                     entry.get("evidenceRequired").ok_or_else(|| {
+                         err(&format!(
+@@ -526,9 +574,11 @@ pub fn parse_stage_map(text: &str) -> Result<StageMap, String> {
+                              conflict the gate is required to hold BLOCKED)"
+                         )));
+                     }
+-                } else if basis_kind == BASIS_DEFERRED_TO_R07 {
+-                    // 递延叶的 R07 义务不由本门禁判定：绑定门禁证据命令
+-                    // 等于把 R07 验收又拉回 R02，与递延声明自相矛盾。
++                } else if basis_kind == BASIS_DEFERRED_TO_R07
++                    || basis_kind == BASIS_DEFERRED_TO_LATER_STAGE
++                {
++                    // 递延叶的后续阶段义务不由本门禁判定：绑定门禁证据命令
++                    // 等于把后续阶段验收又拉回本阶段，与递延声明自相矛盾。
+                     if !evidence_command_refs.is_empty() {
+                         return Err(err(&format!(
+                             "supplemental leaf {id:?} is deferred to R07 and must not bind \
+@@ -548,7 +598,9 @@ pub fn parse_stage_map(text: &str) -> Result<StageMap, String> {
+                 // 命令（这些命令照常运行、照常计入 freshness/清理检查）。
+                 let early_evidence_command_refs = match entry.get("earlyEvidenceCommandRefs") {
+                     Some(v) => {
+-                        if basis_kind != BASIS_DEFERRED_TO_R07 {
++                        if basis_kind != BASIS_DEFERRED_TO_R07
++                            && basis_kind != BASIS_DEFERRED_TO_LATER_STAGE
++                        {
+                             return Err(err(&format!(
+                                 "supplemental leaf {id:?} declares earlyEvidenceCommandRefs \
+                                  without deferred_to_r07 (only a deferred leaf may keep \
+@@ -609,6 +661,14 @@ pub fn parse_stage_map(text: &str) -> Result<StageMap, String> {
+                                  evidencePaths carry the freshness checks)"
+                             )));
+                         }
++                        if basis_kind == BASIS_DEFERRED_TO_LATER_STAGE && !paths.is_empty() {
++                            return Err(err(&format!(
++                                "supplemental leaf {id:?} is deferred to a later stage and \
++                                 must not declare pass-able evidencePaths (its acceptance is \
++                                 not judged by this gate; the early-evidence producers' own \
++                                 declared evidencePaths carry the freshness checks)"
++                            )));
++                        }
+                         paths
+                     }
+                     None => Vec::new(),
+@@ -643,7 +703,8 @@ pub fn parse_stage_map(text: &str) -> Result<StageMap, String> {
+                 // 递延只对真实双阶段（含后续阶段）的叶合法：一个只归属
+                 // 本阶段的叶没有可递延的验收归属，标 deferred 只会是
+                 // 把本阶段义务静默扫地出门。
+-                if basis_kind == BASIS_DEFERRED_TO_R07
++                if (basis_kind == BASIS_DEFERRED_TO_R07
++                    || basis_kind == BASIS_DEFERRED_TO_LATER_STAGE)
+                     && !r00_execution_stage_ids.iter().any(|s| s.as_str() != stage)
+                 {
+                     return Err(err(&format!(
+@@ -706,7 +767,8 @@ pub fn parse_stage_map(text: &str) -> Result<StageMap, String> {
+                 // acceptance is not judged by this gate — the deferred cases
+                 // below are observations, never gates).
+                 let uncontracted_kind = basis_kind == BASIS_CLIENT_ONLY_STAGE_CONFLICT
+-                    || basis_kind == BASIS_DEFERRED_TO_R07;
++                    || basis_kind == BASIS_DEFERRED_TO_R07
++                    || basis_kind == BASIS_DEFERRED_TO_LATER_STAGE;
+                 let assertion_contract = match entry.get("assertionContract") {
+                     Some(v) => {
+                         if uncontracted_kind {
+@@ -922,6 +984,8 @@ pub fn parse_stage_map(text: &str) -> Result<StageMap, String> {
+                     Some(v) => {
+                         if basis_kind != BASIS_R02_SHARE_SATISFIED
+                             && basis_kind != BASIS_DEFERRED_TO_R07
++                            && basis_kind != BASIS_STAGE_SHARE_SATISFIED
++                            && basis_kind != BASIS_DEFERRED_TO_LATER_STAGE
+                         {
+                             return Err(err(&format!(
+                                 "supplemental leaf {id:?} declares deferredR07Cases with \
+@@ -1038,6 +1102,8 @@ pub fn parse_stage_map(text: &str) -> Result<StageMap, String> {
+                     basis_kind,
+                     r02_share,
+                     r07_share,
++                    stage_share,
++                    later_share,
+                     evidence_required,
+                     evidence_command_refs,
+                     evidence_paths,
+diff --git a/rust/crates/xtask/src/verify.rs b/rust/crates/xtask/src/verify.rs
+index f3799492f..b8b74c2a5 100644
+--- a/rust/crates/xtask/src/verify.rs
++++ b/rust/crates/xtask/src/verify.rs
+@@ -92,9 +92,10 @@ use std::time::{Duration, Instant};
+ use serde_json::{json, Value};
+ 
+ use crate::stage_map::{
+-    LeafDeferredCase, StageMap, SupplementalLeaf, BASIS_AUTH_PRIMITIVE_ONLY,
+-    BASIS_CLIENT_ONLY_STAGE_CONFLICT, BASIS_DEFERRED_TO_R07, BASIS_FULL_ORIGINAL_BEHAVIOR,
+-    BASIS_PROTOCOL, BASIS_R02_SHARE_SATISFIED, BASIS_ROUTE_PRESENT_STATIC,
++    is_stage_neutral_kind, LeafDeferredCase, StageMap, SupplementalLeaf, BASIS_AUTH_PRIMITIVE_ONLY,
++    BASIS_CLIENT_ONLY_STAGE_CONFLICT, BASIS_DEFERRED_TO_LATER_STAGE, BASIS_DEFERRED_TO_R07,
++    BASIS_FULL_ORIGINAL_BEHAVIOR, BASIS_PROTOCOL, BASIS_R02_SHARE_SATISFIED,
++    BASIS_ROUTE_PRESENT_STATIC, BASIS_STAGE_SHARE_SATISFIED,
+ };
+ use crate::RESULT_VERSION;
+ 
+@@ -687,6 +688,16 @@ fn observe_deferred_case(
+     })
+ }
+ 
++/// The stages after `stage` this leaf's acceptance also belongs to
++/// (derived from the mirrored R00 execution_stage_ids — never invented).
++fn later_stages_of(leaf: &SupplementalLeaf, stage: &str) -> Vec<String> {
++    leaf.r00_execution_stage_ids
++        .iter()
++        .filter(|id| id.as_str() != stage)
++        .cloned()
++        .collect()
++}
++
+ fn roll_up_supplemental_leaf(
+     leaf: &SupplementalLeaf,
+     stage: &str,
+@@ -711,6 +722,46 @@ fn roll_up_supplemental_leaf(
+     // 递延叶：固定 DEFERRED_TO_R07，附 r07Share 义务文本与 earlyEvidence
+     // 观察。提前实现命令未通过不改叶状态（验收不归本门禁），但命令
+     // FAIL 由 overall 的全命令通过条件拦下，绝不静默变绿。
++    if leaf.basis_kind == BASIS_DEFERRED_TO_LATER_STAGE {
++        let deferred_case_results = leaf
++            .deferred_r07_cases
++            .iter()
++            .map(|record| observe_deferred_case(record, outcomes, repo_root, evidence_root))
++            .collect::<Vec<_>>();
++        let early_not_passing: Vec<&str> = leaf
++            .early_evidence_command_refs
++            .iter()
++            .filter(|key| !outcomes.iter().any(|o| o.key == **key && o.passed()))
++            .map(|key| key.as_str())
++            .collect();
++        let later_stages = later_stages_of(leaf, stage);
++        let mut reason = format!(
++            "deferred to later stage(s) {later_stages:?}: this R00 leaf is still REQUIRED but \
++             has no {stage} gating share; its acceptance belongs to those stages, which must \
++             consume the remainder: {}",
++            leaf.later_share
++        );
++        if !early_not_passing.is_empty() {
++            reason.push_str(&format!(
++                " (early-evidence commands not passing this run (still command FAILs, health \
++                 of the pre-implemented code is mandatory): {early_not_passing:?})"
++            ));
++        }
++        let early_evidence = json!({
++            "commandRefs": leaf.early_evidence_command_refs,
++            "commandsNotPassing": early_not_passing,
++            "note": "non-gating: producers of pre-implemented later-stage behavior stay \
++                     registered and run every gate; their failures are command FAILs but never \
++                     gate this leaf here",
++        });
++        return LeafRollUp {
++            status: "DEFERRED_TO_LATER_STAGE".to_string(),
++            reason,
++            assertion_results: Vec::new(),
++            deferred_case_results,
++            early_evidence: Some(early_evidence),
++        };
++    }
+     if leaf.basis_kind == BASIS_DEFERRED_TO_R07 {
+         let deferred_case_results = leaf
+             .deferred_r07_cases
+@@ -865,6 +916,13 @@ fn roll_up_supplemental_leaf(
+                  and moves with deferredToStage=R07: {}",
+                 leaf.r07_share
+             )
++        } else if leaf.basis_kind == BASIS_STAGE_SHARE_SATISFIED {
++            format!(
++                "{stage} share satisfied: all share pins held; the remainder stays REQUIRED \
++                 and moves with deferredToStages={:?}: {}",
++                later_stages_of(leaf, stage),
++                leaf.later_share
++            )
+         } else {
+             String::new()
+         };
+@@ -1851,7 +1909,7 @@ where
+         );
+         match status.as_str() {
+             "PASS" => supplemental_pass += 1,
+-            "DEFERRED_TO_R07" => {
++            "DEFERRED_TO_R07" | "DEFERRED_TO_LATER_STAGE" => {
+                 supplemental_deferred += 1;
+                 status_deferred_ids.push(leaf.id.clone());
+             }
+@@ -1865,15 +1923,23 @@ where
+         // remainder cases with the observed (non-gating) values.
+         let carries_r07_remainder = leaf.basis_kind == BASIS_R02_SHARE_SATISFIED
+             || leaf.basis_kind == BASIS_DEFERRED_TO_R07;
++        let stage_neutral = is_stage_neutral_kind(&leaf.basis_kind);
+         supplemental_json.push(json!({
+             "id": leaf.id,
+             "featureId": leaf.feature_id,
+             "requirement": leaf.requirement,
+             "basisKind": leaf.basis_kind,
+             "deferredToStage": if carries_r07_remainder { json!("R07") } else { Value::Null },
++            "deferredToStages": if stage_neutral {
++                json!(later_stages_of(leaf, &map.stage))
++            } else {
++                Value::Null
++            },
+             "r00Mirror": mirror_json,
+             "r02Share": leaf.r02_share,
+             "r07Share": leaf.r07_share,
++            "stageShare": leaf.stage_share,
++            "laterShare": leaf.later_share,
+             "evidenceRequired": leaf.evidence_required,
+             "evidenceCommandRefs": leaf.evidence_command_refs,
+             "earlyEvidenceCommandRefs": leaf.early_evidence_command_refs,
+@@ -1915,7 +1981,10 @@ where
+     let mut declared_deferred_ids: Vec<String> = map
+         .supplemental_leaves
+         .iter()
+-        .filter(|leaf| leaf.basis_kind == BASIS_DEFERRED_TO_R07)
++        .filter(|leaf| {
++            leaf.basis_kind == BASIS_DEFERRED_TO_R07
++                || leaf.basis_kind == BASIS_DEFERRED_TO_LATER_STAGE
++        })
+         .map(|leaf| leaf.id.clone())
+         .collect();
+     status_deferred_ids.sort();
+@@ -1982,14 +2051,26 @@ where
+             "expectedFromR00Ledger": r00_expected.len(),
+             "declaredInStageMap": map.supplemental_leaves.len(),
+             "pass": supplemental_pass,
+-            "deferredToR07": supplemental_deferred,
++            "deferredToR07": map
++                .supplemental_leaves
++                .iter()
++                .filter(|leaf| leaf.basis_kind == BASIS_DEFERRED_TO_R07)
++                .count(),
++            "deferredToLaterStage": map
++                .supplemental_leaves
++                .iter()
++                .filter(|leaf| leaf.basis_kind == BASIS_DEFERRED_TO_LATER_STAGE)
++                .count(),
+             "fail": supplemental_fail,
+             "blocked": supplemental_blocked,
+             "deferredLeafIds": declared_deferred_ids,
+             "shareSatisfiedLeafIds": map
+                 .supplemental_leaves
+                 .iter()
+-                .filter(|leaf| leaf.basis_kind == BASIS_R02_SHARE_SATISFIED)
++                .filter(|leaf| {
++                    leaf.basis_kind == BASIS_R02_SHARE_SATISFIED
++                        || leaf.basis_kind == BASIS_STAGE_SHARE_SATISFIED
++                })
+                 .map(|leaf| leaf.id.as_str())
+                 .collect::<Vec<_>>(),
+             "commandsNotPassing": commands_not_passing,
+diff --git a/rust/crates/xtask/src/verify/runner_tests.rs b/rust/crates/xtask/src/verify/runner_tests.rs
+index b9b477b51..1e9279c4f 100644
+--- a/rust/crates/xtask/src/verify/runner_tests.rs
++++ b/rust/crates/xtask/src/verify/runner_tests.rs
+@@ -658,6 +658,16 @@ fn leaf(
+         basis_kind: basis_kind.to_string(),
+         r02_share: "server-side share under test".into(),
+         r07_share: "client-side remainder under test".into(),
++        stage_share: if crate::stage_map::is_stage_neutral_kind(basis_kind) {
++            "stage share under test".into()
++        } else {
++            String::new()
++        },
++        later_share: if crate::stage_map::is_stage_neutral_kind(basis_kind) {
++            "later-stage remainder under test".into()
++        } else {
++            String::new()
++        },
+         evidence_required: "executed records of the referenced commands".into(),
+         evidence_command_refs: refs.iter().map(|s| s.to_string()).collect(),
+         evidence_paths: paths.iter().map(|s| s.to_string()).collect(),
+@@ -1873,3 +1883,364 @@ fn failing_early_evidence_command_blocks_overall_but_leaf_stays_deferred() {
+     assert_eq!(report["overall"], "FAIL");
+     std::fs::remove_dir_all(&root).ok();
+ }
++
++// ── R03-T08: the R03 stage map + stage-neutral kinds ───────────────────────
++
++#[test]
++fn embedded_r03_map_uses_the_taskbook_scenarios() {
++    let (_, text) = crate::STAGE_MAPS
++        .iter()
++        .find(|(stage, _)| *stage == "R03")
++        .expect("R03 is registered in STAGE_MAPS");
++    let r03 = parse_stage_map(text).expect("embedded R03 map parses");
++    let expected: Vec<String> = (1..=16).map(|n| format!("R03-A{n:02}")).collect();
++    let ids: Vec<String> = r03.scenarios.iter().map(|s| s.id.clone()).collect();
++    assert_eq!(
++        ids, expected,
++        "scenario ids must be exactly R03-A01..R03-A16"
++    );
++    assert!(r03.scenarios.iter().all(|s| s.requirement == "REQUIRED"));
++    // Every registered command is referenced by a scenario or a leaf —
++    // an unreferenced command would never run and could not fail.
++    let used: std::collections::HashSet<&str> = r03
++        .scenarios
++        .iter()
++        .flat_map(|s| s.command_refs.iter().map(String::as_str))
++        .chain(
++            r03.supplemental_leaves
++                .iter()
++                .flat_map(|l| l.evidence_command_refs.iter().map(String::as_str)),
++        )
++        .collect();
++    for command in &r03.commands {
++        assert!(
++            used.contains(command.key.as_str()),
++            "command {:?} is referenced by neither a scenario nor a leaf",
++            command.key
++        );
++    }
++    // The R02 regression chain (SUP-02) is registered in this map.
++    for key in [
++        "r02_auth_matrix",
++        "r02_storage_tx",
++        "r02_events_matrix",
++        "r02_backup_restore",
++        "r02_recovery_drill",
++        "r02_full_chain",
++        "r02_legacy_regression",
++    ] {
++        assert!(
++            r03.commands.iter().any(|c| c.key == key),
++            "SUP-02: the R02 regression command {key} must be registered"
++        );
++    }
++}
++
++#[test]
++fn embedded_r03_map_declares_the_48_supplemental_leaves() {
++    let (_, text) = crate::STAGE_MAPS
++        .iter()
++        .find(|(stage, _)| *stage == "R03")
++        .expect("R03 is registered");
++    let r03 = parse_stage_map(text).expect("embedded R03 map parses");
++    assert_eq!(
++        r03.supplemental_leaves.len(),
++        48,
++        "the R00 acceptance ledger binds exactly 48 leaves to R03"
++    );
++    let count_kind = |kind: &str| {
++        r03.supplemental_leaves
++            .iter()
++            .filter(|l| l.basis_kind == kind)
++            .count()
++    };
++    assert_eq!(
++        count_kind(crate::stage_map::BASIS_STAGE_SHARE_SATISFIED),
++        17
++    );
++    assert_eq!(
++        count_kind(crate::stage_map::BASIS_DEFERRED_TO_LATER_STAGE),
++        31
++    );
++    // No R02-named kinds leak into the R03 map (and vice versa).
++    assert_eq!(count_kind(crate::stage_map::BASIS_R02_SHARE_SATISFIED), 0);
++    assert_eq!(count_kind(crate::stage_map::BASIS_DEFERRED_TO_R07), 0);
++    assert!(r03
++        .supplemental_leaves
++        .iter()
++        .all(|l| l.requirement == "REQUIRED_SUPPLEMENTAL"));
++    // Every share leaf pins machine-checked cases from the acceptance
++    // matrix producer; every deferred leaf binds NOTHING gating.
++    for l in &r03.supplemental_leaves {
++        if l.basis_kind == crate::stage_map::BASIS_STAGE_SHARE_SATISFIED {
++            let contract = l
++                .assertion_contract
++                .as_ref()
++                .unwrap_or_else(|| panic!("share leaf {} lacks a contract", l.id));
++            assert!(!contract.cases.is_empty(), "{}", l.id);
++            assert_eq!(contract.producer_command, "a15_combo_and_leaves");
++            assert!(l
++                .evidence_command_refs
++                .contains(&"a15_combo_and_leaves".to_string()));
++        } else {
++            assert!(l.assertion_contract.is_none(), "{}", l.id);
++            assert!(l.evidence_command_refs.is_empty(), "{}", l.id);
++            assert!(l.evidence_paths.is_empty(), "{}", l.id);
++            // Deferral is only legal for genuinely dual-stage leaves.
++            assert!(l
++                .r00_execution_stage_ids
++                .iter()
++                .any(|id| id.as_str() != "R03"));
++        }
++    }
++}
++
++#[test]
++fn r03_map_mirrors_match_the_real_r00_ledgers() {
++    // The verify-time cross-check compared against the REAL ledgers: the
++    // embedded map's 48 mirrors must equal them field-for-field (a drift
++    // here is what verify-stage R03 would abort on before any command).
++    let root = std::path::Path::new(env!("CARGO_MANIFEST_DIR"))
++        .ancestors()
++        .nth(3)
++        .expect("xtask lives at rust/crates/xtask");
++    let (_, text) = crate::STAGE_MAPS
++        .iter()
++        .find(|(stage, _)| *stage == "R03")
++        .expect("R03 is registered");
++    let map = parse_stage_map(text).unwrap();
++    let expected = super::cross_check_supplemental_coverage(&map, root)
++        .expect("the embedded R03 map must mirror the real R00 ledgers");
++    assert_eq!(expected.len(), 48);
++}
++
++#[test]
++fn stage_neutral_share_leaf_passes_on_share_pins() {
++    let root = temp_root("r03-share-pass");
++    let evidence = root.join("evidence");
++    std::fs::create_dir_all(&evidence).expect("create evidence root");
++    std::fs::write(
++        evidence.join("leaf-cases.json"),
++        r#"{"schema":"lingxi.leaf-case-results.v1","cases":[{"case":"pin","expect":1,"actual":1,"ok":true}]}"#,
++    )
++    .expect("write case evidence");
++    let item = leaf(
++        "R00-T02-LA-TESTR03SHARE000",
++        crate::stage_map::BASIS_STAGE_SHARE_SATISFIED,
++        &["good"],
++        &[],
++        contract("good", "{EVIDENCE}/leaf-cases.json", &[("pin", 1)]),
++    );
++    let outcomes = vec![outcome("good", 0)];
++    let roll = super::roll_up_supplemental_leaf(&item, "RX", &outcomes, &root, &evidence);
++    assert_eq!(roll.status, "PASS", "{}", roll.reason);
++    assert!(roll.reason.contains("RX share satisfied"));
++    assert!(roll.reason.contains("RY"), "the later stage is named");
++    std::fs::remove_dir_all(&root).ok();
++}
++
++#[test]
++fn stage_neutral_share_leaf_fails_when_a_pin_does_not_hold() {
++    let root = temp_root("r03-share-fail");
++    let evidence = root.join("evidence");
++    std::fs::create_dir_all(&evidence).expect("create evidence root");
++    std::fs::write(
++        evidence.join("leaf-cases.json"),
++        r#"{"schema":"lingxi.leaf-case-results.v1","cases":[{"case":"pin","expect":1,"actual":0,"ok":false}]}"#,
++    )
++    .expect("write drifted case evidence");
++    let item = leaf(
++        "R00-T02-LA-TESTR03SHAREFAI",
++        crate::stage_map::BASIS_STAGE_SHARE_SATISFIED,
++        &["good"],
++        &[],
++        contract("good", "{EVIDENCE}/leaf-cases.json", &[("pin", 1)]),
++    );
++    let outcomes = vec![outcome("good", 0)];
++    let roll = super::roll_up_supplemental_leaf(&item, "RX", &outcomes, &root, &evidence);
++    assert_eq!(roll.status, "FAIL", "{}", roll.reason);
++    assert!(roll.reason.contains("original-assertion cases not holding"));
++    std::fs::remove_dir_all(&root).ok();
++}
++
++#[test]
++fn stage_neutral_deferred_leaf_is_fixed_and_observational() {
++    let root = temp_root("r03-deferred");
++    let evidence = root.join("evidence");
++    std::fs::create_dir_all(&evidence).expect("create evidence root");
++    let item = leaf(
++        "R00-T02-LA-TESTR03DEFER000",
++        crate::stage_map::BASIS_DEFERRED_TO_LATER_STAGE,
++        &[],
++        &[],
++        None,
++    );
++    let outcomes: Vec<crate::verify::CommandOutcome> = Vec::new();
++    let roll = super::roll_up_supplemental_leaf(&item, "RX", &outcomes, &root, &evidence);
++    assert_eq!(roll.status, "DEFERRED_TO_LATER_STAGE");
++    assert!(roll.reason.contains("deferred to later stage(s) [\"RY\"]"));
++    assert!(roll.reason.contains("still REQUIRED"));
++    std::fs::remove_dir_all(&root).ok();
++}
++
++#[test]
++fn stage_neutral_kinds_are_rejected_for_single_stage_leaves_and_contracts() {
++    // deferred_to_later_stage on a single-stage leaf = sweeping this
++    // stage's obligation out the door — a hard parse error.
++    let mut doc: serde_json::Value = serde_json::json!({
++        "schemaVersion": 1,
++        "resultVersion": crate::RESULT_VERSION,
++        "stage": "RX",
++        "commands": {
++            "a_ok": {
++                "argv": ["bash", "gate.sh", "{EVIDENCE}/RX"],
++                "evidencePaths": ["{EVIDENCE}/RX/out.txt"]
++            }
++        },
++        "scenarios": [
++            {"id": "RX-A01", "requirement": "REQUIRED", "commandRefs": ["a_ok"]}
++        ],
++        "supplementalLeafScenarios": [
++            {
++                "id": "R00-T02-LA-TESTR03KIND000",
++                "featureId": "F-D20-TEST-KIND",
++                "requirement": "REQUIRED_SUPPLEMENTAL",
++                "r00Kind": "supplemental",
++                "r00TaskIds": TEST_R00_TASK_IDS,
++                "r00ExecutionStageIds": TEST_R00_STAGE_IDS,
++                "r00LedgerStatus": "SPECIFIED_NOT_EXECUTED",
++                "r00ResultIds": [],
++                "r00TestIds": [],
++                "r00Then": test_then("R00-T02-LA-TESTR03KIND000"),
++                "r00Assertions": test_assertions("R00-T02-LA-TESTR03KIND000"),
++                "r00Due": TEST_R00_DUE,
++                "basisKind": "deferred_to_later_stage",
++                "stageShare": "no gating share",
++                "laterShare": "later remainder",
++                "evidenceRequired": "records",
++                "evidenceCommandRefs": []
++            }
++        ]
++    });
++    doc["stage"] = serde_json::json!("RX");
++    doc["supplementalLeafScenarios"][0]["basisKind"] =
++        serde_json::json!(crate::stage_map::BASIS_DEFERRED_TO_LATER_STAGE);
++    doc["supplementalLeafScenarios"][0]["stageShare"] = serde_json::json!("no gating share");
++    doc["supplementalLeafScenarios"][0]["laterShare"] = serde_json::json!("remainder");
++    doc["supplementalLeafScenarios"][0]["evidenceCommandRefs"] = serde_json::json!([]);
++    let single = {
++        let mut d = doc.clone();
++        d["supplementalLeafScenarios"][0]["r00ExecutionStageIds"] = serde_json::json!(["RX"]);
++        d
++    };
++    let err = parse_stage_map(&single.to_string()).unwrap_err();
++    assert!(err.contains("may never defer"), "{err}");
++
++    // A share leaf without stageShare (using the R02-named fields) is a
++    // hard parse error — the stage-neutral kinds declare their own pair.
++    let mut nos = doc.clone();
++    nos["supplementalLeafScenarios"][0]["basisKind"] =
++        serde_json::json!(crate::stage_map::BASIS_STAGE_SHARE_SATISFIED);
++    nos["supplementalLeafScenarios"][0]["evidenceCommandRefs"] = serde_json::json!(["a_ok"]);
++    nos["supplementalLeafScenarios"][0]["assertionContract"] = serde_json::json!({
++        "producerCommand": "a_ok",
++        "evidencePath": "{EVIDENCE}/RX/leaf-cases.json",
++        "cases": [{"case": "case-pin", "expect": 1}]
++    });
++    nos["supplementalLeafScenarios"][0]
++        .as_object_mut()
++        .unwrap()
++        .remove("stageShare");
++    let err = parse_stage_map(&nos.to_string()).unwrap_err();
++    assert!(err.contains("missing stageShare"), "{err}");
++
++    // deferred_to_later_stage must not declare gating command refs.
++    let mut gating = doc.clone();
++    gating["supplementalLeafScenarios"][0]["evidenceCommandRefs"] = serde_json::json!(["a_ok"]);
++    let err = parse_stage_map(&gating.to_string()).unwrap_err();
++    assert!(err.contains("must not bind"), "{err}");
++}
++
++#[test]
++fn r03_share_and_deferred_coverage_makes_overall_pass() {
++    // One share leaf whose pins hold + one deferred-to-later leaf: the
++    // supplemental coverage condition (PASS ∪ DEFERRED covers everything)
++    // holds and overall PASS is possible — the R03 shape.
++    let root = temp_root("r03-coverage");
++    write_minimal_r00_ledger(
++        &root,
++        &[
++            ("R00-T02-LA-TESTR03COV0001", "REQUIRED_SUPPLEMENTAL"),
++            ("R00-T02-LA-TESTR03COV0002", "REQUIRED_SUPPLEMENTAL"),
++        ],
++    );
++    let evidence = root.join("evidence");
++    let mut share = leaf(
++        "R00-T02-LA-TESTR03COV0001",
++        crate::stage_map::BASIS_STAGE_SHARE_SATISFIED,
++        &["good"],
++        &[],
++        contract("good", "{EVIDENCE}/leaf-cases.json", &[("pin", 1)]),
++    );
++    // The share leaf's remainder moves to RY (the TEST constants already
++    // carry [RX, RY]); make the stage-share texts explicit.
++    share.stage_share = "the RX share".into();
++    share.later_share = "the RY remainder".into();
++    let mut deferred = leaf(
++        "R00-T02-LA-TESTR03COV0002",
++        crate::stage_map::BASIS_DEFERRED_TO_LATER_STAGE,
++        &[],
++        &[],
++        None,
++    );
++    deferred.stage_share = "no RX gating share".into();
++    deferred.later_share = "the RY remainder".into();
++    let map = StageMap {
++        stage: "RX".into(),
++        result_version: crate::RESULT_VERSION.into(),
++        default_timeout_secs: 60,
++        commands: vec![spec(
++            "good",
++            &[
++                "sh",
++                "-c",
++                "printf ok > {EVIDENCE}/good.txt && \
++                 printf '{\"schema\":\"lingxi.leaf-case-results.v1\",\"cases\":[{\"case\":\"pin\",\"expect\":1,\"actual\":1,\"ok\":true}]}' \
++                 > {EVIDENCE}/leaf-cases.json",
++            ],
++            &["{EVIDENCE}/good.txt"],
++            60,
++        )],
++        scenarios: vec![crate::stage_map::Scenario {
++            id: "RX-A01".into(),
++            requirement: "REQUIRED".into(),
++            command_refs: vec!["good".into()],
++        }],
++        supplemental_leaves: vec![share, deferred],
++    };
++    let report =
++        verify_stage(&map, &root, &evidence, "deadbeef", false, 0).expect("runs to completion");
++    assert_eq!(report["overall"], "PASS", "{report}");
++    assert_eq!(
++        report["supplementalLeafCoverage"]["pass"],
++        serde_json::json!(1)
++    );
++    assert_eq!(
++        report["supplementalLeafCoverage"]["deferredToR07"],
++        serde_json::json!(0)
++    );
++    assert_eq!(
++        report["supplementalLeafCoverage"]["deferredToLaterStage"],
++        serde_json::json!(1)
++    );
++    let deferred_entry = &report["supplementalLeafScenarios"][1];
++    assert_eq!(deferred_entry["status"], "DEFERRED_TO_LATER_STAGE");
++    assert_eq!(
++        deferred_entry["deferredToStages"],
++        serde_json::json!(["RY"])
++    );
++    let share_entry = &report["supplementalLeafScenarios"][0];
++    assert_eq!(share_entry["status"], "PASS");
++    assert_eq!(share_entry["deferredToStages"], serde_json::json!(["RY"]));
++    std::fs::remove_dir_all(&root).ok();
++}
+diff --git a/scripts/rust-tauri/r02_t04_storage_tx.sh b/scripts/rust-tauri/r02_t04_storage_tx.sh
+index ac97e904f..d3e8d25f8 100755
+--- a/scripts/rust-tauri/r02_t04_storage_tx.sh
++++ b/scripts/rust-tauri/r02_t04_storage_tx.sh
+@@ -343,6 +343,21 @@ note "PASS S3 unwritable home: exit=2, explicit error, no readiness line"
+ note "== S4 (A08): three migration checks, stable version/counts/fingerprints =="
+ db_files_sha "$HOME_DIR" > "$EVIDENCE_DIR/s4-hashes-before.txt"
+ BASE_COUNTS="$("$INSPECT_BIN" "$DB" counts)"
++# R03-T08 fix of the deferred T04 R1-F1: the expected migration set is the
++# REGISTERED set (docs/rust-tauri/R02/R02-T04_STORAGE_REGISTRY.json), not a
++# hardcoded version==1. The registry is the fingerprint authority; the
++# binary's own compiledIn set must equal it, and the on-disk receipts must
++# equal both.
++REGISTRY_MIGRATIONS="$(python3 - << 'REGEOF'
++import json
++doc = json.load(open("docs/rust-tauri/R02/R02-T04_STORAGE_REGISTRY.json"))
++migs = doc["new_persistence_points"][0]["migrations"]
++print(json.dumps([
++    {"version": m["version"], "name": m["name"],
++     "fingerprint": m["fingerprint_sha256"]} for m in migs
++]))
++REGEOF
++)" || fail "S4 cannot read the storage registry"
+ for round in 1 2 3; do
+   # each start re-runs the open-time migration pass
+   start_service "$HOME_DIR" "s4-$round" || fail "s4 round $round service did not become ready"
+@@ -351,17 +366,38 @@ for round in 1 2 3; do
+   echo "$MIG" > "$EVIDENCE_DIR/s4-migrations-round$round.json"
+   echo "$BASE_COUNTS" | diff -q - <("$INSPECT_BIN" "$DB" counts) >/dev/null \
+     || fail "S4 round $round: row counts changed"
+-  python3 - "$EVIDENCE_DIR/s4-migrations-round$round.json" << 'PYEOF' || fail "S4 round $round: migration check inconsistent"
+-import json, sys
++  REGISTRY_MIGRATIONS="$REGISTRY_MIGRATIONS" python3 - "$EVIDENCE_DIR/s4-migrations-round$round.json" << 'PYEOF' || fail "S4 round $round: migration check inconsistent"
++import json, os, sys
+ doc = json.load(open(sys.argv[1]))
+-assert doc["userVersion"] == doc["supportedVersion"] == 1, doc
+-receipts = doc["receipts"]; compiled = doc["compiledIn"]
+-assert len(receipts) == len(compiled) == 1, doc
+-assert receipts[0]["fingerprint"] == compiled[0]["fingerprint"], doc
+-assert receipts[0]["version"] == compiled[0]["version"] == 1, doc
++registered = json.loads(os.environ["REGISTRY_MIGRATIONS"])
++registered.sort(key=lambda m: m["version"])
++supported = len(registered)
++assert doc["userVersion"] == doc["supportedVersion"] == supported, (
++    f"userVersion {doc['userVersion']} / supportedVersion {doc['supportedVersion']} "
++    f"disagree with the registry's {supported} migrations"
++)
++receipts = doc["receipts"]
++compiled = doc["compiledIn"]
++assert len(receipts) == len(compiled) == supported, (
++    f"expected {supported} receipts, got receipts={len(receipts)} compiled={len(compiled)}"
++)
++assert [r["version"] for r in receipts] == [m["version"] for m in registered], (
++    "receipt versions disagree with the registry"
++)
++for r, m in zip(receipts, registered):
++    assert r["version"] == m["version"], (r, m)
++    assert r["name"] == m["name"], (r, m)
++    assert r["fingerprint"] == m["fingerprint"], (
++        f"receipt v{r['version']} fingerprint {r['fingerprint']} != registry {m['fingerprint']}"
++    )
++for c, m in zip(compiled, registered):
++    assert c["version"] == m["version"] and c["name"] == m["name"], (c, m)
++    assert c["fingerprint"] == m["fingerprint"], (
++        f"compiledIn v{c['version']} fingerprint {c['fingerprint']} != registry {m['fingerprint']}"
++    )
+ PYEOF
+ done
+-note "PASS S4 3x migration checks: version=1, fingerprint identical, row counts stable"
++note "PASS S4 3x migration checks: registry-conformant version set, identical fingerprints, row counts stable"
+ 
+ # The inspector is read-only: file hashes unchanged around all inspections.
+ db_files_sha "$HOME_DIR" > "$EVIDENCE_DIR/s4-hashes-after.txt"

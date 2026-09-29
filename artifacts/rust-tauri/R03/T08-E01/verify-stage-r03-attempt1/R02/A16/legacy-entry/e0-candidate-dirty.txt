@@ -1,0 +1,9 @@
+ M docs/rust-tauri/R02/R02-T04_STORAGE_REGISTRY.json
+ M rust/crates/lingxi-adapters/tests/late_result_fencing_property.rs
+ M rust/crates/lingxi-adapters/tests/run_finalize_property.rs
+ M rust/crates/xtask/src/main.rs
+ M rust/crates/xtask/src/runner_identity.rs
+ M rust/crates/xtask/src/stage_map.rs
+ M rust/crates/xtask/src/verify.rs
+ M rust/crates/xtask/src/verify/runner_tests.rs
+ M scripts/rust-tauri/r02_t04_storage_tx.sh

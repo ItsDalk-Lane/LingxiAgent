@@ -2237,6 +2237,26 @@ note "== E4.5: npm run build:renderer (candidate copy) =="
 note "PASS E4.5-build-renderer (exit 0; vite build --config vite.config.ts)"
 
 # ── E5: failure attribution by replay ──────────────────────────────────────
+# R03-T08 scope split (dispatch: "npm 侧按 R02 惯例跑受影响定向（完整 npm
+# 与审计封印状态由总控另记，不在本 Task 伪造）"): the DEFAULT mode stays
+# the FULL chain (E0–E5, exactly what the R02 stage map registers). The
+# directed mode runs E0–E4.5 (entry/binding/typecheck/contracts/boundary
+# gates/renderer build) and STOPS BEFORE the full-npm + seal-family
+# classification, recording the skip loudly — it never reclassifies,
+# never weakens, and never turns an E5 red green.
+LEGACY_REGRESSION_MODE="${R02_LEGACY_REGRESSION_MODE:-full}"
+case "$LEGACY_REGRESSION_MODE" in
+  full) : ;;
+  directed-no-seal-family)
+    note "SKIP E5 (full npm + seal-family classification) BY SCOPE: directed mode requested; E0–E4.5 all green above; the full chain remains the R02 stage map's a16 command and the controller's ledger item"
+    note "RESULT: R02 legacy entry regression DIRECTED (E0–E4.5) ALL GREEN"
+    exit 0
+    ;;
+  *)
+    echo "FAIL: unknown R02_LEGACY_REGRESSION_MODE "$LEGACY_REGRESSION_MODE" (expected full|directed-no-seal-family)" >&2
+    exit 1
+    ;;
+esac
 note "== E5a: full npm test (candidate copy) =="
 set +e
 (cd "$CAND_COPY" && npm test) > "$EVIDENCE_DIR/e5-candidate-npm-test.log" 2>&1

@@ -1,0 +1,88 @@
+{
+  "schemaVersion": 1,
+  "credentials": [
+    {
+      "schemaVersion": 1,
+      "credentialId": "cred_ba19e9100ae482ec7bd0a5b2c0fd5477",
+      "deviceId": "device_5b9500a8da31c499d95a1f637d50b110",
+      "secretPrefix": "hana_dev_yufRWQ1O_",
+      "secretHash": "-GzNaEsBVqsISFpFIkoSVrcXBbNsSLyFgoOhZ_kcsok",
+      "secretSalt": "WVghuqFYcOOlnXD0Ktvv-Q",
+      "status": "active",
+      "scopes": [
+        "chat"
+      ],
+      "createdAtUnixMs": 1790683032135,
+      "expiresAtUnixMs": 1,
+      "lastUsedAtUnixMs": null
+    },
+    {
+      "schemaVersion": 1,
+      "credentialId": "cred_58b44d78c106a08c03636cbbc097d7db",
+      "deviceId": "device_656043814587f8f471cef6e2b1c29589",
+      "secretPrefix": "hana_dev_PYnzOK_sD",
+      "secretHash": "aYQHleI1dhka-qplYm8xlDBQg6EhL8OFacfu7VF0ev8",
+      "secretSalt": "JsUgq-hJWElW7sGM8iNC4g",
+      "status": "active",
+      "scopes": [
+        "chat"
+      ],
+      "createdAtUnixMs": 1790683033540,
+      "expiresAtUnixMs": null,
+      "lastUsedAtUnixMs": 1790683034827
+    },
+    {
+      "schemaVersion": 1,
+      "credentialId": "cred_0bd21cd343a5a9c0a0ade07dd992f801",
+      "deviceId": "device_70e814b113bb07d25e7445157bff0a85",
+      "secretPrefix": "hana_dev_YOT6Q6MgO",
+      "secretHash": "oOrdBYwUMRm78jyyPobl7mEJ-WbX3tnAdqoN6DFBYrY",
+      "secretSalt": "TUlWZUAb54ns8EuqsumUuw",
+      "status": "active",
+      "scopes": [
+        "resources.read"
+      ],
+      "createdAtUnixMs": 1790683036146,
+      "expiresAtUnixMs": null,
+      "lastUsedAtUnixMs": 1790683037430
+    }
+  ],
+  "audit": [
+    {
+      "action": "access.cli_credential.issue",
+      "target": "device_5b9500a8da31c499d95a1f637d50b110",
+      "atUnixMs": 1790683032135,
+      "metadata": {
+        "credentialId": "cred_ba19e9100ae482ec7bd0a5b2c0fd5477",
+        "scopes": [
+          "chat"
+        ]
+      }
+    },
+    {
+      "action": "access.cli_credential.issue",
+      "target": "device_656043814587f8f471cef6e2b1c29589",
+      "atUnixMs": 1790683033540,
+      "metadata": {
+        "credentialId": "cred_58b44d78c106a08c03636cbbc097d7db",
+        "scopes": [
+          "chat"
+        ]
+      }
+    },
+    {
+      "action": "access.cli_credential.issue",
+      "target": "device_70e814b113bb07d25e7445157bff0a85",
+      "atUnixMs": 1790683036146,
+      "metadata": {
+        "credentialId": "cred_0bd21cd343a5a9c0a0ade07dd992f801",
+        "scopes": [
+          "resources.read"
+        ]
+      }
+    }
+  ],
+  "pairingSessions": [],
+  "createdAtUnixMs": 1790683031471,
+  "updatedAtUnixMs": 1790683037430
+}

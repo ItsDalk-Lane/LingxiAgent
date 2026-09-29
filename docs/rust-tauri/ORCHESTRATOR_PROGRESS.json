@@ -513,7 +513,7 @@
     },
     "R03": {
       "title": "运行状态机、并发、取消与恢复",
-      "status": "IN_PROGRESS",
+      "status": "ALL_TASKS_DONE_READY_FOR_STAGE_CLOSEOUT",
       "task_ids": [
         "R03-T01",
         "R03-T02",
@@ -2792,10 +2792,12 @@
         "R03-A13": "PASS",
         "R03-A14": "PASS"
       },
-      "task_commit_sha": null,
+      "task_commit_sha": "dc42a01e37d1110293ec137402fd3239bd5b7d9d",
       "push_result": {
-        "status": "PENDING_BACKFILL",
-        "note": "SHA 与远程回执由下一账本提交补登"
+        "status": "CONFIRMED",
+        "remote_branch": "origin/codex/rust-tauri-migration",
+        "remote_head": "dc42a01e37d1110293ec137402fd3239bd5b7d9d",
+        "note": "ls-remote verified after push"
       },
       "blockers": [],
       "evidence": {
@@ -2809,23 +2811,66 @@
     "R03-T08": {
       "name": "状态机验收与 R04 接口交接",
       "stage_id": "R03",
-      "status": "PENDING",
-      "task_base_sha": null,
-      "executor_id": null,
-      "execution_result": null,
-      "review_round": 0,
-      "reviewer_id": null,
-      "review_verdict": null,
-      "findings": [],
+      "status": "DONE",
+      "task_base_sha": "dc42a01e37d1110293ec137402fd3239bd5b7d9d",
+      "executor_id": "ZCode:R03-T08-exec-e1 (agent_5709aed1-0b47-48a0-a685-6d2f62f42ee4)",
+      "execution_result": "READY_FOR_REVIEW",
+      "review_round": 1,
+      "reviewer_id": "ZCode:R03-T08-review-r1 (agent_86cf8b5f-02b8-4104-bf61-4497a13917f5)",
+      "review_verdict": "PASS",
+      "findings": [
+        {
+          "id": "R1-F1",
+          "severity": "MINOR_REGISTRATION",
+          "summary": "父取消路径 subagent child run durable 行不就地收口，由启动扫描两阶段收口 interrupted_needs_attention（A06 监督层判定成立）；T06 报告表述失实需三份阶段文档更正",
+          "review_report": "docs/rust-tauri/R03/R03-T08_REVIEW_R1.md",
+          "resolution": "阶段收口义务：STAGE-REPAIR 修 T06 报告/R03_REPORT/R03_HANDOFF 表述"
+        },
+        {
+          "id": "R1-F2",
+          "severity": "MINOR_REGISTRATION",
+          "summary": "R02 a07 检查器 keyEvents 计数断言相对 R03 生命周期过期（同根因库内断言已在 T07 获审更新 (1,1)→(1,2)）；等价断言方案已给",
+          "review_report": "docs/rust-tauri/R03/R03-T08_REVIEW_R1.md",
+          "resolution": "阶段收口义务：STAGE-REPAIR 按等价断言修 R02 期资产+必跑矩阵"
+        },
+        {
+          "id": "R1-F3",
+          "severity": "MINOR_REGISTRATION",
+          "summary": "R02 a14 风暴 200-only 断言过期（409 session_busy=现役同语义冻结）",
+          "review_report": "docs/rust-tauri/R03/R03-T08_REVIEW_R1.md",
+          "resolution": "阶段收口义务：同上"
+        },
+        {
+          "id": "R1-E5",
+          "severity": "GOVERNANCE",
+          "summary": "verify-stage R02 全量 3 红之 E5 封印族=审计坐标滞后（未提交候选分类器按设计闭失败），归总控账本，与 R02 终审定性一致",
+          "review_report": "docs/rust-tauri/R03/R03-T08_REVIEW_R1.md",
+          "resolution": "如实登记不伪称全绿；封印留待获授权的封印流程"
+        }
+      ],
       "repair_agent_id": null,
       "root_cause_agent_id": null,
       "acceptance_results": {
-        "R03-A15": "NOT_STARTED",
-        "R03-A16": "NOT_STARTED"
+        "R03-A15": "PASS",
+        "R03-A16": "PASS"
       },
       "task_commit_sha": null,
-      "push_result": null,
-      "blockers": []
+      "push_result": {
+        "status": "PENDING_BACKFILL",
+        "note": "SHA 与远程回执由下一账本提交补登"
+      },
+      "blockers": [],
+      "evidence": {
+        "executor_report": "docs/rust-tauri/R03/R03-T08_REPORT.md",
+        "executor_evidence": "artifacts/rust-tauri/R03/T08-E01/",
+        "review_report": "docs/rust-tauri/R03/R03-T08_REVIEW_R1.md",
+        "review_evidence": "artifacts/rust-tauri/R03/T08-R01-review/",
+        "candidate_diff_digest_16": "7deab269990f9b43",
+        "stage_gate": {
+          "verify_stage_r03": "exit 0, 14/14 commands, 16/16 scenarios, 48 leaves (17 stage_share + 31 deferred, 0 fail/0 blocked)",
+          "r02_regression": "7 directed commands green in R03 gate; full verify-stage R02 17/20 with 3 red adjudicated (E5 seal lag + F2/F3 stale R02-era assertions as closeout duties)"
+        }
+      }
     },
     "R04-T01": {
       "name": "建立工具目录与参数契约",
@@ -4256,7 +4301,7 @@
       "blockers": []
     }
   },
-  "current_task": "R03-T08",
+  "current_task": null,
   "orchestration_mode": {
     "effective_from": "R00-T03 R2 repair",
     "task_executor": "new ZCode task per Rxx-Tyy",

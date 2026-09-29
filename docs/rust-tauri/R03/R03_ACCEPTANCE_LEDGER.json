@@ -1,0 +1,733 @@
+{
+ "spec_version": "1.0",
+ "stage_id": "R03",
+ "current_candidate_status": {
+  "status": "READY_FOR_REVIEW",
+  "executor": "ZCode:EXECUTOR-R03-T08-E01（一次性，无 commit/push 授权）",
+  "stage_gate": {
+   "command": "cargo run --manifest-path rust/Cargo.toml --locked -p xtask -- verify-stage R03 --evidence artifacts/rust-tauri/R03/T08-E01/verify-stage-r03",
+   "exit_code": 0,
+   "overall": "PASS",
+   "tested_sha": "dc42a01e37d1110293ec137402fd3239bd5b7d9d",
+   "worktree_dirty": true,
+   "commands_pass": "14/14",
+   "scenarios_pass": "16/16",
+   "supplemental": "48 = 17 stage_share_satisfied + 31 deferred_to_later_stage + 0 fail + 0 blocked",
+   "candidate_source_binding_stable": true,
+   "runner_source_binding": "PASS",
+   "startedAtUnixMs": 1790682233822,
+   "finishedAtUnixMs": 1790682711655
+  },
+  "attempt1": "verify-stage-r03-attempt1/ overall FAIL（a16 脚本参数布局 bug + r02_legacy E5 封印族分类对未提交候选树闭失败）；原字节保留含 FAILURE-ANALYSIS.txt"
+ },
+ "generated_by": "ZCode:EXECUTOR-R03-T08-E01（2026-09-29；一次性执行代理；状态为执行者口径 READY_FOR_REVIEW，最终 PASS 归独立验收与根总控）",
+ "tested_sha": "dc42a01e37d1110293ec137402fd3239bd5b7d9d",
+ "tested_sha_note": "dc42a01e37d1110293ec137402fd3239bd5b7d9d + T08 未提交授权工作树（verify-stage testedSha 同值、worktreeDirty=true 属预期）",
+ "platform": {
+  "os": "macOS",
+  "os_version": "Darwin 27.0.0",
+  "arch": "arm64"
+ },
+ "toolchain": "1.98.1（rustup 锁定；rust/Cargo.lock=90111c4b… 零变化）",
+ "executor_run": {
+  "task_id": "R03-T08",
+  "dispatch": "docs/rust-tauri/R03/dispatches/R03-T08_DISPATCH_E01.md",
+  "TASK_BASE_SHA": "dc42a01e37d1110293ec137402fd3239bd5b7d9d",
+  "evidence_root": "artifacts/rust-tauri/R03/T08-E01/"
+ },
+ "scenarios": [
+  {
+   "id": "R03-A01",
+   "task_id": "R03-T01",
+   "name": "多模型调用只有一个任务终态",
+   "requirement": "REQUIRED",
+   "status": "PASS",
+   "expected": "阶段书通过条件（任务书 §4 对应验收原文）",
+   "command_refs": [
+    "rust_test_workspace",
+    "a15_combo_and_leaves"
+   ],
+   "test_object": "run_lifecycle.rs r03_a01（3 model calls→唯一终态）+ 矩阵 multi-turn-model",
+   "exit_code": 0,
+   "timed_out": false,
+   "platform": "macOS 27.0 arm64（Darwin 27.0.0）",
+   "tested_sha": "dc42a01e37d1110293ec137402fd3239bd5b7d9d + T08 未提交授权工作树（verify-stage testedSha 同值、worktreeDirty=true 属预期）",
+   "evidence_root": "artifacts/rust-tauri/R03/T08-E01/verify-stage-r03",
+   "command_results": {
+    "rust_test_workspace": {
+     "exit": 0,
+     "ms": 89029,
+     "dir": "artifacts/rust-tauri/R03/T08-E01/verify-stage-r03/rust_test_workspace"
+    },
+    "a15_combo_and_leaves": {
+     "exit": 0,
+     "ms": 9387,
+     "dir": "artifacts/rust-tauri/R03/T08-E01/verify-stage-r03/a15_combo_and_leaves"
+    }
+   },
+   "review": null,
+   "note": "verify-stage R03 场景 roll-up PASS（gate overall PASS，2026-09-29）"
+  },
+  {
+   "id": "R03-A02",
+   "task_id": "R03-T01",
+   "name": "重复终态不重复结算",
+   "requirement": "REQUIRED",
+   "status": "PASS",
+   "expected": "阶段书通过条件（任务书 §4 对应验收原文）",
+   "command_refs": [
+    "rust_test_workspace",
+    "r02_storage_tx"
+   ],
+   "test_object": "run_finalize_property.rs（固定 seed 属性）+ r02_storage_tx 同事务基底",
+   "exit_code": 0,
+   "timed_out": false,
+   "platform": "macOS 27.0 arm64（Darwin 27.0.0）",
+   "tested_sha": "dc42a01e37d1110293ec137402fd3239bd5b7d9d + T08 未提交授权工作树（verify-stage testedSha 同值、worktreeDirty=true 属预期）",
+   "evidence_root": "artifacts/rust-tauri/R03/T08-E01/verify-stage-r03",
+   "command_results": {
+    "rust_test_workspace": {
+     "exit": 0,
+     "ms": 89029,
+     "dir": "artifacts/rust-tauri/R03/T08-E01/verify-stage-r03/rust_test_workspace"
+    },
+    "r02_storage_tx": {
+     "exit": 0,
+     "ms": 11226,
+     "dir": "artifacts/rust-tauri/R03/T08-E01/verify-stage-r03/r02_storage_tx"
+    }
+   },
+   "review": null,
+   "note": "verify-stage R03 场景 roll-up PASS（gate overall PASS，2026-09-29）"
+  },
+  {
+   "id": "R03-A03",
+   "task_id": "R03-T02",
+   "name": "同会话顺序可重复",
+   "requirement": "REQUIRED",
+   "status": "PASS",
+   "expected": "阶段书通过条件（任务书 §4 对应验收原文）",
+   "command_refs": [
+    "rust_test_workspace"
+   ],
+   "test_object": "session_serialization.rs 调度轨迹",
+   "exit_code": 0,
+   "timed_out": false,
+   "platform": "macOS 27.0 arm64（Darwin 27.0.0）",
+   "tested_sha": "dc42a01e37d1110293ec137402fd3239bd5b7d9d + T08 未提交授权工作树（verify-stage testedSha 同值、worktreeDirty=true 属预期）",
+   "evidence_root": "artifacts/rust-tauri/R03/T08-E01/verify-stage-r03",
+   "command_results": {
+    "rust_test_workspace": {
+     "exit": 0,
+     "ms": 89029,
+     "dir": "artifacts/rust-tauri/R03/T08-E01/verify-stage-r03/rust_test_workspace"
+    }
+   },
+   "review": null,
+   "note": "verify-stage R03 场景 roll-up PASS（gate overall PASS，2026-09-29）"
+  },
+  {
+   "id": "R03-A04",
+   "task_id": "R03-T02",
+   "name": "跨会话不被全局锁阻塞",
+   "requirement": "REQUIRED",
+   "status": "PASS",
+   "expected": "阶段书通过条件（任务书 §4 对应验收原文）",
+   "command_refs": [
+    "rust_test_workspace"
+   ],
+   "test_object": "session_serialization.rs 并发+配额",
+   "exit_code": 0,
+   "timed_out": false,
+   "platform": "macOS 27.0 arm64（Darwin 27.0.0）",
+   "tested_sha": "dc42a01e37d1110293ec137402fd3239bd5b7d9d + T08 未提交授权工作树（verify-stage testedSha 同值、worktreeDirty=true 属预期）",
+   "evidence_root": "artifacts/rust-tauri/R03/T08-E01/verify-stage-r03",
+   "command_results": {
+    "rust_test_workspace": {
+     "exit": 0,
+     "ms": 89029,
+     "dir": "artifacts/rust-tauri/R03/T08-E01/verify-stage-r03/rust_test_workspace"
+    }
+   },
+   "review": null,
+   "note": "verify-stage R03 场景 roll-up PASS（gate overall PASS，2026-09-29）"
+  },
+  {
+   "id": "R03-A05",
+   "task_id": "R03-T03",
+   "name": "取消覆盖等待态",
+   "requirement": "REQUIRED",
+   "status": "PASS",
+   "expected": "阶段书通过条件（任务书 §4 对应验收原文）",
+   "command_refs": [
+    "rust_test_workspace",
+    "a15_combo_and_leaves"
+   ],
+   "test_object": "cancellation_tree.rs 参数化（队列/审批/流读取）+ 矩阵 cancel-approval-wait",
+   "exit_code": 0,
+   "timed_out": false,
+   "platform": "macOS 27.0 arm64（Darwin 27.0.0）",
+   "tested_sha": "dc42a01e37d1110293ec137402fd3239bd5b7d9d + T08 未提交授权工作树（verify-stage testedSha 同值、worktreeDirty=true 属预期）",
+   "evidence_root": "artifacts/rust-tauri/R03/T08-E01/verify-stage-r03",
+   "command_results": {
+    "rust_test_workspace": {
+     "exit": 0,
+     "ms": 89029,
+     "dir": "artifacts/rust-tauri/R03/T08-E01/verify-stage-r03/rust_test_workspace"
+    },
+    "a15_combo_and_leaves": {
+     "exit": 0,
+     "ms": 9387,
+     "dir": "artifacts/rust-tauri/R03/T08-E01/verify-stage-r03/a15_combo_and_leaves"
+    }
+   },
+   "review": null,
+   "note": "verify-stage R03 场景 roll-up PASS（gate overall PASS，2026-09-29）"
+  },
+  {
+   "id": "R03-A06",
+   "task_id": "R03-T03",
+   "name": "独立任务不被误杀",
+   "requirement": "REQUIRED",
+   "status": "PASS",
+   "expected": "阶段书通过条件（任务书 §4 对应验收原文）",
+   "command_refs": [
+    "rust_test_workspace",
+    "a15_combo_and_leaves"
+   ],
+   "test_object": "cancellation_tree.rs r03_a06 + 矩阵 background-survives/parent-cancel-stops-child",
+   "exit_code": 0,
+   "timed_out": false,
+   "platform": "macOS 27.0 arm64（Darwin 27.0.0）",
+   "tested_sha": "dc42a01e37d1110293ec137402fd3239bd5b7d9d + T08 未提交授权工作树（verify-stage testedSha 同值、worktreeDirty=true 属预期）",
+   "evidence_root": "artifacts/rust-tauri/R03/T08-E01/verify-stage-r03",
+   "command_results": {
+    "rust_test_workspace": {
+     "exit": 0,
+     "ms": 89029,
+     "dir": "artifacts/rust-tauri/R03/T08-E01/verify-stage-r03/rust_test_workspace"
+    },
+    "a15_combo_and_leaves": {
+     "exit": 0,
+     "ms": 9387,
+     "dir": "artifacts/rust-tauri/R03/T08-E01/verify-stage-r03/a15_combo_and_leaves"
+    }
+   },
+   "review": null,
+   "note": "verify-stage R03 场景 roll-up PASS（gate overall PASS，2026-09-29）"
+  },
+  {
+   "id": "R03-A07",
+   "task_id": "R03-T04",
+   "name": "旧结果不能复活任务",
+   "requirement": "REQUIRED",
+   "status": "PASS",
+   "expected": "阶段书通过条件（任务书 §4 对应验收原文）",
+   "command_refs": [
+    "rust_test_workspace",
+    "a15_combo_and_leaves"
+   ],
+   "test_object": "late_result_fence*.rs + 属性测试 + 矩阵 out-of-order",
+   "exit_code": 0,
+   "timed_out": false,
+   "platform": "macOS 27.0 arm64（Darwin 27.0.0）",
+   "tested_sha": "dc42a01e37d1110293ec137402fd3239bd5b7d9d + T08 未提交授权工作树（verify-stage testedSha 同值、worktreeDirty=true 属预期）",
+   "evidence_root": "artifacts/rust-tauri/R03/T08-E01/verify-stage-r03",
+   "command_results": {
+    "rust_test_workspace": {
+     "exit": 0,
+     "ms": 89029,
+     "dir": "artifacts/rust-tauri/R03/T08-E01/verify-stage-r03/rust_test_workspace"
+    },
+    "a15_combo_and_leaves": {
+     "exit": 0,
+     "ms": 9387,
+     "dir": "artifacts/rust-tauri/R03/T08-E01/verify-stage-r03/a15_combo_and_leaves"
+    }
+   },
+   "review": null,
+   "note": "verify-stage R03 场景 roll-up PASS（gate overall PASS，2026-09-29）"
+  },
+  {
+   "id": "R03-A08",
+   "task_id": "R03-T04",
+   "name": "相同 requestId 不同内容拒绝",
+   "requirement": "REQUIRED",
+   "status": "PASS",
+   "expected": "阶段书通过条件（任务书 §4 对应验收原文）",
+   "command_refs": [
+    "rust_test_workspace",
+    "a15_combo_and_leaves"
+   ],
+   "test_object": "request_dedup.rs + 矩阵 duplicate（replay+conflict）",
+   "exit_code": 0,
+   "timed_out": false,
+   "platform": "macOS 27.0 arm64（Darwin 27.0.0）",
+   "tested_sha": "dc42a01e37d1110293ec137402fd3239bd5b7d9d + T08 未提交授权工作树（verify-stage testedSha 同值、worktreeDirty=true 属预期）",
+   "evidence_root": "artifacts/rust-tauri/R03/T08-E01/verify-stage-r03",
+   "command_results": {
+    "rust_test_workspace": {
+     "exit": 0,
+     "ms": 89029,
+     "dir": "artifacts/rust-tauri/R03/T08-E01/verify-stage-r03/rust_test_workspace"
+    },
+    "a15_combo_and_leaves": {
+     "exit": 0,
+     "ms": 9387,
+     "dir": "artifacts/rust-tauri/R03/T08-E01/verify-stage-r03/a15_combo_and_leaves"
+    }
+   },
+   "review": null,
+   "note": "verify-stage R03 场景 roll-up PASS（gate overall PASS，2026-09-29）"
+  },
+  {
+   "id": "R03-A09",
+   "task_id": "R03-T05",
+   "name": "副作用后崩溃不重复执行",
+   "requirement": "REQUIRED",
+   "status": "PASS",
+   "expected": "阶段书通过条件（任务书 §4 对应验收原文）",
+   "command_refs": [
+    "rust_test_workspace"
+   ],
+   "test_object": "invocation_journal.rs（kill-重启形态）",
+   "exit_code": 0,
+   "timed_out": false,
+   "platform": "macOS 27.0 arm64（Darwin 27.0.0）",
+   "tested_sha": "dc42a01e37d1110293ec137402fd3239bd5b7d9d + T08 未提交授权工作树（verify-stage testedSha 同值、worktreeDirty=true 属预期）",
+   "evidence_root": "artifacts/rust-tauri/R03/T08-E01/verify-stage-r03",
+   "command_results": {
+    "rust_test_workspace": {
+     "exit": 0,
+     "ms": 89029,
+     "dir": "artifacts/rust-tauri/R03/T08-E01/verify-stage-r03/rust_test_workspace"
+    }
+   },
+   "review": null,
+   "note": "verify-stage R03 场景 roll-up PASS（gate overall PASS，2026-09-29）"
+  },
+  {
+   "id": "R03-A10",
+   "task_id": "R03-T05",
+   "name": "可验证幂等恢复",
+   "requirement": "REQUIRED",
+   "status": "PASS",
+   "expected": "阶段书通过条件（任务书 §4 对应验收原文）",
+   "command_refs": [
+    "rust_test_workspace"
+   ],
+   "test_object": "invocation_journal.rs 幂等键恢复",
+   "exit_code": 0,
+   "timed_out": false,
+   "platform": "macOS 27.0 arm64（Darwin 27.0.0）",
+   "tested_sha": "dc42a01e37d1110293ec137402fd3239bd5b7d9d + T08 未提交授权工作树（verify-stage testedSha 同值、worktreeDirty=true 属预期）",
+   "evidence_root": "artifacts/rust-tauri/R03/T08-E01/verify-stage-r03",
+   "command_results": {
+    "rust_test_workspace": {
+     "exit": 0,
+     "ms": 89029,
+     "dir": "artifacts/rust-tauri/R03/T08-E01/verify-stage-r03/rust_test_workspace"
+    }
+   },
+   "review": null,
+   "note": "verify-stage R03 场景 roll-up PASS（gate overall PASS，2026-09-29）"
+  },
+  {
+   "id": "R03-A11",
+   "task_id": "R03-T06",
+   "name": "子代理不能升级权限",
+   "requirement": "REQUIRED",
+   "status": "PASS",
+   "expected": "阶段书通过条件（任务书 §4 对应验收原文）",
+   "command_refs": [
+    "rust_test_workspace",
+    "a15_combo_and_leaves"
+   ],
+   "test_object": "subagent_permission_inheritance.rs + 矩阵 escalation 0 child run",
+   "exit_code": 0,
+   "timed_out": false,
+   "platform": "macOS 27.0 arm64（Darwin 27.0.0）",
+   "tested_sha": "dc42a01e37d1110293ec137402fd3239bd5b7d9d + T08 未提交授权工作树（verify-stage testedSha 同值、worktreeDirty=true 属预期）",
+   "evidence_root": "artifacts/rust-tauri/R03/T08-E01/verify-stage-r03",
+   "command_results": {
+    "rust_test_workspace": {
+     "exit": 0,
+     "ms": 89029,
+     "dir": "artifacts/rust-tauri/R03/T08-E01/verify-stage-r03/rust_test_workspace"
+    },
+    "a15_combo_and_leaves": {
+     "exit": 0,
+     "ms": 9387,
+     "dir": "artifacts/rust-tauri/R03/T08-E01/verify-stage-r03/a15_combo_and_leaves"
+    }
+   },
+   "review": null,
+   "note": "verify-stage R03 场景 roll-up PASS（gate overall PASS，2026-09-29）"
+  },
+  {
+   "id": "R03-A12",
+   "task_id": "R03-T06",
+   "name": "断线不等于取消",
+   "requirement": "REQUIRED",
+   "status": "PASS",
+   "expected": "阶段书通过条件（任务书 §4 对应验收原文）",
+   "command_refs": [
+    "rust_test_workspace",
+    "a15_combo_and_leaves"
+   ],
+   "test_object": "background_disconnect_recovery.rs + 矩阵 background decoupled",
+   "exit_code": 0,
+   "timed_out": false,
+   "platform": "macOS 27.0 arm64（Darwin 27.0.0）",
+   "tested_sha": "dc42a01e37d1110293ec137402fd3239bd5b7d9d + T08 未提交授权工作树（verify-stage testedSha 同值、worktreeDirty=true 属预期）",
+   "evidence_root": "artifacts/rust-tauri/R03/T08-E01/verify-stage-r03",
+   "command_results": {
+    "rust_test_workspace": {
+     "exit": 0,
+     "ms": 89029,
+     "dir": "artifacts/rust-tauri/R03/T08-E01/verify-stage-r03/rust_test_workspace"
+    },
+    "a15_combo_and_leaves": {
+     "exit": 0,
+     "ms": 9387,
+     "dir": "artifacts/rust-tauri/R03/T08-E01/verify-stage-r03/a15_combo_and_leaves"
+    }
+   },
+   "review": null,
+   "note": "verify-stage R03 场景 roll-up PASS（gate overall PASS，2026-09-29）"
+  },
+  {
+   "id": "R03-A13",
+   "task_id": "R03-T07",
+   "name": "运行中重启诚实呈现",
+   "requirement": "REQUIRED",
+   "status": "PASS",
+   "expected": "阶段书通过条件（任务书 §4 对应验收原文）",
+   "command_refs": [
+    "rust_test_workspace",
+    "a15_combo_and_leaves",
+    "r02_full_chain",
+    "r02_backup_restore"
+   ],
+   "test_object": "recovery_crash_points.rs（11 SIGKILL 崩溃点）+ recovery_startup_scan.rs + 矩阵 crash-recovery interrupted",
+   "exit_code": 0,
+   "timed_out": false,
+   "platform": "macOS 27.0 arm64（Darwin 27.0.0）",
+   "tested_sha": "dc42a01e37d1110293ec137402fd3239bd5b7d9d + T08 未提交授权工作树（verify-stage testedSha 同值、worktreeDirty=true 属预期）",
+   "evidence_root": "artifacts/rust-tauri/R03/T08-E01/verify-stage-r03",
+   "command_results": {
+    "rust_test_workspace": {
+     "exit": 0,
+     "ms": 89029,
+     "dir": "artifacts/rust-tauri/R03/T08-E01/verify-stage-r03/rust_test_workspace"
+    },
+    "a15_combo_and_leaves": {
+     "exit": 0,
+     "ms": 9387,
+     "dir": "artifacts/rust-tauri/R03/T08-E01/verify-stage-r03/a15_combo_and_leaves"
+    },
+    "r02_full_chain": {
+     "exit": 0,
+     "ms": 9917,
+     "dir": "artifacts/rust-tauri/R03/T08-E01/verify-stage-r03/r02_full_chain"
+    },
+    "r02_backup_restore": {
+     "exit": 0,
+     "ms": 11716,
+     "dir": "artifacts/rust-tauri/R03/T08-E01/verify-stage-r03/r02_backup_restore"
+    }
+   },
+   "review": null,
+   "note": "verify-stage R03 场景 roll-up PASS（gate overall PASS，2026-09-29）"
+  },
+  {
+   "id": "R03-A14",
+   "task_id": "R03-T07",
+   "name": "退出不接收新任务",
+   "requirement": "REQUIRED",
+   "status": "PASS",
+   "expected": "阶段书通过条件（任务书 §4 对应验收原文）",
+   "command_refs": [
+    "rust_test_workspace",
+    "r02_recovery_drill"
+   ],
+   "test_object": "exit_race_rejections.rs + r02_recovery_drill",
+   "exit_code": 0,
+   "timed_out": false,
+   "platform": "macOS 27.0 arm64（Darwin 27.0.0）",
+   "tested_sha": "dc42a01e37d1110293ec137402fd3239bd5b7d9d + T08 未提交授权工作树（verify-stage testedSha 同值、worktreeDirty=true 属预期）",
+   "evidence_root": "artifacts/rust-tauri/R03/T08-E01/verify-stage-r03",
+   "command_results": {
+    "rust_test_workspace": {
+     "exit": 0,
+     "ms": 89029,
+     "dir": "artifacts/rust-tauri/R03/T08-E01/verify-stage-r03/rust_test_workspace"
+    },
+    "r02_recovery_drill": {
+     "exit": 0,
+     "ms": 11245,
+     "dir": "artifacts/rust-tauri/R03/T08-E01/verify-stage-r03/r02_recovery_drill"
+    }
+   },
+   "review": null,
+   "note": "verify-stage R03 场景 roll-up PASS（gate overall PASS，2026-09-29）"
+  },
+  {
+   "id": "R03-A15",
+   "task_id": "R03-T08",
+   "name": "真实入口驱动状态",
+   "requirement": "REQUIRED",
+   "status": "PASS",
+   "expected": "阶段书通过条件（任务书 §4 对应验收原文）",
+   "command_refs": [
+    "a15_combo_and_leaves",
+    "rust_test_workspace",
+    "rust_fmt",
+    "rust_clippy",
+    "check_contracts",
+    "check_boundaries",
+    "r02_auth_matrix",
+    "r02_legacy_regression"
+   ],
+   "test_object": "r03_t08_acceptance_matrix.rs 17 测试（替身只给外部响应）",
+   "exit_code": 0,
+   "timed_out": false,
+   "platform": "macOS 27.0 arm64（Darwin 27.0.0）",
+   "tested_sha": "dc42a01e37d1110293ec137402fd3239bd5b7d9d + T08 未提交授权工作树（verify-stage testedSha 同值、worktreeDirty=true 属预期）",
+   "evidence_root": "artifacts/rust-tauri/R03/T08-E01/verify-stage-r03",
+   "command_results": {
+    "a15_combo_and_leaves": {
+     "exit": 0,
+     "ms": 9387,
+     "dir": "artifacts/rust-tauri/R03/T08-E01/verify-stage-r03/a15_combo_and_leaves"
+    },
+    "rust_test_workspace": {
+     "exit": 0,
+     "ms": 89029,
+     "dir": "artifacts/rust-tauri/R03/T08-E01/verify-stage-r03/rust_test_workspace"
+    },
+    "rust_fmt": {
+     "exit": 0,
+     "ms": 8645,
+     "dir": "artifacts/rust-tauri/R03/T08-E01/verify-stage-r03/rust_fmt"
+    },
+    "rust_clippy": {
+     "exit": 0,
+     "ms": 8916,
+     "dir": "artifacts/rust-tauri/R03/T08-E01/verify-stage-r03/rust_clippy"
+    },
+    "check_contracts": {
+     "exit": 0,
+     "ms": 9290,
+     "dir": "artifacts/rust-tauri/R03/T08-E01/verify-stage-r03/check_contracts"
+    },
+    "check_boundaries": {
+     "exit": 0,
+     "ms": 8502,
+     "dir": "artifacts/rust-tauri/R03/T08-E01/verify-stage-r03/check_boundaries"
+    },
+    "r02_auth_matrix": {
+     "exit": 0,
+     "ms": 76806,
+     "dir": "artifacts/rust-tauri/R03/T08-E01/verify-stage-r03/r02_auth_matrix"
+    },
+    "r02_legacy_regression": {
+     "exit": 0,
+     "ms": 159849,
+     "dir": "artifacts/rust-tauri/R03/T08-E01/verify-stage-r03/r02_legacy_regression"
+    }
+   },
+   "review": null,
+   "note": "组合矩阵 12 场景经真实链路；28 案例 actual==图钉；替身只产外部响应（ProviderTurn/ToolOutcome/审批决策）",
+   "evidence": [
+    "artifacts/rust-tauri/R03/T08-E01/verify-stage-r03/A15/leaf-cases.json",
+    "artifacts/rust-tauri/R03/T08-E01/verify-stage-r03/A15/combo-counts.json",
+    "artifacts/rust-tauri/R03/T08-E01/verify-stage-r03/A15/integration.log"
+   ]
+  },
+  {
+   "id": "R03-A16",
+   "task_id": "R03-T08",
+   "name": "故障种子可重放",
+   "requirement": "REQUIRED",
+   "status": "PASS",
+   "expected": "阶段书通过条件（任务书 §4 对应验收原文）",
+   "command_refs": [
+    "a16_seed_mechanism",
+    "rust_test_workspace"
+   ],
+   "test_object": "r03_t08_a16_seed_mechanism.sh P0–P4（机制证明，如实标注）",
+   "exit_code": 0,
+   "timed_out": false,
+   "platform": "macOS 27.0 arm64（Darwin 27.0.0）",
+   "tested_sha": "dc42a01e37d1110293ec137402fd3239bd5b7d9d + T08 未提交授权工作树（verify-stage testedSha 同值、worktreeDirty=true 属预期）",
+   "evidence_root": "artifacts/rust-tauri/R03/T08-E01/verify-stage-r03",
+   "command_results": {
+    "a16_seed_mechanism": {
+     "exit": 0,
+     "ms": 18446,
+     "dir": "artifacts/rust-tauri/R03/T08-E01/verify-stage-r03/a16_seed_mechanism"
+    },
+    "rust_test_workspace": {
+     "exit": 0,
+     "ms": 89029,
+     "dir": "artifacts/rust-tauri/R03/T08-E01/verify-stage-r03/rust_test_workspace"
+    }
+   },
+   "review": null,
+   "note": "机制证明（无自然异常史，如实标注）：捕获 seed=0xa16d0000000000，两次稳定复现，移除变异后同 seed+全组绿；seed 覆写+失败捕获为永久机制",
+   "evidence": [
+    "artifacts/rust-tauri/R03/T08-E01/verify-stage-r03/A16/captured-seed.txt",
+    "artifacts/rust-tauri/R03/T08-E01/verify-stage-r03/A16/seed-mechanism.json",
+    "artifacts/rust-tauri/R03/T08-E01/verify-stage-r03/A16/p3-replay-1.log",
+    "artifacts/rust-tauri/R03/T08-E01/verify-stage-r03/A16/p4-real-same-seed.log"
+   ]
+  }
+ ],
+ "supplemental_leaf_coverage": {
+  "source": "docs/rust-tauri/R00/ACCEPTANCE_MAP.json + FEATURE_STAGE_ACCEPTANCE.json：execution_stage_ids 含 R03 的 48 个 REQUIRED_SUPPLEMENTAL 叶（原件零改动）",
+  "machine_gate": "rust/crates/xtask/src/stage_maps/R03.json supplementalLeafScenarios（生成器 scripts/rust-tauri/r03_t08_generate_stage_map.py）；verify-stage 对 R00 双账本逐叶全字段全等核对后逐项 roll-up",
+  "classification": "17 stage_share_satisfied（R03 份额=运行/取消/审批/子代理/后台/重连/事件基底；assertionContract 案例由 a15_combo_and_leaves 生产者机器核验 actual==图钉）+ 31 deferred_to_later_stage（无 R03 叶专属门禁份额；仍 REQUIRED；验收归 R06/R07/R08；不绑门禁命令/证据/契约）",
+  "result": {
+   "expected": 48,
+   "pass": 17,
+   "deferred_to_later_stage": 31,
+   "deferred_to_r07": 0,
+   "fail": 0,
+   "blocked": 0
+  },
+  "r07_nine_leaves": "R02 图 9 项 deferred_to_r07 保持 REQUIRED 递延原样（SUP-04：R03 未改写 R02.json）"
+ },
+ "additional_gates": [
+  {
+   "id": "fmt",
+   "command": "cargo fmt --manifest-path rust/Cargo.toml --all -- --check",
+   "exit_code": 0,
+   "evidence": "gate rust_fmt 命令 + 独立实跑"
+  },
+  {
+   "id": "clippy",
+   "command": "cargo clippy --manifest-path rust/Cargo.toml --workspace --all-targets --locked -- -D warnings",
+   "exit_code": 0,
+   "evidence": "gate rust_clippy 命令"
+  },
+  {
+   "id": "cargo-test-workspace",
+   "command": "cargo test --manifest-path rust/Cargo.toml --workspace --locked",
+   "exit_code": 0,
+   "evidence": "gate rust_test_workspace（63 test target 全 ok，含矩阵 17 测试与 xtask 95 测试）"
+  },
+  {
+   "id": "xtask-check-contracts",
+   "command": "cargo run -p xtask -- check-contracts",
+   "exit_code": 0,
+   "evidence": "API_COMPAT_MATRIX 626 entries 零漂移"
+  },
+  {
+   "id": "xtask-check-boundaries",
+   "command": "cargo run -p xtask -- check-boundaries",
+   "exit_code": 0,
+   "evidence": "O1–O8+D1–D5"
+  },
+  {
+   "id": "negative-probes",
+   "command": "verify-stage R99（unknown stage）→ exit 2；verify-stage R03 --evidence 非空目录 → exit 1；单测层 95/95（空场景集/未知 kind/递延绑门禁/镜像漂移等）",
+   "exit_code": "按探针分别为 2 与 1（预期硬失败）",
+   "evidence": "artifacts/rust-tauri/R03/T08-E01/negative-probes/"
+  },
+  {
+   "id": "r02-storage-tx-fixed-s4",
+   "command": "bash scripts/rust-tauri/r02_t04_storage_tx.sh（S4 按注册表指纹集判定）",
+   "exit_code": 0,
+   "evidence": "独立探针 /tmp/r03-t08-r02t04-probe + gate r02_storage_tx 命令"
+  },
+  {
+   "id": "verify-stage-r02-full",
+   "command": "cargo run -p xtask -- verify-stage R02 --evidence artifacts/rust-tauri/R03/T08-E01/verify-stage-r02-regression",
+   "exit_code": 1,
+   "overall": "FAIL（17/20 命令绿；34 叶=25 pass+9 deferred+0 fail+0 blocked；candidate stable）",
+   "reds": [
+    "a16_legacy_regression：E5 全量 npm+封印族分类对未提交候选树闭失败——审计封印/完整 npm 状态归总控另记（派单明示）",
+    "a07_live_fault_02_check：restart.keyEvents mismatch——R02 期精确计数未计入 R03-T07 恢复扫描对 active run 的诚实 finalize（FINDING-2；live_fault_01_test 绿，R03-A07 语义无回退）",
+    "a14_slow_subscriber：1000 并发同会话风暴 1 个 409 session_busy——R02 期「全部 200」断言先于 R03-T02 冻结 busy 闸（FINDING-3；无 stall/无假成功断言不受影响）"
+   ],
+   "note": "派单 R02 回归义务由 7 条定向命令（R03 gate 内全绿）满足；全量 R02 gate 为额外取证，红点逐条归因登记，不改写断言不伪造绿"
+  }
+ ],
+ "task_reviews": [
+  {
+   "task_id": "R03-T01",
+   "report": "docs/rust-tauri/R03/R03-T01_REPORT.md",
+   "review": "docs/rust-tauri/R03/R03-T01_REVIEW_R1.md",
+   "verdict": "PASS(R1)"
+  },
+  {
+   "task_id": "R03-T02",
+   "report": "docs/rust-tauri/R03/R03-T02_REPORT.md",
+   "review": "docs/rust-tauri/R03/R03-T02_REVIEW_R1.md",
+   "verdict": "PASS(R1)"
+  },
+  {
+   "task_id": "R03-T03",
+   "report": "docs/rust-tauri/R03/R03-T03_REPORT.md",
+   "review": "docs/rust-tauri/R03/R03-T03_REVIEW_R1.md",
+   "verdict": "PASS(R1)"
+  },
+  {
+   "task_id": "R03-T04",
+   "report": "docs/rust-tauri/R03/R03-T04_REPORT.md",
+   "review": "docs/rust-tauri/R03/R03-T04_REVIEW_R1.md",
+   "verdict": "PASS(R1)"
+  },
+  {
+   "task_id": "R03-T05",
+   "report": "docs/rust-tauri/R03/R03-T05_REPORT.md",
+   "review": "docs/rust-tauri/R03/R03-T05_REVIEW_R1.md",
+   "verdict": "PASS(R1)"
+  },
+  {
+   "task_id": "R03-T06",
+   "report": "docs/rust-tauri/R03/R03-T06_REPORT.md",
+   "review": "docs/rust-tauri/R03/R03-T06_REVIEW_R1.md",
+   "verdict": "PASS(R1)"
+  },
+  {
+   "task_id": "R03-T07",
+   "report": "docs/rust-tauri/R03/R03-T07_REPORT.md",
+   "review": "docs/rust-tauri/R03/R03-T07_REVIEW_R1.md",
+   "verdict": "PASS(R1)"
+  },
+  {
+   "task_id": "R03-T08",
+   "report": "docs/rust-tauri/R03/R03-T08_REPORT.md",
+   "review": null,
+   "verdict": "READY_FOR_REVIEW（待总控另派独立复核）"
+  }
+ ],
+ "repair_rounds": [
+  {
+   "id": "T03-R1-D1",
+   "fixed_in": "R03-T06（强制携带修复，REVIEW_R1 确认）"
+  },
+  {
+   "id": "T04-R1-F1 + T05/T06 V2–V4 登记",
+   "fixed_in": "R03-T08（本 Task：注册表登记+S4 按注册表判定+全程重跑；指纹独立重算与 T04/T05/T06 报告前缀一致）"
+  },
+  {
+   "id": "gate-attempt-1",
+   "fixed_in": "R03-T08（a16 命令参数改 {EVIDENCE}/A16；legacy 回归按派单拆分 directed 模式——E0–E4.5 入门禁、E5 全量归总控；attempt-1 原字节保留）"
+  }
+ ],
+ "deferred_to_later": [
+  "R03 图 31 项 deferred_to_later_stage 叶（仍 REQUIRED；验收归 R06/R07/R08——R03_HANDOFF.deferred_registrations）",
+  "R02 图 9 项 deferred_to_r07 叶（R07 消费，R03 未触碰）",
+  "R03-T06-O1 ask 档审批策略面 → R04",
+  "完整 npm/审计封印/阶段 seal/commit-push → 总控",
+  "Windows/打包 → R09/R10（继承 R02）"
+ ],
+ "known_findings": [
+  "R03-T08-FINDING-1（MINOR）：父取消路径 subagent child run durable 行不就地收口（spawn_linked 包装器先丢 drive future），由下一进程启动扫描诚实收口 interrupted_needs_attention；矩阵实测+重启闭环已证；T06 报告对应表述在父取消路径不成立；修复归 R04/R06 或总控另派",
+  "R03-T08-FINDING-2（MINOR，R02 资产过期）：a07_live_fault 检查器重启 keyEvents 计数未计入恢复扫描 finalize；R03-A07 语义无回退；资产更新归独立审阅授权",
+  "R03-T08-FINDING-3（MINOR，R02 资产过期）：a14 风暴 200-only 断言与 R03-T02 冻结 busy 闸（409 session_busy retryable）冲突；无 stall/假成功断言不受影响；同上归属"
+ ]
+}

@@ -44,6 +44,59 @@ const SEED: u64 = 0x5EED_0000_A07D_F00D;
 /// Rounds (each against a fresh real database).
 const ROUNDS: u32 = 60;
 
+// ── R03-T08 / A16: replayable-failure machinery (long-term regression) ──────
+//
+// The seed is the test's identity, but a FAILURE must be reproducible:
+// - `R03_T04_PROPERTY_SEED` (hex `0x…` or decimal) overrides the seed so a
+//   captured failing schedule can be replayed verbatim;
+// - every panic in this test is observed by a thread-local-aware panic
+//   hook that prints a machine-greppable `R03_T04_PROPERTY_FAILURE
+//   seed=0x…` line (stdout AND stderr) and, when
+//   `R03_T04_PROPERTY_SEED_FILE` is set, records the seed to that file —
+//   a failing schedule can never be lost to a truncated panic message.
+// No natural anomaly has ever been observed under the default seed; the
+// mechanism is proven by an isolated mutation probe (T08 evidence).
+
+thread_local! {
+    static PROPERTY_SEED: std::cell::Cell<u64> = const { std::cell::Cell::new(0) };
+}
+
+fn effective_seed() -> u64 {
+    let seed = match std::env::var("R03_T04_PROPERTY_SEED") {
+        Ok(raw) => {
+            let trimmed = raw.trim();
+            let parsed = if let Some(hex) = trimmed.strip_prefix("0x") {
+                u64::from_str_radix(hex, 16)
+            } else {
+                trimmed.parse::<u64>()
+            };
+            parsed.unwrap_or_else(|err| panic!("invalid R03_T04_PROPERTY_SEED {raw:?}: {err}"))
+        }
+        Err(_) => SEED,
+    };
+    PROPERTY_SEED.with(|cell| cell.set(seed));
+    install_seed_capture_hook();
+    seed
+}
+
+fn install_seed_capture_hook() {
+    let previous = std::panic::take_hook();
+    std::panic::set_hook(Box::new(move |info| {
+        let seed = PROPERTY_SEED.with(std::cell::Cell::get);
+        let location = info
+            .location()
+            .map(|l| format!("{}:{}", l.file(), l.line()))
+            .unwrap_or_else(|| "<unknown>".to_string());
+        let line = format!("R03_T04_PROPERTY_FAILURE seed={seed:#x} location={location}");
+        println!("{line}");
+        eprintln!("{line}");
+        if let Ok(out) = std::env::var("R03_T04_PROPERTY_SEED_FILE") {
+            let _ = std::fs::write(&out, format!("{seed:#x}\n"));
+        }
+        previous(info);
+    }));
+}
+
 fn xorshift64(state: &mut u64) -> u64 {
     let mut x = *state;
     x ^= x << 13;
@@ -576,7 +629,8 @@ async fn round(db: &RunDatabase, round_index: u32, rng: &mut u64) -> RoundCounte
 
 #[tokio::test(flavor = "current_thread")]
 async fn duplicate_out_of_order_and_delayed_results_fence_exactly_once() {
-    let mut rng = SEED;
+    let seed = effective_seed();
+    let mut rng = seed;
     let mut totals = RoundCounters::default();
     for round_index in 0..ROUNDS {
         let path = temp_db(&format!("r{round_index}"));
@@ -631,7 +685,7 @@ async fn duplicate_out_of_order_and_delayed_results_fence_exactly_once() {
         totals.illegal_rejected >= ROUNDS * 2,
         "every illegal state request was rejected"
     );
-    println!("R03_T04_PROPERTY totals: {totals:?} (seed={SEED:#x}, rounds={ROUNDS})");
+    println!("R03_T04_PROPERTY totals: {totals:?} (seed={seed:#x}, rounds={ROUNDS})");
 
     // Machine-readable evidence (the established env-var pattern).
     if let Ok(path) = std::env::var("R03_T04_EVIDENCE") {
@@ -647,7 +701,7 @@ async fn duplicate_out_of_order_and_delayed_results_fence_exactly_once() {
             map.insert(
                 "r03_t04_fencing_property".to_string(),
                 serde_json::json!({
-                    "seed": format!("{SEED:#x}"),
+                    "seed": format!("{seed:#x}"),
                     "rounds": ROUNDS,
                     "current_attempt_ok": totals.current_ok,
                     "superseded_attempt_refused": totals.stale_refused,

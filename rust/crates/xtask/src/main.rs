@@ -55,7 +55,10 @@ pub use stage_map::RESULT_VERSION;
 
 /// Embedded per-stage implementation-acceptance maps. A later stage (R03+)
 /// adds its own file here in the same PR that registers its scenarios.
-pub const STAGE_MAPS: &[(&str, &str)] = &[("R02", include_str!("stage_maps/R02.json"))];
+pub const STAGE_MAPS: &[(&str, &str)] = &[
+    ("R02", include_str!("stage_maps/R02.json")),
+    ("R03", include_str!("stage_maps/R03.json")),
+];
 
 const USAGE: &str = r#"xtask — Lingxi Rust verification orchestrator (R02-T08)
 

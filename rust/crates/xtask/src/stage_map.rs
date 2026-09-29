@@ -74,6 +74,18 @@ pub const BASIS_R02_SHARE_SATISFIED: &str = "r02_share_satisfied";
 /// NOT_APPLICABLE/optional，最终产品要求不变）。仅 r00_execution_stage_ids
 /// 含后续阶段的叶允许声明；不得带门禁 assertionContract/门禁 commandRefs。
 pub const BASIS_DEFERRED_TO_R07: &str = "deferred_to_r07";
+/// R03-T08 阶段中立份额类（语义与 r02_share_satisfied 同构）：本阶段钉住
+/// 的案例即本阶段份额全部内容（`stageShare` 写明份额边界），份额图钉全
+/// 过即本阶段份额 PASS；余款仍 REQUIRED，随结果以 `laterShare` 文本 +
+/// `deferredToStages`（由 r00_execution_stage_ids 去本阶段派生）输出，不
+/// 作为本阶段门禁。必须带 assertionContract（R14-F01 反假绿规则同构）。
+pub const BASIS_STAGE_SHARE_SATISFIED: &str = "stage_share_satisfied";
+/// 阶段中立递延类（语义与 deferred_to_r07 同构，递延目标不限于 R07）：
+/// 无本阶段门禁份额，仍 REQUIRED，验收归属 r00_execution_stage_ids 中的
+/// 后续阶段（R06/R07/R08…）。仅含后续阶段的叶允许声明；不得带门禁
+/// assertionContract/门禁 commandRefs/可过 evidencePaths；可带非门禁
+/// earlyEvidenceCommandRefs（提前实现代码的健康照跑）。
+pub const BASIS_DEFERRED_TO_LATER_STAGE: &str = "deferred_to_later_stage";
 pub const SUPPLEMENTAL_BASIS_KINDS: &[&str] = &[
     BASIS_ROUTE_PRESENT_STATIC,
     BASIS_PROTOCOL,
@@ -82,7 +94,18 @@ pub const SUPPLEMENTAL_BASIS_KINDS: &[&str] = &[
     BASIS_FULL_ORIGINAL_BEHAVIOR,
     BASIS_R02_SHARE_SATISFIED,
     BASIS_DEFERRED_TO_R07,
+    BASIS_STAGE_SHARE_SATISFIED,
+    BASIS_DEFERRED_TO_LATER_STAGE,
 ];
+
+/// The stage-neutral share kinds (R03+): their share text lives in the
+/// `stageShare`/`laterShare` fields instead of the R02-named
+/// `r02Share`/`r07Share` pair. Both pairs are carried in the struct so
+/// the legacy R02 map and the stage-neutral maps share one parser; each
+/// branch only ever reads its own pair.
+pub fn is_stage_neutral_kind(basis_kind: &str) -> bool {
+    basis_kind == BASIS_STAGE_SHARE_SATISFIED || basis_kind == BASIS_DEFERRED_TO_LATER_STAGE
+}
 
 /// One machine-checked case expectation of a leaf's `assertionContract`
 /// (R14-F01). `expect` is the ORIGINAL R00 assertion value the gate must
@@ -152,6 +175,10 @@ pub struct SupplementalLeaf {
     pub basis_kind: String,
     pub r02_share: String,
     pub r07_share: String,
+    /// Stage-neutral share texts (stage_share_satisfied /
+    /// deferred_to_later_stage). Empty for the R02-named kinds.
+    pub stage_share: String,
+    pub later_share: String,
     pub evidence_required: String,
     pub evidence_command_refs: Vec<String>,
     pub evidence_paths: Vec<String>,
@@ -475,18 +502,39 @@ pub fn parse_stage_map(text: &str) -> Result<StageMap, String> {
                          (known kinds: {SUPPLEMENTAL_BASIS_KINDS:?})"
                     )));
                 }
-                let r02_share = non_empty_string(
-                    entry.get("r02Share").ok_or_else(|| {
-                        err(&format!("supplemental leaf {id:?} missing r02Share"))
-                    })?,
-                    &format!("supplemental leaf {id:?} r02Share"),
-                )?;
-                let r07_share = non_empty_string(
-                    entry.get("r07Share").ok_or_else(|| {
-                        err(&format!("supplemental leaf {id:?} missing r07Share"))
-                    })?,
-                    &format!("supplemental leaf {id:?} r07Share"),
-                )?;
+                let (r02_share, r07_share, stage_share, later_share) =
+                    if is_stage_neutral_kind(&basis_kind) {
+                        let stage_share = non_empty_string(
+                            entry.get("stageShare").ok_or_else(|| {
+                                err(&format!(
+                                "supplemental leaf {id:?} missing stageShare (the stage-neutral \
+                                 share kinds declare their share here, not r02Share)"
+                            ))
+                            })?,
+                            &format!("supplemental leaf {id:?} stageShare"),
+                        )?;
+                        let later_share = non_empty_string(
+                            entry.get("laterShare").ok_or_else(|| {
+                                err(&format!("supplemental leaf {id:?} missing laterShare"))
+                            })?,
+                            &format!("supplemental leaf {id:?} laterShare"),
+                        )?;
+                        (String::new(), String::new(), stage_share, later_share)
+                    } else {
+                        let r02_share = non_empty_string(
+                            entry.get("r02Share").ok_or_else(|| {
+                                err(&format!("supplemental leaf {id:?} missing r02Share"))
+                            })?,
+                            &format!("supplemental leaf {id:?} r02Share"),
+                        )?;
+                        let r07_share = non_empty_string(
+                            entry.get("r07Share").ok_or_else(|| {
+                                err(&format!("supplemental leaf {id:?} missing r07Share"))
+                            })?,
+                            &format!("supplemental leaf {id:?} r07Share"),
+                        )?;
+                        (r02_share, r07_share, String::new(), String::new())
+                    };
                 let evidence_required = non_empty_string(
                     entry.get("evidenceRequired").ok_or_else(|| {
                         err(&format!(
@@ -526,9 +574,11 @@ pub fn parse_stage_map(text: &str) -> Result<StageMap, String> {
                              conflict the gate is required to hold BLOCKED)"
                         )));
                     }
-                } else if basis_kind == BASIS_DEFERRED_TO_R07 {
-                    // 递延叶的 R07 义务不由本门禁判定：绑定门禁证据命令
-                    // 等于把 R07 验收又拉回 R02，与递延声明自相矛盾。
+                } else if basis_kind == BASIS_DEFERRED_TO_R07
+                    || basis_kind == BASIS_DEFERRED_TO_LATER_STAGE
+                {
+                    // 递延叶的后续阶段义务不由本门禁判定：绑定门禁证据命令
+                    // 等于把后续阶段验收又拉回本阶段，与递延声明自相矛盾。
                     if !evidence_command_refs.is_empty() {
                         return Err(err(&format!(
                             "supplemental leaf {id:?} is deferred to R07 and must not bind \
@@ -548,7 +598,9 @@ pub fn parse_stage_map(text: &str) -> Result<StageMap, String> {
                 // 命令（这些命令照常运行、照常计入 freshness/清理检查）。
                 let early_evidence_command_refs = match entry.get("earlyEvidenceCommandRefs") {
                     Some(v) => {
-                        if basis_kind != BASIS_DEFERRED_TO_R07 {
+                        if basis_kind != BASIS_DEFERRED_TO_R07
+                            && basis_kind != BASIS_DEFERRED_TO_LATER_STAGE
+                        {
                             return Err(err(&format!(
                                 "supplemental leaf {id:?} declares earlyEvidenceCommandRefs \
                                  without deferred_to_r07 (only a deferred leaf may keep \
@@ -609,6 +661,14 @@ pub fn parse_stage_map(text: &str) -> Result<StageMap, String> {
                                  evidencePaths carry the freshness checks)"
                             )));
                         }
+                        if basis_kind == BASIS_DEFERRED_TO_LATER_STAGE && !paths.is_empty() {
+                            return Err(err(&format!(
+                                "supplemental leaf {id:?} is deferred to a later stage and \
+                                 must not declare pass-able evidencePaths (its acceptance is \
+                                 not judged by this gate; the early-evidence producers' own \
+                                 declared evidencePaths carry the freshness checks)"
+                            )));
+                        }
                         paths
                     }
                     None => Vec::new(),
@@ -643,7 +703,8 @@ pub fn parse_stage_map(text: &str) -> Result<StageMap, String> {
                 // 递延只对真实双阶段（含后续阶段）的叶合法：一个只归属
                 // 本阶段的叶没有可递延的验收归属，标 deferred 只会是
                 // 把本阶段义务静默扫地出门。
-                if basis_kind == BASIS_DEFERRED_TO_R07
+                if (basis_kind == BASIS_DEFERRED_TO_R07
+                    || basis_kind == BASIS_DEFERRED_TO_LATER_STAGE)
                     && !r00_execution_stage_ids.iter().any(|s| s.as_str() != stage)
                 {
                     return Err(err(&format!(
@@ -706,7 +767,8 @@ pub fn parse_stage_map(text: &str) -> Result<StageMap, String> {
                 // acceptance is not judged by this gate — the deferred cases
                 // below are observations, never gates).
                 let uncontracted_kind = basis_kind == BASIS_CLIENT_ONLY_STAGE_CONFLICT
-                    || basis_kind == BASIS_DEFERRED_TO_R07;
+                    || basis_kind == BASIS_DEFERRED_TO_R07
+                    || basis_kind == BASIS_DEFERRED_TO_LATER_STAGE;
                 let assertion_contract = match entry.get("assertionContract") {
                     Some(v) => {
                         if uncontracted_kind {
@@ -922,6 +984,8 @@ pub fn parse_stage_map(text: &str) -> Result<StageMap, String> {
                     Some(v) => {
                         if basis_kind != BASIS_R02_SHARE_SATISFIED
                             && basis_kind != BASIS_DEFERRED_TO_R07
+                            && basis_kind != BASIS_STAGE_SHARE_SATISFIED
+                            && basis_kind != BASIS_DEFERRED_TO_LATER_STAGE
                         {
                             return Err(err(&format!(
                                 "supplemental leaf {id:?} declares deferredR07Cases with \
@@ -1038,6 +1102,8 @@ pub fn parse_stage_map(text: &str) -> Result<StageMap, String> {
                     basis_kind,
                     r02_share,
                     r07_share,
+                    stage_share,
+                    later_share,
                     evidence_required,
                     evidence_command_refs,
                     evidence_paths,

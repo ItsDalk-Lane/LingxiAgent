@@ -1,0 +1,147 @@
+{
+ "spec_version": "1.0",
+ "stage_id": "R03",
+ "status": "READY_FOR_REVIEW (executor口径；独立复核归总控另派)",
+ "generated_by": "ZCode:EXECUTOR-R03-T08-E01（2026-09-29；一次性执行代理，无 commit/push 授权；最终 PASS/ACCEPTED 归总控另派的独立验收）",
+ "tested_sha": "dc42a01e37d1110293ec137402fd3239bd5b7d9d",
+ "tested_sha_note": "候选 = TASK_BASE_SHA dc42a01e3 + 本 Task 授权工作树（T01–T07 已提交 + T08 未提交修改；verify-stage testedSha 报 HEAD dc42a01e3、worktreeDirty=true 属预期，验收后由总控提交）。",
+ "branch": "codex/rust-tauri-migration",
+ "source_of_truth": {
+  "stage_map": "rust/crates/xtask/src/stage_maps/R03.json（生成器 scripts/rust-tauri/r03_t08_generate_stage_map.py：48 叶镜像逐字段来自 R00 双账本）",
+  "acceptance_ledger": "docs/rust-tauri/R03/R03_ACCEPTANCE_LEDGER.json",
+  "stage_report": "docs/rust-tauri/R03/R03_REPORT.md",
+  "task_report": "docs/rust-tauri/R03/R03-T08_REPORT.md",
+  "evidence_root": "artifacts/rust-tauri/R03/T08-E01/"
+ },
+ "protocol_version": {
+  "lingxi.wire": {
+   "min_supported": 1,
+   "max_supported": 1,
+   "status": "R03 零改动（xtask check-contracts exit 0；API_COMPAT_MATRIX 626 entries 零漂移）"
+  },
+  "data_epoch": {
+   "value": 1,
+   "status": "R03 零改动（fail-closed 闸语义未触碰）"
+  },
+  "events_wire": {
+   "status": "envelope 零改动；R03 新事件类型（model_call_started/completed、tool_call_started/completed、run_state_changed 扩展 reason 词表）复用既有 envelope；seq 仍由单写者产生"
+  },
+  "error_surface": {
+   "status": "EndpointError/ProtocolError 结构零改动；R03 新稳定码经 details/错误链（session_busy、shutting_down、late_result_fenced.*、run_id_exhausted 家族维持 R02/T04 修复后形态）"
+  },
+  "storage_schema": {
+   "current_version": 4,
+   "registry": "docs/rust-tauri/R02/R02-T04_STORAGE_REGISTRY.json（V1=479b0321… 原值不动；V2 stale_result_audit=64d7edfd…、V3 invocation_journal=3bd5388f…、V4 run_lineage=371d4154… 已由 T08 独立重算登记——T04 R1-F1/T05/T06 递延项收口）",
+   "s4_script": "scripts/rust-tauri/r02_t04_storage_tx.sh S4 改为按注册表指纹集判定（不再硬编码 version==1），全程重跑绿"
+  }
+ },
+ "dependency_locks": {
+  "rust/Cargo.lock": "90111c4b5988531d7a891339b6ee5df8afc9d3ec655e4929747da07d5811bb49（R03 全阶段零变化，= R02_HANDOFF 原值）",
+  "package-lock.json": "e54a16fe14f15b4797069106392040924a5dd616c69a73bd025729090505ac8b（零变化）",
+  "rust-toolchain.toml": "eec3410410647a7d39f25371e73dda3ecfd5e7c10359090fff11e83053e11c37（1.98.1；零变化）",
+  "note": "R03-T08 零新依赖（组合矩阵/A16 探针/xtask 扩展全部复用锁内版本；tokio test-util 未引入）"
+ },
+ "interfaces": [
+  {
+   "name": "ToolExecutorPort（R04 交接主面）",
+   "authority": "rust/crates/lingxi-kernel/src/ports.rs",
+   "signature": "pub trait ToolExecutorPort: Send + Sync { fn execute<'a>(&'a self, ctx: &'a RunContext, call: &'a ToolCallId, request: &'a ToolRequest) -> Pin<Box<dyn Future<Output = ToolExecutionResult> + Send + 'a>>; }",
+   "call_context": "RunContext{principal, session_id, run_id, attempt: AttemptId, generation}——工具执行绑定的身份三元组；request=ToolRequest{target: String（注册表 target id）, args_digest: ArgsDigest, args_summary, delegation: Option<DelegationRequest>（subagent 族工具的结构化委派载荷，其余 None）}",
+   "result_and_errors": "ToolExecutionResult{fence: ResultFence（写前核对身份栅栏——R04 网关必须回显请求 ctx 身份）, outcome: ToolOutcome}；ToolOutcome=Success{content_digest}|Failed{error: ProtocolError}|Cancelled|Unknown{reason}——Unknown 为强制档：外部已执行但本地无回执的副作用绝不盲重试也绝不报成功（R03-T05 恢复决策的输入）",
+   "wiring": "ServiceDeps.tool_executor: Option<Arc<dyn ToolExecutorPort>>（lingxi-service/src/lib.rs；生产默认 None=无工具配置时工具请求响亮失败，不静默）；R04 的统一 ToolInvocationGateway 在该 port 形状后替换 T01 测试替身",
+   "authorization_boundary": "运行层授权判定点=驱动在 T05 journal authorized 步应用：RunGrant::Full（用户 run）直授每个 target；RunGrant::Subagent{tier} 逐 target 先经 kernel authorize_child_tool（白名单/禁用面/衰减）——Denied 则不 advance Authorized、不 started、零派发，journal 收据 Failed+dispatched=false。R04 网关必须经同一判定点，不得在网关内另立授权面",
+   "r04_obligation_t06_o1": "ask 档继承坍缩残余差距（T06 REVIEW O-1，R04 绑定）：父会话 ask 档下省略 access 的子代理当前坍缩为 Operate 档放行写类 target；现役栈语义=执行层 approvalPolicy deny_on_prompt（subagent 固定 allowHumanApproval:false）转 TOOL_APPROVAL_UNAVAILABLE 结构化拒。R04 工具策略网关接线 approvalPolicy 面时必须补齐该审批策略面（T03 ApprovalGate 生产默认 None）",
+   "journal_contract": "R04 网关执行工具时沿用 T05 写序：record_invocation_intent(prepared)→authorized→advance_invocation(started)（外部派发前最后一笔）→执行→record_invocation_receipt；意图写失败=响亮失败绝不无收据外发；回执写失败=unknown（恢复面核验/重试/人工确认由 ToolRecoveryCapability 决定，ConservativeCapabilities 为默认）"
+  },
+  {
+   "name": "TurnProviderPort（R05 交接主面）",
+   "authority": "rust/crates/lingxi-kernel/src/ports.rs",
+   "signature": "pub trait TurnProviderPort: Send + Sync { fn descriptor(&self) -> ProviderDescriptor; fn next_turn<'a>(&'a self, ctx: &'a RunContext, call: &'a ModelCallId, turn: u32, input: &'a str) -> Pin<Box<dyn Future<Output = ProviderTurnResult> + Send + 'a>>; }",
+   "turn_contract": "ProviderTurn=Final{message: NormalizedMessage}（空内容不是 Final）|ToolRequests{requests: Vec<ToolRequest>}（模型调用结束≠任务结束）|Continue{process_note}|Empty{detail}|Failed{error: ProtocolError, retryable: bool}（retryable=同 run 新 attempt 合法；provider 重连绝不另建用户任务，run id 固定）",
+   "fence_contract": "ProviderTurnResult{fence: ResultFence{run_id, attempt, generation}, turn}——适配器必须回显请求时的 ctx 身份；驱动在消费/persist 前核对 fence.matches_ctx（R03-T04 写前栅栏）",
+   "wiring": "ServiceDeps.turn_provider: Option<Arc<dyn TurnProviderPort>>（生产默认 None=completed.no_final.no_provider_configured 显式无内容完成，绝不编造回复——R05 注册真实适配器后同一 port）；上下文组装归 R06（port 保持最小 input 面）",
+   "budgets": "RunDriveLimits{max_model_turns（默认 32/硬上限 256）, max_attempts（默认 2/硬上限 8）}→超限 failed.turn_budget_exceeded 响亮失败；配额 QuotaManager model 全局/agent/session 三层（R03-T02）"
+  },
+  {
+   "name": "任务提交/监督入口（R07 交接主面：execute_background_for / cancel / 事件订阅）",
+   "authority": "rust/crates/lingxi-service/src/sessions.rs / runs.rs / events.rs / background.rs / subagents.rs",
+   "submission": [
+    "前台：SessionStore::execute_submission_for(port, events, supervisor, principal, session_id, &ExecuteSubmission{input, request_id: Option<&str>}, now_ms) -> Result<ExecuteAccepted{run_id, run_count, replayed}, SessionExecuteError>（HTTP POST /lingxi/v1/sessions/{id}/execute 已接线）",
+    "后台：SessionStore::execute_background_for(&Arc<RunDatabase>, &Arc<EventService>, &Arc<RunSupervisor>, &Arc<BackgroundDriveRegistry>, principal, session_id, &ExecuteSubmission, now_ms) -> Result<ExecuteAccepted, SessionExecuteError>——同一 admission 链（所有权→busy 闸→requestId 去重），detached 监督驱动与调用方连接寿命解耦；断线≠取消（A12），同 requestId 重连幂等 replay 零重执行；registry 满为 BackgroundRegistryFull 响亮拒绝",
+    "错误/取消语义：SessionExecuteError=NotFound|Forbidden|Busy(409 session_busy, retryable)|SessionRegistryFull|SteeringInboxFull|DuplicateRequestConflict{request_id, recorded_digest, submitted_digest}|ShuttingDown(503, retryable)|IdempotencyRegistryFull|InvalidRequestId|BackgroundRegistryFull|Storage(StorageError)"
+   ],
+   "cancellation": [
+    "SessionStore::cancel_run_for(port, supervisor, principal, run_id) -> Result<CancelRunOutcome, SessionExecuteError>；CancelRunOutcome=Accepted{run_id, phase: CancelPhase}（四相取消：Requested→Cleaning→ConfirmedTerminated|StopUnconfirmed——未清理项如实报告）|AlreadyTerminal{run_id, status}（已终态=诊断式 no-op，不误报）|DanglingActive{run_id, status, detail}（durable 行活跃但本进程无 live driver——归 T07 启动扫描分类）",
+    "监督原语：RunSupervisor::cancel_run(run_id, reason)（CancelRegistry fire；first-wins）、cancel_phase(run_id)；TaskSupervisor::spawn_linked/spawn_detached/drain_run（父取消向下传播、无关后台不连带——A06）",
+    "诚实边界（T08 组合矩阵实测发现，见报告）：经取消树停止的 subagent child run，其 durable 行保持 active（spawn_linked 包装器在树取消时丢弃 drive future），由下一进程启动扫描诚实收口为 interrupted_needs_attention——与 T07 关停残留行同一闭环路径；child 自身超时路径（timeout_at+drive.await）则走自身四相取消正常落 cancelled"
+   ],
+   "events_subscription": [
+    "EventService::subscribe(principal, stream_id=session_id, cursor: Option<Cursor>) -> SubscribeOutcome=Started{cut: EventCut{from_seq, snapshot_seq, events（resume 时直接携带补发事件）}, subscription: SubscriptionGuard}|RequiresSnapshot；SubscribeCursor{stream_id, seq}.encode() 构造游标；重连只订阅不重启模型（R03-T04 永久测试锁定）",
+    "事件面复用 R02 envelope（eventId/sessionId/runId/attempt/streamId/seq/eventType/schemaVersion）；运行事件类型：run_state_changed（含 reason 稳定词表）、model_call_started/completed、tool_call_started/completed"
+   ],
+   "lineage_and_origins": "每个 run 持久化 RunLineage{parent_run_id, origin: RunOrigin=user|subagent|cron|heartbeat|bridge, source_message_id, cause_id}（V4 表；查询 SessionStore::run_lineage_for）——R07 cron/heartbeat/Bridge 接入必须复用该 origin 词表与 execute_background_for 后台登记面，不另建第二调度器",
+   "steering": "SessionStore::steer_for(principal, session_id, text) -> SteerOutcome=Accepted（busy：入有界收件箱，下一模型轮 drain）|Miss（idle：调用方降级普通提交）；WS steer 传输面归 R06/R07（服务层 API 已冻结语义）"
+  },
+  {
+   "name": "xtask 阶段图机制（后续阶段交接）",
+   "authority": "rust/crates/xtask（stage_map.rs/verify.rs/stage_maps/R03.json）",
+   "status": "verify-stage R03 已注册且退出 0（本 Task）；新增阶段中立 basisKind：stage_share_satisfied（份额叶必带 assertionContract，案例由注册生产者机器核验 actual==图钉）与 deferred_to_later_stage（无本阶段门禁份额，仍 REQUIRED，验收归 r00ExecutionStageIds 后续阶段；不得绑门禁命令/证据/契约）——与 R02 的 r02_share_satisfied/deferred_to_r07 同构，R02 图零改动",
+   "consumers": "R04+ 每阶段新建 stage_maps/R0x.json 并注册 STAGE_MAPS+runner_identity（含 stale binary 检测）；R07 阶段图必须消费 R02 图 9 项 DEFERRED_TO_R07 叶的 R07 份额与 R03 图 31 项 DEFERRED_TO_LATER_STAGE 叶的 R06/R07/R08 份额"
+  }
+ ],
+ "deferred_registrations": [
+  {
+   "id": "R03-DEFERRED-TO-R07-NINE-LEAVES",
+   "owner": "R07",
+   "summary": "R02 图 9 项 deferred_to_r07 完整叶（LA-B8A1AD32A8E1/32FFEC05BAA7/8BC1A036AFAA/3291CFD5F7E2/2A1C298F62FC/8ED658F9DB9E/F8935B6B0221/39AD35E1FD71/000E6E1301C0）保持 REQUIRED 递延，R03 未删除/未改写 R02.json（SUP-04）"
+  },
+  {
+   "id": "R03-DEFERRED-TO-LATER-31-LEAVES",
+   "owner": "R06/R07/R08（按 r00ExecutionStageIds）",
+   "summary": "R03 图 31 项 deferred_to_later_stage 叶（UI 投影/草稿/偏好/cron 路由/实验 API/压缩/任务清单等）：仍 REQUIRED；R03 运行基底由基础场景 A01–A16 与组合矩阵承担；验收归后续阶段消费"
+  },
+  {
+   "id": "R03-T06-O1-ASK-TIER",
+   "owner": "R04",
+   "summary": "ask 档继承的审批策略面（approvalPolicy deny_on_prompt→TOOL_APPROVAL_UNAVAILABLE）随 R04 工具策略网关登记补齐（见 interfaces[0].r04_obligation_t06_o1）"
+  },
+  {
+   "id": "R03-WINDOWS-R09-R10",
+   "owner": "R09/R10",
+   "summary": "继承 R02：Windows 真机验证与正式签名/安装包"
+  }
+ ],
+ "known_gaps": [
+  {
+   "id": "R03-T08-FINDING-1",
+   "severity": "MINOR（如实登记，不阻塞 A06/A15 判定）",
+   "summary": "父取消路径的 subagent child run durable 行不就地收口：spawn_linked 包装器的 biased select 在树取消时先于 child drive 的自身取消结算丢弃 drive future，行保持 active，由下一进程启动扫描收口为 interrupted_needs_attention（组合矩阵实测+恢复闭环已证）；线程登记 busy 标志同样只在 drive 完成尾清除。T06 报告「child 由自身 drive 观测并经唯一 finalize 落 cancelled」的表述在父取消路径不成立（child 自身超时路径成立）。修复归属：R04/R06 触碰 task_supervisor/subagents 时按根因收口或由总控另派修复（本 Task 不越权改产线代码）"
+  },
+  {
+   "id": "R03-T08-FINDING-2",
+   "severity": "MINOR（R02 资产过期，非 R03 语义回退）",
+   "summary": "scripts/rust-tauri/r02_t04_live_fault_evidence.py 的 restart.keyEvents 精确计数（=1）未计入 R03-T07 启动恢复扫描对 active run 的诚实 finalize（interrupted_needs_attention 终态+事件）；全量 verify-stage R02（T08 取证）中 a07_live_fault_02_check 红、a07_live_fault_01_test 绿。R02 已验收阶段门禁资产的断言更新归独立审阅授权（本 Task 不改）"
+  },
+  {
+   "id": "R03-T08-FINDING-3",
+   "severity": "MINOR（R02 资产过期，非 R03 语义回退）",
+   "summary": "scripts/rust-tauri/r02_t07_slow_subscriber.sh 的并发同会话风暴「全部 200」断言先于 R03-T02 冻结 busy 闸（409 session_busy retryable=现役 Node 同语义）存在；1000 并发（24 路）出现 1 个 409 触发该单条断言；无 stall/无假成功/订阅者健康断言不受影响。同上归属"
+  }
+ ],
+ "allowed_next_scope": "R04 任务书（统一工具网关、四基础工具与沙盒）。禁止：R05+ 任务提前、生产入口切换、真实数据迁移；R02/R03 递延叶与 Windows/打包登记项不得丢失。",
+ "remote_write_authorized": false,
+ "production_data_authorized": false,
+ "paid_or_external_test_authorized": false,
+ "release_authorized": false,
+ "handoff_note": "本文件不写本 Task 自身 commit SHA（防自引用；总控提交后由后续记录登记）。READY_FOR_REVIEW 不是 PASS：独立验收归根总控另派。",
+ "verify_stage_r02_full_gate": {
+  "command": "cargo run --manifest-path rust/Cargo.toml --locked -p xtask -- verify-stage R02 --evidence artifacts/rust-tauri/R03/T08-E01/verify-stage-r02-regression",
+  "overall": "FAIL (17/20 commands exit 0; 34 leaves = 25 pass + 9 deferred_to_r07 + 0 fail + 0 blocked; candidateSourceBinding stable)",
+  "reds_attributed": [
+   "a16_legacy_regression: E5 全量 npm+封印族分类对未提交候选树闭失败（审计封印/完整 npm 状态归总控另记——派单明示）",
+   "a07_live_fault_02_check: FINDING-2",
+   "a14_slow_subscriber: FINDING-3"
+  ],
+  "in_scope_obligation": "派单 R02 回归义务由 R03 图 7 条定向命令（verify-stage R03 内全绿）+ 修复后 r02_t04 全程满足（『或等效定向命令重跑』路径）"
+ }
+}

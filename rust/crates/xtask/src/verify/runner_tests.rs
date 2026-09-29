@@ -658,6 +658,16 @@ fn leaf(
         basis_kind: basis_kind.to_string(),
         r02_share: "server-side share under test".into(),
         r07_share: "client-side remainder under test".into(),
+        stage_share: if crate::stage_map::is_stage_neutral_kind(basis_kind) {
+            "stage share under test".into()
+        } else {
+            String::new()
+        },
+        later_share: if crate::stage_map::is_stage_neutral_kind(basis_kind) {
+            "later-stage remainder under test".into()
+        } else {
+            String::new()
+        },
         evidence_required: "executed records of the referenced commands".into(),
         evidence_command_refs: refs.iter().map(|s| s.to_string()).collect(),
         evidence_paths: paths.iter().map(|s| s.to_string()).collect(),
@@ -1871,5 +1881,366 @@ fn failing_early_evidence_command_blocks_overall_but_leaf_stays_deferred() {
         serde_json::json!(["bad"])
     );
     assert_eq!(report["overall"], "FAIL");
+    std::fs::remove_dir_all(&root).ok();
+}
+
+// ── R03-T08: the R03 stage map + stage-neutral kinds ───────────────────────
+
+#[test]
+fn embedded_r03_map_uses_the_taskbook_scenarios() {
+    let (_, text) = crate::STAGE_MAPS
+        .iter()
+        .find(|(stage, _)| *stage == "R03")
+        .expect("R03 is registered in STAGE_MAPS");
+    let r03 = parse_stage_map(text).expect("embedded R03 map parses");
+    let expected: Vec<String> = (1..=16).map(|n| format!("R03-A{n:02}")).collect();
+    let ids: Vec<String> = r03.scenarios.iter().map(|s| s.id.clone()).collect();
+    assert_eq!(
+        ids, expected,
+        "scenario ids must be exactly R03-A01..R03-A16"
+    );
+    assert!(r03.scenarios.iter().all(|s| s.requirement == "REQUIRED"));
+    // Every registered command is referenced by a scenario or a leaf —
+    // an unreferenced command would never run and could not fail.
+    let used: std::collections::HashSet<&str> = r03
+        .scenarios
+        .iter()
+        .flat_map(|s| s.command_refs.iter().map(String::as_str))
+        .chain(
+            r03.supplemental_leaves
+                .iter()
+                .flat_map(|l| l.evidence_command_refs.iter().map(String::as_str)),
+        )
+        .collect();
+    for command in &r03.commands {
+        assert!(
+            used.contains(command.key.as_str()),
+            "command {:?} is referenced by neither a scenario nor a leaf",
+            command.key
+        );
+    }
+    // The R02 regression chain (SUP-02) is registered in this map.
+    for key in [
+        "r02_auth_matrix",
+        "r02_storage_tx",
+        "r02_events_matrix",
+        "r02_backup_restore",
+        "r02_recovery_drill",
+        "r02_full_chain",
+        "r02_legacy_regression",
+    ] {
+        assert!(
+            r03.commands.iter().any(|c| c.key == key),
+            "SUP-02: the R02 regression command {key} must be registered"
+        );
+    }
+}
+
+#[test]
+fn embedded_r03_map_declares_the_48_supplemental_leaves() {
+    let (_, text) = crate::STAGE_MAPS
+        .iter()
+        .find(|(stage, _)| *stage == "R03")
+        .expect("R03 is registered");
+    let r03 = parse_stage_map(text).expect("embedded R03 map parses");
+    assert_eq!(
+        r03.supplemental_leaves.len(),
+        48,
+        "the R00 acceptance ledger binds exactly 48 leaves to R03"
+    );
+    let count_kind = |kind: &str| {
+        r03.supplemental_leaves
+            .iter()
+            .filter(|l| l.basis_kind == kind)
+            .count()
+    };
+    assert_eq!(
+        count_kind(crate::stage_map::BASIS_STAGE_SHARE_SATISFIED),
+        17
+    );
+    assert_eq!(
+        count_kind(crate::stage_map::BASIS_DEFERRED_TO_LATER_STAGE),
+        31
+    );
+    // No R02-named kinds leak into the R03 map (and vice versa).
+    assert_eq!(count_kind(crate::stage_map::BASIS_R02_SHARE_SATISFIED), 0);
+    assert_eq!(count_kind(crate::stage_map::BASIS_DEFERRED_TO_R07), 0);
+    assert!(r03
+        .supplemental_leaves
+        .iter()
+        .all(|l| l.requirement == "REQUIRED_SUPPLEMENTAL"));
+    // Every share leaf pins machine-checked cases from the acceptance
+    // matrix producer; every deferred leaf binds NOTHING gating.
+    for l in &r03.supplemental_leaves {
+        if l.basis_kind == crate::stage_map::BASIS_STAGE_SHARE_SATISFIED {
+            let contract = l
+                .assertion_contract
+                .as_ref()
+                .unwrap_or_else(|| panic!("share leaf {} lacks a contract", l.id));
+            assert!(!contract.cases.is_empty(), "{}", l.id);
+            assert_eq!(contract.producer_command, "a15_combo_and_leaves");
+            assert!(l
+                .evidence_command_refs
+                .contains(&"a15_combo_and_leaves".to_string()));
+        } else {
+            assert!(l.assertion_contract.is_none(), "{}", l.id);
+            assert!(l.evidence_command_refs.is_empty(), "{}", l.id);
+            assert!(l.evidence_paths.is_empty(), "{}", l.id);
+            // Deferral is only legal for genuinely dual-stage leaves.
+            assert!(l
+                .r00_execution_stage_ids
+                .iter()
+                .any(|id| id.as_str() != "R03"));
+        }
+    }
+}
+
+#[test]
+fn r03_map_mirrors_match_the_real_r00_ledgers() {
+    // The verify-time cross-check compared against the REAL ledgers: the
+    // embedded map's 48 mirrors must equal them field-for-field (a drift
+    // here is what verify-stage R03 would abort on before any command).
+    let root = std::path::Path::new(env!("CARGO_MANIFEST_DIR"))
+        .ancestors()
+        .nth(3)
+        .expect("xtask lives at rust/crates/xtask");
+    let (_, text) = crate::STAGE_MAPS
+        .iter()
+        .find(|(stage, _)| *stage == "R03")
+        .expect("R03 is registered");
+    let map = parse_stage_map(text).unwrap();
+    let expected = super::cross_check_supplemental_coverage(&map, root)
+        .expect("the embedded R03 map must mirror the real R00 ledgers");
+    assert_eq!(expected.len(), 48);
+}
+
+#[test]
+fn stage_neutral_share_leaf_passes_on_share_pins() {
+    let root = temp_root("r03-share-pass");
+    let evidence = root.join("evidence");
+    std::fs::create_dir_all(&evidence).expect("create evidence root");
+    std::fs::write(
+        evidence.join("leaf-cases.json"),
+        r#"{"schema":"lingxi.leaf-case-results.v1","cases":[{"case":"pin","expect":1,"actual":1,"ok":true}]}"#,
+    )
+    .expect("write case evidence");
+    let item = leaf(
+        "R00-T02-LA-TESTR03SHARE000",
+        crate::stage_map::BASIS_STAGE_SHARE_SATISFIED,
+        &["good"],
+        &[],
+        contract("good", "{EVIDENCE}/leaf-cases.json", &[("pin", 1)]),
+    );
+    let outcomes = vec![outcome("good", 0)];
+    let roll = super::roll_up_supplemental_leaf(&item, "RX", &outcomes, &root, &evidence);
+    assert_eq!(roll.status, "PASS", "{}", roll.reason);
+    assert!(roll.reason.contains("RX share satisfied"));
+    assert!(roll.reason.contains("RY"), "the later stage is named");
+    std::fs::remove_dir_all(&root).ok();
+}
+
+#[test]
+fn stage_neutral_share_leaf_fails_when_a_pin_does_not_hold() {
+    let root = temp_root("r03-share-fail");
+    let evidence = root.join("evidence");
+    std::fs::create_dir_all(&evidence).expect("create evidence root");
+    std::fs::write(
+        evidence.join("leaf-cases.json"),
+        r#"{"schema":"lingxi.leaf-case-results.v1","cases":[{"case":"pin","expect":1,"actual":0,"ok":false}]}"#,
+    )
+    .expect("write drifted case evidence");
+    let item = leaf(
+        "R00-T02-LA-TESTR03SHAREFAI",
+        crate::stage_map::BASIS_STAGE_SHARE_SATISFIED,
+        &["good"],
+        &[],
+        contract("good", "{EVIDENCE}/leaf-cases.json", &[("pin", 1)]),
+    );
+    let outcomes = vec![outcome("good", 0)];
+    let roll = super::roll_up_supplemental_leaf(&item, "RX", &outcomes, &root, &evidence);
+    assert_eq!(roll.status, "FAIL", "{}", roll.reason);
+    assert!(roll.reason.contains("original-assertion cases not holding"));
+    std::fs::remove_dir_all(&root).ok();
+}
+
+#[test]
+fn stage_neutral_deferred_leaf_is_fixed_and_observational() {
+    let root = temp_root("r03-deferred");
+    let evidence = root.join("evidence");
+    std::fs::create_dir_all(&evidence).expect("create evidence root");
+    let item = leaf(
+        "R00-T02-LA-TESTR03DEFER000",
+        crate::stage_map::BASIS_DEFERRED_TO_LATER_STAGE,
+        &[],
+        &[],
+        None,
+    );
+    let outcomes: Vec<crate::verify::CommandOutcome> = Vec::new();
+    let roll = super::roll_up_supplemental_leaf(&item, "RX", &outcomes, &root, &evidence);
+    assert_eq!(roll.status, "DEFERRED_TO_LATER_STAGE");
+    assert!(roll.reason.contains("deferred to later stage(s) [\"RY\"]"));
+    assert!(roll.reason.contains("still REQUIRED"));
+    std::fs::remove_dir_all(&root).ok();
+}
+
+#[test]
+fn stage_neutral_kinds_are_rejected_for_single_stage_leaves_and_contracts() {
+    // deferred_to_later_stage on a single-stage leaf = sweeping this
+    // stage's obligation out the door — a hard parse error.
+    let mut doc: serde_json::Value = serde_json::json!({
+        "schemaVersion": 1,
+        "resultVersion": crate::RESULT_VERSION,
+        "stage": "RX",
+        "commands": {
+            "a_ok": {
+                "argv": ["bash", "gate.sh", "{EVIDENCE}/RX"],
+                "evidencePaths": ["{EVIDENCE}/RX/out.txt"]
+            }
+        },
+        "scenarios": [
+            {"id": "RX-A01", "requirement": "REQUIRED", "commandRefs": ["a_ok"]}
+        ],
+        "supplementalLeafScenarios": [
+            {
+                "id": "R00-T02-LA-TESTR03KIND000",
+                "featureId": "F-D20-TEST-KIND",
+                "requirement": "REQUIRED_SUPPLEMENTAL",
+                "r00Kind": "supplemental",
+                "r00TaskIds": TEST_R00_TASK_IDS,
+                "r00ExecutionStageIds": TEST_R00_STAGE_IDS,
+                "r00LedgerStatus": "SPECIFIED_NOT_EXECUTED",
+                "r00ResultIds": [],
+                "r00TestIds": [],
+                "r00Then": test_then("R00-T02-LA-TESTR03KIND000"),
+                "r00Assertions": test_assertions("R00-T02-LA-TESTR03KIND000"),
+                "r00Due": TEST_R00_DUE,
+                "basisKind": "deferred_to_later_stage",
+                "stageShare": "no gating share",
+                "laterShare": "later remainder",
+                "evidenceRequired": "records",
+                "evidenceCommandRefs": []
+            }
+        ]
+    });
+    doc["stage"] = serde_json::json!("RX");
+    doc["supplementalLeafScenarios"][0]["basisKind"] =
+        serde_json::json!(crate::stage_map::BASIS_DEFERRED_TO_LATER_STAGE);
+    doc["supplementalLeafScenarios"][0]["stageShare"] = serde_json::json!("no gating share");
+    doc["supplementalLeafScenarios"][0]["laterShare"] = serde_json::json!("remainder");
+    doc["supplementalLeafScenarios"][0]["evidenceCommandRefs"] = serde_json::json!([]);
+    let single = {
+        let mut d = doc.clone();
+        d["supplementalLeafScenarios"][0]["r00ExecutionStageIds"] = serde_json::json!(["RX"]);
+        d
+    };
+    let err = parse_stage_map(&single.to_string()).unwrap_err();
+    assert!(err.contains("may never defer"), "{err}");
+
+    // A share leaf without stageShare (using the R02-named fields) is a
+    // hard parse error — the stage-neutral kinds declare their own pair.
+    let mut nos = doc.clone();
+    nos["supplementalLeafScenarios"][0]["basisKind"] =
+        serde_json::json!(crate::stage_map::BASIS_STAGE_SHARE_SATISFIED);
+    nos["supplementalLeafScenarios"][0]["evidenceCommandRefs"] = serde_json::json!(["a_ok"]);
+    nos["supplementalLeafScenarios"][0]["assertionContract"] = serde_json::json!({
+        "producerCommand": "a_ok",
+        "evidencePath": "{EVIDENCE}/RX/leaf-cases.json",
+        "cases": [{"case": "case-pin", "expect": 1}]
+    });
+    nos["supplementalLeafScenarios"][0]
+        .as_object_mut()
+        .unwrap()
+        .remove("stageShare");
+    let err = parse_stage_map(&nos.to_string()).unwrap_err();
+    assert!(err.contains("missing stageShare"), "{err}");
+
+    // deferred_to_later_stage must not declare gating command refs.
+    let mut gating = doc.clone();
+    gating["supplementalLeafScenarios"][0]["evidenceCommandRefs"] = serde_json::json!(["a_ok"]);
+    let err = parse_stage_map(&gating.to_string()).unwrap_err();
+    assert!(err.contains("must not bind"), "{err}");
+}
+
+#[test]
+fn r03_share_and_deferred_coverage_makes_overall_pass() {
+    // One share leaf whose pins hold + one deferred-to-later leaf: the
+    // supplemental coverage condition (PASS ∪ DEFERRED covers everything)
+    // holds and overall PASS is possible — the R03 shape.
+    let root = temp_root("r03-coverage");
+    write_minimal_r00_ledger(
+        &root,
+        &[
+            ("R00-T02-LA-TESTR03COV0001", "REQUIRED_SUPPLEMENTAL"),
+            ("R00-T02-LA-TESTR03COV0002", "REQUIRED_SUPPLEMENTAL"),
+        ],
+    );
+    let evidence = root.join("evidence");
+    let mut share = leaf(
+        "R00-T02-LA-TESTR03COV0001",
+        crate::stage_map::BASIS_STAGE_SHARE_SATISFIED,
+        &["good"],
+        &[],
+        contract("good", "{EVIDENCE}/leaf-cases.json", &[("pin", 1)]),
+    );
+    // The share leaf's remainder moves to RY (the TEST constants already
+    // carry [RX, RY]); make the stage-share texts explicit.
+    share.stage_share = "the RX share".into();
+    share.later_share = "the RY remainder".into();
+    let mut deferred = leaf(
+        "R00-T02-LA-TESTR03COV0002",
+        crate::stage_map::BASIS_DEFERRED_TO_LATER_STAGE,
+        &[],
+        &[],
+        None,
+    );
+    deferred.stage_share = "no RX gating share".into();
+    deferred.later_share = "the RY remainder".into();
+    let map = StageMap {
+        stage: "RX".into(),
+        result_version: crate::RESULT_VERSION.into(),
+        default_timeout_secs: 60,
+        commands: vec![spec(
+            "good",
+            &[
+                "sh",
+                "-c",
+                "printf ok > {EVIDENCE}/good.txt && \
+                 printf '{\"schema\":\"lingxi.leaf-case-results.v1\",\"cases\":[{\"case\":\"pin\",\"expect\":1,\"actual\":1,\"ok\":true}]}' \
+                 > {EVIDENCE}/leaf-cases.json",
+            ],
+            &["{EVIDENCE}/good.txt"],
+            60,
+        )],
+        scenarios: vec![crate::stage_map::Scenario {
+            id: "RX-A01".into(),
+            requirement: "REQUIRED".into(),
+            command_refs: vec!["good".into()],
+        }],
+        supplemental_leaves: vec![share, deferred],
+    };
+    let report =
+        verify_stage(&map, &root, &evidence, "deadbeef", false, 0).expect("runs to completion");
+    assert_eq!(report["overall"], "PASS", "{report}");
+    assert_eq!(
+        report["supplementalLeafCoverage"]["pass"],
+        serde_json::json!(1)
+    );
+    assert_eq!(
+        report["supplementalLeafCoverage"]["deferredToR07"],
+        serde_json::json!(0)
+    );
+    assert_eq!(
+        report["supplementalLeafCoverage"]["deferredToLaterStage"],
+        serde_json::json!(1)
+    );
+    let deferred_entry = &report["supplementalLeafScenarios"][1];
+    assert_eq!(deferred_entry["status"], "DEFERRED_TO_LATER_STAGE");
+    assert_eq!(
+        deferred_entry["deferredToStages"],
+        serde_json::json!(["RY"])
+    );
+    let share_entry = &report["supplementalLeafScenarios"][0];
+    assert_eq!(share_entry["status"], "PASS");
+    assert_eq!(share_entry["deferredToStages"], serde_json::json!(["RY"]));
     std::fs::remove_dir_all(&root).ok();
 }

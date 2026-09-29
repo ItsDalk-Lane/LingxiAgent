@@ -1,0 +1,2 @@
+2026-09-29T11:58:30.445098Z  INFO lingxi_service: data root resolved effective_home=/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T//lingxi-r02t04-fault-pDUsID source=cli ignored_sources=none
+error: cannot create data root "/private/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-r02t04-fault-pDUsID/lingxi-service": Permission denied (os error 13)

@@ -343,6 +343,21 @@ note "PASS S3 unwritable home: exit=2, explicit error, no readiness line"
 note "== S4 (A08): three migration checks, stable version/counts/fingerprints =="
 db_files_sha "$HOME_DIR" > "$EVIDENCE_DIR/s4-hashes-before.txt"
 BASE_COUNTS="$("$INSPECT_BIN" "$DB" counts)"
+# R03-T08 fix of the deferred T04 R1-F1: the expected migration set is the
+# REGISTERED set (docs/rust-tauri/R02/R02-T04_STORAGE_REGISTRY.json), not a
+# hardcoded version==1. The registry is the fingerprint authority; the
+# binary's own compiledIn set must equal it, and the on-disk receipts must
+# equal both.
+REGISTRY_MIGRATIONS="$(python3 - << 'REGEOF'
+import json
+doc = json.load(open("docs/rust-tauri/R02/R02-T04_STORAGE_REGISTRY.json"))
+migs = doc["new_persistence_points"][0]["migrations"]
+print(json.dumps([
+    {"version": m["version"], "name": m["name"],
+     "fingerprint": m["fingerprint_sha256"]} for m in migs
+]))
+REGEOF
+)" || fail "S4 cannot read the storage registry"
 for round in 1 2 3; do
   # each start re-runs the open-time migration pass
   start_service "$HOME_DIR" "s4-$round" || fail "s4 round $round service did not become ready"
@@ -351,17 +366,38 @@ for round in 1 2 3; do
   echo "$MIG" > "$EVIDENCE_DIR/s4-migrations-round$round.json"
   echo "$BASE_COUNTS" | diff -q - <("$INSPECT_BIN" "$DB" counts) >/dev/null \
     || fail "S4 round $round: row counts changed"
-  python3 - "$EVIDENCE_DIR/s4-migrations-round$round.json" << 'PYEOF' || fail "S4 round $round: migration check inconsistent"
-import json, sys
+  REGISTRY_MIGRATIONS="$REGISTRY_MIGRATIONS" python3 - "$EVIDENCE_DIR/s4-migrations-round$round.json" << 'PYEOF' || fail "S4 round $round: migration check inconsistent"
+import json, os, sys
 doc = json.load(open(sys.argv[1]))
-assert doc["userVersion"] == doc["supportedVersion"] == 1, doc
-receipts = doc["receipts"]; compiled = doc["compiledIn"]
-assert len(receipts) == len(compiled) == 1, doc
-assert receipts[0]["fingerprint"] == compiled[0]["fingerprint"], doc
-assert receipts[0]["version"] == compiled[0]["version"] == 1, doc
+registered = json.loads(os.environ["REGISTRY_MIGRATIONS"])
+registered.sort(key=lambda m: m["version"])
+supported = len(registered)
+assert doc["userVersion"] == doc["supportedVersion"] == supported, (
+    f"userVersion {doc['userVersion']} / supportedVersion {doc['supportedVersion']} "
+    f"disagree with the registry's {supported} migrations"
+)
+receipts = doc["receipts"]
+compiled = doc["compiledIn"]
+assert len(receipts) == len(compiled) == supported, (
+    f"expected {supported} receipts, got receipts={len(receipts)} compiled={len(compiled)}"
+)
+assert [r["version"] for r in receipts] == [m["version"] for m in registered], (
+    "receipt versions disagree with the registry"
+)
+for r, m in zip(receipts, registered):
+    assert r["version"] == m["version"], (r, m)
+    assert r["name"] == m["name"], (r, m)
+    assert r["fingerprint"] == m["fingerprint"], (
+        f"receipt v{r['version']} fingerprint {r['fingerprint']} != registry {m['fingerprint']}"
+    )
+for c, m in zip(compiled, registered):
+    assert c["version"] == m["version"] and c["name"] == m["name"], (c, m)
+    assert c["fingerprint"] == m["fingerprint"], (
+        f"compiledIn v{c['version']} fingerprint {c['fingerprint']} != registry {m['fingerprint']}"
+    )
 PYEOF
 done
-note "PASS S4 3x migration checks: version=1, fingerprint identical, row counts stable"
+note "PASS S4 3x migration checks: registry-conformant version set, identical fingerprints, row counts stable"
 
 # The inspector is read-only: file hashes unchanged around all inspections.
 db_files_sha "$HOME_DIR" > "$EVIDENCE_DIR/s4-hashes-after.txt"

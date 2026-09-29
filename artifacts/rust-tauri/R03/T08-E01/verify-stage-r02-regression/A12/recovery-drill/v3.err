@@ -1,0 +1,10 @@
+2026-09-29T11:59:36.048457Z  INFO lingxi_service: data root resolved effective_home=/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T//lingxi-r02t06-drill.BJu7uX/v3-OV0YeU source=cli ignored_sources=none
+2026-09-29T11:59:36.048741Z  INFO lingxi_service: data root prepared (canonicalized; runtime dir private 0700) canonical_home=/private/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-r02t06-drill.BJu7uX/v3-OV0YeU runtime_dir=/private/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-r02t06-drill.BJu7uX/v3-OV0YeU/lingxi-service
+2026-09-29T11:59:36.048944Z  INFO lingxi_service: single-writer lock acquired instance_id=c15faacd744c503e75b0c29361a14b1d start_nonce=d18c0a25603c98dd pid=55451 entropy="os-random-device" lock=/private/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-r02t06-drill.BJu7uX/v3-OV0YeU/lingxi-service/instance.lock network_mode=loopback
+LINGXI_DATA_EPOCH_TRANSITION_INCOMPLETE reason=corrupt-transition evidence=transitionJournal(fromEpoch=1,toEpoch=2,phase=barrier_raised,transitionId=transition-1-2)
+[data-epoch] The data safety gate refused startup (corrupt-transition): journal phase barrier_raised contradicts stamp state missing; startup is refused instead of guessing
+[data-epoch] A READABLE transition journal is present in this data home: epochs 1→2, phase=barrier_raised, transitionId=transition-1-2. It is concrete higher-epoch evidence, so startup is refused instead of guessing.
+[data-epoch] 数据安全闸拒绝启动（corrupt-transition）：journal phase barrier_raised contradicts stamp state missing; startup is refused instead of guessing
+[data-epoch] 请保留现场文件，使用维护/恢复流程处理；不要删除未知状态后强行启动。
+
+2026-09-29T11:59:36.049305Z ERROR lingxi_service: data-epoch gate refused startup (exit 2) reason="corrupt-transition" home=/private/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-r02t06-drill.BJu7uX/v3-OV0YeU
