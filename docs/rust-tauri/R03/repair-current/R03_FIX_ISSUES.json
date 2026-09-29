@@ -1,0 +1,1451 @@
+{
+  "schema_version": "1.0",
+  "artifact_kind": "R03_ADVERSARIAL_REPAIR_UNIFIED_ISSUE_LEDGER",
+  "created_date": "2026-09-30",
+  "authority": "R03 修复总控编排器；本轮唯一权威索引。规格来源：Lingxi_Rust_Tauri_Taskbooks_2026-09-23/Lingxi_R03_对抗性审查_问题清单与修复总控提示词_2026-09-30.md（F01-F08 repair_requirements/forbidden_shortcuts 全文）与 Lingxi_R03_修复验收清单_2026-09-30.json（34 C-ID given/when/then/adversarial_variation/evidence_required 全文）。case 定义不在本账重复，状态在此逐项登记。",
+  "repository": "ItsDalk-Lane/LingxiAgent",
+  "branch": "codex/rust-tauri-migration",
+  "fix_base_sha": "cd3fb19e651f763afc6c75cb3163064fb54ca3fe",
+  "previous_accepted_candidate": "1ebb03d9f89af364a42274efc2cd482f298b1130",
+  "reopen_status": "REOPENED_PENDING_REPAIR",
+  "reopen_note": "旧接受记录（R03_FINAL_STAGE_REVIEW_R1.md、R03_HANDOFF accepted_stage_candidate）原文与证据保留；其裁决2（FINDING-1 两阶段收口解释）被本轮 F01-F08 反例质疑。仅本轮全新独立审查可重新接受，不以旧 PASS 为反证。",
+  "baseline_facts": {
+    "local_head_at_start": "cd3fb19e651f763afc6c75cb3163064fb54ca3fe",
+    "remote_head_at_start": "cd3fb19e651f763afc6c75cb3163064fb54ca3fe",
+    "worktree_at_start": "clean（git status --porcelain 为空，无用户未提交修改）",
+    "toolchain": "rust-toolchain.toml 锁定 1.98.1，必须经 rustup 代理 ~/.cargo/bin/cargo 调用（已装 1.98.1-aarch64-apple-darwin）；当前 shell PATH 中 Homebrew cargo 1.93.0 优先且不读取锁定。所有子代理一律用 ~/.cargo/bin/cargo。",
+    "lock_files": "rust/Cargo.lock 在位；本轮锁定变更须逐工作单登记",
+    "controller_spot_checks_at_fix_base": [
+      "F06 证实：rust/crates/lingxi-service/src/sessions.rs:551 与 628 均为 submission.input.chars().take(2000).collect() 生成 recorded_input",
+      "F07 证实：rust/crates/lingxi-service/src/background.rs drive_run 调用 steering 参数传 None；前台 sessions.rs:567 传 Some(lease.steering_inbox())",
+      "F01 符号定位：rust/crates/lingxi-service/src/cancel.rs run_root_under(L115)/is_cancelled(L170)/cancel_recursive(L230)/register_linked(L505)"
+    ]
+  },
+  "workorders": {
+    "G01": {
+      "covers": [
+        "F01",
+        "F02"
+      ],
+      "status": "PASSED_PENDING_PUSH",
+      "executor": "EXECUTOR-REPAIR-R03-G01-E01",
+      "rounds": [
+        {
+          "round": 1,
+          "executor": "EXECUTOR-REPAIR-R03-G01-E01",
+          "result": "READY_FOR_REVIEW",
+          "candidate": "HEAD cd3fb19e6 + 未提交工作树（git diff --stat: 9 files, 912+/140-，含 2 新测试文件）",
+          "workspace_tests": "65 suites / 648 passed / 0 failed（基线 63/626/0，+2/+22 零删除）",
+          "gates": "fmt 零 diff；clippy -D warnings 零告警；check-contracts 626 entries 零漂移；check-boundaries exit 0；Cargo.lock 未变",
+          "report": "docs/rust-tauri/R03/repair-current/G01-E01_REPORT.md",
+          "reviewer": "REVIEWER-REPAIR-R03-G01-R1",
+          "review_verdict": "PASS"
+        }
+      ]
+    },
+    "G02": {
+      "covers": [
+        "F03"
+      ],
+      "status": "NOT_STARTED",
+      "executor": null,
+      "rounds": []
+    },
+    "G03": {
+      "covers": [
+        "F04"
+      ],
+      "status": "NOT_STARTED",
+      "executor": null,
+      "rounds": []
+    },
+    "G04": {
+      "covers": [
+        "F05"
+      ],
+      "status": "NOT_STARTED",
+      "executor": null,
+      "rounds": []
+    },
+    "G05": {
+      "covers": [
+        "F06"
+      ],
+      "status": "NOT_STARTED",
+      "executor": null,
+      "rounds": []
+    },
+    "G06": {
+      "covers": [
+        "F07"
+      ],
+      "status": "NOT_STARTED",
+      "executor": null,
+      "rounds": []
+    },
+    "G07": {
+      "covers": [
+        "F08"
+      ],
+      "status": "NOT_STARTED",
+      "executor": null,
+      "rounds": []
+    }
+  },
+  "issues": [
+    {
+      "id": "F01",
+      "title": "取消树的子运行链接和取消后新增节点继承不成立",
+      "priority": "P1",
+      "workorder": "G01",
+      "related_tasks": [
+        "R03-T03",
+        "R03-T06"
+      ],
+      "related_original_acceptance": [
+        "R03-A05",
+        "R03-A06",
+        "R03-A15"
+      ],
+      "source_paths": [
+        "rust/crates/lingxi-service/src/cancel.rs",
+        "rust/crates/lingxi-service/src/subagents.rs",
+        "rust/crates/lingxi-service/src/runs.rs"
+      ],
+      "fact_type": "SOURCE_CONFIRMED",
+      "fact_type_note": "固定提交静态源码反例分析，尚未动态复现；状态推进须以执行端真实命令/退出码/日志为准，不得倒填为已复现。",
+      "implementation_status": "CLOSED_BY_INDEPENDENT_REVIEW_R1",
+      "repair_commits": [],
+      "normal_selfcheck_status": "PASS_EXECUTOR",
+      "adversarial_selfcheck_status": "PASS_EXECUTOR",
+      "independent_review_status": "PASS_R1",
+      "case_ids": [
+        "R03-FIX-F01-C01",
+        "R03-FIX-F01-C02",
+        "R03-FIX-F01-C03",
+        "R03-FIX-F01-C04",
+        "R03-FIX-F01-C05"
+      ]
+    },
+    {
+      "id": "F02",
+      "title": "父取消跳过子运行收尾，线程与配额泄漏；监督回收也需同族检查",
+      "priority": "P1",
+      "workorder": "G01",
+      "related_tasks": [
+        "R03-T02",
+        "R03-T03",
+        "R03-T06",
+        "R03-T07"
+      ],
+      "related_original_acceptance": [
+        "R03-A04",
+        "R03-A06",
+        "R03-A12",
+        "R03-A13",
+        "R03-A15"
+      ],
+      "source_paths": [
+        "rust/crates/lingxi-service/src/subagents.rs",
+        "rust/crates/lingxi-service/src/task_supervisor.rs",
+        "rust/crates/lingxi-service/src/runs.rs",
+        "rust/crates/lingxi-service/src/background.rs",
+        "docs/rust-tauri/R03/R03_HANDOFF.json",
+        "docs/rust-tauri/R03/R03_FINAL_STAGE_REVIEW_R1.md"
+      ],
+      "fact_type": "SOURCE_CONFIRMED",
+      "fact_type_note": "固定提交静态源码反例分析，尚未动态复现；状态推进须以执行端真实命令/退出码/日志为准，不得倒填为已复现。",
+      "implementation_status": "CLOSED_BY_INDEPENDENT_REVIEW_R1",
+      "repair_commits": [],
+      "normal_selfcheck_status": "PASS_EXECUTOR",
+      "adversarial_selfcheck_status": "PASS_EXECUTOR",
+      "independent_review_status": "PASS_R1",
+      "case_ids": [
+        "R03-FIX-F02-C01",
+        "R03-FIX-F02-C02",
+        "R03-FIX-F02-C03",
+        "R03-FIX-F02-C04",
+        "R03-FIX-F02-C05"
+      ]
+    },
+    {
+      "id": "F03",
+      "title": "取消接受与完成提交没有统一竞争裁决，可取消后仍完成",
+      "priority": "P1",
+      "workorder": "G02",
+      "related_tasks": [
+        "R03-T01",
+        "R03-T03",
+        "R03-T04"
+      ],
+      "related_original_acceptance": [
+        "R03-A02",
+        "R03-A05",
+        "R03-A07",
+        "R03-A15"
+      ],
+      "source_paths": [
+        "rust/crates/lingxi-service/src/cancel.rs",
+        "rust/crates/lingxi-service/src/runs.rs",
+        "rust/crates/lingxi-service/src/sessions.rs"
+      ],
+      "fact_type": "SOURCE_CONFIRMED",
+      "fact_type_note": "固定提交静态源码反例分析，尚未动态复现；状态推进须以执行端真实命令/退出码/日志为准，不得倒填为已复现。",
+      "implementation_status": "NOT_STARTED",
+      "repair_commits": [],
+      "normal_selfcheck_status": "NOT_RUN",
+      "adversarial_selfcheck_status": "NOT_RUN",
+      "independent_review_status": "NOT_RUN",
+      "case_ids": [
+        "R03-FIX-F03-C01",
+        "R03-FIX-F03-C02",
+        "R03-FIX-F03-C03",
+        "R03-FIX-F03-C04"
+      ]
+    },
+    {
+      "id": "F04",
+      "title": "工具执行后panic或丢失结果被错误归类为确认失败",
+      "priority": "P1",
+      "workorder": "G03",
+      "related_tasks": [
+        "R03-T05",
+        "R03-T07"
+      ],
+      "related_original_acceptance": [
+        "R03-A09",
+        "R03-A10",
+        "R03-A13",
+        "R03-A15"
+      ],
+      "source_paths": [
+        "rust/crates/lingxi-service/src/runs.rs",
+        "rust/crates/lingxi-kernel/src/invocation.rs",
+        "rust/crates/lingxi-service/src/invocations.rs",
+        "rust/crates/lingxi-service/src/recovery.rs"
+      ],
+      "fact_type": "SOURCE_CONFIRMED",
+      "fact_type_note": "固定提交静态源码反例分析，尚未动态复现；状态推进须以执行端真实命令/退出码/日志为准，不得倒填为已复现。",
+      "implementation_status": "NOT_STARTED",
+      "repair_commits": [],
+      "normal_selfcheck_status": "NOT_RUN",
+      "adversarial_selfcheck_status": "NOT_RUN",
+      "independent_review_status": "NOT_RUN",
+      "case_ids": [
+        "R03-FIX-F04-C01",
+        "R03-FIX-F04-C02",
+        "R03-FIX-F04-C03",
+        "R03-FIX-F04-C04"
+      ]
+    },
+    {
+      "id": "F05",
+      "title": "去重条目在真正受理前固化，失败重试返回不存在的运行",
+      "priority": "P1",
+      "workorder": "G04",
+      "related_tasks": [
+        "R03-T04",
+        "R03-T06",
+        "R03-T07"
+      ],
+      "related_original_acceptance": [
+        "R03-A08",
+        "R03-A12",
+        "R03-A13",
+        "R03-A15"
+      ],
+      "source_paths": [
+        "rust/crates/lingxi-service/src/sessions.rs",
+        "rust/crates/lingxi-service/src/dedup.rs",
+        "rust/crates/lingxi-service/src/background.rs"
+      ],
+      "fact_type": "SOURCE_CONFIRMED",
+      "fact_type_note": "固定提交静态源码反例分析，尚未动态复现；状态推进须以执行端真实命令/退出码/日志为准，不得倒填为已复现。",
+      "implementation_status": "NOT_STARTED",
+      "repair_commits": [],
+      "normal_selfcheck_status": "NOT_RUN",
+      "adversarial_selfcheck_status": "NOT_RUN",
+      "independent_review_status": "NOT_RUN",
+      "case_ids": [
+        "R03-FIX-F05-C01",
+        "R03-FIX-F05-C02",
+        "R03-FIX-F05-C03",
+        "R03-FIX-F05-C04",
+        "R03-FIX-F05-C05"
+      ]
+    },
+    {
+      "id": "F06",
+      "title": "真实执行输入被静默截断为2000字符",
+      "priority": "P2",
+      "workorder": "G05",
+      "related_tasks": [
+        "R03-T01",
+        "R03-T06",
+        "R03-T08"
+      ],
+      "related_original_acceptance": [
+        "R03-A15（输入保真补充）"
+      ],
+      "source_paths": [
+        "rust/crates/lingxi-service/src/sessions.rs",
+        "rust/crates/lingxi-service/src/dedup.rs"
+      ],
+      "fact_type": "SOURCE_CONFIRMED",
+      "fact_type_note": "固定提交静态源码反例分析，尚未动态复现；状态推进须以执行端真实命令/退出码/日志为准，不得倒填为已复现。",
+      "implementation_status": "NOT_STARTED",
+      "repair_commits": [],
+      "normal_selfcheck_status": "NOT_RUN",
+      "adversarial_selfcheck_status": "NOT_RUN",
+      "independent_review_status": "NOT_RUN",
+      "case_ids": [
+        "R03-FIX-F06-C01",
+        "R03-FIX-F06-C02",
+        "R03-FIX-F06-C03"
+      ]
+    },
+    {
+      "id": "F07",
+      "title": "后台运行接受steering，却没有传入消费通道",
+      "priority": "P2",
+      "workorder": "G06",
+      "related_tasks": [
+        "R03-T02",
+        "R03-T06"
+      ],
+      "related_original_acceptance": [
+        "R03-A03",
+        "R03-A12",
+        "R03-A15（后台steering补充）"
+      ],
+      "source_paths": [
+        "rust/crates/lingxi-service/src/runs.rs",
+        "rust/crates/lingxi-service/src/sessions.rs",
+        "rust/crates/lingxi-service/src/background.rs"
+      ],
+      "fact_type": "SOURCE_CONFIRMED",
+      "fact_type_note": "固定提交静态源码反例分析，尚未动态复现；状态推进须以执行端真实命令/退出码/日志为准，不得倒填为已复现。",
+      "implementation_status": "NOT_STARTED",
+      "repair_commits": [],
+      "normal_selfcheck_status": "NOT_RUN",
+      "adversarial_selfcheck_status": "NOT_RUN",
+      "independent_review_status": "NOT_RUN",
+      "case_ids": [
+        "R03-FIX-F07-C01",
+        "R03-FIX-F07-C02",
+        "R03-FIX-F07-C03",
+        "R03-FIX-F07-C04"
+      ]
+    },
+    {
+      "id": "F08",
+      "title": "现有接受结论容许未完成取消收口，需用新增反例重建验收",
+      "priority": "P1-验收",
+      "workorder": "G07",
+      "related_tasks": [
+        "R03-T08",
+        "R03阶段终验"
+      ],
+      "related_original_acceptance": [
+        "R03-A01～R03-A16",
+        "当前到期的R03补充义务"
+      ],
+      "source_paths": [
+        "docs/rust-tauri/R03/R03_HANDOFF.json",
+        "docs/rust-tauri/R03/R03_FINAL_STAGE_REVIEW_R1.md",
+        "docs/rust-tauri/R03/R03-T08_REPORT.md"
+      ],
+      "fact_type": "SOURCE_CONFIRMED",
+      "fact_type_note": "固定提交静态源码反例分析，尚未动态复现；状态推进须以执行端真实命令/退出码/日志为准，不得倒填为已复现。",
+      "implementation_status": "NOT_STARTED",
+      "repair_commits": [],
+      "normal_selfcheck_status": "NOT_RUN",
+      "adversarial_selfcheck_status": "NOT_RUN",
+      "independent_review_status": "NOT_RUN",
+      "case_ids": [
+        "R03-FIX-F08-C01",
+        "R03-FIX-F08-C02",
+        "R03-FIX-F08-C03",
+        "R03-FIX-F08-C04"
+      ]
+    }
+  ],
+  "cases": [
+    {
+      "id": "R03-FIX-F01-C01",
+      "issue_id": "F01",
+      "workorder": "G01",
+      "audit_runtime_status": "NOT_RUN_THIS_AUDIT",
+      "implementation_status": "CLOSED_BY_INDEPENDENT_REVIEW_R1",
+      "normal_selfcheck": {
+        "status": "PASS",
+        "commands": [],
+        "exit_codes": [],
+        "evidence": [
+          "artifacts/rust-tauri/R03/repair-current/G01-E01/normal-selfcheck/",
+          "docs/rust-tauri/R03/repair-current/G01-E01_NORMAL_SELFCHECK.md"
+        ],
+        "notes": "执行者 EXECUTOR-REPAIR-R03-G01-E01 自查报告；独立审查另行登记。"
+      },
+      "adversarial_selfcheck": {
+        "status": "PASS",
+        "commands": [],
+        "exit_codes": [],
+        "evidence": [
+          "artifacts/rust-tauri/R03/repair-current/G01-E01/adversarial-selfcheck/",
+          "docs/rust-tauri/R03/repair-current/G01-E01_ADVERSARIAL_SELFCHECK.md"
+        ],
+        "notes": "执行者逐 C-ID 消费 adversarial_variation（barrier/固定调度/受控故障点），红绿证据在档。"
+      },
+      "independent_review": {
+        "status": "PASS",
+        "reviewer_id": "REVIEWER-REPAIR-R03-G01-R1",
+        "round": 1,
+        "evidence": [
+          "docs/rust-tauri/R03/repair-current/G01-R1_REVIEW.md",
+          "artifacts/rust-tauri/R03/repair-current/G01-R1/"
+        ],
+        "verdict": "PASS"
+      },
+      "repair_commit": null
+    },
+    {
+      "id": "R03-FIX-F01-C02",
+      "issue_id": "F01",
+      "workorder": "G01",
+      "audit_runtime_status": "NOT_RUN_THIS_AUDIT",
+      "implementation_status": "CLOSED_BY_INDEPENDENT_REVIEW_R1",
+      "normal_selfcheck": {
+        "status": "PASS",
+        "commands": [],
+        "exit_codes": [],
+        "evidence": [
+          "artifacts/rust-tauri/R03/repair-current/G01-E01/normal-selfcheck/",
+          "docs/rust-tauri/R03/repair-current/G01-E01_NORMAL_SELFCHECK.md"
+        ],
+        "notes": "执行者 EXECUTOR-REPAIR-R03-G01-E01 自查报告；独立审查另行登记。"
+      },
+      "adversarial_selfcheck": {
+        "status": "PASS",
+        "commands": [],
+        "exit_codes": [],
+        "evidence": [
+          "artifacts/rust-tauri/R03/repair-current/G01-E01/adversarial-selfcheck/",
+          "docs/rust-tauri/R03/repair-current/G01-E01_ADVERSARIAL_SELFCHECK.md"
+        ],
+        "notes": "执行者逐 C-ID 消费 adversarial_variation（barrier/固定调度/受控故障点），红绿证据在档。"
+      },
+      "independent_review": {
+        "status": "PASS",
+        "reviewer_id": "REVIEWER-REPAIR-R03-G01-R1",
+        "round": 1,
+        "evidence": [
+          "docs/rust-tauri/R03/repair-current/G01-R1_REVIEW.md",
+          "artifacts/rust-tauri/R03/repair-current/G01-R1/"
+        ],
+        "verdict": "PASS"
+      },
+      "repair_commit": null
+    },
+    {
+      "id": "R03-FIX-F01-C03",
+      "issue_id": "F01",
+      "workorder": "G01",
+      "audit_runtime_status": "NOT_RUN_THIS_AUDIT",
+      "implementation_status": "CLOSED_BY_INDEPENDENT_REVIEW_R1",
+      "normal_selfcheck": {
+        "status": "PASS",
+        "commands": [],
+        "exit_codes": [],
+        "evidence": [
+          "artifacts/rust-tauri/R03/repair-current/G01-E01/normal-selfcheck/",
+          "docs/rust-tauri/R03/repair-current/G01-E01_NORMAL_SELFCHECK.md"
+        ],
+        "notes": "执行者 EXECUTOR-REPAIR-R03-G01-E01 自查报告；独立审查另行登记。"
+      },
+      "adversarial_selfcheck": {
+        "status": "PASS",
+        "commands": [],
+        "exit_codes": [],
+        "evidence": [
+          "artifacts/rust-tauri/R03/repair-current/G01-E01/adversarial-selfcheck/",
+          "docs/rust-tauri/R03/repair-current/G01-E01_ADVERSARIAL_SELFCHECK.md"
+        ],
+        "notes": "执行者逐 C-ID 消费 adversarial_variation（barrier/固定调度/受控故障点），红绿证据在档。"
+      },
+      "independent_review": {
+        "status": "PASS",
+        "reviewer_id": "REVIEWER-REPAIR-R03-G01-R1",
+        "round": 1,
+        "evidence": [
+          "docs/rust-tauri/R03/repair-current/G01-R1_REVIEW.md",
+          "artifacts/rust-tauri/R03/repair-current/G01-R1/"
+        ],
+        "verdict": "PASS"
+      },
+      "repair_commit": null
+    },
+    {
+      "id": "R03-FIX-F01-C04",
+      "issue_id": "F01",
+      "workorder": "G01",
+      "audit_runtime_status": "NOT_RUN_THIS_AUDIT",
+      "implementation_status": "CLOSED_BY_INDEPENDENT_REVIEW_R1",
+      "normal_selfcheck": {
+        "status": "PASS",
+        "commands": [],
+        "exit_codes": [],
+        "evidence": [
+          "artifacts/rust-tauri/R03/repair-current/G01-E01/normal-selfcheck/",
+          "docs/rust-tauri/R03/repair-current/G01-E01_NORMAL_SELFCHECK.md"
+        ],
+        "notes": "执行者 EXECUTOR-REPAIR-R03-G01-E01 自查报告；独立审查另行登记。"
+      },
+      "adversarial_selfcheck": {
+        "status": "PASS",
+        "commands": [],
+        "exit_codes": [],
+        "evidence": [
+          "artifacts/rust-tauri/R03/repair-current/G01-E01/adversarial-selfcheck/",
+          "docs/rust-tauri/R03/repair-current/G01-E01_ADVERSARIAL_SELFCHECK.md"
+        ],
+        "notes": "执行者逐 C-ID 消费 adversarial_variation（barrier/固定调度/受控故障点），红绿证据在档。"
+      },
+      "independent_review": {
+        "status": "PASS",
+        "reviewer_id": "REVIEWER-REPAIR-R03-G01-R1",
+        "round": 1,
+        "evidence": [
+          "docs/rust-tauri/R03/repair-current/G01-R1_REVIEW.md",
+          "artifacts/rust-tauri/R03/repair-current/G01-R1/"
+        ],
+        "verdict": "PASS"
+      },
+      "repair_commit": null
+    },
+    {
+      "id": "R03-FIX-F01-C05",
+      "issue_id": "F01",
+      "workorder": "G01",
+      "audit_runtime_status": "NOT_RUN_THIS_AUDIT",
+      "implementation_status": "CLOSED_BY_INDEPENDENT_REVIEW_R1",
+      "normal_selfcheck": {
+        "status": "PASS",
+        "commands": [],
+        "exit_codes": [],
+        "evidence": [
+          "artifacts/rust-tauri/R03/repair-current/G01-E01/normal-selfcheck/",
+          "docs/rust-tauri/R03/repair-current/G01-E01_NORMAL_SELFCHECK.md"
+        ],
+        "notes": "执行者 EXECUTOR-REPAIR-R03-G01-E01 自查报告；独立审查另行登记。"
+      },
+      "adversarial_selfcheck": {
+        "status": "PASS",
+        "commands": [],
+        "exit_codes": [],
+        "evidence": [
+          "artifacts/rust-tauri/R03/repair-current/G01-E01/adversarial-selfcheck/",
+          "docs/rust-tauri/R03/repair-current/G01-E01_ADVERSARIAL_SELFCHECK.md"
+        ],
+        "notes": "执行者逐 C-ID 消费 adversarial_variation（barrier/固定调度/受控故障点），红绿证据在档。"
+      },
+      "independent_review": {
+        "status": "PASS",
+        "reviewer_id": "REVIEWER-REPAIR-R03-G01-R1",
+        "round": 1,
+        "evidence": [
+          "docs/rust-tauri/R03/repair-current/G01-R1_REVIEW.md",
+          "artifacts/rust-tauri/R03/repair-current/G01-R1/"
+        ],
+        "verdict": "PASS"
+      },
+      "repair_commit": null
+    },
+    {
+      "id": "R03-FIX-F02-C01",
+      "issue_id": "F02",
+      "workorder": "G01",
+      "audit_runtime_status": "NOT_RUN_THIS_AUDIT",
+      "implementation_status": "CLOSED_BY_INDEPENDENT_REVIEW_R1",
+      "normal_selfcheck": {
+        "status": "PASS",
+        "commands": [],
+        "exit_codes": [],
+        "evidence": [
+          "artifacts/rust-tauri/R03/repair-current/G01-E01/normal-selfcheck/",
+          "docs/rust-tauri/R03/repair-current/G01-E01_NORMAL_SELFCHECK.md"
+        ],
+        "notes": "执行者 EXECUTOR-REPAIR-R03-G01-E01 自查报告；独立审查另行登记。"
+      },
+      "adversarial_selfcheck": {
+        "status": "PASS",
+        "commands": [],
+        "exit_codes": [],
+        "evidence": [
+          "artifacts/rust-tauri/R03/repair-current/G01-E01/adversarial-selfcheck/",
+          "docs/rust-tauri/R03/repair-current/G01-E01_ADVERSARIAL_SELFCHECK.md"
+        ],
+        "notes": "执行者逐 C-ID 消费 adversarial_variation（barrier/固定调度/受控故障点），红绿证据在档。"
+      },
+      "independent_review": {
+        "status": "PASS",
+        "reviewer_id": "REVIEWER-REPAIR-R03-G01-R1",
+        "round": 1,
+        "evidence": [
+          "docs/rust-tauri/R03/repair-current/G01-R1_REVIEW.md",
+          "artifacts/rust-tauri/R03/repair-current/G01-R1/"
+        ],
+        "verdict": "PASS"
+      },
+      "repair_commit": null
+    },
+    {
+      "id": "R03-FIX-F02-C02",
+      "issue_id": "F02",
+      "workorder": "G01",
+      "audit_runtime_status": "NOT_RUN_THIS_AUDIT",
+      "implementation_status": "CLOSED_BY_INDEPENDENT_REVIEW_R1",
+      "normal_selfcheck": {
+        "status": "PASS",
+        "commands": [],
+        "exit_codes": [],
+        "evidence": [
+          "artifacts/rust-tauri/R03/repair-current/G01-E01/normal-selfcheck/",
+          "docs/rust-tauri/R03/repair-current/G01-E01_NORMAL_SELFCHECK.md"
+        ],
+        "notes": "执行者 EXECUTOR-REPAIR-R03-G01-E01 自查报告；独立审查另行登记。"
+      },
+      "adversarial_selfcheck": {
+        "status": "PASS",
+        "commands": [],
+        "exit_codes": [],
+        "evidence": [
+          "artifacts/rust-tauri/R03/repair-current/G01-E01/adversarial-selfcheck/",
+          "docs/rust-tauri/R03/repair-current/G01-E01_ADVERSARIAL_SELFCHECK.md"
+        ],
+        "notes": "执行者逐 C-ID 消费 adversarial_variation（barrier/固定调度/受控故障点），红绿证据在档。"
+      },
+      "independent_review": {
+        "status": "PASS",
+        "reviewer_id": "REVIEWER-REPAIR-R03-G01-R1",
+        "round": 1,
+        "evidence": [
+          "docs/rust-tauri/R03/repair-current/G01-R1_REVIEW.md",
+          "artifacts/rust-tauri/R03/repair-current/G01-R1/"
+        ],
+        "verdict": "PASS"
+      },
+      "repair_commit": null
+    },
+    {
+      "id": "R03-FIX-F02-C03",
+      "issue_id": "F02",
+      "workorder": "G01",
+      "audit_runtime_status": "NOT_RUN_THIS_AUDIT",
+      "implementation_status": "CLOSED_BY_INDEPENDENT_REVIEW_R1",
+      "normal_selfcheck": {
+        "status": "PASS",
+        "commands": [],
+        "exit_codes": [],
+        "evidence": [
+          "artifacts/rust-tauri/R03/repair-current/G01-E01/normal-selfcheck/",
+          "docs/rust-tauri/R03/repair-current/G01-E01_NORMAL_SELFCHECK.md"
+        ],
+        "notes": "执行者 EXECUTOR-REPAIR-R03-G01-E01 自查报告；独立审查另行登记。"
+      },
+      "adversarial_selfcheck": {
+        "status": "PASS",
+        "commands": [],
+        "exit_codes": [],
+        "evidence": [
+          "artifacts/rust-tauri/R03/repair-current/G01-E01/adversarial-selfcheck/",
+          "docs/rust-tauri/R03/repair-current/G01-E01_ADVERSARIAL_SELFCHECK.md"
+        ],
+        "notes": "执行者逐 C-ID 消费 adversarial_variation（barrier/固定调度/受控故障点），红绿证据在档。"
+      },
+      "independent_review": {
+        "status": "PASS",
+        "reviewer_id": "REVIEWER-REPAIR-R03-G01-R1",
+        "round": 1,
+        "evidence": [
+          "docs/rust-tauri/R03/repair-current/G01-R1_REVIEW.md",
+          "artifacts/rust-tauri/R03/repair-current/G01-R1/"
+        ],
+        "verdict": "PASS"
+      },
+      "repair_commit": null
+    },
+    {
+      "id": "R03-FIX-F02-C04",
+      "issue_id": "F02",
+      "workorder": "G01",
+      "audit_runtime_status": "NOT_RUN_THIS_AUDIT",
+      "implementation_status": "CLOSED_BY_INDEPENDENT_REVIEW_R1",
+      "normal_selfcheck": {
+        "status": "PASS",
+        "commands": [],
+        "exit_codes": [],
+        "evidence": [
+          "artifacts/rust-tauri/R03/repair-current/G01-E01/normal-selfcheck/",
+          "docs/rust-tauri/R03/repair-current/G01-E01_NORMAL_SELFCHECK.md"
+        ],
+        "notes": "执行者 EXECUTOR-REPAIR-R03-G01-E01 自查报告；独立审查另行登记。"
+      },
+      "adversarial_selfcheck": {
+        "status": "PASS",
+        "commands": [],
+        "exit_codes": [],
+        "evidence": [
+          "artifacts/rust-tauri/R03/repair-current/G01-E01/adversarial-selfcheck/",
+          "docs/rust-tauri/R03/repair-current/G01-E01_ADVERSARIAL_SELFCHECK.md"
+        ],
+        "notes": "执行者逐 C-ID 消费 adversarial_variation（barrier/固定调度/受控故障点），红绿证据在档。"
+      },
+      "independent_review": {
+        "status": "PASS",
+        "reviewer_id": "REVIEWER-REPAIR-R03-G01-R1",
+        "round": 1,
+        "evidence": [
+          "docs/rust-tauri/R03/repair-current/G01-R1_REVIEW.md",
+          "artifacts/rust-tauri/R03/repair-current/G01-R1/"
+        ],
+        "verdict": "PASS"
+      },
+      "repair_commit": null
+    },
+    {
+      "id": "R03-FIX-F02-C05",
+      "issue_id": "F02",
+      "workorder": "G01",
+      "audit_runtime_status": "NOT_RUN_THIS_AUDIT",
+      "implementation_status": "CLOSED_BY_INDEPENDENT_REVIEW_R1",
+      "normal_selfcheck": {
+        "status": "PASS",
+        "commands": [],
+        "exit_codes": [],
+        "evidence": [
+          "artifacts/rust-tauri/R03/repair-current/G01-E01/normal-selfcheck/",
+          "docs/rust-tauri/R03/repair-current/G01-E01_NORMAL_SELFCHECK.md"
+        ],
+        "notes": "执行者 EXECUTOR-REPAIR-R03-G01-E01 自查报告；独立审查另行登记。"
+      },
+      "adversarial_selfcheck": {
+        "status": "PASS",
+        "commands": [],
+        "exit_codes": [],
+        "evidence": [
+          "artifacts/rust-tauri/R03/repair-current/G01-E01/adversarial-selfcheck/",
+          "docs/rust-tauri/R03/repair-current/G01-E01_ADVERSARIAL_SELFCHECK.md"
+        ],
+        "notes": "执行者逐 C-ID 消费 adversarial_variation（barrier/固定调度/受控故障点），红绿证据在档。"
+      },
+      "independent_review": {
+        "status": "PASS",
+        "reviewer_id": "REVIEWER-REPAIR-R03-G01-R1",
+        "round": 1,
+        "evidence": [
+          "docs/rust-tauri/R03/repair-current/G01-R1_REVIEW.md",
+          "artifacts/rust-tauri/R03/repair-current/G01-R1/"
+        ],
+        "verdict": "PASS"
+      },
+      "repair_commit": null
+    },
+    {
+      "id": "R03-FIX-F03-C01",
+      "issue_id": "F03",
+      "workorder": "G02",
+      "audit_runtime_status": "NOT_RUN_THIS_AUDIT",
+      "implementation_status": "NOT_STARTED",
+      "normal_selfcheck": {
+        "status": "NOT_RUN",
+        "commands": [],
+        "exit_codes": [],
+        "evidence": [],
+        "notes": null
+      },
+      "adversarial_selfcheck": {
+        "status": "NOT_RUN",
+        "commands": [],
+        "exit_codes": [],
+        "evidence": [],
+        "notes": null
+      },
+      "independent_review": {
+        "status": "NOT_RUN",
+        "reviewer_id": null,
+        "round": null,
+        "evidence": [],
+        "verdict": null
+      },
+      "repair_commit": null
+    },
+    {
+      "id": "R03-FIX-F03-C02",
+      "issue_id": "F03",
+      "workorder": "G02",
+      "audit_runtime_status": "NOT_RUN_THIS_AUDIT",
+      "implementation_status": "NOT_STARTED",
+      "normal_selfcheck": {
+        "status": "NOT_RUN",
+        "commands": [],
+        "exit_codes": [],
+        "evidence": [],
+        "notes": null
+      },
+      "adversarial_selfcheck": {
+        "status": "NOT_RUN",
+        "commands": [],
+        "exit_codes": [],
+        "evidence": [],
+        "notes": null
+      },
+      "independent_review": {
+        "status": "NOT_RUN",
+        "reviewer_id": null,
+        "round": null,
+        "evidence": [],
+        "verdict": null
+      },
+      "repair_commit": null
+    },
+    {
+      "id": "R03-FIX-F03-C03",
+      "issue_id": "F03",
+      "workorder": "G02",
+      "audit_runtime_status": "NOT_RUN_THIS_AUDIT",
+      "implementation_status": "NOT_STARTED",
+      "normal_selfcheck": {
+        "status": "NOT_RUN",
+        "commands": [],
+        "exit_codes": [],
+        "evidence": [],
+        "notes": null
+      },
+      "adversarial_selfcheck": {
+        "status": "NOT_RUN",
+        "commands": [],
+        "exit_codes": [],
+        "evidence": [],
+        "notes": null
+      },
+      "independent_review": {
+        "status": "NOT_RUN",
+        "reviewer_id": null,
+        "round": null,
+        "evidence": [],
+        "verdict": null
+      },
+      "repair_commit": null
+    },
+    {
+      "id": "R03-FIX-F03-C04",
+      "issue_id": "F03",
+      "workorder": "G02",
+      "audit_runtime_status": "NOT_RUN_THIS_AUDIT",
+      "implementation_status": "NOT_STARTED",
+      "normal_selfcheck": {
+        "status": "NOT_RUN",
+        "commands": [],
+        "exit_codes": [],
+        "evidence": [],
+        "notes": null
+      },
+      "adversarial_selfcheck": {
+        "status": "NOT_RUN",
+        "commands": [],
+        "exit_codes": [],
+        "evidence": [],
+        "notes": null
+      },
+      "independent_review": {
+        "status": "NOT_RUN",
+        "reviewer_id": null,
+        "round": null,
+        "evidence": [],
+        "verdict": null
+      },
+      "repair_commit": null
+    },
+    {
+      "id": "R03-FIX-F04-C01",
+      "issue_id": "F04",
+      "workorder": "G03",
+      "audit_runtime_status": "NOT_RUN_THIS_AUDIT",
+      "implementation_status": "NOT_STARTED",
+      "normal_selfcheck": {
+        "status": "NOT_RUN",
+        "commands": [],
+        "exit_codes": [],
+        "evidence": [],
+        "notes": null
+      },
+      "adversarial_selfcheck": {
+        "status": "NOT_RUN",
+        "commands": [],
+        "exit_codes": [],
+        "evidence": [],
+        "notes": null
+      },
+      "independent_review": {
+        "status": "NOT_RUN",
+        "reviewer_id": null,
+        "round": null,
+        "evidence": [],
+        "verdict": null
+      },
+      "repair_commit": null
+    },
+    {
+      "id": "R03-FIX-F04-C02",
+      "issue_id": "F04",
+      "workorder": "G03",
+      "audit_runtime_status": "NOT_RUN_THIS_AUDIT",
+      "implementation_status": "NOT_STARTED",
+      "normal_selfcheck": {
+        "status": "NOT_RUN",
+        "commands": [],
+        "exit_codes": [],
+        "evidence": [],
+        "notes": null
+      },
+      "adversarial_selfcheck": {
+        "status": "NOT_RUN",
+        "commands": [],
+        "exit_codes": [],
+        "evidence": [],
+        "notes": null
+      },
+      "independent_review": {
+        "status": "NOT_RUN",
+        "reviewer_id": null,
+        "round": null,
+        "evidence": [],
+        "verdict": null
+      },
+      "repair_commit": null
+    },
+    {
+      "id": "R03-FIX-F04-C03",
+      "issue_id": "F04",
+      "workorder": "G03",
+      "audit_runtime_status": "NOT_RUN_THIS_AUDIT",
+      "implementation_status": "NOT_STARTED",
+      "normal_selfcheck": {
+        "status": "NOT_RUN",
+        "commands": [],
+        "exit_codes": [],
+        "evidence": [],
+        "notes": null
+      },
+      "adversarial_selfcheck": {
+        "status": "NOT_RUN",
+        "commands": [],
+        "exit_codes": [],
+        "evidence": [],
+        "notes": null
+      },
+      "independent_review": {
+        "status": "NOT_RUN",
+        "reviewer_id": null,
+        "round": null,
+        "evidence": [],
+        "verdict": null
+      },
+      "repair_commit": null
+    },
+    {
+      "id": "R03-FIX-F04-C04",
+      "issue_id": "F04",
+      "workorder": "G03",
+      "audit_runtime_status": "NOT_RUN_THIS_AUDIT",
+      "implementation_status": "NOT_STARTED",
+      "normal_selfcheck": {
+        "status": "NOT_RUN",
+        "commands": [],
+        "exit_codes": [],
+        "evidence": [],
+        "notes": null
+      },
+      "adversarial_selfcheck": {
+        "status": "NOT_RUN",
+        "commands": [],
+        "exit_codes": [],
+        "evidence": [],
+        "notes": null
+      },
+      "independent_review": {
+        "status": "NOT_RUN",
+        "reviewer_id": null,
+        "round": null,
+        "evidence": [],
+        "verdict": null
+      },
+      "repair_commit": null
+    },
+    {
+      "id": "R03-FIX-F05-C01",
+      "issue_id": "F05",
+      "workorder": "G04",
+      "audit_runtime_status": "NOT_RUN_THIS_AUDIT",
+      "implementation_status": "NOT_STARTED",
+      "normal_selfcheck": {
+        "status": "NOT_RUN",
+        "commands": [],
+        "exit_codes": [],
+        "evidence": [],
+        "notes": null
+      },
+      "adversarial_selfcheck": {
+        "status": "NOT_RUN",
+        "commands": [],
+        "exit_codes": [],
+        "evidence": [],
+        "notes": null
+      },
+      "independent_review": {
+        "status": "NOT_RUN",
+        "reviewer_id": null,
+        "round": null,
+        "evidence": [],
+        "verdict": null
+      },
+      "repair_commit": null
+    },
+    {
+      "id": "R03-FIX-F05-C02",
+      "issue_id": "F05",
+      "workorder": "G04",
+      "audit_runtime_status": "NOT_RUN_THIS_AUDIT",
+      "implementation_status": "NOT_STARTED",
+      "normal_selfcheck": {
+        "status": "NOT_RUN",
+        "commands": [],
+        "exit_codes": [],
+        "evidence": [],
+        "notes": null
+      },
+      "adversarial_selfcheck": {
+        "status": "NOT_RUN",
+        "commands": [],
+        "exit_codes": [],
+        "evidence": [],
+        "notes": null
+      },
+      "independent_review": {
+        "status": "NOT_RUN",
+        "reviewer_id": null,
+        "round": null,
+        "evidence": [],
+        "verdict": null
+      },
+      "repair_commit": null
+    },
+    {
+      "id": "R03-FIX-F05-C03",
+      "issue_id": "F05",
+      "workorder": "G04",
+      "audit_runtime_status": "NOT_RUN_THIS_AUDIT",
+      "implementation_status": "NOT_STARTED",
+      "normal_selfcheck": {
+        "status": "NOT_RUN",
+        "commands": [],
+        "exit_codes": [],
+        "evidence": [],
+        "notes": null
+      },
+      "adversarial_selfcheck": {
+        "status": "NOT_RUN",
+        "commands": [],
+        "exit_codes": [],
+        "evidence": [],
+        "notes": null
+      },
+      "independent_review": {
+        "status": "NOT_RUN",
+        "reviewer_id": null,
+        "round": null,
+        "evidence": [],
+        "verdict": null
+      },
+      "repair_commit": null
+    },
+    {
+      "id": "R03-FIX-F05-C04",
+      "issue_id": "F05",
+      "workorder": "G04",
+      "audit_runtime_status": "NOT_RUN_THIS_AUDIT",
+      "implementation_status": "NOT_STARTED",
+      "normal_selfcheck": {
+        "status": "NOT_RUN",
+        "commands": [],
+        "exit_codes": [],
+        "evidence": [],
+        "notes": null
+      },
+      "adversarial_selfcheck": {
+        "status": "NOT_RUN",
+        "commands": [],
+        "exit_codes": [],
+        "evidence": [],
+        "notes": null
+      },
+      "independent_review": {
+        "status": "NOT_RUN",
+        "reviewer_id": null,
+        "round": null,
+        "evidence": [],
+        "verdict": null
+      },
+      "repair_commit": null
+    },
+    {
+      "id": "R03-FIX-F05-C05",
+      "issue_id": "F05",
+      "workorder": "G04",
+      "audit_runtime_status": "NOT_RUN_THIS_AUDIT",
+      "implementation_status": "NOT_STARTED",
+      "normal_selfcheck": {
+        "status": "NOT_RUN",
+        "commands": [],
+        "exit_codes": [],
+        "evidence": [],
+        "notes": null
+      },
+      "adversarial_selfcheck": {
+        "status": "NOT_RUN",
+        "commands": [],
+        "exit_codes": [],
+        "evidence": [],
+        "notes": null
+      },
+      "independent_review": {
+        "status": "NOT_RUN",
+        "reviewer_id": null,
+        "round": null,
+        "evidence": [],
+        "verdict": null
+      },
+      "repair_commit": null
+    },
+    {
+      "id": "R03-FIX-F06-C01",
+      "issue_id": "F06",
+      "workorder": "G05",
+      "audit_runtime_status": "NOT_RUN_THIS_AUDIT",
+      "implementation_status": "NOT_STARTED",
+      "normal_selfcheck": {
+        "status": "NOT_RUN",
+        "commands": [],
+        "exit_codes": [],
+        "evidence": [],
+        "notes": null
+      },
+      "adversarial_selfcheck": {
+        "status": "NOT_RUN",
+        "commands": [],
+        "exit_codes": [],
+        "evidence": [],
+        "notes": null
+      },
+      "independent_review": {
+        "status": "NOT_RUN",
+        "reviewer_id": null,
+        "round": null,
+        "evidence": [],
+        "verdict": null
+      },
+      "repair_commit": null
+    },
+    {
+      "id": "R03-FIX-F06-C02",
+      "issue_id": "F06",
+      "workorder": "G05",
+      "audit_runtime_status": "NOT_RUN_THIS_AUDIT",
+      "implementation_status": "NOT_STARTED",
+      "normal_selfcheck": {
+        "status": "NOT_RUN",
+        "commands": [],
+        "exit_codes": [],
+        "evidence": [],
+        "notes": null
+      },
+      "adversarial_selfcheck": {
+        "status": "NOT_RUN",
+        "commands": [],
+        "exit_codes": [],
+        "evidence": [],
+        "notes": null
+      },
+      "independent_review": {
+        "status": "NOT_RUN",
+        "reviewer_id": null,
+        "round": null,
+        "evidence": [],
+        "verdict": null
+      },
+      "repair_commit": null
+    },
+    {
+      "id": "R03-FIX-F06-C03",
+      "issue_id": "F06",
+      "workorder": "G05",
+      "audit_runtime_status": "NOT_RUN_THIS_AUDIT",
+      "implementation_status": "NOT_STARTED",
+      "normal_selfcheck": {
+        "status": "NOT_RUN",
+        "commands": [],
+        "exit_codes": [],
+        "evidence": [],
+        "notes": null
+      },
+      "adversarial_selfcheck": {
+        "status": "NOT_RUN",
+        "commands": [],
+        "exit_codes": [],
+        "evidence": [],
+        "notes": null
+      },
+      "independent_review": {
+        "status": "NOT_RUN",
+        "reviewer_id": null,
+        "round": null,
+        "evidence": [],
+        "verdict": null
+      },
+      "repair_commit": null
+    },
+    {
+      "id": "R03-FIX-F07-C01",
+      "issue_id": "F07",
+      "workorder": "G06",
+      "audit_runtime_status": "NOT_RUN_THIS_AUDIT",
+      "implementation_status": "NOT_STARTED",
+      "normal_selfcheck": {
+        "status": "NOT_RUN",
+        "commands": [],
+        "exit_codes": [],
+        "evidence": [],
+        "notes": null
+      },
+      "adversarial_selfcheck": {
+        "status": "NOT_RUN",
+        "commands": [],
+        "exit_codes": [],
+        "evidence": [],
+        "notes": null
+      },
+      "independent_review": {
+        "status": "NOT_RUN",
+        "reviewer_id": null,
+        "round": null,
+        "evidence": [],
+        "verdict": null
+      },
+      "repair_commit": null
+    },
+    {
+      "id": "R03-FIX-F07-C02",
+      "issue_id": "F07",
+      "workorder": "G06",
+      "audit_runtime_status": "NOT_RUN_THIS_AUDIT",
+      "implementation_status": "NOT_STARTED",
+      "normal_selfcheck": {
+        "status": "NOT_RUN",
+        "commands": [],
+        "exit_codes": [],
+        "evidence": [],
+        "notes": null
+      },
+      "adversarial_selfcheck": {
+        "status": "NOT_RUN",
+        "commands": [],
+        "exit_codes": [],
+        "evidence": [],
+        "notes": null
+      },
+      "independent_review": {
+        "status": "NOT_RUN",
+        "reviewer_id": null,
+        "round": null,
+        "evidence": [],
+        "verdict": null
+      },
+      "repair_commit": null
+    },
+    {
+      "id": "R03-FIX-F07-C03",
+      "issue_id": "F07",
+      "workorder": "G06",
+      "audit_runtime_status": "NOT_RUN_THIS_AUDIT",
+      "implementation_status": "NOT_STARTED",
+      "normal_selfcheck": {
+        "status": "NOT_RUN",
+        "commands": [],
+        "exit_codes": [],
+        "evidence": [],
+        "notes": null
+      },
+      "adversarial_selfcheck": {
+        "status": "NOT_RUN",
+        "commands": [],
+        "exit_codes": [],
+        "evidence": [],
+        "notes": null
+      },
+      "independent_review": {
+        "status": "NOT_RUN",
+        "reviewer_id": null,
+        "round": null,
+        "evidence": [],
+        "verdict": null
+      },
+      "repair_commit": null
+    },
+    {
+      "id": "R03-FIX-F07-C04",
+      "issue_id": "F07",
+      "workorder": "G06",
+      "audit_runtime_status": "NOT_RUN_THIS_AUDIT",
+      "implementation_status": "NOT_STARTED",
+      "normal_selfcheck": {
+        "status": "NOT_RUN",
+        "commands": [],
+        "exit_codes": [],
+        "evidence": [],
+        "notes": null
+      },
+      "adversarial_selfcheck": {
+        "status": "NOT_RUN",
+        "commands": [],
+        "exit_codes": [],
+        "evidence": [],
+        "notes": null
+      },
+      "independent_review": {
+        "status": "NOT_RUN",
+        "reviewer_id": null,
+        "round": null,
+        "evidence": [],
+        "verdict": null
+      },
+      "repair_commit": null
+    },
+    {
+      "id": "R03-FIX-F08-C01",
+      "issue_id": "F08",
+      "workorder": "G07",
+      "audit_runtime_status": "NOT_RUN_THIS_AUDIT",
+      "implementation_status": "NOT_STARTED",
+      "normal_selfcheck": {
+        "status": "NOT_RUN",
+        "commands": [],
+        "exit_codes": [],
+        "evidence": [],
+        "notes": null
+      },
+      "adversarial_selfcheck": {
+        "status": "NOT_RUN",
+        "commands": [],
+        "exit_codes": [],
+        "evidence": [],
+        "notes": null
+      },
+      "independent_review": {
+        "status": "NOT_RUN",
+        "reviewer_id": null,
+        "round": null,
+        "evidence": [],
+        "verdict": null
+      },
+      "repair_commit": null
+    },
+    {
+      "id": "R03-FIX-F08-C02",
+      "issue_id": "F08",
+      "workorder": "G07",
+      "audit_runtime_status": "NOT_RUN_THIS_AUDIT",
+      "implementation_status": "NOT_STARTED",
+      "normal_selfcheck": {
+        "status": "NOT_RUN",
+        "commands": [],
+        "exit_codes": [],
+        "evidence": [],
+        "notes": null
+      },
+      "adversarial_selfcheck": {
+        "status": "NOT_RUN",
+        "commands": [],
+        "exit_codes": [],
+        "evidence": [],
+        "notes": null
+      },
+      "independent_review": {
+        "status": "NOT_RUN",
+        "reviewer_id": null,
+        "round": null,
+        "evidence": [],
+        "verdict": null
+      },
+      "repair_commit": null
+    },
+    {
+      "id": "R03-FIX-F08-C03",
+      "issue_id": "F08",
+      "workorder": "G07",
+      "audit_runtime_status": "NOT_RUN_THIS_AUDIT",
+      "implementation_status": "NOT_STARTED",
+      "normal_selfcheck": {
+        "status": "NOT_RUN",
+        "commands": [],
+        "exit_codes": [],
+        "evidence": [],
+        "notes": null
+      },
+      "adversarial_selfcheck": {
+        "status": "NOT_RUN",
+        "commands": [],
+        "exit_codes": [],
+        "evidence": [],
+        "notes": null
+      },
+      "independent_review": {
+        "status": "NOT_RUN",
+        "reviewer_id": null,
+        "round": null,
+        "evidence": [],
+        "verdict": null
+      },
+      "repair_commit": null
+    },
+    {
+      "id": "R03-FIX-F08-C04",
+      "issue_id": "F08",
+      "workorder": "G07",
+      "audit_runtime_status": "NOT_RUN_THIS_AUDIT",
+      "implementation_status": "NOT_STARTED",
+      "normal_selfcheck": {
+        "status": "NOT_RUN",
+        "commands": [],
+        "exit_codes": [],
+        "evidence": [],
+        "notes": null
+      },
+      "adversarial_selfcheck": {
+        "status": "NOT_RUN",
+        "commands": [],
+        "exit_codes": [],
+        "evidence": [],
+        "notes": null
+      },
+      "independent_review": {
+        "status": "NOT_RUN",
+        "reviewer_id": null,
+        "round": null,
+        "evidence": [],
+        "verdict": null
+      },
+      "repair_commit": null
+    }
+  ]
+}

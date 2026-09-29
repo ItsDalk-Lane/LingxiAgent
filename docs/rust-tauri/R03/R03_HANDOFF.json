@@ -1,7 +1,8 @@
 {
   "spec_version": "1.0",
   "stage_id": "R03",
-  "status": "ACCEPTED",
+  "status": "REOPENED_PENDING_REPAIR",
+  "status_note_2026_09_30": "对抗性审查（基线 cd3fb19e651f763afc6c75cb3163064fb54ca3fe）确认 F01–F08 共 8 组缺陷/34 项反例，其中 F08 质疑 accepted_stage_candidate 依据的裁决2（FINDING-1 两阶段收口解释）。原 ACCEPTED 历史与证据保留（见 accepted_stage_candidate 与 R03_FINAL_STAGE_REVIEW_R1.md，原文未改）；重新接受仅可由本轮修复后的全新独立审查作出。统一问题账：docs/rust-tauri/R03/repair-current/R03_FIX_ISSUES.json。allowed_next_scope 在本轮收口前冻结为 R03 修复本身，不放行 R04。",
   "generated_by": "ZCode:EXECUTOR-R03-T08-E01（2026-09-29；一次性执行代理，无 commit/push 授权；最终 PASS/ACCEPTED 归总控另派的独立验收）",
   "tested_sha": "dc42a01e37d1110293ec137402fd3239bd5b7d9d",
   "tested_sha_note": "候选 = TASK_BASE_SHA dc42a01e3 + 本 Task 授权工作树（T01–T07 已提交 + T08 未提交修改；verify-stage testedSha 报 HEAD dc42a01e3、worktreeDirty=true 属预期，验收后由总控提交）。",

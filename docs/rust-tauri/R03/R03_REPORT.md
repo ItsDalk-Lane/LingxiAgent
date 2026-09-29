@@ -1,5 +1,12 @@
 # R03 阶段报告｜运行状态机、并发、取消与恢复
 
+## 本轮状态（2026-09-30）：REOPENED_PENDING_REPAIR
+
+对抗性审查（审查基线 `cd3fb19e6`，即本报告当时 HEAD）确认 8 组缺陷 **F01–F08**（34 项新增反例 C-ID）。其中 F08 直接质疑下方「阶段独立验收」的**裁决2**（FINDING-1「两阶段收口」解释：普通父取消后 child durable/busy 残留递延重启收口）及 HANDOFF known_gaps 对应递延；F01/F02 为其运行层根因。2026-09-29 的 STAGE_VERDICT: PASS、626 测试绿与全部历史证据**原文保留、不予否认**；但其接受依据不再视为充分——R03 在本轮修复（工作单 G01–G07）+ 逐项三层检查 + 全新独立阶段审查完成前处于 REOPENED_PENDING_REPAIR，**不放行 R04**。旧 PASS 不能作为反证驳回本轮反例；驳回须以源码/实测反证经全新 Reviewer 裁决。
+
+- 统一问题账（逐 F-ID/C-ID 三层状态，权威索引）：`docs/rust-tauri/R03/repair-current/R03_FIX_ISSUES.json`
+- 本轮规格全文：`Lingxi_Rust_Tauri_Taskbooks_2026-09-23/Lingxi_R03_对抗性审查_问题清单与修复总控提示词_2026-09-30.md` 与 `Lingxi_R03_修复验收清单_2026-09-30.json`
+
 ## 阶段与结论
 
 **READY_FOR_REVIEW**（执行者口径；独立阶段验收归总控另派。READY_FOR_REVIEW 不是 PASS。）
