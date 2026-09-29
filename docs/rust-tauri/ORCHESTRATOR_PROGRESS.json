@@ -513,7 +513,7 @@
     },
     "R03": {
       "title": "运行状态机、并发、取消与恢复",
-      "status": "STAGE_REPAIR_DONE_READY_FOR_STAGE_REVIEW",
+      "status": "ACCEPTED",
       "task_ids": [
         "R03-T01",
         "R03-T02",
@@ -525,8 +525,8 @@
         "R03-T08"
       ],
       "stage_base_sha": "526f7770f1eff6be289b8c34faeccc1b95e181fd",
-      "stage_review_round": 0,
-      "stage_verdict": null,
+      "stage_review_round": 1,
+      "stage_verdict": "PASS",
       "stage_acceptance_commit_sha": null,
       "blockers": [],
       "stage_repairs": {
@@ -544,7 +544,10 @@
             "a16_residual_red": "双层：注册封印族分类态 + round3 patch-replay patch-too-large 新治理项（审计重放机制规模耗尽，非产品回归、不套旧类别、不扩白名单）——交阶段审查裁决"
           }
         }
-      }
+      },
+      "stage_review_agent_id": "ZCode:STAGE-REVIEWER-R03-R01 (agent_82a4b1bb-0696-4000-a21a-13bbf0cc4266)",
+      "stage_final_candidate_sha": "1ebb03d9f89af364a42274efc2cd482f298b1130",
+      "acceptance_note": "接受文档提交引用候选 1ebb03d9f；接受提交 SHA 由远程回执在最终输出登记（防自引用）"
     },
     "R04": {
       "title": "统一工具网关、四基础工具与沙盒",
@@ -4319,7 +4322,7 @@
       "blockers": []
     }
   },
-  "current_task": "R03-STAGE-REVIEW",
+  "current_task": null,
   "orchestration_mode": {
     "effective_from": "R00-T03 R2 repair",
     "task_executor": "new ZCode task per Rxx-Tyy",

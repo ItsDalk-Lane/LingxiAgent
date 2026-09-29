@@ -1,0 +1,11 @@
+{
+  "combo": "leaf-parent-cancel",
+  "counts": {
+    "child_final_message_rows": 0,
+    "child_status_after_recovery_scan": "interrupted_needs_attention",
+    "child_status_before_restart": "running",
+    "note": "child TASK stopped by the tree cancel (supervision confirmed; the thread registry busy flag only clears via the drive's own bookkeeping, which the tree-cancel drop skips); the durable row is closed by the real recovery scan (the documented dangling-active closure path), never faked",
+    "parent_final_status": "cancelled"
+  },
+  "schema": "lingxi.r03-t08-combo-counts.v1"
+}

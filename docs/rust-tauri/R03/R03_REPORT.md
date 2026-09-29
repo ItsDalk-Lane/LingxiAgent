@@ -54,6 +54,14 @@ macOS darwin 27.0.0 arm64；rustup 锁定 1.98.1（全部经 rustup 代理+`--lo
 
 见 `R03_SCOPE_MATRIX.json`（8 任务/16 验收全 REQUIRED）与 `R03_ACCEPTANCE_LEDGER.json`（16 场景+48 补充叶+additional gates）。未覆盖集合：31 项 deferred_to_later_stage 叶（仍 REQUIRED，验收归 R06/R07/R08，登记于 R03 图与 HANDOFF）+ R02 图 9 项 DEFERRED_TO_R07 叶（R07 消费）。
 
+## 阶段独立验收（2026-09-29）
+
+STAGE-REVIEWER-R03-R01（全新代理，未参与本阶段实现/修复/Task 验收）：**STAGE_VERDICT: PASS**。
+- 候选 1ebb03d9f89af364a42274efc2cd482f298b1130；verify-stage R03 独立重跑 exit 0，testedShaAtEnd=1ebb03d9f；16/16 场景；48 叶 17 share PASS + 31 DEFERRED + 0 fail/0 blocked。
+- 六组核心事实独立重跑全绿；workspace 626/0（63 suites）；fmt/clippy/check-contracts/check-boundaries exit 0。
+- 报告：docs/rust-tauri/R03/R03_FINAL_STAGE_REVIEW_R1.md；证据：artifacts/rust-tauri/R03/STAGE-REVIEW-R01/。
+- 治理递延（不阻塞）：a16/E5 封印族分类态 + round3 patch-too-large（git MAX_APPLY_SIZE 1023MiB 硬限，1.90GB 补丁；审计重放规模耗尽）——归 seal 工作流，见 R03_HANDOFF stage_governance_deferrals。
+
 ## 已知缺陷
 
 - **R03-T08-FINDING-1（MINOR，T08 组合矩阵发现，未修复——如实登记）**：父取消路径 subagent child run durable 行不就地收口（spawn_linked 包装器 biased select 先丢弃 drive future），由下一进程启动扫描诚实收口为 interrupted_needs_attention（矩阵实测+重启闭环已证）；child 自身超时路径正常落 cancelled。T06 报告对应表述在父取消路径不成立。影响域：子代理父取消场景的行级即时终态（监督层 A06 判定成立）；修复归属 R04/R06 触碰或总控另派。关联：R03-A06（判定成立不受影响）。**【G01-F01 文档更正执行记录 2026-09-29】**T06 报告该表述已由 STAGE-REPAIR-R03-G01-F01 按本裁决语义更正（原句删除线保留，见 repairs/R03_STAGE_REPAIR_G01_F01.md）；产线修复归属不变（R04/R06 或总控另派），本条不因此自标关闭。
