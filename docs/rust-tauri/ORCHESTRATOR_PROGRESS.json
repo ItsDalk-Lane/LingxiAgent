@@ -2751,10 +2751,12 @@
         "R03-A11": "PASS",
         "R03-A12": "PASS"
       },
-      "task_commit_sha": null,
+      "task_commit_sha": "0c138456bbe791f21621f5a24eb47bc1948f7585",
       "push_result": {
-        "status": "PENDING_BACKFILL",
-        "note": "SHA 与远程回执由下一账本提交补登"
+        "status": "CONFIRMED",
+        "remote_branch": "origin/codex/rust-tauri-migration",
+        "remote_head": "0c138456bbe791f21621f5a24eb47bc1948f7585",
+        "note": "ls-remote verified after push"
       },
       "blockers": [],
       "evidence": {
@@ -2768,23 +2770,41 @@
     "R03-T07": {
       "name": "故障恢复与服务退出策略",
       "stage_id": "R03",
-      "status": "PENDING",
-      "task_base_sha": null,
-      "executor_id": null,
-      "execution_result": null,
-      "review_round": 0,
-      "reviewer_id": null,
-      "review_verdict": null,
-      "findings": [],
+      "status": "DONE",
+      "task_base_sha": "0c138456bbe791f21621f5a24eb47bc1948f7585",
+      "executor_id": "ZCode:R03-T07-exec-e1 (agent_c2dc34c4-0231-45bf-a843-25c6ef4f0be0)",
+      "execution_result": "READY_FOR_REVIEW",
+      "review_round": 1,
+      "reviewer_id": "ZCode:R03-T07-review-r1 (agent_02f02f5e-80cf-42a0-82be-3904bd952f85)",
+      "review_verdict": "PASS",
+      "findings": [
+        {
+          "id": "R1-OBS",
+          "severity": "ADVISORY",
+          "summary": "O-1..O-5 建议性观察（取消字段命名、可恢复类终态口径已披露、信号→HTTP 端到端归 R09 等）",
+          "review_report": "docs/rust-tauri/R03/R03-T07_REVIEW_R1.md",
+          "resolution": "登记观察；O-5 归 R09/T08 组合验证"
+        }
+      ],
       "repair_agent_id": null,
       "root_cause_agent_id": null,
       "acceptance_results": {
-        "R03-A13": "NOT_STARTED",
-        "R03-A14": "NOT_STARTED"
+        "R03-A13": "PASS",
+        "R03-A14": "PASS"
       },
       "task_commit_sha": null,
-      "push_result": null,
-      "blockers": []
+      "push_result": {
+        "status": "PENDING_BACKFILL",
+        "note": "SHA 与远程回执由下一账本提交补登"
+      },
+      "blockers": [],
+      "evidence": {
+        "executor_report": "docs/rust-tauri/R03/R03-T07_REPORT.md",
+        "executor_evidence": "artifacts/rust-tauri/R03/T07-E01/",
+        "review_report": "docs/rust-tauri/R03/R03-T07_REVIEW_R1.md",
+        "review_evidence": "artifacts/rust-tauri/R03/T07-R01-review/",
+        "candidate_diff_digest_16": "0e0b2144c141977b"
+      }
     },
     "R03-T08": {
       "name": "状态机验收与 R04 接口交接",
@@ -4236,7 +4256,7 @@
       "blockers": []
     }
   },
-  "current_task": "R03-T07",
+  "current_task": "R03-T08",
   "orchestration_mode": {
     "effective_from": "R00-T03 R2 repair",
     "task_executor": "new ZCode task per Rxx-Tyy",

@@ -41,10 +41,18 @@ $BIN --home $home
 - **单写者**：同一 `{home}` 第二实例拒启（exit 3 +
   `LINGXI_SERVICE_SINGLE_WRITER_BLOCKED` 标记行）；锁（OS 文件锁）是唯一
   存活权威，陈旧记录自动归档为 `instance.stale.json` 并接管。
-- **停止**：向进程发 SIGTERM（或 Ctrl-C）；graceful 关闭链 = 停收新请求 →
-  广播 WS 会话关闭（1001）→ 等待/取消受管任务 → flush 关键事件 → 关闭
-  run 数据库（WAL TRUNCATE checkpoint）→ 移除自己的 instance 记录 → 释放锁。
-  正常退出码 0。
+- **停止**：向进程发 SIGTERM（或 Ctrl-C）；graceful 关闭链 = **关闭提交入口
+  （R03-T07：信号时第一动作——此后新提交一律拒绝 503 `shutting_down`；
+  已受理任务的同 requestId 幂等重放仍被回答）** → 停收新请求 → 广播 WS
+  会话关闭（1001）→ 按任务类型取消/等待受管任务（后台驱动经取消树请求
+  取消、由各自唯一 finalize 收束；到期未确认者如实报 residue，durable
+  行保持 active 交给下次启动的恢复扫描）→ flush 关键事件 → 关闭
+  run 数据库（WAL TRUNCATE checkpoint）→ 移除自己的 instance 记录 →
+  释放锁。正常退出码 0。
+- **重启恢复（R03-T07）**：启动时对遗留的非终态 run 执行恢复扫描——
+  journal 落 unknown 判定、按恢复分类表写入可解释的
+  `interrupted_needs_attention`（或完成已在途的 `cancelled`）；终态不
+  复活、不虚构最终回复；无法分类的持久化事实拒绝启动（exit 2）。
 - **首个业务调用**：`GET /lingxi/v1/health`（无需 token，最小面）；读会话
   `GET /lingxi/v1/sessions/{id}`；写 `POST /lingxi/v1/sessions/{id}/execute`
   （`{"input": "..."}`）；订阅 `GET /lingxi/v1/ws` 升级后发

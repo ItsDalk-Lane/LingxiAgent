@@ -1,0 +1,49 @@
+R03-T07-E01 candidate summary (executor口径; no commit/push)
+BASE_SHA = 0c138456bbe791f21621f5a24eb47bc1948f7585 (= TASK_BASE_SHA = HEAD; zero commits made)
+BRANCH   = codex/rust-tauri-migration
+rust/Cargo.lock sha256 = 90111c4b5988531d7a891339b6ee5df8afc9d3ec655e4929747da07d5811bb49 (UNCHANGED = R02_HANDOFF value)
+crate Cargo.toml (kernel/adapters/service) = unmodified (no new dependencies; tokio test-util NOT introduced)
+
+MODIFIED (10 tracked):
+  rust/crates/lingxi-kernel/src/lib.rs
+  rust/crates/lingxi-adapters/src/storage/mod.rs
+  rust/crates/lingxi-adapters/src/storage/run_store.rs
+  rust/crates/lingxi-service/src/lib.rs
+  rust/crates/lingxi-service/src/main.rs
+  rust/crates/lingxi-service/src/sessions.rs
+  rust/crates/lingxi-service/src/shutdown.rs
+  rust/crates/lingxi-service/tests/execute_concurrency.rs       (R02-A07 restart assertions → coordinator semantics)
+  rust/crates/lingxi-service/tests/invocation_journal.rs        (T05 A09 restart assertions → coordinator semantics; A10 unaffected assertions intact)
+  rust/crates/lingxi-service/tests/shutdown_coordinator.rs      (graceful_shutdown signature: + &RunSupervisor at 5 call sites)
+
+NEW (7 rust paths + 1 test-support dir):
+  rust/crates/lingxi-kernel/src/recovery.rs                     (run-level recovery classification table, pure)
+  rust/crates/lingxi-service/src/recovery.rs                    (RecoveryCoordinator startup scan)
+  rust/crates/lingxi-adapters/tests/active_run_listing.rs       (2 permanent tests)
+  rust/crates/lingxi-service/tests/recovery_startup_scan.rs     (7 permanent tests)
+  rust/crates/lingxi-service/tests/exit_race_rejections.rs      (2 permanent tests)
+  rust/crates/lingxi-service/tests/recovery_crash_points.rs     (kill -9 matrix + child harness)
+  rust/crates/lingxi-service/tests/recovery_support/harness.rs  (shared fixtures; subdir = not a cargo target)
+
+STORAGE: NO new migration (list_active_runs is a SELECT over existing tables);
+V1=479b0321… V2=64d7edfd… V3=3bd5388f… V4=371d4154… untouched (r02-script-probe S4 dump cross-check).
+
+Per-file sha256:
+e4068297321b9db54a06666896b2652994a878a38a379c1473baf2e91dcf6eb2  rust/crates/lingxi-kernel/src/lib.rs
+796cc13cfbfe0ef9aa021e3f7c47668d9374468a1defb1dfa0d046b853803268  rust/crates/lingxi-kernel/src/recovery.rs
+9dbca03fe05bddd352dddc3588601afe8682d4b825c74af128b4768b45939a92  rust/crates/lingxi-adapters/src/storage/mod.rs
+c62d74337684cf1c870f50042cc27ad441702541d1d4eab352b4072606790bb0  rust/crates/lingxi-adapters/src/storage/run_store.rs
+598225daad3623a5fb685b533057ee7f136e6e1445e04c4969a4f22194aa436f  rust/crates/lingxi-adapters/tests/active_run_listing.rs
+92df0eff6ae742eb148c08e96f09ef7fa09d0391044cde45c99b9324830b102c  rust/crates/lingxi-service/src/lib.rs
+27b8a12ffe33494f1ad67c2919f351267e0d5d176d001635e562dd8d59f1e786  rust/crates/lingxi-service/src/main.rs
+66417610fe92f2c6ecd433d29e46daf11148d519047160dd82bf9472019635ca  rust/crates/lingxi-service/src/sessions.rs
+401ab707932219fc2a6c174e978705b4c16d57aafa09a0b276580be5d7f4113f  rust/crates/lingxi-service/src/shutdown.rs
+37a268ac26b368e27fac3e81a173f6d29a4d2789603259df2968a4a72be79e45  rust/crates/lingxi-service/src/recovery.rs
+5fba456edb789b036393e631add70861d69eabd0a1ab3a78adf467096556861c  rust/crates/lingxi-service/tests/execute_concurrency.rs
+ab0d8c34b7af02d8f7e323ee10e49e91d886521b3eee134c8f39cb63eb345504  rust/crates/lingxi-service/tests/invocation_journal.rs
+e0e5b281ffb2c1ec6ffc7c97650f0ce8e387f30deaff33762b607c306060e0b6  rust/crates/lingxi-service/tests/shutdown_coordinator.rs
+62905768045be3a7b0ca86296b3800ca486a7d46d513d0b23078368f4f4ba6b7  rust/crates/lingxi-service/tests/recovery_startup_scan.rs
+7225c8ead39c14241eb80209a500f3b60fd7ecb4760323eb9b26ea7a447ebec1  rust/crates/lingxi-service/tests/exit_race_rejections.rs
+3af11867d04ba18c71272833272a89f99130e0e428c45421cd1d28dc15260e23  rust/crates/lingxi-service/tests/recovery_crash_points.rs
+0482ebce472f79e7402dde15ed3eafc8262c29ad68a04ebc042ef01dd60a3764  rust/crates/lingxi-service/tests/recovery_support/harness.rs
+tracked-diff sha256: 84346db6647aefb3bcd8088cb8d3893344402a038a11428e4121850386b87ce2

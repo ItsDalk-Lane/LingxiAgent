@@ -1,0 +1,9 @@
+{
+  "boundary": "Started",
+  "case": "started_before",
+  "input": "r03-t07 crash-point probe (fixed replay input)",
+  "request_id": "crash-point-1",
+  "session": "sess_local_alpha",
+  "side": "Before",
+  "tool_target": "notify.double"
+}

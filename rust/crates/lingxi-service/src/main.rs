@@ -547,9 +547,15 @@ async fn main() -> ExitCode {
     let guard = std::sync::Arc::new(std::sync::Mutex::new(guard));
     let ready_guard = std::sync::Arc::clone(&guard);
     let ws_signal = state.ws_shutdown();
+    // R03-T07/A14: the submission intake — closed at SIGNAL time, the FIRST
+    // exit action, before any drain. Every fresh admission on either
+    // submission surface is refused through the shared admission chain
+    // while the rest of the shutdown proceeds (one-way; idempotent).
+    let intake_signal = state.submission_intake();
     // R02 stage-repair R1 / F03: record the exact signal moment — the ONE
-    // shutdown budget (transport drain + WS drain + storage close + record
-    // cleanup) is anchored here, not whenever an earlier wait returns.
+    // shutdown budget (transport drain + WS drain + task cancellation +
+    // background drain + storage close + record cleanup) is anchored here,
+    // not whenever an earlier wait returns.
     let signal_at = std::sync::Arc::new(std::sync::Mutex::new(None::<std::time::Instant>));
     let signal_at_writer = std::sync::Arc::clone(&signal_at);
     let shutdown = async move {
@@ -557,6 +563,8 @@ async fn main() -> ExitCode {
         *signal_at_writer
             .lock()
             .unwrap_or_else(|poisoned| poisoned.into_inner()) = Some(std::time::Instant::now());
+        // R03-T07 exit order step 1: 退出先拒绝新提交.
+        intake_signal.close();
         // R02-T06: broadcast the shutdown to the managed WS sessions at
         // SIGNAL time, before the transport's own graceful wait — axum
         // waits for upgraded connections to finish, so the sessions must
@@ -566,6 +574,7 @@ async fn main() -> ExitCode {
     let storage = std::sync::Arc::clone(state.storage());
     let ws_shutdown = state.ws_shutdown();
     let background = std::sync::Arc::clone(state.background());
+    let runs = std::sync::Arc::clone(state.runs());
     let shutdown_timeout_ms = state.config().shutdown_timeout_ms;
     let transport = if tls_acceptor.is_some() {
         "https"
@@ -659,6 +668,7 @@ async fn main() -> ExitCode {
                 &storage,
                 &ws_shutdown,
                 &background,
+                &runs,
                 guard,
                 serve.drain_timed_out,
                 budget,
@@ -689,10 +699,13 @@ async fn main() -> ExitCode {
                     eprintln!(
                         "error: shutdown exceeded the unified {}ms from-signal budget \
                          (transport_drain_timed_out={} ws_drain_timed_out={} \
+                         background_drain_timed_out={} residue_runs={:?} \
                          storage_close_timed_out={} record_cleanup_timed_out={})",
                         shutdown_timeout_ms,
                         report.transport_drain_timed_out,
                         report.ws_drain_timed_out,
+                        report.background_drain_timed_out,
+                        report.background_unconfirmed,
                         report.storage_close_timed_out,
                         report.record_cleanup_timed_out
                     );

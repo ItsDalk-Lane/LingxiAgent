@@ -1,0 +1,13 @@
+{
+  "external_executed": 1,
+  "final_messages": "0",
+  "journal_phases": [
+    "unknown"
+  ],
+  "journal_receipt_outcome": "unknown",
+  "recovery_event_reason": "{\"from\":\"running\",\"reason\":\"interrupted_needs_attention.recovery_unsafe; service restarted while the task was in flight; 1 external side effect(s) have UNKNOWN outcomes (blind retry could duplicate them): unknown external outcome for non-idempotent tool \\\"notify.double\\\" (started without receipt; blind retry could duplicate the side effect); next actions: verify the outcome of the listed tool calls with the external system, or confirm them manually | resubmit the task only after the unknown outcomes are resolved\",\"to\":\"interrupted_needs_attention\",\"type\":\"run_state_changed\"}",
+  "run_id": "run_000001a0dcba6c00_000001",
+  "run_rows": 1,
+  "status": "interrupted_needs_attention",
+  "terminal_reason": "interrupted_needs_attention.recovery_unsafe"
+}

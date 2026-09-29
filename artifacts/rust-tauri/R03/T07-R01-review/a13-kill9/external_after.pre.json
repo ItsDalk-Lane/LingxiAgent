@@ -1,0 +1,9 @@
+{
+  "external_executed": 1,
+  "journal_phases": [
+    "started"
+  ],
+  "marker": "{\n  \"boundary\": \"External\",\n  \"external_digest\": \"digest-1\",\n  \"pid\": 32306,\n  \"side\": \"After\"\n}",
+  "run_rows": 1,
+  "status": "running"
+}

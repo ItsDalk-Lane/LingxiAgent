@@ -1,0 +1,13 @@
+{
+  "external_executed": 1,
+  "final_messages": "1",
+  "journal_phases": [
+    "succeeded"
+  ],
+  "journal_receipt_outcome": "succeeded",
+  "recovery_event_reason": "{\"from\":\"running\",\"reason\":\"completed.with_final\",\"to\":\"completed\",\"type\":\"run_state_changed\"}",
+  "run_id": "run_000001a0dcba6c00_000001",
+  "run_rows": 1,
+  "status": "completed",
+  "terminal_reason": "completed.with_final"
+}

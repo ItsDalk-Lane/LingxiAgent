@@ -1,0 +1,13 @@
+{
+  "external_executed": 0,
+  "final_messages": "0",
+  "journal_phases": [
+    "prepared"
+  ],
+  "journal_receipt_outcome": null,
+  "recovery_event_reason": "{\"from\":\"running\",\"reason\":\"interrupted_needs_attention.recovery_unsafe; service restarted while the task was in flight; the invocation journal holds no unresolved external side effect (no tool call was in its crash window), and no final model reply existed when the service stopped; next actions: safe to resubmit the task\",\"to\":\"interrupted_needs_attention\",\"type\":\"run_state_changed\"}",
+  "run_id": "run_000001a0dcba6c00_000001",
+  "run_rows": 1,
+  "status": "interrupted_needs_attention",
+  "terminal_reason": "interrupted_needs_attention.recovery_unsafe"
+}

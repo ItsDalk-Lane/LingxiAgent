@@ -20,6 +20,7 @@ use lingxi_protocol::{AttemptId, NormalizedMessage, RunId, RunStatus, SessionId,
 
 pub mod invocation;
 pub mod ports;
+pub mod recovery;
 pub mod subagent;
 
 /// Identity and authority facts of one running user task.

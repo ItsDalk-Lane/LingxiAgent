@@ -1,0 +1,92 @@
+{
+  "r03_a13_kill9_matrix": {
+    "cases": [
+      {
+        "case": "run_started_before",
+        "category": null,
+        "external_at_kill": 0,
+        "pre_status": null,
+        "restart_status": null
+      },
+      {
+        "case": "run_started_after",
+        "category": "recoverable_wait",
+        "external_at_kill": 0,
+        "pre_status": "running",
+        "restart_status": "interrupted_needs_attention"
+      },
+      {
+        "case": "intent_before",
+        "category": "recoverable_wait",
+        "external_at_kill": 0,
+        "pre_status": "running",
+        "restart_status": "interrupted_needs_attention"
+      },
+      {
+        "case": "intent_after",
+        "category": "recoverable_wait",
+        "external_at_kill": 0,
+        "pre_status": "running",
+        "restart_status": "interrupted_needs_attention"
+      },
+      {
+        "case": "started_before",
+        "category": "recoverable_wait",
+        "external_at_kill": 0,
+        "pre_status": "running",
+        "restart_status": "interrupted_needs_attention"
+      },
+      {
+        "case": "started_after",
+        "category": "interrupted_needs_attention",
+        "external_at_kill": 0,
+        "pre_status": "running",
+        "restart_status": "interrupted_needs_attention"
+      },
+      {
+        "case": "external_after",
+        "category": "interrupted_needs_attention",
+        "external_at_kill": 1,
+        "pre_status": "running",
+        "restart_status": "interrupted_needs_attention"
+      },
+      {
+        "case": "receipt_before",
+        "category": "interrupted_needs_attention",
+        "external_at_kill": 1,
+        "pre_status": "running",
+        "restart_status": "interrupted_needs_attention"
+      },
+      {
+        "case": "receipt_after",
+        "category": "recoverable_wait",
+        "external_at_kill": 1,
+        "pre_status": "running",
+        "restart_status": "interrupted_needs_attention"
+      },
+      {
+        "case": "finalize_before",
+        "category": "recoverable_wait",
+        "external_at_kill": 1,
+        "pre_status": "running",
+        "restart_status": "interrupted_needs_attention"
+      },
+      {
+        "case": "finalize_after",
+        "category": null,
+        "external_at_kill": 1,
+        "pre_status": "completed",
+        "restart_status": "completed"
+      }
+    ]
+  },
+  "r03_a14_exit_window": {
+    "background_unconfirmed": [],
+    "existing_run": "run_000001a0dcba6c00_000001",
+    "existing_run_terminal": "cancelled",
+    "exit_code": 0,
+    "fresh_refused_before_drain": 10,
+    "fresh_refused_during_drain": 4,
+    "replay_answered": true
+  }
+}

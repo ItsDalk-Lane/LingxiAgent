@@ -1,11 +1,16 @@
 //! Graceful-shutdown coordinator (R02-T06 step 2 + step 4 退出超时; R02
-//! stage-repair R1 / F03 unified budget).
+//! stage-repair R1 / F03 unified budget; R03-T07 exit strategy).
 //!
 //! Taskbook order (every phase — transport drain included — is bounded by
 //! ONE budget anchored at the moment the exit signal arrived, and every
 //! phase outcome — including timeouts — is explicit; nothing is ever
 //! silent):
 //!
+//! 0. **close the submission intake** (R03-T07: 退出先拒绝新提交) — at
+//!    SIGNAL time, before any drain: the [`SubmissionIntake`] gate flips
+//!    closed and every subsequent admission (HTTP execute and the
+//!    background surface, through the shared admission chain) is refused
+//!    (A14). The closure is one-way.
 //! 1. **stop accepting new requests + drain in-flight HTTP** — the
 //!    transport drains under the SAME from-signal budget (the serving loop
 //!    reports a timed-out drain explicitly; pre-fix this wait had NO
@@ -15,12 +20,19 @@
 //!    close(1001) frame via the broadcast watch and are waited on with the
 //!    remaining budget (pre-hello handshakes race the broadcast too — a
 //!    client that never sends ClientHello cannot hold the drain);
-//! 3. **flush key events + close the DB** — key events are durable in the
+//! 3. **task-type cancellation + bounded wait** (R03-T07 按任务类型取消/
+//!    等待) — live background drives get their cancellation REQUESTED
+//!    through the run supervisor's cancel tree (they settle through their
+//!    own single finalize, committing their records), then the bounded
+//!    drain joins them; whatever cannot confirm in time is reported as
+//!    residue and its durable run row stays active for the NEXT process's
+//!    recovery scan (no fabricated terminals);
+//! 4. **flush key events + close the DB** — key events are durable in the
 //!    same transaction as their run facts (R02-T04), so flushing IS the
 //!    bounded-queue drain inside `RunDatabase::close` (FIFO drain →
 //!    TRUNCATE checkpoint → worker join; the join runs on a blocking thread
 //!    the async side can time out — the process never wedges behind it);
-//! 4. **remove our own instance record** — record cleanup verifies the
+//! 5. **remove our own instance record** — record cleanup verifies the
 //!    record is still ours and removes it (never a foreign record). The
 //!    synchronous release runs on a DEDICATED thread so the unified
 //!    deadline is REAL for this phase too (R9-F04: a timeout-wrapped
@@ -60,6 +72,41 @@ pub const DEFAULT_SHUTDOWN_TIMEOUT_MS: u64 = 10_000;
 
 /// Machine-readable stderr marker for a phase that exceeded the budget.
 pub const SHUTDOWN_TIMEOUT_MARKER: &str = "LINGXI_SERVICE_SHUTDOWN_TIMEOUT";
+
+/// The submission intake gate (R03-T07 退出序 step 1: 退出先拒绝新提交).
+///
+/// Open from bootstrap; the process's shutdown future closes it at SIGNAL
+/// time — the very first exit action, before any drain waits — so the A14
+/// race window (a submission arriving while the shutdown is already in
+/// progress) is refused at the admission chain instead of being absorbed
+/// into a stopgap queue that can never finish. Closed is one-way: a process
+/// never re-opens submissions after starting its exit.
+///
+/// Checked at the shared admission chain
+/// ([`crate::sessions::SessionStore::admit_submission`]) so BOTH submission
+/// surfaces (foreground HTTP execute and the background drive surface)
+/// refuse identically through the REAL chain.
+#[derive(Debug, Default)]
+pub struct SubmissionIntake {
+    closed: std::sync::atomic::AtomicBool,
+}
+
+impl SubmissionIntake {
+    pub fn new() -> Self {
+        Self::default()
+    }
+
+    /// One-way close (idempotent). Called at signal time by the serving
+    /// process BEFORE the transport/WS drains begin.
+    pub fn close(&self) {
+        self.closed.store(true, Ordering::Release);
+    }
+
+    /// Whether submissions must be refused (R03-A14).
+    pub fn is_closed(&self) -> bool {
+        self.closed.load(Ordering::Acquire)
+    }
+}
 
 /// The ONE shutdown budget, anchored at the signal moment (R02
 /// stage-repair R1 / F03). Every phase — transport drain (enforced inside
@@ -131,6 +178,15 @@ pub struct ShutdownReport {
     /// (reported unconfirmed; their durable run rows stay active for the
     /// R03-T07 recovery scan).
     pub background_drain_timed_out: bool,
+    /// R03-T07: the background drives whose cancellation was REQUESTED at
+    /// exit (按任务类型取消： detached drives settle through their own
+    /// single finalize instead of dangling). A drive whose registration had
+    /// already deregistered reports nothing here.
+    pub background_cancel_requested: Vec<String>,
+    /// R03-T07: drives still live at budget expiry — the honest residue.
+    /// Their durable run rows stay active and the NEXT process's startup
+    /// recovery scan resolves them; no fabricated terminals.
+    pub background_unconfirmed: Vec<String>,
     pub storage_close_timed_out: bool,
     pub storage_error: Option<StorageError>,
     pub record_cleanup_timed_out: bool,
@@ -246,15 +302,32 @@ impl Drop for WsSessionGuard {
     }
 }
 
-/// Runs phases 2–4 of the shutdown contract (phase 1 — stop accepting +
-/// drain in-flight HTTP — ran inside the serving loop under the same
-/// budget; its outcome arrives as `transport_drain_timed_out`). Every
-/// phase is bounded by what REMAINS of `budget` (anchored at the signal
-/// moment); timeouts are loud and non-fatal to the remaining phases.
+/// Runs the exit phases of the shutdown contract (phase 0 — the submission
+/// intake closure — and phase 1 — stop accepting + drain in-flight HTTP —
+/// ran at signal time / inside the serving loop under the same budget; the
+/// intake closure's evidence arrives as the A14 admission rejections, the
+/// transport drain outcome as `transport_drain_timed_out`).
+///
+/// R03-T07 exit order (退出先拒绝新提交，按任务类型取消/等待，再 flush/join):
+/// 2. WS sessions cancelled + waited (bounded);
+/// 2.5a. task-type cancellation — live BACKGROUND drives get their
+///       cancellation REQUESTED through the run supervisor's cancel tree so
+///       they settle through their own single finalize (`cancelled`) with
+///       their records committed, instead of dangling;
+/// 2.5b. the bounded background drain joins them; whatever cannot confirm
+///       within the budget is reported as residue (unconfirmed) — their
+///       durable rows stay active for the NEXT process's recovery scan;
+/// 3. flush key events + close the DB;
+/// 4. remove our own instance record.
+///
+/// Every phase is bounded by what REMAINS of `budget` (anchored at the
+/// signal moment); timeouts are loud and non-fatal to the remaining phases.
+#[allow(clippy::too_many_arguments)]
 pub async fn graceful_shutdown(
     storage: &RunDatabase,
     ws: &WsShutdown,
     background: &crate::background::BackgroundDriveRegistry,
+    runs: &crate::runs::RunSupervisor,
     guard: InstanceGuard,
     transport_drain_timed_out: bool,
     budget: ShutdownBudget,
@@ -291,14 +364,30 @@ pub async fn graceful_shutdown(
         );
     }
 
-    // Phase 2.5 (R03-T06 minimal exit hook): join the live BACKGROUND
-    // drives under the remaining budget. The transport and WS drains
-    // already abandoned the CLIENTS — the background runs are the ones
-    // that must NOT be silently dropped: whatever cannot confirm within
-    // the budget is REPORTED (their durable run rows stay active for the
-    // R03-T07 recovery scan; no fabricated terminals). The full exit
-    // strategy (per-task cancel/wait policy) is R03-T07.
+    // Phase 2.5a (R03-T07 按任务类型取消): request the cancellation of every
+    // live background drive BEFORE joining them. The cancellation travels
+    // the run's own cancel tree — the drive observes it at its next await
+    // point and settles through its own single finalize (cancelled), which
+    // IS the "commit critical records" step for these tasks. Foreground
+    // (inline HTTP) runs already drained with the transport above.
+    for run_id in background.live_ids() {
+        let outcome = runs.cancel_run(&run_id, "service shutdown");
+        tracing::info!(
+            run_id = %run_id,
+            fire = ?outcome,
+            "exit cancellation requested for a live background drive \
+             (it settles through its own finalize)"
+        );
+        report.background_cancel_requested.push(run_id);
+    }
+
+    // Phase 2.5b (R03-T06 exit hook + R03-T07 bounded wait): join the live
+    // BACKGROUND drives under the remaining budget. Expired drives are
+    // REPORTED unconfirmed — the process exit bounds them and their durable
+    // run rows stay active for the R03-T07 recovery scan of the NEXT
+    // process; no fake quiet, no fabricated terminals.
     let background_report = background.drain_within(budget.remaining()).await;
+    report.background_unconfirmed = background_report.unconfirmed.clone();
     if !background_report.unconfirmed.is_empty() {
         report.background_drain_timed_out = true;
         eprintln!(
@@ -426,6 +515,16 @@ pub async fn graceful_shutdown(
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    #[test]
+    fn submission_intake_closes_one_way() {
+        let intake = SubmissionIntake::new();
+        assert!(!intake.is_closed(), "open from construction");
+        intake.close();
+        assert!(intake.is_closed());
+        intake.close();
+        assert!(intake.is_closed(), "closure is idempotent/one-way");
+    }
 
     #[test]
     fn exit_code_precedence_is_deterministic() {

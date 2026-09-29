@@ -1,0 +1,9 @@
+{
+  "external_executed": 1,
+  "journal_phases": [
+    "succeeded"
+  ],
+  "marker": "{\n  \"at_unix_ms\": 1790677354081,\n  \"boundary\": \"Finalize\",\n  \"pid\": 32313,\n  \"run_hint\": \"finalize_after:32313\",\n  \"side\": \"After\"\n}",
+  "run_rows": 1,
+  "status": "completed"
+}

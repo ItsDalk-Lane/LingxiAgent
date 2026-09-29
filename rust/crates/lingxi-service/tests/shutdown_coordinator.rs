@@ -72,11 +72,16 @@ async fn clean_shutdown_reports_zero_and_removes_the_own_record() {
     // background-drive exit hook (empty registry here — no background
     // drives are spawned by these fixtures; the drain phase is exercised
     // in the R03-T06 acceptance tests).
+    // R03-T07: the coordinator also carries the run supervisor for the
+    // exit cancellation of live background drives (none here — a provider-
+    // less supervisor is enough for these fixtures).
     let background = lingxi_service::background::BackgroundDriveRegistry::new();
+    let runs = lingxi_service::runs::RunSupervisor::without_provider();
     let report = graceful_shutdown(
         &db,
         &ws,
         &background,
+        &runs,
         guard,
         false,
         budget(Duration::from_secs(10)),
@@ -129,13 +134,18 @@ async fn storage_close_timeout_is_recorded_and_record_cleanup_still_runs() {
     // background-drive exit hook (empty registry here — no background
     // drives are spawned by these fixtures; the drain phase is exercised
     // in the R03-T06 acceptance tests).
+    // R03-T07: the coordinator also carries the run supervisor for the
+    // exit cancellation of live background drives (none here — a provider-
+    // less supervisor is enough for these fixtures).
     let background = lingxi_service::background::BackgroundDriveRegistry::new();
+    let runs = lingxi_service::runs::RunSupervisor::without_provider();
 
     let started = std::time::Instant::now();
     let report = graceful_shutdown(
         &db,
         &ws,
         &background,
+        &runs,
         guard,
         false,
         budget(Duration::from_millis(120)),
@@ -188,11 +198,16 @@ async fn storage_close_failure_maps_to_exit_five() {
     // background-drive exit hook (empty registry here — no background
     // drives are spawned by these fixtures; the drain phase is exercised
     // in the R03-T06 acceptance tests).
+    // R03-T07: the coordinator also carries the run supervisor for the
+    // exit cancellation of live background drives (none here — a provider-
+    // less supervisor is enough for these fixtures).
     let background = lingxi_service::background::BackgroundDriveRegistry::new();
+    let runs = lingxi_service::runs::RunSupervisor::without_provider();
     let report = graceful_shutdown(
         &db,
         &ws,
         &background,
+        &runs,
         guard,
         false,
         budget(Duration::from_secs(5)),
@@ -225,11 +240,16 @@ async fn record_cleanup_failure_maps_to_exit_four() {
     // background-drive exit hook (empty registry here — no background
     // drives are spawned by these fixtures; the drain phase is exercised
     // in the R03-T06 acceptance tests).
+    // R03-T07: the coordinator also carries the run supervisor for the
+    // exit cancellation of live background drives (none here — a provider-
+    // less supervisor is enough for these fixtures).
     let background = lingxi_service::background::BackgroundDriveRegistry::new();
+    let runs = lingxi_service::runs::RunSupervisor::without_provider();
     let report = graceful_shutdown(
         &db,
         &ws,
         &background,
+        &runs,
         guard,
         false,
         budget(Duration::from_secs(5)),
@@ -287,7 +307,11 @@ async fn exhausted_budget_bounds_every_remaining_phase() {
     // background-drive exit hook (empty registry here — no background
     // drives are spawned by these fixtures; the drain phase is exercised
     // in the R03-T06 acceptance tests).
+    // R03-T07: the coordinator also carries the run supervisor for the
+    // exit cancellation of live background drives (none here — a provider-
+    // less supervisor is enough for these fixtures).
     let background = lingxi_service::background::BackgroundDriveRegistry::new();
+    let runs = lingxi_service::runs::RunSupervisor::without_provider();
     ws.connection_opened(); // a session that never closes on its own
 
     // The signal arrived 150ms ago; the total budget is 100ms — it is
@@ -298,7 +322,7 @@ async fn exhausted_budget_bounds_every_remaining_phase() {
         Duration::from_millis(100),
     );
     assert_eq!(spent.remaining(), Duration::ZERO);
-    let report = graceful_shutdown(&db, &ws, &background, guard, false, spent).await;
+    let report = graceful_shutdown(&db, &ws, &background, &runs, guard, false, spent).await;
     let elapsed = started.elapsed();
 
     assert!(report.ws_drain_timed_out, "{report:?}");

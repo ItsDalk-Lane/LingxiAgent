@@ -37,6 +37,7 @@ pub mod logging;
 mod management;
 pub mod paths;
 pub mod quotas;
+pub mod recovery;
 pub mod redaction;
 pub mod runs;
 mod security_audit;
@@ -377,6 +378,15 @@ pub struct ServiceState {
     /// Background-drive registry (R03-T06): submissions whose runs outlive
     /// the client connection + the minimal service-exit hook.
     background: Arc<background::BackgroundDriveRegistry>,
+    /// The submission intake gate (R03-T07/A14): open from bootstrap; the
+    /// serving process closes it at SIGNAL time — the FIRST exit action —
+    /// and every subsequent admission on either submission surface is
+    /// refused through the shared admission chain.
+    intake: Arc<shutdown::SubmissionIntake>,
+    /// The report of the startup recovery scan (R03-T07), set once during
+    /// bootstrap (`None` only via `Default`-shaped construction paths that
+    /// bypass the scan — none exist in production).
+    recovery_report: Arc<std::sync::OnceLock<recovery::RecoveryScanReport>>,
 }
 
 impl std::fmt::Debug for ServiceState {
@@ -483,6 +493,13 @@ pub struct ServiceDeps {
     /// with the incumbent defaults (intercept strategy, proactive
     /// delegation experiment OFF, 10/20 caps, 30-minute child timeout).
     pub subagent_policy: lingxi_kernel::subagent::SubagentPolicy,
+    /// Recovery capability source for the startup recovery scan
+    /// (R03-T07): which tool targets have VERIFIED recovery capabilities
+    /// (read-only / idempotency-key / externally-verifiable). The default
+    /// is conservative — every unverified target refuses automatic
+    /// recovery of unknown outcomes; R04's tool registry replaces the
+    /// resolution, never the default.
+    pub recovery_capabilities: std::sync::Arc<dyn invocations::RecoveryCapabilitySource>,
 }
 
 impl Default for ServiceDeps {
@@ -507,6 +524,7 @@ impl Default for ServiceDeps {
             cancel_policy: cancel::CancelPolicy::default(),
             approval_gate: None,
             subagent_policy: lingxi_kernel::subagent::SubagentPolicy::default(),
+            recovery_capabilities: std::sync::Arc::new(invocations::ConservativeCapabilities),
         }
     }
 }
@@ -787,9 +805,15 @@ impl ServiceState {
         let storage = Arc::new(storage);
         // R03-T02: the session surface owns the per-session serialization
         // gate (busy `session_busy` rejection + bounded steering inbox);
-        // the policy comes from the deps.
-        let session_store =
-            sessions::SessionStore::with_concurrency((*storage).clone(), deps.session_concurrency);
+        // the policy comes from the deps. R03-T07: the SAME construction
+        // injects the process's submission intake gate so the shutdown can
+        // refuse fresh admissions through the real admission chain (A14).
+        let intake = Arc::new(shutdown::SubmissionIntake::new());
+        let session_store = sessions::SessionStore::with_concurrency_and_intake(
+            (*storage).clone(),
+            deps.session_concurrency,
+            Arc::clone(&intake),
+        );
         let session_arc = Arc::new(session_store);
         // R02-T05: the event subscription service over the same durable
         // log (snapshot/cursor protocol + post-commit publication hub).
@@ -853,6 +877,27 @@ impl ServiceState {
         // R03-T06: the background-drive registry (submission surface whose
         // runs outlive the client connection + the minimal exit hook).
         let background = background::BackgroundDriveRegistry::new();
+        // R03-T07: the STARTUP RECOVERY SCAN. Every non-terminal run a
+        // previous process left behind is resolved NOW, before serving
+        // starts: the T05 journal pass persists the honest unknown
+        // verdicts, the kernel's recovery table classifies the run, and
+        // the dangling-active row settles through the single finalize
+        // path into an explainable `interrupted_needs_attention` (or
+        // `cancelled` when a cancellation was already in flight). A
+        // restart NEVER presents these runs as blank rows or fake
+        // successes, and a scan that cannot classify the durable facts
+        // refuses startup (loud, fail-closed — the R02 integrity stance).
+        let recovery_report = Arc::new(std::sync::OnceLock::new());
+        let scan = recovery::RecoveryCoordinator
+            .run_startup_scan(
+                storage.as_ref(),
+                events.as_ref(),
+                deps.recovery_capabilities.as_ref(),
+                deps.clock.now_unix_ms(),
+            )
+            .await
+            .map_err(ServiceStartupError::Storage)?;
+        let _ = recovery_report.set(scan);
         Ok(Self {
             config: Arc::new(config),
             auth: Arc::new(auth),
@@ -889,6 +934,8 @@ impl ServiceState {
             runs,
             subagents: subagent_runtime,
             background,
+            intake,
+            recovery_report,
         })
     }
 
@@ -961,6 +1008,19 @@ impl ServiceState {
     /// the minimal exit hook.
     pub fn background(&self) -> &Arc<background::BackgroundDriveRegistry> {
         &self.background
+    }
+
+    /// The submission intake gate (R03-T07/A14): the serving process closes
+    /// it at SIGNAL time (the first exit action); tests close it to enter
+    /// the exit race window deterministically.
+    pub fn submission_intake(&self) -> Arc<shutdown::SubmissionIntake> {
+        Arc::clone(&self.intake)
+    }
+
+    /// The startup recovery scan's report (R03-T07): what the scan found
+    /// and how it settled it (observability / acceptance evidence).
+    pub fn recovery_report(&self) -> Option<recovery::RecoveryScanReport> {
+        self.recovery_report.get().cloned()
     }
 
     pub fn ws_connection_count(&self) -> usize {
@@ -1224,6 +1284,21 @@ impl EndpointError {
         out.error.retryable = true;
         out.with_reason("idempotency_registry_full")
             .with_cause("session.idempotency_registry_full")
+    }
+
+    /// R03-A14: the shutdown already began — the submission intake is
+    /// closed and this (fresh) submission was refused at the admission
+    /// chain before any side effect. Retryable against the NEXT process
+    /// instance (the client's idempotent replay semantics stay intact).
+    pub fn shutting_down() -> Self {
+        let mut out = Self::new(
+            StatusCode::SERVICE_UNAVAILABLE,
+            ErrorCode::BudgetExceeded,
+            "service is shutting down; new submissions are refused",
+        );
+        out.error.retryable = true;
+        out.with_reason("shutting_down")
+            .with_cause("service.shutting_down")
     }
 
     /// Stable `storage.<cause>` identifier for a storage-port failure.
@@ -2267,6 +2342,10 @@ async fn execute_session(
         }
         Err(sessions::SessionExecuteError::InvalidRequestId { detail }) => {
             EndpointError::invalid_message(format!("requestId invalid: {detail}")).into_response()
+        }
+        Err(sessions::SessionExecuteError::ShuttingDown) => {
+            // R03-A14: the exit window refuses fresh submissions.
+            EndpointError::shutting_down().into_response()
         }
         Err(sessions::SessionExecuteError::BackgroundRegistryFull { .. }) => {
             // Not reachable from the execute route (background submission

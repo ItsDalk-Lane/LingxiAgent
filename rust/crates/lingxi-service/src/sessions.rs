@@ -172,6 +172,11 @@ pub enum SessionExecuteError {
         recorded_digest: String,
         submitted_digest: String,
     },
+    /// R03-A14: the service's submission intake is CLOSED — the shutdown
+    /// already began. The submission was refused at the admission chain
+    /// BEFORE any side effect (no run id allocated, nothing written); the
+    /// client may retry against the NEXT process instance.
+    ShuttingDown,
     /// The idempotency-key registry is at its hard cap (service protection;
     /// nothing was written, nothing was executed).
     IdempotencyRegistryFull {
@@ -337,6 +342,13 @@ pub struct SessionStore {
     /// principal+session-scoped). Only submissions carrying an explicit id
     /// touch it — the plain path is byte-identical to the pre-T04 flow.
     dedup: crate::dedup::SubmissionDedup,
+    /// R03-T07/A14: the submission intake gate. Defaults to an ALWAYS-OPEN
+    /// gate (tests construct the store directly); the composition root
+    /// injects the process's real gate via
+    /// [`SessionStore::with_concurrency_and_intake`] so closing it at
+    /// signal time refuses every subsequent admission on BOTH submission
+    /// surfaces.
+    intake: std::sync::Arc<crate::shutdown::SubmissionIntake>,
 }
 
 impl std::fmt::Debug for SessionStore {
@@ -359,10 +371,29 @@ impl SessionStore {
         backend: impl SessionBackend + 'static,
         limits: SessionConcurrencyLimits,
     ) -> Self {
+        Self::with_concurrency_and_intake(
+            backend,
+            limits,
+            std::sync::Arc::new(crate::shutdown::SubmissionIntake::new()),
+        )
+    }
+
+    /// The composition-root construction (R03-T07): the concurrency policy
+    /// PLUS the process's submission intake gate — the shutdown future
+    /// closes it at signal time and the shared admission chain below
+    /// refuses every later submission with
+    /// [`SessionExecuteError::ShuttingDown`] (A14: no submission is
+    /// absorbed once the exit has begun).
+    pub fn with_concurrency_and_intake(
+        backend: impl SessionBackend + 'static,
+        limits: SessionConcurrencyLimits,
+        intake: std::sync::Arc<crate::shutdown::SubmissionIntake>,
+    ) -> Self {
         Self {
             backend: Box::new(backend),
             gate: SessionSupervisor::new(limits),
             dedup: crate::dedup::SubmissionDedup::default(),
+            intake,
         }
     }
 
@@ -638,6 +669,13 @@ impl SessionStore {
     /// idempotency decision — the admission of a fresh run happens under
     /// the dedup key lock, so a concurrent duplicate can never slip a
     /// second admission in between.
+    ///
+    /// R03-A14: the shutdown intake gate refuses FRESH admissions inside
+    /// the admission closure — an idempotent REPLAY of an already-admitted
+    /// submission (same explicit requestId + content) is still answered
+    /// with the original acceptance: it is a query about an EXISTING task,
+    /// not a new submission, and the exiting process still owes the client
+    /// that answer.
     async fn admit_submission(
         &self,
         principal: &Principal,
@@ -664,6 +702,20 @@ impl SessionStore {
         // admission settles. A failed admission records NOTHING (no sticky
         // id); a successful one permanently binds the id to the run.
         let admission = || -> Result<(String, _), SessionExecuteError> {
+            // R03-A14: the exit has already begun — refuse the FRESH
+            // admission BEFORE the busy gate, the run-id allocation or any
+            // write. A submission racing the signal either wins this check
+            // (admitted; its run is an EXISTING task the exit then settles
+            // by policy) or loses it (refused here); it can never be
+            // absorbed into a process that is already draining. Idempotent
+            // replays of earlier acceptances never reach this closure.
+            if self.intake.is_closed() {
+                tracing::info!(
+                    session_id = session_id,
+                    "submission refused: the service is shutting down (intake closed)"
+                );
+                return Err(SessionExecuteError::ShuttingDown);
+            }
             let lease = match self.gate.try_begin_run(session_id) {
                 Ok(lease) => lease,
                 Err(crate::session_supervisor::BusyGateError::Busy) => {

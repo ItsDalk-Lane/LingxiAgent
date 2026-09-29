@@ -30,4 +30,6 @@ pub use queue::{
     checkpoint_truncate, DbQueue, StoreOptions, MAX_BUSY_TIMEOUT_MS, MAX_CHECKPOINT_PAGES,
     MAX_QUEUE_CAPACITY, MAX_QUEUE_WAIT_TIMEOUT_MS,
 };
-pub use run_store::{wal_sidecar_path, RunDatabase, RunSummaryRow, SessionRow, RUNS_DB_FILE_NAME};
+pub use run_store::{
+    wal_sidecar_path, ActiveRunFacts, RunDatabase, RunSummaryRow, SessionRow, RUNS_DB_FILE_NAME,
+};

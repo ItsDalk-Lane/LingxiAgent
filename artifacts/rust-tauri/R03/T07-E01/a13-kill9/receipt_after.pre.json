@@ -1,0 +1,9 @@
+{
+  "external_executed": 1,
+  "journal_phases": [
+    "succeeded"
+  ],
+  "marker": "{\n  \"at_unix_ms\": 1790676380846,\n  \"boundary\": \"Receipt\",\n  \"pid\": 19777,\n  \"run_hint\": \"receipt_after:19777\",\n  \"side\": \"After\"\n}",
+  "run_rows": 1,
+  "status": "running"
+}

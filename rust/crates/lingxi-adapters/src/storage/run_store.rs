@@ -59,6 +59,32 @@ pub struct RunSummaryRow {
     pub status: String,
 }
 
+/// Raw `runs` columns of one non-terminal row (pre-parse view; the public
+/// shape is [`ActiveRunFacts`]).
+struct ActiveRunRow {
+    run_id: String,
+    session_id: String,
+    owner_kind: String,
+    owner_subject: String,
+    status_name: String,
+    generation: i64,
+}
+
+/// One NON-terminal run as seen by the R03-T07 startup recovery scan:
+/// identity + durable ownership key + status + generation + the run's
+/// CURRENT attempt — everything needed to rebuild a write context that the
+/// single-writer ownership checks will accept.
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct ActiveRunFacts {
+    pub run_id: String,
+    pub session_id: String,
+    pub owner_kind: String,
+    pub owner_subject: String,
+    pub status: RunStatus,
+    pub generation: u64,
+    pub current_attempt: String,
+}
+
 /// The new run/message database: bounded queue + dedicated SQLite worker.
 /// Cloning shares the one queue/worker (there is exactly one per database
 /// file per process; the composition root owns the original).
@@ -416,6 +442,70 @@ impl RunDatabase {
                     .query_row("SELECT COUNT(*) FROM runs", [], |row| row.get(0))
                     .map_err(migrations::map_rusqlite)?;
                 Ok(n as u64)
+            })
+            .await
+    }
+
+    /// Lists every NON-terminal run (R03-T07 startup recovery scan): the
+    /// dangling-active rows a previous process left behind — `queued`,
+    /// `running`, `waiting_approval` and `cancelling`. Terminal rows are
+    /// never returned (恢复后不复活： a settled run is not recovery's business).
+    ///
+    /// One row carries everything the recovery coordinator needs to rebuild
+    /// the run's write context and settle it through the single finalize
+    /// path: identity (run id / session), the durable ownership key, the
+    /// status, the generation and the CURRENT attempt. An unknown status
+    /// value is a loud [`StorageError::Corrupted`], never a guess.
+    pub async fn list_active_runs(&self) -> Result<Vec<ActiveRunFacts>, StorageError> {
+        self.queue
+            .submit(move |conn| {
+                let mut stmt = conn
+                    .prepare(
+                        "SELECT run_id, session_id, owner_kind, owner_subject, status, \
+                         generation FROM runs \
+                         WHERE status IN ('queued', 'running', 'waiting_approval', 'cancelling') \
+                         ORDER BY created_at_unix_ms, run_id",
+                    )
+                    .map_err(migrations::map_rusqlite)?;
+                let rows = stmt
+                    .query_map([], |row| {
+                        Ok(ActiveRunRow {
+                            run_id: row.get(0)?,
+                            session_id: row.get(1)?,
+                            owner_kind: row.get(2)?,
+                            owner_subject: row.get(3)?,
+                            status_name: row.get(4)?,
+                            generation: row.get(5)?,
+                        })
+                    })
+                    .map_err(migrations::map_rusqlite)?;
+                let mut out = Vec::new();
+                for row in rows {
+                    let raw = row.map_err(migrations::map_rusqlite)?;
+                    let run_id = raw.run_id.clone();
+                    let generation =
+                        u64::try_from(raw.generation).map_err(|_| StorageError::Corrupted {
+                            detail: format!("runs row {run_id} holds a negative generation"),
+                        })?;
+                    out.push(ActiveRunFacts {
+                        run_id,
+                        session_id: raw.session_id,
+                        owner_kind: raw.owner_kind,
+                        owner_subject: raw.owner_subject,
+                        status: parse_status(&raw.status_name)?,
+                        generation,
+                        current_attempt: current_attempt_of(conn, &raw.run_id)?.ok_or_else(
+                            || StorageError::Corrupted {
+                                detail: format!(
+                                    "runs row {} has no attempt rows (record_run_started \
+                                     always opens attempt #1)",
+                                    raw.run_id
+                                ),
+                            },
+                        )?,
+                    });
+                }
+                Ok(out)
             })
             .await
     }

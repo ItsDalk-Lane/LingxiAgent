@@ -577,22 +577,59 @@ async fn r03_a09_crash_after_side_effect_does_not_reexecute_and_receipt_is_unkno
     state.storage().close().await.expect("close storage");
     drop(state);
 
-    // THE RESTART: a fresh ServiceState over the same data root. Nothing
-    // auto-drives (no startup-scan coordinator exists until R03-T07), and
-    // nothing in the T05 recovery pass re-executes anything — assert the
-    // counter is unchanged across the restart BEFORE and AFTER the pass.
+    // THE RESTART: a fresh ServiceState over the same data root. R03-T07:
+    // the bootstrap now runs the STARTUP RECOVERY SCAN — nothing
+    // auto-drives and nothing re-executes (the scan settles durable facts
+    // only), but the dangling-active row no longer stays `running`
+    // forever: it settles through the single finalize path into the
+    // explainable `interrupted_needs_attention` terminal (the honest
+    // presentation A13 requires — never blank, never a fake success).
     let layout2 = lingxi_service::prepare_layout(&home).expect("layout 2");
     let state2 = ServiceState::bootstrap(config_for(&home), &layout2)
         .await
         .expect("bootstrap 2 (production-shaped: no doubles configured)");
     assert_eq!(external.executed_count(), 1, "restart executed nothing");
+    let scan = state2
+        .recovery_report()
+        .expect("bootstrap ran the recovery scan");
+    assert_eq!(scan.scanned, 1, "exactly the dangling run was scanned");
+    let outcome = &scan.outcomes[0];
+    assert_eq!(outcome.run_id, run_id);
+    assert_eq!(
+        outcome.category.name(),
+        "interrupted_needs_attention",
+        "a non-idempotent unknown side effect governs the run"
+    );
+    assert_eq!(outcome.unknown_verdicts_persisted, 1);
     let status = run_status(&state2, &run_id).await;
     assert_eq!(
-        status, "running",
-        "the run row stays honest (dangling active)"
+        status, "interrupted_needs_attention",
+        "the restart settles the dangling run with the honest interrupted terminal"
+    );
+    let terminal_reason = query_text(
+        &state2,
+        "SELECT terminal_reason FROM runs WHERE run_id = ?1",
+        &run_id,
+    )
+    .await
+    .expect("terminal reason");
+    assert_eq!(
+        terminal_reason, "interrupted_needs_attention.recovery_unsafe",
+        "the run ROW keeps the stable reason vocabulary"
+    );
+    assert!(
+        query_text(
+            &state2,
+            "SELECT message_id FROM messages WHERE run_id = ?1",
+            &run_id,
+        )
+        .await
+        .is_none(),
+        "no final model reply is fabricated for the interrupted run"
     );
 
-    // The T05 recovery pass: classify + persist the unknown verdict.
+    // The T05 recovery pass re-run AFTER the scan replays idempotently (the
+    // scan already persisted the unknown verdict).
     let report: RunRecoveryReport = recover_run_invocations(
         state2.storage().as_ref(),
         &run_id,
@@ -609,7 +646,10 @@ async fn r03_a09_crash_after_side_effect_does_not_reexecute_and_receipt_is_unkno
         "a non-idempotent unknown side effect must NEVER auto-retry: {:?}",
         entry.decision
     );
-    assert!(entry.unknown_verdict_persisted, "the verdict was persisted");
+    assert!(
+        !entry.unknown_verdict_persisted,
+        "the scan already persisted the verdict — this pass replays"
+    );
     // The receipt now reads UNKNOWN — the honest durable classification.
     let journal_after = state2
         .storage()

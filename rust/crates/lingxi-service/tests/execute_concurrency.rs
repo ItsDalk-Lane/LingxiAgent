@@ -593,8 +593,28 @@ async fn http_running_storage_fault_has_no_success_event_or_restart_run() {
         ServiceState::bootstrap_with_deps(config, &restarted_layout, ServiceDeps::default())
             .await
             .expect("restart reads the same database after runtime fault");
+    // R03-T07: the restart now runs the STARTUP RECOVERY SCAN, which
+    // resolves the dangling `running` row left by the faulted terminal
+    // transaction through the single finalize path — the run settles as
+    // the explainable `interrupted_needs_attention` (never a fabricated
+    // completion), adding exactly ONE key event (the recovery terminal
+    // run_state_changed) to the already-committed start event.
     let (restart_runs, restart_events, _) = restarted.storage().run_fact_summary().await.unwrap();
-    assert_eq!((restart_runs, restart_events), (1, 1));
+    assert_eq!((restart_runs, restart_events), (1, 2));
+    let restart_status: Option<String> = restarted
+        .storage()
+        .query_one_text(
+            "SELECT status FROM runs WHERE run_id = ?1",
+            vec![run_id.clone()],
+        )
+        .await
+        .unwrap();
+    assert_eq!(
+        restart_status.as_deref(),
+        Some("interrupted_needs_attention"),
+        "the recovery scan settles the faulted dangling run honestly \
+         (no fake success, no blank row)"
+    );
     let restarted_run = restarted
         .sessions()
         .get_for(&owner_principal(), "sess_local_alpha")
@@ -605,7 +625,7 @@ async fn http_running_storage_fault_has_no_success_event_or_restart_run() {
     };
     assert_eq!(facts.last_runs.len(), 1);
     assert_eq!(facts.last_runs[0].run_id, run_id);
-    println!("R02_A07_LIVE_FAULT busyHttp={status} busyReason=db_busy busyLiveEvents=0 busyRuns={running_runs} busyKeyEvents={running_events} terminalHttp={terminal_status} terminalReason=db_failure terminalLiveEvents=1 terminalRunId={run_id} terminalStoredStatus={run_status} diskRuns={disk_runs} diskKeyEvents={disk_events} diskStatus={disk_status} restartRuns={restart_runs} restartKeyEvents={restart_events}");
+    println!("R02_A07_LIVE_FAULT busyHttp={status} busyReason=db_busy busyLiveEvents=0 busyRuns={running_runs} busyKeyEvents={running_events} terminalHttp={terminal_status} terminalReason=db_failure terminalLiveEvents=1 terminalRunId={run_id} terminalStoredStatus={run_status} diskRuns={disk_runs} diskKeyEvents={disk_events} diskStatus={disk_status} restartRuns={restart_runs} restartKeyEvents={restart_events} restartStatus={}", restart_status.as_deref().unwrap_or("none"));
     if let Ok(evidence) = std::env::var("R02_A07_LIVE_FAULT_EVIDENCE") {
         let path = PathBuf::from(evidence);
         std::fs::create_dir_all(path.parent().expect("evidence file has a parent")).unwrap();
@@ -619,7 +639,8 @@ async fn http_running_storage_fault_has_no_success_event_or_restart_run() {
                     "liveEvents": 1, "runId": run_id, "storedStatus": run_status},
                 "disk": {"runs": disk_runs, "keyEvents": disk_events, "status": disk_status},
                 "restart": {"runs": restart_runs, "keyEvents": restart_events,
-                    "runId": facts.last_runs[0].run_id},
+                    "runId": facts.last_runs[0].run_id,
+                    "status": restart_status},
             }))
             .unwrap(),
         )
