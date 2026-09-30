@@ -160,17 +160,53 @@
       "evidence": "artifacts/rust-tauri/R04/T03-E01/"
     },
     "R04-T04": {
-      "status": "PENDING",
+      "status": "READY_FOR_REVIEW",
       "acceptance_map": {
         "R04-A07": {
-          "status": "NOT_STARTED",
-          "tests": []
+          "status": "IMPLEMENTED_SELF_CHECKED",
+          "tests": [
+            "lingxi-service --test r04_t04_file_tools r04_a07_concurrent_edit_never_overwrites_the_user_version (full real chain: read v1 -> USER writes v2 between turns -> edit-per-v1 fails FILE_STALE_SINCE_READ with dispatched=true receipt and v2 intact -> authorized re-read -> retried edit succeeds on top of v2; journal receipts asserted 1:1)",
+            "lingxi-service --test r04_t04_file_tools adversarial_write_records_conflicts_and_atomicity (write-side stale conflict: v2 kept, no change record for the refused write, zero temp residue)"
+          ]
         },
         "R04-A08": {
-          "status": "NOT_STARTED",
-          "tests": []
+          "status": "IMPLEMENTED_SELF_CHECKED",
+          "tests": [
+            "lingxi-service --test r04_t04_file_tools r04_a08_symlinks_are_judged_by_their_real_targets (direct gateway legs: workspace link -> restricted sentinel refused for read/write/edit at prepare with zero side effects; read-granted external doc readable through its link but never writable; in-workspace link operates on its real target and stays a link)",
+            "lingxi-service --test r04_t04_file_tools r04_a08_resource_refusal_on_the_full_chain_is_never_dispatched (full chain: never-dispatched failed receipt, sentinel byte-identical)",
+            "lingxi-service --lib resourceaccess (7 unit tests: component containment, string-prefix sibling, symlink real-target judgment incl. in-workspace link, per-principal/session grant levels + revocation, missing-target parent resolution, case-insensitive resolution, unresolvable construction)"
+          ]
         }
-      }
+      },
+      "adversarial_additions": {
+        "tests": [
+          "r04_t04_file_tools adversarial_prefix_parent_switch_and_unicode_names (ws vs ws-secret prefix sibling; parent-directory switch through a symlinked dir; spaces/Chinese/emoji filename write-read-edit round-trip)",
+          "r04_t04_file_tools adversarial_read_pagination_truncation_and_edit_vocabulary (offset/limit + remaining-lines notice, past-EOF error, 2500-line truncation with continuation, 60KB single-line notice, adjacent duplicate-read stub, BOM strip, binary/non-UTF-8 honesty, edit duplicate/not-found/empty/overlap/no-change/ENOENT vocabulary, CRLF + BOM + smart-quote fuzzy + multi-edit, schema unknown-key refusal with valid contrast)",
+          "r04_t04_file_tools adversarial_write_records_conflicts_and_atomicity (nested create + Created record + existence-verified ResourceRef, overwrite + Modified before-digest, stale conflict keeps user content and records nothing, no .lingxi-write-* residue)",
+          "r04_t04_file_tools adversarial_mid_mutation_swap_is_a_conflict_not_a_lost_update (deterministic TOCTOU via the documented MutationTestHook seam: external inode swap inside the window -> FILE_CHANGED_DURING_MUTATION, external content kept, nothing recorded, temp cleaned)",
+          "r04_t04_file_tools approval_record_binds_real_file_scope_and_alias_resolves_to_the_executor (ask-mode write parks; PendingView.resources carries the canonical write scope; approve -> write lands; T03 OBS-1 real alias-resolution leg through gateway.prepare(ByName alias) -> the REAL read executor; canonical-name identity equality; forged handle refused)",
+          "r04_t04_file_tools read_only_session_denies_file_writes_at_the_policy_face (write: ACTION_BLOCKED_BY_READ_ONLY, dispatched=false, no file; read in the same run succeeds)"
+        ]
+      },
+      "gate_results": {
+        "cargo fmt --all -- --check": "exit 0",
+        "cargo clippy --workspace --all-targets --locked -D warnings": "exit 0",
+        "cargo test --workspace --locked": "exit 0 — 804 passed / 0 failed / 0 ignored across 77 green binaries (r00_management_leaves passed this run: the macOS firewall interception of unsigned test binaries is the intermittent environment item registered since T01, kept open, not written off)",
+        "xtask check-contracts": "exit 0 (626 entries, zero drift)",
+        "xtask check-boundaries": "exit 0 (O1-O8 + D1-D5 + B1; --self-test N1-N17 exit 0)",
+        "R03 regression": "r03_g07_repair_suites.sh exit 0 (ten suites exact pinned counts); r03_t08_matrix.sh A15 exit 0 (28 leaves + 11 combos); r03_t08_a16_seed_mechanism.sh exit 0"
+      },
+      "supplemental": [
+        "ResourceAccess/ResourceScope: canonical resolution (symlinks followed; missing tails through the nearest existing ancestor), component-wise root matching (never string prefixes), workspace roots + per-(principal, session) grants at read/write levels; Windows junction/UNC forms registered under cfg(windows) with a cfg-gated reparse test (real-machine Windows verification remains the stage deferral)",
+        "Native executors: read (pagination/offset-past-EOF/2000-line+50KB truncation notices/truncated flag/BOM strip/binary-non-UTF-8 honesty/adjacent duplicate-read stub), write (parent creation/atomic same-dir temp+rename/mode preservation/stale conflict), edit (incumbent match+conflict vocabulary, exact then simplified-fuzzy (no NFKC — registered gap), CRLF/BOM preserved, unchanged-lines overlay)",
+        "TOCTOU: unix dirfd component-walk with O_NOFOLLOW from /, openat-relative final component, bounded symlink-churn re-resolution + RE-authorization, pre-rename (dev,ino,mtime,size) identity re-verification through the same dirfd, per-canonical-path mutation serialization, RAII temp cleanup covering panic paths",
+        "Gateway: bind_executor_with_resources + ResourceExtractor run at prepare (资源规范化 before 权限/批准 per the frozen chain) and re-derived at execute (临近执行重检); new refusals gateway_resource_scope_denied / gateway_resource_scope_changed; PreparedInvocation/PreparedRecord carry resources",
+        "Approvals: ApprovalRequest/ApprovalRecord/PendingView carry the REAL resource scopes (the approver approves exactly this canonical scope); runs.rs passes prepared.resources into the gate request",
+        "FileModificationRecord/FileChangeLog is the explicit checkpoint/rewind interface (full product integration R06/R07); failed/interrupted mutations record nothing",
+        "Mapping decisions in R04-T04_REPORT.md §8: GBK/office decoding and image attachments not migrated (honest metadata-only results); write-before-digest capture cap 8MiB (recorded as None, never guessed); read-only root ACL vs session-mode layering follows the incumbent; NFKC fuzzy fold not ported"
+      ],
+      "report": "docs/rust-tauri/R04/R04-T04_REPORT.md",
+      "evidence": "artifacts/rust-tauri/R04/T04-E01/"
     },
     "R04-T05": {
       "status": "PENDING",

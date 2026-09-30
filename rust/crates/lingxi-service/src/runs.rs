@@ -1485,6 +1485,15 @@ impl RunSupervisor {
                                             &request.arguments,
                                         ))
                                     }),
+                                    // R04-T04: the approval RECORD binds the
+                                    // REAL resource scopes the gateway
+                                    // derived at preparation (canonical
+                                    // authorized paths + operations) — the
+                                    // approver approves exactly this scope.
+                                    resources: prepared
+                                        .as_ref()
+                                        .map(|prepared| prepared.resources.clone())
+                                        .unwrap_or_default(),
                                 };
                                 let gate_ctx = ctx.clone();
                                 let gate_child = self

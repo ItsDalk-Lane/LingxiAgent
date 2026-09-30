@@ -1,0 +1,23 @@
+== rust_fmt_check: /Users/study_superior/.cargo/bin/cargo fmt --manifest-path rust/Cargo.toml --all -- --check
+exit 0 — rust_fmt_check
+== rust_clippy: /Users/study_superior/.cargo/bin/cargo clippy --manifest-path rust/Cargo.toml --workspace --all-targets --locked -- -D warnings
+exit 0 — rust_clippy
+== workspace_test: /Users/study_superior/.cargo/bin/cargo test --manifest-path rust/Cargo.toml --workspace --locked
+exit 0 — workspace_test
+== check_contracts: /Users/study_superior/.cargo/bin/cargo run --manifest-path rust/Cargo.toml --locked -p xtask -- check-contracts
+exit 0 — check_contracts
+== check_boundaries: /Users/study_superior/.cargo/bin/cargo run --manifest-path rust/Cargo.toml --locked -p xtask -- check-boundaries
+exit 0 — check_boundaries
+== r04_t04_acceptance_tests: /Users/study_superior/.cargo/bin/cargo test --manifest-path rust/Cargo.toml -p lingxi-service --locked --test r04_t04_file_tools -- --nocapture
+exit 0 — r04_t04_acceptance_tests
+== r04_t03_acceptance_tests: /Users/study_superior/.cargo/bin/cargo test --manifest-path rust/Cargo.toml -p lingxi-service --locked --test r04_t03_approval_service -- --nocapture
+exit 0 — r04_t03_acceptance_tests
+== r04_t02_acceptance_tests: /Users/study_superior/.cargo/bin/cargo test --manifest-path rust/Cargo.toml -p lingxi-service --locked --test r04_t02_tool_gateway -- --nocapture
+exit 0 — r04_t02_acceptance_tests
+== r04_t01_acceptance_tests: /Users/study_superior/.cargo/bin/cargo test --manifest-path rust/Cargo.toml -p lingxi-service --locked --test r04_t01_tool_catalog -- --nocapture
+exit 0 — r04_t01_acceptance_tests
+== kernel_lib_tests: /Users/study_superior/.cargo/bin/cargo test --manifest-path rust/Cargo.toml -p lingxi-kernel --locked --lib
+exit 0 — kernel_lib_tests
+exit 0 — r03_g07_repair_suites
+exit 0 — r03_t08_matrix_a15
+exit 0 — r03_t08_a16_seed

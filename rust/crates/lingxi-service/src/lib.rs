@@ -30,6 +30,7 @@ pub mod config;
 pub mod dedup;
 pub mod epoch;
 pub mod events;
+pub mod filetools;
 pub mod inject;
 pub mod instance;
 pub mod invocations;
@@ -40,6 +41,7 @@ pub mod paths;
 pub mod quotas;
 pub mod recovery;
 pub mod redaction;
+pub mod resourceaccess;
 pub mod runs;
 mod security_audit;
 pub mod serve;
@@ -87,6 +89,11 @@ pub use events::{
     SubscribeOutcome, SubscribePageError, SubscribeReject, SubscriberCapKind, SubscriberStats,
     SubscriptionFrame, SubscriptionGuard,
 };
+pub use filetools::{
+    register_core_file_tools, CoreFileExecutor, CoreFileTools, FileChangeLog, FileChangeOperation,
+    FileModificationRecord, FileToolKind, FileTools, FileVersion, FreshnessRegistry, NoopChangeLog,
+    FILE_CHANGED_DURING_MUTATION, FILE_STALE_SINCE_READ, RESOURCE_SYMLINK_CHURN,
+};
 pub use inject::{
     ManualClock, RandomRequestIdGen, RequestIdGen, SequentialRequestIdGen, ServiceClock,
     SystemClock,
@@ -105,6 +112,9 @@ pub use quotas::{
     QuotaPermit, QuotaResource,
 };
 pub use redaction::{redact_line, redact_text};
+pub use resourceaccess::{
+    AccessRefusal, AccessRefusalCause, ResourceAccess, ResourceOp, ResourceScope,
+};
 pub use runs::{DriveError, RunDriveLimits, RunSupervisor};
 pub use session_supervisor::{
     BusyGateError, SessionConcurrencyLimits, SessionLease, SessionSupervisor, SteerError,
@@ -124,7 +134,8 @@ pub use task_supervisor::{
 pub use toolgateway::{
     CallerSurface, FailClosedPolicy, GatewayRefusal, InvocationEntry, InvocationRequest,
     PolicyAdjudicationInput, PolicyVerdict, PreparedInvocation, PreparedInvocationHandle,
-    ToolInvocationGateway, ToolPolicyPort, DEFAULT_LIVE_PREPARED_CAP, DEFAULT_PREPARED_TTL_MS,
+    ResourceExtractionInput, ResourceExtractor, ToolInvocationGateway, ToolPolicyPort,
+    DEFAULT_LIVE_PREPARED_CAP, DEFAULT_PREPARED_TTL_MS,
 };
 pub use transport::{check_origin, infer_connection_kind, ConnectionKind, NetworkMode};
 pub use ws::{

@@ -2962,23 +2962,29 @@
     "R04-T04": {
       "name": "原生读写改文件与资源权限",
       "stage_id": "R04",
-      "status": "PENDING",
-      "task_base_sha": null,
-      "executor_id": null,
-      "execution_result": null,
-      "review_round": 0,
-      "reviewer_id": null,
-      "review_verdict": null,
-      "findings": [],
+      "status": "DONE",
+      "task_base_sha": "c72e0fa02",
+      "executor_id": "EXECUTOR-R04-T04-E01 (ZCode agent_4c6fb50f)",
+      "execution_result": "READY_FOR_REVIEW -> R1 PASS first round (4 non-blocking observations)",
+      "review_round": 1,
+      "reviewer_id": "REVIEWER-R04-T04-R01 (agent_6a8d65f2)",
+      "review_verdict": "PASS (R1)",
+      "findings": [
+        "T03 OBS-1 alias-resolution leg CLOSED",
+        "OBS-1 MINAR registered: edit duplicate-count space differs from legacy in fuzzy layer (both runtime-verified; carry to T08 full matrix)",
+        "OBS-2 INFO: dangling-symlink divergence (legacy escapes, Rust rejects — stricter)",
+        "OBS-3 INFO: post-rename stat failure narrow-window changelog gap"
+      ],
       "repair_agent_id": null,
       "root_cause_agent_id": null,
       "acceptance_results": {
-        "R04-A07": "NOT_STARTED",
-        "R04-A08": "NOT_STARTED"
+        "R04-A07": "PASS (R1 independent full chain incl. TOCTOU identity re-verification probe)",
+        "R04-A08": "PASS (R1 independent 15-test probe crate; legacy dangling-symlink escape confirmed closed by O_NOFOLLOW surface)"
       },
       "task_commit_sha": null,
       "push_result": null,
-      "blockers": []
+      "blockers": [],
+      "candidate_diff_digest": "b13806eb...fa548 (reviewer-recorded, 3-round stable)"
     },
     "R04-T05": {
       "name": "命令、PTY与真实进程树取消",
@@ -4325,7 +4331,7 @@
       "blockers": []
     }
   },
-  "current_task": "R04-T04 (next)",
+  "current_task": "R04-T05 (next)",
   "orchestration_mode": {
     "effective_from": "R00-T03 R2 repair",
     "task_executor": "new ZCode task per Rxx-Tyy",

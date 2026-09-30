@@ -234,6 +234,11 @@ pub struct PendingView {
     /// The run the parked call belongs to (the approver's audit anchor).
     pub run_id: String,
     pub args_summary: Option<String>,
+    /// The REAL resource scopes of the parked invocation (R04-T04): the
+    /// approver sees WHICH canonical file the call touches and with
+    /// which operation — the scope the approval binds. The scope itself
+    /// is the trusted resource boundary's derivation, never model data.
+    pub resources: Vec<crate::resourceaccess::ResourceScope>,
     pub waiting_since_unix_ms: u64,
     pub expires_at_unix_ms: u64,
 }
@@ -267,6 +272,11 @@ struct ApprovalRecord {
     target: String,
     args_digest_hex: String,
     args_summary: Option<String>,
+    /// The REAL resource scopes the approval binds (R04-T04): canonical
+    /// authorized paths + operations, derived by the trusted resource
+    /// boundary at preparation. The approver approves exactly this
+    /// scope; a different scope (different file) is a different record.
+    resources: Vec<crate::resourceaccess::ResourceScope>,
     created_at_unix_ms: u64,
     expires_at_unix_ms: u64,
     state: RecordState,
@@ -486,6 +496,7 @@ impl ApprovalService {
                 target: record.target.clone(),
                 run_id: record.run_id.clone(),
                 args_summary: record.args_summary.clone(),
+                resources: record.resources.clone(),
                 waiting_since_unix_ms: record.created_at_unix_ms,
                 expires_at_unix_ms: record.expires_at_unix_ms,
             })
@@ -755,6 +766,7 @@ impl ApprovalGate for ApprovalService {
                 target: req.target.clone(),
                 args_digest_hex: req.args_digest.clone(),
                 args_summary: req.args_summary.clone(),
+                resources: req.resources.clone(),
                 created_at_unix_ms: now,
                 expires_at_unix_ms: now.saturating_add(self.approval_timeout_ms),
                 state: RecordState::Pending,
@@ -784,12 +796,20 @@ impl ApprovalGate for ApprovalService {
                 // the RECORD itself (the binding IS the record): the
                 // full invocation identity (principal × session × run ×
                 // attempt × generation × call × target × canonical
-                // digest). The approver approves exactly this, and any
-                // other call id/digest/session cannot spend it.
+                // digest) plus the REAL resource scopes (R04-T04). The
+                // approver approves exactly this, and any other call
+                // id/digest/session/scope cannot spend it.
+                let resource_digest = record
+                    .resources
+                    .iter()
+                    .map(|scope| format!("{}:{}", scope.op.wire_name(), scope.path.display()))
+                    .collect::<Vec<_>>()
+                    .join(", ");
                 tracing::info!(
                     approval_id = %record.approval_id,
                     target = %record.target,
                     args_digest = %record.args_digest_hex,
+                    resources = %resource_digest,
                     run_id = %record.run_id,
                     attempt = %record.attempt,
                     generation = record.generation,
@@ -1061,6 +1081,7 @@ mod tests {
             target: "tool:first-party:write".to_string(),
             args_digest: "digest-A".to_string(),
             args_summary: None,
+            resources: Vec::new(),
         };
         assert!(service.spend_preauthorization(&ctx, &req_a));
         // …and the SAME invocation cannot spend it again (single use).
@@ -1080,6 +1101,7 @@ mod tests {
             target: "tool:first-party:write".to_string(),
             args_digest: "digest-B".to_string(),
             args_summary: None,
+            resources: Vec::new(),
         };
         assert!(!service.spend_preauthorization(&ctx, &req_b));
         // A different session/principal cannot spend another session's
@@ -1102,6 +1124,7 @@ mod tests {
             target: "tool:first-party:write".to_string(),
             args_digest: "digest-A3".to_string(),
             args_summary: None,
+            resources: Vec::new(),
         };
         assert!(!service.spend_preauthorization(&ctx_other, &req_c));
         assert!(service.spend_preauthorization(&ctx, &req_c));

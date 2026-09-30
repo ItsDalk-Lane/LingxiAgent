@@ -45,6 +45,12 @@ pub struct ApprovalRequest {
     /// values — `summarize_arguments`) so the authenticated approver
     /// surface can show WHAT is being approved without leaking content.
     pub args_summary: Option<String>,
+    /// The REAL resource scopes of the invocation (R04-T04): canonical
+    /// authorized paths + operations, derived by the trusted resource
+    /// boundary at preparation. Empty for targets without resources.
+    /// This is what the approval RECORD binds (the approver approves
+    /// exactly this scope — the A05 semantics for file paths).
+    pub resources: Vec<crate::resourceaccess::ResourceScope>,
 }
 
 /// The decision of one approval wait.

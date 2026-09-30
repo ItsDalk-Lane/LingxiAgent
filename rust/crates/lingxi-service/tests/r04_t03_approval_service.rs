@@ -1559,6 +1559,7 @@ async fn concurrent_spends_of_one_grant_produce_exactly_one_winner() {
                 target: "tool:first-party:probe_write".to_string(),
                 args_digest: digest,
                 args_summary: None,
+                resources: Vec::new(),
             };
             approvals.request(&req_ctx, &req).await
         }
@@ -1660,6 +1661,7 @@ async fn restart_invalidates_old_approvals_and_grants() {
         target: "tool:first-party:probe_write".to_string(),
         args_digest: digest,
         args_summary: None,
+        resources: Vec::new(),
     };
     let ctx = kernel_ctx(SESSION, "replay-run");
     // The fresh service parks the replayed request (a NEW pending), it
@@ -1745,6 +1747,7 @@ async fn alias_cannot_reuse_a_single_use_grant() {
                 target: "tool:first-party:probe_write".to_string(),
                 args_digest: digest,
                 args_summary: None,
+                resources: Vec::new(),
             };
             approvals.request(&ctx, &req).await
         }

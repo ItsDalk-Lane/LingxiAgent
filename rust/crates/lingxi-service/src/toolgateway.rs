@@ -84,6 +84,31 @@ use lingxi_kernel::{Principal, RunContext};
 use lingxi_protocol::{ErrorCode, ProtocolError, ToolCallId};
 
 use crate::inject::ServiceClock;
+use crate::resourceaccess::ResourceScope;
+
+/// The trusted facts a resource-scope derivation may see (R04-T04). All
+/// of them come from the trusted entry's [`RunContext`] — a model
+/// payload can never populate this input.
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct ResourceExtractionInput {
+    pub principal_kind: &'static str,
+    pub principal_subject: String,
+    pub session_id: String,
+    pub run_id: String,
+}
+
+/// Derives the REAL resource scopes of one invocation from its EFFECTIVE
+/// arguments (`资源规范化` in the frozen invocation chain — between
+/// argument validation and the permission adjudication). For the file
+/// tools this resolves and AUTHORIZES the canonical path
+/// ([`crate::resourceaccess::ResourceAccess::authorize`]); an
+/// unauthorized scope is a loud preparation refusal, never a value the
+/// approver is asked to bless.
+pub type ResourceExtractor = std::sync::Arc<
+    dyn Fn(&ResourceExtractionInput, &EffectiveArguments) -> Result<Vec<ResourceScope>, String>
+        + Send
+        + Sync,
+>;
 
 /// Default lifetime of a [`PreparedInvocation`] (the incumbent's confirm
 /// timeout scale — a prepared call must not outlive its caller's context
@@ -376,6 +401,18 @@ pub enum GatewayRefusal {
     TargetChanged { target_id: String, detail: String },
     /// The target has no bound executor (capability honestly not wired).
     NoExecutorBound { target_id: String },
+    /// The invocation's REAL resource scope could not be derived or is
+    /// not authorized (R04-T04: `资源规范化` refuses before any approval
+    /// or dispatch — an approver is never asked to bless an
+    /// unauthorized path).
+    ResourceScopeDenied { code: String, message: String },
+    /// The resource scope changed between prepare and execute (the real
+    /// target moved / was replaced by a link). Zero dispatch.
+    ResourceScopeChanged {
+        target_id: String,
+        bound: String,
+        current: String,
+    },
 }
 
 impl GatewayRefusal {
@@ -396,6 +433,8 @@ impl GatewayRefusal {
             GatewayRefusal::IdentityMismatch { .. } => "gateway_identity_mismatch",
             GatewayRefusal::TargetChanged { .. } => "gateway_target_changed",
             GatewayRefusal::NoExecutorBound { .. } => "gateway_no_executor_bound",
+            GatewayRefusal::ResourceScopeDenied { .. } => "gateway_resource_scope_denied",
+            GatewayRefusal::ResourceScopeChanged { .. } => "gateway_resource_scope_changed",
         }
     }
 
@@ -503,6 +542,22 @@ impl GatewayRefusal {
                      capability is not wired (refused, never silently skipped)"
                 ),
             ),
+            GatewayRefusal::ResourceScopeDenied { code, message } => (
+                ErrorCode::Forbidden,
+                format!("tool resource scope refused: {code}: {message}"),
+            ),
+            GatewayRefusal::ResourceScopeChanged {
+                target_id,
+                bound,
+                current,
+            } => (
+                ErrorCode::Conflict,
+                format!(
+                    "tool target {target_id}: the invocation's real resource scope changed \
+                     between preparation and execution (bound {bound}, now {current}); refusing \
+                     with zero dispatch — re-prepare the invocation"
+                ),
+            ),
         };
         ProtocolError::new(code, message, false)
     }
@@ -561,6 +616,12 @@ pub struct PreparedInvocation {
     /// The adjudicated policy: `Allowed`, or `NeedsApproval` (the driver
     /// routes it through the approval surface; without one it refuses).
     pub policy: PolicyVerdict,
+    /// The REAL resource scopes this invocation was prepared against
+    /// (R04-T04: canonical authorized paths + operations). Empty for
+    /// targets without a resource extractor. This is what the approval
+    /// record binds (the approver approves exactly this scope) and what
+    /// `execute_prepared` re-derives before dispatch.
+    pub resources: Vec<ResourceScope>,
 }
 
 /// Server-side binding record (never handed to the model). The
@@ -591,14 +652,20 @@ struct PreparedRecord {
     tool_call_id: ToolCallId,
     created_at_unix_ms: u64,
     expires_at_unix_ms: u64,
+    /// The REAL resource scopes bound at preparation (R04-T04): what the
+    /// approval record carries and what execute-time re-derivation must
+    /// reproduce.
+    resources: Vec<ResourceScope>,
 }
 
 /// One bound executor + the registrar's reason (audit: why this executor
-/// may serve this target through the gateway).
+/// may serve this target through the gateway) and, when the target owns
+/// real resources, its resource-scope derivation (R04-T04).
 #[derive(Clone)]
 struct ExecutorBinding {
     executor: Arc<dyn ToolExecutorPort>,
     reason: String,
+    resources: Option<ResourceExtractor>,
 }
 
 struct PreparedState {
@@ -677,6 +744,21 @@ impl ToolInvocationGateway {
         executor: Arc<dyn ToolExecutorPort>,
         reason: &str,
     ) {
+        self.bind_executor_with_resources(target_id, executor, None, reason);
+    }
+
+    /// Binds the executor WITH its resource-scope derivation (R04-T04):
+    /// every preparation of this target derives + AUTHORIZES the real
+    /// resource scopes before the permission adjudication (`资源规范化`
+    /// precedes 权限/批准 in the frozen chain), and every execution
+    /// re-derives them and must reproduce the bound scopes.
+    pub fn bind_executor_with_resources(
+        &self,
+        target_id: ToolTargetId,
+        executor: Arc<dyn ToolExecutorPort>,
+        resources: Option<ResourceExtractor>,
+        reason: &str,
+    ) {
         self.executors
             .lock()
             .unwrap_or_else(|poisoned| poisoned.into_inner())
@@ -685,6 +767,7 @@ impl ToolInvocationGateway {
                 ExecutorBinding {
                     executor,
                     reason: reason.to_string(),
+                    resources,
                 },
             );
     }
@@ -697,6 +780,13 @@ impl ToolInvocationGateway {
             .iter()
             .map(|(id, binding)| (id.as_str().to_string(), binding.reason.clone()))
             .collect()
+    }
+
+    /// The registry this gateway resolves targets against (composition
+    /// and test surfaces register additional targets through it; every
+    /// EXECUTION still funnels through `prepare`/`execute_prepared`).
+    pub fn registry(&self) -> &Arc<ToolRegistry> {
+        &self.registry
     }
 
     /// The unified PREPARE stage: target resolution → availability →
@@ -744,6 +834,48 @@ impl ToolInvocationGateway {
                     }
                     Err(err) => return Err(map_catalog_error(err)),
                 }
+            }
+        };
+        // ── R04-T04: resource normalization (`资源规范化`) ──
+        // Between argument validation and the permission adjudication
+        // (the frozen §4.2 chain: 目标解析→可用性→参数校验→资源规范化→
+        // 权限→批准→…). A target with a resource extractor derives the
+        // REAL canonical scopes now; an unauthorized scope is a LOUD
+        // preparation refusal — an approver is never asked to bless a
+        // path the resource boundary would refuse, and nothing is
+        // dispatched.
+        let resources: Vec<ResourceScope> = {
+            let executors = self
+                .executors
+                .lock()
+                .unwrap_or_else(|poisoned| poisoned.into_inner());
+            match executors
+                .get(&prepared_tool_call.target_id)
+                .and_then(|binding| binding.resources.as_ref())
+            {
+                Some(extractor) => {
+                    let input = ResourceExtractionInput {
+                        principal_kind: request.principal.storage_kind(),
+                        principal_subject: request.principal.storage_subject(),
+                        session_id: request.session_id.clone(),
+                        run_id: request.run_id.clone(),
+                    };
+                    match extractor(&input, &prepared_tool_call.effective) {
+                        Ok(scopes) => scopes,
+                        Err(message) => {
+                            tracing::warn!(
+                                run_id = %request.run_id,
+                                target = %prepared_tool_call.target_id,
+                                "{message}"
+                            );
+                            return Err(GatewayRefusal::ResourceScopeDenied {
+                                code: "resource_scope_refused".to_string(),
+                                message,
+                            });
+                        }
+                    }
+                }
+                None => Vec::new(),
             }
         };
         let policy_input = PolicyAdjudicationInput {
@@ -812,6 +944,7 @@ impl ToolInvocationGateway {
             tool_call_id: request.tool_call_id,
             created_at_unix_ms: now,
             expires_at_unix_ms: expires_at,
+            resources: resources.clone(),
         };
         let mut prepared = self
             .prepared
@@ -846,6 +979,7 @@ impl ToolInvocationGateway {
             catalog_generation: prepared_tool_call.catalog_generation,
             expires_at_unix_ms: expires_at,
             policy,
+            resources,
         })
     }
 
@@ -1056,6 +1190,57 @@ impl ToolInvocationGateway {
                 target_id: record.target_id.as_str().to_string(),
             });
         };
+        // 4b) R04-T04 — the execution-time re-check of the RESOURCE
+        //     scope (`临近执行重检` covers 撤销/代次/参数/资源): the
+        //     bound extractor re-derives the REAL scopes from the CURRENT
+        //     filesystem and they must reproduce the prepared record's
+        //     scopes (canonical path + operation). A file moved, replaced
+        //     by a link, or re-authorized differently between prepare and
+        //     execute is refused with zero dispatch — the approval was
+        //     for the OLD real target, never for whatever is there now.
+        if let Some(extractor) = binding.resources.as_ref() {
+            let input = ResourceExtractionInput {
+                principal_kind: record.principal_kind,
+                principal_subject: record.principal_subject.clone(),
+                session_id: record.session_id.clone(),
+                run_id: record.run_id.clone(),
+            };
+            match extractor(&input, &record.effective) {
+                Ok(current) => {
+                    let same = current.len() == record.resources.len()
+                        && current
+                            .iter()
+                            .zip(record.resources.iter())
+                            .all(|(now, bound)| now.op == bound.op && now.path == bound.path);
+                    if !same {
+                        let describe = |scopes: &[ResourceScope]| {
+                            scopes
+                                .iter()
+                                .map(|scope| {
+                                    format!("{}:{}", scope.op.wire_name(), scope.path.display())
+                                })
+                                .collect::<Vec<_>>()
+                                .join(", ")
+                        };
+                        return Err(GatewayRefusal::ResourceScopeChanged {
+                            target_id: record.target_id.as_str().to_string(),
+                            bound: describe(&record.resources),
+                            current: describe(&current),
+                        });
+                    }
+                }
+                Err(message) => {
+                    tracing::warn!(
+                        target = %record.target_id,
+                        "{message}"
+                    );
+                    return Err(GatewayRefusal::ResourceScopeDenied {
+                        code: "resource_scope_refused".to_string(),
+                        message,
+                    });
+                }
+            }
+        }
         // 5) Dispatch with the SERVER-BOUND arguments.
         let request = ToolRequest {
             target: record.target_id.as_str().to_string(),
