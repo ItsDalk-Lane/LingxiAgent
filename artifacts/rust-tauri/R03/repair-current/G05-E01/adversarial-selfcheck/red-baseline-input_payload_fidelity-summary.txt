@@ -1,0 +1,9 @@
+---- c02_unicode_payloads_byte_honest_on_both_entries stdout ----
+thread 'c02_unicode_payloads_byte_honest_on_both_entries' (43218347) panicked at crates/lingxi-service/tests/input_payload_fidelity.rs:463:5:
+---- c02_dedup_digest_corresponds_to_the_content_actually_executed stdout ----
+thread 'c02_dedup_digest_corresponds_to_the_content_actually_executed' (43218346) panicked at crates/lingxi-service/tests/input_payload_fidelity.rs:511:5:
+---- c01_foreground_boundary_lengths_deliver_the_full_input stdout ----
+thread 'c01_foreground_boundary_lengths_deliver_the_full_input' (43218345) panicked at crates/lingxi-service/tests/input_payload_fidelity.rs:379:9:
+---- c01_background_boundary_lengths_deliver_the_full_input stdout ----
+thread 'c01_background_boundary_lengths_deliver_the_full_input' (43218344) panicked at crates/lingxi-service/tests/input_payload_fidelity.rs:425:9:
+test result: FAILED. 0 passed; 5 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.25s

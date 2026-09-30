@@ -112,7 +112,11 @@
           "gates": "fmt 零 diff；clippy 零告警；check-contracts 626 零漂移；check-boundaries exit 0；Cargo.lock 不变；G01-G03 套件绿",
           "report": "docs/rust-tauri/R03/repair-current/G04-E01_REPORT.md",
           "reviewer": "REVIEWER-REPAIR-R03-G04-R1",
-          "review_verdict": "PASS"
+          "review_verdict": "PASS",
+          "commits": [
+            "d56e6883d fix(rust-tauri): R03 adversarial repair G04 - two-phase admission binding, no ghost replay (F05)"
+          ],
+          "remote_receipt": "origin/codex/rust-tauri-migration=d56e6883df1969a05830a3053afabdc693583a62"
         }
       ]
     },
@@ -120,9 +124,21 @@
       "covers": [
         "F06"
       ],
-      "status": "NOT_STARTED",
-      "executor": null,
-      "rounds": []
+      "status": "DONE",
+      "executor": "EXECUTOR-REPAIR-R03-G05-E01",
+      "rounds": [
+        {
+          "round": 1,
+          "executor": "EXECUTOR-REPAIR-R03-G05-E01",
+          "result": "READY_FOR_REVIEW",
+          "candidate": "HEAD d56e6883d + 未提交工作树（limits.rs + sessions.rs + lib.rs + 2 新测试套件 7 用例）",
+          "workspace_tests": "71 suites / 696 passed / 0 failed（G04 后 69/689/0，+7）",
+          "gates": "fmt 零 diff；clippy 零告警；check-contracts 626 零漂移；check-boundaries exit 0；Cargo.lock 不变；G01-G04 套件绿",
+          "report": "docs/rust-tauri/R03/repair-current/G05-E01_REPORT.md",
+          "reviewer": "REVIEWER-REPAIR-R03-G05-R1",
+          "review_verdict": "PASS"
+        }
+      ]
     },
     "G06": {
       "covers": [
@@ -342,11 +358,11 @@
       ],
       "fact_type": "SOURCE_CONFIRMED",
       "fact_type_note": "固定提交静态源码反例分析，尚未动态复现；状态推进须以执行端真实命令/退出码/日志为准，不得倒填为已复现。",
-      "implementation_status": "NOT_STARTED",
+      "implementation_status": "CLOSED_BY_INDEPENDENT_REVIEW_R1",
       "repair_commits": [],
-      "normal_selfcheck_status": "NOT_RUN",
-      "adversarial_selfcheck_status": "NOT_RUN",
-      "independent_review_status": "NOT_RUN",
+      "normal_selfcheck_status": "PASS_EXECUTOR",
+      "adversarial_selfcheck_status": "PASS_EXECUTOR",
+      "independent_review_status": "PASS_R1",
       "case_ids": [
         "R03-FIX-F06-C01",
         "R03-FIX-F06-C02",
@@ -1299,27 +1315,36 @@
       "issue_id": "F06",
       "workorder": "G05",
       "audit_runtime_status": "NOT_RUN_THIS_AUDIT",
-      "implementation_status": "NOT_STARTED",
+      "implementation_status": "CLOSED_BY_INDEPENDENT_REVIEW_R1",
       "normal_selfcheck": {
-        "status": "NOT_RUN",
+        "status": "PASS",
         "commands": [],
         "exit_codes": [],
-        "evidence": [],
+        "evidence": [
+          "artifacts/rust-tauri/R03/repair-current/G05-E01/normal-selfcheck/",
+          "docs/rust-tauri/R03/repair-current/G05-E01_NORMAL_SELFCHECK.md"
+        ],
         "notes": null
       },
       "adversarial_selfcheck": {
-        "status": "NOT_RUN",
+        "status": "PASS",
         "commands": [],
         "exit_codes": [],
-        "evidence": [],
+        "evidence": [
+          "artifacts/rust-tauri/R03/repair-current/G05-E01/adversarial-selfcheck/",
+          "docs/rust-tauri/R03/repair-current/G05-E01_ADVERSARIAL_SELFCHECK.md"
+        ],
         "notes": null
       },
       "independent_review": {
-        "status": "NOT_RUN",
-        "reviewer_id": null,
-        "round": null,
-        "evidence": [],
-        "verdict": null
+        "status": "PASS",
+        "reviewer_id": "REVIEWER-REPAIR-R03-G05-R1",
+        "round": 1,
+        "evidence": [
+          "docs/rust-tauri/R03/repair-current/G05-R1_REVIEW.md",
+          "artifacts/rust-tauri/R03/repair-current/G05-R1/"
+        ],
+        "verdict": "PASS"
       },
       "repair_commit": null
     },
@@ -1328,27 +1353,36 @@
       "issue_id": "F06",
       "workorder": "G05",
       "audit_runtime_status": "NOT_RUN_THIS_AUDIT",
-      "implementation_status": "NOT_STARTED",
+      "implementation_status": "CLOSED_BY_INDEPENDENT_REVIEW_R1",
       "normal_selfcheck": {
-        "status": "NOT_RUN",
+        "status": "PASS",
         "commands": [],
         "exit_codes": [],
-        "evidence": [],
+        "evidence": [
+          "artifacts/rust-tauri/R03/repair-current/G05-E01/normal-selfcheck/",
+          "docs/rust-tauri/R03/repair-current/G05-E01_NORMAL_SELFCHECK.md"
+        ],
         "notes": null
       },
       "adversarial_selfcheck": {
-        "status": "NOT_RUN",
+        "status": "PASS",
         "commands": [],
         "exit_codes": [],
-        "evidence": [],
+        "evidence": [
+          "artifacts/rust-tauri/R03/repair-current/G05-E01/adversarial-selfcheck/",
+          "docs/rust-tauri/R03/repair-current/G05-E01_ADVERSARIAL_SELFCHECK.md"
+        ],
         "notes": null
       },
       "independent_review": {
-        "status": "NOT_RUN",
-        "reviewer_id": null,
-        "round": null,
-        "evidence": [],
-        "verdict": null
+        "status": "PASS",
+        "reviewer_id": "REVIEWER-REPAIR-R03-G05-R1",
+        "round": 1,
+        "evidence": [
+          "docs/rust-tauri/R03/repair-current/G05-R1_REVIEW.md",
+          "artifacts/rust-tauri/R03/repair-current/G05-R1/"
+        ],
+        "verdict": "PASS"
       },
       "repair_commit": null
     },
@@ -1357,27 +1391,36 @@
       "issue_id": "F06",
       "workorder": "G05",
       "audit_runtime_status": "NOT_RUN_THIS_AUDIT",
-      "implementation_status": "NOT_STARTED",
+      "implementation_status": "CLOSED_BY_INDEPENDENT_REVIEW_R1",
       "normal_selfcheck": {
-        "status": "NOT_RUN",
+        "status": "PASS",
         "commands": [],
         "exit_codes": [],
-        "evidence": [],
+        "evidence": [
+          "artifacts/rust-tauri/R03/repair-current/G05-E01/normal-selfcheck/",
+          "docs/rust-tauri/R03/repair-current/G05-E01_NORMAL_SELFCHECK.md"
+        ],
         "notes": null
       },
       "adversarial_selfcheck": {
-        "status": "NOT_RUN",
+        "status": "PASS",
         "commands": [],
         "exit_codes": [],
-        "evidence": [],
+        "evidence": [
+          "artifacts/rust-tauri/R03/repair-current/G05-E01/adversarial-selfcheck/",
+          "docs/rust-tauri/R03/repair-current/G05-E01_ADVERSARIAL_SELFCHECK.md"
+        ],
         "notes": null
       },
       "independent_review": {
-        "status": "NOT_RUN",
-        "reviewer_id": null,
-        "round": null,
-        "evidence": [],
-        "verdict": null
+        "status": "PASS",
+        "reviewer_id": "REVIEWER-REPAIR-R03-G05-R1",
+        "round": 1,
+        "evidence": [
+          "docs/rust-tauri/R03/repair-current/G05-R1_REVIEW.md",
+          "artifacts/rust-tauri/R03/repair-current/G05-R1/"
+        ],
+        "verdict": "PASS"
       },
       "repair_commit": null
     },

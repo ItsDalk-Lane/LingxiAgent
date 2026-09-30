@@ -1,0 +1,15 @@
+error[E0599]: no variant named `InputTooLarge` found for enum `SessionExecuteError`
+   --> crates/lingxi-service/tests/input_budget_refusal.rs:302:30
+    |
+302 |         SessionExecuteError::InputTooLarge { bytes, limit_bytes } => {
+    |                              ^^^^^^^^^^^^^ variant not found in `SessionExecuteError`
+
+error[E0599]: no variant named `InputTooLarge` found for enum `SessionExecuteError`
+   --> crates/lingxi-service/tests/input_budget_refusal.rs:321:30
+    |
+321 |         SessionExecuteError::InputTooLarge { bytes, limit_bytes } if bytes == limit + 1 && limit_bytes == limit
+    |                              ^^^^^^^^^^^^^ variant not found in `SessionExecuteError`
+
+Some errors have detailed explanations: E0425, E0599.
+For more information about an error, try `rustc --explain E0425`.
+error: could not compile `lingxi-service` (test "input_budget_refusal") due to 4 previous errors

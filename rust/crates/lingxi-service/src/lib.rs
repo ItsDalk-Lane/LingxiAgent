@@ -2386,6 +2386,27 @@ async fn execute_session(
         Err(sessions::SessionExecuteError::InvalidRequestId { detail }) => {
             EndpointError::invalid_message(format!("requestId invalid: {detail}")).into_response()
         }
+        Err(sessions::SessionExecuteError::InputTooLarge { bytes, limit_bytes }) => {
+            // R03 repair G05/F06: the official input budget refused the
+            // submission at admission, before any side effect. 413 (the
+            // same family as the transport body limit) with both byte
+            // counts named — never a silent truncation. Unreachable via
+            // this route today (the 1 MiB framework body limit rejects
+            // larger bodies first); mapped so the surface stays closed
+            // and loud for any future wiring.
+            EndpointError::new(
+                StatusCode::PAYLOAD_TOO_LARGE,
+                ErrorCode::InvalidMessage,
+                format!(
+                    "submission input is {bytes} bytes, over the supported budget of \
+                     {limit_bytes} bytes; resend within the budget — input is never \
+                     silently truncated"
+                ),
+            )
+            .with_reason("input_too_large")
+            .with_cause("session.input_too_large")
+            .into_response()
+        }
         Err(sessions::SessionExecuteError::ShuttingDown) => {
             // R03-A14: the exit window refuses fresh submissions.
             EndpointError::shutting_down().into_response()

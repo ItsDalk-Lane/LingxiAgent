@@ -18,6 +18,20 @@ use std::sync::Mutex;
 /// framework before any handler JSON parsing runs.
 pub const DEFAULT_BODY_LIMIT_BYTES: usize = 1024 * 1024;
 
+/// Maximum accepted UTF-8 length of a session-submission input (the task
+/// content) — the service layer's OFFICIAL input budget (R03 repair
+/// G05/F06). It is deliberately the SAME number as the transport budget
+/// ([`DEFAULT_BODY_LIMIT_BYTES`] / [`WS_FRAME_LIMIT_BYTES`]): an input is
+/// a JSON field inside a request body, so a legal HTTP/WS submission can
+/// never carry a longer input than this. The service-level check is the
+/// admission-time, loud defense-in-depth leg of that one budget (it also
+/// covers in-process callers that bypass the transport); over it the
+/// submission is refused with `input_too_large` BEFORE the busy gate,
+/// run-id allocation or any durable side effect — input is NEVER
+/// silently truncated, and log/display summaries are counts only, never
+/// the executed content.
+pub const MAX_SUBMISSION_INPUT_BYTES: usize = DEFAULT_BODY_LIMIT_BYTES;
+
 /// Default per-peer HTTP rate budget within one window.
 pub const DEFAULT_HTTP_RATE_MAX: u32 = 240;
 /// Default rate window length.

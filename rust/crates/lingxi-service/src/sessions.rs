@@ -218,6 +218,19 @@ pub enum SessionExecuteError {
     InvalidRequestId {
         detail: String,
     },
+    /// R03 repair G05/F06: the submission input exceeds the OFFICIAL
+    /// input budget ([`crate::limits::MAX_SUBMISSION_INPUT_BYTES`] — the
+    /// same number the transport layer enforces as the 1 MiB body/frame
+    /// limit). Refused LOUDLY at admission BEFORE any side effect: no
+    /// run id is allocated, nothing is written, nothing is dispatched,
+    /// and no id→run binding is left behind. Within the budget the input
+    /// flows to the execution surface BYTE-HONEST and complete — input
+    /// is never silently truncated, and the refusal names both byte
+    /// counts so the client can split or shrink the request knowingly.
+    InputTooLarge {
+        bytes: usize,
+        limit_bytes: usize,
+    },
     /// R03-T06: the background-drive registry is at its hard cap (service
     /// protection; nothing was written, nothing was executed).
     BackgroundRegistryFull {
@@ -646,10 +659,15 @@ impl SessionStore {
             } => (run_id, lease, agent_id, binding),
         };
 
-        // Bound what we record (defense in depth; the body limit already
-        // bounds the request).
-        let recorded_input: String = submission.input.chars().take(2000).collect();
-
+        // R03 repair G05/F06: the EXECUTION PAYLOAD is the FULL, byte-
+        // honest input — no projection, no truncation. The admission
+        // chain above has already verified the official input budget
+        // (and the transport layers bound the same input tighter still),
+        // so everything below this point is legal content whose TAIL is
+        // as much a part of the task as its head. Bounded summaries are
+        // a LOG-ONLY concern (see the tracing calls: counts, never
+        // content).
+        //
         // Drive the full lifecycle (start → turns → single finalize); the
         // run drains the session's steering channel before each provider
         // turn. `lease` frees the session on EVERY exit path below.
@@ -661,7 +679,7 @@ impl SessionStore {
                 session_id,
                 &agent_id,
                 &run_id,
-                &recorded_input,
+                submission.input,
                 1,
                 now_ms,
                 Some(lease.steering_inbox()),
@@ -707,7 +725,10 @@ impl SessionStore {
             run_id = %run_id,
             session_id = session_id,
             outcome = %finish.terminal_reason(),
-            input_chars = recorded_input.chars().count(),
+            // Log-only summaries are COUNTS of the full input — the
+            // content itself is task data, not log data (G05/F06).
+            input_chars = submission.input.chars().count(),
+            input_bytes = submission.input.len(),
             "run settled through the single finalize path"
         );
 
@@ -757,7 +778,10 @@ impl SessionStore {
                 binding,
             } => (run_id, lease, agent_id, binding),
         };
-        let recorded_input: String = submission.input.chars().take(2000).collect();
+        // R03 repair G05/F06: the BACKGROUND entry executes the same
+        // FULL, byte-honest input as the foreground — the admission
+        // chain has already verified the official input budget, so
+        // nothing here may shorten the task content.
         // The session lease moves INTO the detached drive: the session
         // stays honestly busy until the background run settles (every
         // exit path of the drive). R03 repair G04/F05: the id→run binding
@@ -776,7 +800,7 @@ impl SessionStore {
             session_id.to_string(),
             _agent_id,
             run_id.clone(),
-            recorded_input,
+            submission.input.to_string(),
             DriveAuthorization::user_submission(submission.request_id),
             binding,
             now_ms,
@@ -835,6 +859,30 @@ impl SessionStore {
         submission: &ExecuteSubmission<'_>,
         now_ms: u64,
     ) -> Result<AdmissionOutcome, SessionExecuteError> {
+        // R03 repair G05/F06 — the OFFICIAL input budget, enforced at the
+        // very head of the admission chain (BOTH submission surfaces),
+        // before the session read, the busy gate, the run-id allocation,
+        // the dedup reservation or ANY durable side effect. Over the
+        // budget the submission is refused loudly; within it the input
+        // is executed complete and byte-honest (see the drive calls
+        // below — the full `submission.input`, never a projection). The
+        // budget equals the transport body/frame limit, so a legal
+        // HTTP/WS request can never trip this leg; it exists so that
+        // over-budget input is REFUSED instead of silently truncated.
+        let input_bytes = submission.input.len();
+        if input_bytes > crate::limits::MAX_SUBMISSION_INPUT_BYTES {
+            tracing::warn!(
+                session_id = session_id,
+                input_bytes = input_bytes,
+                limit_bytes = crate::limits::MAX_SUBMISSION_INPUT_BYTES,
+                "submission refused: input exceeds the official budget — resubmit within \
+                 the budget (input is never silently truncated)"
+            );
+            return Err(SessionExecuteError::InputTooLarge {
+                bytes: input_bytes,
+                limit_bytes: crate::limits::MAX_SUBMISSION_INPUT_BYTES,
+            });
+        }
         let row = match self.backend.get_session_erased(session_id).await {
             Ok(Some(row)) => row,
             Ok(None) => return Err(SessionExecuteError::NotFound),
