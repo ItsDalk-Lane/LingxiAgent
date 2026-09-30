@@ -1,0 +1,20 @@
+{
+ "schema": "lingxi.r03-t08-a16-seed-mechanism.v1",
+ "kind": "MECHANISM_PROOF_ISOLATED_MUTATION",
+ "honesty_note": "No natural property-test anomaly was ever observed; this is the stage-book-allowed isolated controlled-defect proof of the capture->replay mechanism, not a natural discovery history.",
+ "captured_seed": "0xa16d0000000000",
+ "phases": {
+  "p0_baseline_real_default_seed": "PASS",
+  "p1_isolated_mutation_probe_built": "PASS",
+  "p2_anomaly_triggered_and_seed_captured": "PASS",
+  "p3_fixed_seed_stable_reproduction": "PASS (2/2 identical illegal sequences)",
+  "p4_mutation_removed_same_seed_and_full_group": "PASS"
+ },
+ "permanent_mechanism": {
+  "seed_override_env": "R03_T04_PROPERTY_SEED / R03_A02_PROPERTY_SEED",
+  "failure_line": "R03_T04_PROPERTY_FAILURE seed=0x... location=...",
+  "seed_file_env": "R03_T04_PROPERTY_SEED_FILE / R03_A02_PROPERTY_SEED_FILE",
+  "home": "rust/crates/lingxi-adapters/tests/late_result_fencing_property.rs, run_finalize_property.rs"
+ },
+ "mutation_isolation": "throwaway cargo crate under mktemp TMPDIR; repository tree untouched; probe removed before P4"
+}

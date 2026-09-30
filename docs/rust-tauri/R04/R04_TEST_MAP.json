@@ -264,17 +264,52 @@
       "evidence": "artifacts/rust-tauri/R04/T05-E01/"
     },
     "R04-T06": {
-      "status": "PENDING",
+      "status": "READY_FOR_REVIEW",
       "acceptance_map": {
         "R04-A11": {
-          "status": "NOT_STARTED",
-          "tests": []
+          "status": "IMPLEMENTED_SELF_CHECKED",
+          "tests": [
+            "lingxi-service --test r04_t06_sandbox r04_a11_missing_helper_at_composition_is_a_loud_refusal (helper 路径不存在：组合期 sandbox_helper_missing 响亮拒绝，无可绕过的构造路径)",
+            "lingxi-service --test r04_t06_sandbox r04_a11_replaced_helper_is_refused_and_the_impostor_never_runs (腿1：用户所有冒名 helper（exec \"$@\"）组合期 sandbox_helper_untrusted 拒绝；腿2：合法 symlink 别名组合后运行成功→中途换成冒名 helper→经真实网关链 EXEC_SANDBOX_REFUSED+sandbox_helper_untrusted、哨兵字节不变、零存活进程；腿2b：彻底删除 helper=sandbox_helper_missing 同形态)",
+            "lingxi-service --test r04_t06_sandbox r04_a11_unsupported_backend_refuses_through_the_real_chain (Windows 形态 UnsupportedSandbox：必须隔离的命令经真实链拒绝、哨兵不变、绝不裸跑)",
+            "lingxi-service --lib sandbox (构造期 seatbelt 双腿强制探针：允许腿 /usr/bin/true 在 containment core 下 exit0 + 拒绝腿 containment core 下写 /dev/null 必须失败——被替换/损坏 helper 无法通过)"
+          ]
         },
         "R04-A12": {
-          "status": "NOT_STARTED",
-          "tests": []
+          "status": "IMPLEMENTED_SELF_CHECKED (macos-arm64 真机实测；linux 源码级未真机、windows 后端明确拒绝——按 PLATFORM_CAPABILITIES v2 登记)",
+          "tests": [
+            "lingxi-service --test r04_t06_sandbox r04_a12_filesystem_write_isolation_holds_with_real_sentinels (工作区写允许对照+外哨兵写拒+Operation not permitted+安全提示、符号链接改向按真实目标拒、.git 写保护拒、auth.json deny-read 拒（秘密不可读）、TMPDIR 临时资源允许、沙盒内子进程允许)",
+            "lingxi-service --test r04_t06_sandbox r04_a12_network_isolation_against_the_registered_loopback_service (本测试自建登记的回环服务：contained=(deny network*) 连接拒；同策略 network-capable 允许对照拿到 pong；网络拒绝策略下请求 network-capable=sandbox_policy_unsupported)",
+            "lingxi-service --test r04_t06_sandbox r04_a12_environment_whitelist_holds_through_the_sandbox_wrapper (植入服务端秘密不达沙盒子进程；白名单 PATH+显式 env 到达；结果如实标注 sandbox: seatbelt)",
+            "lingxi-service --test r04_t06_sandbox r04_a12_sandboxed_process_tree_still_honors_the_cancellation_chain (沙盒内孙进程经 supervisor killpg 链真实回收——sandbox-exec 原地 exec 语义保组)"
+          ]
         }
-      }
+      },
+      "adversarial_additions": {
+        "tests": [
+          "r04_t06_sandbox adversarial_policy_injection_is_refused_at_both_layers (层1：含引号的工作区根不可嵌入 SBPL 字面量→sandbox_profile_path_unsafe 拒绝执行；层2：模型参数伪造 sandbox_profile 键在 prepare 期 ArgumentsInvalid 零派发)",
+          "r04_t06_sandbox adversarial_tty_terminals_are_honestly_not_claimed_as_contained (tty 终端不套 OS 沙盒=现役语义；结果永不出现 sandbox: 标注——不谎报)",
+          "r04_t06_sandbox seatbelt_helper_trust_and_capabilities_are_recorded (helper trust：root 属主+解析路径=/usr/bin/sandbox-exec；wrapped argv 确为 helper 前缀+命令且 profile 含 deny network*)",
+          "lingxi-service --lib sandbox:: (7 单测：策略推导移植逐字、无效配置拒绝、SBPL deny-在-allow-后顺序+注入拒绝、bwrap 参数形、unsupported 全拒、版本解析、能力矩阵)"
+        ]
+      },
+      "gate_results": {
+        "cargo fmt --all -- --check": "exit 0",
+        "cargo clippy --workspace --all-targets --locked -D warnings": "exit 0",
+        "cargo test --workspace --locked": "见 R04-T06_REPORT.md §5（T06 套件 10/10+单测 7；workspace 全量与 r00 环境项按报告登记）",
+        "xtask check-contracts": "exit 0 (626 entries 零漂移)",
+        "xtask check-boundaries": "exit 0 (O1-O8 + D1-D5 + B1; --self-test N1-N17 exit 0)",
+        "R03 regression": "r03_g07_repair_suites.sh exit 0；r03_t08_matrix.sh exit 0；r03_t08_a16_seed_mechanism.sh exit 0；T01-T05 套件 6/13/11/9/14 复绿"
+      },
+      "supplemental": [
+        "SandboxPort（trait）+ SandboxPolicy（deriveSandboxPolicy 逐字移植）+ 三后端（Seatbelt 复用系统 sandbox-exec、Bwrap 源码级适配、Unsupported 对 Windows/未知平台失败关闭）；helper 信任方案：pinned 绝对路径（非 PATH）+root 属主+非组/全局可写+basename+seatbelt 双腿强制探针/bwrap --version——构造期与每次 wrap 双层验证",
+        "exec 链集成：register_process_tools 增 sandbox 参数（T05 测试一处等价更新 None，断言零变化）；一次性 exec_command argv 经 port 包裹（约束交集=T04 cwd 授权∩T05 env 白名单∩T06 OS 沙盒，各自拒绝零派发）；tty 终端按现役语义不套 OS 沙盒且结果永不谎报 containment",
+        "失败关闭：EXEC_SANDBOX_REFUSED + sandbox_{config_invalid,helper_missing,helper_untrusted,policy_unsupported,profile_path_unsafe} 稳定码；sandbox-exec 探针证明原地 exec——supervisor setsid/getpgid/killpg 链穿过 wrapper 成立（孙进程回收实测）",
+        "SBPL 策略注入防护：嵌入路径含 \" 或 \\\\ 或 NUL → sandbox_profile_path_unsafe 拒绝（现役未防护的缺口已闭合）；deny 行严格位于 allow 行之后（last-match-wins 语义保序）；realpath 嵌入（/tmp→/private/tmp 实测必需）",
+        "映射决策（登记）：require_escalated/sandbox_permissions 模型面参数未迁移（需 T02/T03 冻结面的权限分类耦合，网络能力已在端口层真实可用并验证）；现役 seatbelt -f 临时 profile 文件改为 -p 内联（消 TOCTOU/清理面，机制同为 sandbox-exec）；Windows restricted-token helper 未移植=后端拒绝（递延 R03-WINDOWS-R09-R10）"
+      ],
+      "report": "docs/rust-tauri/R04/R04-T06_REPORT.md",
+      "evidence": "artifacts/rust-tauri/R04/T06-E01/"
     },
     "R04-T07": {
       "status": "PENDING",

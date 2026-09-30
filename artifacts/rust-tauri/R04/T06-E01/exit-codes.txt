@@ -1,0 +1,32 @@
+=== rust_fmt_check: /Users/study_superior/.cargo/bin/cargo fmt --manifest-path /Users/study_superior/Desktop/Code/LingxiAgent/rust/Cargo.toml --all -- --check
+rust_fmt_check exit=0
+=== rust_clippy: /Users/study_superior/.cargo/bin/cargo clippy --manifest-path /Users/study_superior/Desktop/Code/LingxiAgent/rust/Cargo.toml --workspace --all-targets --locked -- -D warnings
+rust_clippy exit=0
+=== workspace_test: /Users/study_superior/.cargo/bin/cargo test --manifest-path /Users/study_superior/Desktop/Code/LingxiAgent/rust/Cargo.toml --workspace --locked --no-fail-fast
+workspace_test exit=101
+=== check_contracts: /Users/study_superior/.cargo/bin/cargo run --manifest-path /Users/study_superior/Desktop/Code/LingxiAgent/rust/Cargo.toml --locked -p xtask -- check-contracts
+check_contracts exit=0
+=== check_boundaries: /Users/study_superior/.cargo/bin/cargo run --manifest-path /Users/study_superior/Desktop/Code/LingxiAgent/rust/Cargo.toml --locked -p xtask -- check-boundaries
+check_boundaries exit=0
+=== r04_t06_acceptance: /Users/study_superior/.cargo/bin/cargo test --manifest-path /Users/study_superior/Desktop/Code/LingxiAgent/rust/Cargo.toml -p lingxi-service --locked --test r04_t06_sandbox
+r04_t06_acceptance exit=0
+=== r04_t06_unit: /Users/study_superior/.cargo/bin/cargo test --manifest-path /Users/study_superior/Desktop/Code/LingxiAgent/rust/Cargo.toml -p lingxi-service --locked --lib sandbox::
+r04_t06_unit exit=0
+=== r04_t05_process: /Users/study_superior/.cargo/bin/cargo test --manifest-path /Users/study_superior/Desktop/Code/LingxiAgent/rust/Cargo.toml -p lingxi-service --locked --test r04_t05_process_tools
+r04_t05_process exit=0
+=== r04_t04_files: /Users/study_superior/.cargo/bin/cargo test --manifest-path /Users/study_superior/Desktop/Code/LingxiAgent/rust/Cargo.toml -p lingxi-service --locked --test r04_t04_file_tools
+r04_t04_files exit=0
+=== r04_t03_approval: /Users/study_superior/.cargo/bin/cargo test --manifest-path /Users/study_superior/Desktop/Code/LingxiAgent/rust/Cargo.toml -p lingxi-service --locked --test r04_t03_approval_service
+r04_t03_approval exit=0
+=== r04_t02_gateway: /Users/study_superior/.cargo/bin/cargo test --manifest-path /Users/study_superior/Desktop/Code/LingxiAgent/rust/Cargo.toml -p lingxi-service --locked --test r04_t02_tool_gateway
+r04_t02_gateway exit=0
+=== r04_t01_catalog: /Users/study_superior/.cargo/bin/cargo test --manifest-path /Users/study_superior/Desktop/Code/LingxiAgent/rust/Cargo.toml -p lingxi-service --locked --test r04_t01_tool_catalog
+r04_t01_catalog exit=0
+=== kernel_lib_tests: /Users/study_superior/.cargo/bin/cargo test --manifest-path /Users/study_superior/Desktop/Code/LingxiAgent/rust/Cargo.toml -p lingxi-kernel --locked --lib
+kernel_lib_tests exit=0
+=== r03_g07_repair_suites: bash /Users/study_superior/Desktop/Code/LingxiAgent/scripts/rust-tauri/r03_g07_repair_suites.sh /Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R04/T06-E01/regression/g07-1790795176
+r03_g07_repair_suites exit=0
+=== r03_t08_matrix_a15: bash /Users/study_superior/Desktop/Code/LingxiAgent/scripts/rust-tauri/r03_t08_matrix.sh /Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R04/T06-E01/regression/a15-1790795182
+r03_t08_matrix_a15 exit=0
+=== r03_t08_a16_seed: bash /Users/study_superior/Desktop/Code/LingxiAgent/scripts/rust-tauri/r03_t08_a16_seed_mechanism.sh /Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R04/T06-E01/regression/a16-1790795183
+r03_t08_a16_seed exit=0

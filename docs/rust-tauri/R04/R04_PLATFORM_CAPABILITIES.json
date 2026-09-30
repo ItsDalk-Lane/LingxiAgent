@@ -1,35 +1,63 @@
 {
-  "schemaVersion": 1,
+  "schemaVersion": 2,
   "artifactKind": "R04_PLATFORM_CAPABILITIES",
   "stage_id": "R04",
-  "generated_by": "R04 orchestrator (startup prep, one-shot; T06 executor fills verified capability matrix)",
+  "generated_by": "EXECUTOR-R04-T06-E01 (frozen at R04-T06; per-platform real capability matrix with evidence pointers)",
   "generated_at": "2026-09-30",
-  "note": "本文件登记各平台在 R04 实际承诺并验证的读/写/网络/进程隔离范围。『已承诺』必须与真实探针证据一致；不把某平台只实现写隔离说成完整网络沙盒。源码/交叉构建验证、真机基础隔离验证和最终安装包验证三者分开（正式安装/签名/公证归 R10/R11）。",
+  "note": "本文件登记 R04 实际承诺并验证的各平台读/写/网络/环境/子进程隔离范围。『已承诺』必须与真实探针证据一致；不把某平台只实现写隔离说成完整网络沙盒。源码/交叉构建验证、真机基础隔离验证和最终安装包验证三者分开（正式安装/签名/公证归 R10/R11）。v2 由 R04-T06 执行代理冻结（v1 为总控准备占位）。",
+  "sandbox_face": {
+    "implementation": "rust/crates/lingxi-service/src/sandbox.rs (SandboxPort trait + SeatbeltSandbox/BwrapSandbox/UnsupportedSandbox)",
+    "exec_integration": "rust/crates/lingxi-service/src/exectools.rs — ProcessTools.with_sandbox / register_process_tools(sandbox=Some) 包裹 every one-shot exec_command argv；拒绝=EXEC_SANDBOX_REFUSED 零派发零副作用",
+    "fail_closed": "构造期（helper 元数据信任方案+seatbelt 双腿强制探针）与每次 wrap（helper 再验证+策略校验+profile 注入拒绝）双层失败关闭；无任何路径返回未包裹命令",
+    "helper_trust_scheme": "pinned 绝对路径（/usr/bin/sandbox-exec、/usr/bin/bwrap——非 PATH 查找，关闭现役 which 的 PATH 欺骗面）+ 常规文件 + 期望 basename + owner uid 0 + 非组/全局可写 + 可执行位；seatbelt 无 --version——身份钉死+双腿强制探针（允许腿 /usr/bin/true 在 containment core 下 exit 0；拒绝腿 containment core 下写 /dev/null 必须失败）即为版本/行为验证；bwrap 另加 --version 解析（bubblewrap x.y.z）",
+    "policy_source": "SandboxPolicy::derive 逐字移植现役 lib/sandbox/policy.ts 常量（BLOCKED/READ_ONLY/READ_WRITE 集）+ workspace roots + runtime writable + network 立场"
+  },
   "platforms": {
     "macos-arm64": {
       "local_available": true,
-      "real_process_pty_verification": "本机可执行（R04-A09/A10 环境要求：真实目标操作系统）",
-      "sandbox_verification": "本机可执行（R04-A12 本平台冻结策略下真实探针）",
-      "legacy_reference": "lib/sandbox/{path-guard,platform,policy,bwrap,exec-helper}.ts + 现役 helper（executor 按 R04-T06 追踪真实机制）",
-      "r04_commitment": "待 R04-T06 冻结并登记（读/写/网络/环境/子进程各项 allow/deny 与证据指针）"
+      "backend": "seatbelt (sandbox-exec -p <SBPL profile> -- argv…；exec 原地替换已实测——supervisor setsid/getpgid/killpg 链穿过 wrapper 仍成立)",
+      "real_process_pty_verification": "本机已执行（R04-A09/A10 于 T05 通过；T06 增补：沙盒内进程树经 killpg 真实回收 r04_a12_sandboxed_process_tree_still_honors_the_cancellation_chain）",
+      "sandbox_verification": "本机真机探针全部通过（tests/r04_t06_sandbox.rs 10/10：受限外哨兵写拒绝+字节不变、工作区写允许对照、符号链接改向拒绝、.git 写保护拒绝、auth.json 读拒绝、TMPDIR 临时资源允许、回环网络 contained 拒绝+network-capable 允许对照、秘密环境不继承、冒名 helper 拒绝且哨兵不变、移除 helper 拒绝、策略注入双层拒绝、tty 不谎报沙盒）",
+      "frozen_guarantees": {
+        "filesystem_read": "all-except-deny-list（全局 file-read*；deny-read：auth.json/models.json/added-models.yaml/crash.log/browser-data/playwright-browsers 于 lingxiHome——实测 auth.json 读被拒）",
+        "filesystem_write": "scoped（agent 读写目录+home 读写目录+workspace roots+runtime writable+realpath(/tmp)+realpath(TMPDIR)；protected：workspace/.git+home/session-files 写拒（SBPL last-match-wins 顺序保持）；实测：外哨兵写拒、工作区写允许、.git 写拒、链接改向按真实目标拒、TMPDIR 允许）",
+        "network": "per-policy（contained 一次性命令=(deny network*) 全禁——实测回环连接拒；network-capable=(allow network-outbound) 需冻结策略允许且仅在端口层可用——实测回环 pong 对照成功；网络拒绝策略下请求 network-capable=sandbox_policy_unsupported 拒绝）",
+        "environment": "executor-whitelist-only（T05 SAFE_ENV_PASSTHROUGH 9 项+调用方显式 env；沙盒不新增任何透传——实测植入秘密不达沙盒子进程）",
+        "subprocess": "allowed-inside-sandbox（process-exec*/process-fork/signal——实测沙盒内子进程运行+组终止可达孙进程）",
+        "interactive_tty": "不套 OS 沙盒（现役语义 sandboxed=!tty）——授权+环境白名单仍生效，结果永不谎报沙盒（adversarial_tty 测试钉住）",
+        "per_call_narrowing": "OS 沙盒是粗粒度外层；T04 ResourceAccess 在 prepare+执行前重推导做会话/调用级收窄（约束交集，无层可放大另一层）"
+      },
+      "evidence": "tests/r04_t06_sandbox.rs；artifacts/rust-tauri/R04/T06-E01/（gates 日志+复跑脚本）"
     },
     "macos-x64": {
       "local_available": false,
-      "r04_commitment": "源码级平台适配与 #[cfg] 分支；真机验证按 R02 起平台登记口径（R09/R10 消除），R04 不冒称已真机验证"
+      "r04_commitment": "同一 cfg(target_os=\"macos\") 源码（seatbelt 后端）；本阶段无真机——按 R02 起平台登记口径真机验证归 R09/R10，R04 不冒称已真机验证"
     },
     "windows-x64": {
       "local_available": false,
-      "r04_commitment": "源码级适配（junction/UNC/盘符/Job Object 路径与测试）；Windows 真机验证沿用 R03-WINDOWS-R09-R10 递延登记（REQUIRED 不丢失）；R04 无法本地执行的份额如实 BLOCKED/递延，不伪造通过",
-      "existing_deferral": "R03-WINDOWS-R09-R10（继承 R02）"
+      "backend": "unsupported（fail-closed）：现役 restricted-token helper（lingxi-win-sandbox.exe，win32-sandbox-helper.ts/w32-exec.ts 接口）R04 未移植；Windows 沙盒后端=UnsupportedSandbox，绑定后所有必须隔离的命令经 EXEC_SANDBOX_REFUSED/sandbox_policy_unsupported 明确拒绝（r04_a11_unsupported_backend_refuses_through_the_real_chain 钉住——绝不裸跑）",
+      "frozen_guarantees": {
+        "filesystem_read": "none（无后端）",
+        "filesystem_write": "none（无后端）",
+        "network": "unsupported",
+        "environment": "executor-whitelist-only (T05)——沙盒面无额外承诺",
+        "subprocess": "unsupported（T05 spawn 于 Windows 本就 UnsupportedPlatform 失败关闭）"
+      },
+      "existing_deferral": "R03-WINDOWS-R09-R10（继承 R02）；真机验证递延不丢失，不冒称通过"
     },
     "linux-x64": {
       "local_available": false,
-      "r04_commitment": "源码级适配（bwrap 等现役机制按 R04-T06 提取）；真机/容器内验证按实际环境能力如实登记，缺项 BLOCKED 不冒称"
+      "backend": "bwrap 源码级适配（BwrapSandbox：ro-bind / / 基座+可写根 --bind 遮蔽+protected ro-bind+deny-read tmpfs//dev/null 遮蔽+unshare-pid+new-session+die-with-parent+contained 时 unshare-net+私有运行时 env 覆盖——buildBwrapArgs 逐字移植，单测钉形）；helper 信任方案含 --version 解析",
+      "r04_commitment": "本阶段无 Linux 主机——真机/容器验证未执行，如实登记未验证（capabilities.verification 明示 NOT machine-verified），不冒称通过；后续具备环境后按同套探针（哨兵/回环/环境）补验"
     }
   },
+  "exec_chain_constraint_intersection": {
+    "shape": "exec_command 一次性路径：T04 cwd 资源授权（prepare+执行器重验）∩ T05 环境白名单（唯一 env 通道）∩ T06 OS 沙盒包裹；三层各自拒绝均零派发/零副作用，无独立兜底放行",
+    "honesty": "沙盒行标注仅在真实包裹时出现（sandbox: seatbelt (contained…)）；无沙盒绑定（T05 形态）或 tty 终端永不出现该行——不谎报『已在沙盒中』"
+  },
   "verification_layer_separation": {
-    "source_and_cross_build": "cargo check/clippy/test 于本机（macos-arm64）+ 可行的交叉检查",
-    "real_machine_isolation": "仅 macos-arm64 本机；其余平台按上述登记",
+    "source_and_cross_build": "cargo check/clippy/test 于本机（macos-arm64）；未安装 windows 交叉目标（沿用 T05 登记）",
+    "real_machine_isolation": "仅 macos-arm64 本机（10/10 真实探针）；Linux 源码级未真机；Windows 后端明确拒绝",
     "final_install_packages": "R10/R11（不在 R04 范围）"
   }
 }

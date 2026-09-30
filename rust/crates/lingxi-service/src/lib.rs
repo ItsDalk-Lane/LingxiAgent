@@ -45,6 +45,7 @@ pub mod recovery;
 pub mod redaction;
 pub mod resourceaccess;
 pub mod runs;
+pub mod sandbox;
 mod security_audit;
 pub mod serve;
 pub mod session_supervisor;
@@ -128,6 +129,12 @@ pub use resourceaccess::{
     AccessRefusal, AccessRefusalCause, ResourceAccess, ResourceOp, ResourceScope,
 };
 pub use runs::{DriveError, RunDriveLimits, RunSupervisor};
+pub use sandbox::{
+    detect_sandbox_backend, platform_sandbox, BwrapSandbox, SandboxBackendKind,
+    SandboxCapabilities, SandboxCommandRequest, SandboxNetworkPolicy, SandboxNetworkRequest,
+    SandboxPolicy, SandboxPolicyInput, SandboxPort, SandboxRefusal, SeatbeltSandbox,
+    UnsupportedSandbox, WrappedSandboxCommand, BWRAP_HELPER_DEFAULT, SEATBELT_HELPER_DEFAULT,
+};
 pub use session_supervisor::{
     BusyGateError, SessionConcurrencyLimits, SessionLease, SessionSupervisor, SteerError,
     SteerOutcome, SteeringInbox, SubmissionKind,

@@ -3016,23 +3016,29 @@
     "R04-T06": {
       "name": "跨平台沙盒与逃逸防护",
       "stage_id": "R04",
-      "status": "PENDING",
-      "task_base_sha": null,
-      "executor_id": null,
-      "execution_result": null,
-      "review_round": 0,
-      "reviewer_id": null,
-      "review_verdict": null,
-      "findings": [],
+      "status": "DONE",
+      "task_base_sha": "84e6499fe",
+      "executor_id": "EXECUTOR-R04-T06-E01 (ZCode agent_40b5247b)",
+      "execution_result": "READY_FOR_REVIEW -> R1 PASS first round (0 blocking, 4 LOW observations)",
+      "review_round": 1,
+      "reviewer_id": "REVIEWER-R04-T06-R01 (agent_82d77c9c)",
+      "review_verdict": "PASS (R1)",
+      "findings": [
+        "Reviewer S6: legacy seatbelt.ts quote-injection exploitable (real sentinel overwrite); Rust profile_literal closes it — security improvement over legacy",
+        "OBS-1 pidprobe residue cleaned by orchestrator (targeted named cleanup)",
+        "OBS-3 per-wrap skips behavior probe (root-owner masquerade residual, SIP-mitigated, registered)",
+        "OBS-4 full-access/require_escalated mapping decision registered (network capability real at port layer)"
+      ],
       "repair_agent_id": null,
       "root_cause_agent_id": null,
       "acceptance_results": {
-        "R04-A11": "NOT_STARTED",
-        "R04-A12": "NOT_STARTED"
+        "R04-A11": "PASS (R1 independent: missing/masquerade/wrong-version helpers via real gateway chain, sentinel bytes unchanged)",
+        "R04-A12": "PASS (R1 independent 29-leg cargo probes on macos-arm64 frozen policy; unsupported capabilities honestly marked)"
       },
       "task_commit_sha": null,
       "push_result": null,
-      "blockers": []
+      "blockers": [],
+      "candidate_diff_digest": "13e424995bcad65d (first/last stable)"
     },
     "R04-T07": {
       "name": "MCP与插件worker接入",
@@ -4337,7 +4343,7 @@
       "blockers": []
     }
   },
-  "current_task": "R04-T06 (next)",
+  "current_task": "R04-T07 (next)",
   "orchestration_mode": {
     "effective_from": "R00-T03 R2 repair",
     "task_executor": "new ZCode task per Rxx-Tyy",

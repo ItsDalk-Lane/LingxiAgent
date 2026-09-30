@@ -251,6 +251,9 @@ async fn process_harness_at(
         Arc::clone(&supervisor),
         Arc::clone(&access),
         ws.clone(),
+        None, // R04-T06: the T05 acceptance suite keeps the unsandboxed T05
+        // shape (authorized + env-whitelisted); the sandbox face has
+        // its own suite (r04_t06_sandbox).
         Arc::new(lingxi_service::inject::SystemClock),
         &budget(),
     );

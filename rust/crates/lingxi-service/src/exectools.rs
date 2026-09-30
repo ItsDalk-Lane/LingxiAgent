@@ -80,6 +80,7 @@ use crate::procsupervisor::{
     SpawnSpec, SpillInfo, TerminationReason,
 };
 use crate::resourceaccess::{ResourceAccess, ResourceOp, ResourceScope};
+use crate::sandbox::{SandboxCommandRequest, SandboxNetworkRequest, SandboxPort};
 use crate::toolgateway::{ResourceExtractionInput, ResourceExtractor, ToolInvocationGateway};
 
 /// Incumbent `EXEC_COMMAND_DEFAULT_TIMEOUT_SECONDS`.
@@ -108,6 +109,10 @@ pub const SAFE_ENV_PASSTHROUGH: &[&str] = &[
 
 pub const EXEC_INVALID_PARAMS: &str = "EXEC_COMMAND_INVALID_PARAMS";
 pub const EXEC_SPAWN_FAILED: &str = "EXEC_SPAWN_FAILED";
+/// The one-shot command could not be wrapped into the sandboxed execution
+/// form (missing/untrusted helper, unsupported policy, unsafe embedded
+/// path). The command was NEVER spawned — fail-closed (R04-A11).
+pub const EXEC_SANDBOX_REFUSED: &str = "EXEC_SANDBOX_REFUSED";
 pub const WRITE_STDIN_PROCESS_ID_REQUIRED: &str = "WRITE_STDIN_PROCESS_ID_REQUIRED";
 pub const WRITE_STDIN_UNKNOWN_PROCESS: &str = "WRITE_STDIN_UNKNOWN_PROCESS";
 pub const WRITE_STDIN_NOT_OWNED: &str = "WRITE_STDIN_NOT_OWNED";
@@ -530,6 +535,12 @@ pub struct ProcessTools {
     supervisor: Arc<ProcessSupervisor>,
     access: Arc<ResourceAccess>,
     cwd: PathBuf,
+    /// The R04-T06 sandbox face. `None` keeps the T05 shape (authorized,
+    /// env-whitelisted, but NOT OS-sandboxed — results never claim
+    /// containment). `Some` wraps every one-shot argv through the port;
+    /// a sandbox that cannot fulfill the request REFUSES the command
+    /// (fail-closed — never a bare run).
+    sandbox: Option<Arc<dyn SandboxPort>>,
 }
 
 impl ProcessTools {
@@ -542,6 +553,22 @@ impl ProcessTools {
             supervisor,
             access,
             cwd,
+            sandbox: None,
+        }
+    }
+
+    /// The R04-T06 composition: process tools behind the sandbox face.
+    pub fn with_sandbox(
+        supervisor: Arc<ProcessSupervisor>,
+        access: Arc<ResourceAccess>,
+        cwd: PathBuf,
+        sandbox: Arc<dyn SandboxPort>,
+    ) -> Self {
+        Self {
+            supervisor,
+            access,
+            cwd,
+            sandbox: Some(sandbox),
         }
     }
 
@@ -601,8 +628,42 @@ impl ProcessTools {
         let cwd = cwd_scope.path.clone();
         let env = build_child_env(&params.env);
         let owner = Self::owner_of(ctx, call);
+        // R04-T06: the one-shot ISOLATED execution path. When the sandbox
+        // face is bound the argv is wrapped through it BEFORE any spawn —
+        // constraint intersection with the T04 cwd authorization above and
+        // the T05 env whitelist (this function's only env funnel): the
+        // sandbox is an additional layer, never a bypass or a second
+        // funnel. A sandbox that cannot fulfill the request refuses the
+        // command with zero side effects (fail-closed, R04-A11).
+        //
+        // `tty: true` keeps the incumbent semantics (`sandboxed = !tty &&
+        // …`): interactive terminals run WITHOUT the OS sandbox (still
+        // authorization + env-whitelist bound) and their results never
+        // claim containment — registered in the frozen capability matrix.
+        let mut argv = params.argv.clone();
+        let mut contained_by: Option<&'static str> = None;
+        if let Some(port) = self.sandbox.as_ref().filter(|_| !params.tty) {
+            match port.wrap(SandboxCommandRequest {
+                argv: params.argv.clone(),
+                // The incumbent's model-facing one-shot path is the
+                // CONTAINED variant (defaultSandboxExec denies network).
+                network: SandboxNetworkRequest::Contained,
+                cwd: Some(cwd.clone()),
+            }) {
+                Ok(wrapped) => {
+                    argv = wrapped.argv;
+                    contained_by = Some(port.backend());
+                }
+                Err(refusal) => {
+                    return failed(
+                        ErrorCode::Forbidden,
+                        format!("{EXEC_SANDBOX_REFUSED}: {refusal}"),
+                    )
+                }
+            }
+        }
         let spec = SpawnSpec {
-            argv: params.argv.clone(),
+            argv,
             cwd: cwd.clone(),
             env,
             owner,
@@ -743,6 +804,24 @@ impl ProcessTools {
         let code = fact.status_code();
         if code != 0 {
             body.push_str(&format!("\n\nCommand exited with code {code}"));
+        }
+        // Honest containment state: the sandbox line appears ONLY when the
+        // argv actually ran behind the sandbox port (R04-T06). An
+        // unsandboxed execution never claims containment.
+        if let Some(backend) = contained_by {
+            body.push_str(&format!(
+                "\n\nsandbox: {backend} (contained; filesystem writes scoped to the \
+                 authorized roots, network denied)"
+            ));
+            // The incumbent's sandbox error translation (sandbox.writeRestricted):
+            // a denied operation surfaces as "Operation not permitted".
+            if body.contains("Operation not permitted") {
+                body.push_str(
+                    "\n\n[Security] File system writes are restricted to allowed workspace \
+                     and session paths. Check the current workspace and path syntax before \
+                     asking the user whether to change sandbox settings.",
+                );
+            }
         }
         text_success(
             body,
@@ -930,20 +1009,31 @@ fn process_manifest(
 /// and binds their executors on the gateway. Composition entry — the
 /// production default bootstrap does NOT call it (no production default
 /// changes in R04).
+///
+/// `sandbox` (R04-T06): `None` keeps the T05 shape; `Some` binds the
+/// sandbox face — every one-shot exec_command runs behind it and a
+/// sandbox that cannot fulfill the request refuses the command
+/// (fail-closed).
+#[allow(clippy::too_many_arguments)]
 pub fn register_process_tools(
     registry: &ToolRegistry,
     gateway: &ToolInvocationGateway,
     supervisor: Arc<ProcessSupervisor>,
     access: Arc<ResourceAccess>,
     cwd: PathBuf,
+    sandbox: Option<Arc<dyn SandboxPort>>,
     _clock: Arc<dyn ServiceClock>,
     budget: &SchemaBudget,
 ) -> CoreProcessTools {
-    let tools = Arc::new(ProcessTools::new(
-        Arc::clone(&supervisor),
-        Arc::clone(&access),
-        cwd.clone(),
-    ));
+    let tools = Arc::new(match sandbox {
+        Some(port) => ProcessTools::with_sandbox(
+            Arc::clone(&supervisor),
+            Arc::clone(&access),
+            cwd.clone(),
+            port,
+        ),
+        None => ProcessTools::new(Arc::clone(&supervisor), Arc::clone(&access), cwd.clone()),
+    });
     let exec_manifest = process_manifest(
         "exec_command",
         "exec_command.run",
