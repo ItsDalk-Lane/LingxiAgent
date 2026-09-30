@@ -41,6 +41,10 @@ pub struct ApprovalRequest {
     pub tool_call_id: ToolCallId,
     pub target: String,
     pub args_digest: String,
+    /// The shape-only argument summary (R04-T03: keys + type tags, never
+    /// values — `summarize_arguments`) so the authenticated approver
+    /// surface can show WHAT is being approved without leaking content.
+    pub args_summary: Option<String>,
 }
 
 /// The decision of one approval wait.

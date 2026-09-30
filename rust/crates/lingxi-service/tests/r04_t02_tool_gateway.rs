@@ -566,6 +566,14 @@ async fn legacy_harness_with(script: Vec<ProviderTurn>) -> LegacyHarness {
     }
 }
 
+/// The user-session operate permission context (the T02 suite's ambient
+/// posture — its conclusions must not change under R04-T03).
+fn user_operate() -> lingxi_service::toolgateway::InvocationPermissionContext {
+    lingxi_service::toolgateway::InvocationPermissionContext::UserSession {
+        mode: lingxi_kernel::subagent::SessionPermissionMode::Operate,
+    }
+}
+
 fn owner_principal() -> lingxi_service::Principal {
     lingxi_service::Principal {
         schema_version: 1,
@@ -624,6 +632,10 @@ async fn subagent_run(harness: &Harness, session: &str, tier: ToolAccessTier) ->
             cause_id: None,
         },
         grant: RunGrant::Subagent { tier },
+        // The T02 suite's subagent legs ran (and still run) under the
+        // incumbent's null-parent default: an OPERATE parent. The ask-tier
+        // inheritance semantics are the R04-T03 suite's subject.
+        session_mode: lingxi_kernel::subagent::SessionPermissionMode::Operate,
     };
     harness
         .state
@@ -1167,6 +1179,7 @@ async fn r04_a04_forged_and_stale_handles_are_refused_by_the_real_gateway() {
             &ctx,
             CallerSurface::UserRun,
             "agent-default",
+            user_operate(),
             ToolTargetRef::ByName {
                 name: "probe_read".to_string(),
             },
@@ -1372,6 +1385,7 @@ async fn adversarial_summary_a_payload_b_is_refused_at_every_layer() {
         &ctx,
         CallerSurface::UserRun,
         "agent-default",
+        user_operate(),
         &ToolCallId::new("run_adv_digest_tc0001".to_string()),
         &smuggled,
     ) {
@@ -1388,6 +1402,7 @@ async fn adversarial_summary_a_payload_b_is_refused_at_every_layer() {
                 &ctx,
                 CallerSurface::UserRun,
                 "agent-default",
+                user_operate(),
                 ToolTargetRef::ByName {
                     name: "probe_read".to_string(),
                 },
@@ -1890,6 +1905,10 @@ async fn subagent_run_legacy(
             cause_id: None,
         },
         grant: RunGrant::Subagent { tier },
+        // The T02 suite's subagent legs ran (and still run) under the
+        // incumbent's null-parent default: an OPERATE parent. The ask-tier
+        // inheritance semantics are the R04-T03 suite's subject.
+        session_mode: lingxi_kernel::subagent::SessionPermissionMode::Operate,
     };
     legacy
         .state

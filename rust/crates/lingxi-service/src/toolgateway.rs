@@ -141,6 +141,43 @@ impl InvocationEntry {
     }
 }
 
+/// The permission context one invocation is adjudicated under
+/// (R04-T03): the trusted entry's snapshot of the session permission
+/// facts the tool-policy face maps onto verdicts. Built by the DRIVER
+/// from its [`crate::runs::DriveAuthorization`] — never from model
+/// `arguments`.
+///
+/// - **UserSession** — a user run's session permission mode
+///   (`operate`/`ask`/`read_only`, the incumbent's
+///   `getSessionPermissionMode`), snapshotted at submission.
+/// - **Subagent** — a subagent child run's ATTENUATED tier (fixed at
+///   dispatch, `resolve_subagent_access`) plus the PARENT session mode
+///   it inherited. The tier alone cannot express the ask inheritance
+///   (the R03-T06-O1 gap): an operate-tier child of an ask parent is
+///   exactly the case whose write-class calls the incumbent answers
+///   with `deny_on_prompt` + `allowHumanApproval:false` →
+///   `TOOL_APPROVAL_UNAVAILABLE` — the policy face reproduces that
+///   verdict from THIS pair (see [`crate::approval_service`]).
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum InvocationPermissionContext {
+    UserSession {
+        mode: lingxi_kernel::subagent::SessionPermissionMode,
+    },
+    Subagent {
+        tier: lingxi_kernel::subagent::ToolAccessTier,
+        parent_mode: lingxi_kernel::subagent::SessionPermissionMode,
+    },
+}
+
+impl InvocationPermissionContext {
+    pub fn wire_kind(&self) -> &'static str {
+        match self {
+            InvocationPermissionContext::UserSession { .. } => "user_session",
+            InvocationPermissionContext::Subagent { .. } => "subagent",
+        }
+    }
+}
+
 /// The unified request every tool-call entry converts into (R04-T02
 /// 怎么做 1). Built by TRUSTED entry code from a [`RunContext`] it owns —
 /// the principal facts NEVER come from model `arguments` (that is the
@@ -154,6 +191,9 @@ pub struct InvocationRequest {
     pub generation: u64,
     pub agent_id: String,
     pub surface: CallerSurface,
+    /// The permission context the policy face adjudicates under
+    /// (R04-T03): the driver's trusted snapshot, never model data.
+    pub permission: InvocationPermissionContext,
     /// Registry reference (target id / name / source+name).
     pub reference: ToolTargetRef,
     /// The caller's pinned catalog generation, when it holds one.
@@ -168,10 +208,12 @@ impl InvocationRequest {
     /// Builds the unified request from the facts a trusted entry holds.
     /// This is the ONLY constructor: there is no "from JSON" path, so a
     /// model payload can never populate the identity fields.
+    #[allow(clippy::too_many_arguments)]
     pub fn from_trusted_entry(
         ctx: &RunContext,
         surface: CallerSurface,
         agent_id: &str,
+        permission: InvocationPermissionContext,
         reference: ToolTargetRef,
         pin: Option<lingxi_kernel::toolcatalog::CatalogPin>,
         raw_arguments: serde_json::Value,
@@ -185,6 +227,7 @@ impl InvocationRequest {
             generation: ctx.generation,
             agent_id: agent_id.to_string(),
             surface,
+            permission,
             reference,
             pin,
             raw_arguments,
@@ -216,7 +259,8 @@ pub enum PolicyVerdict {
 
 /// The input the policy service adjudicates on. Identity facts come from
 /// the trusted entry; the digest is the trusted-boundary digest of the
-/// EFFECTIVE arguments (what an approval binds to).
+/// EFFECTIVE arguments (what an approval binds to); the permission
+/// context is the driver's trusted session-mode snapshot (R04-T03).
 #[derive(Debug, Clone, PartialEq)]
 pub struct PolicyAdjudicationInput {
     pub entry: InvocationEntry,
@@ -230,6 +274,9 @@ pub struct PolicyAdjudicationInput {
     pub session_id: String,
     pub run_id: String,
     pub agent_id: String,
+    /// The permission context of the invocation (R04-T03): user session
+    /// mode, or the subagent tier + inherited parent mode.
+    pub permission_context: InvocationPermissionContext,
 }
 
 /// The tool-policy service port (R04-T02 怎么做 3). R04-T03's ApprovalService
@@ -530,6 +577,10 @@ struct PreparedRecord {
     generation: u64,
     agent_id: String,
     entry: InvocationEntry,
+    /// The permission context the invocation was adjudicated under
+    /// (R04-T03 audit fact — the verdict is already taken; the record
+    /// keeps what it was taken under).
+    permission: InvocationPermissionContext,
     target_id: ToolTargetId,
     permission_kind: PermissionKind,
     capability_base: String,
@@ -707,6 +758,7 @@ impl ToolInvocationGateway {
             session_id: request.session_id.clone(),
             run_id: request.run_id.clone(),
             agent_id: request.agent_id.clone(),
+            permission_context: request.permission,
         };
         let policy = match self.policy.adjudicate(&policy_input) {
             PolicyVerdict::Denied {
@@ -749,6 +801,7 @@ impl ToolInvocationGateway {
             generation: request.generation,
             agent_id: request.agent_id,
             entry,
+            permission: request.permission,
             target_id: prepared_tool_call.target_id.clone(),
             permission_kind: prepared_tool_call.permission.kind,
             capability_base: prepared_tool_call.permission.capability_base.clone(),
@@ -817,6 +870,7 @@ impl ToolInvocationGateway {
         ctx: &RunContext,
         surface: CallerSurface,
         agent_id: &str,
+        permission: InvocationPermissionContext,
         call_id: &ToolCallId,
         request: &ToolRequest,
     ) -> Result<PreparedInvocation, GatewayRefusal> {
@@ -833,6 +887,7 @@ impl ToolInvocationGateway {
             ctx,
             surface,
             agent_id,
+            permission,
             reference,
             None,
             request.arguments.as_value().clone(),
@@ -1014,6 +1069,7 @@ impl ToolInvocationGateway {
         tracing::info!(
             target = %record.target_id,
             entry = record.entry.wire_name(),
+            permission_context = record.permission.wire_kind(),
             capability = %record.capability_base,
             permission_kind = record.permission_kind.wire_name(),
             target_generation = record.target_generation,
@@ -1171,6 +1227,15 @@ mod tests {
         }
     }
 
+    /// The neutral user-session permission context of the gateway unit
+    /// tests (operate — nothing here adjudicates mode semantics; that is
+    /// the ApprovalService suite's job).
+    fn test_permission() -> InvocationPermissionContext {
+        InvocationPermissionContext::UserSession {
+            mode: lingxi_kernel::subagent::SessionPermissionMode::Operate,
+        }
+    }
+
     fn ctx_of(run: &str) -> RunContext {
         RunContext {
             principal: Principal::LocalUser,
@@ -1214,6 +1279,7 @@ mod tests {
             session_id: "s".to_string(),
             run_id: "r".to_string(),
             agent_id: "a".to_string(),
+            permission_context: test_permission(),
         };
         assert_eq!(
             FailClosedPolicy.adjudicate(&read_input),
@@ -1257,6 +1323,7 @@ mod tests {
             &ctx,
             CallerSurface::UserRun,
             "agent",
+            test_permission(),
             ToolTargetRef::ByName {
                 name: "probe".to_string(),
             },
@@ -1273,6 +1340,7 @@ mod tests {
             &ctx,
             CallerSurface::UserRun,
             "agent",
+            test_permission(),
             ToolTargetRef::ByName {
                 name: "probe".to_string(),
             },
@@ -1321,6 +1389,7 @@ mod tests {
             &ctx,
             CallerSurface::UserRun,
             "agent",
+            test_permission(),
             ToolTargetRef::ByName {
                 name: "probe".to_string(),
             },
@@ -1342,6 +1411,7 @@ mod tests {
             &ctx_a,
             CallerSurface::UserRun,
             "agent",
+            test_permission(),
             ToolTargetRef::ByName {
                 name: "probe".to_string(),
             },
@@ -1386,6 +1456,7 @@ mod tests {
                 &ctx,
                 surface,
                 "agent",
+                test_permission(),
                 ToolTargetRef::ByName {
                     name: name.to_string(),
                 },
@@ -1449,6 +1520,7 @@ mod tests {
                     &ctx,
                     CallerSurface::UserRun,
                     "agent",
+                    test_permission(),
                     ToolTargetRef::ByName {
                         name: "probe".to_string(),
                     },
@@ -1543,7 +1615,14 @@ mod tests {
         )
         .expect("wire request builds");
         let prepared = gw
-            .prepare_from_request(&ctx, CallerSurface::UserRun, "agent", &call, &request)
+            .prepare_from_request(
+                &ctx,
+                CallerSurface::UserRun,
+                "agent",
+                test_permission(),
+                &call,
+                &request,
+            )
             .expect("default filling is NOT a digest forgery");
         // The PREPARED digest covers the default-filled payload…
         assert_ne!(prepared.args_digest_hex, request.args_digest.hex);
@@ -1563,7 +1642,14 @@ mod tests {
         .expect("builds");
         forged.args_digest =
             lingxi_protocol::digest_arguments(&json!({"path": "/data/summary-A.txt"}));
-        match gw.prepare_from_request(&ctx, CallerSurface::UserRun, "agent", &call, &forged) {
+        match gw.prepare_from_request(
+            &ctx,
+            CallerSurface::UserRun,
+            "agent",
+            test_permission(),
+            &call,
+            &forged,
+        ) {
             Err(refusal) => assert_eq!(refusal.code(), "gateway_digest_mismatch"),
             Ok(_) => panic!("the smuggled wire pair must be refused"),
         }

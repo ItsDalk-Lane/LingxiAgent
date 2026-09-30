@@ -22,6 +22,7 @@
 //!   常量，本 crate 不复制第二份（实例记录快照同一来源）。
 
 pub mod approval;
+pub mod approval_service;
 pub mod auth;
 pub mod background;
 pub mod cancel;
@@ -53,6 +54,11 @@ pub mod transport;
 pub mod ws;
 
 pub use approval::{ApprovalDecision, ApprovalGate, ApprovalRequest};
+pub use approval_service::{
+    Answer, AnswerOutcome, ApprovalPolicy, ApprovalService, GrantError, InvocationGrantKey,
+    PendingView, ACTION_BLOCKED_BY_READ_ONLY, DEFAULT_APPROVAL_TIMEOUT_MS,
+    TOOL_APPROVAL_UNAVAILABLE,
+};
 pub use auth::{
     authorize as authorize_route, classify_route, scope_allows, AuthDenial, AuthService,
     AuthSetupError, AuthzDenial, CredentialKind, IssuedDeviceCredential, Principal, PrincipalKind,

@@ -450,7 +450,7 @@ impl SubagentRuntime {
         let mode = self.sessions.permission_mode(&parent.session_id);
         let tier = resolve_subagent_access(request.access, mode)
             .map_err(SubagentDispatchError::AccessDenied)?;
-        self.spawn_child(parent, request, tier, None).await
+        self.spawn_child(parent, request, tier, mode, None).await
     }
 
     /// Continues an OPEN thread of the SAME session (`subagent_reply`
@@ -500,7 +500,7 @@ impl SubagentRuntime {
         });
         let tier = resolve_subagent_access(effective_access, mode)
             .map_err(SubagentDispatchError::AccessDenied)?;
-        self.spawn_child(parent, request, tier, Some(thread_id))
+        self.spawn_child(parent, request, tier, mode, Some(thread_id))
             .await
     }
 
@@ -587,6 +587,7 @@ impl SubagentRuntime {
         parent: ParentRunFacts,
         request: DelegationRequest,
         tier: ToolAccessTier,
+        parent_mode: lingxi_kernel::subagent::SessionPermissionMode,
         existing_thread: Option<String>,
     ) -> Result<LaunchedChild, SubagentDispatchError> {
         // 1) Concurrency caps + thread reservation (one lock; rolled back
@@ -730,9 +731,14 @@ impl SubagentRuntime {
             format!("child_run:{child_run_id}"),
             crate::cancel::ScopeKind::ChildRun,
         );
+        // R04-T03: the child's drive authorization snapshots the PARENT
+        // session mode it inherited from — the {tier, parent_mode} pair
+        // is what the tool-policy plane needs to reproduce the
+        // incumbent's ask-tier deny_on_prompt semantics (R04-SUP-01).
         let grant = DriveAuthorization {
             lineage,
             grant: RunGrant::Subagent { tier },
+            session_mode: parent_mode,
         };
         let storage = Arc::clone(&self.storage);
         let events = Arc::clone(&self.events);

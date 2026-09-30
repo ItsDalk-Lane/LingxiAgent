@@ -740,6 +740,9 @@ impl SessionStore {
         // Drive the full lifecycle (start → turns → single finalize); the
         // run drains the session's steering channel before each provider
         // turn. `lease` frees the session on EVERY exit path below.
+        // R04-T03: the session's CURRENT permission mode is snapshotted
+        // into the drive authorization at admission — the run's
+        // tool-policy plane adjudicates under this one stable fact.
         let finish = match supervisor
             .drive_run(
                 port,
@@ -753,7 +756,10 @@ impl SessionStore {
                 now_ms,
                 Some(lease.steering_inbox()),
                 None,
-                DriveAuthorization::user_submission(submission.request_id),
+                DriveAuthorization::user_submission(
+                    submission.request_id,
+                    self.gate.permission_mode(session_id),
+                ),
                 binding.as_ref(),
                 session_id,
             )
@@ -879,7 +885,10 @@ impl SessionStore {
             _agent_id,
             run_id.clone(),
             submission.input.to_string(),
-            DriveAuthorization::user_submission(submission.request_id),
+            DriveAuthorization::user_submission(
+                submission.request_id,
+                self.gate.permission_mode(session_id),
+            ),
             binding,
             now_ms,
             lease,

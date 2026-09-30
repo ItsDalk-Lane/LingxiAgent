@@ -4,7 +4,7 @@
   "start_branch": "main",
   "implementation_branch": "codex/rust-tauri-migration",
   "start_head": "7d1a0c6bc28062ff455adcf8f68c3a80b117e90d",
-  "current_head": "bf6450bcd722668188d1a3091681bf285875ef11",
+  "current_head": "39168bfb0",
   "current_head_note": "R04 start: R03 re-accepted after RR2 fixed repair (candidate f4d4b1666 verified ancestor; RR2 stage review PASS). R04 begins at bf6450bcd (local==remote, clean).",
   "remote": "origin",
   "remote_default_branch": "main",
@@ -2928,28 +2928,36 @@
       "task_commit_sha": null,
       "push_result": null,
       "blockers": [],
-      "candidate_diff_digest": "58b118cc0430c921 (vs base fd5fc2c2c)"
+      "candidate_diff_digest": "58b118cc0430c921 (vs base fd5fc2c2c)",
+      "commit_note": "T02 delivered in two commits: 1a1602c33 (main) + 39168bfb0 (fix: toolcatalog.rs PreparedToolCall.origin missed in staging of 1a1602c33 — intermediate tree did not compile; append-only fix, no rewrite; final tree == reviewed candidate 58b118cc0430c921; remote receipt verified for both)",
+      "incident_note": "Orchestrator staging incident: staged kernel by single file (subagent.rs) instead of crate scope; root cause fixed in orchestrator procedure (stage whole crate dirs). No user modifications affected; no history rewritten."
     },
     "R04-T03": {
       "name": "批准、撤销与只读模式",
       "stage_id": "R04",
-      "status": "PENDING",
-      "task_base_sha": null,
-      "executor_id": null,
-      "execution_result": null,
-      "review_round": 0,
-      "reviewer_id": null,
-      "review_verdict": null,
-      "findings": [],
+      "status": "DONE",
+      "task_base_sha": "39168bfb0",
+      "executor_id": "EXECUTOR-R04-T03-E01 (ZCode agent_c8c2fa7b)",
+      "execution_result": "READY_FOR_REVIEW -> R1 PASS first round (no blocking findings; 5 non-blocking observations registered)",
+      "review_round": 1,
+      "reviewer_id": "REVIEWER-R04-T03-R01 (agent_ba03d73f)",
+      "review_verdict": "PASS (R1)",
+      "findings": [
+        "SUP-01 (R03-T06-O1 ask tier) CLOSED with real delegation chain",
+        "T02 O05 closed: policy surface sole source of approval need",
+        "OBS-1 alias-resolution leg suggested for T04",
+        "OBS-4 ask-tier stricter-than-legacy for ArgumentAwareFile (registered decision)"
+      ],
       "repair_agent_id": null,
       "root_cause_agent_id": null,
       "acceptance_results": {
-        "R04-A05": "NOT_STARTED",
-        "R04-A06": "NOT_STARTED"
+        "R04-A05": "PASS (R1 independent: waiting-surface + preauth forms, concurrent double-spend 40x4)",
+        "R04-A06": "PASS (R1 independent: disable + uninstall legs)"
       },
       "task_commit_sha": null,
       "push_result": null,
-      "blockers": []
+      "blockers": [],
+      "candidate_diff_digest": "b1e9a4ba39a977b5 (vs base 39168bfb0)"
     },
     "R04-T04": {
       "name": "原生读写改文件与资源权限",
@@ -4317,7 +4325,7 @@
       "blockers": []
     }
   },
-  "current_task": "R04-T03 (next)",
+  "current_task": "R04-T04 (next)",
   "orchestration_mode": {
     "effective_from": "R00-T03 R2 repair",
     "task_executor": "new ZCode task per Rxx-Tyy",

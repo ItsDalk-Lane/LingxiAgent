@@ -139,6 +139,23 @@ pub struct DriveAuthorization {
     /// right after the run row is created.
     pub lineage: RunLineage,
     pub grant: RunGrant,
+    /// The session permission mode this run's tool-policy plane
+    /// adjudicates under (R04-T03): the parent/user session's
+    /// `operate`/`ask`/`read_only` mode, SNAPSHOTTED once at
+    /// submission/dispatch. For a user run this is the session's mode;
+    /// for a subagent child run it is the PARENT mode the tier inherited
+    /// from (the pair `{grant tier, session_mode}` is what reproduces the
+    /// incumbent's ask-tier `deny_on_prompt` semantics — R04-SUP-01).
+    ///
+    /// Mapping decision (documented, deliberate): the incumbent reads
+    /// the mode per tool call at the executor boundary; the Rust run
+    /// layer binds it at run admission — a mode switch mid-run takes
+    /// effect for the runs admitted AFTER it, not retroactively for a
+    /// run already driving. This keeps one run's policy adjudication a
+    /// single stable fact (no mid-run TOCTOU between prepare and the
+    /// kernel authorization step); the interactive surface re-reads the
+    /// mode on every new submission through the same snapshot rule.
+    pub session_mode: lingxi_kernel::subagent::SessionPermissionMode,
 }
 
 /// The grant shape of one driven run.
@@ -167,7 +184,10 @@ impl DriveAuthorization {
     /// immediate dev/test failure instead of a durable-anchor divergence
     /// (the cause_id must be built from the same fact as every other
     /// identity consumer).
-    pub fn user_submission(request_id: Option<&str>) -> Self {
+    pub fn user_submission(
+        request_id: Option<&str>,
+        session_mode: lingxi_kernel::subagent::SessionPermissionMode,
+    ) -> Self {
         if let Some(id) = request_id {
             debug_assert!(
                 matches!(crate::dedup::validate_request_id(id).as_deref(), Ok(canonical) if canonical == id),
@@ -179,6 +199,24 @@ impl DriveAuthorization {
         Self {
             lineage: RunLineage::user_submission(request_id),
             grant: RunGrant::Full,
+            session_mode,
+        }
+    }
+
+    /// The gateway permission context of this run's invocations
+    /// (R04-T03): derived from the grant + the session-mode snapshot the
+    /// run was admitted with — a trusted driver fact, never model data.
+    pub fn invocation_permission_context(&self) -> crate::toolgateway::InvocationPermissionContext {
+        match self.grant {
+            RunGrant::Full => crate::toolgateway::InvocationPermissionContext::UserSession {
+                mode: self.session_mode,
+            },
+            RunGrant::Subagent { tier } => {
+                crate::toolgateway::InvocationPermissionContext::Subagent {
+                    tier,
+                    parent_mode: self.session_mode,
+                }
+            }
         }
     }
 }
@@ -1113,8 +1151,13 @@ impl RunSupervisor {
                                 } else {
                                     crate::toolgateway::CallerSurface::UserRun
                                 };
+                                // R04-T03: the permission context is the
+                                // driver's trusted snapshot (grant tier +
+                                // session mode) — the model never supplies
+                                // it.
+                                let permission = authorization.invocation_permission_context();
                                 match gateway.prepare_from_request(
-                                    &ctx, surface, agent_id, &call_id, request,
+                                    &ctx, surface, agent_id, permission, &call_id, request,
                                 ) {
                                     Ok(prepared) => Some(prepared),
                                     Err(refusal) => {
@@ -1427,10 +1470,21 @@ impl RunSupervisor {
                                     format!("approval:{}", call_id.as_str()),
                                     crate::cancel::ScopeKind::ToolCall,
                                 );
+                                // R04-T03: the approver sees the SHAPE-ONLY
+                                // summary — derived from the wire
+                                // arguments when the request carried none
+                                // (values never leak into the approval
+                                // surface; `summarize_arguments` is keys
+                                // + type tags only).
                                 let gate_req = ApprovalRequest {
                                     tool_call_id: call_id.clone(),
                                     target: request.target.clone(),
                                     args_digest: request.args_digest.hex.clone(),
+                                    args_summary: request.args_summary.clone().or_else(|| {
+                                        Some(lingxi_kernel::toolcatalog::summarize_arguments(
+                                            &request.arguments,
+                                        ))
+                                    }),
                                 };
                                 let gate_ctx = ctx.clone();
                                 let gate_child = self

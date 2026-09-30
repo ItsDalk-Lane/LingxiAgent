@@ -112,20 +112,52 @@
       "evidence": "artifacts/rust-tauri/R04/T02-E01/"
     },
     "R04-T03": {
-      "status": "PENDING",
+      "status": "READY_FOR_REVIEW",
       "acceptance_map": {
         "R04-A05": {
-          "status": "NOT_STARTED",
-          "tests": []
+          "status": "IMPLEMENTED_SELF_CHECKED",
+          "tests": [
+            "lingxi-service --test r04_t03_approval_service r04_a05_approved_digest_a_cannot_execute_payload_b (waiting form: approve A -> execute exactly A; double-click AlreadySettled; submit B -> independent pending record, A's settled id cannot settle it; reject B -> failed+dispatched=false, executor payloads exactly [A, A2]; pre-authorization form: grant keyed target+digest covers only the granted invocation, B2 re-requested and rejected)",
+            "lingxi-service --lib approval_service::tests::preauthorization_key_discrimination_and_use_budget (whole-key discrimination: different digest/session/target never match; single use exhausts atomically)"
+          ]
         },
         "R04-A06": {
-          "status": "NOT_STARTED",
-          "tests": []
+          "status": "IMPLEMENTED_SELF_CHECKED",
+          "tests": [
+            "lingxi-service --test r04_t03_approval_service r04_a06_wait_disabled_then_approved_still_refuses (disable leg: gateway_target_changed + disabled reason, zero executions; uninstall leg: not-registered refusal, zero executions)"
+          ]
         }
       },
+      "adversarial_additions": {
+        "tests": [
+          "r04_t03_approval_service sup01_ask_tier_subagent_matrix_on_the_real_chain (R04-SUP-01 closure on the real delegation chain: ask+omitted/explicit-write -> TOOL_APPROVAL_UNAVAILABLE+deny_on_prompt+zero dispatch; ask+read allowed; operate+omitted legitimate write executes; read_only+explicit-write dispatch refusal; read_only+omitted -> kernel ACTION_BLOCKED_BY_READ_ONLY + read dispatches; read_only+explicit read keeps the T02 F01 fix)",
+          "r04_t03_approval_service o05_policy_allowed_never_re_prompts_the_wired_gate (O05 formal adjudication: policy Allowed never consults the wired gate even when it always rejects; ask/NeedsApproval leg honors the gate)",
+          "r04_t03_approval_service approval_timeout_is_a_definite_rejection_and_late_approval_is_refused (bounded wait = definite rejection, zero executions; late approval Refused(expired))",
+          "r04_t03_approval_service cancel_during_wait_then_late_approval_never_resurrects (real cancel_run -> AbortOnDrop marks the record; late approval Refused(aborted); never resurrects)",
+          "r04_t03_approval_service one_approval_cannot_be_spent_by_two_concurrent_requests + concurrent_spends_of_one_grant_produce_exactly_one_winner (independent records; cross-session id replay refused; tokio::join double-spend of one grant = exactly one winner)",
+          "r04_t03_approval_service restart_invalidates_old_approvals_and_grants (old approval id Refused(unknown/do not survive restarts); old grant gone; replay opens its OWN pending)",
+          "r04_t03_approval_service alias_cannot_reuse_a_single_use_grant (alias resolves to the same target; the single-use grant is exhausted by the first spend, the alias spend parks on its own pending)",
+          "r04_t03_approval_service user_session_mode_matrix_on_the_real_chain (read_only write -> gateway_policy_denied+ACTION_BLOCKED_BY_READ_ONLY; ask write round-trips the real approval wait; operate allows)",
+          "lingxi-service --lib approval_service (policy matrix unit battery: user modes, SUP-01 refusal vocabulary, approval-policy resolution, answer-surface ownership/determinism)"
+        ]
+      },
+      "gate_results": {
+        "cargo fmt --all -- --check": "exit 0",
+        "cargo clippy --workspace --all-targets --locked -- -D warnings": "exit 0",
+        "cargo test --workspace --locked": "exit 0 — 788 passed / 0 failed / 0 ignored across 76 green binaries (r00_management_leaves passed this run: the macOS firewall interception of unsigned test binaries is an intermittent environment item registered since T01, kept open, not written off)",
+        "xtask check-contracts": "exit 0 (626 entries, zero drift)",
+        "xtask check-boundaries": "exit 0 (O1-O8 + D1-D5 + B1; --self-test N1-N17 exit 0)",
+        "R03 regression": "r03_g07_repair_suites.sh exit 0 (ten suites exact pinned counts); r03_t08_matrix.sh A15 exit 0 (28 leaves + 11 combos); r03_t08_a16_seed_mechanism.sh exit 0"
+      },
       "supplemental": [
-        "R04-SUP-01 ask 档审批策略面（R03-T06-O1）"
-      ]
+        "R04-SUP-01 CLOSED: ApprovalService policy face maps the incumbent operate/ask/read_only + deny_on_prompt/allowHumanApproval=false semantics; the ask-tier subagent write (access omitted OR explicit write inheriting the ask parent) is the structured TOOL_APPROVAL_UNAVAILABLE refusal — never an operate collapse, never auto-approved, never parked, never bare-dispatched; neighbors protected (read_only escalation refusal at dispatch and in-run, explicit-read attenuation keeping the T02 F01 fix, normal operate legitimate write, pre-authorization judged by the real old whole-key contract)",
+        "R04-T02 O05 CLOSED (formal adjudication, test-pinned): the policy face is the single source of the approval REQUIREMENT — Allowed advances without consulting the wired gate (no double prompting); NeedsApproval waits on the gate; no gate -> TOOL_APPROVAL_UNAVAILABLE (T02 semantics); the R03 minimal gate stays consulted only on the no-gateway legacy wiring",
+        "Approval records bind principal/session/run/attempt/generation/tool-call/target/canonical digest/deadline/use-budget; single-use; concurrent spends impossible (state-lock compare-and-decrement); double-click deterministic (AlreadySettled); drop-on-cancel aborts (late answers refused); restart invalidates everything (explicit rule, in-memory only)",
+        "R04-SUP-02/SUP-05: authorization decision point and journal write order untouched (kernel authorize at the authorized step, driver the only journal writer); gateway gained the trusted InvocationPermissionContext (driver snapshot, never model data); R03 ten suites + A15 + A16 re-run green",
+        "Mapping decisions registered in R04-T03_REPORT.md §8: session-mode snapshot per run admission (vs incumbent per-call read — dispatch-time attenuation was already snapshot semantics in R03); delegation-family permission classification depends on the T01-registered PermissionKind (SUP-04 real registration decides the ask-tier prompting); path-level ResourceRef binding extends the grant key in R04-T04"
+      ],
+      "report": "docs/rust-tauri/R04/R04-T03_REPORT.md",
+      "evidence": "artifacts/rust-tauri/R04/T03-E01/"
     },
     "R04-T04": {
       "status": "PENDING",
