@@ -1,0 +1,10 @@
+$ git rev-parse HEAD
+f4d4b16664827010516bc1f5ec6aee5e14b859d3
+$ git ls-remote origin refs/heads/codex/rust-tauri-migration
+f4d4b16664827010516bc1f5ec6aee5e14b859d3	refs/heads/codex/rust-tauri-migration
+$ git status --porcelain
+?? artifacts/rust-tauri/R03/repair-current/RR2-F05-GATE/
+?? artifacts/rust-tauri/R03/repair-current/STAGE-REVIEW-RR2/
+$ rustc --version / cargo --version
+rustc 1.98.1 (48a229cea 2026-09-01)
+cargo 1.98.1 (797e8a9bc 2026-08-05)

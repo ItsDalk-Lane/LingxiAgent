@@ -7,8 +7,8 @@
   "branch": "codex/rust-tauri-migration",
   "fix_base_sha": "cd3fb19e651f763afc6c75cb3163064fb54ca3fe",
   "previous_accepted_candidate": "1ebb03d9f89af364a42274efc2cd482f298b1130",
-  "reopen_status": "RR2_FIXED_REPAIR_DONE_PENDING_STAGE_REACCEPTANCE",
-  "reopen_note": "旧接受记录（R03_FINAL_STAGE_REVIEW_R1.md、R03_HANDOFF accepted_stage_candidate）原文与证据保留。RR2（2026-09-30）复审确认 F05 同族残留 R03-RR2-F05-01（requestId 规范化不一致）为本轮唯一新增阻塞；已由 EXECUTOR-R03-RR2-F05-E01 定点修复并经 REVIEWER-R03-RR2-F05-R01 独立对抗审查 PASS，完整 R03 门禁与阶段复验进行中，现行状态如实注明待关闭。",
+  "reopen_status": "REACCEPTED_AFTER_RR2_FIXED_REPAIR",
+  "reopen_note": "旧接受记录（R03_FINAL_STAGE_REVIEW_R1.md、R03_HANDOFF accepted_stage_candidate 与 reaccepted_after_adversarial_repair）原文与证据保留。RR2（2026-09-30）复审确认唯一新增阻塞 R03-RR2-F05-01（requestId 规范化不一致，F05 同族残留）；EXECUTOR-R03-RR2-F05-E01 定点修复（基线失败原件在案）→ REVIEWER-R03-RR2-F05-R1 独立对抗审查 PASS（基线 detached worktree 复测 3/3 红）→ 候选 f4d4b1666 完整 verify-stage R03 overall PASS（15/15，binding stable）→ STAGE-REVIEWER-R03-RR2 阶段复验 PASS（候选复测 3/3 绿）；已普通推送并经远程确认。R03 在 RR2 后重新接受。",
   "baseline_facts": {
     "local_head_at_start": "cd3fb19e651f763afc6c75cb3163064fb54ca3fe",
     "remote_head_at_start": "cd3fb19e651f763afc6c75cb3163064fb54ca3fe",
@@ -196,7 +196,7 @@
       "covers": [
         "R03-RR2-F05-01"
       ],
-      "status": "DONE_PENDING_STAGE_REACCEPTANCE",
+      "status": "DONE",
       "executor": "EXECUTOR-R03-RR2-F05-E01",
       "rounds": [
         {
@@ -206,13 +206,15 @@
           "candidate": "HEAD c96f7cc63 + 未提交工作树（kernel canonical 规则/adapters 三态查询/service 受理面规范化/新套件 request_id_canonicalization 7 用例/pin 十套件同步/证据与报告）",
           "workspace_tests": "73 suites / 718 passed / 0 failed（RR1 基线 709 + 新套件 7 + kernel 单测 2）；修复套件生产者十套件精确计数全绿；fmt/clippy(-D warnings)/check-contracts/check-boundaries 全绿",
           "red_baseline": "RR2-F05-E01/failure-originals/baseline-run.txt：产品代码零改动前 C02/C03/C05 形态 4 失败（含前台/确认副作用/原样重试格拿到全新受理 run_count=2 的盲重执行实锤）",
-          "r02_regression": "完整 verify-stage R03（含 7 条 R02 定向链）由总控在候选提交后运行，登记于 RR2-F05-GATE 与 STAGE-REVIEW-RR2",
+          "r02_regression": "完整 verify-stage R03 于候选 f4d4b1666 上 overall PASS：15/15 命令含 7 条 R02 定向链全绿、binding 全程 stable（RR2-F05-GATE/verify-stage-r03/verify-stage-result.json）",
           "report": "docs/rust-tauri/R03/repair-current/R03_RR2_F05_E01_REPORT.md",
           "reviewer": "REVIEWER-R03-RR2-F05-R01",
           "review_verdict": "PASS",
           "review_evidence": "artifacts/rust-tauri/R03/repair-current/RR2-F05-R1/（自写复测：候选侧 3/3 通过、基线 c96f7cc6 detached worktree 侧 3/3 失败独立坐实；候选 diff sha256 审查前后一致零漂移；非阻塞观察 5 条）",
-          "commits": [],
-          "remote_receipt": null
+          "commits": [
+            "f4d4b1666 fix(rust-tauri): R03 RR2 repair — canonical request id across admission, lineage and restart lookup (R03-RR2-F05-01)"
+          ],
+          "remote_receipt": "origin/codex/rust-tauri-migration=f4d4b16664827010516bc1f5ec6aee5e14b859d3"
         }
       ]
     }
@@ -520,11 +522,11 @@
       ],
       "fact_type": "SOURCE_CONFIRMED_AND_RUNTIME_REPRODUCED",
       "fact_type_note": "RR2 固定提交（c96f7cc63）源码链 S01-S05 复核 + 合成 SQLite 探针；执行者在产品代码零改动前于真实受理链复现（RR2-F05-E01/failure-originals）；独立审查者在基线 detached worktree 自写复测 3/3 失败复坐实。",
-      "implementation_status": "FIXED_REVIEW_R1_PASS_PENDING_STAGE_REACCEPTANCE",
+      "implementation_status": "CLOSED_BY_STAGE_REVIEW_RR2",
       "repair_commits": [],
       "normal_selfcheck_status": "PASS_EXECUTOR",
       "adversarial_selfcheck_status": "PASS_EXECUTOR",
-      "independent_review_status": "PASS_R1",
+      "independent_review_status": "PASS_R1_AND_STAGE_RR2",
       "case_ids": [
         "R03-RR2-F05-C01",
         "R03-RR2-F05-C02",
@@ -2052,7 +2054,7 @@
       "issue_id": "R03-RR2-F05-01",
       "workorder": "RR2-F05",
       "audit_runtime_status": "NOT_RUN_THIS_AUDIT",
-      "implementation_status": "OPEN_PENDING_GATE_AND_STAGE_REVIEW",
+      "implementation_status": "CLOSED_BY_STAGE_REVIEW_RR2",
       "normal_selfcheck": {
         "status": "PASS",
         "commands": [
@@ -2080,14 +2082,18 @@
       },
       "independent_review": {
         "status": "PASS",
-        "reviewer_id": "REVIEWER-R03-RR2-F05-R01",
+        "reviewer_id": "REVIEWER-R03-RR2-F05-R1",
+        "stage_reviewer_id": "STAGE-REVIEWER-R03-RR2",
         "round": 1,
         "evidence": [
           "docs/rust-tauri/R03/repair-current/R03_RR2_F05_R1_REVIEW.md",
-          "artifacts/rust-tauri/R03/repair-current/RR2-F05-R1/"
+          "artifacts/rust-tauri/R03/repair-current/RR2-F05-R1/",
+          "artifacts/rust-tauri/R03/repair-current/RR2-F05-GATE/verify-stage-r03/verify-stage-result.json",
+          "docs/rust-tauri/R03/repair-current/R03_RR2_STAGE_REVIEW.md",
+          "artifacts/rust-tauri/R03/repair-current/STAGE-REVIEW-RR2/"
         ],
         "verdict": "PASS",
-        "note": "完整 verify-stage R03 与受影响 R02 定向链由总控在候选提交后运行（RR2-F05-GATE），阶段复验登记于 STAGE-REVIEW-RR2；本条在阶段复验通过前保持 OPEN。"
+        "note": "R1 核验 pin 完整性与候选零漂移；完整 verify-stage R03 于候选 f4d4b1666 上 overall PASS（15/15 命令、binding 全程 stable、含 7 条 R02 定向链与 repair_suites 十套件精确计数）；STAGE-REVIEWER-R03-RR2 复核六项清单/R03 核心不变量/R02 回归证据/最终候选并自写复测（候选 3/3 绿、基线 3/3 红），裁决 PASS。"
       },
       "repair_commit": null
     }
@@ -2100,5 +2106,15 @@
     "evidence": "artifacts/rust-tauri/R03/repair-current/STAGE-REVIEW-RR1/",
     "summary": "七条主反例自写程序独立实测 16/16 exit 0；8 条变体抽查（覆盖 7 个 F-ID）全 PASS；原 R03 Gate 干净重跑 overall PASS（15/15 命令、17/17 场景、48 叶=17+31、binding stable、testedShaAtEnd=ebcbcad1b）；fmt/clippy/workspace 72 suites·709·0 真实重跑；R02 七定向链绿+全量红集归因逐条一致；34 C-ID 三层全闭合；递延归属保持；无 R04 倒灌。",
     "note": "接受记录引用候选 ebcbcad1b；接受记录提交自身 SHA 由远程确认回执登记，不写入仓库文件（防自引用）。"
+  },
+  "reacceptance_rr2": {
+    "stage_verdict": "PASS",
+    "stage_reviewer": "STAGE-REVIEWER-R03-RR2 (全新代理，未参与本轮任何实现/修复/组审)",
+    "candidate_commit": "f4d4b16664827010516bc1f5ec6aee5e14b859d3",
+    "report": "docs/rust-tauri/R03/repair-current/R03_RR2_STAGE_REVIEW.md",
+    "evidence": "artifacts/rust-tauri/R03/repair-current/STAGE-REVIEW-RR2/",
+    "gate": "artifacts/rust-tauri/R03/repair-current/RR2-F05-GATE/verify-stage-r03/",
+    "summary": "六项清单 C01-C06 全闭合；阶段审查者自写复测候选 3/3 绿、基线 c96f7cc6 detached worktree 3/3 红（盲重执行实锤）；门禁 overall PASS 15/15 命令（含 7 条 R02 定向链）、candidateSourceBinding 全程 stable、testedShaAtEnd=远程 HEAD=f4d4b1666；pin 只增不减（第十套件 request_id_canonicalization=7）；workspace 73 suites/718/0；无 R04+ 倒灌。",
+    "note": "接受记录引用候选 f4d4b1666；接受记录提交自身 SHA 由远程确认回执登记，不写入仓库文件（防自引用）。RR1 reacceptance 记录保留。"
   }
 }

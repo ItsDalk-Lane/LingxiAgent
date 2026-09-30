@@ -1,0 +1,43 @@
+# STAGE-REVIEW-RR2 — 门禁证据抽查记录（A 部分亲自核验）
+
+审查者：STAGE-REVIEWER-R03-RR2（2026-09-30）。对象：
+`artifacts/rust-tauri/R03/repair-current/RR2-F05-GATE/verify-stage-r03/verify-stage-result.json`（157595 字节）。
+
+## verify-stage-result.json 机器解析结果（python3，脚本内联于本审查会话）
+
+- overall = **PASS**；stage = R03；resultVersion = lingxi.xtask.verify-stage.v1
+- platform = macos/aarch64/unix；toolchainChannel = 1.98.1；worktreeDirty = false
+- commands：**15/15 status=PASS，exitCode=0，timedOut=false，missingEvidence=[]（全部）**
+  rust_test_workspace, a15_combo_and_leaves, r02_storage_tx, r02_full_chain,
+  r02_backup_restore, r02_recovery_drill, rust_fmt, rust_clippy, check_contracts,
+  check_boundaries, r02_auth_matrix, r02_legacy_regression, a16_seed_mechanism,
+  repair_suites, r02_events_matrix
+- candidateSourceBinding：
+  - schema = lingxi-candidate-source-binding-v1
+  - before.digestSha256 = after.digestSha256 = **60b3e86af3040cb3f577db6d8a325e863f69a0a36259895276b206a2df4b3468**（fileCount 16360 两侧一致）
+  - checkpointAfterEveryCommand：**15 个 checkpoint 全部 digest 与 before/after 相同、stable=true、changedPathBytesHex=[]**（逐条断言通过）
+  - testedShaAtEnd = **f4d4b16664827010516bc1f5ec6aee5e14b859d3**；headAtEndError/afterError = null
+- scenarios：**17/17 PASS**（R03-A01..A16 + R03-RP01）
+- supplementalLeafScenarios：48 叶 = **17 PASS + 31 DEFERRED_TO_LATER_STAGE**，无其他状态（与 RR1 基线形状一致）
+
+## 候选/远程/本地绑定三角核对（logs/../git-and-remote-check.txt 原始输出）
+
+- `git rev-parse HEAD` = f4d4b16664827010516bc1f5ec6aee5e14b859d3
+- `git ls-remote origin refs/heads/codex/rust-tauri-migration` = f4d4b1666…（远程一致）
+- `git status --porcelain`：仅未跟踪 RR2-F05-GATE/ 与本证据根（预期）
+- 门禁 testedShaAtEnd = 同一 SHA → **候选=远程=门禁实测三者绑定一致，无漂移**
+
+## 证据文件抽查（≥4 命令，均亲自 ls/wc/grep）
+
+| 命令 | 证据文件 | 结果 |
+|---|---|---|
+| rust_test_workspace | rust_test_workspace/stdout.log | 60425 字节非空；`test result: ok` 行 73 个、合计 **718 passed / 0 failed**（正则求和复算）；7 个 rr2_f05_* 新用例名逐个出现 `... ok`；kernel 2 单测（subagent::tests::canonical_request_id_*、request_cause_id_prefix_*）出现 ok；adv_c05_* 出现 ok；无 FAILED 行 |
+| repair_suites | G07_REPAIR/repair-cases.json + summary.txt | 1338/1503 字节非空；repair-cases.json **十套件** expect=actual 全 ok：cancel_link_inheritance 7、subagent_closeout 8、cancel_terminal_race 13、tool_receipt_unknown 6、admission_dedup_consistency 5、admission_dedup_adversarial 5、input_payload_fidelity 5、input_budget_refusal 2、background_steering 8、**request_id_canonicalization 7（RR2-F05）**；allSuitesOk=true；summary.txt 逐套件 PASS + "all ten repair suites green with exact pinned counts" |
+| r02_full_chain | R02/A15/full-chain/summary.txt | 2197 字节非空；真实两轮 boot（SIGTERM 优雅关停、端口关闭、同 home 重启、旧 token 401、新 token 200、runCount=2 读回、events preserved）全 PASS |
+| rust_clippy | rust_clippy/stdout.log（0 字节）+ stderr.log | 见下方观察 1：cargo 输出在 stderr（6993 字节，完整 Checking 图 + `Finished dev profile`，`^(warning|error)` 计数 0，-D warnings 下 exit 0 自洽） |
+| check_contracts | check_contracts/stdout.log | 409 字节非空，exit 0 |
+
+## 观察（非阻塞）
+
+1. rust_clippy 的 evidencePaths 指向 stdout.log（0 字节），实际输出按 cargo 行为在 stderr.log（6993 字节，含完整编译检查图与 Finished、0 warning/error）。命令真实执行且 -D warnings 下 exit 0 与日志内容自洽；仅证据文件指向的选择性观察，不构成门禁虚假。rust_fmt --check 成功时 stdout 为空属正常。
+2. rust_test_workspace 的 stdout 不含 `Running tests/...` 头（cargo 将其写 stderr，本命令未捕获 stderr）；套件存在性经用例名检索证实（7 个新用例 + kernel 2 单测 + 既有套件用例均出现），73 个 ok 行与 718 passed 与执行者/R1 报告独立一致。

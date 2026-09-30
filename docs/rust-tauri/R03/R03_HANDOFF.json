@@ -194,5 +194,16 @@
     "stage_review_evidence": "artifacts/rust-tauri/R03/repair-current/STAGE-REVIEW-RR1/",
     "unified_issue_ledger": "docs/rust-tauri/R03/repair-current/R03_FIX_ISSUES.json",
     "acceptance_note": "本对象引用候选提交；接受记录提交自身 SHA 由远程确认回执登记，不写入本文件（防自引用）。"
+  },
+  "reaccepted_after_rr2_fixed_repair": {
+    "candidate_commit": "f4d4b16664827010516bc1f5ec6aee5e14b859d3",
+    "round": "RR2",
+    "issue": "R03-RR2-F05-01",
+    "stage_verdict": "PASS",
+    "stage_review_report": "docs/rust-tauri/R03/repair-current/R03_RR2_STAGE_REVIEW.md",
+    "stage_review_evidence": "artifacts/rust-tauri/R03/repair-current/STAGE-REVIEW-RR2/",
+    "gate_evidence": "artifacts/rust-tauri/R03/repair-current/RR2-F05-GATE/verify-stage-r03/",
+    "unified_issue_ledger": "docs/rust-tauri/R03/repair-current/R03_FIX_ISSUES.json",
+    "acceptance_note": "本对象引用候选提交；接受记录提交自身 SHA 由远程确认回执登记，不写入本文件（防自引用）。RR1 记录（reaccepted_after_adversarial_repair）原文保留。"
   }
 }

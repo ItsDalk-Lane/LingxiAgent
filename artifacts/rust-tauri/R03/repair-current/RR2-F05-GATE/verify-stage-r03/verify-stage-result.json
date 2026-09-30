@@ -1,0 +1,3670 @@
+{
+  "candidateSourceBinding": {
+    "after": {
+      "atUnixMs": 1790752053082,
+      "digestSha256": "60b3e86af3040cb3f577db6d8a325e863f69a0a36259895276b206a2df4b3468",
+      "fileCount": 16360,
+      "manifestPath": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R03/repair-current/RR2-F05-GATE/verify-stage-r03/candidate-source-after.json",
+      "manifestSha256": "ff708f5f178fdab3094b69ebcd1074096265a3389a017c53b93f32775fae2001"
+    },
+    "afterError": null,
+    "before": {
+      "atUnixMs": 1790751407443,
+      "digestSha256": "60b3e86af3040cb3f577db6d8a325e863f69a0a36259895276b206a2df4b3468",
+      "fileCount": 16360,
+      "manifestPath": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R03/repair-current/RR2-F05-GATE/verify-stage-r03/candidate-source-before.json",
+      "manifestSha256": "ff708f5f178fdab3094b69ebcd1074096265a3389a017c53b93f32775fae2001"
+    },
+    "checkpointAfterEveryCommand": [
+      {
+        "atUnixMs": 1790751547682,
+        "changedPathBytesHex": [],
+        "commandKey": "rust_test_workspace",
+        "digestSha256": "60b3e86af3040cb3f577db6d8a325e863f69a0a36259895276b206a2df4b3468",
+        "fileCount": 16360,
+        "stable": true
+      },
+      {
+        "atUnixMs": 1790751571134,
+        "changedPathBytesHex": [],
+        "commandKey": "a15_combo_and_leaves",
+        "digestSha256": "60b3e86af3040cb3f577db6d8a325e863f69a0a36259895276b206a2df4b3468",
+        "fileCount": 16360,
+        "stable": true
+      },
+      {
+        "atUnixMs": 1790751583559,
+        "changedPathBytesHex": [],
+        "commandKey": "r02_storage_tx",
+        "digestSha256": "60b3e86af3040cb3f577db6d8a325e863f69a0a36259895276b206a2df4b3468",
+        "fileCount": 16360,
+        "stable": true
+      },
+      {
+        "atUnixMs": 1790751594751,
+        "changedPathBytesHex": [],
+        "commandKey": "r02_full_chain",
+        "digestSha256": "60b3e86af3040cb3f577db6d8a325e863f69a0a36259895276b206a2df4b3468",
+        "fileCount": 16360,
+        "stable": true
+      },
+      {
+        "atUnixMs": 1790751607382,
+        "changedPathBytesHex": [],
+        "commandKey": "r02_backup_restore",
+        "digestSha256": "60b3e86af3040cb3f577db6d8a325e863f69a0a36259895276b206a2df4b3468",
+        "fileCount": 16360,
+        "stable": true
+      },
+      {
+        "atUnixMs": 1790751619501,
+        "changedPathBytesHex": [],
+        "commandKey": "r02_recovery_drill",
+        "digestSha256": "60b3e86af3040cb3f577db6d8a325e863f69a0a36259895276b206a2df4b3468",
+        "fileCount": 16360,
+        "stable": true
+      },
+      {
+        "atUnixMs": 1790751630102,
+        "changedPathBytesHex": [],
+        "commandKey": "rust_fmt",
+        "digestSha256": "60b3e86af3040cb3f577db6d8a325e863f69a0a36259895276b206a2df4b3468",
+        "fileCount": 16360,
+        "stable": true
+      },
+      {
+        "atUnixMs": 1790751655690,
+        "changedPathBytesHex": [],
+        "commandKey": "rust_clippy",
+        "digestSha256": "60b3e86af3040cb3f577db6d8a325e863f69a0a36259895276b206a2df4b3468",
+        "fileCount": 16360,
+        "stable": true
+      },
+      {
+        "atUnixMs": 1790751666285,
+        "changedPathBytesHex": [],
+        "commandKey": "check_contracts",
+        "digestSha256": "60b3e86af3040cb3f577db6d8a325e863f69a0a36259895276b206a2df4b3468",
+        "fileCount": 16360,
+        "stable": true
+      },
+      {
+        "atUnixMs": 1790751676565,
+        "changedPathBytesHex": [],
+        "commandKey": "check_boundaries",
+        "digestSha256": "60b3e86af3040cb3f577db6d8a325e863f69a0a36259895276b206a2df4b3468",
+        "fileCount": 16360,
+        "stable": true
+      },
+      {
+        "atUnixMs": 1790751755377,
+        "changedPathBytesHex": [],
+        "commandKey": "r02_auth_matrix",
+        "digestSha256": "60b3e86af3040cb3f577db6d8a325e863f69a0a36259895276b206a2df4b3468",
+        "fileCount": 16360,
+        "stable": true
+      },
+      {
+        "atUnixMs": 1790751967532,
+        "changedPathBytesHex": [],
+        "commandKey": "r02_legacy_regression",
+        "digestSha256": "60b3e86af3040cb3f577db6d8a325e863f69a0a36259895276b206a2df4b3468",
+        "fileCount": 16360,
+        "stable": true
+      },
+      {
+        "atUnixMs": 1790751993122,
+        "changedPathBytesHex": [],
+        "commandKey": "a16_seed_mechanism",
+        "digestSha256": "60b3e86af3040cb3f577db6d8a325e863f69a0a36259895276b206a2df4b3468",
+        "fileCount": 16360,
+        "stable": true
+      },
+      {
+        "atUnixMs": 1790752015982,
+        "changedPathBytesHex": [],
+        "commandKey": "repair_suites",
+        "digestSha256": "60b3e86af3040cb3f577db6d8a325e863f69a0a36259895276b206a2df4b3468",
+        "fileCount": 16360,
+        "stable": true
+      },
+      {
+        "atUnixMs": 1790752043135,
+        "changedPathBytesHex": [],
+        "commandKey": "r02_events_matrix",
+        "digestSha256": "60b3e86af3040cb3f577db6d8a325e863f69a0a36259895276b206a2df4b3468",
+        "fileCount": 16360,
+        "stable": true
+      }
+    ],
+    "excluded": {
+      "evidenceOutputPathBytesHex": "6172746966616374732f727573742d74617572692f5230332f7265706169722d63757272656e742f5252322d4630352d474154452f7665726966792d73746167652d723033",
+      "evidenceOutputRelativePath": "artifacts/rust-tauri/R03/repair-current/RR2-F05-GATE/verify-stage-r03",
+      "policy": "Only this invocation's --evidence output subtree is excluded; Git-ignored paths are outside the candidate source set. Tracked paths and non-ignored untracked paths elsewhere are included."
+    },
+    "finalChangedPathBytesHex": [],
+    "headAtEndError": null,
+    "schema": "lingxi-candidate-source-binding-v1",
+    "stable": true,
+    "testedShaAtEnd": "f4d4b16664827010516bc1f5ec6aee5e14b859d3"
+  },
+  "commands": [
+    {
+      "argv": [
+        "cargo",
+        "test",
+        "--manifest-path",
+        "rust/Cargo.toml",
+        "--workspace",
+        "--locked"
+      ],
+      "cleanup": null,
+      "durationMs": 140134,
+      "evidencePaths": [
+        "{EVIDENCE}/rust_test_workspace/stdout.log"
+      ],
+      "exitCode": 0,
+      "internalError": null,
+      "key": "rust_test_workspace",
+      "missingEvidence": [],
+      "preExistingEvidence": [],
+      "status": "PASS",
+      "timedOut": false
+    },
+    {
+      "argv": [
+        "bash",
+        "scripts/rust-tauri/r03_t08_matrix.sh",
+        "{EVIDENCE}/A15"
+      ],
+      "cleanup": null,
+      "durationMs": 23451,
+      "evidencePaths": [
+        "{EVIDENCE}/A15/leaf-cases.json",
+        "{EVIDENCE}/A15/combo-counts.json",
+        "{EVIDENCE}/A15/integration.log",
+        "{EVIDENCE}/A15/summary.txt"
+      ],
+      "exitCode": 0,
+      "internalError": null,
+      "key": "a15_combo_and_leaves",
+      "missingEvidence": [],
+      "preExistingEvidence": [],
+      "status": "PASS",
+      "timedOut": false
+    },
+    {
+      "argv": [
+        "bash",
+        "scripts/rust-tauri/r02_t04_storage_tx.sh",
+        "{EVIDENCE}/R02/A07_A08"
+      ],
+      "cleanup": null,
+      "durationMs": 12424,
+      "evidencePaths": [
+        "{EVIDENCE}/R02/A07_A08/s1-counts-after-stop.json",
+        "{EVIDENCE}/R02/A07_A08/s4-hashes-after.txt"
+      ],
+      "exitCode": 0,
+      "internalError": null,
+      "key": "r02_storage_tx",
+      "missingEvidence": [],
+      "preExistingEvidence": [],
+      "status": "PASS",
+      "timedOut": false
+    },
+    {
+      "argv": [
+        "bash",
+        "scripts/rust-tauri/r02_t08_full_chain_smoke.sh",
+        "{EVIDENCE}/R02/A15"
+      ],
+      "cleanup": null,
+      "durationMs": 11191,
+      "evidencePaths": [
+        "{EVIDENCE}/R02/A15/full-chain/summary.txt"
+      ],
+      "exitCode": 0,
+      "internalError": null,
+      "key": "r02_full_chain",
+      "missingEvidence": [],
+      "preExistingEvidence": [],
+      "status": "PASS",
+      "timedOut": false
+    },
+    {
+      "argv": [
+        "bash",
+        "scripts/rust-tauri/r02_t06_backup_restore.sh",
+        "{EVIDENCE}/R02/A11"
+      ],
+      "cleanup": null,
+      "durationMs": 12630,
+      "evidencePaths": [
+        "{EVIDENCE}/R02/A11/backup-restore/summary.txt"
+      ],
+      "exitCode": 0,
+      "internalError": null,
+      "key": "r02_backup_restore",
+      "missingEvidence": [],
+      "preExistingEvidence": [],
+      "status": "PASS",
+      "timedOut": false
+    },
+    {
+      "argv": [
+        "bash",
+        "scripts/rust-tauri/r02_t06_recovery_drill.sh",
+        "{EVIDENCE}/R02/A12"
+      ],
+      "cleanup": null,
+      "durationMs": 12118,
+      "evidencePaths": [
+        "{EVIDENCE}/R02/A12/recovery-drill/summary.txt"
+      ],
+      "exitCode": 0,
+      "internalError": null,
+      "key": "r02_recovery_drill",
+      "missingEvidence": [],
+      "preExistingEvidence": [],
+      "status": "PASS",
+      "timedOut": false
+    },
+    {
+      "argv": [
+        "cargo",
+        "fmt",
+        "--manifest-path",
+        "rust/Cargo.toml",
+        "--all",
+        "--",
+        "--check"
+      ],
+      "cleanup": null,
+      "durationMs": 10601,
+      "evidencePaths": [
+        "{EVIDENCE}/rust_fmt/stdout.log"
+      ],
+      "exitCode": 0,
+      "internalError": null,
+      "key": "rust_fmt",
+      "missingEvidence": [],
+      "preExistingEvidence": [],
+      "status": "PASS",
+      "timedOut": false
+    },
+    {
+      "argv": [
+        "cargo",
+        "clippy",
+        "--manifest-path",
+        "rust/Cargo.toml",
+        "--workspace",
+        "--all-targets",
+        "--locked",
+        "--",
+        "-D",
+        "warnings"
+      ],
+      "cleanup": null,
+      "durationMs": 25587,
+      "evidencePaths": [
+        "{EVIDENCE}/rust_clippy/stdout.log"
+      ],
+      "exitCode": 0,
+      "internalError": null,
+      "key": "rust_clippy",
+      "missingEvidence": [],
+      "preExistingEvidence": [],
+      "status": "PASS",
+      "timedOut": false
+    },
+    {
+      "argv": [
+        "bash",
+        "scripts/rust-tauri/r01-t02-check-generated.sh"
+      ],
+      "cleanup": null,
+      "durationMs": 10594,
+      "evidencePaths": [
+        "{EVIDENCE}/check_contracts/stdout.log"
+      ],
+      "exitCode": 0,
+      "internalError": null,
+      "key": "check_contracts",
+      "missingEvidence": [],
+      "preExistingEvidence": [],
+      "status": "PASS",
+      "timedOut": false
+    },
+    {
+      "argv": [
+        "python3",
+        "-B",
+        "docs/rust-tauri/R01/r01_t01_check_ownership.py"
+      ],
+      "cleanup": null,
+      "durationMs": 10280,
+      "evidencePaths": [
+        "{EVIDENCE}/check_boundaries/stdout.log"
+      ],
+      "exitCode": 0,
+      "internalError": null,
+      "key": "check_boundaries",
+      "missingEvidence": [],
+      "preExistingEvidence": [],
+      "status": "PASS",
+      "timedOut": false
+    },
+    {
+      "argv": [
+        "bash",
+        "scripts/rust-tauri/r02_t03_auth_matrix.sh",
+        "{EVIDENCE}/R02/A05_A06"
+      ],
+      "cleanup": null,
+      "durationMs": 78811,
+      "evidencePaths": [
+        "{EVIDENCE}/R02/A05_A06/summary.txt",
+        "{EVIDENCE}/R02/A05_A06/leaf-cases.json",
+        "{EVIDENCE}/R02/A05_A06/ws-matrix.json",
+        "{EVIDENCE}/R02/A05_A06/sessions-list-matrix.json"
+      ],
+      "exitCode": 0,
+      "internalError": null,
+      "key": "r02_auth_matrix",
+      "missingEvidence": [],
+      "preExistingEvidence": [],
+      "status": "PASS",
+      "timedOut": false
+    },
+    {
+      "argv": [
+        "env",
+        "R02_LEGACY_REGRESSION_MODE=directed-no-seal-family",
+        "bash",
+        "scripts/rust-tauri/r02_t08_legacy_entry_regression.sh",
+        "{EVIDENCE}/R02/A16"
+      ],
+      "cleanup": null,
+      "durationMs": 212153,
+      "evidencePaths": [
+        "{EVIDENCE}/R02/A16/legacy-entry/summary.txt"
+      ],
+      "exitCode": 0,
+      "internalError": null,
+      "key": "r02_legacy_regression",
+      "missingEvidence": [],
+      "preExistingEvidence": [],
+      "status": "PASS",
+      "timedOut": false
+    },
+    {
+      "argv": [
+        "bash",
+        "scripts/rust-tauri/r03_t08_a16_seed_mechanism.sh",
+        "{EVIDENCE}/A16"
+      ],
+      "cleanup": null,
+      "durationMs": 25590,
+      "evidencePaths": [
+        "{EVIDENCE}/A16/summary.txt",
+        "{EVIDENCE}/A16/captured-seed.txt",
+        "{EVIDENCE}/A16/seed-mechanism.json"
+      ],
+      "exitCode": 0,
+      "internalError": null,
+      "key": "a16_seed_mechanism",
+      "missingEvidence": [],
+      "preExistingEvidence": [],
+      "status": "PASS",
+      "timedOut": false
+    },
+    {
+      "argv": [
+        "bash",
+        "scripts/rust-tauri/r03_g07_repair_suites.sh",
+        "{EVIDENCE}/G07_REPAIR"
+      ],
+      "cleanup": null,
+      "durationMs": 22859,
+      "evidencePaths": [
+        "{EVIDENCE}/G07_REPAIR/repair-cases.json",
+        "{EVIDENCE}/G07_REPAIR/summary.txt"
+      ],
+      "exitCode": 0,
+      "internalError": null,
+      "key": "repair_suites",
+      "missingEvidence": [],
+      "preExistingEvidence": [],
+      "status": "PASS",
+      "timedOut": false
+    },
+    {
+      "argv": [
+        "bash",
+        "scripts/rust-tauri/r02_t05_events_matrix.sh",
+        "{EVIDENCE}/R02/A09_A10"
+      ],
+      "cleanup": null,
+      "durationMs": 27152,
+      "evidencePaths": [
+        "{EVIDENCE}/R02/A09_A10/probe-matrix.jsonl",
+        "{EVIDENCE}/R02/A09_A10/key-events-dump.json"
+      ],
+      "exitCode": 0,
+      "internalError": null,
+      "key": "r02_events_matrix",
+      "missingEvidence": [],
+      "preExistingEvidence": [],
+      "status": "PASS",
+      "timedOut": false
+    }
+  ],
+  "finishedAtUnixMs": 1790752053953,
+  "overall": "PASS",
+  "platform": {
+    "arch": "aarch64",
+    "family": "unix",
+    "os": "macos"
+  },
+  "resultVersion": "lingxi.xtask.verify-stage.v1",
+  "runnerSourceBinding": {
+    "after": {
+      "compiledSourceFiles": [
+        {
+          "compiledAndDiskSha256": "06d83cbaadc17d95bccb4fbd79c347c6136363a39e350119dad2e74a62eae492",
+          "path": "rust/crates/xtask/src/main.rs"
+        },
+        {
+          "compiledAndDiskSha256": "c50440de9b01cb4bfbf9748df54d8c65bbc3e9b6fb8c5df9cabbf612a3d35dfe",
+          "path": "rust/crates/xtask/src/verify.rs"
+        },
+        {
+          "compiledAndDiskSha256": "a38bd219040afcb196d6fae6c4565037195d6e195171e34d78ce0159858fc517",
+          "path": "rust/crates/xtask/src/stage_map.rs"
+        },
+        {
+          "compiledAndDiskSha256": "fb90af8ed20c651bc90e63226e975d8c1f2e95e3dbc0cdd881c25533988daf05",
+          "path": "rust/crates/xtask/src/candidate.rs"
+        },
+        {
+          "compiledAndDiskSha256": "d1671f12d1f34e476334fb54b98925b1db9736f6d912723f9193f3f19529295e",
+          "path": "rust/crates/xtask/src/runner_identity.rs"
+        },
+        {
+          "compiledAndDiskSha256": "c2781009285dd989a5ee9cd092a95b2f6d0de615f84a46edbf7de628915bd1c2",
+          "path": "rust/crates/xtask/src/stage_maps/R02.json"
+        },
+        {
+          "compiledAndDiskSha256": "6dd02d8897e5f915444cc0fc6a2178ab0fc080e45346ce5ae4039f81bbe105ea",
+          "path": "rust/crates/xtask/src/stage_maps/R03.json"
+        },
+        {
+          "compiledAndDiskSha256": "51edb1d897d4fe653e39bc0d92dd3ac7ec2b87bc00a1b9c8433624c196edc776",
+          "path": "rust/crates/xtask/Cargo.toml"
+        },
+        {
+          "compiledAndDiskSha256": "cec902952a04a6bda6296a0f406f12d59ccdb286c13a99282f1aa808751f1096",
+          "path": "rust/Cargo.toml"
+        },
+        {
+          "compiledAndDiskSha256": "eec3410410647a7d39f25371e73dda3ecfd5e7c10359090fff11e83053e11c37",
+          "path": "rust-toolchain.toml"
+        }
+      ],
+      "note": "The executable's embedded implementation and R02 stage map exactly match current disk bytes before any registered command runs.",
+      "schema": "lingxi-xtask-runner-source-v1",
+      "sourceInventory": [
+        "candidate.rs",
+        "candidate/tests.rs",
+        "main.rs",
+        "runner_identity.rs",
+        "stage_map.rs",
+        "stage_maps/R02.json",
+        "stage_maps/R03.json",
+        "verify.rs",
+        "verify/runner_tests.rs"
+      ],
+      "status": "PASS"
+    },
+    "afterError": null,
+    "before": {
+      "compiledSourceFiles": [
+        {
+          "compiledAndDiskSha256": "06d83cbaadc17d95bccb4fbd79c347c6136363a39e350119dad2e74a62eae492",
+          "path": "rust/crates/xtask/src/main.rs"
+        },
+        {
+          "compiledAndDiskSha256": "c50440de9b01cb4bfbf9748df54d8c65bbc3e9b6fb8c5df9cabbf612a3d35dfe",
+          "path": "rust/crates/xtask/src/verify.rs"
+        },
+        {
+          "compiledAndDiskSha256": "a38bd219040afcb196d6fae6c4565037195d6e195171e34d78ce0159858fc517",
+          "path": "rust/crates/xtask/src/stage_map.rs"
+        },
+        {
+          "compiledAndDiskSha256": "fb90af8ed20c651bc90e63226e975d8c1f2e95e3dbc0cdd881c25533988daf05",
+          "path": "rust/crates/xtask/src/candidate.rs"
+        },
+        {
+          "compiledAndDiskSha256": "d1671f12d1f34e476334fb54b98925b1db9736f6d912723f9193f3f19529295e",
+          "path": "rust/crates/xtask/src/runner_identity.rs"
+        },
+        {
+          "compiledAndDiskSha256": "c2781009285dd989a5ee9cd092a95b2f6d0de615f84a46edbf7de628915bd1c2",
+          "path": "rust/crates/xtask/src/stage_maps/R02.json"
+        },
+        {
+          "compiledAndDiskSha256": "6dd02d8897e5f915444cc0fc6a2178ab0fc080e45346ce5ae4039f81bbe105ea",
+          "path": "rust/crates/xtask/src/stage_maps/R03.json"
+        },
+        {
+          "compiledAndDiskSha256": "51edb1d897d4fe653e39bc0d92dd3ac7ec2b87bc00a1b9c8433624c196edc776",
+          "path": "rust/crates/xtask/Cargo.toml"
+        },
+        {
+          "compiledAndDiskSha256": "cec902952a04a6bda6296a0f406f12d59ccdb286c13a99282f1aa808751f1096",
+          "path": "rust/Cargo.toml"
+        },
+        {
+          "compiledAndDiskSha256": "eec3410410647a7d39f25371e73dda3ecfd5e7c10359090fff11e83053e11c37",
+          "path": "rust-toolchain.toml"
+        }
+      ],
+      "note": "The executable's embedded implementation and R02 stage map exactly match current disk bytes before any registered command runs.",
+      "schema": "lingxi-xtask-runner-source-v1",
+      "sourceInventory": [
+        "candidate.rs",
+        "candidate/tests.rs",
+        "main.rs",
+        "runner_identity.rs",
+        "stage_map.rs",
+        "stage_maps/R02.json",
+        "stage_maps/R03.json",
+        "verify.rs",
+        "verify/runner_tests.rs"
+      ],
+      "status": "PASS"
+    },
+    "beforeError": null,
+    "status": "PASS"
+  },
+  "scenarios": [
+    {
+      "commandRefs": [
+        "rust_test_workspace",
+        "a15_combo_and_leaves"
+      ],
+      "id": "R03-A01",
+      "requirement": "REQUIRED",
+      "status": "PASS"
+    },
+    {
+      "commandRefs": [
+        "rust_test_workspace",
+        "r02_storage_tx"
+      ],
+      "id": "R03-A02",
+      "requirement": "REQUIRED",
+      "status": "PASS"
+    },
+    {
+      "commandRefs": [
+        "rust_test_workspace"
+      ],
+      "id": "R03-A03",
+      "requirement": "REQUIRED",
+      "status": "PASS"
+    },
+    {
+      "commandRefs": [
+        "rust_test_workspace"
+      ],
+      "id": "R03-A04",
+      "requirement": "REQUIRED",
+      "status": "PASS"
+    },
+    {
+      "commandRefs": [
+        "rust_test_workspace",
+        "a15_combo_and_leaves"
+      ],
+      "id": "R03-A05",
+      "requirement": "REQUIRED",
+      "status": "PASS"
+    },
+    {
+      "commandRefs": [
+        "rust_test_workspace",
+        "a15_combo_and_leaves"
+      ],
+      "id": "R03-A06",
+      "requirement": "REQUIRED",
+      "status": "PASS"
+    },
+    {
+      "commandRefs": [
+        "rust_test_workspace",
+        "a15_combo_and_leaves"
+      ],
+      "id": "R03-A07",
+      "requirement": "REQUIRED",
+      "status": "PASS"
+    },
+    {
+      "commandRefs": [
+        "rust_test_workspace",
+        "a15_combo_and_leaves"
+      ],
+      "id": "R03-A08",
+      "requirement": "REQUIRED",
+      "status": "PASS"
+    },
+    {
+      "commandRefs": [
+        "rust_test_workspace"
+      ],
+      "id": "R03-A09",
+      "requirement": "REQUIRED",
+      "status": "PASS"
+    },
+    {
+      "commandRefs": [
+        "rust_test_workspace"
+      ],
+      "id": "R03-A10",
+      "requirement": "REQUIRED",
+      "status": "PASS"
+    },
+    {
+      "commandRefs": [
+        "rust_test_workspace",
+        "a15_combo_and_leaves"
+      ],
+      "id": "R03-A11",
+      "requirement": "REQUIRED",
+      "status": "PASS"
+    },
+    {
+      "commandRefs": [
+        "rust_test_workspace",
+        "a15_combo_and_leaves"
+      ],
+      "id": "R03-A12",
+      "requirement": "REQUIRED",
+      "status": "PASS"
+    },
+    {
+      "commandRefs": [
+        "rust_test_workspace",
+        "a15_combo_and_leaves",
+        "r02_full_chain",
+        "r02_backup_restore"
+      ],
+      "id": "R03-A13",
+      "requirement": "REQUIRED",
+      "status": "PASS"
+    },
+    {
+      "commandRefs": [
+        "rust_test_workspace",
+        "r02_recovery_drill"
+      ],
+      "id": "R03-A14",
+      "requirement": "REQUIRED",
+      "status": "PASS"
+    },
+    {
+      "commandRefs": [
+        "a15_combo_and_leaves",
+        "rust_test_workspace",
+        "rust_fmt",
+        "rust_clippy",
+        "check_contracts",
+        "check_boundaries",
+        "r02_auth_matrix",
+        "r02_legacy_regression"
+      ],
+      "id": "R03-A15",
+      "requirement": "REQUIRED",
+      "status": "PASS"
+    },
+    {
+      "commandRefs": [
+        "a16_seed_mechanism",
+        "rust_test_workspace"
+      ],
+      "id": "R03-A16",
+      "requirement": "REQUIRED",
+      "status": "PASS"
+    },
+    {
+      "commandRefs": [
+        "repair_suites",
+        "rust_test_workspace"
+      ],
+      "id": "R03-RP01",
+      "requirement": "REQUIRED",
+      "status": "PASS"
+    }
+  ],
+  "stage": "R03",
+  "startedAtUnixMs": 1790751396121,
+  "supplementalLeafCoverage": {
+    "blocked": 0,
+    "commandsNotPassing": [],
+    "declaredInStageMap": 48,
+    "deferredLeafIds": [
+      "R00-T02-LA-081FACA79F2C",
+      "R00-T02-LA-095E0402EEEC",
+      "R00-T02-LA-0FE8BED686E2",
+      "R00-T02-LA-1B712E189DDF",
+      "R00-T02-LA-1FB3D8BC916D",
+      "R00-T02-LA-267BDFB75804",
+      "R00-T02-LA-2CAC28D96AFE",
+      "R00-T02-LA-2FAA749DA790",
+      "R00-T02-LA-38667593C3E1",
+      "R00-T02-LA-3CF3C154B311",
+      "R00-T02-LA-421EEA1AC8D5",
+      "R00-T02-LA-5882BC217F1D",
+      "R00-T02-LA-5A6E0D526903",
+      "R00-T02-LA-5F394AA4C9A3",
+      "R00-T02-LA-65B2ECECB23A",
+      "R00-T02-LA-689DB6429895",
+      "R00-T02-LA-7244E7DCE678",
+      "R00-T02-LA-92620BF2264F",
+      "R00-T02-LA-A2C385A33493",
+      "R00-T02-LA-A5DE44FF584F",
+      "R00-T02-LA-A765DFFB4BAC",
+      "R00-T02-LA-B34F2B298BFA",
+      "R00-T02-LA-B5CB2993A5C0",
+      "R00-T02-LA-C99A4322D0C1",
+      "R00-T02-LA-D8D47C4680C9",
+      "R00-T02-LA-D901852E1B1A",
+      "R00-T02-LA-D92CD567D6D6",
+      "R00-T02-LA-E6F239636060",
+      "R00-T02-LA-EC5167DAB40C",
+      "R00-T02-LA-F829AEA5931C",
+      "R00-T02-LA-FA0FF4DC0779"
+    ],
+    "deferredToLaterStage": 31,
+    "deferredToR07": 0,
+    "expectedFromR00Ledger": 48,
+    "fail": 0,
+    "note": "R13-F01/R14-F01: this stage gate CONSUMES the R00 REQUIRED_SUPPLEMENTAL leaves bound to the stage (cross-checked for set equality AND per-leaf FULL-record equality — feature, kind, task/stage responsibility, status, result/test registries, then, assertions, due — against both R00 ledgers before any command ran). R02-final group 1 stage ownership: expected == pass + deferredToR07 + fail + blocked, and overall PASS requires PASS ∪ DEFERRED_TO_R07 to cover every leaf. DEFERRED_TO_R07 is NOT a waiver: the leaf stays REQUIRED and its acceptance belongs to R07, which must consume the remainder (deferredToStage + r07Share on each entry); the deferred set is verified EQUAL to the stage map's deferred_to_r07 declarations. Early-evidence producers of pre-implemented R07 behavior stay registered and run; any failing command (commandsNotPassing) still blocks overall PASS. A BLOCKED entry is an unresolved stage-boundary conflict, a generic-authentication leaf whose cases do not prove its original behavior, or a legacy partial-kind dual-stage leaf. A FAIL entry lacks legal evidence for its R02 share or its pinned cases did not hold as recorded in the producer's structured case file.",
+    "pass": 17,
+    "r00FeatureStageAcceptancePath": "docs/rust-tauri/R00/FEATURE_STAGE_ACCEPTANCE.json",
+    "r00LedgerPath": "docs/rust-tauri/R00/ACCEPTANCE_MAP.json",
+    "shareSatisfiedLeafIds": [
+      "R00-T02-LA-00ECC9568490",
+      "R00-T02-LA-010BA6693880",
+      "R00-T02-LA-207DF594B497",
+      "R00-T02-LA-4EA88B5073E4",
+      "R00-T02-LA-5F879158C679",
+      "R00-T02-LA-7CBF6F4A6760",
+      "R00-T02-LA-81664285F927",
+      "R00-T02-LA-81B217A7E581",
+      "R00-T02-LA-84E22CD74BE1",
+      "R00-T02-LA-857747F848F6",
+      "R00-T02-LA-8661576FEAFF",
+      "R00-T02-LA-94CB746D04B7",
+      "R00-T02-LA-980C099F356F",
+      "R00-T02-LA-B47CAC08F418",
+      "R00-T02-LA-C1FB9C92E813",
+      "R00-T02-LA-CFA5BB0273FA",
+      "R00-T02-LA-D483E4CD0935"
+    ]
+  },
+  "supplementalLeafScenarios": [
+    {
+      "assertionContract": {
+        "cases": [
+          {
+            "case": "subagent-dispatch-child-lineage-recorded",
+            "expect": 1
+          }
+        ],
+        "evidencePath": "{EVIDENCE}/A15/leaf-cases.json",
+        "producerCommand": "a15_combo_and_leaves"
+      },
+      "assertionResults": [
+        {
+          "actual": 1,
+          "case": "subagent-dispatch-child-lineage-recorded",
+          "expect": 1,
+          "recordedOk": true,
+          "status": "PASS"
+        }
+      ],
+      "basisKind": "stage_share_satisfied",
+      "deferredR07Cases": [],
+      "deferredToStage": null,
+      "deferredToStages": [
+        "R06"
+      ],
+      "earlyEvidence": null,
+      "earlyEvidenceCommandRefs": [],
+      "evidenceCommandRefs": [
+        "a15_combo_and_leaves"
+      ],
+      "evidencePaths": [],
+      "evidenceRequired": "本阶段份额由 a15_combo_and_leaves 生产者经真实服务链路逐案例机器核验（lingxi.leaf-case-results.v1，actual==图钉）；份额图钉全过即 R03 份额 PASS",
+      "featureId": "F-D05-TOOL-TOOL-SUBAGENT-00ECC9",
+      "id": "R00-T02-LA-00ECC9568490",
+      "laterShare": "subagent 工具的完整目录注册（list/launch 参数面、agent/model 选择）= R04/R06",
+      "originalAssertionCases": [],
+      "r00Mirror": {
+        "assertions": [
+          "父子任务关联",
+          "子任务权限为交集",
+          "结果/失败回到父会话",
+          "无候选、超并发、权限交集不满足或子任务失败如实返回；不升级权限。"
+        ],
+        "due": "R00-T07 建立正式账本时登记；最迟在所列实施 Task 的阶段验收前完成并执行",
+        "executionStageIds": [
+          "R03",
+          "R06"
+        ],
+        "featureId": "F-D05-TOOL-TOOL-SUBAGENT-00ECC9",
+        "kind": "supplemental",
+        "ledgerStatus": "SPECIFIED_NOT_EXECUTED",
+        "resultIds": [],
+        "taskIds": [
+          "R03-T03",
+          "R03-T06",
+          "R06-T03"
+        ],
+        "testIds": [],
+        "then": "list返回候选；launch建子任务/线程，父会话有taskId与进度/结果。"
+      },
+      "r02Share": "",
+      "r07Share": "",
+      "reason": "R03 share satisfied: all share pins held; the remainder stays REQUIRED and moves with deferredToStages=[\"R06\"]: subagent 工具的完整目录注册（list/launch 参数面、agent/model 选择）= R04/R06",
+      "requirement": "REQUIRED_SUPPLEMENTAL",
+      "stageShare": "R03 份额=subagent 派发运行层：dispatch 建 child run（四元 lineage：parent/origin=subagent/source/cause 持久化）、父会话即时返回、结果经 steering 回流（T06 适配）",
+      "status": "PASS"
+    },
+    {
+      "assertionContract": {
+        "cases": [
+          {
+            "case": "combo-events-subscriber-saw-terminal",
+            "expect": 1
+          }
+        ],
+        "evidencePath": "{EVIDENCE}/A15/leaf-cases.json",
+        "producerCommand": "a15_combo_and_leaves"
+      },
+      "assertionResults": [
+        {
+          "actual": 1,
+          "case": "combo-events-subscriber-saw-terminal",
+          "expect": 1,
+          "recordedOk": true,
+          "status": "PASS"
+        }
+      ],
+      "basisKind": "stage_share_satisfied",
+      "deferredR07Cases": [],
+      "deferredToStage": null,
+      "deferredToStages": [
+        "R06",
+        "R08"
+      ],
+      "earlyEvidence": null,
+      "earlyEvidenceCommandRefs": [],
+      "evidenceCommandRefs": [
+        "a15_combo_and_leaves",
+        "r02_auth_matrix",
+        "r02_events_matrix"
+      ],
+      "evidencePaths": [],
+      "evidenceRequired": "本阶段份额由 a15_combo_and_leaves 生产者经真实服务链路逐案例机器核验（lingxi.leaf-case-results.v1，actual==图钉）；份额图钉全过即 R03 份额 PASS",
+      "featureId": "F-D01-SEMANTIC_EFFECT-SEMANTIC-EFFECT-CHAT-WEBSOCKET-TRANSPORT-010BA6",
+      "id": "R00-T02-LA-010BA6693880",
+      "laterShare": "聊天 WS 传输的客户端登记与断线重连完整行为 = R06-T04/R08-T07",
+      "originalAssertionCases": [],
+      "r00Mirror": {
+        "assertions": [
+          "有效 WebSocket 握手建立后有客户端记录",
+          "无权消息不得广播或改动其他会话"
+        ],
+        "due": "R00-T07 建立正式账本时登记；最迟在所列实施 Task 的阶段验收前完成并执行",
+        "executionStageIds": [
+          "R03",
+          "R06",
+          "R08"
+        ],
+        "featureId": "F-D01-SEMANTIC_EFFECT-SEMANTIC-EFFECT-CHAT-WEBSOCKET-TRANSPORT-010BA6",
+        "kind": "supplemental",
+        "ledgerStatus": "SPECIFIED_NOT_EXECUTED",
+        "resultIds": [],
+        "taskIds": [
+          "R03-T01",
+          "R06-T04",
+          "R08-T07"
+        ],
+        "testIds": [],
+        "then": "连接建立后按权限登记客户端并转发已订阅会话事件"
+      },
+      "r02Share": "",
+      "r07Share": "",
+      "reason": "R03 share satisfied: all share pins held; the remainder stays REQUIRED and moves with deferredToStages=[\"R06\", \"R08\"]: 聊天 WS 传输的客户端登记与断线重连完整行为 = R06-T04/R08-T07",
+      "requirement": "REQUIRED_SUPPLEMENTAL",
+      "stageShare": "R03 份额=事件转发与订阅登记：认证订阅者在 run 期间收到提交后的完整事件链（含终态事件）；R02 的按权限登记/转发原语在 R03 运行层持续成立（SUP-02 回归命令同链）",
+      "status": "PASS"
+    },
+    {
+      "assertionContract": null,
+      "assertionResults": [],
+      "basisKind": "deferred_to_later_stage",
+      "deferredR07Cases": [],
+      "deferredToStage": null,
+      "deferredToStages": [
+        "R06",
+        "R08"
+      ],
+      "earlyEvidence": {
+        "commandRefs": [],
+        "commandsNotPassing": [],
+        "note": "non-gating: producers of pre-implemented later-stage behavior stay registered and run every gate; their failures are command FAILs but never gate this leaf here"
+      },
+      "earlyEvidenceCommandRefs": [],
+      "evidenceCommandRefs": [],
+      "evidencePaths": [],
+      "evidenceRequired": "R03 不判本叶（DEFERRED，仍 REQUIRED）：验收归属 r00ExecutionStageIds 中的后续阶段（R06/R07/R08），后续阶段图必须消费本叶余款",
+      "featureId": "F-D01-SEMANTIC_EFFECT-SEMANTIC-EFFECT-DRAFT-CLEAR-081FAC",
+      "id": "R00-T02-LA-081FACA79F2C",
+      "laterShare": "R06-T04/R08-T07",
+      "originalAssertionCases": [],
+      "r00Mirror": {
+        "assertions": [
+          "成功：清空草稿后，text 为空使对应 home/session 草稿删除",
+          "边界：清理仅限选定 surface 与作用域；拒绝时目标状态不变"
+        ],
+        "due": "R00-T07 建立正式账本时登记；最迟在所列实施 Task 的阶段验收前完成并执行",
+        "executionStageIds": [
+          "R03",
+          "R06",
+          "R08"
+        ],
+        "featureId": "F-D01-SEMANTIC_EFFECT-SEMANTIC-EFFECT-DRAFT-CLEAR-081FAC",
+        "kind": "supplemental",
+        "ledgerStatus": "SPECIFIED_NOT_EXECUTED",
+        "resultIds": [],
+        "taskIds": [
+          "R03-T01",
+          "R06-T04",
+          "R08-T07"
+        ],
+        "testIds": [],
+        "then": "text 为空使对应 home/session 草稿删除"
+      },
+      "r02Share": "",
+      "r07Share": "",
+      "reason": "deferred to later stage(s) [\"R06\", \"R08\"]: this R00 leaf is still REQUIRED but has no R03 gating share; its acceptance belongs to those stages, which must consume the remainder: R06-T04/R08-T07",
+      "requirement": "REQUIRED_SUPPLEMENTAL",
+      "stageShare": "无 R03 叶专属门禁份额：空 text 删除草稿 = 会话内容持久化面；运行/取消/身份/事件基底由基础场景 R03-A01..A16 与 a15_combo_and_leaves 组合矩阵门禁承担，无叶专属份额需要图钉",
+      "status": "DEFERRED_TO_LATER_STAGE"
+    },
+    {
+      "assertionContract": null,
+      "assertionResults": [],
+      "basisKind": "deferred_to_later_stage",
+      "deferredR07Cases": [],
+      "deferredToStage": null,
+      "deferredToStages": [
+        "R07"
+      ],
+      "earlyEvidence": {
+        "commandRefs": [],
+        "commandsNotPassing": [],
+        "note": "non-gating: producers of pre-implemented later-stage behavior stay registered and run every gate; their failures are command FAILs but never gate this leaf here"
+      },
+      "earlyEvidenceCommandRefs": [],
+      "evidenceCommandRefs": [],
+      "evidencePaths": [],
+      "evidenceRequired": "R03 不判本叶（DEFERRED，仍 REQUIRED）：验收归属 r00ExecutionStageIds 中的后续阶段（R06/R07/R08），后续阶段图必须消费本叶余款",
+      "featureId": "F-D18-SEMANTIC_EFFECT-SEMANTIC-EFFECT-CRON-APPLY-SUGGESTION-095E04",
+      "id": "R00-T02-LA-095E0402EEEC",
+      "laterShare": "R07-T01",
+      "originalAssertionCases": [],
+      "r00Mirror": {
+        "assertions": [
+          "成功时核对：建议生效并返回 job，过期/冲突拒绝",
+          "拒绝/无效输入时核对：无越权或错误持久化，且错误对用户可见"
+        ],
+        "due": "R00-T07 建立正式账本时登记；最迟在所列实施 Task 的阶段验收前完成并执行",
+        "executionStageIds": [
+          "R03",
+          "R07"
+        ],
+        "featureId": "F-D18-SEMANTIC_EFFECT-SEMANTIC-EFFECT-CRON-APPLY-SUGGESTION-095E04",
+        "kind": "supplemental",
+        "ledgerStatus": "SPECIFIED_NOT_EXECUTED",
+        "resultIds": [],
+        "taskIds": [
+          "R03-T06",
+          "R07-T01"
+        ],
+        "testIds": [],
+        "then": "建议生效并返回 job，过期/冲突拒绝"
+      },
+      "r02Share": "",
+      "r07Share": "",
+      "reason": "deferred to later stage(s) [\"R07\"]: this R00 leaf is still REQUIRED but has no R03 gating share; its acceptance belongs to those stages, which must consume the remainder: R07-T01",
+      "requirement": "REQUIRED_SUPPLEMENTAL",
+      "stageShare": "无 R03 叶专属门禁份额：cron 建议生效路由 = R07 管理面；运行/取消/身份/事件基底由基础场景 R03-A01..A16 与 a15_combo_and_leaves 组合矩阵门禁承担，无叶专属份额需要图钉",
+      "status": "DEFERRED_TO_LATER_STAGE"
+    },
+    {
+      "assertionContract": null,
+      "assertionResults": [],
+      "basisKind": "deferred_to_later_stage",
+      "deferredR07Cases": [],
+      "deferredToStage": null,
+      "deferredToStages": [
+        "R06",
+        "R08"
+      ],
+      "earlyEvidence": {
+        "commandRefs": [],
+        "commandsNotPassing": [],
+        "note": "non-gating: producers of pre-implemented later-stage behavior stay registered and run every gate; their failures are command FAILs but never gate this leaf here"
+      },
+      "earlyEvidenceCommandRefs": [],
+      "evidenceCommandRefs": [],
+      "evidencePaths": [],
+      "evidenceRequired": "R03 不判本叶（DEFERRED，仍 REQUIRED）：验收归属 r00ExecutionStageIds 中的后续阶段（R06/R07/R08），后续阶段图必须消费本叶余款",
+      "featureId": "F-D01-SLASH_COMMAND-SLASH-COMMAND-COMPACT-0FE8BE",
+      "id": "R00-T02-LA-0FE8BED686E2",
+      "laterShare": "R06-T04（压缩权威）/R08-T07",
+      "originalAssertionCases": [],
+      "r00Mirror": {
+        "assertions": [
+          "先回复正在压缩，再返回 token 前后数或完成说明",
+          "失败回传压缩失败；接管态目标为被接管桌面会话"
+        ],
+        "due": "R00-T07 建立正式账本时登记；最迟在所列实施 Task 的阶段验收前完成并执行",
+        "executionStageIds": [
+          "R03",
+          "R06",
+          "R08"
+        ],
+        "featureId": "F-D01-SLASH_COMMAND-SLASH-COMMAND-COMPACT-0FE8BE",
+        "kind": "supplemental",
+        "ledgerStatus": "SPECIFIED_NOT_EXECUTED",
+        "resultIds": [],
+        "taskIds": [
+          "R03-T01",
+          "R06-T04",
+          "R08-T07"
+        ],
+        "testIds": [],
+        "then": "先回复正在压缩，再返回 token 前后数或完成说明"
+      },
+      "r02Share": "",
+      "r07Share": "",
+      "reason": "deferred to later stage(s) [\"R06\", \"R08\"]: this R00 leaf is still REQUIRED but has no R03 gating share; its acceptance belongs to those stages, which must consume the remainder: R06-T04（压缩权威）/R08-T07",
+      "requirement": "REQUIRED_SUPPLEMENTAL",
+      "stageShare": "无 R03 叶专属门禁份额：compact 命令内容（token 统计/完成说明）= 上下文压缩语义；运行/取消/身份/事件基底由基础场景 R03-A01..A16 与 a15_combo_and_leaves 组合矩阵门禁承担，无叶专属份额需要图钉",
+      "status": "DEFERRED_TO_LATER_STAGE"
+    },
+    {
+      "assertionContract": null,
+      "assertionResults": [],
+      "basisKind": "deferred_to_later_stage",
+      "deferredR07Cases": [],
+      "deferredToStage": null,
+      "deferredToStages": [
+        "R06",
+        "R08"
+      ],
+      "earlyEvidence": {
+        "commandRefs": [],
+        "commandsNotPassing": [],
+        "note": "non-gating: producers of pre-implemented later-stage behavior stay registered and run every gate; their failures are command FAILs but never gate this leaf here"
+      },
+      "earlyEvidenceCommandRefs": [],
+      "evidenceCommandRefs": [],
+      "evidencePaths": [],
+      "evidenceRequired": "R03 不判本叶（DEFERRED，仍 REQUIRED）：验收归属 r00ExecutionStageIds 中的后续阶段（R06/R07/R08），后续阶段图必须消费本叶余款",
+      "featureId": "F-D01-SEMANTIC_EFFECT-SEMANTIC-EFFECT-INPUT-DRAFTS-INPUT-DRAFTS-READ-1B712E",
+      "id": "R00-T02-LA-1B712E189DDF",
+      "laterShare": "R06-T04/R08-T07 草稿读取呈现",
+      "originalAssertionCases": [],
+      "r00Mirror": {
+        "assertions": [
+          "成功：执行“读取输入框草稿”后，返回指定 surface 的全部 home/会话草稿",
+          "拒绝/边界：query.surface 必须可规范化；不应错误扩大写入或披露范围"
+        ],
+        "due": "R00-T07 建立正式账本时登记；最迟在所列实施 Task 的阶段验收前完成并执行",
+        "executionStageIds": [
+          "R03",
+          "R06",
+          "R08"
+        ],
+        "featureId": "F-D01-SEMANTIC_EFFECT-SEMANTIC-EFFECT-INPUT-DRAFTS-INPUT-DRAFTS-READ-1B712E",
+        "kind": "supplemental",
+        "ledgerStatus": "SPECIFIED_NOT_EXECUTED",
+        "resultIds": [],
+        "taskIds": [
+          "R03-T01",
+          "R06-T04",
+          "R08-T07"
+        ],
+        "testIds": [],
+        "then": "返回指定 surface 的全部 home/会话草稿"
+      },
+      "r02Share": "",
+      "r07Share": "",
+      "reason": "deferred to later stage(s) [\"R06\", \"R08\"]: this R00 leaf is still REQUIRED but has no R03 gating share; its acceptance belongs to those stages, which must consume the remainder: R06-T04/R08-T07 草稿读取呈现",
+      "requirement": "REQUIRED_SUPPLEMENTAL",
+      "stageShare": "无 R03 叶专属门禁份额：输入草稿读取 = 会话内容持久化面；运行/取消/身份/事件基底由基础场景 R03-A01..A16 与 a15_combo_and_leaves 组合矩阵门禁承担，无叶专属份额需要图钉",
+      "status": "DEFERRED_TO_LATER_STAGE"
+    },
+    {
+      "assertionContract": null,
+      "assertionResults": [],
+      "basisKind": "deferred_to_later_stage",
+      "deferredR07Cases": [],
+      "deferredToStage": null,
+      "deferredToStages": [
+        "R07"
+      ],
+      "earlyEvidence": {
+        "commandRefs": [],
+        "commandsNotPassing": [],
+        "note": "non-gating: producers of pre-implemented later-stage behavior stay registered and run every gate; their failures are command FAILs but never gate this leaf here"
+      },
+      "earlyEvidenceCommandRefs": [],
+      "evidenceCommandRefs": [],
+      "evidencePaths": [],
+      "evidenceRequired": "R03 不判本叶（DEFERRED，仍 REQUIRED）：验收归属 r00ExecutionStageIds 中的后续阶段（R06/R07/R08），后续阶段图必须消费本叶余款",
+      "featureId": "F-D18-SEMANTIC_EFFECT-SEMANTIC-EFFECT-DESK-DESK-CRON-READ-1FB3D8",
+      "id": "R00-T02-LA-1FB3D8BC916D",
+      "laterShare": "R07-T01 cron 路由族",
+      "originalAssertionCases": [],
+      "r00Mirror": {
+        "assertions": [
+          "成功时核对：返回当前 studio 的 jobs",
+          "拒绝/无效输入时核对：无越权或错误持久化，且错误对用户可见"
+        ],
+        "due": "R00-T07 建立正式账本时登记；最迟在所列实施 Task 的阶段验收前完成并执行",
+        "executionStageIds": [
+          "R03",
+          "R07"
+        ],
+        "featureId": "F-D18-SEMANTIC_EFFECT-SEMANTIC-EFFECT-DESK-DESK-CRON-READ-1FB3D8",
+        "kind": "supplemental",
+        "ledgerStatus": "SPECIFIED_NOT_EXECUTED",
+        "resultIds": [],
+        "taskIds": [
+          "R03-T06",
+          "R07-T01"
+        ],
+        "testIds": [],
+        "then": "返回当前 studio 的 jobs"
+      },
+      "r02Share": "",
+      "r07Share": "",
+      "reason": "deferred to later stage(s) [\"R07\"]: this R00 leaf is still REQUIRED but has no R03 gating share; its acceptance belongs to those stages, which must consume the remainder: R07-T01 cron 路由族",
+      "requirement": "REQUIRED_SUPPLEMENTAL",
+      "stageShare": "无 R03 叶专属门禁份额：desk cron 读取路由 = R07 管理面路由；运行/取消/身份/事件基底由基础场景 R03-A01..A16 与 a15_combo_and_leaves 组合矩阵门禁承担，无叶专属份额需要图钉",
+      "status": "DEFERRED_TO_LATER_STAGE"
+    },
+    {
+      "assertionContract": {
+        "cases": [
+          {
+            "case": "subagent-close-thread-closed-status",
+            "expect": 1
+          }
+        ],
+        "evidencePath": "{EVIDENCE}/A15/leaf-cases.json",
+        "producerCommand": "a15_combo_and_leaves"
+      },
+      "assertionResults": [
+        {
+          "actual": 1,
+          "case": "subagent-close-thread-closed-status",
+          "expect": 1,
+          "recordedOk": true,
+          "status": "PASS"
+        }
+      ],
+      "basisKind": "stage_share_satisfied",
+      "deferredR07Cases": [],
+      "deferredToStage": null,
+      "deferredToStages": [
+        "R06"
+      ],
+      "earlyEvidence": null,
+      "earlyEvidenceCommandRefs": [],
+      "evidenceCommandRefs": [
+        "a15_combo_and_leaves"
+      ],
+      "evidencePaths": [],
+      "evidenceRequired": "本阶段份额由 a15_combo_and_leaves 生产者经真实服务链路逐案例机器核验（lingxi.leaf-case-results.v1，actual==图钉）；份额图钉全过即 R03 份额 PASS",
+      "featureId": "F-D05-TOOL-TOOL-SUBAGENT-CLOSE-207DF5",
+      "id": "R00-T02-LA-207DF594B497",
+      "laterShare": "close 的工具参数面与父会话 UI 呈现 = R04/R06/R08",
+      "originalAssertionCases": [],
+      "r00Mirror": {
+        "assertions": [
+          "只关闭指定子线程",
+          "状态回父会话",
+          "线程不存在、非当前父会话或已关闭不可误关另一线程。"
+        ],
+        "due": "R00-T07 建立正式账本时登记；最迟在所列实施 Task 的阶段验收前完成并执行",
+        "executionStageIds": [
+          "R03",
+          "R06"
+        ],
+        "featureId": "F-D05-TOOL-TOOL-SUBAGENT-CLOSE-207DF5",
+        "kind": "supplemental",
+        "ledgerStatus": "SPECIFIED_NOT_EXECUTED",
+        "resultIds": [],
+        "taskIds": [
+          "R03-T03",
+          "R03-T06",
+          "R06-T03"
+        ],
+        "testIds": [],
+        "then": "关闭目标线程/任务并在父会话返回最终状态。"
+      },
+      "r02Share": "",
+      "r07Share": "",
+      "reason": "R03 share satisfied: all share pins held; the remainder stays REQUIRED and moves with deferredToStages=[\"R06\"]: close 的工具参数面与父会话 UI 呈现 = R04/R06/R08",
+      "requirement": "REQUIRED_SUPPLEMENTAL",
+      "stageShare": "R03 份额=线程关闭运行层：close 关闭同会话 OPEN 且非 busy 线程，reason 记为线程 summary 锚（closed: {reason}），父会话可查询最终状态",
+      "status": "PASS"
+    },
+    {
+      "assertionContract": null,
+      "assertionResults": [],
+      "basisKind": "deferred_to_later_stage",
+      "deferredR07Cases": [],
+      "deferredToStage": null,
+      "deferredToStages": [
+        "R07"
+      ],
+      "earlyEvidence": {
+        "commandRefs": [],
+        "commandsNotPassing": [],
+        "note": "non-gating: producers of pre-implemented later-stage behavior stay registered and run every gate; their failures are command FAILs but never gate this leaf here"
+      },
+      "earlyEvidenceCommandRefs": [],
+      "evidenceCommandRefs": [],
+      "evidencePaths": [],
+      "evidenceRequired": "R03 不判本叶（DEFERRED，仍 REQUIRED）：验收归属 r00ExecutionStageIds 中的后续阶段（R06/R07/R08），后续阶段图必须消费本叶余款",
+      "featureId": "F-D18-SEMANTIC_EFFECT-SEMANTIC-EFFECT-CRON-UPDATE-267BDF",
+      "id": "R00-T02-LA-267BDFB75804",
+      "laterShare": "R07-T01",
+      "originalAssertionCases": [],
+      "r00Mirror": {
+        "assertions": [
+          "成功时核对：字段/调度改变并返回 job",
+          "拒绝/无效输入时核对：无越权或错误持久化，且错误对用户可见",
+          "自动化卡片从停用点击启用时，即使其他草稿字段无变更也以 action:update 提交 enabled:true；若标题、周期、提示词或模型有未保存草稿，必须与 enabled:true 同次持久化；失败后不得显示为已启用。",
+          "独立编辑保存仅在字段有变更时发 update；不得用这条路径代替开关启用断言。"
+        ],
+        "due": "R00-T07 建立正式账本时登记；最迟在所列实施 Task 的阶段验收前完成并执行",
+        "executionStageIds": [
+          "R03",
+          "R07"
+        ],
+        "featureId": "F-D18-SEMANTIC_EFFECT-SEMANTIC-EFFECT-CRON-UPDATE-267BDF",
+        "kind": "supplemental",
+        "ledgerStatus": "SPECIFIED_NOT_EXECUTED",
+        "resultIds": [],
+        "taskIds": [
+          "R03-T06",
+          "R07-T01"
+        ],
+        "testIds": [],
+        "then": "字段/调度改变并返回 job"
+      },
+      "r02Share": "",
+      "r07Share": "",
+      "reason": "deferred to later stage(s) [\"R07\"]: this R00 leaf is still REQUIRED but has no R03 gating share; its acceptance belongs to those stages, which must consume the remainder: R07-T01",
+      "requirement": "REQUIRED_SUPPLEMENTAL",
+      "stageShare": "无 R03 叶专属门禁份额：cron 更新路由 = R07 管理面；运行/取消/身份/事件基底由基础场景 R03-A01..A16 与 a15_combo_and_leaves 组合矩阵门禁承担，无叶专属份额需要图钉",
+      "status": "DEFERRED_TO_LATER_STAGE"
+    },
+    {
+      "assertionContract": null,
+      "assertionResults": [],
+      "basisKind": "deferred_to_later_stage",
+      "deferredR07Cases": [],
+      "deferredToStage": null,
+      "deferredToStages": [
+        "R07"
+      ],
+      "earlyEvidence": {
+        "commandRefs": [],
+        "commandsNotPassing": [],
+        "note": "non-gating: producers of pre-implemented later-stage behavior stay registered and run every gate; their failures are command FAILs but never gate this leaf here"
+      },
+      "earlyEvidenceCommandRefs": [],
+      "evidenceCommandRefs": [],
+      "evidencePaths": [],
+      "evidenceRequired": "R03 不判本叶（DEFERRED，仍 REQUIRED）：验收归属 r00ExecutionStageIds 中的后续阶段（R06/R07/R08），后续阶段图必须消费本叶余款",
+      "featureId": "F-D18-SEMANTIC_EFFECT-SEMANTIC-EFFECT-CRON-TOGGLE-2CAC28",
+      "id": "R00-T02-LA-2CAC28D96AFE",
+      "laterShare": "R07-T01",
+      "originalAssertionCases": [],
+      "r00Mirror": {
+        "assertions": [
+          "成功时核对：job 保留而 enabled 改变",
+          "拒绝/无效输入时核对：无越权或错误持久化，且错误对用户可见",
+          "自动化卡片从已启用点击停用时以 action:toggle 提交；不得改走 update 或把未保存草稿混入停用请求。"
+        ],
+        "due": "R00-T07 建立正式账本时登记；最迟在所列实施 Task 的阶段验收前完成并执行",
+        "executionStageIds": [
+          "R03",
+          "R07"
+        ],
+        "featureId": "F-D18-SEMANTIC_EFFECT-SEMANTIC-EFFECT-CRON-TOGGLE-2CAC28",
+        "kind": "supplemental",
+        "ledgerStatus": "SPECIFIED_NOT_EXECUTED",
+        "resultIds": [],
+        "taskIds": [
+          "R03-T06",
+          "R07-T01"
+        ],
+        "testIds": [],
+        "then": "job 保留而 enabled 改变"
+      },
+      "r02Share": "",
+      "r07Share": "",
+      "reason": "deferred to later stage(s) [\"R07\"]: this R00 leaf is still REQUIRED but has no R03 gating share; its acceptance belongs to those stages, which must consume the remainder: R07-T01",
+      "requirement": "REQUIRED_SUPPLEMENTAL",
+      "stageShare": "无 R03 叶专属门禁份额：cron 启停路由 = R07 管理面；运行/取消/身份/事件基底由基础场景 R03-A01..A16 与 a15_combo_and_leaves 组合矩阵门禁承担，无叶专属份额需要图钉",
+      "status": "DEFERRED_TO_LATER_STAGE"
+    },
+    {
+      "assertionContract": null,
+      "assertionResults": [],
+      "basisKind": "deferred_to_later_stage",
+      "deferredR07Cases": [],
+      "deferredToStage": null,
+      "deferredToStages": [
+        "R06",
+        "R08"
+      ],
+      "earlyEvidence": {
+        "commandRefs": [],
+        "commandsNotPassing": [],
+        "note": "non-gating: producers of pre-implemented later-stage behavior stay registered and run every gate; their failures are command FAILs but never gate this leaf here"
+      },
+      "earlyEvidenceCommandRefs": [],
+      "evidenceCommandRefs": [],
+      "evidencePaths": [],
+      "evidenceRequired": "R03 不判本叶（DEFERRED，仍 REQUIRED）：验收归属 r00ExecutionStageIds 中的后续阶段（R06/R07/R08），后续阶段图必须消费本叶余款",
+      "featureId": "F-D01-WS_IN-WS-IN-SLASH-2FAA74",
+      "id": "R00-T02-LA-2FAA749DA790",
+      "laterShare": "R06-T04/R08-T07 slash 帧与结果呈现",
+      "originalAssertionCases": [],
+      "r00Mirror": {
+        "assertions": [
+          "把命令交给同一 slash dispatcher 并以 slash_result 显示",
+          "未知命令回错误；Agent 身份无法解析或系统未就绪时拒绝"
+        ],
+        "due": "R00-T07 建立正式账本时登记；最迟在所列实施 Task 的阶段验收前完成并执行",
+        "executionStageIds": [
+          "R03",
+          "R06",
+          "R08"
+        ],
+        "featureId": "F-D01-WS_IN-WS-IN-SLASH-2FAA74",
+        "kind": "supplemental",
+        "ledgerStatus": "SPECIFIED_NOT_EXECUTED",
+        "resultIds": [],
+        "taskIds": [
+          "R03-T01",
+          "R06-T04",
+          "R08-T07"
+        ],
+        "testIds": [],
+        "then": "把命令交给同一 slash dispatcher 并以 slash_result 显示"
+      },
+      "r02Share": "",
+      "r07Share": "",
+      "reason": "deferred to later stage(s) [\"R06\", \"R08\"]: this R00 leaf is still REQUIRED but has no R03 gating share; its acceptance belongs to those stages, which must consume the remainder: R06-T04/R08-T07 slash 帧与结果呈现",
+      "requirement": "REQUIRED_SUPPLEMENTAL",
+      "stageShare": "无 R03 叶专属门禁份额：slash 命令分发（同一 dispatcher 与 slash_result）= 命令目录/会话语义；运行/取消/身份/事件基底由基础场景 R03-A01..A16 与 a15_combo_and_leaves 组合矩阵门禁承担，无叶专属份额需要图钉",
+      "status": "DEFERRED_TO_LATER_STAGE"
+    },
+    {
+      "assertionContract": null,
+      "assertionResults": [],
+      "basisKind": "deferred_to_later_stage",
+      "deferredR07Cases": [],
+      "deferredToStage": null,
+      "deferredToStages": [
+        "R06",
+        "R08"
+      ],
+      "earlyEvidence": {
+        "commandRefs": [],
+        "commandsNotPassing": [],
+        "note": "non-gating: producers of pre-implemented later-stage behavior stay registered and run every gate; their failures are command FAILs but never gate this leaf here"
+      },
+      "earlyEvidenceCommandRefs": [],
+      "evidenceCommandRefs": [],
+      "evidencePaths": [],
+      "evidenceRequired": "R03 不判本叶（DEFERRED，仍 REQUIRED）：验收归属 r00ExecutionStageIds 中的后续阶段（R06/R07/R08），后续阶段图必须消费本叶余款",
+      "featureId": "F-D01-TOOL-TOOL-CURRENT-STATUS-386675",
+      "id": "R00-T02-LA-38667593C3E1",
+      "laterShare": "R04/R06-T04/R08-T07",
+      "originalAssertionCases": [],
+      "r00Mirror": {
+        "assertions": [
+          "键目录与get一致",
+          "模型/会话值与运行时一致",
+          "未知值标未知",
+          "未知key或依赖不可用返回明确状态/错误，不能猜造供应商结果。"
+        ],
+        "due": "R00-T07 建立正式账本时登记；最迟在所列实施 Task 的阶段验收前完成并执行",
+        "executionStageIds": [
+          "R03",
+          "R06",
+          "R08"
+        ],
+        "featureId": "F-D01-TOOL-TOOL-CURRENT-STATUS-386675",
+        "kind": "supplemental",
+        "ledgerStatus": "SPECIFIED_NOT_EXECUTED",
+        "resultIds": [],
+        "taskIds": [
+          "R03-T01",
+          "R06-T04",
+          "R08-T07"
+        ],
+        "testIds": [],
+        "then": "返回时间/会话/Agent/模型/文件/Bridge等当前值，不修改状态。"
+      },
+      "r02Share": "",
+      "r07Share": "",
+      "reason": "deferred to later stage(s) [\"R06\", \"R08\"]: this R00 leaf is still REQUIRED but has no R03 gating share; its acceptance belongs to those stages, which must consume the remainder: R04/R06-T04/R08-T07",
+      "requirement": "REQUIRED_SUPPLEMENTAL",
+      "stageShare": "无 R03 叶专属门禁份额：current_status 工具内容（模型/文件/Bridge 当前值）= 工具目录+上下文；运行/取消/身份/事件基底由基础场景 R03-A01..A16 与 a15_combo_and_leaves 组合矩阵门禁承担，无叶专属份额需要图钉",
+      "status": "DEFERRED_TO_LATER_STAGE"
+    },
+    {
+      "assertionContract": null,
+      "assertionResults": [],
+      "basisKind": "deferred_to_later_stage",
+      "deferredR07Cases": [],
+      "deferredToStage": null,
+      "deferredToStages": [
+        "R07"
+      ],
+      "earlyEvidence": {
+        "commandRefs": [],
+        "commandsNotPassing": [],
+        "note": "non-gating: producers of pre-implemented later-stage behavior stay registered and run every gate; their failures are command FAILs but never gate this leaf here"
+      },
+      "earlyEvidenceCommandRefs": [],
+      "evidenceCommandRefs": [],
+      "evidencePaths": [],
+      "evidenceRequired": "R03 不判本叶（DEFERRED，仍 REQUIRED）：验收归属 r00ExecutionStageIds 中的后续阶段（R06/R07/R08），后续阶段图必须消费本叶余款",
+      "featureId": "F-D18-SCHEDULER-SCHEDULER-FRESH-COMPACT-3CF3C1",
+      "id": "R00-T02-LA-3CF3C154B311",
+      "laterShare": "R06（压缩）/R07-T01（调度）",
+      "originalAssertionCases": [],
+      "r00Mirror": {
+        "assertions": [
+          "边界后运行 stale 会话 fresh compact，并按结果安排下一次或重试",
+          "任务仍在跑不并发；失败或剩余 stale 会话延迟重试；关闭时清理定时器"
+        ],
+        "due": "R00-T07 建立正式账本时登记；最迟在所列实施 Task 的阶段验收前完成并执行",
+        "executionStageIds": [
+          "R03",
+          "R07"
+        ],
+        "featureId": "F-D18-SCHEDULER-SCHEDULER-FRESH-COMPACT-3CF3C1",
+        "kind": "supplemental",
+        "ledgerStatus": "SPECIFIED_NOT_EXECUTED",
+        "resultIds": [],
+        "taskIds": [
+          "R03-T06",
+          "R07-T01"
+        ],
+        "testIds": [],
+        "then": "边界后运行 stale 会话 fresh compact，并按结果安排下一次或重试"
+      },
+      "r02Share": "",
+      "r07Share": "",
+      "reason": "deferred to later stage(s) [\"R07\"]: this R00 leaf is still REQUIRED but has no R03 gating share; its acceptance belongs to those stages, which must consume the remainder: R06（压缩）/R07-T01（调度）",
+      "requirement": "REQUIRED_SUPPLEMENTAL",
+      "stageShare": "无 R03 叶专属门禁份额：fresh compact 调度内容 = 压缩语义（调度基底已由 LA-866157 钉住）；运行/取消/身份/事件基底由基础场景 R03-A01..A16 与 a15_combo_and_leaves 组合矩阵门禁承担，无叶专属份额需要图钉",
+      "status": "DEFERRED_TO_LATER_STAGE"
+    },
+    {
+      "assertionContract": null,
+      "assertionResults": [],
+      "basisKind": "deferred_to_later_stage",
+      "deferredR07Cases": [],
+      "deferredToStage": null,
+      "deferredToStages": [
+        "R06",
+        "R08"
+      ],
+      "earlyEvidence": {
+        "commandRefs": [],
+        "commandsNotPassing": [],
+        "note": "non-gating: producers of pre-implemented later-stage behavior stay registered and run every gate; their failures are command FAILs but never gate this leaf here"
+      },
+      "earlyEvidenceCommandRefs": [],
+      "evidenceCommandRefs": [],
+      "evidencePaths": [],
+      "evidenceRequired": "R03 不判本叶（DEFERRED，仍 REQUIRED）：验收归属 r00ExecutionStageIds 中的后续阶段（R06/R07/R08），后续阶段图必须消费本叶余款",
+      "featureId": "F-D01-WS_IN-WS-IN-COMPACT-421EEA",
+      "id": "R00-T02-LA-421EEA1AC8D5",
+      "laterShare": "R06-T04/R08-T07",
+      "originalAssertionCases": [],
+      "r00Mirror": {
+        "assertions": [
+          "先回 compaction_accepted，再按实际结果回 succeeded/noop/failed",
+          "未知 method、实验关闭、会话不存在/正在流式时明确失败，不能改历史"
+        ],
+        "due": "R00-T07 建立正式账本时登记；最迟在所列实施 Task 的阶段验收前完成并执行",
+        "executionStageIds": [
+          "R03",
+          "R06",
+          "R08"
+        ],
+        "featureId": "F-D01-WS_IN-WS-IN-COMPACT-421EEA",
+        "kind": "supplemental",
+        "ledgerStatus": "SPECIFIED_NOT_EXECUTED",
+        "resultIds": [],
+        "taskIds": [
+          "R03-T01",
+          "R06-T04",
+          "R08-T07"
+        ],
+        "testIds": [],
+        "then": "先回 compaction_accepted，再按实际结果回 succeeded/noop/failed"
+      },
+      "r02Share": "",
+      "r07Share": "",
+      "reason": "deferred to later stage(s) [\"R06\", \"R08\"]: this R00 leaf is still REQUIRED but has no R03 gating share; its acceptance belongs to those stages, which must consume the remainder: R06-T04/R08-T07",
+      "requirement": "REQUIRED_SUPPLEMENTAL",
+      "stageShare": "无 R03 叶专属门禁份额：compaction_accepted→结果帧 = 上下文压缩语义；运行/取消/身份/事件基底由基础场景 R03-A01..A16 与 a15_combo_and_leaves 组合矩阵门禁承担，无叶专属份额需要图钉",
+      "status": "DEFERRED_TO_LATER_STAGE"
+    },
+    {
+      "assertionContract": {
+        "cases": [
+          {
+            "case": "cancel-terminal-run-already-terminal",
+            "expect": 1
+          }
+        ],
+        "evidencePath": "{EVIDENCE}/A15/leaf-cases.json",
+        "producerCommand": "a15_combo_and_leaves"
+      },
+      "assertionResults": [
+        {
+          "actual": 1,
+          "case": "cancel-terminal-run-already-terminal",
+          "expect": 1,
+          "recordedOk": true,
+          "status": "PASS"
+        }
+      ],
+      "basisKind": "stage_share_satisfied",
+      "deferredR07Cases": [],
+      "deferredToStage": null,
+      "deferredToStages": [
+        "R06",
+        "R08"
+      ],
+      "earlyEvidence": null,
+      "earlyEvidenceCommandRefs": [],
+      "evidenceCommandRefs": [
+        "a15_combo_and_leaves"
+      ],
+      "evidencePaths": [],
+      "evidenceRequired": "本阶段份额由 a15_combo_and_leaves 生产者经真实服务链路逐案例机器核验（lingxi.leaf-case-results.v1，actual==图钉）；份额图钉全过即 R03 份额 PASS",
+      "featureId": "F-D01-SLASH_COMMAND-SLASH-COMMAND-STOP-4EA88B",
+      "id": "R00-T02-LA-4EA88B5073E4",
+      "laterShare": "/slash stop 命令解析与已停止提示的终端呈现 = R06-T04/R08-T07",
+      "originalAssertionCases": [],
+      "r00Mirror": {
+        "assertions": [
+          "当前流中止；无活动流时返回已停止提示",
+          "接管态仅中止被接管桌面会话，不误停 Bridge 自身其他会话"
+        ],
+        "due": "R00-T07 建立正式账本时登记；最迟在所列实施 Task 的阶段验收前完成并执行",
+        "executionStageIds": [
+          "R03",
+          "R06",
+          "R08"
+        ],
+        "featureId": "F-D01-SLASH_COMMAND-SLASH-COMMAND-STOP-4EA88B",
+        "kind": "supplemental",
+        "ledgerStatus": "SPECIFIED_NOT_EXECUTED",
+        "resultIds": [],
+        "taskIds": [
+          "R03-T01",
+          "R06-T04",
+          "R08-T07"
+        ],
+        "testIds": [],
+        "then": "当前流中止；无活动流时返回已停止提示"
+      },
+      "r02Share": "",
+      "r07Share": "",
+      "reason": "R03 share satisfied: all share pins held; the remainder stays REQUIRED and moves with deferredToStages=[\"R06\", \"R08\"]: /slash stop 命令解析与已停止提示的终端呈现 = R06-T04/R08-T07",
+      "requirement": "REQUIRED_SUPPLEMENTAL",
+      "stageShare": "R03 份额=停止命令的运行层语义：无活动流时的停止请求为诊断式 AlreadyTerminal no-op（不误报、不改状态）——已停止提示的服务端依据",
+      "status": "PASS"
+    },
+    {
+      "assertionContract": null,
+      "assertionResults": [],
+      "basisKind": "deferred_to_later_stage",
+      "deferredR07Cases": [],
+      "deferredToStage": null,
+      "deferredToStages": [
+        "R07"
+      ],
+      "earlyEvidence": {
+        "commandRefs": [],
+        "commandsNotPassing": [],
+        "note": "non-gating: producers of pre-implemented later-stage behavior stay registered and run every gate; their failures are command FAILs but never gate this leaf here"
+      },
+      "earlyEvidenceCommandRefs": [],
+      "evidenceCommandRefs": [],
+      "evidencePaths": [],
+      "evidenceRequired": "R03 不判本叶（DEFERRED，仍 REQUIRED）：验收归属 r00ExecutionStageIds 中的后续阶段（R06/R07/R08），后续阶段图必须消费本叶余款",
+      "featureId": "F-D18-SEMANTIC_EFFECT-SEMANTIC-EFFECT-DESK-DESK-HEARTBEAT-POST-5882BC",
+      "id": "R00-T02-LA-5882BC217F1D",
+      "laterShare": "R07-T01",
+      "originalAssertionCases": [],
+      "r00Mirror": {
+        "assertions": [
+          "成功时核对：触发指定智能体 heartbeat",
+          "拒绝/无效输入时核对：无越权或错误持久化，且错误对用户可见"
+        ],
+        "due": "R00-T07 建立正式账本时登记；最迟在所列实施 Task 的阶段验收前完成并执行",
+        "executionStageIds": [
+          "R03",
+          "R07"
+        ],
+        "featureId": "F-D18-SEMANTIC_EFFECT-SEMANTIC-EFFECT-DESK-DESK-HEARTBEAT-POST-5882BC",
+        "kind": "supplemental",
+        "ledgerStatus": "SPECIFIED_NOT_EXECUTED",
+        "resultIds": [],
+        "taskIds": [
+          "R03-T06",
+          "R07-T01"
+        ],
+        "testIds": [],
+        "then": "触发指定智能体 heartbeat"
+      },
+      "r02Share": "",
+      "r07Share": "",
+      "reason": "deferred to later stage(s) [\"R07\"]: this R00 leaf is still REQUIRED but has no R03 gating share; its acceptance belongs to those stages, which must consume the remainder: R07-T01",
+      "requirement": "REQUIRED_SUPPLEMENTAL",
+      "stageShare": "无 R03 叶专属门禁份额：desk heartbeat 触发路由 = R07 管理面；运行/取消/身份/事件基底由基础场景 R03-A01..A16 与 a15_combo_and_leaves 组合矩阵门禁承担，无叶专属份额需要图钉",
+      "status": "DEFERRED_TO_LATER_STAGE"
+    },
+    {
+      "assertionContract": null,
+      "assertionResults": [],
+      "basisKind": "deferred_to_later_stage",
+      "deferredR07Cases": [],
+      "deferredToStage": null,
+      "deferredToStages": [
+        "R06",
+        "R08"
+      ],
+      "earlyEvidence": {
+        "commandRefs": [],
+        "commandsNotPassing": [],
+        "note": "non-gating: producers of pre-implemented later-stage behavior stay registered and run every gate; their failures are command FAILs but never gate this leaf here"
+      },
+      "earlyEvidenceCommandRefs": [],
+      "evidenceCommandRefs": [],
+      "evidencePaths": [],
+      "evidenceRequired": "R03 不判本叶（DEFERRED，仍 REQUIRED）：验收归属 r00ExecutionStageIds 中的后续阶段（R06/R07/R08），后续阶段图必须消费本叶余款",
+      "featureId": "F-D01-SLASH_COMMAND-SLASH-COMMAND-FRESH-COMPACT-5A6E0D",
+      "id": "R00-T02-LA-5A6E0D526903",
+      "laterShare": "R06-T04/R08-T07",
+      "originalAssertionCases": [],
+      "r00Mirror": {
+        "assertions": [
+          "刷新提示词和记忆后压缩，回传 token 变化或原因",
+          "接管态拒绝；失败明确回报且原始历史保留"
+        ],
+        "due": "R00-T07 建立正式账本时登记；最迟在所列实施 Task 的阶段验收前完成并执行",
+        "executionStageIds": [
+          "R03",
+          "R06",
+          "R08"
+        ],
+        "featureId": "F-D01-SLASH_COMMAND-SLASH-COMMAND-FRESH-COMPACT-5A6E0D",
+        "kind": "supplemental",
+        "ledgerStatus": "SPECIFIED_NOT_EXECUTED",
+        "resultIds": [],
+        "taskIds": [
+          "R03-T01",
+          "R06-T04",
+          "R08-T07"
+        ],
+        "testIds": [],
+        "then": "刷新提示词和记忆后压缩，回传 token 变化或原因"
+      },
+      "r02Share": "",
+      "r07Share": "",
+      "reason": "deferred to later stage(s) [\"R06\", \"R08\"]: this R00 leaf is still REQUIRED but has no R03 gating share; its acceptance belongs to those stages, which must consume the remainder: R06-T04/R08-T07",
+      "requirement": "REQUIRED_SUPPLEMENTAL",
+      "stageShare": "无 R03 叶专属门禁份额：fresh compact（刷新提示词和记忆）= 记忆/上下文语义；运行/取消/身份/事件基底由基础场景 R03-A01..A16 与 a15_combo_and_leaves 组合矩阵门禁承担，无叶专属份额需要图钉",
+      "status": "DEFERRED_TO_LATER_STAGE"
+    },
+    {
+      "assertionContract": null,
+      "assertionResults": [],
+      "basisKind": "deferred_to_later_stage",
+      "deferredR07Cases": [],
+      "deferredToStage": null,
+      "deferredToStages": [
+        "R07"
+      ],
+      "earlyEvidence": {
+        "commandRefs": [],
+        "commandsNotPassing": [],
+        "note": "non-gating: producers of pre-implemented later-stage behavior stay registered and run every gate; their failures are command FAILs but never gate this leaf here"
+      },
+      "earlyEvidenceCommandRefs": [],
+      "evidenceCommandRefs": [],
+      "evidencePaths": [],
+      "evidenceRequired": "R03 不判本叶（DEFERRED，仍 REQUIRED）：验收归属 r00ExecutionStageIds 中的后续阶段（R06/R07/R08），后续阶段图必须消费本叶余款",
+      "featureId": "F-D18-SLASH_COMMAND-SLASH-COMMAND-APPLY-5F394A",
+      "id": "R00-T02-LA-5F394AA4C9A3",
+      "laterShare": "R06-T04/R07-T01",
+      "originalAssertionCases": [],
+      "r00Mirror": {
+        "assertions": [
+          "把当前会话内建议写为自动任务，返回任务标题",
+          "找不到建议、Studio 身份缺失或已应用时不创建重复任务"
+        ],
+        "due": "R00-T07 建立正式账本时登记；最迟在所列实施 Task 的阶段验收前完成并执行",
+        "executionStageIds": [
+          "R03",
+          "R07"
+        ],
+        "featureId": "F-D18-SLASH_COMMAND-SLASH-COMMAND-APPLY-5F394A",
+        "kind": "supplemental",
+        "ledgerStatus": "SPECIFIED_NOT_EXECUTED",
+        "resultIds": [],
+        "taskIds": [
+          "R03-T06",
+          "R07-T01"
+        ],
+        "testIds": [],
+        "then": "把当前会话内建议写为自动任务，返回任务标题"
+      },
+      "r02Share": "",
+      "r07Share": "",
+      "reason": "deferred to later stage(s) [\"R07\"]: this R00 leaf is still REQUIRED but has no R03 gating share; its acceptance belongs to those stages, which must consume the remainder: R06-T04/R07-T01",
+      "requirement": "REQUIRED_SUPPLEMENTAL",
+      "stageShare": "无 R03 叶专属门禁份额：slash apply 命令（建议写为自动任务）= 命令目录+cron 存储；运行/取消/身份/事件基底由基础场景 R03-A01..A16 与 a15_combo_and_leaves 组合矩阵门禁承担，无叶专属份额需要图钉",
+      "status": "DEFERRED_TO_LATER_STAGE"
+    },
+    {
+      "assertionContract": {
+        "cases": [
+          {
+            "case": "subagent-reply-continues-thread",
+            "expect": 1
+          }
+        ],
+        "evidencePath": "{EVIDENCE}/A15/leaf-cases.json",
+        "producerCommand": "a15_combo_and_leaves"
+      },
+      "assertionResults": [
+        {
+          "actual": 1,
+          "case": "subagent-reply-continues-thread",
+          "expect": 1,
+          "recordedOk": true,
+          "status": "PASS"
+        }
+      ],
+      "basisKind": "stage_share_satisfied",
+      "deferredR07Cases": [],
+      "deferredToStage": null,
+      "deferredToStages": [
+        "R06"
+      ],
+      "earlyEvidence": null,
+      "earlyEvidenceCommandRefs": [],
+      "evidenceCommandRefs": [
+        "a15_combo_and_leaves"
+      ],
+      "evidencePaths": [],
+      "evidenceRequired": "本阶段份额由 a15_combo_and_leaves 生产者经真实服务链路逐案例机器核验（lingxi.leaf-case-results.v1，actual==图钉）；份额图钉全过即 R03 份额 PASS",
+      "featureId": "F-D05-TOOL-TOOL-SUBAGENT-REPLY-5F8791",
+      "id": "R00-T02-LA-5F879158C679",
+      "laterShare": "reply 的工具参数面与隔离会话完整可见性规则 = R04/R06",
+      "originalAssertionCases": [],
+      "r00Mirror": {
+        "assertions": [
+          "相同threadId续接历史",
+          "跨父会话拒绝",
+          "线程不存在、已关闭或父子关系不符拒绝，不跨会话发消息。"
+        ],
+        "due": "R00-T07 建立正式账本时登记；最迟在所列实施 Task 的阶段验收前完成并执行",
+        "executionStageIds": [
+          "R03",
+          "R06"
+        ],
+        "featureId": "F-D05-TOOL-TOOL-SUBAGENT-REPLY-5F8791",
+        "kind": "supplemental",
+        "ledgerStatus": "SPECIFIED_NOT_EXECUTED",
+        "resultIds": [],
+        "taskIds": [
+          "R03-T03",
+          "R03-T06",
+          "R06-T03"
+        ],
+        "testIds": [],
+        "then": "目标子线程收到消息并继续运行，结果回父会话。"
+      },
+      "r02Share": "",
+      "r07Share": "",
+      "reason": "R03 share satisfied: all share pins held; the remainder stays REQUIRED and moves with deferredToStages=[\"R06\"]: reply 的工具参数面与隔离会话完整可见性规则 = R04/R06",
+      "requirement": "REQUIRED_SUPPLEMENTAL",
+      "stageShare": "R03 份额=线程续接运行层：reply 校验 thread 存在/同会话/open/非 busy 后在同线程开新 child run，lineage.parent 指向发起回复的 run，结果回父会话",
+      "status": "PASS"
+    },
+    {
+      "assertionContract": null,
+      "assertionResults": [],
+      "basisKind": "deferred_to_later_stage",
+      "deferredR07Cases": [],
+      "deferredToStage": null,
+      "deferredToStages": [
+        "R07"
+      ],
+      "earlyEvidence": {
+        "commandRefs": [],
+        "commandsNotPassing": [],
+        "note": "non-gating: producers of pre-implemented later-stage behavior stay registered and run every gate; their failures are command FAILs but never gate this leaf here"
+      },
+      "earlyEvidenceCommandRefs": [],
+      "evidenceCommandRefs": [],
+      "evidencePaths": [],
+      "evidenceRequired": "R03 不判本叶（DEFERRED，仍 REQUIRED）：验收归属 r00ExecutionStageIds 中的后续阶段（R06/R07/R08），后续阶段图必须消费本叶余款",
+      "featureId": "F-D18-SEMANTIC_EFFECT-SEMANTIC-EFFECT-CRON-REMOVE-65B2EC",
+      "id": "R00-T02-LA-65B2ECECB23A",
+      "laterShare": "R07-T01",
+      "originalAssertionCases": [],
+      "r00Mirror": {
+        "assertions": [
+          "成功时核对：job 从列表消失",
+          "拒绝/无效输入时核对：无越权或错误持久化，且错误对用户可见"
+        ],
+        "due": "R00-T07 建立正式账本时登记；最迟在所列实施 Task 的阶段验收前完成并执行",
+        "executionStageIds": [
+          "R03",
+          "R07"
+        ],
+        "featureId": "F-D18-SEMANTIC_EFFECT-SEMANTIC-EFFECT-CRON-REMOVE-65B2EC",
+        "kind": "supplemental",
+        "ledgerStatus": "SPECIFIED_NOT_EXECUTED",
+        "resultIds": [],
+        "taskIds": [
+          "R03-T06",
+          "R07-T01"
+        ],
+        "testIds": [],
+        "then": "job 从列表消失"
+      },
+      "r02Share": "",
+      "r07Share": "",
+      "reason": "deferred to later stage(s) [\"R07\"]: this R00 leaf is still REQUIRED but has no R03 gating share; its acceptance belongs to those stages, which must consume the remainder: R07-T01",
+      "requirement": "REQUIRED_SUPPLEMENTAL",
+      "stageShare": "无 R03 叶专属门禁份额：cron 移除路由 = R07 管理面；运行/取消/身份/事件基底由基础场景 R03-A01..A16 与 a15_combo_and_leaves 组合矩阵门禁承担，无叶专属份额需要图钉",
+      "status": "DEFERRED_TO_LATER_STAGE"
+    },
+    {
+      "assertionContract": null,
+      "assertionResults": [],
+      "basisKind": "deferred_to_later_stage",
+      "deferredR07Cases": [],
+      "deferredToStage": null,
+      "deferredToStages": [
+        "R07"
+      ],
+      "earlyEvidence": {
+        "commandRefs": [],
+        "commandsNotPassing": [],
+        "note": "non-gating: producers of pre-implemented later-stage behavior stay registered and run every gate; their failures are command FAILs but never gate this leaf here"
+      },
+      "earlyEvidenceCommandRefs": [],
+      "evidenceCommandRefs": [],
+      "evidencePaths": [],
+      "evidenceRequired": "R03 不判本叶（DEFERRED，仍 REQUIRED）：验收归属 r00ExecutionStageIds 中的后续阶段（R06/R07/R08），后续阶段图必须消费本叶余款",
+      "featureId": "F-D18-TOOL-TOOL-NOTIFY-689DB6",
+      "id": "R00-T02-LA-689DB6429895",
+      "laterShare": "R04（工具）/R07-T01（通道）",
+      "originalAssertionCases": [],
+      "r00Mirror": {
+        "assertions": [
+          "真实收件端收到一次",
+          "失败状态显式",
+          "上下文策略正确",
+          "投递失败返回sent=false，不能宣称已送达；重复外发需按投递ID核。"
+        ],
+        "due": "R00-T07 建立正式账本时登记；最迟在所列实施 Task 的阶段验收前完成并执行",
+        "executionStageIds": [
+          "R03",
+          "R07"
+        ],
+        "featureId": "F-D18-TOOL-TOOL-NOTIFY-689DB6",
+        "kind": "supplemental",
+        "ledgerStatus": "SPECIFIED_NOT_EXECUTED",
+        "resultIds": [],
+        "taskIds": [
+          "R03-T06",
+          "R07-T01"
+        ],
+        "testIds": [],
+        "then": "返回各投递通道状态；成功投递可能追加到Bridge会话上下文。"
+      },
+      "r02Share": "",
+      "r07Share": "",
+      "reason": "deferred to later stage(s) [\"R07\"]: this R00 leaf is still REQUIRED but has no R03 gating share; its acceptance belongs to those stages, which must consume the remainder: R04（工具）/R07-T01（通道）",
+      "requirement": "REQUIRED_SUPPLEMENTAL",
+      "stageShare": "无 R03 叶专属门禁份额：notify 工具（投递通道/Bridge 追加）= 工具目录+外发通道；运行/取消/身份/事件基底由基础场景 R03-A01..A16 与 a15_combo_and_leaves 组合矩阵门禁承担，无叶专属份额需要图钉",
+      "status": "DEFERRED_TO_LATER_STAGE"
+    },
+    {
+      "assertionContract": null,
+      "assertionResults": [],
+      "basisKind": "deferred_to_later_stage",
+      "deferredR07Cases": [],
+      "deferredToStage": null,
+      "deferredToStages": [
+        "R06"
+      ],
+      "earlyEvidence": {
+        "commandRefs": [],
+        "commandsNotPassing": [],
+        "note": "non-gating: producers of pre-implemented later-stage behavior stay registered and run every gate; their failures are command FAILs but never gate this leaf here"
+      },
+      "earlyEvidenceCommandRefs": [],
+      "evidenceCommandRefs": [],
+      "evidencePaths": [],
+      "evidenceRequired": "R03 不判本叶（DEFERRED，仍 REQUIRED）：验收归属 r00ExecutionStageIds 中的后续阶段（R06/R07/R08），后续阶段图必须消费本叶余款",
+      "featureId": "F-D05-TOOL-TOOL-CHECK-PENDING-TASKS-7244E7",
+      "id": "R00-T02-LA-7244E7DCE678",
+      "laterShare": "R06-T03 会话任务清单",
+      "originalAssertionCases": [],
+      "r00Mirror": {
+        "assertions": [
+          "仅列当前会话任务",
+          "过滤结果和任务状态一致",
+          "无store/无会话显示不可用或空结果；不应以其他会话任务充数。"
+        ],
+        "due": "R00-T07 建立正式账本时登记；最迟在所列实施 Task 的阶段验收前完成并执行",
+        "executionStageIds": [
+          "R03",
+          "R06"
+        ],
+        "featureId": "F-D05-TOOL-TOOL-CHECK-PENDING-TASKS-7244E7",
+        "kind": "supplemental",
+        "ledgerStatus": "SPECIFIED_NOT_EXECUTED",
+        "resultIds": [],
+        "taskIds": [
+          "R03-T03",
+          "R03-T06",
+          "R06-T03"
+        ],
+        "testIds": [],
+        "then": "返回当前会话 pending/resolved/failed 项及结果，不跨会话。"
+      },
+      "r02Share": "",
+      "r07Share": "",
+      "reason": "deferred to later stage(s) [\"R06\"]: this R00 leaf is still REQUIRED but has no R03 gating share; its acceptance belongs to those stages, which must consume the remainder: R06-T03 会话任务清单",
+      "requirement": "REQUIRED_SUPPLEMENTAL",
+      "stageShare": "无 R03 叶专属门禁份额：会话 pending/resolved/failed 任务清单面不在 R03 范围（R03 交付 run/cancel/lineage 查询面）；运行/取消/身份/事件基底由基础场景 R03-A01..A16 与 a15_combo_and_leaves 组合矩阵门禁承担，无叶专属份额需要图钉",
+      "status": "DEFERRED_TO_LATER_STAGE"
+    },
+    {
+      "assertionContract": {
+        "cases": [
+          {
+            "case": "combo-cancel-stream-terminal-cancelled",
+            "expect": 1
+          },
+          {
+            "case": "cancel-terminal-run-already-terminal",
+            "expect": 1
+          }
+        ],
+        "evidencePath": "{EVIDENCE}/A15/leaf-cases.json",
+        "producerCommand": "a15_combo_and_leaves"
+      },
+      "assertionResults": [
+        {
+          "actual": 1,
+          "case": "combo-cancel-stream-terminal-cancelled",
+          "expect": 1,
+          "recordedOk": true,
+          "status": "PASS"
+        },
+        {
+          "actual": 1,
+          "case": "cancel-terminal-run-already-terminal",
+          "expect": 1,
+          "recordedOk": true,
+          "status": "PASS"
+        }
+      ],
+      "basisKind": "stage_share_satisfied",
+      "deferredR07Cases": [],
+      "deferredToStage": null,
+      "deferredToStages": [
+        "R06",
+        "R08"
+      ],
+      "earlyEvidence": null,
+      "earlyEvidenceCommandRefs": [],
+      "evidenceCommandRefs": [
+        "a15_combo_and_leaves"
+      ],
+      "evidencePaths": [],
+      "evidenceRequired": "本阶段份额由 a15_combo_and_leaves 生产者经真实服务链路逐案例机器核验（lingxi.leaf-case-results.v1，actual==图钉）；份额图钉全过即 R03 份额 PASS",
+      "featureId": "F-D01-WS_IN-WS-IN-ABORT-7CBF6F",
+      "id": "R00-T02-LA-7CBF6F4A6760",
+      "laterShare": "WS-IN abort 帧形态与 abort_result accepted 的客户端呈现 = R06-T04/R08-T07",
+      "originalAssertionCases": [],
+      "r00Mirror": {
+        "assertions": [
+          "已接收中止返回 abort_result accepted；排队提交停止后 UI 立即恢复空闲",
+          "旧 streamId 返回 stale_stream 且不取消新流；无活动任务为 already_stopped"
+        ],
+        "due": "R00-T07 建立正式账本时登记；最迟在所列实施 Task 的阶段验收前完成并执行",
+        "executionStageIds": [
+          "R03",
+          "R06",
+          "R08"
+        ],
+        "featureId": "F-D01-WS_IN-WS-IN-ABORT-7CBF6F",
+        "kind": "supplemental",
+        "ledgerStatus": "SPECIFIED_NOT_EXECUTED",
+        "resultIds": [],
+        "taskIds": [
+          "R03-T01",
+          "R06-T04",
+          "R08-T07"
+        ],
+        "testIds": [],
+        "then": "已接收中止返回 abort_result accepted；排队提交停止后 UI 立即恢复空闲"
+      },
+      "r02Share": "",
+      "r07Share": "",
+      "reason": "R03 share satisfied: all share pins held; the remainder stays REQUIRED and moves with deferredToStages=[\"R06\", \"R08\"]: WS-IN abort 帧形态与 abort_result accepted 的客户端呈现 = R06-T04/R08-T07",
+      "requirement": "REQUIRED_SUPPLEMENTAL",
+      "stageShare": "R03 份额=中止的运行层语义：流读取中取消→四相取消落 cancelled、迟到结果被栅栏（内容不落流）；已停 run 的再中止为诊断式 no-op（UI 恢复空闲的服务端依据）",
+      "status": "PASS"
+    },
+    {
+      "assertionContract": {
+        "cases": [
+          {
+            "case": "reconnect-resume-no-model-restart",
+            "expect": 1
+          }
+        ],
+        "evidencePath": "{EVIDENCE}/A15/leaf-cases.json",
+        "producerCommand": "a15_combo_and_leaves"
+      },
+      "assertionResults": [
+        {
+          "actual": 1,
+          "case": "reconnect-resume-no-model-restart",
+          "expect": 1,
+          "recordedOk": true,
+          "status": "PASS"
+        }
+      ],
+      "basisKind": "stage_share_satisfied",
+      "deferredR07Cases": [],
+      "deferredToStage": null,
+      "deferredToStages": [
+        "R06",
+        "R08"
+      ],
+      "earlyEvidence": null,
+      "earlyEvidenceCommandRefs": [],
+      "evidenceCommandRefs": [
+        "a15_combo_and_leaves",
+        "r02_events_matrix"
+      ],
+      "evidencePaths": [],
+      "evidenceRequired": "本阶段份额由 a15_combo_and_leaves 生产者经真实服务链路逐案例机器核验（lingxi.leaf-case-results.v1，actual==图钉）；份额图钉全过即 R03 份额 PASS",
+      "featureId": "F-D01-WS_IN-WS-IN-RESUME-STREAM-816642",
+      "id": "R00-T02-LA-81664285F927",
+      "laterShare": "WS-IN resume_stream 帧（streamId/sinceSeq、重置/截断标记）的传输形态 = R06-T04/R08-T07",
+      "originalAssertionCases": [],
+      "r00Mirror": {
+        "assertions": [
+          "按 streamId/sinceSeq 补发遗漏事件和重置/截断标记",
+          "无活动流返回空事件与运行态；越权会话不泄露旧帧"
+        ],
+        "due": "R00-T07 建立正式账本时登记；最迟在所列实施 Task 的阶段验收前完成并执行",
+        "executionStageIds": [
+          "R03",
+          "R06",
+          "R08"
+        ],
+        "featureId": "F-D01-WS_IN-WS-IN-RESUME-STREAM-816642",
+        "kind": "supplemental",
+        "ledgerStatus": "SPECIFIED_NOT_EXECUTED",
+        "resultIds": [],
+        "taskIds": [
+          "R03-T01",
+          "R06-T04",
+          "R08-T07"
+        ],
+        "testIds": [],
+        "then": "按 streamId/sinceSeq 补发遗漏事件和重置/截断标记"
+      },
+      "r02Share": "",
+      "r07Share": "",
+      "reason": "R03 share satisfied: all share pins held; the remainder stays REQUIRED and moves with deferredToStages=[\"R06\", \"R08\"]: WS-IN resume_stream 帧（streamId/sinceSeq、重置/截断标记）的传输形态 = R06-T04/R08-T07",
+      "requirement": "REQUIRED_SUPPLEMENTAL",
+      "stageShare": "R03 份额=重连只订阅不重启：断开后按 cursor 续读补发遗漏事件（R02 快照/游标面），重连绝不重启模型/不新建 run（T04 永久测试+矩阵案例）",
+      "status": "PASS"
+    },
+    {
+      "assertionContract": {
+        "cases": [
+          {
+            "case": "combo-crash-recovery-honest-interrupted",
+            "expect": 1
+          }
+        ],
+        "evidencePath": "{EVIDENCE}/A15/leaf-cases.json",
+        "producerCommand": "a15_combo_and_leaves"
+      },
+      "assertionResults": [
+        {
+          "actual": 1,
+          "case": "combo-crash-recovery-honest-interrupted",
+          "expect": 1,
+          "recordedOk": true,
+          "status": "PASS"
+        }
+      ],
+      "basisKind": "stage_share_satisfied",
+      "deferredR07Cases": [],
+      "deferredToStage": null,
+      "deferredToStages": [
+        "R06",
+        "R08"
+      ],
+      "earlyEvidence": null,
+      "earlyEvidenceCommandRefs": [],
+      "evidenceCommandRefs": [
+        "a15_combo_and_leaves"
+      ],
+      "evidencePaths": [],
+      "evidenceRequired": "本阶段份额由 a15_combo_and_leaves 生产者经真实服务链路逐案例机器核验（lingxi.leaf-case-results.v1，actual==图钉）；份额图钉全过即 R03 份额 PASS",
+      "featureId": "F-D01-UI-UI-PAGE-CHAT-81B217",
+      "id": "R00-T02-LA-81B217A7E581",
+      "laterShare": "聊天页完整 UI 投影（逐动作状态呈现）= R06-T04/R08-T07",
+      "originalAssertionCases": [],
+      "r00Mirror": {
+        "assertions": [
+          "打开聊天页显示欢迎页/消息流与输入框：成功核对 当前会话投影与欢迎态互斥；输入区自动读取对应会话或待建草稿的思考档位。；空态/未初始化核对 无会话显示欢迎页；mobile 或服务未连时不发该 GET。；错误/无权限核对 RegionalErrorBoundary 捕获区域失败，不自动冒充消息成功",
+          "输入提交普通 prompt 或 slash 两类消息：成功核对 普通 prompt 进入会话并呈现流式回答；slash 单独发送并处理 slash_result，不要求流式回答。；空态/未初始化核对 空文本/缺会话按输入校验阻止；错误/无权限核对 WS 拒绝/断线需在输入和消息区呈现",
+          "中止、插话、运行中输入入队及恢复流：成功核对 中止/插话/恢复分别改变运行状态；运行中普通发送先入队，队列卡片触发时走 interject，界面无 steer 发包。；空态/未初始化核对 无运行任务时控件不可用；错误/无权限核对 拒绝/网络失败不写成功状态",
+          "主聊天页侧边对话、附件/预览、运行信息胶囊：成功核对 主聊天页显示其装配的预览与运行信息；QuickChatApp 是独立窗口，不属于此动作。；空态/未初始化核对 无附件/预览为空；错误/无权限核对 加载失败按各子组件错误提示",
+          "主输入工具栏选择聊天模型：成功核对 已有消息的会话 POST /api/models/switch 并更新该会话模型；无消息或待建会话 POST /api/models/set，保存默认并同步草稿思考档位。；空态/未初始化核对 已建会话选择相同且可用模型直接返回无请求；无可选模型不产生有效切换。；错误/无权限核对 切换失败显示错误状态并保留原模型；两种 body 不可混用。",
+          "主输入工具栏选择思考档位：成功核对 已有会话提交带 sessionPath 的思考档位；待建会话提交不带 sessionPath 的默认档位并更新草稿显示。；空态/未初始化核对 未建立会话时仅改默认档位，不写另一会话。；错误/无权限核对 保存失败仅 console.error，原前端值不应被宣称已经持久化。"
+        ],
+        "due": "R00-T07 建立正式账本时登记；最迟在所列实施 Task 的阶段验收前完成并执行",
+        "executionStageIds": [
+          "R03",
+          "R06",
+          "R08"
+        ],
+        "featureId": "F-D01-UI-UI-PAGE-CHAT-81B217",
+        "kind": "supplemental",
+        "ledgerStatus": "SPECIFIED_NOT_EXECUTED",
+        "resultIds": [],
+        "taskIds": [
+          "R03-T01",
+          "R06-T04",
+          "R08-T07"
+        ],
+        "testIds": [],
+        "then": "逐动作核对实际状态与页面投影；失败不伪装成空数据"
+      },
+      "r02Share": "",
+      "r07Share": "",
+      "reason": "R03 share satisfied: all share pins held; the remainder stays REQUIRED and moves with deferredToStages=[\"R06\", \"R08\"]: 聊天页完整 UI 投影（逐动作状态呈现）= R06-T04/R08-T07",
+      "requirement": "REQUIRED_SUPPLEMENTAL",
+      "stageShare": "R03 份额=聊天页投影的状态权威：run 终态（含崩溃恢复 interrupted_needs_attention、无空白无假成功、不虚构最终回复）经事件/存储可查——页面投影失败不伪装成空数据的服务端依据",
+      "status": "PASS"
+    },
+    {
+      "assertionContract": {
+        "cases": [
+          {
+            "case": "parent-cancel-stops-child-run",
+            "expect": 1
+          }
+        ],
+        "evidencePath": "{EVIDENCE}/A15/leaf-cases.json",
+        "producerCommand": "a15_combo_and_leaves"
+      },
+      "assertionResults": [
+        {
+          "actual": 1,
+          "case": "parent-cancel-stops-child-run",
+          "expect": 1,
+          "recordedOk": true,
+          "status": "PASS"
+        }
+      ],
+      "basisKind": "stage_share_satisfied",
+      "deferredR07Cases": [],
+      "deferredToStage": null,
+      "deferredToStages": [
+        "R06"
+      ],
+      "earlyEvidence": null,
+      "earlyEvidenceCommandRefs": [],
+      "evidenceCommandRefs": [
+        "a15_combo_and_leaves"
+      ],
+      "evidencePaths": [],
+      "evidenceRequired": "本阶段份额由 a15_combo_and_leaves 生产者经真实服务链路逐案例机器核验（lingxi.leaf-case-results.v1，actual==图钉）；份额图钉全过即 R03 份额 PASS",
+      "featureId": "F-D05-TOOL-TOOL-STOP-TASK-84E22C",
+      "id": "R00-T02-LA-84E22CD74BE1",
+      "laterShare": "媒体等其余任务处理器的停止形态 = R06+",
+      "originalAssertionCases": [],
+      "r00Mirror": {
+        "assertions": [
+          "停止后无后续产物",
+          "跨会话任务不受影响",
+          "任务不存在、已结束或无停止处理器给不同结果；不能停止其他会话任务。"
+        ],
+        "due": "R00-T07 建立正式账本时登记；最迟在所列实施 Task 的阶段验收前完成并执行",
+        "executionStageIds": [
+          "R03",
+          "R06"
+        ],
+        "featureId": "F-D05-TOOL-TOOL-STOP-TASK-84E22C",
+        "kind": "supplemental",
+        "ledgerStatus": "SPECIFIED_NOT_EXECUTED",
+        "resultIds": [],
+        "taskIds": [
+          "R03-T03",
+          "R03-T06",
+          "R06-T03"
+        ],
+        "testIds": [],
+        "then": "任务处理器接收stop，任务状态转终止且回报；支持子代理/媒体等。"
+      },
+      "r02Share": "",
+      "r07Share": "",
+      "reason": "R03 share satisfied: all share pins held; the remainder stays REQUIRED and moves with deferredToStages=[\"R06\"]: 媒体等其余任务处理器的停止形态 = R06+",
+      "requirement": "REQUIRED_SUPPLEMENTAL",
+      "stageShare": "R03 份额=停止传播到任务处理器：父 run 取消→取消树向下传播，子任务（含子代理/后台 child）停止且不完成；durable 行经恢复扫描诚实收口（不伪造终态）",
+      "status": "PASS"
+    },
+    {
+      "assertionContract": {
+        "cases": [
+          {
+            "case": "subagent-child-cancel-stops-child-only",
+            "expect": 1
+          }
+        ],
+        "evidencePath": "{EVIDENCE}/A15/leaf-cases.json",
+        "producerCommand": "a15_combo_and_leaves"
+      },
+      "assertionResults": [
+        {
+          "actual": 1,
+          "case": "subagent-child-cancel-stops-child-only",
+          "expect": 1,
+          "recordedOk": true,
+          "status": "PASS"
+        }
+      ],
+      "basisKind": "stage_share_satisfied",
+      "deferredR07Cases": [],
+      "deferredToStage": null,
+      "deferredToStages": [
+        "R06"
+      ],
+      "earlyEvidence": null,
+      "earlyEvidenceCommandRefs": [],
+      "evidenceCommandRefs": [
+        "a15_combo_and_leaves"
+      ],
+      "evidencePaths": [],
+      "evidenceRequired": "本阶段份额由 a15_combo_and_leaves 生产者经真实服务链路逐案例机器核验（lingxi.leaf-case-results.v1，actual==图钉）；份额图钉全过即 R03 份额 PASS",
+      "featureId": "F-D05-WS_IN-WS-IN-SUBAGENT-STOP-REQUEST-857747",
+      "id": "R00-T02-LA-857747F848F6",
+      "laterShare": "WS-IN subagent_stop_request 帧形态与终端呈现 = R06-T04/R08-T07",
+      "originalAssertionCases": [],
+      "r00Mirror": {
+        "assertions": [
+          "按 taskId 与所属会话停止任务，返回 subagent_stop_result",
+          "他人任务或失效会话被拒绝，不终止无关任务"
+        ],
+        "due": "R00-T07 建立正式账本时登记；最迟在所列实施 Task 的阶段验收前完成并执行",
+        "executionStageIds": [
+          "R03",
+          "R06"
+        ],
+        "featureId": "F-D05-WS_IN-WS-IN-SUBAGENT-STOP-REQUEST-857747",
+        "kind": "supplemental",
+        "ledgerStatus": "SPECIFIED_NOT_EXECUTED",
+        "resultIds": [],
+        "taskIds": [
+          "R03-T03",
+          "R03-T06",
+          "R06-T03"
+        ],
+        "testIds": [],
+        "then": "按 taskId 与所属会话停止任务，返回 subagent_stop_result"
+      },
+      "r02Share": "",
+      "r07Share": "",
+      "reason": "R03 share satisfied: all share pins held; the remainder stays REQUIRED and moves with deferredToStages=[\"R06\"]: WS-IN subagent_stop_request 帧形态与终端呈现 = R06-T04/R08-T07",
+      "requirement": "REQUIRED_SUPPLEMENTAL",
+      "stageShare": "R03 份额=按 taskId 停止子任务的运行层：cancel_run_for(child) 只停目标 child run，父任务不受连带（同一取消树按 run 粒度）",
+      "status": "PASS"
+    },
+    {
+      "assertionContract": {
+        "cases": [
+          {
+            "case": "background-run-completes-decoupled",
+            "expect": 1
+          }
+        ],
+        "evidencePath": "{EVIDENCE}/A15/leaf-cases.json",
+        "producerCommand": "a15_combo_and_leaves"
+      },
+      "assertionResults": [
+        {
+          "actual": 1,
+          "case": "background-run-completes-decoupled",
+          "expect": 1,
+          "recordedOk": true,
+          "status": "PASS"
+        }
+      ],
+      "basisKind": "stage_share_satisfied",
+      "deferredR07Cases": [],
+      "deferredToStage": null,
+      "deferredToStages": [
+        "R07"
+      ],
+      "earlyEvidence": null,
+      "earlyEvidenceCommandRefs": [],
+      "evidenceCommandRefs": [
+        "a15_combo_and_leaves"
+      ],
+      "evidencePaths": [],
+      "evidenceRequired": "本阶段份额由 a15_combo_and_leaves 生产者经真实服务链路逐案例机器核验（lingxi.leaf-case-results.v1，actual==图钉）；份额图钉全过即 R03 份额 PASS",
+      "featureId": "F-D18-SCHEDULER-SCHEDULER-CRON-866157",
+      "id": "R00-T02-LA-8661576FEAFF",
+      "laterShare": "cron job 持久化/调度/触发（以指定 actor Agent 独立 Run 执行并广播 cron_job_done）= R07-T01",
+      "originalAssertionCases": [],
+      "r00Mirror": {
+        "assertions": [
+          "触发后以指定 actor Agent 独立 Run 执行，写活动记录并广播 cron_job_done",
+          "actor 不存在/执行上下文不匹配会报错；同一 job 并发跳过，超时取消，不扩大源会话文件授权"
+        ],
+        "due": "R00-T07 建立正式账本时登记；最迟在所列实施 Task 的阶段验收前完成并执行",
+        "executionStageIds": [
+          "R03",
+          "R07"
+        ],
+        "featureId": "F-D18-SCHEDULER-SCHEDULER-CRON-866157",
+        "kind": "supplemental",
+        "ledgerStatus": "SPECIFIED_NOT_EXECUTED",
+        "resultIds": [],
+        "taskIds": [
+          "R03-T06",
+          "R07-T01"
+        ],
+        "testIds": [],
+        "then": "触发后以指定 actor Agent 独立 Run 执行，写活动记录并广播 cron_job_done"
+      },
+      "r02Share": "",
+      "r07Share": "",
+      "reason": "R03 share satisfied: all share pins held; the remainder stays REQUIRED and moves with deferredToStages=[\"R07\"]: cron job 持久化/调度/触发（以指定 actor Agent 独立 Run 执行并广播 cron_job_done）= R07-T01",
+      "requirement": "REQUIRED_SUPPLEMENTAL",
+      "stageShare": "R03 份额=cron 触发的执行基底：execute_background_for 同一 RunSupervisor detached 驱动、与调用方连接寿命解耦、完成后可查询可确认（RunOrigin::Cron 词表已入库）；cron job 存储与调度器本体归 R07-T01",
+      "status": "PASS"
+    },
+    {
+      "assertionContract": null,
+      "assertionResults": [],
+      "basisKind": "deferred_to_later_stage",
+      "deferredR07Cases": [],
+      "deferredToStage": null,
+      "deferredToStages": [
+        "R06",
+        "R08"
+      ],
+      "earlyEvidence": {
+        "commandRefs": [],
+        "commandsNotPassing": [],
+        "note": "non-gating: producers of pre-implemented later-stage behavior stay registered and run every gate; their failures are command FAILs but never gate this leaf here"
+      },
+      "earlyEvidenceCommandRefs": [],
+      "evidenceCommandRefs": [],
+      "evidencePaths": [],
+      "evidenceRequired": "R03 不判本叶（DEFERRED，仍 REQUIRED）：验收归属 r00ExecutionStageIds 中的后续阶段（R06/R07/R08），后续阶段图必须消费本叶余款",
+      "featureId": "F-D01-WS_IN-WS-IN-INTERJECT-92620B",
+      "id": "R00-T02-LA-92620BF2264F",
+      "laterShare": "R06-T04/R08-T07",
+      "originalAssertionCases": [],
+      "r00Mirror": {
+        "assertions": [
+          "经会话授权和媒体校验后走插入队列/打断策略，收到输入回执和新回复",
+          "媒体超限/不支持、会话身份无效时拒绝且不写空消息"
+        ],
+        "due": "R00-T07 建立正式账本时登记；最迟在所列实施 Task 的阶段验收前完成并执行",
+        "executionStageIds": [
+          "R03",
+          "R06",
+          "R08"
+        ],
+        "featureId": "F-D01-WS_IN-WS-IN-INTERJECT-92620B",
+        "kind": "supplemental",
+        "ledgerStatus": "SPECIFIED_NOT_EXECUTED",
+        "resultIds": [],
+        "taskIds": [
+          "R03-T01",
+          "R06-T04",
+          "R08-T07"
+        ],
+        "testIds": [],
+        "then": "经会话授权和媒体校验后走插入队列/打断策略，收到输入回执和新回复"
+      },
+      "r02Share": "",
+      "r07Share": "",
+      "reason": "deferred to later stage(s) [\"R06\", \"R08\"]: this R00 leaf is still REQUIRED but has no R03 gating share; its acceptance belongs to those stages, which must consume the remainder: R06-T04/R08-T07",
+      "requirement": "REQUIRED_SUPPLEMENTAL",
+      "stageShare": "无 R03 叶专属门禁份额：interject 的媒体校验+插入队列 = 媒体/会话语义（队列语义已由 steer 叶钉住）；运行/取消/身份/事件基底由基础场景 R03-A01..A16 与 a15_combo_and_leaves 组合矩阵门禁承担，无叶专属份额需要图钉",
+      "status": "DEFERRED_TO_LATER_STAGE"
+    },
+    {
+      "assertionContract": {
+        "cases": [
+          {
+            "case": "cancel-waiting-approval-cancels-cleanly",
+            "expect": 1
+          }
+        ],
+        "evidencePath": "{EVIDENCE}/A15/leaf-cases.json",
+        "producerCommand": "a15_combo_and_leaves"
+      },
+      "assertionResults": [
+        {
+          "actual": 1,
+          "case": "cancel-waiting-approval-cancels-cleanly",
+          "expect": 1,
+          "recordedOk": true,
+          "status": "PASS"
+        }
+      ],
+      "basisKind": "stage_share_satisfied",
+      "deferredR07Cases": [],
+      "deferredToStage": null,
+      "deferredToStages": [
+        "R06",
+        "R08"
+      ],
+      "earlyEvidence": null,
+      "earlyEvidenceCommandRefs": [],
+      "evidenceCommandRefs": [
+        "a15_combo_and_leaves"
+      ],
+      "evidencePaths": [],
+      "evidenceRequired": "本阶段份额由 a15_combo_and_leaves 生产者经真实服务链路逐案例机器核验（lingxi.leaf-case-results.v1，actual==图钉）；份额图钉全过即 R03 份额 PASS",
+      "featureId": "F-D01-TOOL-TOOL-ASK-USER-94CB74",
+      "id": "R00-T02-LA-94CB746D04B7",
+      "laterShare": "ask_user 工具本体（批量提问卡、按 key 映射答案、超时自动填推荐项、dismissed）= R04（工具网关+T06 O-1 ask 档审批策略面）/R06-T04/R08-T07",
+      "originalAssertionCases": [],
+      "r00Mirror": {
+        "assertions": [
+          "卡片问题与选项正确可见",
+          "提交值与key及label映射一致",
+          "超时只选推荐项",
+          "拒答和中止均无答案",
+          "问题无效/无会话/ConfirmStore不可用返回错误；aborted与dismissed均不编造答案。"
+        ],
+        "due": "R00-T07 建立正式账本时登记；最迟在所列实施 Task 的阶段验收前完成并执行",
+        "executionStageIds": [
+          "R03",
+          "R06",
+          "R08"
+        ],
+        "featureId": "F-D01-TOOL-TOOL-ASK-USER-94CB74",
+        "kind": "supplemental",
+        "ledgerStatus": "SPECIFIED_NOT_EXECUTED",
+        "resultIds": [],
+        "taskIds": [
+          "R03-T01",
+          "R06-T04",
+          "R08-T07"
+        ],
+        "testIds": [],
+        "then": "输入区出现一张批量提问卡；确认返回按key映射的答案与answered=true；超时只自动填推荐项并标timedOut/autoSelected；拒答返回dismissed且answers为空。"
+      },
+      "r02Share": "",
+      "r07Share": "",
+      "reason": "R03 share satisfied: all share pins held; the remainder stays REQUIRED and moves with deferredToStages=[\"R06\", \"R08\"]: ask_user 工具本体（批量提问卡、按 key 映射答案、超时自动填推荐项、dismissed）= R04（工具网关+T06 O-1 ask 档审批策略面）/R06-T04/R08-T07",
+      "requirement": "REQUIRED_SUPPLEMENTAL",
+      "stageShare": "R03 份额=ask 的审批等待运行层：waiting_approval durable 腿、审批等待可取消（取消后零工具执行）、晚到决策不复活（T03 ApprovalGate 语义）",
+      "status": "PASS"
+    },
+    {
+      "assertionContract": {
+        "cases": [
+          {
+            "case": "subagent-policy-proactive-delegation-default-off",
+            "expect": 1
+          },
+          {
+            "case": "subagent-escalation-write-denied-zero-children",
+            "expect": 0
+          }
+        ],
+        "evidencePath": "{EVIDENCE}/A15/leaf-cases.json",
+        "producerCommand": "a15_combo_and_leaves"
+      },
+      "assertionResults": [
+        {
+          "actual": 1,
+          "case": "subagent-policy-proactive-delegation-default-off",
+          "expect": 1,
+          "recordedOk": true,
+          "status": "PASS"
+        },
+        {
+          "actual": 0,
+          "case": "subagent-escalation-write-denied-zero-children",
+          "expect": 0,
+          "recordedOk": true,
+          "status": "PASS"
+        }
+      ],
+      "basisKind": "stage_share_satisfied",
+      "deferredR07Cases": [],
+      "deferredToStage": null,
+      "deferredToStages": [
+        "R06"
+      ],
+      "earlyEvidence": null,
+      "earlyEvidenceCommandRefs": [],
+      "evidenceCommandRefs": [
+        "a15_combo_and_leaves"
+      ],
+      "evidencePaths": [],
+      "evidenceRequired": "本阶段份额由 a15_combo_and_leaves 生产者经真实服务链路逐案例机器核验（lingxi.leaf-case-results.v1，actual==图钉）；份额图钉全过即 R03 份额 PASS",
+      "featureId": "F-D05-EXPERIMENT-EXPERIMENT-SUBAGENT-PROACTIVE-DELEGATION-980C09",
+      "id": "R00-T02-LA-980C099F356F",
+      "laterShare": "开启后的提示词条件注入与完整研究子代理行为（工具按权限执行的完整语义）= R06-T03",
+      "originalAssertionCases": [],
+      "r00Mirror": {
+        "assertions": [
+          "默认关闭；开启后新会话主 Agent 提示增加独立研究可用只读子代理的条件，工具依旧按权限执行",
+          "关闭无额外委派提示；已有会话和子代理不追溯更改；不能自动扩大工具权限"
+        ],
+        "due": "R00-T07 建立正式账本时登记；最迟在所列实施 Task 的阶段验收前完成并执行",
+        "executionStageIds": [
+          "R03",
+          "R06"
+        ],
+        "featureId": "F-D05-EXPERIMENT-EXPERIMENT-SUBAGENT-PROACTIVE-DELEGATION-980C09",
+        "kind": "supplemental",
+        "ledgerStatus": "SPECIFIED_NOT_EXECUTED",
+        "resultIds": [],
+        "taskIds": [
+          "R03-T03",
+          "R03-T06",
+          "R06-T03"
+        ],
+        "testIds": [],
+        "then": "默认关闭；开启后新会话主 Agent 提示增加独立研究可用只读子代理的条件，工具依旧按权限执行"
+      },
+      "r02Share": "",
+      "r07Share": "",
+      "reason": "R03 share satisfied: all share pins held; the remainder stays REQUIRED and moves with deferredToStages=[\"R06\"]: 开启后的提示词条件注入与完整研究子代理行为（工具按权限执行的完整语义）= R06-T03",
+      "requirement": "REQUIRED_SUPPLEMENTAL",
+      "stageShare": "R03 份额=实验开关默认值与子代理衰减边界：subagent.proactive_delegation 默认关闭（frozen incumbent 默认）、只读父会话派生 write 档子代理被统一拒绝且零 child run（T06 权限衰减在真实运行层判定）",
+      "status": "PASS"
+    },
+    {
+      "assertionContract": null,
+      "assertionResults": [],
+      "basisKind": "deferred_to_later_stage",
+      "deferredR07Cases": [],
+      "deferredToStage": null,
+      "deferredToStages": [
+        "R06",
+        "R08"
+      ],
+      "earlyEvidence": {
+        "commandRefs": [],
+        "commandsNotPassing": [],
+        "note": "non-gating: producers of pre-implemented later-stage behavior stay registered and run every gate; their failures are command FAILs but never gate this leaf here"
+      },
+      "earlyEvidenceCommandRefs": [],
+      "evidenceCommandRefs": [],
+      "evidencePaths": [],
+      "evidenceRequired": "R03 不判本叶（DEFERRED，仍 REQUIRED）：验收归属 r00ExecutionStageIds 中的后续阶段（R06/R07/R08），后续阶段图必须消费本叶余款",
+      "featureId": "F-D01-DESKTOP_BEHAVIOR-DESKTOP-BEHAVIOR-QUICK-CHAT-WINDOW-A2C385",
+      "id": "R00-T02-LA-A2C385A33493",
+      "laterShare": "R06-T04/R08-T07 完整悬浮窗行为",
+      "originalAssertionCases": [],
+      "r00Mirror": {
+        "assertions": [
+          "悬浮窗口可见/尺寸改变；选择会话聚焦主窗并打开该会话",
+          "不存在会话或窗口销毁时不应伪称切换成功"
+        ],
+        "due": "R00-T07 建立正式账本时登记；最迟在所列实施 Task 的阶段验收前完成并执行",
+        "executionStageIds": [
+          "R03",
+          "R06",
+          "R08"
+        ],
+        "featureId": "F-D01-DESKTOP_BEHAVIOR-DESKTOP-BEHAVIOR-QUICK-CHAT-WINDOW-A2C385",
+        "kind": "supplemental",
+        "ledgerStatus": "SPECIFIED_NOT_EXECUTED",
+        "resultIds": [],
+        "taskIds": [
+          "R03-T01",
+          "R06-T04",
+          "R08-T07"
+        ],
+        "testIds": [],
+        "then": "悬浮窗口可见/尺寸改变；选择会话聚焦主窗并打开该会话"
+      },
+      "r02Share": "",
+      "r07Share": "",
+      "reason": "deferred to later stage(s) [\"R06\", \"R08\"]: this R00 leaf is still REQUIRED but has no R03 gating share; its acceptance belongs to those stages, which must consume the remainder: R06-T04/R08-T07 完整悬浮窗行为",
+      "requirement": "REQUIRED_SUPPLEMENTAL",
+      "stageShare": "无 R03 叶专属门禁份额：悬浮窗可见性/尺寸/聚焦主窗 = 纯桌面 UI 行为；运行/取消/身份/事件基底由基础场景 R03-A01..A16 与 a15_combo_and_leaves 组合矩阵门禁承担，无叶专属份额需要图钉",
+      "status": "DEFERRED_TO_LATER_STAGE"
+    },
+    {
+      "assertionContract": null,
+      "assertionResults": [],
+      "basisKind": "deferred_to_later_stage",
+      "deferredR07Cases": [],
+      "deferredToStage": null,
+      "deferredToStages": [
+        "R06"
+      ],
+      "earlyEvidence": {
+        "commandRefs": [],
+        "commandsNotPassing": [],
+        "note": "non-gating: producers of pre-implemented later-stage behavior stay registered and run every gate; their failures are command FAILs but never gate this leaf here"
+      },
+      "earlyEvidenceCommandRefs": [],
+      "evidenceCommandRefs": [],
+      "evidencePaths": [],
+      "evidenceRequired": "R03 不判本叶（DEFERRED，仍 REQUIRED）：验收归属 r00ExecutionStageIds 中的后续阶段（R06/R07/R08），后续阶段图必须消费本叶余款",
+      "featureId": "F-D05-SEMANTIC_EFFECT-SEMANTIC-EFFECT-EXPERIMENTS-EXPERIMENTS-READ-A5DE44",
+      "id": "R00-T02-LA-A5DE44FF584F",
+      "laterShare": "R06-T03 实验注册表/读取 API",
+      "originalAssertionCases": [],
+      "r00Mirror": {
+        "assertions": [
+          "成功时核对：返回已解析实验与有效值",
+          "拒绝/无效输入时核对：无越权或错误持久化，且错误对用户可见"
+        ],
+        "due": "R00-T07 建立正式账本时登记；最迟在所列实施 Task 的阶段验收前完成并执行",
+        "executionStageIds": [
+          "R03",
+          "R06"
+        ],
+        "featureId": "F-D05-SEMANTIC_EFFECT-SEMANTIC-EFFECT-EXPERIMENTS-EXPERIMENTS-READ-A5DE44",
+        "kind": "supplemental",
+        "ledgerStatus": "SPECIFIED_NOT_EXECUTED",
+        "resultIds": [],
+        "taskIds": [
+          "R03-T03",
+          "R03-T06",
+          "R06-T03"
+        ],
+        "testIds": [],
+        "then": "返回已解析实验与有效值"
+      },
+      "r02Share": "",
+      "r07Share": "",
+      "reason": "deferred to later stage(s) [\"R06\"]: this R00 leaf is still REQUIRED but has no R03 gating share; its acceptance belongs to those stages, which must consume the remainder: R06-T03 实验注册表/读取 API",
+      "requirement": "REQUIRED_SUPPLEMENTAL",
+      "stageShare": "无 R03 叶专属门禁份额：实验读取 API（已解析实验与有效值）不在 R03 范围；唯一 R03 消费的实验（subagent.proactive_delegation）已由 LA-980C099F356F 钉住；运行/取消/身份/事件基底由基础场景 R03-A01..A16 与 a15_combo_and_leaves 组合矩阵门禁承担，无叶专属份额需要图钉",
+      "status": "DEFERRED_TO_LATER_STAGE"
+    },
+    {
+      "assertionContract": null,
+      "assertionResults": [],
+      "basisKind": "deferred_to_later_stage",
+      "deferredR07Cases": [],
+      "deferredToStage": null,
+      "deferredToStages": [
+        "R07"
+      ],
+      "earlyEvidence": {
+        "commandRefs": [],
+        "commandsNotPassing": [],
+        "note": "non-gating: producers of pre-implemented later-stage behavior stay registered and run every gate; their failures are command FAILs but never gate this leaf here"
+      },
+      "earlyEvidenceCommandRefs": [],
+      "evidenceCommandRefs": [],
+      "evidencePaths": [],
+      "evidenceRequired": "R03 不判本叶（DEFERRED，仍 REQUIRED）：验收归属 r00ExecutionStageIds 中的后续阶段（R06/R07/R08），后续阶段图必须消费本叶余款",
+      "featureId": "F-D18-SEMANTIC_EFFECT-SEMANTIC-EFFECT-CRON-ADD-A765DF",
+      "id": "R00-T02-LA-A765DFFB4BAC",
+      "laterShare": "R07-T01",
+      "originalAssertionCases": [],
+      "r00Mirror": {
+        "assertions": [
+          "成功时核对：持久化 job 并调度",
+          "拒绝/无效输入时核对：无越权或错误持久化，且错误对用户可见"
+        ],
+        "due": "R00-T07 建立正式账本时登记；最迟在所列实施 Task 的阶段验收前完成并执行",
+        "executionStageIds": [
+          "R03",
+          "R07"
+        ],
+        "featureId": "F-D18-SEMANTIC_EFFECT-SEMANTIC-EFFECT-CRON-ADD-A765DF",
+        "kind": "supplemental",
+        "ledgerStatus": "SPECIFIED_NOT_EXECUTED",
+        "resultIds": [],
+        "taskIds": [
+          "R03-T06",
+          "R07-T01"
+        ],
+        "testIds": [],
+        "then": "持久化 job 并调度"
+      },
+      "r02Share": "",
+      "r07Share": "",
+      "reason": "deferred to later stage(s) [\"R07\"]: this R00 leaf is still REQUIRED but has no R03 gating share; its acceptance belongs to those stages, which must consume the remainder: R07-T01",
+      "requirement": "REQUIRED_SUPPLEMENTAL",
+      "stageShare": "无 R03 叶专属门禁份额：cron 添加路由 = R07 管理面；运行/取消/身份/事件基底由基础场景 R03-A01..A16 与 a15_combo_and_leaves 组合矩阵门禁承担，无叶专属份额需要图钉",
+      "status": "DEFERRED_TO_LATER_STAGE"
+    },
+    {
+      "assertionContract": null,
+      "assertionResults": [],
+      "basisKind": "deferred_to_later_stage",
+      "deferredR07Cases": [],
+      "deferredToStage": null,
+      "deferredToStages": [
+        "R06",
+        "R08"
+      ],
+      "earlyEvidence": {
+        "commandRefs": [],
+        "commandsNotPassing": [],
+        "note": "non-gating: producers of pre-implemented later-stage behavior stay registered and run every gate; their failures are command FAILs but never gate this leaf here"
+      },
+      "earlyEvidenceCommandRefs": [],
+      "evidenceCommandRefs": [],
+      "evidencePaths": [],
+      "evidenceRequired": "R03 不判本叶（DEFERRED，仍 REQUIRED）：验收归属 r00ExecutionStageIds 中的后续阶段（R06/R07/R08），后续阶段图必须消费本叶余款",
+      "featureId": "F-D01-TOOL-TOOL-TODO-WRITE-B34F2B",
+      "id": "R00-T02-LA-B34F2B298BFA",
+      "laterShare": "R04（工具注册）/R06-T04/R08-T07",
+      "originalAssertionCases": [],
+      "r00Mirror": {
+        "assertions": [
+          "界面与会话记录一致",
+          "错误输入不覆盖",
+          "状态或blocked理由无效时报错，不覆盖旧清单。"
+        ],
+        "due": "R00-T07 建立正式账本时登记；最迟在所列实施 Task 的阶段验收前完成并执行",
+        "executionStageIds": [
+          "R03",
+          "R06",
+          "R08"
+        ],
+        "featureId": "F-D01-TOOL-TOOL-TODO-WRITE-B34F2B",
+        "kind": "supplemental",
+        "ledgerStatus": "SPECIFIED_NOT_EXECUTED",
+        "resultIds": [],
+        "taskIds": [
+          "R03-T01",
+          "R06-T04",
+          "R08-T07"
+        ],
+        "testIds": [],
+        "then": "会话流发出完整新清单，界面显示各项pending/in_progress/blocked/completed状态。"
+      },
+      "r02Share": "",
+      "r07Share": "",
+      "reason": "deferred to later stage(s) [\"R06\", \"R08\"]: this R00 leaf is still REQUIRED but has no R03 gating share; its acceptance belongs to those stages, which must consume the remainder: R04（工具注册）/R06-T04/R08-T07",
+      "requirement": "REQUIRED_SUPPLEMENTAL",
+      "stageShare": "无 R03 叶专属门禁份额：todo_write 工具（清单事件与状态呈现）= 工具目录+UI；运行/取消/身份/事件基底由基础场景 R03-A01..A16 与 a15_combo_and_leaves 组合矩阵门禁承担，无叶专属份额需要图钉",
+      "status": "DEFERRED_TO_LATER_STAGE"
+    },
+    {
+      "assertionContract": {
+        "cases": [
+          {
+            "case": "cancel-live-run-accepted-terminal-cancelled",
+            "expect": 1
+          },
+          {
+            "case": "cancel-terminal-run-already-terminal",
+            "expect": 1
+          },
+          {
+            "case": "cancel-unknown-run-not-found",
+            "expect": 1
+          }
+        ],
+        "evidencePath": "{EVIDENCE}/A15/leaf-cases.json",
+        "producerCommand": "a15_combo_and_leaves"
+      },
+      "assertionResults": [
+        {
+          "actual": 1,
+          "case": "cancel-live-run-accepted-terminal-cancelled",
+          "expect": 1,
+          "recordedOk": true,
+          "status": "PASS"
+        },
+        {
+          "actual": 1,
+          "case": "cancel-terminal-run-already-terminal",
+          "expect": 1,
+          "recordedOk": true,
+          "status": "PASS"
+        },
+        {
+          "actual": 1,
+          "case": "cancel-unknown-run-not-found",
+          "expect": 1,
+          "recordedOk": true,
+          "status": "PASS"
+        }
+      ],
+      "basisKind": "stage_share_satisfied",
+      "deferredR07Cases": [],
+      "deferredToStage": null,
+      "deferredToStages": [
+        "R06",
+        "R08"
+      ],
+      "earlyEvidence": null,
+      "earlyEvidenceCommandRefs": [],
+      "evidenceCommandRefs": [
+        "a15_combo_and_leaves",
+        "r02_auth_matrix"
+      ],
+      "evidencePaths": [],
+      "evidenceRequired": "本阶段份额由 a15_combo_and_leaves 生产者经真实服务链路逐案例机器核验（lingxi.leaf-case-results.v1，actual==图钉）；份额图钉全过即 R03 份额 PASS",
+      "featureId": "F-D01-SEMANTIC_EFFECT-SEMANTIC-EFFECT-CHAT-TASK-TASKID-ABORT-POST-B47CAC",
+      "id": "R00-T02-LA-B47CAC08F418",
+      "laterShare": "HTTP POST /chat/tasks/{taskId}/abort 路由形态（aborted/already_stopped 响应体）与跨端呈现 = R06-T04/R08-T07（R03 为服务层 cancel_run_for 入口）",
+      "originalAssertionCases": [],
+      "r00Mirror": {
+        "assertions": [
+          "成功：执行“终止当前会话拥有的后台子代理任务”后，返回 aborted 或 already_stopped；找不到 404，非本会话拥有 403",
+          "拒绝/边界：body 会话上下文经 resolveWsSessionContext；taskId 所有权与运行态决定结果；不应错误扩大写入或披露范围"
+        ],
+        "due": "R00-T07 建立正式账本时登记；最迟在所列实施 Task 的阶段验收前完成并执行",
+        "executionStageIds": [
+          "R03",
+          "R06",
+          "R08"
+        ],
+        "featureId": "F-D01-SEMANTIC_EFFECT-SEMANTIC-EFFECT-CHAT-TASK-TASKID-ABORT-POST-B47CAC",
+        "kind": "supplemental",
+        "ledgerStatus": "SPECIFIED_NOT_EXECUTED",
+        "resultIds": [],
+        "taskIds": [
+          "R03-T01",
+          "R06-T04",
+          "R08-T07"
+        ],
+        "testIds": [],
+        "then": "返回 aborted 或 already_stopped；找不到 404，非本会话拥有 403"
+      },
+      "r02Share": "",
+      "r07Share": "",
+      "reason": "R03 share satisfied: all share pins held; the remainder stays REQUIRED and moves with deferredToStages=[\"R06\", \"R08\"]: HTTP POST /chat/tasks/{taskId}/abort 路由形态（aborted/already_stopped 响应体）与跨端呈现 = R06-T04/R08-T07（R03 为服务层 cancel_run_for 入口）",
+      "requirement": "REQUIRED_SUPPLEMENTAL",
+      "stageShare": "R03 份额=任务中止的运行层语义：live run 取消→四相取消+唯一 finalize 落 cancelled；已终态 run→AlreadyTerminal 诊断式 no-op（already_stopped 形态）；未知 run→NotFound；所有权边界与 execute 同链",
+      "status": "PASS"
+    },
+    {
+      "assertionContract": null,
+      "assertionResults": [],
+      "basisKind": "deferred_to_later_stage",
+      "deferredR07Cases": [],
+      "deferredToStage": null,
+      "deferredToStages": [
+        "R06",
+        "R08"
+      ],
+      "earlyEvidence": {
+        "commandRefs": [],
+        "commandsNotPassing": [],
+        "note": "non-gating: producers of pre-implemented later-stage behavior stay registered and run every gate; their failures are command FAILs but never gate this leaf here"
+      },
+      "earlyEvidenceCommandRefs": [],
+      "evidenceCommandRefs": [],
+      "evidencePaths": [],
+      "evidenceRequired": "R03 不判本叶（DEFERRED，仍 REQUIRED）：验收归属 r00ExecutionStageIds 中的后续阶段（R06/R07/R08），后续阶段图必须消费本叶余款",
+      "featureId": "F-D01-SEMANTIC_EFFECT-SEMANTIC-EFFECT-PREFERENCES-PREFERENCES-QUICK-CH-B5CB29",
+      "id": "R00-T02-LA-B5CB2993A5C0",
+      "laterShare": "R06-T04/R08-T07",
+      "originalAssertionCases": [],
+      "r00Mirror": {
+        "assertions": [
+          "成功：执行“读取快捷聊天偏好”后，返回快捷聊天窗口设置，不改动设置",
+          "拒绝/边界：engine.getQuickChatPreferences/setQuickChatPreferences；PUT 接受 quickChat 包裹或扁平 patch；不应错误扩大写入或披露范围"
+        ],
+        "due": "R00-T07 建立正式账本时登记；最迟在所列实施 Task 的阶段验收前完成并执行",
+        "executionStageIds": [
+          "R03",
+          "R06",
+          "R08"
+        ],
+        "featureId": "F-D01-SEMANTIC_EFFECT-SEMANTIC-EFFECT-PREFERENCES-PREFERENCES-QUICK-CH-B5CB29",
+        "kind": "supplemental",
+        "ledgerStatus": "SPECIFIED_NOT_EXECUTED",
+        "resultIds": [],
+        "taskIds": [
+          "R03-T01",
+          "R06-T04",
+          "R08-T07"
+        ],
+        "testIds": [],
+        "then": "返回快捷聊天窗口设置，不改动设置"
+      },
+      "r02Share": "",
+      "r07Share": "",
+      "reason": "deferred to later stage(s) [\"R06\", \"R08\"]: this R00 leaf is still REQUIRED but has no R03 gating share; its acceptance belongs to those stages, which must consume the remainder: R06-T04/R08-T07",
+      "requirement": "REQUIRED_SUPPLEMENTAL",
+      "stageShare": "无 R03 叶专属门禁份额：快捷聊天窗口设置读取 = 偏好持久化面；运行/取消/身份/事件基底由基础场景 R03-A01..A16 与 a15_combo_and_leaves 组合矩阵门禁承担，无叶专属份额需要图钉",
+      "status": "DEFERRED_TO_LATER_STAGE"
+    },
+    {
+      "assertionContract": {
+        "cases": [
+          {
+            "case": "steer-busy-accepted",
+            "expect": 1
+          },
+          {
+            "case": "steer-idle-miss",
+            "expect": 1
+          },
+          {
+            "case": "steer-text-drained-into-model-input",
+            "expect": 1
+          }
+        ],
+        "evidencePath": "{EVIDENCE}/A15/leaf-cases.json",
+        "producerCommand": "a15_combo_and_leaves"
+      },
+      "assertionResults": [
+        {
+          "actual": 1,
+          "case": "steer-busy-accepted",
+          "expect": 1,
+          "recordedOk": true,
+          "status": "PASS"
+        },
+        {
+          "actual": 1,
+          "case": "steer-idle-miss",
+          "expect": 1,
+          "recordedOk": true,
+          "status": "PASS"
+        },
+        {
+          "actual": 1,
+          "case": "steer-text-drained-into-model-input",
+          "expect": 1,
+          "recordedOk": true,
+          "status": "PASS"
+        }
+      ],
+      "basisKind": "stage_share_satisfied",
+      "deferredR07Cases": [],
+      "deferredToStage": null,
+      "deferredToStages": [
+        "R06",
+        "R08"
+      ],
+      "earlyEvidence": null,
+      "earlyEvidenceCommandRefs": [],
+      "evidenceCommandRefs": [
+        "a15_combo_and_leaves"
+      ],
+      "evidencePaths": [],
+      "evidenceRequired": "本阶段份额由 a15_combo_and_leaves 生产者经真实服务链路逐案例机器核验（lingxi.leaf-case-results.v1，actual==图钉）；份额图钉全过即 R03 份额 PASS",
+      "featureId": "F-D01-WS_IN-WS-IN-STEER-C1FB9C",
+      "id": "R00-T02-LA-C1FB9C92E813",
+      "laterShare": "WS-IN steer 帧（流已停降级 prompt）与 steered 回执呈现 = R06-T04/R08-T07",
+      "originalAssertionCases": [],
+      "r00Mirror": {
+        "assertions": [
+          "活动流被 steer 后收到 steered；流已停则作为普通 prompt 提交",
+          "已删除 Agent 或未获会话权限时拒绝，不能混入别人的流"
+        ],
+        "due": "R00-T07 建立正式账本时登记；最迟在所列实施 Task 的阶段验收前完成并执行",
+        "executionStageIds": [
+          "R03",
+          "R06",
+          "R08"
+        ],
+        "featureId": "F-D01-WS_IN-WS-IN-STEER-C1FB9C",
+        "kind": "supplemental",
+        "ledgerStatus": "SPECIFIED_NOT_EXECUTED",
+        "resultIds": [],
+        "taskIds": [
+          "R03-T01",
+          "R06-T04",
+          "R08-T07"
+        ],
+        "testIds": [],
+        "then": "活动流被 steer 后收到 steered；流已停则作为普通 prompt 提交"
+      },
+      "r02Share": "",
+      "r07Share": "",
+      "reason": "R03 share satisfied: all share pins held; the remainder stays REQUIRED and moves with deferredToStages=[\"R06\", \"R08\"]: WS-IN steer 帧（流已停降级 prompt）与 steered 回执呈现 = R06-T04/R08-T07",
+      "requirement": "REQUIRED_SUPPLEMENTAL",
+      "stageShare": "R03 份额=steer 的冻结语义：busy→有界收件箱 Accepted、idle→Miss（调用方降级普通提交）、下一模型轮 drain 进入 input、打断策略不断循环（T02 冻结映射）",
+      "status": "PASS"
+    },
+    {
+      "assertionContract": null,
+      "assertionResults": [],
+      "basisKind": "deferred_to_later_stage",
+      "deferredR07Cases": [],
+      "deferredToStage": null,
+      "deferredToStages": [
+        "R06"
+      ],
+      "earlyEvidence": {
+        "commandRefs": [],
+        "commandsNotPassing": [],
+        "note": "non-gating: producers of pre-implemented later-stage behavior stay registered and run every gate; their failures are command FAILs but never gate this leaf here"
+      },
+      "earlyEvidenceCommandRefs": [],
+      "evidenceCommandRefs": [],
+      "evidencePaths": [],
+      "evidenceRequired": "R03 不判本叶（DEFERRED，仍 REQUIRED）：验收归属 r00ExecutionStageIds 中的后续阶段（R06/R07/R08），后续阶段图必须消费本叶余款",
+      "featureId": "F-D05-SEMANTIC_EFFECT-SEMANTIC-EFFECT-EXPERIMENTS-EXPERIMENTS-ID-PATCH-C99A43",
+      "id": "R00-T02-LA-C99A4322D0C1",
+      "laterShare": "R06-T03 实验 PATCH/生效值",
+      "originalAssertionCases": [],
+      "r00Mirror": {
+        "assertions": [
+          "成功时核对：保存已注册实验的 value 并返回生效值",
+          "拒绝/无效输入时核对：无越权或错误持久化，且错误对用户可见"
+        ],
+        "due": "R00-T07 建立正式账本时登记；最迟在所列实施 Task 的阶段验收前完成并执行",
+        "executionStageIds": [
+          "R03",
+          "R06"
+        ],
+        "featureId": "F-D05-SEMANTIC_EFFECT-SEMANTIC-EFFECT-EXPERIMENTS-EXPERIMENTS-ID-PATCH-C99A43",
+        "kind": "supplemental",
+        "ledgerStatus": "SPECIFIED_NOT_EXECUTED",
+        "resultIds": [],
+        "taskIds": [
+          "R03-T03",
+          "R03-T06",
+          "R06-T03"
+        ],
+        "testIds": [],
+        "then": "保存已注册实验的 value 并返回生效值"
+      },
+      "r02Share": "",
+      "r07Share": "",
+      "reason": "deferred to later stage(s) [\"R06\"]: this R00 leaf is still REQUIRED but has no R03 gating share; its acceptance belongs to those stages, which must consume the remainder: R06-T03 实验 PATCH/生效值",
+      "requirement": "REQUIRED_SUPPLEMENTAL",
+      "stageShare": "无 R03 叶专属门禁份额：实验写入 API 不在 R03 范围；运行/取消/身份/事件基底由基础场景 R03-A01..A16 与 a15_combo_and_leaves 组合矩阵门禁承担，无叶专属份额需要图钉",
+      "status": "DEFERRED_TO_LATER_STAGE"
+    },
+    {
+      "assertionContract": {
+        "cases": [
+          {
+            "case": "background-run-completes-decoupled",
+            "expect": 1
+          }
+        ],
+        "evidencePath": "{EVIDENCE}/A15/leaf-cases.json",
+        "producerCommand": "a15_combo_and_leaves"
+      },
+      "assertionResults": [
+        {
+          "actual": 1,
+          "case": "background-run-completes-decoupled",
+          "expect": 1,
+          "recordedOk": true,
+          "status": "PASS"
+        }
+      ],
+      "basisKind": "stage_share_satisfied",
+      "deferredR07Cases": [],
+      "deferredToStage": null,
+      "deferredToStages": [
+        "R07"
+      ],
+      "earlyEvidence": null,
+      "earlyEvidenceCommandRefs": [],
+      "evidenceCommandRefs": [
+        "a15_combo_and_leaves"
+      ],
+      "evidencePaths": [],
+      "evidenceRequired": "本阶段份额由 a15_combo_and_leaves 生产者经真实服务链路逐案例机器核验（lingxi.leaf-case-results.v1，actual==图钉）；份额图钉全过即 R03 份额 PASS",
+      "featureId": "F-D18-SCHEDULER-SCHEDULER-HEARTBEAT-CFA5BB",
+      "id": "R00-T02-LA-CFA5BB0273FA",
+      "laterShare": "heartbeat 扫描工作区、隔离巡检执行、活动页/通知显示结果 = R06-T03/R07-T01",
+      "originalAssertionCases": [],
+      "r00Mirror": {
+        "assertions": [
+          "扫描该 Agent 工作区并以其身份执行隔离巡检，活动页/通知显示结果",
+          "总开关或 Agent 开关关闭不启动；重复启动幂等；关闭释放任务，不能串 Agent 工作区"
+        ],
+        "due": "R00-T07 建立正式账本时登记；最迟在所列实施 Task 的阶段验收前完成并执行",
+        "executionStageIds": [
+          "R03",
+          "R07"
+        ],
+        "featureId": "F-D18-SCHEDULER-SCHEDULER-HEARTBEAT-CFA5BB",
+        "kind": "supplemental",
+        "ledgerStatus": "SPECIFIED_NOT_EXECUTED",
+        "resultIds": [],
+        "taskIds": [
+          "R03-T06",
+          "R07-T01"
+        ],
+        "testIds": [],
+        "then": "扫描该 Agent 工作区并以其身份执行隔离巡检，活动页/通知显示结果"
+      },
+      "r02Share": "",
+      "r07Share": "",
+      "reason": "R03 share satisfied: all share pins held; the remainder stays REQUIRED and moves with deferredToStages=[\"R07\"]: heartbeat 扫描工作区、隔离巡检执行、活动页/通知显示结果 = R06-T03/R07-T01",
+      "requirement": "REQUIRED_SUPPLEMENTAL",
+      "stageShare": "R03 份额=heartbeat 巡检的执行基底：同一后台提交/监督入口（RunOrigin::Heartbeat 词表已入库），detached 驱动+可确认收束；巡检内容与活动页呈现归 R06/R07",
+      "status": "PASS"
+    },
+    {
+      "assertionContract": {
+        "cases": [
+          {
+            "case": "combo-normal-run-completed",
+            "expect": 1
+          },
+          {
+            "case": "combo-multi-turn-one-terminal",
+            "expect": 1
+          }
+        ],
+        "evidencePath": "{EVIDENCE}/A15/leaf-cases.json",
+        "producerCommand": "a15_combo_and_leaves"
+      },
+      "assertionResults": [
+        {
+          "actual": 1,
+          "case": "combo-normal-run-completed",
+          "expect": 1,
+          "recordedOk": true,
+          "status": "PASS"
+        },
+        {
+          "actual": 1,
+          "case": "combo-multi-turn-one-terminal",
+          "expect": 1,
+          "recordedOk": true,
+          "status": "PASS"
+        }
+      ],
+      "basisKind": "stage_share_satisfied",
+      "deferredR07Cases": [],
+      "deferredToStage": null,
+      "deferredToStages": [
+        "R06",
+        "R08"
+      ],
+      "earlyEvidence": null,
+      "earlyEvidenceCommandRefs": [],
+      "evidenceCommandRefs": [
+        "a15_combo_and_leaves"
+      ],
+      "evidencePaths": [],
+      "evidenceRequired": "本阶段份额由 a15_combo_and_leaves 生产者经真实服务链路逐案例机器核验（lingxi.leaf-case-results.v1，actual==图钉）；份额图钉全过即 R03 份额 PASS",
+      "featureId": "F-D01-WS_IN-WS-IN-PROMPT-D483E4",
+      "id": "R00-T02-LA-D483E4CD0935",
+      "laterShare": "WS-IN prompt 帧形态、流式阶段/工具进度的传输呈现 = R06-T04/R08-T07",
+      "originalAssertionCases": [],
+      "r00Mirror": {
+        "assertions": [
+          "经授权进入会话 Run，流式返回阶段、工具和最终回复",
+          "空内容不提交；图片数量/大小/格式不合法时发送类型化拒绝回执"
+        ],
+        "due": "R00-T07 建立正式账本时登记；最迟在所列实施 Task 的阶段验收前完成并执行",
+        "executionStageIds": [
+          "R03",
+          "R06",
+          "R08"
+        ],
+        "featureId": "F-D01-WS_IN-WS-IN-PROMPT-D483E4",
+        "kind": "supplemental",
+        "ledgerStatus": "SPECIFIED_NOT_EXECUTED",
+        "resultIds": [],
+        "taskIds": [
+          "R03-T01",
+          "R06-T04",
+          "R08-T07"
+        ],
+        "testIds": [],
+        "then": "经授权进入会话 Run，流式返回阶段、工具和最终回复"
+      },
+      "r02Share": "",
+      "r07Share": "",
+      "reason": "R03 share satisfied: all share pins held; the remainder stays REQUIRED and moves with deferredToStages=[\"R06\", \"R08\"]: WS-IN prompt 帧形态、流式阶段/工具进度的传输呈现 = R06-T04/R08-T07",
+      "requirement": "REQUIRED_SUPPLEMENTAL",
+      "stageShare": "R03 份额=经授权会话 Run 的执行语义：admission→状态机→多轮模型调用→唯一终态+最终消息（替身只给外部响应，状态/事件全由真实 Supervisor/存储产生——A01/A15 形态）",
+      "status": "PASS"
+    },
+    {
+      "assertionContract": null,
+      "assertionResults": [],
+      "basisKind": "deferred_to_later_stage",
+      "deferredR07Cases": [],
+      "deferredToStage": null,
+      "deferredToStages": [
+        "R06"
+      ],
+      "earlyEvidence": {
+        "commandRefs": [],
+        "commandsNotPassing": [],
+        "note": "non-gating: producers of pre-implemented later-stage behavior stay registered and run every gate; their failures are command FAILs but never gate this leaf here"
+      },
+      "earlyEvidenceCommandRefs": [],
+      "evidenceCommandRefs": [],
+      "evidencePaths": [],
+      "evidenceRequired": "R03 不判本叶（DEFERRED，仍 REQUIRED）：验收归属 r00ExecutionStageIds 中的后续阶段（R06/R07/R08），后续阶段图必须消费本叶余款",
+      "featureId": "F-D05-UI-UI-SETTINGS-EXPERIMENTS-D8D47C",
+      "id": "R00-T02-LA-D8D47C4680C9",
+      "laterShare": "R06-T03/R07（设置页）",
+      "originalAssertionCases": [],
+      "r00Mirror": {
+        "assertions": [
+          "打开设置容器自动初始化：连接、语言、助手、快照、模型和供应商摘要（各页共用）：成功核对 冷启动完成后 ready；已有缓存直接显示旧数据并后台刷新；供应商摘要不阻塞 ready；空态/未初始化核对 无缓存时显示 loading mask；15 秒超时强制 ready；供应商摘要可暂缺；错误/无权限核对 初始化异常会 log 并 ready=true，可能展示旧/空数据；供应商摘要失败被 catch 静默，不能当空列表成功",
+          "打开页自动读取实验目录和观察记录：成功核对 实验模式及观察数据按卡片显示；空态/未初始化核对 默认关闭的实验显示 off；观察记录可空；错误/无权限核对 目录 GET 未捕获异常，finally 结束 loading，页面无专门加载错误；观察记录 GET 失败写 null，不能一概要求错误提示。",
+          "启停或选择实验模式（含主动委派）：成功核对 保存后实验状态和设置快照刷新；实验 PATCH 成功后广播 experiment-changed；失败不广播，桌面壳据事件更新对应状态。；缓存快照模式改为 shadow 后追加 GET observation。；空态/未初始化核对 未注册实验不显示卡片；其它模式不触发这次观察读取。；错误/无权限核对 PATCH 抛错未由按钮处理成 toast，不能要求统一回滚/提示；主动委派仍默认关闭。；通知失败或保存失败不能冒充目标配置已完成。；observation 读取异常静默，不宣称观察记录已更新。",
+          "清除缓存快照观察记录：成功核对 记录清零；空态/未初始化核对 原本无记录可无变化；错误/无权限核对 DELETE 抛错未由按钮处理成 toast，清除失败不可称记录已清零。",
+          "电脑使用实验开关、系统权限状态与申请权限：成功核对 显示系统权限状态；启停 computer-use 偏好并可请求系统权限；批准列表仅展示已有状态。；启停偏好或申请系统权限成功后，ComputerUseSection.load 再 GET 状态并更新卡片；刷新按钮也 GET。；空态/未初始化核对 权限尚未授予时显示未授权或待请求，不提供批准/撤销记录操作按钮。；错误/无权限核对 偏好保存或系统权限申请失败按对应错误显示；批准/撤销 API 仅服务器路由存在，本页不调用。；启停/申请权限的写入已成功但随后的 GET 失败时 load 内部回退到快照并可能不提示，不能把展示旧状态当写入失败。"
+        ],
+        "due": "R00-T07 建立正式账本时登记；最迟在所列实施 Task 的阶段验收前完成并执行",
+        "executionStageIds": [
+          "R03",
+          "R06"
+        ],
+        "featureId": "F-D05-UI-UI-SETTINGS-EXPERIMENTS-D8D47C",
+        "kind": "supplemental",
+        "ledgerStatus": "SPECIFIED_NOT_EXECUTED",
+        "resultIds": [],
+        "taskIds": [
+          "R03-T03",
+          "R03-T06",
+          "R06-T03"
+        ],
+        "testIds": [],
+        "then": "逐动作核对实际状态与页面投影；失败不伪装成空数据"
+      },
+      "r02Share": "",
+      "r07Share": "",
+      "reason": "deferred to later stage(s) [\"R06\"]: this R00 leaf is still REQUIRED but has no R03 gating share; its acceptance belongs to those stages, which must consume the remainder: R06-T03/R07（设置页）",
+      "requirement": "REQUIRED_SUPPLEMENTAL",
+      "stageShare": "无 R03 叶专属门禁份额：实验设置页 UI 投影 = 纯客户端呈现；运行/取消/身份/事件基底由基础场景 R03-A01..A16 与 a15_combo_and_leaves 组合矩阵门禁承担，无叶专属份额需要图钉",
+      "status": "DEFERRED_TO_LATER_STAGE"
+    },
+    {
+      "assertionContract": null,
+      "assertionResults": [],
+      "basisKind": "deferred_to_later_stage",
+      "deferredR07Cases": [],
+      "deferredToStage": null,
+      "deferredToStages": [
+        "R06",
+        "R08"
+      ],
+      "earlyEvidence": {
+        "commandRefs": [],
+        "commandsNotPassing": [],
+        "note": "non-gating: producers of pre-implemented later-stage behavior stay registered and run every gate; their failures are command FAILs but never gate this leaf here"
+      },
+      "earlyEvidenceCommandRefs": [],
+      "evidenceCommandRefs": [],
+      "evidencePaths": [],
+      "evidenceRequired": "R03 不判本叶（DEFERRED，仍 REQUIRED）：验收归属 r00ExecutionStageIds 中的后续阶段（R06/R07/R08），后续阶段图必须消费本叶余款",
+      "featureId": "F-D01-SEMANTIC_EFFECT-SEMANTIC-EFFECT-DRAFT-SESSION-SAVE-D90185",
+      "id": "R00-T02-LA-D901852E1B1A",
+      "laterShare": "R06-T04/R08-T07",
+      "originalAssertionCases": [],
+      "r00Mirror": {
+        "assertions": [
+          "成功：保存会话草稿后，按 sessionId 保存；sessionPath 先解析为 sessionId",
+          "边界：sessionId 直取或 sessionPath 可解析，不能把 path 当持久键；拒绝时目标状态不变"
+        ],
+        "due": "R00-T07 建立正式账本时登记；最迟在所列实施 Task 的阶段验收前完成并执行",
+        "executionStageIds": [
+          "R03",
+          "R06",
+          "R08"
+        ],
+        "featureId": "F-D01-SEMANTIC_EFFECT-SEMANTIC-EFFECT-DRAFT-SESSION-SAVE-D90185",
+        "kind": "supplemental",
+        "ledgerStatus": "SPECIFIED_NOT_EXECUTED",
+        "resultIds": [],
+        "taskIds": [
+          "R03-T01",
+          "R06-T04",
+          "R08-T07"
+        ],
+        "testIds": [],
+        "then": "按 sessionId 保存；sessionPath 先解析为 sessionId"
+      },
+      "r02Share": "",
+      "r07Share": "",
+      "reason": "deferred to later stage(s) [\"R06\", \"R08\"]: this R00 leaf is still REQUIRED but has no R03 gating share; its acceptance belongs to those stages, which must consume the remainder: R06-T04/R08-T07",
+      "requirement": "REQUIRED_SUPPLEMENTAL",
+      "stageShare": "无 R03 叶专属门禁份额：会话草稿保存（sessionPath 解析）= 会话内容持久化面；运行/取消/身份/事件基底由基础场景 R03-A01..A16 与 a15_combo_and_leaves 组合矩阵门禁承担，无叶专属份额需要图钉",
+      "status": "DEFERRED_TO_LATER_STAGE"
+    },
+    {
+      "assertionContract": null,
+      "assertionResults": [],
+      "basisKind": "deferred_to_later_stage",
+      "deferredR07Cases": [],
+      "deferredToStage": null,
+      "deferredToStages": [
+        "R06",
+        "R08"
+      ],
+      "earlyEvidence": {
+        "commandRefs": [],
+        "commandsNotPassing": [],
+        "note": "non-gating: producers of pre-implemented later-stage behavior stay registered and run every gate; their failures are command FAILs but never gate this leaf here"
+      },
+      "earlyEvidenceCommandRefs": [],
+      "evidenceCommandRefs": [],
+      "evidencePaths": [],
+      "evidenceRequired": "R03 不判本叶（DEFERRED，仍 REQUIRED）：验收归属 r00ExecutionStageIds 中的后续阶段（R06/R07/R08），后续阶段图必须消费本叶余款",
+      "featureId": "F-D01-SEMANTIC_EFFECT-SEMANTIC-EFFECT-PREFERENCES-PREFERENCES-QUICK-CH-D92CD5",
+      "id": "R00-T02-LA-D92CD567D6D6",
+      "laterShare": "R06-T04/R08-T07",
+      "originalAssertionCases": [],
+      "r00Mirror": {
+        "assertions": [
+          "成功：执行“更新快捷聊天偏好”后，保存快捷聊天窗口设置并返回新状态",
+          "拒绝/边界：engine.getQuickChatPreferences/setQuickChatPreferences；PUT 接受 quickChat 包裹或扁平 patch；无效 body/平台拒绝；不应错误扩大写入或披露范围"
+        ],
+        "due": "R00-T07 建立正式账本时登记；最迟在所列实施 Task 的阶段验收前完成并执行",
+        "executionStageIds": [
+          "R03",
+          "R06",
+          "R08"
+        ],
+        "featureId": "F-D01-SEMANTIC_EFFECT-SEMANTIC-EFFECT-PREFERENCES-PREFERENCES-QUICK-CH-D92CD5",
+        "kind": "supplemental",
+        "ledgerStatus": "SPECIFIED_NOT_EXECUTED",
+        "resultIds": [],
+        "taskIds": [
+          "R03-T01",
+          "R06-T04",
+          "R08-T07"
+        ],
+        "testIds": [],
+        "then": "保存快捷聊天窗口设置并返回新状态"
+      },
+      "r02Share": "",
+      "r07Share": "",
+      "reason": "deferred to later stage(s) [\"R06\", \"R08\"]: this R00 leaf is still REQUIRED but has no R03 gating share; its acceptance belongs to those stages, which must consume the remainder: R06-T04/R08-T07",
+      "requirement": "REQUIRED_SUPPLEMENTAL",
+      "stageShare": "无 R03 叶专属门禁份额：快捷聊天窗口设置保存 = 偏好持久化面；运行/取消/身份/事件基底由基础场景 R03-A01..A16 与 a15_combo_and_leaves 组合矩阵门禁承担，无叶专属份额需要图钉",
+      "status": "DEFERRED_TO_LATER_STAGE"
+    },
+    {
+      "assertionContract": null,
+      "assertionResults": [],
+      "basisKind": "deferred_to_later_stage",
+      "deferredR07Cases": [],
+      "deferredToStage": null,
+      "deferredToStages": [
+        "R07"
+      ],
+      "earlyEvidence": {
+        "commandRefs": [],
+        "commandsNotPassing": [],
+        "note": "non-gating: producers of pre-implemented later-stage behavior stay registered and run every gate; their failures are command FAILs but never gate this leaf here"
+      },
+      "earlyEvidenceCommandRefs": [],
+      "evidenceCommandRefs": [],
+      "evidencePaths": [],
+      "evidenceRequired": "R03 不判本叶（DEFERRED，仍 REQUIRED）：验收归属 r00ExecutionStageIds 中的后续阶段（R06/R07/R08），后续阶段图必须消费本叶余款",
+      "featureId": "F-D18-UI-UI-PANEL-ACTIVITY-E6F239",
+      "id": "R00-T02-LA-E6F239636060",
+      "laterShare": "R07-T01 完整活动面板",
+      "originalAssertionCases": [],
+      "r00Mirror": {
+        "assertions": [
+          "面板打开自动加载活动并按助手/类别过滤：成功核对 分组活动卡显示；同时取配置供心跳开关投影，缓存有效时可直接使用缓存。；空态/未初始化核对 empty/emptyForCategory 两态；配置缓存命中不发重复 GET。；错误/无权限核对 活动请求抛异常仅 console.warn 并保留旧列表；HTTP 200 的 {error} 体按 activities||[] 写成空列表，可能出现假 activity.empty。",
+          "展开活动读取对应会话逐条记录：成功核对 内联 transcript 显示；空态/未初始化核对 无记录显示空详情；错误/无权限核对 读取失败应显示错误",
+          "将活动会话升级为普通会话：成功核对 POST promote 返回 sessionPath 后重读会话列表；目标非当前会话时切换到普通会话，最后从活动列表移除，不创建定时任务。；异会话切换会按工作区有无与 mount 类型读取文件，并刷新模型列表。；空态/未初始化核对 无活动不显示；无工作区不读取工作区文件。；错误/无权限核对 promote 无 sessionPath 时直接返回，不重读/切换/移除；请求或后续切换异常仅 console.error，不显示错误 toast。",
+          "心跳开关：成功核对 配置保存并改变活动生成；空态/未初始化核对 配置缺失显示初始值；错误/无权限核对 心跳保存失败回滚开关，无错误 toast；不可宣称已持久化。"
+        ],
+        "due": "R00-T07 建立正式账本时登记；最迟在所列实施 Task 的阶段验收前完成并执行",
+        "executionStageIds": [
+          "R03",
+          "R07"
+        ],
+        "featureId": "F-D18-UI-UI-PANEL-ACTIVITY-E6F239",
+        "kind": "supplemental",
+        "ledgerStatus": "SPECIFIED_NOT_EXECUTED",
+        "resultIds": [],
+        "taskIds": [
+          "R03-T06",
+          "R07-T01"
+        ],
+        "testIds": [],
+        "then": "逐动作核对实际状态与页面投影；失败不伪装成空数据"
+      },
+      "r02Share": "",
+      "r07Share": "",
+      "reason": "deferred to later stage(s) [\"R07\"]: this R00 leaf is still REQUIRED but has no R03 gating share; its acceptance belongs to those stages, which must consume the remainder: R07-T01 完整活动面板",
+      "requirement": "REQUIRED_SUPPLEMENTAL",
+      "stageShare": "无 R03 叶专属门禁份额：活动页 UI 投影 = 纯客户端呈现；运行/取消/身份/事件基底由基础场景 R03-A01..A16 与 a15_combo_and_leaves 组合矩阵门禁承担，无叶专属份额需要图钉",
+      "status": "DEFERRED_TO_LATER_STAGE"
+    },
+    {
+      "assertionContract": null,
+      "assertionResults": [],
+      "basisKind": "deferred_to_later_stage",
+      "deferredR07Cases": [],
+      "deferredToStage": null,
+      "deferredToStages": [
+        "R07"
+      ],
+      "earlyEvidence": {
+        "commandRefs": [],
+        "commandsNotPassing": [],
+        "note": "non-gating: producers of pre-implemented later-stage behavior stay registered and run every gate; their failures are command FAILs but never gate this leaf here"
+      },
+      "earlyEvidenceCommandRefs": [],
+      "evidenceCommandRefs": [],
+      "evidencePaths": [],
+      "evidenceRequired": "R03 不判本叶（DEFERRED，仍 REQUIRED）：验收归属 r00ExecutionStageIds 中的后续阶段（R06/R07/R08），后续阶段图必须消费本叶余款",
+      "featureId": "F-D18-TOOL-TOOL-AUTOMATION-EC5167",
+      "id": "R00-T02-LA-EC5167DAB40C",
+      "laterShare": "R04（工具）/R07-T01（CronStore）",
+      "originalAssertionCases": [],
+      "r00Mirror": {
+        "assertions": [
+          "建议出现但未批准前任务未写入",
+          "确认后只保存一次并可列出",
+          "无效时任务表不变",
+          "无效计划、缺失任务ID或提议存储不可用返回错误；未获确认不新增任务。"
+        ],
+        "due": "R00-T07 建立正式账本时登记；最迟在所列实施 Task 的阶段验收前完成并执行",
+        "executionStageIds": [
+          "R03",
+          "R07"
+        ],
+        "featureId": "F-D18-TOOL-TOOL-AUTOMATION-EC5167",
+        "kind": "supplemental",
+        "ledgerStatus": "SPECIFIED_NOT_EXECUTED",
+        "resultIds": [],
+        "taskIds": [
+          "R03-T06",
+          "R07-T01"
+        ],
+        "testIds": [],
+        "then": "list返回现有任务；create/update默认生成待确认建议，开启自动批准时才写入CronStore并返回任务ID。"
+      },
+      "r02Share": "",
+      "r07Share": "",
+      "reason": "deferred to later stage(s) [\"R07\"]: this R00 leaf is still REQUIRED but has no R03 gating share; its acceptance belongs to those stages, which must consume the remainder: R04（工具）/R07-T01（CronStore）",
+      "requirement": "REQUIRED_SUPPLEMENTAL",
+      "stageShare": "无 R03 叶专属门禁份额：automation 工具（list/create/update+自动批准）= 工具目录+cron 存储；运行/取消/身份/事件基底由基础场景 R03-A01..A16 与 a15_combo_and_leaves 组合矩阵门禁承担，无叶专属份额需要图钉",
+      "status": "DEFERRED_TO_LATER_STAGE"
+    },
+    {
+      "assertionContract": null,
+      "assertionResults": [],
+      "basisKind": "deferred_to_later_stage",
+      "deferredR07Cases": [],
+      "deferredToStage": null,
+      "deferredToStages": [
+        "R06",
+        "R08"
+      ],
+      "earlyEvidence": {
+        "commandRefs": [],
+        "commandsNotPassing": [],
+        "note": "non-gating: producers of pre-implemented later-stage behavior stay registered and run every gate; their failures are command FAILs but never gate this leaf here"
+      },
+      "earlyEvidenceCommandRefs": [],
+      "evidenceCommandRefs": [],
+      "evidencePaths": [],
+      "evidenceRequired": "R03 不判本叶（DEFERRED，仍 REQUIRED）：验收归属 r00ExecutionStageIds 中的后续阶段（R06/R07/R08），后续阶段图必须消费本叶余款",
+      "featureId": "F-D01-SEMANTIC_EFFECT-SEMANTIC-EFFECT-DRAFT-HOME-SAVE-F829AE",
+      "id": "R00-T02-LA-F829AEA5931C",
+      "laterShare": "R06-T04/R08-T07 草稿保存",
+      "originalAssertionCases": [],
+      "r00Mirror": {
+        "assertions": [
+          "成功：保存主页草稿后，在 surface 的 home 槽保存 text/doc/updatedAt",
+          "边界：scope=home 且 text 非空；拒绝时目标状态不变"
+        ],
+        "due": "R00-T07 建立正式账本时登记；最迟在所列实施 Task 的阶段验收前完成并执行",
+        "executionStageIds": [
+          "R03",
+          "R06",
+          "R08"
+        ],
+        "featureId": "F-D01-SEMANTIC_EFFECT-SEMANTIC-EFFECT-DRAFT-HOME-SAVE-F829AE",
+        "kind": "supplemental",
+        "ledgerStatus": "SPECIFIED_NOT_EXECUTED",
+        "resultIds": [],
+        "taskIds": [
+          "R03-T01",
+          "R06-T04",
+          "R08-T07"
+        ],
+        "testIds": [],
+        "then": "在 surface 的 home 槽保存 text/doc/updatedAt"
+      },
+      "r02Share": "",
+      "r07Share": "",
+      "reason": "deferred to later stage(s) [\"R06\", \"R08\"]: this R00 leaf is still REQUIRED but has no R03 gating share; its acceptance belongs to those stages, which must consume the remainder: R06-T04/R08-T07 草稿保存",
+      "requirement": "REQUIRED_SUPPLEMENTAL",
+      "stageShare": "无 R03 叶专属门禁份额：home 草稿保存 = 会话内容持久化面；运行/取消/身份/事件基底由基础场景 R03-A01..A16 与 a15_combo_and_leaves 组合矩阵门禁承担，无叶专属份额需要图钉",
+      "status": "DEFERRED_TO_LATER_STAGE"
+    },
+    {
+      "assertionContract": null,
+      "assertionResults": [],
+      "basisKind": "deferred_to_later_stage",
+      "deferredR07Cases": [],
+      "deferredToStage": null,
+      "deferredToStages": [
+        "R07"
+      ],
+      "earlyEvidence": {
+        "commandRefs": [],
+        "commandsNotPassing": [],
+        "note": "non-gating: producers of pre-implemented later-stage behavior stay registered and run every gate; their failures are command FAILs but never gate this leaf here"
+      },
+      "earlyEvidenceCommandRefs": [],
+      "evidenceCommandRefs": [],
+      "evidencePaths": [],
+      "evidenceRequired": "R03 不判本叶（DEFERRED，仍 REQUIRED）：验收归属 r00ExecutionStageIds 中的后续阶段（R06/R07/R08），后续阶段图必须消费本叶余款",
+      "featureId": "F-D18-UI-UI-PANEL-AUTOMATION-FA0FF4",
+      "id": "R00-T02-LA-FA0FF4DC0779",
+      "laterShare": "R07-T01 完整自动化面板",
+      "originalAssertionCases": [],
+      "r00Mirror": {
+        "assertions": [
+          "面板打开自动读 cron 与模型：成功核对 按助手分组卡片并更新徽标；空态/未初始化核对 无任务显示 empty/emptyForAgent；错误/无权限核对 loadError role=alert；不能混同空列表",
+          "新增手动任务：成功核对 选到助手后发送 prompt 为空、enabled=false 的新增请求；成功保存停用草稿，重读任务并展开新卡。；空态/未初始化核对 无助手时 toast 且不发请求；空提示词允许作为停用草稿保存。；错误/无权限核对 HTTP 非成功显示错误 toast；网络异常也由 catch 显示错误 toast，均不应显示新增成功。",
+          "在任务卡点击启用或停用开关（按 job.enabled 分流）：成功核对 未启用且提示词合法时始终发送 action:update 与 enabled:true；标题、周期、提示词、模型的未保存草稿与启用同次提交，成功重读并显示已启用及保存后的字段。已启用时发送 action:toggle，成功重读并显示停用。；空态/未初始化核对 未启用的 Agent 任务提示词为空时卡片显示错误 toast 且不发请求；未启用且其他草稿无变化时仍发送 enabled:true 的 update。；错误/无权限核对 启用 update 或停用 toggle 请求异常没有本地 catch/错误 toast，不能显示成功后的新状态；服务端拒绝启用时任务不得被视为已启用。",
+          "删除任务：成功核对 删除请求成功后重读任务，原卡从列表消失。；空态/未初始化核对 没有可删任务时不显示该卡操作；无助手和空提示词不是删除限制。；错误/无权限核对 删除请求异常未由面板捕获，不能期待新增任务阶段的错误 toast；原卡不得被当作已删除。",
+          "修改标题/周期/提示词/模型：成功核对 标题、周期、提示词、模型有变更才发送 update；成功后重读并显示保存后的字段。；空态/未初始化核对 无字段变更不发请求；停用草稿可保留空提示词，启用限制在启停动作检查。；错误/无权限核对 更新请求异常未由面板捕获，不能期待新增任务阶段的错误 toast；失败不可宣称字段已持久保存。"
+        ],
+        "due": "R00-T07 建立正式账本时登记；最迟在所列实施 Task 的阶段验收前完成并执行",
+        "executionStageIds": [
+          "R03",
+          "R07"
+        ],
+        "featureId": "F-D18-UI-UI-PANEL-AUTOMATION-FA0FF4",
+        "kind": "supplemental",
+        "ledgerStatus": "SPECIFIED_NOT_EXECUTED",
+        "resultIds": [],
+        "taskIds": [
+          "R03-T06",
+          "R07-T01"
+        ],
+        "testIds": [],
+        "then": "逐动作核对实际状态与页面投影；失败不伪装成空数据"
+      },
+      "r02Share": "",
+      "r07Share": "",
+      "reason": "deferred to later stage(s) [\"R07\"]: this R00 leaf is still REQUIRED but has no R03 gating share; its acceptance belongs to those stages, which must consume the remainder: R07-T01 完整自动化面板",
+      "requirement": "REQUIRED_SUPPLEMENTAL",
+      "stageShare": "无 R03 叶专属门禁份额：自动化面板 UI 投影 = 纯客户端呈现；运行/取消/身份/事件基底由基础场景 R03-A01..A16 与 a15_combo_and_leaves 组合矩阵门禁承担，无叶专属份额需要图钉",
+      "status": "DEFERRED_TO_LATER_STAGE"
+    }
+  ],
+  "testedSha": "f4d4b16664827010516bc1f5ec6aee5e14b859d3",
+  "toolchainChannel": "1.98.1",
+  "worktreeDirty": false
+}

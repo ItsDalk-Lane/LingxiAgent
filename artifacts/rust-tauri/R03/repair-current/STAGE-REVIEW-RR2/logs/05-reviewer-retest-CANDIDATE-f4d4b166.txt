@@ -1,0 +1,11 @@
+   Compiling lingxi-service v0.0.0 (/private/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/srv2-stage-copy.4XLEGK/repo/rust/crates/lingxi-service)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.56s
+     Running tests/srv2_independent_retest.rs (/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/rust-target-stage-review-rr2/debug/deps/srv2_independent_retest-996f36ebdccd12b1)
+
+running 3 tests
+test srv2_b_colliding_legacy_rows_refuse_as_explicit_ambiguity_never_a_pick ... ok
+test srv2_a_padded_id_raw_and_canonical_retries_bind_the_one_logical_request ... ok
+test srv2_c_same_logical_id_never_crosses_session_or_principal_namespaces ... ok
+
+test result: ok. 3 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.20s
+

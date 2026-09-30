@@ -91,6 +91,19 @@
         }
       ],
       "remote_confirmed": "origin/codex/rust-tauri-migration=ebcbcad1b9fa1c621b315dd33b58f8a2e01ab9eb"
+    },
+    "RR2-F05": {
+      "status": "DONE",
+      "base": "c96f7cc635cf18fa83a81b0e28f33d4fed8baf9c（RR2 审查基线＝RR1 接受后的文档提交）",
+      "review": "REVIEWER-R03-RR2-F05-R1 PASS（独立对抗审查；基线 detached worktree 自写复测 3/3 红坐实缺陷）；STAGE-REVIEWER-R03-RR2 PASS（阶段复验；候选自写复测 3/3 绿 + 门禁证据核验 + 六项清单闭合）",
+      "commits": [
+        {
+          "sha": "f4d4b1666",
+          "kind": "repair+tests+gate-pin+evidence",
+          "note": "R03-RR2-F05-01：canonical request id 全链一致 + 旧 cause_id 兼容读取与显式歧义（50 files, 5704+/95-；新套件 request_id_canonicalization 7 用例；repair_suites pin 第十套件）"
+        }
+      ],
+      "remote_confirmed": "origin/codex/rust-tauri-migration=f4d4b16664827010516bc1f5ec6aee5e14b859d3"
     }
   }
 }

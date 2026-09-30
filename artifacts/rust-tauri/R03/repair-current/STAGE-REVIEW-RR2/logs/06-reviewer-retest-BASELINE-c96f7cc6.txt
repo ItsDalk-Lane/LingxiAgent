@@ -1,0 +1,169 @@
+   Compiling libc v0.2.189
+   Compiling proc-macro2 v1.0.107
+   Compiling unicode-ident v1.0.26
+   Compiling quote v1.0.47
+   Compiling shlex v2.0.1
+   Compiling find-msvc-tools v0.1.13
+   Compiling typenum v1.20.1
+   Compiling itoa v1.0.18
+   Compiling pkg-config v0.3.34
+   Compiling pin-project-lite v0.2.17
+   Compiling cfg-if v1.0.5
+   Compiling bytes v1.12.1
+   Compiling serde_core v1.0.229
+   Compiling cmov v0.5.4
+   Compiling once_cell v1.21.4
+   Compiling const-oid v0.10.2
+   Compiling log v0.4.34
+   Compiling fs_extra v1.3.0
+   Compiling dunce v1.0.5
+   Compiling zmij v1.0.23
+   Compiling futures-core v0.3.34
+   Compiling serde v1.0.229
+   Compiling serde_json v1.0.151
+   Compiling memchr v2.8.3
+   Compiling smallvec v1.16.1
+   Compiling ref-cast v1.0.27
+   Compiling aws-lc-rs v1.18.1
+   Compiling zeroize v1.9.0
+   Compiling httparse v1.10.1
+   Compiling vcpkg v0.2.15
+   Compiling base64 v0.23.1
+   Compiling untrusted v0.9.0
+   Compiling tower-service v0.3.3
+   Compiling ctutils v0.4.2
+   Compiling rustls-pki-types v1.15.1
+   Compiling dyn-clone v1.0.20
+   Compiling tracing-core v0.1.36
+   Compiling autocfg v1.5.1
+   Compiling foldhash v0.2.0
+   Compiling futures-channel v0.3.34
+   Compiling sync_wrapper v1.0.2
+   Compiling slab v0.4.12
+   Compiling tower-layer v0.3.3
+   Compiling regex-syntax v0.8.11
+   Compiling percent-encoding v2.3.2
+   Compiling rustls v0.23.45
+   Compiling hashbrown v0.17.1
+   Compiling atomic-waker v1.1.2
+   Compiling futures-task v0.3.34
+   Compiling httpdate v1.0.3
+   Compiling bitflags v2.13.2
+   Compiling http v1.5.0
+   Compiling form_urlencoded v1.2.2
+   Compiling fallible-iterator v0.3.0
+   Compiling core-foundation-sys v0.8.7
+   Compiling lazy_static v1.5.0
+   Compiling ryu v1.0.23
+   Compiling subtle v2.6.1
+   Compiling futures-util v0.3.34
+   Compiling fallible-streaming-iterator v0.1.9
+   Compiling mime v0.3.17
+   Compiling tracing-log v0.2.0
+   Compiling sharded-slab v0.1.7
+   Compiling thread_local v1.1.10
+   Compiling time-core v0.1.9
+   Compiling num-traits v0.2.19
+   Compiling deranged v0.5.8
+   Compiling powerfmt v0.2.0
+   Compiling matchit v0.8.4
+   Compiling num-conv v0.2.2
+   Compiling nu-ansi-term v0.50.3
+   Compiling qrcodegen v1.8.0
+   Compiling iana-time-zone v0.1.65
+   Compiling pem v4.0.0
+   Compiling hybrid-array v0.4.15
+   Compiling hashlink v0.12.2
+   Compiling jobserver v0.1.35
+   Compiling errno v0.3.14
+   Compiling socket2 v0.6.5
+   Compiling mio v1.2.3
+   Compiling cpufeatures v0.3.1
+   Compiling getrandom v0.2.17
+   Compiling if-addrs v0.15.0
+   Compiling http-body v1.1.0
+   Compiling signal-hook-registry v1.4.8
+   Compiling regex-automata v0.4.18
+   Compiling http-body-util v0.1.5
+   Compiling cc v1.4.7
+   Compiling crypto-common v0.2.2
+   Compiling block-buffer v0.12.1
+   Compiling inout v0.2.2
+   Compiling syn v3.0.6
+   Compiling syn v2.0.119
+   Compiling time v0.3.55
+   Compiling chrono v0.4.45
+   Compiling digest v0.11.3
+   Compiling cipher v0.5.2
+   Compiling yasna v0.6.0
+   Compiling sha2 v0.11.0
+   Compiling sha1 v0.11.0
+   Compiling hmac v0.13.0
+   Compiling cmake v0.1.58
+   Compiling salsa20 v0.11.0
+   Compiling pbkdf2 v0.13.0
+   Compiling libsqlite3-sys v0.38.2
+   Compiling ring v0.17.14
+   Compiling aws-lc-sys v0.45.0
+   Compiling scrypt v0.12.0
+   Compiling matchers v0.2.0
+   Compiling serde_path_to_error v0.1.20
+   Compiling serde_derive_internals v0.30.0
+   Compiling tokio-macros v2.7.2
+   Compiling serde_derive v1.0.229
+   Compiling ref-cast-impl v1.0.27
+   Compiling schemars_derive v1.2.2
+   Compiling tokio v1.53.1
+   Compiling tracing-attributes v0.1.31
+   Compiling rcgen v0.14.10
+   Compiling tracing v0.1.44
+   Compiling axum-core v0.5.6
+   Compiling tracing-subscriber v0.3.23
+   Compiling schemars v1.2.2
+   Compiling serde_urlencoded v0.7.1
+   Compiling rusqlite v0.40.2
+   Compiling lingxi-protocol v0.0.0 (/private/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/srv2-baseline-wt/rust/crates/lingxi-protocol)
+   Compiling hyper v1.11.1
+   Compiling tower v0.5.3
+   Compiling hyper-util v0.1.21
+   Compiling axum v0.8.9
+   Compiling lingxi-kernel v0.0.0 (/private/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/srv2-baseline-wt/rust/crates/lingxi-kernel)
+   Compiling lingxi-adapters v0.0.0 (/private/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/srv2-baseline-wt/rust/crates/lingxi-adapters)
+   Compiling rustls-webpki v0.103.15
+   Compiling tokio-rustls v0.26.5
+   Compiling lingxi-service v0.0.0 (/private/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/srv2-baseline-wt/rust/crates/lingxi-service)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 14.73s
+     Running tests/srv2_independent_retest.rs (/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/rust-target-srv2-baseline/debug/deps/srv2_independent_retest-996f36ebdccd12b1)
+
+running 3 tests
+test srv2_b_colliding_legacy_rows_refuse_as_explicit_ambiguity_never_a_pick ... FAILED
+test srv2_a_padded_id_raw_and_canonical_retries_bind_the_one_logical_request ... FAILED
+test srv2_c_same_logical_id_never_crosses_session_or_principal_namespaces ... FAILED
+
+failures:
+
+---- srv2_b_colliding_legacy_rows_refuse_as_explicit_ambiguity_never_a_pick stdout ----
+
+thread 'srv2_b_colliding_legacy_rows_refuse_as_explicit_ambiguity_never_a_pick' (369045) panicked at crates/lingxi-service/tests/srv2_independent_retest.rs:291:25:
+colliding-legacy retry: retry of "req-9x" was FRESHLY accepted (ExecuteAccepted { run_id: "run_000001a0dcba6c00_000003", run_count: 3, replayed: false }) — the silent blind re-execution of R03-RR2-F05-01
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+
+---- srv2_a_padded_id_raw_and_canonical_retries_bind_the_one_logical_request stdout ----
+
+thread 'srv2_a_padded_id_raw_and_canonical_retries_bind_the_one_logical_request' (369044) panicked at crates/lingxi-service/tests/srv2_independent_retest.rs:291:25:
+raw padded retry: retry of " req-9x " was FRESHLY accepted (ExecuteAccepted { run_id: "run_000001a0dcba6c00_000002", run_count: 2, replayed: false }) — the silent blind re-execution of R03-RR2-F05-01
+
+---- srv2_c_same_logical_id_never_crosses_session_or_principal_namespaces stdout ----
+
+thread 'srv2_c_same_logical_id_never_crosses_session_or_principal_namespaces' (369046) panicked at crates/lingxi-service/tests/srv2_independent_retest.rs:291:25:
+owner session X retry: retry of " iso-7 " was FRESHLY accepted (ExecuteAccepted { run_id: "run_000001a0dcba6c00_000004", run_count: 3, replayed: false }) — the silent blind re-execution of R03-RR2-F05-01
+
+
+failures:
+    srv2_a_padded_id_raw_and_canonical_retries_bind_the_one_logical_request
+    srv2_b_colliding_legacy_rows_refuse_as_explicit_ambiguity_never_a_pick
+    srv2_c_same_logical_id_never_crosses_session_or_principal_namespaces
+
+test result: FAILED. 0 passed; 3 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.21s
+
+error: test failed, to rerun pass `-p lingxi-service --test srv2_independent_retest`

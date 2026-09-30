@@ -1,0 +1,59 @@
+# STAGE-REVIEW-RR2 — 亲自重跑与自写独立复测记录（B 部分）
+
+工具链：rustup 1.98.1（rust-toolchain.toml 锁定；新 shell 已 export PATH="$HOME/.cargo/bin:$PATH"），
+全部 `--locked`、`CARGO_NET_OFFLINE=true`、独立 `CARGO_TARGET_DIR=/var/folders/.../rust-target-stage-review-rr2`（基线侧另一独立 target dir rust-target-srv2-baseline，杜绝交叉产物）。仓库工作区 HEAD=f4d4b1666（未检出任何其他提交）。
+
+## B1–B3 既有套件在候选 f4d4b1666 上亲自重跑（logs/01–04，原始输出）
+
+| # | 命令 | 结果 | exit |
+|---|---|---|---|
+| 01 | `cargo test --manifest-path rust/Cargo.toml --locked -p lingxi-service --test request_id_canonicalization -- --test-threads=4` | **7 passed / 0 failed** | 0 |
+| 02 | 同上 `--test admission_dedup_consistency` | **5 passed / 0 failed** | 0 |
+| 03 | 同上 `--test admission_dedup_adversarial` | **5 passed / 0 failed** | 0 |
+| 04 | 同上 `--test cancel_terminal_race`（F03 域非 F05 修复链抽查） | **13 passed / 0 failed** | 0 |
+
+## B4 自写独立复测 srv2_independent_retest（retest-src/srv2_independent_retest.rs，3 用例）
+
+与执行者套件和 R1 审查者复测**均不同源**：自有 ID（req-9x / iso-7 / req-fresh-9z）、自有空白变体
+（旧格式冲突用 CRLF 形态 `"request:\r\nreq-9x\r\n"`，区别于 R1 的 Tab 形态）、新增「重启后全新 ID
+仍正常受理」过度阻断控制臂。夹具形态与两前辈一致：真实 composition root
+（ServiceState::bootstrap_with_deps + prepare_layout 合成数据根）+ 真实 SQLite RunDatabase +
+真实 supervisor/gate/dedup；替身仅脚本化 Provider 与文件外部计数器；"重启" = storage().close()
++ drop + 同数据根重新 boot。错误变体用运行时 Debug 串匹配，使同一文件可在基线 c96f7cc6 编译运行。
+
+- (a) `srv2_a_padded_id_raw_and_canonical_retries_bind_the_one_logical_request`：
+  前台真实受理 " req-9x " → 计数 +1、completed、runs=1 → 重启 → 原样 " req-9x " 与 canonical
+  "req-9x" 重试均 `RequestIdBoundToEarlierRun` 且指向**同一** run、回显 canonical
+  （`request_id: "req-9x"`）、runs 仍 1、计数仍 1、锚点=`request:req-9x`；
+  随后全新 ID "req-fresh-9z" 正常受理并 completed（计数 2、runs 2）——非无条件拒绝。
+- (b) `srv2_b_colliding_legacy_rows_refuse_as_explicit_ambiguity_never_a_pick`：
+  两条旧格式 cause_id（`"request: req-9x "`、`"request:\r\nreq-9x\r\n"`）归一冲突 →
+  "req-9x"/" req-9x "/"\r\nreq-9x\r\n" 三种形态重试均为 `RequestIdBoundAmbiguous`
+  列出**两个** run、非单选 `RequestIdBoundToEarlierRun`、计数 0、runs=2、两条冻结行逐字不变。
+- (c) `srv2_c_same_logical_id_never_crosses_session_or_principal_namespaces`：
+  同一逻辑 ID " iso-7 " 在 owner×sess_local_alpha、owner×sess_local_beta、device 主体×sess_local_alpha
+  三命名空间各自独立受理（计数 3、各自 run）→ 重启 → 三种重试拼写（原样/ canonical / Tab 包裹）
+  各自 `RequestIdBoundToEarlierRun` 指名**自己**的 run、绝不含他命名空间 run；计数仍 3。
+
+运行方式：仓库 rsync 隔离拷贝（剔除 .git/node_modules/artifacts/dist*），测试文件只落入拷贝树
+`rust/crates/lingxi-service/tests/`，仓库 rust/ 树零接触（`ls | grep srv2` = 0 复核）。
+
+| # | 目标 | 结果 | exit | 日志 |
+|---|---|---|---|---|
+| 05 | 候选 f4d4b1666（隔离拷贝树） | **3 passed / 0 failed** | 0 | logs/05-reviewer-retest-CANDIDATE-f4d4b166.txt |
+| 06 | 基线 c96f7cc6（detached git worktree，产品代码零改动） | **0 passed / 3 failed** | 101 | logs/06-reviewer-retest-BASELINE-c96f7cc6.txt |
+
+基线 3 个失败的 panic 全部为 `must_be_refused` 的盲重执行实锤（logs/06 原文）：
+- a 链：`raw padded retry: retry of " req-9x " was FRESHLY accepted (ExecuteAccepted { run_id: "run_..._000002", run_count: 2, replayed: false })`
+- b 链：`colliding-legacy retry: retry of "req-9x" was FRESHLY accepted (… run_count: 3 …)`
+- c 链：`owner session X retry: retry of " iso-7 " was FRESHLY accepted (… run_count: 3 …)`
+
+即：**同一测试文件在未修复基线上红、在候选上绿**——缺陷真实、修复真实生效，由本阶段审查者
+用自己的测试第三次独立坐实（E01 失败原件、R1 复测、本复测三源一致）。
+
+## 如实记录：复测首跑失败（我的夹具错误，非候选缺陷）
+
+首跑（未留存文件，仅本记录）3/3 失败于 0.15s：我误用未预置会话名 `sess_stage_alpha`，
+服务端正确返回 `NotFound` / `InvalidRequest { run_id … references unknown session }`
+（预置会话仅 `sess_local_alpha`/`sess_local_beta`，见 sessions.rs seed_rows）。修正**我自己的测试文件**
+会话名后 3/3 绿。该失败与候选行为无关，恰证明未知会话被响亮拒绝。
