@@ -1541,6 +1541,12 @@ impl ToolTargetRef {
 #[derive(Debug, Clone, PartialEq)]
 pub struct PreparedToolCall {
     pub target_id: ToolTargetId,
+    /// The target's ORIGIN (the namespace of its identity). R04-T02-R1-F01
+    /// same-root-cause closure: the delegation-family match in the run
+    /// driver routes by LOCAL NAME, so it MUST be able to see the origin
+    /// and refuse to route a plugin/MCP-origin name collision into the
+    /// first-party child-run launcher.
+    pub origin: ToolOrigin,
     pub local_name: String,
     pub display_name: String,
     pub version: String,
@@ -1941,6 +1947,7 @@ impl ToolRegistry {
         let args_summary = summarize_arguments(&effective);
         let prepared = PreparedToolCall {
             target_id,
+            origin: tool.manifest.origin.clone(),
             local_name: tool.manifest.local_name.clone(),
             display_name: tool.manifest.display_name.clone(),
             version: tool.manifest.version.clone(),
