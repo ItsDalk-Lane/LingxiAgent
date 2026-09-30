@@ -446,6 +446,54 @@ impl RunDatabase {
             .await
     }
 
+    /// R03 repair G04/F05 (C05) — the durable cross-restart request anchor.
+    /// Every USER run created with an explicit requestId records its
+    /// lineage with `cause_id = "request:{id}"` (origin `user`); this
+    /// answers whether THIS (owner kind, owner subject, session,
+    /// requestId) anchor already owns a run row — newest first, from ANY
+    /// process life. The submission surface uses the answer to REFUSE a
+    /// post-restart same-key retry explicitly (naming the run) instead of
+    /// silently re-executing a task whose earlier life may hold confirmed
+    /// or unknown external effects. Run rows are never deleted, so a hit
+    /// is a stable fact.
+    pub async fn find_run_id_by_request(
+        &self,
+        session_id: &str,
+        owner_kind: &str,
+        owner_subject: &str,
+        request_id: &str,
+    ) -> Result<Option<String>, StorageError> {
+        let (session_id, owner_kind, owner_subject) = (
+            session_id.to_string(),
+            owner_kind.to_string(),
+            owner_subject.to_string(),
+        );
+        let cause_id = format!("request:{request_id}");
+        self.queue
+            .submit(move |conn| {
+                let mut stmt = conn
+                    .prepare(
+                        "SELECT l.run_id FROM run_lineage l \
+                         JOIN runs r ON r.run_id = l.run_id \
+                         WHERE r.session_id = ?1 AND r.owner_kind = ?2 AND r.owner_subject = ?3 \
+                           AND l.origin = 'user' AND l.cause_id = ?4 \
+                         ORDER BY r.created_at_unix_ms DESC, l.run_id DESC LIMIT 1",
+                    )
+                    .map_err(migrations::map_rusqlite)?;
+                let mut rows = stmt
+                    .query_map(
+                        rusqlite::params![session_id, owner_kind, owner_subject, cause_id],
+                        |row| row.get::<_, String>(0),
+                    )
+                    .map_err(migrations::map_rusqlite)?;
+                match rows.next() {
+                    Some(row) => Ok(Some(row.map_err(migrations::map_rusqlite)?)),
+                    None => Ok(None),
+                }
+            })
+            .await
+    }
+
     /// Lists every NON-terminal run (R03-T07 startup recovery scan): the
     /// dangling-active rows a previous process left behind — `queued`,
     /// `running`, `waiting_approval` and `cancelling`. Terminal rows are

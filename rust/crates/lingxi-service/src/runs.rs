@@ -560,6 +560,7 @@ impl RunSupervisor {
         steering: Option<&SteeringInbox>,
         parent_scope: Option<&CancelScope>,
         authorization: DriveAuthorization,
+        admission: Option<&crate::dedup::AdmissionBinding>,
         quota_session_lane: &str,
     ) -> Result<RunFinish, DriveError> {
         let run_id = RunId::new(run_id.to_string());
@@ -602,6 +603,17 @@ impl RunSupervisor {
             .record_run_started(&ctx, now_ms)
             .await
             .map_err(DriveError::Storage)?;
+        // R03 repair G04/F05 — THE PROMISE POINT: the durable run-start
+        // commit is the moment an explicit requestId (when the submission
+        // carried one) starts promising THIS run's identity. From here the
+        // id→run binding is durably admitted: replays are real, and no
+        // later failure — a lost response, a mid-drive storage error, a
+        // dropped drive — may retract it (the run row is a durable fact;
+        // before this point nothing external can have happened, which is
+        // what makes the caller's provably-not-started retraction safe).
+        if let Some(binding) = admission {
+            binding.commit_durable();
+        }
         events.publish_committed(&started.events);
         // R03-T06: the four-part lineage (parentRunId/origin/
         // sourceMessageId/causeId) is durably recorded right after the run

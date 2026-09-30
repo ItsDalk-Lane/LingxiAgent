@@ -182,6 +182,27 @@ pub enum SessionExecuteError {
         recorded_digest: String,
         submitted_digest: String,
     },
+    /// R03 repair G04/F05 (C01/C03): the explicit requestId is currently
+    /// RESERVED by a submission that is still between its admission and
+    /// the durable run-start verdict — nothing replayable exists yet.
+    /// An explicit RETRYABLE refusal: never a half-committed fake result,
+    /// never a run id without a durable row.
+    AdmissionInFlight {
+        request_id: String,
+    },
+    /// R03 repair G04/F05 (C05): this process's dedup registry has NO
+    /// binding for the id, but the DURABLE store shows a run already
+    /// bound to the same (owner, session, requestId) anchor by an
+    /// EARLIER process life (the per-run lineage `cause_id`). The safe
+    /// cross-restart contract is an explicit refusal naming that run:
+    /// query its durable outcome, or resubmit under a NEW id — the
+    /// service never silently re-executes a task whose earlier life may
+    /// have confirmed or unknown external effects (and never claims
+    /// exactly-once across arbitrary external systems).
+    RequestIdBoundToEarlierRun {
+        request_id: String,
+        run_id: String,
+    },
     /// R03-A14: the service's submission intake is CLOSED — the shutdown
     /// already began. The submission was refused at the admission chain
     /// BEFORE any side effect (no run id allocated, nothing written); the
@@ -209,13 +230,19 @@ pub enum SessionExecuteError {
 }
 
 /// The shared admission outcome of the two submission surfaces
-/// (R03-T06): a freshly admitted run (holding its session lease), or an
-/// idempotent REPLAY of an earlier acceptance.
+/// (R03-T06): a freshly admitted run (holding its session lease and —
+/// for explicit-id submissions — the G04/F05 owner-side binding verdict
+/// handle), or an idempotent REPLAY of an earlier DURABLY ADMITTED
+/// acceptance.
 enum AdmissionOutcome {
     Admitted {
         run_id: String,
         lease: crate::session_supervisor::SessionLease,
         agent_id: String,
+        /// R03 repair G04/F05: the two-phase id→run binding handle. The
+        /// submission path holds it through the durable run-start verdict;
+        /// `None` on the plain (no-id) path.
+        binding: Option<crate::dedup::AdmissionBinding>,
     },
     Replayed {
         accepted: ExecuteAccepted,
@@ -249,6 +276,21 @@ pub trait SessionBackend: Send + Sync {
     /// R5-F02: exhaustion surfaces as an explicit
     /// [`StorageError::RunIdExhausted`] (never a panic/wrap/re-issue).
     fn allocate_run_id(&self, now_ms: u64) -> Result<String, StorageError>;
+    /// R03 repair G04/F05 (C05): the durable cross-restart request anchor.
+    /// Answers whether THIS (owner kind, owner subject, session, explicit
+    /// requestId) already owns a run row — the per-run lineage anchor
+    /// `cause_id = "request:{id}"` recorded at every user run's creation.
+    /// The submission surface uses it to REFUSE a post-restart same-key
+    /// retry explicitly (naming the earlier run) instead of silently
+    /// re-executing a task whose earlier life may hold confirmed or
+    /// unknown external effects.
+    fn find_run_id_by_request(
+        &self,
+        session_id: &str,
+        owner_kind: &str,
+        owner_subject: &str,
+        request_id: &str,
+    ) -> impl Future<Output = Result<Option<String>, StorageError>> + Send;
 }
 
 /// Object-safe erasure of [`SessionBackend`] (RPITIT traits are not
@@ -274,6 +316,13 @@ pub trait SessionBackendErased: Send + Sync {
         limit: u32,
     ) -> Pin<Box<dyn Future<Output = Result<Vec<RunSummaryRow>, StorageError>> + Send + 'a>>;
     fn allocate_run_id_erased(&self, now_ms: u64) -> Result<String, StorageError>;
+    fn find_run_id_by_request_erased<'a>(
+        &'a self,
+        session_id: &'a str,
+        owner_kind: &'a str,
+        owner_subject: &'a str,
+        request_id: &'a str,
+    ) -> Pin<Box<dyn Future<Output = Result<Option<String>, StorageError>> + Send + 'a>>;
 }
 
 impl<T: SessionBackend> SessionBackendErased for T {
@@ -309,6 +358,21 @@ impl<T: SessionBackend> SessionBackendErased for T {
     fn allocate_run_id_erased(&self, now_ms: u64) -> Result<String, StorageError> {
         SessionBackend::allocate_run_id(self, now_ms)
     }
+    fn find_run_id_by_request_erased<'a>(
+        &'a self,
+        session_id: &'a str,
+        owner_kind: &'a str,
+        owner_subject: &'a str,
+        request_id: &'a str,
+    ) -> Pin<Box<dyn Future<Output = Result<Option<String>, StorageError>> + Send + 'a>> {
+        Box::pin(SessionBackend::find_run_id_by_request(
+            self,
+            session_id,
+            owner_kind,
+            owner_subject,
+            request_id,
+        ))
+    }
 }
 
 impl SessionBackend for RunDatabase {
@@ -340,6 +404,15 @@ impl SessionBackend for RunDatabase {
     fn allocate_run_id(&self, now_ms: u64) -> Result<String, StorageError> {
         RunDatabase::allocate_run_id(self, now_ms)
     }
+    fn find_run_id_by_request(
+        &self,
+        session_id: &str,
+        owner_kind: &str,
+        owner_subject: &str,
+        request_id: &str,
+    ) -> impl Future<Output = Result<Option<String>, StorageError>> + Send {
+        RunDatabase::find_run_id_by_request(self, session_id, owner_kind, owner_subject, request_id)
+    }
 }
 
 pub struct SessionStore {
@@ -351,7 +424,11 @@ pub struct SessionStore {
     /// R03-T04: the submission-surface requestId dedup (bounded,
     /// principal+session-scoped). Only submissions carrying an explicit id
     /// touch it — the plain path is byte-identical to the pre-T04 flow.
-    dedup: crate::dedup::SubmissionDedup,
+    /// R03 repair G04/F05: shared as `Arc` because the owner-side
+    /// [`crate::dedup::AdmissionBinding`] verdict handles (including the
+    /// one moved into a detached background drive) must reach it after
+    /// the submission call itself has returned.
+    dedup: std::sync::Arc<crate::dedup::SubmissionDedup>,
     /// R03-T07/A14: the submission intake gate. Defaults to an ALWAYS-OPEN
     /// gate (tests construct the store directly); the composition root
     /// injects the process's real gate via
@@ -402,7 +479,7 @@ impl SessionStore {
         Self {
             backend: Box::new(backend),
             gate: SessionSupervisor::new(limits),
-            dedup: crate::dedup::SubmissionDedup::default(),
+            dedup: std::sync::Arc::new(crate::dedup::SubmissionDedup::default()),
             intake,
         }
     }
@@ -522,17 +599,29 @@ impl SessionStore {
     ///   acceptance (the original run id is returned, `replayed: true`,
     ///   nothing re-executed — legal even while the original run is still
     ///   driving, which is precisely the lost-response retry a client
-    ///   performs);
+    ///   performs; R03 repair G04/F05: only a DURABLY ADMITTED binding
+    ///   replays — the run row exists by construction);
     /// - same id + changed digest → [`SessionExecuteError::DuplicateRequestConflict`]:
     ///   the recorded execution is NOT reused for the new content and NO
     ///   new execution starts;
     /// - fresh id → the admission (busy gate + run-id allocation + the
-    ///   id→run binding) is serialized per key, so a concurrent duplicate
-    ///   cannot slip a second admission in between.
+    ///   id→run reservation) is serialized per key, so a concurrent duplicate
+    ///   cannot slip a second admission in between; while the first
+    ///   submission is between its reservation and the durable run start,
+    ///   duplicates get the explicit retryable
+    ///   [`SessionExecuteError::AdmissionInFlight`] (never a half-committed
+    ///   fake result).
     ///
-    /// The idempotency registry is process-memory and bounded (restart
-    /// semantics belong to R03-T07; a post-restart retry is a fully
-    /// validated fresh submission).
+    /// R03 repair G04/F05 compensation: a drive that fails BEFORE its
+    /// durable start is verified against the store and — when the run row
+    /// provably never existed — the reservation is safely retracted (the
+    /// retry re-admits fresh); an un-verifiable outcome keeps the binding
+    /// for lazy resolution. After the durable start NOTHING retracts the
+    /// binding (a lost response replays the real run).
+    ///
+    /// The idempotency registry is process-memory and bounded; the
+    /// CROSS-RESTART same-key contract is the durable lineage anchor (see
+    /// [`SessionExecuteError::RequestIdBoundToEarlierRun`]).
     #[allow(clippy::too_many_arguments)]
     pub async fn execute_submission_for<P: StoragePort>(
         &self,
@@ -544,8 +633,8 @@ impl SessionStore {
         submission: &ExecuteSubmission<'_>,
         now_ms: u64,
     ) -> Result<ExecuteAccepted, SessionExecuteError> {
-        let (run_id, lease, agent_id) = match self
-            .admit_submission(principal, session_id, submission, now_ms)
+        let (run_id, lease, agent_id, binding) = match self
+            .admit_submission(port, principal, session_id, submission, now_ms)
             .await?
         {
             AdmissionOutcome::Replayed { accepted } => return Ok(accepted),
@@ -553,7 +642,8 @@ impl SessionStore {
                 run_id,
                 lease,
                 agent_id,
-            } => (run_id, lease, agent_id),
+                binding,
+            } => (run_id, lease, agent_id, binding),
         };
 
         // Bound what we record (defense in depth; the body limit already
@@ -563,7 +653,7 @@ impl SessionStore {
         // Drive the full lifecycle (start → turns → single finalize); the
         // run drains the session's steering channel before each provider
         // turn. `lease` frees the session on EVERY exit path below.
-        let finish = supervisor
+        let finish = match supervisor
             .drive_run(
                 port,
                 events,
@@ -577,10 +667,41 @@ impl SessionStore {
                 Some(lease.steering_inbox()),
                 None,
                 DriveAuthorization::user_submission(submission.request_id),
+                binding.as_ref(),
                 session_id,
             )
             .await
-            .map_err(SessionExecuteError::from)?;
+        {
+            Ok(finish) => finish,
+            Err(err) => {
+                // R03 repair G04/F05 (C02): the drive failed — the run id
+                // was NOT durably admitted (nothing was dispatched, no
+                // external action can have happened before the durable
+                // start). Settle the reservation against the store: a
+                // verified-absent row safely retracts it; a present row
+                // (the start committed after all) promotes it; an
+                // unreadable store keeps it (unverified — never deleted).
+                if let Some(binding) = binding.as_ref() {
+                    if !binding.is_committed() {
+                        match port
+                            .load_run(&lingxi_protocol::RunId::new(run_id.clone()))
+                            .await
+                        {
+                            Ok(Some(_)) => binding.commit_durable(),
+                            Ok(None) => binding.release_not_started(),
+                            Err(_) => binding.mark_unverified(),
+                        }
+                    }
+                }
+                return Err(err.into());
+            }
+        };
+        // Defensive no-op by construction (the drive committed the binding
+        // at its durable start); keeps the promise even if a future
+        // refactor moves the start write.
+        if let Some(binding) = binding.as_ref() {
+            binding.commit_durable();
+        }
 
         tracing::info!(
             run_id = %run_id,
@@ -624,8 +745,8 @@ impl SessionStore {
         submission: &ExecuteSubmission<'_>,
         now_ms: u64,
     ) -> Result<ExecuteAccepted, SessionExecuteError> {
-        let (run_id, lease, _agent_id) = match self
-            .admit_submission(principal, session_id, submission, now_ms)
+        let (run_id, lease, _agent_id, binding) = match self
+            .admit_submission(storage.as_ref(), principal, session_id, submission, now_ms)
             .await?
         {
             AdmissionOutcome::Replayed { accepted } => return Ok(accepted),
@@ -633,12 +754,19 @@ impl SessionStore {
                 run_id,
                 lease,
                 agent_id,
-            } => (run_id, lease, agent_id),
+                binding,
+            } => (run_id, lease, agent_id, binding),
         };
         let recorded_input: String = submission.input.chars().take(2000).collect();
         // The session lease moves INTO the detached drive: the session
         // stays honestly busy until the background run settles (every
-        // exit path of the drive).
+        // exit path of the drive). R03 repair G04/F05: the id→run binding
+        // verdict handle moves with it — the DETACHED task owns the
+        // reservation until its own durable start (commit) or its honest
+        // failure compensation; a REFUSED dispatch (registry / supervisor
+        // capacity) retracts the reservation here because nothing was
+        // spawned and nothing was written (a loud refusal, never a fake
+        // acceptance).
         crate::background::spawn_background_drive(
             supervisor,
             storage,
@@ -650,6 +778,7 @@ impl SessionStore {
             run_id.clone(),
             recorded_input,
             DriveAuthorization::user_submission(submission.request_id),
+            binding,
             now_ms,
             lease,
         )
@@ -680,14 +809,27 @@ impl SessionStore {
     /// the dedup key lock, so a concurrent duplicate can never slip a
     /// second admission in between.
     ///
+    /// R03 repair G04/F05: the id→run binding is now a TWO-PHASE ledger
+    /// (reserved → durably admitted, with an unverified backstop — see
+    /// [`crate::dedup`]). A REPLAY is only returned for a DURABLY ADMITTED
+    /// binding (the run row exists by construction); an in-flight
+    /// reservation answers the explicit retryable
+    /// [`SessionExecuteError::AdmissionInFlight`]; an UNVERIFIED binding
+    /// (a previous owner that exited without a verdict) is resolved
+    /// against the durable store through `port` right here — promoted
+    /// when the row exists, safely retracted (and the admission re-run)
+    /// when it provably never did, and the storage error surfaced when it
+    /// cannot be read (the binding is kept).
+    ///
     /// R03-A14: the shutdown intake gate refuses FRESH admissions inside
     /// the admission closure — an idempotent REPLAY of an already-admitted
     /// submission (same explicit requestId + content) is still answered
     /// with the original acceptance: it is a query about an EXISTING task,
     /// not a new submission, and the exiting process still owes the client
     /// that answer.
-    async fn admit_submission(
+    async fn admit_submission<P: StoragePort>(
         &self,
+        port: &P,
         principal: &Principal,
         session_id: &str,
         submission: &ExecuteSubmission<'_>,
@@ -708,9 +850,10 @@ impl SessionStore {
         // run id; for explicit-id submissions the closure runs UNDER the
         // dedup registry's key lock, so a concurrent same-id duplicate can
         // neither slip a second admission in between nor observe a
-        // half-admitted binding — it replays or conflicts once this
-        // admission settles. A failed admission records NOTHING (no sticky
-        // id); a successful one permanently binds the id to the run.
+        // half-admitted binding — it replays, conflicts or gets the
+        // in-flight refusal once this admission settles. A failed admission
+        // records NOTHING (no sticky id); a successful one leaves a PENDING
+        // reservation whose owner-side verdict handle returns to the caller.
         let admission = || -> Result<(String, _), SessionExecuteError> {
             // R03-A14: the exit has already begun — refuse the FRESH
             // admission BEFORE the busy gate, the run-id allocation or any
@@ -750,73 +893,227 @@ impl SessionStore {
             Ok((run_id, lease))
         };
 
-        let (run_id, lease) = match submission.request_id {
-            None => admission()?,
-            Some(raw) => {
-                let request_id = crate::dedup::validate_request_id(raw)
-                    .map_err(|detail| SessionExecuteError::InvalidRequestId { detail })?;
-                let kernel_principal = kernel_principal_of(principal);
-                let key = crate::dedup::DedupKey {
-                    owner_kind: kernel_principal.storage_kind().to_string(),
-                    owner_subject: kernel_principal.storage_subject(),
-                    session_id: session_id.to_string(),
+        let Some(raw) = submission.request_id else {
+            let (run_id, lease) = admission()?;
+            return Ok(AdmissionOutcome::Admitted {
+                run_id,
+                lease,
+                agent_id,
+                binding: None,
+            });
+        };
+        let request_id = crate::dedup::validate_request_id(raw)
+            .map_err(|detail| SessionExecuteError::InvalidRequestId { detail })?;
+        let kernel_principal = kernel_principal_of(principal);
+        let key = crate::dedup::DedupKey {
+            owner_kind: kernel_principal.storage_kind().to_string(),
+            owner_subject: kernel_principal.storage_subject(),
+            session_id: session_id.to_string(),
+            request_id: request_id.clone(),
+        };
+        let digest = crate::dedup::normalized_request_digest_hex(submission.input);
+
+        // R03 repair G04/F05 (C05) — the cross-restart same-key contract.
+        // This process's registry has no binding for the key, but the
+        // DURABLE lineage anchor may: an earlier process life admitted a
+        // run under the same (owner, session, requestId). Refuse it
+        // EXPLICITLY naming that run — the client queries the run's
+        // durable outcome or resubmits under a new id; the service never
+        // silently re-executes a task whose earlier life may hold
+        // confirmed or unknown external effects. (Re-check the in-memory
+        // registry after the read so a concurrently admitted SAME-PROCESS
+        // binding still wins with its replay.)
+        if self.dedup.lookup(&key).is_none() {
+            let earlier = self
+                .backend
+                .find_run_id_by_request_erased(
+                    session_id,
+                    kernel_principal.storage_kind(),
+                    &kernel_principal.storage_subject(),
+                    &request_id,
+                )
+                .await
+                .map_err(SessionExecuteError::Storage)?;
+            if let Some(earlier_run) = earlier {
+                if self.dedup.lookup(&key).is_none() {
+                    tracing::warn!(
+                        session_id = session_id,
+                        request_id = %request_id,
+                        earlier_run_id = %earlier_run,
+                        "requestId is durably bound to a run from an earlier process life — \
+                         refusing explicitly instead of silently re-executing (query that run \
+                         or resubmit under a new id)"
+                    );
+                    return Err(SessionExecuteError::RequestIdBoundToEarlierRun {
+                        request_id,
+                        run_id: earlier_run,
+                    });
+                }
+            }
+        }
+
+        // The admission rounds: an UNVERIFIED binding whose row provably
+        // never existed is retracted and the admission re-runs (bounded —
+        // concurrent resolutions make the next round terminal).
+        for round in 0..4 {
+            match self.dedup.admit(key.clone(), digest.clone(), admission) {
+                Err(full) => {
+                    return Err(SessionExecuteError::IdempotencyRegistryFull { cap: full.cap })
+                }
+                Ok(Err(rejection)) => return Err(rejection),
+                Ok(Ok(crate::dedup::DedupDecision::Replay { run_id })) => {
+                    tracing::info!(
+                        run_id = %run_id,
+                        session_id = session_id,
+                        "idempotent submission replayed: same explicit requestId with the \
+                         same normalized content — the durably admitted acceptance is \
+                         returned, nothing is re-executed"
+                    );
+                    let run_count = self
+                        .backend
+                        .count_runs_erased(session_id)
+                        .await
+                        .map_err(SessionExecuteError::Storage)?;
+                    return Ok(AdmissionOutcome::Replayed {
+                        accepted: ExecuteAccepted {
+                            run_id,
+                            run_count,
+                            replayed: true,
+                        },
+                    });
+                }
+                Ok(Ok(crate::dedup::DedupDecision::Conflict {
                     request_id,
-                };
-                let digest = crate::dedup::normalized_request_digest_hex(submission.input);
-                match self.dedup.admit(key, digest, admission) {
-                    Err(full) => {
-                        return Err(SessionExecuteError::IdempotencyRegistryFull { cap: full.cap })
-                    }
-                    Ok(Err(rejection)) => return Err(rejection),
-                    Ok(Ok(crate::dedup::DedupDecision::Replay { run_id })) => {
-                        tracing::info!(
-                            run_id = %run_id,
-                            session_id = session_id,
-                            "idempotent submission replayed: same explicit requestId with the \
-                             same normalized content — the original acceptance is returned, \
-                             nothing is re-executed"
-                        );
-                        let run_count = self
-                            .backend
-                            .count_runs_erased(session_id)
-                            .await
-                            .map_err(SessionExecuteError::Storage)?;
-                        return Ok(AdmissionOutcome::Replayed {
-                            accepted: ExecuteAccepted {
-                                run_id,
-                                run_count,
-                                replayed: true,
-                            },
-                        });
-                    }
-                    Ok(Ok(crate::dedup::DedupDecision::Conflict {
+                    recorded_digest,
+                    submitted_digest,
+                })) => {
+                    tracing::warn!(
+                        session_id = session_id,
+                        request_id = %request_id,
+                        "duplicate requestId with CHANGED content refused: the recorded \
+                         execution is not reused and no new execution starts (conflict)"
+                    );
+                    return Err(SessionExecuteError::DuplicateRequestConflict {
                         request_id,
                         recorded_digest,
                         submitted_digest,
-                    })) => {
-                        tracing::warn!(
-                            session_id = session_id,
-                            request_id = %request_id,
-                            "duplicate requestId with CHANGED content refused: the recorded \
-                             execution is not reused and no new execution starts (conflict)"
-                        );
-                        return Err(SessionExecuteError::DuplicateRequestConflict {
-                            request_id,
-                            recorded_digest,
-                            submitted_digest,
-                        });
-                    }
-                    Ok(Ok(crate::dedup::DedupDecision::Fresh { run_id, admitted })) => {
-                        (run_id, admitted)
+                    });
+                }
+                Ok(Ok(crate::dedup::DedupDecision::InFlight { request_id })) => {
+                    tracing::info!(
+                        session_id = session_id,
+                        request_id = %request_id,
+                        "duplicate requestId while the first submission is still between its \
+                         reservation and the durable run start — explicit retryable refusal \
+                         (no half-committed result)"
+                    );
+                    return Err(SessionExecuteError::AdmissionInFlight { request_id });
+                }
+                Ok(Ok(crate::dedup::DedupDecision::Unverified {
+                    request_id: _,
+                    run_id,
+                    same_digest,
+                    recorded_digest,
+                })) => {
+                    // The previous owner of this id exited WITHOUT a
+                    // durable-start verdict. Resolve against the store
+                    // NOW: the read is the linearization point of the
+                    // outcome (run rows are never deleted).
+                    match port
+                        .load_run(&lingxi_protocol::RunId::new(run_id.clone()))
+                        .await
+                    {
+                        Ok(Some(_)) => {
+                            self.dedup.resolve_unverified_present(&key, &run_id);
+                            if same_digest {
+                                tracing::info!(
+                                    run_id = %run_id,
+                                    session_id = session_id,
+                                    "unverified admission resolved: the durable run row \
+                                     exists — the binding is promoted and replays honestly"
+                                );
+                                let run_count = self
+                                    .backend
+                                    .count_runs_erased(session_id)
+                                    .await
+                                    .map_err(SessionExecuteError::Storage)?;
+                                return Ok(AdmissionOutcome::Replayed {
+                                    accepted: ExecuteAccepted {
+                                        run_id,
+                                        run_count,
+                                        replayed: true,
+                                    },
+                                });
+                            }
+                            tracing::warn!(
+                                session_id = session_id,
+                                run_id = %run_id,
+                                "unverified admission resolved to an EXISTING run; changed \
+                                 content under the same id conflicts"
+                            );
+                            return Err(SessionExecuteError::DuplicateRequestConflict {
+                                request_id,
+                                recorded_digest,
+                                submitted_digest: digest,
+                            });
+                        }
+                        Ok(None) => {
+                            // Proven: nothing was ever durably admitted
+                            // under this id — no run row, hence no
+                            // external action (every external action of a
+                            // drive happens after its durable start).
+                            // Retract and re-admit.
+                            let retracted = self.dedup.resolve_unverified_absent(&key, &run_id);
+                            tracing::info!(
+                                session_id = session_id,
+                                request_id = %request_id,
+                                stale_run_id = %run_id,
+                                retracted,
+                                round,
+                                "unverified admission resolved: the run row provably never \
+                                 existed — the reservation is retracted and the id is fresh \
+                                 again"
+                            );
+                            continue;
+                        }
+                        Err(err) => {
+                            // The outcome stays UNKNOWN: the binding is
+                            // kept (never deleted on an unverifiable
+                            // error) and the storage failure surfaces.
+                            tracing::warn!(
+                                session_id = session_id,
+                                request_id = %request_id,
+                                run_id = %run_id,
+                                error = ?err,
+                                "unverified admission could not be resolved against the \
+                                 store — binding KEPT, storage error surfaced"
+                            );
+                            return Err(SessionExecuteError::Storage(err));
+                        }
                     }
                 }
+                Ok(Ok(crate::dedup::DedupDecision::Fresh {
+                    run_id,
+                    admitted,
+                    binding,
+                })) => {
+                    return Ok(AdmissionOutcome::Admitted {
+                        run_id,
+                        lease: admitted,
+                        agent_id,
+                        binding: Some(binding),
+                    });
+                }
             }
-        };
-        Ok(AdmissionOutcome::Admitted {
-            run_id,
-            lease,
-            agent_id,
-        })
+        }
+        // Bounded churn (concurrent same-key resolutions): an honest
+        // retryable refusal — never a fabricated admission.
+        tracing::warn!(
+            session_id = session_id,
+            request_id = %request_id,
+            "admission resolution churn — refusing retryably"
+        );
+        Err(SessionExecuteError::AdmissionInFlight { request_id })
     }
 
     /// Submits a STEERING / follow-up input for the session's RUNNING turn
@@ -1066,7 +1363,7 @@ mod tests {
     use crate::runs::RunSupervisor;
     use lingxi_kernel::ports::{CommittedOutcome, KeyEvent};
     use lingxi_kernel::RunContext;
-    use lingxi_protocol::{RunId, ToolCallId};
+    use lingxi_protocol::{RunId, SessionId, ToolCallId};
     use std::sync::Mutex as StdMutex;
 
     /// R03-T01: the no-provider supervisor is the production default wiring
@@ -1200,12 +1497,30 @@ mod tests {
                 + 1;
             Ok(format!("run_{now_ms:016x}_{seq:06x}"))
         }
+        async fn find_run_id_by_request(
+            &self,
+            _session_id: &str,
+            _owner_kind: &str,
+            _owner_subject: &str,
+            _request_id: &str,
+        ) -> Result<Option<String>, StorageError> {
+            // The unit-test backend keeps no durable lineage ledger — the
+            // G04/F05 cross-restart contract is covered by the integration
+            // suite against the REAL store (run_lineage.cause_id). No
+            // earlier-life anchor is ever reported here, so the in-process
+            // admission lifecycle is what these unit tests exercise.
+            Ok(None)
+        }
     }
 
-    /// Fake port recording committed outcomes; can inject commit failure.
-    /// Shares the run list with the backend so counts stay coherent.
+    /// Fake port recording committed outcomes; can inject commit failure
+    /// (`fail_outcome`) and, for the G04/F05 compensation paths, a
+    /// run-start failure (`fail_start`). Shares the run list with the
+    /// backend so counts stay coherent; `load_run` reflects the recorded
+    /// run list so the post-failure verification reads a truthful store.
     struct FakePort {
         fail_outcome: bool,
+        fail_start: bool,
         runs: SharedRuns,
         outcomes: StdMutex<Vec<String>>,
     }
@@ -1224,6 +1539,11 @@ mod tests {
             // real-backend concurrency matrix lives in
             // tests/execute_concurrency.rs.)
             tokio::task::yield_now().await;
+            if self.fail_start {
+                return Err(StorageError::Io {
+                    detail: "injected run-start failure (unit)".to_string(),
+                });
+            }
             self.runs
                 .lock()
                 .expect("runs lock")
@@ -1255,9 +1575,26 @@ mod tests {
         }
         async fn load_run(
             &self,
-            _run_id: &RunId,
+            run_id: &RunId,
         ) -> Result<Option<lingxi_kernel::ports::RunRecord>, StorageError> {
-            Ok(None)
+            // Truthful for the compensation paths: a run exists exactly
+            // when its start was recorded through this port.
+            let recorded = self
+                .runs
+                .lock()
+                .expect("runs lock")
+                .iter()
+                .any(|(_, run)| run == run_id.as_str());
+            if recorded {
+                Ok(Some(lingxi_kernel::ports::RunRecord {
+                    run_id: run_id.clone(),
+                    session_id: SessionId::new("sess_local_alpha".to_string()),
+                    status: lingxi_protocol::RunStatus::Running,
+                    last_event_seq: lingxi_protocol::Seq::new(0),
+                }))
+            } else {
+                Ok(None)
+            }
         }
         async fn record_run_events(
             &self,
@@ -1401,6 +1738,7 @@ mod tests {
         let (store, runs) = store_with_runs();
         let port = FakePort {
             fail_outcome: false,
+            fail_start: false,
             runs,
             outcomes: StdMutex::new(Vec::new()),
         };
@@ -1441,6 +1779,7 @@ mod tests {
         let (store, runs) = store_with_runs();
         let port = FakePort {
             fail_outcome: false,
+            fail_start: false,
             runs,
             outcomes: StdMutex::new(Vec::new()),
         };
@@ -1497,6 +1836,7 @@ mod tests {
         let (store, runs) = store_with_runs();
         let port = FakePort {
             fail_outcome: true,
+            fail_start: false,
             runs,
             outcomes: StdMutex::new(Vec::new()),
         };
@@ -1542,6 +1882,7 @@ mod tests {
         let (store, runs) = store_with_runs();
         let port = std::sync::Arc::new(FakePort {
             fail_outcome: false,
+            fail_start: false,
             runs,
             outcomes: StdMutex::new(Vec::new()),
         });
@@ -1628,6 +1969,7 @@ mod tests {
         let (store, runs) = store_with_runs();
         let port = FakePort {
             fail_outcome: false,
+            fail_start: false,
             runs,
             outcomes: StdMutex::new(Vec::new()),
         };
@@ -1718,6 +2060,347 @@ mod tests {
         assert!(rows.iter().all(|r| r.owner_user_id == LOCAL_OWNER_USER_ID));
         assert!(rows.iter().any(|r| r.session_id == "sess_local_alpha"));
         assert!(rows.iter().any(|r| r.session_id == "sess_local_beta"));
+    }
+
+    // ── R03 repair G04/F05: the admission lifecycle through the REAL
+    //    store-less unit harness (ownership + gate + dedup real; the port
+    //    is the shared test fake whose start write is failable). ────────
+
+    /// C02 (unit leg): a run-start failure under an explicit requestId
+    /// retracts the reservation (verified absent against the port) — the
+    /// SAME id re-admits fresh and only ONE run ever exists; no ghost
+    /// replay can survive the failure.
+    #[tokio::test]
+    async fn start_failure_under_request_id_re_admits_the_same_key_fresh() {
+        let (store, runs) = store_with_runs();
+        let port = FakePort {
+            fail_outcome: false,
+            fail_start: true,
+            runs: std::sync::Arc::clone(&runs),
+            outcomes: StdMutex::new(Vec::new()),
+        };
+        let (events, dir) = event_service_for_test().await;
+        let owner = owner_principal();
+        let submission = ExecuteSubmission {
+            input: "hello",
+            request_id: Some("unit-c02"),
+        };
+
+        // The start transaction fails: an explicit error, nothing durable.
+        match store
+            .execute_submission_for(
+                &port,
+                &events,
+                &supervisor(),
+                &owner,
+                "sess_local_alpha",
+                &submission,
+                1234,
+            )
+            .await
+        {
+            Err(SessionExecuteError::Storage(StorageError::Io { detail })) => {
+                assert!(detail.contains("run-start"))
+            }
+            other => panic!("start failure must surface, got {other:?}"),
+        }
+        assert_eq!(store.run_count("sess_local_alpha").await.unwrap(), 0);
+
+        // Storage recovered (a healthy port over the SAME store): the
+        // SAME id re-admits fresh — exactly one valid execution, and the
+        // post-settle retry replays that real run.
+        let healed = FakePort {
+            fail_outcome: false,
+            fail_start: false,
+            runs,
+            outcomes: StdMutex::new(Vec::new()),
+        };
+        let accepted = store
+            .execute_submission_for(
+                &healed,
+                &events,
+                &supervisor(),
+                &owner,
+                "sess_local_alpha",
+                &submission,
+                1235,
+            )
+            .await
+            .expect("the same id re-admits after the failure is compensated");
+        assert!(!accepted.replayed, "the retry is a REAL fresh start");
+        assert_eq!(store.run_count("sess_local_alpha").await.unwrap(), 1);
+        let replay = store
+            .execute_submission_for(
+                &healed,
+                &events,
+                &supervisor(),
+                &owner,
+                "sess_local_alpha",
+                &submission,
+                1236,
+            )
+            .await
+            .expect("post-settle retry replays");
+        assert!(replay.replayed);
+        assert_eq!(replay.run_id, accepted.run_id);
+        assert_eq!(store.run_count("sess_local_alpha").await.unwrap(), 1);
+        drop(events);
+        let _ = std::fs::remove_dir_all(dir);
+    }
+
+    /// C03 (unit leg): a same-key duplicate that arrives while the first
+    /// submission is parked between reservation and durable start gets
+    /// the explicit retryable in-flight refusal — never a half-committed
+    /// fake replay of a run that does not exist.
+    #[tokio::test(flavor = "current_thread")]
+    async fn same_key_duplicate_in_the_start_window_is_in_flight_not_a_ghost() {
+        use std::sync::atomic::{AtomicBool, Ordering};
+
+        let (store, runs) = store_with_runs();
+        let parked = std::sync::Arc::new(AtomicBool::new(false));
+        let release = std::sync::Arc::new(AtomicBool::new(false));
+        // A port whose start write parks until released: the deterministic
+        // reservation→durable-start window.
+        struct ParkingPort {
+            inner: FakePort,
+            parked: std::sync::Arc<AtomicBool>,
+            release: std::sync::Arc<AtomicBool>,
+        }
+        impl StoragePort for ParkingPort {
+            async fn record_run_started(
+                &self,
+                ctx: &RunContext,
+                now_unix_ms: u64,
+            ) -> Result<CommittedOutcome, StorageError> {
+                self.parked.store(true, Ordering::SeqCst);
+                while !self.release.load(Ordering::SeqCst) {
+                    tokio::task::yield_now().await;
+                }
+                StoragePort::record_run_started(&self.inner, ctx, now_unix_ms).await
+            }
+            async fn commit_run_outcome(
+                &self,
+                ctx: &RunContext,
+                outcome: lingxi_kernel::ports::RunOutcome,
+                now_unix_ms: u64,
+            ) -> Result<CommittedOutcome, StorageError> {
+                StoragePort::commit_run_outcome(&self.inner, ctx, outcome, now_unix_ms).await
+            }
+            async fn load_run(
+                &self,
+                run_id: &RunId,
+            ) -> Result<Option<lingxi_kernel::ports::RunRecord>, StorageError> {
+                StoragePort::load_run(&self.inner, run_id).await
+            }
+            async fn record_run_events(
+                &self,
+                ctx: &RunContext,
+                events: Vec<KeyEvent>,
+                now_unix_ms: u64,
+            ) -> Result<CommittedOutcome, StorageError> {
+                StoragePort::record_run_events(&self.inner, ctx, events, now_unix_ms).await
+            }
+            async fn record_stale_result(
+                &self,
+                ctx: &RunContext,
+                refused: lingxi_kernel::ports::StaleResultFact,
+                now_unix_ms: u64,
+            ) -> Result<(), StorageError> {
+                StoragePort::record_stale_result(&self.inner, ctx, refused, now_unix_ms).await
+            }
+            async fn record_attempt_started(
+                &self,
+                ctx: &RunContext,
+                now_unix_ms: u64,
+            ) -> Result<CommittedOutcome, StorageError> {
+                StoragePort::record_attempt_started(&self.inner, ctx, now_unix_ms).await
+            }
+            async fn record_run_state_change(
+                &self,
+                ctx: &RunContext,
+                from: lingxi_protocol::RunStatus,
+                to: lingxi_protocol::RunStatus,
+                reason: Option<String>,
+                now_unix_ms: u64,
+            ) -> Result<CommittedOutcome, StorageError> {
+                StoragePort::record_run_state_change(
+                    &self.inner,
+                    ctx,
+                    from,
+                    to,
+                    reason,
+                    now_unix_ms,
+                )
+                .await
+            }
+            async fn record_invocation_intent(
+                &self,
+                ctx: &RunContext,
+                intent: lingxi_kernel::ports::InvocationIntent,
+                now_unix_ms: u64,
+            ) -> Result<(), StorageError> {
+                StoragePort::record_invocation_intent(&self.inner, ctx, intent, now_unix_ms).await
+            }
+            async fn advance_invocation(
+                &self,
+                ctx: &RunContext,
+                journal_id: &ToolCallId,
+                to: lingxi_kernel::ports::InvocationPhase,
+                now_unix_ms: u64,
+            ) -> Result<(), StorageError> {
+                StoragePort::advance_invocation(&self.inner, ctx, journal_id, to, now_unix_ms).await
+            }
+            async fn record_invocation_receipt(
+                &self,
+                ctx: &RunContext,
+                journal_id: &ToolCallId,
+                receipt: lingxi_kernel::ports::InvocationReceipt,
+                now_unix_ms: u64,
+            ) -> Result<(), StorageError> {
+                StoragePort::record_invocation_receipt(
+                    &self.inner,
+                    ctx,
+                    journal_id,
+                    receipt,
+                    now_unix_ms,
+                )
+                .await
+            }
+            async fn record_invocation_unknown(
+                &self,
+                journal_id: &ToolCallId,
+                detail: String,
+                now_unix_ms: u64,
+            ) -> Result<(), StorageError> {
+                StoragePort::record_invocation_unknown(&self.inner, journal_id, detail, now_unix_ms)
+                    .await
+            }
+            async fn load_invocation_journal(
+                &self,
+                run_id: &RunId,
+            ) -> Result<Vec<lingxi_kernel::ports::InvocationJournalEntry>, StorageError>
+            {
+                StoragePort::load_invocation_journal(&self.inner, run_id).await
+            }
+            async fn record_run_lineage(
+                &self,
+                ctx: &RunContext,
+                lineage: lingxi_kernel::subagent::RunLineage,
+                now_unix_ms: u64,
+            ) -> Result<(), StorageError> {
+                StoragePort::record_run_lineage(&self.inner, ctx, lineage, now_unix_ms).await
+            }
+            async fn load_run_lineage(
+                &self,
+                run_id: &RunId,
+            ) -> Result<Option<lingxi_kernel::subagent::RunLineage>, StorageError> {
+                StoragePort::load_run_lineage(&self.inner, run_id).await
+            }
+        }
+        let port = std::sync::Arc::new(ParkingPort {
+            inner: FakePort {
+                fail_outcome: false,
+                fail_start: false,
+                runs,
+                outcomes: StdMutex::new(Vec::new()),
+            },
+            parked: std::sync::Arc::clone(&parked),
+            release: std::sync::Arc::clone(&release),
+        });
+        let (events, dir) = event_service_for_test().await;
+        let owner = owner_principal();
+        let submission = ExecuteSubmission {
+            input: "hello",
+            request_id: Some("unit-c03"),
+        };
+
+        // The first submission parks between reservation and durable start.
+        let store_a = std::sync::Arc::new(store);
+        let events_a = std::sync::Arc::new(events);
+        let first = tokio::spawn({
+            let store = std::sync::Arc::clone(&store_a);
+            let events = std::sync::Arc::clone(&events_a);
+            let port = std::sync::Arc::clone(&port);
+            let owner = owner.clone();
+            async move {
+                store
+                    .execute_submission_for(
+                        port.as_ref(),
+                        events.as_ref(),
+                        &supervisor(),
+                        &owner,
+                        "sess_local_alpha",
+                        &submission,
+                        1234,
+                    )
+                    .await
+            }
+        });
+        while !parked.load(Ordering::SeqCst) {
+            tokio::task::yield_now().await;
+        }
+
+        // The concurrent same-key duplicate: explicit in-flight refusal.
+        match store_a
+            .execute_submission_for(
+                port.as_ref(),
+                events_a.as_ref(),
+                &supervisor(),
+                &owner,
+                "sess_local_alpha",
+                &submission,
+                1234,
+            )
+            .await
+        {
+            Err(SessionExecuteError::AdmissionInFlight { request_id }) => {
+                assert_eq!(request_id, "unit-c03");
+            }
+            other => panic!("in-window duplicate must be in-flight, got {other:?}"),
+        }
+        // Changed content under the same key still conflicts.
+        let changed = ExecuteSubmission {
+            input: "changed",
+            request_id: Some("unit-c03"),
+        };
+        match store_a
+            .execute_submission_for(
+                port.as_ref(),
+                events_a.as_ref(),
+                &supervisor(),
+                &owner,
+                "sess_local_alpha",
+                &changed,
+                1234,
+            )
+            .await
+        {
+            Err(SessionExecuteError::DuplicateRequestConflict { .. }) => {}
+            other => panic!("changed content must conflict, got {other:?}"),
+        }
+
+        // Release: the first submission commits and settles; the retry
+        // then replays the REAL run.
+        release.store(true, Ordering::SeqCst);
+        let accepted = first.await.expect("task").expect("first completes");
+        assert!(!accepted.replayed);
+        let replay = store_a
+            .execute_submission_for(
+                port.as_ref(),
+                events_a.as_ref(),
+                &supervisor(),
+                &owner,
+                "sess_local_alpha",
+                &submission,
+                1237,
+            )
+            .await
+            .expect("post-settle retry replays");
+        assert!(replay.replayed);
+        assert_eq!(replay.run_id, accepted.run_id);
+        assert_eq!(store_a.run_count("sess_local_alpha").await.unwrap(), 1);
+        drop(events_a);
+        let _ = std::fs::remove_dir_all(dir);
     }
 
     #[allow(unused)]

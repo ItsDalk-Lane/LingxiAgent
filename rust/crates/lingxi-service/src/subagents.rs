@@ -779,6 +779,9 @@ impl SubagentRuntime {
                     None,
                     Some(&drive_scope),
                     grant,
+                    // Child runs carry no submission requestId — there is
+                    // no id→run binding to commit (R03 repair G04/F05).
+                    None,
                     &quota_session_lane,
                 );
                 // Timeout anchored at the child's ACTUAL start (the

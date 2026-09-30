@@ -31,6 +31,18 @@
         }
       ],
       "remote_confirmed": "origin/codex/rust-tauri-migration=ccb09fde679b4cd96e2ba2f5f51e53bce564710f"
+    },
+    "G03": {
+      "status": "DONE",
+      "review": "REVIEWER-REPAIR-R03-G03-R1 PASS (4/4 C-ID)",
+      "commits": [
+        {
+          "sha": "198e0da1e",
+          "kind": "repair",
+          "note": "F04 产品修复/测试/证据（14 files, 2217+/76-）"
+        }
+      ],
+      "remote_confirmed": "origin/codex/rust-tauri-migration=198e0da1e6bd4c3a919982ffe46eb27800dcb78a"
     }
   }
 }

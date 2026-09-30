@@ -66,8 +66,8 @@ pub use config::{
     IgnoredHomeSource, ResolvedHome, HOME_ENV_VAR,
 };
 pub use dedup::{
-    DedupDecision, DedupKey, DedupRegistryFull, SubmissionDedup, DEFAULT_DEDUP_CAP,
-    MAX_REQUEST_ID_LEN,
+    AdmissionBinding, DedupDecision, DedupKey, DedupRegistryFull, SubmissionDedup,
+    DEFAULT_DEDUP_CAP, MAX_REQUEST_ID_LEN,
 };
 pub use epoch::{
     coordinate_data_epoch_startup, read_journal, read_stamp, render_block, EpochGateBlock,
@@ -1286,6 +1286,43 @@ impl EndpointError {
             .with_cause("session.idempotency_registry_full")
     }
 
+    /// R03 repair G04/F05 (C01/C03): the explicit requestId is currently
+    /// reserved by a submission still between its admission and the
+    /// durable run start — nothing replayable exists yet. Retryable: the
+    /// client re-sends the same id once the first submission settles (its
+    /// replay then answers).
+    pub fn admission_in_flight(request_id: &str) -> Self {
+        let mut out = Self::new(
+            StatusCode::CONFLICT,
+            ErrorCode::Conflict,
+            format!("requestId is mid-admission (reserved, not yet durably started): {request_id}"),
+        );
+        out.error.retryable = true;
+        out.with_reason("request_id_admission_in_flight")
+            .with_cause("session.request_id_admission_in_flight")
+    }
+
+    /// R03 repair G04/F05 (C05): this requestId has no binding in THIS
+    /// process, but the durable lineage anchor shows a run already bound
+    /// to the same (owner, session, id) by an EARLIER process life. The
+    /// safe cross-restart contract: query that run's durable outcome or
+    /// resubmit under a NEW id — the service never silently re-executes a
+    /// task whose earlier life may hold confirmed or unknown external
+    /// effects, and never claims exactly-once over arbitrary external
+    /// systems.
+    pub fn request_id_bound_to_earlier_run(request_id: &str, run_id: &str) -> Self {
+        Self::new(
+            StatusCode::CONFLICT,
+            ErrorCode::Conflict,
+            format!(
+                "requestId was already bound to run {run_id} by an earlier process life; query \
+                 that run's durable outcome or resubmit under a new requestId: {request_id}"
+            ),
+        )
+        .with_reason("request_id_bound_to_earlier_run")
+        .with_cause("session.request_id_bound_to_earlier_run")
+    }
+
     /// R03-A14: the shutdown already began — the submission intake is
     /// closed and this (fresh) submission was refused at the admission
     /// chain before any side effect. Retryable against the NEXT process
@@ -2336,6 +2373,12 @@ async fn execute_session(
         }
         Err(sessions::SessionExecuteError::DuplicateRequestConflict { request_id, .. }) => {
             EndpointError::request_id_conflict(&request_id).into_response()
+        }
+        Err(sessions::SessionExecuteError::AdmissionInFlight { request_id }) => {
+            EndpointError::admission_in_flight(&request_id).into_response()
+        }
+        Err(sessions::SessionExecuteError::RequestIdBoundToEarlierRun { request_id, run_id }) => {
+            EndpointError::request_id_bound_to_earlier_run(&request_id, &run_id).into_response()
         }
         Err(sessions::SessionExecuteError::IdempotencyRegistryFull { .. }) => {
             EndpointError::idempotency_registry_full().into_response()

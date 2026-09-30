@@ -28,6 +28,7 @@ use std::collections::HashMap;
 use std::sync::{Arc, Mutex};
 
 use lingxi_adapters::storage::RunDatabase;
+use lingxi_kernel::ports::StoragePort;
 use lingxi_kernel::Principal as KernelPrincipal;
 
 use crate::events::EventService;
@@ -226,6 +227,16 @@ fn record_recent_exit(ring: &Arc<Mutex<Vec<(String, TaskExit)>>>, run_id: String
 /// owns it; the run's OWN cancellation still settles it through the
 /// cancel surface). The session lease moves INTO the drive so the session
 /// stays honestly busy until the background run settles.
+///
+/// R03 repair G04/F05: the id→run binding verdict handle moves INTO the
+/// detached task — the task commits it at its own durable run start and
+/// compensates honestly if the drive fails before that start (verified
+/// retraction / promotion; an unreadable store keeps it). A REFUSED
+/// dispatch (registry or supervisor capacity — including the window
+/// BETWEEN the registry cap check and the supervisor spawn) retracts the
+/// reservation synchronously here: nothing was spawned, nothing was
+/// written, no external action can have happened — the loud refusal is
+/// returned, NEVER a fake acceptance.
 #[allow(clippy::too_many_arguments)]
 pub fn spawn_background_drive(
     supervisor: &Arc<RunSupervisor>,
@@ -238,6 +249,7 @@ pub fn spawn_background_drive(
     run_id: String,
     input: String,
     authorization: DriveAuthorization,
+    binding: Option<crate::dedup::AdmissionBinding>,
     now_ms: u64,
     lease: SessionLease,
 ) -> Result<(), BackgroundSpawnRejected> {
@@ -250,6 +262,11 @@ pub fn spawn_background_drive(
             .lock()
             .unwrap_or_else(|poisoned| poisoned.into_inner());
         if drives.len() >= BACKGROUND_DRIVE_CAP {
+            // Known-not-dispatched: the reservation is safely retracted
+            // (the retry re-admits fresh; no ghost replay can remain).
+            if let Some(binding) = &binding {
+                binding.release_not_started();
+            }
             return Err(BackgroundSpawnRejected {
                 cap: BACKGROUND_DRIVE_CAP,
             });
@@ -260,12 +277,20 @@ pub fn spawn_background_drive(
     let drive_events = Arc::clone(events);
     let drive_run_id = run_id.clone();
     let drive_session = session_id.clone();
+    // The dispatch-side retraction handle: usable in the synchronous
+    // spawn-failure window after `binding` itself has moved into the
+    // task below (provably-not-dispatched failures only).
+    let retractor = binding.as_ref().map(|b| b.retractor());
     let handle = supervisor
         .task_supervisor()
         .spawn_detached(format!("background_drive:{run_id}"), async move {
             // The lease lives as long as the drive: the session frees
             // exactly when the background run settles (every exit path).
             let _lease = lease;
+            // R03 repair G04/F05: this task owns the id→run reservation
+            // until its durable start; `drive_run` commits the binding
+            // the moment `record_run_started` commits.
+            let binding = binding;
             let finish = drive_supervisor
                 .drive_run(
                     drive_storage.as_ref(),
@@ -280,6 +305,7 @@ pub fn spawn_background_drive(
                     None,
                     None,
                     authorization,
+                    binding.as_ref(),
                     &drive_session,
                 )
                 .await;
@@ -298,10 +324,38 @@ pub fn spawn_background_drive(
                         "background drive FAILED before its finalize (loud; the durable row \
                          stays honest)"
                     );
+                    // R03 repair G04/F05 (C01/C02 background leg): the
+                    // drive failed — if the durable start never
+                    // happened, settle the reservation against the REAL
+                    // store: verified-absent retracts it (the id is fresh
+                    // again), present promotes it (the run row is real —
+                    // replays stay honest), unreadable keeps it
+                    // (unverified; the next same-key submission resolves
+                    // it). NEVER delete an unknown outcome.
+                    if let Some(binding) = binding.as_ref() {
+                        if !binding.is_committed() {
+                            match drive_storage
+                                .load_run(&lingxi_protocol::RunId::new(drive_run_id.clone()))
+                                .await
+                            {
+                                Ok(Some(_)) => binding.commit_durable(),
+                                Ok(None) => binding.release_not_started(),
+                                Err(_) => binding.mark_unverified(),
+                            }
+                        }
+                    }
                 }
             }
         })
-        .map_err(|rejected| BackgroundSpawnRejected { cap: rejected.cap })?;
+        .map_err(|rejected| {
+            // Known-not-dispatched (the supervisor spawn refused — the
+            // adversarial window between the registry cap check above and
+            // the real spawn): same safe retraction, never a fake success.
+            if let Some(retractor) = &retractor {
+                retractor.release_not_started();
+            }
+            BackgroundSpawnRejected { cap: rejected.cap }
+        })?;
     registry
         .drives
         .lock()
