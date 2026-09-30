@@ -183,9 +183,7 @@ impl ToolExecutorPort for ImmediateTool {
         Box::pin(async move {
             ToolExecutionResult::of_ctx(
                 &ctx_at_issue,
-                ToolOutcome::Success {
-                    content_digest: "unused".to_string(),
-                },
+                ToolOutcome::success_text("unused".to_string()),
             )
         })
     }

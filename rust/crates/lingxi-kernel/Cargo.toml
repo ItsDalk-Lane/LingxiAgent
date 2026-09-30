@@ -8,3 +8,8 @@ publish.workspace = true
 
 [dependencies]
 lingxi-protocol = { path = "../lingxi-protocol" }
+# R04-T01: the tool catalog's schema subset validation, effective-argument
+# canonicalization and digest derivation work on JSON values directly.
+# Same locked version as lingxi-protocol/lingxi-service (no new package
+# version enters the lock).
+serde_json = "1.0.151"

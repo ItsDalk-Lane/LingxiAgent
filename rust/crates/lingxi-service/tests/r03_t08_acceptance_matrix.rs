@@ -257,25 +257,27 @@ fn delegation_turn(
     thread_id: Option<String>,
 ) -> ProviderTurn {
     ToolRequests {
-        requests: vec![ToolRequest {
-            target: target.to_string(),
-            args_digest: lingxi_protocol::digest_arguments(&serde_json::json!({
+        requests: vec![ToolRequest::from_effective_arguments(
+            target,
+            serde_json::json!({
                 "task": task,
-            })),
-            args_summary: Some(format!("{target}: {task}")),
-            delegation: Some(DelegationRequest {
-                task: task.to_string(),
-                access: if access_write {
-                    Some(lingxi_kernel::subagent::AccessRequest::Write)
-                } else {
-                    None
-                },
-                label: None,
-                agent_id: None,
-                model: None,
-                thread_id,
             }),
-        }],
+            &lingxi_kernel::toolcatalog::SchemaBudget::default(),
+        )
+        .expect("effective tool request")
+        .with_summary(format!("{target}: {task}"))
+        .with_delegation(DelegationRequest {
+            task: task.to_string(),
+            access: if access_write {
+                Some(lingxi_kernel::subagent::AccessRequest::Write)
+            } else {
+                None
+            },
+            label: None,
+            agent_id: None,
+            model: None,
+            thread_id,
+        })],
     }
 }
 
@@ -292,12 +294,13 @@ fn final_message(text: &str) -> ProviderTurn {
 }
 
 fn read_tool(n: u32) -> ToolRequest {
-    ToolRequest {
-        target: format!("read{n}"),
-        args_digest: lingxi_protocol::digest_arguments(&serde_json::json!({"path": "/tmp/x"})),
-        args_summary: Some(format!("read /tmp/x #{n}")),
-        delegation: None,
-    }
+    ToolRequest::from_effective_arguments(
+        format!("read{n}"),
+        serde_json::json!({"path": "/tmp/x"}),
+        &lingxi_kernel::toolcatalog::SchemaBudget::default(),
+    )
+    .expect("effective tool request")
+    .with_summary(format!("read /tmp/x #{n}"))
 }
 
 fn tool_requests(count: u32) -> ProviderTurn {
@@ -334,12 +337,7 @@ impl ToolExecutorPort for CountingTool {
         let ctx_at_issue = ctx.clone();
         let digest = format!("executed:{}", request.target);
         Box::pin(async move {
-            ToolExecutionResult::of_ctx(
-                &ctx_at_issue,
-                ToolOutcome::Success {
-                    content_digest: digest,
-                },
-            )
+            ToolExecutionResult::of_ctx(&ctx_at_issue, ToolOutcome::success_text(digest))
         })
     }
 }

@@ -481,14 +481,15 @@ impl TurnProviderPort for OneToolThenFinalProvider {
         Box::pin(async move {
             let out = if turn == 1 {
                 lingxi_kernel::ports::ProviderTurn::ToolRequests {
-                    requests: vec![ToolRequest {
-                        target: TARGET.to_string(),
-                        args_digest: lingxi_protocol::digest_arguments(&serde_json::json!({
+                    requests: vec![ToolRequest::from_effective_arguments(
+                        TARGET,
+                        serde_json::json!({
                             "target": TARGET, "payload": "fixed",
-                        })),
-                        args_summary: Some("crash-point tool".to_string()),
-                        delegation: None,
-                    }],
+                        }),
+                        &lingxi_kernel::toolcatalog::SchemaBudget::default(),
+                    )
+                    .expect("effective tool request")
+                    .with_summary("crash-point tool")],
                 }
             } else {
                 lingxi_kernel::ports::ProviderTurn::Final {
@@ -563,9 +564,7 @@ impl ToolExecutorPort for ExternalTool {
                 // arrives (the process dies first).
                 std::future::pending::<()>().await;
             }
-            let outcome = ToolOutcome::Success {
-                content_digest: digest,
-            };
+            let outcome = ToolOutcome::success_text(digest);
             ToolExecutionResult::of_ctx(&ctx_at_issue, outcome)
         })
     }

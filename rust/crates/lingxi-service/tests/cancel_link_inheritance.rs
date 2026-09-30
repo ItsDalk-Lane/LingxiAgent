@@ -132,21 +132,23 @@ impl TurnProviderPort for ScriptedProvider {
             let turn = match step {
                 Some(Step::Turn(turn)) => turn,
                 Some(Step::Dispatch { task }) => ProviderTurn::ToolRequests {
-                    requests: vec![ToolRequest {
-                        target: "subagent".to_string(),
-                        args_digest: lingxi_protocol::digest_arguments(&serde_json::json!({
+                    requests: vec![ToolRequest::from_effective_arguments(
+                        "subagent",
+                        serde_json::json!({
                             "task": task,
-                        })),
-                        args_summary: Some(format!("subagent: {task}")),
-                        delegation: Some(DelegationRequest {
-                            task: task.to_string(),
-                            access: None,
-                            label: None,
-                            agent_id: None,
-                            model: None,
-                            thread_id: None,
                         }),
-                    }],
+                        &lingxi_kernel::toolcatalog::SchemaBudget::default(),
+                    )
+                    .expect("effective tool request")
+                    .with_summary(format!("subagent: {task}"))
+                    .with_delegation(DelegationRequest {
+                        task: task.to_string(),
+                        access: None,
+                        label: None,
+                        agent_id: None,
+                        model: None,
+                        thread_id: None,
+                    })],
                 },
                 None => ProviderTurn::Failed {
                     error: ProtocolError::new(
@@ -183,9 +185,7 @@ impl ToolExecutorPort for ParkingTool {
             let _permit = gate.acquire().await.expect("tool gate closed");
             ToolExecutionResult::of_ctx(
                 &ctx_at_issue,
-                ToolOutcome::Success {
-                    content_digest: "parked-then-success".to_string(),
-                },
+                ToolOutcome::success_text("parked-then-success".to_string()),
             )
         })
     }
@@ -267,12 +267,13 @@ fn final_turn(text: &str) -> ProviderTurn {
 }
 
 fn read_tool_request() -> ToolRequest {
-    ToolRequest {
-        target: "read".to_string(),
-        args_digest: lingxi_protocol::digest_arguments(&serde_json::json!({"path": "/tmp/x"})),
-        args_summary: Some("read /tmp/x".to_string()),
-        delegation: None,
-    }
+    ToolRequest::from_effective_arguments(
+        "read",
+        serde_json::json!({"path": "/tmp/x"}),
+        &lingxi_kernel::toolcatalog::SchemaBudget::default(),
+    )
+    .expect("effective tool request")
+    .with_summary("read /tmp/x")
 }
 
 // ── harness ──────────────────────────────────────────────────────────────────

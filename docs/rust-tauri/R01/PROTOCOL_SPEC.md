@@ -136,11 +136,17 @@ WIRE_PROTOCOL_MAX_SUPPORTED = 1`）。协议族名错误、范围不相交都不
 golden、内容摘要、跨语言字节相等判定统一使用该 profile：
 
 - UTF-8、无空白、无尾随换行；
-- 对象键按 Unicode 码点排序（serde_json 默认 BTreeMap；TS 侧 `Object.keys().sort()`
-  在 UTF-16 码元序下与码点序等价）；
+- 对象键按 UTF-16 码元序列排序（R04-T01 关闭 RR-T02-F1：TS 侧 `Object.keys().sort()`
+  的默认比较走 UTF-16 码元，而 Rust 侧 `str` Ord 是 UTF-8 字节序＝码点序；两者仅在
+  「星形字符键（≥U+10000，代理对 D800–DFFF）与 U+E000..=U+FFFF 键混排」时分叉。
+  Rust `canon.rs` 的写入器因此改为按 UTF-16 码元排序键，双端在所有键形上字节一致；
+  `canon.rs` 内的非 BMP 混排 golden 回归钉住该行为）；
 - 非 ASCII 原样输出（不转 `\uXXXX`）；
 - 仅整数；wire 上不存在浮点与 u64 数字（u64 一律十进制字符串）。TS 端遇到非安全整数
-  直接抛错，不静默截断。
+  直接抛错，不静默截断；Rust 侧 R04-T01 起在工具参数摘要的消费边界
+  （`lingxi-kernel::toolcatalog::EffectiveArguments`）对浮点与超出 ±2^53 的整数同样
+  硬失败（RR-T02-F2 裁定：TS 的 hard-fail 语义是正确语义，Rust 摘要边界与之对齐，
+  而不是放宽任何一端）。
 
 双端实现：`rust/.../src/canon.rs` 与 `tests/migration/r01-t02/canonical-json.mjs`；
 字节级一致性由 R01-A03 round-trip（双向逐字节相等）证明。

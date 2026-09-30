@@ -113,9 +113,7 @@ struct ToolDouble {
 impl ToolDouble {
     fn succeeding() -> Arc<Self> {
         Arc::new(Self {
-            outcome: ToolOutcome::Success {
-                content_digest: "deadbeef".to_string(),
-            },
+            outcome: ToolOutcome::success_text("deadbeef".to_string()),
             calls: std::sync::Mutex::new(Vec::new()),
         })
     }
@@ -148,12 +146,13 @@ impl ToolExecutorPort for ToolDouble {
 }
 
 fn read_tool_request() -> ToolRequest {
-    ToolRequest {
-        target: "read".to_string(),
-        args_digest: lingxi_protocol::digest_arguments(&serde_json::json!({"path": "/tmp/x"})),
-        args_summary: Some("read /tmp/x".to_string()),
-        delegation: None,
-    }
+    ToolRequest::from_effective_arguments(
+        "read",
+        serde_json::json!({"path": "/tmp/x"}),
+        &lingxi_kernel::toolcatalog::SchemaBudget::default(),
+    )
+    .expect("effective tool request")
+    .with_summary("read /tmp/x")
 }
 
 fn assistant_final(text: &str, call: &str) -> NormalizedMessage {

@@ -1,0 +1,35 @@
+{
+  "schemaVersion": 1,
+  "artifactKind": "R04_PLATFORM_CAPABILITIES",
+  "stage_id": "R04",
+  "generated_by": "R04 orchestrator (startup prep, one-shot; T06 executor fills verified capability matrix)",
+  "generated_at": "2026-09-30",
+  "note": "本文件登记各平台在 R04 实际承诺并验证的读/写/网络/进程隔离范围。『已承诺』必须与真实探针证据一致；不把某平台只实现写隔离说成完整网络沙盒。源码/交叉构建验证、真机基础隔离验证和最终安装包验证三者分开（正式安装/签名/公证归 R10/R11）。",
+  "platforms": {
+    "macos-arm64": {
+      "local_available": true,
+      "real_process_pty_verification": "本机可执行（R04-A09/A10 环境要求：真实目标操作系统）",
+      "sandbox_verification": "本机可执行（R04-A12 本平台冻结策略下真实探针）",
+      "legacy_reference": "lib/sandbox/{path-guard,platform,policy,bwrap,exec-helper}.ts + 现役 helper（executor 按 R04-T06 追踪真实机制）",
+      "r04_commitment": "待 R04-T06 冻结并登记（读/写/网络/环境/子进程各项 allow/deny 与证据指针）"
+    },
+    "macos-x64": {
+      "local_available": false,
+      "r04_commitment": "源码级平台适配与 #[cfg] 分支；真机验证按 R02 起平台登记口径（R09/R10 消除），R04 不冒称已真机验证"
+    },
+    "windows-x64": {
+      "local_available": false,
+      "r04_commitment": "源码级适配（junction/UNC/盘符/Job Object 路径与测试）；Windows 真机验证沿用 R03-WINDOWS-R09-R10 递延登记（REQUIRED 不丢失）；R04 无法本地执行的份额如实 BLOCKED/递延，不伪造通过",
+      "existing_deferral": "R03-WINDOWS-R09-R10（继承 R02）"
+    },
+    "linux-x64": {
+      "local_available": false,
+      "r04_commitment": "源码级适配（bwrap 等现役机制按 R04-T06 提取）；真机/容器内验证按实际环境能力如实登记，缺项 BLOCKED 不冒称"
+    }
+  },
+  "verification_layer_separation": {
+    "source_and_cross_build": "cargo check/clippy/test 于本机（macos-arm64）+ 可行的交叉检查",
+    "real_machine_isolation": "仅 macos-arm64 本机；其余平台按上述登记",
+    "final_install_packages": "R10/R11（不在 R04 范围）"
+  }
+}

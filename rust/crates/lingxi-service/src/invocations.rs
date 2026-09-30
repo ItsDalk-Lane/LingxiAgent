@@ -95,6 +95,51 @@ impl RecoveryCapabilitySource for ConservativeCapabilities {
     }
 }
 
+/// R04-T01: the registry-backed capability source — the resolution the
+/// R03 handoff deferred to "R04's tool registry". Per-target capabilities
+/// come from the VERIFIED [`ToolManifest::recovery`] facts the registrar
+/// supplied; a target the registry does not know stays conservative
+/// (unknown tool ≠ optimistic tool). The conservative default itself is
+/// never replaced by optimism — only explicitly verified manifests can.
+pub struct RegistryCapabilities {
+    registry: std::sync::Arc<lingxi_kernel::toolcatalog::ToolRegistry>,
+}
+
+impl RegistryCapabilities {
+    pub fn new(registry: std::sync::Arc<lingxi_kernel::toolcatalog::ToolRegistry>) -> Self {
+        Self { registry }
+    }
+}
+
+impl RecoveryCapabilitySource for RegistryCapabilities {
+    fn capability_of(&self, target: &str) -> ToolRecoveryCapability {
+        use lingxi_kernel::toolcatalog::{ToolTargetId, ToolTargetRef};
+        // Journal targets may be derived target ids ("tool:…") or legacy
+        // plain names; resolve both, and stay conservative on ANY
+        // unresolved or ambiguous reference.
+        let resolved = if target.starts_with("tool:") {
+            self.registry
+                .resolve(&ToolTargetRef::ByTargetId {
+                    target_id: ToolTargetId::parse(target),
+                })
+                .ok()
+        } else {
+            self.registry
+                .resolve(&ToolTargetRef::ByName {
+                    name: target.to_string(),
+                })
+                .ok()
+        };
+        match resolved {
+            Some(target_id) => match self.registry.describe(&target_id) {
+                Ok(listing) => listing.recovery,
+                Err(_) => ToolRecoveryCapability::CONSERVATIVE,
+            },
+            None => ToolRecoveryCapability::CONSERVATIVE,
+        }
+    }
+}
+
 /// Loads one run's journal and classifies every entry (READ-ONLY — nothing
 /// is persisted). This is the pure inspection half of
 /// [`recover_run_invocations`].

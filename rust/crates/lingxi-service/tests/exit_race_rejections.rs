@@ -68,14 +68,15 @@ impl TurnProviderPort for OneToolThenFinalProvider {
         Box::pin(async move {
             let out = if turn == 1 {
                 lingxi_kernel::ports::ProviderTurn::ToolRequests {
-                    requests: vec![ToolRequest {
-                        target: "park.tool".to_string(),
-                        args_digest: lingxi_protocol::digest_arguments(&serde_json::json!({
+                    requests: vec![ToolRequest::from_effective_arguments(
+                        "park.tool",
+                        serde_json::json!({
                             "target": "park.tool", "payload": "fixed",
-                        })),
-                        args_summary: Some("parking tool".to_string()),
-                        delegation: None,
-                    }],
+                        }),
+                        &lingxi_kernel::toolcatalog::SchemaBudget::default(),
+                    )
+                    .expect("effective tool request")
+                    .with_summary("parking tool")],
                 }
             } else {
                 lingxi_kernel::ports::ProviderTurn::Final {

@@ -4,8 +4,8 @@
   "start_branch": "main",
   "implementation_branch": "codex/rust-tauri-migration",
   "start_head": "7d1a0c6bc28062ff455adcf8f68c3a80b117e90d",
-  "current_head": "cdd213078f6947217000c7ecd1a36ab5ffe2bb01",
-  "current_head_note": "2026-09-30 R03 对抗性修复轮收口：接受候选 ebcbcad1b9fa1c621b315dd33b58f8a2e01ab9eb（=远程 HEAD）；接受记录提交为后续 docs 提交（自身 SHA 不回填文件）。",
+  "current_head": "bf6450bcd722668188d1a3091681bf285875ef11",
+  "current_head_note": "R04 start: R03 re-accepted after RR2 fixed repair (candidate f4d4b1666 verified ancestor; RR2 stage review PASS). R04 begins at bf6450bcd (local==remote, clean).",
   "remote": "origin",
   "remote_default_branch": "main",
   "taskbook_manifest_sha256": "49968287f564a2a470d55fe4295a26ef70a71ccb4b16e38933567e89076a5c3f",
@@ -549,25 +549,7 @@
       "stage_final_candidate_sha": "1ebb03d9f89af364a42274efc2cd482f298b1130",
       "acceptance_note": "2026-09-30 对抗性修复轮重开并重新接受：F01-F08 全部关闭（34 C-ID 三层），全新阶段 Reviewer RR1 PASS，候选 ebcbcad1b；2026-09-29 首次接受记录与证据原文保留，其裁决2 依据已被本轮替代。"
     },
-    "R04": {
-      "title": "统一工具网关、四基础工具与沙盒",
-      "status": "PENDING",
-      "task_ids": [
-        "R04-T01",
-        "R04-T02",
-        "R04-T03",
-        "R04-T04",
-        "R04-T05",
-        "R04-T06",
-        "R04-T07",
-        "R04-T08"
-      ],
-      "stage_base_sha": null,
-      "stage_review_round": 0,
-      "stage_verdict": null,
-      "stage_acceptance_commit_sha": null,
-      "blockers": []
-    },
+    "R04": "IN_PROGRESS",
     "R05": {
       "title": "模型协议、凭证、流式处理与最小完整闭环",
       "status": "PENDING",
@@ -2896,23 +2878,30 @@
     "R04-T01": {
       "name": "建立工具目录与参数契约",
       "stage_id": "R04",
-      "status": "PENDING",
-      "task_base_sha": null,
-      "executor_id": null,
-      "execution_result": null,
-      "review_round": 0,
-      "reviewer_id": null,
-      "review_verdict": null,
-      "findings": [],
-      "repair_agent_id": null,
+      "status": "DONE",
+      "task_base_sha": "bf6450bcd722668188d1a3091681bf285875ef11",
+      "executor_id": "EXECUTOR-R04-T01-E01 (ZCode agent_38ec1d3a)",
+      "execution_result": "READY_FOR_REVIEW -> review R1 FAIL (F01 minItems/maxItems gated by items; F02 comment; O04 ledger) -> repair REPAIR-R04-T01-F01 -> review R2 PASS",
+      "review_round": 2,
+      "reviewer_id": "REVIEWER-R04-T01-R01 (agent_42156255); REVIEWER-R04-T01-R02 (agent_07a0aed6)",
+      "review_verdict": "PASS (R2)",
+      "findings": [
+        "R04-T01-R1-F01 CLOSED",
+        "R04-T01-R1-F02 CLOSED",
+        "R04-T01-R1-O04 CLOSED",
+        "R04-T01-R1-O03 attributed to orchestrator registration (no action)"
+      ],
+      "repair_agent_id": "REPAIR-R04-T01-F01 (agent_70c97f27)",
       "root_cause_agent_id": null,
       "acceptance_results": {
-        "R04-A01": "NOT_STARTED",
-        "R04-A02": "NOT_STARTED"
+        "R04-A01": "PASS (R2 independent re-run: r04_t01_tool_catalog 6/6 + kernel toolcatalog 19/19)",
+        "R04-A02": "PASS (R2 independent re-run: StaleCatalog refusal + refresh path)"
       },
       "task_commit_sha": null,
       "push_result": null,
-      "blockers": []
+      "blockers": [],
+      "candidate_diff_digest": "48a0d1bdc09fc5b1 (vs base bf6450bcd)",
+      "commit_note": "commit SHA recorded via remote receipt in subsequent records (self-SHA rule)"
     },
     "R04-T02": {
       "name": "实现唯一工具执行网关",
@@ -4322,7 +4311,7 @@
       "blockers": []
     }
   },
-  "current_task": null,
+  "current_task": "R04-T02 (next)",
   "orchestration_mode": {
     "effective_from": "R00-T03 R2 repair",
     "task_executor": "new ZCode task per Rxx-Tyy",

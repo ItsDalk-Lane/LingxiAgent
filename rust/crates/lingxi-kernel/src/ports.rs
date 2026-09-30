@@ -841,14 +841,31 @@ pub struct InvocationJournalEntry {
 /// One tool call a provider requested. Identity (`ToolCallId`) is minted by
 /// the run driver, never by the provider — and never derived from the run
 /// or attempt id.
+///
+/// R04-T01: the request carries the COMPLETE effective arguments
+/// ([`crate::toolcatalog::EffectiveArguments`]) — the R03 digest-only shape
+/// was a test boundary, not the contract executors consume. `args_digest`
+/// is DERIVED from `arguments` by the trusted boundary that built the
+/// request (the R04 gateway / a provider adapter), and the run driver
+/// re-verifies the pair on every call
+/// ([`ToolRequest::digest_matches_arguments`]): a self-filled digest for
+/// OTHER arguments is a loud protocol violation with zero dispatch.
 // NOTE: not `Eq` — `ArgsDigest` follows the wire digest struct.
 #[derive(Debug, Clone, PartialEq)]
 pub struct ToolRequest {
-    /// Registry target id (R04 owns the real registry; T01 doubles carry a
-    /// stable target name).
+    /// Registry target id (R04's [`crate::toolcatalog::ToolRegistry`]
+    /// owns the real target identities; R03 doubles carry a stable target
+    /// name).
     pub target: String,
-    /// Digest of the normalized arguments (the value approvals bind to).
+    /// The complete, immutable, validated + normalized argument object
+    /// the executor consumes (R04-T01).
+    pub arguments: crate::toolcatalog::EffectiveArguments,
+    /// Digest of `arguments` (the value approvals bind to), computed by
+    /// the trusted boundary that produced the request.
     pub args_digest: lingxi_protocol::ArgsDigest,
+    /// Bounded diagnostic summary. UNTRUSTED when it arrives with provider
+    /// output: the trusted boundary's own summaries are shape-only
+    /// ([`crate::toolcatalog::summarize_arguments`]).
     pub args_summary: Option<String>,
     /// The structured delegation payload when (and only when) the target
     /// is a `subagent`-family tool — `subagent` (fresh dispatch),
@@ -859,6 +876,50 @@ pub struct ToolRequest {
     /// facts ([`crate::subagent`]), so neither this payload nor a later
     /// model/executor swap can widen permissions.
     pub delegation: Option<DelegationRequest>,
+}
+
+impl ToolRequest {
+    /// Builds a request from ALREADY-EFFECTIVE arguments, deriving the
+    /// digest from them (the trusted-boundary path: provider doubles in
+    /// tests, the R04 gateway and R05 adapters in production). `None`
+    /// when the value is not a JSON object or violates the canonical
+    /// invariants — a loud refusal, never a guessed default.
+    pub fn from_effective_arguments(
+        target: impl Into<String>,
+        arguments: serde_json::Value,
+        budget: &crate::toolcatalog::SchemaBudget,
+    ) -> Option<Self> {
+        let arguments =
+            crate::toolcatalog::EffectiveArguments::from_value(arguments, budget).ok()?;
+        let args_digest = arguments.digest();
+        Some(Self {
+            target: target.into(),
+            arguments,
+            args_digest,
+            args_summary: None,
+            delegation: None,
+        })
+    }
+
+    /// Attaches a diagnostic summary (untrusted at the model boundary;
+    /// shape-only when produced by the catalog boundary).
+    pub fn with_summary(mut self, summary: impl Into<String>) -> Self {
+        self.args_summary = Some(summary.into());
+        self
+    }
+
+    /// Attaches the subagent-family delegation payload (R03-T06).
+    pub fn with_delegation(mut self, delegation: DelegationRequest) -> Self {
+        self.delegation = Some(delegation);
+        self
+    }
+
+    /// Whether the stored digest is exactly the digest of the stored
+    /// effective arguments. The run driver checks this before journaling
+    /// anything: a mismatch is a forged/adulterated request.
+    pub fn digest_matches_arguments(&self) -> bool {
+        self.arguments.digest_matches(&self.args_digest)
+    }
 }
 
 /// The delegation request of a `subagent`-family tool call (R03-T06).
@@ -936,14 +997,89 @@ pub trait ToolExecutorPort: Send + Sync {
 /// Result of one tool call. `Unknown` is mandatory: an externally
 /// completed side effect with no local receipt is never silently
 /// retried and never reported as success.
+///
+/// R04-T01: `Success` carries the CONSUMABLE structured result
+/// ([`ToolSuccess`]) — actual content blocks, resource references,
+/// truncation and the process run/exit status. The R03 shape (a bare
+/// content digest) was a test boundary; the digest survives as the
+/// integrity/audit value (the journal receipt's dedup id), while the run
+/// driver, the steering payloads and R05 adapters read the real content.
 // NOTE: not `Eq` — it carries `ProtocolError`, whose `details` holds
 // arbitrary JSON values.
 #[derive(Debug, Clone, PartialEq)]
 pub enum ToolOutcome {
-    Success { content_digest: String },
+    Success { result: ToolSuccess },
     Failed { error: ProtocolError },
     Cancelled,
     Unknown { reason: String },
+}
+
+/// The structured success payload of one tool call (R04-T01). Everything
+/// here is consumable data; `content_digest` is derived by this boundary
+/// over the canonical content and never replaces it.
+#[derive(Debug, Clone, PartialEq)]
+pub struct ToolSuccess {
+    /// Actual content blocks of the result (text, resource refs, provider
+    /// opaque payloads).
+    pub content: Vec<lingxi_protocol::ContentBlock>,
+    /// Real resources the call produced/touched (their existence and
+    /// authorization belong to the resource layer; a model claim never
+    /// mints one).
+    pub resource_refs: Vec<lingxi_protocol::ResourceRef>,
+    /// Whether the content was truncated at a boundary. A truncated
+    /// result MUST set this — silent truncation is forbidden.
+    pub truncated: bool,
+    /// Process-family execution status (exit code / still-running
+    /// handle). `None` for non-process tools. "Started/running" is a
+    /// status here, never a disguised success claim (T05 owns the full
+    /// semantics).
+    pub status: Option<ToolRunStatus>,
+    /// SHA-256 of the canonical content blocks — the audit/dedup value.
+    pub content_digest: String,
+}
+
+/// Run/exit status of a process-family tool call (R04-T01; the full
+/// PTY/process lifecycle lands with T05).
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub enum ToolRunStatus {
+    /// The process exited with this code.
+    Exited { code: i64 },
+    /// The process is still running under this opaque handle (its
+    /// lifetime and cancellation belong to the process supervisor).
+    Running { handle: String },
+}
+
+impl ToolSuccess {
+    /// Builds a success payload from content blocks, deriving the digest
+    /// over their canonical form.
+    pub fn from_content(content: Vec<lingxi_protocol::ContentBlock>) -> Self {
+        let value = serde_json::to_value(&content).expect("content blocks serialize to JSON");
+        let canonical = lingxi_protocol::canon::canonical_json_bytes(&value);
+        Self {
+            content,
+            resource_refs: Vec::new(),
+            truncated: false,
+            status: None,
+            content_digest: lingxi_protocol::canon::sha256_hex(&canonical),
+        }
+    }
+
+    /// The minimal text-content success (the common shape).
+    pub fn text(text: impl Into<String>) -> Self {
+        Self::from_content(vec![lingxi_protocol::ContentBlock::Text {
+            text: text.into(),
+        }])
+    }
+}
+
+impl ToolOutcome {
+    /// A successful outcome carrying one text content block whose digest
+    /// is derived from the content itself.
+    pub fn success_text(text: impl Into<String>) -> Self {
+        ToolOutcome::Success {
+            result: ToolSuccess::text(text),
+        }
+    }
 }
 
 /// Server-side resolution of provider credentials. Only the service

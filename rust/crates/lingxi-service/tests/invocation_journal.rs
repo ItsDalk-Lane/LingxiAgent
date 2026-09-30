@@ -218,9 +218,7 @@ impl ToolExecutorPort for ParkingExternalTool {
                     ),
                 }
             } else {
-                ToolOutcome::Success {
-                    content_digest: record.digest,
-                }
+                ToolOutcome::success_text(record.digest)
             };
             ToolExecutionResult::of_ctx(&ctx_at_issue, outcome)
         })
@@ -313,14 +311,15 @@ impl TurnProviderPort for ScriptedProvider {
 }
 
 fn tool_request(target: &str) -> ToolRequest {
-    ToolRequest {
-        target: target.to_string(),
-        args_digest: lingxi_protocol::digest_arguments(&serde_json::json!({
+    ToolRequest::from_effective_arguments(
+        target,
+        serde_json::json!({
             "target": target, "payload": "fixed",
-        })),
-        args_summary: Some(format!("{target} fixed payload")),
-        delegation: None,
-    }
+        }),
+        &lingxi_kernel::toolcatalog::SchemaBudget::default(),
+    )
+    .expect("effective tool request")
+    .with_summary(format!("{target} fixed payload"))
 }
 
 fn assistant_final(text: &str) -> NormalizedMessage {
@@ -832,20 +831,30 @@ async fn r03_a10_idempotent_key_resume_does_not_duplicate_the_external_operation
         generation: entry.generation,
     };
     let call = ToolCallId::new(entry.journal_id.clone());
-    let request = ToolRequest {
-        target: entry.target.clone(),
-        args_digest: lingxi_protocol::ArgsDigest {
-            algorithm: "sha256".to_string(),
-            canonicalization: "jcs".to_string(),
-            hex: entry.args_digest.clone(),
-        },
-        args_summary: entry.args_summary.clone(),
-        delegation: None,
-    };
+    // R04-T01: the resume request carries the COMPLETE effective
+    // arguments; the digest is derived from them by the constructor (the
+    // journal's stored digest remains the receipt binding the recovery
+    // decision consumed above).
+    let request = ToolRequest::from_effective_arguments(
+        entry.target.clone(),
+        serde_json::json!({"target": entry.target.clone(), "payload": "fixed"}),
+        &lingxi_kernel::toolcatalog::SchemaBudget::default(),
+    )
+    .expect("effective tool request")
+    .with_summary("recovery resume: same executor port and call identity");
     let resumed = tools.execute(&recovered_ctx, &call, &request).await;
     assert!(resumed.fence.matches_ctx(&recovered_ctx));
-    let digest = match resumed.outcome {
-        ToolOutcome::Success { content_digest } => content_digest,
+    // 核验 (content-level, R04-T01): the deduped resume returns the
+    // recorded outcome's CONTENT, not just a digest.
+    let outcome_text = match &resumed.outcome {
+        ToolOutcome::Success { result } => result
+            .content
+            .iter()
+            .map(|block| match block {
+                lingxi_protocol::ContentBlock::Text { text } => text.as_str(),
+                other => panic!("expected text content, got {other:?}"),
+            })
+            .collect::<String>(),
         other => panic!("the deduped resume must return the recorded outcome, got {other:?}"),
     };
     // The dedup evidence: TWO requests (original + resume), ONE execution.
@@ -866,7 +875,7 @@ async fn r03_a10_idempotent_key_resume_does_not_duplicate_the_external_operation
         .and_then(|v| v.as_str())
         .expect("the key's recorded outcome");
     assert_eq!(
-        &digest, recorded,
+        &outcome_text, recorded,
         "verified: the dedup result matches the record"
     );
 
@@ -915,7 +924,7 @@ async fn r03_a10_idempotent_key_resume_does_not_duplicate_the_external_operation
             "external_request_count": external.request_count(),
             "external_executed_count": external.executed_count(),
             "decision": decision.name(),
-            "verified_digest": digest,
+            "verified_outcome_text": outcome_text,
             "final_phase": "succeeded",
         }),
     );

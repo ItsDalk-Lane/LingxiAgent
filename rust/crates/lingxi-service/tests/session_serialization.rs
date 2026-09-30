@@ -153,9 +153,7 @@ impl GatedTool {
         Arc::new(Self {
             arrivals,
             gate: Some(Arc::new(tokio::sync::Semaphore::new(0))),
-            outcome: ToolOutcome::Success {
-                content_digest: "parked-then-success".to_string(),
-            },
+            outcome: ToolOutcome::success_text("parked-then-success".to_string()),
         })
     }
 
@@ -200,12 +198,13 @@ impl ToolExecutorPort for GatedTool {
 }
 
 fn read_tool_request() -> ToolRequest {
-    ToolRequest {
-        target: "read".to_string(),
-        args_digest: lingxi_protocol::digest_arguments(&serde_json::json!({"path": "/tmp/x"})),
-        args_summary: Some("read /tmp/x".to_string()),
-        delegation: None,
-    }
+    ToolRequest::from_effective_arguments(
+        "read",
+        serde_json::json!({"path": "/tmp/x"}),
+        &lingxi_kernel::toolcatalog::SchemaBudget::default(),
+    )
+    .expect("effective tool request")
+    .with_summary("read /tmp/x")
 }
 
 fn assistant_final(text: &str) -> NormalizedMessage {
@@ -415,9 +414,7 @@ async fn r03_a03_same_session_serializes_and_steers_per_frozen_semantics() {
             turn_provider: Some(provider.clone() as Arc<dyn TurnProviderPort>),
             tool_executor: Some(GatedTool::immediate(
                 tool_arrivals_tx,
-                ToolOutcome::Success {
-                    content_digest: "unused".to_string(),
-                },
+                ToolOutcome::success_text("unused".to_string()),
             ) as Arc<dyn ToolExecutorPort>),
             ..ServiceDeps::default()
         },
@@ -905,9 +902,7 @@ async fn leftover_steering_survives_into_the_next_run() {
             turn_provider: Some(provider.clone() as Arc<dyn TurnProviderPort>),
             tool_executor: Some(GatedTool::immediate(
                 tool_arrivals_tx,
-                ToolOutcome::Success {
-                    content_digest: "unused".to_string(),
-                },
+                ToolOutcome::success_text("unused".to_string()),
             ) as Arc<dyn ToolExecutorPort>),
             ..ServiceDeps::default()
         },

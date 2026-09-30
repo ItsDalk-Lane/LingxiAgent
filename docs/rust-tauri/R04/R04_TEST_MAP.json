@@ -1,0 +1,113 @@
+{
+  "schemaVersion": 1,
+  "artifactKind": "R04_TEST_MAP",
+  "stage_id": "R04",
+  "generated_by": "R04 orchestrator (startup prep, one-shot; per-task entries appended by executors/reviewers)",
+  "generated_at": "2026-09-30",
+  "conventions": {
+    "gate_commands": [
+      "cargo fmt --manifest-path rust/Cargo.toml --all -- --check",
+      "cargo clippy --manifest-path rust/Cargo.toml --workspace --all-targets --locked -- -D warnings",
+      "cargo test --manifest-path rust/Cargo.toml --workspace --locked",
+      "cargo run --manifest-path rust/Cargo.toml --locked -p xtask -- check-contracts",
+      "cargo run --manifest-path rust/Cargo.toml --locked -p xtask -- check-boundaries"
+    ],
+    "stage_gate": "cargo run --manifest-path rust/Cargo.toml --locked -p xtask -- verify-stage R04 --evidence <fresh evidence dir>（R04.json 注册与生成在 R04-T08 完成前建立；早期逐项登记，不空集合 PASS）",
+    "r03_regression": "完整 R03 Gate（含 repair_suites 十套件）在最终候选重跑；R02 受影响定向链按 R03 图口径",
+    "toolchain_note": "必须经 rustup（~/.cargo/bin 优先于 /opt/homebrew/bin）生效 rust-toolchain.toml 1.98.1；Homebrew cargo 1.93.0 不读取锁定"
+  },
+  "tasks": {
+    "R04-T01": {
+      "status": "READY_FOR_REVIEW",
+      "acceptance_map": {
+        "R04-A01": {
+          "status": "IMPLEMENTED_SELF_CHECKED",
+          "tests": [
+            "lingxi-kernel::toolcatalog (unit battery: identity/no-overwrite/alias/schema-budget/normalization/generation)",
+            "lingxi-service --test r04_t01_tool_catalog r04_a01_catalog_and_execution_share_one_source_of_truth"
+          ]
+        },
+        "R04-A02": {
+          "status": "IMPLEMENTED_SELF_CHECKED",
+          "tests": [
+            "lingxi-kernel::toolcatalog::tests::stale_catalog_generation_refuses_and_requires_refresh",
+            "lingxi-service --test r04_t01_tool_catalog r04_a02_stale_catalog_generation_is_refused_until_refresh"
+          ]
+        }
+      },
+      "adversarial_additions": {
+        "tests": [
+          "r04_t01_tool_catalog adversarial_alias_and_primary_name_share_one_permission_contract",
+          "r04_t01_tool_catalog adversarial_malformed_inputs_never_reach_the_executor",
+          "r04_t01_tool_catalog adversarial_forged_digest_is_refused_with_zero_dispatch_on_real_chain",
+          "r04_t01_tool_catalog registry_capabilities_resolve_recovery_classification"
+        ]
+      },
+      "gate_results": {
+        "cargo fmt --check": "exit 0",
+        "cargo clippy --workspace --all-targets --locked -D warnings": "exit 0",
+        "cargo test --workspace --locked": "527 passed / 0 failed / 0 ignored, 41 suites ok, except r00_management_leaves (environment: macOS firewall vs newly-built unsigned test binary; fails identically outside this change's scope — see R04-T01_REPORT.md §5.3). Number provenance (R04-T01-R1-O04 回填): originally mis-recorded as 524; the actual candidate figure was 526 (R04-T01_REPORT.md §5 #3; review R1 §3 #6 independently measured 526); repair R1 adds 1 permanent R04-T01-R1-F01 regression test → 527, verified in docs/rust-tauri/R04/repairs/R04-T01_REPAIR_R1.md",
+        "xtask check-contracts": "exit 0 (56 generated files drift-free)",
+        "xtask check-boundaries": "exit 0 (D1-D5 + negatives)"
+      },
+      "supplemental": [
+        "R04-SUP-03: RR-T02-F1 CLOSED at T01 consumption point (canon.rs UTF-16 key order + Rust golden + cross-language node parity script); RR-T02-F2 CLOSED at tool-arguments digest boundary (safe-integer hard-fail parity with TS + PROTOCOL_SPEC §9 ruling updated); RR-T02-F3/F4 NOT consumed by T01 (event-schema/parsing surfaces, R04/R08 consumption points) — carried unchanged",
+        "R04-SUP-04 (目录面): registry supports registering R03 laterShare tool shapes honestly (Availability::Future = discoverable/not-callable); unit-tested, full business behavior remains R06-R08"
+      ],
+      "report": "docs/rust-tauri/R04/R04-T01_REPORT.md",
+      "evidence": "artifacts/rust-tauri/R04/T01-E01/"
+    },
+    "R04-T02": {
+      "status": "PENDING",
+      "acceptance_map": {
+        "R04-A03": { "status": "NOT_STARTED", "tests": [] },
+        "R04-A04": { "status": "NOT_STARTED", "tests": [] }
+      },
+      "supplemental": ["R04-SUP-02 journal/授权判定点复用", "R04-SUP-05 R03 回归"]
+    },
+    "R04-T03": {
+      "status": "PENDING",
+      "acceptance_map": {
+        "R04-A05": { "status": "NOT_STARTED", "tests": [] },
+        "R04-A06": { "status": "NOT_STARTED", "tests": [] }
+      },
+      "supplemental": ["R04-SUP-01 ask 档审批策略面（R03-T06-O1）"]
+    },
+    "R04-T04": {
+      "status": "PENDING",
+      "acceptance_map": {
+        "R04-A07": { "status": "NOT_STARTED", "tests": [] },
+        "R04-A08": { "status": "NOT_STARTED", "tests": [] }
+      }
+    },
+    "R04-T05": {
+      "status": "PENDING",
+      "acceptance_map": {
+        "R04-A09": { "status": "NOT_STARTED", "tests": [] },
+        "R04-A10": { "status": "NOT_STARTED", "tests": [] }
+      }
+    },
+    "R04-T06": {
+      "status": "PENDING",
+      "acceptance_map": {
+        "R04-A11": { "status": "NOT_STARTED", "tests": [] },
+        "R04-A12": { "status": "NOT_STARTED", "tests": [] }
+      }
+    },
+    "R04-T07": {
+      "status": "PENDING",
+      "acceptance_map": {
+        "R04-A13": { "status": "NOT_STARTED", "tests": [] },
+        "R04-A14": { "status": "NOT_STARTED", "tests": [] }
+      }
+    },
+    "R04-T08": {
+      "status": "PENDING",
+      "acceptance_map": {
+        "R04-A15": { "status": "NOT_STARTED", "tests": [] },
+        "R04-A16": { "status": "NOT_STARTED", "tests": [] }
+      },
+      "supplemental": ["R04 stage map 注册与 verify-stage R04 建立", "全矩阵（目录×权限×入口×生命周期）"]
+    }
+  }
+}

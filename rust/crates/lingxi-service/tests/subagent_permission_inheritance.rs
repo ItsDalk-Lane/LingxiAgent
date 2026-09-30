@@ -170,9 +170,7 @@ impl ToolExecutorPort for RecordingTool {
         Box::pin(async move {
             ToolExecutionResult::of_ctx(
                 &ctx_at_issue,
-                ToolOutcome::Success {
-                    content_digest: format!("executed:{}", request.target),
-                },
+                ToolOutcome::success_text(format!("executed:{}", request.target)),
             )
         })
     }
@@ -183,41 +181,45 @@ fn delegation_request(
     access: Option<AccessRequest>,
     model: Option<&str>,
 ) -> ToolRequest {
-    ToolRequest {
-        target: "subagent".to_string(),
-        args_digest: lingxi_protocol::digest_arguments(&serde_json::json!({
+    ToolRequest::from_effective_arguments(
+        "subagent",
+        serde_json::json!({
             "task": task,
-        })),
-        args_summary: Some(format!("delegate: {task}")),
-        delegation: Some(DelegationRequest {
-            task: task.to_string(),
-            access,
-            label: Some("research".to_string()),
-            agent_id: None,
-            model: model.map(|m| m.to_string()),
-            thread_id: None,
         }),
-    }
+        &lingxi_kernel::toolcatalog::SchemaBudget::default(),
+    )
+    .expect("effective tool request")
+    .with_summary(format!("delegate: {task}"))
+    .with_delegation(DelegationRequest {
+        task: task.to_string(),
+        access,
+        label: Some("research".to_string()),
+        agent_id: None,
+        model: model.map(|m| m.to_string()),
+        thread_id: None,
+    })
 }
 
 fn write_tool_request() -> ToolRequest {
-    ToolRequest {
-        target: "write".to_string(),
-        args_digest: lingxi_protocol::digest_arguments(&serde_json::json!({
+    ToolRequest::from_effective_arguments(
+        "write",
+        serde_json::json!({
             "path": "/tmp/a11-out.txt", "content": "attempted write"
-        })),
-        args_summary: Some("write /tmp/a11-out.txt".to_string()),
-        delegation: None,
-    }
+        }),
+        &lingxi_kernel::toolcatalog::SchemaBudget::default(),
+    )
+    .expect("effective tool request")
+    .with_summary("write /tmp/a11-out.txt")
 }
 
 fn read_tool_request() -> ToolRequest {
-    ToolRequest {
-        target: "read".to_string(),
-        args_digest: lingxi_protocol::digest_arguments(&serde_json::json!({"path": "/tmp/x"})),
-        args_summary: Some("read /tmp/x".to_string()),
-        delegation: None,
-    }
+    ToolRequest::from_effective_arguments(
+        "read",
+        serde_json::json!({"path": "/tmp/x"}),
+        &lingxi_kernel::toolcatalog::SchemaBudget::default(),
+    )
+    .expect("effective tool request")
+    .with_summary("read /tmp/x")
 }
 
 fn final_turn(text: &str) -> ProviderTurn {

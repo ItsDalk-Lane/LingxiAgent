@@ -135,21 +135,20 @@ impl ToolExecutorPort for CountingFileTool {
             writeln!(file, "external+1").expect("append external effect");
             ToolExecutionResult::of_ctx(
                 &ctx_at_issue,
-                ToolOutcome::Success {
-                    content_digest: "counter+1".to_string(),
-                },
+                ToolOutcome::success_text("counter+1".to_string()),
             )
         })
     }
 }
 
 fn tool_request() -> ToolRequest {
-    ToolRequest {
-        target: "counter.write".to_string(),
-        args_digest: lingxi_protocol::digest_arguments(&serde_json::json!({"op": "bump"})),
-        args_summary: Some("counter bump".to_string()),
-        delegation: None,
-    }
+    ToolRequest::from_effective_arguments(
+        "counter.write",
+        serde_json::json!({"op": "bump"}),
+        &lingxi_kernel::toolcatalog::SchemaBudget::default(),
+    )
+    .expect("effective tool request")
+    .with_summary("counter bump")
 }
 
 fn final_turn(text: &str) -> ProviderTurn {

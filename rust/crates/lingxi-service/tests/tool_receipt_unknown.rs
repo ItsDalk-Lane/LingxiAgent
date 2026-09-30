@@ -230,12 +230,7 @@ impl ToolExecutorPort for FaultTool {
                     if let Some(fired) = fired {
                         let _ = fired.send(key.clone());
                     }
-                    ToolExecutionResult::of_ctx(
-                        &ctx_at_issue,
-                        ToolOutcome::Success {
-                            content_digest: digest,
-                        },
-                    )
+                    ToolExecutionResult::of_ctx(&ctx_at_issue, ToolOutcome::success_text(digest))
                 }
             }
         })
@@ -356,14 +351,15 @@ impl TurnProviderPort for ParkAfterToolsProvider {
 // ── helpers ──────────────────────────────────────────────────────────────────
 
 fn tool_request(target: &str) -> ToolRequest {
-    ToolRequest {
-        target: target.to_string(),
-        args_digest: lingxi_protocol::digest_arguments(&serde_json::json!({
+    ToolRequest::from_effective_arguments(
+        target,
+        serde_json::json!({
             "target": target, "payload": "fixed",
-        })),
-        args_summary: Some(format!("{target} fixed payload")),
-        delegation: None,
-    }
+        }),
+        &lingxi_kernel::toolcatalog::SchemaBudget::default(),
+    )
+    .expect("effective tool request")
+    .with_summary(format!("{target} fixed payload"))
 }
 
 fn assistant_final(text: &str) -> NormalizedMessage {
@@ -1322,20 +1318,28 @@ async fn f04_c04_adv_control_verified_idempotent_recovery_uses_only_the_original
         generation: entry.generation,
     };
     let call = ToolCallId::new(entry.journal_id.clone());
-    let request = ToolRequest {
-        target: entry.target.clone(),
-        args_digest: lingxi_protocol::ArgsDigest {
-            algorithm: "sha256".to_string(),
-            canonicalization: "jcs".to_string(),
-            hex: entry.args_digest.clone(),
-        },
-        args_summary: entry.args_summary.clone(),
-        delegation: None,
-    };
+    // R04-T01: the verification request carries the COMPLETE effective
+    // arguments; the digest is derived from them by the constructor.
+    let request = ToolRequest::from_effective_arguments(
+        entry.target.clone(),
+        serde_json::json!({"target": entry.target.clone(), "payload": "fixed"}),
+        &lingxi_kernel::toolcatalog::SchemaBudget::default(),
+    )
+    .expect("effective tool request")
+    .with_summary("recovery verification: original idempotency key");
     let resumed = tools.execute(&recovered_ctx, &call, &request).await;
     assert!(resumed.fence.matches_ctx(&recovered_ctx));
-    let digest = match resumed.outcome {
-        ToolOutcome::Success { content_digest } => content_digest,
+    // 核验 (content-level, R04-T01): the deduped verification returns the
+    // recorded outcome's CONTENT, not just a digest.
+    let outcome_text = match &resumed.outcome {
+        ToolOutcome::Success { result } => result
+            .content
+            .iter()
+            .map(|block| match block {
+                lingxi_protocol::ContentBlock::Text { text } => text.as_str(),
+                other => panic!("expected text content, got {other:?}"),
+            })
+            .collect::<String>(),
         other => panic!("the deduped verification returns the recorded outcome, got {other:?}"),
     };
     assert_eq!(external.request_count(), 2, "the verification re-issued");
@@ -1350,7 +1354,7 @@ async fn f04_c04_adv_control_verified_idempotent_recovery_uses_only_the_original
         .and_then(|v| v.as_str())
         .expect("the recorded outcome")
         .to_string();
-    assert_eq!(digest, recorded, "verified against the record");
+    assert_eq!(outcome_text, recorded, "verified against the record");
 
     // The verified receipt settles the formerly-unknown entry.
     state
@@ -1391,7 +1395,7 @@ async fn f04_c04_adv_control_verified_idempotent_recovery_uses_only_the_original
             "resume_key": resume_key,
             "external_request_count": external.request_count(),
             "external_executed_count": external.executed_count(),
-            "verified_digest": digest,
+            "verified_outcome_text": outcome_text,
             "final_phase": settled[0].phase.wire_name(),
         }),
     );

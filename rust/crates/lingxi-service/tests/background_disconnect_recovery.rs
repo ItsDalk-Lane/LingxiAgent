@@ -127,21 +127,20 @@ impl ToolExecutorPort for ParkingTool {
             let _permit = gate.acquire().await.expect("tool gate closed");
             ToolExecutionResult::of_ctx(
                 &ctx_at_issue,
-                ToolOutcome::Success {
-                    content_digest: "parked-then-success".to_string(),
-                },
+                ToolOutcome::success_text("parked-then-success".to_string()),
             )
         })
     }
 }
 
 fn read_tool_request() -> ToolRequest {
-    ToolRequest {
-        target: "read".to_string(),
-        args_digest: lingxi_protocol::digest_arguments(&serde_json::json!({"path": "/tmp/x"})),
-        args_summary: Some("read /tmp/x".to_string()),
-        delegation: None,
-    }
+    ToolRequest::from_effective_arguments(
+        "read",
+        serde_json::json!({"path": "/tmp/x"}),
+        &lingxi_kernel::toolcatalog::SchemaBudget::default(),
+    )
+    .expect("effective tool request")
+    .with_summary("read /tmp/x")
 }
 
 fn final_turn(text: &str) -> ProviderTurn {

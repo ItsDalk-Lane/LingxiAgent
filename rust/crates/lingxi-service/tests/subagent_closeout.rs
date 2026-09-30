@@ -147,21 +147,23 @@ impl TurnProviderPort for ScriptedProvider {
 
 fn delegation_turn(target: &'static str, task: &str, thread_id: Option<String>) -> ProviderTurn {
     ProviderTurn::ToolRequests {
-        requests: vec![ToolRequest {
-            target: target.to_string(),
-            args_digest: lingxi_protocol::digest_arguments(&serde_json::json!({
+        requests: vec![ToolRequest::from_effective_arguments(
+            target,
+            serde_json::json!({
                 "task": task,
-            })),
-            args_summary: Some(format!("{target}: {task}")),
-            delegation: Some(DelegationRequest {
-                task: task.to_string(),
-                access: None,
-                label: None,
-                agent_id: None,
-                model: None,
-                thread_id,
             }),
-        }],
+            &lingxi_kernel::toolcatalog::SchemaBudget::default(),
+        )
+        .expect("effective tool request")
+        .with_summary(format!("{target}: {task}"))
+        .with_delegation(DelegationRequest {
+            task: task.to_string(),
+            access: None,
+            label: None,
+            agent_id: None,
+            model: None,
+            thread_id,
+        })],
     }
 }
 
@@ -186,9 +188,7 @@ impl ToolExecutorPort for ParkingTool {
             let _permit = gate.acquire().await.expect("tool gate closed");
             ToolExecutionResult::of_ctx(
                 &ctx_at_issue,
-                ToolOutcome::Success {
-                    content_digest: "parked-then-success".to_string(),
-                },
+                ToolOutcome::success_text("parked-then-success".to_string()),
             )
         })
     }

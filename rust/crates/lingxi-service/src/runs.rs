@@ -58,8 +58,8 @@ use lingxi_kernel::{
     RunStateMachine,
 };
 use lingxi_protocol::{
-    ContentBlock, ErrorCode, EventId, EventPayload, KnownEventPayload, ModelCallCompletedPayload,
-    ModelCallId, ModelCallStartedPayload, ProtocolError, RunId, RunStateChangedPayload, RunStatus,
+    ErrorCode, EventId, EventPayload, KnownEventPayload, ModelCallCompletedPayload, ModelCallId,
+    ModelCallStartedPayload, ProtocolError, RunId, RunStateChangedPayload, RunStatus,
     ToolCallCompletedPayload, ToolCallDescriptor, ToolCallStartedPayload, ToolResultStatus,
     ToolResultWire,
 };
@@ -977,6 +977,81 @@ impl RunSupervisor {
                         // cancellation accepted while queued for the tool
                         // permit must not write a new invocation intent.
                         gate_cancel!();
+                        // ── R04-T01: the anti-forgery argument gate ──
+                        // The request must carry the COMPLETE effective
+                        // arguments whose canonical digest IS args_digest.
+                        // A provider/adapter that self-fills a digest for
+                        // OTHER arguments is a protocol violation: the
+                        // journal records the TRUSTED digest (computed
+                        // from the arguments this driver actually holds)
+                        // and the call is closed as a never-dispatched
+                        // failure — zero side effects, structured refusal
+                        // back to the model.
+                        if !request.digest_matches_arguments() {
+                            let trusted_digest = request.arguments.digest();
+                            tracing::warn!(
+                                run_id = %run_id,
+                                tool_call = %call_id,
+                                target = request.target,
+                                declared = request.args_digest.hex,
+                                computed = trusted_digest.hex,
+                                "tool request argument digest mismatch: refusing (zero \
+                                 dispatch); the journal binds the trusted digest"
+                            );
+                            port.record_invocation_intent(
+                                &ctx,
+                                InvocationIntent {
+                                    journal_id: call_id.clone(),
+                                    target: request.target.clone(),
+                                    args_digest: trusted_digest.hex.clone(),
+                                    args_summary: request.args_summary.clone(),
+                                    idempotency_key: Some(call_id.to_string()),
+                                },
+                                now_ms,
+                            )
+                            .await
+                            .map_err(DriveError::Storage)?;
+                            saw_tool_failure = true;
+                            saw_process_content = true;
+                            let outcome = ToolOutcome::Failed {
+                                error: ProtocolError::new(
+                                    ErrorCode::InvalidMessage,
+                                    "tool request args_digest does not match its arguments \
+                                     (forged or adulterated request); not dispatched"
+                                        .to_string(),
+                                    false,
+                                ),
+                            };
+                            port.record_invocation_receipt(
+                                &ctx,
+                                &call_id,
+                                InvocationReceipt {
+                                    outcome: ReceiptOutcome::Failed,
+                                    detail: format!(
+                                        "not dispatched: args_digest mismatch (declared {}, \
+                                         computed {})",
+                                        request.args_digest.hex, trusted_digest.hex
+                                    ),
+                                    dedup_id: None,
+                                    dispatched: false,
+                                },
+                                now_ms,
+                            )
+                            .await
+                            .map_err(DriveError::Storage)?;
+                            self.persist_tool_event(
+                                port,
+                                events,
+                                &ctx,
+                                &call_id,
+                                request,
+                                Some(&outcome),
+                                now_ms,
+                            )
+                            .await?;
+                            drop(tool_permit);
+                            continue;
+                        }
                         // R03-T05: the invocation INTENT is durable BEFORE
                         // anything else — no external execution may ever be
                         // dispatched without its prepared receipt on disk.
@@ -1324,7 +1399,14 @@ impl RunSupervisor {
                                 }
                             };
                             let outcome = match launched {
-                                Ok(Some(content_digest)) => ToolOutcome::Success { content_digest },
+                                Ok(Some(identity)) => {
+                                    // R04-T01: the delegation success is a
+                                    // CONSUMABLE structured result — the
+                                    // child run / thread identity is real
+                                    // content (its derived digest is the
+                                    // receipt's dedup id, as before).
+                                    ToolOutcome::success_text(identity)
+                                }
                                 Ok(None) => unreachable!("every delegation success carries an id"),
                                 Err(err) => {
                                     tracing::warn!(
@@ -2004,13 +2086,16 @@ fn unobserved_tool_exit_reason(exit: &TaskExit) -> String {
     }
 }
 
-/// Maps a tool outcome onto the durable invocation RECEIPT (R03-T05). The
-/// content digest a healthy double/adapter returns is the dedup identifier
-/// the external system made available; a cancelled outcome says the
-/// executor STOPPED WAITING — it does not prove the external operation did
-/// not complete, so it journals as Unknown (never a fabricated failure);
-/// a fenced/unobserved result is Unknown by construction. The receipt
-/// records what the external system returned — no cross-system atomicity.
+/// Maps a tool outcome onto the durable invocation RECEIPT (R03-T05). A
+/// success's derived content digest is the dedup identifier the external
+/// system made available; the process run/exit status travels in the
+/// detail when present (the receipt is a bounded diagnostic, the
+/// structured result in the stream event carries the full payload); a
+/// cancelled outcome says the executor STOPPED WAITING — it does not
+/// prove the external operation did not complete, so it journals as
+/// Unknown (never a fabricated failure); a fenced/unobserved result is
+/// Unknown by construction. The receipt records what the external system
+/// returned — no cross-system atomicity.
 ///
 /// R03 repair G03/F04: the `Failed` arm is only reachable from outcomes
 /// the EXECUTOR returned (a trustworthy external failure receipt). A
@@ -2019,10 +2104,20 @@ fn unobserved_tool_exit_reason(exit: &TaskExit) -> String {
 /// [`unobserved_tool_exit_reason`] as Unknown instead.
 fn journal_receipt_of(outcome: &ToolOutcome) -> InvocationReceipt {
     match outcome {
-        ToolOutcome::Success { content_digest } => InvocationReceipt {
+        ToolOutcome::Success { result } => InvocationReceipt {
             outcome: ReceiptOutcome::Succeeded,
-            detail: format!("external content digest {content_digest}"),
-            dedup_id: Some(content_digest.clone()),
+            detail: match &result.status {
+                Some(lingxi_kernel::ports::ToolRunStatus::Exited { code }) => format!(
+                    "external content digest {} (exit {code})",
+                    result.content_digest
+                ),
+                Some(lingxi_kernel::ports::ToolRunStatus::Running { handle }) => format!(
+                    "external content digest {} (still running, handle {handle})",
+                    result.content_digest
+                ),
+                None => format!("external content digest {}", result.content_digest),
+            },
+            dedup_id: Some(result.content_digest.clone()),
             dispatched: true,
         },
         ToolOutcome::Failed { error } => InvocationReceipt {
@@ -2046,19 +2141,19 @@ fn journal_receipt_of(outcome: &ToolOutcome) -> InvocationReceipt {
     }
 }
 
-/// Maps the kernel [`ToolOutcome`] onto the wire tool-result shape. The
-/// T01 mapping is minimal and honest: a double's success carries its
-/// content digest as the only content block; R04's gateway owns real tool
-/// result content. Unknown stays Unknown — never retried, never "success".
+/// Maps the kernel [`ToolOutcome`] onto the wire tool-result shape
+/// (R04-T01: the SUCCESS arm now carries the REAL structured result —
+/// actual content blocks, resource references, the truncation flag —
+/// instead of a digest placeholder; consumers read the content, the
+/// digest remains audit/journal data only). Unknown stays Unknown —
+/// never retried, never "success".
 fn tool_result_wire(outcome: &ToolOutcome) -> ToolResultWire {
     match outcome {
-        ToolOutcome::Success { content_digest } => ToolResultWire {
+        ToolOutcome::Success { result } => ToolResultWire {
             status: ToolResultStatus::Success,
-            content: vec![ContentBlock::Text {
-                text: format!("content-digest:{content_digest}"),
-            }],
-            resource_refs: Vec::new(),
-            truncated: false,
+            content: result.content.clone(),
+            resource_refs: result.resource_refs.clone(),
+            truncated: result.truncated,
             error: None,
         },
         ToolOutcome::Failed { error } => ToolResultWire {
@@ -2106,6 +2201,7 @@ impl From<DriveError> for crate::sessions::SessionExecuteError {
 #[cfg(test)]
 mod tests {
     use super::*;
+    use lingxi_protocol::ContentBlock;
 
     #[test]
     fn limits_validation_rejects_degenerate_bounds() {
@@ -2160,10 +2256,16 @@ mod tests {
 
     #[test]
     fn tool_outcome_maps_onto_wire_status_one_to_one() {
-        let wire = tool_result_wire(&ToolOutcome::Success {
-            content_digest: "abc".to_string(),
-        });
+        let wire = tool_result_wire(&ToolOutcome::success_text("abc"));
         assert_eq!(wire.status, ToolResultStatus::Success);
+        // R04-T01: the success wire carries the REAL content block, not a
+        // digest placeholder.
+        assert_eq!(
+            wire.content,
+            vec![ContentBlock::Text {
+                text: "abc".to_string()
+            }]
+        );
         let wire = tool_result_wire(&ToolOutcome::Failed {
             error: ProtocolError::new(ErrorCode::Internal, "x", false),
         });
@@ -2177,20 +2279,44 @@ mod tests {
         assert_eq!(wire.status, ToolResultStatus::Unknown);
     }
 
+    /// R04-T01: a success receipt keeps the R03 dedup semantics (the
+    /// derived content digest) and records the process status in the
+    /// detail when present.
+    #[test]
+    fn success_receipt_keeps_digest_dedup_and_status_detail() {
+        let receipt = journal_receipt_of(&ToolOutcome::success_text("hello"));
+        assert_eq!(receipt.outcome, ReceiptOutcome::Succeeded);
+        assert!(receipt.dispatched);
+        let expected_digest = lingxi_kernel::ports::ToolSuccess::text("hello").content_digest;
+        assert_eq!(receipt.dedup_id.as_deref(), Some(expected_digest.as_str()));
+        let exited = ToolOutcome::Success {
+            result: lingxi_kernel::ports::ToolSuccess {
+                status: Some(lingxi_kernel::ports::ToolRunStatus::Exited { code: 3 }),
+                ..lingxi_kernel::ports::ToolSuccess::text("out")
+            },
+        };
+        let receipt = journal_receipt_of(&exited);
+        assert!(
+            receipt.detail.contains("exit 3"),
+            "detail: {}",
+            receipt.detail
+        );
+    }
+
     /// R03-T05: the durable receipt mapping. Success carries the external
-    /// dedup identifier; a CANCELLED outcome journals as Unknown (stopping
-    /// the wait does not prove the external operation did not complete);
-    /// fenced/unobserved results are Unknown by construction.
+    /// dedup identifier (the derived content digest); a CANCELLED outcome
+    /// journals as Unknown (stopping the wait does not prove the external
+    /// operation did not complete); fenced/unobserved results are Unknown
+    /// by construction.
     #[test]
     fn journal_receipt_maps_outcomes_onto_the_durable_receipt() {
-        let receipt = journal_receipt_of(&ToolOutcome::Success {
-            content_digest: "dd-1".to_string(),
-        });
+        let receipt = journal_receipt_of(&ToolOutcome::success_text("dd-1"));
         assert_eq!(
             receipt.outcome,
             lingxi_kernel::ports::ReceiptOutcome::Succeeded
         );
-        assert_eq!(receipt.dedup_id.as_deref(), Some("dd-1"));
+        let expected_digest = lingxi_kernel::ports::ToolSuccess::text("dd-1").content_digest;
+        assert_eq!(receipt.dedup_id.as_deref(), Some(expected_digest.as_str()));
         assert!(receipt.dispatched);
 
         let receipt = journal_receipt_of(&ToolOutcome::Failed {

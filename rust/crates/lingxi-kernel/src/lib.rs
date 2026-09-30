@@ -22,6 +22,7 @@ pub mod invocation;
 pub mod ports;
 pub mod recovery;
 pub mod subagent;
+pub mod toolcatalog;
 
 /// Identity and authority facts of one running user task.
 ///

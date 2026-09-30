@@ -114,9 +114,7 @@ impl ToolExecutorPort for CountingTool {
         Box::pin(async move {
             ToolExecutionResult::of_ctx(
                 &ctx_at_issue,
-                ToolOutcome::Success {
-                    content_digest: "noop".to_string(),
-                },
+                ToolOutcome::success_text("noop".to_string()),
             )
         })
     }

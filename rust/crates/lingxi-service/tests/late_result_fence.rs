@@ -187,9 +187,7 @@ impl ToolExecutorPort for FencedTool {
         let ctx_at_issue = ctx.clone();
         let fence_override = self.fence_override.clone();
         Box::pin(async move {
-            let outcome = ToolOutcome::Success {
-                content_digest: "tool-content".to_string(),
-            };
+            let outcome = ToolOutcome::success_text("tool-content".to_string());
             match fence_override {
                 Some(fence) => ToolExecutionResult { fence, outcome },
                 None => ToolExecutionResult::of_ctx(&ctx_at_issue, outcome),
@@ -199,12 +197,13 @@ impl ToolExecutorPort for FencedTool {
 }
 
 fn read_tool_request() -> ToolRequest {
-    ToolRequest {
-        target: "read".to_string(),
-        args_digest: lingxi_protocol::digest_arguments(&serde_json::json!({"path": "/tmp/x"})),
-        args_summary: Some("read /tmp/x".to_string()),
-        delegation: None,
-    }
+    ToolRequest::from_effective_arguments(
+        "read",
+        serde_json::json!({"path": "/tmp/x"}),
+        &lingxi_kernel::toolcatalog::SchemaBudget::default(),
+    )
+    .expect("effective tool request")
+    .with_summary("read /tmp/x")
 }
 
 fn assistant_final(text: &str) -> NormalizedMessage {

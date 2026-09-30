@@ -194,9 +194,9 @@ impl GatedTool {
         let mut queue = self.behavior.lock().unwrap();
         queue
             .pop_front()
-            .unwrap_or(ToolBehavior::Immediate(ToolOutcome::Success {
-                content_digest: "default".to_string(),
-            }))
+            .unwrap_or(ToolBehavior::Immediate(ToolOutcome::success_text(
+                "default".to_string(),
+            )))
     }
 }
 
@@ -218,9 +218,7 @@ impl ToolExecutorPort for GatedTool {
                 ToolBehavior::ParkedUntilReleased => {
                     let gate = gate.expect("parked behavior implies a gate");
                     let _permit = gate.acquire().await.expect("tool gate closed");
-                    ToolOutcome::Success {
-                        content_digest: "parked-then-success".to_string(),
-                    }
+                    ToolOutcome::success_text("parked-then-success".to_string())
                 }
                 ToolBehavior::Immediate(outcome) => outcome,
                 ToolBehavior::Panic(message) => panic!("{message}"),
@@ -230,9 +228,7 @@ impl ToolExecutorPort for GatedTool {
                     while std::time::Instant::now() < deadline {
                         std::thread::sleep(Duration::from_millis(5));
                     }
-                    ToolOutcome::Success {
-                        content_digest: "blocked-through".to_string(),
-                    }
+                    ToolOutcome::success_text("blocked-through".to_string())
                 }
             };
             ToolExecutionResult::of_ctx(&ctx_at_issue, outcome)
@@ -343,12 +339,13 @@ impl approval::ApprovalGate for ManualGate {
 }
 
 fn read_tool_request() -> ToolRequest {
-    ToolRequest {
-        target: "read".to_string(),
-        args_digest: lingxi_protocol::digest_arguments(&serde_json::json!({"path": "/tmp/x"})),
-        args_summary: Some("read /tmp/x".to_string()),
-        delegation: None,
-    }
+    ToolRequest::from_effective_arguments(
+        "read",
+        serde_json::json!({"path": "/tmp/x"}),
+        &lingxi_kernel::toolcatalog::SchemaBudget::default(),
+    )
+    .expect("effective tool request")
+    .with_summary("read /tmp/x")
 }
 
 fn assistant_final(text: &str) -> NormalizedMessage {
@@ -708,9 +705,7 @@ async fn a05_case(state_kind: WaitState) {
             );
             let tools = GatedTool::immediate(
                 tool_arrivals_tx,
-                ToolOutcome::Success {
-                    content_digest: "never-reached".to_string(),
-                },
+                ToolOutcome::success_text("never-reached".to_string()),
             );
             let gate = ManualGate::parking(approval_arrivals_tx);
             gate_double = Some(Arc::clone(&gate));
@@ -747,9 +742,7 @@ async fn a05_case(state_kind: WaitState) {
             );
             let tools = GatedTool::immediate(
                 tool_arrivals_tx,
-                ToolOutcome::Success {
-                    content_digest: "never-reached".to_string(),
-                },
+                ToolOutcome::success_text("never-reached".to_string()),
             );
             boot(
                 &tag,
@@ -1073,9 +1066,7 @@ async fn queue_wait_cancel_leaves_the_unrelated_holder_untouched() {
         tool_arrivals_tx,
         vec![
             ToolBehavior::ParkedUntilReleased,
-            ToolBehavior::Immediate(ToolOutcome::Success {
-                content_digest: "beta-tool-ok".to_string(),
-            }),
+            ToolBehavior::Immediate(ToolOutcome::success_text("beta-tool-ok".to_string())),
         ],
     );
     let (state, home) = boot(
@@ -1183,9 +1174,7 @@ async fn r03_a06_cancel_parent_spares_unrelated_background() {
     let (tool_arrivals_tx, _tool_arrivals) = tokio::sync::mpsc::unbounded_channel();
     let tools = GatedTool::immediate(
         tool_arrivals_tx,
-        ToolOutcome::Success {
-            content_digest: "unused".to_string(),
-        },
+        ToolOutcome::success_text("unused".to_string()),
     );
     let (state, home) = boot(
         "a06",
@@ -1581,9 +1570,7 @@ async fn cancel_surface_is_diagnosable_for_unknown_terminal_foreign_and_dangling
     let (tool_arrivals_tx, _tool_arrivals) = tokio::sync::mpsc::unbounded_channel();
     let tools = GatedTool::immediate(
         tool_arrivals_tx,
-        ToolOutcome::Success {
-            content_digest: "unused".to_string(),
-        },
+        ToolOutcome::success_text("unused".to_string()),
     );
     let (state, home) = boot(
         "diag",
@@ -1744,9 +1731,7 @@ async fn approval_wait_round_trips_approve_and_reject_legs() {
     let (tool_arrivals_tx, mut tool_arrivals) = tokio::sync::mpsc::unbounded_channel();
     let tools = GatedTool::immediate(
         tool_arrivals_tx,
-        ToolOutcome::Success {
-            content_digest: "approved-tool".to_string(),
-        },
+        ToolOutcome::success_text("approved-tool".to_string()),
     );
     let (state, home) = boot(
         "appr-ok",
@@ -1816,9 +1801,7 @@ async fn approval_wait_round_trips_approve_and_reject_legs() {
     let (tool_arrivals_tx, mut tool_arrivals) = tokio::sync::mpsc::unbounded_channel();
     let tools = GatedTool::immediate(
         tool_arrivals_tx,
-        ToolOutcome::Success {
-            content_digest: "never".to_string(),
-        },
+        ToolOutcome::success_text("never".to_string()),
     );
     let (state, home) = boot(
         "appr-no",
