@@ -1,0 +1,42 @@
+== rust_fmt_check: /Users/study_superior/.cargo/bin/cargo fmt --manifest-path rust/Cargo.toml --all -- --check
+exit 0
+rust_fmt_check exit 0
+== rust_clippy: /Users/study_superior/.cargo/bin/cargo clippy --manifest-path rust/Cargo.toml --workspace --all-targets --locked -- -D warnings
+exit 0
+rust_clippy exit 0
+== workspace_test: /Users/study_superior/.cargo/bin/cargo test --manifest-path rust/Cargo.toml --workspace --locked --no-fail-fast
+exit 101
+workspace_test exit 101
+== check_contracts: /Users/study_superior/.cargo/bin/cargo run --manifest-path rust/Cargo.toml --locked -p xtask -- check-contracts
+exit 0
+check_contracts exit 0
+== check_boundaries: /Users/study_superior/.cargo/bin/cargo run --manifest-path rust/Cargo.toml --locked -p xtask -- check-boundaries
+exit 0
+check_boundaries exit 0
+== check_boundaries_selftest: /Users/study_superior/.cargo/bin/cargo run --manifest-path rust/Cargo.toml --locked -p xtask -- check-boundaries --self-test
+exit 0
+check_boundaries_selftest exit 0
+== r04_t05_acceptance_tests: /Users/study_superior/.cargo/bin/cargo test --manifest-path rust/Cargo.toml -p lingxi-service --locked --test r04_t05_process_tools
+exit 0
+r04_t05_acceptance_tests exit 0
+== r04_t05_unit_tests: /Users/study_superior/.cargo/bin/cargo test --manifest-path rust/Cargo.toml -p lingxi-service --locked --lib procsupervisor
+exit 0
+r04_t05_unit_tests exit 0
+== r04_t01_regression: /Users/study_superior/.cargo/bin/cargo test --manifest-path rust/Cargo.toml -p lingxi-service --locked --test r04_t01_tool_catalog
+exit 0
+r04_t01_regression exit 0
+== r04_t02_regression: /Users/study_superior/.cargo/bin/cargo test --manifest-path rust/Cargo.toml -p lingxi-service --locked --test r04_t02_tool_gateway
+exit 0
+r04_t02_regression exit 0
+== r04_t03_regression: /Users/study_superior/.cargo/bin/cargo test --manifest-path rust/Cargo.toml -p lingxi-service --locked --test r04_t03_approval_service
+exit 0
+r04_t03_regression exit 0
+== r04_t04_regression: /Users/study_superior/.cargo/bin/cargo test --manifest-path rust/Cargo.toml -p lingxi-service --locked --test r04_t04_file_tools
+exit 0
+r04_t04_regression exit 0
+== kernel_lib_tests: /Users/study_superior/.cargo/bin/cargo test --manifest-path rust/Cargo.toml -p lingxi-kernel --locked --lib
+exit 0
+kernel_lib_tests exit 0
+r03_g07_repair_suites exit 0
+r03_t08_matrix_a15 exit 0
+r03_t08_a16_seed exit 0

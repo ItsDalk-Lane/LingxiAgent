@@ -30,6 +30,7 @@ pub mod config;
 pub mod dedup;
 pub mod epoch;
 pub mod events;
+pub mod exectools;
 pub mod filetools;
 pub mod inject;
 pub mod instance;
@@ -38,6 +39,7 @@ pub mod limits;
 pub mod logging;
 mod management;
 pub mod paths;
+pub mod procsupervisor;
 pub mod quotas;
 pub mod recovery;
 pub mod redaction;
@@ -89,6 +91,12 @@ pub use events::{
     SubscribeOutcome, SubscribePageError, SubscribeReject, SubscriberCapKind, SubscriberStats,
     SubscriptionFrame, SubscriptionGuard,
 };
+pub use exectools::{
+    register_process_tools, CoreProcessExecutor, CoreProcessTools, ProcessOwnershipGuard,
+    ProcessToolKind, ProcessTools, EXEC_DEFAULT_TIMEOUT_SECONDS, EXEC_MAX_TIMEOUT_SECONDS,
+    EXEC_SPAWN_FAILED, SAFE_ENV_PASSTHROUGH, WRITE_STDIN_NOT_INTERACTIVE, WRITE_STDIN_NOT_OWNED,
+    WRITE_STDIN_PROCESS_ID_REQUIRED, WRITE_STDIN_UNKNOWN_PROCESS,
+};
 pub use filetools::{
     register_core_file_tools, CoreFileExecutor, CoreFileTools, FileChangeLog, FileChangeOperation,
     FileModificationRecord, FileToolKind, FileTools, FileVersion, FreshnessRegistry, NoopChangeLog,
@@ -107,6 +115,10 @@ pub use logging::{
     init_tracing, LogRotationConfig, LogRouter, DEFAULT_LOG_MAX_BYTES, DEFAULT_LOG_MAX_FILES,
 };
 pub use paths::{prepare_layout, DataRootLayout};
+pub use procsupervisor::{
+    ProcessSupervisor, SupervisorLimits, TerminationReason, DEFAULT_CLEANUP_TIMEOUT,
+    DEFAULT_LIVE_PROCESS_CAP, DEFAULT_SPILL_CAP_BYTES, DEFAULT_STDIO_GRACE,
+};
 pub use quotas::{
     LayeredQuotaLimits, QuotaFailure, QuotaFailureKind, QuotaLayer, QuotaLimits, QuotaManager,
     QuotaPermit, QuotaResource,

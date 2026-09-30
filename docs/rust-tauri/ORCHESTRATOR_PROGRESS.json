@@ -2989,23 +2989,29 @@
     "R04-T05": {
       "name": "命令、PTY与真实进程树取消",
       "stage_id": "R04",
-      "status": "PENDING",
-      "task_base_sha": null,
-      "executor_id": null,
-      "execution_result": null,
-      "review_round": 0,
-      "reviewer_id": null,
-      "review_verdict": null,
-      "findings": [],
+      "status": "DONE",
+      "task_base_sha": "80b4edbf5",
+      "executor_id": "EXECUTOR-R04-T05-E01 (ZCode agent_3b750ffe)",
+      "execution_result": "READY_FOR_REVIEW -> R1 PASS first round (0 blocking, 4 observations)",
+      "review_round": 1,
+      "reviewer_id": "REVIEWER-R04-T05-R01 (agent_a31416f4)",
+      "review_verdict": "PASS (R1)",
+      "findings": [
+        "OBS-1 stdio grace 250ms vs legacy 100ms unregistered mapping delta",
+        "OBS-2 RegistryFull rejection leaves spawned child orphaned (64-cap rare path, no test)",
+        "OBS-3 CleanupTimedOut PTY master fd partial reclaim (rare branch)",
+        "OBS-4 SpillWriter::info comment mismatch"
+      ],
       "repair_agent_id": null,
       "root_cause_agent_id": null,
       "acceptance_results": {
-        "R04-A09": "NOT_STARTED",
-        "R04-A10": "NOT_STARTED"
+        "R04-A09": "PASS (R1 independent: 4-PID tree ESRCH-verified, sentinel alive, Future-drop path verified)",
+        "R04-A10": "PASS (R1 independent PTY: resize/interrupt/exit + parent-exit grandchild-pipe variant)"
       },
       "task_commit_sha": null,
       "push_result": null,
-      "blockers": []
+      "blockers": [],
+      "candidate_diff_digest": "7cc02865e1712c05 (3-check stable)"
     },
     "R04-T06": {
       "name": "跨平台沙盒与逃逸防护",
@@ -4331,7 +4337,7 @@
       "blockers": []
     }
   },
-  "current_task": "R04-T05 (next)",
+  "current_task": "R04-T06 (next)",
   "orchestration_mode": {
     "effective_from": "R00-T03 R2 repair",
     "task_executor": "new ZCode task per Rxx-Tyy",

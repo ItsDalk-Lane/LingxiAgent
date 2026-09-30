@@ -209,17 +209,59 @@
       "evidence": "artifacts/rust-tauri/R04/T04-E01/"
     },
     "R04-T05": {
-      "status": "PENDING",
+      "status": "READY_FOR_REVIEW",
       "acceptance_map": {
         "R04-A09": {
-          "status": "NOT_STARTED",
-          "tests": []
+          "status": "IMPLEMENTED_SELF_CHECKED",
+          "tests": [
+            "lingxi-service --test r04_t05_process_tools r04_a09_managed_tree_is_killed_and_the_unrelated_sentinel_survives (full real chain: bash child + two sleep grandchildren publish their pids (barrier) -> real user-facing cancel_run -> ALL THREE pids fail kill(pid,0) (reaped by our supervisor, not zombies) -> the unrelated test sentinel SURVIVES -> record Terminated(CallerDropped) with killpg_sent/exit_observed/termination_settled(reclaimed=true) audit -> journal phase=Started with NO receipt (the R03 Unknown window))"
+          ]
         },
         "R04-A10": {
-          "status": "NOT_STARTED",
-          "tests": []
+          "status": "IMPLEMENTED_SELF_CHECKED",
+          "tests": [
+            "lingxi-service --test r04_t05_process_tools r04_a10_pty_input_reads_resize_interrupt_and_exit (real PTY via libc posix_openpt/setsid/TIOCSCTTY/TIOCSWINSZ, O_NONBLOCK master: echo round-trip -> stty size 24 80 -> resize to 40 100 -> \\x03 INTR kills the foreground job (NEVER_REACHED never prints) while the shell answers AFTER_INTR -> exit 7 -> phase Exited(7), final poll reports exited (exit code 7), late write fails 'not running'; the start result is Running{handle}, never a completion claim)"
+          ]
         }
-      }
+      },
+      "adversarial_additions": {
+        "tests": [
+          "r04_t05_process_tools adversarial_parent_exit_with_grandchild_holding_the_pipe_is_bounded (direct child exits <1.5s under the bounded stdio grace while the sleep-2 grandchild still holds the pipe; incumbent semantics: normal exit does not kill the group; test kills the grandchild by exact pid)",
+          "r04_t05_process_tools adversarial_output_storm_is_bounded_truncated_and_spilled (spill cap pinned to 64KiB: ~500KB storm -> truncated flag + [Showing first … of N lines] notice + spill ResourceRef whose file is exactly 64KiB = capped, bounded time/memory)",
+          "r04_t05_process_tools adversarial_utf8_output_survives_chunk_splits + lingxi-service --lib procsupervisor::tests::transcript_delivers_split_multibyte_characters_intact / decode_prefix_utf8_boundary_variants / transcript_force_delivery_flushes_a_dangling_partial (multibyte chars split across chunks are joined whole — byte-offset cursor, no duplication, no mangling; dangling partials flush lossy-honestly on terminal)",
+          "r04_t05_process_tools adversarial_unresponsive_process_times_out_within_the_bound (sleep 300 + timeout 1: 1s<=elapsed<6s, timeout notice with tty continuation, Exited(137), nothing stays live)",
+          "r04_t05_process_tools adversarial_both_streams_blocking_still_completes (~180KB on BOTH stdout and stderr beyond the 64KB pipe buffer: concurrent pumping completes, exit 0)",
+          "r04_t05_process_tools adversarial_cross_session_and_forged_write_stdin_are_refused (session B writing session A's terminal = WRITE_STDIN_NOT_OWNED; forged proc:deadbeef and never-minted hex = WRITE_STDIN_UNKNOWN_PROCESS; a one-shot's live handle = WRITE_STDIN_NOT_INTERACTIVE, then cleaned via the bounded chain)",
+          "r04_t05_process_tools adversarial_cancel_racing_natural_exit_keeps_invariants (cancel fired inside the in-flight window: run settles, record terminal, pid gone; journal is either Started-without-receipt or Succeeded/Failed-with-receipt — never fabricated)",
+          "r04_t05_process_tools process_tools_go_through_the_gateway_policy_and_cwd_authorization (read_only = prepare-time ACTION_BLOCKED_BY_READ_ONLY refusal, zero dispatch; workdir outside the roots AND a symlinked workdir pointing at the restricted area = gateway_resource_scope_denied judged on the real target, sentinel untouched; in-workspace workdir runs with the canonical cwd)",
+          "r04_t05_process_tools ask_session_exec_command_round_trips_the_approval_face (ask parks; PendingView.resources carries the canonical workdir; real answer(Approve) -> journal Succeeded + dispatched=true)",
+          "r04_t05_process_tools environment_is_whitelist_plus_explicit_overrides_never_full_inherit (a planted server secret NEVER reaches the child; whitelisted PATH does; explicit env entries do)",
+          "r04_t05_process_tools persistent_terminal_lifetime_is_explicit_and_shutdown_is_bounded (tty terminal survives its starting call; shutdown_all terminates it bounded with a Terminated/137/reclaimed=true receipt)",
+          "r04_t05_process_tools terminate_after_natural_exit_is_already_terminal_and_spawn_failures_are_loud (AlreadyTerminal receipt with ZERO killpg ever sent for an exited record — the anti-PID-recycling rule; EXEC_SPAWN_FAILED + cwd-missing hint + INVALID_PARAMS vocabularies)"
+        ]
+      },
+      "gate_results": {
+        "cargo fmt --all -- --check": "exit 0",
+        "cargo clippy --workspace --all-targets --locked -D warnings": "exit 0",
+        "cargo test --workspace --locked --no-fail-fast": "exit 101 — 823 passed / 0 assertion failures across 77 green binaries; the ONLY failure is r00_management_leaves (environment: macOS firewall intercepts the newly-built unsigned test binary; reproduced identically in an isolated rerun, exit 101 — the registered intermittent item from T01/T02, kept open, not written off)",
+        "xtask check-contracts": "exit 0 (626 entries, zero drift)",
+        "xtask check-boundaries": "exit 0 (O1-O8 + D1-D5 + B1; --self-test N1-N17 exit 0)",
+        "R03 regression": "r03_g07_repair_suites.sh exit 0 (ten suites exact pinned counts); r03_t08_matrix.sh A15 exit 0 (28 leaves + 11 combos); r03_t08_a16_seed_mechanism.sh exit 0"
+      },
+      "supplemental": [
+        "ProcessSupervisor (procsupervisor.rs): POSIX process-group ownership (every spawn setsid's into its own group, pgid verified via getpgid; termination only ever fires killpg on a registered NON-TERMINAL record — the child is unreaped so the pid cannot have been recycled; no adoption API exists so a foreign leftover can never be mistaken for a managed process)",
+        "Bounded cleanup chain: mark Terminating + killpg(SIGKILL) atomically under the record lock -> bounded wait for the exit observation (default 5s; expiry = honest CleanupTimedOut, never a fabricated success) -> reaper-side reclamation (250ms bounded stdio grace because grandchildren may hold the pipe write ends; pump abort closes our read ends; pty master + spill closed; reclaimed recorded) -> settle into the bounded ring; tokio kill_on_drop is DISABLED and never the guarantee",
+        "Future-drop does not shed ownership: the executor's ProcessOwnershipGuard initiates terminate_detached (killpg fires synchronously from the Drop; the bounded tail runs on a supervisor-owned task) — the run's CALL-level cancellation tree drops the executor future at its await point and the cleanup still completes with receipts",
+        "Persistent terminals are EXPLICITLY registered (kind + owner): a run cancellation does not kill them (the tool call already returned running); they die on the explicit close path or the frozen application-exit policy shutdown_all (each bounded, each with an accurate receipt)",
+        "Env injection is EXPLICIT-whitelist only (PATH/HOME/LANG/LC_*/TERM/TZ/TMPDIR/SHELL) + bounded caller env (<=32 entries, size caps); the server's full environment (secrets) is never inherited — the incumbent env ?? process.env gap closed",
+        "Output bounds: rolling 100KiB window + head/tail truncation with the incumbent notice vocabulary + capped spill file surfaced as an Artifact ResourceRef; PTY transcript ring 256KiB with dropped-undelivered accounting; UTF-8 chunk boundaries handled by byte-offset cursor delivery",
+        "write_stdin authorization: handle format gate -> registered record -> must be PersistentTerminal -> owner (principal+session from the trusted RunContext) must match -> write/deliver; distinct stable codes for forged/unknown/not-interactive/not-owned; final drain works after exit, late writes fail honestly",
+        "Dependencies: ZERO new crates — tokio gains only the 'process' feature flag at the same locked 1.53.1 (bytes/libc/mio already in the lock; the R04-T01 serde_json precedent), libc dev-dep at the same locked 0.2; rust/Cargo.lock is byte-identical (verified by empty git diff)",
+        "Mapping decisions in R04-T05_REPORT.md §8: wait_mode=auto/background handoff (DeferredResultStore/TaskRegistry = R06/R07 surfaces) not migrated — long-running work uses timeout continuation or tty+write_stdin (taught by the timeout notice); incumbent multi-platform shell resolution collapsed to /bin/bash -c + native cwd; terminal-tool close/list surface and the jsonl transcript persistence are R06+; sandbox prefixes (bwrap/seatbelt/escalated) are T06",
+        "Windows form: spawn fails CLOSED with UnsupportedPlatform (no invented Job Object behavior) — real-machine Windows verification remains the stage platform deferral; Linux same-family POSIX calls registered as not machine-verified"
+      ],
+      "report": "docs/rust-tauri/R04/R04-T05_REPORT.md",
+      "evidence": "artifacts/rust-tauri/R04/T05-E01/"
     },
     "R04-T06": {
       "status": "PENDING",
