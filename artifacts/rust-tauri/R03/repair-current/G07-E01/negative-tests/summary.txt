@@ -1,0 +1,16 @@
+== preparing isolated copy /tmp/lingxi-r03-g07-neg-P5Y0n1 (git worktree at HEAD 8a6303bcd + uncommitted gate files) ==
+== cloning node_modules into the copy (cp -Rc, CoW) ==
+== N1a: deleted supplemental leaf mapping R00-T02-LA-00ECC9568490 from the copy's map ==
+case n1a-delete-leaf-mapping: exit=1 gap-named=OK verdict=OK
+== N1b: deleted the repair_suites command mapping from the copy's map ==
+case n1b-delete-command-mapping: exit=2 gap-named=OK verdict=OK
+== N4: deleted the R03-RP01 scenario from the copy's map; xtask map-pinning tests: ==
+case n4-delete-repair-scenario: exit=101 gap-named=OK verdict=OK
+== C03a: evidence root pre-filled with a stale file ==
+case c03a-stale-evidence-root: exit=1 gap-named=OK verdict=OK
+== N2: producer tampered to a 0-match test filter; full verify-stage R03 ==
+case n2-zero-match-filter: exit=1 gap-named=MISSING:filter matched 0 tests verdict=BAD
+== N3: map declares an evidence file the producer never writes; full verify-stage R03 ==
+case n3-missing-evidence-file: exit=1 gap-named=OK verdict=OK
+== C03b: starting a full verify-stage R03, then changing an execution input mid-run ==
+case c03b-midrun-input-change: exit=1 gap-named=OK verdict=OK

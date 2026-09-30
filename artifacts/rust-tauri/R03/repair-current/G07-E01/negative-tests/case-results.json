@@ -1,0 +1,51 @@
+{
+ "schema": "lingxi.r03-g07-gate-negative-tests.v1",
+ "isolatedCopy": "git worktree at HEAD + uncommitted gate files (removed after the run)",
+ "gate": "cargo run -p xtask -- verify-stage R03 (real binary, rebuilt inside the copy)",
+ "driverHaystackFix": "2026-09-30: the driver's gap-naming assertion originally searched only the gate process logs + result JSON; the N2 first run proved the gate refuses (exit 1, overall FAIL, repair_suites FAIL) but the naming text lives in the tampered producer's own evidence files (G07_REPAIR/gaps.txt + summary.txt + repair_suites command logs). The haystack was widened in scripts/rust-tauri/r03_g07_gate_negative_tests.sh and the n2 row was re-evaluated POST-HOC against the same first-run archived artifacts (no re-run, no new gate execution).",
+ "cases": [
+  {
+   "case": "n1a-delete-leaf-mapping",
+   "exitCode": 1,
+   "gapNamed": "OK",
+   "verdict": "OK"
+  },
+  {
+   "case": "n1b-delete-command-mapping",
+   "exitCode": 2,
+   "gapNamed": "OK",
+   "verdict": "OK"
+  },
+  {
+   "case": "n4-delete-repair-scenario",
+   "exitCode": 101,
+   "gapNamed": "OK",
+   "verdict": "OK"
+  },
+  {
+   "case": "c03a-stale-evidence-root",
+   "exitCode": 1,
+   "gapNamed": "OK",
+   "verdict": "OK"
+  },
+  {
+   "case": "n2-zero-match-filter",
+   "exitCode": 1,
+   "gapNamed": "OK",
+   "verdict": "OK"
+  },
+  {
+   "case": "n3-missing-evidence-file",
+   "exitCode": 1,
+   "gapNamed": "OK",
+   "verdict": "OK"
+  },
+  {
+   "case": "c03b-midrun-input-change",
+   "exitCode": 1,
+   "gapNamed": "OK",
+   "verdict": "OK"
+  }
+ ],
+ "allRefused": true
+}

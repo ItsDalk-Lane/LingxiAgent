@@ -1,0 +1,6 @@
+f31a13b089f4ee2be95a72d50811811d05dd2d087f9166de59e0d217dc147a98   M  rust/crates/xtask/src/stage_map.rs
+b77d5c7bef6d484a7e8aa6f4acb7127e3fe20422bbac0d09fad5cf7788eada69   M  rust/crates/xtask/src/stage_maps/R03.json
+e5f7f01bf4c13a4db96811b5a1325d59c5bc69b6ac10ca1fbe0bfb035a518b0c   M  rust/crates/xtask/src/verify/runner_tests.rs
+1ef48fd93e2bb3677cfa3a3b3ee3024349f520146657fa84a6a945b5e8ed2764  ??  scripts/rust-tauri/r03_g07_gate_negative_tests.sh
+135d9ee3ed1e172b2c056ee78625b1a3c8f67176d438448b83f2676d4ee55394  ??  scripts/rust-tauri/r03_g07_repair_suites.sh
+bbeba7fd39609f6dcc82f6c5d5fe827c2af00b50f2bf7401419b737b498b6937   M  scripts/rust-tauri/r03_t08_generate_stage_map.py

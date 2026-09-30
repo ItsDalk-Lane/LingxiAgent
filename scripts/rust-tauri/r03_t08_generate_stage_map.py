@@ -278,7 +278,12 @@ stage_map = {
         "生产者机器核验）+ 31 deferred_to_later_stage（无 R03 叶专属份额；验收归 R06/R07/R08，"
         "仍 REQUIRED）。阶段中立 kinds（stage_share_satisfied/deferred_to_later_stage）为 R03-T08 "
         "新增，语义与 R02 的 r02_share_satisfied/deferred_to_r07 同构（含 R14-F01 反假绿：份额叶"
-        "必带 assertionContract，递延叶不得绑门禁命令/证据/契约）；R02 图零改动。",
+        "必带 assertionContract，递延叶不得绑门禁命令/证据/契约）；R02 图零改动。"
+        "R03 修复轮 G07（2026-09-30，F08）：本图追加 repair_suites 命令与 R03-RP01 场景——"
+        "F01-F07 的 9 个新修复套件按逐套件固定计数接入正式验收（生产者"
+        " scripts/rust-tauri/r03_g07_repair_suites.sh；xtask stage_map 钉图测试镜像本注册与"
+        "钉表，删除映射/过滤 0/计数漂移在 cargo test（门禁命令自身）内变红）；16 原场景、"
+        "48 叶、7 条 R02 定向链注册零改动。",
     "commands": {
         "rust_fmt": {
             "argv": ["cargo", "fmt", "--manifest-path", "rust/Cargo.toml", "--all", "--", "--check"],
@@ -372,6 +377,20 @@ stage_map = {
             "timeoutSecs": 1200,
             "evidencePaths": ["{EVIDENCE}/R02/A16/legacy-entry/summary.txt"],
         },
+        # R03 repair round G07 / F08 (2026-09-30): the nine adversarial-repair
+        # suites from workorders G01-G06 (F01-F07) enter the FORMAL stage gate
+        # as a first-class command + scenario. The producer pins each suite's
+        # executed test count exactly (a filter matching 0 tests, a filtered
+        # subset, or a renamed/deleted test is a named gap, never a pass); the
+        # xtask map-pinning tests mirror this registration and the pin table.
+        "repair_suites": {
+            "argv": ["bash", "scripts/rust-tauri/r03_g07_repair_suites.sh", "{EVIDENCE}/G07_REPAIR"],
+            "timeoutSecs": 2400,
+            "evidencePaths": [
+                "{EVIDENCE}/G07_REPAIR/repair-cases.json",
+                "{EVIDENCE}/G07_REPAIR/summary.txt",
+            ],
+        },
     },
     "scenarios": [
         {"id": "R03-A01", "requirement": "REQUIRED", "commandRefs": ["rust_test_workspace", "a15_combo_and_leaves"]},
@@ -390,6 +409,13 @@ stage_map = {
         {"id": "R03-A14", "requirement": "REQUIRED", "commandRefs": ["rust_test_workspace", "r02_recovery_drill"]},
         {"id": "R03-A15", "requirement": "REQUIRED", "commandRefs": ["a15_combo_and_leaves", "rust_test_workspace", "rust_fmt", "rust_clippy", "check_contracts", "check_boundaries", "r02_auth_matrix", "r02_legacy_regression"]},
         {"id": "R03-A16", "requirement": "REQUIRED", "commandRefs": ["a16_seed_mechanism", "rust_test_workspace"]},
+        # R03 repair round G07 / F08: the F01-F07 adversarial-repair suites
+        # enter the FORMAL acceptance as their own REQUIRED scenario. The 16
+        # original A-IDs above are byte-identical to the T08 registration;
+        # this ADDS coverage, it never rewrites or replaces them.
+        {"id": "R03-RP01", "requirement": "REQUIRED",
+         "commandRefs": ["repair_suites", "rust_test_workspace"],
+         "note": "G07/F08 修复反例正式验收：F01-F07 的 9 个新套件（cancel_link_inheritance/subagent_closeout/cancel_terminal_race/tool_receipt_unknown/admission_dedup_consistency/admission_dedup_adversarial/input_payload_fidelity/input_budget_refusal/background_steering）由 repair_suites 生产者逐套件固定计数机器核验（匹配 0/子集/改名=点名缺口），并要求整个 workspace 保持绿。"},
     ],
     "supplementalLeafScenarios": leaves,
 }

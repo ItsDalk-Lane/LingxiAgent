@@ -1,0 +1,380 @@
+diff --git a/rust/crates/xtask/src/stage_map.rs b/rust/crates/xtask/src/stage_map.rs
+index 6b838da39..d43d02f68 100644
+--- a/rust/crates/xtask/src/stage_map.rs
++++ b/rust/crates/xtask/src/stage_map.rs
+@@ -1854,4 +1854,243 @@ mod map_tests {
+         .unwrap_err();
+         assert!(err.contains("references unknown producer command"), "{err}");
+     }
++
++    // ── R03 repair round G07 / F08: pin the PRODUCTION R03 map ───────────
++    //
++    // The gate's own cross-checks guard the R00 supplemental leaves and the
++    // per-command evidence, but a base SCENARIO registration exists only in
++    // the map itself: deleting R03-RP01 (or the repair command, or the
++    // producer's pin table) would otherwise leave a silent hole the gate
++    // cannot see. These tests pin the real registered map — they run inside
++    // `cargo test` (itself the gate's `rust_test_workspace` command), so any
++    // deletion/drift turns the stage gate red with the gap named here.
++
++    /// The REAL registered R03 stage map (same bytes `verify-stage R03`
++    /// loads via STAGE_MAPS).
++    const R03_PRODUCTION: &str = include_str!("stage_maps/R03.json");
++
++    /// The F01–F07 repair suites and their EXACT pinned test counts, as the
++    /// producer script's `pin <suite> <count> <F-ID>` table must declare
++    /// them (G07/F08-C02: no missing suite, no extra suite, no count drift).
++    const R03_REPAIR_PIN_TABLE: &[(&str, u32, &str)] = &[
++        ("cancel_link_inheritance", 7, "F01"),
++        ("subagent_closeout", 8, "F02"),
++        ("cancel_terminal_race", 13, "F03"),
++        ("tool_receipt_unknown", 6, "F04"),
++        ("admission_dedup_consistency", 5, "F05"),
++        ("admission_dedup_adversarial", 5, "F05"),
++        ("input_payload_fidelity", 5, "F06"),
++        ("input_budget_refusal", 2, "F06"),
++        ("background_steering", 8, "F07"),
++    ];
++
++    fn parse_production_r03() -> StageMap {
++        parse_stage_map(R03_PRODUCTION)
++            .expect("the registered R03 stage map must parse with this runner")
++    }
++
++    #[test]
++    fn r03_production_map_keeps_the_sixteen_a_scenarios_verbatim() {
++        let map = parse_production_r03();
++        // The frozen T08 registration: id → commandRefs, byte-for-byte.
++        let expected: &[(&str, &[&str])] = &[
++            ("R03-A01", &["rust_test_workspace", "a15_combo_and_leaves"]),
++            ("R03-A02", &["rust_test_workspace", "r02_storage_tx"]),
++            ("R03-A03", &["rust_test_workspace"]),
++            ("R03-A04", &["rust_test_workspace"]),
++            ("R03-A05", &["rust_test_workspace", "a15_combo_and_leaves"]),
++            ("R03-A06", &["rust_test_workspace", "a15_combo_and_leaves"]),
++            ("R03-A07", &["rust_test_workspace", "a15_combo_and_leaves"]),
++            ("R03-A08", &["rust_test_workspace", "a15_combo_and_leaves"]),
++            ("R03-A09", &["rust_test_workspace"]),
++            ("R03-A10", &["rust_test_workspace"]),
++            ("R03-A11", &["rust_test_workspace", "a15_combo_and_leaves"]),
++            ("R03-A12", &["rust_test_workspace", "a15_combo_and_leaves"]),
++            (
++                "R03-A13",
++                &[
++                    "rust_test_workspace",
++                    "a15_combo_and_leaves",
++                    "r02_full_chain",
++                    "r02_backup_restore",
++                ],
++            ),
++            ("R03-A14", &["rust_test_workspace", "r02_recovery_drill"]),
++            (
++                "R03-A15",
++                &[
++                    "a15_combo_and_leaves",
++                    "rust_test_workspace",
++                    "rust_fmt",
++                    "rust_clippy",
++                    "check_contracts",
++                    "check_boundaries",
++                    "r02_auth_matrix",
++                    "r02_legacy_regression",
++                ],
++            ),
++            ("R03-A16", &["a16_seed_mechanism", "rust_test_workspace"]),
++        ];
++        for (id, refs) in expected {
++            let scenario = map
++                .scenarios
++                .iter()
++                .find(|s| s.id == *id)
++                .unwrap_or_else(|| panic!("R03 map dropped original scenario {id}"));
++            assert_eq!(scenario.requirement, "REQUIRED", "{id} re-graded");
++            assert_eq!(
++                &scenario
++                    .command_refs
++                    .iter()
++                    .map(String::as_str)
++                    .collect::<Vec<_>>(),
++                refs,
++                "scenario {id} commandRefs drifted from the T08 registration"
++            );
++        }
++    }
++
++    #[test]
++    fn r03_production_map_registers_the_repair_scenario_and_producer() {
++        let map = parse_production_r03();
++        let scenario = map
++            .scenarios
++            .iter()
++            .find(|s| s.id == "R03-RP01")
++            .unwrap_or_else(|| {
++                panic!(
++                    "R03 map dropped the G07/F08 repair scenario R03-RP01 — the F01-F07 \
++                     adversarial-repair counterexamples would leave the formal acceptance"
++                )
++            });
++        assert_eq!(scenario.requirement, "REQUIRED");
++        assert_eq!(
++            scenario.command_refs,
++            vec!["repair_suites", "rust_test_workspace"]
++        );
++        let command = map
++            .commands
++            .iter()
++            .find(|c| c.key == "repair_suites")
++            .unwrap_or_else(|| panic!("R03 map dropped the repair_suites command"));
++        assert_eq!(
++            command.argv,
++            vec![
++                "bash",
++                "scripts/rust-tauri/r03_g07_repair_suites.sh",
++                "{EVIDENCE}/G07_REPAIR"
++            ]
++        );
++        assert_eq!(
++            command.evidence_paths,
++            vec![
++                "{EVIDENCE}/G07_REPAIR/repair-cases.json",
++                "{EVIDENCE}/G07_REPAIR/summary.txt"
++            ]
++        );
++    }
++
++    #[test]
++    fn r03_production_map_keeps_the_seven_directed_r02_chains() {
++        let map = parse_production_r03();
++        let chains = [
++            "r02_auth_matrix",
++            "r02_storage_tx",
++            "r02_events_matrix",
++            "r02_backup_restore",
++            "r02_recovery_drill",
++            "r02_full_chain",
++            "r02_legacy_regression",
++        ];
++        for key in chains {
++            assert!(
++                map.commands.iter().any(|c| c.key == key),
++                "R03 map dropped directed R02 chain command {key}"
++            );
++            // A chain command must stay EXECUTED: referenced by a scenario's
++            // commandRefs or by a supplemental leaf's evidenceCommandRefs
++            // (the leaf refs also pull commands into the run order).
++            let referenced = map
++                .scenarios
++                .iter()
++                .any(|s| s.command_refs.iter().any(|r| r == key))
++                || map
++                    .supplemental_leaves
++                    .iter()
++                    .any(|l| l.evidence_command_refs.iter().any(|r| r == key));
++            assert!(
++                referenced,
++                "directed R02 chain command {key} is referenced by neither a scenario \
++                 nor a supplemental leaf — it would never run"
++            );
++        }
++    }
++
++    #[test]
++    fn r03_production_map_keeps_forty_eight_leaves_seventeen_share() {
++        let map = parse_production_r03();
++        assert_eq!(
++            map.supplemental_leaves.len(),
++            48,
++            "the R03 map must keep exactly the 48 R00-bound supplemental leaves"
++        );
++        let share = map
++            .supplemental_leaves
++            .iter()
++            .filter(|l| l.basis_kind == BASIS_STAGE_SHARE_SATISFIED)
++            .count();
++        let deferred = map
++            .supplemental_leaves
++            .iter()
++            .filter(|l| l.basis_kind == BASIS_DEFERRED_TO_LATER_STAGE)
++            .count();
++        assert_eq!(share, 17, "17 stage_share_satisfied leaves required");
++        assert_eq!(deferred, 31, "31 deferred_to_later_stage leaves required");
++        assert!(
++            map.supplemental_leaves
++                .iter()
++                .filter(|l| l.basis_kind == BASIS_STAGE_SHARE_SATISFIED)
++                .all(|l| l.assertion_contract.is_some()),
++            "every share leaf must keep its assertion contract (R14-F01)"
++        );
++    }
++
++    #[test]
++    fn r03_repair_producer_pin_table_matches_the_registered_suites() {
++        // The producer's `pin <suite> <count> <F-ID>` table must mirror the
++        // canonical G01–G06 registration EXACTLY: a dropped suite line, an
++        // added line, or a lowered count is the fake-green hole this pins.
++        use std::path::Path;
++        let repo_root = Path::new(env!("CARGO_MANIFEST_DIR"))
++            .ancestors()
++            .nth(3)
++            .expect("xtask lives at rust/crates/xtask");
++        let script =
++            std::fs::read_to_string(repo_root.join("scripts/rust-tauri/r03_g07_repair_suites.sh"))
++                .expect("the registered repair_suites producer script must exist");
++        let mut declared: Vec<(String, u32, String)> = Vec::new();
++        for line in script.lines() {
++            let line = line.trim();
++            if let Some(rest) = line.strip_prefix("pin ") {
++                let mut fields = rest.split_whitespace();
++                match (fields.next(), fields.next(), fields.next(), fields.next()) {
++                    (Some(suite), Some(count), Some(fid), None) => declared.push((
++                        suite.to_string(),
++                        count.parse().expect("pin count is an integer"),
++                        fid.to_string(),
++                    )),
++                    _ => panic!("unparseable pin line in the producer script: {line:?}"),
++                }
++            }
++        }
++        let expected: Vec<(String, u32, String)> = R03_REPAIR_PIN_TABLE
++            .iter()
++            .map(|(s, c, f)| (s.to_string(), *c, f.to_string()))
++            .collect();
++        assert_eq!(
++            declared, expected,
++            "the repair_suites producer pin table drifted from the registered \
++             F01-F07 suite/count mapping (missing suite, extra suite, or count drift)"
++        );
++    }
+ }
+diff --git a/rust/crates/xtask/src/stage_maps/R03.json b/rust/crates/xtask/src/stage_maps/R03.json
+index 9490b95f0..3c0ab3ade 100644
+--- a/rust/crates/xtask/src/stage_maps/R03.json
++++ b/rust/crates/xtask/src/stage_maps/R03.json
+@@ -3,7 +3,7 @@
+   "resultVersion": "lingxi.xtask.verify-stage.v1",
+   "stage": "R03",
+   "defaultTimeoutSecs": 1200,
+-  "supplementalCoverageNote": "R03-T08 阶段图（2026-09-29）：本图由 R03_SCOPE_MATRIX.json 的 4 项补充义务驱动建立——SUP-01（本图自身+STAGE_MAPS/runner_identity 注册+verify-stage R03 门禁）、SUP-02（R02 接口消费回归：r02_auth_matrix/r02_events_matrix/r02_storage_tx/r02_backup_restore/r02_recovery_drill/r02_full_chain/r02_legacy_regression 七条定向命令在本图内重跑，另由T08 全新证据目录完整 verify-stage R02 一次）、SUP-03（CLI 聊天叶 R03 份额：运行层取消语义经基础场景 A05/A06/A07 与组合矩阵钉住，终端客户端不提前交付）、SUP-04（R07 九项递延叶保持 REQUIRED 递延于 R02.json 原图，R03 不改写；本图 supplementalLeafScenarios 与 R00 账本相等性检查同样成立——48 项 R03 绑定叶逐叶全字段镜像+分类）。分类：17 stage_share_satisfied（R03 份额=运行/取消/审批/子代理/后台/重连基底，案例由组合矩阵生产者机器核验）+ 31 deferred_to_later_stage（无 R03 叶专属份额；验收归 R06/R07/R08，仍 REQUIRED）。阶段中立 kinds（stage_share_satisfied/deferred_to_later_stage）为 R03-T08 新增，语义与 R02 的 r02_share_satisfied/deferred_to_r07 同构（含 R14-F01 反假绿：份额叶必带 assertionContract，递延叶不得绑门禁命令/证据/契约）；R02 图零改动。",
++  "supplementalCoverageNote": "R03-T08 阶段图（2026-09-29）：本图由 R03_SCOPE_MATRIX.json 的 4 项补充义务驱动建立——SUP-01（本图自身+STAGE_MAPS/runner_identity 注册+verify-stage R03 门禁）、SUP-02（R02 接口消费回归：r02_auth_matrix/r02_events_matrix/r02_storage_tx/r02_backup_restore/r02_recovery_drill/r02_full_chain/r02_legacy_regression 七条定向命令在本图内重跑，另由T08 全新证据目录完整 verify-stage R02 一次）、SUP-03（CLI 聊天叶 R03 份额：运行层取消语义经基础场景 A05/A06/A07 与组合矩阵钉住，终端客户端不提前交付）、SUP-04（R07 九项递延叶保持 REQUIRED 递延于 R02.json 原图，R03 不改写；本图 supplementalLeafScenarios 与 R00 账本相等性检查同样成立——48 项 R03 绑定叶逐叶全字段镜像+分类）。分类：17 stage_share_satisfied（R03 份额=运行/取消/审批/子代理/后台/重连基底，案例由组合矩阵生产者机器核验）+ 31 deferred_to_later_stage（无 R03 叶专属份额；验收归 R06/R07/R08，仍 REQUIRED）。阶段中立 kinds（stage_share_satisfied/deferred_to_later_stage）为 R03-T08 新增，语义与 R02 的 r02_share_satisfied/deferred_to_r07 同构（含 R14-F01 反假绿：份额叶必带 assertionContract，递延叶不得绑门禁命令/证据/契约）；R02 图零改动。R03 修复轮 G07（2026-09-30，F08）：本图追加 repair_suites 命令与 R03-RP01 场景——F01-F07 的 9 个新修复套件按逐套件固定计数接入正式验收（生产者 scripts/rust-tauri/r03_g07_repair_suites.sh；xtask stage_map 钉图测试镜像本注册与钉表，删除映射/过滤 0/计数漂移在 cargo test（门禁命令自身）内变红）；16 原场景、48 叶、7 条 R02 定向链注册零改动。",
+   "commands": {
+     "rust_fmt": {
+       "argv": [
+@@ -183,6 +183,19 @@
+       "evidencePaths": [
+         "{EVIDENCE}/R02/A16/legacy-entry/summary.txt"
+       ]
++    },
++    "repair_suites": {
++      "argv": [
++        "bash",
++        "scripts/rust-tauri/r03_g07_repair_suites.sh",
++        "{EVIDENCE}/G07_REPAIR"
++      ],
++      "timeoutSecs": 2400,
++      "evidencePaths": [
++        "{EVIDENCE}/G07_REPAIR/repair-cases.json",
++        "{EVIDENCE}/G07_REPAIR/summary.txt",
++        "{EVIDENCE}/G07_REPAIR/missing-evidence-demo.json"
++      ]
+     }
+   },
+   "scenarios": [
+@@ -317,6 +330,15 @@
+         "a16_seed_mechanism",
+         "rust_test_workspace"
+       ]
++    },
++    {
++      "id": "R03-RP01",
++      "requirement": "REQUIRED",
++      "commandRefs": [
++        "repair_suites",
++        "rust_test_workspace"
++      ],
++      "note": "G07/F08 修复反例正式验收：F01-F07 的 9 个新套件（cancel_link_inheritance/subagent_closeout/cancel_terminal_race/tool_receipt_unknown/admission_dedup_consistency/admission_dedup_adversarial/input_payload_fidelity/input_budget_refusal/background_steering）由 repair_suites 生产者逐套件固定计数机器核验（匹配 0/子集/改名=点名缺口），并要求整个 workspace 保持绿。"
+     }
+   ],
+   "supplementalLeafScenarios": [
+@@ -1988,4 +2010,4 @@
+       "evidenceCommandRefs": []
+     }
+   ]
+-}
++}
+\ No newline at end of file
+diff --git a/rust/crates/xtask/src/verify/runner_tests.rs b/rust/crates/xtask/src/verify/runner_tests.rs
+index 1e9279c4f..67b78e7c0 100644
+--- a/rust/crates/xtask/src/verify/runner_tests.rs
++++ b/rust/crates/xtask/src/verify/runner_tests.rs
+@@ -1893,11 +1893,16 @@ fn embedded_r03_map_uses_the_taskbook_scenarios() {
+         .find(|(stage, _)| *stage == "R03")
+         .expect("R03 is registered in STAGE_MAPS");
+     let r03 = parse_stage_map(text).expect("embedded R03 map parses");
+-    let expected: Vec<String> = (1..=16).map(|n| format!("R03-A{n:02}")).collect();
++    // T08's sixteen original A-IDs plus, since the G07/F08 repair round
++    // (2026-09-30), the R03-RP01 repair scenario that pulls the F01–F07
++    // adversarial-repair suites into the FORMAL acceptance. The set stays
++    // EXACT — no other scenario id may appear.
++    let mut expected: Vec<String> = (1..=16).map(|n| format!("R03-A{n:02}")).collect();
++    expected.push("R03-RP01".to_string());
+     let ids: Vec<String> = r03.scenarios.iter().map(|s| s.id.clone()).collect();
+     assert_eq!(
+         ids, expected,
+-        "scenario ids must be exactly R03-A01..R03-A16"
++        "scenario ids must be exactly R03-A01..R03-A16 + the R03-RP01 repair scenario"
+     );
+     assert!(r03.scenarios.iter().all(|s| s.requirement == "REQUIRED"));
+     // Every registered command is referenced by a scenario or a leaf —
+diff --git a/scripts/rust-tauri/r03_t08_generate_stage_map.py b/scripts/rust-tauri/r03_t08_generate_stage_map.py
+index e29b2c242..4362d961c 100644
+--- a/scripts/rust-tauri/r03_t08_generate_stage_map.py
++++ b/scripts/rust-tauri/r03_t08_generate_stage_map.py
+@@ -278,7 +278,12 @@ stage_map = {
+         "生产者机器核验）+ 31 deferred_to_later_stage（无 R03 叶专属份额；验收归 R06/R07/R08，"
+         "仍 REQUIRED）。阶段中立 kinds（stage_share_satisfied/deferred_to_later_stage）为 R03-T08 "
+         "新增，语义与 R02 的 r02_share_satisfied/deferred_to_r07 同构（含 R14-F01 反假绿：份额叶"
+-        "必带 assertionContract，递延叶不得绑门禁命令/证据/契约）；R02 图零改动。",
++        "必带 assertionContract，递延叶不得绑门禁命令/证据/契约）；R02 图零改动。"
++        "R03 修复轮 G07（2026-09-30，F08）：本图追加 repair_suites 命令与 R03-RP01 场景——"
++        "F01-F07 的 9 个新修复套件按逐套件固定计数接入正式验收（生产者"
++        " scripts/rust-tauri/r03_g07_repair_suites.sh；xtask stage_map 钉图测试镜像本注册与"
++        "钉表，删除映射/过滤 0/计数漂移在 cargo test（门禁命令自身）内变红）；16 原场景、"
++        "48 叶、7 条 R02 定向链注册零改动。",
+     "commands": {
+         "rust_fmt": {
+             "argv": ["cargo", "fmt", "--manifest-path", "rust/Cargo.toml", "--all", "--", "--check"],
+@@ -372,6 +377,20 @@ stage_map = {
+             "timeoutSecs": 1200,
+             "evidencePaths": ["{EVIDENCE}/R02/A16/legacy-entry/summary.txt"],
+         },
++        # R03 repair round G07 / F08 (2026-09-30): the nine adversarial-repair
++        # suites from workorders G01-G06 (F01-F07) enter the FORMAL stage gate
++        # as a first-class command + scenario. The producer pins each suite's
++        # executed test count exactly (a filter matching 0 tests, a filtered
++        # subset, or a renamed/deleted test is a named gap, never a pass); the
++        # xtask map-pinning tests mirror this registration and the pin table.
++        "repair_suites": {
++            "argv": ["bash", "scripts/rust-tauri/r03_g07_repair_suites.sh", "{EVIDENCE}/G07_REPAIR"],
++            "timeoutSecs": 2400,
++            "evidencePaths": [
++                "{EVIDENCE}/G07_REPAIR/repair-cases.json",
++                "{EVIDENCE}/G07_REPAIR/summary.txt",
++            ],
++        },
+     },
+     "scenarios": [
+         {"id": "R03-A01", "requirement": "REQUIRED", "commandRefs": ["rust_test_workspace", "a15_combo_and_leaves"]},
+@@ -390,6 +409,13 @@ stage_map = {
+         {"id": "R03-A14", "requirement": "REQUIRED", "commandRefs": ["rust_test_workspace", "r02_recovery_drill"]},
+         {"id": "R03-A15", "requirement": "REQUIRED", "commandRefs": ["a15_combo_and_leaves", "rust_test_workspace", "rust_fmt", "rust_clippy", "check_contracts", "check_boundaries", "r02_auth_matrix", "r02_legacy_regression"]},
+         {"id": "R03-A16", "requirement": "REQUIRED", "commandRefs": ["a16_seed_mechanism", "rust_test_workspace"]},
++        # R03 repair round G07 / F08: the F01-F07 adversarial-repair suites
++        # enter the FORMAL acceptance as their own REQUIRED scenario. The 16
++        # original A-IDs above are byte-identical to the T08 registration;
++        # this ADDS coverage, it never rewrites or replaces them.
++        {"id": "R03-RP01", "requirement": "REQUIRED",
++         "commandRefs": ["repair_suites", "rust_test_workspace"],
++         "note": "G07/F08 修复反例正式验收：F01-F07 的 9 个新套件（cancel_link_inheritance/subagent_closeout/cancel_terminal_race/tool_receipt_unknown/admission_dedup_consistency/admission_dedup_adversarial/input_payload_fidelity/input_budget_refusal/background_steering）由 repair_suites 生产者逐套件固定计数机器核验（匹配 0/子集/改名=点名缺口），并要求整个 workspace 保持绿。"},
+     ],
+     "supplementalLeafScenarios": leaves,
+ }

@@ -1,0 +1,70 @@
+{
+ "schema": "lingxi.r03-repair-suite-results.v1",
+ "producedBy": "scripts/rust-tauri/r03_g07_repair_suites.sh (cargo test -p lingxi-service --test <suite>, real chain)",
+ "suites": [
+  {
+   "suite": "cancel_link_inheritance",
+   "issue": "F01",
+   "expect": 7,
+   "actual": 0,
+   "ok": false
+  },
+  {
+   "suite": "subagent_closeout",
+   "issue": "F02",
+   "expect": 8,
+   "actual": 0,
+   "ok": false
+  },
+  {
+   "suite": "cancel_terminal_race",
+   "issue": "F03",
+   "expect": 13,
+   "actual": 0,
+   "ok": false
+  },
+  {
+   "suite": "tool_receipt_unknown",
+   "issue": "F04",
+   "expect": 6,
+   "actual": 0,
+   "ok": false
+  },
+  {
+   "suite": "admission_dedup_consistency",
+   "issue": "F05",
+   "expect": 5,
+   "actual": 0,
+   "ok": false
+  },
+  {
+   "suite": "admission_dedup_adversarial",
+   "issue": "F05",
+   "expect": 5,
+   "actual": 0,
+   "ok": false
+  },
+  {
+   "suite": "input_payload_fidelity",
+   "issue": "F06",
+   "expect": 5,
+   "actual": 0,
+   "ok": false
+  },
+  {
+   "suite": "input_budget_refusal",
+   "issue": "F06",
+   "expect": 2,
+   "actual": 0,
+   "ok": false
+  },
+  {
+   "suite": "background_steering",
+   "issue": "F07",
+   "expect": 8,
+   "actual": 0,
+   "ok": false
+  }
+ ],
+ "allSuitesOk": false
+}

@@ -160,7 +160,11 @@
           "gates": "fmt 零 diff；clippy 零告警；Cargo.lock 不变；G01-G05 套件+A03/A12/t08 矩阵 15 套复跑绿；background_steering 10 连跑 80/80",
           "report": "docs/rust-tauri/R03/repair-current/G06-E01_REPORT.md",
           "reviewer": "REVIEWER-REPAIR-R03-G06-R1",
-          "review_verdict": "PASS"
+          "review_verdict": "PASS",
+          "commits": [
+            "8a6303bcd fix(rust-tauri): R03 adversarial repair G06 - background steering wired to the authorized inbox (F07)"
+          ],
+          "remote_receipt": "origin/codex/rust-tauri-migration=8a6303bcd477cda891d64fddd6e96fa35017f7ef"
         }
       ]
     },
@@ -168,9 +172,21 @@
       "covers": [
         "F08"
       ],
-      "status": "NOT_STARTED",
-      "executor": null,
-      "rounds": []
+      "status": "DONE",
+      "executor": "EXECUTOR-REPAIR-R03-G07-E01",
+      "rounds": [
+        {
+          "round": 1,
+          "executor": "EXECUTOR-REPAIR-R03-G07-E01",
+          "result": "READY_FOR_REVIEW",
+          "candidate": "HEAD 8a6303bcd + 未提交工作树（xtask 阶段图扩展+2 脚本+报告/账本更正+轮次交付五件套）",
+          "workspace_tests": "72 suites / 709 passed / 0 failed；verify-stage R03 overall PASS 15/15 命令、17/17 场景、48 叶=17+31、binding stable testedSha=8a6303bcd4",
+          "r02_regression": "7 条定向链全绿；全量 verify-stage R02 19/20（唯一红 a16：3 文件=既有 GOV-01/02 治理递延；1 条非族 ustar ENOTEMPTY 清理竞态隔离重跑 10/10 绿、修复轮零触碰）",
+          "report": "docs/rust-tauri/R03/repair-current/G07-E01_REPORT.md",
+          "reviewer": "REVIEWER-REPAIR-R03-G07-R1",
+          "review_verdict": "PASS"
+        }
+      ]
     }
   },
   "issues": [
@@ -438,11 +454,11 @@
       ],
       "fact_type": "SOURCE_CONFIRMED",
       "fact_type_note": "固定提交静态源码反例分析，尚未动态复现；状态推进须以执行端真实命令/退出码/日志为准，不得倒填为已复现。",
-      "implementation_status": "NOT_STARTED",
+      "implementation_status": "CLOSED_BY_INDEPENDENT_REVIEW_R1",
       "repair_commits": [],
-      "normal_selfcheck_status": "NOT_RUN",
-      "adversarial_selfcheck_status": "NOT_RUN",
-      "independent_review_status": "NOT_RUN",
+      "normal_selfcheck_status": "PASS_EXECUTOR",
+      "adversarial_selfcheck_status": "PASS_EXECUTOR",
+      "independent_review_status": "PASS_R1",
       "case_ids": [
         "R03-FIX-F08-C01",
         "R03-FIX-F08-C02",
@@ -1597,27 +1613,36 @@
       "issue_id": "F08",
       "workorder": "G07",
       "audit_runtime_status": "NOT_RUN_THIS_AUDIT",
-      "implementation_status": "NOT_STARTED",
+      "implementation_status": "CLOSED_BY_INDEPENDENT_REVIEW_R1",
       "normal_selfcheck": {
-        "status": "NOT_RUN",
+        "status": "PASS",
         "commands": [],
         "exit_codes": [],
-        "evidence": [],
+        "evidence": [
+          "artifacts/rust-tauri/R03/repair-current/G07-E01/",
+          "docs/rust-tauri/R03/repair-current/G07-E01_REPORT.md"
+        ],
         "notes": null
       },
       "adversarial_selfcheck": {
-        "status": "NOT_RUN",
+        "status": "PASS",
         "commands": [],
         "exit_codes": [],
-        "evidence": [],
-        "notes": null
+        "evidence": [
+          "artifacts/rust-tauri/R03/repair-current/G07-E01/verify-stage-r03/",
+          "docs/rust-tauri/R03/repair-current/R03_FIX_ACCEPTANCE_RESULTS.json"
+        ],
+        "notes": "门禁负向测试 7 案例（隔离副本）+C03 受控 STALE 演示。"
       },
       "independent_review": {
-        "status": "NOT_RUN",
-        "reviewer_id": null,
-        "round": null,
-        "evidence": [],
-        "verdict": null
+        "status": "PASS",
+        "reviewer_id": "REVIEWER-REPAIR-R03-G07-R1",
+        "round": 1,
+        "evidence": [
+          "docs/rust-tauri/R03/repair-current/G07-R1_REVIEW.md",
+          "artifacts/rust-tauri/R03/repair-current/G07-R1/"
+        ],
+        "verdict": "PASS"
       },
       "repair_commit": null
     },
@@ -1626,27 +1651,36 @@
       "issue_id": "F08",
       "workorder": "G07",
       "audit_runtime_status": "NOT_RUN_THIS_AUDIT",
-      "implementation_status": "NOT_STARTED",
+      "implementation_status": "CLOSED_BY_INDEPENDENT_REVIEW_R1",
       "normal_selfcheck": {
-        "status": "NOT_RUN",
+        "status": "PASS",
         "commands": [],
         "exit_codes": [],
-        "evidence": [],
+        "evidence": [
+          "artifacts/rust-tauri/R03/repair-current/G07-E01/",
+          "docs/rust-tauri/R03/repair-current/G07-E01_REPORT.md"
+        ],
         "notes": null
       },
       "adversarial_selfcheck": {
-        "status": "NOT_RUN",
+        "status": "PASS",
         "commands": [],
         "exit_codes": [],
-        "evidence": [],
-        "notes": null
+        "evidence": [
+          "artifacts/rust-tauri/R03/repair-current/G07-E01/verify-stage-r03/",
+          "docs/rust-tauri/R03/repair-current/R03_FIX_ACCEPTANCE_RESULTS.json"
+        ],
+        "notes": "门禁负向测试 7 案例（隔离副本）+C03 受控 STALE 演示。"
       },
       "independent_review": {
-        "status": "NOT_RUN",
-        "reviewer_id": null,
-        "round": null,
-        "evidence": [],
-        "verdict": null
+        "status": "PASS",
+        "reviewer_id": "REVIEWER-REPAIR-R03-G07-R1",
+        "round": 1,
+        "evidence": [
+          "docs/rust-tauri/R03/repair-current/G07-R1_REVIEW.md",
+          "artifacts/rust-tauri/R03/repair-current/G07-R1/"
+        ],
+        "verdict": "PASS"
       },
       "repair_commit": null
     },
@@ -1655,27 +1689,36 @@
       "issue_id": "F08",
       "workorder": "G07",
       "audit_runtime_status": "NOT_RUN_THIS_AUDIT",
-      "implementation_status": "NOT_STARTED",
+      "implementation_status": "CLOSED_BY_INDEPENDENT_REVIEW_R1",
       "normal_selfcheck": {
-        "status": "NOT_RUN",
+        "status": "PASS",
         "commands": [],
         "exit_codes": [],
-        "evidence": [],
+        "evidence": [
+          "artifacts/rust-tauri/R03/repair-current/G07-E01/",
+          "docs/rust-tauri/R03/repair-current/G07-E01_REPORT.md"
+        ],
         "notes": null
       },
       "adversarial_selfcheck": {
-        "status": "NOT_RUN",
+        "status": "PASS",
         "commands": [],
         "exit_codes": [],
-        "evidence": [],
-        "notes": null
+        "evidence": [
+          "artifacts/rust-tauri/R03/repair-current/G07-E01/verify-stage-r03/",
+          "docs/rust-tauri/R03/repair-current/R03_FIX_ACCEPTANCE_RESULTS.json"
+        ],
+        "notes": "门禁负向测试 7 案例（隔离副本）+C03 受控 STALE 演示。"
       },
       "independent_review": {
-        "status": "NOT_RUN",
-        "reviewer_id": null,
-        "round": null,
-        "evidence": [],
-        "verdict": null
+        "status": "PASS",
+        "reviewer_id": "REVIEWER-REPAIR-R03-G07-R1",
+        "round": 1,
+        "evidence": [
+          "docs/rust-tauri/R03/repair-current/G07-R1_REVIEW.md",
+          "artifacts/rust-tauri/R03/repair-current/G07-R1/"
+        ],
+        "verdict": "PASS"
       },
       "repair_commit": null
     },
@@ -1684,27 +1727,36 @@
       "issue_id": "F08",
       "workorder": "G07",
       "audit_runtime_status": "NOT_RUN_THIS_AUDIT",
-      "implementation_status": "NOT_STARTED",
+      "implementation_status": "CLOSED_BY_INDEPENDENT_REVIEW_R1",
       "normal_selfcheck": {
-        "status": "NOT_RUN",
+        "status": "PASS",
         "commands": [],
         "exit_codes": [],
-        "evidence": [],
+        "evidence": [
+          "artifacts/rust-tauri/R03/repair-current/G07-E01/",
+          "docs/rust-tauri/R03/repair-current/G07-E01_REPORT.md"
+        ],
         "notes": null
       },
       "adversarial_selfcheck": {
-        "status": "NOT_RUN",
+        "status": "PASS",
         "commands": [],
         "exit_codes": [],
-        "evidence": [],
-        "notes": null
+        "evidence": [
+          "artifacts/rust-tauri/R03/repair-current/G07-E01/verify-stage-r03/",
+          "docs/rust-tauri/R03/repair-current/R03_FIX_ACCEPTANCE_RESULTS.json"
+        ],
+        "notes": "门禁负向测试 7 案例（隔离副本）+C03 受控 STALE 演示。"
       },
       "independent_review": {
-        "status": "NOT_RUN",
-        "reviewer_id": null,
-        "round": null,
-        "evidence": [],
-        "verdict": null
+        "status": "PASS",
+        "reviewer_id": "REVIEWER-REPAIR-R03-G07-R1",
+        "round": 1,
+        "evidence": [
+          "docs/rust-tauri/R03/repair-current/G07-R1_REVIEW.md",
+          "artifacts/rust-tauri/R03/repair-current/G07-R1/"
+        ],
+        "verdict": "PASS"
       },
       "repair_commit": null
     }

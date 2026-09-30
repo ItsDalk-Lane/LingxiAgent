@@ -1,0 +1,5 @@
+# G07-E01 attribution probe: artifact-core-ustar.test.ts isolated rerun (2026-09-30)
+command: npx vitest run tests/artifact-core-ustar.test.ts
+result: Test Files 1 passed (1); Tests 10 passed (10) — green in isolation
+repair-round touch check: git log cd3fb19e6..HEAD -- tests/artifact-core-ustar.test.ts shared/artifact-core/ => EMPTY (untouched)
+conclusion: E5 full-run red was an afterEach fs.rmSync ENOTEMPTY temp-cleanup flake, not a product regression, not the seal family; classifier stayed fail-closed.

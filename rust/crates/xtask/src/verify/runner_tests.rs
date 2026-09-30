@@ -1893,11 +1893,16 @@ fn embedded_r03_map_uses_the_taskbook_scenarios() {
         .find(|(stage, _)| *stage == "R03")
         .expect("R03 is registered in STAGE_MAPS");
     let r03 = parse_stage_map(text).expect("embedded R03 map parses");
-    let expected: Vec<String> = (1..=16).map(|n| format!("R03-A{n:02}")).collect();
+    // T08's sixteen original A-IDs plus, since the G07/F08 repair round
+    // (2026-09-30), the R03-RP01 repair scenario that pulls the F01–F07
+    // adversarial-repair suites into the FORMAL acceptance. The set stays
+    // EXACT — no other scenario id may appear.
+    let mut expected: Vec<String> = (1..=16).map(|n| format!("R03-A{n:02}")).collect();
+    expected.push("R03-RP01".to_string());
     let ids: Vec<String> = r03.scenarios.iter().map(|s| s.id.clone()).collect();
     assert_eq!(
         ids, expected,
-        "scenario ids must be exactly R03-A01..R03-A16"
+        "scenario ids must be exactly R03-A01..R03-A16 + the R03-RP01 repair scenario"
     );
     assert!(r03.scenarios.iter().all(|s| s.requirement == "REQUIRED"));
     // Every registered command is referenced by a scenario or a leaf —

@@ -1,0 +1,11 @@
+{
+  "combo": "cross-session-parallel",
+  "counts": {
+    "final_status_alpha": "completed",
+    "final_status_beta": "completed",
+    "model_calls": 2,
+    "runs": 2,
+    "tool_calls": 0
+  },
+  "schema": "lingxi.r03-t08-combo-counts.v1"
+}

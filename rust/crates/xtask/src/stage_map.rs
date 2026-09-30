@@ -1854,4 +1854,243 @@ mod map_tests {
         .unwrap_err();
         assert!(err.contains("references unknown producer command"), "{err}");
     }
+
+    // ── R03 repair round G07 / F08: pin the PRODUCTION R03 map ───────────
+    //
+    // The gate's own cross-checks guard the R00 supplemental leaves and the
+    // per-command evidence, but a base SCENARIO registration exists only in
+    // the map itself: deleting R03-RP01 (or the repair command, or the
+    // producer's pin table) would otherwise leave a silent hole the gate
+    // cannot see. These tests pin the real registered map — they run inside
+    // `cargo test` (itself the gate's `rust_test_workspace` command), so any
+    // deletion/drift turns the stage gate red with the gap named here.
+
+    /// The REAL registered R03 stage map (same bytes `verify-stage R03`
+    /// loads via STAGE_MAPS).
+    const R03_PRODUCTION: &str = include_str!("stage_maps/R03.json");
+
+    /// The F01–F07 repair suites and their EXACT pinned test counts, as the
+    /// producer script's `pin <suite> <count> <F-ID>` table must declare
+    /// them (G07/F08-C02: no missing suite, no extra suite, no count drift).
+    const R03_REPAIR_PIN_TABLE: &[(&str, u32, &str)] = &[
+        ("cancel_link_inheritance", 7, "F01"),
+        ("subagent_closeout", 8, "F02"),
+        ("cancel_terminal_race", 13, "F03"),
+        ("tool_receipt_unknown", 6, "F04"),
+        ("admission_dedup_consistency", 5, "F05"),
+        ("admission_dedup_adversarial", 5, "F05"),
+        ("input_payload_fidelity", 5, "F06"),
+        ("input_budget_refusal", 2, "F06"),
+        ("background_steering", 8, "F07"),
+    ];
+
+    fn parse_production_r03() -> StageMap {
+        parse_stage_map(R03_PRODUCTION)
+            .expect("the registered R03 stage map must parse with this runner")
+    }
+
+    #[test]
+    fn r03_production_map_keeps_the_sixteen_a_scenarios_verbatim() {
+        let map = parse_production_r03();
+        // The frozen T08 registration: id → commandRefs, byte-for-byte.
+        let expected: &[(&str, &[&str])] = &[
+            ("R03-A01", &["rust_test_workspace", "a15_combo_and_leaves"]),
+            ("R03-A02", &["rust_test_workspace", "r02_storage_tx"]),
+            ("R03-A03", &["rust_test_workspace"]),
+            ("R03-A04", &["rust_test_workspace"]),
+            ("R03-A05", &["rust_test_workspace", "a15_combo_and_leaves"]),
+            ("R03-A06", &["rust_test_workspace", "a15_combo_and_leaves"]),
+            ("R03-A07", &["rust_test_workspace", "a15_combo_and_leaves"]),
+            ("R03-A08", &["rust_test_workspace", "a15_combo_and_leaves"]),
+            ("R03-A09", &["rust_test_workspace"]),
+            ("R03-A10", &["rust_test_workspace"]),
+            ("R03-A11", &["rust_test_workspace", "a15_combo_and_leaves"]),
+            ("R03-A12", &["rust_test_workspace", "a15_combo_and_leaves"]),
+            (
+                "R03-A13",
+                &[
+                    "rust_test_workspace",
+                    "a15_combo_and_leaves",
+                    "r02_full_chain",
+                    "r02_backup_restore",
+                ],
+            ),
+            ("R03-A14", &["rust_test_workspace", "r02_recovery_drill"]),
+            (
+                "R03-A15",
+                &[
+                    "a15_combo_and_leaves",
+                    "rust_test_workspace",
+                    "rust_fmt",
+                    "rust_clippy",
+                    "check_contracts",
+                    "check_boundaries",
+                    "r02_auth_matrix",
+                    "r02_legacy_regression",
+                ],
+            ),
+            ("R03-A16", &["a16_seed_mechanism", "rust_test_workspace"]),
+        ];
+        for (id, refs) in expected {
+            let scenario = map
+                .scenarios
+                .iter()
+                .find(|s| s.id == *id)
+                .unwrap_or_else(|| panic!("R03 map dropped original scenario {id}"));
+            assert_eq!(scenario.requirement, "REQUIRED", "{id} re-graded");
+            assert_eq!(
+                &scenario
+                    .command_refs
+                    .iter()
+                    .map(String::as_str)
+                    .collect::<Vec<_>>(),
+                refs,
+                "scenario {id} commandRefs drifted from the T08 registration"
+            );
+        }
+    }
+
+    #[test]
+    fn r03_production_map_registers_the_repair_scenario_and_producer() {
+        let map = parse_production_r03();
+        let scenario = map
+            .scenarios
+            .iter()
+            .find(|s| s.id == "R03-RP01")
+            .unwrap_or_else(|| {
+                panic!(
+                    "R03 map dropped the G07/F08 repair scenario R03-RP01 — the F01-F07 \
+                     adversarial-repair counterexamples would leave the formal acceptance"
+                )
+            });
+        assert_eq!(scenario.requirement, "REQUIRED");
+        assert_eq!(
+            scenario.command_refs,
+            vec!["repair_suites", "rust_test_workspace"]
+        );
+        let command = map
+            .commands
+            .iter()
+            .find(|c| c.key == "repair_suites")
+            .unwrap_or_else(|| panic!("R03 map dropped the repair_suites command"));
+        assert_eq!(
+            command.argv,
+            vec![
+                "bash",
+                "scripts/rust-tauri/r03_g07_repair_suites.sh",
+                "{EVIDENCE}/G07_REPAIR"
+            ]
+        );
+        assert_eq!(
+            command.evidence_paths,
+            vec![
+                "{EVIDENCE}/G07_REPAIR/repair-cases.json",
+                "{EVIDENCE}/G07_REPAIR/summary.txt"
+            ]
+        );
+    }
+
+    #[test]
+    fn r03_production_map_keeps_the_seven_directed_r02_chains() {
+        let map = parse_production_r03();
+        let chains = [
+            "r02_auth_matrix",
+            "r02_storage_tx",
+            "r02_events_matrix",
+            "r02_backup_restore",
+            "r02_recovery_drill",
+            "r02_full_chain",
+            "r02_legacy_regression",
+        ];
+        for key in chains {
+            assert!(
+                map.commands.iter().any(|c| c.key == key),
+                "R03 map dropped directed R02 chain command {key}"
+            );
+            // A chain command must stay EXECUTED: referenced by a scenario's
+            // commandRefs or by a supplemental leaf's evidenceCommandRefs
+            // (the leaf refs also pull commands into the run order).
+            let referenced = map
+                .scenarios
+                .iter()
+                .any(|s| s.command_refs.iter().any(|r| r == key))
+                || map
+                    .supplemental_leaves
+                    .iter()
+                    .any(|l| l.evidence_command_refs.iter().any(|r| r == key));
+            assert!(
+                referenced,
+                "directed R02 chain command {key} is referenced by neither a scenario \
+                 nor a supplemental leaf — it would never run"
+            );
+        }
+    }
+
+    #[test]
+    fn r03_production_map_keeps_forty_eight_leaves_seventeen_share() {
+        let map = parse_production_r03();
+        assert_eq!(
+            map.supplemental_leaves.len(),
+            48,
+            "the R03 map must keep exactly the 48 R00-bound supplemental leaves"
+        );
+        let share = map
+            .supplemental_leaves
+            .iter()
+            .filter(|l| l.basis_kind == BASIS_STAGE_SHARE_SATISFIED)
+            .count();
+        let deferred = map
+            .supplemental_leaves
+            .iter()
+            .filter(|l| l.basis_kind == BASIS_DEFERRED_TO_LATER_STAGE)
+            .count();
+        assert_eq!(share, 17, "17 stage_share_satisfied leaves required");
+        assert_eq!(deferred, 31, "31 deferred_to_later_stage leaves required");
+        assert!(
+            map.supplemental_leaves
+                .iter()
+                .filter(|l| l.basis_kind == BASIS_STAGE_SHARE_SATISFIED)
+                .all(|l| l.assertion_contract.is_some()),
+            "every share leaf must keep its assertion contract (R14-F01)"
+        );
+    }
+
+    #[test]
+    fn r03_repair_producer_pin_table_matches_the_registered_suites() {
+        // The producer's `pin <suite> <count> <F-ID>` table must mirror the
+        // canonical G01–G06 registration EXACTLY: a dropped suite line, an
+        // added line, or a lowered count is the fake-green hole this pins.
+        use std::path::Path;
+        let repo_root = Path::new(env!("CARGO_MANIFEST_DIR"))
+            .ancestors()
+            .nth(3)
+            .expect("xtask lives at rust/crates/xtask");
+        let script =
+            std::fs::read_to_string(repo_root.join("scripts/rust-tauri/r03_g07_repair_suites.sh"))
+                .expect("the registered repair_suites producer script must exist");
+        let mut declared: Vec<(String, u32, String)> = Vec::new();
+        for line in script.lines() {
+            let line = line.trim();
+            if let Some(rest) = line.strip_prefix("pin ") {
+                let mut fields = rest.split_whitespace();
+                match (fields.next(), fields.next(), fields.next(), fields.next()) {
+                    (Some(suite), Some(count), Some(fid), None) => declared.push((
+                        suite.to_string(),
+                        count.parse().expect("pin count is an integer"),
+                        fid.to_string(),
+                    )),
+                    _ => panic!("unparseable pin line in the producer script: {line:?}"),
+                }
+            }
+        }
+        let expected: Vec<(String, u32, String)> = R03_REPAIR_PIN_TABLE
+            .iter()
+            .map(|(s, c, f)| (s.to_string(), *c, f.to_string()))
+            .collect();
+        assert_eq!(
+            declared, expected,
+            "the repair_suites producer pin table drifted from the registered \
+             F01-F07 suite/count mapping (missing suite, extra suite, or count drift)"
+        );
+    }
 }

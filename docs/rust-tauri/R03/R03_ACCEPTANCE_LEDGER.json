@@ -698,6 +698,31 @@
     {
       "id": "gate-attempt-1",
       "fixed_in": "R03-T08（a16 命令参数改 {EVIDENCE}/A16；legacy 回归按派单拆分 directed 模式——E0–E4.5 入门禁、E5 全量归总控；attempt-1 原字节保留）"
+    },
+    {
+      "id": "adversarial-repair-2026-09-30-G01-G07（F01–F08）",
+      "fixed_in": "修复轮 G01–G06 逐组三层闭环后由总控提交推送（520bb75b9/ccb09fde6/198e0da1e/d56e6883d/8883923a5/8a6303bcd，回执 R03_FIX_COMMIT_RECEIPTS.json）；G07（F08）把 9 个新修复套件（59 用例）经 repair_suites 命令+R03-RP01 场景接入本账本所属 verify-stage R03 门禁（16 原场景条目未动）；门禁负向测试与候选绑定验证落 artifacts/rust-tauri/R03/repair-current/G07-E01/；轮次权威索引 docs/rust-tauri/R03/repair-current/（R03_FIX_ISSUES.json 逐 F-ID/C-ID 三层状态）"
+    }
+  ],
+  "repair_scenarios": [
+    {
+      "id": "R03-RP01",
+      "round": "adversarial-repair-2026-09-30（G07/F08）",
+      "name": "F01–F07 对抗性修复反例正式验收",
+      "requirement": "REQUIRED",
+      "status": "PASS",
+      "command_refs": ["repair_suites", "rust_test_workspace"],
+      "producer": "scripts/rust-tauri/r03_g07_repair_suites.sh（逐套件固定计数：cancel_link_inheritance 7/F01、subagent_closeout 8/F02、cancel_terminal_race 13/F03、tool_receipt_unknown 6/F04、admission_dedup_consistency 5/F05、admission_dedup_adversarial 5/F05、input_payload_fidelity 5/F06、input_budget_refusal 2/F06、background_steering 8/F07；匹配 0/子集/改名=点名缺口）",
+      "test_object": "rust/crates/lingxi-service/tests/ 的 9 个新套件（红基线证据 artifacts/rust-tauri/R03/repair-current/G0x-E01/adversarial-selfcheck/red-baseline-*.log；三层状态见 R03_FIX_ISSUES.json，G01-R1..G06-R1 全 PASS）",
+      "exit_code": 0,
+      "timed_out": false,
+      "tested_sha": "8a6303bcd477cda891d64fddd6e96fa35017f7ef + G07 修复轮未提交工作树",
+      "evidence_root": "artifacts/rust-tauri/R03/repair-current/G07-E01/verify-stage-r03",
+      "command_results": {
+        "repair_suites": {"exit": 0, "dir": "artifacts/rust-tauri/R03/repair-current/G07-E01/verify-stage-r03/repair_suites"},
+        "rust_test_workspace": {"exit": 0, "dir": "artifacts/rust-tauri/R03/repair-current/G07-E01/verify-stage-r03/rust_test_workspace"}
+      },
+      "negative_tests": "scripts/rust-tauri/r03_g07_gate_negative_tests.sh（/tmp 隔离副本：删叶映射/删命令映射/删修复场景/0 匹配过滤器/缺证据文件/陈旧证据根/中途改执行输入→verify-stage 或钉图测试非零退出点名缺口；证据 artifacts/rust-tauri/R03/repair-current/G07-E01/negative-tests/）"
     }
   ],
   "deferred_to_later": [

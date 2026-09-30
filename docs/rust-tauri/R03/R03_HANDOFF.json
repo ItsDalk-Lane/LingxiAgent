@@ -3,6 +3,7 @@
   "stage_id": "R03",
   "status": "REOPENED_PENDING_REPAIR",
   "status_note_2026_09_30": "对抗性审查（基线 cd3fb19e651f763afc6c75cb3163064fb54ca3fe）确认 F01–F08 共 8 组缺陷/34 项反例，其中 F08 质疑 accepted_stage_candidate 依据的裁决2（FINDING-1 两阶段收口解释）。原 ACCEPTED 历史与证据保留（见 accepted_stage_candidate 与 R03_FINAL_STAGE_REVIEW_R1.md，原文未改）；重新接受仅可由本轮修复后的全新独立审查作出。统一问题账：docs/rust-tauri/R03/repair-current/R03_FIX_ISSUES.json。allowed_next_scope 在本轮收口前冻结为 R03 修复本身，不放行 R04。",
+  "status_note_2026_09_30_g07_repair_round": "修复轮进度（G07-E01 追记，2026-09-30）：G01–G06（F01–F07）已全部修复并经三层闭环（六位全新独立 Reviewer G01-R1..G06-R1 均 PASS，提交 520bb75b9/ccb09fde6/198e0da1e/d56e6883d/8883923a5/8a6303bcd 已推送）；G07（F08）把 9 个新修复套件接入 R03 阶段图正式验收（repair_suites 命令+R03-RP01 场景，16 原场景/48 叶/7 条 R02 定向链零改动）并完成门禁负向测试与候选绑定验证。verify-stage R03 在候选 8a6303bcd4+修复轮工作树上 overall PASS（15/15 命令、17/17 场景、48 叶 17 pass+31 deferred、candidateSourceBinding stable）。裁决2 被替代：其『计数清理只可能在被跳过的 note_child_finished 中发生』前提已被 G01 产线修复证伪（父取消在当前进程内收口，重启仅留作真正崩溃兜底）——旧 PASS 原文保留。阶段重开状态保持 REOPENED_PENDING_REPAIR 直至全新阶段 Reviewer 终审（本文件不自称阶段 PASS）。",
   "generated_by": "ZCode:EXECUTOR-R03-T08-E01（2026-09-29；一次性执行代理，无 commit/push 授权；最终 PASS/ACCEPTED 归总控另派的独立验收）",
   "tested_sha": "dc42a01e37d1110293ec137402fd3239bd5b7d9d",
   "tested_sha_note": "候选 = TASK_BASE_SHA dc42a01e3 + 本 Task 授权工作树（T01–T07 已提交 + T08 未提交修改；verify-stage testedSha 报 HEAD dc42a01e3、worktreeDirty=true 属预期，验收后由总控提交）。",
@@ -69,24 +70,25 @@
       "submission": [
         "前台：SessionStore::execute_submission_for(port, events, supervisor, principal, session_id, &ExecuteSubmission{input, request_id: Option<&str>}, now_ms) -> Result<ExecuteAccepted{run_id, run_count, replayed}, SessionExecuteError>（HTTP POST /lingxi/v1/sessions/{id}/execute 已接线）",
         "后台：SessionStore::execute_background_for(&Arc<RunDatabase>, &Arc<EventService>, &Arc<RunSupervisor>, &Arc<BackgroundDriveRegistry>, principal, session_id, &ExecuteSubmission, now_ms) -> Result<ExecuteAccepted, SessionExecuteError>——同一 admission 链（所有权→busy 闸→requestId 去重），detached 监督驱动与调用方连接寿命解耦；断线≠取消（A12），同 requestId 重连幂等 replay 零重执行；registry 满为 BackgroundRegistryFull 响亮拒绝",
-        "错误/取消语义：SessionExecuteError=NotFound|Forbidden|Busy(409 session_busy, retryable)|SessionRegistryFull|SteeringInboxFull|DuplicateRequestConflict{request_id, recorded_digest, submitted_digest}|ShuttingDown(503, retryable)|IdempotencyRegistryFull|InvalidRequestId|BackgroundRegistryFull|Storage(StorageError)"
+        "错误/取消语义：SessionExecuteError=NotFound|Forbidden|Busy(409 session_busy, retryable)|SessionRegistryFull|SteeringInboxFull|DuplicateRequestConflict{request_id, recorded_digest, submitted_digest}|AdmissionInFlight{request_id}（【G04/F05 修复轮新增】requestId 已被仍在受理→run 起始落库裁决之间的提交预留：显式可重试拒绝，绝不半提交假结果/无 durable 行的 run id）|RequestIdBoundToEarlierRun{request_id, run_id}（【G04/F05 修复轮新增】跨重启同 key 安全契约：本进程无绑定但 durable store 显示更早进程生命已绑定同 (owner,session,requestId) 锚——显式拒绝并点名该 run，绝不静默重做可能有已确认/未知外部影响的任务，也不宣称对外部系统 exactly-once）|InputTooLarge{bytes, limit_bytes}（【G05/F06 修复轮新增】输入超过正式预算 MAX_SUBMISSION_INPUT_BYTES（=传输层 1MiB 同数）：受理期响亮拒绝、零副作用零绑定；预算内输入逐字节完整到达执行面，绝不静默截断）|ShuttingDown(503, retryable)|IdempotencyRegistryFull|InvalidRequestId|BackgroundRegistryFull|Storage(StorageError)"
       ],
+      "input_fidelity_g05": "【G05/F06 修复轮现行语义】执行载荷与日志摘要分离：recorded_input 保留完整输入（不再 chars().take(2000)）；日志/展示摘要另行截断且不参与执行与去重判定；normalized_request_digest_hex 覆盖完整输入（去重判定与实际执行内容一致，Unicode/组合字符/CRLF 逐字节诚实——input_payload_fidelity 5 用例钉住）。",
+      "steering": "SessionStore::steer_for(principal, session_id, text) -> SteerOutcome=Accepted（busy：入有界收件箱，下一模型轮 drain）|Miss（idle：调用方降级普通提交）；【G06/F07 修复轮现行语义】前台与后台驱动消费【同一】被授权通道（lease.steering_inbox() 的同一 Arc）：后台 Accepted 的追加输入到达下一模型轮且恰一次（background_steering 8 用例钉住）；取消先赢时不 drain（已接受未消费的 steering 停留 slot 可观测，不假称已用、不自动触发新任务）；错过消费时点的 steering 保留给该会话下一 Run 首轮（既有冻结语义）；子代理 child run 保持隔离 lane 不 drain 父会话 inbox（防偷 steering，禁改）。WS steer 传输面归 R06/R07（服务层 API 已冻结语义）",
       "cancellation": [
-        "SessionStore::cancel_run_for(port, supervisor, principal, run_id) -> Result<CancelRunOutcome, SessionExecuteError>；CancelRunOutcome=Accepted{run_id, phase: CancelPhase}（四相取消：Requested→Cleaning→ConfirmedTerminated|StopUnconfirmed——未清理项如实报告）|AlreadyTerminal{run_id, status}（已终态=诊断式 no-op，不误报）|DanglingActive{run_id, status, detail}（durable 行活跃但本进程无 live driver——归 T07 启动扫描分类）",
-        "监督原语：RunSupervisor::cancel_run(run_id, reason)（CancelRegistry fire；first-wins）、cancel_phase(run_id)；TaskSupervisor::spawn_linked/spawn_detached/drain_run（父取消向下传播、无关后台不连带——A06）",
-        "诚实边界（T08 组合矩阵实测发现，见报告）：经取消树停止的 subagent child run，其 durable 行保持 active（spawn_linked 包装器在树取消时丢弃 drive future），由下一进程启动扫描诚实收口为 interrupted_needs_attention——与 T07 关停残留行同一闭环路径；child 自身超时路径（timeout_at+drive.await）则走自身四相取消正常落 cancelled"
+        "SessionStore::cancel_run_for(port, supervisor, principal, run_id) -> Result<CancelRunOutcome, SessionExecuteError>；CancelRunOutcome=Accepted{run_id, phase: CancelPhase}（四相取消：Requested→Cleaning→ConfirmedTerminated|StopUnconfirmed——未清理项如实报告）|AlreadyTerminal{run_id, status}（已终态=诊断式 no-op，不误报）|DanglingActive{run_id, status, detail}（durable 行活跃但本进程无 live driver——归 T07 启动扫描分类）|TooLate{run_id, detail}（【G02/F03 修复轮新增】取消请求到达时驱动已不可撤销地认领终态结算（finalize 事务在途）：什么都没取消也没停止，绝不谎报 Accepted；落库后查询 run 行即答案，其后请求读 AlreadyTerminal）",
+        "监督原语：RunSupervisor::cancel_run(run_id, reason)（CancelRegistry fire；first-wins；FireOutcome=Cancelled|TooLate——完成先赢时 fire 诚实 TooLate，树不被二次取消）；TaskSupervisor::spawn_linked/spawn_detached/drain_run（父取消向下传播、无关后台不连带——A06）",
+        "诚实边界（修复轮 G01 后现行语义；T08 旧表述「经取消树停止的 subagent child run durable 行保持 active 由下一进程启动扫描收口」已不成立——原文见 git 历史与 R03_REPORT 历史节）：父取消路径在【当前进程内】完成 child drive 的合法取消/收据/唯一 finalize 落 cancelled 与线程 busy/并发配额回收（subagent_closeout 8 用例钉住；普通取消不得以重启为通过步骤——F08 红线）；真正进程崩溃的 durable 残留行仍由 T07 启动扫描按 DanglingActive→同一 finalize 事务诚实收口 interrupted_needs_attention（不伪造终态）；child 自身超时路径走自身四相取消正常落 cancelled"
       ],
       "events_subscription": [
         "EventService::subscribe(principal, stream_id=session_id, cursor: Option<Cursor>) -> SubscribeOutcome=Started{cut: EventCut{from_seq, snapshot_seq, events（resume 时直接携带补发事件）}, subscription: SubscriptionGuard}|RequiresSnapshot；SubscribeCursor{stream_id, seq}.encode() 构造游标；重连只订阅不重启模型（R03-T04 永久测试锁定）",
         "事件面复用 R02 envelope（eventId/sessionId/runId/attempt/streamId/seq/eventType/schemaVersion）；运行事件类型：run_state_changed（含 reason 稳定词表）、model_call_started/completed、tool_call_started/completed"
       ],
-      "lineage_and_origins": "每个 run 持久化 RunLineage{parent_run_id, origin: RunOrigin=user|subagent|cron|heartbeat|bridge, source_message_id, cause_id}（V4 表；查询 SessionStore::run_lineage_for）——R07 cron/heartbeat/Bridge 接入必须复用该 origin 词表与 execute_background_for 后台登记面，不另建第二调度器",
-      "steering": "SessionStore::steer_for(principal, session_id, text) -> SteerOutcome=Accepted（busy：入有界收件箱，下一模型轮 drain）|Miss（idle：调用方降级普通提交）；WS steer 传输面归 R06/R07（服务层 API 已冻结语义）"
+      "lineage_and_origins": "每个 run 持久化 RunLineage{parent_run_id, origin: RunOrigin=user|subagent|cron|heartbeat|bridge, source_message_id, cause_id}（V4 表；查询 SessionStore::run_lineage_for）——R07 cron/heartbeat/Bridge 接入必须复用该 origin 词表与 execute_background_for 后台登记面，不另建第二调度器"
     },
     {
       "name": "xtask 阶段图机制（后续阶段交接）",
       "authority": "rust/crates/xtask（stage_map.rs/verify.rs/stage_maps/R03.json）",
-      "status": "verify-stage R03 已注册且退出 0（本 Task）；新增阶段中立 basisKind：stage_share_satisfied（份额叶必带 assertionContract，案例由注册生产者机器核验 actual==图钉）与 deferred_to_later_stage（无本阶段门禁份额，仍 REQUIRED，验收归 r00ExecutionStageIds 后续阶段；不得绑门禁命令/证据/契约）——与 R02 的 r02_share_satisfied/deferred_to_r07 同构，R02 图零改动",
+      "status": "verify-stage R03 已注册且退出 0（本 Task）；新增阶段中立 basisKind：stage_share_satisfied（份额叶必带 assertionContract，案例由注册生产者机器核验 actual==图钉）与 deferred_to_later_stage（无本阶段门禁份额，仍 REQUIRED，验收归 r00ExecutionStageIds 后续阶段；不得绑门禁命令/证据/契约）——与 R02 的 r02_share_satisfied/deferred_to_r07 同构，R02 图零改动。【G07/F08 修复轮新增】R03 图追加 repair_suites 命令+R03-RP01 场景：F01–F07 的 9 个修复套件以逐套件固定计数进入正式验收（生产者 scripts/rust-tauri/r03_g07_repair_suites.sh；匹配 0/子集/改名=点名缺口）；xtask stage_map 钉图测试镜像该注册与钉表（删除映射/计数漂移在 cargo test——门禁命令自身——内变红）；门禁负向测试脚本 scripts/rust-tauri/r03_g07_gate_negative_tests.sh（/tmp 隔离副本：删映射/0 匹配过滤器/缺证据/陈旧证据根/中途改执行输入→非零退出点名缺口）",
       "consumers": "R04+ 每阶段新建 stage_maps/R0x.json 并注册 STAGE_MAPS+runner_identity（含 stale binary 检测）；R07 阶段图必须消费 R02 图 9 项 DEFERRED_TO_R07 叶的 R07 份额与 R03 图 31 项 DEFERRED_TO_LATER_STAGE 叶的 R06/R07/R08 份额"
     }
   ],
@@ -115,8 +117,14 @@
   "known_gaps": [
     {
       "id": "R03-T08-FINDING-1",
-      "severity": "MINOR（如实登记，不阻塞 A06/A15 判定）",
-      "summary": "父取消路径的 subagent child run durable 行不就地收口：spawn_linked 包装器的 biased select 在树取消时先于 child drive 的自身取消结算丢弃 drive future，行保持 active，由下一进程启动扫描收口为 interrupted_needs_attention（组合矩阵实测+恢复闭环已证）；线程登记 busy 标志同样只在 drive 完成尾清除。T06 报告「child 由自身 drive 观测并经唯一 finalize 落 cancelled」的表述在父取消路径不成立（child 自身超时路径成立）。修复归属：R04/R06 触碰 task_supervisor/subagents 时按根因收口或由总控另派修复（本 Task 不越权改产线代码）。G01-F01 文档更正执行记录（2026-09-29）：T06 报告该表述已由 STAGE-REPAIR-R03-G01-F01 按裁决语义更正（原句删除线保留，见 docs/rust-tauri/R03/repairs/R03_STAGE_REPAIR_G01_F01.md）；产线修复归属不变，本条不因此自标关闭"
+      "severity": "MINOR（历史登记；产线已由修复轮 G01 关闭，原文保留）",
+      "summary": "父取消路径的 subagent child run durable 行不就地收口：spawn_linked 包装器的 biased select 在树取消时先于 child drive 的自身取消结算丢弃 drive future，行保持 active，由下一进程启动扫描收口为 interrupted_needs_attention（组合矩阵实测+恢复闭环已证）；线程登记 busy 标志同样只在 drive 完成尾清除。T06 报告「child 由自身 drive 观测并经唯一 finalize 落 cancelled」的表述在父取消路径不成立（child 自身超时路径成立）。修复归属：R04/R06 触碰 task_supervisor/subagents 时按根因收口或由总控另派修复（本 Task 不越权改产线代码）。G01-F01 文档更正执行记录（2026-09-29）：T06 报告该表述已由 STAGE-REPAIR-R03-G01-F01 按裁决语义更正（原句删除线保留，见 docs/rust-tauri/R03/repairs/R03_STAGE_REPAIR_G01_F01.md）；产线修复归属不变，本条不因此自标关闭。【G07 修复轮关闭 2026-09-30】产线修复已由修复轮 G01 落地（提交 520bb75b9，F01+F02，G01-R1 独立审查 PASS）：父取消在当前进程内完成 child 取消收尾/唯一终态/线程与配额回收，同进程反复超上限取消后仍可派发（subagent_closeout 8 用例）；本缺陷不再是递延项，普通取消不得再以重启为通过步骤（F08 红线）；startup recovery 仅保留为真正进程崩溃兜底。",
+      "closure_evidence": [
+        "docs/rust-tauri/R03/repair-current/G01-E01_REPORT.md",
+        "docs/rust-tauri/R03/repair-current/G01-R1_REVIEW.md",
+        "artifacts/rust-tauri/R03/repair-current/G01-E01/",
+        "artifacts/rust-tauri/R03/repair-current/G07-E01/verify-stage-r03/G07_REPAIR/ (subagent_closeout 8/8 于门禁内机器核验)"
+      ]
     },
     {
       "id": "R03-T08-FINDING-2",
@@ -144,6 +152,16 @@
       "a14_slow_subscriber: FINDING-3"
     ],
     "in_scope_obligation": "派单 R02 回归义务由 R03 图 7 条定向命令（verify-stage R03 内全绿）+ 修复后 r02_t04 全程满足（『或等效定向命令重跑』路径）"
+  },
+  "verify_stage_r02_full_gate_g07_rerun": {
+    "command": "cargo run --manifest-path rust/Cargo.toml --locked -p xtask -- verify-stage R02 --evidence artifacts/rust-tauri/R03/repair-current/G07-E01/verify-stage-r02-regression",
+    "overall": "FAIL (19/20 commands exit 0; 15/16 scenarios; 34 leaves = 25 pass + 9 deferred_to_r07 + 0 fail + 0 blocked; candidateSourceBinding stable, 20 checkpoints)",
+    "reds_attributed": [
+      "a16_legacy_regression exit 1（唯一红）：E5 全量 npm+封印族分类——3 个注册 SEAL_FAMILY 文件（post-verification-audit-seal/round2/round3-delivery-evidence：VERIFIED_SOURCE_SHA 坐标滞后=R03-GOV-01 既有治理递延；round3 patch-too-large=R03-GOV-02 既有治理递延，patch replay failed: error: patch too large 复现在案）+1 条非族红 tests/artifact-core-ustar.test.ts（afterEach fs.rmSync ENOTEMPTY 临时目录清理竞态；该文件与 shared/artifact-core 在修复轮 cd3fb19e6..8a6303bcd 零触碰（git log 空）；隔离重跑 10/10 绿，归因记录 g07-ustar-isolated-rerun-attribution.txt；分类器按设计 fail-closed 不消红）",
+      "a07_live_fault_02_check：绿（FINDING-2 资产面在候选 1ebb03d9f 前已收口，本轮实测保持绿）",
+      "a14_slow_subscriber：绿（FINDING-3 同上）"
+    ],
+    "in_scope_obligation": "受影响 R02 回归=认证/作用域、单写者事务、事件快照续读、备份/损坏库、shutdown、A15 真实重启链、A16 默认入口：R03 图 7 条定向命令在本轮 verify-stage R03 内全绿（r02_auth_matrix/r02_storage_tx/r02_events_matrix/r02_backup_restore/r02_recovery_drill/r02_full_chain/r02_legacy_regression directed E0–E4.5）"
   },
   "accepted_stage_candidate": {
     "candidate_commit": "1ebb03d9f89af364a42274efc2cd482f298b1130",

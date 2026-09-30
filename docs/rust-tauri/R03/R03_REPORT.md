@@ -7,6 +7,14 @@
 - 统一问题账（逐 F-ID/C-ID 三层状态，权威索引）：`docs/rust-tauri/R03/repair-current/R03_FIX_ISSUES.json`
 - 本轮规格全文：`Lingxi_Rust_Tauri_Taskbooks_2026-09-23/Lingxi_R03_对抗性审查_问题清单与修复总控提示词_2026-09-30.md` 与 `Lingxi_R03_修复验收清单_2026-09-30.json`
 
+### 修复轮进度（2026-09-30，G01–G07 全部执行完毕；本节为追加，不改写上方与下方任何历史原文）
+
+- **G01–G06（F01–F07 运行行为缺陷）已全部修复并通过三层闭环**：执行者普通自查+对抗性自查各一份在档，六位全新独立 Reviewer（G01-R1..G06-R1，均未参与对应候选实现）逐组 **VERDICT: PASS**；总控已按授权提交并推送（`520bb75b9`/`ccb09fde6`/`198e0da1e`/`d56e6883d`/`8883923a5`/`8a6303bcd`，远程包含回执见 `repair-current/R03_FIX_COMMIT_RECEIPTS.json`）。9 个新测试套件 59 个反例用例进入仓库（cancel_link_inheritance 7 / subagent_closeout 8 / cancel_terminal_race 13 / tool_receipt_unknown 6 / admission_dedup_consistency 5 / admission_dedup_adversarial 5 / input_payload_fidelity 5 / input_budget_refusal 2 / background_steering 8），红基线（未修代码上逐组实测失败）与绿证据在 `artifacts/rust-tauri/R03/repair-current/G0{1..6}-E01/`。
+- **G07（F08 验收接受缺口）已把上述反例接入正式验收**：R03 阶段图新增 `repair_suites` 门禁命令与 `R03-RP01` 场景（`rust/crates/xtask/src/stage_maps/R03.json`，生成器同步更新；16 原场景/48 叶/7 条 R02 定向链注册零改动），生产者 `scripts/rust-tauri/r03_g07_repair_suites.sh` 逐套件固定计数机器核验（匹配 0/子集/改名=点名缺口），xtask 钉图测试镜像该注册（删除映射在 `cargo test`（门禁命令自身）内变红）。门禁负向测试（删映射/0 匹配过滤器/缺证据文件/陈旧证据根/中途改执行输入→非零退出点名缺口）落为可重跑脚本 `scripts/rust-tauri/r03_g07_gate_negative_tests.sh`（/tmp 隔离副本执行，证据 `artifacts/rust-tauri/R03/repair-current/G07-E01/negative-tests/`）。
+- **门禁重验（G07-E01，候选=HEAD 8a6303bcd4+本修复轮工作树）**：`verify-stage R03` **overall PASS**——15/15 命令 exit 0（含新增 repair_suites 20.8s 与 fmt/clippy/workspace/check-contracts/check-boundaries/A15 矩阵/A16 seed/7 条 R02 定向链）；17/17 场景 PASS（16 原 A-ID + R03-RP01）；48 叶=17 份额 PASS+31 递延+0 fail+0 blocked；candidateSourceBinding stable=true（15 个逐命令 checkpoint 全稳定）；testedSha=8a6303bcd4。独立实跑另有 fmt/clippy/workspace(72 suites/709 passed/0 failed)/check-contracts/check-boundaries 全 exit 0（`artifacts/rust-tauri/R03/repair-current/G07-E01/gate-commands/`）。R02 全量回归 `verify-stage R02` 19/20 绿，唯一红 a16_legacy_regression=E5 封印族+patch-too-large 既有治理递延（R03-GOV-01/02）外加 1 条 artifact-core-ustar ENOTEMPTY 临时目录清理环境闪红（隔离重跑 10/10 绿、该文件与 shared/artifact-core 在本轮零触碰，归因记录在案，分类器按设计 fail-closed 不消红）；FINDING-2/3 对应 a07/a14 现为绿。
+- **替代裁决2 的依据（明示）**：裁决2 把「普通父取消后 child active/busy 直到重启」判为可递延 MINOR 的前提——「计数清理只可能在被跳过的 note_child_finished 中发生」——已被 G01 产线修复证伪：父取消路径现于**当前进程内**完成 child drive 的合法取消/收尾/终态提交与线程/配额回收（subagent_closeout 套件 8 用例在同进程反复超上限取消后仍可派发），不再依赖重启；startup recovery 仅保留为真正进程崩溃的兜底。因此裁决2 不再作为接受依据；其原文与 2026-09-29 PASS 记录保留于下方历史节，不作篡改。裁决1（E5 治理递延）与裁决3（G01 等价断言）不受本轮影响、继续有效。
+- **当前阶段状态**：REOPENED_PENDING_REPAIR（重开→待全新阶段 Reviewer 终审；本轮执行者不自称阶段 PASS）。轮次交付物索引：`docs/rust-tauri/R03/repair-current/`（R03_FIX_NORMAL_SELFCHECK.md / R03_FIX_ADVERSARIAL_SELFCHECK.md / R03_FIX_ACCEPTANCE_RESULTS.json / R03_FIX_HANDOFF.md / R03_FIX_INDEPENDENT_REVIEWS/INDEX.md / G07-E01_REPORT.md）。
+
 ## 阶段与结论
 
 **READY_FOR_REVIEW**（执行者口径；独立阶段验收归总控另派。READY_FOR_REVIEW 不是 PASS。）
@@ -71,7 +79,7 @@ STAGE-REVIEWER-R03-R01（全新代理，未参与本阶段实现/修复/Task 验
 
 ## 已知缺陷
 
-- **R03-T08-FINDING-1（MINOR，T08 组合矩阵发现，未修复——如实登记）**：父取消路径 subagent child run durable 行不就地收口（spawn_linked 包装器 biased select 先丢弃 drive future），由下一进程启动扫描诚实收口为 interrupted_needs_attention（矩阵实测+重启闭环已证）；child 自身超时路径正常落 cancelled。T06 报告对应表述在父取消路径不成立。影响域：子代理父取消场景的行级即时终态（监督层 A06 判定成立）；修复归属 R04/R06 触碰或总控另派。关联：R03-A06（判定成立不受影响）。**【G01-F01 文档更正执行记录 2026-09-29】**T06 报告该表述已由 STAGE-REPAIR-R03-G01-F01 按本裁决语义更正（原句删除线保留，见 repairs/R03_STAGE_REPAIR_G01_F01.md）；产线修复归属不变（R04/R06 或总控另派），本条不因此自标关闭。
+- **R03-T08-FINDING-1（MINOR，T08 组合矩阵发现，未修复——如实登记）**：父取消路径 subagent child run durable 行不就地收口（spawn_linked 包装器 biased select 先丢弃 drive future），由下一进程启动扫描诚实收口为 interrupted_needs_attention（矩阵实测+重启闭环已证）；child 自身超时路径正常落 cancelled。T06 报告对应表述在父取消路径不成立。影响域：子代理父取消场景的行级即时终态（监督层 A06 判定成立）；修复归属 R04/R06 触碰或总控另派。关联：R03-A06（判定成立不受影响）。**【G01-F01 文档更正执行记录 2026-09-29】**T06 报告该表述已由 STAGE-REPAIR-R03-G01-F01 按本裁决语义更正（原句删除线保留，见 repairs/R03_STAGE_REPAIR_G01_F01.md）；产线修复归属不变（R04/R06 或总控另派），本条不因此自标关闭。**【G07 修复轮更新 2026-09-30】**产线修复已由本轮 G01 落地（提交 `520bb75b9`，F01+F02）：父取消路径在当前进程内完成 child 取消收尾/终态/线程与配额回收（`subagent_closeout` 8 用例+`cancel_link_inheritance` 7 用例，同进程反复超上限后仍可派发），G01-R1 独立审查 PASS；本条作为历史 FINDING 记录关闭依据，原文保留。FINDING-2/3 的资产面在候选 `1ebb03d9f` 前已收口（阶段终审裁决3），本轮 G07 全量 R02 回归中 a07/a14 实测绿。
 - **R03-T08-FINDING-2（MINOR，R02 资产过期，非 R03 语义回退）**：`r02_t04_live_fault_evidence.py` 重启 keyEvents 精确计数（=1）未计入 R03-T07 恢复扫描对 active run 的诚实 finalize 事件；全量 verify-stage R02 中 a07_live_fault_02_check 红、live_fault_01_test 绿。R02 资产断言更新归独立审阅授权（本 Task 不改已验收阶段门禁断言）。
 - **R03-T08-FINDING-3（MINOR，R02 资产过期，非 R03 语义回退）**：`r02_t07_slow_subscriber.sh` 并发同会话风暴「全部 200」断言先于 R03-T02 冻结 busy 闸（409 session_busy retryable=现役 Node 同语义）存在；1000 并发出现 1 个 409 触发该单条断言。同上归属。
 - T03 D1/D2（MINOR）：D1 已于 T06 强制修复闭环；D2 为报告文档项，随下次触碰修正。
