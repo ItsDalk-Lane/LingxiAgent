@@ -1,0 +1,29 @@
+{
+  "executor": "EXECUTOR-REPAIR-R03-G06-E01",
+  "issue": "F07",
+  "fix_base_sha": "cd3fb19e651f763afc6c75cb3163064fb54ca3fe",
+  "candidate_start": "8883923a5b30a2a6c0face0c42a9ea143db9a605",
+  "toolchain": "~/.cargo/bin/cargo 1.98.1 (797e8a9bc 2026-08-05); Homebrew cargo 1.93.0 unused; all runs --locked",
+  "cargo_lock_sha1": "3b659f41eb262eaf42efc2f91ec93f9989d42934 (identical to HEAD; zero dependency change)",
+  "red_baseline": {
+    "worktree": "/tmp/lingxi-r03-g06-redbase (detached HEAD=8883923a5, unfixed)",
+    "command": "~/.cargo/bin/cargo test --locked -p lingxi-service --test background_steering",
+    "exit_code": 101,
+    "result": "1 passed / 7 failed",
+    "log": "artifacts/rust-tauri/R03/repair-current/G06-E01/adversarial-selfcheck/red-baseline-final-file.log"
+  },
+  "green": {
+    "command": "~/.cargo/bin/cargo test --locked -p lingxi-service --test background_steering",
+    "exit_code": 0,
+    "result": "8 passed / 0 failed"
+  },
+  "workspace_regression": {
+    "command": "~/.cargo/bin/cargo test --locked --workspace",
+    "exit_code": 0,
+    "result": "72 suites ok / 704 passed / 0 failed (baseline >= 71/696/0)",
+    "log": "artifacts/rust-tauri/R03/repair-current/G06-E01/logs/workspace-test-full.log"
+  },
+  "fmt": "cargo fmt --all --check exit 0 (after applying cargo fmt --all to the new test file); log logs/fmt-check.log",
+  "clippy": "cargo clippy --locked --workspace --all-targets -- -D warnings exit 0; log logs/clippy-D-warnings.log",
+  "hammer": "suite x10 on fixed code: 80/80 passed; log adversarial-selfcheck/hammer-10x.log"
+}

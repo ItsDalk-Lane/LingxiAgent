@@ -226,7 +226,10 @@ fn record_recent_exit(ring: &Arc<Mutex<Vec<(String, TaskExit)>>>, run_id: String
 /// (owner `None` — no client connection and no other run's cancellation
 /// owns it; the run's OWN cancellation still settles it through the
 /// cancel surface). The session lease moves INTO the drive so the session
-/// stays honestly busy until the background run settles.
+/// stays honestly busy until the background run settles; the drive hands
+/// `drive_run` the lease's steering inbox, so steering `Accepted` while
+/// the background run drives is consumed by THIS run's next model turn —
+/// the exact foreground contract (R03 repair G06/F07).
 ///
 /// R03 repair G04/F05: the id→run binding verdict handle moves INTO the
 /// detached task — the task commits it at its own durable run start and
@@ -291,6 +294,15 @@ pub fn spawn_background_drive(
             // until its durable start; `drive_run` commits the binding
             // the moment `record_run_started` commits.
             let binding = binding;
+            // R03 repair G06/F07: the background drive drains the SAME
+            // authorized steering channel the foreground drive uses —
+            // `_lease.steering_inbox()` is the very inbox `steer_for`
+            // accepts into for this session while the lease keeps it
+            // busy, so an `Accepted` background steering text reaches the
+            // NEXT model turn of THIS run (once, bounded, identity-scoped
+            // to the session slot). Passing `None` here (the bug) meant
+            // accepted steering was never consumed by anyone and could
+            // only linger into the session's next run.
             let finish = drive_supervisor
                 .drive_run(
                     drive_storage.as_ref(),
@@ -302,7 +314,7 @@ pub fn spawn_background_drive(
                     &input,
                     1,
                     now_ms,
-                    None,
+                    Some(_lease.steering_inbox()),
                     None,
                     authorization,
                     binding.as_ref(),

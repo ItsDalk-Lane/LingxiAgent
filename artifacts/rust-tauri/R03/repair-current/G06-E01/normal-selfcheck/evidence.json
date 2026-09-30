@@ -1,0 +1,91 @@
+{
+  "c01": {
+    "occurrences": 1,
+    "runId": "run_000001a0dcba6c00_000001",
+    "steerOutcome": "Accepted",
+    "turnInputs": [
+      "BG-C01: please continue",
+      "BG-C01: please continue\n\n[steering]\nSTEER-C01-focus-on-config"
+    ]
+  },
+  "c01_adversarial": {
+    "occurrences": {
+      "first": 1,
+      "second": 1,
+      "yankee": 1,
+      "zulu": 1
+    },
+    "runId": "run_000001a0dcba6c00_000001",
+    "turnInputs": [
+      "BG-C01-ADV: loop several rounds",
+      "BG-C01-ADV: loop several rounds\n\n[steering]\nSTEER-ADV-first\nSTEER-ADV-second",
+      "BG-C01-ADV: loop several rounds\n\n[steering]\nSTEER-ADV-zulu\nSTEER-ADV-yankee",
+      "BG-C01-ADV: loop several rounds"
+    ]
+  },
+  "c02": {
+    "alphaInputs": [
+      "BG-C02-A: authorized target",
+      "BG-C02-A: authorized target\n\n[steering]\nSTEER-C02-only-alpha"
+    ],
+    "alphaRun": "run_000001a0dcba6c00_000001",
+    "betaInputs": [
+      "BG-C02-B: bystander",
+      "BG-C02-B: bystander",
+      "BG-C02-B2: unrelated new task",
+      "BG-C02-B2: unrelated new task"
+    ],
+    "betaRun": "run_000001a0dcba6c00_000002",
+    "betaSecondRun": "run_000001a0dcba6c00_000003",
+    "occurrencesOfSteer": 1
+  },
+  "c02_adversarial": {
+    "alphaInputs": [
+      "BG-C02ADV: will be cancelled",
+      "FG-C02ADV: quick new run\n\n[steering]\nSTEER-C02ADV-during-cancelled",
+      "FG-C02ADV: quick new run"
+    ],
+    "cancelledRun": "run_000001a0dcba6c00_000001",
+    "newRun": "run_000001a0dcba6c00_000002",
+    "runCountAfterCancel": 1,
+    "steeringPendingAfterCancel": 1
+  },
+  "c03_leak": {
+    "firstRun": "run_000001a0dcba6c00_000001",
+    "occurrences": 1,
+    "secondRun": "run_000001a0dcba6c00_000002",
+    "turnInputs": [
+      "BG-C03: first task",
+      "BG-C03: first task\n\n[steering]\nSTEER-C03-midflight",
+      "BG-C03: second unrelated task",
+      "BG-C03: second unrelated task"
+    ]
+  },
+  "c04": {
+    "backgroundInputs": [
+      "BG-C04: bounded background",
+      "BG-C04: bounded background\n\n[steering]\nSTEER-C04BG-one\nSTEER-C04BG-two"
+    ],
+    "backgroundRun": "run_000001a0dcba6c00_000001",
+    "capacity": 2,
+    "foregroundInputs": [
+      "FG-C04: bounded foreground",
+      "FG-C04: bounded foreground\n\n[steering]\nSTEER-C04FG-one\nSTEER-C04FG-two"
+    ],
+    "foregroundRun": "run_000001a0dcba6c00_000002"
+  },
+  "c04_concurrent": {
+    "accepted": 2,
+    "backgroundRun": "run_000001a0dcba6c00_000001",
+    "capacity": 2,
+    "concurrentCalls": 6,
+    "refused": 4,
+    "turnInputs": [
+      "BG-C04CONC: concurrent steers",
+      "BG-C04CONC: concurrent steers\n\n[steering]\nSTEER-C04CONC-0\nSTEER-C04CONC-1"
+    ]
+  }
+}"
+    ]
+  }
+}
