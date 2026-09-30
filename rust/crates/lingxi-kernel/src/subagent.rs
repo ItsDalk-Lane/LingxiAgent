@@ -290,6 +290,26 @@ pub fn authorize_child_tool(tier: ToolAccessTier, target: &str) -> ToolAuthoriza
     ToolAuthorization::Allowed
 }
 
+/// The durable request-anchor prefix of [`RunLineage::user_submission`]'s
+/// `cause_id` (`"request:{id}"`). Single-sourced HERE (the kernel owns the
+/// lineage record) so the writer (the service's authorization) and the
+/// reader (the storage cross-restart lookup) can never drift apart.
+pub const REQUEST_CAUSE_ID_PREFIX: &str = "request:";
+
+/// The CANONICAL form of a client request id (R03 RR2/F05-01): Rust
+/// `str::trim` — the FULL Unicode `White_Space` set (ASCII spaces, tabs,
+/// CR/LF, U+00A0 NBSP, U+3000 ideographic space, ...). This is the ONE
+/// normalization rule shared by every layer above (the submission
+/// boundary's validation, the in-memory dedup key, the durable
+/// `request:` anchor and the cross-restart compatible read) — defined in
+/// the kernel because the lineage record and the storage lookups live at
+/// or below the service layer and must not re-implement trimming. The
+/// acceptance POLICY (non-empty, length bound) stays at the submission
+/// boundary; this is only the canonicalization itself.
+pub fn canonical_request_id(raw: &str) -> &str {
+    raw.trim()
+}
+
 /// Where a run came from. `User` is the interactive submission surface;
 /// `Subagent` is a child run dispatched by a parent run's delegation tool
 /// call. `Cron` / `Heartbeat` / `Bridge` reserve the R07 entry vocabulary
@@ -353,12 +373,20 @@ pub struct RunLineage {
 impl RunLineage {
     /// The lineage of a plain user submission (no parent, no source
     /// message; the cause is the explicit requestId when present).
+    ///
+    /// R03 RR2/F05-01 contract: `request_id` MUST already be the CANONICAL
+    /// form (see [`canonical_request_id`]) — the trusted admission boundary
+    /// canonicalizes ONCE and every consumer (dedup key, durable anchor,
+    /// cross-restart lookup, error echo) uses that single fact. This pure
+    /// constructor cannot validate (it returns `Self`, not a `Result`),
+    /// so callers must not hand it a raw, padded id; the service-layer
+    /// `DriveAuthorization::user_submission` debug-asserts the invariant.
     pub fn user_submission(request_id: Option<&str>) -> Self {
         Self {
             parent_run_id: None,
             origin: RunOrigin::User,
             source_message_id: None,
-            cause_id: request_id.map(|id| format!("request:{id}")),
+            cause_id: request_id.map(|id| format!("{REQUEST_CAUSE_ID_PREFIX}{id}")),
         }
     }
 }
@@ -656,5 +684,42 @@ mod tests {
         assert_eq!(lineage.cause_id.as_deref(), Some("request:req-7"));
         let plain = RunLineage::user_submission(None);
         assert_eq!(plain.cause_id, None);
+    }
+
+    // ── R03 RR2/F05-01: the shared canonicalization rule ──────────────────
+
+    #[test]
+    fn canonical_request_id_trims_the_full_unicode_whitespace_set() {
+        // The rule must cover MORE than ASCII space — SQLite's default
+        // TRIM() handles only a small ASCII set; Rust trim() is the rule.
+        for (raw, canonical) in [
+            (" req-42 ", "req-42"),
+            ("\treq-tab\t", "req-tab"),
+            ("req-crlf\r\n", "req-crlf"),
+            ("\u{3000}req-ideo\u{3000}", "req-ideo"), // ideographic space
+            ("\u{00A0}req-nbsp\u{00A0}", "req-nbsp"), // NBSP
+            ("\r\n \t\u{3000}req-mix \u{00A0}", "req-mix"),
+        ] {
+            assert_eq!(canonical_request_id(raw), canonical, "raw {raw:?}");
+        }
+        // Content is never truncated or folded: INTERNAL whitespace stays.
+        assert_eq!(canonical_request_id(" req-inner  id "), "req-inner  id");
+        // Idempotence — canonicalizing a canonical id is a no-op (this is
+        // what makes the whole chain stable when every layer re-derives
+        // the fact through this one function).
+        assert_eq!(canonical_request_id("req-42"), "req-42");
+        assert_eq!(canonical_request_id(""), "");
+    }
+
+    #[test]
+    fn request_cause_id_prefix_is_the_single_sourced_anchor_format() {
+        // The writer and the cross-restart reader share ONE format.
+        assert_eq!(REQUEST_CAUSE_ID_PREFIX, "request:");
+        let lineage = RunLineage::user_submission(Some(" req-42 ".trim()));
+        assert_eq!(
+            lineage.cause_id.as_deref(),
+            Some("request:req-42"),
+            "the anchor format is built from the single-sourced prefix"
+        );
     }
 }

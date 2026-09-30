@@ -1,0 +1,2 @@
+# E5: cargo test --manifest-path rust/Cargo.toml --locked --workspace (raw output moved to ../logs/e5-workspace-tests.txt)
+exit=0 ; 73 'test result: ok' lines ; total passed 718 (RR1 baseline 709 + 7 new-suite integration tests + 2 new kernel unit tests)

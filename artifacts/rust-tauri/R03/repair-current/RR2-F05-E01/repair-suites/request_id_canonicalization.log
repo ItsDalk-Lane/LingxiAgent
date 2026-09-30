@@ -1,0 +1,14 @@
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.08s
+     Running tests/request_id_canonicalization.rs (/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T//rust-target-r03-g07-repair/debug/deps/request_id_canonicalization-a9ba4f825a4599cc)
+
+running 7 tests
+test rr2_f05_c02_padded_id_raw_and_canonical_retries_bind_one_logical_request ... ok
+test rr2_f05_c01_plain_id_control_group_keeps_the_restart_contract ... ok
+test rr2_f05_c05_colliding_legacy_rows_refuse_as_explicit_ambiguity ... ok
+test rr2_f05_c04_colliding_raw_ids_one_namespace_isolation_and_compensation ... ok
+test rr2_f05_c05_legacy_cause_ids_stay_linkable_across_restart_shapes ... ok
+test rr2_f05_c03_whitespace_variants_share_one_canonical_chain ... ok
+test rr2_f05_c02_restart_matrix_foreground_background_confirmed_unknown ... ok
+
+test result: ok. 7 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 1.41s
+

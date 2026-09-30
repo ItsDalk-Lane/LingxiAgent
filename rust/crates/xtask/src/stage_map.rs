@@ -1869,9 +1869,13 @@ mod map_tests {
     /// loads via STAGE_MAPS).
     const R03_PRODUCTION: &str = include_str!("stage_maps/R03.json");
 
-    /// The F01–F07 repair suites and their EXACT pinned test counts, as the
-    /// producer script's `pin <suite> <count> <F-ID>` table must declare
-    /// them (G07/F08-C02: no missing suite, no extra suite, no count drift).
+    /// The F01–F07 repair suites plus the RR2 fixed-repair suite, and
+    /// their EXACT pinned test counts, as the producer script's
+    /// `pin <suite> <count> <F-ID>` table must declare them (G07/F08-C02:
+    /// no missing suite, no extra suite, no count drift).
+    /// RR2 increment (R03-RR2-F05-01, 2026-09-30): the tenth entry
+    /// `("request_id_canonicalization", 7, "RR2-F05")` — the canonical
+    /// requestId chain cases C01–C05; nothing above was removed or lowered.
     const R03_REPAIR_PIN_TABLE: &[(&str, u32, &str)] = &[
         ("cancel_link_inheritance", 7, "F01"),
         ("subagent_closeout", 8, "F02"),
@@ -1882,6 +1886,7 @@ mod map_tests {
         ("input_payload_fidelity", 5, "F06"),
         ("input_budget_refusal", 2, "F06"),
         ("background_steering", 8, "F07"),
+        ("request_id_canonicalization", 7, "RR2-F05"),
     ];
 
     fn parse_production_r03() -> StageMap {

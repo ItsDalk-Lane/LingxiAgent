@@ -157,7 +157,24 @@ pub enum RunGrant {
 impl DriveAuthorization {
     /// The authorization of a plain user submission (origin=user; the
     /// cause anchor is the explicit requestId when present).
+    ///
+    /// R03 RR2/F05-01 contract: `request_id` must be the CANONICAL id —
+    /// the two submission surfaces canonicalize ONCE at their boundary
+    /// ([`crate::sessions`]) and hand the same fact to the dedup key, this
+    /// authorization and the cross-restart lookup. The debug fence below
+    /// turns a raw/padded id slipping in through any other caller into an
+    /// immediate dev/test failure instead of a durable-anchor divergence
+    /// (the cause_id must be built from the same fact as every other
+    /// identity consumer).
     pub fn user_submission(request_id: Option<&str>) -> Self {
+        if let Some(id) = request_id {
+            debug_assert!(
+                matches!(crate::dedup::validate_request_id(id).as_deref(), Ok(canonical) if canonical == id),
+                "DriveAuthorization::user_submission received a NON-CANONICAL request id {id:?} \
+                 — canonicalize at the admission boundary; the lineage anchor must share the \
+                 same identity fact as the dedup key"
+            );
+        }
         Self {
             lineage: RunLineage::user_submission(request_id),
             grant: RunGrant::Full,

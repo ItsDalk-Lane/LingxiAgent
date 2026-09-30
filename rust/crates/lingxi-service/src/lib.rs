@@ -1323,6 +1323,26 @@ impl EndpointError {
         .with_cause("session.request_id_bound_to_earlier_run")
     }
 
+    /// R03 RR2/F05-01: the CANONICAL requestId resolves to MORE THAN ONE
+    /// durably bound run (the frozen pre-fix shape — raw-padded lineage
+    /// anchors of one logical key each bound their own run). The safe
+    /// contract is an explicit ambiguity naming EVERY bound run: the
+    /// client verifies those runs or resubmits under a NEW id; the service
+    /// never picks one binding and never re-executes the task as fresh.
+    pub fn request_id_bound_ambiguously(request_id: &str, run_ids: &[String]) -> Self {
+        Self::new(
+            StatusCode::CONFLICT,
+            ErrorCode::Conflict,
+            format!(
+                "requestId is durably bound to multiple runs ({}) by earlier process lives; \
+                 verify those runs' outcomes or resubmit under a new requestId: {request_id}",
+                run_ids.join(", ")
+            ),
+        )
+        .with_reason("request_id_bound_ambiguously")
+        .with_cause("session.request_id_bound_ambiguously")
+    }
+
     /// R03-A14: the shutdown already began — the submission intake is
     /// closed and this (fresh) submission was refused at the admission
     /// chain before any side effect. Retryable against the NEXT process
@@ -2380,6 +2400,10 @@ async fn execute_session(
         Err(sessions::SessionExecuteError::RequestIdBoundToEarlierRun { request_id, run_id }) => {
             EndpointError::request_id_bound_to_earlier_run(&request_id, &run_id).into_response()
         }
+        Err(sessions::SessionExecuteError::RequestIdBoundAmbiguous {
+            request_id,
+            run_ids,
+        }) => EndpointError::request_id_bound_ambiguously(&request_id, &run_ids).into_response(),
         Err(sessions::SessionExecuteError::IdempotencyRegistryFull { .. }) => {
             EndpointError::idempotency_registry_full().into_response()
         }

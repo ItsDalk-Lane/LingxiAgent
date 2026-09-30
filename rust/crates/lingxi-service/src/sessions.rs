@@ -22,7 +22,7 @@ use std::pin::Pin;
 use serde::{Deserialize, Serialize};
 
 use lingxi_adapters::storage::{RunDatabase, RunSummaryRow, SessionRow};
-use lingxi_kernel::ports::{StorageError, StoragePort};
+use lingxi_kernel::ports::{RequestBindingLookup, StorageError, StoragePort};
 use lingxi_kernel::Principal as KernelPrincipal;
 use lingxi_protocol::RunStatus;
 
@@ -203,6 +203,20 @@ pub enum SessionExecuteError {
         request_id: String,
         run_id: String,
     },
+    /// R03 RR2/F05-01: the CANONICAL (logical) requestId resolves to MORE
+    /// THAN ONE durably bound run. This is the frozen pre-fix shape: the
+    /// baseline built the lineage anchor from the RAW id, so distinct raw
+    /// spellings of one logical key (" req-42 " and "req-42") could each
+    /// bind their own run across restarts. The honest contract is an
+    /// explicit ambiguity naming EVERY bound run — the client verifies
+    /// those runs' durable outcomes or resubmits under a NEW id; the
+    /// service never silently picks one binding (each bound run may hold
+    /// confirmed or unknown external effects) and never re-executes the
+    /// task as if it were fresh. `run_ids` is newest-first.
+    RequestIdBoundAmbiguous {
+        request_id: String,
+        run_ids: Vec<String>,
+    },
     /// R03-A14: the service's submission intake is CLOSED — the shutdown
     /// already began. The submission was refused at the admission chain
     /// BEFORE any side effect (no run id allocated, nothing written); the
@@ -262,6 +276,41 @@ enum AdmissionOutcome {
     },
 }
 
+/// R03 RR2/F05-01 — the trusted admission boundary's SINGLE canonical
+/// request-id fact. Called exactly once at the head of BOTH submission
+/// surfaces (foreground and background), BEFORE any session read, busy
+/// gate, run-id allocation, dedup reservation, durable write or dispatch;
+/// every consumer below — the in-memory dedup key, the cross-restart
+/// durable lookup, the [`DriveAuthorization`] lineage anchor and every
+/// error echo — uses the returned canonical id, so no layer can re-derive
+/// a different identity from the raw bytes. The RAW id (when it differs)
+/// is kept ONLY as an audit log field; it never becomes an identity
+/// source again. The canonicalization rule itself is the single shared
+/// [`lingxi_kernel::subagent::canonical_request_id`] (Rust `str::trim`,
+/// the full Unicode whitespace set); the acceptance POLICY (non-empty,
+/// length bound) is [`crate::dedup::validate_request_id`], which applies
+/// that rule and refuses illegal ids LOUDLY before any side effect.
+fn canonicalize_submission_request_id(
+    raw: Option<&str>,
+) -> Result<Option<String>, SessionExecuteError> {
+    match raw {
+        None => Ok(None),
+        Some(raw) => {
+            let canonical = crate::dedup::validate_request_id(raw)
+                .map_err(|detail| SessionExecuteError::InvalidRequestId { detail })?;
+            if canonical != raw {
+                tracing::info!(
+                    raw_request_id = raw,
+                    canonical_request_id = %canonical,
+                    "requestId canonicalized at the admission boundary — the raw form is an \
+                     audit-only field; every identity below uses the canonical fact"
+                );
+            }
+            Ok(Some(canonical))
+        }
+    }
+}
+
 /// Storage reads the session surface needs. Implemented by
 /// [`RunDatabase`] (real SQLite store) and by the in-memory fake in tests.
 pub trait SessionBackend: Send + Sync {
@@ -289,21 +338,24 @@ pub trait SessionBackend: Send + Sync {
     /// R5-F02: exhaustion surfaces as an explicit
     /// [`StorageError::RunIdExhausted`] (never a panic/wrap/re-issue).
     fn allocate_run_id(&self, now_ms: u64) -> Result<String, StorageError>;
-    /// R03 repair G04/F05 (C05): the durable cross-restart request anchor.
-    /// Answers whether THIS (owner kind, owner subject, session, explicit
-    /// requestId) already owns a run row — the per-run lineage anchor
-    /// `cause_id = "request:{id}"` recorded at every user run's creation.
-    /// The submission surface uses it to REFUSE a post-restart same-key
-    /// retry explicitly (naming the earlier run) instead of silently
-    /// re-executing a task whose earlier life may hold confirmed or
-    /// unknown external effects.
-    fn find_run_id_by_request(
+    /// R03 RR2/F05-01: the durable cross-restart request-anchor lookup
+    /// (the G04/F05 C05 contract with the legacy compatible read). Answers
+    /// how the (owner kind, owner subject, session, CANONICAL request id)
+    /// namespace's `request:` lineage anchors relate to existing run rows:
+    /// unbound, bound to exactly one run, or bound to SEVERAL (the frozen
+    /// pre-fix shape — raw-padded anchors of one logical key). The
+    /// submission surface uses it to REFUSE a post-restart same-key retry
+    /// explicitly (naming the run(s)) instead of silently re-executing a
+    /// task whose earlier life may have confirmed or unknown external
+    /// effects. `canonical_request_id` must be the CANONICAL form (the
+    /// single normalization rule lives at the submission boundary).
+    fn find_request_binding(
         &self,
         session_id: &str,
         owner_kind: &str,
         owner_subject: &str,
-        request_id: &str,
-    ) -> impl Future<Output = Result<Option<String>, StorageError>> + Send;
+        canonical_request_id: &str,
+    ) -> impl Future<Output = Result<RequestBindingLookup, StorageError>> + Send;
 }
 
 /// Object-safe erasure of [`SessionBackend`] (RPITIT traits are not
@@ -329,13 +381,13 @@ pub trait SessionBackendErased: Send + Sync {
         limit: u32,
     ) -> Pin<Box<dyn Future<Output = Result<Vec<RunSummaryRow>, StorageError>> + Send + 'a>>;
     fn allocate_run_id_erased(&self, now_ms: u64) -> Result<String, StorageError>;
-    fn find_run_id_by_request_erased<'a>(
+    fn find_request_binding_erased<'a>(
         &'a self,
         session_id: &'a str,
         owner_kind: &'a str,
         owner_subject: &'a str,
-        request_id: &'a str,
-    ) -> Pin<Box<dyn Future<Output = Result<Option<String>, StorageError>> + Send + 'a>>;
+        canonical_request_id: &'a str,
+    ) -> Pin<Box<dyn Future<Output = Result<RequestBindingLookup, StorageError>> + Send + 'a>>;
 }
 
 impl<T: SessionBackend> SessionBackendErased for T {
@@ -371,19 +423,19 @@ impl<T: SessionBackend> SessionBackendErased for T {
     fn allocate_run_id_erased(&self, now_ms: u64) -> Result<String, StorageError> {
         SessionBackend::allocate_run_id(self, now_ms)
     }
-    fn find_run_id_by_request_erased<'a>(
+    fn find_request_binding_erased<'a>(
         &'a self,
         session_id: &'a str,
         owner_kind: &'a str,
         owner_subject: &'a str,
-        request_id: &'a str,
-    ) -> Pin<Box<dyn Future<Output = Result<Option<String>, StorageError>> + Send + 'a>> {
-        Box::pin(SessionBackend::find_run_id_by_request(
+        canonical_request_id: &'a str,
+    ) -> Pin<Box<dyn Future<Output = Result<RequestBindingLookup, StorageError>> + Send + 'a>> {
+        Box::pin(SessionBackend::find_request_binding(
             self,
             session_id,
             owner_kind,
             owner_subject,
-            request_id,
+            canonical_request_id,
         ))
     }
 }
@@ -417,14 +469,20 @@ impl SessionBackend for RunDatabase {
     fn allocate_run_id(&self, now_ms: u64) -> Result<String, StorageError> {
         RunDatabase::allocate_run_id(self, now_ms)
     }
-    fn find_run_id_by_request(
+    fn find_request_binding(
         &self,
         session_id: &str,
         owner_kind: &str,
         owner_subject: &str,
-        request_id: &str,
-    ) -> impl Future<Output = Result<Option<String>, StorageError>> + Send {
-        RunDatabase::find_run_id_by_request(self, session_id, owner_kind, owner_subject, request_id)
+        canonical_request_id: &str,
+    ) -> impl Future<Output = Result<RequestBindingLookup, StorageError>> + Send {
+        RunDatabase::find_request_binding(
+            self,
+            session_id,
+            owner_kind,
+            owner_subject,
+            canonical_request_id,
+        )
     }
 }
 
@@ -646,8 +704,19 @@ impl SessionStore {
         submission: &ExecuteSubmission<'_>,
         now_ms: u64,
     ) -> Result<ExecuteAccepted, SessionExecuteError> {
+        // R03 RR2/F05-01 — the SINGLE canonicalization boundary of the
+        // foreground submission surface. Everything below (the dedup key,
+        // the cross-restart anchor lookup, the DriveAuthorization lineage
+        // and the error echoes) consumes this ONE canonical fact; the raw
+        // id stays an audit-only log field (see
+        // `canonicalize_submission_request_id`).
+        let canonical_request_id = canonicalize_submission_request_id(submission.request_id)?;
+        let submission = ExecuteSubmission {
+            input: submission.input,
+            request_id: canonical_request_id.as_deref(),
+        };
         let (run_id, lease, agent_id, binding) = match self
-            .admit_submission(port, principal, session_id, submission, now_ms)
+            .admit_submission(port, principal, session_id, &submission, now_ms)
             .await?
         {
             AdmissionOutcome::Replayed { accepted } => return Ok(accepted),
@@ -766,8 +835,17 @@ impl SessionStore {
         submission: &ExecuteSubmission<'_>,
         now_ms: u64,
     ) -> Result<ExecuteAccepted, SessionExecuteError> {
+        // R03 RR2/F05-01 — the background surface canonicalizes through the
+        // SAME single boundary as the foreground one: the dedup key, the
+        // cross-restart anchor lookup and the DriveAuthorization lineage
+        // of the detached drive all consume this ONE canonical fact.
+        let canonical_request_id = canonicalize_submission_request_id(submission.request_id)?;
+        let submission = ExecuteSubmission {
+            input: submission.input,
+            request_id: canonical_request_id.as_deref(),
+        };
         let (run_id, lease, _agent_id, binding) = match self
-            .admit_submission(storage.as_ref(), principal, session_id, submission, now_ms)
+            .admit_submission(storage.as_ref(), principal, session_id, &submission, now_ms)
             .await?
         {
             AdmissionOutcome::Replayed { accepted } => return Ok(accepted),
@@ -961,20 +1039,25 @@ impl SessionStore {
         };
         let digest = crate::dedup::normalized_request_digest_hex(submission.input);
 
-        // R03 repair G04/F05 (C05) — the cross-restart same-key contract.
+        // R03 repair G04/F05 (C05), extended by RR2/F05-01 — the
+        // cross-restart same-key contract over the CANONICAL logical key.
         // This process's registry has no binding for the key, but the
-        // DURABLE lineage anchor may: an earlier process life admitted a
-        // run under the same (owner, session, requestId). Refuse it
-        // EXPLICITLY naming that run — the client queries the run's
-        // durable outcome or resubmits under a new id; the service never
-        // silently re-executes a task whose earlier life may hold
-        // confirmed or unknown external effects. (Re-check the in-memory
-        // registry after the read so a concurrently admitted SAME-PROCESS
-        // binding still wins with its replay.)
+        // DURABLE lineage anchors may: an earlier process life admitted a
+        // run under the same (owner, session, logical requestId) — the
+        // lookup is legacy-compatible (pre-fix rows whose anchor held the
+        // RAW id still normalize to this key) and ambiguity-honest:
+        //   * ONE bound run → refuse EXPLICITLY naming that run;
+        //   * SEVERAL bound runs (the pre-fix duplicate shape) → refuse as
+        //     an explicit AMBIGUITY naming every run — never a silent pick
+        //     of one binding, never a blind fresh re-execution;
+        //   * none → the id is fresh at the durable layer too.
+        // (Re-check the in-memory registry after the read so a
+        // concurrently admitted SAME-PROCESS binding still wins with its
+        // replay.)
         if self.dedup.lookup(&key).is_none() {
             let earlier = self
                 .backend
-                .find_run_id_by_request_erased(
+                .find_request_binding_erased(
                     session_id,
                     kernel_principal.storage_kind(),
                     &kernel_principal.storage_subject(),
@@ -982,20 +1065,39 @@ impl SessionStore {
                 )
                 .await
                 .map_err(SessionExecuteError::Storage)?;
-            if let Some(earlier_run) = earlier {
-                if self.dedup.lookup(&key).is_none() {
-                    tracing::warn!(
-                        session_id = session_id,
-                        request_id = %request_id,
-                        earlier_run_id = %earlier_run,
-                        "requestId is durably bound to a run from an earlier process life — \
-                         refusing explicitly instead of silently re-executing (query that run \
-                         or resubmit under a new id)"
-                    );
-                    return Err(SessionExecuteError::RequestIdBoundToEarlierRun {
-                        request_id,
+            if self.dedup.lookup(&key).is_none() {
+                match earlier {
+                    RequestBindingLookup::Bound {
                         run_id: earlier_run,
-                    });
+                    } => {
+                        tracing::warn!(
+                            session_id = session_id,
+                            request_id = %request_id,
+                            earlier_run_id = %earlier_run,
+                            "requestId is durably bound to a run from an earlier process life — \
+                             refusing explicitly instead of silently re-executing (query that \
+                             run or resubmit under a new id)"
+                        );
+                        return Err(SessionExecuteError::RequestIdBoundToEarlierRun {
+                            request_id,
+                            run_id: earlier_run,
+                        });
+                    }
+                    RequestBindingLookup::Ambiguous { run_ids } => {
+                        tracing::warn!(
+                            session_id = session_id,
+                            request_id = %request_id,
+                            bound_run_ids = ?run_ids,
+                            "requestId (canonical logical key) is durably bound to SEVERAL runs \
+                             (pre-fix raw-anchor rows) — refusing as an explicit ambiguity; \
+                             verify the named runs or resubmit under a new id"
+                        );
+                        return Err(SessionExecuteError::RequestIdBoundAmbiguous {
+                            request_id,
+                            run_ids,
+                        });
+                    }
+                    RequestBindingLookup::Unbound => {}
                 }
             }
         }
@@ -1545,19 +1647,19 @@ mod tests {
                 + 1;
             Ok(format!("run_{now_ms:016x}_{seq:06x}"))
         }
-        async fn find_run_id_by_request(
+        async fn find_request_binding(
             &self,
             _session_id: &str,
             _owner_kind: &str,
             _owner_subject: &str,
-            _request_id: &str,
-        ) -> Result<Option<String>, StorageError> {
+            _canonical_request_id: &str,
+        ) -> Result<RequestBindingLookup, StorageError> {
             // The unit-test backend keeps no durable lineage ledger — the
             // G04/F05 cross-restart contract is covered by the integration
             // suite against the REAL store (run_lineage.cause_id). No
             // earlier-life anchor is ever reported here, so the in-process
             // admission lifecycle is what these unit tests exercise.
-            Ok(None)
+            Ok(RequestBindingLookup::Unbound)
         }
     }
 

@@ -1,0 +1,190 @@
+   Compiling thiserror v2.0.21
+   Compiling serde_path_to_error v0.1.20
+   Compiling thiserror-impl v2.0.21
+     Running unittests src/lib.rs (/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T//rust-target-r03-rr2-f05-r1/debug/deps/lingxi_adapters-93d40561c9c42916)
+test storage::migrations::tests::sqlite_error_mapping_by_primary_code ... ok
+test result: ok. 21 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.16s
+     Running unittests src/bin/lingxi-storage-inspect.rs (/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T//rust-target-r03-rr2-f05-r1/debug/deps/lingxi_storage_inspect-be1e4fedf8097400)
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+     Running tests/active_run_listing.rs (/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T//rust-target-r03-rr2-f05-r1/debug/deps/active_run_listing-0ecb792f89488dc5)
+test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.02s
+     Running tests/backup_faults.rs (/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T//rust-target-r03-rr2-f05-r1/debug/deps/backup_faults-505569b358966182)
+test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.03s
+     Running tests/backup_restore.rs (/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T//rust-target-r03-rr2-f05-r1/debug/deps/backup_restore-99a6a2c32b3b185c)
+test result: ok. 11 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.21s
+     Running tests/disk_full_fault.rs (/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T//rust-target-r03-rr2-f05-r1/debug/deps/disk_full_fault-f53ddf4a430dc705)
+test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.02s
+     Running tests/event_store_reads.rs (/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T//rust-target-r03-rr2-f05-r1/debug/deps/event_store_reads-37d68bc66ab6dafa)
+test result: ok. 3 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.02s
+     Running tests/invocation_journal_store.rs (/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T//rust-target-r03-rr2-f05-r1/debug/deps/invocation_journal_store-9ca17253ead4b340)
+test result: ok. 5 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.03s
+     Running tests/late_result_fencing_property.rs (/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T//rust-target-r03-rr2-f05-r1/debug/deps/late_result_fencing_property-9819d844756d1a95)
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.34s
+     Running tests/migration_idempotency.rs (/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T//rust-target-r03-rr2-f05-r1/debug/deps/migration_idempotency-9b9aa21fbefbadf1)
+test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.03s
+     Running tests/run_finalize_property.rs (/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T//rust-target-r03-rr2-f05-r1/debug/deps/run_finalize_property-12fcce781abdbc16)
+test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.17s
+     Running tests/run_id_allocator.rs (/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T//rust-target-r03-rr2-f05-r1/debug/deps/run_id_allocator-d6d885fc7d13bd31)
+test result: ok. 5 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.03s
+     Running tests/run_lineage_store.rs (/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T//rust-target-r03-rr2-f05-r1/debug/deps/run_lineage_store-b427da167de8fd4a)
+test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.01s
+     Running tests/storage_transactions.rs (/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T//rust-target-r03-rr2-f05-r1/debug/deps/storage_transactions-aef42ad9a1187fac)
+test result: ok. 7 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.24s
+     Running unittests src/lib.rs (/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T//rust-target-r03-rr2-f05-r1/debug/deps/lingxi_browser_spike-0a5903e94ac32244)
+test cdp::tests::remote_error_surfaces ... ok
+test result: ok. 11 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.06s
+     Running unittests src/bin/spike_browser.rs (/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T//rust-target-r03-rr2-f05-r1/debug/deps/spike_browser-afdc398897759a98)
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+     Running unittests src/bin/spike_pdf.rs (/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T//rust-target-r03-rr2-f05-r1/debug/deps/spike_pdf-e3cb30511e8b4a1e)
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+     Running unittests src/lib.rs (/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T//rust-target-r03-rr2-f05-r1/debug/deps/lingxi_kernel-5870d7adbc7a2006)
+test ports::tests::failed_commit_yields_error_and_no_events ... ok
+test result: ok. 53 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.01s
+     Running unittests src/lib.rs (/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T//rust-target-r03-rr2-f05-r1/debug/deps/lingxi_protocol-73143661d4635a00)
+test tests::error_codes_have_stable_wire_names ... ok
+test tests::protocol_error_rejects_unknown_fields ... ok
+test result: ok. 21 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+     Running unittests src/bin/lingxi-proto-server.rs (/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T//rust-target-r03-rr2-f05-r1/debug/deps/lingxi_proto_server-ea4756a4fc26c631)
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+     Running unittests src/bin/lingxi-protocol-gen.rs (/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T//rust-target-r03-rr2-f05-r1/debug/deps/lingxi_protocol_gen-8459455fdea73203)
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+     Running unittests src/bin/lingxi-protocol-verify.rs (/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T//rust-target-r03-rr2-f05-r1/debug/deps/lingxi_protocol_verify-49fd3f3ebdb77b89)
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+     Running unittests src/lib.rs (/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T//rust-target-r03-rr2-f05-r1/debug/deps/lingxi_service-4d3ce4ef9228ce25)
+test config::tests::cli_empty_is_no_flags_not_an_error ... ok
+test config::tests::log_flag_range_violations_are_parse_time_errors ... ok
+test tests::storage_http_errors_keep_status_reason_and_retryability ... ok
+test sessions::tests::failed_commit_is_a_storage_error_not_a_success ... ok
+test result: ok. 241 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 8.10s
+     Running unittests src/main.rs (/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T//rust-target-r03-rr2-f05-r1/debug/deps/lingxi_service-f9b10d41ca2f0414)
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+     Running tests/admission_dedup_adversarial.rs (/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T//rust-target-r03-rr2-f05-r1/debug/deps/admission_dedup_adversarial-638c7abb8d0992ce)
+test result: ok. 5 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.25s
+     Running tests/admission_dedup_consistency.rs (/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T//rust-target-r03-rr2-f05-r1/debug/deps/admission_dedup_consistency-33244358e8c1131e)
+test result: ok. 5 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.25s
+     Running tests/auth_matrix.rs (/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T//rust-target-r03-rr2-f05-r1/debug/deps/auth_matrix-f7d6f6ff916ba627)
+test a06_unmasked_client_frame_closes_with_protocol_error ... ok
+test a07_closed_storage_returns_http_error_without_run_or_completion_event ... ok
+test result: ok. 24 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 8.61s
+     Running tests/background_disconnect_recovery.rs (/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T//rust-target-r03-rr2-f05-r1/debug/deps/background_disconnect_recovery-9cb498aeedee3895)
+test result: ok. 3 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.19s
+     Running tests/background_steering.rs (/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T//rust-target-r03-rr2-f05-r1/debug/deps/background_steering-349426fc25c3a07e)
+test result: ok. 8 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.34s
+     Running tests/cancel_link_inheritance.rs (/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T//rust-target-r03-rr2-f05-r1/debug/deps/cancel_link_inheritance-62ccf3d0165f7163)
+test result: ok. 7 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.57s
+     Running tests/cancel_terminal_race.rs (/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T//rust-target-r03-rr2-f05-r1/debug/deps/cancel_terminal_race-a03b59eb07557809)
+test result: ok. 13 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.45s
+     Running tests/cancellation_tree.rs (/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T//rust-target-r03-rr2-f05-r1/debug/deps/cancellation_tree-01b95b5fa41a54c7)
+test result: ok. 8 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.61s
+     Running tests/config_bounds.rs (/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T//rust-target-r03-rr2-f05-r1/debug/deps/config_bounds-660af23787b52cdc)
+test result: ok. 5 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.67s
+     Running tests/event_subscription.rs (/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T//rust-target-r03-rr2-f05-r1/debug/deps/event_subscription-1c82acbb0b03b7f0)
+test result: ok. 12 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 2.85s
+     Running tests/execute_concurrency.rs (/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T//rust-target-r03-rr2-f05-r1/debug/deps/execute_concurrency-4fc35c8427be13f6)
+test result: ok. 3 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.25s
+     Running tests/exit_race_rejections.rs (/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T//rust-target-r03-rr2-f05-r1/debug/deps/exit_race_rejections-0194b4ca6418903e)
+test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.12s
+     Running tests/input_budget_refusal.rs (/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T//rust-target-r03-rr2-f05-r1/debug/deps/input_budget_refusal-0df3f2692472bcba)
+test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.11s
+     Running tests/input_payload_fidelity.rs (/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T//rust-target-r03-rr2-f05-r1/debug/deps/input_payload_fidelity-f3eceb7b57f4b5f9)
+test result: ok. 5 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.24s
+     Running tests/instance_lifecycle.rs (/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T//rust-target-r03-rr2-f05-r1/debug/deps/instance_lifecycle-09121c6e84a1b555)
+test result: ok. 3 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.17s
+     Running tests/invocation_journal.rs (/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T//rust-target-r03-rr2-f05-r1/debug/deps/invocation_journal-6ec4b131ac777c35)
+test result: ok. 3 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.18s
+     Running tests/late_result_fence.rs (/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T//rust-target-r03-rr2-f05-r1/debug/deps/late_result_fence-f500e9f801e98f8b)
+test result: ok. 5 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.21s
+     Running tests/r00_management_leaves.rs (/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T//rust-target-r03-rr2-f05-r1/debug/deps/r00_management_leaves-123611678ad8402e)
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 33.86s
+     Running tests/r00_static_web_leaves.rs (/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T//rust-target-r03-rr2-f05-r1/debug/deps/r00_static_web_leaves-e4fcdd8254d533f5)
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.18s
+     Running tests/r03_t08_acceptance_matrix.rs (/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T//rust-target-r03-rr2-f05-r1/debug/deps/r03_t08_acceptance_matrix-50e78557f7a4d677)
+test result: ok. 17 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.68s
+     Running tests/recovery_crash_points.rs (/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T//rust-target-r03-rr2-f05-r1/debug/deps/recovery_crash_points-6a7f191b3d981441)
+test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.85s
+     Running tests/recovery_startup_scan.rs (/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T//rust-target-r03-rr2-f05-r1/debug/deps/recovery_startup_scan-576f80212b5d6732)
+test result: ok. 7 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.46s
+     Running tests/request_dedup.rs (/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T//rust-target-r03-rr2-f05-r1/debug/deps/request_dedup-bdce0a0105108d9f)
+test result: ok. 4 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.19s
+     Running tests/request_id_canonicalization.rs (/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T//rust-target-r03-rr2-f05-r1/debug/deps/request_id_canonicalization-9adf899d216b7a9b)
+test result: ok. 7 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 1.46s
+     Running tests/resource_limits.rs (/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T//rust-target-r03-rr2-f05-r1/debug/deps/resource_limits-87ae1c00b3b3c4a8)
+test a13_error_bodies_carry_cause_id_request_id_and_redacted_paths ... ok
+test not_found_error_carries_structured_cause ... ok
+test result: ok. 12 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 1.08s
+     Running tests/run_lifecycle.rs (/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T//rust-target-r03-rr2-f05-r1/debug/deps/run_lifecycle-3e990b344dd14801)
+test result: ok. 12 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.47s
+     Running tests/service_health.rs (/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T//rust-target-r03-rr2-f05-r1/debug/deps/service_health-0a20248bec3923dd)
+test result: ok. 7 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.19s
+     Running tests/service_persistence.rs (/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T//rust-target-r03-rr2-f05-r1/debug/deps/service_persistence-4955d36dc9f79b2b)
+test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.12s
+     Running tests/session_serialization.rs (/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T//rust-target-r03-rr2-f05-r1/debug/deps/session_serialization-8bc5c414bc63c834)
+test result: ok. 5 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.72s
+     Running tests/shutdown_coordinator.rs (/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T//rust-target-r03-rr2-f05-r1/debug/deps/shutdown_coordinator-5b35e023b29da107)
+test result: ok. 7 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.23s
+     Running tests/subagent_closeout.rs (/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T//rust-target-r03-rr2-f05-r1/debug/deps/subagent_closeout-d600cf8bcd9007f5)
+test result: ok. 8 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.28s
+     Running tests/subagent_lifecycle.rs (/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T//rust-target-r03-rr2-f05-r1/debug/deps/subagent_lifecycle-ed4c8f051c624a3c)
+test result: ok. 3 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.16s
+     Running tests/subagent_permission_inheritance.rs (/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T//rust-target-r03-rr2-f05-r1/debug/deps/subagent_permission_inheritance-b0fdef3366dae554)
+test result: ok. 4 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.18s
+     Running tests/tls_web_login.rs (/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T//rust-target-r03-rr2-f05-r1/debug/deps/tls_web_login-a4a07fd73d334f3b)
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 2.42s
+     Running tests/tool_receipt_unknown.rs (/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T//rust-target-r03-rr2-f05-r1/debug/deps/tool_receipt_unknown-b9925b637bac0970)
+test result: ok. 6 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.28s
+     Running unittests src/lib.rs (/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T//rust-target-r03-rr2-f05-r1/debug/deps/lingxi_spike-c17a9ee965d6ea8a)
+test result: ok. 7 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.08s
+     Running unittests src/bin/spike_check_deps.rs (/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T//rust-target-r03-rr2-f05-r1/debug/deps/spike_check_deps-3d03f06d6c62b3e8)
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+     Running unittests src/bin/spike_health.rs (/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T//rust-target-r03-rr2-f05-r1/debug/deps/spike_health-71049bf841d04f7b)
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+     Running unittests src/bin/spike_mcp_handshake.rs (/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T//rust-target-r03-rr2-f05-r1/debug/deps/spike_mcp_handshake-7423b22b74cf311a)
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+     Running unittests src/bin/spike_schema_validate.rs (/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T//rust-target-r03-rr2-f05-r1/debug/deps/spike_schema_validate-48852f4c62f2a81c)
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+     Running unittests src/bin/spike_sqlite_queue.rs (/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T//rust-target-r03-rr2-f05-r1/debug/deps/spike_sqlite_queue-a31b673f0cd5177a)
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+     Running unittests src/bin/spike_tls_probe.rs (/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T//rust-target-r03-rr2-f05-r1/debug/deps/spike_tls_probe-a3375a98c1520e2a)
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+     Running unittests src/main.rs (/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T//rust-target-r03-rr2-f05-r1/debug/deps/xtask-6d02fc0e8bb5a814)
+test stage_map::map_tests::empty_assertion_contract_cases_is_a_hard_error ... ok
+test stage_map::map_tests::command_without_evidence_paths_is_a_hard_error ... ok
+test stage_map::map_tests::deferred_case_producer_outside_leaf_commands_is_a_hard_error ... ok
+test stage_map::map_tests::deferred_cases_on_a_legacy_kind_are_a_hard_error ... ok
+test stage_map::map_tests::conflicted_leaf_with_assertion_contract_is_a_hard_error ... ok
+test stage_map::map_tests::duplicate_pinned_case_name_is_a_hard_error ... ok
+test stage_map::map_tests::duplicate_scenario_ids_are_a_hard_error ... ok
+test stage_map::map_tests::deferred_leaf_with_gating_refs_is_a_hard_error ... ok
+test stage_map::map_tests::deferred_leaf_with_evidence_paths_is_a_hard_error ... ok
+test stage_map::map_tests::duplicate_supplemental_leaf_ids_are_a_hard_error ... ok
+test stage_map::map_tests::empty_r00_responsibility_mirror_is_a_hard_error ... ok
+test stage_map::map_tests::deferred_case_with_unknown_producer_is_a_hard_error ... ok
+test stage_map::map_tests::empty_result_version_is_a_hard_error ... ok
+test stage_map::map_tests::deferred_leaf_with_assertion_contract_is_a_hard_error ... ok
+test stage_map::map_tests::empty_scenario_set_is_a_hard_error ... ok
+test stage_map::map_tests::empty_supplemental_section_is_a_hard_error ... ok
+test stage_map::map_tests::invalid_json_is_a_hard_error ... ok
+test stage_map::map_tests::missing_assertion_contract_is_a_hard_error ... ok
+test stage_map::map_tests::missing_result_version_is_a_hard_error ... ok
+test stage_map::map_tests::missing_r00_mirror_field_is_a_hard_error ... ok
+test stage_map::map_tests::non_integer_case_expect_is_a_hard_error ... ok
+test stage_map::map_tests::supplemental_leaf_without_command_refs_is_a_hard_error ... ok
+test stage_map::map_tests::share_satisfied_leaf_without_contract_is_a_hard_error ... ok
+test stage_map::map_tests::producer_outside_leaf_refs_is_a_hard_error ... ok
+test stage_map::map_tests::unknown_command_ref_is_a_hard_error ... ok
+test stage_map::map_tests::unknown_result_version_is_a_hard_error ... ok
+test stage_map::map_tests::wrong_schema_version_is_a_hard_error ... ok
+test stage_map::map_tests::supplemental_leaf_with_unknown_command_ref_is_a_hard_error ... ok
+test stage_map::map_tests::scenario_without_command_refs_is_a_hard_error ... ok
+test stage_map::map_tests::unknown_supplemental_basis_kind_is_a_hard_error ... ok
+test stage_map::map_tests::unregistered_producer_command_is_a_hard_parse_error ... ok
+test verify::runner_tests::log_creation_error_is_a_structured_gate_failure_with_checkpoint ... ok
+test verify::runner_tests::spawn_error_is_a_structured_gate_failure_with_checkpoint ... ok
+test result: ok. 100 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 4.41s
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+EXIT=0

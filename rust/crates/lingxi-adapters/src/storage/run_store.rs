@@ -446,50 +446,98 @@ impl RunDatabase {
             .await
     }
 
-    /// R03 repair G04/F05 (C05) — the durable cross-restart request anchor.
-    /// Every USER run created with an explicit requestId records its
-    /// lineage with `cause_id = "request:{id}"` (origin `user`); this
-    /// answers whether THIS (owner kind, owner subject, session,
-    /// requestId) anchor already owns a run row — newest first, from ANY
-    /// process life. The submission surface uses the answer to REFUSE a
-    /// post-restart same-key retry explicitly (naming the run) instead of
-    /// silently re-executing a task whose earlier life may hold confirmed
-    /// or unknown external effects. Run rows are never deleted, so a hit
-    /// is a stable fact.
-    pub async fn find_run_id_by_request(
+    /// R03 RR2/F05-01 — the durable cross-restart request-anchor lookup
+    /// (the G04/F05 C05 contract, extended with the legacy compatible
+    /// read). Every USER run created with an explicit requestId records
+    /// its lineage with `cause_id = "request:{id}"` (origin `user`); this
+    /// answers how THIS (owner kind, owner subject, session, CANONICAL
+    /// request id) namespace's anchors relate to existing run rows — from
+    /// ANY process life. Run rows and lineage rows are never deleted or
+    /// rewritten, so every hit is a stable frozen fact.
+    ///
+    /// The match is done in RUST against the single canonicalization rule
+    /// ([`lingxi_kernel::subagent::canonical_request_id`] — the FULL
+    /// Unicode `White_Space` set), NOT with SQLite's `TRIM()`, whose
+    /// default character set covers only a small ASCII subset and would
+    /// silently miss U+3000/U+00A0-style legacy rows. A row matches when
+    /// its `cause_id` is `request:` + some raw id whose canonical form
+    /// equals the queried canonical id — this keeps the PRE-FIX rows
+    /// (whose anchor held the raw, un-normalized id) linkable, which an
+    /// exact-equality query would miss.
+    ///
+    /// Outcomes: [`RequestBindingLookup::Unbound`] (fresh at the durable
+    /// layer), [`RequestBindingLookup::Bound`] (exactly one run — the
+    /// canonical anchor or a single legacy variant), or
+    /// [`RequestBindingLookup::Ambiguous`] (SEVERAL distinct runs bound to
+    /// the same logical key — the pre-fix duplicate-execution shape; the
+    /// submission surface refuses such a key loudly instead of picking a
+    /// binding or re-executing).
+    pub async fn find_request_binding(
         &self,
         session_id: &str,
         owner_kind: &str,
         owner_subject: &str,
-        request_id: &str,
-    ) -> Result<Option<String>, StorageError> {
-        let (session_id, owner_kind, owner_subject) = (
+        canonical_request_id: &str,
+    ) -> Result<lingxi_kernel::ports::RequestBindingLookup, StorageError> {
+        use lingxi_kernel::ports::RequestBindingLookup;
+        use lingxi_kernel::subagent::REQUEST_CAUSE_ID_PREFIX;
+
+        let (session_id, owner_kind, owner_subject, canonical) = (
             session_id.to_string(),
             owner_kind.to_string(),
             owner_subject.to_string(),
+            canonical_request_id.to_string(),
         );
-        let cause_id = format!("request:{request_id}");
         self.queue
             .submit(move |conn| {
+                // The LIKE only NARROWS the scan (every user-cause anchor
+                // starts with the prefix); the authoritative match is the
+                // Rust-side prefix strip + canonical comparison below.
                 let mut stmt = conn
                     .prepare(
-                        "SELECT l.run_id FROM run_lineage l \
+                        "SELECT l.run_id, l.cause_id FROM run_lineage l \
                          JOIN runs r ON r.run_id = l.run_id \
                          WHERE r.session_id = ?1 AND r.owner_kind = ?2 AND r.owner_subject = ?3 \
-                           AND l.origin = 'user' AND l.cause_id = ?4 \
-                         ORDER BY r.created_at_unix_ms DESC, l.run_id DESC LIMIT 1",
+                           AND l.origin = 'user' AND l.cause_id LIKE ?4 \
+                         ORDER BY r.created_at_unix_ms DESC, l.run_id DESC",
                     )
                     .map_err(migrations::map_rusqlite)?;
+                let like_probe = format!("{REQUEST_CAUSE_ID_PREFIX}%");
                 let mut rows = stmt
-                    .query_map(
-                        rusqlite::params![session_id, owner_kind, owner_subject, cause_id],
-                        |row| row.get::<_, String>(0),
-                    )
+                    .query(rusqlite::params![
+                        session_id,
+                        owner_kind,
+                        owner_subject,
+                        like_probe
+                    ])
                     .map_err(migrations::map_rusqlite)?;
-                match rows.next() {
-                    Some(row) => Ok(Some(row.map_err(migrations::map_rusqlite)?)),
-                    None => Ok(None),
+                // run_lineage's primary key is run_id, so each run appears
+                // at most once; collect the matches newest-first.
+                let mut bound: Vec<String> = Vec::new();
+                while let Some(row) = rows.next().map_err(migrations::map_rusqlite)? {
+                    let run_id: String = row.get(0).map_err(migrations::map_rusqlite)?;
+                    let cause_id: Option<String> = row.get(1).map_err(migrations::map_rusqlite)?;
+                    let Some(raw) = cause_id
+                        .as_deref()
+                        .and_then(|c| c.strip_prefix(REQUEST_CAUSE_ID_PREFIX))
+                    else {
+                        continue;
+                    };
+                    if lingxi_kernel::subagent::canonical_request_id(raw) == canonical {
+                        bound.push(run_id);
+                    }
                 }
+                drop(rows);
+                drop(stmt);
+                Ok(match bound.as_slice() {
+                    [] => RequestBindingLookup::Unbound,
+                    [only] => RequestBindingLookup::Bound {
+                        run_id: only.clone(),
+                    },
+                    many => RequestBindingLookup::Ambiguous {
+                        run_ids: many.to_vec(),
+                    },
+                })
             })
             .await
     }

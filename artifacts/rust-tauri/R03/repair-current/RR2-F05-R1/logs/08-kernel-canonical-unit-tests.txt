@@ -1,0 +1,35 @@
+   Compiling libc v0.2.189
+   Compiling serde_core v1.0.229
+   Compiling serde_json v1.0.151
+   Compiling syn v3.0.6
+   Compiling serde_derive_internals v0.30.0
+   Compiling ref-cast-impl v1.0.27
+   Compiling serde_derive v1.0.229
+   Compiling cpufeatures v0.3.1
+   Compiling schemars_derive v1.2.2
+   Compiling ref-cast v1.0.27
+   Compiling sha1 v0.11.0
+   Compiling sha2 v0.11.0
+   Compiling serde v1.0.229
+   Compiling schemars v1.2.2
+   Compiling lingxi-protocol v0.0.0 (/Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-protocol)
+   Compiling lingxi-kernel v0.0.0 (/Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-kernel)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 3.67s
+     Running unittests src/lib.rs (/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T//rust-target-r03-rr2-f05-r1/debug/deps/lingxi_kernel-f99620b4fb8292b5)
+
+running 1 test
+test subagent::tests::canonical_request_id_trims_the_full_unicode_whitespace_set ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 52 filtered out; finished in 0.00s
+
+EXIT=0
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.05s
+     Running unittests src/lib.rs (/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T//rust-target-r03-rr2-f05-r1/debug/deps/lingxi_kernel-f99620b4fb8292b5)
+
+running 2 tests
+test subagent::tests::canonical_request_id_trims_the_full_unicode_whitespace_set ... ok
+test subagent::tests::request_cause_id_prefix_is_the_single_sourced_anchor_format ... ok
+
+test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 51 filtered out; finished in 0.00s
+
+EXIT=0

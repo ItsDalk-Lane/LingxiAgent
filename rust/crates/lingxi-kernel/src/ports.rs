@@ -134,6 +134,28 @@ impl std::fmt::Display for StorageError {
 
 impl std::error::Error for StorageError {}
 
+/// R03 RR2/F05-01: the result of the durable cross-restart request-anchor
+/// lookup (the `request:` lineage rows of user runs). The logical
+/// (canonical) request key can be durably bound to exactly one run, to
+/// none, or — only for rows written by PRE-FIX builds whose `cause_id`
+/// held the raw, un-normalized id — to SEVERAL runs; the multi-run case
+/// must surface as an explicit ambiguity at the submission boundary, never
+/// a silent pick of one binding (each bound run may hold confirmed or
+/// unknown external effects) and never a blind fresh re-execution.
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub enum RequestBindingLookup {
+    /// No run is durably bound to this logical request key — the id is
+    /// fresh at the durable layer too.
+    Unbound,
+    /// Exactly one run is bound (the canonical anchor, or a single legacy
+    /// raw-padded anchor that normalizes to this key).
+    Bound { run_id: String },
+    /// SEVERAL distinct runs are bound to the same logical key (the
+    /// pre-fix duplicate-execution shape). Newest first (the lookup's
+    /// deterministic order); the caller names them ALL.
+    Ambiguous { run_ids: Vec<String> },
+}
+
 /// One key event to persist as part of a run commit. The kernel supplies
 /// identity (`event_id`) and payload; the single writer assigns the
 /// per-stream `seq` inside the same transaction and returns the durable

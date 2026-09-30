@@ -1,0 +1,14 @@
+    Blocking waiting for file lock on package cache
+    Blocking waiting for file lock on package cache
+   Compiling lingxi-service v0.0.0 (/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/rv1-fixed-rust/crates/lingxi-service)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.71s
+     Running tests/rv1_independent_retest.rs (/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T//rust-target-rv1-fixed/debug/deps/rv1_independent_retest-9776ba337cf95fe6)
+
+running 3 tests
+test rv1_b_colliding_legacy_rows_refuse_as_explicit_ambiguity_never_a_pick ... ok
+test rv1_a_padded_id_raw_and_canonical_retries_bind_the_one_logical_request ... ok
+test rv1_c_same_logical_id_never_crosses_session_or_principal_namespaces ... ok
+
+test result: ok. 3 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.36s
+
+EXIT=0

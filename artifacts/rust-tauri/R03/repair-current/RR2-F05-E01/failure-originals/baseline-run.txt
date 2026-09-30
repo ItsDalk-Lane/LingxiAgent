@@ -1,0 +1,56 @@
+warning: function `device_principal_of_local_user` is never used
+   --> crates/lingxi-service/tests/request_id_canonicalization.rs:286:4
+    |
+286 | fn device_principal_of_local_user() -> lingxi_service::Principal {
+    |    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    |
+    = note: `#[warn(dead_code)]` (part of `#[warn(unused)]`) on by default
+
+warning: `lingxi-service` (test "request_id_canonicalization") generated 1 warning
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.09s
+     Running tests/request_id_canonicalization.rs (/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T//rust-target-r03-rr2-f05/debug/deps/request_id_canonicalization-1df3956ccac0812a)
+
+running 5 tests
+test rr2_f05_c02_padded_id_raw_and_canonical_retries_bind_one_logical_request ... FAILED
+test rr2_f05_c02_restart_matrix_foreground_background_confirmed_unknown ... FAILED
+test rr2_f05_c01_plain_id_control_group_keeps_the_restart_contract ... ok
+test rr2_f05_c03_whitespace_variants_share_one_canonical_chain ... FAILED
+test rr2_f05_c05_legacy_cause_ids_stay_linkable_across_restart_shapes ... FAILED
+
+failures:
+
+---- rr2_f05_c02_padded_id_raw_and_canonical_retries_bind_one_logical_request stdout ----
+
+thread 'rr2_f05_c02_padded_id_raw_and_canonical_retries_bind_one_logical_request' (94194) panicked at crates/lingxi-service/tests/request_id_canonicalization.rs:630:5:
+assertion `left == right` failed: the durable anchor must be built from the CANONICAL id
+  left: Some("request: req-42 ")
+ right: Some("request:req-42")
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+
+---- rr2_f05_c02_restart_matrix_foreground_background_confirmed_unknown stdout ----
+
+thread 'rr2_f05_c02_restart_matrix_foreground_background_confirmed_unknown' (94195) panicked at crates/lingxi-service/tests/request_id_canonicalization.rs:769:25:
+cell fg=true confirmed=true raw=true: a fresh acceptance would be a silent blind re-execution: ExecuteAccepted { run_id: "run_000001a0dcba6c00_000002", run_count: 2, replayed: false }
+
+---- rr2_f05_c03_whitespace_variants_share_one_canonical_chain stdout ----
+
+thread 'rr2_f05_c03_whitespace_variants_share_one_canonical_chain' (94196) panicked at crates/lingxi-service/tests/request_id_canonicalization.rs:869:9:
+assertion `left == right` failed: variant "\treq-tab\t" must persist the canonical anchor
+  left: Some("request:\treq-tab\t")
+ right: Some("request:req-tab")
+
+---- rr2_f05_c05_legacy_cause_ids_stay_linkable_across_restart_shapes stdout ----
+
+thread 'rr2_f05_c05_legacy_cause_ids_stay_linkable_across_restart_shapes' (94207) panicked at crates/lingxi-service/tests/request_id_canonicalization.rs:926:22:
+legacy single row must be found by the logical key, got Ok(ExecuteAccepted { run_id: "run_000001a0dcba6c00_000002", run_count: 2, replayed: false })
+
+
+failures:
+    rr2_f05_c02_padded_id_raw_and_canonical_retries_bind_one_logical_request
+    rr2_f05_c02_restart_matrix_foreground_background_confirmed_unknown
+    rr2_f05_c03_whitespace_variants_share_one_canonical_chain
+    rr2_f05_c05_legacy_cause_ids_stay_linkable_across_restart_shapes
+
+test result: FAILED. 1 passed; 4 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.29s
+
+error: test failed, to rerun pass `-p lingxi-service --test request_id_canonicalization`

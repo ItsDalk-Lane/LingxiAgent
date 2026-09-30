@@ -1,9 +1,9 @@
 #!/usr/bin/env bash
 # R03 repair round G07 / F08-C02 — adversarial-repair suite producer.
 #
-# Runs the nine integration suites added by repair workorders G01–G06
-# (F01–F07) through the REAL service chain and pins each suite's executed
-# test count EXACTLY. This is the registered producer behind the R03 stage
+# Runs the ten integration suites added by repair workorders G01–G06
+# (F01–F07) plus the RR2 fixed repair (R03-RR2-F05-01) through the REAL
+# service chain and pins each suite's executed test count EXACTLY. This is the registered producer behind the R03 stage
 # map's `repair_suites` command / `R03-RP01` scenario: the gate observes
 # this script's real exit code, and this script refuses every fake-green
 # shape on its own:
@@ -61,6 +61,10 @@ note() { printf '%s\n' "$*" | tee -a "$EVIDENCE_DIR/summary.txt"; }
 
 # ── pin table: suite <pinned-count> <F-ID> ───────────────────────────────────
 # pin <suite> <count> <F-ID>   (machine-checked by xtask stage_map tests)
+# RR2 increment (R03-RR2-F05-01, 2026-09-30): added the tenth suite
+# `request_id_canonicalization` (F-ID RR2-F05, count 7) — the canonical
+# requestId chain cases C01-C05 of the RR2 fixed repair. No existing suite
+# or count was removed or lowered.
 PIN_LINES="
 pin cancel_link_inheritance 7 F01
 pin subagent_closeout 8 F02
@@ -71,9 +75,10 @@ pin admission_dedup_adversarial 5 F05
 pin input_payload_fidelity 5 F06
 pin input_budget_refusal 2 F06
 pin background_steering 8 F07
+pin request_id_canonicalization 7 RR2-F05
 "
 
-note "== building the nine repair suites (rustup $TOOLCHAIN, $TARGET_DIR, --locked, offline) =="
+note "== building the ten repair suites (rustup $TOOLCHAIN, $TARGET_DIR, --locked, offline) =="
 env -u all_proxy -u ALL_PROXY -u http_proxy -u HTTP_PROXY -u https_proxy -u HTTPS_PROXY \
   CARGO_NET_OFFLINE=true CARGO_TARGET_DIR=$TARGET_DIR \
   rustup run "$TOOLCHAIN" cargo test --manifest-path rust/Cargo.toml --locked --offline \
@@ -87,6 +92,7 @@ env -u all_proxy -u ALL_PROXY -u http_proxy -u HTTP_PROXY -u https_proxy -u HTTP
   --test input_payload_fidelity \
   --test input_budget_refusal \
   --test background_steering \
+  --test request_id_canonicalization \
   --no-run \
   > "$EVIDENCE_DIR/build.log" 2>&1 || { cat "$EVIDENCE_DIR/build.log"; fail "build failed"; }
 note "PASS build (locked, offline)"
@@ -173,4 +179,4 @@ if grep -q . "$GAPS_FILE"; then
   sed 's/^/  /' "$GAPS_FILE" | tee -a "$EVIDENCE_DIR/summary.txt"
   fail "repair-suite coverage has gaps ($(wc -l < "$GAPS_FILE" | tr -d ' ') lines)"
 fi
-note "RESULT: all nine G01-G06 repair suites green with exact pinned counts"
+note "RESULT: all ten repair suites green with exact pinned counts (G01-G06 nine + RR2-F05-01 one)"

@@ -1,0 +1,39 @@
+    Blocking waiting for file lock on package cache
+    Blocking waiting for file lock on package cache
+   Compiling lingxi-service v0.0.0 (/private/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/rv1-baseline-wt/rust/crates/lingxi-service)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.72s
+     Running tests/rv1_independent_retest.rs (/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T//rust-target-rv1-baseline/debug/deps/rv1_independent_retest-9776ba337cf95fe6)
+
+running 3 tests
+test rv1_b_colliding_legacy_rows_refuse_as_explicit_ambiguity_never_a_pick ... FAILED
+test rv1_a_padded_id_raw_and_canonical_retries_bind_the_one_logical_request ... FAILED
+test rv1_c_same_logical_id_never_crosses_session_or_principal_namespaces ... FAILED
+
+failures:
+
+---- rv1_b_colliding_legacy_rows_refuse_as_explicit_ambiguity_never_a_pick stdout ----
+
+thread 'rv1_b_colliding_legacy_rows_refuse_as_explicit_ambiguity_never_a_pick' (226549) panicked at crates/lingxi-service/tests/rv1_independent_retest.rs:294:25:
+colliding-legacy retry: retry of "req-42" was FRESHLY accepted (ExecuteAccepted { run_id: "run_000001a0dcba6c00_000003", run_count: 3, replayed: false }) — the silent blind re-execution of R03-RR2-F05-01
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+
+---- rv1_a_padded_id_raw_and_canonical_retries_bind_the_one_logical_request stdout ----
+
+thread 'rv1_a_padded_id_raw_and_canonical_retries_bind_the_one_logical_request' (226548) panicked at crates/lingxi-service/tests/rv1_independent_retest.rs:294:25:
+raw padded retry: retry of " req-42 " was FRESHLY accepted (ExecuteAccepted { run_id: "run_000001a0dcba6c00_000002", run_count: 2, replayed: false }) — the silent blind re-execution of R03-RR2-F05-01
+
+---- rv1_c_same_logical_id_never_crosses_session_or_principal_namespaces stdout ----
+
+thread 'rv1_c_same_logical_id_never_crosses_session_or_principal_namespaces' (226550) panicked at crates/lingxi-service/tests/rv1_independent_retest.rs:294:25:
+owner session X retry: retry of " iso-9 " was FRESHLY accepted (ExecuteAccepted { run_id: "run_000001a0dcba6c00_000004", run_count: 3, replayed: false }) — the silent blind re-execution of R03-RR2-F05-01
+
+
+failures:
+    rv1_a_padded_id_raw_and_canonical_retries_bind_the_one_logical_request
+    rv1_b_colliding_legacy_rows_refuse_as_explicit_ambiguity_never_a_pick
+    rv1_c_same_logical_id_never_crosses_session_or_principal_namespaces
+
+test result: FAILED. 0 passed; 3 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.36s
+
+error: test failed, to rerun pass `-p lingxi-service --test rv1_independent_retest`
+EXIT=101

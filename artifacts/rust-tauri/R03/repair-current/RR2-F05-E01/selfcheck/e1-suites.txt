@@ -1,0 +1,39 @@
+# E1: new + affected suites (command from repo root):
+CARGO_NET_OFFLINE=true CARGO_TARGET_DIR=${TMPDIR}/rust-target-r03-rr2-f05 cargo test --manifest-path rust/Cargo.toml --locked -p lingxi-service --test request_id_canonicalization --test admission_dedup_adversarial --test admission_dedup_consistency -- --test-threads=4
+   Compiling lingxi-service v0.0.0 (/Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-service)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 1.15s
+     Running tests/admission_dedup_adversarial.rs (/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T//rust-target-r03-rr2-f05/debug/deps/admission_dedup_adversarial-cbba9f9a301b3fdb)
+
+running 5 tests
+test adv_c01_spawn_window_failure_and_retraction_leave_no_sticky_state ... ok
+test adv_c03_isolation_controls_hold_while_a_key_is_mid_admission ... ok
+test adv_c04_response_lost_before_any_external_effect_replays_real_run ... ok
+test adv_c02_response_lost_inside_start_window_resolves_lazily ... ok
+test adv_c05_restart_with_unknown_side_effects_refuses_explicitly ... ok
+
+test result: ok. 5 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.27s
+
+     Running tests/admission_dedup_consistency.rs (/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T//rust-target-r03-rr2-f05/debug/deps/admission_dedup_consistency-22aeae0ae7a9a8fe)
+
+running 5 tests
+test r03_f05_c02_start_transaction_failure_is_compensated ... ok
+test r03_f05_c01_background_spawn_rejection_leaves_no_ghost_replay ... ok
+test r03_f05_c03_concurrent_same_key_between_reservation_and_commit ... ok
+test r03_f05_c04_post_side_effect_response_loss_never_reexecutes ... ok
+test r03_f05_c05_restart_same_key_is_an_explicit_contract_not_a_blind_redo ... ok
+
+test result: ok. 5 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.26s
+
+     Running tests/request_id_canonicalization.rs (/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T//rust-target-r03-rr2-f05/debug/deps/request_id_canonicalization-1df3956ccac0812a)
+
+running 7 tests
+test rr2_f05_c02_padded_id_raw_and_canonical_retries_bind_one_logical_request ... ok
+test rr2_f05_c01_plain_id_control_group_keeps_the_restart_contract ... ok
+test rr2_f05_c05_colliding_legacy_rows_refuse_as_explicit_ambiguity ... ok
+test rr2_f05_c04_colliding_raw_ids_one_namespace_isolation_and_compensation ... ok
+test rr2_f05_c05_legacy_cause_ids_stay_linkable_across_restart_shapes ... ok
+test rr2_f05_c03_whitespace_variants_share_one_canonical_chain ... ok
+test rr2_f05_c02_restart_matrix_foreground_background_confirmed_unknown ... ok
+
+test result: ok. 7 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 1.50s
+

@@ -79,11 +79,16 @@ pub fn normalized_request_digest_hex(input: &str) -> String {
     lingxi_protocol::digest_arguments(&serde_json::json!({ "input": normalized })).hex
 }
 
-/// Validates a client request id: trimmed non-empty and within the length
-/// bound. Invalid ids are refused loudly (the caller surfaces the error),
+/// Validates a client request id and returns its CANONICAL form (R03
+/// RR2/F05-01): canonicalized non-empty and within the length bound. This
+/// is the admission boundary's validation POLICY; the canonicalization
+/// RULE itself is the single shared
+/// [`lingxi_kernel::subagent::canonical_request_id`] (Rust `str::trim`,
+/// the full Unicode whitespace set — deliberately NOT a SQLite-side
+/// trim). Invalid ids are refused loudly (the caller surfaces the error),
 /// never silently ignored.
 pub fn validate_request_id(raw: &str) -> Result<String, String> {
-    let trimmed = raw.trim();
+    let trimmed = lingxi_kernel::subagent::canonical_request_id(raw);
     if trimmed.is_empty() {
         return Err("requestId must be a non-empty string".to_string());
     }
