@@ -38,6 +38,7 @@ pub mod invocations;
 pub mod limits;
 pub mod logging;
 mod management;
+pub mod mcpbridge;
 pub mod paths;
 pub mod procsupervisor;
 pub mod quotas;
@@ -56,6 +57,7 @@ pub mod subagents;
 pub mod task_supervisor;
 pub mod toolgateway;
 pub mod transport;
+pub mod workerrpc;
 pub mod ws;
 
 pub use approval::{ApprovalDecision, ApprovalGate, ApprovalRequest};
@@ -115,6 +117,14 @@ pub use lingxi_adapters::storage::StoreOptions;
 pub use logging::{
     init_tracing, LogRotationConfig, LogRouter, DEFAULT_LOG_MAX_BYTES, DEFAULT_LOG_MAX_FILES,
 };
+pub use mcpbridge::{
+    breakable_duplex, manifest_for_tool, refresh_mcp_server, register_mcp_server,
+    sync_server_tools, validate_structured_output, BreakableRead, BreakableWrite,
+    BridgeClientHandler, BridgeIo, McpBridgeError, McpCallFailure, McpEndpoint, McpServer,
+    McpSyncReport, McpToolBinding, McpToolExecutor, RegisteredMcpServer,
+    MCP_DEFAULT_CALL_DEADLINE_MS, MCP_MAX_LISTED_TOOLS, MCP_MAX_LIST_PAGES,
+    MCP_MAX_RESULT_CONTENT_BYTES, SAFE_MCP_ENV_PASSTHROUGH,
+};
 pub use paths::{prepare_layout, DataRootLayout};
 pub use procsupervisor::{
     ProcessSupervisor, SupervisorLimits, TerminationReason, DEFAULT_CLEANUP_TIMEOUT,
@@ -157,6 +167,15 @@ pub use toolgateway::{
     DEFAULT_LIVE_PREPARED_CAP, DEFAULT_PREPARED_TTL_MS,
 };
 pub use transport::{check_origin, infer_connection_kind, ConnectionKind, NetworkMode};
+pub use workerrpc::{
+    register_worker_tool, BoundedWorkerModel, RegisteredWorkerTool, UnconfiguredWorkerModel,
+    WorkerCallbackLine, WorkerContentLine, WorkerFailure, WorkerGrant, WorkerLimits,
+    WorkerModelPort, WorkerModelRefusal, WorkerModelReply, WorkerModelRequest, WorkerRequestLine,
+    WorkerResultLine, WorkerRuntime, WorkerToolExecutor, WorkerToolSpec,
+    SAFE_WORKER_ENV_PASSTHROUGH, WORKER_DEFAULT_DEADLINE_MS, WORKER_KILL_GRACE_MS,
+    WORKER_MAX_CALLBACKS_PER_CALL, WORKER_MAX_LINE_BYTES, WORKER_MAX_REQUEST_BYTES,
+    WORKER_RPC_PROTO,
+};
 pub use ws::{
     WsTicketService, WS_CLOSE_FORBIDDEN, WS_CLOSE_TRY_AGAIN_LATER, WS_CLOSE_UNAUTHORIZED,
 };

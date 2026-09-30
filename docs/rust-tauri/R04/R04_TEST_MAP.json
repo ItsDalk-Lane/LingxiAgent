@@ -312,17 +312,62 @@
       "evidence": "artifacts/rust-tauri/R04/T06-E01/"
     },
     "R04-T07": {
-      "status": "PENDING",
+      "status": "READY_FOR_REVIEW",
       "acceptance_map": {
         "R04-A13": {
-          "status": "NOT_STARTED",
-          "tests": []
+          "status": "IMPLEMENTED_SELF_CHECKED",
+          "tests": [
+            "lingxi-service --test r04_t07_mcp_and_workers r04_a13_mcp_reconnect_never_replays_the_side_effect (受控 rmcp 双工服务真实 initialize/协商/list/call；计数动作+断回执→Unknown→refresh_mcp_server 恰一次重连+新握手→计数不盲增→get_count 核验=1)",
+            "lingxi-service --test r04_t07_mcp_and_workers r04_a13_full_chain_journals_unknown_and_a_new_decision_sees_the_real_count (真实 run 链：journal Unknown 收据；重连后新 run 的核验查询 Succeeded、计数仍 1)"
+          ]
         },
         "R04-A14": {
-          "status": "NOT_STARTED",
-          "tests": []
+          "status": "IMPLEMENTED_SELF_CHECKED",
+          "tests": [
+            "lingxi-service --test r04_t07_mcp_and_workers r04_a14_worker_cannot_bypass_grants_or_model_credentials (模型凭证回调→真实 UnconfiguredWorkerModel 拒 model_capability_not_configured 且秘密不泄露；越界文件参数→真实 ResourceAccess 拒 grant 零 spawn；越界 claimed_files→拒绝且不铸造本地引用；env 白名单无 HOME/秘密；主服务仍可用)"
+          ]
         }
-      }
+      },
+      "adversarial_additions": {
+        "tests": [
+          "r04_t07_mcp_and_workers adversarial_two_servers_same_tool_name_hit_their_own_targets (两 server 同名工具=不同 target，各命中各的 server，received_calls 隔离)",
+          "r04_t07_mcp_and_workers adversarial_tools_list_change_updates_generation_and_invalidates_old_shapes (echo schema 变化→update+generation 上升→旧形状 ArgumentsInvalid 拒；boom 消失→uninstall 停止解析)",
+          "r04_t07_mcp_and_workers adversarial_error_oversized_schema_violating_and_forged_results (is_error=完成但失败回执；300KiB 输出→诚实 truncated；structured 违反 output schema→失败；file:///etc/passwd 资源链接→文本不铸造本地 ResourceRef)",
+          "r04_t07_mcp_and_workers adversarial_mcp_pagination_walks_all_pages (分页 listing 全量注册 5/5；游标=数值 offset)",
+          "r04_t07_mcp_and_workers adversarial_endless_paging_is_refused_loudly (不可信 server 永续游标→page bound 响亮拒绝，零注册)",
+          "r04_t07_mcp_and_workers cancelled_call_never_consumes_a_late_response (取消后迟到响应不消费/不复活；句柄单次不可重放；核验查询 count=1)",
+          "r04_t07_mcp_and_workers mcp_and_worker_tools_follow_the_t03_permission_face (MCP/worker 工具按 T03 面：operate→Allowed、ask→NeedsApproval、read_only→PolicyDenied 拒；ask 会话真链 park→批准→恰执行一次)",
+          "r04_t07_mcp_and_workers mcp_unsupported_endpoint_refuses_loudly (未携带 transport→mcp_endpoint_unsupported，绝不回落)",
+          "r04_t07_mcp_and_workers mcp_stdio_child_transport_and_env_whitelist_hold (真实 stdio 子进程 transport+env 白名单，HOME/秘密不到达)",
+          "r04_t07_mcp_and_workers adversarial_worker_protocol_violations_are_refused (伪 id/超限行/畸形行/未知 kind→worker_protocol_violation+主服务仍可用；double_result=首次结果单次入账)",
+          "r04_t07_mcp_and_workers adversarial_worker_deadline_and_silent_exit_are_unknown_never_clean_failures (超时→有界 kill→Unknown；无结果退出→Unknown)",
+          "r04_t07_mcp_and_workers adversarial_worker_error_result_and_callback_budget_are_host_owned (worker 自报错误=完成但失败；回调风暴=宿主预算 refusals=4 oks=2，凭证零泄露)",
+          "r04_t07_mcp_and_workers worker_claim_in_grant_mints_a_verified_resource_ref (grant 内且存在的 claimed_file 才铸造本地 ResourceRef)",
+          "r04_t07_mcp_and_workers worker_concurrency_is_bounded_by_the_runtime_semaphore (并发信号量 cap=1 串行化≥800ms)",
+          "r04_t07_mcp_and_workers worker_sandbox_binding_denies_out_of_boundary_writes (真实 T06 seatbelt：越界写 WRITE_DENIED+磁盘无痕迹；边界内允许对照)",
+          "r04_t07_mcp_and_workers mcp_tool_success_flows_through_the_full_run_chain (真链成功：journal Succeeded+dispatched+dedup；durable tool_call_completed wire 事件含 count= 内容)",
+          "lingxi-service --lib mcpbridge (4 单测：target 命名空间、注解不软化权限/恢复、远程 URI 不映射本地引用、结构化输出校验)",
+          "lingxi-service --lib workerrpc (4 单测：未配置模型诚实拒、宿主侧回调预算+token 上限、无内层仍拒、信封字段)"
+        ]
+      },
+      "gate_results": {
+        "cargo fmt --check": "exit 0",
+        "cargo clippy --workspace --all-targets --locked -D warnings": "exit 0",
+        "cargo test --workspace --locked": "见 R04-T07_REPORT.md §5（T07 集成 19/19+lib 单测 8；workspace 全量与 r00 环境项按报告登记）",
+        "xtask check-contracts": "exit 0 (626 entries 零漂移；本 Task 未触碰协议面)",
+        "xtask check-boundaries": "exit 0 (O1-O8+D1-D5+B1; --self-test N1-N17 exit 0)",
+        "R03 regression": "r03_g07_repair_suites.sh exit 0；r03_t08_matrix.sh exit 0；r03_t08_a16_seed_mechanism.sh exit 0；T01-T06 套件复绿（见报告 §5）"
+      },
+      "supplemental": [
+        "MCP 适配（rmcp 3.4.1 锁内，D-06）：真实 initialize 握手/协议协商/分页 tools/list/变更通知计数/tools/call；McpEndpoint 三态（Stdio 子进程=白名单 env+无 shell、Duplex 工厂、Unsupported=响亮拒绝）；未知回执（transport 断/超时/任务形态）=ToolOutcome::Unknown 永不盲重发；重连=refresh_mcp_server 恰一次新握手（重连从不重放调用）",
+        "listing 同步→registry generation：新增注册/变化 update（target generation 上升→旧句柄 TargetChanged）/消失 uninstall；schema 不兼容（T01 fail-closed 子集）按工具拒绝不放宽；list walk 有 page/tool 双上限（不可信 server 永续游标→响亮拒绝，E02 补齐）",
+        "worker RPC：单操作请求（CSPRNG 调用 ID/期限/资源许可/大小上限）；行级读取中途强制 cap（E02 补齐——read_line 无界缓冲缺口）；并发信号量+进程组 kill+有界 grace；stdin 失败/超时/无结果=Unknown（副作用未确认，绝不伪造干净失败）；worker 环境白名单（无 HOME/服务凭证）+可选 T06 沙盒包裹",
+        "宿主回调契约：WorkerModelPort（R05 边界面）；UnconfiguredWorkerModel=生产形态（model_capability_not_configured 诚实拒）；BoundedWorkerModel 宿主侧回调数+输出 token 预算（内层端口之前强制）；worker 永不获得凭证",
+        "网关集成：MCP/worker 工具全部经 T02 网关（prepare→T03 策略/批准→execute）注册执行（PermissionKind::Execute，read_only 拒/ask 弹审/operate 放行——T03 面真实裁定）；结果=结构化 ToolSuccess（内容块/资源引用/截断/校验过的 claimed_files）",
+        "E01 中断与 E02 续做：E01 交付了桥/worker RPC/fixture/测试的骨架但未跑通验证（合成分页 fixture 游标 bug 致无限循环挂死、行读取无界、6 断言错误、2 clippy lint、T03 面与取消迟到响应对抗项缺失）；E02 修复补齐并全套验证——详见 R04-T07_REPORT.md §2.3"
+      ],
+      "report": "docs/rust-tauri/R04/R04-T07_REPORT.md",
+      "evidence": "artifacts/rust-tauri/R04/T07-E02/"
     },
     "R04-T08": {
       "status": "PENDING",

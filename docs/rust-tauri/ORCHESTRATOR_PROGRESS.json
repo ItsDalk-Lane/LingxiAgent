@@ -3043,23 +3043,28 @@
     "R04-T07": {
       "name": "MCP与插件worker接入",
       "stage_id": "R04",
-      "status": "PENDING",
-      "task_base_sha": null,
-      "executor_id": null,
-      "execution_result": null,
-      "review_round": 0,
-      "reviewer_id": null,
-      "review_verdict": null,
-      "findings": [],
+      "status": "DONE",
+      "task_base_sha": "26251dc92",
+      "executor_id": "EXECUTOR-R04-T07-E01 (agent, interrupted mid-flight) + EXECUTOR-R04-T07-E02 (agent_1d711f24, audited continuation; E01 real defects fixed by root cause)",
+      "execution_result": "E01 timeout-interrupted (no report); E02 audited on-disk state, fixed pagination-deadloop/unbounded-read/6 assertion-contract contradictions, completed -> R1 PASS (F1 assigned to T08)",
+      "review_round": 1,
+      "reviewer_id": "REVIEWER-R04-T07-R01 (agent_85dec600)",
+      "review_verdict": "PASS (R1)",
+      "findings": [
+        "F1 Medium assigned to T08: T07 test unique_dir lacks per-process counter suffix — 19 parallel bootstraps collide (~27% loud false-reds, never false-green); one-line fix recommended before T08 reruns",
+        "F2 Low pre-existing T05 getpgid load race (single-run green)",
+        "4 observations (conn serialization, BoundedWorkerModel key semantics, worker read_only test gap — behavior verified correct by reviewer probe)"
+      ],
       "repair_agent_id": null,
       "root_cause_agent_id": null,
       "acceptance_results": {
-        "R04-A13": "NOT_STARTED",
-        "R04-A14": "NOT_STARTED"
+        "R04-A13": "PASS (R1 independent: 3 fresh synthetic-server variants incl. pre-init and mid-pagination disconnects)",
+        "R04-A14": "PASS (R1 independent: marker-file zero-spawn proof + env full-enumeration no-secret + grant not widened)"
       },
       "task_commit_sha": null,
       "push_result": null,
-      "blockers": []
+      "blockers": [],
+      "candidate_diff_digest": "0d2f496a37a683f4 (first/last stable)"
     },
     "R04-T08": {
       "name": "工具结果、产物与全矩阵验收",
@@ -4343,7 +4348,7 @@
       "blockers": []
     }
   },
-  "current_task": "R04-T07 (next)",
+  "current_task": "R04-T08 (next)",
   "orchestration_mode": {
     "effective_from": "R00-T03 R2 repair",
     "task_executor": "new ZCode task per Rxx-Tyy",

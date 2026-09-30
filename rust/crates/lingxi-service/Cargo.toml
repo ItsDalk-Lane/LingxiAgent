@@ -22,6 +22,17 @@ publish.workspace = true
 [dependencies]
 axum = "0.8.9"
 lingxi-protocol = { path = "../lingxi-protocol" }
+# R04-T07: the OFFICIAL MCP Rust SDK (R01 D-06), at the SAME locked
+# version and feature set lingxi-spike already validated
+# (default-features=false + client,server — in-process duplex initialize
+# handshake, negotiated protocol, tools/list, plus real stdio child
+# transports built on tokio's already-locked "process" feature). No new
+# package version enters rust/Cargo.lock: rmcp 3.4.1 and every dependency
+# of these features is already a locked member via lingxi-spike
+# (workspace feature unification). HTTP/SSE transports are deliberately
+# NOT enabled here (D-06: they would add unlocked packages; an
+# unsupported endpoint refuses loudly instead of falling back).
+rmcp = { version = "3.4.1", default-features = false, features = ["client", "server"] }
 serde = { version = "1.0.229", features = ["derive"] }
 serde_json = "1.0.151"
 # R04-T05: the "process" feature is added for tokio::process::Command
