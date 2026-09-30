@@ -2906,23 +2906,29 @@
     "R04-T02": {
       "name": "实现唯一工具执行网关",
       "stage_id": "R04",
-      "status": "PENDING",
-      "task_base_sha": null,
-      "executor_id": null,
-      "execution_result": null,
-      "review_round": 0,
-      "reviewer_id": null,
-      "review_verdict": null,
-      "findings": [],
-      "repair_agent_id": null,
+      "status": "DONE",
+      "task_base_sha": "fd5fc2c2c583c6f4273ad3fa2122530edd8b152c",
+      "executor_id": "EXECUTOR-R04-T02-E01 (ZCode agent_9c2527e3)",
+      "execution_result": "READY_FOR_REVIEW -> R1 FAIL (F01 read-only decay broken under gateway) -> repair REPAIR-R04-T02-F01 -> R2 PASS",
+      "review_round": 2,
+      "reviewer_id": "REVIEWER-R04-T02-R01 (agent_6d57126f); REVIEWER-R04-T02-R02 (agent_dd5375aa)",
+      "review_verdict": "PASS (R2)",
+      "findings": [
+        "R04-T02-R1-F01 CLOSED (local_name authoritative, registry id blocklist-only)",
+        "R04-T02-R1-F02 CLOSED",
+        "R04-T02-R1-O04 CLOSED (HandleMintFailed)",
+        "O05 policy/gate precedence deferred to T03 by design"
+      ],
+      "repair_agent_id": "REPAIR-R04-T02-F01 (agent_6bc192d6)",
       "root_cause_agent_id": null,
       "acceptance_results": {
-        "R04-A03": "NOT_STARTED",
-        "R04-A04": "NOT_STARTED"
+        "R04-A03": "PASS (R2 full matrix re-run incl. new f01_* regression cells)",
+        "R04-A04": "PASS (R2 forged-credential suite re-run)"
       },
       "task_commit_sha": null,
       "push_result": null,
-      "blockers": []
+      "blockers": [],
+      "candidate_diff_digest": "58b118cc0430c921 (vs base fd5fc2c2c)"
     },
     "R04-T03": {
       "name": "批准、撤销与只读模式",
@@ -4311,7 +4317,7 @@
       "blockers": []
     }
   },
-  "current_task": "R04-T02 (next)",
+  "current_task": "R04-T03 (next)",
   "orchestration_mode": {
     "effective_from": "R00-T03 R2 repair",
     "task_executor": "new ZCode task per Rxx-Tyy",

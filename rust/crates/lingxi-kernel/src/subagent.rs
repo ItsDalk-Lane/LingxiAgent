@@ -256,6 +256,35 @@ pub enum ToolAuthorization {
     },
 }
 
+/// The anti-recursion refusal (tier-independent, always the same code and
+/// layer regardless of the child's access tier).
+fn denied_by_blocklist(target: &str) -> ToolAuthorization {
+    ToolAuthorization::Denied {
+        code: "ACTION_BLOCKED_IN_SUBAGENT",
+        layer: "subagent_blocklist",
+        message: format!(
+            "{target} is not available inside a subagent. This tool is always blocked in \
+             subagent context regardless of access level; perform this action from the \
+             parent session instead."
+        ),
+    }
+}
+
+/// The read-only-tier refusal (mutating/unknown targets; keeps the
+/// parent-child rule and the escape hatch in the text).
+fn denied_by_read_only(target: &str) -> ToolAuthorization {
+    ToolAuthorization::Denied {
+        code: "ACTION_BLOCKED_BY_READ_ONLY",
+        layer: "subagent_access",
+        message: format!(
+            "{target} is blocked: this subagent runs in read-only mode. For write access, \
+             re-dispatch the subagent with access:\"write\" — this requires the parent \
+             session to be in an operable (non read-only) mode; a subagent's permission can \
+             never exceed its parent session."
+        ),
+    }
+}
+
 /// Decides one tool target for a subagent child run
 /// (`classifySessionPermission` with `isSubagent: true`):
 /// 1. blocklisted targets are denied ALWAYS (fixed subagent boundary,
@@ -265,27 +294,53 @@ pub enum ToolAuthorization {
 /// 3. operate tier allows the rest.
 pub fn authorize_child_tool(tier: ToolAccessTier, target: &str) -> ToolAuthorization {
     if SUBAGENT_BLOCKED_TARGETS.contains(&target) {
-        return ToolAuthorization::Denied {
-            code: "ACTION_BLOCKED_IN_SUBAGENT",
-            layer: "subagent_blocklist",
-            message: format!(
-                "{target} is not available inside a subagent. This tool is always blocked in \
-                 subagent context regardless of access level; perform this action from the \
-                 parent session instead."
-            ),
-        };
+        return denied_by_blocklist(target);
     }
     if tier.is_read_only() && !SUBAGENT_READ_ONLY_TARGETS.contains(&target) {
-        return ToolAuthorization::Denied {
-            code: "ACTION_BLOCKED_BY_READ_ONLY",
-            layer: "subagent_access",
-            message: format!(
-                "{target} is blocked: this subagent runs in read-only mode. For write access, \
-                 re-dispatch the subagent with access:\"write\" — this requires the parent \
-                 session to be in an operable (non read-only) mode; a subagent's permission can \
-                 never exceed its parent session."
-            ),
-        };
+        return denied_by_read_only(target);
+    }
+    ToolAuthorization::Allowed
+}
+
+/// Decides one subagent child tool call on the R04-T02 GATEWAY wiring
+/// (the R04-T02-R1-F01 repair), where the request's target is the
+/// REGISTRY TARGET ID (a namespaced id like `tool:first-party:read`)
+/// while the kernel's frozen R03 vocabularies (both lists) are expressed
+/// in BARE LOCAL NAMES.
+///
+/// The LOCAL NAME is the AUTHORITATIVE judgment — exactly what
+/// [`authorize_child_tool`] decides for the same name on the R03
+/// bare-name wiring:
+/// - the anti-recursion blocklist judges the local name FIRST (the
+///   refusal keeps its tier-independent code and layer);
+/// - the read-only tier then judges the local name alone (known
+///   read-only names stay allowed, unknown/mutating names stay denied —
+///   fail-closed exactly like the incumbent).
+///
+/// The REGISTRY ID can only ADD a denial: it is matched against the
+/// anti-recursion blocklist as depth defense (either vocabulary hitting
+/// the blocklist refuses — a namespaced id is not a bypass), but the id
+/// is NEVER judged against the read-only allow-list. Judging the
+/// namespaced id there (the pre-repair order in the service driver)
+/// blanket-denied EVERY registered Read-class target for a read-only
+/// child before the local-name check was reachable — an unregistered,
+/// functional regression of the protected "explicit read attenuation
+/// keeps the research surface open" semantics, not a security tightening.
+/// Conversely the id can never WIDEN the grant: it is not an allow-list
+/// member, so it can never satisfy the read-only tier by itself.
+pub fn authorize_child_tool_with_registry_id(
+    tier: ToolAccessTier,
+    local_name: &str,
+    registry_id: &str,
+) -> ToolAuthorization {
+    if SUBAGENT_BLOCKED_TARGETS.contains(&local_name) {
+        return denied_by_blocklist(local_name);
+    }
+    if SUBAGENT_BLOCKED_TARGETS.contains(&registry_id) {
+        return denied_by_blocklist(registry_id);
+    }
+    if tier.is_read_only() && !SUBAGENT_READ_ONLY_TARGETS.contains(&local_name) {
+        return denied_by_read_only(local_name);
     }
     ToolAuthorization::Allowed
 }
@@ -492,6 +547,22 @@ impl SubagentToolStrategy {
 mod tests {
     use super::*;
 
+    impl ToolAuthorization {
+        /// Test helper: compare two decisions by code+layer only (the
+        /// messages are prose; the stable machine facts are the code and
+        /// the layer).
+        fn normalize_for_assert(self) -> ToolAuthorization {
+            match self {
+                ToolAuthorization::Allowed => ToolAuthorization::Allowed,
+                ToolAuthorization::Denied { code, layer, .. } => ToolAuthorization::Denied {
+                    code,
+                    layer,
+                    message: String::new(),
+                },
+            }
+        }
+    }
+
     #[test]
     fn attenuation_matrix_matches_the_incumbent() {
         use AccessRequest as A;
@@ -611,6 +682,133 @@ mod tests {
                 authorize_child_tool(ToolAccessTier::Operate, target),
                 ToolAuthorization::Allowed
             );
+        }
+    }
+
+    // ── R04-T02-R1-F01: the gateway-wiring judgment (local name
+    //    authoritative, registry id = anti-recursion depth defense only) ──
+
+    #[test]
+    fn registry_id_wiring_keeps_registered_read_tools_open_under_read_only() {
+        // The F01 shape: a Read-class REGISTERED target whose registry id
+        // is namespaced and whose LOCAL NAME is the kernel allow-list
+        // member. The read-only tier must ALLOW it — exactly what the
+        // bare-name judgment decides for the same local name.
+        assert_eq!(
+            authorize_child_tool_with_registry_id(
+                ToolAccessTier::ReadOnly,
+                "read",
+                "tool:first-party:read"
+            ),
+            ToolAuthorization::Allowed
+        );
+        assert_eq!(
+            authorize_child_tool_with_registry_id(
+                ToolAccessTier::ReadOnly,
+                "grep",
+                "tool:first-party:grep"
+            ),
+            ToolAuthorization::Allowed
+        );
+    }
+
+    #[test]
+    fn registry_id_wiring_still_denies_write_and_unknown_local_names() {
+        for (local_name, registry_id) in [
+            ("write", "tool:first-party:write"),
+            ("probe_write", "tool:first-party:probe_write"),
+            ("totally_unknown", "tool:first-party:totally_unknown"),
+        ] {
+            match authorize_child_tool_with_registry_id(
+                ToolAccessTier::ReadOnly,
+                local_name,
+                registry_id,
+            ) {
+                ToolAuthorization::Denied { code, layer, .. } => {
+                    assert_eq!(code, "ACTION_BLOCKED_BY_READ_ONLY", "{local_name}");
+                    assert_eq!(layer, "subagent_access");
+                }
+                other => panic!("read-only must deny {local_name}, got {other:?}"),
+            }
+        }
+    }
+
+    #[test]
+    fn registry_id_wiring_keeps_the_blocklist_tier_independent_and_first() {
+        // The delegation family under the READ-ONLY tier keeps the
+        // BLOCKLIST code/layer (not the read-only one) — the blocklist is
+        // judged first, on the local name, exactly like the bare-name
+        // judgment.
+        for local_name in ["subagent", "subagent_reply", "subagent_close", "cron"] {
+            for tier in [ToolAccessTier::ReadOnly, ToolAccessTier::Operate] {
+                match authorize_child_tool_with_registry_id(
+                    tier,
+                    local_name,
+                    &format!("tool:first-party:{local_name}"),
+                ) {
+                    ToolAuthorization::Denied { code, layer, .. } => {
+                        assert_eq!(code, "ACTION_BLOCKED_IN_SUBAGENT", "{local_name}/{tier:?}");
+                        assert_eq!(layer, "subagent_blocklist");
+                    }
+                    other => panic!("{local_name} must be blocked, got {other:?}"),
+                }
+            }
+        }
+    }
+
+    #[test]
+    fn registry_id_wiring_uses_the_id_as_blocklist_depth_defense_only() {
+        // A hypothetical registration whose REGISTRY ID equals a bare
+        // blocked name (no namespace) is refused through the id — the id
+        // check can only ADD a denial. A namespaced id (the real shape)
+        // never widens anything on its own.
+        match authorize_child_tool_with_registry_id(ToolAccessTier::Operate, "probe", "subagent") {
+            ToolAuthorization::Denied { code, layer, .. } => {
+                assert_eq!(code, "ACTION_BLOCKED_IN_SUBAGENT");
+                assert_eq!(layer, "subagent_blocklist");
+            }
+            other => panic!("the blocklisted id must deny, got {other:?}"),
+        }
+        // The id is NEVER consulted for the read-only allow-list: a
+        // namespaced id for an allow-listed local name stays allowed, and
+        // a bare allow-list name as the ID cannot rescue a non-allow-list
+        // local name.
+        assert_eq!(
+            authorize_child_tool_with_registry_id(ToolAccessTier::ReadOnly, "write", "read")
+                .normalize_for_assert(),
+            ToolAuthorization::Denied {
+                code: "ACTION_BLOCKED_BY_READ_ONLY",
+                layer: "subagent_access",
+                message: String::new(),
+            }
+            .normalize_for_assert(),
+            "the local name stays the single read-only authority"
+        );
+    }
+
+    #[test]
+    fn registry_id_wiring_matches_the_bare_name_judgment_for_every_listed_name() {
+        // Equivalence sweep: for every name in BOTH kernel vocabularies,
+        // the gateway-wiring judgment (local name + a namespaced id)
+        // decides EXACTLY what the R03 bare-name judgment decides for the
+        // local name — the wiring must not change any conclusion.
+        for tier in [ToolAccessTier::ReadOnly, ToolAccessTier::Operate] {
+            for name in SUBAGENT_BLOCKED_TARGETS
+                .iter()
+                .chain(SUBAGENT_READ_ONLY_TARGETS.iter())
+            {
+                let bare = authorize_child_tool(tier, name);
+                let via_registry = authorize_child_tool_with_registry_id(
+                    tier,
+                    name,
+                    &format!("tool:first-party:{name}"),
+                );
+                assert_eq!(
+                    bare.normalize_for_assert(),
+                    via_registry.normalize_for_assert(),
+                    "{name}/{tier:?}: the gateway wiring must not change the conclusion"
+                );
+            }
         }
     }
 

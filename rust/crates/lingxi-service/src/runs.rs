@@ -51,7 +51,8 @@ use lingxi_kernel::ports::{
     ToolExecutionResult, ToolExecutorPort, ToolOutcome, ToolRequest, TurnProviderPort,
 };
 use lingxi_kernel::subagent::{
-    authorize_child_tool, RunLineage, ToolAccessTier, ToolAuthorization,
+    authorize_child_tool, authorize_child_tool_with_registry_id, RunLineage, ToolAccessTier,
+    ToolAuthorization,
 };
 use lingxi_kernel::{
     attempt_id, model_call_id, tool_call_id, FailureCause, NoFinalCause, QuotaResource, RunFinish,
@@ -276,6 +277,19 @@ pub struct RunSupervisor {
     /// wiring) makes a delegation request a loud tool failure, never a
     /// silent no-op.
     subagents: Option<std::sync::Weak<dyn crate::subagents::SubagentLauncher>>,
+    /// R04-T02: the unified tool invocation gateway. When `Some`, EVERY
+    /// tool request of every driven run is PREPARED through it before the
+    /// journal's authorization step (target identity / availability /
+    /// generations / current-schema arguments / policy verdict — a
+    /// refusal or an approval requirement never leaves a `started`
+    /// entry) and dispatched ONLY through its re-verified, single-use
+    /// [`crate::toolgateway::PreparedInvocation`] handle after `started`.
+    /// `None` keeps the R03 shape exactly (the raw `tools` port). The
+    /// gateway holds NO grant logic: the RunGrant application below stays
+    /// THE authorization decision point (R04-SUP-02) — the gateway's
+    /// policy port is the layered tool-policy face whose verdict
+    /// intersects with it.
+    tool_gateway: Option<Arc<crate::toolgateway::ToolInvocationGateway>>,
 }
 
 impl std::fmt::Debug for RunSupervisor {
@@ -290,6 +304,10 @@ impl std::fmt::Debug for RunSupervisor {
             .field(
                 "subagent_launcher",
                 &self.subagents.as_ref().map(|_| "bound"),
+            )
+            .field(
+                "tool_gateway",
+                &self.tool_gateway.as_ref().map(|_| "injected"),
             )
             .finish()
     }
@@ -316,6 +334,7 @@ impl RunSupervisor {
             cancel_policy,
             approval: None,
             subagents: None,
+            tool_gateway: None,
         }
     }
 
@@ -350,7 +369,21 @@ impl RunSupervisor {
             cancel_policy,
             approval,
             subagents: subagent_launcher,
+            tool_gateway: None,
         })
+    }
+
+    /// R04-T02: binds the unified tool invocation gateway (builder-style;
+    /// the composition root calls this after [`Self::new`]). Binding a
+    /// gateway makes it the ONLY execution path of this supervisor — the
+    /// raw `tools` port is no longer consulted for tool dispatch on this
+    /// wiring (no dual path). See the field docs for the contract.
+    pub fn with_tool_gateway(
+        mut self,
+        gateway: Option<Arc<crate::toolgateway::ToolInvocationGateway>>,
+    ) -> Self {
+        self.tool_gateway = gateway;
+        self
     }
 
     pub fn limits(&self) -> &RunDriveLimits {
@@ -920,11 +953,20 @@ impl RunSupervisor {
                     // cancellation accepted during the persist ends the
                     // turn loop here (no tool admission, no intent write).
                     gate_cancel!();
-                    let Some(tools) = self.tools.clone() else {
-                        break RunFinish::Failed {
-                            cause: FailureCause::ToolExecutorUnavailable,
+                    // R04-T02: with a gateway wired the gateway itself
+                    // holds the executors (the raw port is not consulted
+                    // on this wiring); without one the R03 shape stands.
+                    let tools = if self.tool_gateway.is_some() {
+                        None
+                    } else {
+                        let Some(tools) = self.tools.clone() else {
+                            break RunFinish::Failed {
+                                cause: FailureCause::ToolExecutorUnavailable,
+                            };
                         };
+                        Some(tools)
                     };
+                    let tool_gateway = self.tool_gateway.clone();
                     for request in &requests {
                         // F03-C04: each tool-loop iteration re-checks — a
                         // cancellation accepted during the previous
@@ -1052,6 +1094,95 @@ impl RunSupervisor {
                             drop(tool_permit);
                             continue;
                         }
+                        // ── R04-T02: the unified gateway PREPARE stage ──
+                        // Target identity / availability / generations /
+                        // CURRENT-schema arguments / the tool-policy
+                        // verdict all settle HERE, before the intent is
+                        // journaled and long before any `started` write:
+                        // a refusal or an approval requirement can never
+                        // leave a started-without-dispatch entry behind.
+                        // The principal facts come from the driver's
+                        // trusted context — never from the model's
+                        // arguments (R04-A04).
+                        let prepared = match tool_gateway.as_ref() {
+                            Some(gateway) => {
+                                let surface = if request.delegation.is_some() {
+                                    crate::toolgateway::CallerSurface::DelegationDispatch
+                                } else if matches!(authorization.grant, RunGrant::Subagent { .. }) {
+                                    crate::toolgateway::CallerSurface::SubagentRun
+                                } else {
+                                    crate::toolgateway::CallerSurface::UserRun
+                                };
+                                match gateway.prepare_from_request(
+                                    &ctx, surface, agent_id, &call_id, request,
+                                ) {
+                                    Ok(prepared) => Some(prepared),
+                                    Err(refusal) => {
+                                        tracing::warn!(
+                                            run_id = %run_id,
+                                            tool_call = %call_id,
+                                            target = request.target,
+                                            code = refusal.code(),
+                                            "tool gateway refused the preparation (zero \
+                                             dispatch); the journal closes a never-dispatched \
+                                             failure"
+                                        );
+                                        // Same write-order shape as the
+                                        // digest gate above: the intent
+                                        // lands FIRST (a receipt may only
+                                        // close an entry that exists),
+                                        // binding the trusted digest.
+                                        port.record_invocation_intent(
+                                            &ctx,
+                                            InvocationIntent {
+                                                journal_id: call_id.clone(),
+                                                target: request.target.clone(),
+                                                args_digest: request.arguments.digest().hex,
+                                                args_summary: request.args_summary.clone(),
+                                                idempotency_key: Some(call_id.to_string()),
+                                            },
+                                            now_ms,
+                                        )
+                                        .await
+                                        .map_err(DriveError::Storage)?;
+                                        saw_tool_failure = true;
+                                        saw_process_content = true;
+                                        let outcome = ToolOutcome::Failed {
+                                            error: refusal.to_tool_error(),
+                                        };
+                                        port.record_invocation_receipt(
+                                            &ctx,
+                                            &call_id,
+                                            InvocationReceipt {
+                                                outcome: ReceiptOutcome::Failed,
+                                                detail: format!(
+                                                    "not dispatched: gateway refused the \
+                                                     preparation ({refusal})"
+                                                ),
+                                                dedup_id: None,
+                                                dispatched: false,
+                                            },
+                                            now_ms,
+                                        )
+                                        .await
+                                        .map_err(DriveError::Storage)?;
+                                        self.persist_tool_event(
+                                            port,
+                                            events,
+                                            &ctx,
+                                            &call_id,
+                                            request,
+                                            Some(&outcome),
+                                            now_ms,
+                                        )
+                                        .await?;
+                                        drop(tool_permit);
+                                        continue;
+                                    }
+                                }
+                            }
+                            None => None,
+                        };
                         // R03-T05: the invocation INTENT is durable BEFORE
                         // anything else — no external execution may ever be
                         // dispatched without its prepared receipt on disk.
@@ -1093,11 +1224,35 @@ impl RunSupervisor {
                         // the journal closes the invocation as a
                         // never-dispatched failure carrying the reason,
                         // and the model sees the structured refusal.
+                        // R04-T02-R1-F01 repair: on the gateway wiring
+                        // the kernel vocabularies (the anti-recursion
+                        // blocklist AND the read-only allow-list) judge
+                        // the prepared LOCAL NAME as the AUTHORITY — the
+                        // registry target id is matched against the
+                        // blocklist only, as depth defense. The
+                        // pre-repair order judged the namespaced id
+                        // against the bare-name read-only allow-list
+                        // FIRST, which blanket-denied every registered
+                        // Read-class target for a read-only child (the
+                        // local-name re-check was unreachable) — an
+                        // unregistered regression of the protected
+                        // "explicit read attenuation keeps the research
+                        // surface open" semantics. Both protections hold
+                        // at once: write/unknown local names stay denied
+                        // under the read-only tier, and the delegation
+                        // family stays blocked through EITHER vocabulary.
+                        // Without a gateway the R03 bare-name judgment
+                        // stands unchanged.
                         let authorization_decision = match authorization.grant {
                             RunGrant::Full => ToolAuthorization::Allowed,
-                            RunGrant::Subagent { tier } => {
-                                authorize_child_tool(tier, &request.target)
-                            }
+                            RunGrant::Subagent { tier } => match prepared.as_ref() {
+                                Some(prepared) => authorize_child_tool_with_registry_id(
+                                    tier,
+                                    prepared.local_name.as_str(),
+                                    request.target.as_str(),
+                                ),
+                                None => authorize_child_tool(tier, request.target.as_str()),
+                            },
                         };
                         if let ToolAuthorization::Denied {
                             code,
@@ -1154,136 +1309,70 @@ impl RunSupervisor {
                             drop(tool_permit);
                             continue;
                         }
-                        // No approval gate configured: the R03 run-layer
-                        // authorization context itself authorizes the call
-                        // (quota-admitted, authenticated run). R04's policy
-                        // gateway replaces this decision point.
-                        if self.approval.is_none() {
-                            port.advance_invocation(
-                                &ctx,
-                                &call_id,
-                                InvocationPhase::Authorized,
-                                now_ms,
-                            )
-                            .await
-                            .map_err(DriveError::Storage)?;
-                        }
-                        // ── approval wait (R03-T03 minimal interface) ──
-                        if let Some(gate) = self.approval.clone() {
-                            // F03-C04: asking a human is an external
-                            // interaction too — a cancellation accepted at
-                            // the authorization boundary must not open a
-                            // new approval round trip.
-                            gate_cancel!();
-                            live_status = RunStatus::WaitingApproval;
-                            self.persist_state_change(
-                                port,
-                                events,
-                                &ctx,
-                                RunStatus::Running,
-                                RunStatus::WaitingApproval,
-                                Some("approval_required".to_string()),
-                                now_ms,
-                            )
-                            .await?;
-                            let gate_scope = root.child(
-                                format!("approval:{}", call_id.as_str()),
-                                crate::cancel::ScopeKind::ToolCall,
-                            );
-                            let gate_req = ApprovalRequest {
-                                tool_call_id: call_id.clone(),
-                                target: request.target.clone(),
-                                args_digest: request.args_digest.hex.clone(),
-                            };
-                            let gate_ctx = ctx.clone();
-                            let gate_child = self
-                                .tasks
-                                .spawn_linked(
-                                    run_id.as_str(),
-                                    &gate_scope,
-                                    format!("approval:{}", call_id.as_str()),
-                                    async move { gate.request(&gate_ctx, &gate_req).await },
-                                )
-                                .map_err(|rejected| DriveError::Storage(rejected.into()))?;
-                            let decision = tokio::select! {
-                                biased;
-                                _ = root.cancelled() => {
-                                    drop(tool_permit);
-                                    let reason =
-                                        root.reason().unwrap_or_else(|| "cancelled".to_string());
-                                    let finish = self
-                                        .settle_cancellation(
-                                            port,
-                                            events,
-                                            &ctx,
-                                            &entry,
-                                            live_status,
-                                            reason,
-                                            now_ms,
-                                        )
-                                        .await?;
-                                    guard.disarm();
-                                    return Ok(finish);
-                                }
-                                exit = gate_child.wait() => match exit {
-                                    Ok(decision) => decision,
-                                    Err(task_exit) => {
-                                        tracing::error!(
-                                            run_id = %run_id,
-                                            tool_call = %call_id,
-                                            exit = task_exit.name(),
-                                            "approval gate child ended without a decision; \
-                                             treating as rejected (zero executions)"
-                                        );
-                                        ApprovalDecision::Aborted
+                        // ── the approval requirement (R04-T02) ──
+                        // On the gateway wiring the requirement comes from
+                        // the ADJUDICATED POLICY VERDICT: `Allowed` means
+                        // the configured policy service already allowed —
+                        // asking a human again would be a duplicate prompt
+                        // (master prompt §4.2: no double prompting), so the
+                        // call advances to authorized directly.
+                        // `NeedsApproval` routes to the approval surface;
+                        // when NONE is wired the call is REFUSED with zero
+                        // dispatch (the incumbent's TOOL_APPROVAL_UNAVAILABLE
+                        // posture — an unconfigured mechanism never
+                        // auto-allows an execution-class call). Without a
+                        // gateway the R03 shape stands: a wired gate is
+                        // always asked, no gate means the run-layer
+                        // authorization context itself authorizes.
+                        let approval_requirement: Option<String> =
+                            if let Some(prepared) = prepared.as_ref() {
+                                match &prepared.policy {
+                                    crate::toolgateway::PolicyVerdict::NeedsApproval { reason } => {
+                                        Some(reason.clone())
                                     }
-                                },
-                            };
-                            // Back to running BEFORE any tool execution (or
-                            // rejection): the approval wait is over.
-                            live_status = RunStatus::Running;
-                            self.persist_state_change(
-                                port,
-                                events,
-                                &ctx,
-                                RunStatus::WaitingApproval,
-                                RunStatus::Running,
-                                Some("approval_resolved".to_string()),
-                                now_ms,
-                            )
-                            .await?;
-                            match decision {
-                                ApprovalDecision::Approved => {
-                                    // R03-T05: the approval RESOLVED — the
-                                    // receipt advances to authorized (still
-                                    // before any external execution).
-                                    port.advance_invocation(
-                                        &ctx,
-                                        &call_id,
-                                        InvocationPhase::Authorized,
-                                        now_ms,
-                                    )
-                                    .await
-                                    .map_err(DriveError::Storage)?;
+                                    _ => None,
                                 }
-                                ApprovalDecision::Rejected { .. } | ApprovalDecision::Aborted => {
-                                    // ZERO executions — the rejection is a
-                                    // recorded tool failure, not a silent
-                                    // skip (frozen incumbent: the wrapper
-                                    // returns toolError with 执行 0 次). The
-                                    // journal closes the invocation as a
-                                    // never-dispatched failure.
-                                    let reason = match decision {
-                                        ApprovalDecision::Rejected { reason } => reason,
-                                        ApprovalDecision::Aborted => "approval aborted".to_string(),
-                                        ApprovalDecision::Approved => unreachable!(),
-                                    };
+                            } else if self.approval.is_some() {
+                                Some("approval gate wired (R03 minimal interface)".to_string())
+                            } else {
+                                None
+                            };
+                        match approval_requirement {
+                            None => {
+                                port.advance_invocation(
+                                    &ctx,
+                                    &call_id,
+                                    InvocationPhase::Authorized,
+                                    now_ms,
+                                )
+                                .await
+                                .map_err(DriveError::Storage)?;
+                            }
+                            Some(requirement) => {
+                                // No approval surface is wired at all: the
+                                // requirement is real but cannot be served —
+                                // a structured, never-dispatched refusal.
+                                let Some(gate) = self.approval.clone() else {
+                                    tracing::warn!(
+                                        run_id = %run_id,
+                                        tool_call = %call_id,
+                                        target = request.target,
+                                        "tool invocation needs approval but no approval \
+                                         surface is wired: TOOL_APPROVAL_UNAVAILABLE (zero \
+                                         dispatch, never an auto-allow)"
+                                    );
                                     saw_tool_failure = true;
                                     saw_process_content = true;
                                     let outcome = ToolOutcome::Failed {
                                         error: ProtocolError::new(
                                             ErrorCode::Forbidden,
-                                            format!("tool request not approved: {reason}"),
+                                            format!(
+                                                "tool approval unavailable: this invocation \
+                                                 needs approval ({requirement}) but no \
+                                                 approval surface is configured; switch the \
+                                                 session to a mode that can prompt and retry — \
+                                                 the action was not run"
+                                            ),
                                             false,
                                         ),
                                     };
@@ -1292,7 +1381,10 @@ impl RunSupervisor {
                                         &call_id,
                                         InvocationReceipt {
                                             outcome: ReceiptOutcome::Failed,
-                                            detail: format!("not dispatched: {reason}"),
+                                            detail: format!(
+                                                "not dispatched: approval required but \
+                                                 unavailable: {requirement}"
+                                            ),
                                             dedup_id: None,
                                             dispatched: false,
                                         },
@@ -1312,6 +1404,155 @@ impl RunSupervisor {
                                     .await?;
                                     drop(tool_permit);
                                     continue;
+                                };
+                                let _ = requirement;
+                                // ── approval wait (R03-T03 interface) ──
+                                // F03-C04: asking a human is an external
+                                // interaction too — a cancellation accepted
+                                // at the authorization boundary must not
+                                // open a new approval round trip.
+                                gate_cancel!();
+                                live_status = RunStatus::WaitingApproval;
+                                self.persist_state_change(
+                                    port,
+                                    events,
+                                    &ctx,
+                                    RunStatus::Running,
+                                    RunStatus::WaitingApproval,
+                                    Some("approval_required".to_string()),
+                                    now_ms,
+                                )
+                                .await?;
+                                let gate_scope = root.child(
+                                    format!("approval:{}", call_id.as_str()),
+                                    crate::cancel::ScopeKind::ToolCall,
+                                );
+                                let gate_req = ApprovalRequest {
+                                    tool_call_id: call_id.clone(),
+                                    target: request.target.clone(),
+                                    args_digest: request.args_digest.hex.clone(),
+                                };
+                                let gate_ctx = ctx.clone();
+                                let gate_child = self
+                                    .tasks
+                                    .spawn_linked(
+                                        run_id.as_str(),
+                                        &gate_scope,
+                                        format!("approval:{}", call_id.as_str()),
+                                        async move { gate.request(&gate_ctx, &gate_req).await },
+                                    )
+                                    .map_err(|rejected| DriveError::Storage(rejected.into()))?;
+                                let decision = tokio::select! {
+                                    biased;
+                                    _ = root.cancelled() => {
+                                        drop(tool_permit);
+                                        let reason =
+                                            root.reason().unwrap_or_else(|| "cancelled".to_string());
+                                        let finish = self
+                                            .settle_cancellation(
+                                                port,
+                                                events,
+                                                &ctx,
+                                                &entry,
+                                                live_status,
+                                                reason,
+                                                now_ms,
+                                            )
+                                            .await?;
+                                        guard.disarm();
+                                        return Ok(finish);
+                                    }
+                                    exit = gate_child.wait() => match exit {
+                                        Ok(decision) => decision,
+                                        Err(task_exit) => {
+                                            tracing::error!(
+                                                run_id = %run_id,
+                                                tool_call = %call_id,
+                                                exit = task_exit.name(),
+                                                "approval gate child ended without a decision; \
+                                                 treating as rejected (zero executions)"
+                                            );
+                                            ApprovalDecision::Aborted
+                                        }
+                                    },
+                                };
+                                // Back to running BEFORE any tool execution (or
+                                // rejection): the approval wait is over.
+                                live_status = RunStatus::Running;
+                                self.persist_state_change(
+                                    port,
+                                    events,
+                                    &ctx,
+                                    RunStatus::WaitingApproval,
+                                    RunStatus::Running,
+                                    Some("approval_resolved".to_string()),
+                                    now_ms,
+                                )
+                                .await?;
+                                match decision {
+                                    ApprovalDecision::Approved => {
+                                        // R03-T05: the approval RESOLVED — the
+                                        // receipt advances to authorized (still
+                                        // before any external execution).
+                                        port.advance_invocation(
+                                            &ctx,
+                                            &call_id,
+                                            InvocationPhase::Authorized,
+                                            now_ms,
+                                        )
+                                        .await
+                                        .map_err(DriveError::Storage)?;
+                                    }
+                                    ApprovalDecision::Rejected { .. }
+                                    | ApprovalDecision::Aborted => {
+                                        // ZERO executions — the rejection is a
+                                        // recorded tool failure, not a silent
+                                        // skip (frozen incumbent: the wrapper
+                                        // returns toolError with 执行 0 次). The
+                                        // journal closes the invocation as a
+                                        // never-dispatched failure.
+                                        let reason = match decision {
+                                            ApprovalDecision::Rejected { reason } => reason,
+                                            ApprovalDecision::Aborted => {
+                                                "approval aborted".to_string()
+                                            }
+                                            ApprovalDecision::Approved => unreachable!(),
+                                        };
+                                        saw_tool_failure = true;
+                                        saw_process_content = true;
+                                        let outcome = ToolOutcome::Failed {
+                                            error: ProtocolError::new(
+                                                ErrorCode::Forbidden,
+                                                format!("tool request not approved: {reason}"),
+                                                false,
+                                            ),
+                                        };
+                                        port.record_invocation_receipt(
+                                            &ctx,
+                                            &call_id,
+                                            InvocationReceipt {
+                                                outcome: ReceiptOutcome::Failed,
+                                                detail: format!("not dispatched: {reason}"),
+                                                dedup_id: None,
+                                                dispatched: false,
+                                            },
+                                            now_ms,
+                                        )
+                                        .await
+                                        .map_err(DriveError::Storage)?;
+                                        self.persist_tool_event(
+                                            port,
+                                            events,
+                                            &ctx,
+                                            &call_id,
+                                            request,
+                                            Some(&outcome),
+                                            now_ms,
+                                        )
+                                        .await?;
+                                        drop(tool_permit);
+                                        continue;
+                                    }
                                 }
                             }
                         }
@@ -1355,6 +1596,38 @@ impl RunSupervisor {
                             };
                             let launcher =
                                 self.subagents.as_ref().and_then(std::sync::Weak::upgrade);
+                            // R04-T02: on the gateway wiring the request's
+                            // target is the REGISTRY TARGET ID; the family
+                            // match uses the prepared LOCAL NAME (the same
+                            // name the catalog registered), falling back to
+                            // the raw target for the legacy wiring. The
+                            // delegation family went through the SAME
+                            // gateway prepare (identity / availability /
+                            // generations / current-schema arguments /
+                            // policy) as every other target above — a
+                            // special run mechanism is not a gateway bypass.
+                            // R04-T02-R1-F01 same-root-cause closure: the
+                            // family match by LOCAL NAME is restricted to
+                            // FIRST-PARTY targets — a plugin/MCP-origin
+                            // registration whose local name collides with
+                            // the family is a DIFFERENT target and must
+                            // take the loud InvalidTarget refusal below,
+                            // never the real child-run launcher. The legacy
+                            // wiring (no registry) keeps the bare-name
+                            // family exactly as before.
+                            let delegation_target: &str = prepared
+                                .as_ref()
+                                .map(|p| p.local_name.as_str())
+                                .unwrap_or(request.target.as_str());
+                            let delegation_first_party = match prepared.as_ref() {
+                                Some(prepared) => {
+                                    matches!(
+                                        prepared.origin,
+                                        lingxi_kernel::toolcatalog::ToolOrigin::FirstParty
+                                    )
+                                }
+                                None => true,
+                            };
                             // `subagent_close` creates no run: its success
                             // carries the closed thread id as the content
                             // digest, its refusals take the shared failure
@@ -1362,7 +1635,7 @@ impl RunSupervisor {
                             let launched: Result<
                                 Option<String>,
                                 crate::subagents::SubagentDispatchError,
-                            > = if request.target == "subagent_close" {
+                            > = if delegation_target == "subagent_close" && delegation_first_party {
                                 match launcher
                                     .as_ref()
                                     .map(|launcher| launcher.close(&parent, &delegation))
@@ -1371,14 +1644,14 @@ impl RunSupervisor {
                                     Some(Err(err)) => Err(err),
                                     None => Err(crate::subagents::SubagentDispatchError::NotBound),
                                 }
-                            } else {
+                            } else if delegation_first_party {
                                 let Some(launcher) = launcher else {
                                     return Err(DriveError::Internal(
                                         "subagent launcher not bound in this supervisor"
                                             .to_string(),
                                     ));
                                 };
-                                match request.target.as_str() {
+                                match delegation_target {
                                     "subagent" => launcher
                                         .dispatch(parent, delegation)
                                         .await
@@ -1397,6 +1670,14 @@ impl RunSupervisor {
                                         ))
                                     }
                                 }
+                            } else {
+                                // A delegation payload on a NON-first-party
+                                // target is the same protocol violation —
+                                // the local-name collision does not make a
+                                // plugin/MCP tool the child-run mechanism.
+                                Err(crate::subagents::SubagentDispatchError::InvalidTarget(
+                                    delegation_target.to_string(),
+                                ))
                             };
                             let outcome = match launched {
                                 Ok(Some(identity)) => {
@@ -1483,28 +1764,63 @@ impl RunSupervisor {
                         // classifies it as unobserved).
                         gate_cancel!();
                         // ── supervised tool execution ──
+                        // R04-T02: on the gateway wiring the dispatch is
+                        // the gateway's re-verified, single-use
+                        // `execute_prepared` (the ONLY path to the bound
+                        // executors); its Err(refusal) means ZERO dispatch
+                        // and is journaled as a never-dispatched failure
+                        // below. The legacy wiring keeps the raw port
+                        // shape byte-for-byte.
                         let tool_scope = root.child(
                             format!("tool_call:{}", call_id.as_str()),
                             crate::cancel::ScopeKind::ToolCall,
                         );
                         let tool_ctx = ctx.clone();
-                        let tool_request = request.clone();
                         let exec_call_id = call_id.clone();
-                        let tools_clone = Arc::clone(&tools);
-                        let tool_child = self
-                            .tasks
-                            .spawn_linked(
-                                run_id.as_str(),
-                                &tool_scope,
-                                format!("tool_call:{}", call_id.as_str()),
-                                async move {
-                                    tools_clone
-                                        .execute(&tool_ctx, &exec_call_id, &tool_request)
-                                        .await
-                                },
-                            )
-                            .map_err(|rejected| DriveError::Storage(rejected.into()))?;
-                        let outcome = tokio::select! {
+                        let tool_child = match tool_gateway.as_ref() {
+                            Some(gateway) => {
+                                let gateway = Arc::clone(gateway);
+                                let handle = prepared
+                                    .as_ref()
+                                    .expect("the gateway wiring prepared this call")
+                                    .handle
+                                    .clone();
+                                self.tasks
+                                    .spawn_linked(
+                                        run_id.as_str(),
+                                        &tool_scope,
+                                        format!("tool_call:{}", call_id.as_str()),
+                                        async move {
+                                            gateway
+                                                .execute_prepared(&tool_ctx, &exec_call_id, &handle)
+                                                .await
+                                        },
+                                    )
+                                    .map_err(|rejected| DriveError::Storage(rejected.into()))?
+                            }
+                            None => {
+                                let tools_clone = Arc::clone(tools.as_ref().expect(
+                                    "the legacy wiring checked the executor at turn entry",
+                                ));
+                                let tool_request = request.clone();
+                                self.tasks
+                                    .spawn_linked(
+                                        run_id.as_str(),
+                                        &tool_scope,
+                                        format!("tool_call:{}", call_id.as_str()),
+                                        async move {
+                                            Ok(tools_clone
+                                                .execute(&tool_ctx, &exec_call_id, &tool_request)
+                                                .await)
+                                        },
+                                    )
+                                    .map_err(|rejected| DriveError::Storage(rejected.into()))?
+                            }
+                        };
+                        let executed: Result<
+                            ToolExecutionResult,
+                            crate::toolgateway::GatewayRefusal,
+                        > = tokio::select! {
                             biased;
                             _ = root.cancelled() => {
                                 drop(tool_permit);
@@ -1553,53 +1869,107 @@ impl RunSupervisor {
                                          the external outcome is unobserved — journaling \
                                          unknown, never a fabricated failure"
                                     );
-                                    ToolExecutionResult::of_ctx(
+                                    Ok(ToolExecutionResult::of_ctx(
                                         &ctx,
                                         ToolOutcome::Unknown { reason },
-                                    )
+                                    ))
                                 }
                             },
                         };
-                        // R03-T04 result fence: same write-side identity
-                        // check as model calls. A fenced tool result is
-                        // audited; a live run records the started call as
-                        // Unknown (the receipt is not trustworthy — never
-                        // retried blindly, never a success).
-                        let outcome = match self.fence_verdict(&root, &outcome.fence, &ctx) {
-                            FenceVerdict::Current => outcome.outcome,
-                            FenceVerdict::Stale(reason) => {
-                                self.audit_late_result(
-                                    port,
+                        // R04-T02: a gateway execution-time refusal (handle
+                        // spent/expired/foreign, target disabled or updated
+                        // between prepare and execute, no bound executor)
+                        // dispatched NOTHING: the journal closes a
+                        // never-dispatched failure with the refusal's own
+                        // vocabulary — never a dispatched-looking receipt.
+                        let outcome = match executed {
+                            Err(refusal) => {
+                                tracing::warn!(
+                                    run_id = %run_id,
+                                    tool_call = %call_id,
+                                    target = request.target,
+                                    code = refusal.code(),
+                                    "tool gateway refused the execution (zero dispatch)"
+                                );
+                                saw_tool_failure = true;
+                                saw_process_content = true;
+                                let outcome = ToolOutcome::Failed {
+                                    error: refusal.to_tool_error(),
+                                };
+                                port.record_invocation_receipt(
                                     &ctx,
-                                    &outcome.fence,
-                                    reason,
-                                    vec!["tool_call_result".to_string()],
+                                    &call_id,
+                                    InvocationReceipt {
+                                        outcome: ReceiptOutcome::Failed,
+                                        detail: format!(
+                                            "not dispatched: gateway refused the execution \
+                                             ({refusal})"
+                                        ),
+                                        dedup_id: None,
+                                        dispatched: false,
+                                    },
                                     now_ms,
                                 )
-                                .await;
-                                if root.is_cancelled() {
-                                    drop(tool_permit);
-                                    let cancel_reason =
-                                        root.reason().unwrap_or_else(|| "cancelled".to_string());
-                                    let finish = self
-                                        .settle_cancellation(
+                                .await
+                                .map_err(DriveError::Storage)?;
+                                self.persist_tool_event(
+                                    port,
+                                    events,
+                                    &ctx,
+                                    &call_id,
+                                    request,
+                                    Some(&outcome),
+                                    now_ms,
+                                )
+                                .await?;
+                                drop(tool_permit);
+                                continue;
+                            }
+                            Ok(result) => {
+                                // R03-T04 result fence: same write-side
+                                // identity check as model calls. A fenced
+                                // tool result is audited; a live run records
+                                // the started call as Unknown (the receipt
+                                // is not trustworthy — never retried
+                                // blindly, never a success).
+                                match self.fence_verdict(&root, &result.fence, &ctx) {
+                                    FenceVerdict::Current => result.outcome,
+                                    FenceVerdict::Stale(reason) => {
+                                        self.audit_late_result(
                                             port,
-                                            events,
                                             &ctx,
-                                            &entry,
-                                            live_status,
-                                            cancel_reason,
+                                            &result.fence,
+                                            reason,
+                                            vec!["tool_call_result".to_string()],
                                             now_ms,
                                         )
-                                        .await?;
-                                    guard.disarm();
-                                    return Ok(finish);
-                                }
-                                ToolOutcome::Unknown {
-                                    reason: format!(
-                                        "tool result fenced as stale ({})",
-                                        reason.name()
-                                    ),
+                                        .await;
+                                        if root.is_cancelled() {
+                                            drop(tool_permit);
+                                            let cancel_reason = root
+                                                .reason()
+                                                .unwrap_or_else(|| "cancelled".to_string());
+                                            let finish = self
+                                                .settle_cancellation(
+                                                    port,
+                                                    events,
+                                                    &ctx,
+                                                    &entry,
+                                                    live_status,
+                                                    cancel_reason,
+                                                    now_ms,
+                                                )
+                                                .await?;
+                                            guard.disarm();
+                                            return Ok(finish);
+                                        }
+                                        ToolOutcome::Unknown {
+                                            reason: format!(
+                                                "tool result fenced as stale ({})",
+                                                reason.name()
+                                            ),
+                                        }
+                                    }
                                 }
                             }
                         };

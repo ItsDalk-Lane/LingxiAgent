@@ -48,6 +48,7 @@ pub mod shutdown;
 mod static_web;
 pub mod subagents;
 pub mod task_supervisor;
+pub mod toolgateway;
 pub mod transport;
 pub mod ws;
 
@@ -113,6 +114,11 @@ pub use shutdown::{
 };
 pub use task_supervisor::{
     ChildHandle, CleanupReport, SpawnRejected, TaskExit, TaskKind, TaskRef, TaskSupervisor,
+};
+pub use toolgateway::{
+    CallerSurface, FailClosedPolicy, GatewayRefusal, InvocationEntry, InvocationRequest,
+    PolicyAdjudicationInput, PolicyVerdict, PreparedInvocation, PreparedInvocationHandle,
+    ToolInvocationGateway, ToolPolicyPort, DEFAULT_LIVE_PREPARED_CAP, DEFAULT_PREPARED_TTL_MS,
 };
 pub use transport::{check_origin, infer_connection_kind, ConnectionKind, NetworkMode};
 pub use ws::{
@@ -500,6 +506,13 @@ pub struct ServiceDeps {
     /// recovery of unknown outcomes; R04's tool registry replaces the
     /// resolution, never the default.
     pub recovery_capabilities: std::sync::Arc<dyn invocations::RecoveryCapabilitySource>,
+    /// Unified tool invocation gateway (R04-T02). `None` (the production
+    /// default until tool surfaces register real executors) keeps the R03
+    /// behavior exactly: the raw `tool_executor` port (or the loud
+    /// no-tools failure). When `Some`, EVERY tool execution of every run
+    /// driven by the supervisor is prepared and dispatched through the
+    /// gateway — the raw port is not consulted on the gateway wiring.
+    pub tool_gateway: Option<std::sync::Arc<toolgateway::ToolInvocationGateway>>,
 }
 
 impl Default for ServiceDeps {
@@ -525,6 +538,7 @@ impl Default for ServiceDeps {
             approval_gate: None,
             subagent_policy: lingxi_kernel::subagent::SubagentPolicy::default(),
             recovery_capabilities: std::sync::Arc::new(invocations::ConservativeCapabilities),
+            tool_gateway: None,
         }
     }
 }
@@ -560,6 +574,10 @@ impl std::fmt::Debug for ServiceDeps {
                 &self.approval_gate.as_ref().map(|_| "injected"),
             )
             .field("subagent_policy", &self.subagent_policy)
+            .field(
+                "tool_gateway",
+                &self.tool_gateway.as_ref().map(|_| "injected"),
+            )
             .finish()
     }
 }
@@ -871,7 +889,13 @@ impl ServiceState {
                 &(Arc::clone(&subagent_runtime) as Arc<dyn subagents::SubagentLauncher>),
             )),
         )
-        .map_err(ServiceStartupError::Storage)?;
+        .map_err(ServiceStartupError::Storage)?
+        // R04-T02: the unified tool invocation gateway. When wired, EVERY
+        // tool execution of every run driven by this supervisor goes
+        // through it (prepare before the journal's authorized step,
+        // handle-verified dispatch after `started`); `None` keeps the R03
+        // shape exactly (raw executor port / loud no-tools failure).
+        .with_tool_gateway(deps.tool_gateway.clone());
         let runs = Arc::new(runs);
         subagent_runtime.bind_supervisor(Arc::downgrade(&runs));
         // R03-T06: the background-drive registry (submission surface whose

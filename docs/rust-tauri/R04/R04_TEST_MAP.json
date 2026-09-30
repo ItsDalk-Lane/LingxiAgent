@@ -58,56 +58,143 @@
       "evidence": "artifacts/rust-tauri/R04/T01-E01/"
     },
     "R04-T02": {
-      "status": "PENDING",
+      "status": "READY_FOR_REVIEW",
       "acceptance_map": {
-        "R04-A03": { "status": "NOT_STARTED", "tests": [] },
-        "R04-A04": { "status": "NOT_STARTED", "tests": [] }
+        "R04-A03": {
+          "status": "IMPLEMENTED_SELF_CHECKED",
+          "tests": [
+            "lingxi-service --test r04_t02_tool_gateway r04_a03_allow_group_is_identical_across_all_entries (direct/on-demand/subagent/background)",
+            "lingxi-service --test r04_t02_tool_gateway r04_a03_deny_group_unconfigured_policy_refuses_every_entry",
+            "lingxi-service --test r04_t02_tool_gateway r04_a03_stricter_subagent_attenuation_is_explicit (registered stricter-difference basis: kernel authorize_child_tool ACTION_BLOCKED_BY_READ_ONLY)",
+            "lingxi-service --test r04_t02_tool_gateway r04_a03_needs_approval_group_round_trips_every_entry",
+            "lingxi-service --test r04_t02_tool_gateway r04_a03_delegation_entry_goes_through_the_gateway",
+            "lingxi-service --lib toolgateway::tests::delegation_and_subagent_surfaces_record_their_entries",
+            "lingxi-service --test r04_t02_tool_gateway f01_read_only_subagent_registered_read_tool_dispatches_on_both_wirings (R04-T02-R1-F01 repair: gateway wiring read-only subagent × registered Read-class target dispatches with dispatched=true + legacy-wiring control leg)",
+            "lingxi-service --test r04_t02_tool_gateway f01_read_only_attenuation_still_denies_write_and_blocklist_targets (R04-T02-R1-F01 repair protections: policy-Allowed isolation, ApproveAll escalation attempt refused, blocklist code precedence)",
+            "lingxi-service --test r04_t02_tool_gateway f01_access_read_delegation_child_dispatches_registered_read_tools (R04-T02-R1-F01 repair: access:read delegation child run × registered Read-class call dispatches through the real launcher chain)",
+            "lingxi-kernel subagent::tests::registry_id_wiring_* (5 unit tests: local_name authoritative judgment, registry id = blocklist depth defense only, bare-name equivalence sweep)"
+          ]
+        },
+        "R04-A04": {
+          "status": "IMPLEMENTED_SELF_CHECKED",
+          "tests": [
+            "lingxi-service --test r04_t02_tool_gateway r04_a04_forged_arguments_never_override_host_facts",
+            "lingxi-service --test r04_t02_tool_gateway r04_a04_forged_and_stale_handles_are_refused_by_the_real_gateway",
+            "lingxi-service --lib toolgateway::tests::expired_and_foreign_handles_are_refused",
+            "lingxi-service --lib toolgateway::tests::prepared_handles_are_unique_and_single_use"
+          ]
+        }
       },
-      "supplemental": ["R04-SUP-02 journal/授权判定点复用", "R04-SUP-05 R03 回归"]
+      "adversarial_additions": {
+        "tests": [
+          "r04_t02_tool_gateway adversarial_summary_a_payload_b_is_refused_at_every_layer (gateway digest re-derivation + server-bound payload dispatch)",
+          "r04_t02_tool_gateway adversarial_subagent_blocklist_holds_under_registry_target_ids (anti-recursion via prepared local_name dual check)",
+          "r04_a04_forged_and_stale_handles_are_refused_by_the_real_gateway (concurrent single-spend race via tokio::join; cross-session reuse does NOT burn the legitimate handle; disabled/generation-bumped cached handles)",
+          "lingxi-service --lib toolgateway::tests::consumed_records_are_reclaimed_under_cap_pressure (bounded memory, adversarial self-check fix)",
+          "r04_t02_tool_gateway f01_delegation_family_routing_is_first_party_only (R04-T02-R1-F01 same-root-cause closure: plugin-origin local-name collision with the delegation family takes the loud InvalidTarget refusal, zero child runs)"
+        ]
+      },
+      "gate_results": {
+        "cargo fmt --all -- --check": "exit 0",
+        "cargo clippy --workspace --all-targets --locked -- -D warnings": "exit 0",
+        "cargo test --workspace --locked": "repair R1 run: exit 0 — 771 passed / 0 failed / 0 ignored across all binaries (cargo test without --no-fail-fast stops at the first failing binary: the earlier 533/532-passed counts were PARTIAL counts that stopped at the r00_management_leaves environment failure; this run the firewall did not intercept the unsigned test binary, r00_management_leaves passed in 70.4s and every binary ran — the full-workspace count is 771). F02 correction provenance: review R1 measured 533 passed / 1 failed on the pre-repair log (fail-fast partial); the recorded 532 was a transcription error; the repair candidate adds 10 permanent tests (4 integration f01_* + 5 kernel registry_id_wiring_* + 1 gateway entropy-code) — full breakdown in docs/rust-tauri/R04/repairs/R04-T02_REPAIR_R1.md",
+        "xtask check-contracts": "exit 0",
+        "xtask check-boundaries": "exit 0 (O1-O8 + D1-D5 + B1 protected-executor boundary + negatives N1-N17)",
+        "R03 regression": "r03_g07_repair_suites.sh exit 0 (ten suites exact pinned counts); r03_t08_matrix.sh A15 exit 0 (28 leaves + 11 combos); r03_t08_a16_seed_mechanism.sh exit 0"
+      },
+      "supplemental": [
+        "R04-SUP-02: single authorization point preserved (driver RunGrant application at the journal authorized step, untouched); gateway adds NO grant logic; single journal writer preserved (gateway holds no storage port; every refusal becomes a driver-written never-dispatched receipt); policy port is the layered tool-policy face (constraint intersection, master prompt §4.2)",
+        "R04-SUP-05: R03 hard protections re-run green (ten repair suites exact pinned counts + A15 matrix + A16 seed mechanism) after the runs.rs restructure",
+        "R04-T02 怎么做 4: xtask check-boundaries extended with check B1 (protected executor symbols dispatch_executor/execute_prepared whitelisted WITH reasons; negatives N16 forged direct call + N17 reasonless whitelist entry)",
+        "R04-T02-R1 repair round (REPAIR-R04-T02-R1-F01): the child authorization on the gateway wiring now judges the prepared LOCAL NAME as the kernel-vocabulary authority (kernel authorize_child_tool_with_registry_id); the registry target id is matched against the anti-recursion blocklist only (depth defense). The previously unregistered blanket-deny of registered Read-class targets for read-only subagents is closed; the delegation-family match by local name is restricted to first-party origin. Details: docs/rust-tauri/R04/repairs/R04-T02_REPAIR_R1.md"
+      ],
+      "report": "docs/rust-tauri/R04/R04-T02_REPORT.md",
+      "evidence": "artifacts/rust-tauri/R04/T02-E01/"
     },
     "R04-T03": {
       "status": "PENDING",
       "acceptance_map": {
-        "R04-A05": { "status": "NOT_STARTED", "tests": [] },
-        "R04-A06": { "status": "NOT_STARTED", "tests": [] }
+        "R04-A05": {
+          "status": "NOT_STARTED",
+          "tests": []
+        },
+        "R04-A06": {
+          "status": "NOT_STARTED",
+          "tests": []
+        }
       },
-      "supplemental": ["R04-SUP-01 ask 档审批策略面（R03-T06-O1）"]
+      "supplemental": [
+        "R04-SUP-01 ask 档审批策略面（R03-T06-O1）"
+      ]
     },
     "R04-T04": {
       "status": "PENDING",
       "acceptance_map": {
-        "R04-A07": { "status": "NOT_STARTED", "tests": [] },
-        "R04-A08": { "status": "NOT_STARTED", "tests": [] }
+        "R04-A07": {
+          "status": "NOT_STARTED",
+          "tests": []
+        },
+        "R04-A08": {
+          "status": "NOT_STARTED",
+          "tests": []
+        }
       }
     },
     "R04-T05": {
       "status": "PENDING",
       "acceptance_map": {
-        "R04-A09": { "status": "NOT_STARTED", "tests": [] },
-        "R04-A10": { "status": "NOT_STARTED", "tests": [] }
+        "R04-A09": {
+          "status": "NOT_STARTED",
+          "tests": []
+        },
+        "R04-A10": {
+          "status": "NOT_STARTED",
+          "tests": []
+        }
       }
     },
     "R04-T06": {
       "status": "PENDING",
       "acceptance_map": {
-        "R04-A11": { "status": "NOT_STARTED", "tests": [] },
-        "R04-A12": { "status": "NOT_STARTED", "tests": [] }
+        "R04-A11": {
+          "status": "NOT_STARTED",
+          "tests": []
+        },
+        "R04-A12": {
+          "status": "NOT_STARTED",
+          "tests": []
+        }
       }
     },
     "R04-T07": {
       "status": "PENDING",
       "acceptance_map": {
-        "R04-A13": { "status": "NOT_STARTED", "tests": [] },
-        "R04-A14": { "status": "NOT_STARTED", "tests": [] }
+        "R04-A13": {
+          "status": "NOT_STARTED",
+          "tests": []
+        },
+        "R04-A14": {
+          "status": "NOT_STARTED",
+          "tests": []
+        }
       }
     },
     "R04-T08": {
       "status": "PENDING",
       "acceptance_map": {
-        "R04-A15": { "status": "NOT_STARTED", "tests": [] },
-        "R04-A16": { "status": "NOT_STARTED", "tests": [] }
+        "R04-A15": {
+          "status": "NOT_STARTED",
+          "tests": []
+        },
+        "R04-A16": {
+          "status": "NOT_STARTED",
+          "tests": []
+        }
       },
-      "supplemental": ["R04 stage map 注册与 verify-stage R04 建立", "全矩阵（目录×权限×入口×生命周期）"]
+      "supplemental": [
+        "R04 stage map 注册与 verify-stage R04 建立",
+        "全矩阵（目录×权限×入口×生命周期）"
+      ]
     }
   }
 }

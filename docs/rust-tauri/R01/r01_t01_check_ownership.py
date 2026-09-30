@@ -56,6 +56,16 @@ Verifies, mechanically and with a non-zero exit on any violation:
         workspace while no applies_to-keyed rule (DEP-07's workspace-wide
         desktop ban included) ever inspects it.
 
+  Protected executor boundary (R04-T02):
+    B1  the unified tool gateway's protected executor symbols
+        (`dispatch_executor`, `execute_prepared`) may appear ONLY in the
+        whitelisted service source files, and EVERY whitelist entry must
+        carry a non-empty reason (an unexplained allowance is exactly the
+        silent widening the check exists to prevent). Business code reaches
+        bound executors only through the re-verified single-use
+        PreparedInvocation stage; scope is lingxi-service/src (integration
+        tests are not business entry points).
+
   Negative battery (--self-test):
     N1  dual owner on run_terminal_state                -> must be rejected
     N2  "sync" bypass (secondary_owner field)           -> must be rejected
@@ -78,6 +88,10 @@ Verifies, mechanically and with a non-zero exit on any violation:
         (absent from the resolve graph)                      -> rejected
     N15 authoritative store written by a "rust-service-fork"
         prefix look-alike shadow writer                      -> rejected
+    N16 business file directly calling the gateway's protected
+        dispatch_executor (temp-copy source tree)            -> rejected (B1)
+    N17 protected-symbol whitelist entry without a
+        reason (unexplained allowance)                       -> rejected (B1)
     Each negative case is accepted ONLY if the checker rejects it with a
     specific, matching violation id; a silent pass or a wrong-reason
     rejection fails the self-test.
@@ -295,6 +309,86 @@ def check_ownership(doc: dict, features: list[dict], stores: list[dict]) -> list
     if counts.get("features") != len(rows) or counts.get("stores") != len(srows):
         raise Violation("O7", "counts block inconsistent with actual rows")
     findings.append("O7 OK: counts coherent")
+    return findings
+
+
+# ---------------------------------------------------------------------------
+# Protected executor boundary (R04-T02, check B1)
+# ---------------------------------------------------------------------------
+
+# The ONLY source files that may reference each protected gateway symbol,
+# each with its reason. Adding a caller is a deliberate whitelist change:
+# the reason must say WHY that caller may reach the protected path.
+PROTECTED_EXECUTOR_SYMBOLS: dict[str, dict[str, str]] = {
+    # The gateway's single dispatch path to a bound executor. Only the
+    # gateway itself may contain the symbol (definition + internal call);
+    # business code reaches executors ONLY through execute_prepared.
+    # Keys are paths RELATIVE TO rust/crates/lingxi-service/src.
+    "dispatch_executor": {
+        "toolgateway.rs":
+            "definition site — the unified gateway's sole dispatch authority "
+            "(R04-T02: every executor handoff happens here, behind a "
+            "re-verified single-use PreparedInvocation)",
+    },
+    # The handle-verified execution entry. Callers: the gateway itself
+    # (definition) and the run driver (the one business caller — it drives
+    # the frozen journal order around the call).
+    "execute_prepared": {
+        "toolgateway.rs":
+            "definition site — the re-verifying, single-use execution stage",
+        "runs.rs":
+            "the run driver — the ONLY business caller; it invokes the stage "
+            "strictly after advance_invocation(started), inside the frozen "
+            "R03-T05 journal write order (R04-SUP-02)",
+    },
+}
+
+
+def check_protected_executors(service_src: Path, whitelist=PROTECTED_EXECUTOR_SYMBOLS) -> list[str]:
+    """B1: protected executor symbols may appear ONLY in whitelisted
+    business source files, and every whitelist entry MUST carry a reason.
+
+    Scope: lingxi-service/src (the business code of the service process).
+    Integration tests live under tests/ and are NOT business entry points;
+    the check deliberately does not scan them (a test exercising the public
+    surface is not a bypass). A token appearing in comments still counts —
+    the strip_comments preprocessing is reused so a MENTION in a doc
+    comment is fine, actual code text is not (mirrors D3's rule).
+    """
+    # Whitelist self-validation first: every entry needs a non-empty
+    # reason — an unexplained allowance is exactly the silent widening this
+    # check exists to prevent.
+    for symbol, files in whitelist.items():
+        if not files:
+            raise Violation(
+                "B1", f"protected symbol {symbol!r} has an EMPTY whitelist; either forbid "
+                      "it outright or list its allowed files with reasons")
+        for rel, reason in files.items():
+            if not isinstance(reason, str) or not reason.strip():
+                raise Violation(
+                    "B1", f"whitelist entry for {symbol!r} at {rel} carries no reason; "
+                          "every allowance must justify itself")
+    findings: list[str] = []
+    rust_files = sorted(service_src.rglob("*.rs"))
+    scanned = 0
+    for path in rust_files:
+        try:
+            rel = path.relative_to(service_src).as_posix()
+        except ValueError:
+            continue
+        code = strip_comments(path.read_text(encoding="utf-8"))
+        scanned += 1
+        for symbol, files in whitelist.items():
+            if symbol in code and rel not in files:
+                raise Violation(
+                    "B1", f"protected executor symbol {symbol!r} appears in "
+                          f"{rel}, which is not whitelisted for it (allowed: "
+                          f"{sorted(files)}); business code reaches executors "
+                          "only through the unified gateway")
+    findings.append(
+        f"B1 OK: {scanned} service source files scanned; protected executor "
+        f"symbols ({', '.join(sorted(whitelist))}) appear only in their "
+        "reasoned whitelists")
     return findings
 
 
@@ -770,6 +864,38 @@ def negative_battery(base_doc: dict, features: list[dict], stores: list[dict],
         "N15 authoritative store written by rust-service-fork shadow writer",
         "O8", n15))
 
+    # N16 (R04-T02 / B1): a business source file directly calling the
+    # gateway's protected dispatch path (bypassing the unified gateway)
+    # must be rejected. Built in a temp copy so the real tree is untouched.
+    def n16():
+        with tempfile.TemporaryDirectory(prefix="r01-t01-neg16-") as td:
+            src = Path(td) / "src"
+            (src / "runs.rs").parent.mkdir(parents=True)
+            (src / "toolgateway.rs").write_text(
+                "pub async fn dispatch_executor() {}\n", encoding="utf-8")
+            (src / "sessions.rs").write_text(
+                "// bypass: talk to the executor directly\n"
+                "fn x() { gateway.dispatch_executor(); }\n", encoding="utf-8")
+            check_protected_executors(src)
+    results.append(expect_rejection(
+        "N16 business file calls the protected dispatch_executor", "B1", n16))
+
+    # N17 (R04-T02 / B1): a whitelist entry without a reason is an
+    # unexplained allowance and must be rejected by the whitelist's own
+    # validation.
+    def n17():
+        with tempfile.TemporaryDirectory(prefix="r01-t01-neg17-") as td:
+            src = Path(td) / "src"
+            src.mkdir(parents=True)
+            bad_whitelist = {
+                "dispatch_executor": {
+                    "sessions.rs": "  ",
+                }
+            }
+            check_protected_executors(src, bad_whitelist)
+    results.append(expect_rejection(
+        "N17 protected-symbol whitelist entry without a reason", "B1", n17))
+
     return results
 
 
@@ -816,6 +942,15 @@ def main() -> int:
     failures: list[str] = []
     try:
         for line in check_ownership(doc, features, stores):
+            print(f"PASS {line}")
+    except Violation as v:
+        failures.append(str(v))
+        print(f"FAIL {v}")
+
+    # R04-T02 / B1: the protected executor boundary over the real service
+    # sources (cheap, always on — no cargo metadata needed).
+    try:
+        for line in check_protected_executors(REPO_ROOT / "rust/crates/lingxi-service/src"):
             print(f"PASS {line}")
     except Violation as v:
         failures.append(str(v))
