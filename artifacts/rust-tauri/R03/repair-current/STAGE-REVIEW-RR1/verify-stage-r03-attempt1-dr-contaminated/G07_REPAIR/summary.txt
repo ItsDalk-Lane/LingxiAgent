@@ -1,0 +1,21 @@
+== building the nine repair suites (rustup 1.98.1, /var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T//rust-target-r03-g07-repair, --locked, offline) ==
+PASS build (locked, offline)
+== running repair suite cancel_link_inheritance (F-ID F01, pinned 7) ==
+PASS cancel_link_inheritance (F01): 7/7 tests green
+== running repair suite subagent_closeout (F-ID F02, pinned 8) ==
+PASS subagent_closeout (F02): 8/8 tests green
+== running repair suite cancel_terminal_race (F-ID F03, pinned 13) ==
+PASS cancel_terminal_race (F03): 13/13 tests green
+== running repair suite tool_receipt_unknown (F-ID F04, pinned 6) ==
+PASS tool_receipt_unknown (F04): 6/6 tests green
+== running repair suite admission_dedup_consistency (F-ID F05, pinned 5) ==
+PASS admission_dedup_consistency (F05): 5/5 tests green
+== running repair suite admission_dedup_adversarial (F-ID F05, pinned 5) ==
+PASS admission_dedup_adversarial (F05): 5/5 tests green
+== running repair suite input_payload_fidelity (F-ID F06, pinned 5) ==
+PASS input_payload_fidelity (F06): 5/5 tests green
+== running repair suite input_budget_refusal (F-ID F06, pinned 2) ==
+PASS input_budget_refusal (F06): 2/2 tests green
+== running repair suite background_steering (F-ID F07, pinned 8) ==
+PASS background_steering (F07): 8/8 tests green
+RESULT: all nine G01-G06 repair suites green with exact pinned counts

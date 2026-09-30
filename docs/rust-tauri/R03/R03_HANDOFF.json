@@ -1,8 +1,8 @@
 {
   "spec_version": "1.0",
   "stage_id": "R03",
-  "status": "REOPENED_PENDING_REPAIR",
-  "status_note_2026_09_30": "对抗性审查（基线 cd3fb19e651f763afc6c75cb3163064fb54ca3fe）确认 F01–F08 共 8 组缺陷/34 项反例，其中 F08 质疑 accepted_stage_candidate 依据的裁决2（FINDING-1 两阶段收口解释）。原 ACCEPTED 历史与证据保留（见 accepted_stage_candidate 与 R03_FINAL_STAGE_REVIEW_R1.md，原文未改）；重新接受仅可由本轮修复后的全新独立审查作出。统一问题账：docs/rust-tauri/R03/repair-current/R03_FIX_ISSUES.json。allowed_next_scope 在本轮收口前冻结为 R03 修复本身，不放行 R04。",
+  "status": "RE-ACCEPTED_AFTER_ADVERSARIAL_REPAIR",
+  "status_note_2026_09_30": "对抗性修复轮（G01–G07）全部完成：8 F-ID/34 C-ID 三层检查闭合（执行者普通+对抗自查、每工作单全新独立 Reviewer PASS）；全新阶段 Reviewer STAGE-REVIEWER-R03-RR1 独立实测七条主反例与抽查变体全过，原 R03 Gate 干净重跑 overall PASS。候选 ebcbcad1b9fa1c621b315dd33b58f8a2e01ab9eb（=远程 HEAD）。2026-09-29 的 STAGE PASS 与全部历史证据原文保留；本轮以真实运行证据替代其裁决2 依据（FINDING-1 已由 G01 产线修复关闭）。允许范围恢复为 R04 任务书（沿用既有递延约束）。",
   "status_note_2026_09_30_g07_repair_round": "修复轮进度（G07-E01 追记，2026-09-30）：G01–G06（F01–F07）已全部修复并经三层闭环（六位全新独立 Reviewer G01-R1..G06-R1 均 PASS，提交 520bb75b9/ccb09fde6/198e0da1e/d56e6883d/8883923a5/8a6303bcd 已推送）；G07（F08）把 9 个新修复套件接入 R03 阶段图正式验收（repair_suites 命令+R03-RP01 场景，16 原场景/48 叶/7 条 R02 定向链零改动）并完成门禁负向测试与候选绑定验证。verify-stage R03 在候选 8a6303bcd4+修复轮工作树上 overall PASS（15/15 命令、17/17 场景、48 叶 17 pass+31 deferred、candidateSourceBinding stable）。裁决2 被替代：其『计数清理只可能在被跳过的 note_child_finished 中发生』前提已被 G01 产线修复证伪（父取消在当前进程内收口，重启仅留作真正崩溃兜底）——旧 PASS 原文保留。阶段重开状态保持 REOPENED_PENDING_REPAIR 直至全新阶段 Reviewer 终审（本文件不自称阶段 PASS）。",
   "generated_by": "ZCode:EXECUTOR-R03-T08-E01（2026-09-29；一次性执行代理，无 commit/push 授权；最终 PASS/ACCEPTED 归总控另派的独立验收）",
   "tested_sha": "dc42a01e37d1110293ec137402fd3239bd5b7d9d",
@@ -137,7 +137,7 @@
       "summary": "scripts/rust-tauri/r02_t07_slow_subscriber.sh 的并发同会话风暴「全部 200」断言先于 R03-T02 冻结 busy 闸（409 session_busy retryable=现役 Node 同语义）存在；1000 并发（24 路）出现 1 个 409 触发该单条断言；无 stall/无假成功/订阅者健康断言不受影响。同上归属"
     }
   ],
-  "allowed_next_scope": "R04 任务书（统一工具网关、四基础工具与沙盒）。禁止：R05+ 任务提前、生产入口切换、真实数据迁移；R02/R03 递延叶与 Windows/打包登记项不得丢失。",
+  "allowed_next_scope": "R04 任务书（统一工具网关、四基础工具与沙盒）。禁止：R05+ 任务提前、生产入口切换、真实数据迁移；R02/R03 递延叶与 Windows/打包登记项不得丢失。（本轮对抗性修复完成后恢复）",
   "remote_write_authorized": false,
   "production_data_authorized": false,
   "paid_or_external_test_authorized": false,
@@ -185,5 +185,14 @@
       "adjudication": "独立复现+git 源码证实；登记治理递延，随 seal 工作流推进重放基线收口；不套旧封印类别、不扩白名单",
       "owner": "seal 工作流"
     }
-  ]
+  ],
+  "reaccepted_after_adversarial_repair": {
+    "candidate_commit": "ebcbcad1b9fa1c621b315dd33b58f8a2e01ab9eb",
+    "round": "RR1",
+    "stage_verdict": "PASS",
+    "stage_review_report": "docs/rust-tauri/R03/repair-current/R03_FIX_FINAL_STAGE_REVIEW.md",
+    "stage_review_evidence": "artifacts/rust-tauri/R03/repair-current/STAGE-REVIEW-RR1/",
+    "unified_issue_ledger": "docs/rust-tauri/R03/repair-current/R03_FIX_ISSUES.json",
+    "acceptance_note": "本对象引用候选提交；接受记录提交自身 SHA 由远程确认回执登记，不写入本文件（防自引用）。"
+  }
 }

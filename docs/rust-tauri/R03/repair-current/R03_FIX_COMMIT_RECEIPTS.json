@@ -79,6 +79,18 @@
         }
       ],
       "remote_confirmed": "origin/codex/rust-tauri-migration=8a6303bcd477cda891d64fddd6e96fa35017f7ef"
+    },
+    "G07": {
+      "status": "DONE",
+      "review": "REVIEWER-REPAIR-R03-G07-R1 PASS (4/4 C-ID)",
+      "commits": [
+        {
+          "sha": "ebcbcad1b",
+          "kind": "gate+docs",
+          "note": "F08 反例接入门禁+负向测试+报告更正+轮次交付五件套"
+        }
+      ],
+      "remote_confirmed": "origin/codex/rust-tauri-migration=ebcbcad1b9fa1c621b315dd33b58f8a2e01ab9eb"
     }
   }
 }

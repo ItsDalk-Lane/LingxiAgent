@@ -5,7 +5,7 @@
   "implementation_branch": "codex/rust-tauri-migration",
   "start_head": "7d1a0c6bc28062ff455adcf8f68c3a80b117e90d",
   "current_head": "cdd213078f6947217000c7ecd1a36ab5ffe2bb01",
-  "current_head_note": "2026-09-28 R02 最终收口：HEAD 为 R02_FINAL_REPAIR_BASE_SHA；最终候选 = HEAD + 授权修复工作树（e876171c5cd0a6f8，digest 96d5aa25…）；R02 ACCEPTED，独立验收 PASS。stage_acceptance_commit_sha 于验收提交后回填。",
+  "current_head_note": "2026-09-30 R03 对抗性修复轮收口：接受候选 ebcbcad1b9fa1c621b315dd33b58f8a2e01ab9eb（=远程 HEAD）；接受记录提交为后续 docs 提交（自身 SHA 不回填文件）。",
   "remote": "origin",
   "remote_default_branch": "main",
   "taskbook_manifest_sha256": "49968287f564a2a470d55fe4295a26ef70a71ccb4b16e38933567e89076a5c3f",
@@ -547,7 +547,7 @@
       },
       "stage_review_agent_id": "ZCode:STAGE-REVIEWER-R03-R01 (agent_82a4b1bb-0696-4000-a21a-13bbf0cc4266)",
       "stage_final_candidate_sha": "1ebb03d9f89af364a42274efc2cd482f298b1130",
-      "acceptance_note": "接受文档提交引用候选 1ebb03d9f；接受提交 SHA 由远程回执在最终输出登记（防自引用）"
+      "acceptance_note": "2026-09-30 对抗性修复轮重开并重新接受：F01-F08 全部关闭（34 C-ID 三层），全新阶段 Reviewer RR1 PASS，候选 ebcbcad1b；2026-09-29 首次接受记录与证据原文保留，其裁决2 依据已被本轮替代。"
     },
     "R04": {
       "title": "统一工具网关、四基础工具与沙盒",

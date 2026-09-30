@@ -1,0 +1,41 @@
+diff --git a/docs/rust-tauri/R03/repair-current/R03_FIX_COMMIT_RECEIPTS.json b/docs/rust-tauri/R03/repair-current/R03_FIX_COMMIT_RECEIPTS.json
+index e9caeb882..5575b161c 100644
+--- a/docs/rust-tauri/R03/repair-current/R03_FIX_COMMIT_RECEIPTS.json
++++ b/docs/rust-tauri/R03/repair-current/R03_FIX_COMMIT_RECEIPTS.json
+@@ -79,6 +79,18 @@
+         }
+       ],
+       "remote_confirmed": "origin/codex/rust-tauri-migration=8a6303bcd477cda891d64fddd6e96fa35017f7ef"
++    },
++    "G07": {
++      "status": "DONE",
++      "review": "REVIEWER-REPAIR-R03-G07-R1 PASS (4/4 C-ID)",
++      "commits": [
++        {
++          "sha": "ebcbcad1b",
++          "kind": "gate+docs",
++          "note": "F08 反例接入门禁+负向测试+报告更正+轮次交付五件套"
++        }
++      ],
++      "remote_confirmed": "origin/codex/rust-tauri-migration=ebcbcad1b9fa1c621b315dd33b58f8a2e01ab9eb"
+     }
+   }
+ }
+\ No newline at end of file
+diff --git a/docs/rust-tauri/R03/repair-current/R03_FIX_ISSUES.json b/docs/rust-tauri/R03/repair-current/R03_FIX_ISSUES.json
+index c8caa50be..a40909743 100644
+--- a/docs/rust-tauri/R03/repair-current/R03_FIX_ISSUES.json
++++ b/docs/rust-tauri/R03/repair-current/R03_FIX_ISSUES.json
+@@ -184,7 +184,11 @@
+           "r02_regression": "7 条定向链全绿；全量 verify-stage R02 19/20（唯一红 a16：3 文件=既有 GOV-01/02 治理递延；1 条非族 ustar ENOTEMPTY 清理竞态隔离重跑 10/10 绿、修复轮零触碰）",
+           "report": "docs/rust-tauri/R03/repair-current/G07-E01_REPORT.md",
+           "reviewer": "REVIEWER-REPAIR-R03-G07-R1",
+-          "review_verdict": "PASS"
++          "review_verdict": "PASS",
++          "commits": [
++            "ebcbcad1b test(rust-tauri): R03 adversarial repair G07 - counterexamples wired into the formal gate (F08)"
++          ],
++          "remote_receipt": "origin/codex/rust-tauri-migration=ebcbcad1b9fa1c621b315dd33b58f8a2e01ab9eb"
+         }
+       ]
+     }
