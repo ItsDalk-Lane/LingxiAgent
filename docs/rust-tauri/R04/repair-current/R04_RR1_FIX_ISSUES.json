@@ -1,0 +1,130 @@
+{
+  "schema_version": "lingxi.r04.rr1-fix-issues.2026-10-01.v1",
+  "repair_round": "RR1",
+  "source_review": {
+    "document": "/tmp/r04_repair_package/Lingxi_R04_Review/Lingxi_R04_对抗性复审与定点修复总控_2026-10-01.md（原包 Lingxi_R04_对抗性复审修复包_2026-10-01.zip，MANIFEST.sha256 全 OK）",
+    "checklist": "/tmp/r04_repair_package/Lingxi_R04_Review/R04_RR1_修复验收清单.json",
+    "reviewed_head": "773d5a6968b87650cd135cc5684707f81d1acda0",
+    "verdict": "R04_NOT_ACCEPTED_FOR_R05",
+    "issue_count": 5,
+    "check_count": 26
+  },
+  "repair_baseline": {
+    "branch": "codex/rust-tauri-migration",
+    "base_sha": "773d5a6968b87650cd135cc5684707f81d1acda0",
+    "previous_accepted_candidate": "0c67b6fc749ac5c21d0514e3076b0ed2058cd7c4",
+    "worktree_at_start": "clean（无用户未提交修改）",
+    "reopen_status": "REOPENED_PENDING_REPAIR"
+  },
+  "navigation": {
+    "stage_r04_status": "REOPENED_PENDING_REPAIR（历史 ACCEPTED 记录保留，不被抹除；现行裁决以本账本 RR1 收口为准）",
+    "allowed_next_scope": "仅本轮五组问题修复与 R04 重验；禁止 R05 执行、发布、真实数据迁移",
+    "workorders": ["G01", "G02", "G03", "G04", "G05"]
+  },
+  "issues": [
+    {
+      "id": "R04-RR1-F01",
+      "title": "进程已启动后才检查登记容量，拒绝路径失去进程归属",
+      "severity": "P1",
+      "workorder": "G01",
+      "old_observation_mapping": "docs/rust-tauri/R04/R04_HANDOFF.json deferred_registrations.t05-obs2-registryfull-tail（T05-R1-OBS-2 曾被登记非阻塞——本轮对抗性复审裁定该登记依据错误：满容量即可触发，不需要罕见竞态，且误将网关 PreparedRegistryFull 与进程模块 SpawnFailure::RegistryFull 混写）",
+      "locations": [
+        "rust/crates/lingxi-service/src/procsupervisor.rs: ProcessSupervisor::register / spawn_oneshot / spawn_pty",
+        "rust/crates/lingxi-service/src/exectools.rs: ProcessTools::run_exec_command / ProcessOwnershipGuard"
+      ],
+      "source_fact_confirmed_at_baseline": "register() 在 command.spawn()（kill_on_drop(false)）之后调用才检查 live_cap（procsupervisor.rs 基线 824-827/978/1144）",
+      "cases": ["R04-RR1-F01-C01", "R04-RR1-F01-C02", "R04-RR1-F01-C03", "R04-RR1-F01-C04"],
+      "status": "CLOSED_PENDING_COMMIT（R1 独立 PASS；提交回执在 G05 收口统一补记）",
+      "normal_selfcheck": "PASS（E02：C01 零派发五重证明/C02 屏障三腿/C03 三变体+C04 四轮轮换，逐项 exit 0，证据 artifacts/rust-tauri/R04/RR1-G01-E01/logs/ 27 文件，报告 G01-E01_REPORT.md §4）",
+      "adversarial_selfcheck": "PASS（E02：OS 派发计数核对、屏障固定交错、二次失败注入、重复取消/迟到回调、全套件并行 4 次+顺序 1 次，报告 §3-§4）",
+      "independent_review": "PASS（REVIEWER-R04-RR1-G01-R01，2026-10-01：基线运行时红 exit 101 独立复现（哨兵被覆写）；候选全套件 9/9 与逐 C-ID 独立进程运行全 0；reserve_live_slot 原子性/LiveSlot 恰好一次/回滚保真/三重词汇区分/注入钩子零产品调用点逐项核对成立；同族回归 r04_t05_process_tools 14/14、procsupervisor 单测 9/9、clippy -D warnings 0。非阻塞观察 O-1..O-5；O-3 执行者 A10 主张未在审查中复现（基线孤立 3/3 绿），方向不矛盾、归 G02 关注。报告 G01-R1_REVIEW.md，证据 artifacts/rust-tauri/R04/RR1-G01-R1/logs/）",
+      "candidate": "工作区未提交改动（HEAD=773d5a696：procsupervisor.rs +332/exectools.rs +19/lib.rs re-export + 新测试 r04_t05_registry_capacity.rs 1267 行 9 用例）",
+      "commit": null,
+      "execution_notes": {
+        "repro": "E01 基线红复现 exit 101（repro/red_repro_baseline_773d5a6.txt，哨兵摘要被改——被拒命令确实执行）",
+        "gates": "fmt 0/clippy -D warnings 0/workspace tests 0（首跑 101 为既有 A09 pid 竞态，孤立恒绿且基线归因）/check-contracts 0/check-boundaries 0",
+        "carryover_findings": "A10 PTY ^C 后 exit 观察在干净基线 773d5a6 孤立运行确定性红（macOS readline SIGINT 后丢弃 type-ahead 时序）——归 G02/F02 范围处理，证据 e02_baseline_773d5a6_*.txt；E02 未越界修复"
+      }
+    },
+    {
+      "id": "R04-RR1-F02",
+      "title": "reaper 超时只丢 JoinHandle，且 OS 回收先于归属状态更新",
+      "severity": "P1",
+      "workorder": "G02",
+      "old_observation_mapping": "R04-T05_REPORT.md §2 回收/PID 证明主张与 tests/r04_t05_process_tools.rs 只断言返回时长/输出/后代存活——复审裁定不等价于读端回收证明",
+      "locations": [
+        "rust/crates/lingxi-service/src/procsupervisor.rs: spawn_oneshot reaper / finalize_exit / mark_terminating / live_handles",
+        "rust/crates/lingxi-service/tests/r04_t05_process_tools.rs"
+      ],
+      "source_fact_confirmed_at_baseline": "timeout(grace, pump) 超时只置 drained=false 无 abort/join（基线 1000）；finalize_exit 无条件 reclaimed=true；child.wait() 后仍按旧 pgid 可 killpg",
+      "cases": ["R04-RR1-F02-C01", "R04-RR1-F02-C02", "R04-RR1-F02-C03", "R04-RR1-F02-C04"],
+      "status": "OPEN_FOR_NATIVE_REPRODUCTION_AND_REPAIR",
+      "normal_selfcheck": "NOT_RUN",
+      "adversarial_selfcheck": "NOT_RUN",
+      "independent_review": "NOT_RUN",
+      "candidate": null,
+      "commit": null
+    },
+    {
+      "id": "R04-RR1-F03",
+      "title": "清理未确认被转换为已退出和虚构的137退出码",
+      "severity": "P1",
+      "workorder": "G03",
+      "old_observation_mapping": "无旧观察项——本轮新确认的接口保真缺陷",
+      "locations": [
+        "rust/crates/lingxi-service/src/exectools.rs: run_exec_command timeout/result mapping / run_write_stdin",
+        "rust/crates/lingxi-service/src/procsupervisor.rs: RecordPhase::is_terminal / await_termination / terminal_facts"
+      ],
+      "source_fact_confirmed_at_baseline": "非 Terminated 回执兜底 ExitFact::Signal(9)（基线 718）；CleanupTimedOut→Signal(9)（744）→ToolRunStatus::Exited{code:137}（948）",
+      "cases": ["R04-RR1-F03-C01", "R04-RR1-F03-C02", "R04-RR1-F03-C03", "R04-RR1-F03-C04", "R04-RR1-F03-C05"],
+      "status": "OPEN_FOR_NATIVE_REPRODUCTION_AND_REPAIR",
+      "normal_selfcheck": "NOT_RUN",
+      "adversarial_selfcheck": "NOT_RUN",
+      "independent_review": "NOT_RUN",
+      "candidate": null,
+      "commit": null
+    },
+    {
+      "id": "R04-RR1-F04",
+      "title": "PTY 混合分片的已输出前缀未消费，重复输出并误报丢失",
+      "severity": "P2",
+      "workorder": "G04",
+      "old_observation_mapping": "既有单测 transcript_delivers_split_multibyte_characters_intact 把 a 与半字放在不同 chunk，未覆盖同 chunk 反例",
+      "locations": [
+        "rust/crates/lingxi-service/src/procsupervisor.rs: TranscriptCore::deliver_since_cursor / decode_prefix_utf8",
+        "rust/crates/lingxi-service/src/exectools.rs: run_write_stdin truncation message"
+      ],
+      "source_fact_confirmed_at_baseline": "cursor 只跨完整消费 chunk 推进（基线 616-647），部分消费 chunk 整块留队列→重复输出；未补齐尾部计入 dropped_undelivered_bytes",
+      "cases": ["R04-RR1-F04-C01", "R04-RR1-F04-C02", "R04-RR1-F04-C03", "R04-RR1-F04-C04"],
+      "status": "OPEN_FOR_NATIVE_REPRODUCTION_AND_REPAIR",
+      "normal_selfcheck": "NOT_RUN",
+      "adversarial_selfcheck": "NOT_RUN",
+      "independent_review": "NOT_RUN",
+      "candidate": null,
+      "commit": null
+    },
+    {
+      "id": "R04-RR1-F05",
+      "title": "输出完整性只按滚动窗口判断，丢失前缀或spill封顶仍可冒称完整",
+      "severity": "P2",
+      "workorder": "G04",
+      "old_observation_mapping": "无旧观察项——本轮新确认的输出保真缺陷（T08 终验裁决误接受）",
+      "locations": [
+        "rust/crates/lingxi-service/src/procsupervisor.rs: CollectorCore::append / SpillWriter / OutputSnapshot",
+        "rust/crates/lingxi-service/src/exectools.rs: truncate_head_tail / run_exec_command / spill_resource_ref / run_write_stdin"
+      ],
+      "source_fact_confirmed_at_baseline": "truncated=head_tail.truncated 不比较 total_bytes（基线 759）；Full output 声明不含 capped 事实（762）",
+      "cases": ["R04-RR1-F05-C01", "R04-RR1-F05-C02", "R04-RR1-F05-C03", "R04-RR1-F05-C04", "R04-RR1-F05-C05"],
+      "status": "OPEN_FOR_NATIVE_REPRODUCTION_AND_REPAIR",
+      "normal_selfcheck": "NOT_RUN",
+      "adversarial_selfcheck": "NOT_RUN",
+      "independent_review": "NOT_RUN",
+      "candidate": null,
+      "commit": null
+    }
+  ],
+  "closure_checks": ["R04-RR1-CLOSE-C01", "R04-RR1-CLOSE-C02", "R04-RR1-CLOSE-C03", "R04-RR1-CLOSE-C04"],
+  "case_results": {},
+  "evidence_roots": {},
+  "commit_receipts": {}
+}

@@ -1,0 +1,9 @@
+   Compiling lingxi-service v0.0.0 (/private/tmp/r04_r1_g01_baseline/rust/crates/lingxi-service)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 1.00s
+     Running tests/r04_t05_process_tools.rs (rust/target/debug/deps/r04_t05_process_tools-6a5ae24a4a6cd9b7)
+
+running 1 test
+test r04_a09_managed_tree_is_killed_and_the_unrelated_sentinel_survives ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 13 filtered out; finished in 0.11s
+

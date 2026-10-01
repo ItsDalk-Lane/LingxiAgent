@@ -1,0 +1,21 @@
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.09s
+     Running tests/r04_t05_process_tools.rs (/tmp/r04_g01_baseline/rust/target/debug/deps/r04_t05_process_tools-6a5ae24a4a6cd9b7)
+
+running 1 test
+test r04_a10_pty_input_reads_resize_interrupt_and_exit ... FAILED
+
+failures:
+
+---- r04_a10_pty_input_reads_resize_interrupt_and_exit stdout ----
+
+thread 'r04_a10_pty_input_reads_resize_interrupt_and_exit' (2925730) panicked at crates/lingxi-service/tests/r04_t05_process_tools.rs:442:13:
+timed out waiting for terminal exit
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+
+
+failures:
+    r04_a10_pty_input_reads_resize_interrupt_and_exit
+
+test result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 13 filtered out; finished in 15.56s
+
+error: test failed, to rerun pass `-p lingxi-service --test r04_t05_process_tools`

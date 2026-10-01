@@ -109,6 +109,13 @@ pub const SAFE_ENV_PASSTHROUGH: &[&str] = &[
 
 pub const EXEC_INVALID_PARAMS: &str = "EXEC_COMMAND_INVALID_PARAMS";
 pub const EXEC_SPAWN_FAILED: &str = "EXEC_SPAWN_FAILED";
+/// The ProcessSupervisor's LIVE-PROCESS registry is at its cap: the
+/// command was refused BEFORE any OS dispatch (zero execution — R04-RR1
+/// F01). This is the supervisor's process capacity, a DIFFERENT registry
+/// from the gateway's prepared-invocation cap
+/// (`GatewayRefusal::PreparedRegistryFull` / `DEFAULT_LIVE_PREPARED_CAP`);
+/// a test that overflows the latter has not exercised this one.
+pub const EXEC_PROCESS_REGISTRY_FULL: &str = "EXEC_PROCESS_REGISTRY_FULL";
 /// The one-shot command could not be wrapped into the sandboxed execution
 /// form (missing/untrusted helper, unsupported policy, unsafe embedded
 /// path). The command was NEVER spawned — fail-closed (R04-A11).
@@ -677,6 +684,18 @@ impl ProcessTools {
         };
         let spawned = match self.supervisor.spawn(spec).await {
             Ok(spawned) => spawned,
+            // A capacity refusal is NOT a spawn failure: nothing was
+            // dispatched (the slot reservation precedes the OS spawn),
+            // and the caller must be able to distinguish "the command
+            // never ran" from "the binary failed to start". Hence its
+            // own vocabulary and code — never folded into
+            // EXEC_SPAWN_FAILED (R04-RR1-F01).
+            Err(failure @ crate::procsupervisor::SpawnFailure::RegistryFull) => {
+                return failed(
+                    ErrorCode::BudgetExceeded,
+                    format!("{EXEC_PROCESS_REGISTRY_FULL}: {failure}"),
+                )
+            }
             Err(failure) => {
                 return failed(
                     ErrorCode::UpstreamUnavailable,

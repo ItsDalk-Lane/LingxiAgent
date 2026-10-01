@@ -98,8 +98,9 @@ pub use events::{
 pub use exectools::{
     register_process_tools, CoreProcessExecutor, CoreProcessTools, ProcessOwnershipGuard,
     ProcessToolKind, ProcessTools, EXEC_DEFAULT_TIMEOUT_SECONDS, EXEC_MAX_TIMEOUT_SECONDS,
-    EXEC_SPAWN_FAILED, SAFE_ENV_PASSTHROUGH, WRITE_STDIN_NOT_INTERACTIVE, WRITE_STDIN_NOT_OWNED,
-    WRITE_STDIN_PROCESS_ID_REQUIRED, WRITE_STDIN_UNKNOWN_PROCESS,
+    EXEC_PROCESS_REGISTRY_FULL, EXEC_SPAWN_FAILED, SAFE_ENV_PASSTHROUGH,
+    WRITE_STDIN_NOT_INTERACTIVE, WRITE_STDIN_NOT_OWNED, WRITE_STDIN_PROCESS_ID_REQUIRED,
+    WRITE_STDIN_UNKNOWN_PROCESS,
 };
 pub use filetools::{
     register_core_file_tools, CoreFileExecutor, CoreFileTools, FileChangeLog, FileChangeOperation,

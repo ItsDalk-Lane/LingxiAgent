@@ -1,0 +1,109 @@
+   Compiling lingxi-service v0.0.0 (/private/tmp/r04_r1_g01_baseline/rust/crates/lingxi-service)
+warning: fields `write_stdin_target` and `spill_dir` are never read
+  --> crates/lingxi-service/tests/zz_r01_isolated_repro.rs:62:5
+   |
+56 | struct CapHarness {
+   |        ---------- fields in this struct
+...
+62 |     write_stdin_target: ToolTargetId,
+   |     ^^^^^^^^^^^^^^^^^^
+...
+65 |     spill_dir: PathBuf,
+   |     ^^^^^^^^^
+   |
+   = note: `#[warn(dead_code)]` (part of `#[warn(unused)]`) on by default
+
+warning: method `spill_file_count` is never used
+  --> crates/lingxi-service/tests/zz_r01_isolated_repro.rs:78:8
+   |
+71 | impl CapHarness {
+   | --------------- method in this implementation
+...
+78 |     fn spill_file_count(&self) -> usize {
+   |        ^^^^^^^^^^^^^^^^
+
+warning: function `call_write_stdin` is never used
+   --> crates/lingxi-service/tests/zz_r01_isolated_repro.rs:203:10
+    |
+203 | async fn call_write_stdin(
+    |          ^^^^^^^^^^^^^^^^
+
+warning: function `text_of` is never used
+   --> crates/lingxi-service/tests/zz_r01_isolated_repro.rs:226:4
+    |
+226 | fn text_of(result: &ToolExecutionResult) -> String {
+    |    ^^^^^^^
+
+warning: function `status_of` is never used
+   --> crates/lingxi-service/tests/zz_r01_isolated_repro.rs:248:4
+    |
+248 | fn status_of(result: &ToolExecutionResult) -> Option<ToolRunStatus> {
+    |    ^^^^^^^^^
+
+warning: function `wait_until` is never used
+   --> crates/lingxi-service/tests/zz_r01_isolated_repro.rs:276:10
+    |
+276 | async fn wait_until<T>(what: &str, deadline: Duration, mut probe: impl FnMut() -> Option<T>) -> T {
+    |          ^^^^^^^^^^
+
+warning: function `fd_count` is never used
+   --> crates/lingxi-service/tests/zz_r01_isolated_repro.rs:304:4
+    |
+304 | fn fd_count() -> usize {
+    |    ^^^^^^^^
+
+warning: function `write_dispatch_helper` is never used
+   --> crates/lingxi-service/tests/zz_r01_isolated_repro.rs:317:4
+    |
+317 | fn write_dispatch_helper(dir: &Path, counter: &Path, sentinel: &Path) -> PathBuf {
+    |    ^^^^^^^^^^^^^^^^^^^^^
+
+warning: function `make_executable` is never used
+   --> crates/lingxi-service/tests/zz_r01_isolated_repro.rs:333:4
+    |
+333 | fn make_executable(path: &Path) {
+    |    ^^^^^^^^^^^^^^^
+
+warning: function `dispatch_count` is never used
+   --> crates/lingxi-service/tests/zz_r01_isolated_repro.rs:343:4
+    |
+343 | fn dispatch_count(counter: &Path) -> usize {
+    |    ^^^^^^^^^^^^^^
+
+warning: function `barrier_competitor` is never used
+   --> crates/lingxi-service/tests/zz_r01_isolated_repro.rs:378:10
+    |
+378 | async fn barrier_competitor(
+    |          ^^^^^^^^^^^^^^^^^^
+
+warning: function `terminate_and_settle` is never used
+   --> crates/lingxi-service/tests/zz_r01_isolated_repro.rs:404:10
+    |
+404 | async fn terminate_and_settle(h: &CapHarness, id: &ProcessHandleId, reason: TerminationReason) {
+    |          ^^^^^^^^^^^^^^^^^^^^
+
+warning: `lingxi-service` (test "zz_r01_isolated_repro") generated 12 warnings
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.46s
+     Running tests/zz_r01_isolated_repro.rs (rust/target/debug/deps/zz_r01_isolated_repro-2ec3af14ed9f4cb3)
+
+running 1 test
+test repro_rr1_f01_registry_full_refusal_must_not_execute_the_command ... FAILED
+
+failures:
+
+---- repro_rr1_f01_registry_full_refusal_must_not_execute_the_command stdout ----
+
+thread 'repro_rr1_f01_registry_full_refusal_must_not_execute_the_command' (2975630) panicked at crates/lingxi-service/tests/zz_r01_isolated_repro.rs:502:9:
+assertion `left == right` failed: R04-RR1-F01: the refused one-shot must not have executed
+  left: "7e8f4d94580a98fb26ccced99599f9e6e228409ff4b4951c6f84551ffd9bd1d3"
+ right: "678bf03b47ad96012e4b7cf24f90a91aefc5c921863940998e65e28463f45cb0"
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+
+
+failures:
+    repro_rr1_f01_registry_full_refusal_must_not_execute_the_command
+
+test result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.05s
+
+error: test failed, to rerun pass `-p lingxi-service --test zz_r01_isolated_repro`
+exit=101

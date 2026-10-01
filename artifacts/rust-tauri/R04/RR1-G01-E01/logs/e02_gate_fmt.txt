@@ -1,0 +1,5 @@
+# fmt gate (E02)
+# command: ~/.cargo/bin/cargo fmt --manifest-path rust/Cargo.toml --all -- --check
+# date: 2026-10-01T10:08:16Z
+EXIT_CODE=0
+(first run EXIT=1 with formatting drift confined to the new test file; cargo fmt --all applied; re-check clean. The applied fmt touched only rust/crates/lingxi-service/tests/r04_t05_registry_capacity.rs.)

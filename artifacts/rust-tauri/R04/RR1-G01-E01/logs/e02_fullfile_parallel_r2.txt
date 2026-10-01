@@ -1,0 +1,16 @@
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.09s
+     Running tests/r04_t05_registry_capacity.rs (rust/target/debug/deps/r04_t05_registry_capacity-f987ac141ed66163)
+
+running 9 tests
+test rr1_f01_c03_pty_group_verify_failure_closes_the_pty_and_returns_the_slot ... ok
+test repro_rr1_f01_registry_full_refusal_must_not_execute_the_command ... ok
+test rr1_f01_c04_same_process_usable_after_repeated_refusals_and_releases ... ok
+test rr1_f01_c03_one_shot_group_verify_failure_compensates_exactly_once ... ok
+test rr1_f01_c03_pty_open_failure_is_zero_dispatch_and_returns_the_slot ... ok
+test rr1_f01_c02_two_ptys_race_the_last_slot_through_a_barrier ... ok
+test rr1_f01_c01_registry_full_refuses_with_zero_dispatch ... ok
+test rr1_f01_c02_one_shot_and_pty_race_the_last_slot_through_a_barrier ... ok
+test rr1_f01_c02_two_one_shots_race_the_last_slot_through_a_barrier ... ok
+
+test result: ok. 9 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 4.37s
+

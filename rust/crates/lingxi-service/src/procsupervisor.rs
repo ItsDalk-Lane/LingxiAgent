@@ -4,6 +4,21 @@
 //! commands and PTY-backed persistent terminals. The design rules come
 //! from the stage book (R04-T05 怎么做 3/4 and the master prompt §4.4):
 //!
+//! # Admission before dispatch (R04-RR1-F01)
+//! A live-registry slot is reserved ATOMICALLY (one lock-held
+//! check-and-increment — not a lock-free pre-check, which would be a
+//! TOCTOU) BEFORE any OS resource is created or any process dispatched.
+//! A full registry therefore refuses with ZERO dispatch. From reservation
+//! to reaper takeover the slot is owned by exactly one [`LiveSlot`]
+//! guard: every failure path (spawn error, group-verification failure,
+//! PTY initialization failure, future drop before registration) drops
+//! the guard, which returns the slot exactly once; a successful spawn
+//! COMMITS the guard into the registry, transferring the release duty to
+//! the record's settle path (itself exactly-once). A step that can only
+//! fail AFTER the dispatch (process-group verification) keeps the
+//! dispatched fact in its error and performs a bounded kill + reap of
+//! the child we own — never a silent "nothing happened".
+//!
 //! # Ownership identity, never a bare PID
 //! Every spawn is registered under a CSPRNG handle (`proc:<32 hex>`).
 //! Termination accepts ONLY a registered handle whose record is still
@@ -306,6 +321,54 @@ impl std::fmt::Display for SpawnFailure {
                  mechanism on Unix builds; this platform is unsupported and the spawn is \
                  refused rather than run unmanaged"
             ),
+        }
+    }
+}
+
+/// Verification fault injection (R04-RR1-F01-C03): forces the NEXT spawn
+/// to fail at a controlled boundary of the reserve → dispatch → register
+/// responsibility chain, so tests can prove the compensation (slot
+/// returned exactly once, dispatched fact recorded, created resources
+/// reclaimed) without waiting for a rare organic failure of the same
+/// branch. The hook only chooses WHEN the branch fires — the rollback it
+/// exercises is the one a real failure takes. It is NEVER reachable from
+/// model or tool input: only process-local Rust code holding the
+/// supervisor can arm it, and no product path does.
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Default)]
+pub enum SpawnFaultPoint {
+    /// No fault armed (the production default).
+    #[default]
+    None,
+    /// The next PTY spawn fails at `open_pty_pair` — the pre-dispatch
+    /// initialization boundary (zero OS dispatch; the slot must return
+    /// and no pty fd may leak).
+    PtyPairOpen,
+    /// The next spawn (either kind) fails the post-dispatch
+    /// process-group verification — the dispatched-then-failed boundary
+    /// (bounded kill + reap of the really-dispatched child, slot
+    /// return, dispatched fact recorded in the error).
+    GroupVerify,
+}
+
+/// Appends the honest dispatched-fact to a post-dispatch rollback error:
+/// the process DID start and was SIGKILLed and reaped by the spawn
+/// rollback (R04-RR1-F01 repair requirement 3 — never pretend a
+/// dispatched process never existed).
+fn note_dispatched_rollback(failure: &mut SpawnFailure, pid: i32) {
+    match failure {
+        SpawnFailure::GroupOwnership(detail) => {
+            *detail = format!(
+                "{detail}; the already-dispatched child (pid {pid}) was SIGKILLed and \
+                 reaped by the spawn rollback — the dispatch DID happen"
+            );
+        }
+        other => {
+            // No other post-dispatch failure exists today; keep the arm
+            // total so a future variant cannot silently lose the fact.
+            *other = SpawnFailure::Invalid(format!(
+                "{other}; the already-dispatched child (pid {pid}) was SIGKILLed and \
+                 reaped by the spawn rollback — the dispatch DID happen"
+            ));
         }
     }
 }
@@ -784,6 +847,47 @@ pub struct ProcessSupervisor {
     state: Mutex<SupervisorState>,
     clock: Arc<dyn ServiceClock>,
     limits: SupervisorLimits,
+    /// One-shot verification fault (see [`SpawnFaultPoint`]); consumed by
+    /// the next spawn. Production code never arms it.
+    fault: Mutex<SpawnFaultPoint>,
+}
+
+/// A live-registry slot reserved ATOMICALLY before any OS dispatch
+/// (R04-RR1-F01: the old order dispatched the process first and checked
+/// the cap after, so a full registry leaked a running, unowned child).
+///
+/// The slot is accounted in `live_count` from reservation until the
+/// record settles. Exactly-once release: an ARMED guard returns the slot
+/// on drop (every failure path of the spawn — IO, group verification,
+/// PTY initialization, a panic mid-spawn), while [`LiveSlot::commit`]
+/// disarms the guard as it installs the record — the destructor of a
+/// committed guard releases nothing, and the record's `settle` path
+/// (itself exactly-once via the `settled` flag) owns the release from
+/// there. A slot can therefore never be returned twice.
+struct LiveSlot {
+    supervisor: Arc<ProcessSupervisor>,
+    armed: bool,
+}
+
+impl LiveSlot {
+    /// Installs a fully-initialized record and DISARMS the guard: from
+    /// here the record's settle path owns the release duty (the reaper
+    /// always settles, so a committed slot never leaks).
+    fn commit(mut self, record: Arc<ProcessRecord>) {
+        let mut state = lock_or_poison(&self.supervisor.state);
+        state.records.insert(record.id.clone(), record);
+        self.armed = false;
+    }
+}
+
+impl Drop for LiveSlot {
+    fn drop(&mut self) {
+        if !self.armed {
+            return;
+        }
+        let mut state = lock_or_poison(&self.supervisor.state);
+        state.live_count = state.live_count.saturating_sub(1);
+    }
 }
 
 impl ProcessSupervisor {
@@ -804,7 +908,18 @@ impl ProcessSupervisor {
             state: Mutex::new(SupervisorState::default()),
             clock,
             limits,
+            fault: Mutex::new(SpawnFaultPoint::None),
         })
+    }
+
+    /// Arms a one-shot verification fault (see [`SpawnFaultPoint`]).
+    /// Verification-only API: no product or model-reachable path calls it.
+    pub fn arm_spawn_fault_for_verification(&self, point: SpawnFaultPoint) {
+        *lock_or_poison(&self.fault) = point;
+    }
+
+    fn take_spawn_fault(&self) -> SpawnFaultPoint {
+        std::mem::replace(&mut *lock_or_poison(&self.fault), SpawnFaultPoint::None)
     }
 
     fn now_ms(&self) -> u64 {
@@ -821,14 +936,23 @@ impl ProcessSupervisor {
         seed
     }
 
-    fn register(&self, record: Arc<ProcessRecord>) -> Result<(), SpawnFailure> {
+    /// Atomically reserves one live-registry slot BEFORE any OS dispatch.
+    /// The cap check and the increment are one critical section — two
+    /// concurrent spawns can never both take the last slot (a lock-free
+    /// pre-check outside the lock would be a TOCTOU, not admission
+    /// control). A reserved slot counts as live immediately: it is
+    /// unavailable to other spawns for the whole reserve → dispatch →
+    /// register window.
+    fn reserve_live_slot(self: &Arc<Self>) -> Result<LiveSlot, SpawnFailure> {
         let mut state = lock_or_poison(&self.state);
         if state.live_count >= self.limits.live_cap {
             return Err(SpawnFailure::RegistryFull);
         }
         state.live_count += 1;
-        state.records.insert(record.id.clone(), record);
-        Ok(())
+        Ok(LiveSlot {
+            supervisor: Arc::clone(self),
+            armed: true,
+        })
     }
 
     /// Exactly-once settle: moves the record into the bounded settled ring
@@ -889,6 +1013,12 @@ impl ProcessSupervisor {
         id: ProcessHandleId,
         now: u64,
     ) -> Result<SpawnedProcess, SpawnFailure> {
+        // R04-RR1-F01: the capacity slot is reserved BEFORE any OS
+        // dispatch — a full registry refuses with zero processes created.
+        // Every failure below drops the LiveSlot guard, which returns the
+        // slot exactly once.
+        let slot = self.reserve_live_slot()?;
+        let fault = self.take_spawn_fault();
         let mut command = tokio::process::Command::new(&spec.argv[0]);
         command
             .args(&spec.argv[1..])
@@ -922,14 +1052,18 @@ impl ProcessSupervisor {
             }),
         })?;
         let pid = child.id().expect("tokio child id") as i32;
-        if let Err(failure) = self.verify_group(pid, &spec) {
-            // We own the child: kill AND reap it before refusing.
+        if let Err(mut failure) = self.verify_group(pid, &spec, fault) {
+            // A post-dispatch failure: the child REALLY started, so the
+            // rollback is a bounded kill + reap of the child we own and
+            // the error keeps the dispatched fact — never a silent
+            // "nothing happened", and never a bare kill_on_drop handoff.
             // SAFETY: kill our own just-spawned child.
             unsafe {
                 libc::kill(pid, libc::SIGKILL);
             }
             let _ = child.wait().await;
-            return Err(failure);
+            note_dispatched_rollback(&mut failure, pid);
+            return Err(failure); // the LiveSlot drops: slot returned once
         }
         let stdout = child.stdout.take();
         let stderr = child.stderr.take();
@@ -975,7 +1109,10 @@ impl ProcessSupervisor {
             }),
             phase_tx: tokio::sync::watch::Sender::new(RecordPhase::Running),
         });
-        self.register(Arc::clone(&record))?;
+        // Commit: the record is fully initialized and the reaper is about
+        // to take over — the slot's release duty transfers to the settle
+        // path. From registration on, no spawn-side failure exists.
+        slot.commit(Arc::clone(&record));
         // The reaper owns the wait + the bounded stdio grace + reclaim +
         // terminal recording + settle. It is a supervisor-owned task: its
         // life is independent of any caller future.
@@ -1013,9 +1150,25 @@ impl ProcessSupervisor {
     }
 
     #[cfg(unix)]
-    fn verify_group(&self, pid: i32, spec: &SpawnSpec) -> Result<(), SpawnFailure> {
+    fn verify_group(
+        &self,
+        pid: i32,
+        spec: &SpawnSpec,
+        fault: SpawnFaultPoint,
+    ) -> Result<(), SpawnFailure> {
         // SAFETY: getpgid is a plain syscall.
         let pgid = unsafe { libc::getpgid(pid) };
+        if pgid == pid && fault == SpawnFaultPoint::GroupVerify {
+            // Verification-only fault: the REAL check passed, but the
+            // armed hook forces this branch so the dispatched-then-failed
+            // rollback (kill + reap + slot return + dispatched fact) is
+            // observable without waiting for a silent setsid failure.
+            return Err(SpawnFailure::GroupOwnership(format!(
+                "verification fault point armed: forcing the post-dispatch \
+                 group-verification failure (getpgid({pid}) actually returned {pgid} — the \
+                 group was fine; the fault exercises the rollback)"
+            )));
+        }
         if pgid != pid {
             return Err(SpawnFailure::GroupOwnership(format!(
                 "getpgid({pid}) returned {pgid}, expected the child to lead its own group \
@@ -1033,6 +1186,23 @@ impl ProcessSupervisor {
         id: ProcessHandleId,
         now: u64,
     ) -> Result<SpawnedProcess, SpawnFailure> {
+        // R04-RR1-F01: the capacity slot is reserved BEFORE the pty pair
+        // is opened and before any OS dispatch — a full registry refuses
+        // with zero resources created. Every failure below drops the
+        // LiveSlot guard (exactly-once release) and every fd this path
+        // opened is closed by its owner (OwnedFd drop / explicit drop).
+        let slot = self.reserve_live_slot()?;
+        let fault = self.take_spawn_fault();
+        if fault == SpawnFaultPoint::PtyPairOpen {
+            // Verification-only fault: exercises the pre-dispatch
+            // initialization failure (no pty was opened; zero dispatch).
+            return Err(SpawnFailure::Io {
+                message: "verification fault point armed: forcing the pty-pair open \
+                           failure (no pty was opened; zero dispatch)"
+                    .to_string(),
+                cwd_hint: None,
+            });
+        }
         let (master_fd, slave_fd) = open_pty_pair().map_err(|err| SpawnFailure::Io {
             message: format!("opening a pty pair failed: {err}"),
             cwd_hint: None,
@@ -1083,13 +1253,20 @@ impl ProcessSupervisor {
         // dup2'd copies; keeping ours would wedge the pty open forever).
         drop(slave_fd);
         let pid = child.id().expect("tokio child id") as i32;
-        if let Err(failure) = self.verify_group(pid, &spec) {
+        if let Err(mut failure) = self.verify_group(pid, &spec, fault) {
+            // Post-dispatch failure: kill AND reap the child we really
+            // dispatched, close the master we really opened (explicit —
+            // never rely on "closing the pty happens to signal the
+            // child" as the cleanup), keep the dispatched fact, return
+            // the slot exactly once.
             // SAFETY: kill our own just-spawned child.
             unsafe {
                 libc::kill(pid, libc::SIGKILL);
             }
             let _ = child.wait().await;
-            return Err(failure);
+            drop(master_fd); // close our own pty master fd
+            note_dispatched_rollback(&mut failure, pid);
+            return Err(failure); // the LiveSlot drops: slot returned once
         }
         let master = Arc::new(PtyMasterHandle {
             fd: Mutex::new(Some(master_fd)),
@@ -1141,7 +1318,10 @@ impl ProcessSupervisor {
             }),
             phase_tx: tokio::sync::watch::Sender::new(RecordPhase::Running),
         });
-        self.register(Arc::clone(&record))?;
+        // Commit: the record is fully initialized; the reader and the
+        // reaper are about to take over. The slot's release duty
+        // transfers to the settle path.
+        slot.commit(Arc::clone(&record));
         // The master reader appends pty output into the transcript until
         // the master closes (child exit → EIO/EOF, or our reclaim).
         {
@@ -1963,5 +2143,135 @@ mod tests {
         assert_eq!(ExitFact::Code(7).status_code(), 7);
         assert_eq!(ExitFact::Signal(9).status_code(), 137);
         assert_eq!(ExitFact::Signal(15).status_code(), 143);
+    }
+
+    // ── R04-RR1-F01: live-slot admission accounting ──────────────────────
+
+    fn test_supervisor(live_cap: usize) -> Arc<ProcessSupervisor> {
+        let dir = std::env::temp_dir().join(format!(
+            "lingxi-procsup-unit-{}-{}",
+            std::process::id(),
+            std::time::SystemTime::now()
+                .duration_since(std::time::UNIX_EPOCH)
+                .unwrap()
+                .as_nanos()
+        ));
+        let mut limits = SupervisorLimits::with_spill_dir(dir);
+        limits.live_cap = live_cap;
+        Arc::new(
+            ProcessSupervisor::new(Arc::new(crate::inject::SystemClock), limits)
+                .expect("test supervisor"),
+        )
+    }
+
+    fn dummy_record(id: ProcessHandleId) -> Arc<ProcessRecord> {
+        Arc::new(ProcessRecord {
+            id,
+            owner: ProcessOwner {
+                principal_kind: "test".to_string(),
+                principal_subject: "test".to_string(),
+                session_id: "sess".to_string(),
+                run_id: "run".to_string(),
+                tool_call_id: ToolCallId::new("call".to_string()),
+            },
+            kind: ProcessKind::OneShot,
+            argv: vec!["unit".to_string()],
+            pid: 1234,
+            pgid: 1234,
+            spawned_at_unix_ms: 0,
+            inner: Mutex::new(RecordInner {
+                phase: RecordPhase::Running,
+                audit: Vec::new(),
+                settled: false,
+                collector: None,
+                transcript: None,
+                drained_stdio: false,
+                reclaimed: false,
+                pty_master: None,
+            }),
+            phase_tx: tokio::sync::watch::Sender::new(RecordPhase::Running),
+        })
+    }
+
+    fn live_count_of(supervisor: &ProcessSupervisor) -> usize {
+        lock_or_poison(&supervisor.state).live_count
+    }
+
+    #[test]
+    fn live_slot_reservation_enforces_the_cap_atomically() {
+        let supervisor = test_supervisor(1);
+        // The first reservation takes the only slot; the second is a
+        // capacity refusal (zero dispatch follows from the ordering).
+        let slot = supervisor.reserve_live_slot().expect("first reserves");
+        assert_eq!(live_count_of(&supervisor), 1);
+        assert!(
+            matches!(
+                supervisor.reserve_live_slot(),
+                Err(SpawnFailure::RegistryFull)
+            ),
+            "the second reservation must be a capacity refusal"
+        );
+        assert_eq!(live_count_of(&supervisor), 1, "refusal consumes nothing");
+        drop(slot);
+        assert_eq!(live_count_of(&supervisor), 0, "drop returns the slot once");
+        // The returned slot is immediately reusable (no leak).
+        let _again = supervisor.reserve_live_slot().expect("slot reusable");
+        assert_eq!(live_count_of(&supervisor), 1);
+    }
+
+    #[test]
+    fn live_slot_commit_transfers_release_to_settle_exactly_once() {
+        let supervisor = test_supervisor(1);
+        let id = ProcessHandleId::mint().expect("mint");
+        let record = dummy_record(id.clone());
+        let slot = supervisor.reserve_live_slot().expect("reserves");
+        assert_eq!(live_count_of(&supervisor), 1);
+        // Commit consumes the guard: a later "drop" of the spawn path
+        // cannot release the committed slot.
+        slot.commit(Arc::clone(&record));
+        assert_eq!(live_count_of(&supervisor), 1, "commit keeps the slot");
+        assert!(
+            matches!(
+                supervisor.reserve_live_slot(),
+                Err(SpawnFailure::RegistryFull)
+            ),
+            "the committed slot is live"
+        );
+        // Settle releases exactly once: repeated (late/repeated) settles
+        // never decrement again.
+        supervisor.settle(&id);
+        assert_eq!(live_count_of(&supervisor), 0, "settle returns the slot");
+        supervisor.settle(&id);
+        supervisor.settle(&id);
+        assert_eq!(
+            live_count_of(&supervisor),
+            0,
+            "repeated settles never over-release"
+        );
+        // A late settle for a record that no longer exists is a no-op —
+        // it must not mint phantom capacity (no negative undercount).
+        let ghost = ProcessHandleId::mint().expect("mint");
+        supervisor.settle(&ghost);
+        assert_eq!(live_count_of(&supervisor), 0);
+        let _ = supervisor.reserve_live_slot().expect("capacity is exact");
+    }
+
+    #[test]
+    fn live_slot_drop_after_panic_style_abandon_still_releases() {
+        let supervisor = test_supervisor(2);
+        // Simulate a spawn path abandoned between reserve and commit (the
+        // guard's Drop is the compensation — including unwind paths).
+        {
+            let _slot = supervisor.reserve_live_slot().expect("reserves");
+            assert_eq!(live_count_of(&supervisor), 1);
+        }
+        assert_eq!(live_count_of(&supervisor), 0);
+        // Rotation: many reserve/release rounds never drift the count.
+        for _ in 0..8 {
+            let slot = supervisor.reserve_live_slot().expect("reserves");
+            assert_eq!(live_count_of(&supervisor), 1);
+            drop(slot);
+            assert_eq!(live_count_of(&supervisor), 0);
+        }
     }
 }

@@ -1,0 +1,20 @@
+   Compiling lingxi-service v0.0.0 (/tmp/r04_g01_baseline/rust/crates/lingxi-service)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.97s
+     Running tests/zz_probe_a10.rs (/tmp/r04_g01_baseline/rust/target/debug/deps/zz_probe_a10-873b355c8a801259)
+
+running 1 test
+
+thread 'probe_bash_i_exit_observation' (2932165) panicked at crates/lingxi-service/tests/zz_probe_a10.rs:93:13:
+phase stayed Running for 15s; alive=true; ps: Ss   /bin/bash --noprofile --norc -i
+
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+test probe_bash_i_exit_observation ... FAILED
+
+failures:
+
+failures:
+    probe_bash_i_exit_observation
+
+test result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 0 filtered out; finished in 16.10s
+
+error: test failed, to rerun pass `-p lingxi-service --test zz_probe_a10`

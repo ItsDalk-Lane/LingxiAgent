@@ -1,0 +1,17 @@
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.09s
+     Running unittests src/lib.rs (rust/target/debug/deps/lingxi_service-8c78af55f7759b0c)
+
+running 9 tests
+test procsupervisor::tests::exit_fact_status_codes_follow_the_shell_convention ... ok
+test procsupervisor::tests::decode_prefix_utf8_boundary_variants ... ok
+test procsupervisor::tests::transcript_delivers_split_multibyte_characters_intact ... ok
+test procsupervisor::tests::transcript_ring_drop_of_undelivered_is_counted_honestly ... ok
+test procsupervisor::tests::transcript_force_delivery_flushes_a_dangling_partial ... ok
+test procsupervisor::tests::minted_handles_parse_and_forged_ones_do_not ... ok
+test procsupervisor::tests::live_slot_reservation_enforces_the_cap_atomically ... ok
+test procsupervisor::tests::live_slot_commit_transfers_release_to_settle_exactly_once ... ok
+test procsupervisor::tests::live_slot_drop_after_panic_style_abandon_still_releases ... ok
+
+test result: ok. 9 passed; 0 failed; 0 ignored; 0 measured; 281 filtered out; finished in 0.01s
+
+exit=0

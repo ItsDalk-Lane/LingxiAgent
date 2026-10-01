@@ -1,0 +1,121 @@
+# R04-RR1-F01 red reproduction (baseline 773d5a6968b87650cd135cc5684707f81d1acda0)
+# Command: ~/.cargo/bin/cargo test --manifest-path rust/Cargo.toml --locked -p lingxi-service --test r04_t05_registry_capacity
+# Date: 2026-10-01T07:58:00Z
+# Toolchain: cargo 1.98.1 (797e8a9bc 2026-08-05)
+
+# Exit code: captured below
+EXIT_CODE=101
+
+## Output
+   Compiling lingxi-service v0.0.0 (/Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-service)
+warning: variable does not need to be mutable
+   --> crates/lingxi-service/tests/r04_t05_registry_capacity.rs:392:10
+    |
+392 |     let (mut first_fut, first_id) = start_long_oneshot(&h, &ctx, "call-red-first").await;
+    |          ----^^^^^^^^^
+    |          |
+    |          help: remove this `mut`
+    |
+    = note: `#[warn(unused_mut)]` (part of `#[warn(unused)]`) on by default
+
+warning: constant `EXEC_TARGET` is never used
+  --> crates/lingxi-service/tests/r04_t05_registry_capacity.rs:49:7
+   |
+49 | const EXEC_TARGET: &str = "tool:first-party:exec_command";
+   |       ^^^^^^^^^^^
+   |
+   = note: `#[warn(dead_code)]` (part of `#[warn(unused)]`) on by default
+
+warning: fields `write_stdin_target` and `spill_dir` are never read
+  --> crates/lingxi-service/tests/r04_t05_registry_capacity.rs:63:5
+   |
+57 | struct CapHarness {
+   |        ---------- fields in this struct
+...
+63 |     write_stdin_target: ToolTargetId,
+   |     ^^^^^^^^^^^^^^^^^^
+...
+66 |     spill_dir: PathBuf,
+   |     ^^^^^^^^^
+
+warning: method `spill_file_count` is never used
+  --> crates/lingxi-service/tests/r04_t05_registry_capacity.rs:79:8
+   |
+72 | impl CapHarness {
+   | --------------- method in this implementation
+...
+79 |     fn spill_file_count(&self) -> usize {
+   |        ^^^^^^^^^^^^^^^^
+
+warning: function `call_write_stdin` is never used
+   --> crates/lingxi-service/tests/r04_t05_registry_capacity.rs:201:10
+    |
+201 | async fn call_write_stdin(
+    |          ^^^^^^^^^^^^^^^^
+
+warning: function `text_of` is never used
+   --> crates/lingxi-service/tests/r04_t05_registry_capacity.rs:225:4
+    |
+225 | fn text_of(result: &ToolExecutionResult) -> String {
+    |    ^^^^^^^
+
+warning: function `status_of` is never used
+   --> crates/lingxi-service/tests/r04_t05_registry_capacity.rs:247:4
+    |
+247 | fn status_of(result: &ToolExecutionResult) -> Option<ToolRunStatus> {
+    |    ^^^^^^^^^
+
+warning: function `wait_until` is never used
+   --> crates/lingxi-service/tests/r04_t05_registry_capacity.rs:275:10
+    |
+275 | async fn wait_until<T>(what: &str, deadline: Duration, mut probe: impl FnMut() -> Option<T>) -> T {
+    |          ^^^^^^^^^^
+
+warning: function `fd_count` is never used
+   --> crates/lingxi-service/tests/r04_t05_registry_capacity.rs:303:4
+    |
+303 | fn fd_count() -> usize {
+    |    ^^^^^^^^
+
+warning: function `write_dispatch_counter_helper` is never used
+   --> crates/lingxi-service/tests/r04_t05_registry_capacity.rs:310:4
+    |
+310 | fn write_dispatch_counter_helper(dir: &Path, counter: &Path) -> PathBuf {
+    |    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: function `make_executable` is never used
+   --> crates/lingxi-service/tests/r04_t05_registry_capacity.rs:324:4
+    |
+324 | fn make_executable(path: &Path) {
+    |    ^^^^^^^^^^^^^^^
+
+warning: function `dispatch_count` is never used
+   --> crates/lingxi-service/tests/r04_t05_registry_capacity.rs:332:4
+    |
+332 | fn dispatch_count(counter: &Path) -> usize {
+    |    ^^^^^^^^^^^^^^
+
+warning: `lingxi-service` (test "r04_t05_registry_capacity") generated 12 warnings (run `cargo fix --test "r04_t05_registry_capacity" -p lingxi-service` to apply 1 suggestion)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.90s
+     Running tests/r04_t05_registry_capacity.rs (rust/target/debug/deps/r04_t05_registry_capacity-f987ac141ed66163)
+
+running 1 test
+test repro_rr1_f01_registry_full_refusal_must_not_execute_the_command ... FAILED
+
+failures:
+
+---- repro_rr1_f01_registry_full_refusal_must_not_execute_the_command stdout ----
+
+thread 'repro_rr1_f01_registry_full_refusal_must_not_execute_the_command' (2800957) panicked at crates/lingxi-service/tests/r04_t05_registry_capacity.rs:428:9:
+assertion `left == right` failed: R04-RR1-F01: the refused one-shot must not have executed
+  left: "7e8f4d94580a98fb26ccced99599f9e6e228409ff4b4951c6f84551ffd9bd1d3"
+ right: "678bf03b47ad96012e4b7cf24f90a91aefc5c921863940998e65e28463f45cb0"
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+
+
+failures:
+    repro_rr1_f01_registry_full_refusal_must_not_execute_the_command
+
+test result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.05s
+
+error: test failed, to rerun pass `-p lingxi-service --test r04_t05_registry_capacity`
