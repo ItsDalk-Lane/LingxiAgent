@@ -1,0 +1,10 @@
+ M rust/crates/lingxi-service/src/bin/r04_t07_fixture.rs
+ M rust/crates/lingxi-service/src/filetools.rs
+ M rust/crates/lingxi-service/src/lib.rs
+ M rust/crates/lingxi-service/src/toolgateway.rs
+ M rust/crates/lingxi-service/src/workerrpc.rs
+ M rust/crates/lingxi-service/tests/r04_t04_file_tools.rs
+ M rust/crates/lingxi-service/tests/r04_t07_mcp_and_workers.rs
+ M rust/crates/xtask/src/main.rs
+ M rust/crates/xtask/src/runner_identity.rs
+ M rust/crates/xtask/src/stage_map.rs

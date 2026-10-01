@@ -1,0 +1,63 @@
+{
+ "schema": "lingxi.r04-t08-gate-negative-tests.v1",
+ "isolatedCopy": "git worktree at HEAD + uncommitted R04-T08 files (removed after the run); cargo target $HOME/.cache/lingxi-r04-t08-neg-target (outside /private/tmp and $TMPDIR \u2014 the sandbox contract makes those writable, see report \u00a75 10a)",
+ "gate": "cargo run -p xtask -- verify-stage R04 (real binary, rebuilt inside the copy)",
+ "wrapper_interruption_note": "The battery wrapper was killed by the host mid-c03b after n3 passed; c03b was re-run standalone with identical methodology and merged (c03b-worktree-add.log, case-row.tsv). Full-gate cases carry one known worktree-copy environment red: the nested R03 gate's r02_legacy_regression assumes a .git directory, a git-worktree copy has .git as a file \u2014 the MAIN repo gate is unaffected (real .git; R03 stage-review precedent).",
+ "cases": [
+  {
+   "case": "n-unknown-stage",
+   "exitCode": 2,
+   "gapNamed": "OK",
+   "verdict": "OK"
+  },
+  {
+   "case": "n-empty-scenario-set",
+   "exitCode": 2,
+   "gapNamed": "OK",
+   "verdict": "OK"
+  },
+  {
+   "case": "n1a-delete-leaf-mapping",
+   "exitCode": 1,
+   "gapNamed": "OK",
+   "verdict": "OK"
+  },
+  {
+   "case": "n1b-delete-command-mapping",
+   "exitCode": 2,
+   "gapNamed": "OK",
+   "verdict": "OK"
+  },
+  {
+   "case": "c03a-stale-evidence-root",
+   "exitCode": 1,
+   "gapNamed": "OK",
+   "verdict": "OK"
+  },
+  {
+   "case": "n4-delete-sup-scenario",
+   "exitCode": 101,
+   "gapNamed": "OK",
+   "verdict": "OK"
+  },
+  {
+   "case": "n2-zero-match-filter",
+   "exitCode": 1,
+   "gapNamed": "OK",
+   "verdict": "OK"
+  },
+  {
+   "case": "n3-missing-evidence-file",
+   "exitCode": 1,
+   "gapNamed": "OK",
+   "verdict": "OK"
+  },
+  {
+   "case": "c03b-midrun-input-change",
+   "exitCode": 1,
+   "gapNamed": "OK",
+   "verdict": "OK"
+  }
+ ],
+ "allRefused": true
+}

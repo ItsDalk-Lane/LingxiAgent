@@ -2098,4 +2098,392 @@ mod map_tests {
              F01-F07 suite/count mapping (missing suite, extra suite, or count drift)"
         );
     }
+    // ── R04-T08: pin the PRODUCTION R04 map ─────────────────────────────
+    //
+    // Same reasoning as the R03 pinning block above: the gate's
+    // cross-checks guard the R00 supplemental leaves and per-command
+    // evidence, but the base scenario registration, the supplemental-duty
+    // scenarios and the share-case inventory exist only in the map —
+    // deleting any of them would otherwise leave a silent hole. These
+    // tests pin the registered R04 map (they run inside `cargo test`,
+    // itself the gate's `rust_test_workspace` command).
+
+    /// The REAL registered R04 stage map (same bytes `verify-stage R04`
+    /// loads via STAGE_MAPS).
+    const R04_PRODUCTION: &str = include_str!("stage_maps/R04.json");
+
+    /// The 56 case names the matrix producer records (the exact set the
+    /// share leaves' assertion contracts may pin — a map pinning anything
+    /// else, or the producer losing a case, is a named gap).
+    const R04_MATRIX_CASES: &[&str] = &[
+        "a15-directory-claim-refused",
+        "a15-gateway-audit-directory-ref-failed",
+        "a15-gateway-audit-fake-ref-failed",
+        "a15-gateway-audit-real-ref-passes",
+        "a15-missing-claim-refused",
+        "a15-out-of-grant-claim-refused",
+        "a15-real-delivery-registered",
+        "a15-structure-violation-refused",
+        "a16-alias-route-covered",
+        "a16-history-preserved",
+        "approval-answer-executes-once",
+        "approval-duplicate-idempotent",
+        "approval-reject-zero-dispatch",
+        "catalog-face-lists-mcp-tools-with-permission",
+        "future-tool-shape-ast_edit-discoverable-not-callable",
+        "future-tool-shape-ast_grep-discoverable-not-callable",
+        "future-tool-shape-file-discoverable-not-callable",
+        "future-tool-shape-find-discoverable-not-callable",
+        "future-tool-shape-grep-discoverable-not-callable",
+        "future-tool-shape-ls-discoverable-not-callable",
+        "future-tool-shape-lsp-discoverable-not-callable",
+        "future-tool-shape-materialize-discoverable-not-callable",
+        "future-tool-shape-run_code-discoverable-not-callable",
+        "future-tool-shape-security_scan-discoverable-not-callable",
+        "future-tool-shape-stage_files-discoverable-not-callable",
+        "gateway-each-call-independent-permission",
+        "matrix-lifecycle-disable-holes",
+        "matrix-lifecycle-generation-refusals",
+        "matrix-lifecycle-uninstall-holes",
+        "matrix-permission-consistency",
+        "matrix-route-consistency",
+        "matrix-tool-family-count",
+        "mcp-connector-catalog-sync",
+        "mcp-connector-register-handshake",
+        "mcp-describe-real-identity",
+        "mcp-search-namespaced",
+        "mcp-tool-call-full-chain",
+        "mcp-tool-permission-face",
+        "permission-face-modes-verifiable",
+        "preauthorization-single-session-scoped",
+        "semantics-cancel-leaves-no-fabricated-receipt",
+        "semantics-failed-never-dispatched-receipt",
+        "semantics-success-receipt-dispatched",
+        "semantics-unknown-receipt-honest",
+        "sup01-ask-subagent-write-refused",
+        "terminal-close-stops-terminal",
+        "terminal-snapshot-current-transcript",
+        "terminal-tail-cursor-continuation",
+        "tool-edit-conflict-preserves-user-version",
+        "tool-edit-real-chain",
+        "tool-exec-cancel-cleanup",
+        "tool-exec-command-real-chain",
+        "tool-read-real-chain",
+        "tool-write-real-chain",
+        "tool-write-stdin-continuation",
+        "tool-write-stdin-foreign-writes",
+    ];
+
+    /// The subset of producer cases that evidence the BASE scenarios
+    /// (R04-A15/A16, the SUP-01 refusal cell, the matrix cell counters and
+    /// the T08 unified outcome semantics) rather than any one leaf's
+    /// share — they still run every gate (the producer records them) and
+    /// still must exist in R04_MATRIX_CASES, but no leaf owns them.
+    const R04_SCENARIO_EVIDENCE_CASES: &[&str] = &[
+        "a15-directory-claim-refused",
+        "a15-gateway-audit-directory-ref-failed",
+        "a15-gateway-audit-fake-ref-failed",
+        "a15-gateway-audit-real-ref-passes",
+        "a15-missing-claim-refused",
+        "a15-out-of-grant-claim-refused",
+        "a15-structure-violation-refused",
+        "a16-alias-route-covered",
+        "a16-history-preserved",
+        "matrix-permission-consistency",
+        "matrix-tool-family-count",
+        "semantics-cancel-leaves-no-fabricated-receipt",
+        "semantics-failed-never-dispatched-receipt",
+        "semantics-success-receipt-dispatched",
+        "semantics-unknown-receipt-honest",
+        "sup01-ask-subagent-write-refused",
+    ];
+
+    /// The 124 R00 leaves bound to R04 split 55 share / 69 deferred by the
+    /// R04-T08 executor's stage-share decision (the generator script
+    /// `scripts/rust-tauri/r04_t08_generate_stage_map.py` holds the table;
+    /// these numbers pin it — a re-classification that silently drops
+    /// share coverage turns this red until the map and the decision agree).
+    const R04_LEAF_COUNTS: (usize, usize) = (55, 69);
+
+    fn parse_production_r04() -> StageMap {
+        parse_stage_map(R04_PRODUCTION)
+            .expect("the registered R04 stage map must parse with this runner")
+    }
+
+    use std::path::Path;
+
+    #[test]
+    fn r04_production_map_keeps_the_sixteen_a_scenarios_verbatim() {
+        let map = parse_production_r04();
+        // The frozen T01..T08 registration: id → commandRefs.
+        let expected: &[(&str, &[&str])] = &[
+            ("R04-A01", &["rust_test_workspace", "r04_tool_matrix"]),
+            ("R04-A02", &["rust_test_workspace", "r04_tool_matrix"]),
+            ("R04-A03", &["rust_test_workspace", "r04_tool_matrix"]),
+            ("R04-A04", &["rust_test_workspace"]),
+            ("R04-A05", &["rust_test_workspace", "r04_tool_matrix"]),
+            ("R04-A06", &["rust_test_workspace", "r04_tool_matrix"]),
+            ("R04-A07", &["rust_test_workspace", "r04_tool_matrix"]),
+            ("R04-A08", &["rust_test_workspace"]),
+            ("R04-A09", &["rust_test_workspace", "r04_tool_matrix"]),
+            ("R04-A10", &["rust_test_workspace", "r04_tool_matrix"]),
+            ("R04-A11", &["rust_test_workspace"]),
+            ("R04-A12", &["rust_test_workspace"]),
+            ("R04-A13", &["rust_test_workspace", "r04_tool_matrix"]),
+            ("R04-A14", &["rust_test_workspace", "r04_tool_matrix"]),
+            // A15 additionally pins the STANDARD battery (the R03-A15
+            // pattern): an unreferenced command would be silently skipped
+            // by the runner, so fmt/clippy/contracts/boundaries must be
+            // referenced here to actually run inside the gate.
+            (
+                "R04-A15",
+                &[
+                    "r04_tool_matrix",
+                    "rust_test_workspace",
+                    "rust_fmt",
+                    "rust_clippy",
+                    "check_contracts",
+                    "check_boundaries",
+                ],
+            ),
+            ("R04-A16", &["r04_tool_matrix", "rust_test_workspace"]),
+        ];
+        for (id, refs) in expected {
+            let scenario = map
+                .scenarios
+                .iter()
+                .find(|s| s.id == *id)
+                .unwrap_or_else(|| panic!("R04 map dropped original scenario {id}"));
+            assert_eq!(scenario.requirement, "REQUIRED", "{id} re-graded");
+            assert_eq!(
+                &scenario
+                    .command_refs
+                    .iter()
+                    .map(String::as_str)
+                    .collect::<Vec<_>>(),
+                refs,
+                "scenario {id} commandRefs drifted from the T08 registration"
+            );
+        }
+    }
+
+    #[test]
+    fn r04_production_map_registers_the_supplemental_duty_scenarios() {
+        let map = parse_production_r04();
+        for (id, refs) in [
+            ("R04-SUP01", vec!["rust_test_workspace", "r04_tool_matrix"]),
+            ("R04-SUP03", vec!["rust_test_workspace"]),
+            (
+                "R04-SUP05",
+                vec!["r03_regression_gate", "rust_test_workspace"],
+            ),
+        ] {
+            let scenario = map
+                .scenarios
+                .iter()
+                .find(|s| s.id == id)
+                .unwrap_or_else(|| panic!("R04 map dropped the supplemental-duty scenario {id}"));
+            assert_eq!(scenario.requirement, "REQUIRED");
+            assert_eq!(&scenario.command_refs, &refs, "{id} commandRefs drifted");
+        }
+    }
+
+    #[test]
+    fn r04_production_map_registers_the_matrix_and_regression_producers() {
+        let map = parse_production_r04();
+        let matrix = map
+            .commands
+            .iter()
+            .find(|c| c.key == "r04_tool_matrix")
+            .unwrap_or_else(|| panic!("R04 map dropped the r04_tool_matrix producer"));
+        assert_eq!(
+            matrix.argv,
+            vec![
+                "bash",
+                "scripts/rust-tauri/r04_t08_matrix.sh",
+                "{EVIDENCE}/R04_MATRIX"
+            ]
+        );
+        assert!(matrix
+            .evidence_paths
+            .contains(&"{EVIDENCE}/R04_MATRIX/leaf-cases.json".to_string()));
+        let regression = map
+            .commands
+            .iter()
+            .find(|c| c.key == "r03_regression_gate")
+            .unwrap_or_else(|| panic!("R04 map dropped the r03_regression_gate command"));
+        assert!(regression.argv.contains(&"verify-stage".to_string()));
+        assert!(regression.argv.contains(&"R03".to_string()));
+        assert!(regression
+            .evidence_paths
+            .contains(&"{EVIDENCE}/R03_REGRESSION/verify-stage-result.json".to_string()));
+        // The producer script must exist in the tree (a deleted producer is
+        // a command that can only ever fail).
+        let repo_root = Path::new(env!("CARGO_MANIFEST_DIR"))
+            .ancestors()
+            .nth(3)
+            .expect("xtask lives at rust/crates/xtask");
+        assert!(
+            repo_root
+                .join("scripts/rust-tauri/r04_t08_matrix.sh")
+                .is_file(),
+            "the registered r04_tool_matrix producer script must exist"
+        );
+    }
+
+    #[test]
+    fn r04_production_map_keeps_the_124_leaf_split() {
+        let map = parse_production_r04();
+        assert_eq!(
+            map.supplemental_leaves.len(),
+            124,
+            "the R04 map must keep exactly the 124 R00-bound supplemental leaves"
+        );
+        let share = map
+            .supplemental_leaves
+            .iter()
+            .filter(|l| l.basis_kind == BASIS_STAGE_SHARE_SATISFIED)
+            .count();
+        let deferred = map
+            .supplemental_leaves
+            .iter()
+            .filter(|l| l.basis_kind == BASIS_DEFERRED_TO_LATER_STAGE)
+            .count();
+        assert_eq!(
+            (share, deferred),
+            R04_LEAF_COUNTS,
+            "the share/deferred split drifted from the registered decision"
+        );
+        assert!(
+            map.supplemental_leaves
+                .iter()
+                .filter(|l| l.basis_kind == BASIS_STAGE_SHARE_SATISFIED)
+                .all(|l| l.assertion_contract.is_some()),
+            "every R04 share leaf must keep its assertion contract (R14-F01)"
+        );
+        // Every share leaf pins only REAL producer cases, and every known
+        // case is pinned by at least one leaf (an unpinned case is dead
+        // evidence; an unknown pin can never hold).
+        let mut pinned: Vec<&str> = Vec::new();
+        for leaf in &map.supplemental_leaves {
+            if let Some(contract) = leaf.assertion_contract.as_ref() {
+                for case in &contract.cases {
+                    assert!(
+                        R04_MATRIX_CASES.contains(&case.case.as_str()),
+                        "leaf {} pins unknown matrix case {:?}",
+                        leaf.id,
+                        case.case
+                    );
+                    pinned.push(case.case.as_str());
+                }
+            }
+        }
+        for known in R04_MATRIX_CASES {
+            if R04_SCENARIO_EVIDENCE_CASES.contains(known) {
+                // Base-scenario evidence (A15/A16, the SUP-01 cell, the
+                // matrix cell counters and the unified outcome semantics):
+                // consumed by the scenario roll-up on command outcomes, not
+                // by any single leaf's contract.
+                continue;
+            }
+            assert!(
+                pinned.contains(known),
+                "matrix case {known} is recorded by the producer but pinned by NO leaf — \
+                 it must be bound to a share contract or removed from the producer"
+            );
+        }
+    }
+
+    /// The EXPECTATION each producer case records (mirrored from the
+    /// producer's `record_case` calls in
+    /// lingxi-service/tests/r04_t08_tool_matrix.rs — the future-tool-shape
+    /// cases are emitted through a `format!` there, all with expect 1).
+    /// The generator's share table once pinned `matrix-lifecycle-
+    /// disable-holes` as 1 while the producer (and the zero-holes
+    /// semantics it encodes) records 0 — the full gate caught it, but a
+    /// name-only pin cannot; this table pins the VALUES so an expect typo
+    /// fails `cargo test` instead of a whole gate run.
+    fn r04_case_expect(case: &str) -> Option<i64> {
+        if case.starts_with("future-tool-shape-") {
+            return Some(1);
+        }
+        const EXPECTS: &[(&str, i64)] = &[
+            ("a15-directory-claim-refused", 1),
+            ("a15-gateway-audit-directory-ref-failed", 1),
+            ("a15-gateway-audit-fake-ref-failed", 1),
+            ("a15-gateway-audit-real-ref-passes", 1),
+            ("a15-missing-claim-refused", 1),
+            ("a15-out-of-grant-claim-refused", 1),
+            ("a15-real-delivery-registered", 1),
+            ("a15-structure-violation-refused", 1),
+            ("a16-alias-route-covered", 1),
+            ("a16-history-preserved", 1),
+            ("approval-answer-executes-once", 1),
+            ("approval-duplicate-idempotent", 1),
+            ("approval-reject-zero-dispatch", 0),
+            ("catalog-face-lists-mcp-tools-with-permission", 1),
+            ("gateway-each-call-independent-permission", 1),
+            ("matrix-lifecycle-disable-holes", 0),
+            ("matrix-lifecycle-generation-refusals", 0),
+            ("matrix-lifecycle-uninstall-holes", 0),
+            ("matrix-permission-consistency", 1),
+            ("matrix-route-consistency", 1),
+            ("matrix-tool-family-count", 7),
+            ("mcp-connector-catalog-sync", 1),
+            ("mcp-connector-register-handshake", 1),
+            ("mcp-describe-real-identity", 1),
+            ("mcp-search-namespaced", 1),
+            ("mcp-tool-call-full-chain", 1),
+            ("mcp-tool-permission-face", 1),
+            ("permission-face-modes-verifiable", 1),
+            ("preauthorization-single-session-scoped", 1),
+            ("semantics-cancel-leaves-no-fabricated-receipt", 1),
+            ("semantics-failed-never-dispatched-receipt", 1),
+            ("semantics-success-receipt-dispatched", 1),
+            ("semantics-unknown-receipt-honest", 1),
+            ("sup01-ask-subagent-write-refused", 1),
+            ("terminal-close-stops-terminal", 1),
+            ("terminal-snapshot-current-transcript", 1),
+            ("terminal-tail-cursor-continuation", 1),
+            ("tool-edit-conflict-preserves-user-version", 1),
+            ("tool-edit-real-chain", 1),
+            ("tool-exec-cancel-cleanup", 1),
+            ("tool-exec-command-real-chain", 1),
+            ("tool-read-real-chain", 1),
+            ("tool-write-real-chain", 1),
+            ("tool-write-stdin-continuation", 1),
+            ("tool-write-stdin-foreign-writes", 0),
+        ];
+        EXPECTS
+            .iter()
+            .find(|(name, _)| *name == case)
+            .map(|(_, expect)| *expect)
+    }
+
+    #[test]
+    fn r04_production_map_pins_the_real_case_expectations() {
+        let map = parse_production_r04();
+        // Every known producer case must have a mirrored expectation here
+        // (a missing mirror is itself a gap — it means this table drifted
+        // from the producer), and every PIN in the map must equal it.
+        for known in R04_MATRIX_CASES {
+            let expect = r04_case_expect(known).unwrap_or_else(|| {
+                panic!("case {known} has no mirrored expectation in r04_case_expect")
+            });
+            for leaf in &map.supplemental_leaves {
+                if let Some(contract) = leaf.assertion_contract.as_ref() {
+                    for case in &contract.cases {
+                        if case.case == *known {
+                            assert_eq!(
+                                case.expect, expect,
+                                "leaf {} pins case {} with the wrong expectation (the producer \
+                                 records {expect})",
+                                leaf.id, case.case
+                            );
+                        }
+                    }
+                }
+            }
+        }
+    }
 }

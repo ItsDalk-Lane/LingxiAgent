@@ -1,390 +1,416 @@
 {
-  "schemaVersion": 1,
-  "artifactKind": "R04_TEST_MAP",
-  "stage_id": "R04",
-  "generated_by": "R04 orchestrator (startup prep, one-shot; per-task entries appended by executors/reviewers)",
-  "generated_at": "2026-09-30",
-  "conventions": {
-    "gate_commands": [
-      "cargo fmt --manifest-path rust/Cargo.toml --all -- --check",
-      "cargo clippy --manifest-path rust/Cargo.toml --workspace --all-targets --locked -- -D warnings",
-      "cargo test --manifest-path rust/Cargo.toml --workspace --locked",
-      "cargo run --manifest-path rust/Cargo.toml --locked -p xtask -- check-contracts",
-      "cargo run --manifest-path rust/Cargo.toml --locked -p xtask -- check-boundaries"
-    ],
-    "stage_gate": "cargo run --manifest-path rust/Cargo.toml --locked -p xtask -- verify-stage R04 --evidence <fresh evidence dir>（R04.json 注册与生成在 R04-T08 完成前建立；早期逐项登记，不空集合 PASS）",
-    "r03_regression": "完整 R03 Gate（含 repair_suites 十套件）在最终候选重跑；R02 受影响定向链按 R03 图口径",
-    "toolchain_note": "必须经 rustup（~/.cargo/bin 优先于 /opt/homebrew/bin）生效 rust-toolchain.toml 1.98.1；Homebrew cargo 1.93.0 不读取锁定"
-  },
-  "tasks": {
-    "R04-T01": {
-      "status": "READY_FOR_REVIEW",
-      "acceptance_map": {
-        "R04-A01": {
-          "status": "IMPLEMENTED_SELF_CHECKED",
-          "tests": [
-            "lingxi-kernel::toolcatalog (unit battery: identity/no-overwrite/alias/schema-budget/normalization/generation)",
-            "lingxi-service --test r04_t01_tool_catalog r04_a01_catalog_and_execution_share_one_source_of_truth"
-          ]
-        },
-        "R04-A02": {
-          "status": "IMPLEMENTED_SELF_CHECKED",
-          "tests": [
-            "lingxi-kernel::toolcatalog::tests::stale_catalog_generation_refuses_and_requires_refresh",
-            "lingxi-service --test r04_t01_tool_catalog r04_a02_stale_catalog_generation_is_refused_until_refresh"
-          ]
-        }
-      },
-      "adversarial_additions": {
-        "tests": [
-          "r04_t01_tool_catalog adversarial_alias_and_primary_name_share_one_permission_contract",
-          "r04_t01_tool_catalog adversarial_malformed_inputs_never_reach_the_executor",
-          "r04_t01_tool_catalog adversarial_forged_digest_is_refused_with_zero_dispatch_on_real_chain",
-          "r04_t01_tool_catalog registry_capabilities_resolve_recovery_classification"
-        ]
-      },
-      "gate_results": {
-        "cargo fmt --check": "exit 0",
-        "cargo clippy --workspace --all-targets --locked -D warnings": "exit 0",
-        "cargo test --workspace --locked": "527 passed / 0 failed / 0 ignored, 41 suites ok, except r00_management_leaves (environment: macOS firewall vs newly-built unsigned test binary; fails identically outside this change's scope — see R04-T01_REPORT.md §5.3). Number provenance (R04-T01-R1-O04 回填): originally mis-recorded as 524; the actual candidate figure was 526 (R04-T01_REPORT.md §5 #3; review R1 §3 #6 independently measured 526); repair R1 adds 1 permanent R04-T01-R1-F01 regression test → 527, verified in docs/rust-tauri/R04/repairs/R04-T01_REPAIR_R1.md",
-        "xtask check-contracts": "exit 0 (56 generated files drift-free)",
-        "xtask check-boundaries": "exit 0 (D1-D5 + negatives)"
-      },
-      "supplemental": [
-        "R04-SUP-03: RR-T02-F1 CLOSED at T01 consumption point (canon.rs UTF-16 key order + Rust golden + cross-language node parity script); RR-T02-F2 CLOSED at tool-arguments digest boundary (safe-integer hard-fail parity with TS + PROTOCOL_SPEC §9 ruling updated); RR-T02-F3/F4 NOT consumed by T01 (event-schema/parsing surfaces, R04/R08 consumption points) — carried unchanged",
-        "R04-SUP-04 (目录面): registry supports registering R03 laterShare tool shapes honestly (Availability::Future = discoverable/not-callable); unit-tested, full business behavior remains R06-R08"
-      ],
-      "report": "docs/rust-tauri/R04/R04-T01_REPORT.md",
-      "evidence": "artifacts/rust-tauri/R04/T01-E01/"
+ "schemaVersion": 1,
+ "artifactKind": "R04_TEST_MAP",
+ "stage_id": "R04",
+ "generated_by": "R04 orchestrator (startup prep, one-shot; per-task entries appended by executors/reviewers)",
+ "generated_at": "2026-09-30",
+ "conventions": {
+  "gate_commands": [
+   "cargo fmt --manifest-path rust/Cargo.toml --all -- --check",
+   "cargo clippy --manifest-path rust/Cargo.toml --workspace --all-targets --locked -- -D warnings",
+   "cargo test --manifest-path rust/Cargo.toml --workspace --locked",
+   "cargo run --manifest-path rust/Cargo.toml --locked -p xtask -- check-contracts",
+   "cargo run --manifest-path rust/Cargo.toml --locked -p xtask -- check-boundaries"
+  ],
+  "stage_gate": "cargo run --manifest-path rust/Cargo.toml --locked -p xtask -- verify-stage R04 --evidence <fresh evidence dir>（R04.json 注册与生成在 R04-T08 完成前建立；早期逐项登记，不空集合 PASS）",
+  "r03_regression": "完整 R03 Gate（含 repair_suites 十套件）在最终候选重跑；R02 受影响定向链按 R03 图口径",
+  "toolchain_note": "必须经 rustup（~/.cargo/bin 优先于 /opt/homebrew/bin）生效 rust-toolchain.toml 1.98.1；Homebrew cargo 1.93.0 不读取锁定"
+ },
+ "tasks": {
+  "R04-T01": {
+   "status": "READY_FOR_REVIEW",
+   "acceptance_map": {
+    "R04-A01": {
+     "status": "IMPLEMENTED_SELF_CHECKED",
+     "tests": [
+      "lingxi-kernel::toolcatalog (unit battery: identity/no-overwrite/alias/schema-budget/normalization/generation)",
+      "lingxi-service --test r04_t01_tool_catalog r04_a01_catalog_and_execution_share_one_source_of_truth"
+     ]
     },
-    "R04-T02": {
-      "status": "READY_FOR_REVIEW",
-      "acceptance_map": {
-        "R04-A03": {
-          "status": "IMPLEMENTED_SELF_CHECKED",
-          "tests": [
-            "lingxi-service --test r04_t02_tool_gateway r04_a03_allow_group_is_identical_across_all_entries (direct/on-demand/subagent/background)",
-            "lingxi-service --test r04_t02_tool_gateway r04_a03_deny_group_unconfigured_policy_refuses_every_entry",
-            "lingxi-service --test r04_t02_tool_gateway r04_a03_stricter_subagent_attenuation_is_explicit (registered stricter-difference basis: kernel authorize_child_tool ACTION_BLOCKED_BY_READ_ONLY)",
-            "lingxi-service --test r04_t02_tool_gateway r04_a03_needs_approval_group_round_trips_every_entry",
-            "lingxi-service --test r04_t02_tool_gateway r04_a03_delegation_entry_goes_through_the_gateway",
-            "lingxi-service --lib toolgateway::tests::delegation_and_subagent_surfaces_record_their_entries",
-            "lingxi-service --test r04_t02_tool_gateway f01_read_only_subagent_registered_read_tool_dispatches_on_both_wirings (R04-T02-R1-F01 repair: gateway wiring read-only subagent × registered Read-class target dispatches with dispatched=true + legacy-wiring control leg)",
-            "lingxi-service --test r04_t02_tool_gateway f01_read_only_attenuation_still_denies_write_and_blocklist_targets (R04-T02-R1-F01 repair protections: policy-Allowed isolation, ApproveAll escalation attempt refused, blocklist code precedence)",
-            "lingxi-service --test r04_t02_tool_gateway f01_access_read_delegation_child_dispatches_registered_read_tools (R04-T02-R1-F01 repair: access:read delegation child run × registered Read-class call dispatches through the real launcher chain)",
-            "lingxi-kernel subagent::tests::registry_id_wiring_* (5 unit tests: local_name authoritative judgment, registry id = blocklist depth defense only, bare-name equivalence sweep)"
-          ]
-        },
-        "R04-A04": {
-          "status": "IMPLEMENTED_SELF_CHECKED",
-          "tests": [
-            "lingxi-service --test r04_t02_tool_gateway r04_a04_forged_arguments_never_override_host_facts",
-            "lingxi-service --test r04_t02_tool_gateway r04_a04_forged_and_stale_handles_are_refused_by_the_real_gateway",
-            "lingxi-service --lib toolgateway::tests::expired_and_foreign_handles_are_refused",
-            "lingxi-service --lib toolgateway::tests::prepared_handles_are_unique_and_single_use"
-          ]
-        }
-      },
-      "adversarial_additions": {
-        "tests": [
-          "r04_t02_tool_gateway adversarial_summary_a_payload_b_is_refused_at_every_layer (gateway digest re-derivation + server-bound payload dispatch)",
-          "r04_t02_tool_gateway adversarial_subagent_blocklist_holds_under_registry_target_ids (anti-recursion via prepared local_name dual check)",
-          "r04_a04_forged_and_stale_handles_are_refused_by_the_real_gateway (concurrent single-spend race via tokio::join; cross-session reuse does NOT burn the legitimate handle; disabled/generation-bumped cached handles)",
-          "lingxi-service --lib toolgateway::tests::consumed_records_are_reclaimed_under_cap_pressure (bounded memory, adversarial self-check fix)",
-          "r04_t02_tool_gateway f01_delegation_family_routing_is_first_party_only (R04-T02-R1-F01 same-root-cause closure: plugin-origin local-name collision with the delegation family takes the loud InvalidTarget refusal, zero child runs)"
-        ]
-      },
-      "gate_results": {
-        "cargo fmt --all -- --check": "exit 0",
-        "cargo clippy --workspace --all-targets --locked -- -D warnings": "exit 0",
-        "cargo test --workspace --locked": "repair R1 run: exit 0 — 771 passed / 0 failed / 0 ignored across all binaries (cargo test without --no-fail-fast stops at the first failing binary: the earlier 533/532-passed counts were PARTIAL counts that stopped at the r00_management_leaves environment failure; this run the firewall did not intercept the unsigned test binary, r00_management_leaves passed in 70.4s and every binary ran — the full-workspace count is 771). F02 correction provenance: review R1 measured 533 passed / 1 failed on the pre-repair log (fail-fast partial); the recorded 532 was a transcription error; the repair candidate adds 10 permanent tests (4 integration f01_* + 5 kernel registry_id_wiring_* + 1 gateway entropy-code) — full breakdown in docs/rust-tauri/R04/repairs/R04-T02_REPAIR_R1.md",
-        "xtask check-contracts": "exit 0",
-        "xtask check-boundaries": "exit 0 (O1-O8 + D1-D5 + B1 protected-executor boundary + negatives N1-N17)",
-        "R03 regression": "r03_g07_repair_suites.sh exit 0 (ten suites exact pinned counts); r03_t08_matrix.sh A15 exit 0 (28 leaves + 11 combos); r03_t08_a16_seed_mechanism.sh exit 0"
-      },
-      "supplemental": [
-        "R04-SUP-02: single authorization point preserved (driver RunGrant application at the journal authorized step, untouched); gateway adds NO grant logic; single journal writer preserved (gateway holds no storage port; every refusal becomes a driver-written never-dispatched receipt); policy port is the layered tool-policy face (constraint intersection, master prompt §4.2)",
-        "R04-SUP-05: R03 hard protections re-run green (ten repair suites exact pinned counts + A15 matrix + A16 seed mechanism) after the runs.rs restructure",
-        "R04-T02 怎么做 4: xtask check-boundaries extended with check B1 (protected executor symbols dispatch_executor/execute_prepared whitelisted WITH reasons; negatives N16 forged direct call + N17 reasonless whitelist entry)",
-        "R04-T02-R1 repair round (REPAIR-R04-T02-R1-F01): the child authorization on the gateway wiring now judges the prepared LOCAL NAME as the kernel-vocabulary authority (kernel authorize_child_tool_with_registry_id); the registry target id is matched against the anti-recursion blocklist only (depth defense). The previously unregistered blanket-deny of registered Read-class targets for read-only subagents is closed; the delegation-family match by local name is restricted to first-party origin. Details: docs/rust-tauri/R04/repairs/R04-T02_REPAIR_R1.md"
-      ],
-      "report": "docs/rust-tauri/R04/R04-T02_REPORT.md",
-      "evidence": "artifacts/rust-tauri/R04/T02-E01/"
-    },
-    "R04-T03": {
-      "status": "READY_FOR_REVIEW",
-      "acceptance_map": {
-        "R04-A05": {
-          "status": "IMPLEMENTED_SELF_CHECKED",
-          "tests": [
-            "lingxi-service --test r04_t03_approval_service r04_a05_approved_digest_a_cannot_execute_payload_b (waiting form: approve A -> execute exactly A; double-click AlreadySettled; submit B -> independent pending record, A's settled id cannot settle it; reject B -> failed+dispatched=false, executor payloads exactly [A, A2]; pre-authorization form: grant keyed target+digest covers only the granted invocation, B2 re-requested and rejected)",
-            "lingxi-service --lib approval_service::tests::preauthorization_key_discrimination_and_use_budget (whole-key discrimination: different digest/session/target never match; single use exhausts atomically)"
-          ]
-        },
-        "R04-A06": {
-          "status": "IMPLEMENTED_SELF_CHECKED",
-          "tests": [
-            "lingxi-service --test r04_t03_approval_service r04_a06_wait_disabled_then_approved_still_refuses (disable leg: gateway_target_changed + disabled reason, zero executions; uninstall leg: not-registered refusal, zero executions)"
-          ]
-        }
-      },
-      "adversarial_additions": {
-        "tests": [
-          "r04_t03_approval_service sup01_ask_tier_subagent_matrix_on_the_real_chain (R04-SUP-01 closure on the real delegation chain: ask+omitted/explicit-write -> TOOL_APPROVAL_UNAVAILABLE+deny_on_prompt+zero dispatch; ask+read allowed; operate+omitted legitimate write executes; read_only+explicit-write dispatch refusal; read_only+omitted -> kernel ACTION_BLOCKED_BY_READ_ONLY + read dispatches; read_only+explicit read keeps the T02 F01 fix)",
-          "r04_t03_approval_service o05_policy_allowed_never_re_prompts_the_wired_gate (O05 formal adjudication: policy Allowed never consults the wired gate even when it always rejects; ask/NeedsApproval leg honors the gate)",
-          "r04_t03_approval_service approval_timeout_is_a_definite_rejection_and_late_approval_is_refused (bounded wait = definite rejection, zero executions; late approval Refused(expired))",
-          "r04_t03_approval_service cancel_during_wait_then_late_approval_never_resurrects (real cancel_run -> AbortOnDrop marks the record; late approval Refused(aborted); never resurrects)",
-          "r04_t03_approval_service one_approval_cannot_be_spent_by_two_concurrent_requests + concurrent_spends_of_one_grant_produce_exactly_one_winner (independent records; cross-session id replay refused; tokio::join double-spend of one grant = exactly one winner)",
-          "r04_t03_approval_service restart_invalidates_old_approvals_and_grants (old approval id Refused(unknown/do not survive restarts); old grant gone; replay opens its OWN pending)",
-          "r04_t03_approval_service alias_cannot_reuse_a_single_use_grant (alias resolves to the same target; the single-use grant is exhausted by the first spend, the alias spend parks on its own pending)",
-          "r04_t03_approval_service user_session_mode_matrix_on_the_real_chain (read_only write -> gateway_policy_denied+ACTION_BLOCKED_BY_READ_ONLY; ask write round-trips the real approval wait; operate allows)",
-          "lingxi-service --lib approval_service (policy matrix unit battery: user modes, SUP-01 refusal vocabulary, approval-policy resolution, answer-surface ownership/determinism)"
-        ]
-      },
-      "gate_results": {
-        "cargo fmt --all -- --check": "exit 0",
-        "cargo clippy --workspace --all-targets --locked -- -D warnings": "exit 0",
-        "cargo test --workspace --locked": "exit 0 — 788 passed / 0 failed / 0 ignored across 76 green binaries (r00_management_leaves passed this run: the macOS firewall interception of unsigned test binaries is an intermittent environment item registered since T01, kept open, not written off)",
-        "xtask check-contracts": "exit 0 (626 entries, zero drift)",
-        "xtask check-boundaries": "exit 0 (O1-O8 + D1-D5 + B1; --self-test N1-N17 exit 0)",
-        "R03 regression": "r03_g07_repair_suites.sh exit 0 (ten suites exact pinned counts); r03_t08_matrix.sh A15 exit 0 (28 leaves + 11 combos); r03_t08_a16_seed_mechanism.sh exit 0"
-      },
-      "supplemental": [
-        "R04-SUP-01 CLOSED: ApprovalService policy face maps the incumbent operate/ask/read_only + deny_on_prompt/allowHumanApproval=false semantics; the ask-tier subagent write (access omitted OR explicit write inheriting the ask parent) is the structured TOOL_APPROVAL_UNAVAILABLE refusal — never an operate collapse, never auto-approved, never parked, never bare-dispatched; neighbors protected (read_only escalation refusal at dispatch and in-run, explicit-read attenuation keeping the T02 F01 fix, normal operate legitimate write, pre-authorization judged by the real old whole-key contract)",
-        "R04-T02 O05 CLOSED (formal adjudication, test-pinned): the policy face is the single source of the approval REQUIREMENT — Allowed advances without consulting the wired gate (no double prompting); NeedsApproval waits on the gate; no gate -> TOOL_APPROVAL_UNAVAILABLE (T02 semantics); the R03 minimal gate stays consulted only on the no-gateway legacy wiring",
-        "Approval records bind principal/session/run/attempt/generation/tool-call/target/canonical digest/deadline/use-budget; single-use; concurrent spends impossible (state-lock compare-and-decrement); double-click deterministic (AlreadySettled); drop-on-cancel aborts (late answers refused); restart invalidates everything (explicit rule, in-memory only)",
-        "R04-SUP-02/SUP-05: authorization decision point and journal write order untouched (kernel authorize at the authorized step, driver the only journal writer); gateway gained the trusted InvocationPermissionContext (driver snapshot, never model data); R03 ten suites + A15 + A16 re-run green",
-        "Mapping decisions registered in R04-T03_REPORT.md §8: session-mode snapshot per run admission (vs incumbent per-call read — dispatch-time attenuation was already snapshot semantics in R03); delegation-family permission classification depends on the T01-registered PermissionKind (SUP-04 real registration decides the ask-tier prompting); path-level ResourceRef binding extends the grant key in R04-T04"
-      ],
-      "report": "docs/rust-tauri/R04/R04-T03_REPORT.md",
-      "evidence": "artifacts/rust-tauri/R04/T03-E01/"
-    },
-    "R04-T04": {
-      "status": "READY_FOR_REVIEW",
-      "acceptance_map": {
-        "R04-A07": {
-          "status": "IMPLEMENTED_SELF_CHECKED",
-          "tests": [
-            "lingxi-service --test r04_t04_file_tools r04_a07_concurrent_edit_never_overwrites_the_user_version (full real chain: read v1 -> USER writes v2 between turns -> edit-per-v1 fails FILE_STALE_SINCE_READ with dispatched=true receipt and v2 intact -> authorized re-read -> retried edit succeeds on top of v2; journal receipts asserted 1:1)",
-            "lingxi-service --test r04_t04_file_tools adversarial_write_records_conflicts_and_atomicity (write-side stale conflict: v2 kept, no change record for the refused write, zero temp residue)"
-          ]
-        },
-        "R04-A08": {
-          "status": "IMPLEMENTED_SELF_CHECKED",
-          "tests": [
-            "lingxi-service --test r04_t04_file_tools r04_a08_symlinks_are_judged_by_their_real_targets (direct gateway legs: workspace link -> restricted sentinel refused for read/write/edit at prepare with zero side effects; read-granted external doc readable through its link but never writable; in-workspace link operates on its real target and stays a link)",
-            "lingxi-service --test r04_t04_file_tools r04_a08_resource_refusal_on_the_full_chain_is_never_dispatched (full chain: never-dispatched failed receipt, sentinel byte-identical)",
-            "lingxi-service --lib resourceaccess (7 unit tests: component containment, string-prefix sibling, symlink real-target judgment incl. in-workspace link, per-principal/session grant levels + revocation, missing-target parent resolution, case-insensitive resolution, unresolvable construction)"
-          ]
-        }
-      },
-      "adversarial_additions": {
-        "tests": [
-          "r04_t04_file_tools adversarial_prefix_parent_switch_and_unicode_names (ws vs ws-secret prefix sibling; parent-directory switch through a symlinked dir; spaces/Chinese/emoji filename write-read-edit round-trip)",
-          "r04_t04_file_tools adversarial_read_pagination_truncation_and_edit_vocabulary (offset/limit + remaining-lines notice, past-EOF error, 2500-line truncation with continuation, 60KB single-line notice, adjacent duplicate-read stub, BOM strip, binary/non-UTF-8 honesty, edit duplicate/not-found/empty/overlap/no-change/ENOENT vocabulary, CRLF + BOM + smart-quote fuzzy + multi-edit, schema unknown-key refusal with valid contrast)",
-          "r04_t04_file_tools adversarial_write_records_conflicts_and_atomicity (nested create + Created record + existence-verified ResourceRef, overwrite + Modified before-digest, stale conflict keeps user content and records nothing, no .lingxi-write-* residue)",
-          "r04_t04_file_tools adversarial_mid_mutation_swap_is_a_conflict_not_a_lost_update (deterministic TOCTOU via the documented MutationTestHook seam: external inode swap inside the window -> FILE_CHANGED_DURING_MUTATION, external content kept, nothing recorded, temp cleaned)",
-          "r04_t04_file_tools approval_record_binds_real_file_scope_and_alias_resolves_to_the_executor (ask-mode write parks; PendingView.resources carries the canonical write scope; approve -> write lands; T03 OBS-1 real alias-resolution leg through gateway.prepare(ByName alias) -> the REAL read executor; canonical-name identity equality; forged handle refused)",
-          "r04_t04_file_tools read_only_session_denies_file_writes_at_the_policy_face (write: ACTION_BLOCKED_BY_READ_ONLY, dispatched=false, no file; read in the same run succeeds)"
-        ]
-      },
-      "gate_results": {
-        "cargo fmt --all -- --check": "exit 0",
-        "cargo clippy --workspace --all-targets --locked -D warnings": "exit 0",
-        "cargo test --workspace --locked": "exit 0 — 804 passed / 0 failed / 0 ignored across 77 green binaries (r00_management_leaves passed this run: the macOS firewall interception of unsigned test binaries is the intermittent environment item registered since T01, kept open, not written off)",
-        "xtask check-contracts": "exit 0 (626 entries, zero drift)",
-        "xtask check-boundaries": "exit 0 (O1-O8 + D1-D5 + B1; --self-test N1-N17 exit 0)",
-        "R03 regression": "r03_g07_repair_suites.sh exit 0 (ten suites exact pinned counts); r03_t08_matrix.sh A15 exit 0 (28 leaves + 11 combos); r03_t08_a16_seed_mechanism.sh exit 0"
-      },
-      "supplemental": [
-        "ResourceAccess/ResourceScope: canonical resolution (symlinks followed; missing tails through the nearest existing ancestor), component-wise root matching (never string prefixes), workspace roots + per-(principal, session) grants at read/write levels; Windows junction/UNC forms registered under cfg(windows) with a cfg-gated reparse test (real-machine Windows verification remains the stage deferral)",
-        "Native executors: read (pagination/offset-past-EOF/2000-line+50KB truncation notices/truncated flag/BOM strip/binary-non-UTF-8 honesty/adjacent duplicate-read stub), write (parent creation/atomic same-dir temp+rename/mode preservation/stale conflict), edit (incumbent match+conflict vocabulary, exact then simplified-fuzzy (no NFKC — registered gap), CRLF/BOM preserved, unchanged-lines overlay)",
-        "TOCTOU: unix dirfd component-walk with O_NOFOLLOW from /, openat-relative final component, bounded symlink-churn re-resolution + RE-authorization, pre-rename (dev,ino,mtime,size) identity re-verification through the same dirfd, per-canonical-path mutation serialization, RAII temp cleanup covering panic paths",
-        "Gateway: bind_executor_with_resources + ResourceExtractor run at prepare (资源规范化 before 权限/批准 per the frozen chain) and re-derived at execute (临近执行重检); new refusals gateway_resource_scope_denied / gateway_resource_scope_changed; PreparedInvocation/PreparedRecord carry resources",
-        "Approvals: ApprovalRequest/ApprovalRecord/PendingView carry the REAL resource scopes (the approver approves exactly this canonical scope); runs.rs passes prepared.resources into the gate request",
-        "FileModificationRecord/FileChangeLog is the explicit checkpoint/rewind interface (full product integration R06/R07); failed/interrupted mutations record nothing",
-        "Mapping decisions in R04-T04_REPORT.md §8: GBK/office decoding and image attachments not migrated (honest metadata-only results); write-before-digest capture cap 8MiB (recorded as None, never guessed); read-only root ACL vs session-mode layering follows the incumbent; NFKC fuzzy fold not ported"
-      ],
-      "report": "docs/rust-tauri/R04/R04-T04_REPORT.md",
-      "evidence": "artifacts/rust-tauri/R04/T04-E01/"
-    },
-    "R04-T05": {
-      "status": "READY_FOR_REVIEW",
-      "acceptance_map": {
-        "R04-A09": {
-          "status": "IMPLEMENTED_SELF_CHECKED",
-          "tests": [
-            "lingxi-service --test r04_t05_process_tools r04_a09_managed_tree_is_killed_and_the_unrelated_sentinel_survives (full real chain: bash child + two sleep grandchildren publish their pids (barrier) -> real user-facing cancel_run -> ALL THREE pids fail kill(pid,0) (reaped by our supervisor, not zombies) -> the unrelated test sentinel SURVIVES -> record Terminated(CallerDropped) with killpg_sent/exit_observed/termination_settled(reclaimed=true) audit -> journal phase=Started with NO receipt (the R03 Unknown window))"
-          ]
-        },
-        "R04-A10": {
-          "status": "IMPLEMENTED_SELF_CHECKED",
-          "tests": [
-            "lingxi-service --test r04_t05_process_tools r04_a10_pty_input_reads_resize_interrupt_and_exit (real PTY via libc posix_openpt/setsid/TIOCSCTTY/TIOCSWINSZ, O_NONBLOCK master: echo round-trip -> stty size 24 80 -> resize to 40 100 -> \\x03 INTR kills the foreground job (NEVER_REACHED never prints) while the shell answers AFTER_INTR -> exit 7 -> phase Exited(7), final poll reports exited (exit code 7), late write fails 'not running'; the start result is Running{handle}, never a completion claim)"
-          ]
-        }
-      },
-      "adversarial_additions": {
-        "tests": [
-          "r04_t05_process_tools adversarial_parent_exit_with_grandchild_holding_the_pipe_is_bounded (direct child exits <1.5s under the bounded stdio grace while the sleep-2 grandchild still holds the pipe; incumbent semantics: normal exit does not kill the group; test kills the grandchild by exact pid)",
-          "r04_t05_process_tools adversarial_output_storm_is_bounded_truncated_and_spilled (spill cap pinned to 64KiB: ~500KB storm -> truncated flag + [Showing first … of N lines] notice + spill ResourceRef whose file is exactly 64KiB = capped, bounded time/memory)",
-          "r04_t05_process_tools adversarial_utf8_output_survives_chunk_splits + lingxi-service --lib procsupervisor::tests::transcript_delivers_split_multibyte_characters_intact / decode_prefix_utf8_boundary_variants / transcript_force_delivery_flushes_a_dangling_partial (multibyte chars split across chunks are joined whole — byte-offset cursor, no duplication, no mangling; dangling partials flush lossy-honestly on terminal)",
-          "r04_t05_process_tools adversarial_unresponsive_process_times_out_within_the_bound (sleep 300 + timeout 1: 1s<=elapsed<6s, timeout notice with tty continuation, Exited(137), nothing stays live)",
-          "r04_t05_process_tools adversarial_both_streams_blocking_still_completes (~180KB on BOTH stdout and stderr beyond the 64KB pipe buffer: concurrent pumping completes, exit 0)",
-          "r04_t05_process_tools adversarial_cross_session_and_forged_write_stdin_are_refused (session B writing session A's terminal = WRITE_STDIN_NOT_OWNED; forged proc:deadbeef and never-minted hex = WRITE_STDIN_UNKNOWN_PROCESS; a one-shot's live handle = WRITE_STDIN_NOT_INTERACTIVE, then cleaned via the bounded chain)",
-          "r04_t05_process_tools adversarial_cancel_racing_natural_exit_keeps_invariants (cancel fired inside the in-flight window: run settles, record terminal, pid gone; journal is either Started-without-receipt or Succeeded/Failed-with-receipt — never fabricated)",
-          "r04_t05_process_tools process_tools_go_through_the_gateway_policy_and_cwd_authorization (read_only = prepare-time ACTION_BLOCKED_BY_READ_ONLY refusal, zero dispatch; workdir outside the roots AND a symlinked workdir pointing at the restricted area = gateway_resource_scope_denied judged on the real target, sentinel untouched; in-workspace workdir runs with the canonical cwd)",
-          "r04_t05_process_tools ask_session_exec_command_round_trips_the_approval_face (ask parks; PendingView.resources carries the canonical workdir; real answer(Approve) -> journal Succeeded + dispatched=true)",
-          "r04_t05_process_tools environment_is_whitelist_plus_explicit_overrides_never_full_inherit (a planted server secret NEVER reaches the child; whitelisted PATH does; explicit env entries do)",
-          "r04_t05_process_tools persistent_terminal_lifetime_is_explicit_and_shutdown_is_bounded (tty terminal survives its starting call; shutdown_all terminates it bounded with a Terminated/137/reclaimed=true receipt)",
-          "r04_t05_process_tools terminate_after_natural_exit_is_already_terminal_and_spawn_failures_are_loud (AlreadyTerminal receipt with ZERO killpg ever sent for an exited record — the anti-PID-recycling rule; EXEC_SPAWN_FAILED + cwd-missing hint + INVALID_PARAMS vocabularies)"
-        ]
-      },
-      "gate_results": {
-        "cargo fmt --all -- --check": "exit 0",
-        "cargo clippy --workspace --all-targets --locked -D warnings": "exit 0",
-        "cargo test --workspace --locked --no-fail-fast": "exit 101 — 823 passed / 0 assertion failures across 77 green binaries; the ONLY failure is r00_management_leaves (environment: macOS firewall intercepts the newly-built unsigned test binary; reproduced identically in an isolated rerun, exit 101 — the registered intermittent item from T01/T02, kept open, not written off)",
-        "xtask check-contracts": "exit 0 (626 entries, zero drift)",
-        "xtask check-boundaries": "exit 0 (O1-O8 + D1-D5 + B1; --self-test N1-N17 exit 0)",
-        "R03 regression": "r03_g07_repair_suites.sh exit 0 (ten suites exact pinned counts); r03_t08_matrix.sh A15 exit 0 (28 leaves + 11 combos); r03_t08_a16_seed_mechanism.sh exit 0"
-      },
-      "supplemental": [
-        "ProcessSupervisor (procsupervisor.rs): POSIX process-group ownership (every spawn setsid's into its own group, pgid verified via getpgid; termination only ever fires killpg on a registered NON-TERMINAL record — the child is unreaped so the pid cannot have been recycled; no adoption API exists so a foreign leftover can never be mistaken for a managed process)",
-        "Bounded cleanup chain: mark Terminating + killpg(SIGKILL) atomically under the record lock -> bounded wait for the exit observation (default 5s; expiry = honest CleanupTimedOut, never a fabricated success) -> reaper-side reclamation (250ms bounded stdio grace because grandchildren may hold the pipe write ends; pump abort closes our read ends; pty master + spill closed; reclaimed recorded) -> settle into the bounded ring; tokio kill_on_drop is DISABLED and never the guarantee",
-        "Future-drop does not shed ownership: the executor's ProcessOwnershipGuard initiates terminate_detached (killpg fires synchronously from the Drop; the bounded tail runs on a supervisor-owned task) — the run's CALL-level cancellation tree drops the executor future at its await point and the cleanup still completes with receipts",
-        "Persistent terminals are EXPLICITLY registered (kind + owner): a run cancellation does not kill them (the tool call already returned running); they die on the explicit close path or the frozen application-exit policy shutdown_all (each bounded, each with an accurate receipt)",
-        "Env injection is EXPLICIT-whitelist only (PATH/HOME/LANG/LC_*/TERM/TZ/TMPDIR/SHELL) + bounded caller env (<=32 entries, size caps); the server's full environment (secrets) is never inherited — the incumbent env ?? process.env gap closed",
-        "Output bounds: rolling 100KiB window + head/tail truncation with the incumbent notice vocabulary + capped spill file surfaced as an Artifact ResourceRef; PTY transcript ring 256KiB with dropped-undelivered accounting; UTF-8 chunk boundaries handled by byte-offset cursor delivery",
-        "write_stdin authorization: handle format gate -> registered record -> must be PersistentTerminal -> owner (principal+session from the trusted RunContext) must match -> write/deliver; distinct stable codes for forged/unknown/not-interactive/not-owned; final drain works after exit, late writes fail honestly",
-        "Dependencies: ZERO new crates — tokio gains only the 'process' feature flag at the same locked 1.53.1 (bytes/libc/mio already in the lock; the R04-T01 serde_json precedent), libc dev-dep at the same locked 0.2; rust/Cargo.lock is byte-identical (verified by empty git diff)",
-        "Mapping decisions in R04-T05_REPORT.md §8: wait_mode=auto/background handoff (DeferredResultStore/TaskRegistry = R06/R07 surfaces) not migrated — long-running work uses timeout continuation or tty+write_stdin (taught by the timeout notice); incumbent multi-platform shell resolution collapsed to /bin/bash -c + native cwd; terminal-tool close/list surface and the jsonl transcript persistence are R06+; sandbox prefixes (bwrap/seatbelt/escalated) are T06",
-        "Windows form: spawn fails CLOSED with UnsupportedPlatform (no invented Job Object behavior) — real-machine Windows verification remains the stage platform deferral; Linux same-family POSIX calls registered as not machine-verified"
-      ],
-      "report": "docs/rust-tauri/R04/R04-T05_REPORT.md",
-      "evidence": "artifacts/rust-tauri/R04/T05-E01/"
-    },
-    "R04-T06": {
-      "status": "READY_FOR_REVIEW",
-      "acceptance_map": {
-        "R04-A11": {
-          "status": "IMPLEMENTED_SELF_CHECKED",
-          "tests": [
-            "lingxi-service --test r04_t06_sandbox r04_a11_missing_helper_at_composition_is_a_loud_refusal (helper 路径不存在：组合期 sandbox_helper_missing 响亮拒绝，无可绕过的构造路径)",
-            "lingxi-service --test r04_t06_sandbox r04_a11_replaced_helper_is_refused_and_the_impostor_never_runs (腿1：用户所有冒名 helper（exec \"$@\"）组合期 sandbox_helper_untrusted 拒绝；腿2：合法 symlink 别名组合后运行成功→中途换成冒名 helper→经真实网关链 EXEC_SANDBOX_REFUSED+sandbox_helper_untrusted、哨兵字节不变、零存活进程；腿2b：彻底删除 helper=sandbox_helper_missing 同形态)",
-            "lingxi-service --test r04_t06_sandbox r04_a11_unsupported_backend_refuses_through_the_real_chain (Windows 形态 UnsupportedSandbox：必须隔离的命令经真实链拒绝、哨兵不变、绝不裸跑)",
-            "lingxi-service --lib sandbox (构造期 seatbelt 双腿强制探针：允许腿 /usr/bin/true 在 containment core 下 exit0 + 拒绝腿 containment core 下写 /dev/null 必须失败——被替换/损坏 helper 无法通过)"
-          ]
-        },
-        "R04-A12": {
-          "status": "IMPLEMENTED_SELF_CHECKED (macos-arm64 真机实测；linux 源码级未真机、windows 后端明确拒绝——按 PLATFORM_CAPABILITIES v2 登记)",
-          "tests": [
-            "lingxi-service --test r04_t06_sandbox r04_a12_filesystem_write_isolation_holds_with_real_sentinels (工作区写允许对照+外哨兵写拒+Operation not permitted+安全提示、符号链接改向按真实目标拒、.git 写保护拒、auth.json deny-read 拒（秘密不可读）、TMPDIR 临时资源允许、沙盒内子进程允许)",
-            "lingxi-service --test r04_t06_sandbox r04_a12_network_isolation_against_the_registered_loopback_service (本测试自建登记的回环服务：contained=(deny network*) 连接拒；同策略 network-capable 允许对照拿到 pong；网络拒绝策略下请求 network-capable=sandbox_policy_unsupported)",
-            "lingxi-service --test r04_t06_sandbox r04_a12_environment_whitelist_holds_through_the_sandbox_wrapper (植入服务端秘密不达沙盒子进程；白名单 PATH+显式 env 到达；结果如实标注 sandbox: seatbelt)",
-            "lingxi-service --test r04_t06_sandbox r04_a12_sandboxed_process_tree_still_honors_the_cancellation_chain (沙盒内孙进程经 supervisor killpg 链真实回收——sandbox-exec 原地 exec 语义保组)"
-          ]
-        }
-      },
-      "adversarial_additions": {
-        "tests": [
-          "r04_t06_sandbox adversarial_policy_injection_is_refused_at_both_layers (层1：含引号的工作区根不可嵌入 SBPL 字面量→sandbox_profile_path_unsafe 拒绝执行；层2：模型参数伪造 sandbox_profile 键在 prepare 期 ArgumentsInvalid 零派发)",
-          "r04_t06_sandbox adversarial_tty_terminals_are_honestly_not_claimed_as_contained (tty 终端不套 OS 沙盒=现役语义；结果永不出现 sandbox: 标注——不谎报)",
-          "r04_t06_sandbox seatbelt_helper_trust_and_capabilities_are_recorded (helper trust：root 属主+解析路径=/usr/bin/sandbox-exec；wrapped argv 确为 helper 前缀+命令且 profile 含 deny network*)",
-          "lingxi-service --lib sandbox:: (7 单测：策略推导移植逐字、无效配置拒绝、SBPL deny-在-allow-后顺序+注入拒绝、bwrap 参数形、unsupported 全拒、版本解析、能力矩阵)"
-        ]
-      },
-      "gate_results": {
-        "cargo fmt --all -- --check": "exit 0",
-        "cargo clippy --workspace --all-targets --locked -D warnings": "exit 0",
-        "cargo test --workspace --locked": "见 R04-T06_REPORT.md §5（T06 套件 10/10+单测 7；workspace 全量与 r00 环境项按报告登记）",
-        "xtask check-contracts": "exit 0 (626 entries 零漂移)",
-        "xtask check-boundaries": "exit 0 (O1-O8 + D1-D5 + B1; --self-test N1-N17 exit 0)",
-        "R03 regression": "r03_g07_repair_suites.sh exit 0；r03_t08_matrix.sh exit 0；r03_t08_a16_seed_mechanism.sh exit 0；T01-T05 套件 6/13/11/9/14 复绿"
-      },
-      "supplemental": [
-        "SandboxPort（trait）+ SandboxPolicy（deriveSandboxPolicy 逐字移植）+ 三后端（Seatbelt 复用系统 sandbox-exec、Bwrap 源码级适配、Unsupported 对 Windows/未知平台失败关闭）；helper 信任方案：pinned 绝对路径（非 PATH）+root 属主+非组/全局可写+basename+seatbelt 双腿强制探针/bwrap --version——构造期与每次 wrap 双层验证",
-        "exec 链集成：register_process_tools 增 sandbox 参数（T05 测试一处等价更新 None，断言零变化）；一次性 exec_command argv 经 port 包裹（约束交集=T04 cwd 授权∩T05 env 白名单∩T06 OS 沙盒，各自拒绝零派发）；tty 终端按现役语义不套 OS 沙盒且结果永不谎报 containment",
-        "失败关闭：EXEC_SANDBOX_REFUSED + sandbox_{config_invalid,helper_missing,helper_untrusted,policy_unsupported,profile_path_unsafe} 稳定码；sandbox-exec 探针证明原地 exec——supervisor setsid/getpgid/killpg 链穿过 wrapper 成立（孙进程回收实测）",
-        "SBPL 策略注入防护：嵌入路径含 \" 或 \\\\ 或 NUL → sandbox_profile_path_unsafe 拒绝（现役未防护的缺口已闭合）；deny 行严格位于 allow 行之后（last-match-wins 语义保序）；realpath 嵌入（/tmp→/private/tmp 实测必需）",
-        "映射决策（登记）：require_escalated/sandbox_permissions 模型面参数未迁移（需 T02/T03 冻结面的权限分类耦合，网络能力已在端口层真实可用并验证）；现役 seatbelt -f 临时 profile 文件改为 -p 内联（消 TOCTOU/清理面，机制同为 sandbox-exec）；Windows restricted-token helper 未移植=后端拒绝（递延 R03-WINDOWS-R09-R10）"
-      ],
-      "report": "docs/rust-tauri/R04/R04-T06_REPORT.md",
-      "evidence": "artifacts/rust-tauri/R04/T06-E01/"
-    },
-    "R04-T07": {
-      "status": "READY_FOR_REVIEW",
-      "acceptance_map": {
-        "R04-A13": {
-          "status": "IMPLEMENTED_SELF_CHECKED",
-          "tests": [
-            "lingxi-service --test r04_t07_mcp_and_workers r04_a13_mcp_reconnect_never_replays_the_side_effect (受控 rmcp 双工服务真实 initialize/协商/list/call；计数动作+断回执→Unknown→refresh_mcp_server 恰一次重连+新握手→计数不盲增→get_count 核验=1)",
-            "lingxi-service --test r04_t07_mcp_and_workers r04_a13_full_chain_journals_unknown_and_a_new_decision_sees_the_real_count (真实 run 链：journal Unknown 收据；重连后新 run 的核验查询 Succeeded、计数仍 1)"
-          ]
-        },
-        "R04-A14": {
-          "status": "IMPLEMENTED_SELF_CHECKED",
-          "tests": [
-            "lingxi-service --test r04_t07_mcp_and_workers r04_a14_worker_cannot_bypass_grants_or_model_credentials (模型凭证回调→真实 UnconfiguredWorkerModel 拒 model_capability_not_configured 且秘密不泄露；越界文件参数→真实 ResourceAccess 拒 grant 零 spawn；越界 claimed_files→拒绝且不铸造本地引用；env 白名单无 HOME/秘密；主服务仍可用)"
-          ]
-        }
-      },
-      "adversarial_additions": {
-        "tests": [
-          "r04_t07_mcp_and_workers adversarial_two_servers_same_tool_name_hit_their_own_targets (两 server 同名工具=不同 target，各命中各的 server，received_calls 隔离)",
-          "r04_t07_mcp_and_workers adversarial_tools_list_change_updates_generation_and_invalidates_old_shapes (echo schema 变化→update+generation 上升→旧形状 ArgumentsInvalid 拒；boom 消失→uninstall 停止解析)",
-          "r04_t07_mcp_and_workers adversarial_error_oversized_schema_violating_and_forged_results (is_error=完成但失败回执；300KiB 输出→诚实 truncated；structured 违反 output schema→失败；file:///etc/passwd 资源链接→文本不铸造本地 ResourceRef)",
-          "r04_t07_mcp_and_workers adversarial_mcp_pagination_walks_all_pages (分页 listing 全量注册 5/5；游标=数值 offset)",
-          "r04_t07_mcp_and_workers adversarial_endless_paging_is_refused_loudly (不可信 server 永续游标→page bound 响亮拒绝，零注册)",
-          "r04_t07_mcp_and_workers cancelled_call_never_consumes_a_late_response (取消后迟到响应不消费/不复活；句柄单次不可重放；核验查询 count=1)",
-          "r04_t07_mcp_and_workers mcp_and_worker_tools_follow_the_t03_permission_face (MCP/worker 工具按 T03 面：operate→Allowed、ask→NeedsApproval、read_only→PolicyDenied 拒；ask 会话真链 park→批准→恰执行一次)",
-          "r04_t07_mcp_and_workers mcp_unsupported_endpoint_refuses_loudly (未携带 transport→mcp_endpoint_unsupported，绝不回落)",
-          "r04_t07_mcp_and_workers mcp_stdio_child_transport_and_env_whitelist_hold (真实 stdio 子进程 transport+env 白名单，HOME/秘密不到达)",
-          "r04_t07_mcp_and_workers adversarial_worker_protocol_violations_are_refused (伪 id/超限行/畸形行/未知 kind→worker_protocol_violation+主服务仍可用；double_result=首次结果单次入账)",
-          "r04_t07_mcp_and_workers adversarial_worker_deadline_and_silent_exit_are_unknown_never_clean_failures (超时→有界 kill→Unknown；无结果退出→Unknown)",
-          "r04_t07_mcp_and_workers adversarial_worker_error_result_and_callback_budget_are_host_owned (worker 自报错误=完成但失败；回调风暴=宿主预算 refusals=4 oks=2，凭证零泄露)",
-          "r04_t07_mcp_and_workers worker_claim_in_grant_mints_a_verified_resource_ref (grant 内且存在的 claimed_file 才铸造本地 ResourceRef)",
-          "r04_t07_mcp_and_workers worker_concurrency_is_bounded_by_the_runtime_semaphore (并发信号量 cap=1 串行化≥800ms)",
-          "r04_t07_mcp_and_workers worker_sandbox_binding_denies_out_of_boundary_writes (真实 T06 seatbelt：越界写 WRITE_DENIED+磁盘无痕迹；边界内允许对照)",
-          "r04_t07_mcp_and_workers mcp_tool_success_flows_through_the_full_run_chain (真链成功：journal Succeeded+dispatched+dedup；durable tool_call_completed wire 事件含 count= 内容)",
-          "lingxi-service --lib mcpbridge (4 单测：target 命名空间、注解不软化权限/恢复、远程 URI 不映射本地引用、结构化输出校验)",
-          "lingxi-service --lib workerrpc (4 单测：未配置模型诚实拒、宿主侧回调预算+token 上限、无内层仍拒、信封字段)"
-        ]
-      },
-      "gate_results": {
-        "cargo fmt --check": "exit 0",
-        "cargo clippy --workspace --all-targets --locked -D warnings": "exit 0",
-        "cargo test --workspace --locked": "见 R04-T07_REPORT.md §5（T07 集成 19/19+lib 单测 8；workspace 全量与 r00 环境项按报告登记）",
-        "xtask check-contracts": "exit 0 (626 entries 零漂移；本 Task 未触碰协议面)",
-        "xtask check-boundaries": "exit 0 (O1-O8+D1-D5+B1; --self-test N1-N17 exit 0)",
-        "R03 regression": "r03_g07_repair_suites.sh exit 0；r03_t08_matrix.sh exit 0；r03_t08_a16_seed_mechanism.sh exit 0；T01-T06 套件复绿（见报告 §5）"
-      },
-      "supplemental": [
-        "MCP 适配（rmcp 3.4.1 锁内，D-06）：真实 initialize 握手/协议协商/分页 tools/list/变更通知计数/tools/call；McpEndpoint 三态（Stdio 子进程=白名单 env+无 shell、Duplex 工厂、Unsupported=响亮拒绝）；未知回执（transport 断/超时/任务形态）=ToolOutcome::Unknown 永不盲重发；重连=refresh_mcp_server 恰一次新握手（重连从不重放调用）",
-        "listing 同步→registry generation：新增注册/变化 update（target generation 上升→旧句柄 TargetChanged）/消失 uninstall；schema 不兼容（T01 fail-closed 子集）按工具拒绝不放宽；list walk 有 page/tool 双上限（不可信 server 永续游标→响亮拒绝，E02 补齐）",
-        "worker RPC：单操作请求（CSPRNG 调用 ID/期限/资源许可/大小上限）；行级读取中途强制 cap（E02 补齐——read_line 无界缓冲缺口）；并发信号量+进程组 kill+有界 grace；stdin 失败/超时/无结果=Unknown（副作用未确认，绝不伪造干净失败）；worker 环境白名单（无 HOME/服务凭证）+可选 T06 沙盒包裹",
-        "宿主回调契约：WorkerModelPort（R05 边界面）；UnconfiguredWorkerModel=生产形态（model_capability_not_configured 诚实拒）；BoundedWorkerModel 宿主侧回调数+输出 token 预算（内层端口之前强制）；worker 永不获得凭证",
-        "网关集成：MCP/worker 工具全部经 T02 网关（prepare→T03 策略/批准→execute）注册执行（PermissionKind::Execute，read_only 拒/ask 弹审/operate 放行——T03 面真实裁定）；结果=结构化 ToolSuccess（内容块/资源引用/截断/校验过的 claimed_files）",
-        "E01 中断与 E02 续做：E01 交付了桥/worker RPC/fixture/测试的骨架但未跑通验证（合成分页 fixture 游标 bug 致无限循环挂死、行读取无界、6 断言错误、2 clippy lint、T03 面与取消迟到响应对抗项缺失）；E02 修复补齐并全套验证——详见 R04-T07_REPORT.md §2.3"
-      ],
-      "report": "docs/rust-tauri/R04/R04-T07_REPORT.md",
-      "evidence": "artifacts/rust-tauri/R04/T07-E02/"
-    },
-    "R04-T08": {
-      "status": "PENDING",
-      "acceptance_map": {
-        "R04-A15": {
-          "status": "NOT_STARTED",
-          "tests": []
-        },
-        "R04-A16": {
-          "status": "NOT_STARTED",
-          "tests": []
-        }
-      },
-      "supplemental": [
-        "R04 stage map 注册与 verify-stage R04 建立",
-        "全矩阵（目录×权限×入口×生命周期）"
-      ]
+    "R04-A02": {
+     "status": "IMPLEMENTED_SELF_CHECKED",
+     "tests": [
+      "lingxi-kernel::toolcatalog::tests::stale_catalog_generation_refuses_and_requires_refresh",
+      "lingxi-service --test r04_t01_tool_catalog r04_a02_stale_catalog_generation_is_refused_until_refresh"
+     ]
     }
+   },
+   "adversarial_additions": {
+    "tests": [
+     "r04_t01_tool_catalog adversarial_alias_and_primary_name_share_one_permission_contract",
+     "r04_t01_tool_catalog adversarial_malformed_inputs_never_reach_the_executor",
+     "r04_t01_tool_catalog adversarial_forged_digest_is_refused_with_zero_dispatch_on_real_chain",
+     "r04_t01_tool_catalog registry_capabilities_resolve_recovery_classification"
+    ]
+   },
+   "gate_results": {
+    "cargo fmt --check": "exit 0",
+    "cargo clippy --workspace --all-targets --locked -D warnings": "exit 0",
+    "cargo test --workspace --locked": "527 passed / 0 failed / 0 ignored, 41 suites ok, except r00_management_leaves (environment: macOS firewall vs newly-built unsigned test binary; fails identically outside this change's scope — see R04-T01_REPORT.md §5.3). Number provenance (R04-T01-R1-O04 回填): originally mis-recorded as 524; the actual candidate figure was 526 (R04-T01_REPORT.md §5 #3; review R1 §3 #6 independently measured 526); repair R1 adds 1 permanent R04-T01-R1-F01 regression test → 527, verified in docs/rust-tauri/R04/repairs/R04-T01_REPAIR_R1.md",
+    "xtask check-contracts": "exit 0 (56 generated files drift-free)",
+    "xtask check-boundaries": "exit 0 (D1-D5 + negatives)"
+   },
+   "supplemental": [
+    "R04-SUP-03: RR-T02-F1 CLOSED at T01 consumption point (canon.rs UTF-16 key order + Rust golden + cross-language node parity script); RR-T02-F2 CLOSED at tool-arguments digest boundary (safe-integer hard-fail parity with TS + PROTOCOL_SPEC §9 ruling updated); RR-T02-F3/F4 NOT consumed by T01 (event-schema/parsing surfaces, R04/R08 consumption points) — carried unchanged",
+    "R04-SUP-04 (目录面): registry supports registering R03 laterShare tool shapes honestly (Availability::Future = discoverable/not-callable); unit-tested, full business behavior remains R06-R08"
+   ],
+   "report": "docs/rust-tauri/R04/R04-T01_REPORT.md",
+   "evidence": "artifacts/rust-tauri/R04/T01-E01/"
+  },
+  "R04-T02": {
+   "status": "READY_FOR_REVIEW",
+   "acceptance_map": {
+    "R04-A03": {
+     "status": "IMPLEMENTED_SELF_CHECKED",
+     "tests": [
+      "lingxi-service --test r04_t02_tool_gateway r04_a03_allow_group_is_identical_across_all_entries (direct/on-demand/subagent/background)",
+      "lingxi-service --test r04_t02_tool_gateway r04_a03_deny_group_unconfigured_policy_refuses_every_entry",
+      "lingxi-service --test r04_t02_tool_gateway r04_a03_stricter_subagent_attenuation_is_explicit (registered stricter-difference basis: kernel authorize_child_tool ACTION_BLOCKED_BY_READ_ONLY)",
+      "lingxi-service --test r04_t02_tool_gateway r04_a03_needs_approval_group_round_trips_every_entry",
+      "lingxi-service --test r04_t02_tool_gateway r04_a03_delegation_entry_goes_through_the_gateway",
+      "lingxi-service --lib toolgateway::tests::delegation_and_subagent_surfaces_record_their_entries",
+      "lingxi-service --test r04_t02_tool_gateway f01_read_only_subagent_registered_read_tool_dispatches_on_both_wirings (R04-T02-R1-F01 repair: gateway wiring read-only subagent × registered Read-class target dispatches with dispatched=true + legacy-wiring control leg)",
+      "lingxi-service --test r04_t02_tool_gateway f01_read_only_attenuation_still_denies_write_and_blocklist_targets (R04-T02-R1-F01 repair protections: policy-Allowed isolation, ApproveAll escalation attempt refused, blocklist code precedence)",
+      "lingxi-service --test r04_t02_tool_gateway f01_access_read_delegation_child_dispatches_registered_read_tools (R04-T02-R1-F01 repair: access:read delegation child run × registered Read-class call dispatches through the real launcher chain)",
+      "lingxi-kernel subagent::tests::registry_id_wiring_* (5 unit tests: local_name authoritative judgment, registry id = blocklist depth defense only, bare-name equivalence sweep)"
+     ]
+    },
+    "R04-A04": {
+     "status": "IMPLEMENTED_SELF_CHECKED",
+     "tests": [
+      "lingxi-service --test r04_t02_tool_gateway r04_a04_forged_arguments_never_override_host_facts",
+      "lingxi-service --test r04_t02_tool_gateway r04_a04_forged_and_stale_handles_are_refused_by_the_real_gateway",
+      "lingxi-service --lib toolgateway::tests::expired_and_foreign_handles_are_refused",
+      "lingxi-service --lib toolgateway::tests::prepared_handles_are_unique_and_single_use"
+     ]
+    }
+   },
+   "adversarial_additions": {
+    "tests": [
+     "r04_t02_tool_gateway adversarial_summary_a_payload_b_is_refused_at_every_layer (gateway digest re-derivation + server-bound payload dispatch)",
+     "r04_t02_tool_gateway adversarial_subagent_blocklist_holds_under_registry_target_ids (anti-recursion via prepared local_name dual check)",
+     "r04_a04_forged_and_stale_handles_are_refused_by_the_real_gateway (concurrent single-spend race via tokio::join; cross-session reuse does NOT burn the legitimate handle; disabled/generation-bumped cached handles)",
+     "lingxi-service --lib toolgateway::tests::consumed_records_are_reclaimed_under_cap_pressure (bounded memory, adversarial self-check fix)",
+     "r04_t02_tool_gateway f01_delegation_family_routing_is_first_party_only (R04-T02-R1-F01 same-root-cause closure: plugin-origin local-name collision with the delegation family takes the loud InvalidTarget refusal, zero child runs)"
+    ]
+   },
+   "gate_results": {
+    "cargo fmt --all -- --check": "exit 0",
+    "cargo clippy --workspace --all-targets --locked -- -D warnings": "exit 0",
+    "cargo test --workspace --locked": "repair R1 run: exit 0 — 771 passed / 0 failed / 0 ignored across all binaries (cargo test without --no-fail-fast stops at the first failing binary: the earlier 533/532-passed counts were PARTIAL counts that stopped at the r00_management_leaves environment failure; this run the firewall did not intercept the unsigned test binary, r00_management_leaves passed in 70.4s and every binary ran — the full-workspace count is 771). F02 correction provenance: review R1 measured 533 passed / 1 failed on the pre-repair log (fail-fast partial); the recorded 532 was a transcription error; the repair candidate adds 10 permanent tests (4 integration f01_* + 5 kernel registry_id_wiring_* + 1 gateway entropy-code) — full breakdown in docs/rust-tauri/R04/repairs/R04-T02_REPAIR_R1.md",
+    "xtask check-contracts": "exit 0",
+    "xtask check-boundaries": "exit 0 (O1-O8 + D1-D5 + B1 protected-executor boundary + negatives N1-N17)",
+    "R03 regression": "r03_g07_repair_suites.sh exit 0 (ten suites exact pinned counts); r03_t08_matrix.sh A15 exit 0 (28 leaves + 11 combos); r03_t08_a16_seed_mechanism.sh exit 0"
+   },
+   "supplemental": [
+    "R04-SUP-02: single authorization point preserved (driver RunGrant application at the journal authorized step, untouched); gateway adds NO grant logic; single journal writer preserved (gateway holds no storage port; every refusal becomes a driver-written never-dispatched receipt); policy port is the layered tool-policy face (constraint intersection, master prompt §4.2)",
+    "R04-SUP-05: R03 hard protections re-run green (ten repair suites exact pinned counts + A15 matrix + A16 seed mechanism) after the runs.rs restructure",
+    "R04-T02 怎么做 4: xtask check-boundaries extended with check B1 (protected executor symbols dispatch_executor/execute_prepared whitelisted WITH reasons; negatives N16 forged direct call + N17 reasonless whitelist entry)",
+    "R04-T02-R1 repair round (REPAIR-R04-T02-R1-F01): the child authorization on the gateway wiring now judges the prepared LOCAL NAME as the kernel-vocabulary authority (kernel authorize_child_tool_with_registry_id); the registry target id is matched against the anti-recursion blocklist only (depth defense). The previously unregistered blanket-deny of registered Read-class targets for read-only subagents is closed; the delegation-family match by local name is restricted to first-party origin. Details: docs/rust-tauri/R04/repairs/R04-T02_REPAIR_R1.md"
+   ],
+   "report": "docs/rust-tauri/R04/R04-T02_REPORT.md",
+   "evidence": "artifacts/rust-tauri/R04/T02-E01/"
+  },
+  "R04-T03": {
+   "status": "READY_FOR_REVIEW",
+   "acceptance_map": {
+    "R04-A05": {
+     "status": "IMPLEMENTED_SELF_CHECKED",
+     "tests": [
+      "lingxi-service --test r04_t03_approval_service r04_a05_approved_digest_a_cannot_execute_payload_b (waiting form: approve A -> execute exactly A; double-click AlreadySettled; submit B -> independent pending record, A's settled id cannot settle it; reject B -> failed+dispatched=false, executor payloads exactly [A, A2]; pre-authorization form: grant keyed target+digest covers only the granted invocation, B2 re-requested and rejected)",
+      "lingxi-service --lib approval_service::tests::preauthorization_key_discrimination_and_use_budget (whole-key discrimination: different digest/session/target never match; single use exhausts atomically)"
+     ]
+    },
+    "R04-A06": {
+     "status": "IMPLEMENTED_SELF_CHECKED",
+     "tests": [
+      "lingxi-service --test r04_t03_approval_service r04_a06_wait_disabled_then_approved_still_refuses (disable leg: gateway_target_changed + disabled reason, zero executions; uninstall leg: not-registered refusal, zero executions)"
+     ]
+    }
+   },
+   "adversarial_additions": {
+    "tests": [
+     "r04_t03_approval_service sup01_ask_tier_subagent_matrix_on_the_real_chain (R04-SUP-01 closure on the real delegation chain: ask+omitted/explicit-write -> TOOL_APPROVAL_UNAVAILABLE+deny_on_prompt+zero dispatch; ask+read allowed; operate+omitted legitimate write executes; read_only+explicit-write dispatch refusal; read_only+omitted -> kernel ACTION_BLOCKED_BY_READ_ONLY + read dispatches; read_only+explicit read keeps the T02 F01 fix)",
+     "r04_t03_approval_service o05_policy_allowed_never_re_prompts_the_wired_gate (O05 formal adjudication: policy Allowed never consults the wired gate even when it always rejects; ask/NeedsApproval leg honors the gate)",
+     "r04_t03_approval_service approval_timeout_is_a_definite_rejection_and_late_approval_is_refused (bounded wait = definite rejection, zero executions; late approval Refused(expired))",
+     "r04_t03_approval_service cancel_during_wait_then_late_approval_never_resurrects (real cancel_run -> AbortOnDrop marks the record; late approval Refused(aborted); never resurrects)",
+     "r04_t03_approval_service one_approval_cannot_be_spent_by_two_concurrent_requests + concurrent_spends_of_one_grant_produce_exactly_one_winner (independent records; cross-session id replay refused; tokio::join double-spend of one grant = exactly one winner)",
+     "r04_t03_approval_service restart_invalidates_old_approvals_and_grants (old approval id Refused(unknown/do not survive restarts); old grant gone; replay opens its OWN pending)",
+     "r04_t03_approval_service alias_cannot_reuse_a_single_use_grant (alias resolves to the same target; the single-use grant is exhausted by the first spend, the alias spend parks on its own pending)",
+     "r04_t03_approval_service user_session_mode_matrix_on_the_real_chain (read_only write -> gateway_policy_denied+ACTION_BLOCKED_BY_READ_ONLY; ask write round-trips the real approval wait; operate allows)",
+     "lingxi-service --lib approval_service (policy matrix unit battery: user modes, SUP-01 refusal vocabulary, approval-policy resolution, answer-surface ownership/determinism)"
+    ]
+   },
+   "gate_results": {
+    "cargo fmt --all -- --check": "exit 0",
+    "cargo clippy --workspace --all-targets --locked -- -D warnings": "exit 0",
+    "cargo test --workspace --locked": "exit 0 — 788 passed / 0 failed / 0 ignored across 76 green binaries (r00_management_leaves passed this run: the macOS firewall interception of unsigned test binaries is an intermittent environment item registered since T01, kept open, not written off)",
+    "xtask check-contracts": "exit 0 (626 entries, zero drift)",
+    "xtask check-boundaries": "exit 0 (O1-O8 + D1-D5 + B1; --self-test N1-N17 exit 0)",
+    "R03 regression": "r03_g07_repair_suites.sh exit 0 (ten suites exact pinned counts); r03_t08_matrix.sh A15 exit 0 (28 leaves + 11 combos); r03_t08_a16_seed_mechanism.sh exit 0"
+   },
+   "supplemental": [
+    "R04-SUP-01 CLOSED: ApprovalService policy face maps the incumbent operate/ask/read_only + deny_on_prompt/allowHumanApproval=false semantics; the ask-tier subagent write (access omitted OR explicit write inheriting the ask parent) is the structured TOOL_APPROVAL_UNAVAILABLE refusal — never an operate collapse, never auto-approved, never parked, never bare-dispatched; neighbors protected (read_only escalation refusal at dispatch and in-run, explicit-read attenuation keeping the T02 F01 fix, normal operate legitimate write, pre-authorization judged by the real old whole-key contract)",
+    "R04-T02 O05 CLOSED (formal adjudication, test-pinned): the policy face is the single source of the approval REQUIREMENT — Allowed advances without consulting the wired gate (no double prompting); NeedsApproval waits on the gate; no gate -> TOOL_APPROVAL_UNAVAILABLE (T02 semantics); the R03 minimal gate stays consulted only on the no-gateway legacy wiring",
+    "Approval records bind principal/session/run/attempt/generation/tool-call/target/canonical digest/deadline/use-budget; single-use; concurrent spends impossible (state-lock compare-and-decrement); double-click deterministic (AlreadySettled); drop-on-cancel aborts (late answers refused); restart invalidates everything (explicit rule, in-memory only)",
+    "R04-SUP-02/SUP-05: authorization decision point and journal write order untouched (kernel authorize at the authorized step, driver the only journal writer); gateway gained the trusted InvocationPermissionContext (driver snapshot, never model data); R03 ten suites + A15 + A16 re-run green",
+    "Mapping decisions registered in R04-T03_REPORT.md §8: session-mode snapshot per run admission (vs incumbent per-call read — dispatch-time attenuation was already snapshot semantics in R03); delegation-family permission classification depends on the T01-registered PermissionKind (SUP-04 real registration decides the ask-tier prompting); path-level ResourceRef binding extends the grant key in R04-T04"
+   ],
+   "report": "docs/rust-tauri/R04/R04-T03_REPORT.md",
+   "evidence": "artifacts/rust-tauri/R04/T03-E01/"
+  },
+  "R04-T04": {
+   "status": "READY_FOR_REVIEW",
+   "acceptance_map": {
+    "R04-A07": {
+     "status": "IMPLEMENTED_SELF_CHECKED",
+     "tests": [
+      "lingxi-service --test r04_t04_file_tools r04_a07_concurrent_edit_never_overwrites_the_user_version (full real chain: read v1 -> USER writes v2 between turns -> edit-per-v1 fails FILE_STALE_SINCE_READ with dispatched=true receipt and v2 intact -> authorized re-read -> retried edit succeeds on top of v2; journal receipts asserted 1:1)",
+      "lingxi-service --test r04_t04_file_tools adversarial_write_records_conflicts_and_atomicity (write-side stale conflict: v2 kept, no change record for the refused write, zero temp residue)"
+     ]
+    },
+    "R04-A08": {
+     "status": "IMPLEMENTED_SELF_CHECKED",
+     "tests": [
+      "lingxi-service --test r04_t04_file_tools r04_a08_symlinks_are_judged_by_their_real_targets (direct gateway legs: workspace link -> restricted sentinel refused for read/write/edit at prepare with zero side effects; read-granted external doc readable through its link but never writable; in-workspace link operates on its real target and stays a link)",
+      "lingxi-service --test r04_t04_file_tools r04_a08_resource_refusal_on_the_full_chain_is_never_dispatched (full chain: never-dispatched failed receipt, sentinel byte-identical)",
+      "lingxi-service --lib resourceaccess (7 unit tests: component containment, string-prefix sibling, symlink real-target judgment incl. in-workspace link, per-principal/session grant levels + revocation, missing-target parent resolution, case-insensitive resolution, unresolvable construction)"
+     ]
+    }
+   },
+   "adversarial_additions": {
+    "tests": [
+     "r04_t04_file_tools adversarial_prefix_parent_switch_and_unicode_names (ws vs ws-secret prefix sibling; parent-directory switch through a symlinked dir; spaces/Chinese/emoji filename write-read-edit round-trip)",
+     "r04_t04_file_tools adversarial_read_pagination_truncation_and_edit_vocabulary (offset/limit + remaining-lines notice, past-EOF error, 2500-line truncation with continuation, 60KB single-line notice, adjacent duplicate-read stub, BOM strip, binary/non-UTF-8 honesty, edit duplicate/not-found/empty/overlap/no-change/ENOENT vocabulary, CRLF + BOM + smart-quote fuzzy + multi-edit, schema unknown-key refusal with valid contrast)",
+     "r04_t04_file_tools adversarial_write_records_conflicts_and_atomicity (nested create + Created record + existence-verified ResourceRef, overwrite + Modified before-digest, stale conflict keeps user content and records nothing, no .lingxi-write-* residue)",
+     "r04_t04_file_tools adversarial_mid_mutation_swap_is_a_conflict_not_a_lost_update (deterministic TOCTOU via the documented MutationTestHook seam: external inode swap inside the window -> FILE_CHANGED_DURING_MUTATION, external content kept, nothing recorded, temp cleaned)",
+     "r04_t04_file_tools approval_record_binds_real_file_scope_and_alias_resolves_to_the_executor (ask-mode write parks; PendingView.resources carries the canonical write scope; approve -> write lands; T03 OBS-1 real alias-resolution leg through gateway.prepare(ByName alias) -> the REAL read executor; canonical-name identity equality; forged handle refused)",
+     "r04_t04_file_tools read_only_session_denies_file_writes_at_the_policy_face (write: ACTION_BLOCKED_BY_READ_ONLY, dispatched=false, no file; read in the same run succeeds)"
+    ]
+   },
+   "gate_results": {
+    "cargo fmt --all -- --check": "exit 0",
+    "cargo clippy --workspace --all-targets --locked -D warnings": "exit 0",
+    "cargo test --workspace --locked": "exit 0 — 804 passed / 0 failed / 0 ignored across 77 green binaries (r00_management_leaves passed this run: the macOS firewall interception of unsigned test binaries is the intermittent environment item registered since T01, kept open, not written off)",
+    "xtask check-contracts": "exit 0 (626 entries, zero drift)",
+    "xtask check-boundaries": "exit 0 (O1-O8 + D1-D5 + B1; --self-test N1-N17 exit 0)",
+    "R03 regression": "r03_g07_repair_suites.sh exit 0 (ten suites exact pinned counts); r03_t08_matrix.sh A15 exit 0 (28 leaves + 11 combos); r03_t08_a16_seed_mechanism.sh exit 0"
+   },
+   "supplemental": [
+    "ResourceAccess/ResourceScope: canonical resolution (symlinks followed; missing tails through the nearest existing ancestor), component-wise root matching (never string prefixes), workspace roots + per-(principal, session) grants at read/write levels; Windows junction/UNC forms registered under cfg(windows) with a cfg-gated reparse test (real-machine Windows verification remains the stage deferral)",
+    "Native executors: read (pagination/offset-past-EOF/2000-line+50KB truncation notices/truncated flag/BOM strip/binary-non-UTF-8 honesty/adjacent duplicate-read stub), write (parent creation/atomic same-dir temp+rename/mode preservation/stale conflict), edit (incumbent match+conflict vocabulary, exact then simplified-fuzzy (no NFKC — registered gap), CRLF/BOM preserved, unchanged-lines overlay)",
+    "TOCTOU: unix dirfd component-walk with O_NOFOLLOW from /, openat-relative final component, bounded symlink-churn re-resolution + RE-authorization, pre-rename (dev,ino,mtime,size) identity re-verification through the same dirfd, per-canonical-path mutation serialization, RAII temp cleanup covering panic paths",
+    "Gateway: bind_executor_with_resources + ResourceExtractor run at prepare (资源规范化 before 权限/批准 per the frozen chain) and re-derived at execute (临近执行重检); new refusals gateway_resource_scope_denied / gateway_resource_scope_changed; PreparedInvocation/PreparedRecord carry resources",
+    "Approvals: ApprovalRequest/ApprovalRecord/PendingView carry the REAL resource scopes (the approver approves exactly this canonical scope); runs.rs passes prepared.resources into the gate request",
+    "FileModificationRecord/FileChangeLog is the explicit checkpoint/rewind interface (full product integration R06/R07); failed/interrupted mutations record nothing",
+    "Mapping decisions in R04-T04_REPORT.md §8: GBK/office decoding and image attachments not migrated (honest metadata-only results); write-before-digest capture cap 8MiB (recorded as None, never guessed); read-only root ACL vs session-mode layering follows the incumbent; NFKC fuzzy fold not ported"
+   ],
+   "report": "docs/rust-tauri/R04/R04-T04_REPORT.md",
+   "evidence": "artifacts/rust-tauri/R04/T04-E01/"
+  },
+  "R04-T05": {
+   "status": "READY_FOR_REVIEW",
+   "acceptance_map": {
+    "R04-A09": {
+     "status": "IMPLEMENTED_SELF_CHECKED",
+     "tests": [
+      "lingxi-service --test r04_t05_process_tools r04_a09_managed_tree_is_killed_and_the_unrelated_sentinel_survives (full real chain: bash child + two sleep grandchildren publish their pids (barrier) -> real user-facing cancel_run -> ALL THREE pids fail kill(pid,0) (reaped by our supervisor, not zombies) -> the unrelated test sentinel SURVIVES -> record Terminated(CallerDropped) with killpg_sent/exit_observed/termination_settled(reclaimed=true) audit -> journal phase=Started with NO receipt (the R03 Unknown window))"
+     ]
+    },
+    "R04-A10": {
+     "status": "IMPLEMENTED_SELF_CHECKED",
+     "tests": [
+      "lingxi-service --test r04_t05_process_tools r04_a10_pty_input_reads_resize_interrupt_and_exit (real PTY via libc posix_openpt/setsid/TIOCSCTTY/TIOCSWINSZ, O_NONBLOCK master: echo round-trip -> stty size 24 80 -> resize to 40 100 -> \\x03 INTR kills the foreground job (NEVER_REACHED never prints) while the shell answers AFTER_INTR -> exit 7 -> phase Exited(7), final poll reports exited (exit code 7), late write fails 'not running'; the start result is Running{handle}, never a completion claim)"
+     ]
+    }
+   },
+   "adversarial_additions": {
+    "tests": [
+     "r04_t05_process_tools adversarial_parent_exit_with_grandchild_holding_the_pipe_is_bounded (direct child exits <1.5s under the bounded stdio grace while the sleep-2 grandchild still holds the pipe; incumbent semantics: normal exit does not kill the group; test kills the grandchild by exact pid)",
+     "r04_t05_process_tools adversarial_output_storm_is_bounded_truncated_and_spilled (spill cap pinned to 64KiB: ~500KB storm -> truncated flag + [Showing first … of N lines] notice + spill ResourceRef whose file is exactly 64KiB = capped, bounded time/memory)",
+     "r04_t05_process_tools adversarial_utf8_output_survives_chunk_splits + lingxi-service --lib procsupervisor::tests::transcript_delivers_split_multibyte_characters_intact / decode_prefix_utf8_boundary_variants / transcript_force_delivery_flushes_a_dangling_partial (multibyte chars split across chunks are joined whole — byte-offset cursor, no duplication, no mangling; dangling partials flush lossy-honestly on terminal)",
+     "r04_t05_process_tools adversarial_unresponsive_process_times_out_within_the_bound (sleep 300 + timeout 1: 1s<=elapsed<6s, timeout notice with tty continuation, Exited(137), nothing stays live)",
+     "r04_t05_process_tools adversarial_both_streams_blocking_still_completes (~180KB on BOTH stdout and stderr beyond the 64KB pipe buffer: concurrent pumping completes, exit 0)",
+     "r04_t05_process_tools adversarial_cross_session_and_forged_write_stdin_are_refused (session B writing session A's terminal = WRITE_STDIN_NOT_OWNED; forged proc:deadbeef and never-minted hex = WRITE_STDIN_UNKNOWN_PROCESS; a one-shot's live handle = WRITE_STDIN_NOT_INTERACTIVE, then cleaned via the bounded chain)",
+     "r04_t05_process_tools adversarial_cancel_racing_natural_exit_keeps_invariants (cancel fired inside the in-flight window: run settles, record terminal, pid gone; journal is either Started-without-receipt or Succeeded/Failed-with-receipt — never fabricated)",
+     "r04_t05_process_tools process_tools_go_through_the_gateway_policy_and_cwd_authorization (read_only = prepare-time ACTION_BLOCKED_BY_READ_ONLY refusal, zero dispatch; workdir outside the roots AND a symlinked workdir pointing at the restricted area = gateway_resource_scope_denied judged on the real target, sentinel untouched; in-workspace workdir runs with the canonical cwd)",
+     "r04_t05_process_tools ask_session_exec_command_round_trips_the_approval_face (ask parks; PendingView.resources carries the canonical workdir; real answer(Approve) -> journal Succeeded + dispatched=true)",
+     "r04_t05_process_tools environment_is_whitelist_plus_explicit_overrides_never_full_inherit (a planted server secret NEVER reaches the child; whitelisted PATH does; explicit env entries do)",
+     "r04_t05_process_tools persistent_terminal_lifetime_is_explicit_and_shutdown_is_bounded (tty terminal survives its starting call; shutdown_all terminates it bounded with a Terminated/137/reclaimed=true receipt)",
+     "r04_t05_process_tools terminate_after_natural_exit_is_already_terminal_and_spawn_failures_are_loud (AlreadyTerminal receipt with ZERO killpg ever sent for an exited record — the anti-PID-recycling rule; EXEC_SPAWN_FAILED + cwd-missing hint + INVALID_PARAMS vocabularies)"
+    ]
+   },
+   "gate_results": {
+    "cargo fmt --all -- --check": "exit 0",
+    "cargo clippy --workspace --all-targets --locked -D warnings": "exit 0",
+    "cargo test --workspace --locked --no-fail-fast": "exit 101 — 823 passed / 0 assertion failures across 77 green binaries; the ONLY failure is r00_management_leaves (environment: macOS firewall intercepts the newly-built unsigned test binary; reproduced identically in an isolated rerun, exit 101 — the registered intermittent item from T01/T02, kept open, not written off)",
+    "xtask check-contracts": "exit 0 (626 entries, zero drift)",
+    "xtask check-boundaries": "exit 0 (O1-O8 + D1-D5 + B1; --self-test N1-N17 exit 0)",
+    "R03 regression": "r03_g07_repair_suites.sh exit 0 (ten suites exact pinned counts); r03_t08_matrix.sh A15 exit 0 (28 leaves + 11 combos); r03_t08_a16_seed_mechanism.sh exit 0"
+   },
+   "supplemental": [
+    "ProcessSupervisor (procsupervisor.rs): POSIX process-group ownership (every spawn setsid's into its own group, pgid verified via getpgid; termination only ever fires killpg on a registered NON-TERMINAL record — the child is unreaped so the pid cannot have been recycled; no adoption API exists so a foreign leftover can never be mistaken for a managed process)",
+    "Bounded cleanup chain: mark Terminating + killpg(SIGKILL) atomically under the record lock -> bounded wait for the exit observation (default 5s; expiry = honest CleanupTimedOut, never a fabricated success) -> reaper-side reclamation (250ms bounded stdio grace because grandchildren may hold the pipe write ends; pump abort closes our read ends; pty master + spill closed; reclaimed recorded) -> settle into the bounded ring; tokio kill_on_drop is DISABLED and never the guarantee",
+    "Future-drop does not shed ownership: the executor's ProcessOwnershipGuard initiates terminate_detached (killpg fires synchronously from the Drop; the bounded tail runs on a supervisor-owned task) — the run's CALL-level cancellation tree drops the executor future at its await point and the cleanup still completes with receipts",
+    "Persistent terminals are EXPLICITLY registered (kind + owner): a run cancellation does not kill them (the tool call already returned running); they die on the explicit close path or the frozen application-exit policy shutdown_all (each bounded, each with an accurate receipt)",
+    "Env injection is EXPLICIT-whitelist only (PATH/HOME/LANG/LC_*/TERM/TZ/TMPDIR/SHELL) + bounded caller env (<=32 entries, size caps); the server's full environment (secrets) is never inherited — the incumbent env ?? process.env gap closed",
+    "Output bounds: rolling 100KiB window + head/tail truncation with the incumbent notice vocabulary + capped spill file surfaced as an Artifact ResourceRef; PTY transcript ring 256KiB with dropped-undelivered accounting; UTF-8 chunk boundaries handled by byte-offset cursor delivery",
+    "write_stdin authorization: handle format gate -> registered record -> must be PersistentTerminal -> owner (principal+session from the trusted RunContext) must match -> write/deliver; distinct stable codes for forged/unknown/not-interactive/not-owned; final drain works after exit, late writes fail honestly",
+    "Dependencies: ZERO new crates — tokio gains only the 'process' feature flag at the same locked 1.53.1 (bytes/libc/mio already in the lock; the R04-T01 serde_json precedent), libc dev-dep at the same locked 0.2; rust/Cargo.lock is byte-identical (verified by empty git diff)",
+    "Mapping decisions in R04-T05_REPORT.md §8: wait_mode=auto/background handoff (DeferredResultStore/TaskRegistry = R06/R07 surfaces) not migrated — long-running work uses timeout continuation or tty+write_stdin (taught by the timeout notice); incumbent multi-platform shell resolution collapsed to /bin/bash -c + native cwd; terminal-tool close/list surface and the jsonl transcript persistence are R06+; sandbox prefixes (bwrap/seatbelt/escalated) are T06",
+    "Windows form: spawn fails CLOSED with UnsupportedPlatform (no invented Job Object behavior) — real-machine Windows verification remains the stage platform deferral; Linux same-family POSIX calls registered as not machine-verified"
+   ],
+   "report": "docs/rust-tauri/R04/R04-T05_REPORT.md",
+   "evidence": "artifacts/rust-tauri/R04/T05-E01/"
+  },
+  "R04-T06": {
+   "status": "READY_FOR_REVIEW",
+   "acceptance_map": {
+    "R04-A11": {
+     "status": "IMPLEMENTED_SELF_CHECKED",
+     "tests": [
+      "lingxi-service --test r04_t06_sandbox r04_a11_missing_helper_at_composition_is_a_loud_refusal (helper 路径不存在：组合期 sandbox_helper_missing 响亮拒绝，无可绕过的构造路径)",
+      "lingxi-service --test r04_t06_sandbox r04_a11_replaced_helper_is_refused_and_the_impostor_never_runs (腿1：用户所有冒名 helper（exec \"$@\"）组合期 sandbox_helper_untrusted 拒绝；腿2：合法 symlink 别名组合后运行成功→中途换成冒名 helper→经真实网关链 EXEC_SANDBOX_REFUSED+sandbox_helper_untrusted、哨兵字节不变、零存活进程；腿2b：彻底删除 helper=sandbox_helper_missing 同形态)",
+      "lingxi-service --test r04_t06_sandbox r04_a11_unsupported_backend_refuses_through_the_real_chain (Windows 形态 UnsupportedSandbox：必须隔离的命令经真实链拒绝、哨兵不变、绝不裸跑)",
+      "lingxi-service --lib sandbox (构造期 seatbelt 双腿强制探针：允许腿 /usr/bin/true 在 containment core 下 exit0 + 拒绝腿 containment core 下写 /dev/null 必须失败——被替换/损坏 helper 无法通过)"
+     ]
+    },
+    "R04-A12": {
+     "status": "IMPLEMENTED_SELF_CHECKED (macos-arm64 真机实测；linux 源码级未真机、windows 后端明确拒绝——按 PLATFORM_CAPABILITIES v2 登记)",
+     "tests": [
+      "lingxi-service --test r04_t06_sandbox r04_a12_filesystem_write_isolation_holds_with_real_sentinels (工作区写允许对照+外哨兵写拒+Operation not permitted+安全提示、符号链接改向按真实目标拒、.git 写保护拒、auth.json deny-read 拒（秘密不可读）、TMPDIR 临时资源允许、沙盒内子进程允许)",
+      "lingxi-service --test r04_t06_sandbox r04_a12_network_isolation_against_the_registered_loopback_service (本测试自建登记的回环服务：contained=(deny network*) 连接拒；同策略 network-capable 允许对照拿到 pong；网络拒绝策略下请求 network-capable=sandbox_policy_unsupported)",
+      "lingxi-service --test r04_t06_sandbox r04_a12_environment_whitelist_holds_through_the_sandbox_wrapper (植入服务端秘密不达沙盒子进程；白名单 PATH+显式 env 到达；结果如实标注 sandbox: seatbelt)",
+      "lingxi-service --test r04_t06_sandbox r04_a12_sandboxed_process_tree_still_honors_the_cancellation_chain (沙盒内孙进程经 supervisor killpg 链真实回收——sandbox-exec 原地 exec 语义保组)"
+     ]
+    }
+   },
+   "adversarial_additions": {
+    "tests": [
+     "r04_t06_sandbox adversarial_policy_injection_is_refused_at_both_layers (层1：含引号的工作区根不可嵌入 SBPL 字面量→sandbox_profile_path_unsafe 拒绝执行；层2：模型参数伪造 sandbox_profile 键在 prepare 期 ArgumentsInvalid 零派发)",
+     "r04_t06_sandbox adversarial_tty_terminals_are_honestly_not_claimed_as_contained (tty 终端不套 OS 沙盒=现役语义；结果永不出现 sandbox: 标注——不谎报)",
+     "r04_t06_sandbox seatbelt_helper_trust_and_capabilities_are_recorded (helper trust：root 属主+解析路径=/usr/bin/sandbox-exec；wrapped argv 确为 helper 前缀+命令且 profile 含 deny network*)",
+     "lingxi-service --lib sandbox:: (7 单测：策略推导移植逐字、无效配置拒绝、SBPL deny-在-allow-后顺序+注入拒绝、bwrap 参数形、unsupported 全拒、版本解析、能力矩阵)"
+    ]
+   },
+   "gate_results": {
+    "cargo fmt --all -- --check": "exit 0",
+    "cargo clippy --workspace --all-targets --locked -D warnings": "exit 0",
+    "cargo test --workspace --locked": "见 R04-T06_REPORT.md §5（T06 套件 10/10+单测 7；workspace 全量与 r00 环境项按报告登记）",
+    "xtask check-contracts": "exit 0 (626 entries 零漂移)",
+    "xtask check-boundaries": "exit 0 (O1-O8 + D1-D5 + B1; --self-test N1-N17 exit 0)",
+    "R03 regression": "r03_g07_repair_suites.sh exit 0；r03_t08_matrix.sh exit 0；r03_t08_a16_seed_mechanism.sh exit 0；T01-T05 套件 6/13/11/9/14 复绿"
+   },
+   "supplemental": [
+    "SandboxPort（trait）+ SandboxPolicy（deriveSandboxPolicy 逐字移植）+ 三后端（Seatbelt 复用系统 sandbox-exec、Bwrap 源码级适配、Unsupported 对 Windows/未知平台失败关闭）；helper 信任方案：pinned 绝对路径（非 PATH）+root 属主+非组/全局可写+basename+seatbelt 双腿强制探针/bwrap --version——构造期与每次 wrap 双层验证",
+    "exec 链集成：register_process_tools 增 sandbox 参数（T05 测试一处等价更新 None，断言零变化）；一次性 exec_command argv 经 port 包裹（约束交集=T04 cwd 授权∩T05 env 白名单∩T06 OS 沙盒，各自拒绝零派发）；tty 终端按现役语义不套 OS 沙盒且结果永不谎报 containment",
+    "失败关闭：EXEC_SANDBOX_REFUSED + sandbox_{config_invalid,helper_missing,helper_untrusted,policy_unsupported,profile_path_unsafe} 稳定码；sandbox-exec 探针证明原地 exec——supervisor setsid/getpgid/killpg 链穿过 wrapper 成立（孙进程回收实测）",
+    "SBPL 策略注入防护：嵌入路径含 \" 或 \\\\ 或 NUL → sandbox_profile_path_unsafe 拒绝（现役未防护的缺口已闭合）；deny 行严格位于 allow 行之后（last-match-wins 语义保序）；realpath 嵌入（/tmp→/private/tmp 实测必需）",
+    "映射决策（登记）：require_escalated/sandbox_permissions 模型面参数未迁移（需 T02/T03 冻结面的权限分类耦合，网络能力已在端口层真实可用并验证）；现役 seatbelt -f 临时 profile 文件改为 -p 内联（消 TOCTOU/清理面，机制同为 sandbox-exec）；Windows restricted-token helper 未移植=后端拒绝（递延 R03-WINDOWS-R09-R10）"
+   ],
+   "report": "docs/rust-tauri/R04/R04-T06_REPORT.md",
+   "evidence": "artifacts/rust-tauri/R04/T06-E01/"
+  },
+  "R04-T07": {
+   "status": "READY_FOR_REVIEW",
+   "acceptance_map": {
+    "R04-A13": {
+     "status": "IMPLEMENTED_SELF_CHECKED",
+     "tests": [
+      "lingxi-service --test r04_t07_mcp_and_workers r04_a13_mcp_reconnect_never_replays_the_side_effect (受控 rmcp 双工服务真实 initialize/协商/list/call；计数动作+断回执→Unknown→refresh_mcp_server 恰一次重连+新握手→计数不盲增→get_count 核验=1)",
+      "lingxi-service --test r04_t07_mcp_and_workers r04_a13_full_chain_journals_unknown_and_a_new_decision_sees_the_real_count (真实 run 链：journal Unknown 收据；重连后新 run 的核验查询 Succeeded、计数仍 1)"
+     ]
+    },
+    "R04-A14": {
+     "status": "IMPLEMENTED_SELF_CHECKED",
+     "tests": [
+      "lingxi-service --test r04_t07_mcp_and_workers r04_a14_worker_cannot_bypass_grants_or_model_credentials (模型凭证回调→真实 UnconfiguredWorkerModel 拒 model_capability_not_configured 且秘密不泄露；越界文件参数→真实 ResourceAccess 拒 grant 零 spawn；越界 claimed_files→拒绝且不铸造本地引用；env 白名单无 HOME/秘密；主服务仍可用)"
+     ]
+    }
+   },
+   "adversarial_additions": {
+    "tests": [
+     "r04_t07_mcp_and_workers adversarial_two_servers_same_tool_name_hit_their_own_targets (两 server 同名工具=不同 target，各命中各的 server，received_calls 隔离)",
+     "r04_t07_mcp_and_workers adversarial_tools_list_change_updates_generation_and_invalidates_old_shapes (echo schema 变化→update+generation 上升→旧形状 ArgumentsInvalid 拒；boom 消失→uninstall 停止解析)",
+     "r04_t07_mcp_and_workers adversarial_error_oversized_schema_violating_and_forged_results (is_error=完成但失败回执；300KiB 输出→诚实 truncated；structured 违反 output schema→失败；file:///etc/passwd 资源链接→文本不铸造本地 ResourceRef)",
+     "r04_t07_mcp_and_workers adversarial_mcp_pagination_walks_all_pages (分页 listing 全量注册 5/5；游标=数值 offset)",
+     "r04_t07_mcp_and_workers adversarial_endless_paging_is_refused_loudly (不可信 server 永续游标→page bound 响亮拒绝，零注册)",
+     "r04_t07_mcp_and_workers cancelled_call_never_consumes_a_late_response (取消后迟到响应不消费/不复活；句柄单次不可重放；核验查询 count=1)",
+     "r04_t07_mcp_and_workers mcp_and_worker_tools_follow_the_t03_permission_face (MCP/worker 工具按 T03 面：operate→Allowed、ask→NeedsApproval、read_only→PolicyDenied 拒；ask 会话真链 park→批准→恰执行一次)",
+     "r04_t07_mcp_and_workers mcp_unsupported_endpoint_refuses_loudly (未携带 transport→mcp_endpoint_unsupported，绝不回落)",
+     "r04_t07_mcp_and_workers mcp_stdio_child_transport_and_env_whitelist_hold (真实 stdio 子进程 transport+env 白名单，HOME/秘密不到达)",
+     "r04_t07_mcp_and_workers adversarial_worker_protocol_violations_are_refused (伪 id/超限行/畸形行/未知 kind→worker_protocol_violation+主服务仍可用；double_result=首次结果单次入账)",
+     "r04_t07_mcp_and_workers adversarial_worker_deadline_and_silent_exit_are_unknown_never_clean_failures (超时→有界 kill→Unknown；无结果退出→Unknown)",
+     "r04_t07_mcp_and_workers adversarial_worker_error_result_and_callback_budget_are_host_owned (worker 自报错误=完成但失败；回调风暴=宿主预算 refusals=4 oks=2，凭证零泄露)",
+     "r04_t07_mcp_and_workers worker_claim_in_grant_mints_a_verified_resource_ref (grant 内且存在的 claimed_file 才铸造本地 ResourceRef)",
+     "r04_t07_mcp_and_workers worker_concurrency_is_bounded_by_the_runtime_semaphore (并发信号量 cap=1 串行化≥800ms)",
+     "r04_t07_mcp_and_workers worker_sandbox_binding_denies_out_of_boundary_writes (真实 T06 seatbelt：越界写 WRITE_DENIED+磁盘无痕迹；边界内允许对照)",
+     "r04_t07_mcp_and_workers mcp_tool_success_flows_through_the_full_run_chain (真链成功：journal Succeeded+dispatched+dedup；durable tool_call_completed wire 事件含 count= 内容)",
+     "lingxi-service --lib mcpbridge (4 单测：target 命名空间、注解不软化权限/恢复、远程 URI 不映射本地引用、结构化输出校验)",
+     "lingxi-service --lib workerrpc (4 单测：未配置模型诚实拒、宿主侧回调预算+token 上限、无内层仍拒、信封字段)"
+    ]
+   },
+   "gate_results": {
+    "cargo fmt --check": "exit 0",
+    "cargo clippy --workspace --all-targets --locked -D warnings": "exit 0",
+    "cargo test --workspace --locked": "见 R04-T07_REPORT.md §5（T07 集成 19/19+lib 单测 8；workspace 全量与 r00 环境项按报告登记）",
+    "xtask check-contracts": "exit 0 (626 entries 零漂移；本 Task 未触碰协议面)",
+    "xtask check-boundaries": "exit 0 (O1-O8+D1-D5+B1; --self-test N1-N17 exit 0)",
+    "R03 regression": "r03_g07_repair_suites.sh exit 0；r03_t08_matrix.sh exit 0；r03_t08_a16_seed_mechanism.sh exit 0；T01-T06 套件复绿（见报告 §5）"
+   },
+   "supplemental": [
+    "MCP 适配（rmcp 3.4.1 锁内，D-06）：真实 initialize 握手/协议协商/分页 tools/list/变更通知计数/tools/call；McpEndpoint 三态（Stdio 子进程=白名单 env+无 shell、Duplex 工厂、Unsupported=响亮拒绝）；未知回执（transport 断/超时/任务形态）=ToolOutcome::Unknown 永不盲重发；重连=refresh_mcp_server 恰一次新握手（重连从不重放调用）",
+    "listing 同步→registry generation：新增注册/变化 update（target generation 上升→旧句柄 TargetChanged）/消失 uninstall；schema 不兼容（T01 fail-closed 子集）按工具拒绝不放宽；list walk 有 page/tool 双上限（不可信 server 永续游标→响亮拒绝，E02 补齐）",
+    "worker RPC：单操作请求（CSPRNG 调用 ID/期限/资源许可/大小上限）；行级读取中途强制 cap（E02 补齐——read_line 无界缓冲缺口）；并发信号量+进程组 kill+有界 grace；stdin 失败/超时/无结果=Unknown（副作用未确认，绝不伪造干净失败）；worker 环境白名单（无 HOME/服务凭证）+可选 T06 沙盒包裹",
+    "宿主回调契约：WorkerModelPort（R05 边界面）；UnconfiguredWorkerModel=生产形态（model_capability_not_configured 诚实拒）；BoundedWorkerModel 宿主侧回调数+输出 token 预算（内层端口之前强制）；worker 永不获得凭证",
+    "网关集成：MCP/worker 工具全部经 T02 网关（prepare→T03 策略/批准→execute）注册执行（PermissionKind::Execute，read_only 拒/ask 弹审/operate 放行——T03 面真实裁定）；结果=结构化 ToolSuccess（内容块/资源引用/截断/校验过的 claimed_files）",
+    "E01 中断与 E02 续做：E01 交付了桥/worker RPC/fixture/测试的骨架但未跑通验证（合成分页 fixture 游标 bug 致无限循环挂死、行读取无界、6 断言错误、2 clippy lint、T03 面与取消迟到响应对抗项缺失）；E02 修复补齐并全套验证——详见 R04-T07_REPORT.md §2.3"
+   ],
+   "report": "docs/rust-tauri/R04/R04-T07_REPORT.md",
+   "evidence": "artifacts/rust-tauri/R04/T07-E02/"
+  },
+  "R04-T08": {
+   "status": "READY_FOR_REVIEW",
+   "acceptance_map": {
+    "R04-A15": {
+     "status": "IMPLEMENTED_SELF_CHECKED",
+     "tests": [
+      "lingxi-service --test r04_t08_tool_matrix a15_empty_and_invalid_products_never_register (真实 worker 链：fixture claim_ok 对照=存在性核验过的 ResourceRef+审计存活；claim_outside=worker_claimed_unauthorized_path 且受限哨兵字节不变；claim_missing=worker 删除自己 grant 内交付物后声称→worker_claimed_artifact_invalid/artifact_missing+『nothing is registered as delivered』；claim_dir=目录替换交付物→artifact_not_a_regular_file；claim_bad_json=JSON 内容契约违反→artifact_content_condition_failed/not valid JSON)",
+      "lingxi-service --test r04_t08_tool_matrix a15_gateway_registration_audit_converts_fake_refs (网关登记审计：SUCCESS 携带不存在/目录 file:// 引用→转显式 FAILED gateway_artifact_verification_failed，消息如实声明 execution WAS dispatched+side effects may exist+NOT registered as a valid deliverable；真实文件引用对照通过)",
+      "lingxi-service --lib artifactverify (4 单测：目录非文件交付物/越界与缺失/有界内容契约/URI 提取与审计形状)",
+      "r04_tool_matrix 图钉案例: a15-real-delivery-registered / a15-out-of-grant-claim-refused / a15-missing-claim-refused / a15-directory-claim-refused / a15-structure-violation-refused / a15-gateway-audit-real-ref-passes / a15-gateway-audit-fake-ref-failed / a15-gateway-audit-directory-ref-failed"
+     ]
+    },
+    "R04-A16": {
+     "status": "IMPLEMENTED_SELF_CHECKED",
+     "tests": [
+      "lingxi-service --test r04_t08_tool_matrix a16_disabled_state_covers_every_route (先真执行留历史收据→缓存描述+双句柄（本体+别名）→disable→6 路线全拒零派发：fresh prepare/cached handle/别名 ByName/缓存别名句柄/完整 run 链（journal Failed+dispatched=false）/钉旧代次（StaleCatalog）；历史 Succeeded+dispatched 收据保留未删；uninstall 腿=resolve 拒+缓存句柄拒；generation bump 腿=缓存句柄 TargetChanged)",
+      "r04_tool_matrix 图钉案例: matrix-lifecycle-disable-holes=0 / matrix-lifecycle-uninstall-holes=0 / matrix-lifecycle-generation-refusals=0 / a16-history-preserved=1 / a16-alias-route-covered=1"
+     ]
+    }
+   },
+   "adversarial_additions": {
+    "tests": [
+     "r04_t08_tool_matrix matrix_tools_x_permission_x_entry_consistency (7 家族×operate/ask/read_only×用户/子代理策略面 35 格一致性+SUP-01 结构化拒词汇+直接路线 vs 完整 run 链同判定同副作用 matrix-route-consistency)",
+     "r04_t08_tool_matrix matrix_future_tools_honest_in_catalog (11 个未迁移工具形态 Availability::Future：可发现/描述诚实/零派发 TargetNotCallable——不伪装 available)",
+     "r04_t08_tool_matrix outcome_semantics_and_receipts_unified (四态统一语义+journal 收据：Success=dispatched+Succeeded；Failed(拒派发)=!dispatched+目标无副作用；Unknown(worker 超期限)=dispatched+Unknown 恰一条不盲重试；Cancelled=用户 cancel→无伪造成功收据；同 read_only 上下文 read 派发 write 拒=逐调用独立授权)",
+     "r04_t08_tool_matrix native_tool_share_cases_on_the_real_chain (read/write/edit 真实字节+edit 冲突保版本2+exec_command 真进程)",
+     "r04_t08_tool_matrix terminal_family_share_cases (tty 持续终端：Running 句柄/tail 游标只交付新输出/foreign 会话 write_stdin 拒/close 后迟到写诚实失败/取消清理 live_handles 清空)",
+     "r04_t08_tool_matrix mcp_mechanism_face_share_cases (真实握手注册/describe 真实命名空间身份/search 命名空间命中/快照含权限契约/T03 面三档/完整链调用真内容)",
+     "r04_t08_tool_matrix approval_face_share_cases (三模式可设可读/ASK park→批准恰一次执行/重复点击 AlreadySettled 幂等/REJECT 零派发/预授权跨会话不可见+单次消费)",
+     "门禁负向: scripts/rust-tauri/r04_t08_gate_negative_tests.sh（9 用例：未知阶段/空集/删叶映射/删命令映射/删 SUP 场景/0 匹配过滤器/缺失证据文件/陈旧证据根/候选中途漂移→全部非零退出+缺口点名）"
+    ]
+   },
+   "gate_results": "见 R04-T08_REPORT.md §5 与 artifacts/rust-tauri/R04/T08-E01/gates/（exit 码逐项在案）",
+   "supplemental": [
+    "R04 stage map（R04.json 19 场景+124 R00 叶=55 share+69 deferred）注册 STAGE_MAPS+runner_identity+生成器脚本幂等复现",
+    "verify-stage R04 --evidence <fresh> 真实退出 0 且证据落盘（内含完整 verify-stage R03 回归= r03_regression_gate）",
+    "T07-R1-F1 unique_dir 并行碰撞修复（复现 3/8 失败→修复后 15/15 绿）",
+    "T04-R1-OBS-1 edit fuzzy 重复计数空间对齐现役（修复+回归）",
+    "T07-R1-O4 worker read_only 面补钉"
+   ],
+   "report": "docs/rust-tauri/R04/R04-T08_REPORT.md",
+   "evidence": "artifacts/rust-tauri/R04/T08-E01/"
   }
+ }
 }

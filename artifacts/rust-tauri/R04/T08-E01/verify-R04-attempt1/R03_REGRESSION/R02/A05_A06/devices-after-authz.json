@@ -1,0 +1,40 @@
+{
+  "schemaVersion": 1,
+  "devices": [
+    {
+      "schemaVersion": 1,
+      "deviceId": "device_0c7f142f32f99a2b28a4fc6038e6db65",
+      "userId": "user_remote",
+      "displayName": "CLI",
+      "deviceKind": "cli",
+      "status": "active",
+      "trustState": "lan",
+      "createdAtUnixMs": 1790821938674,
+      "lastSeenAtUnixMs": null
+    },
+    {
+      "schemaVersion": 1,
+      "deviceId": "device_40ae23e5116ba87d425ab1cfba101af3",
+      "userId": "user_remote_b",
+      "displayName": "CLI",
+      "deviceKind": "cli",
+      "status": "active",
+      "trustState": "lan",
+      "createdAtUnixMs": 1790821940032,
+      "lastSeenAtUnixMs": 1790821948771
+    },
+    {
+      "schemaVersion": 1,
+      "deviceId": "device_796eaf04b6dca03b20eeca4207b6c473",
+      "userId": "user_no_chat",
+      "displayName": "CLI",
+      "deviceKind": "cli",
+      "status": "active",
+      "trustState": "lan",
+      "createdAtUnixMs": 1790821942562,
+      "lastSeenAtUnixMs": 1790821943815
+    }
+  ],
+  "createdAtUnixMs": 1790821937913,
+  "updatedAtUnixMs": 1790821948771
+}

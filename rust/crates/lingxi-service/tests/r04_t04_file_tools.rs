@@ -1709,3 +1709,78 @@ async fn read_only_session_denies_file_writes_at_the_policy_face() {
     );
     teardown(&harness).await;
 }
+
+// T04 review OBS-1 (fixed in R04-T08): the incumbent's `countOccurrences`
+// ALWAYS counts in the fuzzy-normalized space (edit-diff.js L177-180
+// normalizes both sides regardless of which layer matched), so a file that
+// contains BOTH `it's` and `it’s` refuses `Found 2 occurrences` for
+// oldText `it's` — never a quiet exact-layer replacement of just the ASCII
+// copy. The Rust port had counted in whichever space `replacement_base`
+// happened to be, diverging on exactly that conflict case. This regression
+// pins the aligned semantics plus its two legal contrasts.
+#[tokio::test]
+async fn edit_duplicate_counting_runs_in_the_fuzzy_space_like_the_incumbent() {
+    let harness = file_harness(StepsProvider::new(vec![])).await;
+    let ctx = kernel_ctx("sess-obs1", "run-obs1");
+
+    // The OBS-1 case itself: exact-layer hit present, but the file also
+    // holds the smart-quote variant — the incumbent counts BOTH and
+    // refuses; the file keeps every byte.
+    std::fs::write(harness.ws.join("mix.txt"), "it's here\nand it’s there\n").expect("mix");
+    let mixed = call_file_tool(
+        &harness,
+        &ctx,
+        "edit-obs1-mixed",
+        &harness.core.edit_target,
+        json!({"path": "mix.txt", "edits": [{"oldText": "it's", "newText": "IT IS"}]}),
+    )
+    .await
+    .expect("mixed-variant duplicate is a tool error");
+    assert!(
+        error_text(&mixed).contains("Found 2 occurrences of the text in mix.txt"),
+        "{}",
+        error_text(&mixed)
+    );
+    assert_eq!(
+        std::fs::read_to_string(harness.ws.join("mix.txt")).expect("untouched"),
+        "it's here\nand it’s there\n"
+    );
+
+    // Contrast A: only the smart-quote variant exists — the fuzzy layer
+    // still matches it uniquely and the edit succeeds (unchanged behavior).
+    std::fs::write(harness.ws.join("smart.txt"), "only it’s here\n").expect("smart");
+    let smart = call_file_tool(
+        &harness,
+        &ctx,
+        "edit-obs1-smart",
+        &harness.core.edit_target,
+        json!({"path": "smart.txt", "edits": [{"oldText": "it's", "newText": "IT IS"}]}),
+    )
+    .await
+    .expect("fuzzy single match succeeds");
+    assert!(text_of(&smart).contains("Successfully replaced 1 block(s)"));
+    assert_eq!(
+        std::fs::read_to_string(harness.ws.join("smart.txt")).expect("edited"),
+        "only IT IS here\n"
+    );
+
+    // Contrast B: two exact duplicates keep refusing (the pre-existing
+    // semantics, now reached through the same fuzzy-space counter).
+    std::fs::write(harness.ws.join("two.txt"), "alpha alpha\n").expect("two");
+    let two = call_file_tool(
+        &harness,
+        &ctx,
+        "edit-obs1-two",
+        &harness.core.edit_target,
+        json!({"path": "two.txt", "edits": [{"oldText": "alpha", "newText": "beta"}]}),
+    )
+    .await
+    .expect("exact duplicates refuse");
+    assert!(
+        error_text(&two).contains("Found 2 occurrences of the text in two.txt"),
+        "{}",
+        error_text(&two)
+    );
+    assert_no_temp_residue(&harness.ws);
+    teardown(&harness).await;
+}

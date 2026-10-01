@@ -1,0 +1,10 @@
+PASS health-200-minimal ({"status":"ok","serverKind":"lingxi-service","serverVersion":"0.0.0","wireProtocolMin":1,"wireProtocolMax":1,"dataEpoch")
+PASS unauthenticated-me-401
+PASS loopback-token-me-200 (principalId=principal_local_user_user_local_no_studio_no_nod)
+PASS execute-write-1-committed (runId=run_000001a0f4efbbae_000001)
+PASS ws-subscribed-with-snapshot-boundary (snapshotSeq=2)
+PASS execute-write-2-committed (runId=run_000001a0f4efbbb1_000002)
+PASS ws-live-event-after-write (seq=3 eventId=run_000001a0f4efbb…)
+PASS http-events-page-contiguous (head=4 count=4)
+PASS ws-future-cursor-explicit-reject (invalid_message/future_cursor close)
+PASS phase-boot-write-subscribe-complete (head=4)

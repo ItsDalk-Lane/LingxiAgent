@@ -32,6 +32,10 @@ const EMBEDDED: &[(&str, &[u8])] = &[
         include_bytes!("stage_maps/R03.json"),
     ),
     (
+        "rust/crates/xtask/src/stage_maps/R04.json",
+        include_bytes!("stage_maps/R04.json"),
+    ),
+    (
         "rust/crates/xtask/Cargo.toml",
         include_bytes!("../Cargo.toml"),
     ),
@@ -50,6 +54,7 @@ const SOURCE_INVENTORY: &[&str] = &[
     "runner_identity.rs",
     "stage_maps/R02.json",
     "stage_maps/R03.json",
+    "stage_maps/R04.json",
     "verify/runner_tests.rs",
     "candidate/tests.rs",
 ];

@@ -23,6 +23,7 @@
 
 pub mod approval;
 pub mod approval_service;
+pub mod artifactverify;
 pub mod auth;
 pub mod background;
 pub mod cancel;

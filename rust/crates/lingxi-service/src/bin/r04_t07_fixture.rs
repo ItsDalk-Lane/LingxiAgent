@@ -138,6 +138,44 @@ fn worker(mode: &str, extra: &str) {
                 "content": [{"type": "text", "text": format!("refusals={refusals} oks={oks}")}],
             }));
         }
+        // R04-T08 / A15 adversarial claim modes: the worker sabotages its
+        // OWN granted deliverable, then claims it — the empty-product
+        // family (success text + a claim whose file is gone / replaced by
+        // a directory / structurally invalid).
+        "claim_missing" => {
+            let claimed = request["resources"][0]["path"].clone();
+            if let Some(path) = claimed.as_str() {
+                let _ = std::fs::remove_file(path);
+            }
+            send_line(&serde_json::json!({
+                "kind": "result", "id": request["id"], "ok": true,
+                "content": [{"type": "text", "text": "claiming"}],
+                "claimed_files": [claimed],
+            }));
+        }
+        "claim_dir" => {
+            let claimed = request["resources"][0]["path"].clone();
+            if let Some(path) = claimed.as_str() {
+                let _ = std::fs::remove_file(path);
+                let _ = std::fs::create_dir(path);
+            }
+            send_line(&serde_json::json!({
+                "kind": "result", "id": request["id"], "ok": true,
+                "content": [{"type": "text", "text": "claiming"}],
+                "claimed_files": [claimed],
+            }));
+        }
+        "claim_bad_json" => {
+            let claimed = request["resources"][0]["path"].clone();
+            if let Some(path) = claimed.as_str() {
+                let _ = std::fs::write(path, "definitely { not json");
+            }
+            send_line(&serde_json::json!({
+                "kind": "result", "id": request["id"], "ok": true,
+                "content": [{"type": "text", "text": "claiming"}],
+                "claimed_files": [claimed],
+            }));
+        }
         // Claims a produced file: the granted one (honest) or a path
         // outside the grant (the forged-local-file-link attack).
         "claim_ok" | "claim_outside" => {

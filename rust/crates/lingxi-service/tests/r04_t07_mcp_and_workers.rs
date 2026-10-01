@@ -71,8 +71,17 @@ fn fixture_exe() -> &'static str {
 }
 
 fn unique_dir(label: &str) -> PathBuf {
+    // T07 review R1 / F1 (fixed in R04-T08): `pid + nanos` alone collided
+    // at microsecond clock granularity when two tests booted the full
+    // `bootstrap_with_deps` in the same nanosecond window (~25% flake per
+    // full-suite run, loud `table schema_migrations already exists`).
+    // The per-process counter suffix is the T04/T05/T06 helper convention
+    // — it makes every directory unique within this process by
+    // construction, whatever the clock granularity is.
+    static DIR_SEQ: AtomicUsize = AtomicUsize::new(0);
+    let seq = DIR_SEQ.fetch_add(1, Ordering::SeqCst);
     let base = std::env::temp_dir().join(format!(
-        "r04t07-{label}-{}-{}",
+        "r04t07-{label}-{}-{}-{seq}",
         std::process::id(),
         std::time::SystemTime::now()
             .duration_since(std::time::UNIX_EPOCH)
@@ -712,6 +721,7 @@ async fn register_worker(
         env: BTreeMap::new(),
         cwd: h.ws.clone(),
         model,
+        claimed_file_contract: None,
     };
     register_worker_tool(
         &h.registry,
@@ -2040,6 +2050,23 @@ async fn mcp_and_worker_tools_follow_the_t03_permission_face() {
         ),
         Ok(Verdict::NeedsApproval)
     );
+    // T07 review R1 / O4 (closed in R04-T08): the worker tool's read_only
+    // leg was the one uncovered cell of the T03 face (only MCP tools were
+    // asserted above). A read_only session denies the worker tool's
+    // prepare with the SAME read-only vocabulary — zero dispatch.
+    match verdict_of(
+        worker_target.as_str(),
+        json!({"input": "input.txt"}),
+        mode_of(SessionPermissionMode::ReadOnly),
+    ) {
+        Err(lingxi_service::toolgateway::GatewayRefusal::PolicyDenied { code, .. }) => {
+            assert!(
+                code.contains("ACTION_BLOCKED_BY_READ_ONLY"),
+                "worker {code}"
+            );
+        }
+        other => panic!("worker tool read_only must deny the prepare, got {other:?}"),
+    }
 
     // Full-chain leg: an ASK session's run on the MCP tool PARKS at the
     // real approval surface; the user approves; the call executes exactly

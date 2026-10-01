@@ -76,7 +76,7 @@
 use std::collections::HashMap;
 use std::sync::Arc;
 
-use lingxi_kernel::ports::{ToolExecutionResult, ToolExecutorPort, ToolRequest};
+use lingxi_kernel::ports::{ToolExecutionResult, ToolExecutorPort, ToolOutcome, ToolRequest};
 use lingxi_kernel::toolcatalog::{
     EffectiveArguments, PermissionKind, SchemaBudget, ToolRegistry, ToolTargetId, ToolTargetRef,
 };
@@ -1264,8 +1264,46 @@ impl ToolInvocationGateway {
             "gateway dispatch: every re-verification passed; dispatching the server-bound \
              effective arguments to the bound executor"
         );
-        self.dispatch_executor(ctx, call_id, &request, &binding.executor)
-            .await
+        let mut executed = self
+            .dispatch_executor(ctx, call_id, &request, &binding.executor)
+            .await?;
+        // 6) R04-A15 — the DELIVERY-REGISTRATION audit. The executor ran,
+        //    so this is NOT a zero-dispatch refusal: a SUCCESS whose
+        //    `file://` resource reference does not verify against the
+        //    filesystem RIGHT NOW (missing / not a regular file) is
+        //    converted to an explicit FAILED that states the dispatch
+        //    happened, that side effects may exist, and that the artifact
+        //    is NOT registered as a valid deliverable. "Request sent"
+        //    never masquerades as "file produced" — and a vanished or
+        //    bogus artifact never masquerades as a delivery either.
+        if let ToolOutcome::Success { result } = &mut executed.outcome {
+            if let Err(rejection) = audit_success_artifacts(result) {
+                tracing::warn!(
+                    target = %record.target_id,
+                    code = rejection.code(),
+                    "delivered artifact failed the gateway registration audit: {}",
+                    rejection.message()
+                );
+                executed.outcome = ToolOutcome::Failed {
+                    error: ProtocolError::new(
+                        ErrorCode::Internal,
+                        format!(
+                            "delivered artifact failed verification ({}): {}; the execution WAS \
+                             dispatched and side effects may exist, but this file is NOT \
+                             registered as a valid deliverable",
+                            rejection.code(),
+                            rejection.message()
+                        ),
+                        false,
+                    )
+                    .with_details(serde_json::Map::from_iter([(
+                        "code".to_string(),
+                        serde_json::json!("gateway_artifact_verification_failed"),
+                    )])),
+                };
+            }
+        }
+        Ok(executed)
     }
 
     /// The PROTECTED dispatch path — the only place a business flow may
@@ -1282,6 +1320,28 @@ impl ToolInvocationGateway {
         let outcome = executor.execute(ctx, call_id, request).await;
         Ok(outcome)
     }
+}
+
+/// R04-A15: audits every LOCAL-FILE resource reference a SUCCESS carries
+/// (the universal facts the gateway can derive on its own — existence and
+/// regular-file shape, judged at registration time). Scope/contract
+/// conditions belong to the boundary that owns them (worker grants, the
+/// file tools' resource extractor) and are NOT re-judged here; remote
+/// URIs are verified by their own type and never forced through a
+/// local-file audit.
+fn audit_success_artifacts(
+    result: &lingxi_kernel::ports::ToolSuccess,
+) -> Result<(), crate::artifactverify::ArtifactRejection> {
+    for reference in &result.resource_refs {
+        let Some(uri) = reference.uri.as_deref() else {
+            continue;
+        };
+        let Some(path_text) = crate::artifactverify::local_path_of_uri(uri) else {
+            continue;
+        };
+        crate::artifactverify::audit_delivered_file(std::path::Path::new(path_text))?;
+    }
+    Ok(())
 }
 
 /// Rebuilds the protocol digest value from the stored hex (the canonical

@@ -1,0 +1,793 @@
+diff --git a/rust/crates/lingxi-service/src/bin/r04_t07_fixture.rs b/rust/crates/lingxi-service/src/bin/r04_t07_fixture.rs
+index e3471a3da..64dd9329d 100644
+--- a/rust/crates/lingxi-service/src/bin/r04_t07_fixture.rs
++++ b/rust/crates/lingxi-service/src/bin/r04_t07_fixture.rs
+@@ -138,6 +138,44 @@ fn worker(mode: &str, extra: &str) {
+                 "content": [{"type": "text", "text": format!("refusals={refusals} oks={oks}")}],
+             }));
+         }
++        // R04-T08 / A15 adversarial claim modes: the worker sabotages its
++        // OWN granted deliverable, then claims it — the empty-product
++        // family (success text + a claim whose file is gone / replaced by
++        // a directory / structurally invalid).
++        "claim_missing" => {
++            let claimed = request["resources"][0]["path"].clone();
++            if let Some(path) = claimed.as_str() {
++                let _ = std::fs::remove_file(path);
++            }
++            send_line(&serde_json::json!({
++                "kind": "result", "id": request["id"], "ok": true,
++                "content": [{"type": "text", "text": "claiming"}],
++                "claimed_files": [claimed],
++            }));
++        }
++        "claim_dir" => {
++            let claimed = request["resources"][0]["path"].clone();
++            if let Some(path) = claimed.as_str() {
++                let _ = std::fs::remove_file(path);
++                let _ = std::fs::create_dir(path);
++            }
++            send_line(&serde_json::json!({
++                "kind": "result", "id": request["id"], "ok": true,
++                "content": [{"type": "text", "text": "claiming"}],
++                "claimed_files": [claimed],
++            }));
++        }
++        "claim_bad_json" => {
++            let claimed = request["resources"][0]["path"].clone();
++            if let Some(path) = claimed.as_str() {
++                let _ = std::fs::write(path, "definitely { not json");
++            }
++            send_line(&serde_json::json!({
++                "kind": "result", "id": request["id"], "ok": true,
++                "content": [{"type": "text", "text": "claiming"}],
++                "claimed_files": [claimed],
++            }));
++        }
+         // Claims a produced file: the granted one (honest) or a path
+         // outside the grant (the forged-local-file-link attack).
+         "claim_ok" | "claim_outside" => {
+diff --git a/rust/crates/lingxi-service/src/filetools.rs b/rust/crates/lingxi-service/src/filetools.rs
+index b34ca44c5..4b1e2b784 100644
+--- a/rust/crates/lingxi-service/src/filetools.rs
++++ b/rust/crates/lingxi-service/src/filetools.rs
+@@ -844,11 +844,27 @@ fn fuzzy_find(content: &str, old_text: &str) -> FuzzyFind {
+     }
+ }
+ 
++/// Counts occurrences ALWAYS in the fuzzy-normalized space — the
++/// incumbent's `countOccurrences` (edit-diff.js L177-180) normalizes BOTH
++/// sides with `normalizeForFuzzyMatch` regardless of which layer matched,
++/// so a file containing both `it's` and `it’s` with oldText `it's` is
++/// `Found 2 occurrences`, never a quiet exact-layer replacement of the
++/// ASCII copy. T04 review OBS-1, fixed in R04-T08: the Rust port counted
++/// in whatever space `replacement_base` happened to be (exact space when
++/// every edit matched exactly), diverging on exactly that conflict case.
++/// The NFKC fold inside the incumbent's normalizer remains the registered
++/// T04 §8.6 gap; everything else of the fold is shared with
++/// [`normalize_for_fuzzy`].
+ fn count_occurrences(content: &str, needle: &str) -> usize {
+     if needle.is_empty() {
+         return 0;
+     }
+-    content.match_indices(needle).count()
++    let fuzzy_content = normalize_for_fuzzy(content);
++    let fuzzy_needle = normalize_for_fuzzy(needle);
++    if fuzzy_needle.is_empty() {
++        return 0;
++    }
++    fuzzy_content.match_indices(&fuzzy_needle).count()
+ }
+ 
+ #[derive(Clone)]
+diff --git a/rust/crates/lingxi-service/src/lib.rs b/rust/crates/lingxi-service/src/lib.rs
+index 7c7279d74..f3e3778d5 100644
+--- a/rust/crates/lingxi-service/src/lib.rs
++++ b/rust/crates/lingxi-service/src/lib.rs
+@@ -23,6 +23,7 @@
+ 
+ pub mod approval;
+ pub mod approval_service;
++pub mod artifactverify;
+ pub mod auth;
+ pub mod background;
+ pub mod cancel;
+diff --git a/rust/crates/lingxi-service/src/toolgateway.rs b/rust/crates/lingxi-service/src/toolgateway.rs
+index 4c86aba28..8fb380d39 100644
+--- a/rust/crates/lingxi-service/src/toolgateway.rs
++++ b/rust/crates/lingxi-service/src/toolgateway.rs
+@@ -76,7 +76,7 @@
+ use std::collections::HashMap;
+ use std::sync::Arc;
+ 
+-use lingxi_kernel::ports::{ToolExecutionResult, ToolExecutorPort, ToolRequest};
++use lingxi_kernel::ports::{ToolExecutionResult, ToolExecutorPort, ToolOutcome, ToolRequest};
+ use lingxi_kernel::toolcatalog::{
+     EffectiveArguments, PermissionKind, SchemaBudget, ToolRegistry, ToolTargetId, ToolTargetRef,
+ };
+@@ -1264,8 +1264,46 @@ impl ToolInvocationGateway {
+             "gateway dispatch: every re-verification passed; dispatching the server-bound \
+              effective arguments to the bound executor"
+         );
+-        self.dispatch_executor(ctx, call_id, &request, &binding.executor)
+-            .await
++        let mut executed = self
++            .dispatch_executor(ctx, call_id, &request, &binding.executor)
++            .await?;
++        // 6) R04-A15 — the DELIVERY-REGISTRATION audit. The executor ran,
++        //    so this is NOT a zero-dispatch refusal: a SUCCESS whose
++        //    `file://` resource reference does not verify against the
++        //    filesystem RIGHT NOW (missing / not a regular file) is
++        //    converted to an explicit FAILED that states the dispatch
++        //    happened, that side effects may exist, and that the artifact
++        //    is NOT registered as a valid deliverable. "Request sent"
++        //    never masquerades as "file produced" — and a vanished or
++        //    bogus artifact never masquerades as a delivery either.
++        if let ToolOutcome::Success { result } = &mut executed.outcome {
++            if let Err(rejection) = audit_success_artifacts(result) {
++                tracing::warn!(
++                    target = %record.target_id,
++                    code = rejection.code(),
++                    "delivered artifact failed the gateway registration audit: {}",
++                    rejection.message()
++                );
++                executed.outcome = ToolOutcome::Failed {
++                    error: ProtocolError::new(
++                        ErrorCode::Internal,
++                        format!(
++                            "delivered artifact failed verification ({}): {}; the execution WAS \
++                             dispatched and side effects may exist, but this file is NOT \
++                             registered as a valid deliverable",
++                            rejection.code(),
++                            rejection.message()
++                        ),
++                        false,
++                    )
++                    .with_details(serde_json::Map::from_iter([(
++                        "code".to_string(),
++                        serde_json::json!("gateway_artifact_verification_failed"),
++                    )])),
++                };
++            }
++        }
++        Ok(executed)
+     }
+ 
+     /// The PROTECTED dispatch path — the only place a business flow may
+@@ -1284,6 +1322,28 @@ impl ToolInvocationGateway {
+     }
+ }
+ 
++/// R04-A15: audits every LOCAL-FILE resource reference a SUCCESS carries
++/// (the universal facts the gateway can derive on its own — existence and
++/// regular-file shape, judged at registration time). Scope/contract
++/// conditions belong to the boundary that owns them (worker grants, the
++/// file tools' resource extractor) and are NOT re-judged here; remote
++/// URIs are verified by their own type and never forced through a
++/// local-file audit.
++fn audit_success_artifacts(
++    result: &lingxi_kernel::ports::ToolSuccess,
++) -> Result<(), crate::artifactverify::ArtifactRejection> {
++    for reference in &result.resource_refs {
++        let Some(uri) = reference.uri.as_deref() else {
++            continue;
++        };
++        let Some(path_text) = crate::artifactverify::local_path_of_uri(uri) else {
++            continue;
++        };
++        crate::artifactverify::audit_delivered_file(std::path::Path::new(path_text))?;
++    }
++    Ok(())
++}
++
+ /// Rebuilds the protocol digest value from the stored hex (the canonical
+ /// algorithm/canonicalization ids are the boundary's fixed vocabulary).
+ fn digest_of_hex(hex: &str) -> lingxi_protocol::ArgsDigest {
+diff --git a/rust/crates/lingxi-service/src/workerrpc.rs b/rust/crates/lingxi-service/src/workerrpc.rs
+index ce9c8492b..479d70cca 100644
+--- a/rust/crates/lingxi-service/src/workerrpc.rs
++++ b/rust/crates/lingxi-service/src/workerrpc.rs
+@@ -335,12 +335,34 @@ impl Default for WorkerLimits {
+ /// Why one worker invocation failed (stable codes).
+ #[derive(Debug, Clone, PartialEq, Eq)]
+ pub enum WorkerFailure {
+-    SpawnFailed { detail: String },
+-    SandboxRefused { detail: String },
+-    ProtocolViolation { detail: String },
+-    WorkerError { message: String },
+-    DeadlineExceeded { detail: String },
+-    ClaimedUnauthorizedPath { path: String },
++    SpawnFailed {
++        detail: String,
++    },
++    SandboxRefused {
++        detail: String,
++    },
++    ProtocolViolation {
++        detail: String,
++    },
++    WorkerError {
++        message: String,
++    },
++    DeadlineExceeded {
++        detail: String,
++    },
++    ClaimedUnauthorizedPath {
++        path: String,
++    },
++    /// R04-A15: the worker claimed a file as its deliverable and the claim
++    /// failed artifact verification (missing / not a regular file /
++    /// content contract). The invocation's success is converted to this
++    /// explicit failure — the worker ran (side effects may exist), but the
++    /// claimed artifact is NOT registered as a valid deliverable.
++    ClaimedArtifactInvalid {
++        path: String,
++        code: &'static str,
++        detail: String,
++    },
+ }
+ 
+ impl WorkerFailure {
+@@ -352,6 +374,7 @@ impl WorkerFailure {
+             WorkerFailure::WorkerError { .. } => "worker_error",
+             WorkerFailure::DeadlineExceeded { .. } => "worker_deadline_exceeded",
+             WorkerFailure::ClaimedUnauthorizedPath { .. } => "worker_claimed_unauthorized_path",
++            WorkerFailure::ClaimedArtifactInvalid { .. } => "worker_claimed_artifact_invalid",
+         }
+     }
+ 
+@@ -374,6 +397,10 @@ impl WorkerFailure {
+                 "worker claimed a file outside its granted scopes: {path}; the claim is \
+                  refused and no local resource is minted"
+             ),
++            WorkerFailure::ClaimedArtifactInvalid { path, code, detail } => format!(
++                "worker claimed a deliverable that failed artifact verification ({code}): \
++                 {path}: {detail}; the worker ran, but nothing is registered as delivered"
++            ),
+         }
+     }
+ 
+@@ -386,6 +413,9 @@ impl WorkerFailure {
+             | WorkerFailure::ClaimedUnauthorizedPath { .. } => ErrorCode::Forbidden,
+             WorkerFailure::ProtocolViolation { .. } => ErrorCode::InvalidMessage,
+             WorkerFailure::DeadlineExceeded { .. } => ErrorCode::UpstreamUnavailable,
++            // A fake-success deliverable is a violation of the claimed
++            // result contract — InvalidMessage, retryable: false.
++            WorkerFailure::ClaimedArtifactInvalid { .. } => ErrorCode::InvalidMessage,
+         };
+         ProtocolError::new(code, self.message(), false).with_details(serde_json::Map::from_iter([
+             ("code".to_string(), serde_json::json!(self.code())),
+@@ -544,6 +574,11 @@ pub struct WorkerToolSpec {
+     pub cwd: std::path::PathBuf,
+     /// The model callback port (the R05 boundary face).
+     pub model: Arc<dyn WorkerModelPort>,
++    /// R04-A15: the content contract every `claimed_files` entry must
++    /// satisfy before it becomes a local ResourceRef. `None` = the basic
++    /// contract (inside a grant + exists + regular file); a tool that
++    /// promises structured output declares the stricter format/minimum.
++    pub claimed_file_contract: Option<crate::artifactverify::ClaimedFileContract>,
+ }
+ 
+ /// The registered worker tool.
+@@ -1025,37 +1060,34 @@ impl ToolExecutorPort for WorkerToolExecutor {
+                     },
+                 );
+             }
+-            // Claimed files: only in-grant, existing paths become local
+-            // ResourceRefs — anything else is a refused claim (the
+-            // forged-local-file-link case).
++            // Claimed files: only artifacts that pass verification become
++            // local ResourceRefs — inside a grant, existing, a REGULAR
++            // file, and (when the tool declares one) satisfying the
++            // claimed-file content contract. Anything else is a refused
++            // claim: the worker ran, but nothing is registered as
++            // delivered (the forged-local-file-link AND the empty-product
++            // cases, R04-A15).
++            let contract = self.spec.claimed_file_contract.unwrap_or_default();
+             let mut resource_refs = Vec::new();
+             for claimed in &result.claimed_files {
+                 let path = std::path::Path::new(claimed);
+-                let inside = grants.iter().any(|scope| {
+-                    path.starts_with(&scope.path)
+-                        || std::fs::canonicalize(path)
+-                            .map(|real| real.starts_with(&scope.path))
+-                            .unwrap_or(false)
+-                });
+-                if !inside {
+-                    return ToolExecutionResult::of_ctx(
+-                        ctx,
+-                        ToolOutcome::Failed {
+-                            error: WorkerFailure::ClaimedUnauthorizedPath {
+-                                path: claimed.clone(),
+-                            }
+-                            .to_protocol_error(),
++                if let Err(rejection) =
++                    crate::artifactverify::verify_claimed_artifact(path, &grants, &contract)
++                {
++                    let failure = match &rejection {
++                        crate::artifactverify::ArtifactRejection::OutOfScope { path } => {
++                            WorkerFailure::ClaimedUnauthorizedPath { path: path.clone() }
++                        }
++                        other => WorkerFailure::ClaimedArtifactInvalid {
++                            path: claimed.clone(),
++                            code: other.code(),
++                            detail: other.message(),
+                         },
+-                    );
+-                }
+-                if !path.exists() {
++                    };
+                     return ToolExecutionResult::of_ctx(
+                         ctx,
+                         ToolOutcome::Failed {
+-                            error: WorkerFailure::ProtocolViolation {
+-                                detail: format!("claimed file {claimed:?} does not exist"),
+-                            }
+-                            .to_protocol_error(),
++                            error: failure.to_protocol_error(),
+                         },
+                     );
+                 }
+diff --git a/rust/crates/lingxi-service/tests/r04_t04_file_tools.rs b/rust/crates/lingxi-service/tests/r04_t04_file_tools.rs
+index fe00b3ad1..995d13ecb 100644
+--- a/rust/crates/lingxi-service/tests/r04_t04_file_tools.rs
++++ b/rust/crates/lingxi-service/tests/r04_t04_file_tools.rs
+@@ -1709,3 +1709,78 @@ async fn read_only_session_denies_file_writes_at_the_policy_face() {
+     );
+     teardown(&harness).await;
+ }
++
++// T04 review OBS-1 (fixed in R04-T08): the incumbent's `countOccurrences`
++// ALWAYS counts in the fuzzy-normalized space (edit-diff.js L177-180
++// normalizes both sides regardless of which layer matched), so a file that
++// contains BOTH `it's` and `it’s` refuses `Found 2 occurrences` for
++// oldText `it's` — never a quiet exact-layer replacement of just the ASCII
++// copy. The Rust port had counted in whichever space `replacement_base`
++// happened to be, diverging on exactly that conflict case. This regression
++// pins the aligned semantics plus its two legal contrasts.
++#[tokio::test]
++async fn edit_duplicate_counting_runs_in_the_fuzzy_space_like_the_incumbent() {
++    let harness = file_harness(StepsProvider::new(vec![])).await;
++    let ctx = kernel_ctx("sess-obs1", "run-obs1");
++
++    // The OBS-1 case itself: exact-layer hit present, but the file also
++    // holds the smart-quote variant — the incumbent counts BOTH and
++    // refuses; the file keeps every byte.
++    std::fs::write(harness.ws.join("mix.txt"), "it's here\nand it’s there\n").expect("mix");
++    let mixed = call_file_tool(
++        &harness,
++        &ctx,
++        "edit-obs1-mixed",
++        &harness.core.edit_target,
++        json!({"path": "mix.txt", "edits": [{"oldText": "it's", "newText": "IT IS"}]}),
++    )
++    .await
++    .expect("mixed-variant duplicate is a tool error");
++    assert!(
++        error_text(&mixed).contains("Found 2 occurrences of the text in mix.txt"),
++        "{}",
++        error_text(&mixed)
++    );
++    assert_eq!(
++        std::fs::read_to_string(harness.ws.join("mix.txt")).expect("untouched"),
++        "it's here\nand it’s there\n"
++    );
++
++    // Contrast A: only the smart-quote variant exists — the fuzzy layer
++    // still matches it uniquely and the edit succeeds (unchanged behavior).
++    std::fs::write(harness.ws.join("smart.txt"), "only it’s here\n").expect("smart");
++    let smart = call_file_tool(
++        &harness,
++        &ctx,
++        "edit-obs1-smart",
++        &harness.core.edit_target,
++        json!({"path": "smart.txt", "edits": [{"oldText": "it's", "newText": "IT IS"}]}),
++    )
++    .await
++    .expect("fuzzy single match succeeds");
++    assert!(text_of(&smart).contains("Successfully replaced 1 block(s)"));
++    assert_eq!(
++        std::fs::read_to_string(harness.ws.join("smart.txt")).expect("edited"),
++        "only IT IS here\n"
++    );
++
++    // Contrast B: two exact duplicates keep refusing (the pre-existing
++    // semantics, now reached through the same fuzzy-space counter).
++    std::fs::write(harness.ws.join("two.txt"), "alpha alpha\n").expect("two");
++    let two = call_file_tool(
++        &harness,
++        &ctx,
++        "edit-obs1-two",
++        &harness.core.edit_target,
++        json!({"path": "two.txt", "edits": [{"oldText": "alpha", "newText": "beta"}]}),
++    )
++    .await
++    .expect("exact duplicates refuse");
++    assert!(
++        error_text(&two).contains("Found 2 occurrences of the text in two.txt"),
++        "{}",
++        error_text(&two)
++    );
++    assert_no_temp_residue(&harness.ws);
++    teardown(&harness).await;
++}
+diff --git a/rust/crates/lingxi-service/tests/r04_t07_mcp_and_workers.rs b/rust/crates/lingxi-service/tests/r04_t07_mcp_and_workers.rs
+index 7ce216ec8..21c235c49 100644
+--- a/rust/crates/lingxi-service/tests/r04_t07_mcp_and_workers.rs
++++ b/rust/crates/lingxi-service/tests/r04_t07_mcp_and_workers.rs
+@@ -71,8 +71,17 @@ fn fixture_exe() -> &'static str {
+ }
+ 
+ fn unique_dir(label: &str) -> PathBuf {
++    // T07 review R1 / F1 (fixed in R04-T08): `pid + nanos` alone collided
++    // at microsecond clock granularity when two tests booted the full
++    // `bootstrap_with_deps` in the same nanosecond window (~25% flake per
++    // full-suite run, loud `table schema_migrations already exists`).
++    // The per-process counter suffix is the T04/T05/T06 helper convention
++    // — it makes every directory unique within this process by
++    // construction, whatever the clock granularity is.
++    static DIR_SEQ: AtomicUsize = AtomicUsize::new(0);
++    let seq = DIR_SEQ.fetch_add(1, Ordering::SeqCst);
+     let base = std::env::temp_dir().join(format!(
+-        "r04t07-{label}-{}-{}",
++        "r04t07-{label}-{}-{}-{seq}",
+         std::process::id(),
+         std::time::SystemTime::now()
+             .duration_since(std::time::UNIX_EPOCH)
+@@ -712,6 +721,7 @@ async fn register_worker(
+         env: BTreeMap::new(),
+         cwd: h.ws.clone(),
+         model,
++        claimed_file_contract: None,
+     };
+     register_worker_tool(
+         &h.registry,
+@@ -2040,6 +2050,23 @@ async fn mcp_and_worker_tools_follow_the_t03_permission_face() {
+         ),
+         Ok(Verdict::NeedsApproval)
+     );
++    // T07 review R1 / O4 (closed in R04-T08): the worker tool's read_only
++    // leg was the one uncovered cell of the T03 face (only MCP tools were
++    // asserted above). A read_only session denies the worker tool's
++    // prepare with the SAME read-only vocabulary — zero dispatch.
++    match verdict_of(
++        worker_target.as_str(),
++        json!({"input": "input.txt"}),
++        mode_of(SessionPermissionMode::ReadOnly),
++    ) {
++        Err(lingxi_service::toolgateway::GatewayRefusal::PolicyDenied { code, .. }) => {
++            assert!(
++                code.contains("ACTION_BLOCKED_BY_READ_ONLY"),
++                "worker {code}"
++            );
++        }
++        other => panic!("worker tool read_only must deny the prepare, got {other:?}"),
++    }
+ 
+     // Full-chain leg: an ASK session's run on the MCP tool PARKS at the
+     // real approval surface; the user approves; the call executes exactly
+diff --git a/rust/crates/xtask/src/main.rs b/rust/crates/xtask/src/main.rs
+index f59f5259a..edc901363 100644
+--- a/rust/crates/xtask/src/main.rs
++++ b/rust/crates/xtask/src/main.rs
+@@ -58,6 +58,7 @@ pub use stage_map::RESULT_VERSION;
+ pub const STAGE_MAPS: &[(&str, &str)] = &[
+     ("R02", include_str!("stage_maps/R02.json")),
+     ("R03", include_str!("stage_maps/R03.json")),
++    ("R04", include_str!("stage_maps/R04.json")),
+ ];
+ 
+ const USAGE: &str = r#"xtask — Lingxi Rust verification orchestrator (R02-T08)
+diff --git a/rust/crates/xtask/src/runner_identity.rs b/rust/crates/xtask/src/runner_identity.rs
+index 844f6cf1c..c6736d1af 100644
+--- a/rust/crates/xtask/src/runner_identity.rs
++++ b/rust/crates/xtask/src/runner_identity.rs
+@@ -31,6 +31,10 @@ const EMBEDDED: &[(&str, &[u8])] = &[
+         "rust/crates/xtask/src/stage_maps/R03.json",
+         include_bytes!("stage_maps/R03.json"),
+     ),
++    (
++        "rust/crates/xtask/src/stage_maps/R04.json",
++        include_bytes!("stage_maps/R04.json"),
++    ),
+     (
+         "rust/crates/xtask/Cargo.toml",
+         include_bytes!("../Cargo.toml"),
+@@ -50,6 +54,7 @@ const SOURCE_INVENTORY: &[&str] = &[
+     "runner_identity.rs",
+     "stage_maps/R02.json",
+     "stage_maps/R03.json",
++    "stage_maps/R04.json",
+     "verify/runner_tests.rs",
+     "candidate/tests.rs",
+ ];
+diff --git a/rust/crates/xtask/src/stage_map.rs b/rust/crates/xtask/src/stage_map.rs
+index 66e8c0af9..bb57a6d7d 100644
+--- a/rust/crates/xtask/src/stage_map.rs
++++ b/rust/crates/xtask/src/stage_map.rs
+@@ -2098,4 +2098,285 @@ mod map_tests {
+              F01-F07 suite/count mapping (missing suite, extra suite, or count drift)"
+         );
+     }
++    // ── R04-T08: pin the PRODUCTION R04 map ─────────────────────────────
++    //
++    // Same reasoning as the R03 pinning block above: the gate's
++    // cross-checks guard the R00 supplemental leaves and per-command
++    // evidence, but the base scenario registration, the supplemental-duty
++    // scenarios and the share-case inventory exist only in the map —
++    // deleting any of them would otherwise leave a silent hole. These
++    // tests pin the registered R04 map (they run inside `cargo test`,
++    // itself the gate's `rust_test_workspace` command).
++
++    /// The REAL registered R04 stage map (same bytes `verify-stage R04`
++    /// loads via STAGE_MAPS).
++    const R04_PRODUCTION: &str = include_str!("stage_maps/R04.json");
++
++    /// The 56 case names the matrix producer records (the exact set the
++    /// share leaves' assertion contracts may pin — a map pinning anything
++    /// else, or the producer losing a case, is a named gap).
++    const R04_MATRIX_CASES: &[&str] = &[
++        "a15-directory-claim-refused",
++        "a15-gateway-audit-directory-ref-failed",
++        "a15-gateway-audit-fake-ref-failed",
++        "a15-gateway-audit-real-ref-passes",
++        "a15-missing-claim-refused",
++        "a15-out-of-grant-claim-refused",
++        "a15-real-delivery-registered",
++        "a15-structure-violation-refused",
++        "a16-alias-route-covered",
++        "a16-history-preserved",
++        "approval-answer-executes-once",
++        "approval-duplicate-idempotent",
++        "approval-reject-zero-dispatch",
++        "catalog-face-lists-mcp-tools-with-permission",
++        "future-tool-shape-ast_edit-discoverable-not-callable",
++        "future-tool-shape-ast_grep-discoverable-not-callable",
++        "future-tool-shape-file-discoverable-not-callable",
++        "future-tool-shape-find-discoverable-not-callable",
++        "future-tool-shape-grep-discoverable-not-callable",
++        "future-tool-shape-ls-discoverable-not-callable",
++        "future-tool-shape-lsp-discoverable-not-callable",
++        "future-tool-shape-materialize-discoverable-not-callable",
++        "future-tool-shape-run_code-discoverable-not-callable",
++        "future-tool-shape-security_scan-discoverable-not-callable",
++        "future-tool-shape-stage_files-discoverable-not-callable",
++        "gateway-each-call-independent-permission",
++        "matrix-lifecycle-disable-holes",
++        "matrix-lifecycle-generation-refusals",
++        "matrix-lifecycle-uninstall-holes",
++        "matrix-permission-consistency",
++        "matrix-route-consistency",
++        "matrix-tool-family-count",
++        "mcp-connector-catalog-sync",
++        "mcp-connector-register-handshake",
++        "mcp-describe-real-identity",
++        "mcp-search-namespaced",
++        "mcp-tool-call-full-chain",
++        "mcp-tool-permission-face",
++        "permission-face-modes-verifiable",
++        "preauthorization-single-session-scoped",
++        "semantics-cancel-leaves-no-fabricated-receipt",
++        "semantics-failed-never-dispatched-receipt",
++        "semantics-success-receipt-dispatched",
++        "semantics-unknown-receipt-honest",
++        "sup01-ask-subagent-write-refused",
++        "terminal-close-stops-terminal",
++        "terminal-snapshot-current-transcript",
++        "terminal-tail-cursor-continuation",
++        "tool-edit-conflict-preserves-user-version",
++        "tool-edit-real-chain",
++        "tool-exec-cancel-cleanup",
++        "tool-exec-command-real-chain",
++        "tool-read-real-chain",
++        "tool-write-real-chain",
++        "tool-write-stdin-continuation",
++        "tool-write-stdin-foreign-writes",
++    ];
++
++    /// The subset of producer cases that evidence the BASE scenarios
++    /// (R04-A15/A16, the SUP-01 refusal cell, the matrix cell counters and
++    /// the T08 unified outcome semantics) rather than any one leaf's
++    /// share — they still run every gate (the producer records them) and
++    /// still must exist in R04_MATRIX_CASES, but no leaf owns them.
++    const R04_SCENARIO_EVIDENCE_CASES: &[&str] = &[
++        "a15-directory-claim-refused",
++        "a15-gateway-audit-directory-ref-failed",
++        "a15-gateway-audit-fake-ref-failed",
++        "a15-gateway-audit-real-ref-passes",
++        "a15-missing-claim-refused",
++        "a15-out-of-grant-claim-refused",
++        "a15-structure-violation-refused",
++        "a16-alias-route-covered",
++        "a16-history-preserved",
++        "matrix-permission-consistency",
++        "matrix-tool-family-count",
++        "semantics-cancel-leaves-no-fabricated-receipt",
++        "semantics-failed-never-dispatched-receipt",
++        "semantics-success-receipt-dispatched",
++        "semantics-unknown-receipt-honest",
++        "sup01-ask-subagent-write-refused",
++    ];
++
++    /// The 124 R00 leaves bound to R04 split 55 share / 69 deferred by the
++    /// R04-T08 executor's stage-share decision (the generator script
++    /// `scripts/rust-tauri/r04_t08_generate_stage_map.py` holds the table;
++    /// these numbers pin it — a re-classification that silently drops
++    /// share coverage turns this red until the map and the decision agree).
++    const R04_LEAF_COUNTS: (usize, usize) = (55, 69);
++
++    fn parse_production_r04() -> StageMap {
++        parse_stage_map(R04_PRODUCTION)
++            .expect("the registered R04 stage map must parse with this runner")
++    }
++
++    use std::path::Path;
++
++    #[test]
++    fn r04_production_map_keeps_the_sixteen_a_scenarios_verbatim() {
++        let map = parse_production_r04();
++        // The frozen T01..T08 registration: id → commandRefs.
++        let expected: &[(&str, &[&str])] = &[
++            ("R04-A01", &["rust_test_workspace", "r04_tool_matrix"]),
++            ("R04-A02", &["rust_test_workspace", "r04_tool_matrix"]),
++            ("R04-A03", &["rust_test_workspace", "r04_tool_matrix"]),
++            ("R04-A04", &["rust_test_workspace"]),
++            ("R04-A05", &["rust_test_workspace", "r04_tool_matrix"]),
++            ("R04-A06", &["rust_test_workspace", "r04_tool_matrix"]),
++            ("R04-A07", &["rust_test_workspace", "r04_tool_matrix"]),
++            ("R04-A08", &["rust_test_workspace"]),
++            ("R04-A09", &["rust_test_workspace", "r04_tool_matrix"]),
++            ("R04-A10", &["rust_test_workspace", "r04_tool_matrix"]),
++            ("R04-A11", &["rust_test_workspace"]),
++            ("R04-A12", &["rust_test_workspace"]),
++            ("R04-A13", &["rust_test_workspace", "r04_tool_matrix"]),
++            ("R04-A14", &["rust_test_workspace", "r04_tool_matrix"]),
++            ("R04-A15", &["r04_tool_matrix", "rust_test_workspace"]),
++            ("R04-A16", &["r04_tool_matrix", "rust_test_workspace"]),
++        ];
++        for (id, refs) in expected {
++            let scenario = map
++                .scenarios
++                .iter()
++                .find(|s| s.id == *id)
++                .unwrap_or_else(|| panic!("R04 map dropped original scenario {id}"));
++            assert_eq!(scenario.requirement, "REQUIRED", "{id} re-graded");
++            assert_eq!(
++                &scenario
++                    .command_refs
++                    .iter()
++                    .map(String::as_str)
++                    .collect::<Vec<_>>(),
++                refs,
++                "scenario {id} commandRefs drifted from the T08 registration"
++            );
++        }
++    }
++
++    #[test]
++    fn r04_production_map_registers_the_supplemental_duty_scenarios() {
++        let map = parse_production_r04();
++        for (id, refs) in [
++            ("R04-SUP01", vec!["rust_test_workspace", "r04_tool_matrix"]),
++            ("R04-SUP03", vec!["rust_test_workspace"]),
++            (
++                "R04-SUP05",
++                vec!["r03_regression_gate", "rust_test_workspace"],
++            ),
++        ] {
++            let scenario = map
++                .scenarios
++                .iter()
++                .find(|s| s.id == id)
++                .unwrap_or_else(|| panic!("R04 map dropped the supplemental-duty scenario {id}"));
++            assert_eq!(scenario.requirement, "REQUIRED");
++            assert_eq!(&scenario.command_refs, &refs, "{id} commandRefs drifted");
++        }
++    }
++
++    #[test]
++    fn r04_production_map_registers_the_matrix_and_regression_producers() {
++        let map = parse_production_r04();
++        let matrix = map
++            .commands
++            .iter()
++            .find(|c| c.key == "r04_tool_matrix")
++            .unwrap_or_else(|| panic!("R04 map dropped the r04_tool_matrix producer"));
++        assert_eq!(
++            matrix.argv,
++            vec![
++                "bash",
++                "scripts/rust-tauri/r04_t08_matrix.sh",
++                "{EVIDENCE}/R04_MATRIX"
++            ]
++        );
++        assert!(matrix
++            .evidence_paths
++            .contains(&"{EVIDENCE}/R04_MATRIX/leaf-cases.json".to_string()));
++        let regression = map
++            .commands
++            .iter()
++            .find(|c| c.key == "r03_regression_gate")
++            .unwrap_or_else(|| panic!("R04 map dropped the r03_regression_gate command"));
++        assert!(regression.argv.contains(&"verify-stage".to_string()));
++        assert!(regression.argv.contains(&"R03".to_string()));
++        assert!(regression
++            .evidence_paths
++            .contains(&"{EVIDENCE}/R03_REGRESSION/verify-stage-result.json".to_string()));
++        // The producer script must exist in the tree (a deleted producer is
++        // a command that can only ever fail).
++        let repo_root = Path::new(env!("CARGO_MANIFEST_DIR"))
++            .ancestors()
++            .nth(3)
++            .expect("xtask lives at rust/crates/xtask");
++        assert!(
++            repo_root
++                .join("scripts/rust-tauri/r04_t08_matrix.sh")
++                .is_file(),
++            "the registered r04_tool_matrix producer script must exist"
++        );
++    }
++
++    #[test]
++    fn r04_production_map_keeps_the_124_leaf_split() {
++        let map = parse_production_r04();
++        assert_eq!(
++            map.supplemental_leaves.len(),
++            124,
++            "the R04 map must keep exactly the 124 R00-bound supplemental leaves"
++        );
++        let share = map
++            .supplemental_leaves
++            .iter()
++            .filter(|l| l.basis_kind == BASIS_STAGE_SHARE_SATISFIED)
++            .count();
++        let deferred = map
++            .supplemental_leaves
++            .iter()
++            .filter(|l| l.basis_kind == BASIS_DEFERRED_TO_LATER_STAGE)
++            .count();
++        assert_eq!(
++            (share, deferred),
++            R04_LEAF_COUNTS,
++            "the share/deferred split drifted from the registered decision"
++        );
++        assert!(
++            map.supplemental_leaves
++                .iter()
++                .filter(|l| l.basis_kind == BASIS_STAGE_SHARE_SATISFIED)
++                .all(|l| l.assertion_contract.is_some()),
++            "every R04 share leaf must keep its assertion contract (R14-F01)"
++        );
++        // Every share leaf pins only REAL producer cases, and every known
++        // case is pinned by at least one leaf (an unpinned case is dead
++        // evidence; an unknown pin can never hold).
++        let mut pinned: Vec<&str> = Vec::new();
++        for leaf in &map.supplemental_leaves {
++            if let Some(contract) = leaf.assertion_contract.as_ref() {
++                for case in &contract.cases {
++                    assert!(
++                        R04_MATRIX_CASES.contains(&case.case.as_str()),
++                        "leaf {} pins unknown matrix case {:?}",
++                        leaf.id,
++                        case.case
++                    );
++                    pinned.push(case.case.as_str());
++                }
++            }
++        }
++        for known in R04_MATRIX_CASES {
++            if R04_SCENARIO_EVIDENCE_CASES.contains(known) {
++                // Base-scenario evidence (A15/A16, the SUP-01 cell, the
++                // matrix cell counters and the unified outcome semantics):
++                // consumed by the scenario roll-up on command outcomes, not
++                // by any single leaf's contract.
++                continue;
++            }
++            assert!(
++                pinned.contains(known),
++                "matrix case {known} is recorded by the producer but pinned by NO leaf — \
++                 it must be bound to a share contract or removed from the producer"
++            );
++        }
++    }
+ }

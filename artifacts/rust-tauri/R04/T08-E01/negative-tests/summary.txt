@@ -1,0 +1,21 @@
+== preparing isolated copy /tmp/lingxi-r04-t08-neg-wEGEl1 (git worktree at HEAD ded3467bf + uncommitted R04-T08 files) ==
+== cloning node_modules into the copy (cp -Rc, CoW) ==
+== N-unknown: verify-stage R99 (no such map registered) ==
+case n-unknown-stage: exit=2 gap-named=OK verdict=OK
+== N-empty: R04 map with an EMPTY scenario set ==
+case n-empty-scenario-set: exit=2 gap-named=OK verdict=OK
+== N1a: deleted supplemental leaf mapping R00-T02-LA-00C88B996AA0 from the copy's map ==
+case n1a-delete-leaf-mapping: exit=1 gap-named=OK verdict=OK
+== N1b: deleted the r04_tool_matrix command mapping from the copy's map ==
+case n1b-delete-command-mapping: exit=2 gap-named=OK verdict=OK
+== C03a: evidence root pre-filled with a stale file ==
+case c03a-stale-evidence-root: exit=1 gap-named=OK verdict=OK
+== N4: deleted the R04-SUP01 scenario from the copy's map; xtask map-pinning tests: ==
+case n4-delete-sup-scenario: exit=101 gap-named=OK verdict=OK
+== N2: producer tampered to a 0-match test filter; full verify-stage R04 ==
+case n2-zero-match-filter: exit=1 gap-named=OK verdict=OK
+== N3: map declares an evidence file the producer never writes; full verify-stage R04 ==
+case n3-missing-evidence-file: exit=1 gap-named=OK verdict=OK
+== C03b: starting a full verify-stage R04, then changing an execution input mid-run ==
+case c03b-midrun-input-change: exit=1 gap-named=OK verdict=OK
+== NOTE: the battery wrapper was killed by the host environment mid-c03b (after n3); c03b was re-run standalone with the identical isolation methodology (/tmp/c03b_only.sh, archived as c03b-worktree-add.log + case-row.tsv) and merged here ==

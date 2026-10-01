@@ -1,0 +1,116 @@
+{
+  "spec_version": "lingxi.r04-handoff.v1",
+  "stage_id": "R04",
+  "status": "READY_FOR_REVIEW（T08 执行者交接；阶段独立验收未发生——R05 消费方以此文件的『已证明接口』为准，不消费任何未标证明的项）",
+  "generated_by": "EXECUTOR-R04-T08-E02（续做 E01 的中断落盘；本文件为 R04-T08 交付）",
+  "generated_at": "2026-09-30",
+  "baseline_task07": "ded3467bf（R04-T07 独立 PASS 并推送确认）",
+  "branch": "codex/rust-tauri-migration",
+  "source_of_truth": {
+    "stage_map": "rust/crates/xtask/src/stage_maps/R04.json（生成器 scripts/rust-tauri/r04_t08_generate_stage_map.py 幂等复现；注册于 xtask STAGE_MAPS + runner_identity）",
+    "acceptance_ledger": "docs/rust-tauri/R04/R04_ACCEPTANCE_LEDGER.json",
+    "stage_report": "docs/rust-tauri/R04/R04_REPORT.md",
+    "t08_task_report": "docs/rust-tauri/R04/R04-T08_REPORT.md",
+    "evidence_root": "artifacts/rust-tauri/R04/T08-E01/"
+  },
+  "r04_gate": {
+    "command": "cargo run --manifest-path rust/Cargo.toml --locked -p xtask -- verify-stage R04 --evidence <全新证据目录>",
+    "evidence": "artifacts/rust-tauri/R04/T08-E01/verify-R04/verify-stage-result.json",
+    "note": "内嵌 r03_regression_gate 命令在最终候选上完整重跑 verify-stage R03（十修复套件+A15 矩阵+A16 种子+全部 R02 定向链）——R05 改动 T01-T07 冻结面后重跑本门禁即同时回归 R03。"
+  },
+  "tool_catalog": {
+    "authority": "rust/crates/lingxi-kernel/src/toolcatalog.rs（ToolRegistry：register/update/uninstall/resolve(ByName|ByTargetId)/describe/describe_full/search/snapshot/set_availability；generation 语义：update 或 disable/uninstall 上升，旧 prepared 句柄与旧批准失效）",
+    "target_id_namespaces": {
+      "first_party": "裸 local_name（read/write/edit/exec_command/write_stdin）",
+      "mcp": "tool:mcp:{server}:{tool}（T07，与现役 TS registry 字节兼容）",
+      "worker": "tool:plugin:{plugin_id}:{op}（T07 register_worker_tool 铸造）"
+    },
+    "available_now": [
+      "read（PermissionKind::Read）", "write（Execute）", "edit（Execute）",
+      "exec_command（Execute；可选 sandbox 包裹）", "write_stdin（Execute；持续终端句柄续写）",
+      "MCP stdio server 工具（register_mcp_server 后按 listing 动态注册）",
+      "worker 工具（register_worker_tool 注册的最小单操作执行器）",
+      "subagent/subagent_reply/subagent_close 委派族（T02 特殊分支，同一网关同一策略面）"
+    ],
+    "future_not_callable": [
+      "file", "find", "grep", "ls", "materialize", "stage_files", "ast_edit", "ast_grep",
+      "lsp", "run_code", "security_scan"
+    ],
+    "future_semantics": "Availability::Future{reason}：可发现（search/describe 命中且描述诚实）、零派发（prepare → GatewayRefusal::TargetNotCallable，稳定词汇）——R06/R07 接入执行本体时改 Available 并迁回 T04/T05 同款资源抽取器。11 个形态由 r04_tool_matrix 的 future-tool-shape-* 案例图钉。",
+    "schemas": "ToolManifest.input_schema/output_schema=ToolSchemaDocument{dialect:\"json-schema/2020-12\", schema}；T01 fail-closed 校验（$ref 等不兼容方言响亮拒绝）；SchemaBudget 限制大小/深度/成本。四基础工具 schema 在 filetools.rs/exectools.rs 的 manifest 定义处（read: path/offset/limit…；write: path/content…；edit: path/edits[{oldText,newText}]；exec_command: argv[]|cmd/tty/cwd…；write_stdin: process_id/chars）。"
+  },
+  "parameters_and_results": {
+    "request_side": "ToolRequest::from_effective_arguments(target, args_json, &budget)——完整参数→canonical ArgsDigest+args_summary（可信边界计算，模型自填摘要不被信任）；网关内 EffectiveArguments 是唯一不可变有效参数源。",
+    "result_side": "ToolExecutionResult{fence, outcome}；ToolOutcome::Success{result: ToolSuccess}——ToolSuccess 携带真实 ContentBlock 内容（非仅 digest）、resource_refs、截断/运行状态（ToolRunStatus::Running{handle} 用于 tty/后台）、派生摘要；Failed{error: ProtocolError(code/message/details)}；Unknown{reason}（已派发无回执——worker 期限/hang、MCP 传输断；禁止盲重试）。",
+    "payload_semantics": "『请求已发送』≠『文件已生成』：R04-T08 网关登记审计（toolgateway.rs audit_success_artifacts）在 SUCCESS 落账前对每个 file:// 引用核验存在+常规文件，失败转显式 Failed(gateway_artifact_verification_failed) 且消息如实声明已派发/可能有副作用/未登记为有效交付。worker claimed_files 同族（workerrpc ClaimedArtifactInvalid）。",
+    "resource_refs": "ResourceRef{resource_id, kind, display_name, uri: \"file://<abs>\", digest, size_bytes}（lingxi_protocol）；本地引用只在存在+常规文件+（契约时）格式核验后铸造；远程/不可验证身份永不映射本地 ResourceRef。"
+  },
+  "authorization_and_approval": {
+    "gateway": "ToolInvocationGateway::new(registry, policy: Arc<dyn ToolPolicyPort>, clock, budget, prepared_ttl_ms, live_prepared_cap)；两阶段 prepare_from_request/prepare → execute_prepared；PreparedInvocation 服务端生成绑定主体/Run/target 代次/有效参数/资源/期限；执行时重验（撤销/代次/参数/资源）。单一授权判定点=驱动在 journal authorized 步应用 RunGrant（网关零授权逻辑、零存储、不写第二收据——SUP-02）。",
+    "policy_face": "ApprovalService 实现 ToolPolicyPort::adjudicate（approval_service.rs）：operate=Allowed；ask=Read 类 Allowed / 其余 NeedsApproval（经 grant_preauthorization 的单次预授权可免）；read_only=Read 类 Allowed / 其余 Denied(ACTION_BLOCKED_BY_READ_ONLY)；子代理 ask 档写类=TOOL_APPROVAL_UNAVAILABLE 结构化拒（SUP-01 已关闭）。",
+    "approval_lifecycle": "pending_of(principal, session)→PendingView；answer(Approve/Reject)——重复点击 AlreadySettled 幂等；批准绑定完整调用身份（target+canonical digest+principal+session），改参/换目标不消费；grant_preauthorization 单次、会话域、期限内。等待期零预执行。",
+    "cancellation_ownership": "run 级取消=state.runs().cancel_run(run_id, reason)（FireOutcome Fired/AlreadyCancelling）；取消树传播与终态统一裁决=R03 冻结语义（本阶段回归钉住）；exec/PTY 进程清理归 ProcessSupervisor（有界 killpg）；MCP 调用取消=在途 future abort，迟到响应不被已消费句柄复活；worker 取消=WorkerRuntime 有界 kill。取消后 journal 不伪造成功收据（semantics-cancel-leaves-no-fabricated-receipt 图钉）。"
+  },
+  "mcp_and_workers": {
+    "mcp_capabilities": [
+      "官方 rmcp 3.4.1（锁内）stdio transport：真实 initialize/协议协商/分页 tools/list（MCP_MAX_LIST_PAGES=64、MCP_MAX_LISTED_TOOLS=1024 有界）/tools/call/变更通知计数",
+      "register_mcp_server(Arc<McpServer>, &registry, gateway, &budget) 组合入口（生产 bootstrap 默认不调用）；refresh_mcp_server 重列+注册/更新/消失同步（死传输恰一次重连）"
+    ],
+    "mcp_limits": [
+      "HTTP/SSE transport 未携带（锁外 feature）→ McpEndpoint::Unsupported 响亮拒绝（R07 D-06 归属）",
+      "server 注解/描述/schema/结果全部不可信：注解只进 declared_permission 审计；远程 URI 永不铸造本地 ResourceRef（映射文本描述）",
+      "传输断/超时=Unknown（不盲重发）；is_error=完成但失败；structured_content 违反注册 output schema=失败；输出 256KiB 截断诚实标注"
+    ],
+    "worker_capabilities": [
+      "WorkerRuntime::new(WorkerLimits, Option<SandboxPort>, clock)：并发信号量、CSPRNG 调用 id、期限、进程组 kill、可选 T06 沙盒包裹（拒绝=响亮 spawn 失败不裸跑）",
+      "register_worker_tool：最小单操作 WorkerToolSpec{plugin_id, op, local_name, input_schema, path_args, argv, env, cwd, model, claimed_file_contract}",
+      "claimed_files 经 artifactverify::verify_claimed_artifact 核验（grant 内+存在+常规文件+内容契约）才铸造 ResourceRef；worker 自报错误=完成但失败；未确认结局=Unknown"
+    ],
+    "worker_limits": [
+      "WorkerModelPort 回调契约：R04 生产形态 UnconfiguredWorkerModel 一切回调诚实拒 model_capability_not_configured（R05 接真实 ModelGateway 时替换该 port，不新增旁路）；载荷与回调预算宿主侧强制",
+      "env 白名单（PATH/LANG/LC_ALL/LC_CTYPE/TZ/TMPDIR——无 HOME、无凭证）；stdin/stdout 行协议双向 256KiB 有界；单调用回调上限 4"
+    ]
+  },
+  "registration_recipe": {
+    "file_tools": "filetools::register_core_file_tools(&registry, gateway.as_ref(), access: Arc<ResourceAccess>, cwd, clock, changes: Arc<dyn FileChangeLog>, &budget) → read/write/edit（资源抽取器绑资源授权）",
+    "process_tools": "exectools::register_process_tools(&registry, gateway.as_ref(), supervisor: Arc<ProcessSupervisor>, access, cwd, sandbox: Option<Arc<dyn SandboxPort>>, clock, &budget) → exec_command/write_stdin",
+    "mcp": "mcpbridge::register_mcp_server(Arc::new(McpServer::new(id, McpEndpoint::Stdio{command,args,env,cwd})), &registry, gateway.as_ref(), &budget).await",
+    "worker": "workerrpc::register_worker_tool(&registry, gateway.as_ref(), &runtime, &access, &budget, spec) → target（spec.model 用 UnconfiguredWorkerModel，claimed_file_contract 按工具产物契约声明或 None）",
+    "harness_reference": "tests/r04_t08_tool_matrix.rs matrix_harness()（bootstrap_with_deps 真实 run 链完整组装样例——R05 接入可直接参考）"
+  },
+  "regression_commands": [
+    "cargo fmt --manifest-path rust/Cargo.toml --all -- --check",
+    "cargo clippy --manifest-path rust/Cargo.toml --workspace --all-targets --locked -- -D warnings",
+    "cargo test --manifest-path rust/Cargo.toml --workspace --locked",
+    "cargo run --manifest-path rust/Cargo.toml --locked -p xtask -- check-contracts",
+    "cargo run --manifest-path rust/Cargo.toml --locked -p xtask -- check-boundaries（+ -- --self-test）",
+    "bash scripts/rust-tauri/r04_t08_matrix.sh <fresh dir>（全矩阵+A15/A16+124 叶案例生产者）",
+    "cargo run --manifest-path rust/Cargo.toml --locked -p xtask -- verify-stage R03 --evidence <fresh dir>（R03 硬保护独立重跑）",
+    "cargo run --manifest-path rust/Cargo.toml --locked -p xtask -- verify-stage R04 --evidence <fresh dir>（全部门禁+内嵌 R03 回归）",
+    "bash scripts/rust-tauri/r04_t08_gate_negative_tests.sh <evidence dir in repo>（门禁负向 9 用例）"
+  ],
+  "known_environment_item": {
+    "id": "R04-ENV-FIREWALL-R00-MGMT",
+    "summary": "cargo test workspace 中 r00_management_leaves 的 LAN 自连腿（192.168.3.5 非环回自地址）可能被 macOS 应用防火墙/代理 TUN 拦截（新测试二进制哈希=新未签名 app）；T01/T02/T06/T07 轮均登记过，隔离复跑同文案。本轮 T08 最终候选的 workspace 全量与 verify-stage R04 内嵌 workspace 均 GREEN（环境窗口良好）；若 R05 复现按 T07 报告 §5.1 口径处置（隔离核证、不销项、不掩盖）。"
+  },
+  "deferred_registrations": [
+    {
+      "id": "t05-obs2-registryfull-tail",
+      "owner": "R05+/阶段审查裁定",
+      "summary": "R04-T05 review R1 OBS-2：RegistryFull 拒绝路径可能留下已 spawn 未监督子进程（登记非阻塞）；T05 源码不在 T08 修复范围，按冻结面纪律原样携带。"
+    },
+    {
+      "id": "R04-DEFERRED-LEAVES-69",
+      "owner": "R06/R07/R08/R09",
+      "summary": "R04.json 的 124 R00 补充叶中 69 叶 deferred_to_later_stage（无 R04 叶专属门禁份额，仍 REQUIRED）；后续阶段图必须消费其余款（叶 id 清单见 R04.json supplementalLeafScenarios basisKind=deferred_to_later_stage）。"
+    },
+    {
+      "id": "r04-sup03-f3f4",
+      "owner": "R08（事件面消费点）",
+      "summary": "RR-T02 F3/F4（事件面 canonical 消费）未被 R04 消费，按登记携带（SUP-03）。"
+    }
+  ],
+  "allowed_next_scope": "R05（模型协议与真实供应商接入）。允许：实现 ModelGateway/真实凭证流、消费本交接的工具执行面、以真实 provider 替换 StepsProvider/UnconfiguredWorkerModel 双侧。不允许：改 T01-T07 冻结语义而不重跑 verify-stage R04+R03；提前 Tauri 替壳/R06+/R09+事项。",
+  "not_authorized": ["commit/push（本交接生成时未执行）", "真实用户数据迁移", "付费/外部真实账户调用", "发布/签名/公证"],
+  "handoff_note": "Provider 双（StepsProvider、fixture 子进程）只产生外部响应；网关/策略/注册表/journal/监督器全部为真实实现。R05 不得按工具名伪造输出复用这些测试（r04_t08_tool_matrix 的 Provider 双即示范：只发请求+检查真实结果）。"
+}

@@ -844,11 +844,27 @@ fn fuzzy_find(content: &str, old_text: &str) -> FuzzyFind {
     }
 }
 
+/// Counts occurrences ALWAYS in the fuzzy-normalized space — the
+/// incumbent's `countOccurrences` (edit-diff.js L177-180) normalizes BOTH
+/// sides with `normalizeForFuzzyMatch` regardless of which layer matched,
+/// so a file containing both `it's` and `it’s` with oldText `it's` is
+/// `Found 2 occurrences`, never a quiet exact-layer replacement of the
+/// ASCII copy. T04 review OBS-1, fixed in R04-T08: the Rust port counted
+/// in whatever space `replacement_base` happened to be (exact space when
+/// every edit matched exactly), diverging on exactly that conflict case.
+/// The NFKC fold inside the incumbent's normalizer remains the registered
+/// T04 §8.6 gap; everything else of the fold is shared with
+/// [`normalize_for_fuzzy`].
 fn count_occurrences(content: &str, needle: &str) -> usize {
     if needle.is_empty() {
         return 0;
     }
-    content.match_indices(needle).count()
+    let fuzzy_content = normalize_for_fuzzy(content);
+    let fuzzy_needle = normalize_for_fuzzy(needle);
+    if fuzzy_needle.is_empty() {
+        return 0;
+    }
+    fuzzy_content.match_indices(&fuzzy_needle).count()
 }
 
 #[derive(Clone)]

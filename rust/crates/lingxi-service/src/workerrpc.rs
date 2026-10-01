@@ -335,12 +335,34 @@ impl Default for WorkerLimits {
 /// Why one worker invocation failed (stable codes).
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub enum WorkerFailure {
-    SpawnFailed { detail: String },
-    SandboxRefused { detail: String },
-    ProtocolViolation { detail: String },
-    WorkerError { message: String },
-    DeadlineExceeded { detail: String },
-    ClaimedUnauthorizedPath { path: String },
+    SpawnFailed {
+        detail: String,
+    },
+    SandboxRefused {
+        detail: String,
+    },
+    ProtocolViolation {
+        detail: String,
+    },
+    WorkerError {
+        message: String,
+    },
+    DeadlineExceeded {
+        detail: String,
+    },
+    ClaimedUnauthorizedPath {
+        path: String,
+    },
+    /// R04-A15: the worker claimed a file as its deliverable and the claim
+    /// failed artifact verification (missing / not a regular file /
+    /// content contract). The invocation's success is converted to this
+    /// explicit failure — the worker ran (side effects may exist), but the
+    /// claimed artifact is NOT registered as a valid deliverable.
+    ClaimedArtifactInvalid {
+        path: String,
+        code: &'static str,
+        detail: String,
+    },
 }
 
 impl WorkerFailure {
@@ -352,6 +374,7 @@ impl WorkerFailure {
             WorkerFailure::WorkerError { .. } => "worker_error",
             WorkerFailure::DeadlineExceeded { .. } => "worker_deadline_exceeded",
             WorkerFailure::ClaimedUnauthorizedPath { .. } => "worker_claimed_unauthorized_path",
+            WorkerFailure::ClaimedArtifactInvalid { .. } => "worker_claimed_artifact_invalid",
         }
     }
 
@@ -374,6 +397,10 @@ impl WorkerFailure {
                 "worker claimed a file outside its granted scopes: {path}; the claim is \
                  refused and no local resource is minted"
             ),
+            WorkerFailure::ClaimedArtifactInvalid { path, code, detail } => format!(
+                "worker claimed a deliverable that failed artifact verification ({code}): \
+                 {path}: {detail}; the worker ran, but nothing is registered as delivered"
+            ),
         }
     }
 
@@ -386,6 +413,9 @@ impl WorkerFailure {
             | WorkerFailure::ClaimedUnauthorizedPath { .. } => ErrorCode::Forbidden,
             WorkerFailure::ProtocolViolation { .. } => ErrorCode::InvalidMessage,
             WorkerFailure::DeadlineExceeded { .. } => ErrorCode::UpstreamUnavailable,
+            // A fake-success deliverable is a violation of the claimed
+            // result contract — InvalidMessage, retryable: false.
+            WorkerFailure::ClaimedArtifactInvalid { .. } => ErrorCode::InvalidMessage,
         };
         ProtocolError::new(code, self.message(), false).with_details(serde_json::Map::from_iter([
             ("code".to_string(), serde_json::json!(self.code())),
@@ -544,6 +574,11 @@ pub struct WorkerToolSpec {
     pub cwd: std::path::PathBuf,
     /// The model callback port (the R05 boundary face).
     pub model: Arc<dyn WorkerModelPort>,
+    /// R04-A15: the content contract every `claimed_files` entry must
+    /// satisfy before it becomes a local ResourceRef. `None` = the basic
+    /// contract (inside a grant + exists + regular file); a tool that
+    /// promises structured output declares the stricter format/minimum.
+    pub claimed_file_contract: Option<crate::artifactverify::ClaimedFileContract>,
 }
 
 /// The registered worker tool.
@@ -1025,37 +1060,34 @@ impl ToolExecutorPort for WorkerToolExecutor {
                     },
                 );
             }
-            // Claimed files: only in-grant, existing paths become local
-            // ResourceRefs — anything else is a refused claim (the
-            // forged-local-file-link case).
+            // Claimed files: only artifacts that pass verification become
+            // local ResourceRefs — inside a grant, existing, a REGULAR
+            // file, and (when the tool declares one) satisfying the
+            // claimed-file content contract. Anything else is a refused
+            // claim: the worker ran, but nothing is registered as
+            // delivered (the forged-local-file-link AND the empty-product
+            // cases, R04-A15).
+            let contract = self.spec.claimed_file_contract.unwrap_or_default();
             let mut resource_refs = Vec::new();
             for claimed in &result.claimed_files {
                 let path = std::path::Path::new(claimed);
-                let inside = grants.iter().any(|scope| {
-                    path.starts_with(&scope.path)
-                        || std::fs::canonicalize(path)
-                            .map(|real| real.starts_with(&scope.path))
-                            .unwrap_or(false)
-                });
-                if !inside {
-                    return ToolExecutionResult::of_ctx(
-                        ctx,
-                        ToolOutcome::Failed {
-                            error: WorkerFailure::ClaimedUnauthorizedPath {
-                                path: claimed.clone(),
-                            }
-                            .to_protocol_error(),
+                if let Err(rejection) =
+                    crate::artifactverify::verify_claimed_artifact(path, &grants, &contract)
+                {
+                    let failure = match &rejection {
+                        crate::artifactverify::ArtifactRejection::OutOfScope { path } => {
+                            WorkerFailure::ClaimedUnauthorizedPath { path: path.clone() }
+                        }
+                        other => WorkerFailure::ClaimedArtifactInvalid {
+                            path: claimed.clone(),
+                            code: other.code(),
+                            detail: other.message(),
                         },
-                    );
-                }
-                if !path.exists() {
+                    };
                     return ToolExecutionResult::of_ctx(
                         ctx,
                         ToolOutcome::Failed {
-                            error: WorkerFailure::ProtocolViolation {
-                                detail: format!("claimed file {claimed:?} does not exist"),
-                            }
-                            .to_protocol_error(),
+                            error: failure.to_protocol_error(),
                         },
                     );
                 }

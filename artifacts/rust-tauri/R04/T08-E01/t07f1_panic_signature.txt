@@ -1,0 +1,25 @@
+running 19 tests
+test adversarial_mcp_pagination_walks_all_pages ... ok
+test mcp_unsupported_endpoint_refuses_loudly ... FAILED
+test adversarial_worker_error_result_and_callback_budget_are_host_owned ... ok
+test mcp_stdio_child_transport_and_env_whitelist_hold ... ok
+test adversarial_tools_list_change_updates_generation_and_invalidates_old_shapes ... ok
+test r04_a13_mcp_reconnect_never_replays_the_side_effect ... ok
+test worker_claim_in_grant_mints_a_verified_resource_ref ... ok
+test adversarial_two_servers_same_tool_name_hit_their_own_targets ... ok
+test mcp_tool_success_flows_through_the_full_run_chain ... ok
+test r04_a13_full_chain_journals_unknown_and_a_new_decision_sees_the_real_count ... ok
+--
+---- mcp_unsupported_endpoint_refuses_loudly stdout ----
+
+thread 'mcp_unsupported_endpoint_refuses_loudly' (1694628) panicked at crates/lingxi-service/tests/r04_t07_mcp_and_workers.rs:587:10:
+bootstrap: Storage(Internal { detail: "table invocation_journal already exists" })
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+
+
+failures:
+    mcp_unsupported_endpoint_refuses_loudly
+
+test result: FAILED. 18 passed; 1 failed; 0 ignored; 0 measured; 0 filtered out; finished in 1.52s
+
+error: test failed, to rerun pass `-p lingxi-service --test r04_t07_mcp_and_workers`

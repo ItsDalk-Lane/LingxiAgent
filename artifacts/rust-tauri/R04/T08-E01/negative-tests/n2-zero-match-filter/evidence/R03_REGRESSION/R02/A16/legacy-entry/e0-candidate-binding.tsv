@@ -1,0 +1,16 @@
+3b4e84802fd3dda9719295f3d3e95a2218fca520a88d4b2ea610865113c049d7  ??  rust/crates/lingxi-service/src/artifactverify.rs
+754752b02ef1e52106d5623d36f86560ca7e87d0db03c83cd273cb25427fdceb   M  rust/crates/lingxi-service/src/bin/r04_t07_fixture.rs
+4fae1611fa470a2a57833d9819782ccd54a2fb4afed7400303626ace731c8bad   M  rust/crates/lingxi-service/src/filetools.rs
+5228ddb7f0532be1eef955785f9c5d9d850d14f4080dee9f26bd88fd9e87b919   M  rust/crates/lingxi-service/src/lib.rs
+77391f7d4419ffbb00385d4bfc58a0b5553d5f177cfb5219777e62c0192594d2   M  rust/crates/lingxi-service/src/toolgateway.rs
+2a0c00766df825aefa552ec94c5a1d194c5935ca015458c0345152adb915f24b   M  rust/crates/lingxi-service/src/workerrpc.rs
+982959de20ffb9cd237799544f8b7eab0e6caec2449e1365862da6f9647241fe   M  rust/crates/lingxi-service/tests/r04_t04_file_tools.rs
+120966accdadb3af31880986e35831b8ba37cee38b3c09a0d06c7654e039ac53   M  rust/crates/lingxi-service/tests/r04_t07_mcp_and_workers.rs
+3735f76842532761c52e1ac517383b6ebb41795e78db329faf70a1822e935136  ??  rust/crates/lingxi-service/tests/r04_t08_tool_matrix.rs
+54e9f2ee1f1b8b9beef5202d002cd4624d3c81814d2eb800a400e56ea96964a4   M  rust/crates/xtask/src/main.rs
+7e942bb4635d939c2856e9e3aa0899f2bb15c03a220eadf5a0b5990e152ff7c1   M  rust/crates/xtask/src/runner_identity.rs
+364070db8a81de78950f6483c588e384399681b21d510a6c63dffdcf56412d83   M  rust/crates/xtask/src/stage_map.rs
+cfa4d175039778bbebfc1339f18a9aeaf345922d4d305489908c0ada5be28262  ??  rust/crates/xtask/src/stage_maps/R04.json
+12e54326fb0ae444ffaec0a8a257a0c8a094df1e96404a92c048f27185931be2  ??  scripts/rust-tauri/r04_t08_gate_negative_tests.sh
+1cc9907c5e56ed90a792b5827e5939b1b3a6b0fdf315057b83b429381b7ffbad  ??  scripts/rust-tauri/r04_t08_generate_stage_map.py
+b3e4722454960af55fba84c34de65455f886b884f65fb6d109135e2415aa0c1a  ??  scripts/rust-tauri/r04_t08_matrix.sh
