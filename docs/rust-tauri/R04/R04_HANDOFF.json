@@ -26,15 +26,27 @@
       "worker": "tool:plugin:{plugin_id}:{op}（T07 register_worker_tool 铸造）"
     },
     "available_now": [
-      "read（PermissionKind::Read）", "write（Execute）", "edit（Execute）",
-      "exec_command（Execute；可选 sandbox 包裹）", "write_stdin（Execute；持续终端句柄续写）",
+      "read（PermissionKind::Read）",
+      "write（Execute）",
+      "edit（Execute）",
+      "exec_command（Execute；可选 sandbox 包裹）",
+      "write_stdin（Execute；持续终端句柄续写）",
       "MCP stdio server 工具（register_mcp_server 后按 listing 动态注册）",
       "worker 工具（register_worker_tool 注册的最小单操作执行器）",
       "subagent/subagent_reply/subagent_close 委派族（T02 特殊分支，同一网关同一策略面）"
     ],
     "future_not_callable": [
-      "file", "find", "grep", "ls", "materialize", "stage_files", "ast_edit", "ast_grep",
-      "lsp", "run_code", "security_scan"
+      "file",
+      "find",
+      "grep",
+      "ls",
+      "materialize",
+      "stage_files",
+      "ast_edit",
+      "ast_grep",
+      "lsp",
+      "run_code",
+      "security_scan"
     ],
     "future_semantics": "Availability::Future{reason}：可发现（search/describe 命中且描述诚实）、零派发（prepare → GatewayRefusal::TargetNotCallable，稳定词汇）——R06/R07 接入执行本体时改 Available 并迁回 T04/T05 同款资源抽取器。11 个形态由 r04_tool_matrix 的 future-tool-shape-* 案例图钉。",
     "schemas": "ToolManifest.input_schema/output_schema=ToolSchemaDocument{dialect:\"json-schema/2020-12\", schema}；T01 fail-closed 校验（$ref 等不兼容方言响亮拒绝）；SchemaBudget 限制大小/深度/成本。四基础工具 schema 在 filetools.rs/exectools.rs 的 manifest 定义处（read: path/offset/limit…；write: path/content…；edit: path/edits[{oldText,newText}]；exec_command: argv[]|cmd/tty/cwd…；write_stdin: process_id/chars）。"
@@ -111,6 +123,29 @@
     }
   ],
   "allowed_next_scope": "R05（模型协议与真实供应商接入）。允许：实现 ModelGateway/真实凭证流、消费本交接的工具执行面、以真实 provider 替换 StepsProvider/UnconfiguredWorkerModel 双侧。不允许：改 T01-T07 冻结语义而不重跑 verify-stage R04+R03；提前 Tauri 替壳/R06+/R09+事项。",
-  "not_authorized": ["commit/push（本交接生成时未执行）", "真实用户数据迁移", "付费/外部真实账户调用", "发布/签名/公证"],
-  "handoff_note": "Provider 双（StepsProvider、fixture 子进程）只产生外部响应；网关/策略/注册表/journal/监督器全部为真实实现。R05 不得按工具名伪造输出复用这些测试（r04_t08_tool_matrix 的 Provider 双即示范：只发请求+检查真实结果）。"
+  "not_authorized": [
+    "commit/push（本交接生成时未执行）",
+    "真实用户数据迁移",
+    "付费/外部真实账户调用",
+    "发布/签名/公证"
+  ],
+  "handoff_note": "Provider 双（StepsProvider、fixture 子进程）只产生外部响应；网关/策略/注册表/journal/监督器全部为真实实现。R05 不得按工具名伪造输出复用这些测试（r04_t08_tool_matrix 的 Provider 双即示范：只发请求+检查真实结果）。",
+  "accepted_stage_candidate": {
+    "candidate_commit": "0c67b6fc7",
+    "stage_review_round": 1,
+    "stage_verdict": "PASS",
+    "stage_review_report": "docs/rust-tauri/R04/R04_FINAL_STAGE_REVIEW_R1.md",
+    "stage_review_evidence": "/private/tmp/r04-stage-review/verify-R04 (fresh evidence root, exit 0, stable binding, testedShaAtEnd=0c67b6fc7; summary mirrored in report)",
+    "task_commit_chain": {
+      "R04-T01": "fd5fc2c2c",
+      "R04-T02": "1a1602c33+39168bfb0",
+      "R04-T03": "c72e0fa02",
+      "R04-T04": "80b4edbf5",
+      "R04-T05": "84e6499fe",
+      "R04-T06": "26251dc92",
+      "R04-T07": "ded3467bf",
+      "R04-T08": "0c67b6fc7"
+    },
+    "acceptance_note": "本对象引用候选提交；接受记录提交自身 SHA 由远程确认回执登记，不写入本文件（防自引用）。8 Task 全部经全新独立 Reviewer PASS（T01/T02 历经 R1 FAIL→全新修复→R2 PASS，历史保留）；阶段 Reviewer 从未参与任何执行/修复/Task 审查。"
+  }
 }

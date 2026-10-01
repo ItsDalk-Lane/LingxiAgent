@@ -4,8 +4,8 @@
   "start_branch": "main",
   "implementation_branch": "codex/rust-tauri-migration",
   "start_head": "7d1a0c6bc28062ff455adcf8f68c3a80b117e90d",
-  "current_head": "39168bfb0",
-  "current_head_note": "R04 start: R03 re-accepted after RR2 fixed repair (candidate f4d4b1666 verified ancestor; RR2 stage review PASS). R04 begins at bf6450bcd (local==remote, clean).",
+  "current_head": "0c67b6fc7",
+  "current_head_note": "R04 accepted after independent stage review (STAGE-REVIEWER-R04-R01 PASS, fresh evidence root, candidate binding stable). Closeout docs commit follows; its SHA recorded via remote receipt.",
   "remote": "origin",
   "remote_default_branch": "main",
   "taskbook_manifest_sha256": "49968287f564a2a470d55fe4295a26ef70a71ccb4b16e38933567e89076a5c3f",
@@ -549,7 +549,7 @@
       "stage_final_candidate_sha": "1ebb03d9f89af364a42274efc2cd482f298b1130",
       "acceptance_note": "2026-09-30 对抗性修复轮重开并重新接受：F01-F08 全部关闭（34 C-ID 三层），全新阶段 Reviewer RR1 PASS，候选 ebcbcad1b；2026-09-29 首次接受记录与证据原文保留，其裁决2 依据已被本轮替代。"
     },
-    "R04": "READY_FOR_STAGE_REVIEW",
+    "R04": "ACCEPTED",
     "R05": {
       "title": "模型协议、凭证、流式处理与最小完整闭环",
       "status": "PENDING",
@@ -4355,7 +4355,7 @@
       "blockers": []
     }
   },
-  "current_task": "R04 stage review (STAGE-REVIEWER-R04-R01)",
+  "current_task": "R04 complete — stage stops here per authorization (no R05 executor)",
   "orchestration_mode": {
     "effective_from": "R00-T03 R2 repair",
     "task_executor": "new ZCode task per Rxx-Tyy",
