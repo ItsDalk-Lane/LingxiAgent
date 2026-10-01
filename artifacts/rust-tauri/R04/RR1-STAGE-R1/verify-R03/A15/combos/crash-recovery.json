@@ -1,0 +1,12 @@
+{
+  "combo": "crash-recovery",
+  "counts": {
+    "final_message_rows": 0,
+    "final_status": "interrupted_needs_attention",
+    "form": "drive-lost + real startup scan (SIGKILL form: recovery_crash_points.rs)",
+    "model_calls": 1,
+    "runs_scanned": 1,
+    "tool_calls": 0
+  },
+  "schema": "lingxi.r03-t08-combo-counts.v1"
+}

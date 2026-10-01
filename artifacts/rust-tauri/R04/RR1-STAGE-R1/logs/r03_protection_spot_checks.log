@@ -1,0 +1,9 @@
+== R03 protection spot checks (main tree, 2026-10-01T22:55:01Z) ==
+[cancel_terminal_race] test result: ok. 13 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.45s
+[cancel_terminal_race] exit=0
+[request_dedup] test result: ok. 4 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.19s
+[request_dedup] exit=0
+[request_id_canonicalization] test result: ok. 7 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 1.45s
+[request_id_canonicalization] exit=0
+[tool_receipt_unknown] test result: ok. 6 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.32s
+[tool_receipt_unknown] exit=0

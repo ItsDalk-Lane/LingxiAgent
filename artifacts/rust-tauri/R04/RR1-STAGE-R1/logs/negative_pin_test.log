@@ -1,0 +1,22 @@
+   Compiling xtask v0.1.0 (/private/tmp/r04-stage-r1-neg/rust/crates/xtask)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 1.24s
+     Running unittests src/main.rs (rust/target/debug/deps/xtask-ad766de8ea03e62c)
+
+running 1 test
+test stage_map::map_tests::r04_production_map_registers_the_rr1_repair_scenarios ... FAILED
+
+failures:
+
+---- stage_map::map_tests::r04_production_map_registers_the_rr1_repair_scenarios stdout ----
+
+thread 'stage_map::map_tests::r04_production_map_registers_the_rr1_repair_scenarios' (4377469) panicked at crates/xtask/src/stage_map.rs:2732:21:
+R04 map dropped the RR1 repair scenario R04-RR1-F03 — the F01-F05 adversarial-repair counterexamples would leave the formal acceptance
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+
+
+failures:
+    stage_map::map_tests::r04_production_map_registers_the_rr1_repair_scenarios
+
+test result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 107 filtered out; finished in 0.01s
+
+error: test failed, to rerun pass `-p xtask --bin xtask`

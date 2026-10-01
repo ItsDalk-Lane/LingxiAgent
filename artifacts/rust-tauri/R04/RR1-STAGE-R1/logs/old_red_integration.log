@@ -1,0 +1,56 @@
+   Compiling lingxi-service v0.0.0 (/private/tmp/r04-stage-r1-old/rust/crates/lingxi-service)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.46s
+     Running tests/zz_stage_r1_counterexamples.rs (rust/target/debug/deps/zz_stage_r1_counterexamples-0f1d91adb9480406)
+
+running 5 tests
+test stage_r1_f03_unconfirmed_stop_must_not_claim_an_exit ... FAILED
+test stage_r1_f05_capped_spill_must_not_be_claimed_full ... FAILED
+test stage_r1_f02_settled_collector_frozen_after_terminal ... FAILED
+test stage_r1_f01_refused_oneshot_must_not_execute ... FAILED
+test stage_r1_f05_lost_head_must_be_visible_and_flagged ... FAILED
+
+failures:
+
+---- stage_r1_f03_unconfirmed_stop_must_not_claim_an_exit stdout ----
+
+thread 'stage_r1_f03_unconfirmed_stop_must_not_claim_an_exit' (4231435) panicked at crates/lingxi-service/tests/zz_stage_r1_counterexamples.rs:440:9:
+STAGE-R1-F03: the result claims an exit (code 137) while the stop was never observed as a trusted receipt; text tail: (no output)
+
+Command timed out after 1 seconds. For long-running work pass timeout=<seconds> (max 600), or run with tty=true and continue via write_stdin.
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+
+---- stage_r1_f05_capped_spill_must_not_be_claimed_full stdout ----
+
+thread 'stage_r1_f05_capped_spill_must_not_be_claimed_full' (4231436) panicked at crates/lingxi-service/tests/zz_stage_r1_counterexamples.rs:537:13:
+STAGE-R1-F05: a capped spill (65536) is claimed as the full output (100023 bytes): /var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-stager1-spill-f05b-19903-1790890939479287000-2/lingxi-exec-output-84120ee84e626053.log
+
+---- stage_r1_f02_settled_collector_frozen_after_terminal stdout ----
+
+thread 'stage_r1_f02_settled_collector_frozen_after_terminal' (4231434) panicked at crates/lingxi-service/tests/zz_stage_r1_counterexamples.rs:382:5:
+assertion `left == right` failed: STAGE-R1-F02: the settled collector changed after the terminal phase (0 -> 7)
+  left: 0
+ right: 7
+
+---- stage_r1_f01_refused_oneshot_must_not_execute stdout ----
+
+thread 'stage_r1_f01_refused_oneshot_must_not_execute' (4231433) panicked at crates/lingxi-service/tests/zz_stage_r1_counterexamples.rs:307:9:
+assertion `left == right` failed: STAGE-R1-F01: the refused one-shot must not have executed
+  left: "7e8f4d94580a98fb26ccced99599f9e6e228409ff4b4951c6f84551ffd9bd1d3"
+ right: "678bf03b47ad96012e4b7cf24f90a91aefc5c921863940998e65e28463f45cb0"
+
+---- stage_r1_f05_lost_head_must_be_visible_and_flagged stdout ----
+
+thread 'stage_r1_f05_lost_head_must_be_visible_and_flagged' (4231437) panicked at crates/lingxi-service/tests/zz_stage_r1_counterexamples.rs:483:5:
+STAGE-R1-F05: the true stream head must be visible in the result
+
+
+failures:
+    stage_r1_f01_refused_oneshot_must_not_execute
+    stage_r1_f02_settled_collector_frozen_after_terminal
+    stage_r1_f03_unconfirmed_stop_must_not_claim_an_exit
+    stage_r1_f05_capped_spill_must_not_be_claimed_full
+    stage_r1_f05_lost_head_must_be_visible_and_flagged
+
+test result: FAILED. 0 passed; 5 failed; 0 ignored; 0 measured; 0 filtered out; finished in 3.63s
+
+error: test failed, to rerun pass `-p lingxi-service --test zz_stage_r1_counterexamples`

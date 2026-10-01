@@ -14,12 +14,18 @@
     "base_sha": "773d5a6968b87650cd135cc5684707f81d1acda0",
     "previous_accepted_candidate": "0c67b6fc749ac5c21d0514e3076b0ed2058cd7c4",
     "worktree_at_start": "clean（无用户未提交修改）",
-    "reopen_status": "REOPENED_PENDING_REPAIR"
+    "reopen_status": "RE-ACCEPTED_AFTER_ADVERSARIAL_REPAIR（STAGE-REVIEWER-R04-RR1 PASS，2026-10-01）"
   },
   "navigation": {
-    "stage_r04_status": "REOPENED_PENDING_REPAIR（历史 ACCEPTED 记录保留，不被抹除；现行裁决以本账本 RR1 收口为准）",
+    "stage_r04_status": "RE-ACCEPTED_AFTER_ADVERSARIAL_REPAIR（历史 ACCEPTED@0c67b6fc7 与本轮 RR1 重验链并存；见 R04_RR1_STAGE_REVIEW.md）",
     "allowed_next_scope": "仅本轮五组问题修复与 R04 重验；禁止 R05 执行、发布、真实数据迁移",
-    "workorders": ["G01", "G02", "G03", "G04", "G05"]
+    "workorders": [
+      "G01",
+      "G02",
+      "G03",
+      "G04",
+      "G05"
+    ]
   },
   "issues": [
     {
@@ -33,13 +39,18 @@
         "rust/crates/lingxi-service/src/exectools.rs: ProcessTools::run_exec_command / ProcessOwnershipGuard"
       ],
       "source_fact_confirmed_at_baseline": "register() 在 command.spawn()（kill_on_drop(false)）之后调用才检查 live_cap（procsupervisor.rs 基线 824-827/978/1144）",
-      "cases": ["R04-RR1-F01-C01", "R04-RR1-F01-C02", "R04-RR1-F01-C03", "R04-RR1-F01-C04"],
-      "status": "CLOSED_PENDING_COMMIT（R1 独立 PASS；提交回执在 G05 收口统一补记）",
+      "cases": [
+        "R04-RR1-F01-C01",
+        "R04-RR1-F01-C02",
+        "R04-RR1-F01-C03",
+        "R04-RR1-F01-C04"
+      ],
+      "status": "CLOSED_COMMITTED_PUSHED（组级 R1 独立 PASS + 阶段重审复核；提交见 commit_receipts）",
       "normal_selfcheck": "PASS（E02：C01 零派发五重证明/C02 屏障三腿/C03 三变体+C04 四轮轮换，逐项 exit 0，证据 artifacts/rust-tauri/R04/RR1-G01-E01/logs/ 27 文件，报告 G01-E01_REPORT.md §4）",
       "adversarial_selfcheck": "PASS（E02：OS 派发计数核对、屏障固定交错、二次失败注入、重复取消/迟到回调、全套件并行 4 次+顺序 1 次，报告 §3-§4）",
       "independent_review": "PASS（REVIEWER-R04-RR1-G01-R01，2026-10-01：基线运行时红 exit 101 独立复现（哨兵被覆写）；候选全套件 9/9 与逐 C-ID 独立进程运行全 0；reserve_live_slot 原子性/LiveSlot 恰好一次/回滚保真/三重词汇区分/注入钩子零产品调用点逐项核对成立；同族回归 r04_t05_process_tools 14/14、procsupervisor 单测 9/9、clippy -D warnings 0。非阻塞观察 O-1..O-5；O-3 执行者 A10 主张未在审查中复现（基线孤立 3/3 绿），方向不矛盾、归 G02 关注。报告 G01-R1_REVIEW.md，证据 artifacts/rust-tauri/R04/RR1-G01-R1/logs/）",
       "candidate": "工作区未提交改动（HEAD=773d5a696：procsupervisor.rs +332/exectools.rs +19/lib.rs re-export + 新测试 r04_t05_registry_capacity.rs 1267 行 9 用例）",
-      "commit": null,
+      "commit": "1692d2314d381ac8da4aead6d2561878a5bb415b",
       "execution_notes": {
         "repro": "E01 基线红复现 exit 101（repro/red_repro_baseline_773d5a6.txt，哨兵摘要被改——被拒命令确实执行）",
         "gates": "fmt 0/clippy -D warnings 0/workspace tests 0（首跑 101 为既有 A09 pid 竞态，孤立恒绿且基线归因）/check-contracts 0/check-boundaries 0",
@@ -57,13 +68,18 @@
         "rust/crates/lingxi-service/tests/r04_t05_process_tools.rs"
       ],
       "source_fact_confirmed_at_baseline": "timeout(grace, pump) 超时只置 drained=false 无 abort/join（基线 1000）；finalize_exit 无条件 reclaimed=true；child.wait() 后仍按旧 pgid 可 killpg",
-      "cases": ["R04-RR1-F02-C01", "R04-RR1-F02-C02", "R04-RR1-F02-C03", "R04-RR1-F02-C04"],
-      "status": "CLOSED_PENDING_COMMIT（R1 独立 PASS；提交回执在 G05 收口统一补记）",
+      "cases": [
+        "R04-RR1-F02-C01",
+        "R04-RR1-F02-C02",
+        "R04-RR1-F02-C03",
+        "R04-RR1-F02-C04"
+      ],
+      "status": "CLOSED_COMMITTED_PUSHED（组级 R1 独立 PASS + 阶段重审复核；提交见 commit_receipts）",
       "normal_selfcheck": "PASS（E01：C01 三腿 collector 冻结/fd 回落/pumps_alive=0；C02 两腿 wait 边界零信号+诚实收据；C03 三腿单一预算/abort 被 join；C04 12 轮压力逐轮快照，证据 artifacts/rust-tauri/R04/RR1-G02-E01/logs/，报告 G02-E01_REPORT.md）",
       "adversarial_selfcheck": "PASS（E01：后代慢写/双泵不结束/泵 panic/退出与取消竞走 15 轮/终态淘汰与延后退出并发/写与静默持有者交替；屏障与就绪回执驱动）",
       "independent_review": "PASS（REVIEWER-R04-RR1-G02-R01，2026-10-01：自写反例在基线 worktree 红——终态后 settled collector 7→14 字节（脱管泵继续追加）+ fd 10→12（读端泄漏），候选同测试绿；C01×3/C02×2 逐个独立运行+自设 C02 变体（grace=900ms/Shutdown 原因）绿；A09 合法对照——归属可证树恰 1 条 Group 信号、树上 3 pid 真死、哨兵存活（归属门未把该杀的不杀）；verify_group -1 接纳经确定性 revert 实验双向证实（旧拒绝→单测红、候选→绿）且 ESRCH 语义核实；t05 14/14/G01 套件 9/9/lib 296/296/clippy 0/fmt 0；观察缝零产品调用点；t05 加强纯增量逐行核对。非阻塞观察 OBS-01..05。A10 第三方观测孤立 10/10 绿，三方矛盾观测如实并列于报告 §5。报告 G02-R1_REVIEW.md，证据 RR1-G02-R1/logs/）",
       "candidate": "工作区未提交改动（基线 1692d2314：procsupervisor.rs +1143/−111——drain_output_tasks abort+join 收口/child_reaped 发布时序/mark_terminating 归属门/verify_group getpgid=-1 接纳；tests/r04_t05_process_tools.rs 加强 +50；新测试 r04_rr1_f02_reaper_cleanup.rs 12 用例）",
-      "commit": null,
+      "commit": "da15c4bd90a0bb8e27fa4a3fb0bca0ba7268cd82",
       "execution_notes": {
         "repro": "E01 红复现 exit 非 0 三份（repro/red_repro_baseline_1692d23.txt、red_fastexit_old_behavior*.txt——旧 reaper 泵脱离监督/无条件 reclaimed/假拒路径），修复后同测试绿",
         "gates": "fmt 0/clippy 0/workspace tests 0（84 结果行全绿）/check-contracts 0/check-boundaries 0/G01 套件复跑 9/9",
@@ -81,13 +97,19 @@
         "rust/crates/lingxi-service/src/procsupervisor.rs: RecordPhase::is_terminal / await_termination / terminal_facts"
       ],
       "source_fact_confirmed_at_baseline": "非 Terminated 回执兜底 ExitFact::Signal(9)（基线 718）；CleanupTimedOut→Signal(9)（744）→ToolRunStatus::Exited{code:137}（948）",
-      "cases": ["R04-RR1-F03-C01", "R04-RR1-F03-C02", "R04-RR1-F03-C03", "R04-RR1-F03-C04", "R04-RR1-F03-C05"],
-      "status": "CLOSED_PENDING_COMMIT（R1 独立 PASS；提交回执在 G05 收口统一补记）",
+      "cases": [
+        "R04-RR1-F03-C01",
+        "R04-RR1-F03-C02",
+        "R04-RR1-F03-C03",
+        "R04-RR1-F03-C04",
+        "R04-RR1-F03-C05"
+      ],
+      "status": "CLOSED_COMMITTED_PUSHED（组级 R1 独立 PASS + 阶段重审复核；提交见 commit_receipts）",
       "normal_selfcheck": "PASS（E01：C01 确定性红→绿含两事实时间线；C02 文本与结构化一致+空 chars×3/重复轮询/异会话对照；C03 重复终止不升级+首因保留+名额恰好一次；C04 四组+10 轮取消竞争；C05 run driver 取消链+Future 丢弃腿。证据 artifacts/rust-tauri/R04/RR1-G03-E01/logs/，报告 G03-E01_REPORT.md）",
       "adversarial_selfcheck": "PASS（E01：终止请求已发/观察未发分离、真实退出竞逐 deadline、迟到观察不改判、重复轮询；屏障与注入受控驱动）",
       "independent_review": "PASS（REVIEWER-R04-RR1-G03-R01，2026-10-01：自写基线可编译反例 R1/R2 确定性红 4/4、R3 竞态门控 2/4 见证红（并独立验证 macOS PTY 未确认窗口无法确定性打开），候选对照树（逐字节 cmp 一致）同反例 6/6 绿；四条虚构分支基线行号逐一定位并核销（Code(-1) 全树 0 处、observed_status_code 类型层杜绝）；合法对照 V4 不降级；自设 6 对抗变体+V5/V6 迟到观察不改判全绿 3 连跑；workspace 全量 925/0、clippy/fmt/contracts/boundaries 0、ReapFaultPoint 零产品调用点、journal 新臂不混淆。非阻塞观察 O-1..O-4。报告 G03-R1_REVIEW.md，证据 RR1-G03-R1/）",
       "candidate": "工作区未提交改动（基线 da15c4bd9：ports.rs ToolRunStatus::StopUnconfirmed+status 装箱；procsupervisor.rs ExitFact::Unobserved/terminal_facts 不升级/finalize_exit 首因保留/ReapFaultPoint；exectools.rs 诚实映射；runs.rs journal StopUnconfirmed 臂；4 测试文件 API 适配；新测试 r04_rr1_f03_stop_honesty.rs）",
-      "commit": null,
+      "commit": "614fab1afa1ed2c45ebfe41045df4db339c4f9b5",
       "execution_notes": {
         "refact_verification": "E01 在 da15c4bd9 重新核实：复审 4 处虚构分支全部仍存在；另发现同族 finalize_exit 在 CleanupTimedOut 上丢失首因，一并修复",
         "gates": "fmt 0/clippy 0/workspace 0（含 R03 全部套件）/check-contracts 0/check-boundaries 0/G01 9/9+G02 11/11 复跑/F03 套件 3 连跑稳定",
@@ -105,13 +127,18 @@
         "rust/crates/lingxi-service/src/exectools.rs: run_write_stdin truncation message"
       ],
       "source_fact_confirmed_at_baseline": "cursor 只跨完整消费 chunk 推进（基线 616-647），部分消费 chunk 整块留队列→重复输出；未补齐尾部计入 dropped_undelivered_bytes",
-      "cases": ["R04-RR1-F04-C01", "R04-RR1-F04-C02", "R04-RR1-F04-C03", "R04-RR1-F04-C04"],
-      "status": "CLOSED_PENDING_COMMIT（R1 独立 PASS；提交回执在 G05 收口统一补记）",
+      "cases": [
+        "R04-RR1-F04-C01",
+        "R04-RR1-F04-C02",
+        "R04-RR1-F04-C03",
+        "R04-RR1-F04-C04"
+      ],
+      "status": "CLOSED_COMMITTED_PUSHED（组级 R1 独立 PASS + 阶段重审复核；提交见 commit_receipts）",
       "normal_selfcheck": "PASS（E01：C01 红 exit 101 存证+控制组；C02 文本+结构化双核；C03 72 种子属性测试；C04 真实 PTY 握手两段写无 sleep。证据 artifacts/rust-tauri/R04/RR1-G04-E01/logs/）",
       "adversarial_selfcheck": "PASS（E01：确定性淘汰形状/多 chunk 边界/非法字节+不完整尾并存/权限不退化/3× soak）",
       "independent_review": "PASS（REVIEWER-R04-RR1-G04-R01，2026-10-01：自写反例基线红——混合 chunk joined=\"aaa日\"（a 交付三次）+暂存被计 dropped；候选 exit 0 恰 a日。chunk 内 consumed 字节偏移模型逐路径核对（join 只取未消费余量/force 全消费）；四态分立；decode_prefix_utf8 与 lossy maximal-subpart 对齐；属性测试换 3 组全新 seed 72 条新序列全过。报告 G04-R1_REVIEW.md，证据 RR1-G04-R1/）",
       "candidate": "工作区未提交改动（基线 614fab1af：procsupervisor.rs TranscriptCore 字节级消费模型+decode_prefix_utf8 迭代式重写；exectools.rs 四态声明；3 个新集成测试文件+单测/属性测试）",
-      "commit": null
+      "commit": "1285c3bf66ca251fe64956becd4aab44a6f3ef4d"
     },
     {
       "id": "R04-RR1-F05",
@@ -124,17 +151,262 @@
         "rust/crates/lingxi-service/src/exectools.rs: truncate_head_tail / run_exec_command / spill_resource_ref / run_write_stdin"
       ],
       "source_fact_confirmed_at_baseline": "truncated=head_tail.truncated 不比较 total_bytes（基线 759）；Full output 声明不含 capped 事实（762）",
-      "cases": ["R04-RR1-F05-C01", "R04-RR1-F05-C02", "R04-RR1-F05-C03", "R04-RR1-F05-C04", "R04-RR1-F05-C05"],
-      "status": "CLOSED_PENDING_COMMIT（R1 独立 PASS；提交回执在 G05 收口统一补记）",
+      "cases": [
+        "R04-RR1-F05-C01",
+        "R04-RR1-F05-C02",
+        "R04-RR1-F05-C03",
+        "R04-RR1-F05-C04",
+        "R04-RR1-F05-C05"
+      ],
+      "status": "CLOSED_COMMITTED_PUSHED（组级 R1 独立 PASS + 阶段重审复核；提交见 commit_receipts）",
       "normal_selfcheck": "PASS（E01：C01 三腿含控制组两事实分清；C02 多字节/末尾换行；C03 BEYOND_CAP 只在内存；C04 EFBIG/EACCES 零 ResourceRef；C05 双窗/spill/FD 有界+并发+中途取消）",
       "adversarial_selfcheck": "PASS（E01：结果预算小/大两流并发取消输出中途；资源趋势与清理证据）",
       "independent_review": "PASS（REVIEWER-R04-RR1-G04-R01，2026-10-01：自写反例基线红——150024B 单行/200000 预算 truncated=false 且文本以 xxxx 开头 HEAD 已丢；候选 exit 0 全流精确/300KB 腿显式 evicted+真头真尾。truncated=head_tail.truncated||evicted>0 核对；内存上界恒等式 head=min(cap,total)/window=min(cap,total)/lost=max(0,total−2cap) 以真实 record 断言；单超长行 UTF-8 字符边界切分；Full 四态仅字节完整文件；失败 spill 零 ResourceRef；网关产物存在性审计未触及）",
       "candidate": "同 F04 候选（CollectorCore 真头窗+OutputSnapshot.head/lost_middle_bytes+SpillInfo.failed；exectools.rs assemble_retained_output/truncate_head_tail 回退/full_output_claim 四态）",
-      "commit": null
+      "commit": "1285c3bf66ca251fe64956becd4aab44a6f3ef4d"
     }
   ],
-  "closure_checks": ["R04-RR1-CLOSE-C01", "R04-RR1-CLOSE-C02", "R04-RR1-CLOSE-C03", "R04-RR1-CLOSE-C04"],
-  "case_results": {},
-  "evidence_roots": {},
-  "commit_receipts": {}
+  "closure_checks": {
+    "R04-RR1-CLOSE-C01": "PASS——原 16 A-ID/124 叶/19→24 场景在最终候选 verify-stage R04 overall PASS（G05-E01 与 STAGE-REVIEWER 双跑，stable 绑定 629e15b85）；负向：既有 9 例电池 9/9 + RR1 新增 4/4（删场景→门禁 exit 1 且钉测点名）；过滤 0/缺文件/旧证据/漂移均失败关闭",
+    "R04-RR1-CLOSE-C02": "PASS——STAGE-REVIEWER-R04-RR1 未参与任何实现，自写两树同源反例独立完成五组旧红新绿（F01 哨兵覆写/零派发、F02 collector 终态后追加/冻结、F03 虚构 137/不报 exit、F04 重复投递/恰一次、F05 丢 HEAD truncated=false/封顶称 Full→全绿 3 次稳定复跑），非抄执行者日志",
+    "R04-RR1-CLOSE-C03": "PASS——verify-stage R03 独立重跑 overall PASS（15/15 命令、17/17 场景、R02 七链全绿）；cancel_terminal_race/request_dedup/request_id_canonicalization/tool_receipt_unknown 抽验全绿；R03 Cancelled/Unknown 语义未动",
+    "R04-RR1-CLOSE-C04": "PASS——七项错误接受依据逐项核验并被本轮事实替代（登记满≠网关 PreparedRegistryFull、满容量常规可触发非稀有、timeout(JoinHandle)≠abort、running record≠未 reap、CleanupTimedOut≠exit137、逐 chunk seq≠chunk 内消费、尾窗未截断≠完整）；历史报告保留未改写；接受记录引用真实源码提交不自引用"
+  },
+  "case_results": {
+    "R04-RR1-F01-C01": {
+      "status": "PASS",
+      "normal_selfcheck": "PASS（执行者，证据见该 F 的 E01 目录）",
+      "adversarial_selfcheck": "PASS（执行者，对抗变体逐条执行）",
+      "independent_review": "PASS（组级全新 Reviewer R1 独立运行复核）",
+      "stage_review": "PASS（STAGE-REVIEWER-R04-RR1：五 F 主反例旧红新绿独立重做；22 个在图 C-ID 经 r04_rr1_repair_suites 生产者 63 测试全绿；其余经组审证据核验）",
+      "gate_binding": "R04 阶段图场景 R04-RR1-F01..F05（REQUIRED）+ 生产者 pin"
+    },
+    "R04-RR1-F01-C02": {
+      "status": "PASS",
+      "normal_selfcheck": "PASS（执行者，证据见该 F 的 E01 目录）",
+      "adversarial_selfcheck": "PASS（执行者，对抗变体逐条执行）",
+      "independent_review": "PASS（组级全新 Reviewer R1 独立运行复核）",
+      "stage_review": "PASS（STAGE-REVIEWER-R04-RR1：五 F 主反例旧红新绿独立重做；22 个在图 C-ID 经 r04_rr1_repair_suites 生产者 63 测试全绿；其余经组审证据核验）",
+      "gate_binding": "R04 阶段图场景 R04-RR1-F01..F05（REQUIRED）+ 生产者 pin"
+    },
+    "R04-RR1-F01-C03": {
+      "status": "PASS",
+      "normal_selfcheck": "PASS（执行者，证据见该 F 的 E01 目录）",
+      "adversarial_selfcheck": "PASS（执行者，对抗变体逐条执行）",
+      "independent_review": "PASS（组级全新 Reviewer R1 独立运行复核）",
+      "stage_review": "PASS（STAGE-REVIEWER-R04-RR1：五 F 主反例旧红新绿独立重做；22 个在图 C-ID 经 r04_rr1_repair_suites 生产者 63 测试全绿；其余经组审证据核验）",
+      "gate_binding": "R04 阶段图场景 R04-RR1-F01..F05（REQUIRED）+ 生产者 pin"
+    },
+    "R04-RR1-F01-C04": {
+      "status": "PASS",
+      "normal_selfcheck": "PASS（执行者，证据见该 F 的 E01 目录）",
+      "adversarial_selfcheck": "PASS（执行者，对抗变体逐条执行）",
+      "independent_review": "PASS（组级全新 Reviewer R1 独立运行复核）",
+      "stage_review": "PASS（STAGE-REVIEWER-R04-RR1：五 F 主反例旧红新绿独立重做；22 个在图 C-ID 经 r04_rr1_repair_suites 生产者 63 测试全绿；其余经组审证据核验）",
+      "gate_binding": "R04 阶段图场景 R04-RR1-F01..F05（REQUIRED）+ 生产者 pin"
+    },
+    "R04-RR1-F02-C01": {
+      "status": "PASS",
+      "normal_selfcheck": "PASS（执行者，证据见该 F 的 E01 目录）",
+      "adversarial_selfcheck": "PASS（执行者，对抗变体逐条执行）",
+      "independent_review": "PASS（组级全新 Reviewer R1 独立运行复核）",
+      "stage_review": "PASS（STAGE-REVIEWER-R04-RR1：五 F 主反例旧红新绿独立重做；22 个在图 C-ID 经 r04_rr1_repair_suites 生产者 63 测试全绿；其余经组审证据核验）",
+      "gate_binding": "R04 阶段图场景 R04-RR1-F01..F05（REQUIRED）+ 生产者 pin"
+    },
+    "R04-RR1-F02-C02": {
+      "status": "PASS",
+      "normal_selfcheck": "PASS（执行者，证据见该 F 的 E01 目录）",
+      "adversarial_selfcheck": "PASS（执行者，对抗变体逐条执行）",
+      "independent_review": "PASS（组级全新 Reviewer R1 独立运行复核）",
+      "stage_review": "PASS（STAGE-REVIEWER-R04-RR1：五 F 主反例旧红新绿独立重做；22 个在图 C-ID 经 r04_rr1_repair_suites 生产者 63 测试全绿；其余经组审证据核验）",
+      "gate_binding": "R04 阶段图场景 R04-RR1-F01..F05（REQUIRED）+ 生产者 pin"
+    },
+    "R04-RR1-F02-C03": {
+      "status": "PASS",
+      "normal_selfcheck": "PASS（执行者，证据见该 F 的 E01 目录）",
+      "adversarial_selfcheck": "PASS（执行者，对抗变体逐条执行）",
+      "independent_review": "PASS（组级全新 Reviewer R1 独立运行复核）",
+      "stage_review": "PASS（STAGE-REVIEWER-R04-RR1：五 F 主反例旧红新绿独立重做；22 个在图 C-ID 经 r04_rr1_repair_suites 生产者 63 测试全绿；其余经组审证据核验）",
+      "gate_binding": "R04 阶段图场景 R04-RR1-F01..F05（REQUIRED）+ 生产者 pin"
+    },
+    "R04-RR1-F02-C04": {
+      "status": "PASS",
+      "normal_selfcheck": "PASS（执行者，证据见该 F 的 E01 目录）",
+      "adversarial_selfcheck": "PASS（执行者，对抗变体逐条执行）",
+      "independent_review": "PASS（组级全新 Reviewer R1 独立运行复核）",
+      "stage_review": "PASS（STAGE-REVIEWER-R04-RR1：五 F 主反例旧红新绿独立重做；22 个在图 C-ID 经 r04_rr1_repair_suites 生产者 63 测试全绿；其余经组审证据核验）",
+      "gate_binding": "R04 阶段图场景 R04-RR1-F01..F05（REQUIRED）+ 生产者 pin"
+    },
+    "R04-RR1-F03-C01": {
+      "status": "PASS",
+      "normal_selfcheck": "PASS（执行者，证据见该 F 的 E01 目录）",
+      "adversarial_selfcheck": "PASS（执行者，对抗变体逐条执行）",
+      "independent_review": "PASS（组级全新 Reviewer R1 独立运行复核）",
+      "stage_review": "PASS（STAGE-REVIEWER-R04-RR1：五 F 主反例旧红新绿独立重做；22 个在图 C-ID 经 r04_rr1_repair_suites 生产者 63 测试全绿；其余经组审证据核验）",
+      "gate_binding": "R04 阶段图场景 R04-RR1-F01..F05（REQUIRED）+ 生产者 pin"
+    },
+    "R04-RR1-F03-C02": {
+      "status": "PASS",
+      "normal_selfcheck": "PASS（执行者，证据见该 F 的 E01 目录）",
+      "adversarial_selfcheck": "PASS（执行者，对抗变体逐条执行）",
+      "independent_review": "PASS（组级全新 Reviewer R1 独立运行复核）",
+      "stage_review": "PASS（STAGE-REVIEWER-R04-RR1：五 F 主反例旧红新绿独立重做；22 个在图 C-ID 经 r04_rr1_repair_suites 生产者 63 测试全绿；其余经组审证据核验）",
+      "gate_binding": "R04 阶段图场景 R04-RR1-F01..F05（REQUIRED）+ 生产者 pin"
+    },
+    "R04-RR1-F03-C03": {
+      "status": "PASS",
+      "normal_selfcheck": "PASS（执行者，证据见该 F 的 E01 目录）",
+      "adversarial_selfcheck": "PASS（执行者，对抗变体逐条执行）",
+      "independent_review": "PASS（组级全新 Reviewer R1 独立运行复核）",
+      "stage_review": "PASS（STAGE-REVIEWER-R04-RR1：五 F 主反例旧红新绿独立重做；22 个在图 C-ID 经 r04_rr1_repair_suites 生产者 63 测试全绿；其余经组审证据核验）",
+      "gate_binding": "R04 阶段图场景 R04-RR1-F01..F05（REQUIRED）+ 生产者 pin"
+    },
+    "R04-RR1-F03-C04": {
+      "status": "PASS",
+      "normal_selfcheck": "PASS（执行者，证据见该 F 的 E01 目录）",
+      "adversarial_selfcheck": "PASS（执行者，对抗变体逐条执行）",
+      "independent_review": "PASS（组级全新 Reviewer R1 独立运行复核）",
+      "stage_review": "PASS（STAGE-REVIEWER-R04-RR1：五 F 主反例旧红新绿独立重做；22 个在图 C-ID 经 r04_rr1_repair_suites 生产者 63 测试全绿；其余经组审证据核验）",
+      "gate_binding": "R04 阶段图场景 R04-RR1-F01..F05（REQUIRED）+ 生产者 pin"
+    },
+    "R04-RR1-F03-C05": {
+      "status": "PASS",
+      "normal_selfcheck": "PASS（执行者，证据见该 F 的 E01 目录）",
+      "adversarial_selfcheck": "PASS（执行者，对抗变体逐条执行）",
+      "independent_review": "PASS（组级全新 Reviewer R1 独立运行复核）",
+      "stage_review": "PASS（STAGE-REVIEWER-R04-RR1：五 F 主反例旧红新绿独立重做；22 个在图 C-ID 经 r04_rr1_repair_suites 生产者 63 测试全绿；其余经组审证据核验）",
+      "gate_binding": "R04 阶段图场景 R04-RR1-F01..F05（REQUIRED）+ 生产者 pin"
+    },
+    "R04-RR1-F04-C01": {
+      "status": "PASS",
+      "normal_selfcheck": "PASS（执行者，证据见该 F 的 E01 目录）",
+      "adversarial_selfcheck": "PASS（执行者，对抗变体逐条执行）",
+      "independent_review": "PASS（组级全新 Reviewer R1 独立运行复核）",
+      "stage_review": "PASS（STAGE-REVIEWER-R04-RR1：五 F 主反例旧红新绿独立重做；22 个在图 C-ID 经 r04_rr1_repair_suites 生产者 63 测试全绿；其余经组审证据核验）",
+      "gate_binding": "R04 阶段图场景 R04-RR1-F01..F05（REQUIRED）+ 生产者 pin"
+    },
+    "R04-RR1-F04-C02": {
+      "status": "PASS",
+      "normal_selfcheck": "PASS（执行者，证据见该 F 的 E01 目录）",
+      "adversarial_selfcheck": "PASS（执行者，对抗变体逐条执行）",
+      "independent_review": "PASS（组级全新 Reviewer R1 独立运行复核）",
+      "stage_review": "PASS（STAGE-REVIEWER-R04-RR1：五 F 主反例旧红新绿独立重做；22 个在图 C-ID 经 r04_rr1_repair_suites 生产者 63 测试全绿；其余经组审证据核验）",
+      "gate_binding": "R04 阶段图场景 R04-RR1-F01..F05（REQUIRED）+ 生产者 pin"
+    },
+    "R04-RR1-F04-C03": {
+      "status": "PASS",
+      "normal_selfcheck": "PASS（执行者，证据见该 F 的 E01 目录）",
+      "adversarial_selfcheck": "PASS（执行者，对抗变体逐条执行）",
+      "independent_review": "PASS（组级全新 Reviewer R1 独立运行复核）",
+      "stage_review": "PASS（STAGE-REVIEWER-R04-RR1：五 F 主反例旧红新绿独立重做；22 个在图 C-ID 经 r04_rr1_repair_suites 生产者 63 测试全绿；其余经组审证据核验）",
+      "gate_binding": "R04 阶段图场景 R04-RR1-F01..F05（REQUIRED）+ 生产者 pin"
+    },
+    "R04-RR1-F04-C04": {
+      "status": "PASS",
+      "normal_selfcheck": "PASS（执行者，证据见该 F 的 E01 目录）",
+      "adversarial_selfcheck": "PASS（执行者，对抗变体逐条执行）",
+      "independent_review": "PASS（组级全新 Reviewer R1 独立运行复核）",
+      "stage_review": "PASS（STAGE-REVIEWER-R04-RR1：五 F 主反例旧红新绿独立重做；22 个在图 C-ID 经 r04_rr1_repair_suites 生产者 63 测试全绿；其余经组审证据核验）",
+      "gate_binding": "R04 阶段图场景 R04-RR1-F01..F05（REQUIRED）+ 生产者 pin"
+    },
+    "R04-RR1-F05-C01": {
+      "status": "PASS",
+      "normal_selfcheck": "PASS（执行者，证据见该 F 的 E01 目录）",
+      "adversarial_selfcheck": "PASS（执行者，对抗变体逐条执行）",
+      "independent_review": "PASS（组级全新 Reviewer R1 独立运行复核）",
+      "stage_review": "PASS（STAGE-REVIEWER-R04-RR1：五 F 主反例旧红新绿独立重做；22 个在图 C-ID 经 r04_rr1_repair_suites 生产者 63 测试全绿；其余经组审证据核验）",
+      "gate_binding": "R04 阶段图场景 R04-RR1-F01..F05（REQUIRED）+ 生产者 pin"
+    },
+    "R04-RR1-F05-C02": {
+      "status": "PASS",
+      "normal_selfcheck": "PASS（执行者，证据见该 F 的 E01 目录）",
+      "adversarial_selfcheck": "PASS（执行者，对抗变体逐条执行）",
+      "independent_review": "PASS（组级全新 Reviewer R1 独立运行复核）",
+      "stage_review": "PASS（STAGE-REVIEWER-R04-RR1：五 F 主反例旧红新绿独立重做；22 个在图 C-ID 经 r04_rr1_repair_suites 生产者 63 测试全绿；其余经组审证据核验）",
+      "gate_binding": "R04 阶段图场景 R04-RR1-F01..F05（REQUIRED）+ 生产者 pin"
+    },
+    "R04-RR1-F05-C03": {
+      "status": "PASS",
+      "normal_selfcheck": "PASS（执行者，证据见该 F 的 E01 目录）",
+      "adversarial_selfcheck": "PASS（执行者，对抗变体逐条执行）",
+      "independent_review": "PASS（组级全新 Reviewer R1 独立运行复核）",
+      "stage_review": "PASS（STAGE-REVIEWER-R04-RR1：五 F 主反例旧红新绿独立重做；22 个在图 C-ID 经 r04_rr1_repair_suites 生产者 63 测试全绿；其余经组审证据核验）",
+      "gate_binding": "R04 阶段图场景 R04-RR1-F01..F05（REQUIRED）+ 生产者 pin"
+    },
+    "R04-RR1-F05-C04": {
+      "status": "PASS",
+      "normal_selfcheck": "PASS（执行者，证据见该 F 的 E01 目录）",
+      "adversarial_selfcheck": "PASS（执行者，对抗变体逐条执行）",
+      "independent_review": "PASS（组级全新 Reviewer R1 独立运行复核）",
+      "stage_review": "PASS（STAGE-REVIEWER-R04-RR1：五 F 主反例旧红新绿独立重做；22 个在图 C-ID 经 r04_rr1_repair_suites 生产者 63 测试全绿；其余经组审证据核验）",
+      "gate_binding": "R04 阶段图场景 R04-RR1-F01..F05（REQUIRED）+ 生产者 pin"
+    },
+    "R04-RR1-F05-C05": {
+      "status": "PASS",
+      "normal_selfcheck": "PASS（执行者，证据见该 F 的 E01 目录）",
+      "adversarial_selfcheck": "PASS（执行者，对抗变体逐条执行）",
+      "independent_review": "PASS（组级全新 Reviewer R1 独立运行复核）",
+      "stage_review": "PASS（STAGE-REVIEWER-R04-RR1：五 F 主反例旧红新绿独立重做；22 个在图 C-ID 经 r04_rr1_repair_suites 生产者 63 测试全绿；其余经组审证据核验）",
+      "gate_binding": "R04 阶段图场景 R04-RR1-F01..F05（REQUIRED）+ 生产者 pin"
+    }
+  },
+  "evidence_roots": {
+    "R04-RR1-F01": [
+      "artifacts/rust-tauri/R04/RR1-G01-E01/",
+      "artifacts/rust-tauri/R04/RR1-G01-R1/"
+    ],
+    "R04-RR1-F02": [
+      "artifacts/rust-tauri/R04/RR1-G02-E01/",
+      "artifacts/rust-tauri/R04/RR1-G02-R1/"
+    ],
+    "R04-RR1-F03": [
+      "artifacts/rust-tauri/R04/RR1-G03-E01/",
+      "artifacts/rust-tauri/R04/RR1-G03-R1/"
+    ],
+    "R04-RR1-F04": [
+      "artifacts/rust-tauri/R04/RR1-G04-E01/",
+      "artifacts/rust-tauri/R04/RR1-G04-R1/"
+    ],
+    "R04-RR1-F05": [
+      "artifacts/rust-tauri/R04/RR1-G04-E01/",
+      "artifacts/rust-tauri/R04/RR1-G04-R1/"
+    ],
+    "G05_GATE": [
+      "artifacts/rust-tauri/R04/RR1-G05-E01/"
+    ],
+    "STAGE_REVIEW": [
+      "artifacts/rust-tauri/R04/RR1-STAGE-R1/"
+    ]
+  },
+  "commit_receipts": {
+    "G01": {
+      "commit": "1692d2314d381ac8da4aead6d2561878a5bb415b",
+      "push": "origin/codex/rust-tauri-migration（2026-10-01 ls-remote 确认包含）"
+    },
+    "G02": {
+      "commit": "da15c4bd90a0bb8e27fa4a3fb0bca0ba7268cd82",
+      "push": "origin/codex/rust-tauri-migration（ls-remote 确认包含）"
+    },
+    "G03": {
+      "commit": "614fab1afa1ed2c45ebfe41045df4db339c4f9b5",
+      "push": "origin/codex/rust-tauri-migration（ls-remote 确认包含）"
+    },
+    "G04": {
+      "commit": "1285c3bf66ca251fe64956becd4aab44a6f3ef4d",
+      "push": "origin/codex/rust-tauri-migration（ls-remote 确认包含）"
+    },
+    "G05_gate_wiring": {
+      "commit": "629e15b85cf54ff20673b24150cc00e4e4366f61",
+      "push": "origin/codex/rust-tauri-migration（ls-remote 确认包含）"
+    },
+    "note": "接受收口提交（本提交）的远程回执由总控在推送后核对登记于 ORCHESTRATOR_PROGRESS；不接受提交自引用自身 SHA。"
+  },
+  "stage_review": {
+    "reviewer": "STAGE-REVIEWER-R04-RR1（全新，未参与本轮任何执行/修复/组审）",
+    "report": "docs/rust-tauri/R04/repair-current/R04_RR1_STAGE_REVIEW.md",
+    "verdict": "STAGE_VERDICT: PASS",
+    "final_candidate": "629e15b85cf54ff20673b24150cc00e4e4366f61",
+    "date": "2026-10-01",
+    "conclusion": "R04 RE-ACCEPTED AFTER ADVERSARIAL REPAIR；不启动 R05"
+  }
 }

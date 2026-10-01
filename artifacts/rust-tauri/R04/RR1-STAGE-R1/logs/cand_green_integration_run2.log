@@ -1,0 +1,12 @@
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.08s
+     Running tests/zz_stage_r1_counterexamples.rs (rust/target/debug/deps/zz_stage_r1_counterexamples-0f1d91adb9480406)
+
+running 5 tests
+test stage_r1_f01_refused_oneshot_must_not_execute ... ok
+test stage_r1_f03_unconfirmed_stop_must_not_claim_an_exit ... ok
+test stage_r1_f05_lost_head_must_be_visible_and_flagged ... ok
+test stage_r1_f05_capped_spill_must_not_be_claimed_full ... ok
+test stage_r1_f02_settled_collector_frozen_after_terminal ... ok
+
+test result: ok. 5 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 4.33s
+

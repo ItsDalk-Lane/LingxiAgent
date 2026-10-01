@@ -1,0 +1,14 @@
+== terminal-snapshot flake isolated probes (STAGE-REVIEWER-R04-RR1, 2026-10-01T22:55:42Z) ==
+[tsf-run1] test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 9 filtered out; finished in 0.21s
+[tsf-run1] exit=0
+[tsf-run2] test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 9 filtered out; finished in 0.17s
+[tsf-run2] exit=0
+[tsf-run3] test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 9 filtered out; finished in 0.17s
+[tsf-run3] exit=0
+[tsf-run4] test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 9 filtered out; finished in 0.17s
+[tsf-run4] exit=0
+[tsf-run5] test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 9 filtered out; finished in 0.17s
+[tsf-run5] exit=0
+== matrix evidence from my full gates (in-suite occurrences) ==
+terminal-snapshot-current-transcript occurrences in my R04_MATRIX evidence: 1
+failedCases: n/a

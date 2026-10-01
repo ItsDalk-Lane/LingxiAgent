@@ -549,7 +549,7 @@
       "stage_final_candidate_sha": "1ebb03d9f89af364a42274efc2cd482f298b1130",
       "acceptance_note": "2026-09-30 对抗性修复轮重开并重新接受：F01-F08 全部关闭（34 C-ID 三层），全新阶段 Reviewer RR1 PASS，候选 ebcbcad1b；2026-09-29 首次接受记录与证据原文保留，其裁决2 依据已被本轮替代。"
     },
-    "R04": "REOPENED_PENDING_REPAIR (RR1 adversarial repair 2026-10-01; historical ACCEPTED@0c67b6fc7 preserved; ledger docs/rust-tauri/R04/repair-current/R04_RR1_FIX_ISSUES.json)",
+    "R04": "RE-ACCEPTED_AFTER_ADVERSARIAL_REPAIR (RR1 2026-10-01: F01-F05 repaired G01-G05, each with fresh independent R1 PASS; fresh stage reviewer STAGE_VERDICT PASS; commits 1692d2314/da15c4bd9/614fab1af/1285c3bf6/629e15b85 all pushed & remote-confirmed; prior ACCEPTED@0c67b6fc7 history preserved; ledger docs/rust-tauri/R04/repair-current/R04_RR1_FIX_ISSUES.json)",
     "R05": {
       "title": "模型协议、凭证、流式处理与最小完整闭环",
       "status": "PENDING",
@@ -4355,7 +4355,7 @@
       "blockers": []
     }
   },
-  "current_task": "R04 RR1 adversarial repair (G01..G05; five findings F01-F05, 26 checks; no R05 executor)",
+  "current_task": "R04 RR1 adversarial repair complete — RE-ACCEPTED AFTER ADVERSARIAL REPAIR; stage stops here per authorization (no R05 executor)",
   "orchestration_mode": {
     "effective_from": "R00-T03 R2 repair",
     "task_executor": "new ZCode task per Rxx-Tyy",

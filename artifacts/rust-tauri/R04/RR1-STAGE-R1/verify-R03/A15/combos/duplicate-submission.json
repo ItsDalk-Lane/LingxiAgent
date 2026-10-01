@@ -1,0 +1,13 @@
+{
+  "combo": "duplicate-submission",
+  "counts": {
+    "diagnosed_conflicts": 1,
+    "final_status": "completed",
+    "idempotent_replays": 1,
+    "model_calls": 1,
+    "runs": 1,
+    "terminal_events": 1,
+    "tool_calls": 0
+  },
+  "schema": "lingxi.r03-t08-combo-counts.v1"
+}

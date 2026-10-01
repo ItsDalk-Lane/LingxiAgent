@@ -1,5 +1,18 @@
 # R04 报告｜统一工具网关、四基础工具与沙盒（阶段报告，91 模板）
 
+> **RR1 再接受附录（总控，2026-10-01）**：2026-10-01 对抗性复审（基线 `773d5a696`）确认五组
+> 缺陷 F01-F05 并裁定先前接受依据（T05-R1-OBS-2 非阻塞登记等）不成立。本轮定点修复
+> G01→G05 全部经"红复现→根因修复→两层自查→全新独立审查 R1 PASS"闭环收口，并由全新
+> STAGE-REVIEWER-R04-RR1 阶段重审（五组反例独立旧红新绿、原 16 A-ID 门禁、内嵌+独立 R03
+> 回归、R02 七链、七项接受依据纠正）**STAGE_VERDICT: PASS**。修复链：G01=`1692d2314`
+> （F01 容量预留/RAII/回滚）、G02=`da15c4bd9`（F02 泵收口/归属门/reap 竞态）、G03=`614fab1af`
+> （F03 StopUnconfirmed 全链保真）、G04=`1285c3bf6`（F04 字节级消费+F05 输出完整性）、
+> G05=`629e15b85`（RR1 五场景入 R04 阶段门禁，24 场景全 REQUIRED，负向 9/9+4/4）。最终候选
+> `629e15b85`，全部已普通推送并核对远程包含。现行结论：**R04 RE-ACCEPTED AFTER
+> ADVERSARIAL REPAIR**；不启动 R05。明细：`repair-current/R04_RR1_FIX_ISSUES.json`（账本+
+> 回执）、`R04_RR1_STAGE_REVIEW.md`（阶段重审）、`R04_HANDOFF.json` reaccepted_after_
+> rr1_adversarial_repair（含七项纠正后的接受依据）。以下为 T08 执行代理时期的历史原文。
+
 > 本报告由 R04-T08 执行代理（E02）在完成最后一个执行 Task 时按 91 模板编写；
 > 阶段组合独立验收（全新阶段 Reviewer）**尚未发生**——本报告不是阶段 PASS 声明。
 

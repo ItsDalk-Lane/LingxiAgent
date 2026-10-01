@@ -1,0 +1,69 @@
+== building the RR1 repair suites (rustup 1.98.1, /var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T//rust-target-r04-rr1-g05, --locked, offline) ==
+PASS build (locked, offline)
+== running repair suite r04_t05_registry_capacity (F-ID RR1-F01, pinned 9) ==
+PASS r04_t05_registry_capacity (RR1-F01): 9/9 tests green
+== running repair suite r04_rr1_f02_reaper_cleanup (F-ID RR1-F02, pinned 11) ==
+PASS r04_rr1_f02_reaper_cleanup (RR1-F02): 11/11 tests green
+== running repair suite r04_rr1_f03_stop_honesty (F-ID RR1-F03, pinned 7) ==
+PASS r04_rr1_f03_stop_honesty (RR1-F03): 7/7 tests green
+== running repair suite r04_rr1_f04_pty_consumption (F-ID RR1-F04, pinned 1) ==
+PASS r04_rr1_f04_pty_consumption (RR1-F04): 1/1 tests green
+== running repair suite r04_rr1_f05_output_integrity (F-ID RR1-F05, pinned 7) ==
+PASS r04_rr1_f05_output_integrity (RR1-F05): 7/7 tests green
+== running repair suite r04_rr1_f05_spill_failure (F-ID RR1-F05, pinned 2) ==
+PASS r04_rr1_f05_spill_failure (RR1-F05): 2/2 tests green
+== running lib unit test procsupervisor::tests::live_slot_reservation_enforces_the_cap_atomically (F-ID RR1-F01, pinned 1) ==
+PASS lib/procsupervisor::tests::live_slot_reservation_enforces_the_cap_atomically (RR1-F01): 1/1 tests green
+== running lib unit test procsupervisor::tests::live_slot_commit_transfers_release_to_settle_exactly_once (F-ID RR1-F01, pinned 1) ==
+PASS lib/procsupervisor::tests::live_slot_commit_transfers_release_to_settle_exactly_once (RR1-F01): 1/1 tests green
+== running lib unit test procsupervisor::tests::live_slot_drop_after_panic_style_abandon_still_releases (F-ID RR1-F01, pinned 1) ==
+PASS lib/procsupervisor::tests::live_slot_drop_after_panic_style_abandon_still_releases (RR1-F01): 1/1 tests green
+== running lib unit test procsupervisor::tests::group_signal_is_skipped_once_the_child_reap_is_published (F-ID RR1-F02, pinned 1) ==
+PASS lib/procsupervisor::tests::group_signal_is_skipped_once_the_child_reap_is_published (RR1-F02): 1/1 tests green
+== running lib unit test procsupervisor::tests::group_signal_is_skipped_when_the_kernel_identity_disagrees (F-ID RR1-F02, pinned 1) ==
+PASS lib/procsupervisor::tests::group_signal_is_skipped_when_the_kernel_identity_disagrees (RR1-F02): 1/1 tests green
+== running lib unit test procsupervisor::tests::exit_fact_status_codes_follow_the_shell_convention (F-ID RR1-F03, pinned 1) ==
+PASS lib/procsupervisor::tests::exit_fact_status_codes_follow_the_shell_convention (RR1-F03): 1/1 tests green
+== running lib unit test procsupervisor::tests::terminal_facts_never_fabricate_an_exit_for_unconfirmed_or_live_phases (F-ID RR1-F03, pinned 1) ==
+PASS lib/procsupervisor::tests::terminal_facts_never_fabricate_an_exit_for_unconfirmed_or_live_phases (RR1-F03): 1/1 tests green
+== running lib unit test procsupervisor::tests::transcript_delivers_split_multibyte_characters_intact (F-ID RR1-F04, pinned 1) ==
+PASS lib/procsupervisor::tests::transcript_delivers_split_multibyte_characters_intact (RR1-F04): 1/1 tests green
+== running lib unit test procsupervisor::tests::transcript_mixed_chunk_prefix_is_consumed_byte_exactly_r04_rr1_f04_c01 (F-ID RR1-F04, pinned 1) ==
+PASS lib/procsupervisor::tests::transcript_mixed_chunk_prefix_is_consumed_byte_exactly_r04_rr1_f04_c01 (RR1-F04): 1/1 tests green
+== running lib unit test procsupervisor::tests::transcript_idle_polls_after_a_partial_delivery_hold_back_without_loss (F-ID RR1-F04, pinned 1) ==
+PASS lib/procsupervisor::tests::transcript_idle_polls_after_a_partial_delivery_hold_back_without_loss (RR1-F04): 1/1 tests green
+== running lib unit test procsupervisor::tests::transcript_property_valid_input_reassembles_exactly (F-ID RR1-F04, pinned 1) ==
+PASS lib/procsupervisor::tests::transcript_property_valid_input_reassembles_exactly (RR1-F04): 1/1 tests green
+== running lib unit test procsupervisor::tests::transcript_property_invalid_bytes_replaced_exactly_once (F-ID RR1-F04, pinned 1) ==
+PASS lib/procsupervisor::tests::transcript_property_invalid_bytes_replaced_exactly_once (RR1-F04): 1/1 tests green
+== running lib unit test procsupervisor::tests::transcript_property_eviction_accounting_counts_only_real_loss (F-ID RR1-F04, pinned 1) ==
+PASS lib/procsupervisor::tests::transcript_property_eviction_accounting_counts_only_real_loss (RR1-F04): 1/1 tests green
+== running lib unit test procsupervisor::tests::transcript_ring_overflow_while_holding_back_counts_only_real_evictions (F-ID RR1-F04, pinned 1) ==
+PASS lib/procsupervisor::tests::transcript_ring_overflow_while_holding_back_counts_only_real_evictions (RR1-F04): 1/1 tests green
+== running lib unit test procsupervisor::tests::transcript_boundary_across_many_chunks_with_interleaved_polls (F-ID RR1-F04, pinned 1) ==
+PASS lib/procsupervisor::tests::transcript_boundary_across_many_chunks_with_interleaved_polls (RR1-F04): 1/1 tests green
+== running lib unit test procsupervisor::tests::transcript_force_delivery_flushes_a_dangling_partial (F-ID RR1-F04, pinned 1) ==
+PASS lib/procsupervisor::tests::transcript_force_delivery_flushes_a_dangling_partial (RR1-F04): 1/1 tests green
+== running lib unit test procsupervisor::tests::transcript_ring_drop_of_undelivered_is_counted_honestly (F-ID RR1-F04, pinned 1) ==
+PASS lib/procsupervisor::tests::transcript_ring_drop_of_undelivered_is_counted_honestly (RR1-F04): 1/1 tests green
+== running lib unit test exectools::tests::transcript_spill_claim_vocabulary_is_state_exclusive (F-ID RR1-F05, pinned 1) ==
+PASS lib/exectools::tests::transcript_spill_claim_vocabulary_is_state_exclusive (RR1-F05): 1/1 tests green
+== running lib unit test exectools::tests::full_output_claim_vocabulary_is_state_exclusive (F-ID RR1-F05, pinned 1) ==
+PASS lib/exectools::tests::full_output_claim_vocabulary_is_state_exclusive (RR1-F05): 1/1 tests green
+== running lib unit test exectools::tests::spill_resource_ref_never_claims_full_when_capped_or_failed (F-ID RR1-F05, pinned 1) ==
+PASS lib/exectools::tests::spill_resource_ref_never_claims_full_when_capped_or_failed (RR1-F05): 1/1 tests green
+== running lib unit test exectools::tests::assemble_retained_output_small_stream_is_whole_and_exact (F-ID RR1-F05, pinned 1) ==
+PASS lib/exectools::tests::assemble_retained_output_small_stream_is_whole_and_exact (RR1-F05): 1/1 tests green
+== running lib unit test exectools::tests::assemble_retained_output_evicted_middle_is_counted_and_marked (F-ID RR1-F05, pinned 1) ==
+PASS lib/exectools::tests::assemble_retained_output_evicted_middle_is_counted_and_marked (RR1-F05): 1/1 tests green
+== running lib unit test exectools::tests::truncate_head_tail_single_huge_ascii_line_keeps_head_and_tail (F-ID RR1-F05, pinned 1) ==
+PASS lib/exectools::tests::truncate_head_tail_single_huge_ascii_line_keeps_head_and_tail (RR1-F05): 1/1 tests green
+== running lib unit test exectools::tests::truncate_head_tail_multibyte_line_cuts_on_char_boundaries (F-ID RR1-F05, pinned 1) ==
+PASS lib/exectools::tests::truncate_head_tail_multibyte_line_cuts_on_char_boundaries (RR1-F05): 1/1 tests green
+== running lib unit test exectools::tests::truncate_head_tail_newline_only_at_end_keeps_both_markers (F-ID RR1-F05, pinned 1) ==
+PASS lib/exectools::tests::truncate_head_tail_newline_only_at_end_keeps_both_markers (RR1-F05): 1/1 tests green
+== running lib unit test exectools::tests::truncate_head_tail_small_output_stays_whole (F-ID RR1-F05, pinned 1) ==
+PASS lib/exectools::tests::truncate_head_tail_small_output_stays_whole (RR1-F05): 1/1 tests green
+assembled 32 run records / 22 C-ID case records
+PASS case files assembled (rr1-cases.json; every executed test owned by exactly one C-ID)
+RESULT: all RR1 repair runs green with exact pinned counts (6 integration suites + 26 lib unit tests, 63 tests across 22 C-IDs)

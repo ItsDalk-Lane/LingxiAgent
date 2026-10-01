@@ -1,7 +1,7 @@
 {
   "spec_version": "lingxi.r04-handoff.v1",
   "stage_id": "R04",
-  "status": "READY_FOR_REVIEW（T08 执行者交接；阶段独立验收未发生——R05 消费方以此文件的『已证明接口』为准，不消费任何未标证明的项）",
+  "status": "RE-ACCEPTED_AFTER_ADVERSARIAL_REPAIR（RR1，2026-10-01；先前 READY_FOR_REVIEW/ACCEPTED 历史保留——R05 消费方仍以『已证明接口』为准）",
   "generated_by": "EXECUTOR-R04-T08-E02（续做 E01 的中断落盘；本文件为 R04-T08 交付）",
   "generated_at": "2026-09-30",
   "baseline_task07": "ded3467bf（R04-T07 独立 PASS 并推送确认）",
@@ -109,7 +109,10 @@
     {
       "id": "t05-obs2-registryfull-tail",
       "owner": "R05+/阶段审查裁定",
-      "summary": "R04-T05 review R1 OBS-2：RegistryFull 拒绝路径可能留下已 spawn 未监督子进程（登记非阻塞）；T05 源码不在 T08 修复范围，按冻结面纪律原样携带。"
+      "summary": "R04-T05 review R1 OBS-2：RegistryFull 拒绝路径可能留下已 spawn 未监督子进程（登记非阻塞）；T05 源码不在 T08 修复范围，按冻结面纪律原样携带。",
+      "status": "CLOSED_BY_RR1_G01",
+      "closed_by": "R04-RR1-F01 修复（提交 1692d2314d381ac8da4aead6d2561878a5bb415b）",
+      "closure_note": "2026-10-01 对抗性复审裁定该登记依据错误：登记满常规可触发（非罕见竞态），且曾与网关 PreparedRegistryFull 混写。G01 已实现 OS spawn 前原子容量预留+RAII 恰好一次归还+失败回滚；组级独立审查 R1 PASS 与阶段重审复核（旧红新绿）。原 summary 保留如下以存历史：R04-T05 review R1 OBS-2：RegistryFull 拒绝路径可能留下已 spawn 未监督子进程（登记非阻塞）；T05 源码不在 T08 修复范围，按冻结面纪律原样携带。"
     },
     {
       "id": "R04-DEFERRED-LEAVES-69",
@@ -147,5 +150,37 @@
       "R04-T08": "0c67b6fc7"
     },
     "acceptance_note": "本对象引用候选提交；接受记录提交自身 SHA 由远程确认回执登记，不写入本文件（防自引用）。8 Task 全部经全新独立 Reviewer PASS（T01/T02 历经 R1 FAIL→全新修复→R2 PASS，历史保留）；阶段 Reviewer 从未参与任何执行/修复/Task 审查。"
+  },
+  "reaccepted_after_rr1_adversarial_repair": {
+    "repair_round": "RR1",
+    "date": "2026-10-01",
+    "source_review": "Lingxi_R04_对抗性复审与定点修复总控_2026-10-01（五组问题 F01-F05、26 项检查、4 项收口检查）",
+    "adversarial_review_baseline": "773d5a6968b87650cd135cc5687f81d1acda0",
+    "previous_accepted_candidate": "0c67b6fc749ac5c21d0514e3076b0ed2058cd7c4",
+    "final_candidate": "629e15b85cf54ff20673b24150cc00e4e4366f61",
+    "repair_commits": {
+      "G01_F01_capacity_reservation": "1692d2314d381ac8da4aead6d2561878a5bb415b",
+      "G02_F02_pump_ownership_reap_race": "da15c4bd90a0bb8e27fa4a3fb0bca0ba7268cd82",
+      "G03_F03_stop_unconfirmed_honesty": "614fab1afa1ed2c45ebfe41045df4db339c4f9b5",
+      "G04_F04_F05_output_fidelity": "1285c3bf66ca251fe64956becd4aab44a6f3ef4d",
+      "G05_gate_wiring": "629e15b85cf54ff20673b24150cc00e4e4366f61"
+    },
+    "stage_review": {
+      "reviewer": "STAGE-REVIEWER-R04-RR1（全新，未参与本轮执行/修复/组审）",
+      "report": "docs/rust-tauri/R04/repair-current/R04_RR1_STAGE_REVIEW.md",
+      "verdict": "STAGE_VERDICT: PASS"
+    },
+    "corrected_acceptance_basis": [
+      "进程登记满缺陷是 ProcessSupervisor 的 SpawnFailure::RegistryFull，不是网关 PreparedRegistryFull",
+      "满容量常规可触发；旧 T05-R1-OBS-2 以「罕见」登记非阻塞不成立，已由 G01 关闭",
+      "timeout(JoinHandle) 超时不 abort 被spawn任务（tokio detach）；泵收口必须保留句柄并观察 abort 结束",
+      "running record 不等于直接子进程尚未 reap；组信号只在发送时仍可证明归属时发出",
+      "CleanupTimedOut 不等于观察到 exit 137；未确认清理保持 StopUnconfirmed",
+      "逐 chunk seq 推进不等于 chunk 内字节消费；TranscriptCore 采用 consumed 字节偏移",
+      "尾窗未再次截断不等于原输出完整；truncated 必须计入 evicted/lost_middle"
+    ],
+    "gate": "verify-stage R04：24 场景（19 原有+5 RR1 REQUIRED）、124 叶、内嵌 R03 17/17、RR1 生产者 63 测试/22 C-ID 全绿；负向 9/9+4/4；R03 独立门禁 overall PASS（R02 七链全绿）",
+    "ledger": "docs/rust-tauri/R04/repair-current/R04_RR1_FIX_ISSUES.json",
+    "note": "本对象引用真实源码提交；接受收口提交自身 SHA 由远程回执在 ORCHESTRATOR_PROGRESS 登记，不自引用。"
   }
 }
