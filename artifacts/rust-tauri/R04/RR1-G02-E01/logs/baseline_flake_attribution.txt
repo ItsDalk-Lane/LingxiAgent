@@ -1,0 +1,43 @@
+Baseline flake attribution (clean worktree of HEAD 1692d2314, /tmp/r04_g02_baseline, 2026-10-01)
+Command per run: cargo test --manifest-path rust/Cargo.toml --locked -p lingxi-service --test r04_t05_process_tools
+(worktree removed after the runs; full per-run stdout was written to /tmp/t05_base_{1..12}.txt then cleaned)
+
+run 1:  ok.  14 passed
+run 2:  ok.  14 passed
+run 3:  ok.  14 passed
+run 4:  ok.  14 passed
+run 5:  FAILED (1)  environment_is_whitelist_plus_explicit_overrides_never_full_inherit
+run 6:  ok.  14 passed
+run 7:  FAILED (1)  environment_is_whitelist_plus_explicit_overrides_never_full_inherit
+run 8:  ok.  14 passed
+run 9:  ok.  14 passed
+run 10: FAILED (1)  environment_is_whitelist_plus_explicit_overrides_never_full_inherit
+run 11: ok.  14 passed
+run 12: FAILED (1)  environment_is_whitelist_plus_explicit_overrides_never_full_inherit
+
+=> 4/12 runs failed on the CLEAN BASELINE.
+
+Representative failure (baseline):
+  thread 'environment_is_whitelist_plus_explicit_overrides_never_full_inherit' panicked at
+  tests/r04_t05_process_tools.rs:378:18:
+  expected a success outcome, got Failed { error: ProtocolError { code: UpstreamUnavailable,
+  message: "EXEC_SPAWN_FAILED: process-group ownership could not be established:
+  getpgid(6896) returned -1, expected the child to lead its own group (setsid failed
+  silently?); argv=[\"/usr/bin/env\"]; the already-dispatched child (pid 6896) was SIGKILLed
+  and reaped by the spawn rollback — the dispatch DID happen", ... } }
+
+Root cause: the fast-exiting child (/usr/bin/env, /usr/bin/true, /bin/pwd — exit in ~1-2 ms)
+is reaped by tokio's process-wide SIGCHLD handling (which may run on ANY runtime thread of
+the test process) BEFORE spawn_oneshot's verify_group runs its getpgid. The baseline then
+refuses a legitimately-ours child that had already fully run.
+
+This is the spawn-side instance of F02's "OS reaping precedes the ownership state update"
+family. The same root produced the earlier ask_session_exec_command_round_trips_the_approval_face
+flake (/usr/bin/true refused -> run Failed -> journal not Succeeded at line 1485).
+
+Fix (procsupervisor.rs verify_group): getpgid(pid) == -1 for a microseconds-old child of
+ours means the child exited and was reaped; the record is ADMITTED (the reaper owns the real
+Child and resolves the stored exit status; the child_reaped gate closes all group signalling
+from the reap publish on). Refusal remains for a live pid reporting a DIFFERENT pgid.
+
+After the fix: 20/20 full-suite runs green (logs/t05_stability_final.txt).

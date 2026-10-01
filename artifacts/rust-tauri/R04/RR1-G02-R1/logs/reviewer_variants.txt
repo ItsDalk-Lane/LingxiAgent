@@ -1,0 +1,10 @@
+   Compiling lingxi-service v0.0.0 (/private/tmp/r04-g02-candidate/rust/crates/lingxi-service)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.40s
+     Running tests/rr1_g02_r01_reviewer_variants.rs (rust/target/debug/deps/rr1_g02_r01_reviewer_variants-79766d80b8d8c46d)
+
+running 2 tests
+test reviewer_legal_control_normal_cancel_still_group_signals ... ok
+test reviewer_c02_variant_shutdown_in_window_no_group_signal ... ok
+
+test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.93s
+

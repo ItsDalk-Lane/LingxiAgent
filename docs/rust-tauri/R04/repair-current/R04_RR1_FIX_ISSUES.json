@@ -58,12 +58,17 @@
       ],
       "source_fact_confirmed_at_baseline": "timeout(grace, pump) 超时只置 drained=false 无 abort/join（基线 1000）；finalize_exit 无条件 reclaimed=true；child.wait() 后仍按旧 pgid 可 killpg",
       "cases": ["R04-RR1-F02-C01", "R04-RR1-F02-C02", "R04-RR1-F02-C03", "R04-RR1-F02-C04"],
-      "status": "OPEN_FOR_NATIVE_REPRODUCTION_AND_REPAIR",
-      "normal_selfcheck": "NOT_RUN",
-      "adversarial_selfcheck": "NOT_RUN",
-      "independent_review": "NOT_RUN",
-      "candidate": null,
-      "commit": null
+      "status": "CLOSED_PENDING_COMMIT（R1 独立 PASS；提交回执在 G05 收口统一补记）",
+      "normal_selfcheck": "PASS（E01：C01 三腿 collector 冻结/fd 回落/pumps_alive=0；C02 两腿 wait 边界零信号+诚实收据；C03 三腿单一预算/abort 被 join；C04 12 轮压力逐轮快照，证据 artifacts/rust-tauri/R04/RR1-G02-E01/logs/，报告 G02-E01_REPORT.md）",
+      "adversarial_selfcheck": "PASS（E01：后代慢写/双泵不结束/泵 panic/退出与取消竞走 15 轮/终态淘汰与延后退出并发/写与静默持有者交替；屏障与就绪回执驱动）",
+      "independent_review": "PASS（REVIEWER-R04-RR1-G02-R01，2026-10-01：自写反例在基线 worktree 红——终态后 settled collector 7→14 字节（脱管泵继续追加）+ fd 10→12（读端泄漏），候选同测试绿；C01×3/C02×2 逐个独立运行+自设 C02 变体（grace=900ms/Shutdown 原因）绿；A09 合法对照——归属可证树恰 1 条 Group 信号、树上 3 pid 真死、哨兵存活（归属门未把该杀的不杀）；verify_group -1 接纳经确定性 revert 实验双向证实（旧拒绝→单测红、候选→绿）且 ESRCH 语义核实；t05 14/14/G01 套件 9/9/lib 296/296/clippy 0/fmt 0；观察缝零产品调用点；t05 加强纯增量逐行核对。非阻塞观察 OBS-01..05。A10 第三方观测孤立 10/10 绿，三方矛盾观测如实并列于报告 §5。报告 G02-R1_REVIEW.md，证据 RR1-G02-R1/logs/）",
+      "candidate": "工作区未提交改动（基线 1692d2314：procsupervisor.rs +1143/−111——drain_output_tasks abort+join 收口/child_reaped 发布时序/mark_terminating 归属门/verify_group getpgid=-1 接纳；tests/r04_t05_process_tools.rs 加强 +50；新测试 r04_rr1_f02_reaper_cleanup.rs 12 用例）",
+      "commit": null,
+      "execution_notes": {
+        "repro": "E01 红复现 exit 非 0 三份（repro/red_repro_baseline_1692d23.txt、red_fastexit_old_behavior*.txt——旧 reaper 泵脱离监督/无条件 reclaimed/假拒路径），修复后同测试绿",
+        "gates": "fmt 0/clippy 0/workspace tests 0（84 结果行全绿）/check-contracts 0/check-boundaries 0/G01 套件复跑 9/9",
+        "carryover_findings": "A10 复核：16/16 孤立+20/20 并行未复现（G01 执行者曾称孤立时敏红）；两方观测矛盾如实并列，待独立 Reviewer 第三方观测。同族发现：干净基线 verify_group 对 getpgid=-1 fast-exit 子进程假拒（12 循环 4 次 EXEC_SPAWN_FAILED），本单一并修复为接纳+20/20"
+      }
     },
     {
       "id": "R04-RR1-F03",

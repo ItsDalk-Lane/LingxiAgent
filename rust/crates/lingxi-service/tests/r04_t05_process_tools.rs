@@ -960,6 +960,56 @@ async fn adversarial_parent_exit_with_grandchild_holding_the_pipe_is_bounded() {
         process_alive(grandchild),
         "grandchild alive after parent exit"
     );
+    // R04-RR1-F02 strengthening (additive — the bounds above are
+    // unchanged): the returned result is only produced after the pumps
+    // were REALLY closed. No output task survives the record, the
+    // read-end closure was OBSERVED (abort + join, not a dropped
+    // JoinHandle), the drain facts are honest, the settled collector is
+    // frozen, and no signal was ever sent for this natural exit.
+    let settled_id = h
+        .supervisor
+        .retained_record_ids()
+        .into_iter()
+        .next()
+        .expect("the settled record is retained");
+    let settled = wait_until("settled pumps closed", Duration::from_secs(2), || {
+        let snap = h.supervisor.record(&settled_id)?;
+        (snap.pumps_alive == 0).then_some(snap)
+    })
+    .await;
+    assert!(settled.child_reaped, "the reap was really observed");
+    assert!(settled.reclaimed, "every read end's end was observed");
+    assert!(
+        !settled.drained_stdio,
+        "honest: the grandchild held the write ends past the grace"
+    );
+    let audit_kinds: Vec<&str> = settled.audit.iter().map(|e| e.kind).collect();
+    assert_eq!(
+        audit_kinds
+            .iter()
+            .filter(|k| **k == "output_task_closed_after_abort")
+            .count(),
+        2,
+        "both streams aborted-and-observed: {settled:?}"
+    );
+    let frozen = h
+        .supervisor
+        .output_snapshot(&settled_id)
+        .expect("settled collector");
+    tokio::time::sleep(Duration::from_millis(300)).await;
+    let recheck = h
+        .supervisor
+        .output_snapshot(&settled_id)
+        .expect("settled collector recheck");
+    assert_eq!(
+        (recheck.total_bytes, recheck.window),
+        (frozen.total_bytes, frozen.window),
+        "the settled collector is frozen after the result returned"
+    );
+    assert!(
+        h.supervisor.verification_signal_log().is_empty(),
+        "a naturally-exited one-shot is never signalled"
+    );
     // Cleanup: kill the test-registered grandchild by exact pid.
     // SAFETY: the grandchild was created by this test's command.
     unsafe {

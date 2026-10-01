@@ -1,0 +1,22 @@
+   Compiling lingxi-service v0.0.0 (/private/tmp/r04-g02-baseline/rust/crates/lingxi-service)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.34s
+     Running tests/rr1_g02_r01_red_baseline.rs (rust/target/debug/deps/rr1_g02_r01_red_baseline-40ca63e806bac0c4)
+
+running 1 test
+DBG fds_before=10 fds_after=12
+
+thread 'reviewer_red_grandchild_pump_outlives_grace_and_mutates_settled_state' (3219090) panicked at crates/lingxi-service/tests/rr1_g02_r01_red_baseline.rs:107:5:
+assertion `left == right` failed: I2 VIOLATED: pipe read ends still open after settle (12 vs 10)
+  left: 12
+ right: 10
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+test reviewer_red_grandchild_pump_outlives_grace_and_mutates_settled_state ... FAILED
+
+failures:
+
+failures:
+    reviewer_red_grandchild_pump_outlives_grace_and_mutates_settled_state
+
+test result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.53s
+
+error: test failed, to rerun pass `-p lingxi-service --test rr1_g02_r01_red_baseline`

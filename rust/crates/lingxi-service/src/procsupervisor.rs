@@ -22,15 +22,49 @@
 //! # Ownership identity, never a bare PID
 //! Every spawn is registered under a CSPRNG handle (`proc:<32 hex>`).
 //! Termination accepts ONLY a registered handle whose record is still
-//! non-terminal — while a record is live the child is either running or
-//! an unreaped zombie, so its PID cannot have been recycled; after the
-//! reaper observes the exit the record goes terminal and `terminate`
-//! refuses instead of firing `killpg` at what might now be someone
-//! else's process group. The pgid used by `killpg` is VERIFIED right
-//! after spawn (`getpgid(child) == child` — every spawn `setsid`s into
-//! its own group), so a group we kill is provably a group we created.
-//! Nothing outside this supervisor's spawn path can be adopted, so a
-//! leftover foreign process can never be mistaken for a managed one.
+//! non-terminal — but a NON-TERMINAL RECORD ALONE DOES NOT PROVE THE PID
+//! IS UNREAPED (R04-RR1-F02): the reaper reaps the direct child the
+//! instant `wait()` resolves, and only afterwards finishes the stdio
+//! grace and records the terminal phase, so there is a real window where
+//! the record is non-terminal yet the pid/pgid are already recyclable.
+//! Group signals are therefore gated on TWO live facts, evaluated at
+//! SEND TIME under the record lock (one atomic step with the reaper's
+//! reap bookkeeping):
+//! 1. `child_reaped` — the reaper's REAL `wait()` observation; once the
+//!    child is reaped its pid can be recycled by the kernel, so the
+//!    group is no longer provably ours and NO signal is ever sent.
+//! 2. a `getpgid(child)` kernel recheck — while the child is alive or an
+//!    UNREAPED zombie its pid cannot be recycled, so a successful
+//!    `getpgid(child) == pgid` proves the group is still the one this
+//!    supervisor created (`setsid` at spawn).
+//!
+//! The residual window — a new process acquiring the exact pid AND
+//! becoming a session leader in the few instructions between the kernel
+//! reaping the child and the flag publish — is the userspace minimum
+//! without pidfds (a macOS-absent facility) and is documented here
+//! rather than papered over. The pgid used by `killpg` is VERIFIED
+//! right after spawn (`getpgid(child) == child` — every spawn `setsid`s
+//! into its own group). Nothing outside this supervisor's spawn path
+//! can be adopted, so a leftover foreign process can never be mistaken
+//! for a managed one.
+//!
+//! # Reaper observability: a dropped JoinHandle detaches, it never cancels
+//! Tokio's documented semantics: dropping a `JoinHandle` DETACHES the
+//! task; `timeout(grace, join_handle)` expiring is therefore NOT an
+//! abort. The reaper (one-shot AND pty) keeps every pump/reader
+//! JoinHandle, waits a BOUNDED stdio grace for natural EOF, and on
+//! expiry requests `abort()` and OBSERVES the task's actual end by
+//! joining within a second bounded budget (`pump_abort_join`). Only an
+//! observed end counts as reclamation: `reclaimed`/`drained_stdio` are
+//! real observations (EOF seen, or abort-join confirmed), and a join
+//! that cannot be observed within the bound is recorded loudly as
+//! unconfirmed — never folded into "reclaimed". The reaper publishes
+//! `child_reaped` the moment `wait()` resolves — BEFORE the grace — so
+//! the ownership gate above is closed for the whole drain window.
+//! Backgrounded descendants holding the pipe/pty write ends get exactly
+//! this bounded budget for their output; they are not killed for
+//! exiting-and-holding (the approved `cmd &` lifetime), but neither can
+//! they pin this service's read ends forever.
 //!
 //! # The bounded cleanup responsibility chain
 //! `terminate(handle, reason)` runs: mark `Terminating` → `killpg(pgid,
@@ -99,6 +133,11 @@ pub const DEFAULT_CLEANUP_TIMEOUT: Duration = Duration::from_secs(5);
 /// Bounded stdio grace after the direct child exits (grandchildren may
 /// still hold the pipe write ends — the incumbent's `exitStdioGraceMs`).
 pub const DEFAULT_STDIO_GRACE: Duration = Duration::from_millis(250);
+/// Bounded wait to OBSERVE a pump/reader task's actual end after the
+/// reaper requested `abort()` (a dropped JoinHandle detaches — R04-RR1
+/// F02 — so the end must be joined, not assumed). The whole reaper tail
+/// is bounded by `stdio_grace + pump_abort_join` per stream phase.
+pub const DEFAULT_PUMP_ABORT_JOIN: Duration = Duration::from_millis(500);
 /// Rolling in-memory window of one-shot output (the incumbent's
 /// `MAX_ROLLING_BYTES` = 2 × the 50 KiB result budget).
 pub const DEFAULT_OUTPUT_WINDOW_BYTES: usize = 100 * 1024;
@@ -350,6 +389,55 @@ pub enum SpawnFaultPoint {
     GroupVerify,
 }
 
+/// Verification fault injection (R04-RR1-F02-C03 adversarial "pump
+/// panics"): forces the NEXT output task (one-shot pump or pty reader)
+/// to panic immediately, so tests can prove the reaper's join
+/// observation handles a panicked pump honestly (end observed, nothing
+/// hidden, no unbounded wait). The hook only chooses WHEN the branch
+/// fires — the drain/join code it exercises is the one a real panic in
+/// a pump takes. It is NEVER reachable from model or tool input: only
+/// process-local Rust code holding the supervisor can arm it, and no
+/// product path does.
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Default)]
+pub enum PumpFaultPoint {
+    /// No fault armed (the production default).
+    #[default]
+    None,
+    /// The next output task panics right at start (before its first
+    /// read), exercising the panic-disposition branch of the drain.
+    PanicNext,
+}
+
+/// One supervisor-originated signal as ACTUALLY sent — the verification
+/// signal-call log (R04-RR1-F02-C02 evidence): tests prove no group
+/// signal was ever fired at a target whose ownership was not provable
+/// at send time. Observation only — never a decision input.
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub struct SignalRecord {
+    pub at_unix_ms: u64,
+    pub target: SignalTarget,
+    pub signal: i32,
+    /// The raw syscall return (`kill`/`killpg`).
+    pub syscall_result: i32,
+    /// How ownership of the target was proven at send time.
+    pub ownership: &'static str,
+}
+
+/// The target of one supervisor-originated signal.
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum SignalTarget {
+    /// A direct child pid (spawn rollback only — the child is provably
+    /// unreaped there: this supervisor owns the `Child` and has not
+    /// waited it).
+    Child(i32),
+    /// A process group id (group termination — gated by the
+    /// send-time ownership proof).
+    Group(i32),
+}
+
+/// Bound of the in-memory verification signal log (oldest dropped).
+const SIGNAL_LOG_CAP: usize = 256;
+
 /// Appends the honest dispatched-fact to a post-dispatch rollback error:
 /// the process DID start and was SIGKILLed and reaped by the spawn
 /// rollback (R04-RR1-F01 repair requirement 3 — never pretend a
@@ -380,6 +468,9 @@ pub struct SupervisorLimits {
     pub settled_ring_cap: usize,
     pub cleanup_timeout: Duration,
     pub stdio_grace: Duration,
+    /// Bounded wait to observe an aborted pump's actual end
+    /// ([`DEFAULT_PUMP_ABORT_JOIN`]).
+    pub pump_abort_join: Duration,
     pub output_window_bytes: usize,
     pub transcript_ring_bytes: usize,
     pub spill_cap_bytes: u64,
@@ -394,6 +485,7 @@ impl SupervisorLimits {
             settled_ring_cap: DEFAULT_SETTLED_RING_CAP,
             cleanup_timeout: DEFAULT_CLEANUP_TIMEOUT,
             stdio_grace: DEFAULT_STDIO_GRACE,
+            pump_abort_join: DEFAULT_PUMP_ABORT_JOIN,
             output_window_bytes: DEFAULT_OUTPUT_WINDOW_BYTES,
             transcript_ring_bytes: DEFAULT_TRANSCRIPT_RING_BYTES,
             spill_cap_bytes: DEFAULT_SPILL_CAP_BYTES,
@@ -476,6 +568,22 @@ pub struct ProcessSnapshot {
     pub argv: Vec<String>,
     pub phase: RecordPhase,
     pub spawned_at_unix_ms: u64,
+    /// REAL observation: the reaper's `wait()` resolved (the direct child
+    /// WAS reaped — from that instant the pid/pgid are no longer provably
+    /// owned by this record).
+    pub child_reaped: bool,
+    /// REAL observation: whether both output streams were drained to EOF
+    /// before the grace expired (a backgrounded descendant holding the
+    /// write ends makes this honestly `false`).
+    pub drained_stdio: bool,
+    /// REAL observation: whether the reclamation was fully observed
+    /// (every pump/reader task's end was joined; the read ends are
+    /// closed). `false` means at least one end was unconfirmed within
+    /// the bound — never a silent "done".
+    pub reclaimed: bool,
+    /// Output tasks (pumps / pty reader) still alive for this record —
+    /// the observability seam for "no detached task outlives the record".
+    pub pumps_alive: usize,
     pub audit: Vec<AuditEvent>,
 }
 
@@ -779,10 +887,20 @@ struct RecordInner {
     collector: Option<Arc<Mutex<CollectorCore>>>,
     /// PTY transcript.
     transcript: Option<Arc<Mutex<TranscriptCore>>>,
+    /// REAL observation (R04-RR1-F02): the reaper's `wait()` resolved —
+    /// the direct child WAS reaped, so from this instant the record's
+    /// pid/pgid are no longer provably ours and no group signal may be
+    /// sent. Published BEFORE the stdio grace so the whole drain window
+    /// is covered.
+    child_reaped: bool,
     /// Whether both stdio pumps observed EOF before the grace expired.
     drained_stdio: bool,
-    /// Whether the reaper finished reclaiming (pipes/master/spill).
+    /// Whether the reaper finished reclaiming with every task end
+    /// OBSERVED (pipes/master/spill closed; aborted pumps joined).
     reclaimed: bool,
+    /// Output tasks (one-shot pumps / pty reader) still alive — the
+    /// observability seam proving no task outlives the record.
+    pumps_alive: usize,
     pty_master: Option<Arc<PtyMasterHandle>>,
 }
 
@@ -814,6 +932,10 @@ impl ProcessRecord {
             argv: self.argv.clone(),
             phase: inner.phase.clone(),
             spawned_at_unix_ms: self.spawned_at_unix_ms,
+            child_reaped: inner.child_reaped,
+            drained_stdio: inner.drained_stdio,
+            reclaimed: inner.reclaimed,
+            pumps_alive: inner.pumps_alive,
             audit: inner.audit.clone(),
         }
     }
@@ -850,6 +972,68 @@ pub struct ProcessSupervisor {
     /// One-shot verification fault (see [`SpawnFaultPoint`]); consumed by
     /// the next spawn. Production code never arms it.
     fault: Mutex<SpawnFaultPoint>,
+    /// One-shot output-task fault (see [`PumpFaultPoint`]); consumed by
+    /// the next output task. Production code never arms it.
+    pump_fault: Mutex<PumpFaultPoint>,
+    /// Verification signal-call log (see [`SignalRecord`]) — every signal
+    /// this supervisor actually sent, bounded. Observation only.
+    signal_log: Mutex<Vec<SignalRecord>>,
+    /// Supervisor-owned tasks currently alive (reapers, output pumps,
+    /// pty readers, detached termination tails) — the observability seam
+    /// proving cleanup leaves no unqueryable task behind.
+    owned_tasks: std::sync::atomic::AtomicUsize,
+}
+
+/// Accounts one supervisor-owned task: bumps `owned_tasks` at creation
+/// and returns it on drop (any exit — natural completion, abort, panic).
+/// For output tasks it also feeds the per-record `pumps_alive` seam.
+struct OwnedTaskGuard {
+    supervisor: Option<Arc<ProcessSupervisor>>,
+    record: Option<Arc<ProcessRecord>>,
+}
+
+impl OwnedTaskGuard {
+    /// A supervisor-owned task that is not an output task (reaper,
+    /// detached termination tail).
+    fn for_supervision(supervisor: &Arc<ProcessSupervisor>) -> Self {
+        supervisor
+            .owned_tasks
+            .fetch_add(1, std::sync::atomic::Ordering::SeqCst);
+        Self {
+            supervisor: Some(Arc::clone(supervisor)),
+            record: None,
+        }
+    }
+
+    /// An output task (one-shot pump / pty reader): additionally feeds
+    /// the record's `pumps_alive` observability seam.
+    fn for_output_task(supervisor: &Arc<ProcessSupervisor>, record: &Arc<ProcessRecord>) -> Self {
+        supervisor
+            .owned_tasks
+            .fetch_add(1, std::sync::atomic::Ordering::SeqCst);
+        {
+            let mut inner = lock_or_poison(&record.inner);
+            inner.pumps_alive += 1;
+        }
+        Self {
+            supervisor: Some(Arc::clone(supervisor)),
+            record: Some(Arc::clone(record)),
+        }
+    }
+}
+
+impl Drop for OwnedTaskGuard {
+    fn drop(&mut self) {
+        if let Some(record) = self.record.take() {
+            let mut inner = lock_or_poison(&record.inner);
+            inner.pumps_alive = inner.pumps_alive.saturating_sub(1);
+        }
+        if let Some(supervisor) = self.supervisor.take() {
+            supervisor
+                .owned_tasks
+                .fetch_sub(1, std::sync::atomic::Ordering::SeqCst);
+        }
+    }
 }
 
 /// A live-registry slot reserved ATOMICALLY before any OS dispatch
@@ -909,6 +1093,9 @@ impl ProcessSupervisor {
             clock,
             limits,
             fault: Mutex::new(SpawnFaultPoint::None),
+            pump_fault: Mutex::new(PumpFaultPoint::None),
+            signal_log: Mutex::new(Vec::new()),
+            owned_tasks: std::sync::atomic::AtomicUsize::new(0),
         })
     }
 
@@ -920,6 +1107,89 @@ impl ProcessSupervisor {
 
     fn take_spawn_fault(&self) -> SpawnFaultPoint {
         std::mem::replace(&mut *lock_or_poison(&self.fault), SpawnFaultPoint::None)
+    }
+
+    /// Arms a one-shot output-task fault (see [`PumpFaultPoint`]).
+    /// Verification-only API: no product or model-reachable path calls it.
+    pub fn arm_pump_fault_for_verification(&self, point: PumpFaultPoint) {
+        *lock_or_poison(&self.pump_fault) = point;
+    }
+
+    fn take_pump_fault(&self) -> PumpFaultPoint {
+        std::mem::replace(&mut *lock_or_poison(&self.pump_fault), PumpFaultPoint::None)
+    }
+
+    /// The signals this supervisor ACTUALLY sent (bounded log, oldest
+    /// first) — verification evidence that every group signal targeted an
+    /// ownership-provable group. Observation only.
+    pub fn verification_signal_log(&self) -> Vec<SignalRecord> {
+        lock_or_poison(&self.signal_log).clone()
+    }
+
+    /// Supervisor-owned tasks currently alive (reapers, output pumps,
+    /// pty readers, detached termination tails).
+    pub fn owned_task_count(&self) -> usize {
+        self.owned_tasks.load(std::sync::atomic::Ordering::SeqCst)
+    }
+
+    /// Records retained in the registry map (live + settled ring) — the
+    /// declared steady-state bound is `settled_ring_cap` plus the live
+    /// set.
+    pub fn retained_record_count(&self) -> usize {
+        lock_or_poison(&self.state).records.len()
+    }
+
+    /// The ids of every retained record (live + settled ring) — an
+    /// observation seam for tests that drive the tool surface (whose
+    /// results do not carry the internal process handle).
+    pub fn retained_record_ids(&self) -> Vec<ProcessHandleId> {
+        lock_or_poison(&self.state)
+            .records
+            .keys()
+            .cloned()
+            .collect()
+    }
+
+    fn note_signal(
+        &self,
+        target: SignalTarget,
+        signal: i32,
+        syscall_result: i32,
+        ownership: &'static str,
+    ) {
+        let mut log = lock_or_poison(&self.signal_log);
+        if log.len() >= SIGNAL_LOG_CAP {
+            log.remove(0);
+        }
+        log.push(SignalRecord {
+            at_unix_ms: self.now_ms(),
+            target,
+            signal,
+            syscall_result,
+            ownership,
+        });
+    }
+
+    /// Sends `SIGKILL` to a process group whose ownership was PROVEN at
+    /// the call site (under the record lock, `child_reaped == false` +
+    /// `getpgid` recheck). Every group signal this supervisor sends goes
+    /// through here so the verification log is exhaustive.
+    #[cfg(unix)]
+    fn send_group_kill(&self, pgid: i32, ownership: &'static str) {
+        // SAFETY: killpg on a group whose ownership the caller just
+        // proved with live kernel facts.
+        let rc = unsafe { libc::killpg(pgid, libc::SIGKILL) };
+        self.note_signal(SignalTarget::Group(pgid), libc::SIGKILL, rc, ownership);
+    }
+
+    /// Sends `SIGKILL` to a direct child of a spawn rollback — the child
+    /// is provably unreaped there (this supervisor owns the `Child` and
+    /// has not waited it).
+    #[cfg(unix)]
+    fn send_child_kill(&self, pid: i32, ownership: &'static str) {
+        // SAFETY: kill our own just-spawned child.
+        let rc = unsafe { libc::kill(pid, libc::SIGKILL) };
+        self.note_signal(SignalTarget::Child(pid), libc::SIGKILL, rc, ownership);
     }
 
     fn now_ms(&self) -> u64 {
@@ -1057,10 +1327,7 @@ impl ProcessSupervisor {
             // rollback is a bounded kill + reap of the child we own and
             // the error keeps the dispatched fact — never a silent
             // "nothing happened", and never a bare kill_on_drop handoff.
-            // SAFETY: kill our own just-spawned child.
-            unsafe {
-                libc::kill(pid, libc::SIGKILL);
-            }
+            self.send_child_kill(pid, "spawn_rollback_unreaped");
             let _ = child.wait().await;
             note_dispatched_rollback(&mut failure, pid);
             return Err(failure); // the LiveSlot drops: slot returned once
@@ -1103,8 +1370,10 @@ impl ProcessSupervisor {
                 settled: false,
                 collector: Some(Arc::clone(&collector)),
                 transcript: None,
+                child_reaped: false,
                 drained_stdio: false,
                 reclaimed: false,
+                pumps_alive: 0,
                 pty_master: None,
             }),
             phase_tx: tokio::sync::watch::Sender::new(RecordPhase::Running),
@@ -1117,33 +1386,54 @@ impl ProcessSupervisor {
         // terminal recording + settle. It is a supervisor-owned task: its
         // life is independent of any caller future.
         let grace = self.limits.stdio_grace;
+        let join_bound = self.limits.pump_abort_join;
         let supervisor = Arc::clone(&self);
         let reaper_record = Arc::clone(&record);
         tokio::spawn(async move {
+            let _reaper = OwnedTaskGuard::for_supervision(&supervisor);
             let out_pump = stdout.map(|stream| {
-                let collector = Arc::clone(&collector);
-                tokio::spawn(pump_stream(stream, collector, OutputStream::Stdout))
+                spawn_output_pump(
+                    &supervisor,
+                    &reaper_record,
+                    stream,
+                    Arc::clone(&collector),
+                    OutputStream::Stdout,
+                )
             });
             let err_pump = stderr.map(|stream| {
-                let collector = Arc::clone(&collector);
-                tokio::spawn(pump_stream(stream, collector, OutputStream::Stderr))
+                spawn_output_pump(
+                    &supervisor,
+                    &reaper_record,
+                    stream,
+                    Arc::clone(&collector),
+                    OutputStream::Stderr,
+                )
             });
             let status = child.wait().await;
+            // REAL observation, published BEFORE the grace: from this
+            // instant the pid/pgid are reaped and no longer provably
+            // ours — the send-time ownership gate reads this flag under
+            // the same lock, so a terminate arriving anywhere in the
+            // drain window can never signal the stale group.
+            note_child_reaped(&reaper_record);
             // Bounded stdio grace: grandchildren may still hold the write
-            // ends. After the grace, leftover pump tasks are aborted —
-            // dropping our read ends closes the pipes (reclaim).
-            let mut drained = true;
-            for pump in [out_pump, err_pump].into_iter().flatten() {
-                if tokio::time::timeout(grace, pump).await.is_err() {
-                    drained = false;
-                }
-            }
+            // ends. On expiry the leftover pump is ABORTED and its end
+            // OBSERVED by joining (tokio semantics: a dropped JoinHandle
+            // DETACHES — it does not cancel; R04-RR1-F02). An observed
+            // end drops the task's read end: the pipe is really closed.
+            let drain = drain_output_tasks(
+                &reaper_record,
+                [("stdout", out_pump), ("stderr", err_pump)],
+                grace,
+                join_bound,
+            )
+            .await;
             let fact = match status {
                 Ok(status) => exit_fact_of(&status),
                 Err(_) => ExitFact::Code(-1),
             };
             let leftover_group = group_has_members(reaper_record.pgid);
-            finalize_exit(&reaper_record, fact, drained, leftover_group);
+            finalize_exit(&reaper_record, fact, &drain, leftover_group);
             supervisor.settle(&reaper_record.id);
         });
         Ok(SpawnedProcess { id, pid, pgid: pid })
@@ -1169,14 +1459,39 @@ impl ProcessSupervisor {
                  group was fine; the fault exercises the rollback)"
             )));
         }
-        if pgid != pid {
-            return Err(SpawnFailure::GroupOwnership(format!(
-                "getpgid({pid}) returned {pgid}, expected the child to lead its own group \
-                 (setsid failed silently?); argv={:?}",
-                spec.argv
-            )));
+        if pgid == pid {
+            return Ok(());
         }
-        Ok(())
+        if pgid == -1 {
+            // The same "OS reaping precedes the ownership state update"
+            // race as R04-RR1-F02, on the spawn side: a fast-exiting
+            // child may already have been reaped (tokio's SIGCHLD
+            // handling — which may run on ANY runtime thread of this
+            // process — reaps opportunistically), so getpgid sees no
+            // process. The kernel fact at THIS instant is decisive: the
+            // pid our just-spawned child held is gone, which for a
+            // microseconds-old child of ours means it EXITED and was
+            // reaped. Admitting the record is safe and honest because:
+            //   - the reaper owns the real `Child` and resolves the
+            //     stored exit status (a status lost to a foreign reaper
+            //     would surface as the existing honest wait-error fact,
+            //     never a fabricated success);
+            //   - the group's signal gating is closed from the reap
+            //     publish on (the reaper sets `child_reaped` BEFORE any
+            //     grace; `mark_terminating` refuses group signals from
+            //     then on), so even a pid recycled to a foreign process
+            //     before this check CANNOT be signalled through this
+            //     record;
+            //   - refusing here (the baseline behavior) killed a
+            //     legitimately-ours child that had already fully run
+            //     (~1/3 of parallel suite runs on the baseline).
+            return Ok(());
+        }
+        Err(SpawnFailure::GroupOwnership(format!(
+            "getpgid({pid}) returned {pgid}, expected the child to lead its own group \
+             (setsid failed silently?); argv={:?}",
+            spec.argv
+        )))
     }
 
     #[cfg(unix)]
@@ -1259,10 +1574,7 @@ impl ProcessSupervisor {
             // never rely on "closing the pty happens to signal the
             // child" as the cleanup), keep the dispatched fact, return
             // the slot exactly once.
-            // SAFETY: kill our own just-spawned child.
-            unsafe {
-                libc::kill(pid, libc::SIGKILL);
-            }
+            self.send_child_kill(pid, "spawn_rollback_unreaped");
             let _ = child.wait().await;
             drop(master_fd); // close our own pty master fd
             note_dispatched_rollback(&mut failure, pid);
@@ -1312,8 +1624,10 @@ impl ProcessSupervisor {
                 settled: false,
                 collector: None,
                 transcript: Some(Arc::clone(&transcript)),
+                child_reaped: false,
                 drained_stdio: false,
                 reclaimed: false,
+                pumps_alive: 0,
                 pty_master: Some(Arc::clone(&master)),
             }),
             phase_tx: tokio::sync::watch::Sender::new(RecordPhase::Running),
@@ -1323,26 +1637,39 @@ impl ProcessSupervisor {
         // transfers to the settle path.
         slot.commit(Arc::clone(&record));
         // The master reader appends pty output into the transcript until
-        // the master closes (child exit → EIO/EOF, or our reclaim).
-        {
-            let reader_master = Arc::clone(&master);
-            let reader_transcript = Arc::clone(&transcript);
-            tokio::spawn(async move {
-                pty_read_loop(reader_master, reader_transcript).await;
-            });
-        }
-        // The pty reaper: wait + terminal recording + settle.
+        // the master closes (child exit → EIO/EOF, or our reclaim). Its
+        // JoinHandle is OWNED by the reaper below: a grandchild holding
+        // the pty slave keeps the master readable forever, so after the
+        // bounded grace the reaper aborts the reader AND observes its
+        // end — the reader's dup'd master fd drops with it, closing the
+        // LAST reference (no unbounded read-end leak; R04-RR1-F02).
+        let reader = spawn_pty_reader(&self, &record, Arc::clone(&master), Arc::clone(&transcript));
+        // The pty reaper: wait + reaped-observation + bounded reader
+        // drain + terminal recording + settle.
         {
             let supervisor = Arc::clone(&self);
             let reaper_record = Arc::clone(&record);
+            let grace = self.limits.stdio_grace;
+            let join_bound = self.limits.pump_abort_join;
             tokio::spawn(async move {
+                let _reaper = OwnedTaskGuard::for_supervision(&supervisor);
                 let status = child.wait().await;
+                // Same real-observation ordering as the one-shot reaper:
+                // the reap fact is published BEFORE the drain window.
+                note_child_reaped(&reaper_record);
+                let drain = drain_output_tasks(
+                    &reaper_record,
+                    [("pty_master_reader", Some(reader)), ("", None)],
+                    grace,
+                    join_bound,
+                )
+                .await;
                 let fact = match status {
                     Ok(status) => exit_fact_of(&status),
                     Err(_) => ExitFact::Code(-1),
                 };
                 let leftover_group = group_has_members(reaper_record.pgid);
-                finalize_exit(&reaper_record, fact, true, leftover_group);
+                finalize_exit(&reaper_record, fact, &drain, leftover_group);
                 supervisor.settle(&reaper_record.id);
             });
         }
@@ -1498,7 +1825,7 @@ impl ProcessSupervisor {
                 outcome: TerminationOutcome::UnknownProcess,
             };
         };
-        let started = mark_terminating(&record, reason, self.now_ms());
+        let started = self.mark_terminating(&record, reason, self.now_ms());
         if !started {
             let phase = lock_or_poison(&record.inner).phase.clone();
             return TerminationReceipt {
@@ -1527,7 +1854,7 @@ impl ProcessSupervisor {
         let Some(record) = self.any_record(id) else {
             return;
         };
-        if !mark_terminating(&record, reason, self.now_ms()) {
+        if !self.mark_terminating(&record, reason, self.now_ms()) {
             return;
         }
         match tokio::runtime::Handle::try_current() {
@@ -1535,6 +1862,7 @@ impl ProcessSupervisor {
                 let supervisor = Arc::clone(self);
                 let record = Arc::clone(&record);
                 handle.spawn(async move {
+                    let _tail = OwnedTaskGuard::for_supervision(&supervisor);
                     supervisor.await_termination(&record, reason).await;
                 });
             }
@@ -1625,6 +1953,93 @@ impl ProcessSupervisor {
         }
         receipts
     }
+
+    /// Marks a record Terminating and fires the group kill ONLY when
+    /// ownership of the group is still PROVABLE at send time (the mark,
+    /// the proof and the signal are one atomic step under the record
+    /// lock — no window where the reaper's reap bookkeeping and a
+    /// terminator disagree). Returns whether a termination is in progress
+    /// or was started by this call; `false` means the record was already
+    /// terminal.
+    fn mark_terminating(
+        self: &Arc<Self>,
+        record: &Arc<ProcessRecord>,
+        reason: TerminationReason,
+        now: u64,
+    ) -> bool {
+        let mut inner = lock_or_poison(&record.inner);
+        match inner.phase.clone() {
+            RecordPhase::Running => {
+                inner.phase = RecordPhase::Terminating { reason };
+                let _ = record.phase_tx.send(inner.phase.clone());
+                let (audit_kind, audit_detail) =
+                    match prove_group_ownership(&inner, record.pid, record.pgid) {
+                        GroupOwnership::Proven => {
+                            self.send_group_kill(record.pgid, "verified_at_send");
+                            (
+                                "killpg_sent",
+                                format!(
+                                    "killpg({}) SIGKILL reason={} (ownership proven at send \
+                                     time: child unreaped, getpgid({}) == {})",
+                                    record.pgid,
+                                    reason.wire_name(),
+                                    record.pid,
+                                    record.pgid
+                                ),
+                            )
+                        }
+                        GroupOwnership::ChildAlreadyReaped => {
+                            // R04-RR1-F02: the direct child was already
+                            // reaped — the pid/pgid may have been recycled,
+                            // so NO group signal is sent. The reaper is
+                            // already in its bounded drain window and will
+                            // record the terminal phase; the honest receipt
+                            // follows.
+                            (
+                                "group_signal_skipped",
+                                format!(
+                                    "group signal SKIPPED reason={}: the direct child was \
+                                     already reaped (wait() resolved) — pid/pgid ownership is \
+                                     no longer provable; the reaper's bounded drain will \
+                                     settle the record",
+                                    reason.wire_name()
+                                ),
+                            )
+                        }
+                        GroupOwnership::KernelIdentityMismatch(live_pgid) => {
+                            // The live kernel fact disagrees with the
+                            // record's stale pgid (reaped-and-recycled pid,
+                            // or a foreign group): never signal what we
+                            // cannot prove.
+                            (
+                                "group_signal_skipped",
+                                format!(
+                                    "group signal SKIPPED reason={}: send-time identity \
+                                     recheck getpgid({}) returned {live_pgid}, expected {} — \
+                                     ownership not provable, refusing to signal",
+                                    reason.wire_name(),
+                                    record.pid,
+                                    record.pgid
+                                ),
+                            )
+                        }
+                    };
+                if inner.audit.len() >= AUDIT_CAP {
+                    inner.audit.remove(0);
+                }
+                inner.audit.push(AuditEvent {
+                    at_unix_ms: now,
+                    kind: audit_kind,
+                    detail: audit_detail,
+                });
+                true
+            }
+            RecordPhase::Terminating { .. } => true,
+            RecordPhase::Exited { .. }
+            | RecordPhase::Terminated { .. }
+            | RecordPhase::CleanupTimedOut { .. } => false,
+        }
+    }
 }
 
 impl Drop for ProcessSupervisor {
@@ -1636,11 +2051,16 @@ impl Drop for ProcessSupervisor {
         for record in state.records.values() {
             let inner = lock_or_poison(&record.inner);
             if !inner.phase.is_terminal() {
-                #[cfg(unix)]
-                // SAFETY: killpg on a group this supervisor created and
-                // whose record is still non-terminal (pid not reusable).
-                unsafe {
-                    libc::killpg(record.pgid, libc::SIGKILL);
+                // R04-RR1-F02: the same send-time ownership gate as
+                // `mark_terminating` — a non-terminal record alone does
+                // NOT prove the pid is unreaped, so the kernel identity
+                // is rechecked before any group signal leaves Drop.
+                if matches!(
+                    prove_group_ownership(&inner, record.pid, record.pgid),
+                    GroupOwnership::Proven
+                ) {
+                    #[cfg(unix)]
+                    self.send_group_kill(record.pgid, "drop_unreaped_verified");
                 }
             }
         }
@@ -1652,83 +2072,291 @@ impl Drop for ProcessSupervisor {
 
 // ── phase helpers ───────────────────────────────────────────────────────────
 
-/// Marks a record Terminating and fires `killpg` under the lock (the mark
-/// and the kill are one atomic step — no window where two terminators
-/// disagree). Returns whether a termination is in progress or was started
-/// by this call; `false` means the record was already terminal.
-fn mark_terminating(record: &Arc<ProcessRecord>, reason: TerminationReason, now: u64) -> bool {
+/// Records a terminal phase from the reaper (natural exit or post-kill),
+/// performs the reclamation and broadcasts.
+/// Publishes the REAL reap observation (R04-RR1-F02): the reaper's
+/// `wait()` resolved, so the direct child HAS been reaped and the
+/// record's pid/pgid are no longer provably ours. Published under the
+/// record lock BEFORE any grace waiting — the ownership gate inside
+/// `mark_terminating` reads this flag under the same lock, which makes
+/// the reap fact and every send/skip decision one atomic step.
+fn note_child_reaped(record: &Arc<ProcessRecord>) {
     let mut inner = lock_or_poison(&record.inner);
-    match inner.phase.clone() {
-        RecordPhase::Running => {
-            inner.phase = RecordPhase::Terminating { reason };
-            let _ = record.phase_tx.send(inner.phase.clone());
-            if inner.audit.len() >= AUDIT_CAP {
-                inner.audit.remove(0);
-            }
-            inner.audit.push(AuditEvent {
-                at_unix_ms: now,
-                kind: "killpg_sent",
-                detail: format!(
-                    "killpg({}) SIGKILL reason={}",
-                    record.pgid,
-                    reason.wire_name()
-                ),
-            });
-            #[cfg(unix)]
-            // SAFETY: pgid was verified at spawn (child leads its own
-            // group) and the record is non-terminal — the child (or its
-            // unreaped zombie) still owns that pid, so the group cannot be
-            // a recycled foreign one.
-            unsafe {
-                libc::killpg(record.pgid, libc::SIGKILL);
-            }
-            #[cfg(not(unix))]
-            let _ = record.pgid;
-            true
-        }
-        RecordPhase::Terminating { .. } => true,
-        RecordPhase::Exited { .. }
-        | RecordPhase::Terminated { .. }
-        | RecordPhase::CleanupTimedOut { .. } => false,
+    if inner.child_reaped {
+        return;
+    }
+    inner.child_reaped = true;
+    let now = wall_now_ms();
+    audit_push(
+        &mut inner,
+        now,
+        "child_reaped",
+        "wait() resolved: the direct child was reaped; pid/pgid ownership is no \
+         longer provable from this record (group signals are refused from now on)"
+            .to_string(),
+    );
+}
+
+/// The send-time group-ownership proof (R04-RR1-F02): live facts only, no
+/// stale-field trust. Evaluated under the record lock so the result and
+/// the signal are atomic with respect to the reaper publishing the reap.
+enum GroupOwnership {
+    /// The child is unreaped (alive or zombie — the kernel cannot recycle
+    /// its pid) and `getpgid` still reports it leading our group.
+    Proven,
+    /// The reaper already reaped the child: the pid may have been
+    /// recycled; ownership is UNPROVABLE and no signal may be sent.
+    ChildAlreadyReaped,
+    /// `getpgid` disagrees with the record (reaped pid probed as another
+    /// live process's, or a foreign group): UNPROVABLE.
+    KernelIdentityMismatch(i32),
+}
+
+#[cfg(unix)]
+fn prove_group_ownership(inner: &RecordInner, pid: i32, pgid: i32) -> GroupOwnership {
+    if inner.child_reaped {
+        return GroupOwnership::ChildAlreadyReaped;
+    }
+    // SAFETY: getpgid is a plain syscall (no effect).
+    let live_pgid = unsafe { libc::getpgid(pid) };
+    if live_pgid == pgid {
+        GroupOwnership::Proven
+    } else {
+        GroupOwnership::KernelIdentityMismatch(live_pgid)
     }
 }
 
+#[cfg(not(unix))]
+fn prove_group_ownership(inner: &RecordInner, _pid: i32, _pgid: i32) -> GroupOwnership {
+    // Non-Unix builds never spawn (UnsupportedPlatform); nothing reaches
+    // this, and no group signal exists to gate.
+    GroupOwnership::ChildAlreadyReaped
+}
+
+/// What the reaper OBSERVED about one output task at the end of the
+/// bounded drain window — every variant is a real observation, never an
+/// assumption.
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+enum PumpEnd {
+    /// The task finished on its own (EOF or read error) within the
+    /// grace; `panicked` distinguishes an honest panic disposition.
+    Finished { panicked: bool },
+    /// The grace expired, abort was requested and the task's end WAS
+    /// observed by joining — the task is gone and its read end is closed.
+    AbortedObserved,
+    /// The grace expired, abort was requested, but the end could NOT be
+    /// observed within the join bound — recorded loudly; the record can
+    /// never report itself reclaimed on this path.
+    EndUnconfirmed,
+}
+
+/// The reaper's drain summary (R04-RR1-F02 requirement 4: facts from real
+/// observations, whole tail under one explicit budget).
+#[derive(Debug, Clone)]
+struct DrainFacts {
+    /// Output tasks that existed (0-2 one-shot pumps, or 1 pty reader).
+    streams: usize,
+    /// Tasks that finished naturally (EOF/read-error) within the grace.
+    natural_end: usize,
+    /// Tasks aborted after the grace whose end was OBSERVED.
+    aborted_observed: usize,
+    /// Tasks whose end could NOT be observed within the join bound.
+    end_unconfirmed: usize,
+    /// Tasks that ended in a panic (real or verification-faulted).
+    panicked: usize,
+    /// TRUE only if EVERY stream observed EOF naturally before the grace.
+    drained_stdio: bool,
+    /// TRUE only if EVERY task's end was observed (join result obtained).
+    all_ends_observed: bool,
+    /// The whole drain window's measured duration (budget evidence).
+    elapsed: Duration,
+}
+
+impl DrainFacts {
+    fn new() -> Self {
+        Self {
+            streams: 0,
+            natural_end: 0,
+            aborted_observed: 0,
+            end_unconfirmed: 0,
+            panicked: 0,
+            drained_stdio: true,
+            all_ends_observed: true,
+            elapsed: Duration::ZERO,
+        }
+    }
+}
+
+fn audit_push(inner: &mut RecordInner, at_unix_ms: u64, kind: &'static str, detail: String) {
+    if inner.audit.len() >= AUDIT_CAP {
+        inner.audit.remove(0);
+    }
+    inner.audit.push(AuditEvent {
+        at_unix_ms,
+        kind,
+        detail,
+    });
+}
+
+fn wall_now_ms() -> u64 {
+    std::time::SystemTime::now()
+        .duration_since(std::time::UNIX_EPOCH)
+        .map(|d| d.as_millis() as u64)
+        .unwrap_or(0)
+}
+
+/// The bounded output-task drain (R04-RR1-F02): for each pump/reader
+/// JoinHandle the reaper owns, wait up to `grace` for a natural end;
+/// on expiry request `abort()` and OBSERVE the actual end by joining
+/// within `join_bound` (tokio semantics: DROPPING a JoinHandle detaches
+/// the task — it does not cancel it). The budget is explicit and shared:
+/// one grace deadline for the natural phase, one join deadline covering
+/// every abort-join. Every disposition is audited; an unobservable end is
+/// recorded as such and never counted as reclamation.
+async fn drain_output_tasks(
+    record: &Arc<ProcessRecord>,
+    tasks: [(&'static str, Option<tokio::task::JoinHandle<()>>); 2],
+    grace: Duration,
+    join_bound: Duration,
+) -> DrainFacts {
+    let started = std::time::Instant::now();
+    let grace_deadline = tokio::time::Instant::now() + grace;
+    let join_deadline = grace_deadline + join_bound;
+    let mut facts = DrainFacts::new();
+    for (label, task) in tasks {
+        let Some(mut task) = task else {
+            continue;
+        };
+        facts.streams += 1;
+        let end = match tokio::time::timeout_at(grace_deadline, &mut task).await {
+            // The task finished on its own within the grace (a joined
+            // Err is a panic/abort receipt — both are OBSERVED ends).
+            Ok(joined) => PumpEnd::Finished {
+                panicked: joined.is_err(),
+            },
+            Err(_grace_expired) => {
+                // tokio: dropping the JoinHandle DETACHES the task. Keep
+                // the handle, request abort, and OBSERVE the actual end.
+                task.abort();
+                match tokio::time::timeout_at(join_deadline, &mut task).await {
+                    Ok(_end_observed) => PumpEnd::AbortedObserved,
+                    Err(_join_bound_expired) => PumpEnd::EndUnconfirmed,
+                }
+            }
+        };
+        let (kind, detail) = match end {
+            PumpEnd::Finished { panicked: false } => (
+                "output_task_finished",
+                format!(
+                    "{label} finished within the stdio grace (EOF or read error); end \
+                     observed via join"
+                ),
+            ),
+            PumpEnd::Finished { panicked: true } => (
+                "output_task_panicked",
+                format!(
+                    "{label} ended in a panic within the grace; end observed via join \
+                     (nothing hidden, no unbounded wait)"
+                ),
+            ),
+            PumpEnd::AbortedObserved => (
+                "output_task_closed_after_abort",
+                format!(
+                    "{label} grace expired; abort requested and the task's end was \
+                     OBSERVED by joining — its read end is closed"
+                ),
+            ),
+            PumpEnd::EndUnconfirmed => (
+                "output_task_end_unconfirmed",
+                format!(
+                    "{label} grace expired; abort requested but the end was NOT \
+                     observable within the join bound — unconfirmed, the record is \
+                     never reported reclaimed on this path"
+                ),
+            ),
+        };
+        match end {
+            PumpEnd::Finished { panicked: false } => facts.natural_end += 1,
+            PumpEnd::Finished { panicked: true } => {
+                facts.panicked += 1;
+                facts.natural_end += 1; // finished within the grace (observed end)
+            }
+            PumpEnd::AbortedObserved => facts.aborted_observed += 1,
+            PumpEnd::EndUnconfirmed => {
+                facts.end_unconfirmed += 1;
+                facts.all_ends_observed = false;
+            }
+        }
+        if !matches!(end, PumpEnd::Finished { panicked: false }) {
+            facts.drained_stdio = false;
+        }
+        let now = wall_now_ms();
+        let mut inner = lock_or_poison(&record.inner);
+        audit_push(&mut inner, now, kind, detail);
+    }
+    facts.elapsed = started.elapsed();
+    let summary = format!(
+        "streams={} natural_end={} aborted_observed={} panicked={} end_unconfirmed={} \
+         drained_stdio={} all_ends_observed={} elapsed_ms={}",
+        facts.streams,
+        facts.natural_end,
+        facts.aborted_observed,
+        facts.panicked,
+        facts.end_unconfirmed,
+        facts.drained_stdio,
+        facts.all_ends_observed,
+        facts.elapsed.as_millis()
+    );
+    let now = wall_now_ms();
+    let mut inner = lock_or_poison(&record.inner);
+    audit_push(&mut inner, now, "output_drain_summary", summary);
+    facts
+}
+
 /// Records a terminal phase from the reaper (natural exit or post-kill),
-/// performs the reclamation and broadcasts.
+/// performs the reclamation and broadcasts. `drain` carries the REAL
+/// observations: `drained_stdio` is true only when every stream reached
+/// EOF before the grace, and `reclaimed` is true only when every task's
+/// end was OBSERVED (an aborted-then-joined pump really dropped its read
+/// end; an unconfirmed end is never folded into "reclaimed").
 fn finalize_exit(
     record: &Arc<ProcessRecord>,
     fact: ExitFact,
-    drained_stdio: bool,
+    drain: &DrainFacts,
     leftover_group: bool,
 ) {
-    let now = std::time::SystemTime::now()
-        .duration_since(std::time::UNIX_EPOCH)
-        .map(|d| d.as_millis() as u64)
-        .unwrap_or(0);
+    let now = wall_now_ms();
     {
         let mut inner = lock_or_poison(&record.inner);
         let reason = match inner.phase {
             RecordPhase::Terminating { reason } => Some(reason),
             _ => None,
         };
-        inner.drained_stdio = drained_stdio;
+        inner.drained_stdio = drain.drained_stdio;
         inner.phase = match reason {
             Some(reason) => RecordPhase::Terminated { reason, fact },
             None => RecordPhase::Exited { fact },
         };
-        if inner.audit.len() >= AUDIT_CAP {
-            inner.audit.remove(0);
-        }
-        inner.audit.push(AuditEvent {
-            at_unix_ms: now,
-            kind: "exit_observed",
-            detail: format!(
-                "{} drained_stdio={drained_stdio} leftover_group_after_exit={leftover_group}",
-                fact.describe()
-            ),
-        });
-        // Reclaim: close the pty master (one-shots have no master; their
-        // pumps were joined/aborted by the reaper after the grace).
+        let summary = format!(
+            "{} drained_stdio={} reclaimed={} leftover_group_after_exit={} \
+             (drain: streams={} natural_end={} aborted_observed={} panicked={} \
+             end_unconfirmed={} elapsed_ms={})",
+            fact.describe(),
+            drain.drained_stdio,
+            drain.all_ends_observed,
+            leftover_group,
+            drain.streams,
+            drain.natural_end,
+            drain.aborted_observed,
+            drain.panicked,
+            drain.end_unconfirmed,
+            drain.elapsed.as_millis()
+        );
+        audit_push(&mut inner, now, "exit_observed", summary);
+        // Reclaim: close the pty master (a synchronous, real observation
+        // — we hold and close the fd ourselves) and the spill files. The
+        // one-shot pipe read ends were closed by their OBSERVED task
+        // ends (natural EOF, or abort+join) before this point.
         if let Some(master) = inner.pty_master.take() {
             master.close();
         }
@@ -1738,7 +2366,7 @@ fn finalize_exit(
         if let Some(collector) = inner.collector.as_ref() {
             lock_or_poison(collector).close_spill();
         }
-        inner.reclaimed = true;
+        inner.reclaimed = drain.all_ends_observed;
         let _ = record.phase_tx.send(inner.phase.clone());
     }
 }
@@ -1810,6 +2438,59 @@ where
             Err(_) => break,
         }
     }
+}
+
+/// Spawns one one-shot output pump with full observability: an
+/// [`OwnedTaskGuard`] feeds the supervisor's task count and the record's
+/// `pumps_alive` seam (dropped when the task ends — natural EOF, abort or
+/// panic), and the verification fault hook (see [`PumpFaultPoint`]) can
+/// force the panic disposition of the drain.
+#[cfg(unix)]
+fn spawn_output_pump<R>(
+    supervisor: &Arc<ProcessSupervisor>,
+    record: &Arc<ProcessRecord>,
+    stream: R,
+    collector: Arc<Mutex<CollectorCore>>,
+    which: OutputStream,
+) -> tokio::task::JoinHandle<()>
+where
+    R: tokio::io::AsyncRead + Unpin + Send + 'static,
+{
+    let guard = OwnedTaskGuard::for_output_task(supervisor, record);
+    let fault = supervisor.take_pump_fault();
+    tokio::spawn(async move {
+        let _guard = guard;
+        if fault == PumpFaultPoint::PanicNext {
+            panic!(
+                "verification fault: the {which:?} output pump panics before its first read \
+                 (exercises the reaper's panicked-pump observation)"
+            );
+        }
+        pump_stream(stream, collector, which).await;
+    })
+}
+
+/// Spawns the pty master reader with the same observability guard as the
+/// one-shot pumps (the reader is the pty family's output task).
+#[cfg(unix)]
+fn spawn_pty_reader(
+    supervisor: &Arc<ProcessSupervisor>,
+    record: &Arc<ProcessRecord>,
+    master: Arc<PtyMasterHandle>,
+    transcript: Arc<Mutex<TranscriptCore>>,
+) -> tokio::task::JoinHandle<()> {
+    let guard = OwnedTaskGuard::for_output_task(supervisor, record);
+    let fault = supervisor.take_pump_fault();
+    tokio::spawn(async move {
+        let _guard = guard;
+        if fault == PumpFaultPoint::PanicNext {
+            panic!(
+                "verification fault: the pty master reader panics before its first read \
+                 (exercises the reaper's panicked-task observation)"
+            );
+        }
+        pty_read_loop(master, transcript).await;
+    })
 }
 
 // ── PTY plumbing (libc; no new dependencies) ───────────────────────────────
@@ -2185,8 +2866,10 @@ mod tests {
                 settled: false,
                 collector: None,
                 transcript: None,
+                child_reaped: false,
                 drained_stdio: false,
                 reclaimed: false,
+                pumps_alive: 0,
                 pty_master: None,
             }),
             phase_tx: tokio::sync::watch::Sender::new(RecordPhase::Running),
@@ -2273,5 +2956,243 @@ mod tests {
             drop(slot);
             assert_eq!(live_count_of(&supervisor), 0);
         }
+    }
+
+    // ── R04-RR1-F02: send-time group-ownership gate & drain honesty ──────
+
+    #[test]
+    fn group_signal_is_skipped_once_the_child_reap_is_published() {
+        let supervisor = test_supervisor(1);
+        let id = ProcessHandleId::mint().expect("mint");
+        let record = dummy_record(id);
+        // Simulate the reaper's real observation: wait() resolved.
+        note_child_reaped(&record);
+        assert!(record.snapshot().child_reaped);
+        // A terminate arriving anywhere in the drain window must NOT fire
+        // a group signal: the pid may already have been recycled.
+        assert!(supervisor.mark_terminating(
+            &record,
+            TerminationReason::Close,
+            supervisor.now_ms()
+        ));
+        assert!(matches!(
+            record.snapshot().phase,
+            RecordPhase::Terminating {
+                reason: TerminationReason::Close
+            }
+        ));
+        let snapshot = record.snapshot();
+        assert!(
+            snapshot
+                .audit
+                .iter()
+                .any(|e| e.kind == "group_signal_skipped"),
+            "the skip is audited: {snapshot:?}"
+        );
+        assert!(
+            !snapshot.audit.iter().any(|e| e.kind == "killpg_sent"),
+            "no signal was ever sent: {snapshot:?}"
+        );
+        assert!(
+            supervisor.verification_signal_log().is_empty(),
+            "the exhaustive signal log proves nothing left the process"
+        );
+    }
+
+    #[test]
+    fn group_signal_is_skipped_when_the_kernel_identity_disagrees() {
+        let supervisor = test_supervisor(1);
+        let id = ProcessHandleId::mint().expect("mint");
+        // A record whose pid provably does not exist anymore (dummy pid
+        // never spawned): the send-time getpgid recheck must refuse.
+        let record = dummy_record(id);
+        assert!(!record.snapshot().child_reaped);
+        assert!(supervisor.mark_terminating(
+            &record,
+            TerminationReason::Shutdown,
+            supervisor.now_ms()
+        ));
+        let snapshot = record.snapshot();
+        assert!(
+            snapshot
+                .audit
+                .iter()
+                .any(|e| e.kind == "group_signal_skipped" && e.detail.contains("identity recheck")),
+            "the kernel-fact refusal is audited: {snapshot:?}"
+        );
+        assert!(
+            supervisor.verification_signal_log().is_empty(),
+            "no signal at an unprovable target"
+        );
+    }
+
+    #[tokio::test]
+    async fn drain_observes_an_already_finished_task_without_waiting_the_grace() {
+        let id = ProcessHandleId::mint().expect("mint");
+        let record = dummy_record(id);
+        let finished = tokio::spawn(async {});
+        let started = std::time::Instant::now();
+        let facts = drain_output_tasks(
+            &record,
+            [("stdout", Some(finished)), ("stderr", None)],
+            Duration::from_secs(30),
+            Duration::from_secs(30),
+        )
+        .await;
+        // A naturally-finished task joins immediately — the grace is a
+        // deadline, not a delay.
+        assert!(started.elapsed() < Duration::from_secs(5));
+        assert_eq!(facts.streams, 1);
+        assert!(facts.drained_stdio, "an EOF-finished task drains");
+        assert!(facts.all_ends_observed);
+        let snapshot = record.snapshot();
+        assert!(snapshot
+            .audit
+            .iter()
+            .any(|e| e.kind == "output_drain_summary"));
+    }
+
+    #[tokio::test]
+    async fn drain_aborts_a_never_ending_task_and_observes_its_end() {
+        let id = ProcessHandleId::mint().expect("mint");
+        let record = dummy_record(id);
+        // A task that never ends on its own (blocked on a channel that
+        // nobody closes) — the grandchild-held-pipe shape.
+        let (tx, mut rx) = tokio::sync::mpsc::channel::<()>(1);
+        let stuck = tokio::spawn(async move { while rx.recv().await.is_some() {} });
+        let facts = drain_output_tasks(
+            &record,
+            [("stdout", Some(stuck)), ("stderr", None)],
+            Duration::from_millis(50),
+            Duration::from_millis(500),
+        )
+        .await;
+        drop(tx);
+        assert_eq!(facts.aborted_observed, 1, "the end was observed: {facts:?}");
+        assert!(!facts.drained_stdio, "no natural EOF — honestly flagged");
+        assert!(facts.all_ends_observed, "reclamation is earned by the join");
+        assert!(
+            facts.elapsed < Duration::from_secs(2),
+            "the whole drain is bounded: {:?}",
+            facts.elapsed
+        );
+        let snapshot = record.snapshot();
+        assert!(
+            snapshot
+                .audit
+                .iter()
+                .any(|e| e.kind == "output_task_closed_after_abort"),
+            "the abort observation is audited: {snapshot:?}"
+        );
+    }
+
+    #[tokio::test]
+    async fn verify_group_admits_a_reaped_child_of_ours_and_the_live_leader() {
+        let supervisor = test_supervisor(2);
+        // A REAL child that exits and is reaped under OUR wait: getpgid
+        // then returns -1 (the pid is gone), but the `Child` we hold
+        // PROVES the exit was ours — the spawn-side "reaping precedes
+        // ownership" race (the baseline flake family). The verification
+        // must ADMIT this child (the baseline refused it with a false
+        // EXEC_SPAWN_FAILED even though the command had really run).
+        let mut dead = tokio::process::Command::new("/bin/sh")
+            .arg("-c")
+            .arg("exit 0")
+            .stdin(std::process::Stdio::null())
+            .stdout(std::process::Stdio::null())
+            .stderr(std::process::Stdio::null())
+            .kill_on_drop(false)
+            .spawn()
+            .expect("test child spawns");
+        let dead_pid = dead.id().expect("pid") as i32;
+        let status = dead.wait().await.expect("the child exits");
+        assert!(status.success());
+        let spec = SpawnSpec {
+            argv: vec!["unit".to_string()],
+            cwd: std::env::temp_dir(),
+            env: BTreeMap::new(),
+            owner: ProcessOwner {
+                principal_kind: "test".to_string(),
+                principal_subject: "test".to_string(),
+                session_id: "sess".to_string(),
+                run_id: "run".to_string(),
+                tool_call_id: ToolCallId::new("call".to_string()),
+            },
+            kind: ProcessKind::OneShot,
+            cols: 80,
+            rows: 24,
+        };
+        // SAFETY: getpgid probe.
+        assert_eq!(
+            unsafe { libc::getpgid(dead_pid) },
+            -1,
+            "precondition: the pid is really reaped-and-gone"
+        );
+        assert!(
+            supervisor
+                .verify_group(dead_pid, &spec, SpawnFaultPoint::None)
+                .is_ok(),
+            "a reaped-and-gone pid of our just-spawned child admits the record (the              baseline refused it with a false EXEC_SPAWN_FAILED)"
+        );
+        drop(dead);
+        // A LIVE session leader verifies the normal way (getpgid == pid)
+        // — the same wiring as the product spawn path (setsid before
+        // exec, kill_on_drop disabled).
+        let mut command = tokio::process::Command::new("/bin/sleep");
+        command.arg("30");
+        command.stdin(std::process::Stdio::null());
+        command.stdout(std::process::Stdio::null());
+        command.stderr(std::process::Stdio::null());
+        command.kill_on_drop(false);
+        // SAFETY: setsid in pre_exec is async-signal-safe.
+        unsafe {
+            command.pre_exec(|| {
+                if libc::setsid() == -1 {
+                    return Err(std::io::Error::last_os_error());
+                }
+                Ok(())
+            });
+        }
+        let mut leader = command.spawn().expect("leader spawns");
+        let leader_pid = leader.id().expect("pid") as i32;
+        assert!(
+            supervisor
+                .verify_group(leader_pid, &spec, SpawnFaultPoint::None)
+                .is_ok(),
+            "a live session leader verifies normally"
+        );
+        // Cleanup the test-created child by exact pid.
+        // SAFETY: our own test child.
+        unsafe {
+            libc::kill(leader_pid, libc::SIGKILL);
+        }
+        let _ = leader.wait().await;
+    }
+
+    #[tokio::test]
+    async fn drain_records_a_panicked_task_honestly() {
+        let id = ProcessHandleId::mint().expect("mint");
+        let record = dummy_record(id);
+        let panicking = tokio::spawn(async {
+            panic!("a real pump panic");
+        });
+        let facts = drain_output_tasks(
+            &record,
+            [("stdout", Some(panicking)), ("stderr", None)],
+            Duration::from_secs(5),
+            Duration::from_secs(5),
+        )
+        .await;
+        assert_eq!(facts.panicked, 1, "{facts:?}");
+        assert!(!facts.drained_stdio, "a panic is not a natural EOF");
+        assert!(facts.all_ends_observed, "the panic end was observed");
+        let snapshot = record.snapshot();
+        assert!(
+            snapshot
+                .audit
+                .iter()
+                .any(|e| e.kind == "output_task_panicked"),
+            "{snapshot:?}"
+        );
     }
 }

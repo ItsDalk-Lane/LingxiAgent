@@ -1,0 +1,20 @@
+=== run 1 ===
+test r04_a09_managed_tree_is_killed_and_the_unrelated_sentinel_survives ... FAILED
+test adversarial_both_streams_blocking_still_completes ... ok
+test environment_is_whitelist_plus_explicit_overrides_never_full_inherit ... FAILED
+test adversarial_cancel_racing_natural_exit_keeps_invariants ... ok
+test adversarial_output_storm_is_bounded_truncated_and_spilled ... ok
+---- r04_a09_managed_tree_is_killed_and_the_unrelated_sentinel_survives stdout ----
+    r04_a09_managed_tree_is_killed_and_the_unrelated_sentinel_survives
+test result: FAILED. 12 passed; 2 failed; 0 ignored; 0 measured; 0 filtered out; finished in 3.60s
+error: test failed, to rerun pass `-p lingxi-service --test r04_t05_process_tools`
+=== run 2 ===
+test result: ok. 14 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 3.52s
+=== run 3 ===
+test result: ok. 14 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 3.64s
+=== run 4 ===
+test result: ok. 14 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 3.58s
+=== run 5 ===
+test result: ok. 14 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 3.60s
+=== run 6 ===
+test result: ok. 14 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 3.61s

@@ -1,0 +1,21 @@
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.08s
+     Running tests/r04_t05_process_tools.rs (rust/target/debug/deps/r04_t05_process_tools-6a5ae24a4a6cd9b7)
+
+running 14 tests
+test persistent_terminal_lifetime_is_explicit_and_shutdown_is_bounded ... ok
+test adversarial_cancel_racing_natural_exit_keeps_invariants ... ok
+test r04_a09_managed_tree_is_killed_and_the_unrelated_sentinel_survives ... ok
+test process_tools_go_through_the_gateway_policy_and_cwd_authorization ... ok
+test environment_is_whitelist_plus_explicit_overrides_never_full_inherit ... ok
+test ask_session_exec_command_round_trips_the_approval_face ... ok
+test adversarial_output_storm_is_bounded_truncated_and_spilled ... ok
+test adversarial_both_streams_blocking_still_completes ... ok
+test adversarial_cross_session_and_forged_write_stdin_are_refused ... ok
+test adversarial_parent_exit_with_grandchild_holding_the_pipe_is_bounded ... ok
+test r04_a10_pty_input_reads_resize_interrupt_and_exit ... ok
+test adversarial_utf8_output_survives_chunk_splits ... ok
+test adversarial_unresponsive_process_times_out_within_the_bound ... ok
+test terminate_after_natural_exit_is_already_terminal_and_spawn_failures_are_loud ... ok
+
+test result: ok. 14 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 3.59s
+

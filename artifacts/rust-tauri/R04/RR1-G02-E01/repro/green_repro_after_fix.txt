@@ -1,0 +1,19 @@
+   Compiling lingxi-service v0.0.0 (/Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-service)
+warning: function `process_alive` is never used
+  --> crates/lingxi-service/tests/r04_rr1_f02_reaper_cleanup.rs:85:4
+   |
+85 | fn process_alive(pid: i32) -> bool {
+   |    ^^^^^^^^^^^^^
+   |
+   = note: `#[warn(dead_code)]` (part of `#[warn(unused)]`) on by default
+
+warning: `lingxi-service` (test "r04_rr1_f02_reaper_cleanup") generated 1 warning
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.83s
+     Running tests/r04_rr1_f02_reaper_cleanup.rs (rust/target/debug/deps/r04_rr1_f02_reaper_cleanup-50b09fa6e18e0cdd)
+
+running 1 test
+test rr1_f02_repro_grandchild_pump_outlives_the_grace_and_mutates_the_settled_collector ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 2.73s
+
+CARGO_EXIT_CODE=0

@@ -1,0 +1,30 @@
+== repro (red on baseline -> green on fix) ==
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 9 filtered out; finished in 2.77s
+exit=0
+== C01 ==
+test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 8 filtered out; finished in 3.07s
+exit=0
+== C02 ==
+test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 8 filtered out; finished in 4.03s
+exit=0
+== C03 ==
+test result: ok. 3 passed; 0 failed; 0 ignored; 0 measured; 7 filtered out; finished in 0.51s
+exit=0
+== C04 ==
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 9 filtered out; finished in 1.74s
+exit=0
+== same-family fast-exit regression ==
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 9 filtered out; finished in 0.14s
+exit=0
+== unit tests (supervisor) ==
+test result: ok. 15 passed; 0 failed; 0 ignored; 0 measured; 281 filtered out; finished in 0.06s
+exit=0
+== G01 suite re-run ==
+test result: ok. 9 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 4.39s
+exit=0
+== strengthened adversarial_parent_exit ==
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 13 filtered out; finished in 0.66s
+exit=0
+== A10 leg isolated ==
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 13 filtered out; finished in 0.58s
+exit=0

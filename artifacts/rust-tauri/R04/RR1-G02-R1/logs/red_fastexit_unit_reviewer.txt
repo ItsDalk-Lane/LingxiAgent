@@ -1,0 +1,22 @@
+   Compiling lingxi-service v0.0.0 (/private/tmp/r04-g02-candidate/rust/crates/lingxi-service)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 3.26s
+     Running unittests src/lib.rs (rust/target/debug/deps/lingxi_service-8c78af55f7759b0c)
+
+running 1 test
+test procsupervisor::tests::verify_group_admits_a_reaped_child_of_ours_and_the_live_leader ... FAILED
+
+failures:
+
+---- procsupervisor::tests::verify_group_admits_a_reaped_child_of_ours_and_the_live_leader stdout ----
+
+thread 'procsupervisor::tests::verify_group_admits_a_reaped_child_of_ours_and_the_live_leader' (3212674) panicked at crates/lingxi-service/src/procsupervisor.rs:3113:9:
+a reaped-and-gone pid of our just-spawned child admits the record (the              baseline refused it with a false EXEC_SPAWN_FAILED)
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+
+
+failures:
+    procsupervisor::tests::verify_group_admits_a_reaped_child_of_ours_and_the_live_leader
+
+test result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 295 filtered out; finished in 0.01s
+
+error: test failed, to rerun pass `-p lingxi-service --lib`

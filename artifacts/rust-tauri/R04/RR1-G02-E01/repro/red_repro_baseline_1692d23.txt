@@ -1,0 +1,22 @@
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.08s
+     Running tests/r04_rr1_f02_reaper_cleanup.rs (rust/target/debug/deps/r04_rr1_f02_reaper_cleanup-50b09fa6e18e0cdd)
+
+running 1 test
+test rr1_f02_repro_grandchild_pump_outlives_the_grace_and_mutates_the_settled_collector ... FAILED
+
+failures:
+
+---- rr1_f02_repro_grandchild_pump_outlives_the_grace_and_mutates_the_settled_collector stdout ----
+
+thread 'rr1_f02_repro_grandchild_pump_outlives_the_grace_and_mutates_the_settled_collector' (2992684) panicked at crates/lingxi-service/tests/r04_rr1_f02_reaper_cleanup.rs:197:5:
+the settled collector CHANGED after the terminal phase (total_bytes Some((12, 21))): a pump task survived the stdio grace and kept mutating settled state
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+
+
+failures:
+    rr1_f02_repro_grandchild_pump_outlives_the_grace_and_mutates_the_settled_collector
+
+test result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 0 filtered out; finished in 1.01s
+
+error: test failed, to rerun pass `-p lingxi-service --test r04_rr1_f02_reaper_cleanup`
+CARGO_EXIT_CODE=101

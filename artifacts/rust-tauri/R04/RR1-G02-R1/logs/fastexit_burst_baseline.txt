@@ -1,0 +1,9 @@
+   Compiling lingxi-service v0.0.0 (/private/tmp/r04-g02-baseline/rust/crates/lingxi-service)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.35s
+     Running tests/rr1_g02_r01_fastexit_burst.rs (rust/target/debug/deps/rr1_g02_r01_fastexit_burst-b4d5f328e6a439dc)
+
+running 1 test
+test reviewer_fastexit_burst_no_false_refusals ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 2.00s
+

@@ -1,0 +1,14 @@
+--- run 1 done
+--- run 2 done
+--- run 3 done
+test ask_session_exec_command_round_trips_the_approval_face ... FAILED
+thread 'ask_session_exec_command_round_trips_the_approval_face' (3064992) panicked at crates/lingxi-service/tests/r04_t05_process_tools.rs:1485:5:
+test result: FAILED. 13 passed; 1 failed; 0 ignored; 0 measured; 0 filtered out; finished in 3.61s
+--- run 4 done
+--- run 5 done
+--- run 6 done
+test ask_session_exec_command_round_trips_the_approval_face ... FAILED
+thread 'ask_session_exec_command_round_trips_the_approval_face' (3065457) panicked at crates/lingxi-service/tests/r04_t05_process_tools.rs:1485:5:
+test result: FAILED. 13 passed; 1 failed; 0 ignored; 0 measured; 0 filtered out; finished in 3.63s
+--- run 7 done
+--- run 8 done
