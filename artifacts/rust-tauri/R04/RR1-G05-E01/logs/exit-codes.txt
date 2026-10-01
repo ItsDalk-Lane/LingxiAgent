@@ -1,0 +1,15 @@
+a_fmt_check exit=0
+b_clippy exit=0
+d_check_contracts exit=0
+e_check_boundaries exit=0
+c_workspace_test exit=0
+f_verify_stage_R04 exit=1
+f_verify_stage_R04 exit=0
+g_verify_stage_R03 exit=0
+h_negative_rr1 exit=1
+h_negative_rr1 exit=1
+h_negative_rr1 exit=0
+i_negative_t08_c03b exit=1
+i_negative_t08_c03b exit=0
+f_verify_stage_R04 exit=0
+g_verify_stage_R03 exit=0

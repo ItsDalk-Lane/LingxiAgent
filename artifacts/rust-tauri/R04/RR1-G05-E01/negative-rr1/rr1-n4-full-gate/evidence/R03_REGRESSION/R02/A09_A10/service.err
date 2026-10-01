@@ -1,0 +1,42 @@
+2026-10-01T19:14:05.972035Z  INFO lingxi_service: data root resolved effective_home=/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T//lingxi-r02t05-home-gLHbzg source=cli ignored_sources=none
+2026-10-01T19:14:05.973418Z  INFO lingxi_service: data root prepared (canonicalized; runtime dir private 0700) canonical_home=/private/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-r02t05-home-gLHbzg runtime_dir=/private/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-r02t05-home-gLHbzg/lingxi-service
+2026-10-01T19:14:05.973939Z  INFO lingxi_service: single-writer lock acquired instance_id=34df6f840a1225f998a3618212de7fd8 start_nonce=abfcde4935530c95 pid=62330 entropy="os-random-device" lock=/private/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-r02t05-home-gLHbzg/lingxi-service/instance.lock network_mode=loopback
+2026-10-01T19:14:05.989939Z  INFO lingxi_service: data-epoch gate passed home=/private/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-r02t05-home-gLHbzg decision=ProceedStampedNew(EpochStamp { format: V2, minimum_reader_epoch: 1, committed_data_epoch: 1, last_version: Some("0.0.0") })
+2026-10-01T19:14:06.038606Z  INFO lingxi_adapters::storage::run_store: run database migrated db=/private/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-r02t05-home-gLHbzg/lingxi-service/data/runs.db applied=[1, 2, 3, 4] version=4
+2026-10-01T19:14:06.039656Z  INFO lingxi_service: auth service bootstrapped (per-start loopback token, owner-only); run database migrated and seeded local_token_file=/private/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-r02t05-home-gLHbzg/lingxi-service/local-token.json run_database=/private/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-r02t05-home-gLHbzg/lingxi-service/data/runs.db
+2026-10-01T19:14:06.049019Z  INFO lingxi_service: instance record published (atomic write) record=/private/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-r02t05-home-gLHbzg/lingxi-service/instance.json bind_addr=127.0.0.1:59734
+2026-10-01T19:14:06.248317Z  INFO lingxi_service::sessions: run settled through the single finalize path run_id=run_000001a0f8e36127_000001 session_id="sess_local_alpha" outcome=completed.no_final.no_provider_configured input_chars=10 input_bytes=10
+2026-10-01T19:14:06.248513Z  INFO lingxi_service: request handled request_id=req-96719484991b19ab8d8ed0a4d76fa0c4 method=POST path=/lingxi/v1/sessions/sess_local_alpha/execute status=200
+2026-10-01T19:14:06.249578Z  INFO lingxi_service::sessions: run settled through the single finalize path run_id=run_000001a0f8e36128_000002 session_id="sess_local_alpha" outcome=completed.no_final.no_provider_configured input_chars=10 input_bytes=10
+2026-10-01T19:14:06.249695Z  INFO lingxi_service: request handled request_id=req-b08575e5fd5c14f50442011aae69cadf method=POST path=/lingxi/v1/sessions/sess_local_alpha/execute status=200
+2026-10-01T19:14:06.250144Z  INFO lingxi_service: request handled request_id=req-87c1b41349053ec2c450c0bf571213a8 method=GET path=/lingxi/v1/ws status=101
+2026-10-01T19:14:06.251709Z  INFO lingxi_service::sessions: run settled through the single finalize path run_id=run_000001a0f8e3612a_000003 session_id="sess_local_alpha" outcome=completed.no_final.no_provider_configured input_chars=12 input_bytes=12
+2026-10-01T19:14:06.251831Z  INFO lingxi_service: request handled request_id=req-91ef0e320c5a94120ee86210692197de method=POST path=/lingxi/v1/sessions/sess_local_alpha/execute status=200
+2026-10-01T19:14:06.252660Z  INFO lingxi_service::sessions: run settled through the single finalize path run_id=run_000001a0f8e3612c_000004 session_id="sess_local_alpha" outcome=completed.no_final.no_provider_configured input_chars=12 input_bytes=12
+2026-10-01T19:14:06.252764Z  INFO lingxi_service: request handled request_id=req-9b11581af3f734927954a53236927f2b method=POST path=/lingxi/v1/sessions/sess_local_alpha/execute status=200
+2026-10-01T19:14:06.253586Z  INFO lingxi_service::sessions: run settled through the single finalize path run_id=run_000001a0f8e3612d_000005 session_id="sess_local_alpha" outcome=completed.no_final.no_provider_configured input_chars=12 input_bytes=12
+2026-10-01T19:14:06.253708Z  INFO lingxi_service: request handled request_id=req-4fc702187a41225aff0ac37f6e57801b method=POST path=/lingxi/v1/sessions/sess_local_alpha/execute status=200
+2026-10-01T19:14:06.254484Z  INFO lingxi_service::sessions: run settled through the single finalize path run_id=run_000001a0f8e3612e_000006 session_id="sess_local_alpha" outcome=completed.no_final.no_provider_configured input_chars=12 input_bytes=12
+2026-10-01T19:14:06.254583Z  INFO lingxi_service: request handled request_id=req-f7f30070546ef3e7fddf058ea09fc770 method=POST path=/lingxi/v1/sessions/sess_local_alpha/execute status=200
+2026-10-01T19:14:07.265420Z  INFO lingxi_service::sessions: run settled through the single finalize path run_id=run_000001a0f8e3651e_000007 session_id="sess_local_alpha" outcome=completed.no_final.no_provider_configured input_chars=8 input_bytes=8
+2026-10-01T19:14:07.265721Z  INFO lingxi_service: request handled request_id=req-3771053863dc73800d103afdf4612146 method=POST path=/lingxi/v1/sessions/sess_local_alpha/execute status=200
+2026-10-01T19:14:07.267574Z  INFO lingxi_service: request handled request_id=req-9cac082fce1318f70f4c3eb68196622d method=GET path=/lingxi/v1/sessions/sess_local_alpha/events status=200
+2026-10-01T19:14:07.270006Z  INFO lingxi_service: request handled request_id=req-3ce80737895cc392414f94cf4f483a21 method=GET path=/lingxi/v1/sessions/sess_local_alpha/events status=409
+2026-10-01T19:14:07.271004Z  INFO lingxi_service: request handled request_id=req-20bc8c2bbdd9f77da3a572bf2e5f7f45 method=GET path=/lingxi/v1/ws status=101
+2026-10-01T19:14:07.274973Z  INFO lingxi_service: request handled request_id=req-25b28479fc48e8c87e318fb3c4a614a0 method=GET path=/lingxi/v1/sessions/sess_local_alpha/events status=200
+2026-10-01T19:14:07.277163Z  INFO lingxi_service::sessions: run settled through the single finalize path run_id=run_000001a0f8e3652c_000008 session_id="sess_local_beta" outcome=completed.no_final.no_provider_configured input_chars=8 input_bytes=8
+2026-10-01T19:14:07.277361Z  INFO lingxi_service: request handled request_id=req-bfa4461427b73c53f5f4516280712c96 method=POST path=/lingxi/v1/sessions/sess_local_beta/execute status=200
+2026-10-01T19:14:07.278290Z  INFO lingxi_service: request handled request_id=req-5fb54b5585caa9d57fd305f701201c0a method=GET path=/lingxi/v1/sessions/sess_local_beta/events status=200
+2026-10-01T19:14:07.279847Z  INFO lingxi_service: request handled request_id=req-d4a2ff2c4c40c9bee92da3b471846ad9 method=GET path=/lingxi/v1/sessions/sess_local_beta/events status=409
+2026-10-01T19:14:07.280484Z  INFO lingxi_service: request handled request_id=req-ccccee5a4b48602634a06e32e21c8c81 method=GET path=/lingxi/v1/ws status=101
+2026-10-01T19:14:07.282789Z  INFO lingxi_service: request handled request_id=req-34788d9626dc31b124fb0b95235b790a method=GET path=/lingxi/v1/ws status=101
+2026-10-01T19:14:10.288846Z  INFO lingxi_service: request handled request_id=req-ea74ce450f45d295b6963ddbf1e305ab method=GET path=/lingxi/v1/sessions/stream_never_existed/events status=404
+2026-10-01T19:14:10.291279Z  INFO lingxi_service: request handled request_id=req-f50d2872150609a45dc2d02194c402c0 method=GET path=/lingxi/v1/ws status=101
+2026-10-01T19:14:13.298652Z  INFO lingxi_service: request handled request_id=req-ef3eed976b3e0d77f20d9d327ad48e1f method=GET path=/lingxi/v1/ws status=101
+2026-10-01T19:14:16.306698Z  INFO lingxi_service: request handled request_id=req-245479584ddd0bb42f5b2c20c7bbabf8 method=GET path=/lingxi/v1/ws status=101
+2026-10-01T19:14:20.509355Z  INFO lingxi_service: request handled request_id=req-d25bc2f02dd37ff1916ebfed7b2ca28d method=POST path=/lingxi/v1/devices/credentials status=201
+2026-10-01T19:14:21.677731Z  INFO lingxi_service: request handled request_id=req-0b13c779a57fdec3323f8adcedd43b86 method=GET path=/lingxi/v1/sessions/sess_local_alpha/events status=403
+2026-10-01T19:14:21.870711Z  INFO lingxi_service: shutdown signal: SIGTERM
+2026-10-01T19:14:21.872083Z  INFO lingxi_service::shutdown: run database closed (drained, WAL truncated) phase=storage_close
+2026-10-01T19:14:21.872443Z  INFO lingxi_service::shutdown: own instance record removed, lock released phase=record_cleanup
+2026-10-01T19:14:21.872502Z  INFO lingxi_service: lingxi-service stopped cleanly (run database closed, own record removed, lock released)

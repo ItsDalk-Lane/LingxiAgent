@@ -2486,4 +2486,387 @@ mod map_tests {
             }
         }
     }
+
+    // ── R04 RR1 repair round G05 (CLOSE-C01, 2026-10-01): pin the RR1
+    // registration ─────────────────────────────────────────────────────────
+    //
+    // The five adversarial-repair findings F01–F05 (repair candidates
+    // G01..G04 = 1692d2314/da15c4bd9/614fab1af/1285c3bf6) entered the
+    // formal R04 gate as first-class REQUIRED scenarios with their own
+    // producer (`r04_rr1_repair_suites` →
+    // scripts/rust-tauri/r04_rr1_g05_repair_suites.sh). The scenario
+    // registration, the producer's run pin table and its per-C-ID test
+    // ownership table exist only in the map + the script — deleting any
+    // of them, lowering a pinned count, or dropping a C-ID would
+    // otherwise leave a silent hole the gate cannot see. These tests pin
+    // all three; they run inside `cargo test` (itself the gate's
+    // `rust_test_workspace` command), so any deletion/drift turns the
+    // stage gate red with the gap named here.
+
+    /// The RR1 repair runs and their EXACT pinned executed-test counts, as
+    /// the producer script's `pin <run> <count> <F-ID>` table must declare
+    /// them (no missing run, no extra run, no count drift). A `lib/`-
+    /// prefixed run is one exact lib unit test; a bare run is one
+    /// integration suite. 6 integration suites (37 tests) + 26 lib unit
+    /// tests = 63 tests (the F04 pure-logic family and the G04 exectools
+    /// output-integrity family are unit tests by design — the G04 report's
+    /// C-ID evidence mapping is mirrored verbatim).
+    const R04_RR1_PIN_TABLE: &[(&str, u32, &str)] = &[
+        ("r04_t05_registry_capacity", 9, "RR1-F01"),
+        ("r04_rr1_f02_reaper_cleanup", 11, "RR1-F02"),
+        ("r04_rr1_f03_stop_honesty", 7, "RR1-F03"),
+        ("r04_rr1_f04_pty_consumption", 1, "RR1-F04"),
+        ("r04_rr1_f05_output_integrity", 7, "RR1-F05"),
+        ("r04_rr1_f05_spill_failure", 2, "RR1-F05"),
+        (
+            "lib/procsupervisor::tests::live_slot_reservation_enforces_the_cap_atomically",
+            1,
+            "RR1-F01",
+        ),
+        (
+            "lib/procsupervisor::tests::live_slot_commit_transfers_release_to_settle_exactly_once",
+            1,
+            "RR1-F01",
+        ),
+        (
+            "lib/procsupervisor::tests::live_slot_drop_after_panic_style_abandon_still_releases",
+            1,
+            "RR1-F01",
+        ),
+        (
+            "lib/procsupervisor::tests::group_signal_is_skipped_once_the_child_reap_is_published",
+            1,
+            "RR1-F02",
+        ),
+        (
+            "lib/procsupervisor::tests::group_signal_is_skipped_when_the_kernel_identity_disagrees",
+            1,
+            "RR1-F02",
+        ),
+        (
+            "lib/procsupervisor::tests::exit_fact_status_codes_follow_the_shell_convention",
+            1,
+            "RR1-F03",
+        ),
+        (
+            "lib/procsupervisor::tests::terminal_facts_never_fabricate_an_exit_for_unconfirmed_or_live_phases",
+            1,
+            "RR1-F03",
+        ),
+        (
+            "lib/procsupervisor::tests::transcript_delivers_split_multibyte_characters_intact",
+            1,
+            "RR1-F04",
+        ),
+        (
+            "lib/procsupervisor::tests::transcript_mixed_chunk_prefix_is_consumed_byte_exactly_r04_rr1_f04_c01",
+            1,
+            "RR1-F04",
+        ),
+        (
+            "lib/procsupervisor::tests::transcript_idle_polls_after_a_partial_delivery_hold_back_without_loss",
+            1,
+            "RR1-F04",
+        ),
+        (
+            "lib/procsupervisor::tests::transcript_property_valid_input_reassembles_exactly",
+            1,
+            "RR1-F04",
+        ),
+        (
+            "lib/procsupervisor::tests::transcript_property_invalid_bytes_replaced_exactly_once",
+            1,
+            "RR1-F04",
+        ),
+        (
+            "lib/procsupervisor::tests::transcript_property_eviction_accounting_counts_only_real_loss",
+            1,
+            "RR1-F04",
+        ),
+        (
+            "lib/procsupervisor::tests::transcript_ring_overflow_while_holding_back_counts_only_real_evictions",
+            1,
+            "RR1-F04",
+        ),
+        (
+            "lib/procsupervisor::tests::transcript_boundary_across_many_chunks_with_interleaved_polls",
+            1,
+            "RR1-F04",
+        ),
+        (
+            "lib/procsupervisor::tests::transcript_force_delivery_flushes_a_dangling_partial",
+            1,
+            "RR1-F04",
+        ),
+        (
+            "lib/procsupervisor::tests::transcript_ring_drop_of_undelivered_is_counted_honestly",
+            1,
+            "RR1-F04",
+        ),
+        (
+            "lib/exectools::tests::transcript_spill_claim_vocabulary_is_state_exclusive",
+            1,
+            "RR1-F05",
+        ),
+        (
+            "lib/exectools::tests::full_output_claim_vocabulary_is_state_exclusive",
+            1,
+            "RR1-F05",
+        ),
+        (
+            "lib/exectools::tests::spill_resource_ref_never_claims_full_when_capped_or_failed",
+            1,
+            "RR1-F05",
+        ),
+        (
+            "lib/exectools::tests::assemble_retained_output_small_stream_is_whole_and_exact",
+            1,
+            "RR1-F05",
+        ),
+        (
+            "lib/exectools::tests::assemble_retained_output_evicted_middle_is_counted_and_marked",
+            1,
+            "RR1-F05",
+        ),
+        (
+            "lib/exectools::tests::truncate_head_tail_single_huge_ascii_line_keeps_head_and_tail",
+            1,
+            "RR1-F05",
+        ),
+        (
+            "lib/exectools::tests::truncate_head_tail_multibyte_line_cuts_on_char_boundaries",
+            1,
+            "RR1-F05",
+        ),
+        (
+            "lib/exectools::tests::truncate_head_tail_newline_only_at_end_keeps_both_markers",
+            1,
+            "RR1-F05",
+        ),
+        (
+            "lib/exectools::tests::truncate_head_tail_small_output_stays_whole",
+            1,
+            "RR1-F05",
+        ),
+    ];
+
+    /// The 22 five-F acceptance C-IDs of the RR1 checklist and the EXACT
+    /// number of executed tests the producer's `cid` table must own for
+    /// each (the checklist's other four C-IDs, CLOSE-C01..C04, are
+    /// closeout checks executed by the orchestrator — never stage-map
+    /// scenarios). A dropped/added/renamed C-ID line, or a case losing or
+    /// gaining a test, turns this red.
+    const R04_RR1_CASE_TABLE: &[(&str, usize)] = &[
+        ("R04-RR1-F01-C01", 3),
+        ("R04-RR1-F01-C02", 3),
+        ("R04-RR1-F01-C03", 5),
+        ("R04-RR1-F01-C04", 1),
+        ("R04-RR1-F02-C01", 4),
+        ("R04-RR1-F02-C02", 5),
+        ("R04-RR1-F02-C03", 3),
+        ("R04-RR1-F02-C04", 1),
+        ("R04-RR1-F03-C01", 2),
+        ("R04-RR1-F03-C02", 1),
+        ("R04-RR1-F03-C03", 1),
+        ("R04-RR1-F03-C04", 3),
+        ("R04-RR1-F03-C05", 2),
+        ("R04-RR1-F04-C01", 2),
+        ("R04-RR1-F04-C02", 1),
+        ("R04-RR1-F04-C03", 7),
+        ("R04-RR1-F04-C04", 1),
+        ("R04-RR1-F05-C01", 5),
+        ("R04-RR1-F05-C02", 5),
+        ("R04-RR1-F05-C03", 4),
+        ("R04-RR1-F05-C04", 2),
+        ("R04-RR1-F05-C05", 2),
+    ];
+
+    fn read_rr1_producer_script() -> String {
+        let repo_root = Path::new(env!("CARGO_MANIFEST_DIR"))
+            .ancestors()
+            .nth(3)
+            .expect("xtask lives at rust/crates/xtask");
+        std::fs::read_to_string(repo_root.join("scripts/rust-tauri/r04_rr1_g05_repair_suites.sh"))
+            .expect("the registered r04_rr1_repair_suites producer script must exist")
+    }
+
+    fn parse_rr1_pin_lines(script: &str) -> Vec<(String, u32, String)> {
+        let mut declared = Vec::new();
+        for line in script.lines() {
+            let line = line.trim();
+            if let Some(rest) = line.strip_prefix("pin ") {
+                let mut fields = rest.split_whitespace();
+                match (fields.next(), fields.next(), fields.next(), fields.next()) {
+                    (Some(run), Some(count), Some(fid), None) => declared.push((
+                        run.to_string(),
+                        count.parse().expect("pin count is an integer"),
+                        fid.to_string(),
+                    )),
+                    _ => panic!("unparseable pin line in the RR1 producer script: {line:?}"),
+                }
+            }
+        }
+        declared
+    }
+
+    #[test]
+    fn r04_production_map_registers_the_rr1_repair_scenarios() {
+        let map = parse_production_r04();
+        // Additive-only: the frozen T01..T08 registration (16 A-IDs +
+        // SUP01/03/05) plus exactly the five RR1-F scenarios — nothing may
+        // be dropped or re-graded. The per-id membership check runs FIRST
+        // so a deleted scenario is named, then the total pins the
+        // additive-only count (an invented extra scenario is equally red).
+        for id in [
+            "R04-RR1-F01",
+            "R04-RR1-F02",
+            "R04-RR1-F03",
+            "R04-RR1-F04",
+            "R04-RR1-F05",
+        ] {
+            let scenario = map
+                .scenarios
+                .iter()
+                .find(|s| s.id == id)
+                .unwrap_or_else(|| {
+                    panic!(
+                        "R04 map dropped the RR1 repair scenario {id} — the F01-F05 \
+                         adversarial-repair counterexamples would leave the formal acceptance"
+                    )
+                });
+            assert_eq!(scenario.requirement, "REQUIRED", "{id} re-graded");
+            assert_eq!(
+                scenario.command_refs,
+                vec!["r04_rr1_repair_suites", "rust_test_workspace"],
+                "scenario {id} commandRefs drifted from the G05 registration"
+            );
+        }
+        assert_eq!(
+            map.scenarios.len(),
+            24,
+            "the R04 map must keep exactly the 16 A-IDs + SUP01/03/05 + the five \
+             R04-RR1-F01..F05 repair scenarios (additive-only — an invented extra \
+             scenario is as red as a dropped one)"
+        );
+        let command = map
+            .commands
+            .iter()
+            .find(|c| c.key == "r04_rr1_repair_suites")
+            .unwrap_or_else(|| panic!("R04 map dropped the r04_rr1_repair_suites producer"));
+        assert_eq!(
+            command.argv,
+            vec![
+                "bash",
+                "scripts/rust-tauri/r04_rr1_g05_repair_suites.sh",
+                "{EVIDENCE}/R04_RR1_REPAIR"
+            ]
+        );
+        assert!(command
+            .evidence_paths
+            .contains(&"{EVIDENCE}/R04_RR1_REPAIR/rr1-cases.json".to_string()));
+        assert!(command
+            .evidence_paths
+            .contains(&"{EVIDENCE}/R04_RR1_REPAIR/summary.txt".to_string()));
+        // The producer script must exist in the tree (a deleted producer is
+        // a command that can only ever fail).
+        let _ = read_rr1_producer_script();
+    }
+
+    #[test]
+    fn r04_rr1_producer_pin_table_matches_the_registered_suites() {
+        // The producer's `pin <run> <count> <F-ID>` table must mirror the
+        // G05 registration EXACTLY: a dropped run line, an added line, or a
+        // lowered count is the fake-green hole this pins.
+        let declared = parse_rr1_pin_lines(&read_rr1_producer_script());
+        let expected: Vec<(String, u32, String)> = R04_RR1_PIN_TABLE
+            .iter()
+            .map(|(run, count, fid)| (run.to_string(), *count, fid.to_string()))
+            .collect();
+        assert_eq!(
+            declared, expected,
+            "the RR1 repair_suites producer pin table drifted from the registered \
+             run/count/F-ID mapping (missing run, extra run, or count drift)"
+        );
+    }
+
+    #[test]
+    fn r04_rr1_producer_case_table_owns_every_check_id_exactly() {
+        let script = read_rr1_producer_script();
+        let pins = parse_rr1_pin_lines(&script);
+        // Parse the `cid <C-ID> <run> <name1>+<name2>...` ownership lines.
+        let mut declared: Vec<(String, String, Vec<String>)> = Vec::new();
+        for line in script.lines() {
+            let line = line.trim();
+            if let Some(rest) = line.strip_prefix("cid ") {
+                let mut fields = rest.split_whitespace();
+                match (fields.next(), fields.next(), fields.next(), fields.next()) {
+                    (Some(cid), Some(run), Some(names), None) => {
+                        let names: Vec<String> = names.split('+').map(str::to_string).collect();
+                        assert!(
+                            !names.is_empty(),
+                            "cid line {line:?} owns no test name — a case with no \
+                             machine-checked test is the exit-0-only fake-green path"
+                        );
+                        declared.push((cid.to_string(), run.to_string(), names));
+                    }
+                    _ => panic!("unparseable cid line in the RR1 producer script: {line:?}"),
+                }
+            }
+        }
+        // (a) The owned C-ID set and the per-case test-name counts must
+        //     equal the registered checklist table exactly (漏 ID fails
+        //     closed; so does an invented one).
+        let mut counts: std::collections::BTreeMap<String, usize> = Default::default();
+        for (cid, _run, names) in &declared {
+            *counts.entry(cid.clone()).or_insert(0) += names.len();
+        }
+        let actual: Vec<(String, usize)> = counts.into_iter().collect();
+        let expected: Vec<(String, usize)> = R04_RR1_CASE_TABLE
+            .iter()
+            .map(|(cid, count)| (cid.to_string(), *count))
+            .collect();
+        assert_eq!(
+            actual, expected,
+            "the RR1 producer cid table drifted from the 22 five-F acceptance C-IDs \
+             (dropped, added, or re-counted case)"
+        );
+        // (b) Every cid line must reference a REGISTERED pin-table run whose
+        //     F-ID matches the case id — a case evidenced by a run that
+        //     never happens (or belongs to another finding) is a hole.
+        for (cid, run, _) in &declared {
+            let pin = pins
+                .iter()
+                .find(|(pinned_run, _, _)| pinned_run == run)
+                .unwrap_or_else(|| {
+                    panic!("cid {cid} references run {run:?} which the producer pin table does not register")
+                });
+            assert!(
+                cid.starts_with(&format!("R04-{}-", pin.2)),
+                "cid {cid} is evidenced by run {run:?} pinned for {FID}",
+                FID = pin.2
+            );
+        }
+        // (c) No test name may be owned by two C-IDs.
+        let mut seen: Vec<(&str, &str)> = Vec::new();
+        for (cid, run, names) in &declared {
+            for name in names {
+                let key = (run.as_str(), name.as_str());
+                assert!(
+                    !seen.contains(&key),
+                    "test {name:?} in run {run:?} is claimed by two C-IDs (last {cid})"
+                );
+                seen.push(key);
+            }
+        }
+        // (d) The union of owned names must equal the total pinned executed
+        //     tests — every executed test is owned by exactly one C-ID, so
+        //     a run that executes tests no case owns cannot pass silently.
+        let total_names: usize = declared.iter().map(|(_, _, names)| names.len()).sum();
+        let total_pinned: u32 = pins.iter().map(|(_, count, _)| *count).sum();
+        assert_eq!(
+            total_names as u32, total_pinned,
+            "the cid table owns {total_names} test names but the pin table executes \
+             {total_pinned} tests — orphan executions or phantom ownership"
+        );
+    }
 }

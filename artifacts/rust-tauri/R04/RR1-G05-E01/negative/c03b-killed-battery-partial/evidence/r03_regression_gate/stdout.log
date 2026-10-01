@@ -1,0 +1,23 @@
+xtask: verify-stage R03 [cargo test --manifest-path rust/Cargo.toml --workspace --locked] > /Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R04/RR1-G05-E01/negative/c03b-midrun-input-change/evidence/R03_REGRESSION/rust_test_workspace
+xtask: verify-stage R03 [rust_test_workspace] FAIL
+xtask: verify-stage R03 [bash scripts/rust-tauri/r03_t08_matrix.sh {EVIDENCE}/A15] > /Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R04/RR1-G05-E01/negative/c03b-midrun-input-change/evidence/R03_REGRESSION/a15_combo_and_leaves
+xtask: verify-stage R03 [a15_combo_and_leaves] PASS
+xtask: verify-stage R03 [bash scripts/rust-tauri/r02_t04_storage_tx.sh {EVIDENCE}/R02/A07_A08] > /Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R04/RR1-G05-E01/negative/c03b-midrun-input-change/evidence/R03_REGRESSION/r02_storage_tx
+xtask: verify-stage R03 [r02_storage_tx] PASS
+xtask: verify-stage R03 [bash scripts/rust-tauri/r02_t08_full_chain_smoke.sh {EVIDENCE}/R02/A15] > /Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R04/RR1-G05-E01/negative/c03b-midrun-input-change/evidence/R03_REGRESSION/r02_full_chain
+xtask: verify-stage R03 [r02_full_chain] PASS
+xtask: verify-stage R03 [bash scripts/rust-tauri/r02_t06_backup_restore.sh {EVIDENCE}/R02/A11] > /Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R04/RR1-G05-E01/negative/c03b-midrun-input-change/evidence/R03_REGRESSION/r02_backup_restore
+xtask: verify-stage R03 [r02_backup_restore] PASS
+xtask: verify-stage R03 [bash scripts/rust-tauri/r02_t06_recovery_drill.sh {EVIDENCE}/R02/A12] > /Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R04/RR1-G05-E01/negative/c03b-midrun-input-change/evidence/R03_REGRESSION/r02_recovery_drill
+xtask: verify-stage R03 [r02_recovery_drill] PASS
+xtask: verify-stage R03 [cargo fmt --manifest-path rust/Cargo.toml --all -- --check] > /Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R04/RR1-G05-E01/negative/c03b-midrun-input-change/evidence/R03_REGRESSION/rust_fmt
+xtask: verify-stage R03 [rust_fmt] PASS
+xtask: verify-stage R03 [cargo clippy --manifest-path rust/Cargo.toml --workspace --all-targets --locked -- -D warnings] > /Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R04/RR1-G05-E01/negative/c03b-midrun-input-change/evidence/R03_REGRESSION/rust_clippy
+xtask: verify-stage R03 [rust_clippy] PASS
+xtask: verify-stage R03 [bash scripts/rust-tauri/r01-t02-check-generated.sh] > /Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R04/RR1-G05-E01/negative/c03b-midrun-input-change/evidence/R03_REGRESSION/check_contracts
+xtask: verify-stage R03 [check_contracts] PASS
+xtask: verify-stage R03 [python3 -B docs/rust-tauri/R01/r01_t01_check_ownership.py] > /Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R04/RR1-G05-E01/negative/c03b-midrun-input-change/evidence/R03_REGRESSION/check_boundaries
+xtask: verify-stage R03 [check_boundaries] PASS
+xtask: verify-stage R03 [bash scripts/rust-tauri/r02_t03_auth_matrix.sh {EVIDENCE}/R02/A05_A06] > /Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R04/RR1-G05-E01/negative/c03b-midrun-input-change/evidence/R03_REGRESSION/r02_auth_matrix
+xtask: verify-stage R03 [r02_auth_matrix] PASS
+xtask: verify-stage R03 [env R02_LEGACY_REGRESSION_MODE=directed-no-seal-family bash scripts/rust-tauri/r02_t08_legacy_entry_regression.sh {EVIDENCE}/R02/A16] > /Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R04/RR1-G05-E01/negative/c03b-midrun-input-change/evidence/R03_REGRESSION/r02_legacy_regression

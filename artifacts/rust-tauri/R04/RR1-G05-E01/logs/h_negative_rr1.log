@@ -1,0 +1,36 @@
+== preparing isolated copy /tmp/lingxi-r04-rr1-neg-JMLNJa (git worktree at HEAD 1285c3bf6 + uncommitted G05-E01 files) ==
+== RR1-N1: deleted the R04-RR1-F03 scenario from the copy's map; xtask map-pinning tests: ==
+case rr1-n1-delete-rr1-scenario: exit=101 gap-named=OK verdict=OK
+== RR1-N2: producer pin count tampered 9 -> 8 in the copy; xtask pin-table mirror test: ==
+case rr1-n2-tamper-pin-count: exit=101 gap-named=OK verdict=OK
+== RR1-N3: dropped the R04-RR1-F05-C05 cid ownership line in the copy; xtask C-ID coverage test: ==
+case rr1-n3-drop-cid-line: exit=101 gap-named=OK verdict=OK
+== RR1-N4: deleted the R04-RR1-F03 scenario; REAL full verify-stage R04 in the copy ==
+case rr1-n4-full-gate: exit=1 gap-named=OK verdict=OK
+[
+ {
+  "case": "rr1-n1-delete-rr1-scenario",
+  "exitCode": 101,
+  "gapNamed": "OK",
+  "verdict": "OK"
+ },
+ {
+  "case": "rr1-n2-tamper-pin-count",
+  "exitCode": 101,
+  "gapNamed": "OK",
+  "verdict": "OK"
+ },
+ {
+  "case": "rr1-n3-drop-cid-line",
+  "exitCode": 101,
+  "gapNamed": "OK",
+  "verdict": "OK"
+ },
+ {
+  "case": "rr1-n4-full-gate",
+  "exitCode": 1,
+  "gapNamed": "OK",
+  "verdict": "OK"
+ }
+]
+RESULT: every RR1 negative case failed closed with the gap named (the new registration is not an empty shell)

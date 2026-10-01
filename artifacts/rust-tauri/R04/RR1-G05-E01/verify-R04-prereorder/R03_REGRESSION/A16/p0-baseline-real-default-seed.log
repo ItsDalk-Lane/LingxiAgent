@@ -1,0 +1,69 @@
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.17s
+     Running tests/late_result_fencing_property.rs (/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T//rust-target-r03-t08-a16/debug/deps/late_result_fencing_property-561c377b272f7acc)
+
+running 1 test
+R03_T04_PROPERTY round=0 ok=0 stale=0 ghost=0 terminal=3 settle=1 replay=0 conflict=2 illegal=2
+R03_T04_PROPERTY round=1 ok=0 stale=2 ghost=1 terminal=2 settle=1 replay=0 conflict=2 illegal=2
+R03_T04_PROPERTY round=2 ok=1 stale=2 ghost=1 terminal=1 settle=1 replay=0 conflict=2 illegal=2
+R03_T04_PROPERTY round=3 ok=1 stale=1 ghost=0 terminal=3 settle=1 replay=0 conflict=2 illegal=2
+R03_T04_PROPERTY round=4 ok=0 stale=0 ghost=0 terminal=3 settle=1 replay=0 conflict=2 illegal=2
+R03_T04_PROPERTY round=5 ok=0 stale=0 ghost=0 terminal=5 settle=1 replay=0 conflict=2 illegal=2
+R03_T04_PROPERTY round=6 ok=2 stale=2 ghost=1 terminal=0 settle=1 replay=0 conflict=2 illegal=2
+R03_T04_PROPERTY round=7 ok=1 stale=0 ghost=0 terminal=4 settle=1 replay=1 conflict=1 illegal=2
+R03_T04_PROPERTY round=8 ok=2 stale=0 ghost=0 terminal=3 settle=1 replay=0 conflict=2 illegal=2
+R03_T04_PROPERTY round=9 ok=1 stale=0 ghost=0 terminal=2 settle=1 replay=0 conflict=2 illegal=2
+R03_T04_PROPERTY round=10 ok=2 stale=0 ghost=1 terminal=0 settle=1 replay=0 conflict=2 illegal=2
+R03_T04_PROPERTY round=11 ok=0 stale=0 ghost=0 terminal=3 settle=1 replay=1 conflict=1 illegal=2
+R03_T04_PROPERTY round=12 ok=1 stale=1 ghost=1 terminal=2 settle=1 replay=1 conflict=1 illegal=2
+R03_T04_PROPERTY round=13 ok=0 stale=0 ghost=0 terminal=3 settle=1 replay=0 conflict=2 illegal=2
+R03_T04_PROPERTY round=14 ok=1 stale=0 ghost=1 terminal=3 settle=1 replay=0 conflict=2 illegal=2
+R03_T04_PROPERTY round=15 ok=0 stale=0 ghost=1 terminal=4 settle=1 replay=0 conflict=2 illegal=2
+R03_T04_PROPERTY round=16 ok=0 stale=0 ghost=0 terminal=5 settle=1 replay=0 conflict=2 illegal=2
+R03_T04_PROPERTY round=17 ok=0 stale=0 ghost=1 terminal=2 settle=1 replay=0 conflict=2 illegal=2
+R03_T04_PROPERTY round=18 ok=0 stale=1 ghost=0 terminal=4 settle=1 replay=0 conflict=2 illegal=2
+R03_T04_PROPERTY round=19 ok=2 stale=0 ghost=1 terminal=0 settle=1 replay=0 conflict=2 illegal=2
+R03_T04_PROPERTY round=20 ok=2 stale=1 ghost=0 terminal=2 settle=1 replay=0 conflict=2 illegal=2
+R03_T04_PROPERTY round=21 ok=0 stale=0 ghost=0 terminal=3 settle=1 replay=0 conflict=2 illegal=2
+R03_T04_PROPERTY round=22 ok=2 stale=1 ghost=1 terminal=1 settle=1 replay=0 conflict=2 illegal=2
+R03_T04_PROPERTY round=23 ok=1 stale=1 ghost=1 terminal=2 settle=1 replay=1 conflict=1 illegal=2
+R03_T04_PROPERTY round=24 ok=0 stale=0 ghost=0 terminal=5 settle=1 replay=0 conflict=2 illegal=2
+R03_T04_PROPERTY round=25 ok=1 stale=2 ghost=1 terminal=1 settle=1 replay=0 conflict=2 illegal=2
+R03_T04_PROPERTY round=26 ok=0 stale=1 ghost=1 terminal=3 settle=1 replay=0 conflict=2 illegal=2
+R03_T04_PROPERTY round=27 ok=0 stale=0 ghost=0 terminal=3 settle=1 replay=1 conflict=1 illegal=2
+R03_T04_PROPERTY round=28 ok=1 stale=0 ghost=1 terminal=1 settle=1 replay=0 conflict=2 illegal=2
+R03_T04_PROPERTY round=29 ok=0 stale=0 ghost=1 terminal=4 settle=1 replay=0 conflict=2 illegal=2
+R03_T04_PROPERTY round=30 ok=1 stale=0 ghost=1 terminal=3 settle=1 replay=0 conflict=2 illegal=2
+R03_T04_PROPERTY round=31 ok=0 stale=0 ghost=1 terminal=4 settle=1 replay=1 conflict=1 illegal=2
+R03_T04_PROPERTY round=32 ok=2 stale=0 ghost=1 terminal=0 settle=1 replay=0 conflict=2 illegal=2
+R03_T04_PROPERTY round=33 ok=0 stale=0 ghost=0 terminal=3 settle=1 replay=0 conflict=2 illegal=2
+R03_T04_PROPERTY round=34 ok=2 stale=0 ghost=1 terminal=0 settle=1 replay=0 conflict=2 illegal=2
+R03_T04_PROPERTY round=35 ok=0 stale=0 ghost=1 terminal=2 settle=1 replay=0 conflict=2 illegal=2
+R03_T04_PROPERTY round=36 ok=0 stale=1 ghost=1 terminal=3 settle=1 replay=0 conflict=2 illegal=2
+R03_T04_PROPERTY round=37 ok=1 stale=0 ghost=1 terminal=1 settle=1 replay=0 conflict=2 illegal=2
+R03_T04_PROPERTY round=38 ok=0 stale=0 ghost=1 terminal=4 settle=1 replay=0 conflict=2 illegal=2
+R03_T04_PROPERTY round=39 ok=0 stale=1 ghost=0 terminal=4 settle=1 replay=0 conflict=2 illegal=2
+R03_T04_PROPERTY round=40 ok=0 stale=0 ghost=0 terminal=3 settle=1 replay=0 conflict=2 illegal=2
+R03_T04_PROPERTY round=41 ok=0 stale=0 ghost=0 terminal=3 settle=1 replay=0 conflict=2 illegal=2
+R03_T04_PROPERTY round=42 ok=0 stale=0 ghost=0 terminal=5 settle=1 replay=0 conflict=2 illegal=2
+R03_T04_PROPERTY round=43 ok=0 stale=1 ghost=0 terminal=4 settle=1 replay=1 conflict=1 illegal=2
+R03_T04_PROPERTY round=44 ok=0 stale=1 ghost=1 terminal=3 settle=1 replay=1 conflict=1 illegal=2
+R03_T04_PROPERTY round=45 ok=0 stale=1 ghost=0 terminal=4 settle=1 replay=0 conflict=2 illegal=2
+R03_T04_PROPERTY round=46 ok=0 stale=0 ghost=0 terminal=5 settle=1 replay=0 conflict=2 illegal=2
+R03_T04_PROPERTY round=47 ok=0 stale=0 ghost=0 terminal=5 settle=1 replay=0 conflict=2 illegal=2
+R03_T04_PROPERTY round=48 ok=1 stale=0 ghost=0 terminal=2 settle=1 replay=0 conflict=2 illegal=2
+R03_T04_PROPERTY round=49 ok=1 stale=1 ghost=0 terminal=3 settle=1 replay=0 conflict=2 illegal=2
+R03_T04_PROPERTY round=50 ok=1 stale=0 ghost=0 terminal=4 settle=1 replay=1 conflict=1 illegal=2
+R03_T04_PROPERTY round=51 ok=0 stale=0 ghost=0 terminal=3 settle=1 replay=0 conflict=2 illegal=2
+R03_T04_PROPERTY round=52 ok=0 stale=1 ghost=0 terminal=4 settle=1 replay=0 conflict=2 illegal=2
+R03_T04_PROPERTY round=53 ok=2 stale=0 ghost=1 terminal=0 settle=1 replay=0 conflict=2 illegal=2
+R03_T04_PROPERTY round=54 ok=2 stale=0 ghost=0 terminal=3 settle=1 replay=0 conflict=2 illegal=2
+R03_T04_PROPERTY round=55 ok=0 stale=0 ghost=0 terminal=3 settle=1 replay=0 conflict=2 illegal=2
+R03_T04_PROPERTY round=56 ok=1 stale=1 ghost=0 terminal=3 settle=1 replay=0 conflict=2 illegal=2
+R03_T04_PROPERTY round=57 ok=0 stale=0 ghost=0 terminal=3 settle=1 replay=1 conflict=1 illegal=2
+R03_T04_PROPERTY round=58 ok=0 stale=0 ghost=0 terminal=5 settle=1 replay=0 conflict=2 illegal=2
+R03_T04_PROPERTY round=59 ok=1 stale=0 ghost=1 terminal=1 settle=1 replay=0 conflict=2 illegal=2
+R03_T04_PROPERTY totals: RoundCounters { current_ok: 36, stale_refused: 23, ghost_refused: 26, terminal_refused: 167, settle_first: 60, settle_replay: 10, settle_conflict: 110, illegal_rejected: 120 } (seed=0x5eed0000a07df00d, rounds=60)
+test duplicate_out_of_order_and_delayed_results_fence_exactly_once ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.30s
+

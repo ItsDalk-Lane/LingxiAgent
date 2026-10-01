@@ -1,0 +1,29 @@
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.02s
+     Running mutation_probe.rs (/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T//rust-target-r03-t08-a16-probe/debug/deps/mutation_probe-5e32be9ff747f45c)
+
+running 1 test
+R03_T04_PROPERTY round=0 ok=0 stale=0 ghost=0 terminal=5 settle=1 replay=0 conflict=2 illegal=2
+R03_T04_PROPERTY round=1 ok=2 stale=1 ghost=1 terminal=1 settle=1 replay=0 conflict=2 illegal=2
+R03_T04_PROPERTY round=2 ok=2 stale=0 ghost=1 terminal=0 settle=1 replay=1 conflict=1 illegal=2
+R03_T04_PROPERTY round=3 ok=1 stale=1 ghost=0 terminal=3 settle=1 replay=0 conflict=2 illegal=2
+R03_T04_PROPERTY round=4 ok=0 stale=0 ghost=0 terminal=3 settle=1 replay=0 conflict=2 illegal=2
+R03_T04_PROPERTY round=5 ok=1 stale=0 ghost=0 terminal=4 settle=1 replay=0 conflict=2 illegal=2
+R03_T04_PROPERTY round=6 ok=1 stale=0 ghost=0 terminal=4 settle=1 replay=0 conflict=2 illegal=2
+R03_T04_PROPERTY round=7 ok=0 stale=0 ghost=0 terminal=3 settle=1 replay=0 conflict=2 illegal=2
+R03_T04_PROPERTY round=8 ok=0 stale=0 ghost=0 terminal=3 settle=1 replay=1 conflict=1 illegal=2
+R03_T04_PROPERTY_FAILURE seed=0xa16d0000000000 location=mutation_probe.rs:473
+R03_T04_PROPERTY_FAILURE seed=0xa16d0000000000 location=mutation_probe.rs:473
+
+thread 'duplicate_out_of_order_and_delayed_results_fence_exactly_once' (3644797) panicked at mutation_probe.rs:473:21:
+round 9: current-attempt delivery after terminal must conflict, got Ok(CommittedOutcome { newly_committed: true, events: [EventEnvelope { schema_version: 1, event_id: EventId("run_000001a0dcba6c09_000001-mc0101-done"), stream_id: StreamId("sess_a"), seq: Seq(3), session_id: SessionId("sess_a"), run_id: Some(RunId("run_000001a0dcba6c09_000001")), attempt: Some(AttemptId("run_000001a0dcba6c09_000001#a1")), event_type: "model_call_completed", payload: Known(ModelCallCompleted(ModelCallCompletedPayload { model_call_id: ModelCallId("run_000001a0dcba6c09_000001-mc0101"), usage: None })) }] })
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+test duplicate_out_of_order_and_delayed_results_fence_exactly_once ... FAILED
+
+failures:
+
+failures:
+    duplicate_out_of_order_and_delayed_results_fence_exactly_once
+
+test result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.05s
+
+error: test failed, to rerun pass `--test mutation_probe`

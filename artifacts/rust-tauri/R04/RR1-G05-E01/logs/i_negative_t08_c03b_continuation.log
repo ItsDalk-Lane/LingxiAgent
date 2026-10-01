@@ -1,0 +1,61 @@
+== [continuation] preparing isolated copy /tmp/lingxi-r04-t08-neg-53MPbz (git worktree at HEAD 1285c3bf6 + uncommitted gate files) ==
+== [continuation] cloning node_modules into the copy (cp -Rc, CoW) ==
+== C03b: starting a full verify-stage R04, then changing an execution input mid-run ==
+case c03b-midrun-input-change: exit=1 gap-named=OK verdict=OK
+[
+ {
+  "case": "n-unknown-stage",
+  "exitCode": 2,
+  "gapNamed": "OK",
+  "verdict": "OK"
+ },
+ {
+  "case": "n-empty-scenario-set",
+  "exitCode": 2,
+  "gapNamed": "OK",
+  "verdict": "OK"
+ },
+ {
+  "case": "n1a-delete-leaf-mapping",
+  "exitCode": 1,
+  "gapNamed": "OK",
+  "verdict": "OK"
+ },
+ {
+  "case": "n1b-delete-command-mapping",
+  "exitCode": 2,
+  "gapNamed": "OK",
+  "verdict": "OK"
+ },
+ {
+  "case": "c03a-stale-evidence-root",
+  "exitCode": 1,
+  "gapNamed": "OK",
+  "verdict": "OK"
+ },
+ {
+  "case": "n4-delete-sup-scenario",
+  "exitCode": 101,
+  "gapNamed": "OK",
+  "verdict": "OK"
+ },
+ {
+  "case": "n2-zero-match-filter",
+  "exitCode": 1,
+  "gapNamed": "OK",
+  "verdict": "OK"
+ },
+ {
+  "case": "n3-missing-evidence-file",
+  "exitCode": 1,
+  "gapNamed": "OK",
+  "verdict": "OK"
+ },
+ {
+  "case": "c03b-midrun-input-change",
+  "exitCode": 1,
+  "gapNamed": "OK",
+  "verdict": "OK"
+ }
+]
+RESULT: every negative case failed closed with the gap named (no total PASS was granted)

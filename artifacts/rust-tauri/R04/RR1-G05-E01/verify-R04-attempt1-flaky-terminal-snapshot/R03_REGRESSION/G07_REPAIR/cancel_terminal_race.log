@@ -1,0 +1,20 @@
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.09s
+     Running tests/cancel_terminal_race.rs (/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T//rust-target-r03-g07-repair/debug/deps/cancel_terminal_race-c8837354ad45d71d)
+
+running 13 tests
+test a_fire_after_the_driver_reached_cleaning_never_regresses_the_phase ... ok
+test cancel_accepted_while_final_events_persist_beats_the_completed_terminal ... ok
+test cancel_after_the_committed_terminal_reports_already_terminal ... ok
+test cancel_accepted_before_the_terminal_claim_beats_every_terminal_shape ... ok
+test cancel_accepted_before_the_terminal_claim_beats_the_failed_terminal_too ... ok
+test cancel_at_the_no_provider_early_close_settles_cancelled ... ok
+test cancel_at_the_intent_boundary_dispatches_no_new_external_call ... ok
+test cancel_at_the_authorization_boundary_never_opens_the_approval_ask ... ok
+test concurrent_duplicate_fires_keep_the_first_reason_and_a_single_fired ... ok
+test cancel_at_the_started_boundary_dispatches_no_new_external_call ... ok
+test cancel_racing_the_finalize_transaction_is_too_late_not_accepted ... ok
+test cancel_between_tool_iterations_stops_the_second_dispatch ... ok
+test started_without_receipt_journals_unknown_receipt_facts ... ok
+
+test result: ok. 13 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.52s
+

@@ -1,0 +1,23 @@
+2026-10-01T20:13:28.231537Z  INFO lingxi_service: data root resolved effective_home=/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T//lingxi-r02t08-a15-home.jFh0BP source=cli ignored_sources=none
+2026-10-01T20:13:28.232720Z  INFO lingxi_service: data root prepared (canonicalized; runtime dir private 0700) canonical_home=/private/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-r02t08-a15-home.jFh0BP runtime_dir=/private/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-r02t08-a15-home.jFh0BP/lingxi-service
+2026-10-01T20:13:28.233277Z  INFO lingxi_service: single-writer lock acquired instance_id=8f8d93d6cde44615171167c8cedcc5ab start_nonce=3d94ec0c458ff358 pid=80869 entropy="os-random-device" lock=/private/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-r02t08-a15-home.jFh0BP/lingxi-service/instance.lock network_mode=loopback
+2026-10-01T20:13:28.246064Z  INFO lingxi_service: data-epoch gate passed home=/private/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-r02t08-a15-home.jFh0BP decision=ProceedStampedNew(EpochStamp { format: V2, minimum_reader_epoch: 1, committed_data_epoch: 1, last_version: Some("0.0.0") })
+2026-10-01T20:13:28.296734Z  INFO lingxi_adapters::storage::run_store: run database migrated db=/private/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-r02t08-a15-home.jFh0BP/lingxi-service/data/runs.db applied=[1, 2, 3, 4] version=4
+2026-10-01T20:13:28.297528Z  INFO lingxi_service: auth service bootstrapped (per-start loopback token, owner-only); run database migrated and seeded local_token_file=/private/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-r02t08-a15-home.jFh0BP/lingxi-service/local-token.json run_database=/private/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-r02t08-a15-home.jFh0BP/lingxi-service/data/runs.db
+2026-10-01T20:13:28.308172Z  INFO lingxi_service: instance record published (atomic write) record=/private/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-r02t08-a15-home.jFh0BP/lingxi-service/instance.json bind_addr=127.0.0.1:60891
+LINGXI_AUTH_REJECTED request_id=req-bc2f4f5616a261773ca73f3d0ca3b3bd method=GET path=/lingxi/v1/me status=401 Unauthorized reason=missing_credential remote=127.0.0.1:60893
+2026-10-01T20:13:28.490812Z  INFO lingxi_service: request handled request_id=req-bc2f4f5616a261773ca73f3d0ca3b3bd method=GET path=/lingxi/v1/me status=401
+2026-10-01T20:13:28.491731Z  INFO lingxi_service: request handled request_id=req-4b024bdcfb7868c9a2fa492c91647783 method=GET path=/lingxi/v1/me status=200
+2026-10-01T20:13:28.493911Z  INFO lingxi_service::sessions: run settled through the single finalize path run_id=run_000001a0f919bc2c_000001 session_id="sess_local_alpha" outcome=completed.no_final.no_provider_configured input_chars=23 input_bytes=23
+2026-10-01T20:13:28.494045Z  INFO lingxi_service: request handled request_id=req-91dc04ed2c22d9660df242e576000f1f method=POST path=/lingxi/v1/sessions/sess_local_alpha/execute status=200
+2026-10-01T20:13:28.494489Z  INFO lingxi_service: request handled request_id=req-4a3a7de8ad3b7f23cc8e34937ca92b47 method=GET path=/lingxi/v1/ws status=101
+2026-10-01T20:13:28.496147Z  INFO lingxi_service::sessions: run settled through the single finalize path run_id=run_000001a0f919bc2f_000002 session_id="sess_local_alpha" outcome=completed.no_final.no_provider_configured input_chars=26 input_bytes=26
+2026-10-01T20:13:28.496285Z  INFO lingxi_service: request handled request_id=req-e80e0eef43cb903181d840b1b370e9a4 method=POST path=/lingxi/v1/sessions/sess_local_alpha/execute status=200
+2026-10-01T20:13:28.496958Z  INFO lingxi_service: request handled request_id=req-3d5a98daff9e168ed0fe01839c2bdbad method=GET path=/lingxi/v1/sessions/sess_local_alpha status=200
+2026-10-01T20:13:28.497740Z  INFO lingxi_service: request handled request_id=req-5e57ba7e769617d832953c5687be843c method=GET path=/lingxi/v1/sessions/sess_local_alpha/events status=200
+2026-10-01T20:13:28.498139Z  INFO lingxi_service: request handled request_id=req-082a998642ea663b5d3c672a98250ec2 method=GET path=/lingxi/v1/ws status=101
+2026-10-01T20:13:28.499212Z  WARN lingxi_service: ws session read failed err=Connection reset by peer (os error 54)
+2026-10-01T20:13:28.519744Z  INFO lingxi_service: shutdown signal: SIGTERM
+2026-10-01T20:13:28.520569Z  INFO lingxi_service::shutdown: run database closed (drained, WAL truncated) phase=storage_close
+2026-10-01T20:13:28.520811Z  INFO lingxi_service::shutdown: own instance record removed, lock released phase=record_cleanup
+2026-10-01T20:13:28.520881Z  INFO lingxi_service: lingxi-service stopped cleanly (run database closed, own record removed, lock released)

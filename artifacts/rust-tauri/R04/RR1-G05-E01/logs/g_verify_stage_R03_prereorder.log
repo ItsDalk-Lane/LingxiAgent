@@ -1,0 +1,81 @@
+    Finished `dev` profile [unoptimized + debuginfo] target(s) in 0.04s
+     Running `rust/target/debug/xtask verify-stage R03 --evidence artifacts/rust-tauri/R04/RR1-G05-E01/verify-R03/`
+xtask: verify-stage R03 [cargo test --manifest-path rust/Cargo.toml --workspace --locked] > /Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R04/RR1-G05-E01/verify-R03/rust_test_workspace
+xtask: verify-stage R03 [rust_test_workspace] PASS
+xtask: verify-stage R03 [bash scripts/rust-tauri/r03_t08_matrix.sh {EVIDENCE}/A15] > /Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R04/RR1-G05-E01/verify-R03/a15_combo_and_leaves
+xtask: verify-stage R03 [a15_combo_and_leaves] PASS
+xtask: verify-stage R03 [bash scripts/rust-tauri/r02_t04_storage_tx.sh {EVIDENCE}/R02/A07_A08] > /Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R04/RR1-G05-E01/verify-R03/r02_storage_tx
+xtask: verify-stage R03 [r02_storage_tx] PASS
+xtask: verify-stage R03 [bash scripts/rust-tauri/r02_t08_full_chain_smoke.sh {EVIDENCE}/R02/A15] > /Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R04/RR1-G05-E01/verify-R03/r02_full_chain
+xtask: verify-stage R03 [r02_full_chain] PASS
+xtask: verify-stage R03 [bash scripts/rust-tauri/r02_t06_backup_restore.sh {EVIDENCE}/R02/A11] > /Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R04/RR1-G05-E01/verify-R03/r02_backup_restore
+xtask: verify-stage R03 [r02_backup_restore] PASS
+xtask: verify-stage R03 [bash scripts/rust-tauri/r02_t06_recovery_drill.sh {EVIDENCE}/R02/A12] > /Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R04/RR1-G05-E01/verify-R03/r02_recovery_drill
+xtask: verify-stage R03 [r02_recovery_drill] PASS
+xtask: verify-stage R03 [cargo fmt --manifest-path rust/Cargo.toml --all -- --check] > /Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R04/RR1-G05-E01/verify-R03/rust_fmt
+xtask: verify-stage R03 [rust_fmt] PASS
+xtask: verify-stage R03 [cargo clippy --manifest-path rust/Cargo.toml --workspace --all-targets --locked -- -D warnings] > /Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R04/RR1-G05-E01/verify-R03/rust_clippy
+xtask: verify-stage R03 [rust_clippy] PASS
+xtask: verify-stage R03 [bash scripts/rust-tauri/r01-t02-check-generated.sh] > /Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R04/RR1-G05-E01/verify-R03/check_contracts
+xtask: verify-stage R03 [check_contracts] PASS
+xtask: verify-stage R03 [python3 -B docs/rust-tauri/R01/r01_t01_check_ownership.py] > /Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R04/RR1-G05-E01/verify-R03/check_boundaries
+xtask: verify-stage R03 [check_boundaries] PASS
+xtask: verify-stage R03 [bash scripts/rust-tauri/r02_t03_auth_matrix.sh {EVIDENCE}/R02/A05_A06] > /Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R04/RR1-G05-E01/verify-R03/r02_auth_matrix
+xtask: verify-stage R03 [r02_auth_matrix] PASS
+xtask: verify-stage R03 [env R02_LEGACY_REGRESSION_MODE=directed-no-seal-family bash scripts/rust-tauri/r02_t08_legacy_entry_regression.sh {EVIDENCE}/R02/A16] > /Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R04/RR1-G05-E01/verify-R03/r02_legacy_regression
+xtask: verify-stage R03 [r02_legacy_regression] PASS
+xtask: verify-stage R03 [bash scripts/rust-tauri/r03_t08_a16_seed_mechanism.sh {EVIDENCE}/A16] > /Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R04/RR1-G05-E01/verify-R03/a16_seed_mechanism
+xtask: verify-stage R03 [a16_seed_mechanism] PASS
+xtask: verify-stage R03 [bash scripts/rust-tauri/r03_g07_repair_suites.sh {EVIDENCE}/G07_REPAIR] > /Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R04/RR1-G05-E01/verify-R03/repair_suites
+xtask: verify-stage R03 [repair_suites] PASS
+xtask: verify-stage R03 [bash scripts/rust-tauri/r02_t05_events_matrix.sh {EVIDENCE}/R02/A09_A10] > /Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R04/RR1-G05-E01/verify-R03/r02_events_matrix
+xtask: verify-stage R03 [r02_events_matrix] PASS
+xtask: verify-stage R03 supplemental R00-T02-LA-00ECC9568490 [stage_share_satisfied] PASS
+xtask: verify-stage R03 supplemental R00-T02-LA-010BA6693880 [stage_share_satisfied] PASS
+xtask: verify-stage R03 supplemental R00-T02-LA-081FACA79F2C [deferred_to_later_stage] DEFERRED_TO_LATER_STAGE
+xtask: verify-stage R03 supplemental R00-T02-LA-095E0402EEEC [deferred_to_later_stage] DEFERRED_TO_LATER_STAGE
+xtask: verify-stage R03 supplemental R00-T02-LA-0FE8BED686E2 [deferred_to_later_stage] DEFERRED_TO_LATER_STAGE
+xtask: verify-stage R03 supplemental R00-T02-LA-1B712E189DDF [deferred_to_later_stage] DEFERRED_TO_LATER_STAGE
+xtask: verify-stage R03 supplemental R00-T02-LA-1FB3D8BC916D [deferred_to_later_stage] DEFERRED_TO_LATER_STAGE
+xtask: verify-stage R03 supplemental R00-T02-LA-207DF594B497 [stage_share_satisfied] PASS
+xtask: verify-stage R03 supplemental R00-T02-LA-267BDFB75804 [deferred_to_later_stage] DEFERRED_TO_LATER_STAGE
+xtask: verify-stage R03 supplemental R00-T02-LA-2CAC28D96AFE [deferred_to_later_stage] DEFERRED_TO_LATER_STAGE
+xtask: verify-stage R03 supplemental R00-T02-LA-2FAA749DA790 [deferred_to_later_stage] DEFERRED_TO_LATER_STAGE
+xtask: verify-stage R03 supplemental R00-T02-LA-38667593C3E1 [deferred_to_later_stage] DEFERRED_TO_LATER_STAGE
+xtask: verify-stage R03 supplemental R00-T02-LA-3CF3C154B311 [deferred_to_later_stage] DEFERRED_TO_LATER_STAGE
+xtask: verify-stage R03 supplemental R00-T02-LA-421EEA1AC8D5 [deferred_to_later_stage] DEFERRED_TO_LATER_STAGE
+xtask: verify-stage R03 supplemental R00-T02-LA-4EA88B5073E4 [stage_share_satisfied] PASS
+xtask: verify-stage R03 supplemental R00-T02-LA-5882BC217F1D [deferred_to_later_stage] DEFERRED_TO_LATER_STAGE
+xtask: verify-stage R03 supplemental R00-T02-LA-5A6E0D526903 [deferred_to_later_stage] DEFERRED_TO_LATER_STAGE
+xtask: verify-stage R03 supplemental R00-T02-LA-5F394AA4C9A3 [deferred_to_later_stage] DEFERRED_TO_LATER_STAGE
+xtask: verify-stage R03 supplemental R00-T02-LA-5F879158C679 [stage_share_satisfied] PASS
+xtask: verify-stage R03 supplemental R00-T02-LA-65B2ECECB23A [deferred_to_later_stage] DEFERRED_TO_LATER_STAGE
+xtask: verify-stage R03 supplemental R00-T02-LA-689DB6429895 [deferred_to_later_stage] DEFERRED_TO_LATER_STAGE
+xtask: verify-stage R03 supplemental R00-T02-LA-7244E7DCE678 [deferred_to_later_stage] DEFERRED_TO_LATER_STAGE
+xtask: verify-stage R03 supplemental R00-T02-LA-7CBF6F4A6760 [stage_share_satisfied] PASS
+xtask: verify-stage R03 supplemental R00-T02-LA-81664285F927 [stage_share_satisfied] PASS
+xtask: verify-stage R03 supplemental R00-T02-LA-81B217A7E581 [stage_share_satisfied] PASS
+xtask: verify-stage R03 supplemental R00-T02-LA-84E22CD74BE1 [stage_share_satisfied] PASS
+xtask: verify-stage R03 supplemental R00-T02-LA-857747F848F6 [stage_share_satisfied] PASS
+xtask: verify-stage R03 supplemental R00-T02-LA-8661576FEAFF [stage_share_satisfied] PASS
+xtask: verify-stage R03 supplemental R00-T02-LA-92620BF2264F [deferred_to_later_stage] DEFERRED_TO_LATER_STAGE
+xtask: verify-stage R03 supplemental R00-T02-LA-94CB746D04B7 [stage_share_satisfied] PASS
+xtask: verify-stage R03 supplemental R00-T02-LA-980C099F356F [stage_share_satisfied] PASS
+xtask: verify-stage R03 supplemental R00-T02-LA-A2C385A33493 [deferred_to_later_stage] DEFERRED_TO_LATER_STAGE
+xtask: verify-stage R03 supplemental R00-T02-LA-A5DE44FF584F [deferred_to_later_stage] DEFERRED_TO_LATER_STAGE
+xtask: verify-stage R03 supplemental R00-T02-LA-A765DFFB4BAC [deferred_to_later_stage] DEFERRED_TO_LATER_STAGE
+xtask: verify-stage R03 supplemental R00-T02-LA-B34F2B298BFA [deferred_to_later_stage] DEFERRED_TO_LATER_STAGE
+xtask: verify-stage R03 supplemental R00-T02-LA-B47CAC08F418 [stage_share_satisfied] PASS
+xtask: verify-stage R03 supplemental R00-T02-LA-B5CB2993A5C0 [deferred_to_later_stage] DEFERRED_TO_LATER_STAGE
+xtask: verify-stage R03 supplemental R00-T02-LA-C1FB9C92E813 [stage_share_satisfied] PASS
+xtask: verify-stage R03 supplemental R00-T02-LA-C99A4322D0C1 [deferred_to_later_stage] DEFERRED_TO_LATER_STAGE
+xtask: verify-stage R03 supplemental R00-T02-LA-CFA5BB0273FA [stage_share_satisfied] PASS
+xtask: verify-stage R03 supplemental R00-T02-LA-D483E4CD0935 [stage_share_satisfied] PASS
+xtask: verify-stage R03 supplemental R00-T02-LA-D8D47C4680C9 [deferred_to_later_stage] DEFERRED_TO_LATER_STAGE
+xtask: verify-stage R03 supplemental R00-T02-LA-D901852E1B1A [deferred_to_later_stage] DEFERRED_TO_LATER_STAGE
+xtask: verify-stage R03 supplemental R00-T02-LA-D92CD567D6D6 [deferred_to_later_stage] DEFERRED_TO_LATER_STAGE
+xtask: verify-stage R03 supplemental R00-T02-LA-E6F239636060 [deferred_to_later_stage] DEFERRED_TO_LATER_STAGE
+xtask: verify-stage R03 supplemental R00-T02-LA-EC5167DAB40C [deferred_to_later_stage] DEFERRED_TO_LATER_STAGE
+xtask: verify-stage R03 supplemental R00-T02-LA-F829AEA5931C [deferred_to_later_stage] DEFERRED_TO_LATER_STAGE
+xtask: verify-stage R03 supplemental R00-T02-LA-FA0FF4DC0779 [deferred_to_later_stage] DEFERRED_TO_LATER_STAGE
+xtask: verify-stage R03 result written to /Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R04/RR1-G05-E01/verify-R03/verify-stage-result.json (overall: "PASS")

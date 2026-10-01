@@ -1,0 +1,4 @@
+   Compiling xtask v0.1.0 (/private/tmp/lingxi-r04-t08-neg-Pa0LSe/rust/crates/xtask)
+    Finished `dev` profile [unoptimized + debuginfo] target(s) in 1.17s
+     Running `/Users/study_superior/.cache/lingxi-r04-t08-neg-target/debug/xtask verify-stage R99 --evidence /Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R04/RR1-G05-E01/negative/n-unknown-stage/evidence`
+error: unknown stage "R99"; no implementation-acceptance map is registered in xtask (registered stages: R02, R03, R04). A stage without a map is a hard error — never an empty pass.

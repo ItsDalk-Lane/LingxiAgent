@@ -1,0 +1,5 @@
+rr1-n1-delete-rr1-scenario	101	OK	OK
+rr1-n2-tamper-pin-count	101	OK	OK
+rr1-n3-drop-cid-line	101	OK	OK
+rr1-n4-full-gate	1	MISSING:R04-RR1-F03-named	BAD
+rr1-n4-full-gate	1	MISSING:R04-RR1-F03-named	BAD

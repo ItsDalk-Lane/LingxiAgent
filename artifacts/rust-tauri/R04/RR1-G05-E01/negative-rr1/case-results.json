@@ -1,0 +1,32 @@
+{
+ "schema": "lingxi.r04-rr1-g05-gate-negative-tests.v1",
+ "isolatedCopy": "git worktree at HEAD + uncommitted G05-E01 files (removed after the run)",
+ "gate": "cargo test -p xtask (RR1-N1..N3) + real verify-stage R04 (RR1-N4)",
+ "cases": [
+  {
+   "case": "rr1-n1-delete-rr1-scenario",
+   "exitCode": 101,
+   "gapNamed": "OK",
+   "verdict": "OK"
+  },
+  {
+   "case": "rr1-n2-tamper-pin-count",
+   "exitCode": 101,
+   "gapNamed": "OK",
+   "verdict": "OK"
+  },
+  {
+   "case": "rr1-n3-drop-cid-line",
+   "exitCode": 101,
+   "gapNamed": "OK",
+   "verdict": "OK"
+  },
+  {
+   "case": "rr1-n4-full-gate",
+   "exitCode": 1,
+   "gapNamed": "OK",
+   "verdict": "OK"
+  }
+ ],
+ "allRefused": true
+}

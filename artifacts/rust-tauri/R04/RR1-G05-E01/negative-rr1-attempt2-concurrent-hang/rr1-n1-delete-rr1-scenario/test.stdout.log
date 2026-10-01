@@ -1,0 +1,29 @@
+   Compiling xtask v0.1.0 (/private/tmp/lingxi-r04-rr1-neg-Kwirxl/rust/crates/xtask)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 1.31s
+     Running unittests src/main.rs (/Users/study_superior/.cache/lingxi-r04-rr1-neg-target/debug/deps/xtask-ad766de8ea03e62c)
+
+running 8 tests
+test stage_map::map_tests::r04_rr1_producer_pin_table_matches_the_registered_suites ... ok
+test stage_map::map_tests::r04_rr1_producer_case_table_owns_every_check_id_exactly ... ok
+test stage_map::map_tests::r04_production_map_keeps_the_sixteen_a_scenarios_verbatim ... ok
+test stage_map::map_tests::r04_production_map_registers_the_supplemental_duty_scenarios ... ok
+test stage_map::map_tests::r04_production_map_registers_the_matrix_and_regression_producers ... ok
+test stage_map::map_tests::r04_production_map_keeps_the_124_leaf_split ... ok
+test stage_map::map_tests::r04_production_map_pins_the_real_case_expectations ... ok
+test stage_map::map_tests::r04_production_map_registers_the_rr1_repair_scenarios ... FAILED
+
+failures:
+
+---- stage_map::map_tests::r04_production_map_registers_the_rr1_repair_scenarios stdout ----
+
+thread 'stage_map::map_tests::r04_production_map_registers_the_rr1_repair_scenarios' (3785553) panicked at crates/xtask/src/stage_map.rs:2732:21:
+R04 map dropped the RR1 repair scenario R04-RR1-F03 — the F01-F05 adversarial-repair counterexamples would leave the formal acceptance
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+
+
+failures:
+    stage_map::map_tests::r04_production_map_registers_the_rr1_repair_scenarios
+
+test result: FAILED. 7 passed; 1 failed; 0 ignored; 0 measured; 100 filtered out; finished in 0.01s
+
+error: test failed, to rerun pass `-p xtask --bin xtask`

@@ -467,7 +467,11 @@ stage_map = {
         "批准/原生执行器/worker/MCP 桥，案例由 r04_tool_matrix 生产者机器核验）+ "
         f"{deferred_count} deferred_to_later_stage（无 R04 叶专属门禁份额；验收归 "
         "R06/R07/R08/R09，仍 REQUIRED）。阶段中立 kinds 与 R03 图同构（份额叶必带 "
-        "assertionContract，递延叶不得绑门禁命令）；R02/R03 图零改动。",
+        "assertionContract，递延叶不得绑门禁命令）；R02/R03 图零改动。"
+        "RR1 修复轮 G05 增量（2026-10-01，CLOSE-C01）：追加 R04-RR1-F01..F05 五个"
+        "REQUIRED 场景与 r04_rr1_repair_suites 生产者（六集成套件+二十六单测=63 测试，"
+        "逐测试归属 22 个五 F C-ID；CLOSE-C01..C04 为收口检查不入图）；原 16 A-ID、"
+        "SUP01/03/05 与 124 叶结构零改动，只增不减。",
     "commands": {
         "rust_fmt": {
             "argv": ["cargo", "fmt", "--manifest-path", "rust/Cargo.toml", "--all", "--", "--check"],
@@ -519,6 +523,21 @@ stage_map = {
             "timeoutSecs": 5400,
             "evidencePaths": ["{EVIDENCE}/R03_REGRESSION/verify-stage-result.json"],
         },
+        # R04 RR1 repair round G05 (CLOSE-C01, 2026-10-01): the adversarial-
+        # repair suite producer for findings F01–F05 (candidates G01..G04 =
+        # 1692d2314/da15c4bd9/614fab1af/1285c3bf6). Pins the six new
+        # integration suites (37 tests) and the twenty-six RR1 lib unit
+        # tests EXACTLY, and owns every executed test by exactly one of the
+        # 22 five-F C-IDs (漏 ID/过滤0/计数漂移/改名 = named gap, fail closed).
+        "r04_rr1_repair_suites": {
+            "argv": ["bash", "scripts/rust-tauri/r04_rr1_g05_repair_suites.sh",
+                      "{EVIDENCE}/R04_RR1_REPAIR"],
+            "timeoutSecs": 2400,
+            "evidencePaths": [
+                "{EVIDENCE}/R04_RR1_REPAIR/rr1-cases.json",
+                "{EVIDENCE}/R04_RR1_REPAIR/summary.txt",
+            ],
+        },
     },
     "scenarios": [
         {"id": "R04-A01", "requirement": "REQUIRED", "commandRefs": ["rust_test_workspace", "r04_tool_matrix"]},
@@ -559,6 +578,42 @@ stage_map = {
          "commandRefs": ["r03_regression_gate", "rust_test_workspace"],
          "note": "R03 回归硬保护：完整 verify-stage R03（十修复套件+A15 矩阵+A16 种子机制"
                  "与全部 R02 定向链）在本图最终候选上整体重跑。"},
+        # R04 RR1 repair round G05 (CLOSE-C01, 2026-10-01): the five
+        # adversarial-repair findings enter the formal gate as first-class
+        # REQUIRED scenarios (ADDITIVE — the 16 A-IDs + SUP01/03/05 above
+        # are frozen; nothing was removed, re-graded or deferred). Each
+        # finding's C-ID acceptance lives in the r04_rr1_repair_suites
+        # producer's cid table (every executed test owned by exactly one
+        # C-ID; 22 five-F C-IDs of the 26-check RR1 checklist — the four
+        # CLOSE-C01..C04 are closeout checks executed by the orchestrator,
+        # not stage-map scenarios), machine-mirrored by the xtask
+        # r04_rr1_* map-pinning tests inside rust_test_workspace.
+        {"id": "R04-RR1-F01", "requirement": "REQUIRED",
+         "commandRefs": ["r04_rr1_repair_suites", "rust_test_workspace"],
+         "note": "RR1-F01 容量预留先于 OS 派发（G01/1692d2314）：登记满零派发/屏障争名额"
+                 "恰一次/启动后异常恰一次补偿/失败后同进程可复用——C01-C04 由生产者"
+                 "cid 表逐案例钉住（套件 r04_t05_registry_capacity 9 用例 + live_slot 3 单测）。"},
+        {"id": "R04-RR1-F02", "requirement": "REQUIRED",
+         "commandRefs": ["r04_rr1_repair_suites", "rust_test_workspace"],
+         "note": "RR1-F02 泵归属/reap 竞态/诚实回收（G02/da15c4bd9）：孙进程持端冻结结果并"
+                 "关读端/reaped-undrained 窗口零失效组信号/双泵单一预算/压力稳态——C01-C04"
+                 "（套件 r04_rr1_f02_reaper_cleanup 11 用例 + group_signal 2 单测）。"},
+        {"id": "R04-RR1-F03", "requirement": "REQUIRED",
+         "commandRefs": ["r04_rr1_repair_suites", "rust_test_workspace"],
+         "note": "RR1-F03 清理未确认不虚构 137/exit（G03/614fab1af）：StopUnconfirmed 全链"
+                 "（exec/PTY/run）保真、重复终止不升级、控制组真实状态、wait 错误=观察失败"
+                 "——C01-C05（套件 r04_rr1_f03_stop_honesty 7 用例 + 2 单测）。"},
+        {"id": "R04-RR1-F04", "requirement": "REQUIRED",
+         "commandRefs": ["r04_rr1_repair_suites", "rust_test_workspace"],
+         "note": "RR1-F04 PTY 混合分片字节级恰一次消费（G04/1285c3bf6）：混合 chunk 最小反例"
+                 "（旧分块控制组保留）、空闲 poll 暂存不计丢、分片不变性属性组、真实 PTY 握手"
+                 "恰一次——C01-C04（套件 r04_rr1_f04_pty_consumption 1 集成 + transcript 10 单测）。"},
+        {"id": "R04-RR1-F05", "requirement": "REQUIRED",
+         "commandRefs": ["r04_rr1_repair_suites", "rust_test_workspace"],
+         "note": "RR1-F05 输出完整性按全流事实标注（G04/1285c3bf6）：滚动窗前缀丢失必标真、"
+                 "超长单行字节安全保头尾、spill 封顶=partial 不得称 Full、写失败准确诊断、"
+                 "资源有界——C01-C05（套件 r04_rr1_f05_output_integrity 7 + "
+                 "r04_rr1_f05_spill_failure 2 + exectools 输出完整性 9 单测）。"},
     ],
     "supplementalLeafScenarios": leaves,
 }

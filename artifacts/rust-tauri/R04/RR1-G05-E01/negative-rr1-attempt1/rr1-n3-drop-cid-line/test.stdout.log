@@ -1,0 +1,24 @@
+   Compiling xtask v0.1.0 (/private/tmp/lingxi-r04-rr1-neg-XHIKts/rust/crates/xtask)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.45s
+     Running unittests src/main.rs (/Users/study_superior/.cache/lingxi-r04-rr1-neg-target/debug/deps/xtask-ad766de8ea03e62c)
+
+running 1 test
+test stage_map::map_tests::r04_rr1_producer_case_table_owns_every_check_id_exactly ... FAILED
+
+failures:
+
+---- stage_map::map_tests::r04_rr1_producer_case_table_owns_every_check_id_exactly stdout ----
+
+thread 'stage_map::map_tests::r04_rr1_producer_case_table_owns_every_check_id_exactly' (3747175) panicked at crates/xtask/src/stage_map.rs:2825:9:
+assertion `left == right` failed: the RR1 producer cid table drifted from the 22 five-F acceptance C-IDs (dropped, added, or re-counted case)
+  left: [("R04-RR1-F01-C01", 3), ("R04-RR1-F01-C02", 3), ("R04-RR1-F01-C03", 5), ("R04-RR1-F01-C04", 1), ("R04-RR1-F02-C01", 4), ("R04-RR1-F02-C02", 5), ("R04-RR1-F02-C03", 3), ("R04-RR1-F02-C04", 1), ("R04-RR1-F03-C01", 2), ("R04-RR1-F03-C02", 1), ("R04-RR1-F03-C03", 1), ("R04-RR1-F03-C04", 3), ("R04-RR1-F03-C05", 2), ("R04-RR1-F04-C01", 2), ("R04-RR1-F04-C02", 1), ("R04-RR1-F04-C03", 7), ("R04-RR1-F04-C04", 1), ("R04-RR1-F05-C01", 5), ("R04-RR1-F05-C02", 5), ("R04-RR1-F05-C03", 4), ("R04-RR1-F05-C04", 2)]
+ right: [("R04-RR1-F01-C01", 3), ("R04-RR1-F01-C02", 3), ("R04-RR1-F01-C03", 5), ("R04-RR1-F01-C04", 1), ("R04-RR1-F02-C01", 4), ("R04-RR1-F02-C02", 5), ("R04-RR1-F02-C03", 3), ("R04-RR1-F02-C04", 1), ("R04-RR1-F03-C01", 2), ("R04-RR1-F03-C02", 1), ("R04-RR1-F03-C03", 1), ("R04-RR1-F03-C04", 3), ("R04-RR1-F03-C05", 2), ("R04-RR1-F04-C01", 2), ("R04-RR1-F04-C02", 1), ("R04-RR1-F04-C03", 7), ("R04-RR1-F04-C04", 1), ("R04-RR1-F05-C01", 5), ("R04-RR1-F05-C02", 5), ("R04-RR1-F05-C03", 4), ("R04-RR1-F05-C04", 2), ("R04-RR1-F05-C05", 2)]
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+
+
+failures:
+    stage_map::map_tests::r04_rr1_producer_case_table_owns_every_check_id_exactly
+
+test result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 107 filtered out; finished in 0.00s
+
+error: test failed, to rerun pass `-p xtask --bin xtask`

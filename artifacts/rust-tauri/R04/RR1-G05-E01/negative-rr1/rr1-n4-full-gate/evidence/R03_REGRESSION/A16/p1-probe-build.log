@@ -1,0 +1,7 @@
+     Locking 68 packages to latest compatible versions
+   Compiling lingxi-protocol v0.0.0 (/tmp/lingxi-r04-rr1-neg-JMLNJa/rust/crates/lingxi-protocol)
+   Compiling lingxi-kernel v0.0.0 (/tmp/lingxi-r04-rr1-neg-JMLNJa/rust/crates/lingxi-kernel)
+   Compiling lingxi-adapters v0.0.0 (/tmp/lingxi-r04-rr1-neg-JMLNJa/rust/crates/lingxi-adapters)
+   Compiling r03-t08-a16-mutation-probe v0.0.0 (/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-r03t08-a16-epFQ8H/probe)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 2.34s
+  Executable mutation_probe.rs (/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T//rust-target-r03-t08-a16-probe/debug/deps/mutation_probe-1ea00e5a2119fbab)

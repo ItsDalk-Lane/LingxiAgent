@@ -1,0 +1,62 @@
+{
+ "schema": "lingxi.r04-t08-gate-negative-tests.v1",
+ "isolatedCopy": "git worktree at HEAD + uncommitted gate files (removed after the run); case C03b executed by the continuation runner after the battery process was externally killed at 8/9 cases",
+ "gate": "cargo run -p xtask -- verify-stage R04 (real binary, rebuilt inside the copy)",
+ "cases": [
+  {
+   "case": "n-unknown-stage",
+   "exitCode": 2,
+   "gapNamed": "OK",
+   "verdict": "OK"
+  },
+  {
+   "case": "n-empty-scenario-set",
+   "exitCode": 2,
+   "gapNamed": "OK",
+   "verdict": "OK"
+  },
+  {
+   "case": "n1a-delete-leaf-mapping",
+   "exitCode": 1,
+   "gapNamed": "OK",
+   "verdict": "OK"
+  },
+  {
+   "case": "n1b-delete-command-mapping",
+   "exitCode": 2,
+   "gapNamed": "OK",
+   "verdict": "OK"
+  },
+  {
+   "case": "c03a-stale-evidence-root",
+   "exitCode": 1,
+   "gapNamed": "OK",
+   "verdict": "OK"
+  },
+  {
+   "case": "n4-delete-sup-scenario",
+   "exitCode": 101,
+   "gapNamed": "OK",
+   "verdict": "OK"
+  },
+  {
+   "case": "n2-zero-match-filter",
+   "exitCode": 1,
+   "gapNamed": "OK",
+   "verdict": "OK"
+  },
+  {
+   "case": "n3-missing-evidence-file",
+   "exitCode": 1,
+   "gapNamed": "OK",
+   "verdict": "OK"
+  },
+  {
+   "case": "c03b-midrun-input-change",
+   "exitCode": 1,
+   "gapNamed": "OK",
+   "verdict": "OK"
+  }
+ ],
+ "allRefused": true
+}

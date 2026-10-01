@@ -1,0 +1,37 @@
+   Compiling xtask v0.1.0 (/private/tmp/lingxi-r04-t08-neg-Pa0LSe/rust/crates/xtask)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 1.32s
+     Running unittests src/main.rs (/Users/study_superior/.cache/lingxi-r04-t08-neg-target/debug/deps/xtask-ad766de8ea03e62c)
+
+running 8 tests
+test stage_map::map_tests::r04_rr1_producer_pin_table_matches_the_registered_suites ... ok
+test stage_map::map_tests::r04_rr1_producer_case_table_owns_every_check_id_exactly ... ok
+test stage_map::map_tests::r04_production_map_pins_the_real_case_expectations ... ok
+test stage_map::map_tests::r04_production_map_keeps_the_sixteen_a_scenarios_verbatim ... ok
+test stage_map::map_tests::r04_production_map_registers_the_matrix_and_regression_producers ... ok
+test stage_map::map_tests::r04_production_map_registers_the_rr1_repair_scenarios ... FAILED
+test stage_map::map_tests::r04_production_map_keeps_the_124_leaf_split ... ok
+test stage_map::map_tests::r04_production_map_registers_the_supplemental_duty_scenarios ... FAILED
+
+failures:
+
+---- stage_map::map_tests::r04_production_map_registers_the_rr1_repair_scenarios stdout ----
+
+thread 'stage_map::map_tests::r04_production_map_registers_the_rr1_repair_scenarios' (3926120) panicked at crates/xtask/src/stage_map.rs:2744:9:
+assertion `left == right` failed: the R04 map must keep exactly the 16 A-IDs + SUP01/03/05 + the five R04-RR1-F01..F05 repair scenarios (additive-only — an invented extra scenario is as red as a dropped one)
+  left: 23
+ right: 24
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+
+---- stage_map::map_tests::r04_production_map_registers_the_supplemental_duty_scenarios stdout ----
+
+thread 'stage_map::map_tests::r04_production_map_registers_the_supplemental_duty_scenarios' (3926121) panicked at crates/xtask/src/stage_map.rs:2285:36:
+R04 map dropped the supplemental-duty scenario R04-SUP01
+
+
+failures:
+    stage_map::map_tests::r04_production_map_registers_the_rr1_repair_scenarios
+    stage_map::map_tests::r04_production_map_registers_the_supplemental_duty_scenarios
+
+test result: FAILED. 6 passed; 2 failed; 0 ignored; 0 measured; 100 filtered out; finished in 0.01s
+
+error: test failed, to rerun pass `-p xtask --bin xtask`

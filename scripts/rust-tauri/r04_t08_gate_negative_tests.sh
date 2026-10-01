@@ -86,7 +86,8 @@ for f in \
   rust/crates/lingxi-service/tests/r04_t08_tool_matrix.rs \
   scripts/rust-tauri/r04_t08_matrix.sh \
   scripts/rust-tauri/r04_t08_generate_stage_map.py \
-  scripts/rust-tauri/r04_t08_gate_negative_tests.sh; do
+  scripts/rust-tauri/r04_t08_gate_negative_tests.sh \
+  scripts/rust-tauri/r04_rr1_g05_repair_suites.sh; do
   mkdir -p "$COPY/$(dirname "$f")"
   cp "$ROOT/$f" "$COPY/$f"
 done
@@ -100,12 +101,19 @@ if [ -d "$ROOT/node_modules" ]; then
 fi
 
 # Pristine copies for resetting between cases.
+# RR1 G05 increment (2026-10-01): the overlay also carries the RR1 repair
+# producer — the map now registers `r04_rr1_repair_suites` and the xtask
+# pin tests read that script, so a copy without it would be a broken tree
+# (the battery must tamper exactly ONE thing per case, never accidentally
+# red on a missing registered file).
 mkdir -p "$EV/pristine"
 cp "$COPY/rust/crates/xtask/src/stage_maps/R04.json" "$EV/pristine/R04.json"
 cp "$COPY/scripts/rust-tauri/r04_t08_matrix.sh" "$EV/pristine/r04_t08_matrix.sh"
+cp "$COPY/scripts/rust-tauri/r04_rr1_g05_repair_suites.sh" "$EV/pristine/r04_rr1_g05_repair_suites.sh"
 reset_copy() {
   cp "$EV/pristine/R04.json" "$COPY/rust/crates/xtask/src/stage_maps/R04.json"
   cp "$EV/pristine/r04_t08_matrix.sh" "$COPY/scripts/rust-tauri/r04_t08_matrix.sh"
+  cp "$EV/pristine/r04_rr1_g05_repair_suites.sh" "$COPY/scripts/rust-tauri/r04_rr1_g05_repair_suites.sh"
 }
 
 record_case() { # name exit_code named verdict

@@ -1,0 +1,1 @@
+error: --bind 0.0.0.0:8080 is not a loopback address while the network mode is loopback: pass --network-mode lan explicitly to expose the service beyond loopback (never a silent LAN bind)

@@ -1,0 +1,3 @@
+    Finished `dev` profile [unoptimized + debuginfo] target(s) in 0.04s
+     Running `/Users/study_superior/.cache/lingxi-r04-rr1-neg-target/debug/xtask verify-stage R03 --evidence /Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R04/RR1-G05-E01/negative-rr1/rr1-n4-full-gate/evidence/R03_REGRESSION`
+error: repo-root mismatch: this xtask was compiled in "/private/tmp/lingxi-r04-rr1-neg-Kwirxl", but the current working directory belongs to "/private/tmp/lingxi-r04-rr1-neg-XHIKts". Refusing to run gates across checkouts (RR-T08-F1).

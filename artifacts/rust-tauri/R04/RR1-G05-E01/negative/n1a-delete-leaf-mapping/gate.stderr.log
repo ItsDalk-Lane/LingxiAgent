@@ -1,0 +1,4 @@
+   Compiling xtask v0.1.0 (/private/tmp/lingxi-r04-t08-neg-Pa0LSe/rust/crates/xtask)
+    Finished `dev` profile [unoptimized + debuginfo] target(s) in 0.45s
+     Running `/Users/study_superior/.cache/lingxi-r04-t08-neg-target/debug/xtask verify-stage R04 --evidence /Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R04/RR1-G05-E01/negative/n1a-delete-leaf-mapping/evidence`
+error: verify-stage for R04 aborted: stage map for R04 drops 1 REQUIRED_SUPPLEMENTAL leaf scenario(s) that the R00 acceptance ledger binds to this stage: ["R00-T02-LA-00C88B996AA0"] — required leaves may not be filtered out of the stage gate (R13-F01)

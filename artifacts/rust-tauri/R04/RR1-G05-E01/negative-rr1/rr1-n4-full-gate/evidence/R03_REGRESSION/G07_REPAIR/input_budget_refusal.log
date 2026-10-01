@@ -1,0 +1,9 @@
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.08s
+     Running tests/input_budget_refusal.rs (/Users/study_superior/.cache/lingxi-r04-rr1-neg-target/debug/deps/input_budget_refusal-26bbfb3ea22ca6ba)
+
+running 2 tests
+test c03_log_summary_oversized_legal_input_is_not_misrefused ... ok
+test c03_over_budget_refused_loudly_with_zero_side_effects ... ok
+
+test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.11s
+

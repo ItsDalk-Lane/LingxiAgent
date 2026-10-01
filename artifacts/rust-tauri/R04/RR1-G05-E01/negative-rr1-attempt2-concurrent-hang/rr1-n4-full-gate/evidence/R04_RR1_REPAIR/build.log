@@ -1,0 +1,9 @@
+   Compiling lingxi-service v0.0.0 (/private/tmp/lingxi-r04-rr1-neg-XHIKts/rust/crates/lingxi-service)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 8.80s
+  Executable unittests src/lib.rs (/Users/study_superior/.cache/lingxi-r04-rr1-neg-target/debug/deps/lingxi_service-8c78af55f7759b0c)
+  Executable tests/r04_rr1_f02_reaper_cleanup.rs (/Users/study_superior/.cache/lingxi-r04-rr1-neg-target/debug/deps/r04_rr1_f02_reaper_cleanup-50b09fa6e18e0cdd)
+  Executable tests/r04_rr1_f03_stop_honesty.rs (/Users/study_superior/.cache/lingxi-r04-rr1-neg-target/debug/deps/r04_rr1_f03_stop_honesty-f444d567d680df3a)
+  Executable tests/r04_rr1_f04_pty_consumption.rs (/Users/study_superior/.cache/lingxi-r04-rr1-neg-target/debug/deps/r04_rr1_f04_pty_consumption-09882cfff87e08ea)
+  Executable tests/r04_rr1_f05_output_integrity.rs (/Users/study_superior/.cache/lingxi-r04-rr1-neg-target/debug/deps/r04_rr1_f05_output_integrity-f09943acdcfa1c74)
+  Executable tests/r04_rr1_f05_spill_failure.rs (/Users/study_superior/.cache/lingxi-r04-rr1-neg-target/debug/deps/r04_rr1_f05_spill_failure-6860071db7204b60)
+  Executable tests/r04_t05_registry_capacity.rs (/Users/study_superior/.cache/lingxi-r04-rr1-neg-target/debug/deps/r04_t05_registry_capacity-f987ac141ed66163)

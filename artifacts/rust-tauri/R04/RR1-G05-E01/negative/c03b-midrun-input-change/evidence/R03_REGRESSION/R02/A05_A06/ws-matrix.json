@@ -1,0 +1,350 @@
+{
+ "results": [
+  {
+   "case": "ws-evil-origin",
+   "expected": 403,
+   "actual": 403,
+   "ok": true,
+   "detail": "{\"code\":\"forbidden\",\"details\":{\"causeId\":\"transport.bad_origin\",\"reason\":\"bad_origin\",\"requestId\":\"req-66fe61a9575fcb0b7f3d807b65f41bba\"},\"message\":\"transport policy rejected the request\",\"retryable\":false}"
+  },
+  {
+   "case": "ws-foreign-host",
+   "expected": 403,
+   "actual": 403,
+   "ok": true,
+   "detail": "HTTP/1.1 403 Forbidden"
+  },
+  {
+   "case": "ws-no-credential",
+   "expected": 401,
+   "actual": 401,
+   "ok": true,
+   "detail": "{\"code\":\"unauthorized\",\"details\":{\"causeId\":\"auth.missing_credential\",\"reason\":\"missing_credential\",\"requestId\":\"req-a030076ef345ec7d8fefd0d563f9beb0\"},\"message\":\"authentication required\",\"retryable\":false}"
+  },
+  {
+   "case": "ws-ticket-legit-origin-upgrade",
+   "expected": 101,
+   "actual": 101,
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "case": "ws-server-hello",
+   "expected": true,
+   "actual": true,
+   "ok": true,
+   "detail": "{\"dataEpoch\":1,\"protocol\":\"lingxi.wire\",\"selectedProtocol\":1,\"serverKind\":\"lingxi-service\",\"serverVersion\":\"0.0.0\",\"wire"
+  },
+  {
+   "case": "ws-session-read-owner",
+   "expected": true,
+   "actual": true,
+   "ok": true,
+   "detail": "{\"runCount\":1,\"sessionId\":\"sess_local_alpha\",\"type\":\"sessionReadResult\"}"
+  },
+  {
+   "case": "ws-ticket-replay",
+   "expected": 401,
+   "actual": 401,
+   "ok": true,
+   "detail": "{\"code\":\"unauthorized\",\"details\":{\"causeId\":\"auth.invalid_ws_ticket\",\"reason\":\"invalid_ws_ticket\",\"requestId\":\"req-2cfa5cdd7042e5e06bf0fd41e8aaa65c\"},\"message\":\"authentication required\",\"retryable\":false}"
+  },
+  {
+   "case": "ws-no-origin-cli-bearer",
+   "expected": 101,
+   "actual": 101,
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "case": "ws-cli-server-hello",
+   "expected": true,
+   "actual": true,
+   "ok": true,
+   "detail": "{\"dataEpoch\":1,\"protocol\":\"lingxi.wire\",\"selectedProtocol\":1,\"serverKind\":\"lingxi-service\",\"serverVersion\":\"0.0.0\",\"wire"
+  },
+  {
+   "case": "ws-unmasked-text-upgrade",
+   "expected": 101,
+   "actual": 101,
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "case": "ws-unmasked-text-hello",
+   "expected": "text",
+   "actual": "text",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "case": "ws-unmasked-text-protocol-close",
+   "expected": [
+    "close",
+    1002
+   ],
+   "actual": [
+    "close",
+    1002
+   ],
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "case": "ws-unmasked-close-upgrade",
+   "expected": 101,
+   "actual": 101,
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "case": "ws-unmasked-close-hello",
+   "expected": "text",
+   "actual": "text",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "case": "ws-unmasked-close-protocol-close",
+   "expected": [
+    "close",
+    1002
+   ],
+   "actual": [
+    "close",
+    1002
+   ],
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "case": "ws-unmasked-ping-upgrade",
+   "expected": 101,
+   "actual": 101,
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "case": "ws-unmasked-ping-hello",
+   "expected": "text",
+   "actual": "text",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "case": "ws-unmasked-ping-protocol-close",
+   "expected": [
+    "close",
+    1002
+   ],
+   "actual": [
+    "close",
+    1002
+   ],
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "case": "ws-unmasked-pong-upgrade",
+   "expected": 101,
+   "actual": 101,
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "case": "ws-unmasked-pong-hello",
+   "expected": "text",
+   "actual": "text",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "case": "ws-unmasked-pong-protocol-close",
+   "expected": [
+    "close",
+    1002
+   ],
+   "actual": [
+    "close",
+    1002
+   ],
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "case": "ws-invalid-upgrade-missing-version",
+   "expected": 400,
+   "actual": 400,
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "case": "ws-invalid-upgrade-missing-key",
+   "expected": 400,
+   "actual": 400,
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "case": "ws-invalid-upgrade-malformed-key",
+   "expected": 400,
+   "actual": 400,
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "case": "ws-invalid-upgrade-wrong-upgrade",
+   "expected": 400,
+   "actual": 400,
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "case": "ws-invalid-upgrade-substring-connection",
+   "expected": 400,
+   "actual": 400,
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "case": "unknown-trailing-slash-/lingxi/v1/health/",
+   "expected": 401,
+   "actual": 401,
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "case": "unknown-trailing-slash-/lingxi/v1/web-auth/session/",
+   "expected": 401,
+   "actual": 401,
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "case": "ws-live-revoke-issue",
+   "expected": 201,
+   "actual": 201,
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "case": "ws-live-revoke-upgrade",
+   "expected": 101,
+   "actual": 101,
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "case": "ws-live-revoke-hello",
+   "expected": "text",
+   "actual": "text",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "case": "ws-live-revoke-action",
+   "expected": 200,
+   "actual": 200,
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "case": "ws-live-revoke-denial-frame",
+   "expected": true,
+   "actual": true,
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "case": "ws-live-revoke-idle-close",
+   "expected": [
+    "close",
+    4401
+   ],
+   "actual": [
+    "close",
+    4401
+   ],
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "case": "ws-web-logout-password-setup",
+   "expected": 200,
+   "actual": 200,
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "case": "ws-web-logout-login",
+   "expected": 200,
+   "actual": 200,
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "case": "ws-web-logout-cookie-issued",
+   "expected": true,
+   "actual": true,
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "case": "ws-web-logout-ticket",
+   "expected": 200,
+   "actual": 200,
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "case": "ws-web-logout-upgrade",
+   "expected": 101,
+   "actual": 101,
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "case": "ws-web-logout-hello",
+   "expected": "text",
+   "actual": "text",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "case": "ws-web-logout-action",
+   "expected": 200,
+   "actual": 200,
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "case": "ws-web-logout-denial-frame",
+   "expected": true,
+   "actual": true,
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "case": "ws-web-logout-idle-close",
+   "expected": [
+    "close",
+    4401
+   ],
+   "actual": [
+    "close",
+    4401
+   ],
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "case": "ws-ticket-expired",
+   "expected": 401,
+   "actual": 401,
+   "ok": true,
+   "detail": "{\"code\":\"unauthorized\",\"details\":{\"causeId\":\"auth.invalid_ws_ticket\",\"reason\":\"invalid_ws_ticket\",\"requestId\":\"req-8feabfc0d471a86f78477eb605ae24b0\"},\"message\":\"authentication required\",\"retryable\":false}"
+  }
+ ],
+ "all_ok": true,
+ "issues": []
+}
