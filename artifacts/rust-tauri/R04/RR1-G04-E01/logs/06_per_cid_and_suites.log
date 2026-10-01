@@ -1,0 +1,211 @@
+== F04-C01/C02/C03 (unit, procsupervisor transcript*) ==
+   Compiling lingxi-service v0.0.0 (/Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-service)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 3.54s
+     Running unittests src/lib.rs (rust/target/debug/deps/lingxi_service-8c78af55f7759b0c)
+
+running 11 tests
+test procsupervisor::tests::transcript_boundary_across_many_chunks_with_interleaved_polls ... ok
+test procsupervisor::tests::transcript_ring_drop_of_undelivered_is_counted_honestly ... ok
+test procsupervisor::tests::transcript_mixed_chunk_prefix_is_consumed_byte_exactly_r04_rr1_f04_c01 ... ok
+test procsupervisor::tests::transcript_delivers_split_multibyte_characters_intact ... ok
+test procsupervisor::tests::transcript_force_delivery_flushes_a_dangling_partial ... ok
+test procsupervisor::tests::transcript_ring_overflow_while_holding_back_counts_only_real_evictions ... ok
+test procsupervisor::tests::transcript_idle_polls_after_a_partial_delivery_hold_back_without_loss ... ok
+test exectools::tests::transcript_spill_claim_vocabulary_is_state_exclusive ... ok
+test procsupervisor::tests::transcript_property_valid_input_reassembles_exactly ... ok
+test procsupervisor::tests::transcript_property_invalid_bytes_replaced_exactly_once ... ok
+test procsupervisor::tests::transcript_property_eviction_accounting_counts_only_real_loss ... ok
+
+test result: ok. 11 passed; 0 failed; 0 ignored; 0 measured; 302 filtered out; finished in 0.00s
+
+EXIT_CODE=0
+
+== F05 pure-logic units (exectools truncate/assemble/claims) ==
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.10s
+     Running unittests src/lib.rs (rust/target/debug/deps/lingxi_service-8c78af55f7759b0c)
+
+running 9 tests
+test exectools::tests::assemble_retained_output_small_stream_is_whole_and_exact ... ok
+test exectools::tests::transcript_spill_claim_vocabulary_is_state_exclusive ... ok
+test exectools::tests::full_output_claim_vocabulary_is_state_exclusive ... ok
+test exectools::tests::assemble_retained_output_evicted_middle_is_counted_and_marked ... ok
+test exectools::tests::truncate_head_tail_small_output_stays_whole ... ok
+test exectools::tests::spill_resource_ref_never_claims_full_when_capped_or_failed ... ok
+test exectools::tests::truncate_head_tail_single_huge_ascii_line_keeps_head_and_tail ... ok
+test exectools::tests::truncate_head_tail_newline_only_at_end_keeps_both_markers ... ok
+test exectools::tests::truncate_head_tail_multibyte_line_cuts_on_char_boundaries ... ok
+
+test result: ok. 9 passed; 0 failed; 0 ignored; 0 measured; 304 filtered out; finished in 0.00s
+
+EXIT_CODE=0
+
+== F04-C04 (real PTY handshake) ==
+   Compiling lingxi-service v0.0.0 (/Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-service)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 3.92s
+     Running tests/r04_rr1_f04_pty_consumption.rs (rust/target/debug/deps/r04_rr1_f04_pty_consumption-09882cfff87e08ea)
+
+running 1 test
+test f04_c04_real_pty_handshake_delivers_mixed_bytes_exactly_once ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.10s
+
+EXIT_CODE=0
+
+== F05-C01/C02/C03/C05 (output integrity) ==
+   Compiling lingxi-service v0.0.0 (/Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-service)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.76s
+     Running tests/r04_rr1_f05_output_integrity.rs (rust/target/debug/deps/r04_rr1_f05_output_integrity-f09943acdcfa1c74)
+
+running 7 tests
+test f05_c03_capped_spill_is_partial_and_honest ... ok
+test f05_c01_control_small_stream_big_budget_distinguishes_facts ... ok
+test f05_c02_single_multibyte_line_keeps_head_and_tail_content ... ok
+test f05_c01_hidden_window_prefix_loss_is_flagged_not_hidden ... ok
+test f05_c01_big_stream_marks_eviction_and_keeps_true_head_and_tail ... ok
+test f05_c05_high_output_and_many_pty_polls_stay_bounded ... ok
+test f05_c05_cancelling_mid_output_closes_the_spill_and_bounds_everything ... ok
+
+test result: ok. 7 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.35s
+
+EXIT_CODE=0
+
+== F05-C04 (spill failure, isolated process) ==
+   Compiling lingxi-service v0.0.0 (/Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-service)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.61s
+     Running tests/r04_rr1_f05_spill_failure.rs (rust/target/debug/deps/r04_rr1_f05_spill_failure-6860071db7204b60)
+
+running 2 tests
+test f05_c04_spill_write_failure_diagnoses_honestly_no_ghost_full_file ... ok
+test f05_c04_unwritable_spill_dir_reports_no_spill_kept ... ok
+
+test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.03s
+
+EXIT_CODE=0
+
+== G01 suite re-run (r04_t05_registry_capacity) ==
+   Compiling lingxi-service v0.0.0 (/Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-service)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.81s
+     Running tests/r04_t05_registry_capacity.rs (rust/target/debug/deps/r04_t05_registry_capacity-f987ac141ed66163)
+
+running 9 tests
+test rr1_f01_c02_two_one_shots_race_the_last_slot_through_a_barrier ... ok
+test rr1_f01_c02_two_ptys_race_the_last_slot_through_a_barrier ... ok
+test rr1_f01_c03_pty_group_verify_failure_closes_the_pty_and_returns_the_slot ... ok
+test repro_rr1_f01_registry_full_refusal_must_not_execute_the_command ... ok
+test rr1_f01_c03_pty_open_failure_is_zero_dispatch_and_returns_the_slot ... ok
+test rr1_f01_c02_one_shot_and_pty_race_the_last_slot_through_a_barrier ... ok
+test rr1_f01_c03_one_shot_group_verify_failure_compensates_exactly_once ... ok
+test rr1_f01_c04_same_process_usable_after_repeated_refusals_and_releases ... ok
+test rr1_f01_c01_registry_full_refuses_with_zero_dispatch ... ok
+
+test result: ok. 9 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 4.38s
+
+EXIT_CODE=0
+
+== G02 suite re-run (r04_rr1_f02_reaper_cleanup) ==
+   Compiling lingxi-service v0.0.0 (/Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-service)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.58s
+     Running tests/r04_rr1_f02_reaper_cleanup.rs (rust/target/debug/deps/r04_rr1_f02_reaper_cleanup-50b09fa6e18e0cdd)
+
+running 11 tests
+test rr1_f02_c03_adversarial_panicking_pump_is_observed_and_honest ... ok
+test rr1_f02_c04_stress_cycles_return_to_the_declared_steady_state ... ok
+test rr1_f02_c03_double_stuck_pumps_complete_within_the_single_budget ... ok
+test rr1_f02_c02_terminate_in_the_reaped_undrained_window_signals_nothing ... ok
+test rr1_f02_c01_pty_family_grandchild_holding_the_slave_closes_the_master ... ok
+test rr1_f02_c02_adversarial_window_offsets_never_signal_a_stale_group ... ok
+test rr1_f02_c01_adversarial_slow_writer_cannot_mutate_the_settled_collector ... ok
+test rr1_f02_c01_grandchild_holding_both_ends_freezes_the_result_and_closes_the_read_ends ... ok
+test rr1_f02_c03_adversarial_exit_and_cancel_racing_never_signals_unprovably ... ok
+test rr1_f02_fast_exiting_child_is_not_refused_by_the_reap_race ... ok
+test rr1_f02_repro_grandchild_pump_outlives_the_grace_and_mutates_the_settled_collector ... ok
+
+test result: ok. 11 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 13.02s
+
+EXIT_CODE=0
+
+== G03 suite re-run (r04_rr1_f03_stop_honesty) ==
+   Compiling lingxi-service v0.0.0 (/Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-service)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.91s
+     Running tests/r04_rr1_f03_stop_honesty.rs (rust/target/debug/deps/r04_rr1_f03_stop_honesty-f444d567d680df3a)
+
+running 7 tests
+test rr1_f03_c04_adversarial_cancel_racing_natural_exit_stays_real ... ok
+test rr1_f03_c04_control_group_real_states_stay_accurate ... ok
+test rr1_f03_c02_pty_cleanup_unconfirmed_poll_agrees_with_the_text ... ok
+test rr1_f03_c05_adversarial_dropped_tool_future_keeps_the_honest_chain ... ok
+test rr1_f03_c03_repeated_terminate_does_not_upgrade_unconfirmed_to_confirmed ... ok
+test rr1_f03_c01_timeout_cleanup_unconfirmed_never_reports_an_exit ... ok
+test rr1_f03_c05_run_cancel_keeps_control_flow_and_external_unconfirmed_separate ... ok
+
+test result: ok. 7 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 2.17s
+
+EXIT_CODE=0
+
+== T05 process tools (PTY/output regressions) ==
+   Compiling lingxi-service v0.0.0 (/Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-service)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.75s
+     Running tests/r04_t05_process_tools.rs (rust/target/debug/deps/r04_t05_process_tools-6a5ae24a4a6cd9b7)
+
+running 14 tests
+test process_tools_go_through_the_gateway_policy_and_cwd_authorization ... ok
+test adversarial_output_storm_is_bounded_truncated_and_spilled ... ok
+test adversarial_both_streams_blocking_still_completes ... ok
+test persistent_terminal_lifetime_is_explicit_and_shutdown_is_bounded ... ok
+test environment_is_whitelist_plus_explicit_overrides_never_full_inherit ... ok
+test adversarial_cross_session_and_forged_write_stdin_are_refused ... ok
+test adversarial_cancel_racing_natural_exit_keeps_invariants ... ok
+test ask_session_exec_command_round_trips_the_approval_face ... ok
+test r04_a09_managed_tree_is_killed_and_the_unrelated_sentinel_survives ... ok
+test r04_a10_pty_input_reads_resize_interrupt_and_exit ... ok
+test adversarial_parent_exit_with_grandchild_holding_the_pipe_is_bounded ... ok
+test adversarial_unresponsive_process_times_out_within_the_bound ... ok
+test adversarial_utf8_output_survives_chunk_splits ... ok
+test terminate_after_natural_exit_is_already_terminal_and_spawn_failures_are_loud ... ok
+
+test result: ok. 14 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 3.61s
+
+EXIT_CODE=0
+
+== T06 sandbox re-run ==
+   Compiling lingxi-service v0.0.0 (/Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-service)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.66s
+     Running tests/r04_t06_sandbox.rs (rust/target/debug/deps/r04_t06_sandbox-2315168487dcb1f8)
+
+running 10 tests
+test r04_a11_missing_helper_at_composition_is_a_loud_refusal ... ok
+test seatbelt_helper_trust_and_capabilities_are_recorded ... ok
+test r04_a11_unsupported_backend_refuses_through_the_real_chain ... ok
+test adversarial_policy_injection_is_refused_at_both_layers ... ok
+test adversarial_tty_terminals_are_honestly_not_claimed_as_contained ... ok
+test r04_a12_environment_whitelist_holds_through_the_sandbox_wrapper ... ok
+test r04_a11_replaced_helper_is_refused_and_the_impostor_never_runs ... ok
+test r04_a12_network_isolation_against_the_registered_loopback_service ... ok
+test r04_a12_filesystem_write_isolation_holds_with_real_sentinels ... ok
+test r04_a12_sandboxed_process_tree_still_honors_the_cancellation_chain ... ok
+
+test result: ok. 10 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 2.33s
+
+EXIT_CODE=0
+
+== T08 tool matrix re-run ==
+   Compiling lingxi-service v0.0.0 (/Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-service)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 1.25s
+     Running tests/r04_t08_tool_matrix.rs (rust/target/debug/deps/r04_t08_tool_matrix-ff9ad8403b5cdac5)
+
+running 10 tests
+test matrix_future_tools_honest_in_catalog ... ok
+test a15_gateway_registration_audit_converts_fake_refs ... ok
+test native_tool_share_cases_on_the_real_chain ... ok
+test terminal_family_share_cases ... ok
+test mcp_mechanism_face_share_cases ... ok
+test a16_disabled_state_covers_every_route ... ok
+test matrix_tools_x_permission_x_entry_consistency ... ok
+test a15_empty_and_invalid_products_never_register ... ok
+test outcome_semantics_and_receipts_unified ... ok
+test approval_face_share_cases has been running for over 60 seconds
+test approval_face_share_cases ... ok
+
+test result: ok. 10 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 300.76s
+
+EXIT_CODE=0

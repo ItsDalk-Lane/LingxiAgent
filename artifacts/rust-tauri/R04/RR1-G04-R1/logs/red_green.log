@@ -1,0 +1,73 @@
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.08s
+     Running unittests src/lib.rs (rust/target/debug/deps/lingxi_service-8c78af55f7759b0c)
+
+running 1 test
+test procsupervisor::tests::reviewer_indep_mixed_chunk_is_consumed_byte_exactly ... FAILED
+
+failures:
+
+---- procsupervisor::tests::reviewer_indep_mixed_chunk_is_consumed_byte_exactly stdout ----
+
+thread 'procsupervisor::tests::reviewer_indep_mixed_chunk_is_consumed_byte_exactly' (3491894) panicked at crates/lingxi-service/src/procsupervisor.rs:2974:9:
+assertion `left == right` failed: each byte is delivered exactly once (joined="aaa日")
+  left: "aaa日"
+ right: "a日"
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+
+
+failures:
+    procsupervisor::tests::reviewer_indep_mixed_chunk_is_consumed_byte_exactly
+
+test result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 298 filtered out; finished in 0.00s
+
+error: test failed, to rerun pass `-p lingxi-service --lib`
+BASELINE_F04_EXIT=101
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.07s
+     Running tests/r04_review_g04r1_indep_f05.rs (rust/target/debug/deps/r04_review_g04r1_indep_f05-e2950e03f35e8dc4)
+
+running 2 tests
+test reviewer_indep_f05_window_prefix_loss_cannot_read_complete ... FAILED
+test reviewer_indep_f05_evicted_middle_is_flagged_with_big_budget ... FAILED
+
+failures:
+
+---- reviewer_indep_f05_window_prefix_loss_cannot_read_complete stdout ----
+
+thread 'reviewer_indep_f05_window_prefix_loss_cannot_read_complete' (3491918) panicked at crates/lingxi-service/tests/r04_review_g04r1_indep_f05.rs:179:5:
+the true stream head must be visible; truncated=false, head of text: "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+
+---- reviewer_indep_f05_evicted_middle_is_flagged_with_big_budget stdout ----
+
+thread 'reviewer_indep_f05_evicted_middle_is_flagged_with_big_budget' (3491917) panicked at crates/lingxi-service/tests/r04_review_g04r1_indep_f05.rs:215:5:
+an evicted middle must flag truncated even with a budget larger than the window
+
+
+failures:
+    reviewer_indep_f05_evicted_middle_is_flagged_with_big_budget
+    reviewer_indep_f05_window_prefix_loss_cannot_read_complete
+
+test result: FAILED. 0 passed; 2 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.03s
+
+error: test failed, to rerun pass `-p lingxi-service --test r04_review_g04r1_indep_f05`
+BASELINE_F05_EXIT=101
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.08s
+     Running unittests src/lib.rs (rust/target/debug/deps/lingxi_service-8c78af55f7759b0c)
+
+running 2 tests
+test procsupervisor::tests::reviewer_indep_split_emoji_across_chunks_with_polls_and_force ... ok
+test procsupervisor::tests::reviewer_indep_mixed_chunk_is_consumed_byte_exactly ... ok
+
+test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 313 filtered out; finished in 0.00s
+
+CANDIDATE_F04_EXIT=0
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.07s
+     Running tests/r04_review_g04r1_indep_f05.rs (rust/target/debug/deps/r04_review_g04r1_indep_f05-e2950e03f35e8dc4)
+
+running 2 tests
+test reviewer_indep_f05_window_prefix_loss_cannot_read_complete ... ok
+test reviewer_indep_f05_evicted_middle_is_flagged_with_big_budget ... ok
+
+test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.03s
+
+CANDIDATE_F05_EXIT=0

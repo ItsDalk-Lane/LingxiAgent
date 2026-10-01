@@ -1,0 +1,68 @@
+   Compiling lingxi-service v0.0.0 (/Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-service)
+warning: unused import: `ProcessHandleId`
+  --> crates/lingxi-service/tests/r04_rr1_f05_output_integrity.rs:30:38
+   |
+30 | use lingxi_service::procsupervisor::{ProcessHandleId, ProcessSupervisor, SupervisorLimits};
+   |                                      ^^^^^^^^^^^^^^^
+   |
+   = note: `#[warn(unused_imports)]` (part of `#[warn(unused)]`) on by default
+
+warning: variable does not need to be mutable
+  --> crates/lingxi-service/tests/r04_rr1_f05_output_integrity.rs:81:27
+   |
+81 | fn integrity_harness_with(mut limits: SupervisorLimits) -> IntegrityHarness {
+   |                           ----^^^^^^
+   |                           |
+   |                           help: remove this `mut`
+   |
+   = note: `#[warn(unused_mut)]` (part of `#[warn(unused)]`) on by default
+
+warning: fields `write_stdin_target` and `ws` are never read
+  --> crates/lingxi-service/tests/r04_rr1_f05_output_integrity.rs:50:5
+   |
+44 | struct IntegrityHarness {
+   |        ---------------- fields in this struct
+...
+50 |     write_stdin_target: ToolTargetId,
+   |     ^^^^^^^^^^^^^^^^^^
+...
+53 |     ws: PathBuf,
+   |     ^^
+   |
+   = note: `#[warn(dead_code)]` (part of `#[warn(unused)]`) on by default
+
+warning: function `call_write_stdin` is never used
+   --> crates/lingxi-service/tests/r04_rr1_f05_output_integrity.rs:167:10
+    |
+167 | async fn call_write_stdin(
+    |          ^^^^^^^^^^^^^^^^
+
+warning: function `wait_until` is never used
+   --> crates/lingxi-service/tests/r04_rr1_f05_output_integrity.rs:237:10
+    |
+237 | async fn wait_until<T>(
+    |          ^^^^^^^^^^
+
+warning: `lingxi-service` (test "r04_rr1_f05_output_integrity") generated 5 warnings (run `cargo fix --test "r04_rr1_f05_output_integrity" -p lingxi-service` to apply 2 suggestions)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 2.16s
+     Running tests/r04_rr1_f05_output_integrity.rs (rust/target/debug/deps/r04_rr1_f05_output_integrity-f09943acdcfa1c74)
+
+running 1 test
+test f05_c01_hidden_window_prefix_loss_is_flagged_not_hidden ... FAILED
+
+failures:
+
+---- f05_c01_hidden_window_prefix_loss_is_flagged_not_hidden stdout ----
+
+thread 'f05_c01_hidden_window_prefix_loss_is_flagged_not_hidden' (3393653) panicked at crates/lingxi-service/tests/r04_rr1_f05_output_integrity.rs:286:5:
+the true stream head must be visible or the loss flagged; truncated=false; text head: "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"… text tail: …"xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx|TAIL_MARK"
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+
+
+failures:
+    f05_c01_hidden_window_prefix_loss_is_flagged_not_hidden
+
+test result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.08s
+
+error: test failed, to rerun pass `-p lingxi-service --test r04_rr1_f05_output_integrity`
+EXIT_CODE=101

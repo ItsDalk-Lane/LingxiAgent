@@ -106,11 +106,11 @@
       ],
       "source_fact_confirmed_at_baseline": "cursor 只跨完整消费 chunk 推进（基线 616-647），部分消费 chunk 整块留队列→重复输出；未补齐尾部计入 dropped_undelivered_bytes",
       "cases": ["R04-RR1-F04-C01", "R04-RR1-F04-C02", "R04-RR1-F04-C03", "R04-RR1-F04-C04"],
-      "status": "OPEN_FOR_NATIVE_REPRODUCTION_AND_REPAIR",
-      "normal_selfcheck": "NOT_RUN",
-      "adversarial_selfcheck": "NOT_RUN",
-      "independent_review": "NOT_RUN",
-      "candidate": null,
+      "status": "CLOSED_PENDING_COMMIT（R1 独立 PASS；提交回执在 G05 收口统一补记）",
+      "normal_selfcheck": "PASS（E01：C01 红 exit 101 存证+控制组；C02 文本+结构化双核；C03 72 种子属性测试；C04 真实 PTY 握手两段写无 sleep。证据 artifacts/rust-tauri/R04/RR1-G04-E01/logs/）",
+      "adversarial_selfcheck": "PASS（E01：确定性淘汰形状/多 chunk 边界/非法字节+不完整尾并存/权限不退化/3× soak）",
+      "independent_review": "PASS（REVIEWER-R04-RR1-G04-R01，2026-10-01：自写反例基线红——混合 chunk joined=\"aaa日\"（a 交付三次）+暂存被计 dropped；候选 exit 0 恰 a日。chunk 内 consumed 字节偏移模型逐路径核对（join 只取未消费余量/force 全消费）；四态分立；decode_prefix_utf8 与 lossy maximal-subpart 对齐；属性测试换 3 组全新 seed 72 条新序列全过。报告 G04-R1_REVIEW.md，证据 RR1-G04-R1/）",
+      "candidate": "工作区未提交改动（基线 614fab1af：procsupervisor.rs TranscriptCore 字节级消费模型+decode_prefix_utf8 迭代式重写；exectools.rs 四态声明；3 个新集成测试文件+单测/属性测试）",
       "commit": null
     },
     {
@@ -125,11 +125,11 @@
       ],
       "source_fact_confirmed_at_baseline": "truncated=head_tail.truncated 不比较 total_bytes（基线 759）；Full output 声明不含 capped 事实（762）",
       "cases": ["R04-RR1-F05-C01", "R04-RR1-F05-C02", "R04-RR1-F05-C03", "R04-RR1-F05-C04", "R04-RR1-F05-C05"],
-      "status": "OPEN_FOR_NATIVE_REPRODUCTION_AND_REPAIR",
-      "normal_selfcheck": "NOT_RUN",
-      "adversarial_selfcheck": "NOT_RUN",
-      "independent_review": "NOT_RUN",
-      "candidate": null,
+      "status": "CLOSED_PENDING_COMMIT（R1 独立 PASS；提交回执在 G05 收口统一补记）",
+      "normal_selfcheck": "PASS（E01：C01 三腿含控制组两事实分清；C02 多字节/末尾换行；C03 BEYOND_CAP 只在内存；C04 EFBIG/EACCES 零 ResourceRef；C05 双窗/spill/FD 有界+并发+中途取消）",
+      "adversarial_selfcheck": "PASS（E01：结果预算小/大两流并发取消输出中途；资源趋势与清理证据）",
+      "independent_review": "PASS（REVIEWER-R04-RR1-G04-R01，2026-10-01：自写反例基线红——150024B 单行/200000 预算 truncated=false 且文本以 xxxx 开头 HEAD 已丢；候选 exit 0 全流精确/300KB 腿显式 evicted+真头真尾。truncated=head_tail.truncated||evicted>0 核对；内存上界恒等式 head=min(cap,total)/window=min(cap,total)/lost=max(0,total−2cap) 以真实 record 断言；单超长行 UTF-8 字符边界切分；Full 四态仅字节完整文件；失败 spill 零 ResourceRef；网关产物存在性审计未触及）",
+      "candidate": "同 F04 候选（CollectorCore 真头窗+OutputSnapshot.head/lost_middle_bytes+SpillInfo.failed；exectools.rs assemble_retained_output/truncate_head_tail 回退/full_output_claim 四态）",
       "commit": null
     }
   ],

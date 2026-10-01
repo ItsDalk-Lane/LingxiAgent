@@ -21,12 +21,16 @@
 //!   entries. The server's full environment (tokens, secrets) is NEVER
 //!   inherited — the incumbent's `env ?? process.env` is the gap this
 //!   closes (registered mapping decision).
-//! - One-shot result: bounded output window, head+tail truncation with
-//!   the incumbent's notice vocabulary, exit code (`128+signal` for
-//!   signal deaths), timeout watchdog (default 120 s, clamped to 600 s
-//!   like the incumbent) that runs the supervisor's bounded termination
-//!   chain, and a full-output SPILL reference (ResourceRef) when the
-//!   output exceeded the window.
+//! - One-shot result: the whole-stream FACTS (total bytes, the true
+//!   head, the retained tail window, in-memory evictions, spill
+//!   cap/error) drive the head+tail presentation and the `truncated`
+//!   flag (R04-RR1-F05): a legal return budget larger than the window
+//!   can never turn an evicted prefix into "complete", and only a
+//!   byte-complete spill file is ever called "Full output". Exit code
+//!   (`128+signal` for signal deaths), timeout watchdog (default 120 s,
+//!   clamped to 600 s like the incumbent) running the supervisor's
+//!   bounded termination chain, and the SPILL reference (ResourceRef)
+//!   with capped/failed states explicit.
 //! - `tty: true` starts a PTY terminal and RETURNS IMMEDIATELY with
 //!   `ToolRunStatus::Running { handle }` — "started" never masquerades
 //!   as completion. The terminal's lifetime is registered as a
@@ -386,6 +390,75 @@ fn decode_window(window: &[u8]) -> String {
     text
 }
 
+/// Decodes the TRUE stream head for the evicted-middle presentation. A
+/// TRAILING incomplete sequence (the head window ends mid-character —
+/// its completion lives in the evicted middle) is TRIMMED and its byte
+/// count returned: fabricating a replacement character for bytes whose
+/// continuation is gone would invent content, and the eviction marker
+/// states the loss instead. Interior invalid bytes become replacement
+/// characters (deterministic, consumed).
+fn decode_head_bytes(bytes: &[u8]) -> (String, usize) {
+    match std::str::from_utf8(bytes) {
+        Ok(text) => (text.to_string(), 0),
+        Err(err) if err.error_len().is_none() => {
+            let valid = err.valid_up_to();
+            (
+                String::from_utf8_lossy(&bytes[..valid]).into_owned(),
+                bytes.len() - valid,
+            )
+        }
+        Err(_) => (String::from_utf8_lossy(bytes).into_owned(), 0),
+    }
+}
+
+/// The retained-output presentation assembled from the collector's
+/// facts (R04-RR1-F05): the TRUE head plus the rolling tail, with the
+/// evicted middle marked. When the whole stream fits the two windows it
+/// is presented whole (deduplicated); otherwise the middle loss is
+/// stated in-band and counted honestly (including a head trimmed
+/// mid-character at the eviction boundary).
+struct AssembledOutput {
+    text: String,
+    /// Real bytes of the stream present in NEITHER window (+ a head
+    /// partial trimmed at the eviction boundary). Zero == the full
+    /// stream is retained.
+    evicted_bytes: u64,
+}
+
+fn assemble_retained_output(head: &[u8], tail: &[u8], total_bytes: u64) -> AssembledOutput {
+    let head_len = head.len() as u64;
+    let tail_len = tail.len() as u64;
+    if total_bytes <= head_len + tail_len {
+        // Full stream retained: head plus the non-overlapping tail
+        // suffix (the windows overlap over the middle; the suffix is
+        // the LAST `total - head` bytes of the tail, so every byte
+        // appears exactly once).
+        let mut full = head.to_vec();
+        if total_bytes > head_len {
+            let suffix_len = (total_bytes - head_len) as usize;
+            let suffix_start = tail.len().saturating_sub(suffix_len);
+            full.extend_from_slice(&tail[suffix_start..]);
+        }
+        AssembledOutput {
+            text: String::from_utf8_lossy(&full).into_owned(),
+            evicted_bytes: 0,
+        }
+    } else {
+        let evicted = total_bytes - head_len - tail_len;
+        let (head_text, head_trimmed) = decode_head_bytes(head);
+        let tail_text = decode_window(tail);
+        let evicted_total = evicted + head_trimmed as u64;
+        let text = format!(
+            "{head_text}\n[... {} bytes of the middle evicted ...]\n{tail_text}",
+            evicted_total
+        );
+        AssembledOutput {
+            text,
+            evicted_bytes: evicted_total,
+        }
+    }
+}
+
 struct HeadTail {
     content: String,
     truncated: bool,
@@ -443,11 +516,19 @@ fn truncate_head_tail(text: &str, max_lines: usize, max_bytes: usize) -> HeadTai
         tail_bytes += line_bytes;
         tail_lines.push(line);
     }
+    let head_content_bytes: usize = head_lines.iter().map(|l| l.len()).sum();
+    let tail_content_bytes: usize = tail_lines.iter().map(|l| l.len()).sum();
     let tail_start = lines.len() - tail_lines.len();
-    if tail_start <= head_lines.len() {
-        // The two segments met: the overflow is small — fall back to a
-        // byte-split head/tail with a precise omission marker (always on
-        // UTF-8 character boundaries).
+    if tail_start <= head_lines.len() || head_content_bytes == 0 || tail_content_bytes == 0 {
+        // Byte-split fallback. Reached when the two line segments met OR
+        // when a line-budget window could not retain actual CONTENT on
+        // either side — the single-huge-line shape (R04-RR1-F05-C02):
+        // the first/last line exceeds both byte budgets, so the line
+        // loops collected nothing (possibly only an empty trailing-line
+        // artifact) and the whole body would otherwise be replaced by a
+        // bare omission marker. The fallback keeps REAL head and tail
+        // CONTENT, split on UTF-8 character boundaries, with the precise
+        // omission size between them.
         let head_part = &text[..floor_char_boundary(text, head_byte_budget)];
         let tail_from = ceil_char_boundary(text, total_bytes.saturating_sub(tail_byte_budget));
         let tail_part = &text[tail_from..];
@@ -487,8 +568,26 @@ fn truncate_head_tail(text: &str, max_lines: usize, max_bytes: usize) -> HeadTai
     }
 }
 
-fn spill_resource_ref(spill: &SpillInfo) -> ResourceRef {
-    ResourceRef {
+/// The honest spill reference (R04-RR1-F05): ONLY an uncapped,
+/// un-failed spill that actually holds the whole stream is a "full
+/// output" reference. A capped spill is referenced as PARTIAL (the file
+/// holds only the first `bytes_written` bytes); a FAILED spill is never
+/// referenced at all — pointing a ResourceRef at an incomplete leftover
+/// invites reading it as the authoritative full output (the ghost-file
+/// defect).
+fn spill_resource_ref(spill: &SpillInfo) -> Option<ResourceRef> {
+    if spill.failed {
+        return None;
+    }
+    let display_name = if spill.capped {
+        format!(
+            "exec_command partial output (spill capped at {} bytes — not the full output)",
+            spill.bytes_written
+        )
+    } else {
+        "exec_command full output".to_string()
+    };
+    Some(ResourceRef {
         resource_id: ResourceId::new(format!(
             "exec-output:{}",
             spill
@@ -498,10 +597,57 @@ fn spill_resource_ref(spill: &SpillInfo) -> ResourceRef {
                 .unwrap_or_else(|| "unknown".to_string())
         )),
         kind: ResourceKind::Artifact,
-        display_name: Some("exec_command full output".to_string()),
+        display_name: Some(display_name),
         uri: Some(format!("file://{}", spill.path.display())),
         digest: None,
         size_bytes: Some(spill.bytes_written),
+    })
+}
+
+/// The full-output availability claim for result notices — one
+/// vocabulary, every state explicit (R04-RR1-F05 requirement 4: only a
+/// genuinely complete file may be called "Full output").
+fn full_output_claim(spill: Option<&SpillInfo>, total_bytes: u64) -> String {
+    match spill {
+        // "Full output" is claimed ONLY when the file provably holds the
+        // whole stream: not capped, not failed, byte-complete.
+        Some(spill) if !spill.capped && !spill.failed && spill.bytes_written >= total_bytes => {
+            format!("Full output: {}", spill.path.display())
+        }
+        Some(spill) if spill.capped => format!(
+            "Full output: unavailable — the spill file was capped at {} bytes (partial file: {})",
+            spill.bytes_written,
+            spill.path.display()
+        ),
+        Some(spill) => format!(
+            "Full output: unavailable — the spill write failed after {} bytes (incomplete \
+             leftover: {}; the in-memory result is unaffected)",
+            spill.bytes_written,
+            spill.path.display()
+        ),
+        None => "Full output: unavailable (no spill file was kept)".to_string(),
+    }
+}
+
+/// The transcript-spill claim appended to the ring-drop notice: only an
+/// uncapped, un-failed spill is a "full transcript"; capped/failed
+/// states are explicit (R04-RR1-F05 vocabulary for the PTY family).
+fn transcript_spill_claim(spill: Option<&SpillInfo>) -> String {
+    match spill {
+        Some(spill) if !spill.capped && !spill.failed && spill.bytes_written > 0 => {
+            format!("; full transcript: {}", spill.path.display())
+        }
+        Some(spill) if spill.capped => format!(
+            "; transcript spill capped at {} bytes (partial file: {})",
+            spill.bytes_written,
+            spill.path.display()
+        ),
+        Some(spill) => format!(
+            "; transcript spill write failed after {} bytes (incomplete file: {})",
+            spill.bytes_written,
+            spill.path.display()
+        ),
+        None => String::new(),
     }
 }
 
@@ -777,8 +923,17 @@ impl ProcessTools {
             .supervisor
             .output_snapshot(&spawned.id)
             .unwrap_or_else(empty_output_snapshot);
-        let text = decode_window(&snapshot.window);
-        let head_tail = truncate_head_tail(&text, EXEC_RESULT_MAX_LINES, params.max_output_bytes);
+        // R04-RR1-F05: the result is assembled from the WHOLE-stream
+        // facts — the true head, the rolling tail, the total — and the
+        // completeness flag is true to those facts, never to whether
+        // the retained window happened to fit the return budget.
+        let assembled =
+            assemble_retained_output(&snapshot.head, &snapshot.window, snapshot.total_bytes);
+        let head_tail = truncate_head_tail(
+            &assembled.text,
+            EXEC_RESULT_MAX_LINES,
+            params.max_output_bytes,
+        );
         // R04-RR1-F03: the run/exit status of the call. An exit CODE is
         // claimed only from a REAL observed fact; a stop whose exit was
         // not observed (CleanupTimedOut) or whose status could not be
@@ -817,20 +972,38 @@ impl ProcessTools {
         } else {
             head_tail.content.clone()
         };
-        let truncated = head_tail.truncated;
-        if truncated {
-            let notice = format!(
-                "\n\n[Showing first {} and last {} of {} lines. Full output: {}]",
-                head_tail.head_lines,
-                head_tail.tail_lines,
-                head_tail.total_lines,
-                snapshot
-                    .spill
-                    .as_ref()
-                    .map(|s| s.path.display().to_string())
-                    .unwrap_or_else(|| "unavailable".to_string())
-            );
-            body.push_str(&notice);
+        // The completeness flag: BOTH facts must be true for false — the
+        // returned body needs no omission AND the in-memory retention
+        // lost nothing. A lost middle marks truncated even when the
+        // return budget is huge (the hidden-loss counter-example).
+        let evicted_bytes = assembled.evicted_bytes;
+        let truncated = head_tail.truncated || evicted_bytes > 0;
+        if truncated || evicted_bytes > 0 {
+            let claim = full_output_claim(snapshot.spill.as_ref(), snapshot.total_bytes);
+            if head_tail.truncated {
+                body.push_str(&format!(
+                    "\n\n[Showing first {} and last {} of {} lines. {claim}]",
+                    head_tail.head_lines, head_tail.tail_lines, head_tail.total_lines,
+                ));
+            }
+            if evicted_bytes > 0 {
+                // The retention fact, stated independently of the return
+                // truncation: the shown beginning and end ARE the
+                // stream's true head and tail, and the middle bytes are
+                // gone from memory (the spill claim above/below says
+                // where the whole stream lives, if anywhere).
+                body.push_str(&format!(
+                    "\n\n[{evicted_bytes} bytes of the output middle were evicted from the \
+                     bounded in-memory head/tail windows; the shown beginning and end are the \
+                     stream's true head and tail. {}]",
+                    if head_tail.truncated {
+                        // The claim is already stated in the lines notice.
+                        String::new()
+                    } else {
+                        claim
+                    }
+                ));
+            }
         }
         if params.timeout_clamped {
             body.push_str(&format!(
@@ -839,7 +1012,9 @@ impl ProcessTools {
         }
         let mut resource_refs = Vec::new();
         if let Some(spill) = snapshot.spill.as_ref().filter(|s| s.bytes_written > 0) {
-            resource_refs.push(spill_resource_ref(spill));
+            // `None` for a failed spill: no ghost full-output reference
+            // (the failure is stated in the body notice instead).
+            resource_refs.extend(spill_resource_ref(spill));
         }
         if timed_out {
             body.push_str(&format!(
@@ -1005,20 +1180,48 @@ impl ProcessTools {
         if !delivery.text.is_empty() {
             lines.push(format!("output:\n{}", delivery.text));
         }
-        if delivery.truncated {
+        // R04-RR1-F04: the four dispositions are stated as DISTINCT
+        // facts. The ring-drop message appears ONLY for real loss (the
+        // structured `truncated` flag covers exactly real loss + a
+        // held-back tail — the two always agree with these lines).
+        if delivery.dropped_undelivered_bytes > 0 {
             lines.push(format!(
-                "[transcript truncated: {} undelivered bytes were dropped by the bounded \
-                 ring{}]",
+                "[transcript truncated: {} bytes were dropped by the bounded ring before \
+                 delivery{}]",
                 delivery.dropped_undelivered_bytes,
-                delivery
-                    .spill
-                    .as_ref()
-                    .map(|s| format!("; full transcript: {}", s.path.display()))
-                    .unwrap_or_default()
+                transcript_spill_claim(delivery.spill.as_ref()),
+            ));
+        }
+        if delivery.pending_incomplete_bytes > 0 {
+            lines.push(format!(
+                "[{} trailing bytes of an incomplete UTF-8 sequence are held back until the \
+                 rest arrives; they are not lost and will be delivered complete]",
+                delivery.pending_incomplete_bytes,
+            ));
+        }
+        if delivery.replaced_bytes > 0 {
+            lines.push(format!(
+                "[the terminal closed mid-character: {} dangling bytes were flushed as one \
+                 U+FFFD replacement]",
+                delivery.replaced_bytes,
             ));
         }
         if let Some(spill) = delivery.spill.as_ref().filter(|s| s.bytes_written > 0) {
-            lines.push(format!("transcript_path: {}", spill.path.display()));
+            if spill.failed {
+                lines.push(format!(
+                    "transcript_path: {} (incomplete — the spill write failed after {} bytes)",
+                    spill.path.display(),
+                    spill.bytes_written,
+                ));
+            } else if spill.capped {
+                lines.push(format!(
+                    "transcript_path: {} (capped at {} bytes — partial transcript)",
+                    spill.path.display(),
+                    spill.bytes_written,
+                ));
+            } else {
+                lines.push(format!("transcript_path: {}", spill.path.display()));
+            }
         }
         // R04-RR1-F03: text and structured status AGREE. An exit code is
         // claimed only from a real observed fact; an unconfirmed stop
@@ -1059,6 +1262,7 @@ impl ProcessTools {
 fn empty_output_snapshot() -> crate::procsupervisor::OutputSnapshot {
     crate::procsupervisor::OutputSnapshot {
         window: Vec::new(),
+        head: Vec::new(),
         total_bytes: 0,
         stdout_bytes: 0,
         stderr_bytes: 0,
@@ -1273,5 +1477,220 @@ impl ToolExecutorPort for CoreProcessExecutor {
             };
             ToolExecutionResult::of_ctx(&ctx, outcome)
         })
+    }
+}
+
+// ── unit tests (pure logic; the toolchain legs live in the integration
+//    suites r04_rr1_f04_* / r04_rr1_f05_*) ───────────────────────────────────
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    // ── R04-RR1-F05-C02: a single huge line keeps REAL head/tail content ──
+
+    #[test]
+    fn truncate_head_tail_single_huge_ascii_line_keeps_head_and_tail() {
+        // One 100 KiB line, 2 KiB budget: the line exceeds both side
+        // budgets — the body must still show the true head and tail
+        // bytes, not only an omission marker.
+        let text = format!("HEAD_MARK|{}|TAIL_MARK", "x".repeat(100 * 1024));
+        let head_tail = truncate_head_tail(&text, 2000, 2048);
+        assert!(head_tail.truncated);
+        assert!(
+            head_tail.content.contains("HEAD_MARK|"),
+            "the true head content survives: {}…",
+            &head_tail.content[..80.min(head_tail.content.len())]
+        );
+        assert!(
+            head_tail.content.contains("|TAIL_MARK"),
+            "the true tail content survives"
+        );
+        assert!(head_tail.content.contains("omitted"));
+        // The shown content is meaningfully bounded by the budget.
+        assert!(head_tail.content.len() < 4 * 1024 + 64);
+    }
+
+    #[test]
+    fn truncate_head_tail_multibyte_line_cuts_on_char_boundaries() {
+        // A multibyte-only line (3 bytes/char): byte cuts must land on
+        // character boundaries — no U+FFFD, markers intact.
+        let text = format!("头标记{}尾标记", "中".repeat(20_000));
+        let head_tail = truncate_head_tail(&text, 2000, 6 * 1024);
+        assert!(head_tail.truncated);
+        assert!(head_tail.content.contains("头标记"));
+        assert!(head_tail.content.contains("尾标记"));
+        assert!(
+            !head_tail.content.contains('\u{FFFD}'),
+            "byte-boundary-safe: {}",
+            &head_tail.content[..120.min(head_tail.content.len())]
+        );
+    }
+
+    #[test]
+    fn truncate_head_tail_newline_only_at_end_keeps_both_markers() {
+        // The adversarial shape: a single huge line whose ONLY newline is
+        // the trailing one — the empty last line must not sneak into the
+        // tail budget and hide the real tail content.
+        let text = format!("HEAD_MARK|{}|TAIL_MARK\n", "y".repeat(60 * 1024));
+        let head_tail = truncate_head_tail(&text, 2000, 8 * 1024);
+        assert!(head_tail.truncated);
+        assert!(head_tail.content.contains("HEAD_MARK|"));
+        assert!(head_tail.content.contains("|TAIL_MARK"));
+    }
+
+    #[test]
+    fn truncate_head_tail_small_output_stays_whole() {
+        let text = "line1\nline2\nline3\n";
+        let head_tail = truncate_head_tail(text, 2000, 50 * 1024);
+        assert!(!head_tail.truncated);
+        assert_eq!(head_tail.content, text);
+    }
+
+    // ── R04-RR1-F05: whole-stream fact assembly ────────────────────────────
+
+    #[test]
+    fn assemble_retained_output_small_stream_is_whole_and_exact() {
+        // Total ≤ head+tail windows: the whole stream, byte-exact, no
+        // duplicated overlap.
+        let stream = b"HEAD|....middle....|TAIL".to_vec();
+        let head = &stream[..16];
+        let tail = &stream[stream.len() - 16..];
+        let assembled = assemble_retained_output(head, tail, stream.len() as u64);
+        assert_eq!(assembled.evicted_bytes, 0);
+        assert_eq!(assembled.text.as_bytes(), &stream[..]);
+    }
+
+    #[test]
+    fn assemble_retained_output_evicted_middle_is_counted_and_marked() {
+        let head = "真head".as_bytes(); // ends cleanly
+        let tail = b"\xA5tail"; // starts mid-character (the evicted char's 3rd byte)
+        let total = 64u64;
+        let assembled = assemble_retained_output(head, tail, total);
+        assert_eq!(
+            assembled.evicted_bytes,
+            total - head.len() as u64 - tail.len() as u64
+        );
+        assert!(assembled.text.contains("真head"));
+        assert!(assembled.text.contains("evicted"));
+        assert!(
+            assembled.text.contains('\u{FFFD}'),
+            "the tail's leading continuation bytes become the incumbent's \
+             continuation-skip marker"
+        );
+        assert!(assembled.text.contains("tail"));
+    }
+
+    #[test]
+    fn full_output_claim_vocabulary_is_state_exclusive() {
+        let dir = std::env::temp_dir();
+        let complete = SpillInfo {
+            path: dir.join("complete.log"),
+            bytes_written: 100,
+            capped: false,
+            failed: false,
+        };
+        assert_eq!(
+            full_output_claim(Some(&complete), 100),
+            format!("Full output: {}", dir.join("complete.log").display())
+        );
+        let capped = SpillInfo {
+            path: dir.join("capped.log"),
+            bytes_written: 50,
+            capped: true,
+            failed: false,
+        };
+        let claim = full_output_claim(Some(&capped), 100);
+        assert!(
+            claim.contains("unavailable") && claim.contains("capped"),
+            "{claim}"
+        );
+        let failed = SpillInfo {
+            path: dir.join("failed.log"),
+            bytes_written: 30,
+            capped: false,
+            failed: true,
+        };
+        let claim = full_output_claim(Some(&failed), 100);
+        assert!(
+            claim.contains("unavailable") && claim.contains("failed"),
+            "{claim}"
+        );
+        let claim = full_output_claim(None, 100);
+        assert!(claim.contains("unavailable"), "{claim}");
+    }
+
+    #[test]
+    fn transcript_spill_claim_vocabulary_is_state_exclusive() {
+        let dir = std::env::temp_dir();
+        let complete = SpillInfo {
+            path: dir.join("t-complete.log"),
+            bytes_written: 100,
+            capped: false,
+            failed: false,
+        };
+        assert_eq!(
+            transcript_spill_claim(Some(&complete)),
+            format!(
+                "; full transcript: {}",
+                dir.join("t-complete.log").display()
+            )
+        );
+        let capped = SpillInfo {
+            path: dir.join("t-capped.log"),
+            bytes_written: 50,
+            capped: true,
+            failed: false,
+        };
+        let claim = transcript_spill_claim(Some(&capped));
+        assert!(
+            claim.contains("capped") && claim.contains("partial"),
+            "{claim}"
+        );
+        assert!(!claim.contains("full transcript:"), "{claim}");
+        let failed = SpillInfo {
+            path: dir.join("t-failed.log"),
+            bytes_written: 30,
+            capped: false,
+            failed: true,
+        };
+        let claim = transcript_spill_claim(Some(&failed));
+        assert!(
+            claim.contains("failed") && claim.contains("incomplete"),
+            "{claim}"
+        );
+        assert_eq!(transcript_spill_claim(None), "");
+    }
+
+    #[test]
+    fn spill_resource_ref_never_claims_full_when_capped_or_failed() {
+        let dir = std::env::temp_dir();
+        let capped = SpillInfo {
+            path: dir.join("capped.log"),
+            bytes_written: 50,
+            capped: true,
+            failed: false,
+        };
+        let reference = spill_resource_ref(&capped).expect("capped spill still referenced");
+        assert!(reference
+            .display_name
+            .as_deref()
+            .unwrap()
+            .contains("partial"));
+        assert!(!reference
+            .display_name
+            .as_deref()
+            .unwrap()
+            .contains("exec_command full output"));
+        let failed = SpillInfo {
+            path: dir.join("failed.log"),
+            bytes_written: 30,
+            capped: false,
+            failed: true,
+        };
+        assert!(
+            spill_resource_ref(&failed).is_none(),
+            "a failed spill is never referenced (no ghost full-output file)"
+        );
     }
 }

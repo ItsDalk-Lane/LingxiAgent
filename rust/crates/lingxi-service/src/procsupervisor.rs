@@ -108,13 +108,29 @@
 //!
 //! # Output bounds (both families)
 //! One-shot collectors and PTY transcripts are bounded in memory
-//! (rolling window / ring) with full-output SPILL to a supervisor-owned
-//! directory, itself capped (`spill_cap_bytes`) — an output storm fills
-//! the spill to its cap and is reported as capped, never unbounded.
-//! UTF-8 chunk boundaries are handled by joining bytes before decoding
-//! and holding back an incomplete trailing sequence until more bytes
-//! arrive (a multibyte character split across two PTY reads is
-//! delivered whole, never mangled).
+//! (true-head + rolling-tail windows / ring) with full-output SPILL to
+//! a supervisor-owned directory, itself capped (`spill_cap_bytes`) — an
+//! output storm fills the spill to its cap and is reported as capped,
+//! never unbounded. A spill WRITE failure is a distinct fact from the
+//! cap (`SpillInfo::failed`): the on-disk file is an incomplete
+//! leftover that is never referenced as a full output, while the
+//! in-memory result stays accurate.
+//!
+//! UTF-8 boundaries are handled at BYTE granularity (R04-RR1-F04):
+//! delivery joins the UNCONSUMED remainder of the buffered bytes,
+//! decodes the longest complete UTF-8 prefix, and consumes exactly that
+//! prefix — the same byte is never delivered twice, whether the ASCII
+//! lead and half a multibyte character arrived in ONE chunk or split
+//! across many. A trailing INCOMPLETE sequence stays unconsumed (held
+//! back — explicitly not counted as loss) until the rest arrives; a
+//! forced final drain (terminal closed) flushes the dangling partial as
+//! a single U+FFFD replacement. Only REAL ring evictions count as
+//! dropped bytes.
+//!
+//! Completeness of a one-shot result is decided by the WHOLE-stream
+//! facts (R04-RR1-F05): total bytes, the true head, the retained tail,
+//! the evicted middle, the spill cap/error state — never by whether the
+//! retained window happened to fit the caller's return budget.
 
 use std::collections::{BTreeMap, HashMap, VecDeque};
 use std::io::{self, Write as _};
@@ -660,7 +676,17 @@ pub struct AuditEvent {
 pub struct SpillInfo {
     pub path: PathBuf,
     pub bytes_written: u64,
+    /// The cap was reached: the file holds only the FIRST `bytes_written`
+    /// bytes — a PARTIAL transcript of the stream, never "the full
+    /// output" (R04-RR1-F05: a capped spill must not be advertised as
+    /// full).
     pub capped: bool,
+    /// A write FAILED after `bytes_written` bytes (ENOSPC-class errors,
+    /// permissions, the file disappearing). The on-disk file is an
+    /// INCOMPLETE leftover — it is never referenced as a full output and
+    /// the result must distinguish the in-memory facts from the on-disk
+    /// availability (R04-RR1-F05-C04).
+    pub failed: bool,
 }
 
 /// Full-output spill writer (bounded; supervisor-owned directory).
@@ -669,6 +695,7 @@ struct SpillWriter {
     path: PathBuf,
     written: u64,
     capped: bool,
+    failed: bool,
     cap: u64,
 }
 
@@ -686,12 +713,13 @@ impl SpillWriter {
             path,
             written: 0,
             capped: false,
+            failed: false,
             cap,
         })
     }
 
     fn write_bytes(&mut self, bytes: &[u8]) {
-        if self.capped {
+        if self.capped || self.failed {
             return;
         }
         let Some(file) = self.file.as_mut() else {
@@ -716,9 +744,13 @@ impl SpillWriter {
             }
             Err(_) => {
                 // Spill failure degrades to the bounded window only — the
-                // process keeps running; the result reports no live spill
-                // writer (recorded as capped, never retried silently).
-                self.capped = true;
+                // process keeps running. The two facts stay DISTINCT from
+                // the cap: `failed` marks an on-disk write error (the
+                // file is an incomplete leftover, never a full-output
+                // reference), `capped` marks a deliberate size bound.
+                // Either way the writer is dead and never retried
+                // silently (R04-RR1-F05).
+                self.failed = true;
                 self.file = None;
             }
         }
@@ -736,6 +768,7 @@ impl SpillWriter {
             path: self.path.clone(),
             bytes_written: self.written,
             capped: self.capped,
+            failed: self.failed,
         })
     }
 }
@@ -748,10 +781,21 @@ pub enum OutputStream {
 }
 
 /// The bounded one-shot output collector (the incumbent
-/// `CommandOutputCollector`): rolling window + counters + bounded spill.
+/// `CommandOutputCollector`): a TRUE-head window, a rolling TAIL window,
+/// counters, and a bounded spill. The tail window keeps the incumbent's
+/// `MAX_ROLLING_BYTES` semantics, and the head window (same bound) keeps
+/// the TRUE beginning of the stream so the head+tail presentation
+/// contract can be honored and the "head of the retained segment" is
+/// never mistaken for "head of the output" when the middle was evicted
+/// (R04-RR1-F05). Memory stays bounded at `head_cap + window_cap` bytes
+/// per process — never the unbounded full stream.
 struct CollectorCore {
+    /// The rolling TAIL window (last `window_cap` bytes of the stream).
     window: VecDeque<u8>,
     window_cap: usize,
+    /// The TRUE stream head (first `head_cap` bytes — frozen once full).
+    head: Vec<u8>,
+    head_cap: usize,
     total_bytes: u64,
     stdout_bytes: u64,
     stderr_bytes: u64,
@@ -768,6 +812,10 @@ impl CollectorCore {
         }
         if let Some(spill) = self.spill.as_mut() {
             spill.write_bytes(bytes);
+        }
+        if self.head.len() < self.head_cap {
+            let take = (self.head_cap - self.head.len()).min(bytes.len());
+            self.head.extend_from_slice(&bytes[..take]);
         }
         for b in bytes {
             self.window.push_back(*b);
@@ -787,36 +835,85 @@ impl CollectorCore {
 /// The immutable result-facing view of a one-shot collector.
 #[derive(Debug, Clone)]
 pub struct OutputSnapshot {
+    /// The rolling TAIL window (last `window_cap` bytes).
     pub window: Vec<u8>,
+    /// The TRUE stream head (first bytes of the whole output, bounded).
+    pub head: Vec<u8>,
     pub total_bytes: u64,
     pub stdout_bytes: u64,
     pub stderr_bytes: u64,
     pub spill: Option<SpillInfo>,
 }
 
-/// The delivered view of a PTY read.
+impl OutputSnapshot {
+    /// Bytes of the stream retained in NEITHER window (the real
+    /// in-memory eviction fact — R04-RR1-F05; derived so it can never
+    /// drift from the windows themselves).
+    pub fn lost_middle_bytes(&self) -> u64 {
+        self.total_bytes
+            .saturating_sub(self.head.len() as u64)
+            .saturating_sub(self.window.len() as u64)
+    }
+}
+
+/// The delivered view of a PTY read. The four byte-dispositions are
+/// DISTINCT facts (R04-RR1-F04): `dropped_undelivered_bytes` counts only
+/// REAL ring evictions; `pending_incomplete_bytes` counts bytes held
+/// back awaiting the rest of a multibyte character (waiting is NOT
+/// loss); `replaced_bytes` counts a forced final flush's dangling
+/// partial (the terminal closed mid-character — replaced by U+FFFD);
+/// `consumed_bytes` counts the stream bytes this delivery consumed.
 #[derive(Debug, Clone)]
 pub struct TranscriptDelivery {
     pub text: String,
     pub last_seq: u64,
+    /// True when the delivery does not account for every received byte
+    /// as-is: bytes were really dropped by the ring, are held back in an
+    /// incomplete tail (they will arrive complete later), or — never on
+    /// `force` alone — a dangling partial was replaced. A forced
+    /// replacement by itself is the documented lossy final state and
+    /// keeps `truncated == false` (the legacy contract).
     pub truncated: bool,
+    /// REAL loss only: bytes the ring evicted before delivery.
     pub dropped_undelivered_bytes: u64,
+    /// Held back awaiting a complete UTF-8 sequence (not loss).
+    pub pending_incomplete_bytes: usize,
+    /// A forced final drain flushed a dangling partial as U+FFFD.
+    pub replaced_bytes: usize,
+    /// Stream bytes consumed by THIS delivery (each byte exactly once).
+    pub consumed_bytes: u64,
     pub total_bytes: u64,
     pub spill: Option<SpillInfo>,
 }
 
+/// One transcript chunk with its CONSUMED prefix length. The consumption
+/// point is a byte offset inside the chunk (R04-RR1-F04): a chunk may be
+/// partially consumed — its delivered prefix is never re-delivered.
+#[derive(Debug)]
+struct TranscriptChunk {
+    seq: u64,
+    bytes: Vec<u8>,
+    /// Prefix length already delivered (bytes [..consumed] are gone from
+    /// every future delivery).
+    consumed: usize,
+}
+
 /// The bounded PTY transcript: chunk ring + seq cursor + spill, with
-/// UTF-8-boundary-safe delivery. A trailing INCOMPLETE sequence stays in
-/// its chunk (the cursor stops before it): the next delivery re-joins
-/// that chunk whole, so split multibyte characters are delivered intact
-/// and bytes are never duplicated or dropped mid-character.
+/// UTF-8-boundary-safe delivery at BYTE granularity. Delivery joins the
+/// UNCONSUMED remainder of every chunk, decodes the longest complete
+/// UTF-8 prefix, and advances each chunk's consumed offset by exactly
+/// the bytes its text accounts for: the same byte is consumed at most
+/// once (no duplication), and a trailing INCOMPLETE sequence stays
+/// unconsumed (held back — not dropped, not lost) until the rest
+/// arrives. With `force` (the terminal is terminal) the dangling
+/// remainder is lossy-flushed instead of held.
 struct TranscriptCore {
-    chunks: VecDeque<(u64, Vec<u8>)>,
+    chunks: VecDeque<TranscriptChunk>,
     ring_bytes: usize,
     ring_cap: usize,
     /// Seq of the next chunk (starts at 1; cursor 0 = nothing delivered).
     next_seq: u64,
-    /// Delivered up to (inclusive) this seq.
+    /// Delivered into (partially or wholly) up to this seq.
     cursor_seq: u64,
     dropped_undelivered_bytes: u64,
     total_bytes: u64,
@@ -835,36 +932,31 @@ impl TranscriptCore {
         let seq = self.next_seq;
         self.next_seq += 1;
         self.ring_bytes += bytes.len();
-        self.chunks.push_back((seq, bytes.to_vec()));
+        self.chunks.push_back(TranscriptChunk {
+            seq,
+            bytes: bytes.to_vec(),
+            consumed: 0,
+        });
         while self.ring_bytes > self.ring_cap {
-            // Evict the oldest chunk. If it is UNDELIVERED data the loss is
-            // recorded honestly (dropped_undelivered_bytes).
-            let Some((seq, evicted)) = self.chunks.pop_front() else {
+            // Evict the oldest chunk. Only its UNDELIVERED remainder is a
+            // real loss, recorded honestly (dropped_undelivered_bytes).
+            let Some(evicted) = self.chunks.pop_front() else {
                 break;
             };
-            self.ring_bytes -= evicted.len();
-            if seq > self.cursor_seq {
-                self.dropped_undelivered_bytes += evicted.len() as u64;
-            }
+            self.ring_bytes -= evicted.bytes.len() - evicted.consumed;
+            self.dropped_undelivered_bytes += (evicted.bytes.len() - evicted.consumed) as u64;
         }
     }
 
-    /// Delivers everything after the cursor, advancing the cursor only
-    /// across chunks whose bytes end on a COMPLETE UTF-8 boundary. With
-    /// `force` (the terminal is terminal — no more bytes can arrive) the
-    /// remainder is lossy-delivered instead of held back.
+    /// Delivers the unconsumed bytes after the cursor, advancing the
+    /// per-chunk consumed offsets by exactly the bytes the delivered
+    /// text accounts for. With `force` (the terminal is terminal — no
+    /// more bytes can arrive) a dangling incomplete tail is
+    /// lossy-delivered (U+FFFD) instead of held back.
     fn deliver_since_cursor(&mut self, force: bool) -> TranscriptDelivery {
-        let undelivered: Vec<(u64, usize)> = self
-            .chunks
-            .iter()
-            .filter(|(seq, _)| *seq > self.cursor_seq)
-            .map(|(seq, bytes)| (*seq, bytes.len()))
-            .collect();
-        let mut joined: Vec<u8> = Vec::new();
-        for (seq, _) in &undelivered {
-            if let Some((_, bytes)) = self.chunks.iter().find(|(s, _)| s == seq) {
-                joined.extend_from_slice(bytes);
-            }
+        let mut joined: Vec<u8> = Vec::with_capacity(self.ring_bytes);
+        for chunk in &self.chunks {
+            joined.extend_from_slice(&chunk.bytes[chunk.consumed..]);
         }
         let dropped = self.dropped_undelivered_bytes;
         let total = self.total_bytes;
@@ -875,34 +967,73 @@ impl TranscriptCore {
                 last_seq: self.cursor_seq,
                 truncated: dropped > 0,
                 dropped_undelivered_bytes: dropped,
+                pending_incomplete_bytes: 0,
+                replaced_bytes: 0,
+                consumed_bytes: 0,
                 total_bytes: total,
                 spill,
             };
         }
-        let (text, consumed) = if force {
-            (String::from_utf8_lossy(&joined).into_owned(), joined.len())
+        let (text, consumed, replaced_bytes, pending) = if force {
+            let (prefix_text, valid_prefix) = decode_prefix_utf8(&joined);
+            let replaced = joined.len() - valid_prefix;
+            if replaced == 0 {
+                (prefix_text, joined.len(), 0, 0)
+            } else {
+                // The dangling partial becomes U+FFFD: the forced final
+                // state is lossy-honest (one replacement per dangling
+                // sequence, delivered exactly once — and only once: the
+                // bytes are consumed with this delivery).
+                let mut text = prefix_text;
+                text.push('\u{FFFD}');
+                (text, joined.len(), replaced, 0)
+            }
         } else {
-            decode_prefix_utf8(&joined)
+            let (text, consumed) = decode_prefix_utf8(&joined);
+            (text, consumed, 0, joined.len() - consumed)
         };
-        // Advance the cursor across every chunk whose bytes are fully
-        // consumed (byte-offset accounting — a partially consumed chunk
-        // stays wholly undelivered and is re-joined next time).
-        let mut offset = 0usize;
-        let mut new_cursor = self.cursor_seq;
-        for (seq, len) in &undelivered {
-            if offset + len <= consumed {
-                offset += len;
-                new_cursor = *seq;
+        // Advance the per-chunk consumed offsets across exactly the
+        // consumed bytes (`ring_bytes` tracks the UNCONSUMED bytes the
+        // ring holds — the cap governs undelivered data), then drop the
+        // fully consumed chunks from the front (their bytes can never be
+        // delivered again). A partially consumed chunk stays as the
+        // front hold: the cursor points INTO its seq and later chunks
+        // are wholly unconsumed.
+        let mut remaining = consumed;
+        let mut last_touched: Option<u64> = None;
+        while remaining > 0 {
+            let Some(chunk) = self.chunks.front_mut() else {
+                break;
+            };
+            let unconsumed = chunk.bytes.len() - chunk.consumed;
+            if unconsumed == 0 {
+                // Defensive: a zero-remainder chunk holds no consumption.
+                let evicted = self.chunks.pop_front().expect("front exists");
+                last_touched = Some(evicted.seq);
+                continue;
+            }
+            let take = unconsumed.min(remaining);
+            chunk.consumed += take;
+            self.ring_bytes -= take;
+            remaining -= take;
+            last_touched = Some(chunk.seq);
+            if chunk.consumed == chunk.bytes.len() {
+                self.chunks.pop_front();
             } else {
                 break;
             }
         }
-        self.cursor_seq = new_cursor;
+        if let Some(seq) = last_touched {
+            self.cursor_seq = seq;
+        }
         TranscriptDelivery {
             text,
             last_seq: self.cursor_seq,
-            truncated: dropped > 0 || consumed < joined.len(),
-            dropped_undelivered_bytes: dropped + (joined.len() - consumed) as u64,
+            truncated: dropped > 0 || pending > 0,
+            dropped_undelivered_bytes: dropped,
+            pending_incomplete_bytes: pending,
+            replaced_bytes,
+            consumed_bytes: consumed as u64,
             total_bytes: total,
             spill,
         }
@@ -915,22 +1046,40 @@ impl TranscriptCore {
     }
 }
 
-/// Decodes `bytes` returning the text and how many bytes were consumed. A
-/// trailing INCOMPLETE UTF-8 sequence is not consumed (held back by the
-/// caller); interior invalid bytes become replacement characters and are
-/// consumed (never held, never dropped silently).
+/// Decodes `bytes` returning the text and how many bytes were consumed.
+/// Interior invalid subsequences become one replacement character each
+/// and are consumed (matching `from_utf8_lossy`'s maximal-subpart rule);
+/// a TRAILING incomplete sequence is not consumed (held back by the
+/// caller) — even when interior invalid bytes precede it, so a character
+/// split across later arrivals is still delivered whole exactly once
+/// (R04-RR1-F04: the completion may still arrive).
 fn decode_prefix_utf8(bytes: &[u8]) -> (String, usize) {
-    match std::str::from_utf8(bytes) {
-        Ok(text) => (text.to_string(), bytes.len()),
-        Err(err) => {
-            let valid = err.valid_up_to();
-            if err.error_len().is_none() {
-                // Trailing incomplete sequence: deliver the valid prefix.
-                let head = String::from_utf8_lossy(&bytes[..valid]).into_owned();
-                (head, valid)
-            } else {
-                // Interior invalid bytes: lossy-decode everything.
-                (String::from_utf8_lossy(bytes).into_owned(), bytes.len())
+    let mut text = String::new();
+    let mut consumed = 0usize;
+    let mut rest = bytes;
+    loop {
+        match std::str::from_utf8(rest) {
+            Ok(valid) => {
+                text.push_str(valid);
+                return (text, bytes.len());
+            }
+            Err(err) => {
+                let valid_up_to = err.valid_up_to();
+                match err.error_len() {
+                    Some(invalid_len) => {
+                        // One interior invalid subsequence → one U+FFFD.
+                        text.push_str(std::str::from_utf8(&rest[..valid_up_to]).unwrap_or(""));
+                        text.push('\u{FFFD}');
+                        let advance = valid_up_to + invalid_len;
+                        consumed += advance;
+                        rest = &rest[advance..];
+                    }
+                    None => {
+                        // Trailing incomplete sequence: hold it back.
+                        text.push_str(std::str::from_utf8(&rest[..valid_up_to]).unwrap_or(""));
+                        return (text, consumed + valid_up_to);
+                    }
+                }
             }
         }
     }
@@ -1416,6 +1565,8 @@ impl ProcessSupervisor {
         let collector = Arc::new(Mutex::new(CollectorCore {
             window: VecDeque::new(),
             window_cap: self.limits.output_window_bytes,
+            head: Vec::new(),
+            head_cap: self.limits.output_window_bytes,
             total_bytes: 0,
             stdout_bytes: 0,
             stderr_bytes: 0,
@@ -1772,7 +1923,8 @@ impl ProcessSupervisor {
             .collect()
     }
 
-    /// The one-shot output snapshot (window + counters + spill info).
+    /// The one-shot output snapshot (true head + tail window + counters +
+    /// spill info).
     pub fn output_snapshot(&self, id: &ProcessHandleId) -> Option<OutputSnapshot> {
         let record = self.any_record(id)?;
         let inner = lock_or_poison(&record.inner);
@@ -1780,6 +1932,7 @@ impl ProcessSupervisor {
         let core = lock_or_poison(collector);
         Some(OutputSnapshot {
             window: core.window.iter().copied().collect(),
+            head: core.head.clone(),
             total_bytes: core.total_bytes,
             stdout_bytes: core.stdout_bytes,
             stderr_bytes: core.stderr_bytes,
@@ -1787,6 +1940,7 @@ impl ProcessSupervisor {
                 path: spill.path.clone(),
                 bytes_written: spill.written,
                 capped: spill.capped,
+                failed: spill.failed,
             }),
         })
     }
@@ -2953,6 +3107,417 @@ mod tests {
         assert_eq!(second.text, "日", "no duplication, no mangling");
         let third = core.deliver_since_cursor(false);
         assert_eq!(third.text, "", "cursor advanced past the completed char");
+    }
+
+    // ── R04-RR1-F04: byte-exact consumption of a mixed chunk ────────────
+
+    #[test]
+    fn transcript_mixed_chunk_prefix_is_consumed_byte_exactly_r04_rr1_f04_c01() {
+        // The C01 counter-example: 'a' AND the first two bytes of "日"
+        // (E6 97) arrive in ONE chunk. The legal prefix 'a' is delivered
+        // and MUST count as consumed — a re-poll without new data returns
+        // nothing, and completing the character delivers exactly "日".
+        let mut core = transcript(1024);
+        core.append(&[0x61, 0xE6, 0x97]);
+        let first = core.deliver_since_cursor(false);
+        assert_eq!(first.text, "a");
+        // Idle re-poll (no new bytes): the already-delivered prefix must
+        // not repeat.
+        let idle = core.deliver_since_cursor(false);
+        assert_eq!(idle.text, "", "no duplication on an idle re-poll");
+        // Complete "日" in a second chunk.
+        core.append(&[0xA5]);
+        let second = core.deliver_since_cursor(false);
+        assert_eq!(second.text, "日");
+        let joined = format!("{}{}{}", first.text, idle.text, second.text);
+        assert_eq!(joined, "a日", "each byte is delivered exactly once");
+    }
+
+    #[test]
+    fn transcript_idle_polls_after_a_partial_delivery_hold_back_without_loss() {
+        // C02: after a mixed chunk delivered its legal prefix, repeated
+        // polls return EMPTY, the held-back bytes are NOT counted as
+        // dropped (waiting for completion is not loss), and the final
+        // delivery returns only the unconsumed remainder.
+        let mut core = transcript(1024);
+        core.append(&[0x61, 0xE6, 0x97]);
+        let first = core.deliver_since_cursor(false);
+        assert_eq!(first.text, "a");
+        assert_eq!(
+            first.dropped_undelivered_bytes, 0,
+            "bytes held back for completion are NOT dropped"
+        );
+        for i in 0..5 {
+            let idle = core.deliver_since_cursor(false);
+            assert_eq!(idle.text, "", "idle poll {i} returns no content");
+            assert_eq!(idle.dropped_undelivered_bytes, 0, "poll {i}");
+        }
+        core.append(&[0xA5]);
+        let last = core.deliver_since_cursor(false);
+        assert_eq!(last.text, "日", "only the unconsumed remainder");
+        assert_eq!(last.dropped_undelivered_bytes, 0);
+    }
+
+    // ── R04-RR1-F04-C03: fragmentation invariance (property, fixed seeds)
+
+    /// Deterministic xorshift64* PRNG (fixed seeds; no external crate).
+    struct TestRng(u64);
+
+    impl TestRng {
+        fn next_u64(&mut self) -> u64 {
+            let mut x = self.0;
+            x ^= x >> 12;
+            x ^= x << 25;
+            x ^= x >> 27;
+            self.0 = x;
+            x.wrapping_mul(0x2545_F491_4F6C_DD1D)
+        }
+
+        fn below(&mut self, n: u64) -> u64 {
+            self.next_u64() % n.max(1)
+        }
+    }
+
+    /// One generated operation against the transcript under test.
+    #[derive(Debug, Clone, PartialEq, Eq)]
+    enum TranscriptOp {
+        Append(Vec<u8>),
+        Poll,
+        Force,
+    }
+
+    /// Builds a random UTF-8-ish payload: valid multilingual text with,
+    /// for the invalid-input properties, occasional lone invalid bytes.
+    fn random_payload(rng: &mut TestRng, len: usize, invalid_ratio: u64) -> Vec<u8> {
+        let pieces = [
+            "a".as_bytes(),
+            "Z".as_bytes(),
+            " ".as_bytes(),
+            "\n".as_bytes(),
+            "中".as_bytes(),
+            "日".as_bytes(),
+            "글".as_bytes(),
+            "🦀".as_bytes(),
+            "é".as_bytes(),
+            // A combining sequence (e + COMBINING ACUTE ACCENT).
+            "e\u{0301}".as_bytes(),
+        ];
+        let mut out = Vec::new();
+        while out.len() < len {
+            if invalid_ratio > 0 && rng.below(invalid_ratio) == 0 {
+                out.push(0xFFu8);
+                continue;
+            }
+            let piece = pieces[rng.below(pieces.len() as u64) as usize];
+            out.extend_from_slice(piece);
+        }
+        out
+    }
+
+    /// Splits `input` at random BYTE positions (arbitrary points —
+    /// including mid-multibyte-character) into chunk boundaries.
+    fn random_split(rng: &mut TestRng, input: &[u8]) -> Vec<Vec<u8>> {
+        let mut chunks = Vec::new();
+        let mut rest = input;
+        while !rest.is_empty() {
+            let take = 1 + rng.below(7.min(rest.len() as u64).max(1)) as usize;
+            let (head, tail) = rest.split_at(take.min(rest.len()));
+            chunks.push(head.to_vec());
+            rest = tail;
+        }
+        chunks
+    }
+
+    fn random_plan(rng: &mut TestRng, input: &[u8], force_at_end: bool) -> Vec<TranscriptOp> {
+        let mut plan = Vec::new();
+        for chunk in random_split(rng, input) {
+            plan.push(TranscriptOp::Append(chunk));
+            // Interleave polls after ~half the appends.
+            if rng.below(2) == 0 {
+                plan.push(TranscriptOp::Poll);
+            }
+        }
+        if force_at_end {
+            plan.push(TranscriptOp::Force);
+        }
+        plan
+    }
+
+    struct RunSummary {
+        delivered: String,
+        consumed_total: u64,
+        dropped_final: u64,
+        pending_final: usize,
+        total_bytes: u64,
+    }
+
+    /// Runs the plan and (when `final_drain`) performs one closing
+    /// NON-forced poll so the accounting identity can be asserted over
+    /// a settled state (consumed + dropped + pending == total).
+    fn run_plan(ring_cap: usize, plan: &[TranscriptOp], final_drain: bool) -> RunSummary {
+        let mut core = transcript(ring_cap);
+        let mut delivered = String::new();
+        let mut consumed_total = 0u64;
+        let mut last: Option<crate::procsupervisor::TranscriptDelivery> = None;
+        let deliver =
+            |core: &mut TranscriptCore, force: bool, delivered: &mut String, consumed: &mut u64| {
+                let delivery = core.deliver_since_cursor(force);
+                delivered.push_str(&delivery.text);
+                *consumed += delivery.consumed_bytes;
+                delivery
+            };
+        for op in plan {
+            match op {
+                TranscriptOp::Append(bytes) => core.append(bytes),
+                TranscriptOp::Poll => {
+                    last = Some(deliver(
+                        &mut core,
+                        false,
+                        &mut delivered,
+                        &mut consumed_total,
+                    ));
+                }
+                TranscriptOp::Force => {
+                    last = Some(deliver(
+                        &mut core,
+                        true,
+                        &mut delivered,
+                        &mut consumed_total,
+                    ));
+                }
+            }
+        }
+        if final_drain {
+            last = Some(deliver(
+                &mut core,
+                false,
+                &mut delivered,
+                &mut consumed_total,
+            ));
+        }
+        let (dropped_final, pending_final, total_bytes) = match last {
+            Some(delivery) => (
+                delivery.dropped_undelivered_bytes,
+                delivery.pending_incomplete_bytes,
+                delivery.total_bytes,
+            ),
+            None => (0, 0, core.total_bytes),
+        };
+        RunSummary {
+            delivered,
+            consumed_total,
+            dropped_final,
+            pending_final,
+            total_bytes,
+        }
+    }
+
+    fn sample_description(input: &[u8], plan: &[TranscriptOp]) -> String {
+        let ops = plan
+            .iter()
+            .map(|op| match op {
+                TranscriptOp::Append(bytes) => format!(
+                    "append({})",
+                    bytes.iter().map(|b| format!("{b:02x}")).collect::<String>()
+                ),
+                TranscriptOp::Poll => "poll".to_string(),
+                TranscriptOp::Force => "force".to_string(),
+            })
+            .collect::<Vec<_>>()
+            .join(", ");
+        format!(
+            "input=[{}], plan=[{ops}]",
+            input.iter().map(|b| format!("{b:02x}")).collect::<String>()
+        )
+    }
+
+    /// Greedy minimizer: repeatedly try simplifications (halve the input,
+    /// drop trailing ops, drop an interior poll) and keep the first one
+    /// that still fails — the printed sample is a local minimum.
+    fn minimize<F: Fn(&[u8], &[TranscriptOp]) -> bool>(
+        input: &[u8],
+        plan: &[TranscriptOp],
+        still_fails: F,
+    ) -> (Vec<u8>, Vec<TranscriptOp>) {
+        let mut input = input.to_vec();
+        let mut plan = plan.to_vec();
+        loop {
+            let mut changed = false;
+            // 1) Halve the input (keeping the plan's append sizes valid
+            //    is unnecessary — rerun random_split-free: drop appends
+            //    proportionally).
+            if input.len() > 1 {
+                let halved: Vec<u8> = input[..input.len() / 2].to_vec();
+                let halved_plan = random_plan(
+                    &mut TestRng(0x5EED_0000_0000_0001),
+                    &halved,
+                    plan.last() == Some(&TranscriptOp::Force),
+                );
+                if still_fails(&halved, &halved_plan) {
+                    input = halved;
+                    plan = halved_plan;
+                    changed = true;
+                }
+            }
+            // 2) Drop the last op.
+            if plan.len() > 1 {
+                let shortened = plan[..plan.len() - 1].to_vec();
+                if still_fails(&input, &shortened) {
+                    plan = shortened;
+                    changed = true;
+                }
+            }
+            // 3) Drop one interior poll.
+            if let Some(idx) = plan.iter().position(|op| matches!(op, TranscriptOp::Poll)) {
+                let mut reduced = plan.clone();
+                reduced.remove(idx);
+                if still_fails(&input, &reduced) {
+                    plan = reduced;
+                    changed = true;
+                }
+            }
+            if !changed {
+                return (input, plan);
+            }
+        }
+    }
+
+    /// P1: every VALID UTF-8 input, split at arbitrary byte positions
+    /// with interleaved polls and a final force, reassembles EXACTLY —
+    /// no byte delivered twice, none silently altered.
+    #[test]
+    fn transcript_property_valid_input_reassembles_exactly() {
+        for seed in 1u64..=24 {
+            let mut rng = TestRng(seed.wrapping_mul(0x9E37_79B9_7F4A_7C15));
+            let len = 40 + rng.below(200) as usize;
+            let input = random_payload(&mut rng, len, 0);
+            let plan = random_plan(&mut rng, &input, true);
+            let expected = String::from_utf8(input.clone()).expect("generated input is valid");
+            let summary = run_plan(1024 * 1024, &plan, false);
+            assert_eq!(
+                summary.delivered,
+                expected,
+                "seed {seed}: {}",
+                sample_description(&input, &plan)
+            );
+        }
+    }
+
+    /// P2: INVALID bytes follow the deterministic replacement policy and
+    /// each invalid byte is replaced exactly once: the concatenation of
+    /// all deliveries equals the one-shot lossy decode of the input.
+    #[test]
+    fn transcript_property_invalid_bytes_replaced_exactly_once() {
+        for seed in 25u64..=48 {
+            let mut rng = TestRng(seed.wrapping_mul(0x9E37_79B9_7F4A_7C15));
+            let len = 40 + rng.below(200) as usize;
+            let input = random_payload(&mut rng, len, 9);
+            let plan = random_plan(&mut rng, &input, true);
+            let expected = String::from_utf8_lossy(&input).into_owned();
+            let summary = run_plan(1024 * 1024, &plan, false);
+            assert_eq!(
+                summary.delivered,
+                expected,
+                "seed {seed}: {}",
+                sample_description(&input, &plan)
+            );
+        }
+    }
+
+    /// P3 (the C03 adversarial): ring eviction AND an incomplete tail at
+    /// the same time — every byte is EXACTLY ONE of {consumed, pending,
+    /// dropped}, so the drop count can only contain REAL evictions
+    /// (held-back bytes are never miscounted as loss). Includes a
+    /// minimized failing sample in the panic message.
+    #[test]
+    fn transcript_property_eviction_accounting_counts_only_real_loss() {
+        for seed in 49u64..=72 {
+            let mut rng = TestRng(seed.wrapping_mul(0x9E37_79B9_7F4A_7C15));
+            let len = 40 + rng.below(300) as usize;
+            let input = random_payload(&mut rng, len, 0);
+            let plan = random_plan(&mut rng, &input, false);
+            let summary = run_plan(24, &plan, true);
+            let accounted =
+                summary.consumed_total + summary.dropped_final + summary.pending_final as u64;
+            if accounted != summary.total_bytes {
+                let (mini_input, mini_plan) = minimize(&input, &plan, |_input, p| {
+                    let s = run_plan(24, p, true);
+                    s.consumed_total + s.dropped_final + s.pending_final as u64 != s.total_bytes
+                });
+                panic!(
+                    "seed {seed}: accounting broke (consumed {} + dropped {} + pending {} != \
+                     total {}); minimized sample: {}",
+                    summary.consumed_total,
+                    summary.dropped_final,
+                    summary.pending_final,
+                    summary.total_bytes,
+                    sample_description(&mini_input, &mini_plan),
+                );
+            }
+        }
+    }
+
+    /// The C03 adversarial, deterministic shape: a mixed chunk delivers
+    /// its prefix, the ring then overflows while the incomplete tail is
+    /// STILL held — the dropped count must contain exactly the EVICTED
+    /// unconsumed bytes (2), never the delivered prefix or anything
+    /// else, and no byte may be delivered twice.
+    #[test]
+    fn transcript_ring_overflow_while_holding_back_counts_only_real_evictions() {
+        let mut core = transcript(6);
+        core.append(&[0x61, 0xE6, 0x97]); // 'a' + half of 日
+        let first = core.deliver_since_cursor(false);
+        assert_eq!(first.text, "a");
+        assert_eq!(first.dropped_undelivered_bytes, 0);
+        // 5 more bytes overflow the 4-byte ring: the front (partially
+        // consumed) chunk is evicted — its UNCONSUMED remainder (E6 97)
+        // is the real loss; the consumed 'a' prefix is not.
+        core.append(&[0x62, 0x63, 0x64, 0x65, 0x66]);
+        let second = core.deliver_since_cursor(false);
+        assert_eq!(second.text, "bcdef");
+        assert_eq!(
+            second.dropped_undelivered_bytes, 2,
+            "exactly the two evicted unconsumed bytes (E6 97): {:?}",
+            second
+        );
+        assert_eq!(second.pending_incomplete_bytes, 0);
+        // Accounting: consumed 1 + 5, dropped 2 == total 8.
+        assert_eq!(
+            first.consumed_bytes + second.consumed_bytes + second.dropped_undelivered_bytes,
+            second.total_bytes
+        );
+        // No duplication across the whole history.
+        assert_eq!(format!("{}{}", first.text, second.text), "abcdef");
+    }
+
+    /// A boundary crossing MANY chunks: a 4-byte emoji split across four
+    /// single-byte appends with polls between each — the mangled char is
+    /// never delivered incomplete; once complete it arrives exactly once
+    /// and nothing is duplicated afterwards.
+    #[test]
+    fn transcript_boundary_across_many_chunks_with_interleaved_polls() {
+        let crab = "🦀".as_bytes(); // F0 9F A6 80
+        let mut core = transcript(1024);
+        core.append(b"pre ");
+        let mut history = String::new();
+        for (i, byte) in crab.iter().enumerate() {
+            core.append(&[*byte]);
+            let delivery = core.deliver_since_cursor(false);
+            history.push_str(&delivery.text);
+            if i + 1 < crab.len() {
+                assert!(
+                    !delivery.text.contains('\u{FFFD}'),
+                    "an incomplete char is never delivered mangled: {delivery:?}"
+                );
+            }
+        }
+        // Idle polls deliver nothing further; the emoji arrived EXACTLY
+        // once in the history.
+        for _ in 0..3 {
+            history.push_str(&core.deliver_since_cursor(false).text);
+        }
+        assert_eq!(history, "pre 🦀");
+        assert_eq!(core.total_bytes, 8, "\"pre \" (4) + the 4 emoji bytes");
     }
 
     #[test]
