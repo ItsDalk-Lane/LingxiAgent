@@ -1911,7 +1911,7 @@ async fn terminal_family_share_cases() {
     .await
     .expect("terminal starts");
     let handle = match &start.outcome {
-        ToolOutcome::Success { result } => match &result.status {
+        ToolOutcome::Success { result } => match result.status.as_deref() {
             Some(lingxi_kernel::ports::ToolRunStatus::Running { handle }) => handle.clone(),
             other => panic!("a tty start must be Running, got {other:?}"),
         },

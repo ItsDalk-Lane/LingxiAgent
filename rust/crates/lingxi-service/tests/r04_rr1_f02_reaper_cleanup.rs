@@ -346,7 +346,7 @@ async fn rr1_f02_fast_exiting_child_is_not_refused_by_the_reap_race() {
             .await
             .expect("round: terminal");
         match phase {
-            RecordPhase::Exited { fact } => assert_eq!(fact.status_code(), 0),
+            RecordPhase::Exited { fact } => assert_eq!(fact.observed_status_code(), Some(0)),
             other => panic!("round {round}: natural exit 0, got {other:?}"),
         }
         let snapshot = supervisor.record(&spawned.id).expect("retained");
@@ -415,7 +415,7 @@ async fn rr1_f02_c01_grandchild_holding_both_ends_freezes_the_result_and_closes_
                 })
                 .collect();
             assert!(text.contains("PARENT_DONE"), "{text}");
-            match &result.status {
+            match result.status.as_deref() {
                 Some(ToolRunStatus::Exited { code }) => assert_eq!(*code, 0),
                 other => panic!("exit 0: {other:?}"),
             }
@@ -431,7 +431,9 @@ async fn rr1_f02_c01_grandchild_holding_both_ends_freezes_the_result_and_closes_
         .next()
         .expect("one retained record");
     let snapshot = supervisor.record(&handle).expect("retained");
-    assert!(matches!(snapshot.phase, RecordPhase::Exited { fact } if fact.status_code() == 0));
+    assert!(
+        matches!(snapshot.phase, RecordPhase::Exited { fact } if fact.observed_status_code() == Some(0))
+    );
     assert!(snapshot.child_reaped, "the reap was really observed");
     // Pump-exit observation: zero output tasks remain for this record.
     wait_until("pumps closed", Duration::from_secs(2), || {
@@ -532,7 +534,7 @@ async fn rr1_f02_c01_pty_family_grandchild_holding_the_slave_closes_the_master()
         .await
         .expect("terminal phase");
     match phase {
-        RecordPhase::Exited { fact } => assert_eq!(fact.status_code(), 0),
+        RecordPhase::Exited { fact } => assert_eq!(fact.observed_status_code(), Some(0)),
         other => panic!("natural exit 0: {other:?}"),
     }
     // Fresh post-terminal facts (never the probe's possibly-stale
@@ -727,7 +729,11 @@ async fn rr1_f02_c02_terminate_in_the_reaped_undrained_window_signals_nothing() 
             reclaimed,
             drained_stdio,
         } => {
-            assert_eq!(fact.status_code(), 0, "the real direct-child exit");
+            assert_eq!(
+                fact.observed_status_code(),
+                Some(0),
+                "the real direct-child exit"
+            );
             assert!(reclaimed, "read-end closure was observed");
             assert!(!drained_stdio, "the pipe state is honest");
         }
@@ -739,7 +745,7 @@ async fn rr1_f02_c02_terminate_in_the_reaped_undrained_window_signals_nothing() 
         RecordPhase::Terminated {
             reason: TerminationReason::Close,
             fact
-        } if fact.status_code() == 0
+        } if fact.observed_status_code() == Some(0)
     ));
     // THE C02 core: no group signal was ever fired — the exhaustive
     // signal log is empty and the skip is audited with the reap reason.
@@ -821,9 +827,9 @@ async fn rr1_f02_c02_adversarial_window_offsets_never_signal_a_stale_group() {
                 fact,
                 reclaimed: _,
                 drained_stdio: _,
-            } => assert_eq!(fact.status_code(), 0),
+            } => assert_eq!(fact.observed_status_code(), Some(0)),
             TerminationOutcome::AlreadyTerminal(RecordPhase::Exited { fact }) => {
-                assert_eq!(fact.status_code(), 0)
+                assert_eq!(fact.observed_status_code(), Some(0))
             }
             other => panic!("leg {leg}: safe receipt: {other:?}"),
         }
@@ -1032,7 +1038,7 @@ async fn rr1_f02_c03_adversarial_exit_and_cancel_racing_never_signals_unprovably
                 );
             }
             TerminationOutcome::AlreadyTerminal(RecordPhase::Exited { fact }) => {
-                assert_eq!(fact.status_code(), 0, "round {round}")
+                assert_eq!(fact.observed_status_code(), Some(0), "round {round}")
             }
             other => panic!("round {round}: safe receipt: {other:?}"),
         }

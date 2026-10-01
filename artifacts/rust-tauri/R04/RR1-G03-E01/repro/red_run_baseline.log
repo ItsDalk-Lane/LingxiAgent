@@ -1,0 +1,36 @@
+   Compiling lingxi-service v0.0.0 (/Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-service)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.49s
+     Running tests/r04_rr1_f03_stop_honesty.rs (rust/target/debug/deps/r04_rr1_f03_stop_honesty-f444d567d680df3a)
+
+running 3 tests
+test rr1_f03_c01_timeout_cleanup_unconfirmed_never_reports_an_exit ... FAILED
+test rr1_f03_c02_pty_cleanup_unconfirmed_poll_agrees_with_the_text ... FAILED
+test rr1_f03_c03_repeated_terminate_does_not_upgrade_unconfirmed_to_confirmed ... FAILED
+
+failures:
+
+---- rr1_f03_c01_timeout_cleanup_unconfirmed_never_reports_an_exit stdout ----
+
+thread 'rr1_f03_c01_timeout_cleanup_unconfirmed_never_reports_an_exit' (3242441) panicked at crates/lingxi-service/tests/r04_rr1_f03_stop_honesty.rs:188:9:
+C01 tool result after the timeout: the exit was NOT observed, yet the result claims Exited(137) — an unconfirmed cleanup must never surface as an exit
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+
+---- rr1_f03_c02_pty_cleanup_unconfirmed_poll_agrees_with_the_text stdout ----
+
+thread 'rr1_f03_c02_pty_cleanup_unconfirmed_poll_agrees_with_the_text' (3242442) panicked at crates/lingxi-service/tests/r04_rr1_f03_stop_honesty.rs:152:13:
+timed out waiting for reaped-but-undrained window
+
+---- rr1_f03_c03_repeated_terminate_does_not_upgrade_unconfirmed_to_confirmed stdout ----
+
+thread 'rr1_f03_c03_repeated_terminate_does_not_upgrade_unconfirmed_to_confirmed' (3242443) panicked at crates/lingxi-service/tests/r04_rr1_f03_stop_honesty.rs:152:13:
+timed out waiting for the deferred real exit
+
+
+failures:
+    rr1_f03_c01_timeout_cleanup_unconfirmed_never_reports_an_exit
+    rr1_f03_c02_pty_cleanup_unconfirmed_poll_agrees_with_the_text
+    rr1_f03_c03_repeated_terminate_does_not_upgrade_unconfirmed_to_confirmed
+
+test result: FAILED. 0 passed; 3 failed; 0 ignored; 0 measured; 0 filtered out; finished in 5.56s
+
+error: test failed, to rerun pass `-p lingxi-service --test r04_rr1_f03_stop_honesty`

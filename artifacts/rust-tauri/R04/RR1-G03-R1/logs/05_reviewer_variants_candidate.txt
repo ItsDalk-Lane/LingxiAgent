@@ -1,0 +1,13 @@
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.07s
+     Running tests/rr1_g03_r01_variants_reviewer.rs (rust/target/debug/deps/rr1_g03_r01_variants_reviewer-4908fa1f5f084dc8)
+
+running 6 tests
+test v2_c02_variant_repeated_mixed_polls_and_foreign_refusal ... ok
+test v3_c03_variant_real_exit_between_deadline_and_second_call ... ok
+test v4_controls_exit0_exit7_observed_kill_stay_exact ... ok
+test v5_c05_variant_late_observation_does_not_upgrade_the_cancelled_run_journal ... ok
+test v6_journal_success_stop_unconfirmed_not_upgraded_by_late_observation ... ok
+test v1_c01_variant_wider_window_stays_unconfirmed_then_real_exit ... ok
+
+test result: ok. 6 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 3.36s
+

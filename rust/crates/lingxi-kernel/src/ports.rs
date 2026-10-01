@@ -1029,11 +1029,13 @@ pub struct ToolSuccess {
     /// Whether the content was truncated at a boundary. A truncated
     /// result MUST set this — silent truncation is forbidden.
     pub truncated: bool,
-    /// Process-family execution status (exit code / still-running
-    /// handle). `None` for non-process tools. "Started/running" is a
-    /// status here, never a disguised success claim (T05 owns the full
-    /// semantics).
-    pub status: Option<ToolRunStatus>,
+    /// Process-family execution status (exit code / still-running /
+    /// unconfirmed-stop handle). `None` for non-process tools.
+    /// "Started/running" is a status here, never a disguised success
+    /// claim (T05 owns the full semantics). Boxed: cold metadata whose
+    /// inline growth would bloat every `Result<_, ToolOutcome>` helper
+    /// past the large-Err bound.
+    pub status: Option<Box<ToolRunStatus>>,
     /// SHA-256 of the canonical content blocks — the audit/dedup value.
     pub content_digest: String,
 }
@@ -1042,11 +1044,23 @@ pub struct ToolSuccess {
 /// PTY/process lifecycle lands with T05).
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub enum ToolRunStatus {
-    /// The process exited with this code.
+    /// The process exited with this code. ONLY from a REAL observation
+    /// (a resolved `wait()`/trusted system receipt): an observed
+    /// SIGKILL is the legitimate `code: 137`; a stop that was merely
+    /// REQUESTED never claims this variant (R04-RR1-F03).
     Exited { code: i64 },
     /// The process is still running under this opaque handle (its
     /// lifetime and cancellation belong to the process supervisor).
     Running { handle: String },
+    /// A stop was requested (watchdog timeout / close / caller drop)
+    /// but the exit was NOT observed as a trusted receipt within the
+    /// bound — or the wait itself failed. The process's final state is
+    /// unconfirmed: this is neither "exited", "killed" nor a confirmed
+    /// failure, and the caller must not assume the absence of further
+    /// side effects. The referenced handle stays queryable; a late REAL
+    /// observation lands on the process record — never silently
+    /// upgraded here (R04-RR1-F03).
+    StopUnconfirmed { handle: String, detail: String },
 }
 
 impl ToolSuccess {

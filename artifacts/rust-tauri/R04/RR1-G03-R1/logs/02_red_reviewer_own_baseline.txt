@@ -1,0 +1,29 @@
+
+running 3 tests
+test r3_write_stdin_text_and_status_agree_during_cleanup_timed_out ... ok
+test r2_concurrent_terminator_never_receives_fabricated_terminated ... FAILED
+test r1_exec_timeout_in_drain_window_never_claims_exited_137 ... FAILED
+
+failures:
+
+---- r2_concurrent_terminator_never_receives_fabricated_terminated stdout ----
+
+thread 'r2_concurrent_terminator_never_receives_fabricated_terminated' (3335821) panicked at crates/lingxi-service/tests/rr1_g03_r01_redgreen_reviewer.rs:316:17:
+R2 VIOLATED (t2): the receipt claims a confirmed kill Terminated{Signal(9)} without an observed exit (record phase CleanupTimedOut { reason: Timeout }, exit_observed in audit: false)
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+
+---- r1_exec_timeout_in_drain_window_never_claims_exited_137 stdout ----
+
+thread 'r1_exec_timeout_in_drain_window_never_claims_exited_137' (3335820) panicked at crates/lingxi-service/tests/rr1_g03_r01_redgreen_reviewer.rs:232:9:
+R1 VIOLATED: the tool result claims Exited(137) while the never-signalled grandchild pid 58284 is alive — the exit was never observed. Text: R1_MARKER
+
+
+Command timed out after 1 seconds. For long-running work pass timeout=<seconds> (max 600), or run with tty=true and continue via write_stdin.
+
+
+failures:
+    r1_exec_timeout_in_drain_window_never_claims_exited_137
+    r2_concurrent_terminator_never_receives_fabricated_terminated
+
+test result: FAILED. 1 passed; 2 failed; 0 ignored; 0 measured; 0 filtered out; finished in 1.02s
+

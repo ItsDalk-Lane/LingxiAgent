@@ -1,0 +1,8 @@
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.09s
+     Running tests/r04_rr1_f03_stop_honesty.rs (rust/target/debug/deps/r04_rr1_f03_stop_honesty-f444d567d680df3a)
+
+running 1 test
+test rr1_f03_c04_adversarial_cancel_racing_natural_exit_stays_real ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 6 filtered out; finished in 0.06s
+

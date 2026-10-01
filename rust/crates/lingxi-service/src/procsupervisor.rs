@@ -68,11 +68,15 @@
 //!
 //! # The bounded cleanup responsibility chain
 //! `terminate(handle, reason)` runs: mark `Terminating` → `killpg(pgid,
-//! SIGKILL)` → bounded wait for the exit observation (`cleanup_timeout`)
-//! → reaper-side reclamation (bounded stdio grace, pipe/master closure,
-//! spill-file closure) → terminal record + audit receipt. If the bound
-//! expires the record honestly says `CleanupTimedOut` (the kill was
-//! sent; the exit was not observed) — never a fabricated success.
+//! SIGKILL)` (skipped, audited, when the reap already invalidated the
+//! group ownership) → bounded wait for the exit observation
+//! (`cleanup_timeout`) → reaper-side reclamation (bounded stdio grace,
+//! pipe/master closure, spill-file closure) → terminal record + audit
+//! receipt. If the bound expires the record honestly says
+//! `CleanupTimedOut` (a termination was requested; the exit was not
+//! observed) — never a fabricated success, never an upgrade by a later
+//! `terminate` (R04-RR1-F03); the LATE real observation replaces it
+//! with `Terminated` carrying the same first cause.
 //!
 //! # Future-drop does not shed ownership
 //! The calling future (the gateway executor inside the run driver) may
@@ -253,20 +257,31 @@ impl TerminationReason {
     }
 }
 
-/// How the direct child ended.
+/// How the direct child ended. Every variant is a REAL observation;
+/// an end whose status could not be read is `Unobserved` — never a
+/// fabricated code or signal (R04-RR1-F03).
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum ExitFact {
     Code(i32),
     Signal(i32),
+    /// The child's end was reached without a readable status — the
+    /// `wait()` itself failed, or the status carried neither code nor
+    /// signal. An OBSERVATION failure: stating an exit code for it
+    /// would be fabrication.
+    Unobserved,
 }
 
 impl ExitFact {
-    /// Shell-convention numeric status (`128 + signal` for signals) — the
-    /// value surfaced in `ToolRunStatus::Exited`.
-    pub fn status_code(self) -> i64 {
+    /// Shell-convention numeric status (`128 + signal` for signals) —
+    /// the value surfaced in `ToolRunStatus::Exited`. `None` for an
+    /// observation failure: there IS no honest numeric status, and the
+    /// callers surface an unconfirmed state instead of inventing one
+    /// (`-1`/`137` fabrications are exactly the R04-RR1-F03 defect).
+    pub fn observed_status_code(self) -> Option<i64> {
         match self {
-            ExitFact::Code(code) => code as i64,
-            ExitFact::Signal(sig) => 128 + sig as i64,
+            ExitFact::Code(code) => Some(code as i64),
+            ExitFact::Signal(sig) => Some(128 + sig as i64),
+            ExitFact::Unobserved => None,
         }
     }
 
@@ -274,6 +289,9 @@ impl ExitFact {
         match self {
             ExitFact::Code(code) => format!("exit code {code}"),
             ExitFact::Signal(sig) => format!("signal {sig}"),
+            ExitFact::Unobserved => {
+                "exit status unobserved (the wait failed or the status was unreadable)".to_string()
+            }
         }
     }
 }
@@ -285,7 +303,9 @@ pub enum RecordPhase {
     Terminating {
         reason: TerminationReason,
     },
-    /// Natural exit observed.
+    /// Natural exit observed (the wait resolved; `Unobserved` marks an
+    /// observation failure — the reaper's watch over the child is
+    /// closed, with no readable status).
     Exited {
         fact: ExitFact,
     },
@@ -294,7 +314,11 @@ pub enum RecordPhase {
         reason: TerminationReason,
         fact: ExitFact,
     },
-    /// Kill sent but the exit was NOT observed within the cleanup bound.
+    /// A termination was requested and the bound expired WITHOUT the
+    /// exit being observed — terminal-without-fact: queryable, never
+    /// reported as an exit. A LATER real observation replaces this
+    /// phase with [`RecordPhase::Terminated`] carrying the same first
+    /// cause and the real fact (R04-RR1-F03).
     CleanupTimedOut {
         reason: TerminationReason,
     },
@@ -407,6 +431,37 @@ pub enum PumpFaultPoint {
     /// read), exercising the panic-disposition branch of the drain.
     PanicNext,
 }
+
+/// Verification fault injection (R04-RR1-F03): controlled boundaries for
+/// the reaper's OBSERVATION, so the honest unconfirmed/observation-
+/// failure branches are testable without waiting for rare organic OS
+/// behavior. The hooks only choose WHEN a branch fires — the code they
+/// exercise is the one a real slow receipt / failed wait takes. They
+/// are NEVER reachable from model or tool input: only process-local
+/// Rust code holding the supervisor can arm them, and no product path
+/// does.
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Default)]
+pub enum ReapFaultPoint {
+    /// No fault armed (the production default).
+    #[default]
+    None,
+    /// The next reaper's `wait()` takes the honest error branch: the
+    /// observation fails and the exit fact must be `Unobserved` — never
+    /// a fabricated `-1`/`137` (the C04 wait-error leg).
+    WaitErrorNext,
+    /// The next reaper, after the wait resolves and the reap fact is
+    /// published, holds the terminal recording for a fixed verification
+    /// delay (`VERIFICATION_OBSERVATION_DELAY`) — modeling an OS that
+    /// is slow to deliver the exit receipt, so a small cleanup bound
+    /// expires DETERMINISTICALLY before the observation (the sanctioned
+    /// "受控边界延迟 reaper 观察" of the F03 acceptance).
+    DelayObservationNext,
+}
+
+/// The fixed hold of [`ReapFaultPoint::DelayObservationNext`] — long
+/// enough to dominate any cleanup bound the tests arm, short enough to
+/// keep the suite fast.
+const VERIFICATION_OBSERVATION_DELAY: Duration = Duration::from_secs(2);
 
 /// One supervisor-originated signal as ACTUALLY sent — the verification
 /// signal-call log (R04-RR1-F02-C02 evidence): tests prove no group
@@ -543,7 +598,11 @@ pub enum TerminationOutcome {
         reclaimed: bool,
         drained_stdio: bool,
     },
-    /// Kill sent; the exit was not observed within the cleanup bound.
+    /// A termination was requested (the kill sent — or honestly
+    /// SKIPPED when the reap had already invalidated the group
+    /// ownership, audited either way) and the exit was NOT observed
+    /// within the cleanup bound: an unconfirmed stop — never a
+    /// fabricated exit fact (R04-RR1-F03).
     CleanupTimedOut,
 }
 
@@ -975,6 +1034,9 @@ pub struct ProcessSupervisor {
     /// One-shot output-task fault (see [`PumpFaultPoint`]); consumed by
     /// the next output task. Production code never arms it.
     pump_fault: Mutex<PumpFaultPoint>,
+    /// One-shot reaper-observation fault (see [`ReapFaultPoint`]);
+    /// consumed by the next reaper. Production code never arms it.
+    reap_fault: Mutex<ReapFaultPoint>,
     /// Verification signal-call log (see [`SignalRecord`]) — every signal
     /// this supervisor actually sent, bounded. Observation only.
     signal_log: Mutex<Vec<SignalRecord>>,
@@ -1094,6 +1156,7 @@ impl ProcessSupervisor {
             limits,
             fault: Mutex::new(SpawnFaultPoint::None),
             pump_fault: Mutex::new(PumpFaultPoint::None),
+            reap_fault: Mutex::new(ReapFaultPoint::None),
             signal_log: Mutex::new(Vec::new()),
             owned_tasks: std::sync::atomic::AtomicUsize::new(0),
         })
@@ -1117,6 +1180,16 @@ impl ProcessSupervisor {
 
     fn take_pump_fault(&self) -> PumpFaultPoint {
         std::mem::replace(&mut *lock_or_poison(&self.pump_fault), PumpFaultPoint::None)
+    }
+
+    /// Arms the next reaper's observation fault (verification only — see
+    /// [`ReapFaultPoint`]; no product path arms it).
+    pub fn arm_reap_fault_for_verification(&self, point: ReapFaultPoint) {
+        *lock_or_poison(&self.reap_fault) = point;
+    }
+
+    fn take_reap_fault(&self) -> ReapFaultPoint {
+        std::mem::replace(&mut *lock_or_poison(&self.reap_fault), ReapFaultPoint::None)
     }
 
     /// The signals this supervisor ACTUALLY sent (bounded log, oldest
@@ -1391,6 +1464,7 @@ impl ProcessSupervisor {
         let reaper_record = Arc::clone(&record);
         tokio::spawn(async move {
             let _reaper = OwnedTaskGuard::for_supervision(&supervisor);
+            let reap_fault = supervisor.take_reap_fault();
             let out_pump = stdout.map(|stream| {
                 spawn_output_pump(
                     &supervisor,
@@ -1409,13 +1483,16 @@ impl ProcessSupervisor {
                     OutputStream::Stderr,
                 )
             });
-            let status = child.wait().await;
+            let status = reap_wait(child, reap_fault).await;
             // REAL observation, published BEFORE the grace: from this
             // instant the pid/pgid are reaped and no longer provably
             // ours — the send-time ownership gate reads this flag under
             // the same lock, so a terminate arriving anywhere in the
             // drain window can never signal the stale group.
             note_child_reaped(&reaper_record);
+            if reap_fault == ReapFaultPoint::DelayObservationNext {
+                hold_observation_for_verification(&reaper_record).await;
+            }
             // Bounded stdio grace: grandchildren may still hold the write
             // ends. On expiry the leftover pump is ABORTED and its end
             // OBSERVED by joining (tokio semantics: a dropped JoinHandle
@@ -1428,10 +1505,7 @@ impl ProcessSupervisor {
                 join_bound,
             )
             .await;
-            let fact = match status {
-                Ok(status) => exit_fact_of(&status),
-                Err(_) => ExitFact::Code(-1),
-            };
+            let fact = observed_exit_fact(status, &reaper_record);
             let leftover_group = group_has_members(reaper_record.pgid);
             finalize_exit(&reaper_record, fact, &drain, leftover_group);
             supervisor.settle(&reaper_record.id);
@@ -1653,10 +1727,14 @@ impl ProcessSupervisor {
             let join_bound = self.limits.pump_abort_join;
             tokio::spawn(async move {
                 let _reaper = OwnedTaskGuard::for_supervision(&supervisor);
-                let status = child.wait().await;
+                let reap_fault = supervisor.take_reap_fault();
+                let status = reap_wait(child, reap_fault).await;
                 // Same real-observation ordering as the one-shot reaper:
                 // the reap fact is published BEFORE the drain window.
                 note_child_reaped(&reaper_record);
+                if reap_fault == ReapFaultPoint::DelayObservationNext {
+                    hold_observation_for_verification(&reaper_record).await;
+                }
                 let drain = drain_output_tasks(
                     &reaper_record,
                     [("pty_master_reader", Some(reader)), ("", None)],
@@ -1664,10 +1742,7 @@ impl ProcessSupervisor {
                     join_bound,
                 )
                 .await;
-                let fact = match status {
-                    Ok(status) => exit_fact_of(&status),
-                    Err(_) => ExitFact::Code(-1),
-                };
+                let fact = observed_exit_fact(status, &reaper_record);
                 let leftover_group = group_has_members(reaper_record.pgid);
                 finalize_exit(&reaper_record, fact, &drain, leftover_group);
                 supervisor.settle(&reaper_record.id);
@@ -1903,20 +1978,44 @@ impl ProcessSupervisor {
         match outcome {
             Some(phase) => {
                 let (fact, reclaimed, drained) = terminal_facts(record);
-                record.audit(
-                    now,
-                    "termination_settled",
-                    format!(
-                        "reason={} phase={:?} reclaimed={reclaimed} drained_stdio={drained}",
-                        reason.wire_name(),
-                        phase
-                    ),
-                );
-                self.settle(&record.id);
-                TerminationOutcome::Terminated {
-                    fact,
-                    reclaimed,
-                    drained_stdio: drained,
+                match fact {
+                    Some(fact) => {
+                        record.audit(
+                            now,
+                            "termination_settled",
+                            format!(
+                                "reason={} phase={:?} reclaimed={reclaimed} \
+                                 drained_stdio={drained}",
+                                reason.wire_name(),
+                                phase
+                            ),
+                        );
+                        self.settle(&record.id);
+                        TerminationOutcome::Terminated {
+                            fact,
+                            reclaimed,
+                            drained_stdio: drained,
+                        }
+                    }
+                    None => {
+                        // R04-RR1-F03: the phase is terminal WITHOUT an
+                        // observed exit — another terminator's bound
+                        // expired first (`CleanupTimedOut`). That is NOT
+                        // a confirmation: the receipt stays the honest
+                        // unconfirmed outcome; nothing settles or claims
+                        // a kill that was not observed.
+                        record.audit(
+                            now,
+                            "termination_unconfirmed_echo",
+                            format!(
+                                "reason={} observed a terminal-without-fact phase ({:?}); \
+                                 no exit was observed — the receipt stays unconfirmed",
+                                reason.wire_name(),
+                                phase
+                            ),
+                        );
+                        TerminationOutcome::CleanupTimedOut
+                    }
                 }
             }
             None => {
@@ -2319,6 +2418,13 @@ async fn drain_output_tasks(
 /// EOF before the grace, and `reclaimed` is true only when every task's
 /// end was OBSERVED (an aborted-then-joined pump really dropped its read
 /// end; an unconfirmed end is never folded into "reclaimed").
+///
+/// R04-RR1-F03 first-cause preservation: when the LATE real observation
+/// lands on a record sitting in `CleanupTimedOut`, the terminal phase is
+/// `Terminated { reason }` with the reason of the termination that was
+/// requested when the bound expired — the first cause survives the
+/// unconfirmed window (never re-attributed to a later caller, never
+/// downgraded to a cause-less `Exited`).
 fn finalize_exit(
     record: &Arc<ProcessRecord>,
     fact: ExitFact,
@@ -2329,8 +2435,12 @@ fn finalize_exit(
     {
         let mut inner = lock_or_poison(&record.inner);
         let reason = match inner.phase {
-            RecordPhase::Terminating { reason } => Some(reason),
-            _ => None,
+            RecordPhase::Terminating { reason } | RecordPhase::CleanupTimedOut { reason } => {
+                Some(reason)
+            }
+            RecordPhase::Running | RecordPhase::Exited { .. } | RecordPhase::Terminated { .. } => {
+                None
+            }
         };
         inner.drained_stdio = drain.drained_stdio;
         inner.phase = match reason {
@@ -2384,14 +2494,78 @@ fn reclaim_handles(record: &Arc<ProcessRecord>) {
     }
 }
 
-fn terminal_facts(record: &Arc<ProcessRecord>) -> (ExitFact, bool, bool) {
+/// Facts for a terminal phase — the exit fact is `Some` ONLY when the
+/// phase carries a REAL observation; a terminal-WITHOUT-fact phase
+/// (`CleanupTimedOut`) yields `None` — never a fabricated `Signal(9)`
+/// (R04-RR1-F03: the second waiter observing another terminator's
+/// expiry must not receive a confirmed kill it never saw).
+fn terminal_facts(record: &Arc<ProcessRecord>) -> (Option<ExitFact>, bool, bool) {
     let inner = lock_or_poison(&record.inner);
     let fact = match inner.phase.clone() {
-        RecordPhase::Exited { fact } | RecordPhase::Terminated { fact, .. } => fact,
-        RecordPhase::CleanupTimedOut { .. } => ExitFact::Signal(9),
-        _ => ExitFact::Code(-1),
+        RecordPhase::Exited { fact } | RecordPhase::Terminated { fact, .. } => Some(fact),
+        RecordPhase::Running
+        | RecordPhase::Terminating { .. }
+        | RecordPhase::CleanupTimedOut { .. } => None,
     };
     (fact, inner.reclaimed, inner.drained_stdio)
+}
+
+/// The reaper's wait, with the verification-only observation faults
+/// applied (see [`ReapFaultPoint`]; production spawns always take the
+/// plain `wait` path).
+async fn reap_wait(
+    mut child: tokio::process::Child,
+    fault: ReapFaultPoint,
+) -> Result<std::process::ExitStatus, io::Error> {
+    match fault {
+        ReapFaultPoint::None => child.wait().await,
+        ReapFaultPoint::WaitErrorNext => Err(io::Error::other(
+            "verification fault point armed: forcing the reaper wait-error branch (the wait \
+             itself did not fail; the fault exercises the honest observation-failure path)",
+        )),
+        ReapFaultPoint::DelayObservationNext => child.wait().await,
+    }
+}
+
+/// The verification-only observation hold (see [`ReapFaultPoint::
+/// DelayObservationNext`]): the wait has resolved and the reap fact is
+/// already published, but the terminal recording is held — modeling an
+/// OS slow to deliver the exit receipt. Audited so the timeline stays
+/// inspectable.
+async fn hold_observation_for_verification(record: &Arc<ProcessRecord>) {
+    record.audit(
+        wall_now_ms(),
+        "observation_hold_verification",
+        format!(
+            "verification fault: holding the terminal recording for {:?} (the wait HAS \
+             resolved; modeling a slow exit receipt)",
+            VERIFICATION_OBSERVATION_DELAY
+        ),
+    );
+    tokio::time::sleep(VERIFICATION_OBSERVATION_DELAY).await;
+}
+
+/// Maps the reaper's wait result onto the exit fact. A FAILED wait is an
+/// OBSERVATION failure — `Unobserved`, audited — never a fabricated
+/// `-1` (or worse, a signal) exit (R04-RR1-F03).
+fn observed_exit_fact(
+    status: Result<std::process::ExitStatus, io::Error>,
+    record: &Arc<ProcessRecord>,
+) -> ExitFact {
+    match status {
+        Ok(status) => exit_fact_of(&status),
+        Err(err) => {
+            record.audit(
+                wall_now_ms(),
+                "wait_failed",
+                format!(
+                    "the reaper's wait() failed: {err}; the child's end is treated as \
+                     unobserved — no exit code or signal is fabricated"
+                ),
+            );
+            ExitFact::Unobserved
+        }
+    }
 }
 
 #[cfg(unix)]
@@ -2402,7 +2576,7 @@ fn exit_fact_of(status: &std::process::ExitStatus) -> ExitFact {
     } else if let Some(sig) = status.signal() {
         ExitFact::Signal(sig)
     } else {
-        ExitFact::Code(-1)
+        ExitFact::Unobserved
     }
 }
 
@@ -2821,9 +2995,60 @@ mod tests {
 
     #[test]
     fn exit_fact_status_codes_follow_the_shell_convention() {
-        assert_eq!(ExitFact::Code(7).status_code(), 7);
-        assert_eq!(ExitFact::Signal(9).status_code(), 137);
-        assert_eq!(ExitFact::Signal(15).status_code(), 143);
+        assert_eq!(ExitFact::Code(7).observed_status_code(), Some(7));
+        assert_eq!(ExitFact::Signal(9).observed_status_code(), Some(137));
+        assert_eq!(ExitFact::Signal(15).observed_status_code(), Some(143));
+        // An observation failure has NO honest numeric status — surfacing
+        // one would be the R04-RR1-F03 fabrication (-1/137).
+        assert_eq!(ExitFact::Unobserved.observed_status_code(), None);
+    }
+
+    // ── R04-RR1-F03: no fabricated exit facts ────────────────────────────
+
+    #[test]
+    fn terminal_facts_never_fabricate_an_exit_for_unconfirmed_or_live_phases() {
+        let id = ProcessHandleId::mint().expect("mint");
+        let record = dummy_record(id);
+        for phase in [
+            RecordPhase::Running,
+            RecordPhase::Terminating {
+                reason: TerminationReason::Timeout,
+            },
+            RecordPhase::CleanupTimedOut {
+                reason: TerminationReason::Timeout,
+            },
+        ] {
+            {
+                let mut inner = lock_or_poison(&record.inner);
+                inner.phase = phase.clone();
+            }
+            let (fact, _, _) = terminal_facts(&record);
+            assert!(
+                fact.is_none(),
+                "{phase:?} carries no observed exit — a fact would be fabricated"
+            );
+        }
+        // Only fact-bearing phases yield one, and it is THEIR fact.
+        for phase in [
+            RecordPhase::Exited {
+                fact: ExitFact::Code(0),
+            },
+            RecordPhase::Terminated {
+                reason: TerminationReason::Close,
+                fact: ExitFact::Signal(9),
+            },
+        ] {
+            {
+                let mut inner = lock_or_poison(&record.inner);
+                inner.phase = phase.clone();
+            }
+            let (fact, _, _) = terminal_facts(&record);
+            let expected = match phase {
+                RecordPhase::Exited { fact } | RecordPhase::Terminated { fact, .. } => fact,
+                _ => unreachable!(),
+            };
+            assert_eq!(fact, Some(expected), "{phase:?}");
+        }
     }
 
     // ── R04-RR1-F01: live-slot admission accounting ──────────────────────

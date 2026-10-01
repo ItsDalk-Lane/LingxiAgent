@@ -1,0 +1,3 @@
+PASS D5-reverse OK: every cargo workspace member is a registered module
+RESULT: OK (ownership contract + dependency rules + negative battery)
+xtask: [python3 -B docs/rust-tauri/R01/r01_t01_check_ownership.py] exit 0 (OK)

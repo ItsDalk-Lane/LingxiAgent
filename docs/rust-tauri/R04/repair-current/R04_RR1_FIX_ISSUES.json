@@ -82,12 +82,17 @@
       ],
       "source_fact_confirmed_at_baseline": "非 Terminated 回执兜底 ExitFact::Signal(9)（基线 718）；CleanupTimedOut→Signal(9)（744）→ToolRunStatus::Exited{code:137}（948）",
       "cases": ["R04-RR1-F03-C01", "R04-RR1-F03-C02", "R04-RR1-F03-C03", "R04-RR1-F03-C04", "R04-RR1-F03-C05"],
-      "status": "OPEN_FOR_NATIVE_REPRODUCTION_AND_REPAIR",
-      "normal_selfcheck": "NOT_RUN",
-      "adversarial_selfcheck": "NOT_RUN",
-      "independent_review": "NOT_RUN",
-      "candidate": null,
-      "commit": null
+      "status": "CLOSED_PENDING_COMMIT（R1 独立 PASS；提交回执在 G05 收口统一补记）",
+      "normal_selfcheck": "PASS（E01：C01 确定性红→绿含两事实时间线；C02 文本与结构化一致+空 chars×3/重复轮询/异会话对照；C03 重复终止不升级+首因保留+名额恰好一次；C04 四组+10 轮取消竞争；C05 run driver 取消链+Future 丢弃腿。证据 artifacts/rust-tauri/R04/RR1-G03-E01/logs/，报告 G03-E01_REPORT.md）",
+      "adversarial_selfcheck": "PASS（E01：终止请求已发/观察未发分离、真实退出竞逐 deadline、迟到观察不改判、重复轮询；屏障与注入受控驱动）",
+      "independent_review": "PASS（REVIEWER-R04-RR1-G03-R01，2026-10-01：自写基线可编译反例 R1/R2 确定性红 4/4、R3 竞态门控 2/4 见证红（并独立验证 macOS PTY 未确认窗口无法确定性打开），候选对照树（逐字节 cmp 一致）同反例 6/6 绿；四条虚构分支基线行号逐一定位并核销（Code(-1) 全树 0 处、observed_status_code 类型层杜绝）；合法对照 V4 不降级；自设 6 对抗变体+V5/V6 迟到观察不改判全绿 3 连跑；workspace 全量 925/0、clippy/fmt/contracts/boundaries 0、ReapFaultPoint 零产品调用点、journal 新臂不混淆。非阻塞观察 O-1..O-4。报告 G03-R1_REVIEW.md，证据 RR1-G03-R1/）",
+      "candidate": "工作区未提交改动（基线 da15c4bd9：ports.rs ToolRunStatus::StopUnconfirmed+status 装箱；procsupervisor.rs ExitFact::Unobserved/terminal_facts 不升级/finalize_exit 首因保留/ReapFaultPoint；exectools.rs 诚实映射；runs.rs journal StopUnconfirmed 臂；4 测试文件 API 适配；新测试 r04_rr1_f03_stop_honesty.rs）",
+      "commit": null,
+      "execution_notes": {
+        "refact_verification": "E01 在 da15c4bd9 重新核实：复审 4 处虚构分支全部仍存在；另发现同族 finalize_exit 在 CleanupTimedOut 上丢失首因，一并修复",
+        "gates": "fmt 0/clippy 0/workspace 0（含 R03 全部套件）/check-contracts 0/check-boundaries 0/G01 9/9+G02 11/11 复跑/F03 套件 3 连跑稳定",
+        "honest_limits": "并发双 await 集成级确定性窗口（macOS 无 setsid）以单元级+竞争轮覆盖；wait 错误/PTY 观察延迟为受控注入；C02/C03 最终形态红证据为首轮竞态红+单元红（依赖新 API 无法对基线编译）"
+      }
     },
     {
       "id": "R04-RR1-F04",

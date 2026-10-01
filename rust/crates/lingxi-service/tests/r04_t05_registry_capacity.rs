@@ -247,7 +247,7 @@ fn error_text(result: &ToolExecutionResult) -> String {
 
 fn status_of(result: &ToolExecutionResult) -> Option<ToolRunStatus> {
     match &result.outcome {
-        ToolOutcome::Success { result } => result.status.clone(),
+        ToolOutcome::Success { result } => result.status.as_deref().cloned(),
         other => panic!("expected a success outcome, got {other:?}"),
     }
 }

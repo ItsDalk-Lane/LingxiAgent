@@ -2539,7 +2539,7 @@ fn journal_receipt_of(outcome: &ToolOutcome) -> InvocationReceipt {
     match outcome {
         ToolOutcome::Success { result } => InvocationReceipt {
             outcome: ReceiptOutcome::Succeeded,
-            detail: match &result.status {
+            detail: match result.status.as_deref() {
                 Some(lingxi_kernel::ports::ToolRunStatus::Exited { code }) => format!(
                     "external content digest {} (exit {code})",
                     result.content_digest
@@ -2548,6 +2548,14 @@ fn journal_receipt_of(outcome: &ToolOutcome) -> InvocationReceipt {
                     "external content digest {} (still running, handle {handle})",
                     result.content_digest
                 ),
+                // R04-RR1-F03: an unconfirmed stop is journaled as what
+                // it is — the receipt never reads as an observed exit.
+                Some(lingxi_kernel::ports::ToolRunStatus::StopUnconfirmed { handle, detail }) => {
+                    format!(
+                        "external content digest {} (stop unconfirmed, handle {handle}: {detail})",
+                        result.content_digest
+                    )
+                }
                 None => format!("external content digest {}", result.content_digest),
             },
             dedup_id: Some(result.content_digest.clone()),
@@ -2724,7 +2732,9 @@ mod tests {
         assert_eq!(receipt.dedup_id.as_deref(), Some(expected_digest.as_str()));
         let exited = ToolOutcome::Success {
             result: lingxi_kernel::ports::ToolSuccess {
-                status: Some(lingxi_kernel::ports::ToolRunStatus::Exited { code: 3 }),
+                status: Some(Box::new(lingxi_kernel::ports::ToolRunStatus::Exited {
+                    code: 3,
+                })),
                 ..lingxi_kernel::ports::ToolSuccess::text("out")
             },
         };

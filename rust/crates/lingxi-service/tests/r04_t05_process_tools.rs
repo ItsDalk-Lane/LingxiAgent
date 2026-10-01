@@ -388,7 +388,7 @@ fn error_text(result: &ToolExecutionResult) -> String {
 
 fn status_of(result: &ToolExecutionResult) -> Option<ToolRunStatus> {
     match &result.outcome {
-        ToolOutcome::Success { result } => result.status.clone(),
+        ToolOutcome::Success { result } => result.status.as_deref().cloned(),
         other => panic!("expected a success outcome, got {other:?}"),
     }
 }
@@ -806,7 +806,7 @@ async fn r04_a10_pty_input_reads_resize_interrupt_and_exit() {
     })
     .await;
     match final_phase {
-        RecordPhase::Exited { fact } => assert_eq!(fact.status_code(), 7),
+        RecordPhase::Exited { fact } => assert_eq!(fact.observed_status_code(), Some(7)),
         other => panic!("expected natural exit 7, got {other:?}"),
     }
     let final_poll = call_process_tool(
@@ -900,7 +900,7 @@ async fn persistent_terminal_lifetime_is_explicit_and_shutdown_is_bounded() {
             reclaimed,
             drained_stdio: _,
         } => {
-            assert_eq!(fact.status_code(), 137, "SIGKILL convention");
+            assert_eq!(fact.observed_status_code(), Some(137), "SIGKILL convention");
             assert!(reclaimed, "resources reclaimed");
         }
         other => panic!("bounded shutdown receipt: {other:?}"),
@@ -1630,7 +1630,7 @@ async fn terminate_after_natural_exit_is_already_terminal_and_spawn_failures_are
         .await;
     match receipt.outcome {
         TerminationOutcome::AlreadyTerminal(RecordPhase::Exited { fact }) => {
-            assert_eq!(fact.status_code(), 0);
+            assert_eq!(fact.observed_status_code(), Some(0));
         }
         other => panic!("already-terminal receipt: {other:?}"),
     }

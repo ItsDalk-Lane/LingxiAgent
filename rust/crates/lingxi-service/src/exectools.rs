@@ -138,6 +138,7 @@ fn text_success(
     resource_refs: Vec<ResourceRef>,
     status: Option<ToolRunStatus>,
 ) -> ToolOutcome {
+    let status = status.map(Box::new);
     let content = vec![ContentBlock::Text { text }];
     let value = serde_json::to_value(&content).expect("content blocks serialize");
     let canonical = lingxi_protocol::canon::canonical_json_bytes(&value);
@@ -724,22 +725,42 @@ impl ProcessTools {
             ProcessOwnershipGuard::new(Arc::clone(&self.supervisor), spawned.id.clone());
         let timeout_at =
             tokio::time::Instant::now() + Duration::from_secs(params.timeout_seconds.max(1));
+        // Which select arm fired — the deadline notice is tied to the
+        // watchdog, NOT to an assumed kill outcome.
+        let mut timeout_fired = false;
         let phase = tokio::select! {
             biased;
             phase = self.supervisor.wait_terminal(&spawned.id) => phase,
             _ = tokio::time::sleep_until(timeout_at) => {
+                timeout_fired = true;
+                // R04-RR1-F03: the receipt is mapped HONESTLY — a real
+                // observed exit keeps its real fact; an unconfirmed
+                // cleanup stays unconfirmed; nothing is invented here.
                 let receipt = self
                     .supervisor
                     .terminate(&spawned.id, TerminationReason::Timeout)
                     .await;
-                let fact = match receipt.outcome {
-                    crate::procsupervisor::TerminationOutcome::Terminated { fact, .. } => fact,
-                    _ => ExitFact::Signal(9),
-                };
-                Some(RecordPhase::Terminated {
-                    reason: TerminationReason::Timeout,
-                    fact,
-                })
+                match receipt.outcome {
+                    crate::procsupervisor::TerminationOutcome::Terminated { fact, .. } => {
+                        Some(RecordPhase::Terminated {
+                            reason: TerminationReason::Timeout,
+                            fact,
+                        })
+                    }
+                    // The record was already terminal when the kill was
+                    // about to fire (e.g. a natural exit raced the
+                    // deadline): echo the REAL phase — its fact is the
+                    // honest result, never a fabricated 137.
+                    crate::procsupervisor::TerminationOutcome::AlreadyTerminal(phase) => {
+                        Some(phase)
+                    }
+                    crate::procsupervisor::TerminationOutcome::CleanupTimedOut => {
+                        Some(RecordPhase::CleanupTimedOut {
+                            reason: TerminationReason::Timeout,
+                        })
+                    }
+                    crate::procsupervisor::TerminationOutcome::UnknownProcess => None,
+                }
             }
         };
         guard.disarm();
@@ -758,18 +779,39 @@ impl ProcessTools {
             .unwrap_or_else(empty_output_snapshot);
         let text = decode_window(&snapshot.window);
         let head_tail = truncate_head_tail(&text, EXEC_RESULT_MAX_LINES, params.max_output_bytes);
-        let fact = match &phase {
-            RecordPhase::Exited { fact } | RecordPhase::Terminated { fact, .. } => *fact,
-            RecordPhase::CleanupTimedOut { .. } => ExitFact::Signal(9),
-            _ => ExitFact::Code(-1),
-        };
-        let timed_out = matches!(
-            &phase,
-            RecordPhase::Terminated {
-                reason: TerminationReason::Timeout,
-                ..
+        // R04-RR1-F03: the run/exit status of the call. An exit CODE is
+        // claimed only from a REAL observed fact; a stop whose exit was
+        // not observed (CleanupTimedOut) or whose status could not be
+        // read (a failed wait) surfaces as the queryable
+        // `StopUnconfirmed` — never `Exited`, never a fabricated 137/-1.
+        let observed_code = match &phase {
+            RecordPhase::Exited { fact } | RecordPhase::Terminated { fact, .. } => {
+                fact.observed_status_code()
             }
-        );
+            RecordPhase::Running
+            | RecordPhase::Terminating { .. }
+            | RecordPhase::CleanupTimedOut { .. } => None,
+        };
+        let unconfirmed_detail = match &phase {
+            RecordPhase::Exited {
+                fact: ExitFact::Unobserved,
+            }
+            | RecordPhase::Terminated {
+                fact: ExitFact::Unobserved,
+                ..
+            } => Some(
+                "the child's end was observed but its exit status could not be read (the \
+                 wait failed) — unconfirmed"
+                    .to_string(),
+            ),
+            RecordPhase::CleanupTimedOut { reason } => Some(format!(
+                "termination was requested ({}) but the exit was not observed within the \
+                 cleanup bound — unconfirmed",
+                reason.wire_name()
+            )),
+            _ => None,
+        };
+        let timed_out = timeout_fired;
         let mut body = if head_tail.content.trim().is_empty() {
             "(no output)".to_string()
         } else {
@@ -811,18 +853,22 @@ impl ProcessTools {
                     ""
                 }
             ));
-            return text_success(
-                body,
-                truncated,
-                resource_refs,
-                Some(ToolRunStatus::Exited {
-                    code: fact.status_code(),
-                }),
-            );
         }
-        let code = fact.status_code();
-        if code != 0 {
+        // The exit statement matches the observed fact exactly: a real
+        // nonzero code is stated; an unconfirmed stop says so and keeps
+        // the handle queryable (R04-RR1-F03 — a kill that was merely
+        // requested never reads as an exit).
+        if let Some(code) = observed_code.filter(|code| *code != 0) {
             body.push_str(&format!("\n\nCommand exited with code {code}"));
+        }
+        if let Some(detail) = unconfirmed_detail.as_deref() {
+            body.push_str(&format!(
+                "\n\n[stop unconfirmed] {detail}. The command's final state is not confirmed — \
+                 it may still be running or have ended unobserved; do not assume the absence \
+                 of further side effects. process_id {} remains queryable via the process \
+                 record.",
+                spawned.id
+            ));
         }
         // Honest containment state: the sandbox line appears ONLY when the
         // argv actually ran behind the sandbox port (R04-T06). An
@@ -842,12 +888,26 @@ impl ProcessTools {
                 );
             }
         }
-        text_success(
-            body,
-            truncated,
-            resource_refs,
-            Some(ToolRunStatus::Exited { code }),
-        )
+        let run_status = if let Some(code) = observed_code {
+            ToolRunStatus::Exited { code }
+        } else if let Some(detail) = unconfirmed_detail {
+            ToolRunStatus::StopUnconfirmed {
+                handle: spawned.id.to_string(),
+                detail,
+            }
+        } else {
+            // A non-terminal phase where a terminal one is required is an
+            // internal invariant break — stated loudly, never papered
+            // over with an invented exit.
+            return failed(
+                ErrorCode::Internal,
+                format!(
+                    "the process record reported a non-terminal phase ({phase:?}) where a \
+                     terminal one was required"
+                ),
+            );
+        };
+        text_success(body, truncated, resource_refs, Some(run_status))
     }
 
     pub async fn run_write_stdin(&self, ctx: &RunContext, args: &serde_json::Value) -> ToolOutcome {
@@ -927,9 +987,16 @@ impl ProcessTools {
             RecordPhase::Terminated { reason, fact } => {
                 format!("terminated ({}; {})", reason.wire_name(), fact.describe())
             }
-            RecordPhase::CleanupTimedOut { reason } => {
-                format!("cleanup_timed_out ({}; kill was sent)", reason.wire_name())
-            }
+            // R04-RR1-F03: the text states exactly what is known — a
+            // termination was requested and the bound expired WITHOUT
+            // the exit being observed. It does not claim the kill was
+            // delivered (the audit carries the real sent/skip fact) and
+            // it never reads as an exit.
+            RecordPhase::CleanupTimedOut { reason } => format!(
+                "cleanup_timed_out ({}; termination was requested, exit not observed — \
+                 unconfirmed, not exited)",
+                reason.wire_name()
+            ),
         };
         let mut lines = vec![
             format!("process_id: {}", record.id),
@@ -953,6 +1020,10 @@ impl ProcessTools {
         if let Some(spill) = delivery.spill.as_ref().filter(|s| s.bytes_written > 0) {
             lines.push(format!("transcript_path: {}", spill.path.display()));
         }
+        // R04-RR1-F03: text and structured status AGREE. An exit code is
+        // claimed only from a real observed fact; an unconfirmed stop
+        // (CleanupTimedOut, or a wait that failed) surfaces as the
+        // queryable StopUnconfirmed — never Exited{137}.
         let run_status = match &phase {
             RecordPhase::Running | RecordPhase::Terminating { .. } => {
                 Some(ToolRunStatus::Running {
@@ -960,11 +1031,24 @@ impl ProcessTools {
                 })
             }
             RecordPhase::Exited { fact } | RecordPhase::Terminated { fact, .. } => {
-                Some(ToolRunStatus::Exited {
-                    code: fact.status_code(),
-                })
+                match fact.observed_status_code() {
+                    Some(code) => Some(ToolRunStatus::Exited { code }),
+                    None => Some(ToolRunStatus::StopUnconfirmed {
+                        handle: record.id.to_string(),
+                        detail: "the terminal's end was observed but its exit status could \
+                                 not be read (the wait failed) — unconfirmed"
+                            .to_string(),
+                    }),
+                }
             }
-            RecordPhase::CleanupTimedOut { .. } => Some(ToolRunStatus::Exited { code: 137 }),
+            RecordPhase::CleanupTimedOut { reason } => Some(ToolRunStatus::StopUnconfirmed {
+                handle: record.id.to_string(),
+                detail: format!(
+                    "termination was requested ({}) but the exit was not observed within \
+                     the cleanup bound — unconfirmed",
+                    reason.wire_name()
+                ),
+            }),
         };
         let text = lines.join("\n");
         text_success(text, delivery.truncated, Vec::new(), run_status)
