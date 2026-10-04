@@ -1,0 +1,14 @@
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.08s
+     Running tests/cancel_link_inheritance.rs (/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T//rust-target-r03-g07-repair/debug/deps/cancel_link_inheritance-7811d07e892d1159)
+
+running 7 tests
+test nodes_created_after_parent_cancellation_inherit_it ... ok
+test linked_run_roots_receive_parent_cancellation_across_mixed_entries ... ok
+test isolation_and_first_reason_survive_repeated_and_concurrent_cancels ... ok
+test registration_racing_cancellation_misses_no_node ... ok
+test subagent_timeout_settles_a_parked_provider_wait ... ok
+test subagent_timeout_settles_a_parked_approval_wait ... ok
+test subagent_timeout_settles_a_parked_quota_wait ... ok
+
+test result: ok. 7 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.59s
+

@@ -1,0 +1,13 @@
+
+> lingxi@0.1.43 test
+> vitest run --exclude '**/.claude/**' --exclude '**/.cache/**' --exclude '**/dist/**' --exclude '**/dist-server/**' --exclude '**/dist-computer-use/**' --exclude '**/dist-sandbox/**' --run desktop/src/react/__tests__/app-init.test.ts
+
+
+ RUN  v4.1.10 /Users/study_superior/Desktop/Code/LingxiAgent
+
+
+ Test Files  1 passed (1)
+      Tests  14 passed (14)
+   Start at  15:19:59
+   Duration  521ms (transform 293ms, setup 18ms, import 32ms, tests 410ms, environment 0ms)
+

@@ -1,0 +1,33 @@
+{
+  "schema": "r05-t05-compat-golden/v1",
+  "module": "volcengine",
+  "case": "auto-level-maps-medium",
+  "model": {
+    "provider": "volcengine",
+    "id": "doubao-seed-1-8",
+    "baseUrl": "https://ark.cn-beijing.volces.com/api/v3",
+    "api": "openai-completions",
+    "reasoning": true
+  },
+  "payload": {
+    "model": "doubao-seed-1-8",
+    "messages": []
+  },
+  "options": {
+    "mode": "chat",
+    "reasoningLevel": "auto"
+  },
+  "expected": {
+    "thinkingFormat": "volcengine",
+    "reasoningProfile": null,
+    "matched": "volcengine",
+    "result": {
+      "model": "doubao-seed-1-8",
+      "messages": [],
+      "thinking": {
+        "type": "enabled"
+      },
+      "reasoning_effort": "medium"
+    }
+  }
+}

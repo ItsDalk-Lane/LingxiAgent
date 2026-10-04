@@ -1,0 +1,4 @@
+2026-09-26T11:10:51.764921Z  INFO lingxi_service: data root resolved effective_home=/private/tmp/lingxi-r02t02-a03-home.tFa4J6 source=cli ignored_sources=none
+2026-09-26T11:10:51.765040Z  INFO lingxi_service: data root prepared (canonicalized; runtime dir private 0700) canonical_home=/private/tmp/lingxi-r02t02-a03-home.tFa4J6 runtime_dir=/private/tmp/lingxi-r02t02-a03-home.tFa4J6/lingxi-service
+LINGXI_SERVICE_SINGLE_WRITER_BLOCKED home=/private/tmp/lingxi-r02t02-a03-home.tFa4J6 recordedPid=32926 recordedInstanceId=22af02b33f6a6d03defadb9c6facd079 recordedStartNonce=72c3d00950b133b8 recordedAddr=127.0.0.1:63607 probe=live authority=os-file-lock
+error: another lingxi-service instance holds the single-writer lock for data root /private/tmp/lingxi-r02t02-a03-home.tFa4J6; recorded peer pid=32926 instanceId=22af02b33f6a6d03defadb9c6facd079 startNonce=72c3d00950b133b8 startedAtUnixMs=1790421051382 addr=127.0.0.1:63607; health probe: peer is LIVE

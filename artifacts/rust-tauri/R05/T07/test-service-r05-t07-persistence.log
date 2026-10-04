@@ -1,0 +1,12 @@
+   Compiling lingxi-service v0.0.0 (/Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-service)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 1.63s
+     Running tests/r05_t07_persistence.rs (rust/target/debug/deps/r05_t07_persistence-589add7ec63b41b7)
+
+running 4 tests
+test identical_replay_is_idempotent_and_a_rewrite_is_a_loud_conflict ... ok
+test the_ledger_round_trips_partial_and_invalid_states ... ok
+test migration_v4_to_v5_upgrades_an_isolated_copy_and_keeps_old_rows ... ok
+test old_ledger_rows_survive_a_model_config_reload ... ok
+
+test result: ok. 4 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.12s
+

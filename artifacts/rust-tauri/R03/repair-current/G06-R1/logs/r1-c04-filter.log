@@ -1,0 +1,9 @@
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.08s
+     Running tests/background_steering.rs (target/debug/deps/background_steering-75b51d3f2c8d4f81)
+
+running 2 tests
+test c04_adversarial_concurrent_steers_respect_the_bound ... ok
+test c04_bounded_inbox_same_contract_foreground_and_background ... ok
+
+test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 6 filtered out; finished in 0.09s
+

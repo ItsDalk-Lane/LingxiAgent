@@ -1,0 +1,4 @@
+error: no matching package named `scrypt` found
+location searched: crates.io index
+required by package `lingxi-service v0.0.0 (/Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-service)`
+As a reminder, you're using offline mode (--offline) which can sometimes cause surprising resolution failures, if this error is too confusing you may wish to retry without `--offline`.

@@ -1,0 +1,1857 @@
+{
+ "schema": "lingxi.r05-provider-support-matrix.v1",
+ "generated_by": "docs/rust-tauri/R05/r05_t01_extract_provider_matrix.mjs",
+ "generated_at": "2026-10-02",
+ "extraction_method": "Node 24 直接 import lib/providers/*.ts 的 39 个插件导出对象（真实运行时值，非文本猜测）；provider-compat 调度表、model-operations 词汇、media/speech 适配器清单为静态读取；每行与 R00 账本的 注册 id/auth/api 三元组逐字段核对。",
+ "source_digests": {
+  "lib/providers/": "per-row sourceFile 为准",
+  "core/provider-compat.ts": "9f525eaacea92d6a168a34ccf82d22e3e4a8d71592087002bba0b9b34a04c4ed",
+  "shared/model-operations.ts": "432edee0c551f384a31d3a5a93106100633c35f0094534499d6a288105334d2d",
+  "docs/rust-tauri/R00/ACCEPTANCE_MAP.json": "96f70219d1df88249e8df073f4dfe211f8562cef20f7e45b1c03064feb5362be"
+ },
+ "totals": {
+  "providerPlugins": 39,
+  "helperFiles": [
+   "media-schema-helpers.ts",
+   "xai-oauth-cli-headers.ts"
+  ],
+  "protocolFamilies": {
+   "anthropic-messages": 4,
+   "google-generative-ai": 1,
+   "openai-codex-responses": 1,
+   "openai-completions": 29,
+   "openai-responses": 2,
+   "system-speech": 1,
+   "volcengine-bigasr": 1
+  },
+  "authShapes": {
+   "api-key": 35,
+   "none": 2,
+   "oauth": 2
+  },
+  "mediaProtocolIds": [
+   "agnes-images",
+   "agnes-videos",
+   "dashscope-qwen-asr-chat",
+   "dashscope-qwen-multimodal-image",
+   "dashscope-qwen-text2image",
+   "dashscope-qwen-tts",
+   "dashscope-wan-images",
+   "gemini-generate-content-image",
+   "mimo-chat-completions-asr",
+   "minimax-images",
+   "minimax-tts",
+   "openai-audio-speech",
+   "openai-audio-transcriptions",
+   "openai-codex-responses-image",
+   "openai-images",
+   "system-speech",
+   "system-speech-recognition",
+   "volcengine-bigasr-transcription",
+   "volcengine-images"
+  ]
+ },
+ "protocol_families": {
+  "anthropic-messages": {
+   "count": 4,
+   "providers": [
+    "anthropic",
+    "minimax",
+    "minimax-token-plan",
+    "opencode"
+   ]
+  },
+  "google-generative-ai": {
+   "count": 1,
+   "providers": [
+    "gemini"
+   ]
+  },
+  "openai-codex-responses": {
+   "count": 1,
+   "providers": [
+    "openai-codex-oauth"
+   ]
+  },
+  "openai-completions": {
+   "count": 29,
+   "providers": [
+    "agnes",
+    "baichuan",
+    "baidu-cloud",
+    "dashscope",
+    "dashscope-coding",
+    "deepseek",
+    "fireworks",
+    "groq",
+    "hunyuan",
+    "infini",
+    "kimi-coding",
+    "mimo",
+    "mimo-token-plan",
+    "mistral",
+    "modelscope",
+    "moonshot",
+    "ollama",
+    "openai",
+    "opencode-go",
+    "openrouter",
+    "perplexity",
+    "siliconflow",
+    "stepfun",
+    "together",
+    "volcengine",
+    "volcengine-coding",
+    "xai",
+    "zhipu",
+    "zhipu-coding"
+   ]
+  },
+  "openai-responses": {
+   "count": 2,
+   "providers": [
+    "deepseek-responses",
+    "xai-oauth"
+   ]
+  },
+  "system-speech": {
+   "count": 1,
+   "providers": [
+    "system-speech"
+   ]
+  },
+  "volcengine-bigasr": {
+   "count": 1,
+   "providers": [
+    "volcengine-speech"
+   ]
+  }
+ },
+ "auth_shapes": {
+  "api-key": {
+   "count": 35,
+   "providers": [
+    "agnes",
+    "anthropic",
+    "baichuan",
+    "baidu-cloud",
+    "dashscope",
+    "dashscope-coding",
+    "deepseek",
+    "deepseek-responses",
+    "fireworks",
+    "gemini",
+    "groq",
+    "hunyuan",
+    "infini",
+    "kimi-coding",
+    "mimo",
+    "mimo-token-plan",
+    "minimax",
+    "minimax-token-plan",
+    "mistral",
+    "modelscope",
+    "moonshot",
+    "openai",
+    "opencode",
+    "opencode-go",
+    "openrouter",
+    "perplexity",
+    "siliconflow",
+    "stepfun",
+    "together",
+    "volcengine",
+    "volcengine-coding",
+    "volcengine-speech",
+    "xai",
+    "zhipu",
+    "zhipu-coding"
+   ]
+  },
+  "none": {
+   "count": 2,
+   "providers": [
+    "ollama",
+    "system-speech"
+   ]
+  },
+  "oauth": {
+   "count": 2,
+   "providers": [
+    "openai-codex-oauth",
+    "xai-oauth"
+   ]
+  }
+ },
+ "providers": [
+  {
+   "id": "agnes",
+   "displayName": "Agnes AI",
+   "authType": "api-key",
+   "defaultBaseUrl": "https://apihub.agnes-ai.com/v1",
+   "defaultApi": "openai-completions",
+   "chatCapabilityOverride": null,
+   "media": {
+    "imageGeneration": {
+     "defaultModelId": "agnes-image-2.1-flash",
+     "models": [
+      {
+       "id": "agnes-image-2.1-flash",
+       "protocolId": "agnes-images",
+       "inputs": [
+        "text",
+        "image"
+       ],
+       "outputs": [
+        "image"
+       ],
+       "supportsEdit": true,
+       "aliases": []
+      }
+     ]
+    },
+    "videoGeneration": {
+     "defaultModelId": "agnes-video-v2.0",
+     "models": [
+      {
+       "id": "agnes-video-v2.0",
+       "protocolId": "agnes-videos",
+       "inputs": [
+        "text",
+        "image"
+       ],
+       "outputs": [
+        "video"
+       ],
+       "supportsEdit": false,
+       "aliases": []
+      }
+     ]
+    }
+   },
+   "extraFields": {},
+   "sourceFile": "lib/providers/agnes.ts",
+   "exportName": "agnesPlugin"
+  },
+  {
+   "id": "anthropic",
+   "displayName": "Anthropic",
+   "authType": "api-key",
+   "defaultBaseUrl": "https://api.anthropic.com",
+   "defaultApi": "anthropic-messages",
+   "chatCapabilityOverride": null,
+   "media": {},
+   "extraFields": {},
+   "sourceFile": "lib/providers/anthropic.ts",
+   "exportName": "anthropicPlugin"
+  },
+  {
+   "id": "baichuan",
+   "displayName": "百川智能",
+   "authType": "api-key",
+   "defaultBaseUrl": "https://api.baichuan-ai.com/v1",
+   "defaultApi": "openai-completions",
+   "chatCapabilityOverride": null,
+   "media": {},
+   "extraFields": {},
+   "sourceFile": "lib/providers/baichuan.ts",
+   "exportName": "baichuanPlugin"
+  },
+  {
+   "id": "baidu-cloud",
+   "displayName": "百度智能云 (文心)",
+   "authType": "api-key",
+   "defaultBaseUrl": "https://qianfan.baidubce.com/v2",
+   "defaultApi": "openai-completions",
+   "chatCapabilityOverride": null,
+   "media": {},
+   "extraFields": {},
+   "sourceFile": "lib/providers/baidu-cloud.ts",
+   "exportName": "baiduCloudPlugin"
+  },
+  {
+   "id": "dashscope",
+   "displayName": "阿里云百炼 (DashScope)",
+   "authType": "api-key",
+   "defaultBaseUrl": "https://dashscope.aliyuncs.com/compatible-mode/v1",
+   "defaultApi": "openai-completions",
+   "chatCapabilityOverride": null,
+   "media": {
+    "speechGeneration": {
+     "defaultModelId": "qwen-tts-latest",
+     "models": [
+      {
+       "id": "qwen-tts-latest",
+       "protocolId": "dashscope-qwen-tts",
+       "inputs": [
+        "text"
+       ],
+       "outputs": [
+        "audio"
+       ],
+       "supportsEdit": false,
+       "aliases": []
+      }
+     ]
+    },
+    "imageGeneration": {
+     "defaultModelId": "wan2.7-image-pro",
+     "models": [
+      {
+       "id": "wan2.7-image-pro",
+       "protocolId": "dashscope-wan-images",
+       "inputs": [
+        "text",
+        "image"
+       ],
+       "outputs": [
+        "image"
+       ],
+       "supportsEdit": true,
+       "aliases": [
+        "wan-2.7-pro"
+       ]
+      },
+      {
+       "id": "wan2.7-image",
+       "protocolId": "dashscope-wan-images",
+       "inputs": [
+        "text",
+        "image"
+       ],
+       "outputs": [
+        "image"
+       ],
+       "supportsEdit": true,
+       "aliases": [
+        "wan-2.7"
+       ]
+      },
+      {
+       "id": "qwen-image-2.0-pro",
+       "protocolId": "dashscope-qwen-multimodal-image",
+       "inputs": [
+        "text",
+        "image"
+       ],
+       "outputs": [
+        "image"
+       ],
+       "supportsEdit": true,
+       "aliases": [
+        "qwen-image-pro"
+       ]
+      },
+      {
+       "id": "qwen-image-plus",
+       "protocolId": "dashscope-qwen-text2image",
+       "inputs": [
+        "text"
+       ],
+       "outputs": [
+        "image"
+       ],
+       "supportsEdit": false,
+       "aliases": [
+        "qwen-image"
+       ]
+      },
+      {
+       "id": "qwen-image",
+       "protocolId": "dashscope-qwen-text2image",
+       "inputs": [
+        "text"
+       ],
+       "outputs": [
+        "image"
+       ],
+       "supportsEdit": false,
+       "aliases": []
+      }
+     ]
+    },
+    "speechRecognition": {
+     "defaultModelId": "qwen3-asr-flash",
+     "models": [
+      {
+       "id": "qwen3-asr-flash",
+       "protocolId": "dashscope-qwen-asr-chat",
+       "inputs": [
+        "audio"
+       ],
+       "outputs": [
+        "text"
+       ],
+       "supportsEdit": false,
+       "aliases": []
+      }
+     ]
+    }
+   },
+   "extraFields": {},
+   "sourceFile": "lib/providers/dashscope.ts",
+   "exportName": "dashscopePlugin"
+  },
+  {
+   "id": "dashscope-coding",
+   "displayName": "百炼 Coding Plan",
+   "authType": "api-key",
+   "defaultBaseUrl": "https://coding.dashscope.aliyuncs.com/v1",
+   "defaultApi": "openai-completions",
+   "chatCapabilityOverride": null,
+   "media": {},
+   "extraFields": {},
+   "sourceFile": "lib/providers/dashscope-coding.ts",
+   "exportName": "dashscopeCodingPlugin"
+  },
+  {
+   "id": "deepseek",
+   "displayName": "DeepSeek",
+   "authType": "api-key",
+   "defaultBaseUrl": "https://api.deepseek.com",
+   "defaultApi": "openai-completions",
+   "chatCapabilityOverride": null,
+   "media": {},
+   "extraFields": {},
+   "sourceFile": "lib/providers/deepseek.ts",
+   "exportName": "deepseekPlugin"
+  },
+  {
+   "id": "deepseek-responses",
+   "displayName": "DeepSeek (Responses)",
+   "authType": "api-key",
+   "defaultBaseUrl": "https://api.deepseek.com",
+   "defaultApi": "openai-responses",
+   "chatCapabilityOverride": null,
+   "media": {},
+   "extraFields": {
+    "models": {
+     "declaredModelCount": 2
+    }
+   },
+   "sourceFile": "lib/providers/deepseek-responses.ts",
+   "exportName": "deepseekResponsesPlugin"
+  },
+  {
+   "id": "fireworks",
+   "displayName": "Fireworks AI",
+   "authType": "api-key",
+   "defaultBaseUrl": "https://api.fireworks.ai/inference/v1",
+   "defaultApi": "openai-completions",
+   "chatCapabilityOverride": null,
+   "media": {},
+   "extraFields": {},
+   "sourceFile": "lib/providers/fireworks.ts",
+   "exportName": "fireworksPlugin"
+  },
+  {
+   "id": "gemini",
+   "displayName": "Google Gemini",
+   "authType": "api-key",
+   "defaultBaseUrl": "https://generativelanguage.googleapis.com/v1beta",
+   "defaultApi": "google-generative-ai",
+   "chatCapabilityOverride": null,
+   "media": {
+    "imageGeneration": {
+     "defaultModelId": "gemini-3.1-flash-image",
+     "models": [
+      {
+       "id": "gemini-2.5-flash-image",
+       "protocolId": "gemini-generate-content-image",
+       "inputs": [
+        "text",
+        "image"
+       ],
+       "outputs": [
+        "image"
+       ],
+       "supportsEdit": true,
+       "aliases": [
+        "nano-banana"
+       ]
+      },
+      {
+       "id": "gemini-3.1-flash-image",
+       "protocolId": "gemini-generate-content-image",
+       "inputs": [
+        "text",
+        "image"
+       ],
+       "outputs": [
+        "image"
+       ],
+       "supportsEdit": true,
+       "aliases": [
+        "nano-banana-2",
+        "gemini-3.1-flash-image-preview"
+       ]
+      },
+      {
+       "id": "gemini-3-pro-image",
+       "protocolId": "gemini-generate-content-image",
+       "inputs": [
+        "text",
+        "image"
+       ],
+       "outputs": [
+        "image"
+       ],
+       "supportsEdit": true,
+       "aliases": [
+        "nano-banana-pro",
+        "gemini-3-pro-image-preview"
+       ]
+      }
+     ]
+    }
+   },
+   "extraFields": {},
+   "sourceFile": "lib/providers/gemini.ts",
+   "exportName": "geminiPlugin"
+  },
+  {
+   "id": "groq",
+   "displayName": "Groq",
+   "authType": "api-key",
+   "defaultBaseUrl": "https://api.groq.com/openai/v1",
+   "defaultApi": "openai-completions",
+   "chatCapabilityOverride": null,
+   "media": {
+    "speechGeneration": {
+     "defaultModelId": "playai-tts",
+     "models": [
+      {
+       "id": "playai-tts",
+       "protocolId": "openai-audio-speech",
+       "inputs": [
+        "text"
+       ],
+       "outputs": [
+        "audio"
+       ],
+       "supportsEdit": false,
+       "aliases": []
+      }
+     ]
+    }
+   },
+   "extraFields": {},
+   "sourceFile": "lib/providers/groq.ts",
+   "exportName": "groqPlugin"
+  },
+  {
+   "id": "hunyuan",
+   "displayName": "腾讯混元",
+   "authType": "api-key",
+   "defaultBaseUrl": "https://api.hunyuan.cloud.tencent.com/v1",
+   "defaultApi": "openai-completions",
+   "chatCapabilityOverride": null,
+   "media": {},
+   "extraFields": {},
+   "sourceFile": "lib/providers/hunyuan.ts",
+   "exportName": "hunyuanPlugin"
+  },
+  {
+   "id": "infini",
+   "displayName": "无问芯穹 (Infini)",
+   "authType": "api-key",
+   "defaultBaseUrl": "https://cloud.infini-ai.com/maas/v1",
+   "defaultApi": "openai-completions",
+   "chatCapabilityOverride": null,
+   "media": {},
+   "extraFields": {},
+   "sourceFile": "lib/providers/infini.ts",
+   "exportName": "infiniPlugin"
+  },
+  {
+   "id": "kimi-coding",
+   "displayName": "Kimi Coding Plan",
+   "authType": "api-key",
+   "defaultBaseUrl": "https://api.kimi.com/coding/v1",
+   "defaultApi": "openai-completions",
+   "chatCapabilityOverride": null,
+   "media": {},
+   "extraFields": {},
+   "sourceFile": "lib/providers/kimi-coding.ts",
+   "exportName": "kimiCodingPlugin"
+  },
+  {
+   "id": "mimo",
+   "displayName": "Xiaomi (MiMo)",
+   "authType": "api-key",
+   "defaultBaseUrl": "https://api.xiaomimimo.com/v1",
+   "defaultApi": "openai-completions",
+   "chatCapabilityOverride": null,
+   "media": {
+    "speechRecognition": {
+     "defaultModelId": "mimo-v2.5-asr",
+     "models": [
+      {
+       "id": "mimo-v2.5-asr",
+       "protocolId": "mimo-chat-completions-asr",
+       "inputs": [
+        "audio"
+       ],
+       "outputs": [
+        "text"
+       ],
+       "supportsEdit": false,
+       "aliases": []
+      }
+     ]
+    }
+   },
+   "extraFields": {},
+   "sourceFile": "lib/providers/mimo.ts",
+   "exportName": "mimoPlugin"
+  },
+  {
+   "id": "mimo-token-plan",
+   "displayName": "Xiaomi MiMo Token Plan",
+   "authType": "api-key",
+   "defaultBaseUrl": "https://token-plan-cn.xiaomimimo.com/v1",
+   "defaultApi": "openai-completions",
+   "chatCapabilityOverride": null,
+   "media": {
+    "speechRecognition": {
+     "defaultModelId": "mimo-v2.5-asr",
+     "models": [
+      {
+       "id": "mimo-v2.5-asr",
+       "protocolId": "mimo-chat-completions-asr",
+       "inputs": [
+        "audio"
+       ],
+       "outputs": [
+        "text"
+       ],
+       "supportsEdit": false,
+       "aliases": []
+      }
+     ]
+    }
+   },
+   "extraFields": {},
+   "sourceFile": "lib/providers/mimo-token-plan.ts",
+   "exportName": "mimoTokenPlanPlugin"
+  },
+  {
+   "id": "minimax",
+   "displayName": "MiniMax",
+   "authType": "api-key",
+   "defaultBaseUrl": "https://api.minimaxi.com/anthropic",
+   "defaultApi": "anthropic-messages",
+   "chatCapabilityOverride": null,
+   "media": {
+    "imageGeneration": {
+     "defaultModelId": "image-01",
+     "models": [
+      {
+       "id": "image-01",
+       "protocolId": "minimax-images",
+       "inputs": [
+        "text",
+        "image"
+       ],
+       "outputs": [
+        "image"
+       ],
+       "supportsEdit": true,
+       "aliases": []
+      },
+      {
+       "id": "image-01-live",
+       "protocolId": "minimax-images",
+       "inputs": [
+        "text",
+        "image"
+       ],
+       "outputs": [
+        "image"
+       ],
+       "supportsEdit": true,
+       "aliases": []
+      }
+     ]
+    },
+    "speechGeneration": {
+     "defaultModelId": "speech-02-hd",
+     "models": [
+      {
+       "id": "speech-02-hd",
+       "protocolId": "minimax-tts",
+       "inputs": [
+        "text"
+       ],
+       "outputs": [
+        "audio"
+       ],
+       "supportsEdit": false,
+       "aliases": []
+      },
+      {
+       "id": "speech-02-turbo",
+       "protocolId": "minimax-tts",
+       "inputs": [
+        "text"
+       ],
+       "outputs": [
+        "audio"
+       ],
+       "supportsEdit": false,
+       "aliases": []
+      }
+     ]
+    }
+   },
+   "extraFields": {},
+   "sourceFile": "lib/providers/minimax.ts",
+   "exportName": "minimaxPlugin"
+  },
+  {
+   "id": "minimax-token-plan",
+   "displayName": "MiniMax Token Plan",
+   "authType": "api-key",
+   "defaultBaseUrl": "https://api.minimaxi.com/anthropic",
+   "defaultApi": "anthropic-messages",
+   "chatCapabilityOverride": null,
+   "media": {},
+   "extraFields": {},
+   "sourceFile": "lib/providers/minimax-token-plan.ts",
+   "exportName": "minimaxTokenPlanPlugin"
+  },
+  {
+   "id": "mistral",
+   "displayName": "Mistral AI",
+   "authType": "api-key",
+   "defaultBaseUrl": "https://api.mistral.ai/v1",
+   "defaultApi": "openai-completions",
+   "chatCapabilityOverride": null,
+   "media": {},
+   "extraFields": {},
+   "sourceFile": "lib/providers/mistral.ts",
+   "exportName": "mistralPlugin"
+  },
+  {
+   "id": "modelscope",
+   "displayName": "魔搭 (ModelScope)",
+   "authType": "api-key",
+   "defaultBaseUrl": "https://api-inference.modelscope.cn/v1",
+   "defaultApi": "openai-completions",
+   "chatCapabilityOverride": null,
+   "media": {},
+   "extraFields": {},
+   "sourceFile": "lib/providers/modelscope.ts",
+   "exportName": "modelscopePlugin"
+  },
+  {
+   "id": "moonshot",
+   "displayName": "Moonshot (Kimi)",
+   "authType": "api-key",
+   "defaultBaseUrl": "https://api.moonshot.cn/v1",
+   "defaultApi": "openai-completions",
+   "chatCapabilityOverride": null,
+   "media": {},
+   "extraFields": {},
+   "sourceFile": "lib/providers/moonshot.ts",
+   "exportName": "moonshotPlugin"
+  },
+  {
+   "id": "ollama",
+   "displayName": "Ollama (本地)",
+   "authType": "none",
+   "defaultBaseUrl": "http://localhost:11434/v1",
+   "defaultApi": "openai-completions",
+   "chatCapabilityOverride": null,
+   "media": {},
+   "extraFields": {},
+   "sourceFile": "lib/providers/ollama.ts",
+   "exportName": "ollamaPlugin"
+  },
+  {
+   "id": "openai",
+   "displayName": "OpenAI",
+   "authType": "api-key",
+   "defaultBaseUrl": "https://api.openai.com/v1",
+   "defaultApi": "openai-completions",
+   "chatCapabilityOverride": null,
+   "media": {
+    "imageGeneration": {
+     "defaultModelId": "gpt-image-1.5",
+     "models": [
+      {
+       "id": "gpt-image-1.5",
+       "protocolId": "openai-images",
+       "inputs": [
+        "text",
+        "image"
+       ],
+       "outputs": [
+        "image"
+       ],
+       "supportsEdit": true,
+       "aliases": [
+        "1.5"
+       ]
+      },
+      {
+       "id": "gpt-image-1",
+       "protocolId": "openai-images",
+       "inputs": [
+        "text",
+        "image"
+       ],
+       "outputs": [
+        "image"
+       ],
+       "supportsEdit": true,
+       "aliases": [
+        "1"
+       ]
+      },
+      {
+       "id": "gpt-image-1-mini",
+       "protocolId": "openai-images",
+       "inputs": [
+        "text",
+        "image"
+       ],
+       "outputs": [
+        "image"
+       ],
+       "supportsEdit": true,
+       "aliases": [
+        "1-mini",
+        "mini"
+       ]
+      },
+      {
+       "id": "dall-e-3",
+       "protocolId": "openai-images",
+       "inputs": [
+        "text"
+       ],
+       "outputs": [
+        "image"
+       ],
+       "supportsEdit": false,
+       "aliases": [
+        "dalle3"
+       ]
+      }
+     ]
+    },
+    "speechGeneration": {
+     "defaultModelId": "gpt-4o-mini-tts",
+     "models": [
+      {
+       "id": "gpt-4o-mini-tts",
+       "protocolId": "openai-audio-speech",
+       "inputs": [
+        "text"
+       ],
+       "outputs": [
+        "audio"
+       ],
+       "supportsEdit": false,
+       "aliases": []
+      },
+      {
+       "id": "tts-1",
+       "protocolId": "openai-audio-speech",
+       "inputs": [
+        "text"
+       ],
+       "outputs": [
+        "audio"
+       ],
+       "supportsEdit": false,
+       "aliases": []
+      },
+      {
+       "id": "tts-1-hd",
+       "protocolId": "openai-audio-speech",
+       "inputs": [
+        "text"
+       ],
+       "outputs": [
+        "audio"
+       ],
+       "supportsEdit": false,
+       "aliases": []
+      }
+     ]
+    },
+    "speechRecognition": {
+     "defaultModelId": "gpt-4o-mini-transcribe",
+     "models": [
+      {
+       "id": "gpt-4o-transcribe",
+       "protocolId": "openai-audio-transcriptions",
+       "inputs": [
+        "audio"
+       ],
+       "outputs": [
+        "text"
+       ],
+       "supportsEdit": false,
+       "aliases": []
+      },
+      {
+       "id": "gpt-4o-mini-transcribe",
+       "protocolId": "openai-audio-transcriptions",
+       "inputs": [
+        "audio"
+       ],
+       "outputs": [
+        "text"
+       ],
+       "supportsEdit": false,
+       "aliases": []
+      },
+      {
+       "id": "whisper-1",
+       "protocolId": "openai-audio-transcriptions",
+       "inputs": [
+        "audio"
+       ],
+       "outputs": [
+        "text"
+       ],
+       "supportsEdit": false,
+       "aliases": []
+      }
+     ]
+    }
+   },
+   "extraFields": {},
+   "sourceFile": "lib/providers/openai.ts",
+   "exportName": "openaiPlugin"
+  },
+  {
+   "id": "openai-codex-oauth",
+   "displayName": "OpenAI Codex (OAuth)",
+   "authType": "oauth",
+   "defaultBaseUrl": "https://chatgpt.com/backend-api",
+   "defaultApi": "openai-codex-responses",
+   "chatCapabilityOverride": {
+    "runtimeProviderId": "openai-codex",
+    "displayProviderId": "openai-codex",
+    "projection": "models-json",
+    "credentialSource": "auth-storage",
+    "allowListSource": "provider.models"
+   },
+   "media": {
+    "imageGeneration": {
+     "defaultModelId": "gpt-image-2",
+     "models": [
+      {
+       "id": "gpt-image-2",
+       "protocolId": "openai-codex-responses-image",
+       "inputs": [
+        "text",
+        "image"
+       ],
+       "outputs": [
+        "image"
+       ],
+       "supportsEdit": true,
+       "aliases": [
+        "2",
+        "image-2"
+       ]
+      }
+     ]
+    }
+   },
+   "extraFields": {
+    "authJsonKey": "openai-codex",
+    "models": {
+     "declaredModelCount": 7
+    }
+   },
+   "sourceFile": "lib/providers/openai-codex-oauth.ts",
+   "exportName": "openaiCodexOAuthPlugin"
+  },
+  {
+   "id": "opencode",
+   "displayName": "OpenCode Zen",
+   "authType": "api-key",
+   "defaultBaseUrl": "https://opencode.ai/zen",
+   "defaultApi": "anthropic-messages",
+   "chatCapabilityOverride": null,
+   "media": {},
+   "extraFields": {
+    "models": {
+     "declaredModelCount": 70
+    }
+   },
+   "sourceFile": "lib/providers/opencode.ts",
+   "exportName": "opencodePlugin"
+  },
+  {
+   "id": "opencode-go",
+   "displayName": "OpenCode Go",
+   "authType": "api-key",
+   "defaultBaseUrl": "https://opencode.ai/zen/go/v1",
+   "defaultApi": "openai-completions",
+   "chatCapabilityOverride": null,
+   "media": {},
+   "extraFields": {},
+   "sourceFile": "lib/providers/opencode-go.ts",
+   "exportName": "opencodeGoPlugin"
+  },
+  {
+   "id": "openrouter",
+   "displayName": "OpenRouter",
+   "authType": "api-key",
+   "defaultBaseUrl": "https://openrouter.ai/api/v1",
+   "defaultApi": "openai-completions",
+   "chatCapabilityOverride": null,
+   "media": {},
+   "extraFields": {},
+   "sourceFile": "lib/providers/openrouter.ts",
+   "exportName": "openrouterPlugin"
+  },
+  {
+   "id": "perplexity",
+   "displayName": "Perplexity",
+   "authType": "api-key",
+   "defaultBaseUrl": "https://api.perplexity.ai",
+   "defaultApi": "openai-completions",
+   "chatCapabilityOverride": null,
+   "media": {},
+   "extraFields": {},
+   "sourceFile": "lib/providers/perplexity.ts",
+   "exportName": "perplexityPlugin"
+  },
+  {
+   "id": "siliconflow",
+   "displayName": "SiliconFlow (硅基流动)",
+   "authType": "api-key",
+   "defaultBaseUrl": "https://api.siliconflow.cn/v1",
+   "defaultApi": "openai-completions",
+   "chatCapabilityOverride": null,
+   "media": {
+    "speechGeneration": {
+     "defaultModelId": "FunAudioLLM/CosyVoice2-0.5B",
+     "models": [
+      {
+       "id": "FunAudioLLM/CosyVoice2-0.5B",
+       "protocolId": "openai-audio-speech",
+       "inputs": [
+        "text"
+       ],
+       "outputs": [
+        "audio"
+       ],
+       "supportsEdit": false,
+       "aliases": []
+      }
+     ]
+    }
+   },
+   "extraFields": {},
+   "sourceFile": "lib/providers/siliconflow.ts",
+   "exportName": "siliconflowPlugin"
+  },
+  {
+   "id": "stepfun",
+   "displayName": "阶跃星辰 (StepFun)",
+   "authType": "api-key",
+   "defaultBaseUrl": "https://api.stepfun.com/v1",
+   "defaultApi": "openai-completions",
+   "chatCapabilityOverride": null,
+   "media": {},
+   "extraFields": {},
+   "sourceFile": "lib/providers/stepfun.ts",
+   "exportName": "stepfunPlugin"
+  },
+  {
+   "id": "system-speech",
+   "displayName": "系统语音识别",
+   "authType": "none",
+   "defaultBaseUrl": "",
+   "defaultApi": "system-speech",
+   "chatCapabilityOverride": {
+    "projection": "none",
+    "runtimeProviderId": "system-speech",
+    "displayProviderId": "system-speech",
+    "allowListSource": "none"
+   },
+   "media": {
+    "speechGeneration": {
+     "defaultModelId": "system-speech-tts",
+     "models": [
+      {
+       "id": "system-speech-tts",
+       "protocolId": "system-speech",
+       "inputs": [
+        "text"
+       ],
+       "outputs": [
+        "audio"
+       ],
+       "supportsEdit": false,
+       "aliases": []
+      }
+     ]
+    },
+    "speechRecognition": {
+     "defaultModelId": "system-speech",
+     "models": [
+      {
+       "id": "system-speech",
+       "protocolId": "system-speech-recognition",
+       "inputs": [
+        "audio"
+       ],
+       "outputs": [
+        "text"
+       ],
+       "supportsEdit": false,
+       "aliases": []
+      }
+     ]
+    }
+   },
+   "extraFields": {},
+   "sourceFile": "lib/providers/system-speech.ts",
+   "exportName": "systemSpeechPlugin"
+  },
+  {
+   "id": "together",
+   "displayName": "Together AI",
+   "authType": "api-key",
+   "defaultBaseUrl": "https://api.together.xyz/v1",
+   "defaultApi": "openai-completions",
+   "chatCapabilityOverride": null,
+   "media": {},
+   "extraFields": {},
+   "sourceFile": "lib/providers/together.ts",
+   "exportName": "togetherPlugin"
+  },
+  {
+   "id": "volcengine",
+   "displayName": "火山引擎 (豆包)",
+   "authType": "api-key",
+   "defaultBaseUrl": "https://ark.cn-beijing.volces.com/api/v3",
+   "defaultApi": "openai-completions",
+   "chatCapabilityOverride": null,
+   "media": {
+    "imageGeneration": {
+     "defaultModelId": "doubao-seedream-5-0-lite-260128",
+     "models": [
+      {
+       "id": "doubao-seedream-3-0-t2i",
+       "protocolId": "volcengine-images",
+       "inputs": [
+        "text"
+       ],
+       "outputs": [
+        "image"
+       ],
+       "supportsEdit": false,
+       "aliases": [
+        "3.0"
+       ]
+      },
+      {
+       "id": "doubao-seedream-4-0-250828",
+       "protocolId": "volcengine-images",
+       "inputs": [
+        "text",
+        "image"
+       ],
+       "outputs": [
+        "image"
+       ],
+       "supportsEdit": true,
+       "aliases": [
+        "4.0"
+       ]
+      },
+      {
+       "id": "doubao-seedream-4-5-251128",
+       "protocolId": "volcengine-images",
+       "inputs": [
+        "text",
+        "image"
+       ],
+       "outputs": [
+        "image"
+       ],
+       "supportsEdit": true,
+       "aliases": [
+        "4.5"
+       ]
+      },
+      {
+       "id": "doubao-seedream-5-0-lite-260128",
+       "protocolId": "volcengine-images",
+       "inputs": [
+        "text",
+        "image"
+       ],
+       "outputs": [
+        "image"
+       ],
+       "supportsEdit": true,
+       "aliases": [
+        "5.0-lite"
+       ]
+      },
+      {
+       "id": "doubao-seedream-5-0-260128",
+       "protocolId": "volcengine-images",
+       "inputs": [
+        "text",
+        "image"
+       ],
+       "outputs": [
+        "image"
+       ],
+       "supportsEdit": true,
+       "aliases": [
+        "5.0"
+       ]
+      }
+     ]
+    }
+   },
+   "extraFields": {},
+   "sourceFile": "lib/providers/volcengine.ts",
+   "exportName": "volcenginePlugin"
+  },
+  {
+   "id": "volcengine-coding",
+   "displayName": "火山引擎 Coding Plan",
+   "authType": "api-key",
+   "defaultBaseUrl": "https://ark.cn-beijing.volces.com/api/coding/v3",
+   "defaultApi": "openai-completions",
+   "chatCapabilityOverride": null,
+   "media": {},
+   "extraFields": {},
+   "sourceFile": "lib/providers/volcengine-coding.ts",
+   "exportName": "volcegineCodingPlugin"
+  },
+  {
+   "id": "volcengine-speech",
+   "displayName": "火山引擎语音 (BigASR)",
+   "authType": "api-key",
+   "defaultBaseUrl": "https://openspeech.bytedance.com",
+   "defaultApi": "volcengine-bigasr",
+   "chatCapabilityOverride": null,
+   "media": {
+    "speechRecognition": {
+     "defaultModelId": "bigasr-flash",
+     "models": [
+      {
+       "id": "bigasr-flash",
+       "protocolId": "volcengine-bigasr-transcription",
+       "inputs": [
+        "audio"
+       ],
+       "outputs": [
+        "text"
+       ],
+       "supportsEdit": false,
+       "aliases": [
+        "bigasr",
+        "bigasr-auc"
+       ]
+      }
+     ]
+    }
+   },
+   "extraFields": {},
+   "sourceFile": "lib/providers/volcengine-speech.ts",
+   "exportName": "volcengineSpeechPlugin"
+  },
+  {
+   "id": "xai",
+   "displayName": "xAI (Grok)",
+   "authType": "api-key",
+   "defaultBaseUrl": "https://api.x.ai/v1",
+   "defaultApi": "openai-completions",
+   "chatCapabilityOverride": null,
+   "media": {},
+   "extraFields": {},
+   "sourceFile": "lib/providers/xai.ts",
+   "exportName": "xaiPlugin"
+  },
+  {
+   "id": "xai-oauth",
+   "displayName": "xAI Grok (OAuth)",
+   "authType": "oauth",
+   "defaultBaseUrl": "https://cli-chat-proxy.grok.com/v1",
+   "defaultApi": "openai-responses",
+   "chatCapabilityOverride": {
+    "runtimeProviderId": "xai-oauth",
+    "displayProviderId": "xai-oauth",
+    "projection": "models-json",
+    "credentialSource": "auth-storage",
+    "allowListSource": "provider.models"
+   },
+   "media": {},
+   "extraFields": {
+    "headers": {
+     "x-xai-token-auth": "xai-grok-cli",
+     "x-grok-client-version": "0.2.95",
+     "x-grok-client-identifier": "hana"
+    },
+    "authJsonKey": "xai-oauth",
+    "runtime": {
+     "kind": "oauth-http",
+     "protocolId": "openai-responses",
+     "allowedBaseUrlOrigins": [
+      "https://cli-chat-proxy.grok.com"
+     ]
+    },
+    "sdkProvider": {
+     "providerId": "xai-oauth",
+     "config": {
+      "name": "xAI Grok (OAuth)",
+      "baseUrl": "https://cli-chat-proxy.grok.com/v1",
+      "api": "openai-responses",
+      "headers": {
+       "x-xai-token-auth": "xai-grok-cli",
+       "x-grok-client-version": "0.2.95",
+       "x-grok-client-identifier": "hana"
+      },
+      "oauth": {
+       "name": "xAI Grok (OAuth)"
+      }
+     }
+    },
+    "models": {
+     "declaredModelCount": 4
+    }
+   },
+   "sourceFile": "lib/providers/xai-oauth.ts",
+   "exportName": "xaiOAuthPlugin"
+  },
+  {
+   "id": "zhipu",
+   "displayName": "智谱 AI (GLM)",
+   "authType": "api-key",
+   "defaultBaseUrl": "https://open.bigmodel.cn/api/paas/v4",
+   "defaultApi": "openai-completions",
+   "chatCapabilityOverride": null,
+   "media": {},
+   "extraFields": {},
+   "sourceFile": "lib/providers/zhipu.ts",
+   "exportName": "zhipuPlugin"
+  },
+  {
+   "id": "zhipu-coding",
+   "displayName": "智谱 GLM Coding Plan",
+   "authType": "api-key",
+   "defaultBaseUrl": "https://api.z.ai/api/coding/paas/v4",
+   "defaultApi": "openai-completions",
+   "chatCapabilityOverride": null,
+   "media": {},
+   "extraFields": {},
+   "sourceFile": "lib/providers/zhipu-coding.ts",
+   "exportName": "zhipuCodingPlugin"
+  }
+ ],
+ "provider_compat_layer": {
+  "entry": "core/provider-compat.ts",
+  "dispatch_rule": "first-match-wins",
+  "dispatch_order": [
+   "deepseekResponses",
+   "deepseek",
+   "kimi",
+   "mimo",
+   "qwen",
+   "zhipu",
+   "volcengine",
+   "longcat",
+   "agnes",
+   "openaiInputAudio",
+   "openrouter",
+   "anthropic",
+   "codexResponses",
+   "ollama"
+  ],
+  "modules": [
+   {
+    "module": "core/provider-compat/agnes.ts",
+    "purpose": "Agnes AI provider compatibility layer."
+   },
+   {
+    "module": "core/provider-compat/anthropic.ts",
+    "purpose": "Anthropic Messages prompt-cache compatibility layer."
+   },
+   {
+    "module": "core/provider-compat/codex-responses.ts",
+    "purpose": "OpenAI Codex Responses compatibility layer."
+   },
+   {
+    "module": "core/provider-compat/deepseek-responses.ts",
+    "purpose": "DeepSeek Responses 协议兼容层"
+   },
+   {
+    "module": "core/provider-compat/deepseek-thinking-budget.ts",
+    "purpose": "DeepSeek 请求缺少输出预算时的兜底"
+   },
+   {
+    "module": "core/provider-compat/deepseek.ts",
+    "purpose": "DeepSeek provider 兼容层"
+   },
+   {
+    "module": "core/provider-compat/input-audio.ts",
+    "purpose": "OpenAI-compatible input_audio helper."
+   },
+   {
+    "module": "core/provider-compat/kimi.ts",
+    "purpose": "Kimi / Moonshot OpenAI-compatible thinking compatibility."
+   },
+   {
+    "module": "core/provider-compat/longcat.ts",
+    "purpose": "LongCat OpenAI-compatible thinking compatibility."
+   },
+   {
+    "module": "core/provider-compat/mimo.ts",
+    "purpose": "MiMo provider 兼容层"
+   },
+   {
+    "module": "core/provider-compat/ollama.ts",
+    "purpose": "Ollama OpenAI-compatible provider 兼容层。"
+   },
+   {
+    "module": "core/provider-compat/openai-input-audio.ts",
+    "purpose": "OpenAI input_audio compatibility."
+   },
+   {
+    "module": "core/provider-compat/openai-video-url.ts",
+    "purpose": "OpenAI-compatible video_url 兼容层"
+   },
+   {
+    "module": "core/provider-compat/openrouter.ts",
+    "purpose": "OpenRouter provider compatibility layer."
+   },
+   {
+    "module": "core/provider-compat/output-budget.ts",
+    "purpose": "Generic output budget normalization."
+   },
+   {
+    "module": "core/provider-compat/purpose-scope.ts",
+    "purpose": "purpose-scope.ts — provider compat 请求用途（purpose）作用域"
+   },
+   {
+    "module": "core/provider-compat/qwen.ts",
+    "purpose": "Qwen-style provider 兼容层"
+   },
+   {
+    "module": "core/provider-compat/reasoning-content-replay.ts",
+    "purpose": ""
+   },
+   {
+    "module": "core/provider-compat/structured-output.ts",
+    "purpose": "structured-output.ts — 「结构化输出」运行时 contract"
+   },
+   {
+    "module": "core/provider-compat/tool-pairing.ts",
+    "purpose": "core/provider-compat/tool-pairing.ts — 孤儿 toolResult 配对兜底（provider-agnostic）"
+   },
+   {
+    "module": "core/provider-compat/volcengine.ts",
+    "purpose": "Volcengine Ark OpenAI-compatible thinking compatibility."
+   },
+   {
+    "module": "core/provider-compat/web-search.ts",
+    "purpose": "web-search.ts — 「联网」运行时 contract（模型级开关 → 供应商原生联网搜索）"
+   },
+   {
+    "module": "core/provider-compat/zhipu.ts",
+    "purpose": "Zhipu GLM OpenAI-compatible provider compatibility."
+   }
+  ],
+  "note": "唯一出站 payload 兼容入口 normalizeProviderPayload；chat 链路与 utility callText 共享。"
+ },
+ "model_operations": {
+  "operationIds": [
+   "embedding",
+   "rerank"
+  ],
+  "operationProtocols": [
+   "openai-embeddings",
+   "ollama-embed",
+   "gemini-embed",
+   "voyage-embeddings",
+   "cohere-rerank",
+   "siliconflow-rerank",
+   "voyage-rerank",
+   "dashscope-rerank",
+   "minimax-embeddings"
+  ]
+ },
+ "media_adapters": [
+  "core/media-adapters/agnes.ts",
+  "core/media-adapters/builtin-adapters.ts",
+  "core/media-adapters/common.ts",
+  "core/media-adapters/dashscope.ts",
+  "core/media-adapters/gemini.ts",
+  "core/media-adapters/minimax.ts",
+  "core/media-adapters/model-catalog.ts",
+  "core/media-adapters/openai-codex.ts",
+  "core/media-adapters/openai.ts",
+  "core/media-adapters/resolution-tiers.ts",
+  "core/media-adapters/speech.ts",
+  "core/media-adapters/volcengine.ts"
+ ],
+ "speech_recognition_adapters": [
+  "core/speech-recognition/adapters.ts",
+  "core/speech-recognition/system-speech-adapter.ts"
+ ],
+ "r00_provider_leaf_crosscheck": {
+  "leaves": [
+   {
+    "leaf": "R00-T02-LA-C4EFBA7711E1",
+    "providerId": "agnes",
+    "ledgerAuth": "api-key",
+    "ledgerApi": "openai-completions",
+    "matrixAuth": "api-key",
+    "matrixApi": "openai-completions",
+    "match": true
+   },
+   {
+    "leaf": "R00-T02-LA-D86616980926",
+    "providerId": "anthropic",
+    "ledgerAuth": "api-key",
+    "ledgerApi": "anthropic-messages",
+    "matrixAuth": "api-key",
+    "matrixApi": "anthropic-messages",
+    "match": true
+   },
+   {
+    "leaf": "R00-T02-LA-BA4BDB7F7338",
+    "providerId": "baichuan",
+    "ledgerAuth": "api-key",
+    "ledgerApi": "openai-completions",
+    "matrixAuth": "api-key",
+    "matrixApi": "openai-completions",
+    "match": true
+   },
+   {
+    "leaf": "R00-T02-LA-71738E50BACA",
+    "providerId": "baidu-cloud",
+    "ledgerAuth": "api-key",
+    "ledgerApi": "openai-completions",
+    "matrixAuth": "api-key",
+    "matrixApi": "openai-completions",
+    "match": true
+   },
+   {
+    "leaf": "R00-T02-LA-39733312E5F4",
+    "providerId": "dashscope",
+    "ledgerAuth": "api-key",
+    "ledgerApi": "openai-completions",
+    "matrixAuth": "api-key",
+    "matrixApi": "openai-completions",
+    "match": true
+   },
+   {
+    "leaf": "R00-T02-LA-89707E479335",
+    "providerId": "dashscope-coding",
+    "ledgerAuth": "api-key",
+    "ledgerApi": "openai-completions",
+    "matrixAuth": "api-key",
+    "matrixApi": "openai-completions",
+    "match": true
+   },
+   {
+    "leaf": "R00-T02-LA-ED13EB6D0FA6",
+    "providerId": "deepseek",
+    "ledgerAuth": "api-key",
+    "ledgerApi": "openai-completions",
+    "matrixAuth": "api-key",
+    "matrixApi": "openai-completions",
+    "match": true
+   },
+   {
+    "leaf": "R00-T02-LA-419F19D7AA64",
+    "providerId": "deepseek-responses",
+    "ledgerAuth": "api-key",
+    "ledgerApi": "openai-responses",
+    "matrixAuth": "api-key",
+    "matrixApi": "openai-responses",
+    "match": true
+   },
+   {
+    "leaf": "R00-T02-LA-184E03F012D5",
+    "providerId": "fireworks",
+    "ledgerAuth": "api-key",
+    "ledgerApi": "openai-completions",
+    "matrixAuth": "api-key",
+    "matrixApi": "openai-completions",
+    "match": true
+   },
+   {
+    "leaf": "R00-T02-LA-BFD9531DEA41",
+    "providerId": "gemini",
+    "ledgerAuth": "api-key",
+    "ledgerApi": "google-generative-ai",
+    "matrixAuth": "api-key",
+    "matrixApi": "google-generative-ai",
+    "match": true
+   },
+   {
+    "leaf": "R00-T02-LA-FBCFA99A89A2",
+    "providerId": "groq",
+    "ledgerAuth": "api-key",
+    "ledgerApi": "openai-completions",
+    "matrixAuth": "api-key",
+    "matrixApi": "openai-completions",
+    "match": true
+   },
+   {
+    "leaf": "R00-T02-LA-2097E172B42B",
+    "providerId": "hunyuan",
+    "ledgerAuth": "api-key",
+    "ledgerApi": "openai-completions",
+    "matrixAuth": "api-key",
+    "matrixApi": "openai-completions",
+    "match": true
+   },
+   {
+    "leaf": "R00-T02-LA-477D944DF19B",
+    "providerId": "infini",
+    "ledgerAuth": "api-key",
+    "ledgerApi": "openai-completions",
+    "matrixAuth": "api-key",
+    "matrixApi": "openai-completions",
+    "match": true
+   },
+   {
+    "leaf": "R00-T02-LA-B70FCDCAC1ED",
+    "providerId": "kimi-coding",
+    "ledgerAuth": "api-key",
+    "ledgerApi": "openai-completions",
+    "matrixAuth": "api-key",
+    "matrixApi": "openai-completions",
+    "match": true
+   },
+   {
+    "leaf": "R00-T02-LA-0DFFAB20A40B",
+    "providerId": "mimo",
+    "ledgerAuth": "api-key",
+    "ledgerApi": "openai-completions",
+    "matrixAuth": "api-key",
+    "matrixApi": "openai-completions",
+    "match": true
+   },
+   {
+    "leaf": "R00-T02-LA-D61616CAF15F",
+    "providerId": "mimo-token-plan",
+    "ledgerAuth": "api-key",
+    "ledgerApi": "openai-completions",
+    "matrixAuth": "api-key",
+    "matrixApi": "openai-completions",
+    "match": true
+   },
+   {
+    "leaf": "R00-T02-LA-FE9588171A23",
+    "providerId": "minimax",
+    "ledgerAuth": "api-key",
+    "ledgerApi": "anthropic-messages",
+    "matrixAuth": "api-key",
+    "matrixApi": "anthropic-messages",
+    "match": true
+   },
+   {
+    "leaf": "R00-T02-LA-9194C0F0D909",
+    "providerId": "minimax-token-plan",
+    "ledgerAuth": "api-key",
+    "ledgerApi": "anthropic-messages",
+    "matrixAuth": "api-key",
+    "matrixApi": "anthropic-messages",
+    "match": true
+   },
+   {
+    "leaf": "R00-T02-LA-77812804951F",
+    "providerId": "mistral",
+    "ledgerAuth": "api-key",
+    "ledgerApi": "openai-completions",
+    "matrixAuth": "api-key",
+    "matrixApi": "openai-completions",
+    "match": true
+   },
+   {
+    "leaf": "R00-T02-LA-DE0309EF3F56",
+    "providerId": "modelscope",
+    "ledgerAuth": "api-key",
+    "ledgerApi": "openai-completions",
+    "matrixAuth": "api-key",
+    "matrixApi": "openai-completions",
+    "match": true
+   },
+   {
+    "leaf": "R00-T02-LA-565BE3400DAC",
+    "providerId": "moonshot",
+    "ledgerAuth": "api-key",
+    "ledgerApi": "openai-completions",
+    "matrixAuth": "api-key",
+    "matrixApi": "openai-completions",
+    "match": true
+   },
+   {
+    "leaf": "R00-T02-LA-43DDCE21A45C",
+    "providerId": "ollama",
+    "ledgerAuth": "none",
+    "ledgerApi": "openai-completions",
+    "matrixAuth": "none",
+    "matrixApi": "openai-completions",
+    "match": true
+   },
+   {
+    "leaf": "R00-T02-LA-03E1121574A1",
+    "providerId": "openai",
+    "ledgerAuth": "api-key",
+    "ledgerApi": "openai-completions",
+    "matrixAuth": "api-key",
+    "matrixApi": "openai-completions",
+    "match": true
+   },
+   {
+    "leaf": "R00-T02-LA-ABAC28922F7A",
+    "providerId": "openai-codex-oauth",
+    "ledgerAuth": "oauth",
+    "ledgerApi": "openai-codex-responses",
+    "matrixAuth": "oauth",
+    "matrixApi": "openai-codex-responses",
+    "match": true
+   },
+   {
+    "leaf": "R00-T02-LA-80DB4026AF13",
+    "providerId": "opencode",
+    "ledgerAuth": "api-key",
+    "ledgerApi": "anthropic-messages",
+    "matrixAuth": "api-key",
+    "matrixApi": "anthropic-messages",
+    "match": true
+   },
+   {
+    "leaf": "R00-T02-LA-668EEC15C958",
+    "providerId": "opencode-go",
+    "ledgerAuth": "api-key",
+    "ledgerApi": "openai-completions",
+    "matrixAuth": "api-key",
+    "matrixApi": "openai-completions",
+    "match": true
+   },
+   {
+    "leaf": "R00-T02-LA-9871F51BE25B",
+    "providerId": "openrouter",
+    "ledgerAuth": "api-key",
+    "ledgerApi": "openai-completions",
+    "matrixAuth": "api-key",
+    "matrixApi": "openai-completions",
+    "match": true
+   },
+   {
+    "leaf": "R00-T02-LA-00A769DD0FA3",
+    "providerId": "perplexity",
+    "ledgerAuth": "api-key",
+    "ledgerApi": "openai-completions",
+    "matrixAuth": "api-key",
+    "matrixApi": "openai-completions",
+    "match": true
+   },
+   {
+    "leaf": "R00-T02-LA-2EDB69DA3AE2",
+    "providerId": "siliconflow",
+    "ledgerAuth": "api-key",
+    "ledgerApi": "openai-completions",
+    "matrixAuth": "api-key",
+    "matrixApi": "openai-completions",
+    "match": true
+   },
+   {
+    "leaf": "R00-T02-LA-7D969CDBF21C",
+    "providerId": "stepfun",
+    "ledgerAuth": "api-key",
+    "ledgerApi": "openai-completions",
+    "matrixAuth": "api-key",
+    "matrixApi": "openai-completions",
+    "match": true
+   },
+   {
+    "leaf": "R00-T02-LA-22A8DCD792BE",
+    "providerId": null,
+    "note": "注册 id=system-speech 的语音合成、语音识别能力；凭证/适配器满足条件时，经系统语音运行时得到相应音频或"
+   },
+   {
+    "leaf": "R00-T02-LA-AC352BFA3D82",
+    "providerId": "together",
+    "ledgerAuth": "api-key",
+    "ledgerApi": "openai-completions",
+    "matrixAuth": "api-key",
+    "matrixApi": "openai-completions",
+    "match": true
+   },
+   {
+    "leaf": "R00-T02-LA-CCD6BA30F9ED",
+    "providerId": "volcengine-coding",
+    "ledgerAuth": "api-key",
+    "ledgerApi": "openai-completions",
+    "matrixAuth": "api-key",
+    "matrixApi": "openai-completions",
+    "match": true
+   },
+   {
+    "leaf": "R00-T02-LA-E06C7DDB93D2",
+    "providerId": "volcengine",
+    "ledgerAuth": "api-key",
+    "ledgerApi": "openai-completions",
+    "matrixAuth": "api-key",
+    "matrixApi": "openai-completions",
+    "match": true
+   },
+   {
+    "leaf": "R00-T02-LA-A9ACB7418FC4",
+    "providerId": null,
+    "note": "注册 id=volcengine-speech 的语音识别能力；凭证/适配器满足条件时，经volcengine-biga"
+   },
+   {
+    "leaf": "R00-T02-LA-D79C2E204AFB",
+    "providerId": "xai",
+    "ledgerAuth": "api-key",
+    "ledgerApi": "openai-completions",
+    "matrixAuth": "api-key",
+    "matrixApi": "openai-completions",
+    "match": true
+   },
+   {
+    "leaf": "R00-T02-LA-3D8337A8088F",
+    "providerId": "xai-oauth",
+    "ledgerAuth": "oauth",
+    "ledgerApi": "openai-responses",
+    "matrixAuth": "oauth",
+    "matrixApi": "openai-responses",
+    "match": true
+   },
+   {
+    "leaf": "R00-T02-LA-FF3AD97F8429",
+    "providerId": "zhipu",
+    "ledgerAuth": "api-key",
+    "ledgerApi": "openai-completions",
+    "matrixAuth": "api-key",
+    "matrixApi": "openai-completions",
+    "match": true
+   },
+   {
+    "leaf": "R00-T02-LA-834034527694",
+    "providerId": "zhipu-coding",
+    "ledgerAuth": "api-key",
+    "ledgerApi": "openai-completions",
+    "matrixAuth": "api-key",
+    "matrixApi": "openai-completions",
+    "match": true
+   }
+  ],
+  "mismatches": []
+ }
+}

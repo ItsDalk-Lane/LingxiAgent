@@ -1,0 +1,2 @@
+LINGXI_AUTH_REJECTED request_id=req-a18c7fd966f88d35e20ca82a26388ac8 method=GET path=/lingxi/v1/sessions status=401 Unauthorized reason=invalid_credential remote=127.0.0.1:59627
+LINGXI_AUTH_REJECTED request_id=req-4243c5c2afe42f521023bb3f7da01592 method=GET path=/lingxi/v1/me status=401 Unauthorized reason=invalid_credential remote=127.0.0.1:59629

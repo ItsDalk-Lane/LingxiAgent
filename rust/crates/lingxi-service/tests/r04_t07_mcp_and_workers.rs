@@ -32,9 +32,10 @@ use std::sync::atomic::{AtomicBool, AtomicUsize, Ordering};
 use std::sync::{Arc, Mutex};
 use std::time::Duration;
 
+use lingxi_kernel::model_exchange::ModelTurnInput;
 use lingxi_kernel::ports::{
     ProviderDescriptor, ProviderTurn, ProviderTurnResult, StoragePort, ToolExecutionResult,
-    ToolOutcome, ToolRequest, TurnProviderPort,
+    ToolOutcome, ToolRequest, TurnDeltaSink, TurnProviderPort,
 };
 use lingxi_kernel::subagent::SessionPermissionMode;
 use lingxi_kernel::toolcatalog::{SchemaBudget, ToolRegistry, ToolTargetId};
@@ -482,8 +483,9 @@ impl TurnProviderPort for StepsProvider {
         &'a self,
         ctx: &'a RunContext,
         _call: &'a ModelCallId,
-        _turn: u32,
-        _input: &'a str,
+        _input: &'a ModelTurnInput,
+
+        _deltas: &'a dyn TurnDeltaSink,
     ) -> Pin<Box<dyn std::future::Future<Output = ProviderTurnResult> + Send + 'a>> {
         let next = self
             .steps
@@ -510,6 +512,7 @@ fn final_turn(text: &str) -> ProviderTurn {
 
 fn tool_turn(target: &str, args: serde_json::Value) -> ProviderTurn {
     ProviderTurn::ToolRequests {
+        content: Vec::new(),
         requests: vec![
             ToolRequest::from_effective_arguments(target, args, &budget())
                 .expect("effective request"),
@@ -671,17 +674,28 @@ fn text_of(result: &ToolExecutionResult) -> String {
 /// front of it is the code under test.
 struct OkModel;
 impl WorkerModelPort for OkModel {
-    fn complete(
-        &self,
-        _ctx: &RunContext,
-        _worker: &str,
-        _request: &lingxi_service::workerrpc::WorkerModelRequest,
-    ) -> Result<
-        lingxi_service::workerrpc::WorkerModelReply,
-        lingxi_service::workerrpc::WorkerModelRefusal,
+    fn complete<'a>(
+        &'a self,
+        _ctx: &'a RunContext,
+        _worker: &'a str,
+        _invocation: &'a str,
+        _cb_id: &'a str,
+        _request: &'a lingxi_service::workerrpc::WorkerModelRequest,
+    ) -> std::pin::Pin<
+        Box<
+            dyn std::future::Future<
+                    Output = Result<
+                        lingxi_service::workerrpc::WorkerModelReply,
+                        lingxi_service::workerrpc::WorkerModelRefusal,
+                    >,
+                > + Send
+                + 'a,
+        >,
     > {
-        Ok(lingxi_service::workerrpc::WorkerModelReply {
-            text: "model-ok".to_string(),
+        Box::pin(async {
+            Ok(lingxi_service::workerrpc::WorkerModelReply {
+                text: "model-ok".to_string(),
+            })
         })
     }
 }
@@ -721,6 +735,12 @@ async fn register_worker(
         env: BTreeMap::new(),
         cwd: h.ws.clone(),
         model,
+        // R05-T06 (C09): the host-granted purposes — the two the fixture
+        // worker uses ("ask_credentials" probes, "callback_storm").
+        allowed_model_purposes: vec![
+            "worker claims it needs the model".to_string(),
+            "storm".to_string(),
+        ],
         claimed_file_contract: None,
     };
     register_worker_tool(

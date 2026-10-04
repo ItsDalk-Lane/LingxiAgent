@@ -1,0 +1,210 @@
+   Compiling serde_core v1.0.229
+   Compiling serde v1.0.229
+   Compiling serde_json v1.0.151
+   Compiling allocator-api2 v0.2.21
+   Compiling equivalent v1.0.2
+   Compiling num-traits v0.2.19
+   Compiling futures-sink v0.3.34
+   Compiling slab v0.4.12
+   Compiling futures-io v0.3.34
+   Compiling futures-task v0.3.34
+   Compiling system-configuration-sys v0.6.0
+   Compiling fnv v1.0.7
+   Compiling try-lock v0.2.5
+   Compiling regex-syntax v0.8.11
+   Compiling syn v3.0.6
+   Compiling syn v2.0.119
+   Compiling core-foundation v0.9.4
+   Compiling sync_wrapper v1.0.2
+   Compiling aho-corasick v1.1.5
+   Compiling ipnet v2.12.2
+   Compiling stable_deref_trait v1.2.1
+   Compiling litemap v0.8.3
+   Compiling writeable v0.6.4
+   Compiling icu_normalizer_data v2.3.0
+   Compiling icu_properties_data v2.3.0
+   Compiling utf8_iter v1.0.4
+   Compiling rustversion v1.0.23
+   Compiling getrandom v0.3.4
+   Compiling futures-channel v0.3.34
+   Compiling want v0.3.1
+   Compiling version_check v0.9.5
+   Compiling scopeguard v1.2.0
+   Compiling zerocopy v0.8.58
+   Compiling parking_lot_core v0.9.12
+   Compiling security-framework-sys v2.17.0
+   Compiling core-foundation v0.10.1
+   Compiling getrandom v0.4.3
+   Compiling simdutf8 v0.1.5
+   Compiling thiserror v2.0.21
+   Compiling hashbrown v0.17.1
+   Compiling bit-vec v0.8.0
+   Compiling unicode-general-category v1.1.0
+   Compiling heck v0.5.0
+   Compiling regex-automata v0.4.18
+   Compiling lock_api v0.4.14
+   Compiling borrow-or-share v0.2.4
+   Compiling multiversion_no_op v1.0.0
+   Compiling outref v0.5.2
+   Compiling bytecount v0.6.9
+   Compiling ahash v0.8.12
+   Compiling bit-set v0.8.0
+   Compiling vsimd v0.8.0
+   Compiling security-framework v3.7.0
+   Compiling hashlink v0.12.2
+   Compiling rmcp v3.4.1
+   Compiling micromap v0.3.0
+   Compiling serde_derive_internals v0.30.0
+   Compiling synstructure v0.14.0
+   Compiling num-cmp v0.1.0
+   Compiling jsonschema-regex v0.57.0
+   Compiling data-encoding v2.11.1
+   Compiling pastey v0.2.3
+   Compiling uuid-simd v0.8.0
+   Compiling rusqlite v0.40.2
+   Compiling tracing-attributes v0.1.31
+   Compiling strum_macros v0.28.0
+   Compiling serde_derive v1.0.229
+   Compiling ref-cast-impl v1.0.27
+   Compiling tokio-macros v2.7.2
+   Compiling futures-macro v0.3.34
+   Compiling zerovec-derive v0.11.6
+   Compiling displaydoc v0.2.7
+   Compiling zerofrom-derive v0.1.8
+   Compiling yoke-derive v0.8.3
+   Compiling schemars_derive v1.2.2
+   Compiling matchers v0.2.0
+   Compiling ref-cast v1.0.27
+   Compiling tokio v1.53.1
+   Compiling rustls-platform-verifier v0.7.1
+   Compiling thiserror-impl v2.0.21
+   Compiling tracing v0.1.44
+   Compiling futures-util v0.3.34
+   Compiling fancy-regex v0.19.2
+   Compiling regex v1.13.1
+   Compiling num-integer v0.1.47
+   Compiling num-complex v0.4.6
+   Compiling strum v0.28.0
+   Compiling encoding_rs v0.8.42
+   Compiling zerofrom v0.1.8
+   Compiling parking_lot v0.12.5
+   Compiling uuid v1.26.1
+   Compiling num-bigint v0.4.8
+   Compiling num-iter v0.1.46
+   Compiling indexmap v2.14.2
+   Compiling serde_path_to_error v0.1.20
+   Compiling system-configuration v0.7.0
+   Compiling num-rational v0.4.2
+   Compiling xtask v0.1.0 (/Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/xtask)
+   Compiling num v0.4.3
+   Compiling fraction v0.17.0
+   Compiling axum-core v0.5.6
+   Compiling tracing-subscriber v0.3.23
+   Compiling yoke v0.8.3
+   Compiling chrono v0.4.45
+   Compiling serde_urlencoded v0.7.1
+   Compiling fluent-uri v0.4.1
+   Compiling email_address v0.2.9
+   Compiling lingxi-browser-spike v0.0.0 (/Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-browser-spike)
+   Compiling futures-executor v0.3.34
+   Compiling jsonschema-value v0.57.0
+   Compiling referencing v0.57.0
+   Compiling futures v0.3.34
+   Compiling tokio-util v0.7.19
+   Compiling tower v0.5.3
+   Compiling tokio-rustls v0.26.5
+   Compiling tokio-stream v0.1.19
+   Compiling schemars v1.2.2
+   Compiling zerovec v0.11.8
+   Compiling zerotrie v0.2.5
+   Compiling h2 v0.4.19
+   Compiling lingxi-protocol v0.0.0 (/Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-protocol)
+   Compiling tinystr v0.8.4
+   Compiling potential_utf v0.1.6
+   Compiling hyper v1.11.1
+   Compiling icu_collections v2.3.0
+   Compiling icu_locale_core v2.3.0
+   Compiling lingxi-kernel v0.0.0 (/Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-kernel)
+   Compiling hyper-util v0.1.21
+   Compiling icu_provider v2.3.1
+   Compiling lingxi-adapters v0.0.0 (/Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-adapters)
+   Compiling icu_normalizer v2.3.0
+   Compiling icu_properties v2.3.0
+   Compiling axum v0.8.9
+   Compiling hyper-rustls v0.27.10
+   Compiling idna_adapter v1.2.2
+   Compiling idna v1.1.0
+   Compiling url v2.5.8
+   Compiling lingxi-service v0.0.0 (/Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-service)
+   Compiling tower-http v0.6.11
+   Compiling reqwest v0.13.5
+   Compiling jsonschema v0.57.0
+   Compiling lingxi-spike v0.0.0 (/Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-spike)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 28.67s
+     Running unittests src/lib.rs (rust/target/debug/deps/lingxi_adapters-570811d037ebdd91)
+     Running unittests src/bin/lingxi-storage-inspect.rs (rust/target/debug/deps/lingxi_storage_inspect-2b32788d08461480)
+     Running tests/active_run_listing.rs (rust/target/debug/deps/active_run_listing-d207864e5ceec8e2)
+     Running tests/backup_faults.rs (rust/target/debug/deps/backup_faults-ea735b066d5c69ad)
+     Running tests/backup_restore.rs (rust/target/debug/deps/backup_restore-3f5f3b6c2da3286d)
+     Running tests/disk_full_fault.rs (rust/target/debug/deps/disk_full_fault-070bbf1d1ddcf95c)
+     Running tests/event_store_reads.rs (rust/target/debug/deps/event_store_reads-8f3ecc01655eeb0c)
+     Running tests/invocation_journal_store.rs (rust/target/debug/deps/invocation_journal_store-6ab210257e88177e)
+     Running tests/late_result_fencing_property.rs (rust/target/debug/deps/late_result_fencing_property-a4d39eb7405a5095)
+     Running tests/migration_idempotency.rs (rust/target/debug/deps/migration_idempotency-70f7bf1150f5c508)
+     Running tests/run_finalize_property.rs (rust/target/debug/deps/run_finalize_property-985d46fdb3adee42)
+     Running tests/run_id_allocator.rs (rust/target/debug/deps/run_id_allocator-87713e109af2720c)
+     Running tests/run_lineage_store.rs (rust/target/debug/deps/run_lineage_store-93a9dcbc3779b7b5)
+     Running tests/storage_transactions.rs (rust/target/debug/deps/storage_transactions-347736bb655dcdce)
+     Running unittests src/lib.rs (rust/target/debug/deps/lingxi_browser_spike-dd5cc4b7cfab0636)
+     Running unittests src/bin/spike_browser.rs (rust/target/debug/deps/spike_browser-2ede3e1be29cdc36)
+     Running unittests src/bin/spike_pdf.rs (rust/target/debug/deps/spike_pdf-73323ed5b0875dcd)
+     Running unittests src/lib.rs (rust/target/debug/deps/lingxi_kernel-4559f67255c36088)
+     Running unittests src/lib.rs (rust/target/debug/deps/lingxi_protocol-511e5d578397e9e4)
+     Running unittests src/bin/lingxi-proto-server.rs (rust/target/debug/deps/lingxi_proto_server-e6fc7122934b8c8d)
+     Running unittests src/bin/lingxi-protocol-gen.rs (rust/target/debug/deps/lingxi_protocol_gen-2c9d4c211e5d54c9)
+     Running unittests src/bin/lingxi-protocol-verify.rs (rust/target/debug/deps/lingxi_protocol_verify-34e57c4f7efe866d)
+     Running unittests src/lib.rs (rust/target/debug/deps/lingxi_service-d430534b90ad69d1)
+     Running unittests src/main.rs (rust/target/debug/deps/lingxi_service-9ed376f5411ef200)
+     Running tests/auth_matrix.rs (rust/target/debug/deps/auth_matrix-15d46be6de56682c)
+     Running tests/background_disconnect_recovery.rs (rust/target/debug/deps/background_disconnect_recovery-d1d2997be7cdf4a0)
+     Running tests/cancellation_tree.rs (rust/target/debug/deps/cancellation_tree-5f8b03a5b23361b6)
+     Running tests/config_bounds.rs (rust/target/debug/deps/config_bounds-6cbeed148f3273f0)
+     Running tests/event_subscription.rs (rust/target/debug/deps/event_subscription-032846c229b2c9d6)
+     Running tests/execute_concurrency.rs (rust/target/debug/deps/execute_concurrency-594484557ddb879e)
+     Running tests/exit_race_rejections.rs (rust/target/debug/deps/exit_race_rejections-5a0bf69b70b26e26)
+     Running tests/instance_lifecycle.rs (rust/target/debug/deps/instance_lifecycle-d11384224b25ac64)
+     Running tests/invocation_journal.rs (rust/target/debug/deps/invocation_journal-1ffc140b69dc7e4e)
+     Running tests/late_result_fence.rs (rust/target/debug/deps/late_result_fence-d99f7de5d0a210d9)
+     Running tests/r00_management_leaves.rs (rust/target/debug/deps/r00_management_leaves-26c371207cef699e)
+     Running tests/r00_static_web_leaves.rs (rust/target/debug/deps/r00_static_web_leaves-7cc6444f0fafe389)
+     Running tests/r03_t08_acceptance_matrix.rs (rust/target/debug/deps/r03_t08_acceptance_matrix-64e9643356fa78f3)
+     Running tests/recovery_crash_points.rs (rust/target/debug/deps/recovery_crash_points-c868da08fda76732)
+     Running tests/recovery_startup_scan.rs (rust/target/debug/deps/recovery_startup_scan-18f8dab1aa85f6ac)
+     Running tests/request_dedup.rs (rust/target/debug/deps/request_dedup-67c133054227d77c)
+     Running tests/resource_limits.rs (rust/target/debug/deps/resource_limits-dd50f72b91647d4f)
+     Running tests/run_lifecycle.rs (rust/target/debug/deps/run_lifecycle-713e51150e3f15f3)
+     Running tests/service_health.rs (rust/target/debug/deps/service_health-5e8b955edb4e47cc)
+     Running tests/service_persistence.rs (rust/target/debug/deps/service_persistence-dea024040b831822)
+     Running tests/session_serialization.rs (rust/target/debug/deps/session_serialization-2cb80ebec4c86ecd)
+     Running tests/shutdown_coordinator.rs (rust/target/debug/deps/shutdown_coordinator-f2223ee2cf1f1f49)
+     Running tests/subagent_lifecycle.rs (rust/target/debug/deps/subagent_lifecycle-6239cc4099101eab)
+     Running tests/subagent_permission_inheritance.rs (rust/target/debug/deps/subagent_permission_inheritance-be210b7a1b9c46fb)
+     Running tests/tls_web_login.rs (rust/target/debug/deps/tls_web_login-64cdccad70ac0666)
+     Running unittests src/lib.rs (rust/target/debug/deps/lingxi_spike-c4313c36663c8f36)
+     Running unittests src/bin/spike_check_deps.rs (rust/target/debug/deps/spike_check_deps-5ce327ddc8d10426)
+     Running unittests src/bin/spike_health.rs (rust/target/debug/deps/spike_health-63f364eb71c461c0)
+     Running unittests src/bin/spike_mcp_handshake.rs (rust/target/debug/deps/spike_mcp_handshake-9a39531cf7e6918c)
+     Running unittests src/bin/spike_schema_validate.rs (rust/target/debug/deps/spike_schema_validate-84c9c4ea62c3a57f)
+     Running unittests src/bin/spike_sqlite_queue.rs (rust/target/debug/deps/spike_sqlite_queue-d260be2be7751de7)
+     Running unittests src/bin/spike_tls_probe.rs (rust/target/debug/deps/spike_tls_probe-ae029bb7c04c58b7)
+     Running unittests src/main.rs (rust/target/debug/deps/xtask-4dbcdba3a91fb3a2)
+kill: 44766: No such process
+kill: 44766: No such process
+kill: 44766: No such process
+kill: 44765: No such process
+   Doc-tests lingxi_adapters
+   Doc-tests lingxi_browser_spike
+   Doc-tests lingxi_kernel
+   Doc-tests lingxi_protocol
+   Doc-tests lingxi_service
+   Doc-tests lingxi_spike

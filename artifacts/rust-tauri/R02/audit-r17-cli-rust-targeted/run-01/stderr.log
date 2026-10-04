@@ -1,0 +1,29 @@
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  tests/cli-rust-service.test.ts > Rust CLI discovery > binds a local token to the matching instance and home
+AssertionError: expected { ok: false, …(2) } to match object { ok: true, backend: 'rust', …(3) }
+(2 matching properties omitted from actual)
+
+- Expected
++ Received
+
+  {
+-   "backend": "rust",
+-   "baseUrl": "http://127.0.0.1:14567",
+-   "ok": true,
+-   "source": "rust-local-token",
+-   "token": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
++   "ok": false,
+  }
+
+ ❯ tests/cli-rust-service.test.ts:34:64
+     32|   it("binds a local token to the matching instance and home", () => {
+     33|     const fixture = syntheticHome();
+     34|     expect(readRustLocalService({ lingxiHome: fixture.home })).toMatch…
+       |                                                                ^
+     35|       ok: true, backend: "rust", baseUrl: "http://127.0.0.1:14567",
+     36|       token: "a".repeat(32), source: "rust-local-token",
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯
+

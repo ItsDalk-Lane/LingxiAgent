@@ -1,0 +1,3 @@
+run lib-adapters/models::gateway::tests::zz_zero_match_probe_no_such_test: filter matched 0 tests (running=0, pinned=1) — empty test collections must not pass
+run lib-adapters/models::gateway::tests::zz_zero_match_probe_no_such_test: executed 0 tests but the stage pin is 1 (filtered subset / renamed or deleted tests)
+run lib-adapters/models::gateway::tests::zz_zero_match_probe_no_such_test: passed 0 but the stage pin is 1

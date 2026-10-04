@@ -1,0 +1,29 @@
+{
+  "schema": "r05-t05-compat-golden/v1",
+  "module": "qwen",
+  "case": "dashscope-video-route-matches-without-quirks",
+  "model": {
+    "provider": "dashscope",
+    "id": "qwen3-vl-plus",
+    "baseUrl": "https://dashscope.aliyuncs.com/v1",
+    "api": "openai-completions",
+    "video": true
+  },
+  "payload": {
+    "model": "qwen3-vl-plus",
+    "messages": []
+  },
+  "options": {
+    "mode": "utility"
+  },
+  "expected": {
+    "thinkingFormat": null,
+    "reasoningProfile": null,
+    "matched": "qwen",
+    "result": {
+      "model": "qwen3-vl-plus",
+      "messages": [],
+      "enable_thinking": false
+    }
+  }
+}

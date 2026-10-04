@@ -22,9 +22,30 @@ publish.workspace = true
 #   - tracing 0.1.44: worker diagnostics (never payloads/secrets).
 #   - serde/serde_json 1.0.229/1.0.151: canonical payload serialization via
 #     lingxi-protocol's canonical JSON profile.
+#   - reqwest 0.13.5 + `json` (R05-T01, models/openai_completions.rs): the
+#     HTTP client of the openai-completions adapter. Same locked version and
+#     TLS stack as lingxi-spike (default-tls on 0.13 = rustls + aws-lc-rs +
+#     rustls-platform-verifier); the lock gains only this dependency edge on
+#     an already-locked version — zero new third-party versions.
+#     R05-T02 additionally enables the `form` feature (models/oauth.rs posts
+#     application/x-www-form-urlencoded grant bodies): the flag pulls in the
+#     already-locked serde_urlencoded 0.7.1 — one more dependency edge, zero
+#     new third-party versions.
+#   - getrandom 0.2.17 / base64 0.23.1 (R05-T02, models/oauth.rs): the OAuth
+#     state machines' CSPRNG (PKCE verifier / anti-CSRF state — refusal on
+#     failure, same posture as lingxi-service src/auth.rs) and the
+#     base64url codec (S256 challenge, JWT-exp fallback). Both are locked
+#     workspace members already; the lock gains only dependency edges.
+#   - httpdate 1.x (R05-T05, models/dispatch.rs): the Retry-After HTTP-date
+#     form's parser. Already locked as a reqwest dependency; the lock gains
+#     only this dependency edge — zero new third-party versions.
 [dependencies]
 lingxi-kernel = { path = "../lingxi-kernel" }
 lingxi-protocol = { path = "../lingxi-protocol" }
+base64 = "0.23.1"
+getrandom = "0.2"
+httpdate = "1"
+reqwest = { version = "0.13.5", features = ["json", "form"] }
 rusqlite = { version = "0.40.2", features = ["bundled", "backup"] }
 serde = { version = "1.0.229", features = ["derive"] }
 serde_json = "1.0.151"
@@ -32,7 +53,9 @@ sha2 = "0.11.0"
 # R02-T06: `time` feature flag added for the backup-while-writing
 # integration test's head-start sleep (same locked tokio 1.53.1; the flag
 # unlocks existing code inside the crate — no new lock entries).
-tokio = { version = "1.53.1", features = ["sync", "macros", "rt", "time"] }
+# R05-T02: `net` added for the OAuth authorization-code flow's loopback
+# redirect listener (models/oauth.rs) — same locked version, flag only.
+tokio = { version = "1.53.1", features = ["sync", "macros", "rt", "time", "net"] }
 tracing = "0.1.44"
 
 [target.'cfg(windows)'.dependencies]

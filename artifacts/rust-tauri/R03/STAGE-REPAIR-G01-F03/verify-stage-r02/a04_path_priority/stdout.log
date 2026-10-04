@@ -1,0 +1,16 @@
+== toolchain: rustup run 1.98.1 (rustc 1.98.1 (48a229cea 2026-09-01))
+== [build] lingxi-service (locked, offline, isolated target dir)
+    Finished `dev` profile [unoptimized + debuginfo] target(s) in 0.08s
+== [1] only CLI
+only CLI materialized: OK
+== [2] only env
+only env materialized (fresh candidates untouched): OK
+== [3] only config file
+only config materialized (fresh candidates untouched): OK
+== [4] conflict: CLI beats env and config
+CLI won; env+config ignored and reported: OK
+== [5] test mode: no prod-lookalike root is touched
+test mode wrote only to its isolated synthetic home: OK
+== [6] negative probes (loud failures, no side effects)
+negative probes all loud: OK
+A04 RESULT: PASS (precedence honored, file probes prove the real choice, test mode isolated)

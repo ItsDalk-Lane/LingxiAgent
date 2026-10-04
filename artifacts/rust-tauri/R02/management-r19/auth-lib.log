@@ -1,0 +1,38 @@
+   Compiling cmov v0.5.4
+   Compiling inout v0.2.2
+   Compiling cipher v0.5.2
+   Compiling ctutils v0.4.2
+   Compiling salsa20 v0.11.0
+   Compiling digest v0.11.3
+   Compiling sha2 v0.11.0
+   Compiling sha1 v0.11.0
+   Compiling hmac v0.13.0
+   Compiling pbkdf2 v0.13.0
+   Compiling lingxi-protocol v0.0.0 (/Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-protocol)
+   Compiling scrypt v0.12.0
+   Compiling lingxi-kernel v0.0.0 (/Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-kernel)
+   Compiling lingxi-adapters v0.0.0 (/Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-adapters)
+   Compiling lingxi-service v0.0.0 (/Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-service)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 5.40s
+     Running unittests src/lib.rs (rust/target/debug/deps/lingxi_service-a49d24ac2e98c84a)
+
+running 16 tests
+test auth::tests::constant_time_eq_basics ... ok
+test auth::tests::bearer_parsing_mirrors_incumbent ... ok
+test auth::tests::scope_namespace_expansion ... ok
+test auth::tests::route_policy_table ... ok
+test auth::tests::failed_authentication_never_touches_registry_files ... ok
+test auth::tests::token_file_is_owner_only_and_instance_bound ... ok
+test auth::tests::local_token_roundtrip_and_owner_principal ... ok
+test auth::tests::expired_pairing_records_expiry_without_issuing_credential ... ok
+test auth::tests::registries_reload_across_bootstrap ... ok
+test auth::tests::device_secret_hash_matches_node_and_accepts_earlier_rust_hashes ... ok
+test auth::tests::revoking_device_cascades_to_its_credentials_only ... ok
+test auth::tests::concurrent_pairing_approval_issues_once ... ok
+test auth::tests::pairing_and_issued_device_survive_restart ... ok
+test auth::tests::authorize_order_and_denials ... ok
+test auth::tests::device_credential_lifecycle_create_auth_expire_revoke ... ok
+test auth::tests::failed_device_registry_write_keeps_live_memory_and_disk_unchanged ... ok
+
+test result: ok. 16 passed; 0 failed; 0 ignored; 0 measured; 151 filtered out; finished in 7.99s
+

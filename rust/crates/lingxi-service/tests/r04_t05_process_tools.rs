@@ -49,9 +49,11 @@ use std::pin::Pin;
 use std::sync::Arc;
 use std::time::{Duration, Instant};
 
+use lingxi_kernel::model_exchange::ModelTurnInput;
 use lingxi_kernel::ports::{
     InvocationJournalEntry, InvocationPhase, ProviderDescriptor, ProviderTurn, ProviderTurnResult,
-    StoragePort, ToolExecutionResult, ToolOutcome, ToolRequest, ToolRunStatus, TurnProviderPort,
+    StoragePort, ToolExecutionResult, ToolOutcome, ToolRequest, ToolRunStatus, TurnDeltaSink,
+    TurnProviderPort,
 };
 use lingxi_kernel::subagent::SessionPermissionMode;
 use lingxi_kernel::toolcatalog::{SchemaBudget, ToolRegistry, ToolTargetId};
@@ -128,8 +130,9 @@ impl TurnProviderPort for RunIdCaptureProvider {
         &'a self,
         ctx: &'a RunContext,
         _call: &'a ModelCallId,
-        _turn: u32,
-        _input: &'a str,
+        _input: &'a ModelTurnInput,
+
+        _deltas: &'a dyn TurnDeltaSink,
     ) -> Pin<Box<dyn std::future::Future<Output = ProviderTurnResult> + Send + 'a>> {
         *self.seen_run.lock().unwrap() = Some(ctx.run_id.to_string());
         let next = self
@@ -145,6 +148,7 @@ impl TurnProviderPort for RunIdCaptureProvider {
 
 fn tool_request(target: &str, args: serde_json::Value) -> ProviderTurn {
     ProviderTurn::ToolRequests {
+        content: Vec::new(),
         requests: vec![
             ToolRequest::from_effective_arguments(target, args, &budget())
                 .expect("effective request"),

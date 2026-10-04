@@ -1,0 +1,31 @@
+== start: 2026-10-02T13:54:43Z ==
+== r05_t01_model_plane ==
+   Compiling lingxi-service v0.0.0 (/Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-service)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 1.26s
+     Running tests/r05_t01_model_plane.rs (rust/target/debug/deps/r05_t01_model_plane-61d3c1c51b855145)
+
+running 7 tests
+test c03_no_model_plane_is_the_explicit_unconfigured_outcome ... ok
+test c05_reload_without_a_configured_plane_is_a_loud_404 ... ok
+test c06_unsupported_family_makes_zero_requests ... ok
+test c04_same_model_id_different_providers_never_cross_wire ... ok
+test c02_full_chain_real_wiring_real_tool_real_result ... ok
+test c05_in_flight_call_keeps_its_snapshot_and_cancel_is_unaffected ... ok
+test c05_reload_through_management_surface_swaps_atomically ... ok
+
+test result: ok. 7 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 1.69s
+
+== exit: 0 ==
+== r05_t01_binary_wiring ==
+   Compiling lingxi-service v0.0.0 (/Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-service)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.80s
+     Running tests/r05_t01_binary_wiring.rs (rust/target/debug/deps/r05_t01_binary_wiring-7c89112e09c92d5a)
+
+running 2 tests
+test c03_real_binary_without_plane_settles_unconfigured ... ok
+test c02_real_binary_full_chain_through_authenticated_endpoint ... ok
+
+test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 1.01s
+
+== exit: 0 ==
+== end: 2026-10-02T13:54:51Z ==

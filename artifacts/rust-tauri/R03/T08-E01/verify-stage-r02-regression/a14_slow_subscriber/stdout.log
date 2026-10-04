@@ -1,0 +1,13 @@
+== run 2026-09-29T20:00:06+0800 (pid 56290) ==
+== R02-T07 / R02-A14 slow-subscriber storm (toolchain 1.98.1, target /tmp/r03-t08-target) ==
+== building lingxi-service (--locked, offline) ==
+PASS build
+== starting service (event-subscriber-queue=4, max-ws-connections=8) ==
+PASS service ready at 127.0.0.1:60534 (pid 56309)
+== S1/S2: subscriber A stops reading; B keeps reading; writers commit key events until the subscriber-queue cap is reached ==
+A subscribed: {'frameKind': 'control', 'fromSeq': '0', 'mode': 'snapshot', 'snapshotSeq': '0', 'streamId': 'sess_local_alpha', 'type': 'subscribed'}
+B subscribed: {'frameKind': 'control', 'fromSeq': '0', 'mode': 'snapshot', 'snapshotSeq': '0', 'streamId': 'sess_local_alpha', 'type': 'subscribed'}
+writer storm done: 1000 requests, statuses ['200', "<HTTPError 409: 'Conflict'>"]
+Traceback (most recent call last):
+  File "<stdin>", line 183, in <module>
+AssertionError: every execute must answer 200 (no stall, no fake success)

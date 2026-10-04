@@ -1,0 +1,7 @@
+{
+  "node": "v24.16.0",
+  "extraCa": "/tmp/rt05_ca.pem",
+  "fetchStatus": 200,
+  "fetchError": null,
+  "verdict": "builtin fetch TRUSTS the private CA (NODE_EXTRA_CA_CERTS honored)"
+}

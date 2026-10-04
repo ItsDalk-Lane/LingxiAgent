@@ -1,0 +1,24 @@
+=== PRE-FIX code (three fixes reverted), rust-target /tmp/rust-target-r02-t05-prefix-check ===
+--- race test a09_join_window_race, 2 rounds ---
+assertion `left == right` failed: sub 0: SILENT join hole at the seam (cut=480)
+test result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 7 filtered out; finished in 0.19s
+assertion `left == right` failed: sub 0: SILENT join hole at the seam (cut=480)
+test result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 7 filtered out; finished in 0.16s
+--- deterministic hub unit tests (probe A/A2/B counterparts), 1 round ---
+test events::tests::held_event_above_the_cut_flushes_after_the_hold_advanced_the_watermark ... FAILED
+test events::tests::restart_baseline_drains_the_parked_event_at_the_new_next_seq ... FAILED
+test events::tests::restart_baseline_drains_a_parked_chain_above_the_head ... FAILED
+test events::tests::held_delta_above_the_cut_is_delivered_not_counted_lost ... FAILED
+---- events::tests::held_event_above_the_cut_flushes_after_the_hold_advanced_the_watermark stdout ----
+thread 'events::tests::held_event_above_the_cut_flushes_after_the_hold_advanced_the_watermark' (30232854) panicked at crates/lingxi-service/src/events.rs:1420:9:
+---- events::tests::restart_baseline_drains_the_parked_event_at_the_new_next_seq stdout ----
+thread 'events::tests::restart_baseline_drains_the_parked_event_at_the_new_next_seq' (30232862) panicked at crates/lingxi-service/src/events.rs:1493:9:
+---- events::tests::restart_baseline_drains_a_parked_chain_above_the_head stdout ----
+thread 'events::tests::restart_baseline_drains_a_parked_chain_above_the_head' (30232861) panicked at crates/lingxi-service/src/events.rs:1519:9:
+---- events::tests::held_delta_above_the_cut_is_delivered_not_counted_lost stdout ----
+thread 'events::tests::held_delta_above_the_cut_is_delivered_not_counted_lost' (30232853) panicked at crates/lingxi-service/src/events.rs:1456:9:
+    events::tests::held_delta_above_the_cut_is_delivered_not_counted_lost
+    events::tests::held_event_above_the_cut_flushes_after_the_hold_advanced_the_watermark
+    events::tests::restart_baseline_drains_a_parked_chain_above_the_head
+    events::tests::restart_baseline_drains_the_parked_event_at_the_new_next_seq
+test result: FAILED. 11 passed; 4 failed; 0 ignored; 0 measured; 72 filtered out; finished in 0.00s

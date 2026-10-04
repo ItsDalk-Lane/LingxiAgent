@@ -7,7 +7,10 @@
 //!   depend on `lingxi-service` (DEP-09) and never on any desktop stack
 //!   (DEP-07).
 //! - Current surface: the storage port ([`storage::RunDatabase`]) backed by
-//!   the new Rust run/message SQLite database. Model/tool/browser/
-//!   integrations adapters arrive with their owning stages (R04/R05/R07).
+//!   the new Rust run/message SQLite database; the model plane
+//!   ([`models`]) — the config-backed model gateway, the openai-completions
+//!   real HTTP adapter and the gateway-backed turn provider (R05-T01).
+//!   Browser/integrations adapters arrive with their owning stages (R07).
 
+pub mod models;
 pub mod storage;

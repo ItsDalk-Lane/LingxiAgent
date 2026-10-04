@@ -1,0 +1,19 @@
+# R05-T07 R01 independent-review adversarial probe (reviewer-owned).
+# NOT part of the product workspace; lives in the REVIEW-T07 evidence dir and
+# path-depends on the working-tree crates exactly as they are.
+[package]
+name = "r05t07-review-probe"
+version = "0.0.0"
+edition = "2021"
+publish = false
+
+[dependencies]
+lingxi-adapters = { path = "../../../../../rust/crates/lingxi-adapters" }
+lingxi-kernel = { path = "../../../../../rust/crates/lingxi-kernel" }
+lingxi-protocol = { path = "../../../../../rust/crates/lingxi-protocol" }
+serde_json = "1"
+tokio = { version = "1", features = ["rt", "rt-multi-thread"] }
+
+[[bin]]
+name = "r05t07-review-probe"
+path = "src/main.rs"

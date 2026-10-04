@@ -1,0 +1,15 @@
+scripts/rust-tauri/r02_t08_legacy_entry_regression.sh: line 530: ✗: command not found
+scripts/rust-tauri/r02_t08_legacy_entry_regression.sh: line 530: Error:: command not found
+fatal: ambiguous argument '失败': unknown revision or path not in the working tree.
+Use '--' to separate paths from revisions, like this:
+'git <command> [<revision>...] -- [<file>...]'
+scripts/rust-tauri/r02_t08_legacy_entry_regression.sh: line 530: -: command not found
+scripts/rust-tauri/r02_t08_legacy_entry_regression.sh: line 530: ✗: command not found
+scripts/rust-tauri/r02_t08_legacy_entry_regression.sh: line 530: -: command not found
+scripts/rust-tauri/r02_t08_legacy_entry_regression.sh: line 530: fatal:: command not found
+scripts/rust-tauri/r02_t08_legacy_entry_regression.sh: line 1774: ]: command not found
+scripts/rust-tauri/r02_t08_legacy_entry_regression.sh: line 1774: ,: command not found
+tests/post-verification-audit-seal.test.ts	seal-coordinate-lag
+tests/round2-delivery-evidence.test.ts	UNRECOGNIZED,seal-coordinate-lag,uncommitted-source-rejection
+tests/round3-delivery-evidence.test.ts	UNRECOGNIZED,seal-coordinate-lag,uncommitted-source-rejection
+FAIL: E5: unrecognized CANDIDATE failure cause (a bare command-failed wrapper, a crash, or a foreign diagnostic — not a documented seal class; see e5-candidate-blocks.txt)

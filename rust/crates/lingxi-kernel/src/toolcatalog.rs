@@ -1570,6 +1570,7 @@ impl PreparedToolCall {
             arguments: self.effective,
             args_digest: self.args_digest,
             args_summary: Some(self.args_summary),
+            provider_call_id: None,
             delegation: None,
         }
     }

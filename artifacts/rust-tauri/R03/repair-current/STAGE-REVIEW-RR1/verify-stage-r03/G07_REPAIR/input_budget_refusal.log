@@ -1,0 +1,9 @@
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.08s
+     Running tests/input_budget_refusal.rs (/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T//rust-target-r03-g07-repair/debug/deps/input_budget_refusal-65e385d9a1a49ac1)
+
+running 2 tests
+test c03_log_summary_oversized_legal_input_is_not_misrefused ... ok
+test c03_over_budget_refused_loudly_with_zero_side_effects ... ok
+
+test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.10s
+

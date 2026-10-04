@@ -1,0 +1,31 @@
+{
+  "family": "openai-codex-responses",
+  "case": "error",
+  "route": {"provider": "codex-golden", "model": "gpt-codex-golden"},
+  "auth": {"kind": "bearer_jwt", "chatgpt_account_id": "acct-golden-0001"},
+  "input": {
+    "submission": "ping",
+    "tools": [],
+    "prior": []
+  },
+  "http_error": {
+    "status": 429,
+    "body": "{\"error\":{\"message\":\"token ${jwt} throttled\"}}"
+  },
+  "expected_transport": {
+    "path": "/backend-api/codex/responses",
+    "headers": [
+      ["authorization", "Bearer ${jwt}"],
+      ["openai-beta", "responses=experimental"],
+      ["originator", "pi"],
+      ["chatgpt-account-id", "acct-golden-0001"],
+      ["content-type", "application/json"]
+    ],
+    "absent_headers": ["x-api-key"]
+  },
+  "expected_failure": {
+    "code": "budget_exceeded",
+    "retryable": true,
+    "message": "provider returned HTTP 429 Too Many Requests: {\"error\":{\"message\":\"token [redacted] throttled\"}}"
+  }
+}

@@ -1,0 +1,79 @@
+Diff in /Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-service/src/cancel.rs:517:
+         match &*phase {
+             CancelPhase::Active => {
+                 *phase = CancelPhase::Requested {
+-                    reason: self
+-                        .scope
+-                        .reason()
+-                        .unwrap_or_else(|| reason.to_string()),
++                    reason: self.scope.reason().unwrap_or_else(|| reason.to_string()),
+                 };
+                 FireOutcome::Fired
+             }
+Diff in /Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-service/src/cancel.rs:1037:
+             entry.claim_terminal("completed.with_final"),
+             TerminalAdjudication::Claimed
+         );
+-        assert_eq!(entry.phase(), CancelPhase::Settling {
+-            terminal: "completed.with_final".to_string()
+-        });
+-        assert!(!entry.scope.is_cancelled(), "no tree fire for a settling run");
+-        assert_eq!(registry.fire("run_f03_claim_first", "user"), FireOutcome::TooLate);
++        assert_eq!(
++            entry.phase(),
++            CancelPhase::Settling {
++                terminal: "completed.with_final".to_string()
++            }
++        );
+         assert!(
+             !entry.scope.is_cancelled(),
++            "no tree fire for a settling run"
++        );
++        assert_eq!(
++            registry.fire("run_f03_claim_first", "user"),
++            FireOutcome::TooLate
++        );
++        assert!(
++            !entry.scope.is_cancelled(),
+             "a TooLate fire must not cancel the tree either"
+         );
+         // Settling is NOT a cancellation verdict: the phase machine reports
+Diff in /Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-service/src/cancel.rs:1061:
+     async fn claim_after_an_accepted_cancel_diverts_with_the_first_reason() {
+         let registry = CancelRegistry::new();
+         let entry = registry.register("run_f03_cancel_first");
+-        assert_eq!(registry.fire("run_f03_cancel_first", "user"), FireOutcome::Fired);
++        assert_eq!(
++            registry.fire("run_f03_cancel_first", "user"),
++            FireOutcome::Fired
++        );
+         assert_eq!(
+             registry.fire("run_f03_cancel_first", "second caller"),
+             FireOutcome::AlreadyCancelling
+Diff in /Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-service/src/runs.rs:620:
+                 cause: NoFinalCause::NoProviderConfigured,
+             };
+             let finish = self
+-                .adjudicated_finalize(port, events, &ctx, &entry, RunStatus::Running, finish, now_ms)
++                .adjudicated_finalize(
++                    port,
++                    events,
++                    &ctx,
++                    &entry,
++                    RunStatus::Running,
++                    finish,
++                    now_ms,
++                )
+                 .await?;
+             guard.disarm();
+             return Ok(finish);
+Diff in /Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-service/src/runs.rs:650:
+                 if root.is_cancelled() {
+                     let reason = root.reason().unwrap_or_else(|| "cancelled".to_string());
+                     let finish = self
+-                        .settle_cancellation(port, events, &ctx, &entry, live_status, reason, now_ms)
++                        .settle_cancellation(
++                            port,
++                            events,
++                            &ctx,
++                            &entry,

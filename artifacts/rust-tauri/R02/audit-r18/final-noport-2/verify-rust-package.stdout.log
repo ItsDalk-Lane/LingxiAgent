@@ -1,0 +1,5 @@
+
+> lingxi@0.1.43 verify:rust-service-package
+> node scripts/build-rust-desktop-service.mjs --verify
+
+[rust-desktop-service] verified /Users/study_superior/Desktop/Code/LingxiAgent/dist-rust-service/mac-arm64/lingxi-service sha256=acc0ba4a28e5ae2430c83aea2d3b12a1a763ee2e9fad56ab5c598b63623d710b

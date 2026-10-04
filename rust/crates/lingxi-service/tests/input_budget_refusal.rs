@@ -24,9 +24,10 @@ use std::path::{Path, PathBuf};
 use std::pin::Pin;
 use std::sync::Arc;
 
+use lingxi_kernel::model_exchange::ModelTurnInput;
 use lingxi_kernel::ports::{
     ProviderDescriptor, ProviderTurn, ProviderTurnResult, ToolExecutionResult, ToolExecutorPort,
-    ToolOutcome, TurnProviderPort,
+    ToolOutcome, TurnDeltaSink, TurnProviderPort,
 };
 use lingxi_kernel::RunContext;
 use lingxi_protocol::{ContentBlock, ModelCallId, NormalizedMessage};
@@ -72,9 +73,11 @@ impl TurnProviderPort for RecordingProvider {
         &'a self,
         ctx: &'a RunContext,
         _call: &'a ModelCallId,
-        _turn: u32,
-        input: &'a str,
+        input: &'a ModelTurnInput,
+
+        _deltas: &'a dyn TurnDeltaSink,
     ) -> Pin<Box<dyn std::future::Future<Output = ProviderTurnResult> + Send + 'a>> {
+        let input = input.submission.as_str();
         self.inputs
             .lock()
             .unwrap_or_else(|poisoned| poisoned.into_inner())

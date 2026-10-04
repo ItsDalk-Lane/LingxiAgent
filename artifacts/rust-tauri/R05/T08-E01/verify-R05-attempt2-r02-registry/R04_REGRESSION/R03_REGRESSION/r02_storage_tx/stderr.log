@@ -1,0 +1,6 @@
+columns: ["schema_migrations", "sessions", "runs", "run_attempts", "invocations", "messages", "key_events"] — use --table to filter
+columns: ["schema_migrations", "sessions", "runs", "run_attempts", "invocations", "messages", "key_events"] — use --table to filter
+Traceback (most recent call last):
+  File "<stdin>", line 6, in <module>
+AssertionError: userVersion 5 / supportedVersion 5 disagree with the registry's 4 migrations
+FAIL: S4 round 1: migration check inconsistent

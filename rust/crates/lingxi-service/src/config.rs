@@ -17,9 +17,12 @@
 //! - The config file is opt-in via an explicit `--config <PATH>`; there is
 //!   no conventional-location discovery, because silently reading files out
 //!   of a real user directory is exactly what this task forbids. The file is
-//!   strict JSON: exactly `{"home": "<absolute path>"}` — unknown keys,
-//!   missing `home`, non-string values and unreadable/unparsable files are
-//!   loud errors, never silently skipped.
+//!   strict JSON with the closed key set `{home, workspace?, providers?,
+//!   models?}` (R05-T01 widened the original exactly-`{"home"}` set):
+//!   `home` is required; `workspace` is the optional tool-plane root;
+//!   `providers` / `models` embed the model plane. Unknown keys, missing
+//!   `home`, non-string values and unreadable/unparsable files are loud
+//!   errors, never silently skipped.
 //! - No source at all => [`ConfigError::MissingHome`] (exit 2 in the binary).
 //!
 //! CLI parsing is strict (T01 REVIEW_R1 F03): duplicate flags, flag-shaped
@@ -45,6 +48,7 @@ use std::fmt;
 use std::path::{Path, PathBuf};
 use std::sync::atomic::{AtomicU64, Ordering};
 
+use lingxi_adapters::models::config::ModelPlaneConfig;
 use lingxi_adapters::storage::{MAX_QUEUE_CAPACITY, MAX_QUEUE_WAIT_TIMEOUT_MS};
 
 /// Inclusive upper bound of every millisecond time-budget flag
@@ -770,12 +774,32 @@ where
     })
 }
 
-/// Reads the `home` value from a strict JSON config file
-/// (`{"home": "/absolute/path"}`). Anything else — missing file, unparsable
-/// JSON, missing `home` key, non-string value, unknown extra keys — is a
-/// loud error: the caller pointed at this file explicitly, so silently
-/// skipping it would be a silent downgrade.
-pub fn read_config_home(path: &Path) -> Result<PathBuf, ConfigError> {
+/// The strict `--config` file, fully parsed. The closed key set is
+/// `{home, workspace?, providers?, models?}` (R05-T01 widened the original
+/// exactly-`{"home"}` contract): anything outside that set, a missing
+/// `home`, non-string `home`/`workspace` values and unreadable/unparsable
+/// files are loud errors, never silently skipped.
+#[derive(Debug, Clone)]
+pub struct ServiceConfigFile {
+    /// The data root (still pre-validation-as-home; the caller resolves and
+    /// canonicalizes it like every other home source).
+    pub home: PathBuf,
+    /// The workspace root the production tool plane is scoped to. This is
+    /// the ONLY workspace source (R05-T01): an implicit current-directory
+    /// workspace is exactly the silent downgrade this field exists to
+    /// prevent, so a relative value is a loud error here.
+    pub workspace: Option<PathBuf>,
+    /// The embedded model plane — present iff the file declares `providers`
+    /// and/or `models`, already validated against the closed model-plane
+    /// schema (a half-valid plane never reaches the composition root).
+    pub model_plane: Option<ModelPlaneConfig>,
+}
+
+/// Reads and validates the whole strict config file. Unknown keys and every
+/// malformed section are loud errors: the caller pointed at this file
+/// explicitly, so silently skipping any part of it would be a silent
+/// downgrade.
+pub fn read_service_config(path: &Path) -> Result<ServiceConfigFile, ConfigError> {
     let raw =
         std::fs::read_to_string(path).map_err(|source| ConfigError::ConfigFileUnreadable {
             path: path.to_path_buf(),
@@ -793,20 +817,162 @@ pub fn read_config_home(path: &Path) -> Result<PathBuf, ConfigError> {
     let object = value
         .as_object()
         .ok_or_else(|| detail_of("top level must be a JSON object".to_string()))?;
-    if object.len() != 1 || !object.contains_key("home") {
-        return Err(detail_of(format!(
-            "expected exactly one key \"home\", got {}",
-            object
-                .keys()
-                .map(String::as_str)
-                .collect::<Vec<_>>()
-                .join(", ")
-        )));
+    for key in object.keys() {
+        if !matches!(key.as_str(), "home" | "workspace" | "providers" | "models") {
+            return Err(detail_of(format!(
+                "unknown key {key:?} (the closed key set is \"home\", \"workspace\", \
+                 \"providers\", \"models\")"
+            )));
+        }
     }
-    let home = object["home"].as_str().ok_or_else(|| {
-        detail_of("\"home\" must be a string containing an absolute path".to_string())
-    })?;
-    Ok(PathBuf::from(home))
+    let home = object
+        .get("home")
+        .ok_or_else(|| detail_of("missing required key \"home\"".to_string()))?
+        .as_str()
+        .ok_or_else(|| {
+            detail_of("\"home\" must be a string containing an absolute path".to_string())
+        })?;
+    let workspace = match object.get("workspace") {
+        None => None,
+        Some(value) => {
+            let text = value.as_str().ok_or_else(|| {
+                detail_of("\"workspace\" must be a string containing an absolute path".to_string())
+            })?;
+            let workspace = PathBuf::from(text);
+            if !workspace.is_absolute() {
+                return Err(detail_of(format!(
+                    "\"workspace\" must be an absolute path, got {text:?}"
+                )));
+            }
+            Some(workspace)
+        }
+    };
+    let model_plane = match (object.get("providers"), object.get("models")) {
+        (None, None) => None,
+        (providers, models) => {
+            // Hand exactly the two model-plane keys to the closed-schema
+            // validator — everything else in the envelope is this module's
+            // own contract, and the plane validator must never see it.
+            let mut plane = serde_json::Map::new();
+            if let Some(providers) = providers {
+                plane.insert("providers".to_string(), providers.clone());
+            }
+            if let Some(models) = models {
+                plane.insert("models".to_string(), models.clone());
+            }
+            Some(
+                ModelPlaneConfig::from_value(serde_json::Value::Object(plane))
+                    .map_err(|err| detail_of(err.to_string()))?,
+            )
+        }
+    };
+    Ok(ServiceConfigFile {
+        home: PathBuf::from(home),
+        workspace,
+        model_plane,
+    })
+}
+
+/// Reads the `home` value from the strict JSON config file. Anything
+/// outside the closed schema — missing file, unparsable JSON, missing
+/// `home`, non-string values, unknown extra keys — is a loud error: the
+/// caller pointed at this file explicitly, so silently skipping it would be
+/// a silent downgrade.
+pub fn read_config_home(path: &Path) -> Result<PathBuf, ConfigError> {
+    Ok(read_service_config(path)?.home)
+}
+
+/// Where the model plane (R05-T01: provider credentials + per-operation
+/// route bindings) was loaded from. Remembered by the composition root so
+/// the management reload surface re-reads the SAME source.
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub enum ModelPlaneSource {
+    /// Embedded `providers` / `models` sections of the `--config` file.
+    EmbeddedInConfigFile { path: PathBuf },
+    /// The standalone `models.json` inside the runtime dir.
+    ModelsFile { path: PathBuf },
+}
+
+impl ModelPlaneSource {
+    pub fn path(&self) -> &Path {
+        match self {
+            ModelPlaneSource::EmbeddedInConfigFile { path } => path,
+            ModelPlaneSource::ModelsFile { path } => path,
+        }
+    }
+}
+
+/// The standalone model-plane file name inside the runtime dir.
+pub const MODELS_FILE_NAME: &str = "models.json";
+
+/// Resolves the model plane from its two loud sources (never merged, never
+/// guessed):
+///
+/// - the `providers` / `models` sections embedded in the `--config` file, or
+/// - a standalone `models.json` inside the runtime dir (the whole file IS
+///   the model-plane document).
+///
+/// Both present at once is ambiguous — a loud [`ConfigError::ConfigFileInvalid`],
+/// because picking one silently would be a silent downgrade. Neither present
+/// is the explicit unconfigured state (`Ok(None)`, C03): the service runs
+/// and every model call fails loudly with `no_provider_configured`. A
+/// present-but-broken source is likewise loud (unreadable →
+/// [`ConfigError::ConfigFileUnreadable`], malformed →
+/// [`ConfigError::ConfigFileInvalid`]); a broken plane never starts the
+/// service silently degraded.
+pub fn resolve_model_plane(
+    config_file: Option<&Path>,
+    runtime_dir: &Path,
+) -> Result<Option<(ModelPlaneSource, ModelPlaneConfig)>, ConfigError> {
+    let embedded = match config_file {
+        Some(path) => read_service_config(path)?.model_plane.map(|plane| {
+            (
+                ModelPlaneSource::EmbeddedInConfigFile {
+                    path: path.to_path_buf(),
+                },
+                plane,
+            )
+        }),
+        None => None,
+    };
+    let models_path = runtime_dir.join(MODELS_FILE_NAME);
+    let standalone = match std::fs::read_to_string(&models_path) {
+        Ok(raw) => {
+            let plane = ModelPlaneConfig::parse_and_validate(&raw).map_err(|err| {
+                ConfigError::ConfigFileInvalid {
+                    path: models_path.clone(),
+                    detail: err.to_string(),
+                }
+            })?;
+            Some((
+                ModelPlaneSource::ModelsFile {
+                    path: models_path.clone(),
+                },
+                plane,
+            ))
+        }
+        Err(err) if err.kind() == std::io::ErrorKind::NotFound => None,
+        Err(err) => {
+            return Err(ConfigError::ConfigFileUnreadable {
+                path: models_path,
+                source: err.to_string(),
+            })
+        }
+    };
+    match (embedded, standalone) {
+        (Some(_), Some((source, _))) => Err(ConfigError::ConfigFileInvalid {
+            path: source.path().to_path_buf(),
+            detail: format!(
+                "a model plane is already embedded in the --config file {:?}; the two \
+                 sources are never merged and precedence is never guessed — remove one \
+                 of them",
+                config_file.expect("embedded implies --config").display()
+            ),
+        }),
+        (Some(plane), None) => Ok(Some(plane)),
+        (None, Some(plane)) => Ok(Some(plane)),
+        (None, None) => Ok(None),
+    }
 }
 
 /// Builds a unique synthetic home directory name for test mode.
@@ -1376,6 +1542,178 @@ mod tests {
         assert_eq!(
             read_config_home(&path).unwrap(),
             PathBuf::from("/tmp/r02t02-from-config")
+        );
+        std::fs::remove_dir_all(&dir).ok();
+    }
+
+    // ── R05-T01: workspace + embedded model plane ──────────────────────────
+
+    fn unique_dir(tag: &str) -> PathBuf {
+        let dir = std::env::temp_dir().join(format!(
+            "lingxi-r05t01-{tag}-{}-{line}",
+            std::process::id(),
+            line = line!()
+        ));
+        std::fs::create_dir_all(&dir).unwrap();
+        dir
+    }
+
+    const VALID_PLANE: &str = r#""providers": {
+            "main": {
+                "protocol": "openai-completions",
+                "endpoint": "https://api.example.test/v1",
+                "auth": {"kind": "apiKey", "apiKey": "sk-test"}
+            }
+        },
+        "models": {"chat": {"provider": "main", "model": "gpt-test"}}"#;
+
+    #[test]
+    fn service_config_reads_workspace_and_embedded_model_plane() {
+        let dir = unique_dir("full");
+        let path = dir.join("service.json");
+        std::fs::write(
+            &path,
+            format!(
+                r#"{{"home": "/tmp/r05t01-home", "workspace": "/tmp/r05t01-ws", {VALID_PLANE}}}"#
+            ),
+        )
+        .unwrap();
+        let parsed = read_service_config(&path).unwrap();
+        assert_eq!(parsed.home, PathBuf::from("/tmp/r05t01-home"));
+        assert_eq!(parsed.workspace, Some(PathBuf::from("/tmp/r05t01-ws")));
+        let plane = parsed.model_plane.expect("embedded plane");
+        assert_eq!(
+            plane.models.chat.as_ref().map(|b| b.model.as_str()),
+            Some("gpt-test")
+        );
+        std::fs::remove_dir_all(&dir).ok();
+    }
+
+    #[test]
+    fn service_config_without_optional_sections_keeps_them_none() {
+        let dir = unique_dir("minimal");
+        let path = dir.join("service.json");
+        std::fs::write(&path, br#"{"home": "/tmp/r05t01-home"}"#).unwrap();
+        let parsed = read_service_config(&path).unwrap();
+        assert_eq!(parsed.workspace, None);
+        assert!(parsed.model_plane.is_none());
+        // providers-only also yields a (valid) plane with no route bindings.
+        std::fs::write(
+            &path,
+            r#"{"home": "/tmp/r05t01-home", "providers": {
+                "main": {
+                    "protocol": "openai-completions",
+                    "endpoint": "https://api.example.test/v1",
+                    "auth": {"kind": "none"}
+                }
+            }}"#,
+        )
+        .unwrap();
+        let parsed = read_service_config(&path).unwrap();
+        let plane = parsed.model_plane.expect("providers-only plane");
+        assert_eq!(plane.providers.len(), 1);
+        assert!(plane.models.chat.is_none());
+        std::fs::remove_dir_all(&dir).ok();
+    }
+
+    #[test]
+    fn service_config_rejects_bad_workspace_and_bad_plane_loudly() {
+        let dir = unique_dir("bad");
+        let cases: Vec<(&str, String)> = vec![
+            (
+                "relative-workspace",
+                r#"{"home": "/tmp/a", "workspace": "relative/ws"}"#.to_string(),
+            ),
+            (
+                "non-string-workspace",
+                r#"{"home": "/tmp/a", "workspace": 42}"#.to_string(),
+            ),
+            // The embedded plane is validated eagerly at load: an unknown
+            // protocol family is a config-file error, never a deferred one.
+            (
+                "bad-plane-protocol",
+                r#"{"home": "/tmp/a", "providers": {"main": {
+                        "protocol": "made-up", "endpoint": "https://api.example.test/v1",
+                        "auth": {"kind": "none"}
+                    }}}"#
+                    .to_string(),
+            ),
+            // A route binding naming an undefined provider is loud at load.
+            (
+                "bad-plane-route",
+                r#"{"home": "/tmp/a", "models": {"chat": {"provider": "ghost", "model": "m"}}}"#
+                    .to_string(),
+            ),
+        ];
+        for (name, content) in cases {
+            let path = dir.join(format!("{name}.json"));
+            std::fs::write(&path, content).unwrap();
+            let err = read_service_config(&path).unwrap_err();
+            assert!(
+                matches!(err, ConfigError::ConfigFileInvalid { .. }),
+                "{name}: expected ConfigFileInvalid, got {err:?}"
+            );
+        }
+        std::fs::remove_dir_all(&dir).ok();
+    }
+
+    #[test]
+    fn resolve_model_plane_sources_and_conflicts() {
+        // Neither source -> the explicit unconfigured state.
+        let dir = unique_dir("none");
+        let resolved = resolve_model_plane(None, &dir).unwrap();
+        assert!(resolved.is_none());
+
+        // Standalone models.json only.
+        let models_path = dir.join(MODELS_FILE_NAME);
+        std::fs::write(&models_path, format!("{{{VALID_PLANE}}}")).unwrap();
+        let (source, plane) = resolve_model_plane(None, &dir)
+            .unwrap()
+            .expect("standalone");
+        assert_eq!(
+            source,
+            ModelPlaneSource::ModelsFile {
+                path: models_path.clone()
+            }
+        );
+        assert_eq!(
+            plane.models.chat.as_ref().map(|b| b.model.as_str()),
+            Some("gpt-test")
+        );
+
+        // Both sources -> loud ambiguity, never a guessed precedence.
+        let cfg = dir.join("service.json");
+        std::fs::write(&cfg, format!(r#"{{"home": "/tmp/a", {VALID_PLANE}}}"#)).unwrap();
+        let err = resolve_model_plane(Some(&cfg), &dir).unwrap_err();
+        assert!(
+            matches!(err, ConfigError::ConfigFileInvalid { .. }),
+            "both sources present must be loud, got {err:?}"
+        );
+
+        // Removing the standalone file leaves the embedded plane.
+        std::fs::remove_file(&models_path).unwrap();
+        let (source, _) = resolve_model_plane(Some(&cfg), &dir)
+            .unwrap()
+            .expect("embedded");
+        assert_eq!(
+            source,
+            ModelPlaneSource::EmbeddedInConfigFile { path: cfg.clone() }
+        );
+
+        // A malformed standalone file is loud (never silently ignored).
+        std::fs::write(&models_path, "not json").unwrap();
+        let err = resolve_model_plane(None, &dir).unwrap_err();
+        assert!(
+            matches!(err, ConfigError::ConfigFileInvalid { .. }),
+            "malformed models.json must be loud, got {err:?}"
+        );
+        // An unreadable one (a directory) is ConfigFileUnreadable.
+        std::fs::remove_file(&models_path).unwrap();
+        std::fs::create_dir(&models_path).unwrap();
+        let err = resolve_model_plane(None, &dir).unwrap_err();
+        assert!(
+            matches!(err, ConfigError::ConfigFileUnreadable { .. }),
+            "unreadable models.json must be loud, got {err:?}"
         );
         std::fs::remove_dir_all(&dir).ok();
     }

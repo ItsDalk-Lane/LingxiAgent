@@ -1,0 +1,33 @@
+Diff in /Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-service/src/lib.rs:2547:
+             assert_eq!(body["code"], "internal", "{failure:?}: {body}");
+             assert_eq!(body["details"]["reason"], reason, "{failure:?}: {body}");
+             assert_eq!(
+-                body["details"]["retryable"],
+-                retryable,
++                body["details"]["retryable"], retryable,
+                 "{failure:?}: {body}"
+             );
+             assert_eq!(body["details"]["causeId"], cause, "{failure:?}: {body}");
+Diff in /Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-service/tests/auth_matrix.rs:1561:
+     .await;
+     assert_eq!(status, 200, "正常存储应能读取会话: {body}");
+ 
+-    server.storage.close().await.expect("close test database queue");
++    server
++        .storage
++        .close()
++        .await
++        .expect("close test database queue");
+     for (method, path, request_body) in [
+         ("GET", "/lingxi/v1/sessions", None),
+         ("GET", "/lingxi/v1/sessions/sess_local_alpha", None),
+Diff in /Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-service/tests/auth_matrix.rs:1586:
+         assert_eq!(error["details"]["reason"], "db_failure", "{path}: {error}");
+         assert_eq!(error["details"]["retryable"], false, "{path}: {error}");
+         assert_eq!(
+-            error["details"]["causeId"],
+-            "storage.queue_closed",
++            error["details"]["causeId"], "storage.queue_closed",
+             "{path}: {error}"
+         );
+         assert!(error.get("runId").is_none(), "失败响应不能携带成功 runId");

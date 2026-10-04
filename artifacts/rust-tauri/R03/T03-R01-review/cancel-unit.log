@@ -1,0 +1,13 @@
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.08s
+     Running unittests src/lib.rs (/tmp/r03-t03-review-target/debug/deps/lingxi_service-254d9c3036524e2c)
+
+running 6 tests
+test cancel::tests::degenerate_policy_refuses_validation ... ok
+test cancel::tests::budget_counts_from_the_request_moment ... ok
+test cancel::tests::a_child_scope_never_cancels_its_parent ... ok
+test cancel::tests::registry_fire_tracks_the_first_reason_and_is_idempotent ... ok
+test cancel::tests::cancelling_a_parent_eagerly_cancels_the_whole_tree ... ok
+test cancel::tests::settled_verdicts_stay_queryable_and_normal_settles_leave_none ... ok
+
+test result: ok. 6 passed; 0 failed; 0 ignored; 0 measured; 206 filtered out; finished in 0.00s
+

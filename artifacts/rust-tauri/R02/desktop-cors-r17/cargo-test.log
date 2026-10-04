@@ -1,0 +1,10 @@
+   Compiling lingxi-service v0.0.0 (/Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-service)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 2.44s
+     Running tests/service_health.rs (rust/target/debug/deps/service_health-1d99c3917800da84)
+
+running 1 test
+LINGXI_TRANSPORT_REJECTED request_id=req-ee8523f5fe3787c2acf1d953affa6afe method=OPTIONS path=/lingxi/v1/web-auth/login status=403 reason=bad_origin origin=https://foreign.example host=127.0.0.1:58902 remote=127.0.0.1:58905
+test browser_cors_preflight_and_response_keep_origin_boundary ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 5 filtered out; finished in 0.07s
+

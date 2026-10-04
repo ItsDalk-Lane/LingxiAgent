@@ -114,6 +114,89 @@ fn worker(mode: &str, extra: &str) {
                 }],
             }));
         }
+        // R05-T06: asks the host's REAL model plane for one completion.
+        // `extra` is the requested purpose (empty → "summarize"). The
+        // result carries the invocation id (from the request envelope) and
+        // the verbatim reply, so the test joins the host-side trace to
+        // THIS invocation (C04 parent/child correlation).
+        "ask_model" => {
+            let purpose = if extra.is_empty() { "summarize" } else { extra };
+            send_line(&serde_json::json!({
+                "kind": "callback", "cb_id": "cb-1", "op": "model.complete",
+                "purpose": purpose,
+                "prompt": "Summarize the granted input.",
+                "max_output_tokens": 64,
+            }));
+            let reply = read_line_stdin();
+            send_line(&serde_json::json!({
+                "kind": "result", "id": request["id"], "ok": true,
+                "content": [{
+                    "type": "text",
+                    "text": serde_json::to_string(&serde_json::json!({
+                        "request_id": request["id"],
+                        "reply": reply,
+                    }))
+                    .expect("serializes"),
+                }],
+            }));
+        }
+        // R05-T06 (C08): one callback whose output-token ask is far over
+        // the host cap — the host must refuse it BEFORE any provider
+        // contact.
+        "ask_model_overcap" => {
+            send_line(&serde_json::json!({
+                "kind": "callback", "cb_id": "cb-1", "op": "model.complete",
+                "purpose": "summarize",
+                "prompt": "p",
+                "max_output_tokens": 999999,
+            }));
+            let reply = read_line_stdin();
+            send_line(&serde_json::json!({
+                "kind": "result", "id": request["id"], "ok": true,
+                "content": [{
+                    "type": "text",
+                    "text": serde_json::to_string(&reply).expect("serializes"),
+                }],
+            }));
+        }
+        // R05-T06 (C09): the callback carries an identity-claiming field —
+        // the host must refuse it loudly, never consult it.
+        "forged_identity" => {
+            send_line(&serde_json::json!({
+                "kind": "callback", "cb_id": "cb-1", "op": "model.complete",
+                "purpose": "summarize",
+                "prompt": "p",
+                "max_output_tokens": 64,
+                "provider": "openai",
+            }));
+            let reply = read_line_stdin();
+            send_line(&serde_json::json!({
+                "kind": "result", "id": request["id"], "ok": true,
+                "content": [{
+                    "type": "text",
+                    "text": serde_json::to_string(&reply).expect("serializes"),
+                }],
+            }));
+        }
+        // R05-T06 (C07 replay leg): the SAME cb_id twice — the host must
+        // answer the replay from its receipt cache (one provider call).
+        "callback_replay" => {
+            let mut replies = Vec::new();
+            for _ in 0..2 {
+                send_line(&serde_json::json!({
+                    "kind": "callback", "cb_id": "cb-dup", "op": "model.complete",
+                    "purpose": "summarize", "prompt": "p", "max_output_tokens": 64,
+                }));
+                replies.push(read_line_stdin());
+            }
+            send_line(&serde_json::json!({
+                "kind": "result", "id": request["id"], "ok": true,
+                "content": [{
+                    "type": "text",
+                    "text": serde_json::to_string(&replies).expect("serializes"),
+                }],
+            }));
+        }
         // Fires more callbacks than any honest invocation needs; counts
         // how many the host refused and how many completed (the budget
         // evidence: cap enforced host-side, honest calls still answered).

@@ -1,0 +1,22 @@
+   Compiling xtask v0.1.0 (/Users/study_superior/r05t08-work/negcopy/rust/crates/xtask)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.66s
+     Running unittests src/main.rs (/Users/study_superior/.cache/lingxi-r05-neg-target/debug/deps/xtask-ad766de8ea03e62c)
+
+running 1 test
+test stage_map::map_tests::r05_production_map_keeps_the_sixteen_a_scenarios_verbatim ... FAILED
+
+failures:
+
+---- stage_map::map_tests::r05_production_map_keeps_the_sixteen_a_scenarios_verbatim stdout ----
+
+thread 'stage_map::map_tests::r05_production_map_keeps_the_sixteen_a_scenarios_verbatim' (8168037) panicked at crates/xtask/src/stage_map.rs:2988:36:
+R05 map dropped original scenario R05-A16
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+
+
+failures:
+    stage_map::map_tests::r05_production_map_keeps_the_sixteen_a_scenarios_verbatim
+
+test result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 114 filtered out; finished in 0.00s
+
+error: test failed, to rerun pass `-p xtask --bin xtask`

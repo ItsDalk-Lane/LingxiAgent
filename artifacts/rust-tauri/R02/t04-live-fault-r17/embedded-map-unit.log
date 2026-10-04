@@ -1,0 +1,9 @@
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.03s
+     Running unittests src/main.rs (target/debug/deps/xtask-3069b20bc2d29d58)
+
+running 2 tests
+test verify::runner_tests::embedded_r02_map_declares_the_34_supplemental_leaves ... ok
+test verify::runner_tests::embedded_r02_map_is_valid_and_non_empty ... ok
+
+test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 54 filtered out; finished in 0.00s
+

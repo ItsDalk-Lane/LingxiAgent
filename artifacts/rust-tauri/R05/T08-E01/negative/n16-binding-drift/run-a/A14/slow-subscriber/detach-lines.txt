@@ -1,0 +1,1 @@
+2026-10-03T17:55:51.374263Z ERROR lingxi_service::events: subscription detached with explicit snapshot_required signal stream=sess_local_alpha subscriber=0 reason="slow_consumer" queue_capacity=4 dropped_deltas=0 last_enqueued_seq=1328

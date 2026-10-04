@@ -1,0 +1,10 @@
+=== fmt
+fmt exit=0
+=== clippy
+    Checking lingxi-spike v0.0.0 (/Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-spike)
+    Finished `dev` profile [unoptimized + debuginfo] target(s) in 3m 19s
+clippy exit=0
+=== contracts
+contracts exit=0
+=== boundaries
+boundaries exit=0

@@ -1,0 +1,9 @@
+=== rust_fmt
+EXIT=0
+=== rust_clippy
+EXIT=0
+=== check_contracts
+EXIT=0
+=== check_boundaries
+EXIT=0
+ALL_DONE

@@ -1,0 +1,9 @@
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.10s
+     Running tests/r04_rr1_f05_spill_failure.rs (/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T//rust-target-r04-rr1-g05/debug/deps/r04_rr1_f05_spill_failure-6f0eb0cf86b50993)
+
+running 2 tests
+test f05_c04_spill_write_failure_diagnoses_honestly_no_ghost_full_file ... ok
+test f05_c04_unwritable_spill_dir_reports_no_spill_kept ... ok
+
+test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.02s
+

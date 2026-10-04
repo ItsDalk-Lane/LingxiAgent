@@ -1,0 +1,27 @@
+== run 2026-09-29T20:57:19+0800 (pid 87244) ==
+== R02-T07 / R02-A14 slow-subscriber storm (toolchain 1.98.1, target /var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T//rust-target-r02-t07) ==
+== building lingxi-service (--locked, offline) ==
+PASS build
+== starting service (event-subscriber-queue=4, max-ws-connections=8) ==
+PASS service ready at 127.0.0.1:54080 (pid 87263)
+== S1/S2: subscriber A stops reading; B keeps reading; writers commit key events until the subscriber-queue cap is reached ==
+A subscribed: {'frameKind': 'control', 'fromSeq': '0', 'mode': 'snapshot', 'snapshotSeq': '0', 'streamId': 'sess_local_alpha', 'type': 'subscribed'}
+B subscribed: {'frameKind': 'control', 'fromSeq': '0', 'mode': 'snapshot', 'snapshotSeq': '0', 'streamId': 'sess_local_alpha', 'type': 'subscribed'}
+writer storm done: 1000 requests, statuses ['200', '409']
+sequential phase done: 1200 requests, statuses ['200']
+B reader ended: TimeoutError('timed out') count=2892
+durable head: 2892 key events
+B merged view complete: 2892/2892 key events (live-only: True)
+A detached explicitly: reason=slow_consumer (buffered key events delivered before the signal: 1328)
+A resubscribed after detach: fresh subscribed control received
+STORM COMPLETE
+PASS S1: all 1000 concurrent executes were ANSWERED (246x200 + 754x409(session_busy retryable)) — 409 is the R03-T02 frozen busy-gate refusal (served, retryable; not a stall, not a fake success; zero 5xx/timeout/hang); counts read from storm-results.json
+PASS S1: healthy subscriber B's merged view equals the durable head (no silent loss)
+PASS S2: slow subscriber A got the EXPLICIT snapshot_required (reason=slow_consumer) and resubscribed
+== S3: memory bound (real RSS samples during the storm) ==
+RSS first=18064 KB peak=24192 KB final=24192 KB growth=6128 KB ceiling=512000 KB -> BOUNDED
+PASS S3: RSS stayed bounded during the sustained storm (see rss-samples.csv)
+== S4: server detach line with real queue stats ==
+PASS S4: server logged the detach with queue_capacity=4 and the slow_consumer reason
+== stopping service (graceful; R9-F02: no silent handle retirement; R10-F03: four-state ownership probe) ==
+== R02-A14 evidence complete ==

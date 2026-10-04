@@ -1,0 +1,28 @@
+   Compiling lingxi-service v0.0.0 (/tmp/r03-g05-redcheck/rust/crates/lingxi-service)
+error[E0425]: cannot find value `MAX_SUBMISSION_INPUT_BYTES` in module `limits`
+   --> crates/lingxi-service/tests/input_budget_refusal.rs:278:17
+    |
+278 |         limits::MAX_SUBMISSION_INPUT_BYTES,
+    |                 ^^^^^^^^^^^^^^^^^^^^^^^^^^ not found in `limits`
+
+error[E0425]: cannot find value `MAX_SUBMISSION_INPUT_BYTES` in module `limits`
+   --> crates/lingxi-service/tests/input_budget_refusal.rs:282:25
+    |
+282 |     let limit = limits::MAX_SUBMISSION_INPUT_BYTES;
+    |                         ^^^^^^^^^^^^^^^^^^^^^^^^^^ not found in `limits`
+
+error[E0599]: no variant named `InputTooLarge` found for enum `SessionExecuteError`
+   --> crates/lingxi-service/tests/input_budget_refusal.rs:299:30
+    |
+299 |         SessionExecuteError::InputTooLarge { bytes, limit_bytes } => {
+    |                              ^^^^^^^^^^^^^ variant not found in `SessionExecuteError`
+
+error[E0599]: no variant named `InputTooLarge` found for enum `SessionExecuteError`
+   --> crates/lingxi-service/tests/input_budget_refusal.rs:318:30
+    |
+318 |         SessionExecuteError::InputTooLarge { bytes, limit_bytes } if bytes == limit + 1 && limit_bytes == limit
+    |                              ^^^^^^^^^^^^^ variant not found in `SessionExecuteError`
+
+Some errors have detailed explanations: E0425, E0599.
+For more information about an error, try `rustc --explain E0425`.
+error: could not compile `lingxi-service` (test "input_budget_refusal") due to 4 previous errors

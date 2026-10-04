@@ -1,0 +1,14 @@
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.10s
+     Running unittests src/lib.rs (rust/target/debug/deps/lingxi_service-0d9b1f8e110deb6c)
+
+running 7 tests
+test sandbox::tests::bwrap_version_probe_parses_the_official_line ... ok
+test sandbox::tests::policy_derivation_refuses_unusable_config ... ok
+test sandbox::tests::unsupported_backend_refuses_every_request ... ok
+test sandbox::tests::capabilities_matrix_names_the_frozen_guarantees ... ok
+test sandbox::tests::policy_derivation_ports_the_incumbent_sets ... ok
+test sandbox::tests::seatbelt_profile_orders_denies_after_allows_and_refuses_injection ... ok
+test sandbox::tests::bwrap_args_port_the_incumbent_shape ... ok
+
+test result: ok. 7 passed; 0 failed; 0 ignored; 0 measured; 268 filtered out; finished in 0.00s
+

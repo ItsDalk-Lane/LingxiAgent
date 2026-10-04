@@ -45,7 +45,10 @@ const USAGE: &str = r#"usage: lingxi-service [--bind <SOCKADDR>] [--home <DIR>] 
 Options:
   --bind <SOCKADDR>       Listen address (default 127.0.0.1:0, loopback + ephemeral).
   --home <DIR>            Absolute service data root (created if missing).
-  --config <FILE>         Strict JSON config file ({"home": "/absolute/path"}).
+  --config <FILE>         Strict JSON config file; closed key set
+                          {"home", "workspace"?, "providers"?, "models"?}
+                          ("home" required; providers/models embed the model
+                          plane, R05-T01).
   --test-mode             Force an isolated synthetic home under the system temp
                           dir; --home/LINGXI_HOME/--config home are ignored.
   --network-mode <MODE>   loopback (default) or lan. LAN exposure is an explicit
@@ -314,7 +317,7 @@ async fn main() -> ExitCode {
     // override it explicitly. Validation happens in bootstrap_with_deps
     // (a degenerate limit is a loud startup error, exit 2 — never a silent
     // unbounded fallback).
-    let deps = lingxi_service::ServiceDeps {
+    let mut deps = lingxi_service::ServiceDeps {
         ws_max_connections: cli
             .max_ws_connections
             .unwrap_or(lingxi_service::limits::DEFAULT_WS_MAX_CONNECTIONS),
@@ -402,6 +405,60 @@ async fn main() -> ExitCode {
         runtime_dir = %layout.runtime_dir.display(),
         "data root prepared (canonicalized; runtime dir private 0700)"
     );
+
+    // ---- model plane + workspace (R05-T01) ----
+    // Resolved BEFORE the instance lock so a broken plane refuses startup
+    // with exit 2 like every other configuration error — a configured-but-
+    // broken plane never serves silently degraded. The workspace rides the
+    // strict --config file only (there is no implicit-cwd workspace).
+    if let Some(config_path) = cli.config.as_deref() {
+        match lingxi_service::config::read_service_config(config_path) {
+            Ok(file) => deps.workspace_root = file.workspace,
+            Err(err) => {
+                eprintln!("error: {err}");
+                return ExitCode::from(2);
+            }
+        }
+    }
+    let model_plane = match lingxi_service::config::resolve_model_plane(
+        cli.config.as_deref(),
+        &layout.runtime_dir,
+    ) {
+        Ok(plane) => plane,
+        Err(err) => {
+            eprintln!("error: {err}");
+            return ExitCode::from(2);
+        }
+    };
+    if let Some((source, plane)) = model_plane {
+        tracing::info!(
+            model_plane_source = %source.path().display(),
+            providers = plane.providers.len(),
+            "model plane resolved (credentials never logged)"
+        );
+        // R05-T02 (C01): the credential service — the single material exit
+        // of the model plane — is seeded from the SAME validated plane and
+        // owns the OAuth store inside the private runtime dir. A store that
+        // cannot be understood refuses startup (exit 2), never a silent
+        // empty store.
+        deps.credential_service = Some(std::sync::Arc::new(
+            match lingxi_service::credentials::CredentialService::bootstrap(
+                &plane,
+                &layout.runtime_dir,
+                std::sync::Arc::new(lingxi_service::inject::SystemClock),
+            ) {
+                Ok(service) => service,
+                Err(err) => {
+                    eprintln!("error: credential service bootstrap failed: {err}");
+                    return ExitCode::from(2);
+                }
+            },
+        ));
+        deps.model_gateway = Some(std::sync::Arc::new(
+            lingxi_adapters::models::gateway::ConfigModelGateway::from_validated(plane),
+        ));
+        deps.model_plane_source = Some(source);
+    }
 
     // ---- single-writer lock + instance identity (steps 3–4) ----
     let (guard, stale) = match acquire(&layout) {

@@ -1,0 +1,121 @@
+{
+  "family": "anthropic-messages",
+  "case": "tool_roundtrip",
+  "route": {"provider": "anthropic-golden", "model": "claude-golden-3-7"},
+  "input": {
+    "submission": "把两个笔记合并写入 out.md",
+    "system_prompt": "golden persona",
+    "tools": [
+      {
+        "target": "tool:first-party:read",
+        "wire_name": "read",
+        "description": "Read a file 读取文件",
+        "schema": {"type": "object", "properties": {"path": {"type": "string"}}, "required": ["path"]}
+      },
+      {
+        "target": "tool:first-party:write",
+        "wire_name": "write",
+        "description": "Write a file 写入文件",
+        "schema": {"type": "object", "properties": {"content": {"type": "string"}, "path": {"type": "string"}}, "required": ["path", "content"]}
+      }
+    ],
+    "prior": [
+      {
+        "assistant": {
+          "call": "mc-golden-1",
+          "content": [
+            {"reasoning": "检查文件状态"},
+            {"opaque": {"provider": "anthropic-messages", "data": {"type": "thinking_signature", "signature": "sig-golden-αβ"}}},
+            {"text": "读取两个文件"},
+            {"opaque": {"provider": "anthropic-messages", "data": {"type": "redacted_thinking", "data": "encrypted-黄金-xyz"}}}
+          ],
+          "tool_calls": [
+            {"seq": 1, "provider_call_id": "toolu_读取-α-0001", "target": "tool:first-party:read", "arguments": {"path": "/tmp/a.md"}},
+            {"seq": 2, "provider_call_id": "toolu_读取-β-0002", "target": "tool:first-party:read", "arguments": {"path": "/tmp/b.md"}},
+            {"seq": 3, "provider_call_id": "toolu_写入-0003", "target": "tool:first-party:write", "arguments": {"content": "merged", "path": "/tmp/out.md"}}
+          ]
+        }
+      },
+      {
+        "tool_result": {
+          "seq": 1,
+          "provider_call_id": "toolu_读取-α-0001",
+          "outcome": {
+            "kind": "success_full",
+            "text": "body a 内容",
+            "resource_refs": [{"id": "res-golden-a", "kind": "artifact", "name": "a.md", "uri": "file:///tmp/a.md"}],
+            "truncated": false,
+            "status": {"running": "proc-golden-7"}
+          }
+        }
+      },
+      {
+        "tool_result": {
+          "seq": 2,
+          "provider_call_id": "toolu_读取-β-0002",
+          "outcome": {"kind": "failed", "code": "forbidden", "message": "denied 拒绝"}
+        }
+      },
+      {
+        "tool_result": {
+          "seq": 3,
+          "provider_call_id": "toolu_写入-0003",
+          "outcome": {"kind": "unknown", "reason": "receipt lost"}
+        }
+      }
+    ]
+  },
+  "expected_request": {
+    "model": "claude-golden-3-7",
+    "max_tokens": 16384,
+    "system": "golden persona",
+    "messages": [
+      {"role": "user", "content": "把两个笔记合并写入 out.md"},
+      {
+        "role": "assistant",
+        "content": [
+          {"type": "thinking", "thinking": "检查文件状态", "signature": "sig-golden-αβ"},
+          {"type": "text", "text": "读取两个文件"},
+          {"type": "redacted_thinking", "data": "encrypted-黄金-xyz"},
+          {"type": "tool_use", "id": "toolu_读取-α-0001", "name": "read", "input": {"path": "/tmp/a.md"}},
+          {"type": "tool_use", "id": "toolu_读取-β-0002", "name": "read", "input": {"path": "/tmp/b.md"}},
+          {"type": "tool_use", "id": "toolu_写入-0003", "name": "write", "input": {"content": "merged", "path": "/tmp/out.md"}}
+        ]
+      },
+      {
+        "role": "user",
+        "content": [
+          {"type": "tool_result", "tool_use_id": "toolu_读取-α-0001", "content": "body a 内容\n[resource: a.md]\n[process still running (handle: proc-golden-7)]", "is_error": false},
+          {"type": "tool_result", "tool_use_id": "toolu_读取-β-0002", "content": "tool error [forbidden]: denied 拒绝", "is_error": true},
+          {"type": "tool_result", "tool_use_id": "toolu_写入-0003", "content": "tool outcome could not be determined: receipt lost", "is_error": true}
+        ]
+      }
+    ],
+    "stream": false,
+    "tools": [
+      {"name": "read", "description": "Read a file 读取文件", "input_schema": {"type": "object", "properties": {"path": {"type": "string"}}, "required": ["path"]}},
+      {"name": "write", "description": "Write a file 写入文件", "input_schema": {"type": "object", "properties": {"content": {"type": "string"}, "path": {"type": "string"}}, "required": ["path", "content"]}}
+    ]
+  },
+  "response_wire": {
+    "id": "msg_golden_rt",
+    "model": "claude-lies",
+    "content": [
+      {"type": "thinking", "thinking": "再核对一次", "signature": "sig-golden-2"},
+      {"type": "text", "text": "合并完成"},
+      {"type": "redacted_thinking", "data": "enc-2"}
+    ],
+    "stop_reason": "end_turn",
+    "usage": {"input_tokens": 301, "output_tokens": 44}
+  },
+  "expected_turn": {
+    "kind": "final",
+    "content": [
+      {"reasoning": "再核对一次"},
+      {"opaque": {"provider": "anthropic-messages", "data": {"type": "thinking_signature", "signature": "sig-golden-2"}}},
+      {"text": "合并完成"},
+      {"opaque": {"provider": "anthropic-messages", "data": {"type": "redacted_thinking", "data": "enc-2"}}}
+    ],
+    "usage": {"input_tokens": 301, "output_tokens": 44}
+  }
+}

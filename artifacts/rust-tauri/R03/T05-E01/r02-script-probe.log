@@ -1,0 +1,21 @@
+== building lingxi-service + lingxi-storage-inspect (rustup 1.98.1, /var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T//rust-target-r02-t04, --locked) ==
+PASS build (locked, offline)
+== S1: full lifecycle over the real database ==
+PASS S1 execute accepted (http=200)
+PASS S1 graceful stop (exit 0, WAL checkpointed)
+PASS S1 inspect: runs=1 key_events=2 (terminal+event committed together)
+PASS S1 restart reads runCount=1 from the database
+== S2: kill -9 after committed execute — no half terminal state ==
+PASS S2 crash delivered (kill -9 right after the committed execute)
+columns: ["schema_migrations", "sessions", "runs", "run_attempts", "invocations", "messages", "key_events"] — use --table to filter
+columns: ["schema_migrations", "sessions", "runs", "run_attempts", "invocations", "messages", "key_events"] — use --table to filter
+PASS S2 inspect: terminal rows and completion events coexist (same transaction, crash-safe)
+PASS S2 restart recovers the committed-but-crashed run (runCount=1)
+== S3: real IO fault at startup — loud refusal, no fallback ==
+PASS S3 unwritable home: exit=2, explicit error, no readiness line
+== S4 (A08): three migration checks, stable version/counts/fingerprints ==
+Traceback (most recent call last):
+  File "<stdin>", line 3, in <module>
+AssertionError: {'compiledIn': [{'fingerprint': '479b0321494269fca85d9f973b01a8f9d1aa57dc08fc3cf8fddbafeace461bb8', 'name': 'initial_run_message_schema', 'version': 1}, {'fingerprint': '64d7edfdab74e13e623a9d8d5f2381dad4803f545fa126d8eda8cc02c3dc889c', 'name': 'stale_result_audit', 'version': 2}, {'fingerprint': '3bd5388f090ab0ae0e137d91d59a8e48f82f409bbd0de657abf29b897a4252c1', 'name': 'invocation_journal', 'version': 3}], 'dbPath': 'withheld-from-evidence', 'receipts': [{'appliedAtUnixMs': 1790664881005, 'appliedBy': 'lingxi-adapters 0.0.0', 'fingerprint': '479b0321494269fca85d9f973b01a8f9d1aa57dc08fc3cf8fddbafeace461bb8', 'name': 'initial_run_message_schema', 'version': 1}, {'appliedAtUnixMs': 1790664881005, 'appliedBy': 'lingxi-adapters 0.0.0', 'fingerprint': '64d7edfdab74e13e623a9d8d5f2381dad4803f545fa126d8eda8cc02c3dc889c', 'name': 'stale_result_audit', 'version': 2}, {'appliedAtUnixMs': 1790664881005, 'appliedBy': 'lingxi-adapters 0.0.0', 'fingerprint': '3bd5388f090ab0ae0e137d91d59a8e48f82f409bbd0de657abf29b897a4252c1', 'name': 'invocation_journal', 'version': 3}], 'supportedVersion': 3, 'userVersion': 3}
+FAIL: S4 round 1: migration check inconsistent
+SCRIPT_EXIT=1

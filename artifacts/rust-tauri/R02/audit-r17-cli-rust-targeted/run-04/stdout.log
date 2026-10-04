@@ -1,0 +1,12 @@
+
+ RUN  v4.1.10 /Users/study_superior/Desktop/Code/LingxiAgent
+
+ ❯ tests/cli-chat-runtime.test.ts (1 test | 1 failed) 60044ms
+     × hides another session's stream frame and exits nonzero on an unexpected disconnect 60043ms
+
+ Test Files  1 failed | 4 passed (5)
+      Tests  1 failed | 44 passed (45)
+     Errors  1 error
+   Start at  15:26:12
+   Duration  60.18s (transform 280ms, setup 90ms, import 291ms, tests 60.25s, environment 0ms)
+

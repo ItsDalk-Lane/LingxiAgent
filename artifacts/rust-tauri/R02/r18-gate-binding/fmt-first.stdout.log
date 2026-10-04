@@ -1,0 +1,399 @@
+Diff in /Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/xtask/src/candidate/tests.rs:2:
+ use std::time::{SystemTime, UNIX_EPOCH};
+ 
+ fn fixture() -> PathBuf {
+-    let stamp = SystemTime::now().duration_since(UNIX_EPOCH).unwrap().as_nanos();
+-    let root = std::env::temp_dir().join(format!("lingxi-xtask-binding-{}-{stamp}", std::process::id()));
++    let stamp = SystemTime::now()
++        .duration_since(UNIX_EPOCH)
++        .unwrap()
++        .as_nanos();
++    let root = std::env::temp_dir().join(format!(
++        "lingxi-xtask-binding-{}-{stamp}",
++        std::process::id()
++    ));
+     fs::create_dir_all(&root).unwrap();
+-    assert!(Command::new("git").arg("init").arg("-q").arg(&root).status().unwrap().success());
++    assert!(Command::new("git")
++        .arg("init")
++        .arg("-q")
++        .arg(&root)
++        .status()
++        .unwrap()
++        .success());
+     root
+ }
+ 
+Diff in /Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/xtask/src/candidate/tests.rs:12:
+ fn add(root: &Path, path: &str) {
+-    assert!(Command::new("git").args(["add", "--", path]).current_dir(root).status().unwrap().success());
++    assert!(Command::new("git")
++        .args(["add", "--", path])
++        .current_dir(root)
++        .status()
++        .unwrap()
++        .success());
+ }
+ 
+ #[test]
+Diff in /Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/xtask/src/candidate/tests.rs:36:
+     assert_eq!(differences(&before, &after_change).len(), 1);
+     fs::remove_file(root.join("tracked.txt")).unwrap();
+     let after_delete = scope.snapshot(&root).unwrap();
+-    assert!(after_delete.entries.iter().any(|e| e.display == "tracked.txt" && e.kind == "missing-tracked-file"));
++    assert!(after_delete
++        .entries
++        .iter()
++        .any(|e| e.display == "tracked.txt" && e.kind == "missing-tracked-file"));
+     fs::write(root.join("tracked.txt"), b"original").unwrap();
+     fs::remove_file(root.join("new.txt")).unwrap();
+     let after_untracked_remove = scope.snapshot(&root).unwrap();
+Diff in /Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/xtask/src/candidate/tests.rs:63:
+     fs::write(root.join("source.txt"), b"before").unwrap();
+     let after = scope.snapshot(&root).unwrap();
+     assert_eq!(before.digest, after.digest);
+-    assert!(!snapshots_stable(&before, &[("first".into(), 0, Ok(during))], &Ok(after.clone())));
+-    assert!(!snapshots_stable(&before, &[("first".into(), 0, Err("read denied".into()))], &Ok(after)));
++    assert!(!snapshots_stable(
++        &before,
++        &[("first".into(), 0, Ok(during))],
++        &Ok(after.clone())
++    ));
++    assert!(!snapshots_stable(
++        &before,
++        &[("first".into(), 0, Err("read denied".into()))],
++        &Ok(after)
++    ));
+     fs::remove_dir_all(root).unwrap();
+ }
+ 
+Diff in /Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/xtask/src/candidate/tests.rs:82:
+     let scope = Scope::new(&root, &root.join("evidence")).unwrap();
+     let before = scope.snapshot(&root).unwrap();
+     if odd_created {
+-        assert!(before.entries.iter().any(|e| e.path_hex == hex(b"odd-\xff.txt")));
++        assert!(before
++            .entries
++            .iter()
++            .any(|e| e.path_hex == hex(b"odd-\xff.txt")));
+     }
+     fs::remove_file(root.join("link")).unwrap();
+     symlink("second", root.join("link")).unwrap();
+Diff in /Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/xtask/src/candidate.rs:47:
+ 
+ impl Scope {
+     pub fn new(root: &Path, evidence_root: &Path) -> Result<Self, String> {
+-        let root = root.canonicalize().map_err(|e| format!("cannot canonicalize repo root: {e}"))?;
++        let root = root
++            .canonicalize()
++            .map_err(|e| format!("cannot canonicalize repo root: {e}"))?;
+         let evidence = canonicalize_future(evidence_root)?;
+         let excluded_relative = evidence.strip_prefix(&root).ok().map(Path::to_path_buf);
+-        if excluded_relative.as_ref().is_some_and(|p| p.as_os_str().is_empty()) {
+-            return Err("--evidence cannot be the repo root: it would exclude the entire candidate".into());
++        if excluded_relative
++            .as_ref()
++            .is_some_and(|p| p.as_os_str().is_empty())
++        {
++            return Err(
++                "--evidence cannot be the repo root: it would exclude the entire candidate".into(),
++            );
+         }
+         Ok(Self { excluded_relative })
+     }
+Diff in /Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/xtask/src/candidate.rs:66:
+ 
+     pub fn snapshot(&self, root: &Path) -> Result<Snapshot, String> {
+         let output = Command::new("git")
+-            .args(["ls-files", "--cached", "--others", "--exclude-standard", "-z", "--"])
++            .args([
++                "ls-files",
++                "--cached",
++                "--others",
++                "--exclude-standard",
++                "-z",
++                "--",
++            ])
+             .current_dir(root)
+             .output()
+             .map_err(|e| format!("cannot run git ls-files for candidate binding: {e}"))?;
+Diff in /Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/xtask/src/candidate.rs:73:
+         if !output.status.success() {
+-            return Err(format!("git ls-files for candidate binding failed: {}", String::from_utf8_lossy(&output.stderr)));
++            return Err(format!(
++                "git ls-files for candidate binding failed: {}",
++                String::from_utf8_lossy(&output.stderr)
++            ));
+         }
+         let mut paths = Vec::<Vec<u8>>::new();
+         for raw in output.stdout.split(|b| *b == 0).filter(|p| !p.is_empty()) {
+Diff in /Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/xtask/src/candidate.rs:82:
+         let mut entries = Vec::with_capacity(paths.len());
+         for raw in paths {
+             let relative = path_from_git(&raw)?;
+-            if relative.components().any(|c| !matches!(c, Component::Normal(_))) {
+-                return Err(format!("git candidate path is not a plain relative path: {}", hex(&raw)));
++            if relative
++                .components()
++                .any(|c| !matches!(c, Component::Normal(_)))
++            {
++                return Err(format!(
++                    "git candidate path is not a plain relative path: {}",
++                    hex(&raw)
++                ));
+             }
+-            if self.excluded_relative.as_ref().is_some_and(|p| relative.starts_with(p)) {
++            if self
++                .excluded_relative
++                .as_ref()
++                .is_some_and(|p| relative.starts_with(p))
++            {
+                 continue;
+             }
+             let full = root.join(&relative);
+Diff in /Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/xtask/src/candidate.rs:92:
+             let (kind, sha256, mode) = match fs::symlink_metadata(&full) {
+                 Ok(metadata) if metadata.file_type().is_symlink() => {
+-                    let target = fs::read_link(&full)
+-                        .map_err(|e| format!("cannot read candidate symlink {}: {e}", full.display()))?;
+-                    ("symlink", Some(hash(&os_bytes(target.as_os_str()))), file_mode(&metadata))
++                    let target = fs::read_link(&full).map_err(|e| {
++                        format!("cannot read candidate symlink {}: {e}", full.display())
++                    })?;
++                    (
++                        "symlink",
++                        Some(hash(&os_bytes(target.as_os_str()))),
++                        file_mode(&metadata),
++                    )
+                 }
+                 Ok(metadata) if metadata.is_file() => {
+-                    let mut file = File::open(&full)
+-                        .map_err(|e| format!("cannot open candidate file {}: {e}", full.display()))?;
++                    let mut file = File::open(&full).map_err(|e| {
++                        format!("cannot open candidate file {}: {e}", full.display())
++                    })?;
+                     let mut hasher = Sha256::new();
+                     let mut buffer = [0u8; 64 * 1024];
+                     loop {
+Diff in /Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/xtask/src/candidate.rs:104:
+-                        let size = file.read(&mut buffer)
+-                            .map_err(|e| format!("cannot hash candidate file {}: {e}", full.display()))?;
+-                        if size == 0 { break; }
++                        let size = file.read(&mut buffer).map_err(|e| {
++                            format!("cannot hash candidate file {}: {e}", full.display())
++                        })?;
++                        if size == 0 {
++                            break;
++                        }
+                         hasher.update(&buffer[..size]);
+                     }
+                     ("file", Some(hex(&hasher.finalize())), file_mode(&metadata))
+Diff in /Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/xtask/src/candidate.rs:110:
+                 }
+-                Ok(metadata) if metadata.is_dir() => ("directory-replacing-file", None, file_mode(&metadata)),
+-                Ok(_) => return Err(format!("unsupported candidate file kind at {}", full.display())),
+-                Err(e) if e.kind() == std::io::ErrorKind::NotFound => ("missing-tracked-file", None, None),
+-                Err(e) => return Err(format!("cannot stat candidate path {}: {e}", full.display())),
++                Ok(metadata) if metadata.is_dir() => {
++                    ("directory-replacing-file", None, file_mode(&metadata))
++                }
++                Ok(_) => {
++                    return Err(format!(
++                        "unsupported candidate file kind at {}",
++                        full.display()
++                    ))
++                }
++                Err(e) if e.kind() == std::io::ErrorKind::NotFound => {
++                    ("missing-tracked-file", None, None)
++                }
++                Err(e) => {
++                    return Err(format!(
++                        "cannot stat candidate path {}: {e}",
++                        full.display()
++                    ))
++                }
+             };
+             entries.push(Entry {
+                 path_hex: hex(&raw),
+Diff in /Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/xtask/src/candidate.rs:124:
+         let mut hasher = Sha256::new();
+         hasher.update(b"lingxi-candidate-source-v1\0");
+         for entry in &entries {
+-            for value in [&entry.path_hex, entry.kind, entry.sha256.as_deref().unwrap_or(""), &entry.mode.map(|m| m.to_string()).unwrap_or_default()] {
++            for value in [
++                &entry.path_hex,
++                entry.kind,
++                entry.sha256.as_deref().unwrap_or(""),
++                &entry.mode.map(|m| m.to_string()).unwrap_or_default(),
++            ] {
+                 hasher.update((value.len() as u64).to_be_bytes());
+                 hasher.update(value.as_bytes());
+             }
+Diff in /Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/xtask/src/candidate.rs:131:
+         }
+-        Ok(Snapshot { digest: hex(&hasher.finalize()), entries })
++        Ok(Snapshot {
++            digest: hex(&hasher.finalize()),
++            entries,
++        })
+     }
+ }
+ 
+Diff in /Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/xtask/src/candidate.rs:136:
+ pub fn differences(before: &Snapshot, after: &Snapshot) -> Vec<String> {
+-    let a: std::collections::BTreeMap<_, _> = before.entries.iter().map(|e| (&e.path_hex, e)).collect();
+-    let b: std::collections::BTreeMap<_, _> = after.entries.iter().map(|e| (&e.path_hex, e)).collect();
+-    a.keys().chain(b.keys()).collect::<std::collections::BTreeSet<_>>()
++    let a: std::collections::BTreeMap<_, _> =
++        before.entries.iter().map(|e| (&e.path_hex, e)).collect();
++    let b: std::collections::BTreeMap<_, _> =
++        after.entries.iter().map(|e| (&e.path_hex, e)).collect();
++    a.keys()
++        .chain(b.keys())
++        .collect::<std::collections::BTreeSet<_>>()
+         .into_iter()
+         .filter(|p| a.get(**p) != b.get(**p))
+         .map(|p| (*p).clone())
+Diff in /Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/xtask/src/candidate.rs:150:
+ ) -> bool {
+     after.as_ref().is_ok_and(|end| end.digest == before.digest)
+         && checkpoints.iter().all(|(_, _, result)| {
+-            result.as_ref().is_ok_and(|shot| shot.digest == before.digest)
++            result
++                .as_ref()
++                .is_ok_and(|shot| shot.digest == before.digest)
+         })
+ }
+ 
+Diff in /Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/xtask/src/candidate.rs:158:
+     let mut bytes = serde_json::to_vec_pretty(&snapshot.to_json())
+         .map_err(|e| format!("cannot serialize candidate manifest: {e}"))?;
+     bytes.push(b'\n');
+-    let mut file = File::create(path).map_err(|e| format!("cannot create {}: {e}", path.display()))?;
+-    file.write_all(&bytes).map_err(|e| format!("cannot write {}: {e}", path.display()))?;
+-    file.sync_all().map_err(|e| format!("cannot sync {}: {e}", path.display()))
++    let mut file =
++        File::create(path).map_err(|e| format!("cannot create {}: {e}", path.display()))?;
++    file.write_all(&bytes)
++        .map_err(|e| format!("cannot write {}: {e}", path.display()))?;
++    file.sync_all()
++        .map_err(|e| format!("cannot sync {}: {e}", path.display()))
+ }
+ 
+ fn canonicalize_future(path: &Path) -> Result<PathBuf, String> {
+Diff in /Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/xtask/src/candidate.rs:167:
+-    let absolute = if path.is_absolute() { path.to_path_buf() } else {
+-        std::env::current_dir().map_err(|e| format!("cannot read current dir: {e}"))?.join(path)
++    let absolute = if path.is_absolute() {
++        path.to_path_buf()
++    } else {
++        std::env::current_dir()
++            .map_err(|e| format!("cannot read current dir: {e}"))?
++            .join(path)
+     };
+     let mut clean = PathBuf::new();
+     for component in absolute.components() {
+Diff in /Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/xtask/src/candidate.rs:172:
+         match component {
+-            Component::ParentDir => { clean.pop(); }
++            Component::ParentDir => {
++                clean.pop();
++            }
+             Component::CurDir => {}
+             other => clean.push(other.as_os_str()),
+         }
+Diff in /Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/xtask/src/candidate.rs:178:
+     let mut missing = Vec::<OsString>::new();
+     let mut known = clean.as_path();
+     while !known.exists() {
+-        let name = known.file_name().ok_or_else(|| format!("cannot resolve evidence path {}", clean.display()))?;
++        let name = known
++            .file_name()
++            .ok_or_else(|| format!("cannot resolve evidence path {}", clean.display()))?;
+         missing.push(name.to_os_string());
+-        known = known.parent().ok_or_else(|| format!("cannot resolve evidence parent {}", clean.display()))?;
++        known = known
++            .parent()
++            .ok_or_else(|| format!("cannot resolve evidence parent {}", clean.display()))?;
+     }
+-    let mut resolved = known.canonicalize()
+-        .map_err(|e| format!("cannot canonicalize evidence ancestor {}: {e}", known.display()))?;
+-    for name in missing.into_iter().rev() { resolved.push(name); }
++    let mut resolved = known.canonicalize().map_err(|e| {
++        format!(
++            "cannot canonicalize evidence ancestor {}: {e}",
++            known.display()
++        )
++    })?;
++    for name in missing.into_iter().rev() {
++        resolved.push(name);
++    }
+     Ok(resolved)
+ }
+ 
+Diff in /Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/xtask/src/candidate.rs:191:
+-fn hash(bytes: &[u8]) -> String { hex(&Sha256::digest(bytes)) }
++fn hash(bytes: &[u8]) -> String {
++    hex(&Sha256::digest(bytes))
++}
+ 
+ fn hex(bytes: &[u8]) -> String {
+     const DIGITS: &[u8; 16] = b"0123456789abcdef";
+Diff in /Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/xtask/src/candidate.rs:220:
+ 
+ #[cfg(windows)]
+ fn path_from_git(raw: &[u8]) -> Result<PathBuf, String> {
+-    String::from_utf8(raw.to_vec()).map(PathBuf::from)
++    String::from_utf8(raw.to_vec())
++        .map(PathBuf::from)
+         .map_err(|e| format!("git emitted an invalid UTF-8 Windows path: {e}"))
+ }
+ 
+Diff in /Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/xtask/src/candidate.rs:231:
+ }
+ 
+ #[cfg(windows)]
+-fn file_mode(_metadata: &fs::Metadata) -> Option<u32> { None }
++fn file_mode(_metadata: &fs::Metadata) -> Option<u32> {
++    None
++}
+ 
+ #[cfg(test)]
+ mod tests;
+Diff in /Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/xtask/src/main.rs:38:
+ use std::path::{Path, PathBuf};
+ use std::process::{Command, ExitCode};
+ 
++pub mod candidate;
+ pub mod stage_map;
+ pub mod verify;
+-pub mod candidate;
+ 
+ pub use stage_map::{parse_stage_map, CommandSpec, Scenario, StageMap};
+ pub use verify::{verify_stage, CommandOutcome};
+Diff in /Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/xtask/src/main.rs:348:
+     };
+     let mut checkpoints = Vec::<(String, u128, Result<candidate::Snapshot, String>)>::new();
+     let report = match verify::verify_stage_with_checkpoint(
+-        &map, root, &evidence_root, &tested_sha, dirty, started,
++        &map,
++        root,
++        &evidence_root,
++        &tested_sha,
++        dirty,
++        started,
+         |key| checkpoints.push((key.to_string(), now_ms(), scope.snapshot(root))),
+     ) {
+         Ok(report) => report,
+Diff in /Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/xtask/src/main.rs:392:
+             }
+         }
+     }).collect();
+-    let final_changed = after.as_ref().map(|end| candidate::differences(&before, end)).unwrap_or_default();
++    let final_changed = after
++        .as_ref()
++        .map(|end| candidate::differences(&before, end))
++        .unwrap_or_default();
+     let mut report = report;
+     report["candidateSourceBinding"] = serde_json::json!({
+         "schema": "lingxi-candidate-source-binding-v1",

@@ -1,0 +1,6 @@
+TLS_PORT=62454 HTTP_PORT=62455
+TLS_RESULT=REFUSED certificate_related=true
+TLS_ERROR=reqwest::Error { kind: Request, url: "https://127.0.0.1:62454/v1/messages", source: hyper_util::client::legacy::Error(Connect, Custom { kind: Other, error: Custom { kind: InvalidData, error: InvalidCertificate(Other(OtherError("“localhost” certificate is not trusted: -67843"))) } }) } <- client error (Connect) <- invalid peer certificate: Other(OtherError("“localhost” certificate is not trusted: -67843"))
+HTTP_CONTROL=OK status=200 OK
+VERDICT=tls_verification_enforced
+PROBE_EXIT=0

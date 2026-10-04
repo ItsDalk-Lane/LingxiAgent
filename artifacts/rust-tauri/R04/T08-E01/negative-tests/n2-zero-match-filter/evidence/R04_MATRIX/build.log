@@ -1,0 +1,48 @@
+   Compiling serde_json v1.0.151
+   Compiling num-traits v0.2.19
+   Compiling slab v0.4.12
+   Compiling hashbrown v0.17.1
+   Compiling regex-syntax v0.8.11
+   Compiling sync_wrapper v1.0.2
+   Compiling syn v3.0.6
+   Compiling syn v2.0.119
+   Compiling hashlink v0.12.2
+   Compiling indexmap v2.14.2
+   Compiling rusqlite v0.40.2
+   Compiling regex-automata v0.4.18
+   Compiling serde_derive_internals v0.30.0
+   Compiling tokio-macros v2.7.2
+   Compiling serde_derive v1.0.229
+   Compiling futures-macro v0.3.34
+   Compiling ref-cast-impl v1.0.27
+   Compiling thiserror-impl v2.0.21
+   Compiling schemars_derive v1.2.2
+   Compiling matchers v0.2.0
+   Compiling ref-cast v1.0.27
+   Compiling tokio v1.53.1
+   Compiling futures-util v0.3.34
+   Compiling tracing-attributes v0.1.31
+   Compiling thiserror v2.0.21
+   Compiling tracing v0.1.44
+   Compiling serde v1.0.229
+   Compiling axum-core v0.5.6
+   Compiling tracing-subscriber v0.3.23
+   Compiling chrono v0.4.45
+   Compiling serde_urlencoded v0.7.1
+   Compiling futures-executor v0.3.34
+   Compiling futures v0.3.34
+   Compiling schemars v1.2.2
+   Compiling hyper v1.11.1
+   Compiling tower v0.5.3
+   Compiling tokio-util v0.7.19
+   Compiling tokio-stream v0.1.19
+   Compiling tokio-rustls v0.26.5
+   Compiling hyper-util v0.1.21
+   Compiling axum v0.8.9
+   Compiling lingxi-protocol v0.0.0 (/private/tmp/lingxi-r04-t08-neg-wEGEl1/rust/crates/lingxi-protocol)
+   Compiling rmcp v3.4.1
+   Compiling lingxi-kernel v0.0.0 (/private/tmp/lingxi-r04-t08-neg-wEGEl1/rust/crates/lingxi-kernel)
+   Compiling lingxi-adapters v0.0.0 (/private/tmp/lingxi-r04-t08-neg-wEGEl1/rust/crates/lingxi-adapters)
+   Compiling lingxi-service v0.0.0 (/private/tmp/lingxi-r04-t08-neg-wEGEl1/rust/crates/lingxi-service)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 15.85s
+  Executable tests/r04_t08_tool_matrix.rs (/Users/study_superior/.cache/lingxi-r04-t08-neg-target/debug/deps/r04_t08_tool_matrix-ff9ad8403b5cdac5)

@@ -1,0 +1,10 @@
+   },
+R02_ACCEPT_PATCH_BYTES=1865452864
+R03_CAND_PATCH_BYTES=1946857066
+---top contributors R03 range---
+ artifacts/rust-tauri/R03/STAGE-REPAIR-G01-F03/verify-stage-r03/candidate-source-before.json                                    | 95145 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+ artifacts/rust-tauri/R03/STAGE-REPAIR-G01-F03/verify-stage-r03/candidate-source-after.json                                     | 95145 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+ artifacts/rust-tauri/R03/STAGE-REPAIR-G01-F03/verify-stage-r02/candidate-source-before.json                                    | 92996 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+ artifacts/rust-tauri/R03/STAGE-REPAIR-G01-F03/verify-stage-r02/candidate-source-after.json                                     | 92996 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+ artifacts/rust-tauri/R03/T08-R01-review/verify-stage-r03/candidate-source-before.json                                          | 88327 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+ artifacts/rust-tauri/R03/T08-R01-review/verify-stage-r03/candidate-source-after.json                                           | 88327 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++

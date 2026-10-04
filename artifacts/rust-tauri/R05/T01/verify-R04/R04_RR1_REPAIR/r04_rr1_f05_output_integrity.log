@@ -1,0 +1,14 @@
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.10s
+     Running tests/r04_rr1_f05_output_integrity.rs (/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T//rust-target-r04-rr1-g05/debug/deps/r04_rr1_f05_output_integrity-344623c78921d99a)
+
+running 7 tests
+test f05_c01_control_small_stream_big_budget_distinguishes_facts ... ok
+test f05_c01_big_stream_marks_eviction_and_keeps_true_head_and_tail ... ok
+test f05_c01_hidden_window_prefix_loss_is_flagged_not_hidden ... ok
+test f05_c02_single_multibyte_line_keeps_head_and_tail_content ... ok
+test f05_c03_capped_spill_is_partial_and_honest ... ok
+test f05_c05_high_output_and_many_pty_polls_stay_bounded ... ok
+test f05_c05_cancelling_mid_output_closes_the_spill_and_bounds_everything ... ok
+
+test result: ok. 7 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.40s
+

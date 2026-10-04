@@ -1,0 +1,879 @@
+Diff in /Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-service/src/auth.rs:921:
+             return Err(denial());
+         };
+         if record.status != DeviceStatus::Active
+-            || record.expires_at_unix_ms.is_some_and(|expires| expires <= now_unix_ms())
++            || record
++                .expires_at_unix_ms
++                .is_some_and(|expires| expires <= now_unix_ms())
+             || principal.device_id.as_deref() != Some(record.device_id.as_str())
+             || principal.scopes != record.scopes
+         {
+Diff in /Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-service/src/auth.rs:989:
+             detail: err.to_string(),
+         }
+     })?;
+-    let credentials: CredentialsRegistry =
+-        serde_json::from_value(load(credentials_path)?).map_err(|err| {
+-            AuthSetupError::RegistryInvalid {
+-                path: credentials_path.clone(),
+-                detail: err.to_string(),
+-            }
++    let credentials: CredentialsRegistry = serde_json::from_value(load(credentials_path)?)
++        .map_err(|err| AuthSetupError::RegistryInvalid {
++            path: credentials_path.clone(),
++            detail: err.to_string(),
+         })?;
+     if devices.schema_version != AUTH_SCHEMA_VERSION
+         || credentials.schema_version != AUTH_SCHEMA_VERSION
+Diff in /Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-service/src/shutdown.rs:372:
+             // The worker dropped its sender without delivering a result —
+             // it ended abruptly mid-cleanup (panic). The record state is
+             // UNKNOWN: report it explicitly instead of a silent Ok.
+-            report.record_error =
+-                Some("record-cleanup worker ended without a result".to_string());
++            report.record_error = Some("record-cleanup worker ended without a result".to_string());
+             tracing::error!(
+                 phase = %ShutdownPhase::RecordCleanup,
+                 "record-cleanup worker ended without delivering a result — the \
+Diff in /Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-service/src/ws.rs:731:
+         let mask = [0x11, 0x22, 0x33, 0x44];
+         let mut masked = vec![0x81, 0x80 | payload.len() as u8];
+         masked.extend_from_slice(&mask);
+-        masked.extend(payload.iter().enumerate().map(|(i, byte)| byte ^ mask[i % 4]));
++        masked.extend(
++            payload
++                .iter()
++                .enumerate()
++                .map(|(i, byte)| byte ^ mask[i % 4]),
++        );
+         let mut cursor = std::io::Cursor::new(masked);
+         assert_eq!(
+             read_client_ws_frame(&mut cursor).await.unwrap(),
+Diff in /Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-service/tests/auth_matrix.rs:681:
+         None,
+     )
+     .await;
+-    assert_eq!(status, 401, "externally revoked credential must fail: {body}");
++    assert_eq!(
++        status, 401,
++        "externally revoked credential must fail: {body}"
++    );
+     assert!(body.contains("invalid_credential"), "body: {body}");
+     assert_eq!(std::fs::read(&registry_path).unwrap(), revoked_bytes);
+ 
+Diff in /Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-service/tests/auth_matrix.rs:765:
+     .await;
+     assert_eq!(status, 401, "missing registry must deny: {body}");
+     assert!(body.contains("auth_registry_unavailable"), "body: {body}");
+-    assert!(!path.exists(), "denied request must not recreate the registry");
++    assert!(
++        !path.exists(),
++        "denied request must not recreate the registry"
++    );
+ 
+     std::fs::write(&path, valid).unwrap();
+     let (status, body) = http(
+Diff in /Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-service/tests/auth_matrix.rs:1203:
+     let bearer = server.bearer();
+     let key = client_ws_key();
+     for headers in [
+-        format!(
+-            "Upgrade: websocket\r\nConnection: Upgrade, close\r\nSec-WebSocket-Key: {key}\r\n"
+-        ),
++        format!("Upgrade: websocket\r\nConnection: Upgrade, close\r\nSec-WebSocket-Key: {key}\r\n"),
+         "Upgrade: websocket\r\nConnection: Upgrade, close\r\nSec-WebSocket-Version: 13\r\n"
+             .to_string(),
+     ] {
+Diff in /Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-service/tests/service_health.rs:23:
+ fn help_and_version_do_not_hide_invalid_arguments() {
+     let binary = env!("CARGO_BIN_EXE_lingxi-service");
+     for arg in ["--help", "-h", "--version"] {
+-        let output = Command::new(binary).arg(arg).output().expect("run service binary");
++        let output = Command::new(binary)
++            .arg(arg)
++            .output()
++            .expect("run service binary");
+         assert_eq!(output.status.code(), Some(0), "standalone {arg}");
+     }
+ 
+Diff in /Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-service/tests/service_health.rs:66:
+         vec!["--test-mode", "--help"],
+         vec!["--help", "--help"],
+     ] {
+-        let output = Command::new(binary).args(&args).output().expect("run service binary");
++        let output = Command::new(binary)
++            .args(&args)
++            .output()
++            .expect("run service binary");
+         assert_eq!(output.status.code(), Some(2), "invalid arguments: {args:?}");
+         assert!(
+             String::from_utf8_lossy(&output.stderr).contains("error:"),
+Diff in /Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-service/tests/shutdown_coordinator.rs:68:
+     assert!(layout.record_path.exists());
+ 
+     let ws = WsShutdown::new();
+-    let report =
+-        graceful_shutdown(&db, &ws, guard, false, budget(Duration::from_secs(10))).await;
++    let report = graceful_shutdown(&db, &ws, guard, false, budget(Duration::from_secs(10))).await;
+ 
+     assert_eq!(report.exit_code(), 0, "{report:?}");
+     assert!(!report.any_timeout());
+Diff in /Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-service/tests/shutdown_coordinator.rs:115:
+     let ws = WsShutdown::new();
+ 
+     let started = std::time::Instant::now();
+-    let report = graceful_shutdown(
+-        &db,
+-        &ws,
+-        guard,
+-        false,
+-        budget(Duration::from_millis(120)),
+-    )
+-    .await;
++    let report =
++        graceful_shutdown(&db, &ws, guard, false, budget(Duration::from_millis(120))).await;
+     let elapsed = started.elapsed();
+ 
+     assert!(report.storage_close_timed_out, "{report:?}");
+Diff in /Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-service/tests/shutdown_coordinator.rs:166:
+         .publish("127.0.0.1:3".parse().unwrap())
+         .expect("publish");
+     let ws = WsShutdown::new();
+-    let report =
+-        graceful_shutdown(&db, &ws, guard, false, budget(Duration::from_secs(5))).await;
++    let report = graceful_shutdown(&db, &ws, guard, false, budget(Duration::from_secs(5))).await;
+ 
+     assert!(report.storage_error.is_some(), "{report:?}");
+     assert_eq!(report.exit_code(), 5, "{report:?}");
+Diff in /Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-service/tests/shutdown_coordinator.rs:191:
+     std::fs::write(&layout.record_path, b"{ not json").unwrap();
+ 
+     let ws = WsShutdown::new();
+-    let report =
+-        graceful_shutdown(&db, &ws, guard, false, budget(Duration::from_secs(5))).await;
++    let report = graceful_shutdown(&db, &ws, guard, false, budget(Duration::from_secs(5))).await;
+ 
+     assert!(report.record_error.is_some(), "{report:?}");
+     assert_eq!(report.exit_code(), 4, "{report:?}");
+Diff in /Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/xtask/src/stage_map.rs:372:
+     let supplemental_leaves = match object.get("supplementalLeafScenarios") {
+         None => Vec::new(),
+         Some(value) => {
+-            let list = value.as_array().ok_or_else(|| {
+-                err("supplementalLeafScenarios must be an array of leaf objects")
+-            })?;
++            let list = value
++                .as_array()
++                .ok_or_else(|| err("supplementalLeafScenarios must be an array of leaf objects"))?;
+             if list.is_empty() {
+                 return Err(err(
+                     "supplementalLeafScenarios must not be EMPTY (declaring the \
+Diff in /Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/xtask/src/stage_map.rs:387:
+             let mut leaves = Vec::with_capacity(list.len());
+             for (index, value) in list.iter().enumerate() {
+                 let entry = value.as_object().ok_or_else(|| {
+-                    err(&format!("supplementalLeafScenarios #{index} must be an object"))
++                    err(&format!(
++                        "supplementalLeafScenarios #{index} must be an object"
++                    ))
+                 })?;
+                 let id = non_empty_string(
+-                    entry
+-                        .get("id")
+-                        .ok_or_else(|| err(&format!("supplementalLeafScenarios #{index} missing id")))?,
++                    entry.get("id").ok_or_else(|| {
++                        err(&format!("supplementalLeafScenarios #{index} missing id"))
++                    })?,
+                     &format!("supplementalLeafScenarios #{index} id"),
+                 )?;
+                 if leaves.iter().any(|leaf: &SupplementalLeaf| leaf.id == id) {
+Diff in /Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/xtask/src/stage_map.rs:423:
+                     )));
+                 }
+                 let r02_share = non_empty_string(
+-                    entry
+-                        .get("r02Share")
+-                        .ok_or_else(|| err(&format!("supplemental leaf {id:?} missing r02Share")))?,
++                    entry.get("r02Share").ok_or_else(|| {
++                        err(&format!("supplemental leaf {id:?} missing r02Share"))
++                    })?,
+                     &format!("supplemental leaf {id:?} r02Share"),
+                 )?;
+                 let r07_share = non_empty_string(
+Diff in /Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/xtask/src/stage_map.rs:432:
+-                    entry
+-                        .get("r07Share")
+-                        .ok_or_else(|| err(&format!("supplemental leaf {id:?} missing r07Share")))?,
++                    entry.get("r07Share").ok_or_else(|| {
++                        err(&format!("supplemental leaf {id:?} missing r07Share"))
++                    })?,
+                     &format!("supplemental leaf {id:?} r07Share"),
+                 )?;
+                 let evidence_required = non_empty_string(
+Diff in /Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/xtask/src/stage_map.rs:438:
+                     entry.get("evidenceRequired").ok_or_else(|| {
+-                        err(&format!("supplemental leaf {id:?} missing evidenceRequired"))
++                        err(&format!(
++                            "supplemental leaf {id:?} missing evidenceRequired"
++                        ))
+                     })?,
+                     &format!("supplemental leaf {id:?} evidenceRequired"),
+                 )?;
+Diff in /Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/xtask/src/stage_map.rs:443:
+                 let refs_value = entry.get("evidenceCommandRefs").ok_or_else(|| {
+-                    err(&format!("supplemental leaf {id:?} missing evidenceCommandRefs"))
++                    err(&format!(
++                        "supplemental leaf {id:?} missing evidenceCommandRefs"
++                    ))
+                 })?;
+                 let refs_list = refs_value.as_array().ok_or_else(|| {
+                     err(&format!(
+Diff in /Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/xtask/src/stage_map.rs:509:
+                 // original assertions, or due line to a different object.
+                 let r00_kind = non_empty_string(
+                     entry.get("r00Kind").ok_or_else(|| {
+-                        err(&format!("supplemental leaf {id:?} missing r00Kind (R00 mirror)"))
++                        err(&format!(
++                            "supplemental leaf {id:?} missing r00Kind (R00 mirror)"
++                        ))
+                     })?,
+                     &format!("supplemental leaf {id:?} r00Kind"),
+                 )?;
+Diff in /Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/xtask/src/stage_map.rs:547:
+                 )?;
+                 let r00_then = non_empty_string(
+                     entry.get("r00Then").ok_or_else(|| {
+-                        err(&format!("supplemental leaf {id:?} missing r00Then (R00 mirror)"))
++                        err(&format!(
++                            "supplemental leaf {id:?} missing r00Then (R00 mirror)"
++                        ))
+                     })?,
+                     &format!("supplemental leaf {id:?} r00Then"),
+                 )?;
+Diff in /Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/xtask/src/stage_map.rs:559:
+                 )?;
+                 let r00_due = non_empty_string(
+                     entry.get("r00Due").ok_or_else(|| {
+-                        err(&format!("supplemental leaf {id:?} missing r00Due (R00 mirror)"))
++                        err(&format!(
++                            "supplemental leaf {id:?} missing r00Due (R00 mirror)"
++                        ))
+                     })?,
+                     &format!("supplemental leaf {id:?} r00Due"),
+                 )?;
+Diff in /Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/xtask/src/stage_map.rs:590:
+                                      producerCommand"
+                                 ))
+                             })?,
+-                            &format!(
+-                                "supplemental leaf {id:?} assertionContract producerCommand"
+-                            ),
++                            &format!("supplemental leaf {id:?} assertionContract producerCommand"),
+                         )?;
+                         if !commands_value.contains_key(&producer_command) {
+                             return Err(err(&format!(
+Diff in /Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/xtask/src/stage_map.rs:615:
+                                      evidencePath"
+                                 ))
+                             })?,
+-                            &format!(
+-                                "supplemental leaf {id:?} assertionContract evidencePath"
+-                            ),
++                            &format!("supplemental leaf {id:?} assertionContract evidencePath"),
+                         )?;
+                         let cases_value = contract
+                             .get("cases")
+Diff in /Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/xtask/src/stage_map.rs:655:
+                                          missing case name"
+                                     ))
+                                 })?,
+-                                &format!(
+-                                    "supplemental leaf {id:?} assertionContract case name"
+-                                ),
++                                &format!("supplemental leaf {id:?} assertionContract case name"),
+                             )?;
+                             let expect = case_object
+                                 .get("expect")
+Diff in /Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/xtask/src/stage_map.rs:922:
+         // empty array: declaring the section with zero entries would drop
+         // every R00 REQUIRED_SUPPLEMENTAL obligation from the gate.
+         let mut hacked = String::new();
+-        hacked.push_str(SUPPLEMENTAL_VALID.split("\"supplementalLeafScenarios\"").next().unwrap());
++        hacked.push_str(
++            SUPPLEMENTAL_VALID
++                .split("\"supplementalLeafScenarios\"")
++                .next()
++                .unwrap(),
++        );
+         hacked.push_str("\"supplementalLeafScenarios\": []}");
+         let err = parse_stage_map(&hacked).unwrap_err();
+         assert!(err.contains("must not be EMPTY"), "{err}");
+Diff in /Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/xtask/src/stage_map.rs:930:
+ 
+     #[test]
+     fn unknown_supplemental_basis_kind_is_a_hard_error() {
+-        let text = SUPPLEMENTAL_VALID.replace(r#""basisKind": "protocol_basis""#, r#""basisKind": "mystery""#);
++        let text = SUPPLEMENTAL_VALID.replace(
++            r#""basisKind": "protocol_basis""#,
++            r#""basisKind": "mystery""#,
++        );
+         let err = parse_stage_map(&text).unwrap_err();
+         assert!(err.contains("unknown basisKind"), "{err}");
+     }
+Diff in /Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/xtask/src/stage_map.rs:937:
+ 
+     #[test]
+     fn supplemental_leaf_without_command_refs_is_a_hard_error() {
+-        let text =
+-            SUPPLEMENTAL_VALID.replace(r#""evidenceCommandRefs": ["a_ok"]"#, r#""evidenceCommandRefs": []"#);
++        let text = SUPPLEMENTAL_VALID.replace(
++            r#""evidenceCommandRefs": ["a_ok"]"#,
++            r#""evidenceCommandRefs": []"#,
++        );
+         let err = parse_stage_map(&text).unwrap_err();
+         assert!(err.contains("hole in the map"), "{err}");
+     }
+Diff in /Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/xtask/src/stage_map.rs:945:
+ 
+     #[test]
+     fn supplemental_leaf_with_unknown_command_ref_is_a_hard_error() {
+-        let text =
+-            SUPPLEMENTAL_VALID.replace(r#""evidenceCommandRefs": ["a_ok"]"#, r#""evidenceCommandRefs": ["nope"]"#);
++        let text = SUPPLEMENTAL_VALID.replace(
++            r#""evidenceCommandRefs": ["a_ok"]"#,
++            r#""evidenceCommandRefs": ["nope"]"#,
++        );
+         let err = parse_stage_map(&text).unwrap_err();
+         assert!(err.contains("unknown command"), "{err}");
+     }
+Diff in /Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/xtask/src/stage_map.rs:953:
+ 
+     #[test]
+     fn conflicted_leaf_must_not_bind_evidence() {
+-        let text = SUPPLEMENTAL_VALID
+-            .replace(r#""basisKind": "protocol_basis""#, r#""basisKind": "client_only_stage_boundary_conflict""#);
++        let text = SUPPLEMENTAL_VALID.replace(
++            r#""basisKind": "protocol_basis""#,
++            r#""basisKind": "client_only_stage_boundary_conflict""#,
++        );
+         let err = parse_stage_map(&text).unwrap_err();
+         assert!(err.contains("must not bind evidence commands"), "{err}");
+     }
+Diff in /Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/xtask/src/stage_map.rs:981:
+                 "",
+             );
+         let map = parse_stage_map(&text).expect("unbound conflicted leaf parses");
+-        assert_eq!(map.supplemental_leaves[0].basis_kind, BASIS_CLIENT_ONLY_STAGE_CONFLICT);
++        assert_eq!(
++            map.supplemental_leaves[0].basis_kind,
++            BASIS_CLIENT_ONLY_STAGE_CONFLICT
++        );
+         assert!(map.supplemental_leaves[0].evidence_command_refs.is_empty());
+         assert!(map.supplemental_leaves[0].assertion_contract.is_none());
+     }
+Diff in /Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/xtask/src/stage_map.rs:1000:
+ 
+     #[test]
+     fn empty_r00_responsibility_mirror_is_a_hard_error() {
+-        let text =
+-            SUPPLEMENTAL_VALID.replace(r#""r00TaskIds": ["R02-T03", "R07-T09"]"#, r#""r00TaskIds": []"#);
++        let text = SUPPLEMENTAL_VALID.replace(
++            r#""r00TaskIds": ["R02-T03", "R07-T09"]"#,
++            r#""r00TaskIds": []"#,
++        );
+         let err = parse_stage_map(&text).unwrap_err();
+         assert!(err.contains("r00TaskIds must not be empty"), "{err}");
+     }
+Diff in /Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/xtask/src/stage_map.rs:1013:
+         // closes.
+         let text = SUPPLEMENTAL_VALID.replace(
+             concat!(
+-                r#"                "assertionContract": {"#, "\n",
+-                r#"                    "producerCommand": "a_ok","#, "\n",
+-                r#"                    "evidencePath": "{EVIDENCE}/RX/leaf-cases.json","#, "\n",
+-                r#"                    "cases": [{"case": "case-no-credential", "expect": 401}]"#, "\n",
+-                r#"                },"#, "\n",
++                r#"                "assertionContract": {"#,
++                "\n",
++                r#"                    "producerCommand": "a_ok","#,
++                "\n",
++                r#"                    "evidencePath": "{EVIDENCE}/RX/leaf-cases.json","#,
++                "\n",
++                r#"                    "cases": [{"case": "case-no-credential", "expect": 401}]"#,
++                "\n",
++                r#"                },"#,
++                "\n",
+             ),
+             "",
+         );
+Diff in /Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/xtask/src/stage_map.rs:1032:
+                 r#""basisKind": "protocol_basis""#,
+                 r#""basisKind": "client_only_stage_boundary_conflict""#,
+             )
+-            .replace(r#""evidenceCommandRefs": ["a_ok"]"#, r#""evidenceCommandRefs": []"#);
++            .replace(
++                r#""evidenceCommandRefs": ["a_ok"]"#,
++                r#""evidenceCommandRefs": []"#,
++            );
+         let err = parse_stage_map(&text).unwrap_err();
+-        assert!(err.contains("must not declare an assertionContract"), "{err}");
++        assert!(
++            err.contains("must not declare an assertionContract"),
++            "{err}"
++        );
+     }
+ 
+     #[test]
+Diff in /Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/xtask/src/stage_map.rs:1047:
+         let text = SUPPLEMENTAL_VALID.replace(
+             r#""scenarios": ["#,
+             concat!(
+-                r#""b_two": {"#, "\n",
+-                r#"                "argv": ["bash", "gate2.sh", "{EVIDENCE}/RX"],"#, "\n",
+-                r#"                "evidencePaths": ["{EVIDENCE}/RX/out2.txt"]"#, "\n",
+-                r#"            },"#, "\n",
++                r#""b_two": {"#,
++                "\n",
++                r#"                "argv": ["bash", "gate2.sh", "{EVIDENCE}/RX"],"#,
++                "\n",
++                r#"                "evidencePaths": ["{EVIDENCE}/RX/out2.txt"]"#,
++                "\n",
++                r#"            },"#,
++                "\n",
+                 r#"        "scenarios": ["#,
+             ),
+         );
+Diff in /Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/xtask/src/stage_map.rs:1057:
+-        let text = text.replace(r#""producerCommand": "a_ok","#, r#""producerCommand": "b_two","#);
++        let text = text.replace(
++            r#""producerCommand": "a_ok","#,
++            r#""producerCommand": "b_two","#,
++        );
+         let err = parse_stage_map(&text).unwrap_err();
+-        assert!(err.contains("is not in the leaf's evidenceCommandRefs"), "{err}");
++        assert!(
++            err.contains("is not in the leaf's evidenceCommandRefs"),
++            "{err}"
++        );
+     }
+ 
+     #[test]
+Diff in /Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/xtask/src/verify/runner_tests.rs:5:
+ use std::time::{SystemTime, UNIX_EPOCH};
+ 
+ use crate::stage_map::{
+-    parse_stage_map, CommandSpec, StageMap, LeafAssertionContract, LeafCaseExpect,
++    parse_stage_map, CommandSpec, LeafAssertionContract, LeafCaseExpect, StageMap,
+ };
+ use crate::verify::{run_command, verify_stage};
+ 
+Diff in /Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/xtask/src/verify/runner_tests.rs:75:
+     std::fs::create_dir_all(&dir).expect("create R00 ledger dir");
+     std::fs::write(
+         dir.join("ACCEPTANCE_MAP.json"),
+-        serde_json::to_string(&serde_json::json!({ "scenarios": scenarios })).expect("ledger serializes"),
++        serde_json::to_string(&serde_json::json!({ "scenarios": scenarios }))
++            .expect("ledger serializes"),
+     )
+     .expect("write minimal R00 acceptance ledger");
+     std::fs::write(
+Diff in /Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/xtask/src/verify/runner_tests.rs:591:
+     }
+ }
+ 
+-fn contract(
+-    producer: &str,
+-    path: &str,
+-    cases: &[(&str, i64)],
+-) -> Option<LeafAssertionContract> {
++fn contract(producer: &str, path: &str, cases: &[(&str, i64)]) -> Option<LeafAssertionContract> {
+     Some(LeafAssertionContract {
+         producer_command: producer.to_string(),
+         evidence_path: path.to_string(),
+Diff in /Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/xtask/src/verify/runner_tests.rs:681:
+             ),
+         ],
+     };
+-    let report = verify_stage(&map, &root, &evidence, "deadbeef", false, 0)
+-        .expect("runs to completion");
++    let report =
++        verify_stage(&map, &root, &evidence, "deadbeef", false, 0).expect("runs to completion");
+     // Base scenario green, supplemental verdicts mixed, overall FAIL.
+     assert_eq!(report["scenarios"][0]["status"], "PASS");
+     let find = |id: &str| {
+Diff in /Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/xtask/src/verify/runner_tests.rs:699:
+     // 案例数值通过只证明当前阶段份额，原叶还绑定后续阶段。
+     assert_eq!(ok_leaf["assertionResults"][0]["case"], "case-ok");
+     assert_eq!(ok_leaf["assertionResults"][0]["status"], "PASS");
+-    assert!(ok_leaf["reason"].as_str().unwrap().contains("another stage"));
+-    assert_eq!(ok_leaf["r00Mirror"]["then"], serde_json::json!(test_then("R00-T02-LA-TESTOK000000000")));
++    assert!(ok_leaf["reason"]
++        .as_str()
++        .unwrap()
++        .contains("another stage"));
++    assert_eq!(
++        ok_leaf["r00Mirror"]["then"],
++        serde_json::json!(test_then("R00-T02-LA-TESTOK000000000"))
++    );
+     let noev_leaf = find("R00-T02-LA-TESTNOEV00000000");
+     assert_eq!(noev_leaf["status"], "FAIL");
+     assert!(
+Diff in /Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/xtask/src/verify/runner_tests.rs:707:
+-        noev_leaf["reason"].as_str().unwrap().contains("evidence commands not passing"),
++        noev_leaf["reason"]
++            .as_str()
++            .unwrap()
++            .contains("evidence commands not passing"),
+         "the failing producer is named: {}",
+         noev_leaf["reason"]
+     );
+Diff in /Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/xtask/src/verify/runner_tests.rs:712:
+     let generic_leaf = find("R00-T02-LA-TESTGENERIC0000");
+     assert_eq!(generic_leaf["assertionResults"][0]["status"], "PASS");
+     assert_eq!(generic_leaf["status"], "BLOCKED");
+-    assert!(generic_leaf["reason"].as_str().unwrap().contains("do not prove"));
+-    assert_eq!(report["supplementalLeafCoverage"]["pass"], serde_json::json!(0));
+-    assert_eq!(report["supplementalLeafCoverage"]["fail"], serde_json::json!(1));
+-    assert_eq!(report["supplementalLeafCoverage"]["blocked"], serde_json::json!(3));
++    assert!(generic_leaf["reason"]
++        .as_str()
++        .unwrap()
++        .contains("do not prove"));
+     assert_eq!(
++        report["supplementalLeafCoverage"]["pass"],
++        serde_json::json!(0)
++    );
++    assert_eq!(
++        report["supplementalLeafCoverage"]["fail"],
++        serde_json::json!(1)
++    );
++    assert_eq!(
++        report["supplementalLeafCoverage"]["blocked"],
++        serde_json::json!(3)
++    );
++    assert_eq!(
+         report["supplementalLeafCoverage"]["expectedFromR00Ledger"],
+         serde_json::json!(4)
+     );
+Diff in /Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/xtask/src/verify/runner_tests.rs:724:
+     // The leaf-only command really ran (two entries with real exit codes);
+     // its failure is what fails the NOEV leaf.
+     assert_eq!(report["commands"].as_array().unwrap().len(), 2);
+-    assert_eq!(report["commands"].as_array().unwrap()[1]["exitCode"], serde_json::json!(9));
++    assert_eq!(
++        report["commands"].as_array().unwrap()[1]["exitCode"],
++        serde_json::json!(9)
++    );
+     std::fs::remove_dir_all(&root).ok();
+ }
+ 
+Diff in /Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/xtask/src/verify/runner_tests.rs:799:
+         let (status, reason, _) =
+             super::roll_up_supplemental_leaf(&item, "RX", &outcomes, &root, &evidence);
+         assert_eq!(status, "FAIL", "{label}: {reason}");
+-        assert!(reason.contains("duplicate evidence case name"), "{label}: {reason}");
++        assert!(
++            reason.contains("duplicate evidence case name"),
++            "{label}: {reason}"
++        );
+         std::fs::remove_dir_all(&root).ok();
+     }
+ }
+Diff in /Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/xtask/src/verify/runner_tests.rs:851:
+     // is 401 while the leaf's original R00 assertion (pinned in the map)
+     // demands 403. Pre-fix the leaf passed on exit 0; now it must FAIL.
+     let root = temp_root("actual401");
+-    write_minimal_r00_ledger(&root, &[("R00-T02-LA-TESTTICKET00000", "REQUIRED_SUPPLEMENTAL")]);
++    write_minimal_r00_ledger(
++        &root,
++        &[("R00-T02-LA-TESTTICKET00000", "REQUIRED_SUPPLEMENTAL")],
++    );
+     let evidence = root.join("evidence");
+     let map = StageMap {
+         stage: "RX".into(),
+Diff in /Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/xtask/src/verify/runner_tests.rs:882:
+             contract("ok", "{EVIDENCE}/leaf-cases.json", &[("no-cred-ticket", 403)]),
+         )],
+     };
+-    let report = verify_stage(&map, &root, &evidence, "deadbeef", false, 0)
+-        .expect("runs to completion");
+-    assert_eq!(report["commands"][0]["status"], "PASS", "the command itself is green");
++    let report =
++        verify_stage(&map, &root, &evidence, "deadbeef", false, 0).expect("runs to completion");
++    assert_eq!(
++        report["commands"][0]["status"], "PASS",
++        "the command itself is green"
++    );
+     let leaf_entry = &report["supplementalLeafScenarios"][0];
+-    assert_eq!(leaf_entry["status"], "FAIL", "the leaf must NOT ride the green exit");
++    assert_eq!(
++        leaf_entry["status"], "FAIL",
++        "the leaf must NOT ride the green exit"
++    );
+     let reason = leaf_entry["reason"].as_str().unwrap();
+     assert!(
+         reason.contains("original-assertion cases not holding"),
+Diff in /Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/xtask/src/verify/runner_tests.rs:903:
+     // expectation in the MAP, so this mismatch must also fail — a producer
+     // that rewrites what it was checking for cannot keep the leaf green.
+     let root = temp_root("softexpect");
+-    write_minimal_r00_ledger(&root, &[("R00-T02-LA-TESTSOFT00000000", "REQUIRED_SUPPLEMENTAL")]);
++    write_minimal_r00_ledger(
++        &root,
++        &[("R00-T02-LA-TESTSOFT00000000", "REQUIRED_SUPPLEMENTAL")],
++    );
+     let evidence = root.join("evidence");
+     let map = StageMap {
+         stage: "RX".into(),
+Diff in /Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/xtask/src/verify/runner_tests.rs:934:
+             contract("ok", "{EVIDENCE}/leaf-cases.json", &[("c1", 403)]),
+         )],
+     };
+-    let report = verify_stage(&map, &root, &evidence, "deadbeef", false, 0)
+-        .expect("runs to completion");
++    let report =
++        verify_stage(&map, &root, &evidence, "deadbeef", false, 0).expect("runs to completion");
+     let leaf_entry = &report["supplementalLeafScenarios"][0];
+     assert_eq!(leaf_entry["status"], "FAIL");
+     assert!(
+Diff in /Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/xtask/src/verify/runner_tests.rs:1001:
+             ),
+         ],
+     };
+-    let report = verify_stage(&map, &root, &evidence, "deadbeef", false, 0)
+-        .expect("runs to completion");
++    let report =
++        verify_stage(&map, &root, &evidence, "deadbeef", false, 0).expect("runs to completion");
+     let leaves = report["supplementalLeafScenarios"].as_array().unwrap();
+     assert_eq!(leaves[0]["status"], "FAIL");
+     assert!(
+Diff in /Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/xtask/src/verify/runner_tests.rs:1012:
+     );
+     assert_eq!(leaves[1]["status"], "FAIL");
+     assert!(
+-        leaves[1]["reason"].as_str().unwrap().contains("not recorded"),
++        leaves[1]["reason"]
++            .as_str()
++            .unwrap()
++            .contains("not recorded"),
+         "missing case named: {}",
+         leaves[1]["reason"]
+     );
+Diff in /Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/xtask/src/verify/runner_tests.rs:1027:
+     // the R13-F01 check passed this shape; the R14-F01 full-record check
+     // must abort on it.
+     let root = temp_root("mirrordrift");
+-    write_minimal_r00_ledger(&root, &[("R00-T02-LA-TESTDRIFT0000000", "REQUIRED_SUPPLEMENTAL")]);
++    write_minimal_r00_ledger(
++        &root,
++        &[("R00-T02-LA-TESTDRIFT0000000", "REQUIRED_SUPPLEMENTAL")],
++    );
+     let evidence = root.join("evidence");
+     let mut drifted = leaf(
+         "R00-T02-LA-TESTDRIFT0000000",
+Diff in /Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/xtask/src/verify/runner_tests.rs:1056:
+     };
+     let err = verify_stage(&map, &root, &evidence, "deadbeef", false, 0)
+         .expect_err("a drifted mirror must abort the gate");
+-    assert!(err.contains("mirrors an R00 record that does not match"), "{err}");
++    assert!(
++        err.contains("mirrors an R00 record that does not match"),
++        "{err}"
++    );
+     assert!(err.contains("r00Then"), "the drifted field is named: {err}");
+     assert!(
+         !evidence.join("ran.marker").exists(),
+Diff in /Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/xtask/src/verify/runner_tests.rs:1071:
+     // empty) evidence root — an absolute-path pin pointing at an old file
+     // — must be refused up front exactly like stale command evidence.
+     let root = temp_root("staleleaf");
+-    write_minimal_r00_ledger(&root, &[("R00-T02-LA-TESTSTALE0000000", "REQUIRED_SUPPLEMENTAL")]);
++    write_minimal_r00_ledger(
++        &root,
++        &[("R00-T02-LA-TESTSTALE0000000", "REQUIRED_SUPPLEMENTAL")],
++    );
+     let evidence = root.join("evidence");
+     let stale_dir = root.join("stale");
+     std::fs::create_dir_all(&stale_dir).unwrap();
+Diff in /Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/xtask/src/verify/runner_tests.rs:1173:
+     };
+     let err = verify_stage(&map, &root, &evidence, "deadbeef", false, 0)
+         .expect_err("a missing R00 ledger must abort the gate");
+-    assert!(err.contains("cannot read the R00 acceptance ledger"), "{err}");
+     assert!(
++        err.contains("cannot read the R00 acceptance ledger"),
++        "{err}"
++    );
++    assert!(
+         !evidence.join("ran.marker").exists(),
+         "the refusal happens before any command runs"
+     );
+Diff in /Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/xtask/src/verify/runner_tests.rs:1189:
+         34,
+         "R02 must declare all 34 R00 REQUIRED_SUPPLEMENTAL leaves"
+     );
+-    let count_kind = |kind: &str| r02.supplemental_leaves.iter().filter(|l| l.basis_kind == kind).count();
++    let count_kind = |kind: &str| {
++        r02.supplemental_leaves
++            .iter()
++            .filter(|l| l.basis_kind == kind)
++            .count()
++    };
+     assert_eq!(count_kind(crate::stage_map::BASIS_ROUTE_PRESENT_STATIC), 4);
+     assert_eq!(count_kind(crate::stage_map::BASIS_PROTOCOL), 7);
+     assert_eq!(count_kind(crate::stage_map::BASIS_AUTH_PRIMITIVE_ONLY), 21);
+Diff in /Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/xtask/src/verify/runner_tests.rs:1196:
+-    assert_eq!(count_kind(crate::stage_map::BASIS_CLIENT_ONLY_STAGE_CONFLICT), 2);
++    assert_eq!(
++        count_kind(crate::stage_map::BASIS_CLIENT_ONLY_STAGE_CONFLICT),
++        2
++    );
+     assert!(r02
+         .supplemental_leaves
+         .iter()
+Diff in /Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/xtask/src/verify/runner_tests.rs:1203:
+         l.r00_execution_stage_ids.iter().any(|id| id == "R02")
+             && l.r00_execution_stage_ids.iter().any(|id| id == "R07")
+     }));
+-    for l in r02.supplemental_leaves.iter().filter(|l| l.basis_kind == crate::stage_map::BASIS_CLIENT_ONLY_STAGE_CONFLICT) {
++    for l in r02
++        .supplemental_leaves
++        .iter()
++        .filter(|l| l.basis_kind == crate::stage_map::BASIS_CLIENT_ONLY_STAGE_CONFLICT)
++    {
+         assert!(
+             l.evidence_command_refs.is_empty() && l.evidence_paths.is_empty(),
+             "{}: a BLOCKED conflict leaf must carry no pass-able evidence",
+Diff in /Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/xtask/src/verify/runner_tests.rs:1215:
+             l.id
+         );
+     }
+-    for l in r02.supplemental_leaves.iter().filter(|l| l.basis_kind != crate::stage_map::BASIS_CLIENT_ONLY_STAGE_CONFLICT) {
++    for l in r02
++        .supplemental_leaves
++        .iter()
++        .filter(|l| l.basis_kind != crate::stage_map::BASIS_CLIENT_ONLY_STAGE_CONFLICT)
++    {
+         assert!(
+             !l.evidence_command_refs.is_empty(),
+             "{}: an R02-share leaf must bind evidence commands",
+Diff in /Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/xtask/src/verify/runner_tests.rs:1223:
+         );
+         // R14-F01: every pass-able leaf carries the machine-checked cases
+         // that consume its original R00 assertions.
+-        let contract = l
+-            .assertion_contract
+-            .as_ref()
+-            .unwrap_or_else(|| panic!("{}: non-conflict leaf must declare an assertionContract", l.id));
++        let contract = l.assertion_contract.as_ref().unwrap_or_else(|| {
++            panic!(
++                "{}: non-conflict leaf must declare an assertionContract",
++                l.id
++            )
++        });
+         assert!(
+             l.evidence_command_refs.contains(&contract.producer_command),
+             "{}: the contract's producer must be one of the leaf's bound commands",
+Diff in /Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/xtask/src/verify.rs:111:
+ /// it owns the leaf's original `assertions` list, the `due` line, and the
+ /// per-A-ID coverage relations (GAP/INDIRECT) that prove the base
+ /// scenarios alone cannot cover a leaf.
+-pub const R00_FEATURE_STAGE_ACCEPTANCE_PATH: &str = "docs/rust-tauri/R00/FEATURE_STAGE_ACCEPTANCE.json";
++pub const R00_FEATURE_STAGE_ACCEPTANCE_PATH: &str =
++    "docs/rust-tauri/R00/FEATURE_STAGE_ACCEPTANCE.json";
+ 
+ /// The R00-side expectation for one supplemental leaf (R14-F01: the FULL
+ /// original record, not just id+requirement). Every field is compared
+Diff in /Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/xtask/src/verify.rs:138:
+ /// leaves it binds to `stage`, sorted by id. Fails closed on every error:
+ /// an unreadable, unparsable, or structurally drifted ledger means leaf
+ /// coverage CANNOT be verified, which must abort the gate — never pass.
+-fn load_r00_supplemental_expectations(repo_root: &Path, stage: &str) -> Result<Vec<R00LeafExpectation>, String> {
++fn load_r00_supplemental_expectations(
++    repo_root: &Path,
++    stage: &str,
++) -> Result<Vec<R00LeafExpectation>, String> {
+     let path = repo_root.join(R00_ACCEPTANCE_MAP_PATH);
+     let text = std::fs::read_to_string(&path).map_err(|e| {
+         format!(
+Diff in /Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/xtask/src/verify.rs:148:
+             path.display()
+         )
+     })?;
+-    let value: Value = serde_json::from_str(&text)
+-        .map_err(|e| format!("R00 acceptance ledger {} is not valid JSON: {e}", path.display()))?;
++    let value: Value = serde_json::from_str(&text).map_err(|e| {
++        format!(
++            "R00 acceptance ledger {} is not valid JSON: {e}",
++            path.display()
++        )
++    })?;
+     let scenarios = value
+         .get("scenarios")
+         .and_then(Value::as_object)
+Diff in /Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/xtask/src/verify.rs:203:
+             .get(field)
+             .and_then(Value::as_str)
+             .map(str::to_string)
+-            .ok_or_else(|| {
+-                format!("R00 ledger {ledger} scenario {id:?} has no {field} string")
+-            })
++            .ok_or_else(|| format!("R00 ledger {ledger} scenario {id:?} has no {field} string"))
+     }
+     /// Reads one required string-array field of an R00 record.
+-    fn req_str_array(entry: &Value, field: &str, id: &str, ledger: &str) -> Result<Vec<String>, String> {
++    fn req_str_array(
++        entry: &Value,
++        field: &str,
++        id: &str,
++        ledger: &str,
++    ) -> Result<Vec<String>, String> {
+         entry
+             .get(field)
+             .and_then(Value::as_array)
+Diff in /Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/xtask/src/verify.rs:429:
+         // this is reached the invariant broke — fail closed, never pass.
+         return (
+             Vec::new(),
+-            "assertion contract missing (parser invariant violated — failing closed)"
+-                .to_string(),
++            "assertion contract missing (parser invariant violated — failing closed)".to_string(),
+         );
+     };
+     // The producer must have PASSED this run. (The refs check below already
+Diff in /Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/xtask/src/verify.rs:544:
+         let ok = recorded.get("ok").and_then(Value::as_bool);
+         let actual = recorded.get("actual").and_then(Value::as_i64);
+         let file_expect = recorded.get("expect").and_then(Value::as_i64);
+-        let case_ok = ok == Some(true)
+-            && actual == Some(pinned.expect)
+-            && file_expect == Some(pinned.expect);
++        let case_ok =
++            ok == Some(true) && actual == Some(pinned.expect) && file_expect == Some(pinned.expect);
+         if !case_ok {
+             failures.push(format!(
+                 "case {:?}: map pins expect {} but evidence records ok={:?} \
+Diff in /Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/xtask/src/verify.rs:1493:
+         };
+         println!(
+             "xtask: verify-stage {} supplemental {} [{}] {}",
+-            map.stage,
+-            leaf.id,
+-            leaf.basis_kind,
+-            status
++            map.stage, leaf.id, leaf.basis_kind, status
+         );
+         match status.as_str() {
+             "PASS" => supplemental_pass += 1,
+Diff in /Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/xtask/src/verify.rs:1535:
+              after the pre-run cross-check — invariant violation, failing closed"
+         ));
+     }
+-    let supplemental_all_pass =
+-        supplemental_pass == map.supplemental_leaves.len() && map.supplemental_leaves.len() == r00_expected.len();
++    let supplemental_all_pass = supplemental_pass == map.supplemental_leaves.len()
++        && map.supplemental_leaves.len() == r00_expected.len();
+ 
+     let overall_pass = scenario_json.iter().all(|s| s["status"] == "PASS") && supplemental_all_pass;
+     let finished = crate::now_ms();

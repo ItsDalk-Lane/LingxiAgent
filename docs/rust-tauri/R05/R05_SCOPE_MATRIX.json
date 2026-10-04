@@ -1,0 +1,2912 @@
+{
+ "schema": "lingxi.r05-scope-matrix.v1",
+ "stage_id": "R05",
+ "generated_by": "docs/rust-tauri/R05/r05_t01_build_scope_matrix.py",
+ "generated_at": "2026-10-02",
+ "source_ledgers": {
+  "docs/rust-tauri/R00/ACCEPTANCE_MAP.json": "96f70219d1df88249e8df073f4dfe211f8562cef20f7e45b1c03064feb5362be"
+ },
+ "disposition_rules": "share=R05 拥有该叶可在本阶段门禁验证的具体份额（逐叶写明，缺密钥不构成延期——协议适配一律离线替身验证）；deferred=该叶无 R05 门禁份额，且仅当其行为是真实的 R07 业务入口（设置页语义/桌面壳行为/业务路由）。规则全文见生成脚本模块注释 R1–R7。",
+ "base_scenarios": [
+  {
+   "id": "R05-A01",
+   "name": "同名模型不串凭证",
+   "owner_task": "R05-T01",
+   "requirement": "REQUIRED",
+   "r00_task_ids": [
+    "R05-T01"
+   ],
+   "t01_check_ids": [
+    "R05-T01-C04"
+   ]
+  },
+  {
+   "id": "R05-A02",
+   "name": "不支持能力提前失败",
+   "owner_task": "R05-T01",
+   "requirement": "REQUIRED",
+   "r00_task_ids": [
+    "R05-T01"
+   ],
+   "t01_check_ids": [
+    "R05-T01-C06"
+   ]
+  },
+  {
+   "id": "R05-A03",
+   "name": "并发401只协调一次刷新",
+   "owner_task": "R05-T02",
+   "requirement": "REQUIRED",
+   "r00_task_ids": [
+    "R05-T02"
+   ],
+   "t01_check_ids": []
+  },
+  {
+   "id": "R05-A04",
+   "name": "撤销后迟到刷新不能复活",
+   "owner_task": "R05-T02",
+   "requirement": "REQUIRED",
+   "r00_task_ids": [
+    "R05-T02"
+   ],
+   "t01_check_ids": []
+  },
+  {
+   "id": "R05-A05",
+   "name": "工具多轮协议匹配",
+   "owner_task": "R05-T03",
+   "requirement": "REQUIRED",
+   "r00_task_ids": [
+    "R05-T03"
+   ],
+   "t01_check_ids": []
+  },
+  {
+   "id": "R05-A06",
+   "name": "协议差异不被吞掉",
+   "owner_task": "R05-T03",
+   "requirement": "REQUIRED",
+   "r00_task_ids": [
+    "R05-T03"
+   ],
+   "t01_check_ids": []
+  },
+  {
+   "id": "R05-A07",
+   "name": "任意分片保持语义",
+   "owner_task": "R05-T04",
+   "requirement": "REQUIRED",
+   "r00_task_ids": [
+    "R05-T04"
+   ],
+   "t01_check_ids": []
+  },
+  {
+   "id": "R05-A08",
+   "name": "中断流不伪造最终回复",
+   "owner_task": "R05-T04",
+   "requirement": "REQUIRED",
+   "r00_task_ids": [
+    "R05-T04"
+   ],
+   "t01_check_ids": []
+  },
+  {
+   "id": "R05-A09",
+   "name": "流中取消释放连接",
+   "owner_task": "R05-T05",
+   "requirement": "REQUIRED",
+   "r00_task_ids": [
+    "R05-T05"
+   ],
+   "t01_check_ids": []
+  },
+  {
+   "id": "R05-A10",
+   "name": "外发阶段重试不复制副作用",
+   "owner_task": "R05-T05",
+   "requirement": "REQUIRED",
+   "r00_task_ids": [
+    "R05-T05"
+   ],
+   "t01_check_ids": []
+  },
+  {
+   "id": "R05-A11",
+   "name": "异供应商媒体调用正确",
+   "owner_task": "R05-T06",
+   "requirement": "REQUIRED",
+   "r00_task_ids": [
+    "R05-T06"
+   ],
+   "t01_check_ids": []
+  },
+  {
+   "id": "R05-A12",
+   "name": "辅助调用同受取消和预算约束",
+   "owner_task": "R05-T06",
+   "requirement": "REQUIRED",
+   "r00_task_ids": [
+    "R05-T06"
+   ],
+   "t01_check_ids": []
+  },
+  {
+   "id": "R05-A13",
+   "name": "多轮不拆成无关轨迹",
+   "owner_task": "R05-T07",
+   "requirement": "REQUIRED",
+   "r00_task_ids": [
+    "R05-T07"
+   ],
+   "t01_check_ids": []
+  },
+  {
+   "id": "R05-A14",
+   "name": "重复usage事件不多计费",
+   "owner_task": "R05-T07",
+   "requirement": "REQUIRED",
+   "r00_task_ids": [
+    "R05-T07"
+   ],
+   "t01_check_ids": []
+  },
+  {
+   "id": "R05-A15",
+   "name": "无Pi真实工具闭环",
+   "owner_task": "R05-T08",
+   "requirement": "REQUIRED",
+   "r00_task_ids": [
+    "R05-T08"
+   ],
+   "t01_check_ids": [
+    "R05-T01-C02",
+    "R05-T01-C03"
+   ]
+  },
+  {
+   "id": "R05-A16",
+   "name": "关键失败可复原",
+   "owner_task": "R05-T08",
+   "requirement": "REQUIRED",
+   "r00_task_ids": [
+    "R05-T08"
+   ],
+   "t01_check_ids": []
+  }
+ ],
+ "supplemental_leaves": [
+  {
+   "id": "R00-T02-LA-00A769DD0FA3",
+   "feature_id": "F-D10-PROVIDER-PROVIDER-PERPLEXITY-00A769",
+   "requirement": "REQUIRED_SUPPLEMENTAL",
+   "r00_task_ids": [
+    "R05-T01",
+    "R07-T08",
+    "R05-T02",
+    "R05-T03"
+   ],
+   "r00_execution_stage_ids": [
+    "R05",
+    "R07"
+   ],
+   "r00_then": "注册 id=perplexity、auth=api-key、api=openai-completions；配置/选择后仅已允许的模型参与调用，凭证按provider+model隔离，真实调用返回该端点的回复。",
+   "disposition": "share",
+   "rule": "R3",
+   "r05_share": "协议族 openai-completions 与认证形态 api-key 在 Rust ModelGateway 注册并以离线协议替身验证（provider=perplexity 同名 modelId 跨 provider 不串凭证/端点/trace；不支持能力请求前明确失败）；归属 R05-T01 网关/能力矩阵、R05-T02 凭证、R05-T03 协议适配。",
+   "deferred_to": null,
+   "deferred_reason": null,
+   "r07_remainder": "设置页注册/选择/展示的现役 UI 与业务路由链（R07-T08）。"
+  },
+  {
+   "id": "R00-T02-LA-03E1121574A1",
+   "feature_id": "F-D10-PROVIDER-PROVIDER-OPENAI-03E112",
+   "requirement": "REQUIRED_SUPPLEMENTAL",
+   "r00_task_ids": [
+    "R05-T01",
+    "R07-T08",
+    "R05-T02",
+    "R05-T03",
+    "R05-T06"
+   ],
+   "r00_execution_stage_ids": [
+    "R05",
+    "R07"
+   ],
+   "r00_then": "注册 id=openai、auth=api-key、api=openai-completions；配置/选择后仅已允许的模型参与调用，凭证按provider+model隔离，真实调用返回该端点的回复；另可按能力执行图片生成、语音合成、语音识别。",
+   "disposition": "share",
+   "rule": "R3",
+   "r05_share": "协议族 openai-completions 与认证形态 api-key 在 Rust ModelGateway 注册并以离线协议替身验证（provider=openai 同名 modelId 跨 provider 不串凭证/端点/trace；不支持能力请求前明确失败）；归属 R05-T01 网关/能力矩阵、R05-T02 凭证、R05-T03 协议适配。",
+   "deferred_to": null,
+   "deferred_reason": null,
+   "r07_remainder": "设置页注册/选择/展示的现役 UI 与业务路由链（R07-T08）。"
+  },
+  {
+   "id": "R00-T02-LA-057B048D6C07",
+   "feature_id": "F-D12-SEMANTIC_EFFECT-SEMANTIC-EFFECT-MEDIA-MEDIA-VIDEO-PROVIDERS-PROV-057B04",
+   "requirement": "REQUIRED_SUPPLEMENTAL",
+   "r00_task_ids": [
+    "R05-T03",
+    "R05-T06",
+    "R07-T06"
+   ],
+   "r00_execution_stage_ids": [
+    "R05",
+    "R07"
+   ],
+   "r00_then": "更新供应商模型并返回记录",
+   "disposition": "share",
+   "rule": "R5",
+   "r05_share": "对应媒体 operation（image/video/speech/asr）的 Rust 协议适配、配置段与异步任务语义（job accepted≠产物完成；凭证不跨供应商串用）离线替身验证：R05-T06。",
+   "deferred_to": null,
+   "deferred_reason": null,
+   "r07_remainder": "媒体业务入口路由与页面投影（R07-T06）。"
+  },
+  {
+   "id": "R00-T02-LA-05A57775857D",
+   "feature_id": "F-D10-SEMANTIC_EFFECT-SEMANTIC-EFFECT-MODELS-MODELS-SET-05A577",
+   "requirement": "REQUIRED_SUPPLEMENTAL",
+   "r00_task_ids": [
+    "R05-T01",
+    "R07-T08"
+   ],
+   "r00_execution_stage_ids": [
+    "R05",
+    "R07"
+   ],
+   "r00_then": "保存 pending 模型，活跃会话不切换，返回新模型及思考强度",
+   "disposition": "share",
+   "rule": "R7",
+   "r05_share": "该叶依赖的内核侧语义由 R05 覆盖：模型/槽位解析与能力预检（R05-T01）、凭证引用与脱敏（R05-T02）、providers/models 配置段的代次、原子写入与未知字段保留（R05-T01/T02）、连通性探测作为网关 operation 经离线替身验证（R05-T01/T03）。",
+   "deferred_to": null,
+   "deferred_reason": null,
+   "r07_remainder": "现役 HTTP 业务路由、设置页与交互语义（R07-T08）。"
+  },
+  {
+   "id": "R00-T02-LA-08EB520C2ECC",
+   "feature_id": "F-D22-SEMANTIC_EFFECT-SEMANTIC-EFFECT-MODEL-OBSERVABILITY-MODEL-OBSERV-08EB52",
+   "requirement": "REQUIRED_SUPPLEMENTAL",
+   "r00_task_ids": [
+    "R05-T07",
+    "R07-T10"
+   ],
+   "r00_execution_stage_ids": [
+    "R05",
+    "R07"
+   ],
+   "r00_then": "返回大小与数量，未初始化 404",
+   "disposition": "share",
+   "rule": "R6",
+   "r05_share": "usage/trace/观测数据的产生、持久化、去重、保留期与查询结构（含 NDJSON/blob 数据面语义、未初始化/无权限明确报错）：R05-T07；现役字段与隐私设置保留。",
+   "deferred_to": null,
+   "deferred_reason": null,
+   "r07_remainder": "模型观测/用量的业务路由与 UI 投影验收（R07-T10）。"
+  },
+  {
+   "id": "R00-T02-LA-0949F828BEA3",
+   "feature_id": "F-D12-SEMANTIC_EFFECT-SEMANTIC-EFFECT-MEDIA-MEDIA-GENERATED-FILENAME-R-0949F8",
+   "requirement": "REQUIRED_SUPPLEMENTAL",
+   "r00_task_ids": [
+    "R05-T03",
+    "R05-T06",
+    "R07-T06"
+   ],
+   "r00_execution_stage_ids": [
+    "R05",
+    "R07"
+   ],
+   "r00_then": "流式返回文件，Range 返回 206",
+   "disposition": "share",
+   "rule": "R5",
+   "r05_share": "生成产物以真实文件经 ResourceRef/受控流交付且可校验（非 base64 内联、非幽灵登记）：R05-T06/T08 闭环内验证产物真实性。",
+   "deferred_to": null,
+   "deferred_reason": null,
+   "r07_remainder": "media 文件 HTTP 路由的流式/Range(206) 业务语义与页面下载入口（R07-T06）。"
+  },
+  {
+   "id": "R00-T02-LA-0BD9E0FFDCF8",
+   "feature_id": "F-D10-ROUTE_BEHAVIOR-BEHAVIOR-CONFIG-CONFIG-WORKSPACES-RECENT-DELETE-0BD9E0",
+   "requirement": "REQUIRED_SUPPLEMENTAL",
+   "r00_task_ids": [
+    "R05-T01",
+    "R07-T08"
+   ],
+   "r00_execution_stage_ids": [
+    "R05",
+    "R07"
+   ],
+   "r00_then": "从当前 Agent 的 cwd_history 移除指定路径并返回新列表；不删除目录",
+   "disposition": "share",
+   "rule": "R7",
+   "r05_share": "该叶依赖的内核侧语义由 R05 覆盖：模型/槽位解析与能力预检（R05-T01）、凭证引用与脱敏（R05-T02）、providers/models 配置段的代次、原子写入与未知字段保留（R05-T01/T02）、连通性探测作为网关 operation 经离线替身验证（R05-T01/T03）。",
+   "deferred_to": null,
+   "deferred_reason": null,
+   "r07_remainder": "现役 HTTP 业务路由、设置页与交互语义（R07-T08）。"
+  },
+  {
+   "id": "R00-T02-LA-0DFFAB20A40B",
+   "feature_id": "F-D10-PROVIDER-PROVIDER-MIMO-0DFFAB",
+   "requirement": "REQUIRED_SUPPLEMENTAL",
+   "r00_task_ids": [
+    "R05-T01",
+    "R07-T08",
+    "R05-T02",
+    "R05-T03",
+    "R05-T06"
+   ],
+   "r00_execution_stage_ids": [
+    "R05",
+    "R07"
+   ],
+   "r00_then": "注册 id=mimo、auth=api-key、api=openai-completions；配置/选择后仅已允许的模型参与调用，凭证按provider+model隔离，真实调用返回该端点的回复；另可按能力执行语音识别。",
+   "disposition": "share",
+   "rule": "R3",
+   "r05_share": "协议族 openai-completions 与认证形态 api-key 在 Rust ModelGateway 注册并以离线协议替身验证（provider=mimo 同名 modelId 跨 provider 不串凭证/端点/trace；不支持能力请求前明确失败）；归属 R05-T01 网关/能力矩阵、R05-T02 凭证、R05-T03 协议适配。",
+   "deferred_to": null,
+   "deferred_reason": null,
+   "r07_remainder": "设置页注册/选择/展示的现役 UI 与业务路由链（R07-T08）。"
+  },
+  {
+   "id": "R00-T02-LA-0E9326840E66",
+   "feature_id": "F-D22-SEMANTIC_EFFECT-SEMANTIC-EFFECT-MODEL-OBSERVABILITY-MODEL-OBSERV-0E9326",
+   "requirement": "REQUIRED_SUPPLEMENTAL",
+   "r00_task_ids": [
+    "R05-T07",
+    "R07-T10"
+   ],
+   "r00_execution_stage_ids": [
+    "R05",
+    "R07"
+   ],
+   "r00_then": "只保存 retention，永开字段不可关闭",
+   "disposition": "share",
+   "rule": "R6",
+   "r05_share": "usage/trace/观测数据的产生、持久化、去重、保留期与查询结构（含 NDJSON/blob 数据面语义、未初始化/无权限明确报错）：R05-T07；现役字段与隐私设置保留。",
+   "deferred_to": null,
+   "deferred_reason": null,
+   "r07_remainder": "模型观测/用量的业务路由与 UI 投影验收（R07-T10）。"
+  },
+  {
+   "id": "R00-T02-LA-0F28429F329E",
+   "feature_id": "F-D22-DESKTOP_BEHAVIOR-DESKTOP-BEHAVIOR-OBSERVABILITY-EXPORT-0F2842",
+   "requirement": "REQUIRED_SUPPLEMENTAL",
+   "r00_task_ids": [
+    "R05-T07",
+    "R07-T10"
+   ],
+   "r00_execution_stage_ids": [
+    "R05",
+    "R07"
+   ],
+   "r00_then": "得到可下载或保存的观测数据文件",
+   "disposition": "deferred",
+   "rule": "R2",
+   "r05_share": null,
+   "deferred_to": [
+    "R07"
+   ],
+   "deferred_reason": "「得到可下载或保存的观测数据文件」是桌面壳下载/保存业务入口（R07）；R05 只保证导出数据本身真实可查询。",
+   "r07_remainder": "得到可下载或保存的观测数据文件"
+  },
+  {
+   "id": "R00-T02-LA-16CEB6D12A6A",
+   "feature_id": "F-D11-SEMANTIC_EFFECT-SEMANTIC-EFFECT-AUTH-AUTH-OAUTH-PROVIDER-CUSTOM--16CEB6",
+   "requirement": "REQUIRED_SUPPLEMENTAL",
+   "r00_task_ids": [
+    "R05-T02"
+   ],
+   "r00_execution_stage_ids": [
+    "R05"
+   ],
+   "r00_then": "把 modelId 加入 provider 注册表并刷新模型，返回新清单",
+   "disposition": "share",
+   "rule": "R4",
+   "r05_share": "OAuth/CredentialService 服务端全份额离线替身验证（start/callback/poll/state/PKCE/logout/custom modelId 管理按该叶 then 文本逐项）：R05-T02。",
+   "deferred_to": null,
+   "deferred_reason": null,
+   "r07_remainder": null
+  },
+  {
+   "id": "R00-T02-LA-17702A7B3335",
+   "feature_id": "F-D12-SEMANTIC_EFFECT-SEMANTIC-EFFECT-MEDIA-MEDIA-SPEECH-CONFIG-READ-17702A",
+   "requirement": "REQUIRED_SUPPLEMENTAL",
+   "r00_task_ids": [
+    "R05-T03",
+    "R05-T06",
+    "R07-T06"
+   ],
+   "r00_execution_stage_ids": [
+    "R05",
+    "R07"
+   ],
+   "r00_then": "返回 config",
+   "disposition": "share",
+   "rule": "R5",
+   "r05_share": "对应媒体 operation（image/video/speech/asr）的 Rust 协议适配、配置段与异步任务语义（job accepted≠产物完成；凭证不跨供应商串用）离线替身验证：R05-T06。",
+   "deferred_to": null,
+   "deferred_reason": null,
+   "r07_remainder": "媒体业务入口路由与页面投影（R07-T06）。"
+  },
+  {
+   "id": "R00-T02-LA-184E03F012D5",
+   "feature_id": "F-D10-PROVIDER-PROVIDER-FIREWORKS-184E03",
+   "requirement": "REQUIRED_SUPPLEMENTAL",
+   "r00_task_ids": [
+    "R05-T01",
+    "R07-T08",
+    "R05-T02",
+    "R05-T03"
+   ],
+   "r00_execution_stage_ids": [
+    "R05",
+    "R07"
+   ],
+   "r00_then": "注册 id=fireworks、auth=api-key、api=openai-completions；配置/选择后仅已允许的模型参与调用，凭证按provider+model隔离，真实调用返回该端点的回复。",
+   "disposition": "share",
+   "rule": "R3",
+   "r05_share": "协议族 openai-completions 与认证形态 api-key 在 Rust ModelGateway 注册并以离线协议替身验证（provider=fireworks 同名 modelId 跨 provider 不串凭证/端点/trace；不支持能力请求前明确失败）；归属 R05-T01 网关/能力矩阵、R05-T02 凭证、R05-T03 协议适配。",
+   "deferred_to": null,
+   "deferred_reason": null,
+   "r07_remainder": "设置页注册/选择/展示的现役 UI 与业务路由链（R07-T08）。"
+  },
+  {
+   "id": "R00-T02-LA-1850FE23DD5D",
+   "feature_id": "F-D22-UI-UI-SETTINGS-USAGE-1850FE",
+   "requirement": "REQUIRED_SUPPLEMENTAL",
+   "r00_task_ids": [
+    "R05-T07",
+    "R07-T10"
+   ],
+   "r00_execution_stage_ids": [
+    "R05",
+    "R07"
+   ],
+   "r00_then": "逐动作核对实际状态与页面投影；失败不伪装成空数据",
+   "disposition": "deferred",
+   "rule": "R1",
+   "r05_share": null,
+   "deferred_to": [
+    "R07"
+   ],
+   "deferred_reason": "用量设置页的逐动作页面投影核对属于 R07 设置页业务入口；R05-T07 只交付 usage/trace 数据产生与查询结构。",
+   "r07_remainder": "逐动作核对实际状态与页面投影；失败不伪装成空数据"
+  },
+  {
+   "id": "R00-T02-LA-1B65B0793D67",
+   "feature_id": "F-D12-SEMANTIC_EFFECT-SEMANTIC-EFFECT-MEDIA-MEDIA-IMAGE-CONFIG-PUT-1B65B0",
+   "requirement": "REQUIRED_SUPPLEMENTAL",
+   "r00_task_ids": [
+    "R05-T03",
+    "R05-T06",
+    "R07-T06"
+   ],
+   "r00_execution_stage_ids": [
+    "R05",
+    "R07"
+   ],
+   "r00_then": "保存 config 并返回生效值",
+   "disposition": "share",
+   "rule": "R5",
+   "r05_share": "对应媒体 operation（image/video/speech/asr）的 Rust 协议适配、配置段与异步任务语义（job accepted≠产物完成；凭证不跨供应商串用）离线替身验证：R05-T06。",
+   "deferred_to": null,
+   "deferred_reason": null,
+   "r07_remainder": "媒体业务入口路由与页面投影（R07-T06）。"
+  },
+  {
+   "id": "R00-T02-LA-1EA9E4819E27",
+   "feature_id": "F-D12-SEMANTIC_EFFECT-SEMANTIC-EFFECT-MEDIA-MEDIA-VIDEO-PROVIDERS-READ-1EA9E4",
+   "requirement": "REQUIRED_SUPPLEMENTAL",
+   "r00_task_ids": [
+    "R05-T03",
+    "R05-T06",
+    "R07-T06"
+   ],
+   "r00_execution_stage_ids": [
+    "R05",
+    "R07"
+   ],
+   "r00_then": "返回video供应商/模型列表",
+   "disposition": "share",
+   "rule": "R5",
+   "r05_share": "对应媒体 operation（image/video/speech/asr）的 Rust 协议适配、配置段与异步任务语义（job accepted≠产物完成；凭证不跨供应商串用）离线替身验证：R05-T06。",
+   "deferred_to": null,
+   "deferred_reason": null,
+   "r07_remainder": "媒体业务入口路由与页面投影（R07-T06）。"
+  },
+  {
+   "id": "R00-T02-LA-2045462C0D98",
+   "feature_id": "F-D22-ROUTE_BEHAVIOR-BEHAVIOR-MODEL-OBSERVABILITY-MODEL-OBSERVABILITY-204546",
+   "requirement": "REQUIRED_SUPPLEMENTAL",
+   "r00_task_ids": [
+    "R05-T07",
+    "R07-T10"
+   ],
+   "r00_execution_stage_ids": [
+    "R05",
+    "R07"
+   ],
+   "r00_then": "可用状态与录制状态如实显示；无权限和网络失败显示 alert，不冒充空数据",
+   "disposition": "share",
+   "rule": "R6",
+   "r05_share": "usage/trace/观测数据的产生、持久化、去重、保留期与查询结构（含 NDJSON/blob 数据面语义、未初始化/无权限明确报错）：R05-T07；现役字段与隐私设置保留。",
+   "deferred_to": null,
+   "deferred_reason": null,
+   "r07_remainder": "模型观测/用量的业务路由与 UI 投影验收（R07-T10）。"
+  },
+  {
+   "id": "R00-T02-LA-2097E172B42B",
+   "feature_id": "F-D10-PROVIDER-PROVIDER-HUNYUAN-2097E1",
+   "requirement": "REQUIRED_SUPPLEMENTAL",
+   "r00_task_ids": [
+    "R05-T01",
+    "R07-T08",
+    "R05-T02",
+    "R05-T03"
+   ],
+   "r00_execution_stage_ids": [
+    "R05",
+    "R07"
+   ],
+   "r00_then": "注册 id=hunyuan、auth=api-key、api=openai-completions；配置/选择后仅已允许的模型参与调用，凭证按provider+model隔离，真实调用返回该端点的回复。",
+   "disposition": "share",
+   "rule": "R3",
+   "r05_share": "协议族 openai-completions 与认证形态 api-key 在 Rust ModelGateway 注册并以离线协议替身验证（provider=hunyuan 同名 modelId 跨 provider 不串凭证/端点/trace；不支持能力请求前明确失败）；归属 R05-T01 网关/能力矩阵、R05-T02 凭证、R05-T03 协议适配。",
+   "deferred_to": null,
+   "deferred_reason": null,
+   "r07_remainder": "设置页注册/选择/展示的现役 UI 与业务路由链（R07-T08）。"
+  },
+  {
+   "id": "R00-T02-LA-22A8DCD792BE",
+   "feature_id": "F-D10-PROVIDER-PROVIDER-SYSTEMSPEECH-22A8DC",
+   "requirement": "REQUIRED_SUPPLEMENTAL",
+   "r00_task_ids": [
+    "R05-T01",
+    "R07-T08",
+    "R05-T06"
+   ],
+   "r00_execution_stage_ids": [
+    "R05",
+    "R07"
+   ],
+   "r00_then": "注册 id=system-speech 的语音合成、语音识别能力；凭证/适配器满足条件时，经系统语音运行时得到相应音频或转写结果，配置页如实显示能力状态。",
+   "disposition": "share",
+   "rule": "R3",
+   "r05_share": "语音 provider 的注册形态与协议归属（system-speech 系统运行时 / volcengine-bigasr 供应商端点）在 Rust ModelGateway 能力矩阵中登记并以离线替身验证能力与凭证边界；归属 R05-T01/R05-T06。",
+   "deferred_to": null,
+   "deferred_reason": null,
+   "r07_remainder": "配置页能力状态展示与现役 UI 链（R07-T08）。"
+  },
+  {
+   "id": "R00-T02-LA-27A9F02FCD58",
+   "feature_id": "F-D12-SEMANTIC_EFFECT-SEMANTIC-EFFECT-MEDIA-MEDIA-IMAGE-PROVIDERS-READ-27A9F0",
+   "requirement": "REQUIRED_SUPPLEMENTAL",
+   "r00_task_ids": [
+    "R05-T03",
+    "R05-T06",
+    "R07-T06"
+   ],
+   "r00_execution_stage_ids": [
+    "R05",
+    "R07"
+   ],
+   "r00_then": "返回image供应商/模型列表",
+   "disposition": "share",
+   "rule": "R5",
+   "r05_share": "对应媒体 operation（image/video/speech/asr）的 Rust 协议适配、配置段与异步任务语义（job accepted≠产物完成；凭证不跨供应商串用）离线替身验证：R05-T06。",
+   "deferred_to": null,
+   "deferred_reason": null,
+   "r07_remainder": "媒体业务入口路由与页面投影（R07-T06）。"
+  },
+  {
+   "id": "R00-T02-LA-2E137D5F14B9",
+   "feature_id": "F-D12-SEMANTIC_EFFECT-SEMANTIC-EFFECT-MEDIA-MEDIA-SPEECH-PROVIDERS-REA-2E137D",
+   "requirement": "REQUIRED_SUPPLEMENTAL",
+   "r00_task_ids": [
+    "R05-T03",
+    "R05-T06",
+    "R07-T06"
+   ],
+   "r00_execution_stage_ids": [
+    "R05",
+    "R07"
+   ],
+   "r00_then": "返回speech供应商/模型列表",
+   "disposition": "share",
+   "rule": "R5",
+   "r05_share": "对应媒体 operation（image/video/speech/asr）的 Rust 协议适配、配置段与异步任务语义（job accepted≠产物完成；凭证不跨供应商串用）离线替身验证：R05-T06。",
+   "deferred_to": null,
+   "deferred_reason": null,
+   "r07_remainder": "媒体业务入口路由与页面投影（R07-T06）。"
+  },
+  {
+   "id": "R00-T02-LA-2EDB69DA3AE2",
+   "feature_id": "F-D10-PROVIDER-PROVIDER-SILICONFLOW-2EDB69",
+   "requirement": "REQUIRED_SUPPLEMENTAL",
+   "r00_task_ids": [
+    "R05-T01",
+    "R07-T08",
+    "R05-T02",
+    "R05-T03",
+    "R05-T06"
+   ],
+   "r00_execution_stage_ids": [
+    "R05",
+    "R07"
+   ],
+   "r00_then": "注册 id=siliconflow、auth=api-key、api=openai-completions；配置/选择后仅已允许的模型参与调用，凭证按provider+model隔离，真实调用返回该端点的回复；另可按能力执行语音合成。",
+   "disposition": "share",
+   "rule": "R3",
+   "r05_share": "协议族 openai-completions 与认证形态 api-key 在 Rust ModelGateway 注册并以离线协议替身验证（provider=siliconflow 同名 modelId 跨 provider 不串凭证/端点/trace；不支持能力请求前明确失败）；归属 R05-T01 网关/能力矩阵、R05-T02 凭证、R05-T03 协议适配。",
+   "deferred_to": null,
+   "deferred_reason": null,
+   "r07_remainder": "设置页注册/选择/展示的现役 UI 与业务路由链（R07-T08）。"
+  },
+  {
+   "id": "R00-T02-LA-3645002066F0",
+   "feature_id": "F-D22-SEMANTIC_EFFECT-SEMANTIC-EFFECT-OBSERVABILITY-BLOB-HEAD-364500",
+   "requirement": "REQUIRED_SUPPLEMENTAL",
+   "r00_task_ids": [
+    "R05-T07",
+    "R07-T10"
+   ],
+   "r00_execution_stage_ids": [
+    "R05",
+    "R07"
+   ],
+   "r00_then": "HEAD 仅返回头",
+   "disposition": "share",
+   "rule": "R6",
+   "r05_share": "usage/trace/观测数据的产生、持久化、去重、保留期与查询结构（含 NDJSON/blob 数据面语义、未初始化/无权限明确报错）：R05-T07；现役字段与隐私设置保留。",
+   "deferred_to": null,
+   "deferred_reason": null,
+   "r07_remainder": "模型观测/用量的业务路由与 UI 投影验收（R07-T10）。"
+  },
+  {
+   "id": "R00-T02-LA-385F593D5622",
+   "feature_id": "F-D12-SEMANTIC_EFFECT-SEMANTIC-EFFECT-MEDIA-MEDIA-IMAGE-GENERATE-POST-385F59",
+   "requirement": "REQUIRED_SUPPLEMENTAL",
+   "r00_task_ids": [
+    "R05-T03",
+    "R05-T06",
+    "R07-T06"
+   ],
+   "r00_execution_stage_ids": [
+    "R05",
+    "R07"
+   ],
+   "r00_then": "创建图片生成任务并返回结果",
+   "disposition": "share",
+   "rule": "R5",
+   "r05_share": "对应媒体 operation（image/video/speech/asr）的 Rust 协议适配、配置段与异步任务语义（job accepted≠产物完成；凭证不跨供应商串用）离线替身验证：R05-T06。",
+   "deferred_to": null,
+   "deferred_reason": null,
+   "r07_remainder": "媒体业务入口路由与页面投影（R07-T06）。"
+  },
+  {
+   "id": "R00-T02-LA-39733312E5F4",
+   "feature_id": "F-D10-PROVIDER-PROVIDER-DASHSCOPE-397333",
+   "requirement": "REQUIRED_SUPPLEMENTAL",
+   "r00_task_ids": [
+    "R05-T01",
+    "R07-T08",
+    "R05-T02",
+    "R05-T03",
+    "R05-T06"
+   ],
+   "r00_execution_stage_ids": [
+    "R05",
+    "R07"
+   ],
+   "r00_then": "注册 id=dashscope、auth=api-key、api=openai-completions；配置/选择后仅已允许的模型参与调用，凭证按provider+model隔离，真实调用返回该端点的回复；另可按能力执行图片生成、语音合成、语音识别。",
+   "disposition": "share",
+   "rule": "R3",
+   "r05_share": "协议族 openai-completions 与认证形态 api-key 在 Rust ModelGateway 注册并以离线协议替身验证（provider=dashscope 同名 modelId 跨 provider 不串凭证/端点/trace；不支持能力请求前明确失败）；归属 R05-T01 网关/能力矩阵、R05-T02 凭证、R05-T03 协议适配。",
+   "deferred_to": null,
+   "deferred_reason": null,
+   "r07_remainder": "设置页注册/选择/展示的现役 UI 与业务路由链（R07-T08）。"
+  },
+  {
+   "id": "R00-T02-LA-3D8337A8088F",
+   "feature_id": "F-D10-PROVIDER-PROVIDER-XAIOAUTH-3D8337",
+   "requirement": "REQUIRED_SUPPLEMENTAL",
+   "r00_task_ids": [
+    "R05-T01",
+    "R07-T08",
+    "R05-T02",
+    "R05-T03"
+   ],
+   "r00_execution_stage_ids": [
+    "R05",
+    "R07"
+   ],
+   "r00_then": "注册 id=xai-oauth、auth=oauth、api=openai-responses；配置/选择后仅已允许的模型参与调用，凭证按provider+model隔离，真实调用返回该端点的回复。",
+   "disposition": "share",
+   "rule": "R3",
+   "r05_share": "协议族 openai-responses 与认证形态 oauth 在 Rust ModelGateway 注册并以离线协议替身验证（provider=xai-oauth 同名 modelId 跨 provider 不串凭证/端点/trace；不支持能力请求前明确失败）；归属 R05-T01 网关/能力矩阵、R05-T02 凭证、R05-T03 协议适配。",
+   "deferred_to": null,
+   "deferred_reason": null,
+   "r07_remainder": "设置页注册/选择/展示的现役 UI 与业务路由链（R07-T08）。"
+  },
+  {
+   "id": "R00-T02-LA-3FE814BB7C56",
+   "feature_id": "F-D12-SEMANTIC_EFFECT-SEMANTIC-EFFECT-MEDIA-GENERATE-IMAGE-3FE814",
+   "requirement": "REQUIRED_SUPPLEMENTAL",
+   "r00_task_ids": [
+    "R05-T03",
+    "R05-T06",
+    "R07-T06"
+   ],
+   "r00_execution_stage_ids": [
+    "R05",
+    "R07"
+   ],
+   "r00_then": "创建图片任务",
+   "disposition": "share",
+   "rule": "R5",
+   "r05_share": "对应媒体 operation（image/video/speech/asr）的 Rust 协议适配、配置段与异步任务语义（job accepted≠产物完成；凭证不跨供应商串用）离线替身验证：R05-T06。",
+   "deferred_to": null,
+   "deferred_reason": null,
+   "r07_remainder": "媒体业务入口路由与页面投影（R07-T06）。"
+  },
+  {
+   "id": "R00-T02-LA-40DF54BC8F29",
+   "feature_id": "F-D12-SEMANTIC_EFFECT-SEMANTIC-EFFECT-SPEECH-RECOGNITION-SPEECH-RECOGN-40DF54",
+   "requirement": "REQUIRED_SUPPLEMENTAL",
+   "r00_task_ids": [
+    "R05-T03",
+    "R05-T06",
+    "R07-T06"
+   ],
+   "r00_execution_stage_ids": [
+    "R05",
+    "R07"
+   ],
+   "r00_then": "更新模型并通知 provider changed",
+   "disposition": "share",
+   "rule": "R5",
+   "r05_share": "对应媒体 operation（image/video/speech/asr）的 Rust 协议适配、配置段与异步任务语义（job accepted≠产物完成；凭证不跨供应商串用）离线替身验证：R05-T06。",
+   "deferred_to": null,
+   "deferred_reason": null,
+   "r07_remainder": "媒体业务入口路由与页面投影（R07-T06）。"
+  },
+  {
+   "id": "R00-T02-LA-419F19D7AA64",
+   "feature_id": "F-D10-PROVIDER-PROVIDER-DEEPSEEKRESPONSES-419F19",
+   "requirement": "REQUIRED_SUPPLEMENTAL",
+   "r00_task_ids": [
+    "R05-T01",
+    "R07-T08",
+    "R05-T02",
+    "R05-T03"
+   ],
+   "r00_execution_stage_ids": [
+    "R05",
+    "R07"
+   ],
+   "r00_then": "注册 id=deepseek-responses、auth=api-key、api=openai-responses；配置/选择后仅已允许的模型参与调用，凭证按provider+model隔离，真实调用返回该端点的回复。",
+   "disposition": "share",
+   "rule": "R3",
+   "r05_share": "协议族 openai-responses 与认证形态 api-key 在 Rust ModelGateway 注册并以离线协议替身验证（provider=deepseek-responses 同名 modelId 跨 provider 不串凭证/端点/trace；不支持能力请求前明确失败）；归属 R05-T01 网关/能力矩阵、R05-T02 凭证、R05-T03 协议适配。",
+   "deferred_to": null,
+   "deferred_reason": null,
+   "r07_remainder": "设置页注册/选择/展示的现役 UI 与业务路由链（R07-T08）。"
+  },
+  {
+   "id": "R00-T02-LA-43DDCE21A45C",
+   "feature_id": "F-D10-PROVIDER-PROVIDER-OLLAMA-43DDCE",
+   "requirement": "REQUIRED_SUPPLEMENTAL",
+   "r00_task_ids": [
+    "R05-T01",
+    "R07-T08",
+    "R05-T02",
+    "R05-T03"
+   ],
+   "r00_execution_stage_ids": [
+    "R05",
+    "R07"
+   ],
+   "r00_then": "注册 id=ollama、auth=none、api=openai-completions；配置/选择后仅已允许的模型参与调用，凭证按provider+model隔离，真实调用返回该端点的回复。",
+   "disposition": "share",
+   "rule": "R3",
+   "r05_share": "协议族 openai-completions 与认证形态 none 在 Rust ModelGateway 注册并以离线协议替身验证（provider=ollama 同名 modelId 跨 provider 不串凭证/端点/trace；不支持能力请求前明确失败）；归属 R05-T01 网关/能力矩阵、R05-T02 凭证、R05-T03 协议适配。",
+   "deferred_to": null,
+   "deferred_reason": null,
+   "r07_remainder": "设置页注册/选择/展示的现役 UI 与业务路由链（R07-T08）。"
+  },
+  {
+   "id": "R00-T02-LA-44DC28F20C8A",
+   "feature_id": "F-D12-SEMANTIC_EFFECT-SEMANTIC-EFFECT-MEDIA-PROVIDERS-ASR-44DC28",
+   "requirement": "REQUIRED_SUPPLEMENTAL",
+   "r00_task_ids": [
+    "R05-T03",
+    "R05-T06",
+    "R07-T06"
+   ],
+   "r00_execution_stage_ids": [
+    "R05",
+    "R07"
+   ],
+   "r00_then": "返回 ASR 供应商列表",
+   "disposition": "share",
+   "rule": "R5",
+   "r05_share": "对应媒体 operation（image/video/speech/asr）的 Rust 协议适配、配置段与异步任务语义（job accepted≠产物完成；凭证不跨供应商串用）离线替身验证：R05-T06。",
+   "deferred_to": null,
+   "deferred_reason": null,
+   "r07_remainder": "媒体业务入口路由与页面投影（R07-T06）。"
+  },
+  {
+   "id": "R00-T02-LA-4629FFC0E72A",
+   "feature_id": "F-D10-SEMANTIC_EFFECT-SEMANTIC-EFFECT-PREFERENCES-SEARCH-SECRET-CLEAR-4629FF",
+   "requirement": "REQUIRED_SUPPLEMENTAL",
+   "r00_task_ids": [
+    "R05-T01",
+    "R07-T08"
+   ],
+   "r00_execution_stage_ids": [
+    "R05",
+    "R07"
+   ],
+   "r00_then": "显式空值由 resolveSearchPreferencePatch 清除已保存值",
+   "disposition": "share",
+   "rule": "R7",
+   "r05_share": "该叶依赖的内核侧语义由 R05 覆盖：模型/槽位解析与能力预检（R05-T01）、凭证引用与脱敏（R05-T02）、providers/models 配置段的代次、原子写入与未知字段保留（R05-T01/T02）、连通性探测作为网关 operation 经离线替身验证（R05-T01/T03）。",
+   "deferred_to": null,
+   "deferred_reason": null,
+   "r07_remainder": "现役 HTTP 业务路由、设置页与交互语义（R07-T08）。"
+  },
+  {
+   "id": "R00-T02-LA-477D944DF19B",
+   "feature_id": "F-D10-PROVIDER-PROVIDER-INFINI-477D94",
+   "requirement": "REQUIRED_SUPPLEMENTAL",
+   "r00_task_ids": [
+    "R05-T01",
+    "R07-T08",
+    "R05-T02",
+    "R05-T03"
+   ],
+   "r00_execution_stage_ids": [
+    "R05",
+    "R07"
+   ],
+   "r00_then": "注册 id=infini、auth=api-key、api=openai-completions；配置/选择后仅已允许的模型参与调用，凭证按provider+model隔离，真实调用返回该端点的回复。",
+   "disposition": "share",
+   "rule": "R3",
+   "r05_share": "协议族 openai-completions 与认证形态 api-key 在 Rust ModelGateway 注册并以离线协议替身验证（provider=infini 同名 modelId 跨 provider 不串凭证/端点/trace；不支持能力请求前明确失败）；归属 R05-T01 网关/能力矩阵、R05-T02 凭证、R05-T03 协议适配。",
+   "deferred_to": null,
+   "deferred_reason": null,
+   "r07_remainder": "设置页注册/选择/展示的现役 UI 与业务路由链（R07-T08）。"
+  },
+  {
+   "id": "R00-T02-LA-4D1720CCD10D",
+   "feature_id": "F-D22-WS_IN-WS-IN-CONTEXT-USAGE-4D1720",
+   "requirement": "REQUIRED_SUPPLEMENTAL",
+   "r00_task_ids": [
+    "R05-T07",
+    "R07-T10"
+   ],
+   "r00_execution_stage_ids": [
+    "R05",
+    "R07"
+   ],
+   "r00_then": "返回 tokens、contextWindow、percent 及可选 breakdown 供界面展示",
+   "disposition": "share",
+   "rule": "R6",
+   "r05_share": "usage/trace/观测数据的产生、持久化、去重、保留期与查询结构（含 NDJSON/blob 数据面语义、未初始化/无权限明确报错）：R05-T07；现役字段与隐私设置保留。",
+   "deferred_to": null,
+   "deferred_reason": null,
+   "r07_remainder": "模型观测/用量的业务路由与 UI 投影验收（R07-T10）。"
+  },
+  {
+   "id": "R00-T02-LA-504F95068625",
+   "feature_id": "F-D12-SEMANTIC_EFFECT-SEMANTIC-EFFECT-MEDIA-PROVIDERS-VIDEO-504F95",
+   "requirement": "REQUIRED_SUPPLEMENTAL",
+   "r00_task_ids": [
+    "R05-T03",
+    "R05-T06",
+    "R07-T06"
+   ],
+   "r00_execution_stage_ids": [
+    "R05",
+    "R07"
+   ],
+   "r00_then": "返回视频供应商列表",
+   "disposition": "share",
+   "rule": "R5",
+   "r05_share": "对应媒体 operation（image/video/speech/asr）的 Rust 协议适配、配置段与异步任务语义（job accepted≠产物完成；凭证不跨供应商串用）离线替身验证：R05-T06。",
+   "deferred_to": null,
+   "deferred_reason": null,
+   "r07_remainder": "媒体业务入口路由与页面投影（R07-T06）。"
+  },
+  {
+   "id": "R00-T02-LA-51DD4E37E5F4",
+   "feature_id": "F-D10-SEMANTIC_EFFECT-SEMANTIC-EFFECT-PROVIDERS-PROVIDERS-NAME-DISCOVE-51DD4E",
+   "requirement": "REQUIRED_SUPPLEMENTAL",
+   "r00_task_ids": [
+    "R05-T01",
+    "R07-T08"
+   ],
+   "r00_execution_stage_ids": [
+    "R05",
+    "R07"
+   ],
+   "r00_then": "返回筛选后的缓存模型与时间",
+   "disposition": "share",
+   "rule": "R7",
+   "r05_share": "该叶依赖的内核侧语义由 R05 覆盖：模型/槽位解析与能力预检（R05-T01）、凭证引用与脱敏（R05-T02）、providers/models 配置段的代次、原子写入与未知字段保留（R05-T01/T02）、连通性探测作为网关 operation 经离线替身验证（R05-T01/T03）。",
+   "deferred_to": null,
+   "deferred_reason": null,
+   "r07_remainder": "现役 HTTP 业务路由、设置页与交互语义（R07-T08）。"
+  },
+  {
+   "id": "R00-T02-LA-565BE3400DAC",
+   "feature_id": "F-D10-PROVIDER-PROVIDER-MOONSHOT-565BE3",
+   "requirement": "REQUIRED_SUPPLEMENTAL",
+   "r00_task_ids": [
+    "R05-T01",
+    "R07-T08",
+    "R05-T02",
+    "R05-T03"
+   ],
+   "r00_execution_stage_ids": [
+    "R05",
+    "R07"
+   ],
+   "r00_then": "注册 id=moonshot、auth=api-key、api=openai-completions；配置/选择后仅已允许的模型参与调用，凭证按provider+model隔离，真实调用返回该端点的回复。",
+   "disposition": "share",
+   "rule": "R3",
+   "r05_share": "协议族 openai-completions 与认证形态 api-key 在 Rust ModelGateway 注册并以离线协议替身验证（provider=moonshot 同名 modelId 跨 provider 不串凭证/端点/trace；不支持能力请求前明确失败）；归属 R05-T01 网关/能力矩阵、R05-T02 凭证、R05-T03 协议适配。",
+   "deferred_to": null,
+   "deferred_reason": null,
+   "r07_remainder": "设置页注册/选择/展示的现役 UI 与业务路由链（R07-T08）。"
+  },
+  {
+   "id": "R00-T02-LA-595235FD7113",
+   "feature_id": "F-D12-SEMANTIC_EFFECT-SEMANTIC-EFFECT-MEDIA-MEDIA-SPEECH-CONFIG-PUT-595235",
+   "requirement": "REQUIRED_SUPPLEMENTAL",
+   "r00_task_ids": [
+    "R05-T03",
+    "R05-T06",
+    "R07-T06"
+   ],
+   "r00_execution_stage_ids": [
+    "R05",
+    "R07"
+   ],
+   "r00_then": "保存 config 并返回生效值",
+   "disposition": "share",
+   "rule": "R5",
+   "r05_share": "对应媒体 operation（image/video/speech/asr）的 Rust 协议适配、配置段与异步任务语义（job accepted≠产物完成；凭证不跨供应商串用）离线替身验证：R05-T06。",
+   "deferred_to": null,
+   "deferred_reason": null,
+   "r07_remainder": "媒体业务入口路由与页面投影（R07-T06）。"
+  },
+  {
+   "id": "R00-T02-LA-5BEFE4A3A61C",
+   "feature_id": "F-D22-SEMANTIC_EFFECT-SEMANTIC-EFFECT-MODEL-OBSERVABILITY-MODEL-OBSERV-5BEFE4",
+   "requirement": "REQUIRED_SUPPLEMENTAL",
+   "r00_task_ids": [
+    "R05-T07",
+    "R07-T10"
+   ],
+   "r00_execution_stage_ids": [
+    "R05",
+    "R07"
+   ],
+   "r00_then": "返回持久化与保留期设置",
+   "disposition": "share",
+   "rule": "R6",
+   "r05_share": "usage/trace/观测数据的产生、持久化、去重、保留期与查询结构（含 NDJSON/blob 数据面语义、未初始化/无权限明确报错）：R05-T07；现役字段与隐私设置保留。",
+   "deferred_to": null,
+   "deferred_reason": null,
+   "r07_remainder": "模型观测/用量的业务路由与 UI 投影验收（R07-T10）。"
+  },
+  {
+   "id": "R00-T02-LA-5D32356CD275",
+   "feature_id": "F-D12-SEMANTIC_EFFECT-SEMANTIC-EFFECT-MEDIA-MEDIA-TASKS-TASKID-RETRY-P-5D3235",
+   "requirement": "REQUIRED_SUPPLEMENTAL",
+   "r00_task_ids": [
+    "R05-T03",
+    "R05-T06",
+    "R07-T06"
+   ],
+   "r00_execution_stage_ids": [
+    "R05",
+    "R07"
+   ],
+   "r00_then": "返回新 taskId/placeholder 或错误",
+   "disposition": "share",
+   "rule": "R5",
+   "r05_share": "对应媒体 operation（image/video/speech/asr）的 Rust 协议适配、配置段与异步任务语义（job accepted≠产物完成；凭证不跨供应商串用）离线替身验证：R05-T06。",
+   "deferred_to": null,
+   "deferred_reason": null,
+   "r07_remainder": "媒体业务入口路由与页面投影（R07-T06）。"
+  },
+  {
+   "id": "R00-T02-LA-62106F57675C",
+   "feature_id": "F-D12-SEMANTIC_EFFECT-SEMANTIC-EFFECT-SPEECH-RECOGNITION-SPEECH-RECOGN-62106F",
+   "requirement": "REQUIRED_SUPPLEMENTAL",
+   "r00_task_ids": [
+    "R05-T03",
+    "R05-T06",
+    "R07-T06"
+   ],
+   "r00_execution_stage_ids": [
+    "R05",
+    "R07"
+   ],
+   "r00_then": "返回 ASR 供应商列表",
+   "disposition": "share",
+   "rule": "R5",
+   "r05_share": "对应媒体 operation（image/video/speech/asr）的 Rust 协议适配、配置段与异步任务语义（job accepted≠产物完成；凭证不跨供应商串用）离线替身验证：R05-T06。",
+   "deferred_to": null,
+   "deferred_reason": null,
+   "r07_remainder": "媒体业务入口路由与页面投影（R07-T06）。"
+  },
+  {
+   "id": "R00-T02-LA-668EEC15C958",
+   "feature_id": "F-D10-PROVIDER-PROVIDER-OPENCODEGO-668EEC",
+   "requirement": "REQUIRED_SUPPLEMENTAL",
+   "r00_task_ids": [
+    "R05-T01",
+    "R07-T08",
+    "R05-T02",
+    "R05-T03"
+   ],
+   "r00_execution_stage_ids": [
+    "R05",
+    "R07"
+   ],
+   "r00_then": "注册 id=opencode-go、auth=api-key、api=openai-completions；配置/选择后仅已允许的模型参与调用，凭证按provider+model隔离，真实调用返回该端点的回复。",
+   "disposition": "share",
+   "rule": "R3",
+   "r05_share": "协议族 openai-completions 与认证形态 api-key 在 Rust ModelGateway 注册并以离线协议替身验证（provider=opencode-go 同名 modelId 跨 provider 不串凭证/端点/trace；不支持能力请求前明确失败）；归属 R05-T01 网关/能力矩阵、R05-T02 凭证、R05-T03 协议适配。",
+   "deferred_to": null,
+   "deferred_reason": null,
+   "r07_remainder": "设置页注册/选择/展示的现役 UI 与业务路由链（R07-T08）。"
+  },
+  {
+   "id": "R00-T02-LA-66FFBF09DEA3",
+   "feature_id": "F-D12-SEMANTIC_EFFECT-SEMANTIC-EFFECT-MEDIA-MEDIA-GENERATED-OPEN-FILEN-66FFBF",
+   "requirement": "REQUIRED_SUPPLEMENTAL",
+   "r00_task_ids": [
+    "R05-T03",
+    "R05-T06",
+    "R07-T06"
+   ],
+   "r00_execution_stage_ids": [
+    "R05",
+    "R07"
+   ],
+   "r00_then": "调用本机 open/cmd/xdg-open 并返回 ok",
+   "disposition": "deferred",
+   "rule": "R2",
+   "r05_share": null,
+   "deferred_to": [
+    "R07"
+   ],
+   "deferred_reason": "「调用本机 open/cmd/xdg-open」是桌面壳打开文件业务入口（R07）；R05 只保证生成产物真实存在且可校验。",
+   "r07_remainder": "调用本机 open/cmd/xdg-open 并返回 ok"
+  },
+  {
+   "id": "R00-T02-LA-6ADB2A53988A",
+   "feature_id": "F-D12-SEMANTIC_EFFECT-SEMANTIC-EFFECT-MEDIA-MEDIA-VIDEO-CONFIG-PUT-6ADB2A",
+   "requirement": "REQUIRED_SUPPLEMENTAL",
+   "r00_task_ids": [
+    "R05-T03",
+    "R05-T06",
+    "R07-T06"
+   ],
+   "r00_execution_stage_ids": [
+    "R05",
+    "R07"
+   ],
+   "r00_then": "保存 config 并返回生效值",
+   "disposition": "share",
+   "rule": "R5",
+   "r05_share": "对应媒体 operation（image/video/speech/asr）的 Rust 协议适配、配置段与异步任务语义（job accepted≠产物完成；凭证不跨供应商串用）离线替身验证：R05-T06。",
+   "deferred_to": null,
+   "deferred_reason": null,
+   "r07_remainder": "媒体业务入口路由与页面投影（R07-T06）。"
+  },
+  {
+   "id": "R00-T02-LA-6C23FF248130",
+   "feature_id": "F-D12-SEMANTIC_EFFECT-SEMANTIC-EFFECT-SPEECH-RECOGNITION-SPEECH-RECOGN-6C23FF",
+   "requirement": "REQUIRED_SUPPLEMENTAL",
+   "r00_task_ids": [
+    "R05-T03",
+    "R05-T06",
+    "R07-T06"
+   ],
+   "r00_execution_stage_ids": [
+    "R05",
+    "R07"
+   ],
+   "r00_then": "保存 config 并记录安全审计",
+   "disposition": "share",
+   "rule": "R5",
+   "r05_share": "对应媒体 operation（image/video/speech/asr）的 Rust 协议适配、配置段与异步任务语义（job accepted≠产物完成；凭证不跨供应商串用）离线替身验证：R05-T06。",
+   "deferred_to": null,
+   "deferred_reason": null,
+   "r07_remainder": "媒体业务入口路由与页面投影（R07-T06）。"
+  },
+  {
+   "id": "R00-T02-LA-6DA6634C4D7B",
+   "feature_id": "F-D12-SEMANTIC_EFFECT-SEMANTIC-EFFECT-SPEECH-RECOGNITION-SPEECH-RECOGN-6DA663",
+   "requirement": "REQUIRED_SUPPLEMENTAL",
+   "r00_task_ids": [
+    "R05-T03",
+    "R05-T06",
+    "R07-T06"
+   ],
+   "r00_execution_stage_ids": [
+    "R05",
+    "R07"
+   ],
+   "r00_then": "移除模型并通知 provider changed",
+   "disposition": "share",
+   "rule": "R5",
+   "r05_share": "对应媒体 operation（image/video/speech/asr）的 Rust 协议适配、配置段与异步任务语义（job accepted≠产物完成；凭证不跨供应商串用）离线替身验证：R05-T06。",
+   "deferred_to": null,
+   "deferred_reason": null,
+   "r07_remainder": "媒体业务入口路由与页面投影（R07-T06）。"
+  },
+  {
+   "id": "R00-T02-LA-71738E50BACA",
+   "feature_id": "F-D10-PROVIDER-PROVIDER-BAIDUCLOUD-71738E",
+   "requirement": "REQUIRED_SUPPLEMENTAL",
+   "r00_task_ids": [
+    "R05-T01",
+    "R07-T08",
+    "R05-T02",
+    "R05-T03"
+   ],
+   "r00_execution_stage_ids": [
+    "R05",
+    "R07"
+   ],
+   "r00_then": "注册 id=baidu-cloud、auth=api-key、api=openai-completions；配置/选择后仅已允许的模型参与调用，凭证按provider+model隔离，真实调用返回该端点的回复。",
+   "disposition": "share",
+   "rule": "R3",
+   "r05_share": "协议族 openai-completions 与认证形态 api-key 在 Rust ModelGateway 注册并以离线协议替身验证（provider=baidu-cloud 同名 modelId 跨 provider 不串凭证/端点/trace；不支持能力请求前明确失败）；归属 R05-T01 网关/能力矩阵、R05-T02 凭证、R05-T03 协议适配。",
+   "deferred_to": null,
+   "deferred_reason": null,
+   "r07_remainder": "设置页注册/选择/展示的现役 UI 与业务路由链（R07-T08）。"
+  },
+  {
+   "id": "R00-T02-LA-75DFB815753B",
+   "feature_id": "F-D10-SEMANTIC_EFFECT-SEMANTIC-EFFECT-CONFIG-CONFIG-DEFAULT-WORKSPACE--75DFB8",
+   "requirement": "REQUIRED_SUPPLEMENTAL",
+   "r00_task_ids": [
+    "R05-T01",
+    "R07-T08"
+   ],
+   "r00_execution_stage_ids": [
+    "R05",
+    "R07"
+   ],
+   "r00_then": "确保目录存在并返回路径",
+   "disposition": "share",
+   "rule": "R7",
+   "r05_share": "该叶依赖的内核侧语义由 R05 覆盖：模型/槽位解析与能力预检（R05-T01）、凭证引用与脱敏（R05-T02）、providers/models 配置段的代次、原子写入与未知字段保留（R05-T01/T02）、连通性探测作为网关 operation 经离线替身验证（R05-T01/T03）。",
+   "deferred_to": null,
+   "deferred_reason": null,
+   "r07_remainder": "现役 HTTP 业务路由、设置页与交互语义（R07-T08）。"
+  },
+  {
+   "id": "R00-T02-LA-766F5F3C47C3",
+   "feature_id": "F-D10-SEMANTIC_EFFECT-SEMANTIC-EFFECT-PROVIDERS-PROVIDERS-SUMMARY-READ-766F5F",
+   "requirement": "REQUIRED_SUPPLEMENTAL",
+   "r00_task_ids": [
+    "R05-T01",
+    "R07-T08"
+   ],
+   "r00_execution_stage_ids": [
+    "R05",
+    "R07"
+   ],
+   "r00_then": "返回模型、OAuth 状态与媒体能力摘要",
+   "disposition": "share",
+   "rule": "R7",
+   "r05_share": "该叶依赖的内核侧语义由 R05 覆盖：模型/槽位解析与能力预检（R05-T01）、凭证引用与脱敏（R05-T02）、providers/models 配置段的代次、原子写入与未知字段保留（R05-T01/T02）、连通性探测作为网关 operation 经离线替身验证（R05-T01/T03）。",
+   "deferred_to": null,
+   "deferred_reason": null,
+   "r07_remainder": "现役 HTTP 业务路由、设置页与交互语义（R07-T08）。"
+  },
+  {
+   "id": "R00-T02-LA-77812804951F",
+   "feature_id": "F-D10-PROVIDER-PROVIDER-MISTRAL-778128",
+   "requirement": "REQUIRED_SUPPLEMENTAL",
+   "r00_task_ids": [
+    "R05-T01",
+    "R07-T08",
+    "R05-T02",
+    "R05-T03"
+   ],
+   "r00_execution_stage_ids": [
+    "R05",
+    "R07"
+   ],
+   "r00_then": "注册 id=mistral、auth=api-key、api=openai-completions；配置/选择后仅已允许的模型参与调用，凭证按provider+model隔离，真实调用返回该端点的回复。",
+   "disposition": "share",
+   "rule": "R3",
+   "r05_share": "协议族 openai-completions 与认证形态 api-key 在 Rust ModelGateway 注册并以离线协议替身验证（provider=mistral 同名 modelId 跨 provider 不串凭证/端点/trace；不支持能力请求前明确失败）；归属 R05-T01 网关/能力矩阵、R05-T02 凭证、R05-T03 协议适配。",
+   "deferred_to": null,
+   "deferred_reason": null,
+   "r07_remainder": "设置页注册/选择/展示的现役 UI 与业务路由链（R07-T08）。"
+  },
+  {
+   "id": "R00-T02-LA-794DD254406F",
+   "feature_id": "F-D12-SEMANTIC_EFFECT-SEMANTIC-EFFECT-MEDIA-MEDIA-SPEECH-GENERATE-POST-794DD2",
+   "requirement": "REQUIRED_SUPPLEMENTAL",
+   "r00_task_ids": [
+    "R05-T03",
+    "R05-T06",
+    "R07-T06"
+   ],
+   "r00_execution_stage_ids": [
+    "R05",
+    "R07"
+   ],
+   "r00_then": "创建 TTS 任务并返回结果",
+   "disposition": "share",
+   "rule": "R5",
+   "r05_share": "对应媒体 operation（image/video/speech/asr）的 Rust 协议适配、配置段与异步任务语义（job accepted≠产物完成；凭证不跨供应商串用）离线替身验证：R05-T06。",
+   "deferred_to": null,
+   "deferred_reason": null,
+   "r07_remainder": "媒体业务入口路由与页面投影（R07-T06）。"
+  },
+  {
+   "id": "R00-T02-LA-7ADA0D0848E0",
+   "feature_id": "F-D10-SEMANTIC_EFFECT-SEMANTIC-EFFECT-PROVIDERS-PROVIDERS-NAME-API-KEY-7ADA0D",
+   "requirement": "REQUIRED_SUPPLEMENTAL",
+   "r00_task_ids": [
+    "R05-T01",
+    "R07-T08"
+   ],
+   "r00_execution_stage_ids": [
+    "R05",
+    "R07"
+   ],
+   "r00_then": "双权限通过后返回已保存 API Key",
+   "disposition": "share",
+   "rule": "R7",
+   "r05_share": "该叶依赖的内核侧语义由 R05 覆盖：模型/槽位解析与能力预检（R05-T01）、凭证引用与脱敏（R05-T02）、providers/models 配置段的代次、原子写入与未知字段保留（R05-T01/T02）、连通性探测作为网关 operation 经离线替身验证（R05-T01/T03）。",
+   "deferred_to": null,
+   "deferred_reason": null,
+   "r07_remainder": "现役 HTTP 业务路由、设置页与交互语义（R07-T08）。"
+  },
+  {
+   "id": "R00-T02-LA-7BD0C2A8039E",
+   "feature_id": "F-D10-SEMANTIC_EFFECT-SEMANTIC-EFFECT-PREFERENCES-SEARCH-UPDATE-7BD0C2",
+   "requirement": "REQUIRED_SUPPLEMENTAL",
+   "r00_task_ids": [
+    "R05-T01",
+    "R07-T08"
+   ],
+   "r00_execution_stage_ids": [
+    "R05",
+    "R07"
+   ],
+   "r00_then": "search.provider/api_key/api_keys 持久保存，秘密按作用域审计",
+   "disposition": "share",
+   "rule": "R7",
+   "r05_share": "该叶依赖的内核侧语义由 R05 覆盖：模型/槽位解析与能力预检（R05-T01）、凭证引用与脱敏（R05-T02）、providers/models 配置段的代次、原子写入与未知字段保留（R05-T01/T02）、连通性探测作为网关 operation 经离线替身验证（R05-T01/T03）。",
+   "deferred_to": null,
+   "deferred_reason": null,
+   "r07_remainder": "现役 HTTP 业务路由、设置页与交互语义（R07-T08）。"
+  },
+  {
+   "id": "R00-T02-LA-7BFFEC690DC3",
+   "feature_id": "F-D10-SEMANTIC_EFFECT-SEMANTIC-EFFECT-MODELS-MODELS-AUXILIARY-VISION-7BFFEC",
+   "requirement": "REQUIRED_SUPPLEMENTAL",
+   "r00_task_ids": [
+    "R05-T01",
+    "R07-T08"
+   ],
+   "r00_execution_stage_ids": [
+    "R05",
+    "R07"
+   ],
+   "r00_then": "仅返回辅助视觉状态，不暴露模型凭证配置",
+   "disposition": "share",
+   "rule": "R7",
+   "r05_share": "该叶依赖的内核侧语义由 R05 覆盖：模型/槽位解析与能力预检（R05-T01）、凭证引用与脱敏（R05-T02）、providers/models 配置段的代次、原子写入与未知字段保留（R05-T01/T02）、连通性探测作为网关 operation 经离线替身验证（R05-T01/T03）。",
+   "deferred_to": null,
+   "deferred_reason": null,
+   "r07_remainder": "现役 HTTP 业务路由、设置页与交互语义（R07-T08）。"
+  },
+  {
+   "id": "R00-T02-LA-7D969CDBF21C",
+   "feature_id": "F-D10-PROVIDER-PROVIDER-STEPFUN-7D969C",
+   "requirement": "REQUIRED_SUPPLEMENTAL",
+   "r00_task_ids": [
+    "R05-T01",
+    "R07-T08",
+    "R05-T02",
+    "R05-T03"
+   ],
+   "r00_execution_stage_ids": [
+    "R05",
+    "R07"
+   ],
+   "r00_then": "注册 id=stepfun、auth=api-key、api=openai-completions；配置/选择后仅已允许的模型参与调用，凭证按provider+model隔离，真实调用返回该端点的回复。",
+   "disposition": "share",
+   "rule": "R3",
+   "r05_share": "协议族 openai-completions 与认证形态 api-key 在 Rust ModelGateway 注册并以离线协议替身验证（provider=stepfun 同名 modelId 跨 provider 不串凭证/端点/trace；不支持能力请求前明确失败）；归属 R05-T01 网关/能力矩阵、R05-T02 凭证、R05-T03 协议适配。",
+   "deferred_to": null,
+   "deferred_reason": null,
+   "r07_remainder": "设置页注册/选择/展示的现役 UI 与业务路由链（R07-T08）。"
+  },
+  {
+   "id": "R00-T02-LA-7EC5F0F2FF7C",
+   "feature_id": "F-D10-SEMANTIC_EFFECT-SEMANTIC-EFFECT-PREFERENCES-PREFERENCES-MODELS-R-7EC5F0",
+   "requirement": "REQUIRED_SUPPLEMENTAL",
+   "r00_task_ids": [
+    "R05-T01",
+    "R07-T08"
+   ],
+   "r00_execution_stage_ids": [
+    "R05",
+    "R07"
+   ],
+   "r00_then": "返回共享模型、操作模型、思考级别和掩码后的搜索密钥",
+   "disposition": "share",
+   "rule": "R7",
+   "r05_share": "该叶依赖的内核侧语义由 R05 覆盖：模型/槽位解析与能力预检（R05-T01）、凭证引用与脱敏（R05-T02）、providers/models 配置段的代次、原子写入与未知字段保留（R05-T01/T02）、连通性探测作为网关 operation 经离线替身验证（R05-T01/T03）。",
+   "deferred_to": null,
+   "deferred_reason": null,
+   "r07_remainder": "现役 HTTP 业务路由、设置页与交互语义（R07-T08）。"
+  },
+  {
+   "id": "R00-T02-LA-8060BE8AA02C",
+   "feature_id": "F-D11-SEMANTIC_EFFECT-SEMANTIC-EFFECT-AUTH-AUTH-OAUTH-PROVIDER-CUSTOM--8060BE",
+   "requirement": "REQUIRED_SUPPLEMENTAL",
+   "r00_task_ids": [
+    "R05-T02"
+   ],
+   "r00_execution_stage_ids": [
+    "R05"
+   ],
+   "r00_then": "从 provider 注册表移除 modelId 并刷新模型，返回新清单",
+   "disposition": "share",
+   "rule": "R4",
+   "r05_share": "OAuth/CredentialService 服务端全份额离线替身验证（start/callback/poll/state/PKCE/logout/custom modelId 管理按该叶 then 文本逐项）：R05-T02。",
+   "deferred_to": null,
+   "deferred_reason": null,
+   "r07_remainder": null
+  },
+  {
+   "id": "R00-T02-LA-80DB4026AF13",
+   "feature_id": "F-D10-PROVIDER-PROVIDER-OPENCODE-80DB40",
+   "requirement": "REQUIRED_SUPPLEMENTAL",
+   "r00_task_ids": [
+    "R05-T01",
+    "R07-T08",
+    "R05-T02",
+    "R05-T03"
+   ],
+   "r00_execution_stage_ids": [
+    "R05",
+    "R07"
+   ],
+   "r00_then": "注册 id=opencode、auth=api-key、api=anthropic-messages；配置/选择后仅已允许的模型参与调用，凭证按provider+model隔离，真实调用返回该端点的回复。",
+   "disposition": "share",
+   "rule": "R3",
+   "r05_share": "协议族 anthropic-messages 与认证形态 api-key 在 Rust ModelGateway 注册并以离线协议替身验证（provider=opencode 同名 modelId 跨 provider 不串凭证/端点/trace；不支持能力请求前明确失败）；归属 R05-T01 网关/能力矩阵、R05-T02 凭证、R05-T03 协议适配。",
+   "deferred_to": null,
+   "deferred_reason": null,
+   "r07_remainder": "设置页注册/选择/展示的现役 UI 与业务路由链（R07-T08）。"
+  },
+  {
+   "id": "R00-T02-LA-834034527694",
+   "feature_id": "F-D10-PROVIDER-PROVIDER-ZHIPUCODING-834034",
+   "requirement": "REQUIRED_SUPPLEMENTAL",
+   "r00_task_ids": [
+    "R05-T01",
+    "R07-T08",
+    "R05-T02",
+    "R05-T03"
+   ],
+   "r00_execution_stage_ids": [
+    "R05",
+    "R07"
+   ],
+   "r00_then": "注册 id=zhipu-coding、auth=api-key、api=openai-completions；配置/选择后仅已允许的模型参与调用，凭证按provider+model隔离，真实调用返回该端点的回复。",
+   "disposition": "share",
+   "rule": "R3",
+   "r05_share": "协议族 openai-completions 与认证形态 api-key 在 Rust ModelGateway 注册并以离线协议替身验证（provider=zhipu-coding 同名 modelId 跨 provider 不串凭证/端点/trace；不支持能力请求前明确失败）；归属 R05-T01 网关/能力矩阵、R05-T02 凭证、R05-T03 协议适配。",
+   "deferred_to": null,
+   "deferred_reason": null,
+   "r07_remainder": "设置页注册/选择/展示的现役 UI 与业务路由链（R07-T08）。"
+  },
+  {
+   "id": "R00-T02-LA-835CCD55115A",
+   "feature_id": "F-D10-SEMANTIC_EFFECT-SEMANTIC-EFFECT-PROVIDERS-PROVIDERS-NAME-MODELS--835CCD",
+   "requirement": "REQUIRED_SUPPLEMENTAL",
+   "r00_task_ids": [
+    "R05-T01",
+    "R07-T08"
+   ],
+   "r00_execution_stage_ids": [
+    "R05",
+    "R07"
+   ],
+   "r00_then": "从目录移除模型并刷新运行时",
+   "disposition": "share",
+   "rule": "R7",
+   "r05_share": "该叶依赖的内核侧语义由 R05 覆盖：模型/槽位解析与能力预检（R05-T01）、凭证引用与脱敏（R05-T02）、providers/models 配置段的代次、原子写入与未知字段保留（R05-T01/T02）、连通性探测作为网关 operation 经离线替身验证（R05-T01/T03）。",
+   "deferred_to": null,
+   "deferred_reason": null,
+   "r07_remainder": "现役 HTTP 业务路由、设置页与交互语义（R07-T08）。"
+  },
+  {
+   "id": "R00-T02-LA-85BCDAD6E3AE",
+   "feature_id": "F-D22-SEMANTIC_EFFECT-SEMANTIC-EFFECT-MODEL-OBSERVABILITY-MODEL-OBSERV-85BCDA",
+   "requirement": "REQUIRED_SUPPLEMENTAL",
+   "r00_task_ids": [
+    "R05-T07",
+    "R07-T10"
+   ],
+   "r00_execution_stage_ids": [
+    "R05",
+    "R07"
+   ],
+   "r00_then": "返回统计聚合",
+   "disposition": "share",
+   "rule": "R6",
+   "r05_share": "usage/trace/观测数据的产生、持久化、去重、保留期与查询结构（含 NDJSON/blob 数据面语义、未初始化/无权限明确报错）：R05-T07；现役字段与隐私设置保留。",
+   "deferred_to": null,
+   "deferred_reason": null,
+   "r07_remainder": "模型观测/用量的业务路由与 UI 投影验收（R07-T10）。"
+  },
+  {
+   "id": "R00-T02-LA-885BA80F4F96",
+   "feature_id": "F-D10-SEMANTIC_EFFECT-SEMANTIC-EFFECT-CONFIG-CONFIG-DEFAULT-WORKSPACE--885BA8",
+   "requirement": "REQUIRED_SUPPLEMENTAL",
+   "r00_task_ids": [
+    "R05-T01",
+    "R07-T08"
+   ],
+   "r00_execution_stage_ids": [
+    "R05",
+    "R07"
+   ],
+   "r00_then": "返回机器级默认目录路径",
+   "disposition": "share",
+   "rule": "R7",
+   "r05_share": "该叶依赖的内核侧语义由 R05 覆盖：模型/槽位解析与能力预检（R05-T01）、凭证引用与脱敏（R05-T02）、providers/models 配置段的代次、原子写入与未知字段保留（R05-T01/T02）、连通性探测作为网关 operation 经离线替身验证（R05-T01/T03）。",
+   "deferred_to": null,
+   "deferred_reason": null,
+   "r07_remainder": "现役 HTTP 业务路由、设置页与交互语义（R07-T08）。"
+  },
+  {
+   "id": "R00-T02-LA-89707E479335",
+   "feature_id": "F-D10-PROVIDER-PROVIDER-DASHSCOPECODING-89707E",
+   "requirement": "REQUIRED_SUPPLEMENTAL",
+   "r00_task_ids": [
+    "R05-T01",
+    "R07-T08",
+    "R05-T02",
+    "R05-T03"
+   ],
+   "r00_execution_stage_ids": [
+    "R05",
+    "R07"
+   ],
+   "r00_then": "注册 id=dashscope-coding、auth=api-key、api=openai-completions；配置/选择后仅已允许的模型参与调用，凭证按provider+model隔离，真实调用返回该端点的回复。",
+   "disposition": "share",
+   "rule": "R3",
+   "r05_share": "协议族 openai-completions 与认证形态 api-key 在 Rust ModelGateway 注册并以离线协议替身验证（provider=dashscope-coding 同名 modelId 跨 provider 不串凭证/端点/trace；不支持能力请求前明确失败）；归属 R05-T01 网关/能力矩阵、R05-T02 凭证、R05-T03 协议适配。",
+   "deferred_to": null,
+   "deferred_reason": null,
+   "r07_remainder": "设置页注册/选择/展示的现役 UI 与业务路由链（R07-T08）。"
+  },
+  {
+   "id": "R00-T02-LA-8E933C4BE7D0",
+   "feature_id": "F-D12-SEMANTIC_EFFECT-SEMANTIC-EFFECT-MEDIA-MEDIA-SPEECH-PROVIDERS-PRO-8E933C",
+   "requirement": "REQUIRED_SUPPLEMENTAL",
+   "r00_task_ids": [
+    "R05-T03",
+    "R05-T06",
+    "R07-T06"
+   ],
+   "r00_execution_stage_ids": [
+    "R05",
+    "R07"
+   ],
+   "r00_then": "移除供应商模型并返回结果",
+   "disposition": "share",
+   "rule": "R5",
+   "r05_share": "对应媒体 operation（image/video/speech/asr）的 Rust 协议适配、配置段与异步任务语义（job accepted≠产物完成；凭证不跨供应商串用）离线替身验证：R05-T06。",
+   "deferred_to": null,
+   "deferred_reason": null,
+   "r07_remainder": "媒体业务入口路由与页面投影（R07-T06）。"
+  },
+  {
+   "id": "R00-T02-LA-8F775B4AA30F",
+   "feature_id": "F-D10-SEMANTIC_EFFECT-SEMANTIC-EFFECT-CONFIG-CONFIG-WORKSPACES-RECENT--8F775B",
+   "requirement": "REQUIRED_SUPPLEMENTAL",
+   "r00_task_ids": [
+    "R05-T01",
+    "R07-T08"
+   ],
+   "r00_execution_stage_ids": [
+    "R05",
+    "R07"
+   ],
+   "r00_then": "写指定智能体 cwd_history",
+   "disposition": "share",
+   "rule": "R7",
+   "r05_share": "该叶依赖的内核侧语义由 R05 覆盖：模型/槽位解析与能力预检（R05-T01）、凭证引用与脱敏（R05-T02）、providers/models 配置段的代次、原子写入与未知字段保留（R05-T01/T02）、连通性探测作为网关 operation 经离线替身验证（R05-T01/T03）。",
+   "deferred_to": null,
+   "deferred_reason": null,
+   "r07_remainder": "现役 HTTP 业务路由、设置页与交互语义（R07-T08）。"
+  },
+  {
+   "id": "R00-T02-LA-9194C0F0D909",
+   "feature_id": "F-D10-PROVIDER-PROVIDER-MINIMAXTOKENPLAN-9194C0",
+   "requirement": "REQUIRED_SUPPLEMENTAL",
+   "r00_task_ids": [
+    "R05-T01",
+    "R07-T08",
+    "R05-T02",
+    "R05-T03"
+   ],
+   "r00_execution_stage_ids": [
+    "R05",
+    "R07"
+   ],
+   "r00_then": "注册 id=minimax-token-plan、auth=api-key、api=anthropic-messages；配置/选择后仅已允许的模型参与调用，凭证按provider+model隔离，真实调用返回该端点的回复。",
+   "disposition": "share",
+   "rule": "R3",
+   "r05_share": "协议族 anthropic-messages 与认证形态 api-key 在 Rust ModelGateway 注册并以离线协议替身验证（provider=minimax-token-plan 同名 modelId 跨 provider 不串凭证/端点/trace；不支持能力请求前明确失败）；归属 R05-T01 网关/能力矩阵、R05-T02 凭证、R05-T03 协议适配。",
+   "deferred_to": null,
+   "deferred_reason": null,
+   "r07_remainder": "设置页注册/选择/展示的现役 UI 与业务路由链（R07-T08）。"
+  },
+  {
+   "id": "R00-T02-LA-9569C0C0C4D8",
+   "feature_id": "F-D12-SEMANTIC_EFFECT-SEMANTIC-EFFECT-MEDIA-MEDIA-IMAGE-PROVIDERS-PROV-9569C0",
+   "requirement": "REQUIRED_SUPPLEMENTAL",
+   "r00_task_ids": [
+    "R05-T03",
+    "R05-T06",
+    "R07-T06"
+   ],
+   "r00_execution_stage_ids": [
+    "R05",
+    "R07"
+   ],
+   "r00_then": "更新供应商模型并返回记录",
+   "disposition": "share",
+   "rule": "R5",
+   "r05_share": "对应媒体 operation（image/video/speech/asr）的 Rust 协议适配、配置段与异步任务语义（job accepted≠产物完成；凭证不跨供应商串用）离线替身验证：R05-T06。",
+   "deferred_to": null,
+   "deferred_reason": null,
+   "r07_remainder": "媒体业务入口路由与页面投影（R07-T06）。"
+  },
+  {
+   "id": "R00-T02-LA-96071267A5C5",
+   "feature_id": "F-D12-SEMANTIC_EFFECT-SEMANTIC-EFFECT-MEDIA-PROVIDERS-IMAGE-960712",
+   "requirement": "REQUIRED_SUPPLEMENTAL",
+   "r00_task_ids": [
+    "R05-T03",
+    "R05-T06",
+    "R07-T06"
+   ],
+   "r00_execution_stage_ids": [
+    "R05",
+    "R07"
+   ],
+   "r00_then": "返回图片供应商列表",
+   "disposition": "share",
+   "rule": "R5",
+   "r05_share": "对应媒体 operation（image/video/speech/asr）的 Rust 协议适配、配置段与异步任务语义（job accepted≠产物完成；凭证不跨供应商串用）离线替身验证：R05-T06。",
+   "deferred_to": null,
+   "deferred_reason": null,
+   "r07_remainder": "媒体业务入口路由与页面投影（R07-T06）。"
+  },
+  {
+   "id": "R00-T02-LA-96CA6DBF8317",
+   "feature_id": "F-D22-SEMANTIC_EFFECT-SEMANTIC-EFFECT-MODEL-OBSERVABILITY-MODEL-OBSERV-96CA6D",
+   "requirement": "REQUIRED_SUPPLEMENTAL",
+   "r00_task_ids": [
+    "R05-T07",
+    "R07-T10"
+   ],
+   "r00_execution_stage_ids": [
+    "R05",
+    "R07"
+   ],
+   "r00_then": "返回 NDJSON 字节流",
+   "disposition": "share",
+   "rule": "R6",
+   "r05_share": "usage/trace/观测数据的产生、持久化、去重、保留期与查询结构（含 NDJSON/blob 数据面语义、未初始化/无权限明确报错）：R05-T07；现役字段与隐私设置保留。",
+   "deferred_to": null,
+   "deferred_reason": null,
+   "r07_remainder": "模型观测/用量的业务路由与 UI 投影验收（R07-T10）。"
+  },
+  {
+   "id": "R00-T02-LA-97EC58F3099F",
+   "feature_id": "F-D12-SEMANTIC_EFFECT-SEMANTIC-EFFECT-SPEECH-RECOGNITION-SPEECH-RECOGN-97EC58",
+   "requirement": "REQUIRED_SUPPLEMENTAL",
+   "r00_task_ids": [
+    "R05-T03",
+    "R05-T06",
+    "R07-T06"
+   ],
+   "r00_execution_stage_ids": [
+    "R05",
+    "R07"
+   ],
+   "r00_then": "保存模型并通知 provider changed",
+   "disposition": "share",
+   "rule": "R5",
+   "r05_share": "对应媒体 operation（image/video/speech/asr）的 Rust 协议适配、配置段与异步任务语义（job accepted≠产物完成；凭证不跨供应商串用）离线替身验证：R05-T06。",
+   "deferred_to": null,
+   "deferred_reason": null,
+   "r07_remainder": "媒体业务入口路由与页面投影（R07-T06）。"
+  },
+  {
+   "id": "R00-T02-LA-9871F51BE25B",
+   "feature_id": "F-D10-PROVIDER-PROVIDER-OPENROUTER-9871F5",
+   "requirement": "REQUIRED_SUPPLEMENTAL",
+   "r00_task_ids": [
+    "R05-T01",
+    "R07-T08",
+    "R05-T02",
+    "R05-T03"
+   ],
+   "r00_execution_stage_ids": [
+    "R05",
+    "R07"
+   ],
+   "r00_then": "注册 id=openrouter、auth=api-key、api=openai-completions；配置/选择后仅已允许的模型参与调用，凭证按provider+model隔离，真实调用返回该端点的回复。",
+   "disposition": "share",
+   "rule": "R3",
+   "r05_share": "协议族 openai-completions 与认证形态 api-key 在 Rust ModelGateway 注册并以离线协议替身验证（provider=openrouter 同名 modelId 跨 provider 不串凭证/端点/trace；不支持能力请求前明确失败）；归属 R05-T01 网关/能力矩阵、R05-T02 凭证、R05-T03 协议适配。",
+   "deferred_to": null,
+   "deferred_reason": null,
+   "r07_remainder": "设置页注册/选择/展示的现役 UI 与业务路由链（R07-T08）。"
+  },
+  {
+   "id": "R00-T02-LA-990A225D8A35",
+   "feature_id": "F-D10-SEMANTIC_EFFECT-SEMANTIC-EFFECT-MODELS-MODELS-HEALTH-990A22",
+   "requirement": "REQUIRED_SUPPLEMENTAL",
+   "r00_task_ids": [
+    "R05-T01",
+    "R07-T08"
+   ],
+   "r00_execution_stage_ids": [
+    "R05",
+    "R07"
+   ],
+   "r00_then": "解析复合模型引用与凭证；一般模型真实试调用，Codex Responses 明示 skipped",
+   "disposition": "share",
+   "rule": "R7",
+   "r05_share": "该叶依赖的内核侧语义由 R05 覆盖：模型/槽位解析与能力预检（R05-T01）、凭证引用与脱敏（R05-T02）、providers/models 配置段的代次、原子写入与未知字段保留（R05-T01/T02）、连通性探测作为网关 operation 经离线替身验证（R05-T01/T03）。",
+   "deferred_to": null,
+   "deferred_reason": null,
+   "r07_remainder": "现役 HTTP 业务路由、设置页与交互语义（R07-T08）。"
+  },
+  {
+   "id": "R00-T02-LA-99D6C304D697",
+   "feature_id": "F-D11-SEMANTIC_EFFECT-SEMANTIC-EFFECT-AUTH-AUTH-OAUTH-START-POST-99D6C3",
+   "requirement": "REQUIRED_SUPPLEMENTAL",
+   "r00_task_ids": [
+    "R05-T02"
+   ],
+   "r00_execution_stage_ids": [
+    "R05"
+   ],
+   "r00_then": "start 返回登录指引；手输授权码经 callback 完成登录，设备码经 poll 进入 done 后刷新 provider；失败不报告已登录",
+   "disposition": "share",
+   "rule": "R4",
+   "r05_share": "OAuth/CredentialService 服务端全份额离线替身验证（start/callback/poll/state/PKCE/logout/custom modelId 管理按该叶 then 文本逐项）：R05-T02。",
+   "deferred_to": null,
+   "deferred_reason": null,
+   "r07_remainder": null
+  },
+  {
+   "id": "R00-T02-LA-9B809055BF01",
+   "feature_id": "F-D12-SEMANTIC_EFFECT-SEMANTIC-EFFECT-MEDIA-MEDIA-TASKS-TASKID-READ-9B8090",
+   "requirement": "REQUIRED_SUPPLEMENTAL",
+   "r00_task_ids": [
+    "R05-T03",
+    "R05-T06",
+    "R07-T06"
+   ],
+   "r00_execution_stage_ids": [
+    "R05",
+    "R07"
+   ],
+   "r00_then": "返回 task，不存在 404",
+   "disposition": "share",
+   "rule": "R5",
+   "r05_share": "对应媒体 operation（image/video/speech/asr）的 Rust 协议适配、配置段与异步任务语义（job accepted≠产物完成；凭证不跨供应商串用）离线替身验证：R05-T06。",
+   "deferred_to": null,
+   "deferred_reason": null,
+   "r07_remainder": "媒体业务入口路由与页面投影（R07-T06）。"
+  },
+  {
+   "id": "R00-T02-LA-9FBBC275BD34",
+   "feature_id": "F-D10-SEMANTIC_EFFECT-SEMANTIC-EFFECT-PROVIDER-GLOBAL-SAVE-9FBBC2",
+   "requirement": "REQUIRED_SUPPLEMENTAL",
+   "r00_task_ids": [
+    "R05-T01",
+    "R07-T08"
+   ],
+   "r00_execution_stage_ids": [
+    "R05",
+    "R07"
+   ],
+   "r00_then": "逐处读回权威目录、条件插件文件、条件模型投影、焦点 YAML 与仅另含全局字段才变化的 preferences；失败后记录可能的部分成功，不把 HTTP 错误当回滚",
+   "disposition": "share",
+   "rule": "R7",
+   "r05_share": "该叶依赖的内核侧语义由 R05 覆盖：模型/槽位解析与能力预检（R05-T01）、凭证引用与脱敏（R05-T02）、providers/models 配置段的代次、原子写入与未知字段保留（R05-T01/T02）、连通性探测作为网关 operation 经离线替身验证（R05-T01/T03）。",
+   "deferred_to": null,
+   "deferred_reason": null,
+   "r07_remainder": "现役 HTTP 业务路由、设置页与交互语义（R07-T08）。"
+  },
+  {
+   "id": "R00-T02-LA-A1F51A12AD61",
+   "feature_id": "F-D10-SEMANTIC_EFFECT-SEMANTIC-EFFECT-PREFERENCES-SHARED-MODELS-UPDATE-A1F51A",
+   "requirement": "REQUIRED_SUPPLEMENTAL",
+   "r00_task_ids": [
+    "R05-T01",
+    "R07-T08"
+   ],
+   "r00_execution_stage_ids": [
+    "R05",
+    "R07"
+   ],
+   "r00_then": "models patch 持久保存；必要时同步运行中模型并发 models-changed",
+   "disposition": "share",
+   "rule": "R7",
+   "r05_share": "该叶依赖的内核侧语义由 R05 覆盖：模型/槽位解析与能力预检（R05-T01）、凭证引用与脱敏（R05-T02）、providers/models 配置段的代次、原子写入与未知字段保留（R05-T01/T02）、连通性探测作为网关 operation 经离线替身验证（R05-T01/T03）。",
+   "deferred_to": null,
+   "deferred_reason": null,
+   "r07_remainder": "现役 HTTP 业务路由、设置页与交互语义（R07-T08）。"
+  },
+  {
+   "id": "R00-T02-LA-A48BCE9716A7",
+   "feature_id": "F-D10-SEMANTIC_EFFECT-SEMANTIC-EFFECT-MODELS-MODELS-SWITCH-A48BCE",
+   "requirement": "REQUIRED_SUPPLEMENTAL",
+   "r00_task_ids": [
+    "R05-T01",
+    "R07-T08"
+   ],
+   "r00_execution_stage_ids": [
+    "R05",
+    "R07"
+   ],
+   "r00_then": "更新该会话模型并返回适配和思考强度；流式中返回 409",
+   "disposition": "share",
+   "rule": "R7",
+   "r05_share": "该叶依赖的内核侧语义由 R05 覆盖：模型/槽位解析与能力预检（R05-T01）、凭证引用与脱敏（R05-T02）、providers/models 配置段的代次、原子写入与未知字段保留（R05-T01/T02）、连通性探测作为网关 operation 经离线替身验证（R05-T01/T03）。",
+   "deferred_to": null,
+   "deferred_reason": null,
+   "r07_remainder": "现役 HTTP 业务路由、设置页与交互语义（R07-T08）。"
+  },
+  {
+   "id": "R00-T02-LA-A524D3723654",
+   "feature_id": "F-D10-SEMANTIC_EFFECT-SEMANTIC-EFFECT-CONFIG-CONFIG-READ-A524D3",
+   "requirement": "REQUIRED_SUPPLEMENTAL",
+   "r00_task_ids": [
+    "R05-T01",
+    "R07-T08"
+   ],
+   "r00_execution_stage_ids": [
+    "R05",
+    "R07"
+   ],
+   "r00_then": "返回脱敏供应商目录和全局字段",
+   "disposition": "share",
+   "rule": "R7",
+   "r05_share": "该叶依赖的内核侧语义由 R05 覆盖：模型/槽位解析与能力预检（R05-T01）、凭证引用与脱敏（R05-T02）、providers/models 配置段的代次、原子写入与未知字段保留（R05-T01/T02）、连通性探测作为网关 operation 经离线替身验证（R05-T01/T03）。",
+   "deferred_to": null,
+   "deferred_reason": null,
+   "r07_remainder": "现役 HTTP 业务路由、设置页与交互语义（R07-T08）。"
+  },
+  {
+   "id": "R00-T02-LA-A5B2F5BAD27E",
+   "feature_id": "F-D12-SEMANTIC_EFFECT-SEMANTIC-EFFECT-MEDIA-MEDIA-VIDEO-GENERATE-POST-A5B2F5",
+   "requirement": "REQUIRED_SUPPLEMENTAL",
+   "r00_task_ids": [
+    "R05-T03",
+    "R05-T06",
+    "R07-T06"
+   ],
+   "r00_execution_stage_ids": [
+    "R05",
+    "R07"
+   ],
+   "r00_then": "创建视频生成任务并返回结果",
+   "disposition": "share",
+   "rule": "R5",
+   "r05_share": "对应媒体 operation（image/video/speech/asr）的 Rust 协议适配、配置段与异步任务语义（job accepted≠产物完成；凭证不跨供应商串用）离线替身验证：R05-T06。",
+   "deferred_to": null,
+   "deferred_reason": null,
+   "r07_remainder": "媒体业务入口路由与页面投影（R07-T06）。"
+  },
+  {
+   "id": "R00-T02-LA-A86068D93F1D",
+   "feature_id": "F-D12-SEMANTIC_EFFECT-SEMANTIC-EFFECT-MEDIA-PROVIDERS-TTS-A86068",
+   "requirement": "REQUIRED_SUPPLEMENTAL",
+   "r00_task_ids": [
+    "R05-T03",
+    "R05-T06",
+    "R07-T06"
+   ],
+   "r00_execution_stage_ids": [
+    "R05",
+    "R07"
+   ],
+   "r00_then": "返回 TTS 供应商列表",
+   "disposition": "share",
+   "rule": "R5",
+   "r05_share": "对应媒体 operation（image/video/speech/asr）的 Rust 协议适配、配置段与异步任务语义（job accepted≠产物完成；凭证不跨供应商串用）离线替身验证：R05-T06。",
+   "deferred_to": null,
+   "deferred_reason": null,
+   "r07_remainder": "媒体业务入口路由与页面投影（R07-T06）。"
+  },
+  {
+   "id": "R00-T02-LA-A9ACB7418FC4",
+   "feature_id": "F-D10-PROVIDER-PROVIDER-VOLCENGINESPEECH-A9ACB7",
+   "requirement": "REQUIRED_SUPPLEMENTAL",
+   "r00_task_ids": [
+    "R05-T01",
+    "R07-T08",
+    "R05-T06"
+   ],
+   "r00_execution_stage_ids": [
+    "R05",
+    "R07"
+   ],
+   "r00_then": "注册 id=volcengine-speech 的语音识别能力；凭证/适配器满足条件时，经volcengine-bigasr 协议的供应商端点得到相应音频或转写结果，配置页如实显示能力状态。",
+   "disposition": "share",
+   "rule": "R3",
+   "r05_share": "语音 provider 的注册形态与协议归属（system-speech 系统运行时 / volcengine-bigasr 供应商端点）在 Rust ModelGateway 能力矩阵中登记并以离线替身验证能力与凭证边界；归属 R05-T01/R05-T06。",
+   "deferred_to": null,
+   "deferred_reason": null,
+   "r07_remainder": "配置页能力状态展示与现役 UI 链（R07-T08）。"
+  },
+  {
+   "id": "R00-T02-LA-AB2CF6B28D08",
+   "feature_id": "F-D22-SEMANTIC_EFFECT-SEMANTIC-EFFECT-MODEL-OBSERVABILITY-MODEL-OBSERV-AB2CF6",
+   "requirement": "REQUIRED_SUPPLEMENTAL",
+   "r00_task_ids": [
+    "R05-T07",
+    "R07-T10"
+   ],
+   "r00_execution_stage_ids": [
+    "R05",
+    "R07"
+   ],
+   "r00_then": "返回过滤后的调用列表",
+   "disposition": "share",
+   "rule": "R6",
+   "r05_share": "usage/trace/观测数据的产生、持久化、去重、保留期与查询结构（含 NDJSON/blob 数据面语义、未初始化/无权限明确报错）：R05-T07；现役字段与隐私设置保留。",
+   "deferred_to": null,
+   "deferred_reason": null,
+   "r07_remainder": "模型观测/用量的业务路由与 UI 投影验收（R07-T10）。"
+  },
+  {
+   "id": "R00-T02-LA-AB6545B18E22",
+   "feature_id": "F-D12-SEMANTIC_EFFECT-SEMANTIC-EFFECT-MEDIA-MEDIA-IMAGE-PROVIDERS-PROV-AB6545",
+   "requirement": "REQUIRED_SUPPLEMENTAL",
+   "r00_task_ids": [
+    "R05-T03",
+    "R05-T06",
+    "R07-T06"
+   ],
+   "r00_execution_stage_ids": [
+    "R05",
+    "R07"
+   ],
+   "r00_then": "保存供应商模型并返回记录",
+   "disposition": "share",
+   "rule": "R5",
+   "r05_share": "对应媒体 operation（image/video/speech/asr）的 Rust 协议适配、配置段与异步任务语义（job accepted≠产物完成；凭证不跨供应商串用）离线替身验证：R05-T06。",
+   "deferred_to": null,
+   "deferred_reason": null,
+   "r07_remainder": "媒体业务入口路由与页面投影（R07-T06）。"
+  },
+  {
+   "id": "R00-T02-LA-ABAC28922F7A",
+   "feature_id": "F-D10-PROVIDER-PROVIDER-OPENAICODEXOAUTH-ABAC28",
+   "requirement": "REQUIRED_SUPPLEMENTAL",
+   "r00_task_ids": [
+    "R05-T01",
+    "R07-T08",
+    "R05-T02",
+    "R05-T03",
+    "R05-T06"
+   ],
+   "r00_execution_stage_ids": [
+    "R05",
+    "R07"
+   ],
+   "r00_then": "注册 id=openai-codex-oauth、auth=oauth、api=openai-codex-responses；配置/选择后仅已允许的模型参与调用，凭证按provider+model隔离，真实调用返回该端点的回复；另可按能力执行图片生成。",
+   "disposition": "share",
+   "rule": "R3",
+   "r05_share": "协议族 openai-codex-responses 与认证形态 oauth 在 Rust ModelGateway 注册并以离线协议替身验证（provider=openai-codex-oauth 同名 modelId 跨 provider 不串凭证/端点/trace；不支持能力请求前明确失败）；归属 R05-T01 网关/能力矩阵、R05-T02 凭证、R05-T03 协议适配。",
+   "deferred_to": null,
+   "deferred_reason": null,
+   "r07_remainder": "设置页注册/选择/展示的现役 UI 与业务路由链（R07-T08）。"
+  },
+  {
+   "id": "R00-T02-LA-AC352BFA3D82",
+   "feature_id": "F-D10-PROVIDER-PROVIDER-TOGETHER-AC352B",
+   "requirement": "REQUIRED_SUPPLEMENTAL",
+   "r00_task_ids": [
+    "R05-T01",
+    "R07-T08",
+    "R05-T02",
+    "R05-T03"
+   ],
+   "r00_execution_stage_ids": [
+    "R05",
+    "R07"
+   ],
+   "r00_then": "注册 id=together、auth=api-key、api=openai-completions；配置/选择后仅已允许的模型参与调用，凭证按provider+model隔离，真实调用返回该端点的回复。",
+   "disposition": "share",
+   "rule": "R3",
+   "r05_share": "协议族 openai-completions 与认证形态 api-key 在 Rust ModelGateway 注册并以离线协议替身验证（provider=together 同名 modelId 跨 provider 不串凭证/端点/trace；不支持能力请求前明确失败）；归属 R05-T01 网关/能力矩阵、R05-T02 凭证、R05-T03 协议适配。",
+   "deferred_to": null,
+   "deferred_reason": null,
+   "r07_remainder": "设置页注册/选择/展示的现役 UI 与业务路由链（R07-T08）。"
+  },
+  {
+   "id": "R00-T02-LA-AF4A3588D5DA",
+   "feature_id": "F-D12-SEMANTIC_EFFECT-SEMANTIC-EFFECT-MEDIA-MEDIA-SPEECH-PROVIDERS-PRO-AF4A35",
+   "requirement": "REQUIRED_SUPPLEMENTAL",
+   "r00_task_ids": [
+    "R05-T03",
+    "R05-T06",
+    "R07-T06"
+   ],
+   "r00_execution_stage_ids": [
+    "R05",
+    "R07"
+   ],
+   "r00_then": "保存供应商模型并返回记录",
+   "disposition": "share",
+   "rule": "R5",
+   "r05_share": "对应媒体 operation（image/video/speech/asr）的 Rust 协议适配、配置段与异步任务语义（job accepted≠产物完成；凭证不跨供应商串用）离线替身验证：R05-T06。",
+   "deferred_to": null,
+   "deferred_reason": null,
+   "r07_remainder": "媒体业务入口路由与页面投影（R07-T06）。"
+  },
+  {
+   "id": "R00-T02-LA-AFCCC4FB7DBA",
+   "feature_id": "F-D12-SEMANTIC_EFFECT-SEMANTIC-EFFECT-MEDIA-MEDIA-TASKS-READ-AFCCC4",
+   "requirement": "REQUIRED_SUPPLEMENTAL",
+   "r00_task_ids": [
+    "R05-T03",
+    "R05-T06",
+    "R07-T06"
+   ],
+   "r00_execution_stage_ids": [
+    "R05",
+    "R07"
+   ],
+   "r00_then": "返回对应筛选的 tasks，按创建时间倒序",
+   "disposition": "share",
+   "rule": "R5",
+   "r05_share": "对应媒体 operation（image/video/speech/asr）的 Rust 协议适配、配置段与异步任务语义（job accepted≠产物完成；凭证不跨供应商串用）离线替身验证：R05-T06。",
+   "deferred_to": null,
+   "deferred_reason": null,
+   "r07_remainder": "媒体业务入口路由与页面投影（R07-T06）。"
+  },
+  {
+   "id": "R00-T02-LA-AFDC77ECAE8B",
+   "feature_id": "F-D22-SEMANTIC_EFFECT-SEMANTIC-EFFECT-MODEL-OBSERVABILITY-MODEL-OBSERV-AFDC77",
+   "requirement": "REQUIRED_SUPPLEMENTAL",
+   "r00_task_ids": [
+    "R05-T07",
+    "R07-T10"
+   ],
+   "r00_execution_stage_ids": [
+    "R05",
+    "R07"
+   ],
+   "r00_then": "返回过滤后的 trace 列表",
+   "disposition": "share",
+   "rule": "R6",
+   "r05_share": "usage/trace/观测数据的产生、持久化、去重、保留期与查询结构（含 NDJSON/blob 数据面语义、未初始化/无权限明确报错）：R05-T07；现役字段与隐私设置保留。",
+   "deferred_to": null,
+   "deferred_reason": null,
+   "r07_remainder": "模型观测/用量的业务路由与 UI 投影验收（R07-T10）。"
+  },
+  {
+   "id": "R00-T02-LA-B30DA03C8576",
+   "feature_id": "F-D10-TOOL-TOOL-UPDATE-SETTINGS-B30DA0",
+   "requirement": "REQUIRED_SUPPLEMENTAL",
+   "r00_task_ids": [
+    "R05-T01",
+    "R07-T08"
+   ],
+   "r00_execution_stage_ids": [
+    "R05",
+    "R07"
+   ],
+   "r00_then": "search返回键/描述；apply对普通配置写入目标；用户专属MCP设置经bus执行并返回结果。",
+   "disposition": "share",
+   "rule": "R7",
+   "r05_share": "该叶依赖的内核侧语义由 R05 覆盖：模型/槽位解析与能力预检（R05-T01）、凭证引用与脱敏（R05-T02）、providers/models 配置段的代次、原子写入与未知字段保留（R05-T01/T02）、连通性探测作为网关 operation 经离线替身验证（R05-T01/T03）。",
+   "deferred_to": null,
+   "deferred_reason": null,
+   "r07_remainder": "现役 HTTP 业务路由、设置页与交互语义（R07-T08）。"
+  },
+  {
+   "id": "R00-T02-LA-B70FCDCAC1ED",
+   "feature_id": "F-D10-PROVIDER-PROVIDER-KIMICODING-B70FCD",
+   "requirement": "REQUIRED_SUPPLEMENTAL",
+   "r00_task_ids": [
+    "R05-T01",
+    "R07-T08",
+    "R05-T02",
+    "R05-T03"
+   ],
+   "r00_execution_stage_ids": [
+    "R05",
+    "R07"
+   ],
+   "r00_then": "注册 id=kimi-coding、auth=api-key、api=openai-completions；配置/选择后仅已允许的模型参与调用，凭证按provider+model隔离，真实调用返回该端点的回复。",
+   "disposition": "share",
+   "rule": "R3",
+   "r05_share": "协议族 openai-completions 与认证形态 api-key 在 Rust ModelGateway 注册并以离线协议替身验证（provider=kimi-coding 同名 modelId 跨 provider 不串凭证/端点/trace；不支持能力请求前明确失败）；归属 R05-T01 网关/能力矩阵、R05-T02 凭证、R05-T03 协议适配。",
+   "deferred_to": null,
+   "deferred_reason": null,
+   "r07_remainder": "设置页注册/选择/展示的现役 UI 与业务路由链（R07-T08）。"
+  },
+  {
+   "id": "R00-T02-LA-BA4BDB7F7338",
+   "feature_id": "F-D10-PROVIDER-PROVIDER-BAICHUAN-BA4BDB",
+   "requirement": "REQUIRED_SUPPLEMENTAL",
+   "r00_task_ids": [
+    "R05-T01",
+    "R07-T08",
+    "R05-T02",
+    "R05-T03"
+   ],
+   "r00_execution_stage_ids": [
+    "R05",
+    "R07"
+   ],
+   "r00_then": "注册 id=baichuan、auth=api-key、api=openai-completions；配置/选择后仅已允许的模型参与调用，凭证按provider+model隔离，真实调用返回该端点的回复。",
+   "disposition": "share",
+   "rule": "R3",
+   "r05_share": "协议族 openai-completions 与认证形态 api-key 在 Rust ModelGateway 注册并以离线协议替身验证（provider=baichuan 同名 modelId 跨 provider 不串凭证/端点/trace；不支持能力请求前明确失败）；归属 R05-T01 网关/能力矩阵、R05-T02 凭证、R05-T03 协议适配。",
+   "deferred_to": null,
+   "deferred_reason": null,
+   "r07_remainder": "设置页注册/选择/展示的现役 UI 与业务路由链（R07-T08）。"
+  },
+  {
+   "id": "R00-T02-LA-BABF0EBA1DE2",
+   "feature_id": "F-D12-SEMANTIC_EFFECT-SEMANTIC-EFFECT-MEDIA-MEDIA-TASKS-BATCH-BATCHID--BABF0E",
+   "requirement": "REQUIRED_SUPPLEMENTAL",
+   "r00_task_ids": [
+    "R05-T03",
+    "R05-T06",
+    "R07-T06"
+   ],
+   "r00_execution_stage_ids": [
+    "R05",
+    "R07"
+   ],
+   "r00_then": "返回 batch 内 tasks",
+   "disposition": "share",
+   "rule": "R5",
+   "r05_share": "对应媒体 operation（image/video/speech/asr）的 Rust 协议适配、配置段与异步任务语义（job accepted≠产物完成；凭证不跨供应商串用）离线替身验证：R05-T06。",
+   "deferred_to": null,
+   "deferred_reason": null,
+   "r07_remainder": "媒体业务入口路由与页面投影（R07-T06）。"
+  },
+  {
+   "id": "R00-T02-LA-BFD9531DEA41",
+   "feature_id": "F-D10-PROVIDER-PROVIDER-GEMINI-BFD953",
+   "requirement": "REQUIRED_SUPPLEMENTAL",
+   "r00_task_ids": [
+    "R05-T01",
+    "R07-T08",
+    "R05-T02",
+    "R05-T03",
+    "R05-T06"
+   ],
+   "r00_execution_stage_ids": [
+    "R05",
+    "R07"
+   ],
+   "r00_then": "注册 id=gemini、auth=api-key、api=google-generative-ai；配置/选择后仅已允许的模型参与调用，凭证按provider+model隔离，真实调用返回该端点的回复；另可按能力执行图片生成。",
+   "disposition": "share",
+   "rule": "R3",
+   "r05_share": "协议族 google-generative-ai 与认证形态 api-key 在 Rust ModelGateway 注册并以离线协议替身验证（provider=gemini 同名 modelId 跨 provider 不串凭证/端点/trace；不支持能力请求前明确失败）；归属 R05-T01 网关/能力矩阵、R05-T02 凭证、R05-T03 协议适配。",
+   "deferred_to": null,
+   "deferred_reason": null,
+   "r07_remainder": "设置页注册/选择/展示的现役 UI 与业务路由链（R07-T08）。"
+  },
+  {
+   "id": "R00-T02-LA-C3CAB2E8B298",
+   "feature_id": "F-D12-SEMANTIC_EFFECT-SEMANTIC-EFFECT-MEDIA-GENERATE-SPEECH-C3CAB2",
+   "requirement": "REQUIRED_SUPPLEMENTAL",
+   "r00_task_ids": [
+    "R05-T03",
+    "R05-T06",
+    "R07-T06"
+   ],
+   "r00_execution_stage_ids": [
+    "R05",
+    "R07"
+   ],
+   "r00_then": "创建语音任务",
+   "disposition": "share",
+   "rule": "R5",
+   "r05_share": "对应媒体 operation（image/video/speech/asr）的 Rust 协议适配、配置段与异步任务语义（job accepted≠产物完成；凭证不跨供应商串用）离线替身验证：R05-T06。",
+   "deferred_to": null,
+   "deferred_reason": null,
+   "r07_remainder": "媒体业务入口路由与页面投影（R07-T06）。"
+  },
+  {
+   "id": "R00-T02-LA-C4EFBA7711E1",
+   "feature_id": "F-D10-PROVIDER-PROVIDER-AGNES-C4EFBA",
+   "requirement": "REQUIRED_SUPPLEMENTAL",
+   "r00_task_ids": [
+    "R05-T01",
+    "R07-T08",
+    "R05-T02",
+    "R05-T03",
+    "R05-T06"
+   ],
+   "r00_execution_stage_ids": [
+    "R05",
+    "R07"
+   ],
+   "r00_then": "注册 id=agnes、auth=api-key、api=openai-completions；配置/选择后仅已允许的模型参与调用，凭证按provider+model隔离，真实调用返回该端点的回复；另可按能力执行图片生成、视频生成。",
+   "disposition": "share",
+   "rule": "R3",
+   "r05_share": "协议族 openai-completions 与认证形态 api-key 在 Rust ModelGateway 注册并以离线协议替身验证（provider=agnes 同名 modelId 跨 provider 不串凭证/端点/trace；不支持能力请求前明确失败）；归属 R05-T01 网关/能力矩阵、R05-T02 凭证、R05-T03 协议适配。",
+   "deferred_to": null,
+   "deferred_reason": null,
+   "r07_remainder": "设置页注册/选择/展示的现役 UI 与业务路由链（R07-T08）。"
+  },
+  {
+   "id": "R00-T02-LA-C7D757226915",
+   "feature_id": "F-D22-SEMANTIC_EFFECT-SEMANTIC-EFFECT-MODEL-OBSERVABILITY-MODEL-OBSERV-C7D757",
+   "requirement": "REQUIRED_SUPPLEMENTAL",
+   "r00_task_ids": [
+    "R05-T07",
+    "R07-T10"
+   ],
+   "r00_execution_stage_ids": [
+    "R05",
+    "R07"
+   ],
+   "r00_then": "返回调用详情与来源",
+   "disposition": "share",
+   "rule": "R6",
+   "r05_share": "usage/trace/观测数据的产生、持久化、去重、保留期与查询结构（含 NDJSON/blob 数据面语义、未初始化/无权限明确报错）：R05-T07；现役字段与隐私设置保留。",
+   "deferred_to": null,
+   "deferred_reason": null,
+   "r07_remainder": "模型观测/用量的业务路由与 UI 投影验收（R07-T10）。"
+  },
+  {
+   "id": "R00-T02-LA-CA0BF9A7AEA9",
+   "feature_id": "F-D11-SEMANTIC_EFFECT-SEMANTIC-EFFECT-AUTH-AUTH-OAUTH-STATUS-READ-CA0BF9",
+   "requirement": "REQUIRED_SUPPLEMENTAL",
+   "r00_task_ids": [
+    "R05-T02"
+   ],
+   "r00_execution_stage_ids": [
+    "R05"
+   ],
+   "r00_then": "返回每个 OAuth provider 的 loggedIn 与可用模型数量",
+   "disposition": "share",
+   "rule": "R4",
+   "r05_share": "OAuth/CredentialService 服务端全份额离线替身验证（start/callback/poll/state/PKCE/logout/custom modelId 管理按该叶 then 文本逐项）：R05-T02。",
+   "deferred_to": null,
+   "deferred_reason": null,
+   "r07_remainder": null
+  },
+  {
+   "id": "R00-T02-LA-CABCB5355784",
+   "feature_id": "F-D10-ROUTE_BEHAVIOR-BEHAVIOR-PROVIDERS-PROVIDERS-FETCH-MODELS-POST-CABCB5",
+   "requirement": "REQUIRED_SUPPLEMENTAL",
+   "r00_task_ids": [
+    "R05-T01",
+    "R07-T08"
+   ],
+   "r00_execution_stage_ids": [
+    "R05",
+    "R07"
+   ],
+   "r00_then": "经 providers.manage 和凭证边界探测远端模型目录；API key 远端失败明确报错，OAuth 目录按现行规则回落",
+   "disposition": "share",
+   "rule": "R7",
+   "r05_share": "该叶依赖的内核侧语义由 R05 覆盖：模型/槽位解析与能力预检（R05-T01）、凭证引用与脱敏（R05-T02）、providers/models 配置段的代次、原子写入与未知字段保留（R05-T01/T02）、连通性探测作为网关 operation 经离线替身验证（R05-T01/T03）。",
+   "deferred_to": null,
+   "deferred_reason": null,
+   "r07_remainder": "现役 HTTP 业务路由、设置页与交互语义（R07-T08）。"
+  },
+  {
+   "id": "R00-T02-LA-CC33172F1B57",
+   "feature_id": "F-D12-SEMANTIC_EFFECT-SEMANTIC-EFFECT-MEDIA-MEDIA-SPEECH-PROVIDERS-PRO-CC3317",
+   "requirement": "REQUIRED_SUPPLEMENTAL",
+   "r00_task_ids": [
+    "R05-T03",
+    "R05-T06",
+    "R07-T06"
+   ],
+   "r00_execution_stage_ids": [
+    "R05",
+    "R07"
+   ],
+   "r00_then": "更新供应商模型并返回记录",
+   "disposition": "share",
+   "rule": "R5",
+   "r05_share": "对应媒体 operation（image/video/speech/asr）的 Rust 协议适配、配置段与异步任务语义（job accepted≠产物完成；凭证不跨供应商串用）离线替身验证：R05-T06。",
+   "deferred_to": null,
+   "deferred_reason": null,
+   "r07_remainder": "媒体业务入口路由与页面投影（R07-T06）。"
+  },
+  {
+   "id": "R00-T02-LA-CC8E90E00CB6",
+   "feature_id": "F-D22-ROUTE_BEHAVIOR-BEHAVIOR-MODEL-OBSERVABILITY-MODEL-OBSERVABILITY-CC8E90",
+   "requirement": "REQUIRED_SUPPLEMENTAL",
+   "r00_task_ids": [
+    "R05-T07",
+    "R07-T10"
+   ],
+   "r00_execution_stage_ids": [
+    "R05",
+    "R07"
+   ],
+   "r00_then": "调用观测存储删除并返回实际结果；无存储、筛选无效或查询失败均明确报错",
+   "disposition": "share",
+   "rule": "R6",
+   "r05_share": "usage/trace/观测数据的产生、持久化、去重、保留期与查询结构（含 NDJSON/blob 数据面语义、未初始化/无权限明确报错）：R05-T07；现役字段与隐私设置保留。",
+   "deferred_to": null,
+   "deferred_reason": null,
+   "r07_remainder": "模型观测/用量的业务路由与 UI 投影验收（R07-T10）。"
+  },
+  {
+   "id": "R00-T02-LA-CCD6BA30F9ED",
+   "feature_id": "F-D10-PROVIDER-PROVIDER-VOLCEGINECODING-CCD6BA",
+   "requirement": "REQUIRED_SUPPLEMENTAL",
+   "r00_task_ids": [
+    "R05-T01",
+    "R07-T08",
+    "R05-T02",
+    "R05-T03"
+   ],
+   "r00_execution_stage_ids": [
+    "R05",
+    "R07"
+   ],
+   "r00_then": "注册 id=volcengine-coding、auth=api-key、api=openai-completions；配置/选择后仅已允许的模型参与调用，凭证按provider+model隔离，真实调用返回该端点的回复。",
+   "disposition": "share",
+   "rule": "R3",
+   "r05_share": "协议族 openai-completions 与认证形态 api-key 在 Rust ModelGateway 注册并以离线协议替身验证（provider=volcengine-coding 同名 modelId 跨 provider 不串凭证/端点/trace；不支持能力请求前明确失败）；归属 R05-T01 网关/能力矩阵、R05-T02 凭证、R05-T03 协议适配。",
+   "deferred_to": null,
+   "deferred_reason": null,
+   "r07_remainder": "设置页注册/选择/展示的现役 UI 与业务路由链（R07-T08）。"
+  },
+  {
+   "id": "R00-T02-LA-CFACFCAD88EC",
+   "feature_id": "F-D22-SEMANTIC_EFFECT-SEMANTIC-EFFECT-USAGE-USAGE-LLM-READ-CFACFC",
+   "requirement": "REQUIRED_SUPPLEMENTAL",
+   "r00_task_ids": [
+    "R05-T07",
+    "R07-T10"
+   ],
+   "r00_execution_stage_ids": [
+    "R05",
+    "R07"
+   ],
+   "r00_then": "返回账本中按时间、归属、助手、模型、提供者、状态等过滤的记录",
+   "disposition": "share",
+   "rule": "R6",
+   "r05_share": "usage/trace/观测数据的产生、持久化、去重、保留期与查询结构（含 NDJSON/blob 数据面语义、未初始化/无权限明确报错）：R05-T07；现役字段与隐私设置保留。",
+   "deferred_to": null,
+   "deferred_reason": null,
+   "r07_remainder": "模型观测/用量的业务路由与 UI 投影验收（R07-T10）。"
+  },
+  {
+   "id": "R00-T02-LA-CFEC64F68DDE",
+   "feature_id": "F-D11-SEMANTIC_EFFECT-SEMANTIC-EFFECT-AUTH-AUTH-OAUTH-PROVIDER-CUSTOM--CFEC64",
+   "requirement": "REQUIRED_SUPPLEMENTAL",
+   "r00_task_ids": [
+    "R05-T02"
+   ],
+   "r00_execution_stage_ids": [
+    "R05"
+   ],
+   "r00_then": "返回指定 OAuth provider 的模型 ID",
+   "disposition": "share",
+   "rule": "R4",
+   "r05_share": "OAuth/CredentialService 服务端全份额离线替身验证（start/callback/poll/state/PKCE/logout/custom modelId 管理按该叶 then 文本逐项）：R05-T02。",
+   "deferred_to": null,
+   "deferred_reason": null,
+   "r07_remainder": null
+  },
+  {
+   "id": "R00-T02-LA-D50161CE274A",
+   "feature_id": "F-D10-UI-UI-SETTINGS-PROVIDERS-D50161",
+   "requirement": "REQUIRED_SUPPLEMENTAL",
+   "r00_task_ids": [
+    "R05-T01",
+    "R07-T08"
+   ],
+   "r00_execution_stage_ids": [
+    "R05",
+    "R07"
+   ],
+   "r00_then": "逐动作核对实际状态与页面投影；失败不伪装成空数据",
+   "disposition": "deferred",
+   "rule": "R1",
+   "r05_share": null,
+   "deferred_to": [
+    "R07"
+   ],
+   "deferred_reason": "逐动作核对设置页供应商区实际状态与页面投影属于 R07 设置页业务入口；R05 无 UI 面可门禁。",
+   "r07_remainder": "逐动作核对实际状态与页面投影；失败不伪装成空数据"
+  },
+  {
+   "id": "R00-T02-LA-D61616CAF15F",
+   "feature_id": "F-D10-PROVIDER-PROVIDER-MIMOTOKENPLAN-D61616",
+   "requirement": "REQUIRED_SUPPLEMENTAL",
+   "r00_task_ids": [
+    "R05-T01",
+    "R07-T08",
+    "R05-T02",
+    "R05-T03",
+    "R05-T06"
+   ],
+   "r00_execution_stage_ids": [
+    "R05",
+    "R07"
+   ],
+   "r00_then": "注册 id=mimo-token-plan、auth=api-key、api=openai-completions；配置/选择后仅已允许的模型参与调用，凭证按provider+model隔离，真实调用返回该端点的回复；另可按能力执行语音识别。",
+   "disposition": "share",
+   "rule": "R3",
+   "r05_share": "协议族 openai-completions 与认证形态 api-key 在 Rust ModelGateway 注册并以离线协议替身验证（provider=mimo-token-plan 同名 modelId 跨 provider 不串凭证/端点/trace；不支持能力请求前明确失败）；归属 R05-T01 网关/能力矩阵、R05-T02 凭证、R05-T03 协议适配。",
+   "deferred_to": null,
+   "deferred_reason": null,
+   "r07_remainder": "设置页注册/选择/展示的现役 UI 与业务路由链（R07-T08）。"
+  },
+  {
+   "id": "R00-T02-LA-D656CA656A89",
+   "feature_id": "F-D22-SEMANTIC_EFFECT-SEMANTIC-EFFECT-OBSERVABILITY-BLOB-GET-D656CA",
+   "requirement": "REQUIRED_SUPPLEMENTAL",
+   "r00_task_ids": [
+    "R05-T07",
+    "R07-T10"
+   ],
+   "r00_execution_stage_ids": [
+    "R05",
+    "R07"
+   ],
+   "r00_then": "GET 返回正文流",
+   "disposition": "share",
+   "rule": "R6",
+   "r05_share": "usage/trace/观测数据的产生、持久化、去重、保留期与查询结构（含 NDJSON/blob 数据面语义、未初始化/无权限明确报错）：R05-T07；现役字段与隐私设置保留。",
+   "deferred_to": null,
+   "deferred_reason": null,
+   "r07_remainder": "模型观测/用量的业务路由与 UI 投影验收（R07-T10）。"
+  },
+  {
+   "id": "R00-T02-LA-D672EB55CD31",
+   "feature_id": "F-D12-SEMANTIC_EFFECT-SEMANTIC-EFFECT-MEDIA-GENERATE-VIDEO-D672EB",
+   "requirement": "REQUIRED_SUPPLEMENTAL",
+   "r00_task_ids": [
+    "R05-T03",
+    "R05-T06",
+    "R07-T06"
+   ],
+   "r00_execution_stage_ids": [
+    "R05",
+    "R07"
+   ],
+   "r00_then": "创建视频任务",
+   "disposition": "share",
+   "rule": "R5",
+   "r05_share": "对应媒体 operation（image/video/speech/asr）的 Rust 协议适配、配置段与异步任务语义（job accepted≠产物完成；凭证不跨供应商串用）离线替身验证：R05-T06。",
+   "deferred_to": null,
+   "deferred_reason": null,
+   "r07_remainder": "媒体业务入口路由与页面投影（R07-T06）。"
+  },
+  {
+   "id": "R00-T02-LA-D79C2E204AFB",
+   "feature_id": "F-D10-PROVIDER-PROVIDER-XAI-D79C2E",
+   "requirement": "REQUIRED_SUPPLEMENTAL",
+   "r00_task_ids": [
+    "R05-T01",
+    "R07-T08",
+    "R05-T02",
+    "R05-T03"
+   ],
+   "r00_execution_stage_ids": [
+    "R05",
+    "R07"
+   ],
+   "r00_then": "注册 id=xai、auth=api-key、api=openai-completions；配置/选择后仅已允许的模型参与调用，凭证按provider+model隔离，真实调用返回该端点的回复。",
+   "disposition": "share",
+   "rule": "R3",
+   "r05_share": "协议族 openai-completions 与认证形态 api-key 在 Rust ModelGateway 注册并以离线协议替身验证（provider=xai 同名 modelId 跨 provider 不串凭证/端点/trace；不支持能力请求前明确失败）；归属 R05-T01 网关/能力矩阵、R05-T02 凭证、R05-T03 协议适配。",
+   "deferred_to": null,
+   "deferred_reason": null,
+   "r07_remainder": "设置页注册/选择/展示的现役 UI 与业务路由链（R07-T08）。"
+  },
+  {
+   "id": "R00-T02-LA-D86616980926",
+   "feature_id": "F-D10-PROVIDER-PROVIDER-ANTHROPIC-D86616",
+   "requirement": "REQUIRED_SUPPLEMENTAL",
+   "r00_task_ids": [
+    "R05-T01",
+    "R07-T08",
+    "R05-T02",
+    "R05-T03"
+   ],
+   "r00_execution_stage_ids": [
+    "R05",
+    "R07"
+   ],
+   "r00_then": "注册 id=anthropic、auth=api-key、api=anthropic-messages；配置/选择后仅已允许的模型参与调用，凭证按provider+model隔离，真实调用返回该端点的回复。",
+   "disposition": "share",
+   "rule": "R3",
+   "r05_share": "协议族 anthropic-messages 与认证形态 api-key 在 Rust ModelGateway 注册并以离线协议替身验证（provider=anthropic 同名 modelId 跨 provider 不串凭证/端点/trace；不支持能力请求前明确失败）；归属 R05-T01 网关/能力矩阵、R05-T02 凭证、R05-T03 协议适配。",
+   "deferred_to": null,
+   "deferred_reason": null,
+   "r07_remainder": "设置页注册/选择/展示的现役 UI 与业务路由链（R07-T08）。"
+  },
+  {
+   "id": "R00-T02-LA-DA74F52F18A0",
+   "feature_id": "F-D12-SEMANTIC_EFFECT-SEMANTIC-EFFECT-MEDIA-MEDIA-VIDEO-PROVIDERS-PROV-DA74F5",
+   "requirement": "REQUIRED_SUPPLEMENTAL",
+   "r00_task_ids": [
+    "R05-T03",
+    "R05-T06",
+    "R07-T06"
+   ],
+   "r00_execution_stage_ids": [
+    "R05",
+    "R07"
+   ],
+   "r00_then": "保存供应商模型并返回记录",
+   "disposition": "share",
+   "rule": "R5",
+   "r05_share": "对应媒体 operation（image/video/speech/asr）的 Rust 协议适配、配置段与异步任务语义（job accepted≠产物完成；凭证不跨供应商串用）离线替身验证：R05-T06。",
+   "deferred_to": null,
+   "deferred_reason": null,
+   "r07_remainder": "媒体业务入口路由与页面投影（R07-T06）。"
+  },
+  {
+   "id": "R00-T02-LA-DBBDA23AB24F",
+   "feature_id": "F-D10-SEMANTIC_EFFECT-SEMANTIC-EFFECT-PROVIDER-GLOBAL-REMOVE-DBBDA2",
+   "requirement": "REQUIRED_SUPPLEMENTAL",
+   "r00_task_ids": [
+    "R05-T01",
+    "R07-T08"
+   ],
+   "r00_execution_stage_ids": [
+    "R05",
+    "R07"
+   ],
+   "r00_then": "逐处读回权威目录、条件插件文件、条件模型投影、焦点 YAML 与仅另含全局字段才变化的 preferences；失败后记录可能的部分成功，不把 HTTP 错误当回滚",
+   "disposition": "share",
+   "rule": "R7",
+   "r05_share": "该叶依赖的内核侧语义由 R05 覆盖：模型/槽位解析与能力预检（R05-T01）、凭证引用与脱敏（R05-T02）、providers/models 配置段的代次、原子写入与未知字段保留（R05-T01/T02）、连通性探测作为网关 operation 经离线替身验证（R05-T01/T03）。",
+   "deferred_to": null,
+   "deferred_reason": null,
+   "r07_remainder": "现役 HTTP 业务路由、设置页与交互语义（R07-T08）。"
+  },
+  {
+   "id": "R00-T02-LA-DE0309EF3F56",
+   "feature_id": "F-D10-PROVIDER-PROVIDER-MODELSCOPE-DE0309",
+   "requirement": "REQUIRED_SUPPLEMENTAL",
+   "r00_task_ids": [
+    "R05-T01",
+    "R07-T08",
+    "R05-T02",
+    "R05-T03"
+   ],
+   "r00_execution_stage_ids": [
+    "R05",
+    "R07"
+   ],
+   "r00_then": "注册 id=modelscope、auth=api-key、api=openai-completions；配置/选择后仅已允许的模型参与调用，凭证按provider+model隔离，真实调用返回该端点的回复。",
+   "disposition": "share",
+   "rule": "R3",
+   "r05_share": "协议族 openai-completions 与认证形态 api-key 在 Rust ModelGateway 注册并以离线协议替身验证（provider=modelscope 同名 modelId 跨 provider 不串凭证/端点/trace；不支持能力请求前明确失败）；归属 R05-T01 网关/能力矩阵、R05-T02 凭证、R05-T03 协议适配。",
+   "deferred_to": null,
+   "deferred_reason": null,
+   "r07_remainder": "设置页注册/选择/展示的现役 UI 与业务路由链（R07-T08）。"
+  },
+  {
+   "id": "R00-T02-LA-DEDBD68525B0",
+   "feature_id": "F-D12-SEMANTIC_EFFECT-SEMANTIC-EFFECT-MEDIA-GENERATE-ASR-DEDBD6",
+   "requirement": "REQUIRED_SUPPLEMENTAL",
+   "r00_task_ids": [
+    "R05-T03",
+    "R05-T06",
+    "R07-T06"
+   ],
+   "r00_execution_stage_ids": [
+    "R05",
+    "R07"
+   ],
+   "r00_then": "返回识别文字/结果；取消与失败不算成功",
+   "disposition": "share",
+   "rule": "R5",
+   "r05_share": "对应媒体 operation（image/video/speech/asr）的 Rust 协议适配、配置段与异步任务语义（job accepted≠产物完成；凭证不跨供应商串用）离线替身验证：R05-T06。",
+   "deferred_to": null,
+   "deferred_reason": null,
+   "r07_remainder": "媒体业务入口路由与页面投影（R07-T06）。"
+  },
+  {
+   "id": "R00-T02-LA-E06C7DDB93D2",
+   "feature_id": "F-D10-PROVIDER-PROVIDER-VOLCENGINE-E06C7D",
+   "requirement": "REQUIRED_SUPPLEMENTAL",
+   "r00_task_ids": [
+    "R05-T01",
+    "R07-T08",
+    "R05-T02",
+    "R05-T03",
+    "R05-T06"
+   ],
+   "r00_execution_stage_ids": [
+    "R05",
+    "R07"
+   ],
+   "r00_then": "注册 id=volcengine、auth=api-key、api=openai-completions；配置/选择后仅已允许的模型参与调用，凭证按provider+model隔离，真实调用返回该端点的回复；另可按能力执行图片生成。",
+   "disposition": "share",
+   "rule": "R3",
+   "r05_share": "协议族 openai-completions 与认证形态 api-key 在 Rust ModelGateway 注册并以离线协议替身验证（provider=volcengine 同名 modelId 跨 provider 不串凭证/端点/trace；不支持能力请求前明确失败）；归属 R05-T01 网关/能力矩阵、R05-T02 凭证、R05-T03 协议适配。",
+   "deferred_to": null,
+   "deferred_reason": null,
+   "r07_remainder": "设置页注册/选择/展示的现役 UI 与业务路由链（R07-T08）。"
+  },
+  {
+   "id": "R00-T02-LA-E80885395AE1",
+   "feature_id": "F-D10-SEMANTIC_EFFECT-SEMANTIC-EFFECT-PROVIDERS-PROVIDERS-TEST-POST-E80885",
+   "requirement": "REQUIRED_SUPPLEMENTAL",
+   "r00_task_ids": [
+    "R05-T01",
+    "R07-T08"
+   ],
+   "r00_execution_stage_ids": [
+    "R05",
+    "R07"
+   ],
+   "r00_then": "向供应商发探测并返回结果，不保存配置",
+   "disposition": "share",
+   "rule": "R7",
+   "r05_share": "该叶依赖的内核侧语义由 R05 覆盖：模型/槽位解析与能力预检（R05-T01）、凭证引用与脱敏（R05-T02）、providers/models 配置段的代次、原子写入与未知字段保留（R05-T01/T02）、连通性探测作为网关 operation 经离线替身验证（R05-T01/T03）。",
+   "deferred_to": null,
+   "deferred_reason": null,
+   "r07_remainder": "现役 HTTP 业务路由、设置页与交互语义（R07-T08）。"
+  },
+  {
+   "id": "R00-T02-LA-EB074679FAE5",
+   "feature_id": "F-D10-SEMANTIC_EFFECT-SEMANTIC-EFFECT-MODELS-MODELS-EB0746",
+   "requirement": "REQUIRED_SUPPLEMENTAL",
+   "r00_task_ids": [
+    "R05-T01",
+    "R07-T08"
+   ],
+   "r00_execution_stage_ids": [
+    "R05",
+    "R07"
+   ],
+   "r00_then": "返回模型列表、默认模型与当前会话模型",
+   "disposition": "share",
+   "rule": "R7",
+   "r05_share": "该叶依赖的内核侧语义由 R05 覆盖：模型/槽位解析与能力预检（R05-T01）、凭证引用与脱敏（R05-T02）、providers/models 配置段的代次、原子写入与未知字段保留（R05-T01/T02）、连通性探测作为网关 operation 经离线替身验证（R05-T01/T03）。",
+   "deferred_to": null,
+   "deferred_reason": null,
+   "r07_remainder": "现役 HTTP 业务路由、设置页与交互语义（R07-T08）。"
+  },
+  {
+   "id": "R00-T02-LA-ECC851003BBF",
+   "feature_id": "F-D22-SEMANTIC_EFFECT-SEMANTIC-EFFECT-MODEL-OBSERVABILITY-MODEL-OBSERV-ECC851",
+   "requirement": "REQUIRED_SUPPLEMENTAL",
+   "r00_task_ids": [
+    "R05-T07",
+    "R07-T10"
+   ],
+   "r00_execution_stage_ids": [
+    "R05",
+    "R07"
+   ],
+   "r00_then": "返回 trace 详情与来源",
+   "disposition": "share",
+   "rule": "R6",
+   "r05_share": "usage/trace/观测数据的产生、持久化、去重、保留期与查询结构（含 NDJSON/blob 数据面语义、未初始化/无权限明确报错）：R05-T07；现役字段与隐私设置保留。",
+   "deferred_to": null,
+   "deferred_reason": null,
+   "r07_remainder": "模型观测/用量的业务路由与 UI 投影验收（R07-T10）。"
+  },
+  {
+   "id": "R00-T02-LA-ED13EB6D0FA6",
+   "feature_id": "F-D10-PROVIDER-PROVIDER-DEEPSEEK-ED13EB",
+   "requirement": "REQUIRED_SUPPLEMENTAL",
+   "r00_task_ids": [
+    "R05-T01",
+    "R07-T08",
+    "R05-T02",
+    "R05-T03"
+   ],
+   "r00_execution_stage_ids": [
+    "R05",
+    "R07"
+   ],
+   "r00_then": "注册 id=deepseek、auth=api-key、api=openai-completions；配置/选择后仅已允许的模型参与调用，凭证按provider+model隔离，真实调用返回该端点的回复。",
+   "disposition": "share",
+   "rule": "R3",
+   "r05_share": "协议族 openai-completions 与认证形态 api-key 在 Rust ModelGateway 注册并以离线协议替身验证（provider=deepseek 同名 modelId 跨 provider 不串凭证/端点/trace；不支持能力请求前明确失败）；归属 R05-T01 网关/能力矩阵、R05-T02 凭证、R05-T03 协议适配。",
+   "deferred_to": null,
+   "deferred_reason": null,
+   "r07_remainder": "设置页注册/选择/展示的现役 UI 与业务路由链（R07-T08）。"
+  },
+  {
+   "id": "R00-T02-LA-F1491D612E5D",
+   "feature_id": "F-D10-SEMANTIC_EFFECT-SEMANTIC-EFFECT-PROVIDERS-PROVIDERS-NAME-MODELS--F1491D",
+   "requirement": "REQUIRED_SUPPLEMENTAL",
+   "r00_task_ids": [
+    "R05-T01",
+    "R07-T08"
+   ],
+   "r00_execution_stage_ids": [
+    "R05",
+    "R07"
+   ],
+   "r00_then": "写目录并刷新 model-sync",
+   "disposition": "share",
+   "rule": "R7",
+   "r05_share": "该叶依赖的内核侧语义由 R05 覆盖：模型/槽位解析与能力预检（R05-T01）、凭证引用与脱敏（R05-T02）、providers/models 配置段的代次、原子写入与未知字段保留（R05-T01/T02）、连通性探测作为网关 operation 经离线替身验证（R05-T01/T03）。",
+   "deferred_to": null,
+   "deferred_reason": null,
+   "r07_remainder": "现役 HTTP 业务路由、设置页与交互语义（R07-T08）。"
+  },
+  {
+   "id": "R00-T02-LA-F6C12F9E54F6",
+   "feature_id": "F-D12-SEMANTIC_EFFECT-SEMANTIC-EFFECT-MEDIA-MEDIA-VIDEO-PROVIDERS-PROV-F6C12F",
+   "requirement": "REQUIRED_SUPPLEMENTAL",
+   "r00_task_ids": [
+    "R05-T03",
+    "R05-T06",
+    "R07-T06"
+   ],
+   "r00_execution_stage_ids": [
+    "R05",
+    "R07"
+   ],
+   "r00_then": "移除供应商模型并返回结果",
+   "disposition": "share",
+   "rule": "R5",
+   "r05_share": "对应媒体 operation（image/video/speech/asr）的 Rust 协议适配、配置段与异步任务语义（job accepted≠产物完成；凭证不跨供应商串用）离线替身验证：R05-T06。",
+   "deferred_to": null,
+   "deferred_reason": null,
+   "r07_remainder": "媒体业务入口路由与页面投影（R07-T06）。"
+  },
+  {
+   "id": "R00-T02-LA-F92121640419",
+   "feature_id": "F-D10-UI-UI-SETTINGS-MODELS-F92121",
+   "requirement": "REQUIRED_SUPPLEMENTAL",
+   "r00_task_ids": [
+    "R05-T01",
+    "R07-T08"
+   ],
+   "r00_execution_stage_ids": [
+    "R05",
+    "R07"
+   ],
+   "r00_then": "逐动作核对实际状态与页面投影；失败不伪装成空数据",
+   "disposition": "deferred",
+   "rule": "R1",
+   "r05_share": null,
+   "deferred_to": [
+    "R07"
+   ],
+   "deferred_reason": "逐动作核对设置页模型区实际状态与页面投影属于 R07 设置页业务入口；R05 无 UI 面可门禁。",
+   "r07_remainder": "逐动作核对实际状态与页面投影；失败不伪装成空数据"
+  },
+  {
+   "id": "R00-T02-LA-F9EA8D71EE92",
+   "feature_id": "F-D22-SEMANTIC_EFFECT-SEMANTIC-EFFECT-MODEL-OBSERVABILITY-MODEL-OBSERV-F9EA8D",
+   "requirement": "REQUIRED_SUPPLEMENTAL",
+   "r00_task_ids": [
+    "R05-T07",
+    "R07-T10"
+   ],
+   "r00_execution_stage_ids": [
+    "R05",
+    "R07"
+   ],
+   "r00_then": "返回 payloadRecords，不内联正文",
+   "disposition": "share",
+   "rule": "R6",
+   "r05_share": "usage/trace/观测数据的产生、持久化、去重、保留期与查询结构（含 NDJSON/blob 数据面语义、未初始化/无权限明确报错）：R05-T07；现役字段与隐私设置保留。",
+   "deferred_to": null,
+   "deferred_reason": null,
+   "r07_remainder": "模型观测/用量的业务路由与 UI 投影验收（R07-T10）。"
+  },
+  {
+   "id": "R00-T02-LA-FA8EA4339EFF",
+   "feature_id": "F-D22-SEMANTIC_EFFECT-SEMANTIC-EFFECT-MODEL-OBSERVABILITY-MODEL-OBSERV-FA8EA4",
+   "requirement": "REQUIRED_SUPPLEMENTAL",
+   "r00_task_ids": [
+    "R05-T07",
+    "R07-T10"
+   ],
+   "r00_execution_stage_ids": [
+    "R05",
+    "R07"
+   ],
+   "r00_then": "返回精确记录正文",
+   "disposition": "share",
+   "rule": "R6",
+   "r05_share": "usage/trace/观测数据的产生、持久化、去重、保留期与查询结构（含 NDJSON/blob 数据面语义、未初始化/无权限明确报错）：R05-T07；现役字段与隐私设置保留。",
+   "deferred_to": null,
+   "deferred_reason": null,
+   "r07_remainder": "模型观测/用量的业务路由与 UI 投影验收（R07-T10）。"
+  },
+  {
+   "id": "R00-T02-LA-FBB9392CF926",
+   "feature_id": "F-D10-SEMANTIC_EFFECT-SEMANTIC-EFFECT-CONFIG-GLOBAL-UPDATE-FBB939",
+   "requirement": "REQUIRED_SUPPLEMENTAL",
+   "r00_task_ids": [
+    "R05-T01",
+    "R07-T08"
+   ],
+   "r00_execution_stage_ids": [
+    "R05",
+    "R07"
+   ],
+   "r00_then": "全局值生效",
+   "disposition": "share",
+   "rule": "R7",
+   "r05_share": "该叶依赖的内核侧语义由 R05 覆盖：模型/槽位解析与能力预检（R05-T01）、凭证引用与脱敏（R05-T02）、providers/models 配置段的代次、原子写入与未知字段保留（R05-T01/T02）、连通性探测作为网关 operation 经离线替身验证（R05-T01/T03）。",
+   "deferred_to": null,
+   "deferred_reason": null,
+   "r07_remainder": "现役 HTTP 业务路由、设置页与交互语义（R07-T08）。"
+  },
+  {
+   "id": "R00-T02-LA-FBCFA99A89A2",
+   "feature_id": "F-D10-PROVIDER-PROVIDER-GROQ-FBCFA9",
+   "requirement": "REQUIRED_SUPPLEMENTAL",
+   "r00_task_ids": [
+    "R05-T01",
+    "R07-T08",
+    "R05-T02",
+    "R05-T03",
+    "R05-T06"
+   ],
+   "r00_execution_stage_ids": [
+    "R05",
+    "R07"
+   ],
+   "r00_then": "注册 id=groq、auth=api-key、api=openai-completions；配置/选择后仅已允许的模型参与调用，凭证按provider+model隔离，真实调用返回该端点的回复；另可按能力执行语音合成。",
+   "disposition": "share",
+   "rule": "R3",
+   "r05_share": "协议族 openai-completions 与认证形态 api-key 在 Rust ModelGateway 注册并以离线协议替身验证（provider=groq 同名 modelId 跨 provider 不串凭证/端点/trace；不支持能力请求前明确失败）；归属 R05-T01 网关/能力矩阵、R05-T02 凭证、R05-T03 协议适配。",
+   "deferred_to": null,
+   "deferred_reason": null,
+   "r07_remainder": "设置页注册/选择/展示的现役 UI 与业务路由链（R07-T08）。"
+  },
+  {
+   "id": "R00-T02-LA-FBF90A1BB572",
+   "feature_id": "F-D12-SEMANTIC_EFFECT-SEMANTIC-EFFECT-MEDIA-MEDIA-IMAGE-PROVIDERS-PROV-FBF90A",
+   "requirement": "REQUIRED_SUPPLEMENTAL",
+   "r00_task_ids": [
+    "R05-T03",
+    "R05-T06",
+    "R07-T06"
+   ],
+   "r00_execution_stage_ids": [
+    "R05",
+    "R07"
+   ],
+   "r00_then": "移除供应商模型并返回结果",
+   "disposition": "share",
+   "rule": "R5",
+   "r05_share": "对应媒体 operation（image/video/speech/asr）的 Rust 协议适配、配置段与异步任务语义（job accepted≠产物完成；凭证不跨供应商串用）离线替身验证：R05-T06。",
+   "deferred_to": null,
+   "deferred_reason": null,
+   "r07_remainder": "媒体业务入口路由与页面投影（R07-T06）。"
+  },
+  {
+   "id": "R00-T02-LA-FC80B6C4FBE4",
+   "feature_id": "F-D11-ROUTE_BEHAVIOR-BEHAVIOR-AUTH-AUTH-OAUTH-LOGOUT-POST-FC80B6",
+   "requirement": "REQUIRED_SUPPLEMENTAL",
+   "r00_task_ids": [
+    "R05-T02"
+   ],
+   "r00_execution_stage_ids": [
+    "R05"
+   ],
+   "r00_then": "删除指定供应商凭证、清空认证缓存并刷新模型列表，返回成功或错误",
+   "disposition": "share",
+   "rule": "R4",
+   "r05_share": "OAuth/CredentialService 服务端全份额离线替身验证（start/callback/poll/state/PKCE/logout/custom modelId 管理按该叶 then 文本逐项）：R05-T02。",
+   "deferred_to": null,
+   "deferred_reason": null,
+   "r07_remainder": null
+  },
+  {
+   "id": "R00-T02-LA-FE1D56A67D39",
+   "feature_id": "F-D10-ROUTE_BEHAVIOR-BEHAVIOR-CONFIG-CONFIG-WORKSPACES-RECENT-ALL-DEL-FE1D56",
+   "requirement": "REQUIRED_SUPPLEMENTAL",
+   "r00_task_ids": [
+    "R05-T01",
+    "R07-T08"
+   ],
+   "r00_execution_stage_ids": [
+    "R05",
+    "R07"
+   ],
+   "r00_then": "清空当前 Agent 的 cwd_history 并返回空列表；不删除目录",
+   "disposition": "share",
+   "rule": "R7",
+   "r05_share": "该叶依赖的内核侧语义由 R05 覆盖：模型/槽位解析与能力预检（R05-T01）、凭证引用与脱敏（R05-T02）、providers/models 配置段的代次、原子写入与未知字段保留（R05-T01/T02）、连通性探测作为网关 operation 经离线替身验证（R05-T01/T03）。",
+   "deferred_to": null,
+   "deferred_reason": null,
+   "r07_remainder": "现役 HTTP 业务路由、设置页与交互语义（R07-T08）。"
+  },
+  {
+   "id": "R00-T02-LA-FE9588171A23",
+   "feature_id": "F-D10-PROVIDER-PROVIDER-MINIMAX-FE9588",
+   "requirement": "REQUIRED_SUPPLEMENTAL",
+   "r00_task_ids": [
+    "R05-T01",
+    "R07-T08",
+    "R05-T02",
+    "R05-T03",
+    "R05-T06"
+   ],
+   "r00_execution_stage_ids": [
+    "R05",
+    "R07"
+   ],
+   "r00_then": "注册 id=minimax、auth=api-key、api=anthropic-messages；配置/选择后仅已允许的模型参与调用，凭证按provider+model隔离，真实调用返回该端点的回复；另可按能力执行图片生成、语音合成。",
+   "disposition": "share",
+   "rule": "R3",
+   "r05_share": "协议族 anthropic-messages 与认证形态 api-key 在 Rust ModelGateway 注册并以离线协议替身验证（provider=minimax 同名 modelId 跨 provider 不串凭证/端点/trace；不支持能力请求前明确失败）；归属 R05-T01 网关/能力矩阵、R05-T02 凭证、R05-T03 协议适配。",
+   "deferred_to": null,
+   "deferred_reason": null,
+   "r07_remainder": "设置页注册/选择/展示的现役 UI 与业务路由链（R07-T08）。"
+  },
+  {
+   "id": "R00-T02-LA-FF3AD97F8429",
+   "feature_id": "F-D10-PROVIDER-PROVIDER-ZHIPU-FF3AD9",
+   "requirement": "REQUIRED_SUPPLEMENTAL",
+   "r00_task_ids": [
+    "R05-T01",
+    "R07-T08",
+    "R05-T02",
+    "R05-T03"
+   ],
+   "r00_execution_stage_ids": [
+    "R05",
+    "R07"
+   ],
+   "r00_then": "注册 id=zhipu、auth=api-key、api=openai-completions；配置/选择后仅已允许的模型参与调用，凭证按provider+model隔离，真实调用返回该端点的回复。",
+   "disposition": "share",
+   "rule": "R3",
+   "r05_share": "协议族 openai-completions 与认证形态 api-key 在 Rust ModelGateway 注册并以离线协议替身验证（provider=zhipu 同名 modelId 跨 provider 不串凭证/端点/trace；不支持能力请求前明确失败）；归属 R05-T01 网关/能力矩阵、R05-T02 凭证、R05-T03 协议适配。",
+   "deferred_to": null,
+   "deferred_reason": null,
+   "r07_remainder": "设置页注册/选择/展示的现役 UI 与业务路由链（R07-T08）。"
+  }
+ ],
+ "counts": {
+  "base": 16,
+  "supplemental_total": 130,
+  "share": 125,
+  "deferred": 5,
+  "single_stage_r05_only": 6,
+  "dual_stage_r05_r07": 124
+ }
+}

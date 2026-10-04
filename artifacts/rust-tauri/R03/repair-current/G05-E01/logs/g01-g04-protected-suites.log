@@ -1,0 +1,81 @@
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.07s
+     Running tests/admission_dedup_adversarial.rs (target/debug/deps/admission_dedup_adversarial-874804375557d917)
+
+running 5 tests
+test adv_c01_spawn_window_failure_and_retraction_leave_no_sticky_state ... ok
+test adv_c03_isolation_controls_hold_while_a_key_is_mid_admission ... ok
+test adv_c05_restart_with_unknown_side_effects_refuses_explicitly ... ok
+test adv_c04_response_lost_before_any_external_effect_replays_real_run ... ok
+test adv_c02_response_lost_inside_start_window_resolves_lazily ... ok
+
+test result: ok. 5 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.22s
+
+     Running tests/admission_dedup_consistency.rs (target/debug/deps/admission_dedup_consistency-9a04c825c923e96f)
+
+running 5 tests
+test r03_f05_c02_start_transaction_failure_is_compensated ... ok
+test r03_f05_c01_background_spawn_rejection_leaves_no_ghost_replay ... ok
+test r03_f05_c03_concurrent_same_key_between_reservation_and_commit ... ok
+test r03_f05_c05_restart_same_key_is_an_explicit_contract_not_a_blind_redo ... ok
+test r03_f05_c04_post_side_effect_response_loss_never_reexecutes ... ok
+
+test result: ok. 5 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.26s
+
+     Running tests/cancel_link_inheritance.rs (target/debug/deps/cancel_link_inheritance-7811d07e892d1159)
+
+running 7 tests
+test nodes_created_after_parent_cancellation_inherit_it ... ok
+test linked_run_roots_receive_parent_cancellation_across_mixed_entries ... ok
+test isolation_and_first_reason_survive_repeated_and_concurrent_cancels ... ok
+test registration_racing_cancellation_misses_no_node ... ok
+test subagent_timeout_settles_a_parked_approval_wait ... ok
+test subagent_timeout_settles_a_parked_provider_wait ... ok
+test subagent_timeout_settles_a_parked_quota_wait ... ok
+
+test result: ok. 7 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.57s
+
+     Running tests/cancel_terminal_race.rs (target/debug/deps/cancel_terminal_race-7862bed29c7d76a7)
+
+running 13 tests
+test a_fire_after_the_driver_reached_cleaning_never_regresses_the_phase ... ok
+test concurrent_duplicate_fires_keep_the_first_reason_and_a_single_fired ... ok
+test cancel_at_the_started_boundary_dispatches_no_new_external_call ... ok
+test cancel_accepted_while_final_events_persist_beats_the_completed_terminal ... ok
+test cancel_at_the_intent_boundary_dispatches_no_new_external_call ... ok
+test cancel_after_the_committed_terminal_reports_already_terminal ... ok
+test cancel_racing_the_finalize_transaction_is_too_late_not_accepted ... ok
+test cancel_at_the_no_provider_early_close_settles_cancelled ... ok
+test cancel_at_the_authorization_boundary_never_opens_the_approval_ask ... ok
+test cancel_accepted_before_the_terminal_claim_beats_every_terminal_shape ... ok
+test cancel_between_tool_iterations_stops_the_second_dispatch ... ok
+test started_without_receipt_journals_unknown_receipt_facts ... ok
+test cancel_accepted_before_the_terminal_claim_beats_the_failed_terminal_too ... ok
+
+test result: ok. 13 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.42s
+
+     Running tests/subagent_closeout.rs (target/debug/deps/subagent_closeout-457ac9f82fee79f3)
+
+running 8 tests
+test drain_expired_child_is_finally_reaped_after_its_actual_exit ... ok
+test panicking_background_exits_are_recorded_and_reaped_without_a_waiter ... ok
+test parent_cancel_before_the_childs_first_provider_call_settles_with_zero_calls ... ok
+test thread_registry_refusal_leaves_no_permanent_reservations ... ok
+test child_provider_panic_closes_out_and_the_thread_continues ... ok
+test finished_background_drives_reap_both_registries ... ok
+test parent_cancel_closes_children_in_process_repeatedly_beyond_the_cap ... ok
+test late_and_duplicate_completions_cannot_corrupt_the_closeout ... ok
+
+test result: ok. 8 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.26s
+
+     Running tests/tool_receipt_unknown.rs (target/debug/deps/tool_receipt_unknown-74fc5e83e2a71fc1)
+
+running 6 tests
+test f04_c01_adv_panic_before_side_effect_is_still_unknown ... ok
+test f04_c01_panic_after_side_effect_journals_unknown_not_confirmed_failure ... ok
+test f04_c04_adv_control_verified_idempotent_recovery_uses_only_the_original_key ... ok
+test f04_c02_dispatched_no_result_variants_classify_consistently_unknown ... ok
+test f04_c03_trusted_negatives_survive_alongside_the_unknown ... ok
+test f04_c04_recovery_and_repeat_recovery_do_not_redo_unknown ... ok
+
+test result: ok. 6 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.41s
+

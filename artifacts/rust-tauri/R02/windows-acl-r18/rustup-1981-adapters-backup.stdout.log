@@ -1,0 +1,16 @@
+
+running 11 tests
+test backup_validates_the_file_stem ... ok
+test backup_into_unwritable_destination_fails_without_artifacts ... ok
+test database_files_are_tightened_to_owner_only ... ok
+test restore_refuses_an_existing_target ... ok
+test backup_and_restore_artifacts_are_owner_only ... ok
+test restore_refuses_a_tampered_backup_file ... ok
+test a11_pure_online_backup_without_precheckpoint_is_also_complete ... ok
+test a11_backup_of_a_started_but_uncommitted_run_is_a_complete_prefix ... ok
+test a11_transaction_boundary_rolled_back_data_is_absent_from_backup ... ok
+test a11_online_backup_captures_wal_resident_committed_data_and_restores ... ok
+test a11_backup_during_concurrent_commits_is_a_consistent_prefix ... ok
+
+test result: ok. 11 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.23s
+

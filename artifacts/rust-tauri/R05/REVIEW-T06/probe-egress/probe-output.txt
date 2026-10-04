@@ -1,0 +1,21 @@
+URL                                          | guard     | url-crate host               | verdict
+--------------------------------------------------------------------------------------------------------------
+https://127.0.0.1:18080/asset.png            | REFUSE(Forbidden) | Ipv4 127.0.0.1 (GUARDED RANGE) | ok
+https://10.1.2.3/asset.png                   | REFUSE(Forbidden) | Ipv4 10.1.2.3 (GUARDED RANGE) | ok
+https://192.168.3.5/asset.png                | REFUSE(Forbidden) | Ipv4 192.168.3.5 (GUARDED RANGE) | ok
+https://0x7f.0.0.1/asset.png                 | PASS      | Ipv4 127.0.0.1 (GUARDED RANGE) | !! BYPASS
+https://0x7f000001/asset.png                 | PASS      | Ipv4 127.0.0.1 (GUARDED RANGE) | !! BYPASS
+https://2130706433/asset.png                 | PASS      | Ipv4 127.0.0.1 (GUARDED RANGE) | !! BYPASS
+https://0177.0.0.1/asset.png                 | PASS      | Ipv4 127.0.0.1 (GUARDED RANGE) | !! BYPASS
+https://0177.0.0.1:18080/asset.png           | PASS      | Ipv4 127.0.0.1 (GUARDED RANGE) | !! BYPASS
+https://127.1/asset.png                      | PASS      | Ipv4 127.0.0.1 (GUARDED RANGE) | !! BYPASS
+https://127.000.000.001/asset.png            | PASS      | Ipv4 127.0.0.1 (GUARDED RANGE) | !! BYPASS
+https://127.0.0.1./asset.png                 | PASS      | Ipv4 127.0.0.1 (GUARDED RANGE) | !! BYPASS
+https://3232235885/asset.png                 | PASS      | Ipv4 192.168.1.109 (GUARDED RANGE) | !! BYPASS
+https://[fe80::1%25eth0]/asset.png           | REFUSE(Forbidden) | parse-error invalid IPv6 address | ok
+https://[::ffff:127.0.0.1]/asset.png         | PASS      | Ipv6 ::ffff:127.0.0.1 (MAPPED->[127, 0, 0, 1] GUARDED) | !! BYPASS
+https://[::ffff:169.254.169.254]/latest/meta-data | PASS      | Ipv6 ::ffff:169.254.169.254 (MAPPED->[169, 254, 169, 254] GUARDED) | !! BYPASS
+https://[::ffff:10.1.2.3]/asset.png          | PASS      | Ipv6 ::ffff:10.1.2.3 (MAPPED->[10, 1, 2, 3] GUARDED) | !! BYPASS
+https://[::ffff:192.168.3.5]/asset.png       | PASS      | Ipv6 ::ffff:192.168.3.5 (MAPPED->[192, 168, 3, 5] GUARDED) | !! BYPASS
+
+bypass rows: 13

@@ -1,0 +1,37 @@
+
+ RUN  v4.1.10 /Users/study_superior/Desktop/Code/LingxiAgent
+
+ ❯ tests/cli-rust-service.test.ts (17 tests | 1 failed | 16 skipped) 33ms
+     × uses the recorded transport and rejects unknown transport values 33ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  tests/cli-rust-service.test.ts > Rust CLI discovery > uses the recorded transport and rejects unknown transport values
+AssertionError: expected { ok: true, backend: 'rust', …(3) } to match object { ok: true, …(1) }
+(3 matching properties omitted from actual)
+
+- Expected
++ Received
+
+  {
+-   "baseUrl": "https://127.0.0.1:14567",
++   "baseUrl": "http://127.0.0.1:14567",
+    "ok": true,
+  }
+
+ ❯ tests/cli-rust-service.test.ts:50:64
+     48|     });
+     49|     fs.writeFileSync(recordPath, JSON.stringify({ ...fixture.instance,…
+     50|     expect(readRustLocalService({ lingxiHome: fixture.home })).toMatch…
+       |                                                                ^
+     51|       ok: true, baseUrl: "https://127.0.0.1:14567",
+     52|     });
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  1 failed | 16 skipped (17)
+   Start at  17:18:10
+   Duration  267ms (transform 122ms, setup 20ms, import 143ms, tests 33ms, environment 0ms)
+

@@ -1,0 +1,8 @@
+   Compiling xtask v0.1.0 (/Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/xtask)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.88s
+     Running unittests src/main.rs (rust/target/debug/deps/xtask-ad766de8ea03e62c)
+kill: 42304: No such process
+kill: 42304: No such process
+kill: 42304: No such process
+kill: 42306: No such process
+error: test failed, to rerun pass `-p xtask --bin xtask`

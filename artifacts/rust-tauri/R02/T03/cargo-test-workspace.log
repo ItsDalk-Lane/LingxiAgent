@@ -1,0 +1,288 @@
+   Compiling lingxi-kernel v0.0.0 (/Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-kernel)
+   Compiling lingxi-service v0.0.0 (/Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-service)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 2.06s
+     Running unittests src/lib.rs (/tmp/rust-target-r02-t03/debug/deps/lingxi_browser_spike-d25dbff7ca8425a8)
+
+running 11 tests
+test cdp::tests::png_dims_parse ... ok
+test ops::tests::find_ref_parses_snapshot_lines ... ok
+test pdf::tests::page_sizes ... ok
+test pdf::tests::percent_decode ... ok
+test pdf::tests::font_css_extract_and_rewrite ... ok
+test pdf::tests::fetch_policy ... ok
+test cdp::tests::events_buffered_and_waitable ... ok
+test snapshot_source::tests::sha256_hex_stable ... ok
+test cdp::tests::roundtrip_command_response ... ok
+test snapshot_source::tests::extracts_from_repo ... ok
+test cdp::tests::remote_error_surfaces ... ok
+
+test result: ok. 11 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.06s
+
+     Running unittests src/bin/spike_browser.rs (/tmp/rust-target-r02-t03/debug/deps/spike_browser-6bbdf9f73811746e)
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running unittests src/bin/spike_pdf.rs (/tmp/rust-target-r02-t03/debug/deps/spike_pdf-93ad1486195c4fe6)
+
+running 1 test
+test tests::timeout_exit_code_classification ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running unittests src/lib.rs (/tmp/rust-target-r02-t03/debug/deps/lingxi_kernel-1b1acaed818d95e2)
+
+running 7 tests
+test tests::cancellation_resolves_only_to_cancelled ... ok
+test tests::cancelling_cannot_be_revoked_back_to_running ... ok
+test tests::happy_path_queued_to_completed ... ok
+test tests::queued_cannot_skip_to_completed ... ok
+test tests::terminal_states_reject_every_transition ... ok
+test tests::seq_precision_holds_across_kernel_boundary ... ok
+test tests::run_context_carries_identity_only ... ok
+
+test result: ok. 7 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running unittests src/lib.rs (/tmp/rust-target-r02-t03/debug/deps/lingxi_protocol-d90789915c0df003)
+
+running 19 tests
+test canon::tests::canonical_form_has_no_whitespace_or_trailing_newline ... ok
+test canon::tests::canonical_form_sorts_keys_and_keeps_utf8 ... ok
+test handshake::tests::client_hello_rejects_unknown_fields ... ok
+test handshake::tests::intersection_selects_highest_common ... ok
+test handshake::tests::unknown_caps_are_reported_not_dropped ... ok
+test handshake::tests::disjoint_ranges_fail_explicitly ... ok
+test handshake::tests::wrong_family_and_malformed_range_are_invalid_message ... ok
+test tests::error_codes_have_stable_wire_names ... ok
+test tests::ids_are_opaque_and_preserved ... ok
+test tests::r00_baseline_versions_are_one ... ok
+test tests::seq_wire_string_rejects_garbage ... ok
+test tests::protocol_error_rejects_unknown_fields ... ok
+test tests::seq_wire_string_roundtrips_beyond_js_safe_integer ... ok
+test tests::terminal_states_are_terminal_and_named_stably ... ok
+test wire::tests::dialect_check_is_explicit ... ok
+test wire::tests::closed_payload_variants_reject_unknown_fields ... ok
+test wire::tests::u64_fields_are_decimal_strings ... ok
+test wire::tests::unknown_event_payload_is_preserved_verbatim ... ok
+test wire::tests::envelope_roundtrips_and_validates_event_type ... ok
+
+test result: ok. 19 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running unittests src/bin/lingxi-proto-server.rs (/tmp/rust-target-r02-t03/debug/deps/lingxi_proto_server-b386498339ddb0ca)
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running unittests src/bin/lingxi-protocol-gen.rs (/tmp/rust-target-r02-t03/debug/deps/lingxi_protocol_gen-c66177ea2b0ba198)
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running unittests src/bin/lingxi-protocol-verify.rs (/tmp/rust-target-r02-t03/debug/deps/lingxi_protocol_verify-621781e0733a1003)
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running unittests src/lib.rs (/tmp/rust-target-r02-t03/debug/deps/lingxi_service-22ec36fe96a82422)
+
+running 70 tests
+test auth::tests::constant_time_eq_basics ... ok
+test auth::tests::bearer_parsing_mirrors_incumbent ... ok
+test auth::tests::route_policy_table ... ok
+test config::tests::cli_empty_is_no_flags_not_an_error ... ok
+test config::tests::test_mode_home_name_is_unique_and_prefixed ... ok
+test config::tests::cli_rejects_duplicate_home ... ok
+test config::tests::cli_rejects_flag_shaped_values_instead_of_consuming_them ... ok
+test config::tests::cli_rejects_equals_form_and_unknown_tokens ... ok
+test config::tests::cli_rejects_missing_values ... ok
+test config::tests::cli_network_mode_strictness ... ok
+test config::tests::cli_rejects_duplicate_bind_and_config_and_test_mode ... ok
+test auth::tests::scope_namespace_expansion ... ok
+test config::tests::cli_parses_all_flags ... ok
+test config::tests::config_file_missing_is_loud ... ok
+test instance::tests::probe_peer_reports_unreachable_for_dead_port ... ok
+test limits::tests::ws_connection_counter_enforces_ceiling_and_frees ... ok
+test limits::tests::rate_limiter_fixed_window_behavior ... ok
+test sessions::tests::cross_principal_access_is_forbidden_not_found ... ok
+test sessions::tests::execute_request_rejects_identity_shaped_payload_fields ... ok
+test sessions::tests::owner_sees_everything_and_execute_records_runs ... ok
+test sessions::tests::same_user_device_principal_can_access ... ok
+test tests::config_defaults_to_loopback_ephemeral ... ok
+test tests::config_network_mode_is_explicit_only ... ok
+test tests::config_parses_bind_and_home ... ok
+test tests::config_rejects_garbage_bind ... ok
+test tests::config_rejects_relative_home ... ok
+test tests::config_rejects_unknown_and_missing_values ... ok
+test tests::config_requires_explicit_home ... ok
+test tests::health_response_serializes_minimal_camel_case ... ok
+test tests::health_response_sources_versions_from_protocol ... ok
+test transport::tests::host_loopback_detection_covers_v4_v6_and_ports ... ok
+test transport::tests::lan_mode_still_recognizes_local_connections ... ok
+test transport::tests::loopback_mode_requires_loopback_host_and_remote ... ok
+test transport::tests::network_mode_parses_strictly ... ok
+test instance::tests::identity_is_unique_and_well_formed ... ok
+test transport::tests::origin_policy_allowlist ... ok
+test ws::tests::frame_codec_roundtrip_through_memory ... ok
+test ws::tests::oversized_frame_is_rejected_not_buffered ... ok
+test ws::tests::query_pair_parsing ... ok
+test ws::tests::ticket_lifecycle_single_use_expiry_and_binding ... ok
+test ws::tests::websocket_accept_known_vector ... ok
+test config::tests::precedence_cli_wins_but_broken_config_is_still_loud ... ok
+test ws::tests::ws_credential_extraction_order ... ok
+test instance::tests::record_json_round_trips_camel_case ... ok
+test config::tests::precedence_only_cli_only_env_only_config_and_none ... ok
+test ws::tests::ws_request_vocabulary_parses_and_rejects_unknown ... ok
+test instance::tests::record_handshake_mismatch_is_reported ... ok
+test ws::tests::ticket_table_is_bounded_and_prunes_expired ... ok
+test paths::tests::layout_rejects_relative_and_root_and_file_as_home ... ok
+test config::tests::precedence_env_wins_over_config ... ok
+test config::tests::test_mode_overrides_all_sources_and_is_unique_per_call ... ok
+test config::tests::precedence_cli_wins_over_env_and_config ... ok
+test paths::tests::layout_tightens_wide_runtime_dir ... ok
+test config::tests::config_file_reads_absolute_home ... ok
+test paths::tests::layout_creates_normalized_dirs_with_private_mode ... ok
+test paths::tests::atomic_write_replaces_content_and_leaves_no_tmp ... ok
+test instance::tests::second_acquire_in_process_is_rejected_with_diagnostics ... ok
+test config::tests::config_file_rejects_unknown_keys_missing_home_and_bad_types ... ok
+test instance::tests::stale_record_with_nonexistent_pid_is_still_taken_over ... ok
+test instance::tests::held_lock_with_live_foreign_pid_still_rejects ... ok
+test instance::tests::unreadable_leftover_record_is_replaced_not_fatal ... ok
+test instance::tests::release_never_deletes_a_foreign_record ... ok
+test auth::tests::failed_authentication_never_touches_registry_files ... ok
+test auth::tests::local_token_roundtrip_and_owner_principal ... ok
+test instance::tests::stale_record_is_archived_and_taken_over_regardless_of_pid ... ok
+test auth::tests::token_file_is_owner_only_and_instance_bound ... ok
+test auth::tests::registries_reload_across_bootstrap ... ok
+test auth::tests::authorize_order_and_denials ... ok
+test auth::tests::device_credential_lifecycle_create_auth_expire_revoke ... ok
+test paths::tests::atomic_write_many_rounds_do_not_collide ... ok
+
+test result: ok. 70 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.83s
+
+     Running unittests src/main.rs (/tmp/rust-target-r02-t03/debug/deps/lingxi_service-1c9de929a87d4430)
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running tests/auth_matrix.rs (/tmp/rust-target-r02-t03/debug/deps/auth_matrix-7e1608d34fd90f8f)
+
+running 13 tests
+test a05_loopback_mode_refuses_non_loopback_bind_at_config_layer ... ok
+test a06_origin_matrix_http ... ok
+test a06_cli_shape_full_business_roundtrip ... ok
+test a05_no_credential_is_rejected_without_side_effects ... ok
+test a05_forged_principal_fields_are_ignored_not_trusted ... ok
+test a05_loopback_token_over_nonlocal_transport_is_denied_at_policy_layer ... ok
+test a06_host_header_tampering_is_rejected ... ok
+test limits_body_size_and_rate_and_ws_ceiling ... ok
+test a06_ws_origin_and_host_matrix ... ok
+test a05_forged_and_unknown_session_ids ... ok
+test a05_expired_and_revoked_device_credentials_are_rejected_without_side_effects ... ok
+test a06_expired_and_replayed_ws_tickets_are_rejected ... ok
+test a05_cross_principal_session_misuse_is_forbidden_without_side_effects ... ok
+
+test result: ok. 13 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.37s
+
+     Running tests/instance_lifecycle.rs (/tmp/rust-target-r02-t03/debug/deps/instance_lifecycle-3515184dde519cf3)
+
+running 3 tests
+test config_source_field_reaches_the_service_config ... ok
+test locked_instance_survives_rejected_second_claim ... ok
+test crashed_owner_leaves_stale_record_and_restart_takes_over ... ok
+
+test result: ok. 3 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.09s
+
+     Running tests/service_health.rs (/tmp/rust-target-r02-t03/debug/deps/service_health-ad857729ec153688)
+
+running 4 tests
+test prepare_data_home_creates_and_is_idempotent ... ok
+test prepare_data_home_rejects_file_as_home ... ok
+test health_check_over_real_loopback ... ok
+test unknown_route_is_not_found_for_owner_but_closed_for_strangers ... ok
+
+test result: ok. 4 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.05s
+
+     Running unittests src/lib.rs (/tmp/rust-target-r02-t03/debug/deps/lingxi_spike-0e9ad56c297dbc12)
+
+running 7 tests
+test queue::tests::zero_capacity_is_rejected ... ok
+test queue::tests::bounded_queue_reports_full_instead_of_dropping ... ok
+test queue::tests::put_get_count_roundtrip_and_wal ... ok
+test schema::tests::golden_server_hello_validates ... ok
+test schema::tests::golden_client_hello_validates_against_generated_schema ... ok
+test schema::tests::tampered_client_hello_is_rejected ... ok
+test queue::tests::many_jobs_all_complete_in_order ... ok
+
+test result: ok. 7 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.05s
+
+     Running unittests src/bin/spike_check_deps.rs (/tmp/rust-target-r02-t03/debug/deps/spike_check_deps-0eb6c03a3afd401f)
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running unittests src/bin/spike_health.rs (/tmp/rust-target-r02-t03/debug/deps/spike_health-76d80f52af395e70)
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running unittests src/bin/spike_mcp_handshake.rs (/tmp/rust-target-r02-t03/debug/deps/spike_mcp_handshake-33b63306bde05922)
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running unittests src/bin/spike_schema_validate.rs (/tmp/rust-target-r02-t03/debug/deps/spike_schema_validate-ee445a2e114df3e7)
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running unittests src/bin/spike_sqlite_queue.rs (/tmp/rust-target-r02-t03/debug/deps/spike_sqlite_queue-3d2f75bca911968a)
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running unittests src/bin/spike_tls_probe.rs (/tmp/rust-target-r02-t03/debug/deps/spike_tls_probe-82ea3115badd300a)
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+   Doc-tests lingxi_browser_spike
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+   Doc-tests lingxi_kernel
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+   Doc-tests lingxi_protocol
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+   Doc-tests lingxi_service
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+   Doc-tests lingxi_spike
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+

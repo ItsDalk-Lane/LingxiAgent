@@ -1,0 +1,58 @@
+   Compiling lingxi-service v0.0.0 (/Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-service)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.88s
+     Running tests/cancel_link_inheritance.rs (rust/target/debug/deps/cancel_link_inheritance-7811d07e892d1159)
+
+running 7 tests
+test isolation_and_first_reason_survive_repeated_and_concurrent_cancels ... ok
+test nodes_created_after_parent_cancellation_inherit_it ... FAILED
+test linked_run_roots_receive_parent_cancellation_across_mixed_entries ... FAILED
+test registration_racing_cancellation_misses_no_node ... FAILED
+test subagent_timeout_settles_a_parked_provider_wait ... FAILED
+test subagent_timeout_settles_a_parked_quota_wait ... FAILED
+test subagent_timeout_settles_a_parked_approval_wait ... FAILED
+
+failures:
+
+---- nodes_created_after_parent_cancellation_inherit_it stdout ----
+
+thread 'nodes_created_after_parent_cancellation_inherit_it' (42721290) panicked at crates/lingxi-service/tests/cancel_link_inheritance.rs:498:5:
+a child of an already-cancelled parent starts cancelled
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+
+---- linked_run_roots_receive_parent_cancellation_across_mixed_entries stdout ----
+
+thread 'linked_run_roots_receive_parent_cancellation_across_mixed_entries' (42721289) panicked at crates/lingxi-service/tests/cancel_link_inheritance.rs:450:9:
+cancelling the parent must reach child_entry
+
+---- registration_racing_cancellation_misses_no_node stdout ----
+
+thread 'registration_racing_cancellation_misses_no_node' (42721291) panicked at crates/lingxi-service/tests/cancel_link_inheritance.rs:583:5:
+every node registered (before, during or after the traversal) is cancelled
+
+---- subagent_timeout_settles_a_parked_provider_wait stdout ----
+
+thread 'subagent_timeout_settles_a_parked_provider_wait' (42721293) panicked at crates/lingxi-service/tests/cancel_link_inheritance.rs:394:9:
+timed out waiting for the child settles cancelled through its timeout (run run_000001a0dcba6c00_000002 to become cancelled)
+
+---- subagent_timeout_settles_a_parked_quota_wait stdout ----
+
+thread 'subagent_timeout_settles_a_parked_quota_wait' (42721294) panicked at crates/lingxi-service/tests/cancel_link_inheritance.rs:394:9:
+timed out waiting for the child settles cancelled through its timeout (run run_000001a0dcba6c00_000002 to become cancelled)
+
+---- subagent_timeout_settles_a_parked_approval_wait stdout ----
+
+thread 'subagent_timeout_settles_a_parked_approval_wait' (42721292) panicked at crates/lingxi-service/tests/cancel_link_inheritance.rs:394:9:
+timed out waiting for the child settles cancelled through its timeout (run run_000001a0dcba6c00_000002 to become cancelled)
+
+
+failures:
+    linked_run_roots_receive_parent_cancellation_across_mixed_entries
+    nodes_created_after_parent_cancellation_inherit_it
+    registration_racing_cancellation_misses_no_node
+    subagent_timeout_settles_a_parked_approval_wait
+    subagent_timeout_settles_a_parked_provider_wait
+    subagent_timeout_settles_a_parked_quota_wait
+
+test result: FAILED. 1 passed; 6 failed; 0 ignored; 0 measured; 0 filtered out; finished in 5.17s
+
+error: test failed, to rerun pass `-p lingxi-service --test cancel_link_inheritance`

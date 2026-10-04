@@ -1,0 +1,9 @@
+2026-09-26T13:33:18.657317Z  INFO lingxi_service: data root resolved effective_home=/tmp/lingxi-r02t02-a03-home.OO97ld source=cli ignored_sources=none
+2026-09-26T13:33:18.657431Z  INFO lingxi_service: data root prepared (canonicalized; runtime dir private 0700) canonical_home=/private/tmp/lingxi-r02t02-a03-home.OO97ld runtime_dir=/private/tmp/lingxi-r02t02-a03-home.OO97ld/lingxi-service
+2026-09-26T13:33:18.668643Z  INFO lingxi_service: single-writer lock acquired instance_id=e26312f88182abd5779df89e1cca149b start_nonce=2e27a831a8a7f9ac pid=91648 entropy="os-random-device" lock=/private/tmp/lingxi-r02t02-a03-home.OO97ld/lingxi-service/instance.lock network_mode=loopback
+LINGXI_SERVICE_STALE_RECORD_TAKEN_OVER home=/private/tmp/lingxi-r02t02-a03-home.OO97ld previousInstanceId=1ed51c66dc30d0b3099efb61283d5a3d previousPid=1 previousStartNonce=0000000000000000 previousStartedAtUnixMs=0 handshakeMismatches=none
+2026-09-26T13:33:18.668790Z  WARN lingxi_service: stale instance record taken over (lock was free; decision never used pid liveness) stale_instance_id=1ed51c66dc30d0b3099efb61283d5a3d stale_archive=/private/tmp/lingxi-r02t02-a03-home.OO97ld/lingxi-service/instance.stale.json
+2026-09-26T13:33:18.679724Z  INFO lingxi_service: auth service bootstrapped (per-start loopback token, owner-only);          run database migrated and seeded local_token_file=/private/tmp/lingxi-r02t02-a03-home.OO97ld/lingxi-service/local-token.json run_database=/private/tmp/lingxi-r02t02-a03-home.OO97ld/lingxi-service/data/runs.db
+2026-09-26T13:33:18.687516Z  INFO lingxi_service: instance record published (atomic write) record=/private/tmp/lingxi-r02t02-a03-home.OO97ld/lingxi-service/instance.json bind_addr=127.0.0.1:61681
+2026-09-26T13:33:18.770094Z  INFO lingxi_service: shutdown signal: SIGTERM
+2026-09-26T13:33:18.770880Z  INFO lingxi_service: lingxi-service stopped cleanly (run database closed, own record                          removed, lock released)

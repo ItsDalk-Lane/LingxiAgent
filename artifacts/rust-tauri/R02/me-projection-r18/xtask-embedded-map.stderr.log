@@ -1,0 +1,10 @@
+   Compiling xtask v0.1.0 (/Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/xtask)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.52s
+     Running unittests src/main.rs (rust/target/debug/deps/xtask-3069b20bc2d29d58)
+
+thread 'verify::runner_tests::embedded_r02_map_declares_the_34_supplemental_leaves' (37755593) panicked at crates/xtask/src/verify/runner_tests.rs:1372:9:
+assertion `left != right` failed: R00-T02-LA-4BCE8CCFD5DC: generic authentication checks cannot prove original full behavior
+  left: "a05_a06_auth_matrix"
+ right: "a05_a06_auth_matrix"
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+error: test failed, to rerun pass `-p xtask --bin xtask`

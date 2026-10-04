@@ -1,0 +1,8 @@
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.08s
+     Running tests/admission_dedup_consistency.rs (target/debug/deps/admission_dedup_consistency-9a04c825c923e96f)
+
+running 1 test
+test r03_f05_c04_post_side_effect_response_loss_never_reexecutes ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 4 filtered out; finished in 0.08s
+

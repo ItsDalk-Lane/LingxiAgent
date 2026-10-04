@@ -1,0 +1,5 @@
+node v24.16.0
+generator: node docs/rust-tauri/R05/r05_t05_generate_compat_goldens.mjs (imports the LIVE TS modules core/provider-compat/*.ts)
+generator exit=0
+fixture count: 49
+shasum -a 256 before/after diff: EMPTY (byte-identical regeneration)

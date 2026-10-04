@@ -42,9 +42,11 @@ use std::sync::Arc;
 use std::time::Duration;
 
 use lingxi_kernel::invocation::{RecoveryDecision, ToolRecoveryCapability};
+use lingxi_kernel::model_exchange::ModelTurnInput;
 use lingxi_kernel::ports::{
     InvocationPhase, InvocationReceipt, ProviderDescriptor, ProviderTurnResult, ReceiptOutcome,
-    StoragePort, ToolExecutionResult, ToolExecutorPort, ToolOutcome, ToolRequest, TurnProviderPort,
+    StoragePort, ToolExecutionResult, ToolExecutorPort, ToolOutcome, ToolRequest, TurnDeltaSink,
+    TurnProviderPort,
 };
 use lingxi_kernel::RunContext;
 use lingxi_protocol::{
@@ -276,8 +278,9 @@ impl TurnProviderPort for ScriptedProvider {
         &'a self,
         ctx: &'a RunContext,
         _call: &'a ModelCallId,
-        _turn: u32,
-        _input: &'a str,
+        _input: &'a ModelTurnInput,
+
+        _deltas: &'a dyn TurnDeltaSink,
     ) -> Pin<Box<dyn std::future::Future<Output = ProviderTurnResult> + Send + 'a>> {
         let session = ctx.session_id.to_string();
         let pop = {
@@ -488,6 +491,7 @@ async fn r03_a09_crash_after_side_effect_does_not_reexecute_and_receipt_is_unkno
             "sess_local_alpha",
             vec![
                 lingxi_kernel::ports::ProviderTurn::ToolRequests {
+                    content: Vec::new(),
                     requests: vec![tool_request("notify.double")],
                 },
                 lingxi_kernel::ports::ProviderTurn::Final {
@@ -714,6 +718,7 @@ async fn r03_a10_idempotent_key_resume_does_not_duplicate_the_external_operation
             "sess_local_alpha",
             vec![
                 lingxi_kernel::ports::ProviderTurn::ToolRequests {
+                    content: Vec::new(),
                     requests: vec![tool_request("ledger.double")],
                 },
                 lingxi_kernel::ports::ProviderTurn::Final {
@@ -1034,9 +1039,11 @@ async fn journal_lifecycle_progresses_and_closes_receipts_on_the_live_chain() {
             "sess_local_alpha",
             vec![
                 lingxi_kernel::ports::ProviderTurn::ToolRequests {
+                    content: Vec::new(),
                     requests: vec![tool_request("notify.double"), tool_request("notify.double")],
                 },
                 lingxi_kernel::ports::ProviderTurn::ToolRequests {
+                    content: Vec::new(),
                     requests: vec![tool_request("notify.double")],
                 },
                 lingxi_kernel::ports::ProviderTurn::Final {

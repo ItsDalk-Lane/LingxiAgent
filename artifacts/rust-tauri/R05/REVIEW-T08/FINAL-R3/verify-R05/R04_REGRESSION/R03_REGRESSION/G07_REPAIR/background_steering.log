@@ -1,0 +1,15 @@
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.11s
+     Running tests/background_steering.rs (/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T//rust-target-r03-g07-repair/debug/deps/background_steering-87cb8bc150bec48c)
+
+running 8 tests
+test c01_background_accepted_steering_reaches_next_turn_exactly_once ... ok
+test c02_adversarial_cancel_then_quick_new_run_no_misattribution ... ok
+test c01_adversarial_multi_steer_orders_and_rounds_no_redrain ... ok
+test c02_steering_stays_in_the_authorized_session_across_parallel_runs ... ok
+test c03_too_late_steering_retained_not_claimed_no_auto_trigger ... ok
+test c04_adversarial_concurrent_steers_respect_the_bound ... ok
+test c03_midflight_steering_is_consumed_not_leaked_into_next_run ... ok
+test c04_bounded_inbox_same_contract_foreground_and_background ... ok
+
+test result: ok. 8 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.40s
+

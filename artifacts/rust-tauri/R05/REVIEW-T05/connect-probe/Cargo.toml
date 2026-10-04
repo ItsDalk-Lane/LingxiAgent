@@ -1,0 +1,11 @@
+[package]
+name = "review-t05-connect-probe"
+version = "0.0.0"
+edition = "2021"
+
+[dependencies]
+lingxi-adapters = { path = "../../../../../rust/crates/lingxi-adapters" }
+lingxi-protocol = { path = "../../../../../rust/crates/lingxi-protocol" }
+tokio = { version = "1", features = ["full"] }
+
+[workspace]

@@ -1,0 +1,51 @@
+    Checking lingxi-service v0.0.0 (/Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-service)
+    Checking lingxi-spike v0.0.0 (/Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-spike)
+error: used `assert_eq!` with a literal bool
+    --> crates/lingxi-service/tests/auth_matrix.rs:1878:5
+     |
+1878 | /     assert_eq!(
+1879 | |         me["capabilities"]
+1880 | |             .as_array()
+1881 | |             .unwrap()
+1882 | |             .contains(&serde_json::json!("chat")),
+1883 | |         true
+1884 | |     );
+     | |_____^
+     |
+     = help: for further information visit https://rust-lang.github.io/rust-clippy/rust-1.98.0/index.html#bool_assert_comparison
+     = note: `-D clippy::bool-assert-comparison` implied by `-D warnings`
+     = help: to override `-D warnings` add `#[allow(clippy::bool_assert_comparison)]`
+help: replace it with `assert!(..)`
+     |
+1878 ~     assert!(
+1879 |         me["capabilities"]
+1880 |             .as_array()
+1881 |             .unwrap()
+1882 ~             .contains(&serde_json::json!("chat"))
+     |
+
+error: could not compile `lingxi-service` (test "auth_matrix") due to 1 previous error
+warning: build failed, waiting for other jobs to finish...
+error: called `.iter().cloned().collect()` on a slice to create a `Vec`
+   --> crates/lingxi-service/tests/r00_management_leaves.rs:342:44
+    |
+342 |           .expect("management audit intents")
+    |  ____________________________________________^
+343 | |         .iter()
+344 | |         .cloned()
+345 | |         .collect();
+    | |__________________^
+    |
+    = help: for further information visit https://rust-lang.github.io/rust-clippy/rust-1.98.0/index.html#iter_cloned_collect
+    = note: `-D clippy::iter-cloned-collect` implied by `-D warnings`
+    = help: to override `-D warnings` add `#[allow(clippy::iter_cloned_collect)]`
+help: calling `.to_vec()` is both faster and more readable
+    |
+342 -         .expect("management audit intents")
+343 -         .iter()
+344 -         .cloned()
+345 -         .collect();
+342 +         .expect("management audit intents").to_vec();
+    |
+
+error: could not compile `lingxi-service` (test "r00_management_leaves") due to 1 previous error

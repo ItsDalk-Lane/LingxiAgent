@@ -1,0 +1,92 @@
+== run 2026-10-02T16:18:37+0800 (pid 19502) ==
+== R02-T08 / R02-A16 legacy-entry regression (SHA-bound baseline/candidate replay, pristine baseline, content-based cause classes) ==
+base SHA:      201584f2917a7fd96d6ea603bdeddbd420082cfe
+candidate SHA: c549ff654508ab951e2cf39cf9d309fc9c6b8656
+scope: regression gate only — PASS here is NOT the formal audit seal (orchestrator step)
+PASS E0-ancestry (base is an ancestor of candidate)
+NOTE candidate-worktree-dirty: this run binds the WORKTREE (uncommitted changes), tracked diff sha256=cb624a210abf95428f0a771e0c136708bb5254575a58d123981e0b868880e392, full tracked+untracked binding in e0-candidate-binding.tsv (1060 paths)
+NOTE e0-binding-exclusion: artifacts/rust-tauri/R05/T01/verify-R04-rerun/R03_REGRESSION/R02/A16/legacy-entry/** (this gate's own run-time evidence output subtree — in-repo evidence root; runner output, never candidate source; applied symmetrically to both bindings — recorded in the # header row of e0-candidate-binding.tsv)
+== isolated copies under /var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T//r02-a16.OmcfFe ==
+PASS E0-baseline-purity (baseline = fresh construction of committed 201584f2917a7fd96d6ea603bdeddbd420082cfe content; no prohibited git operations; purity asserts in e0-base-purity.txt)
+isolated copies verified: base pristine at 201584f2917a7fd96d6ea603bdeddbd420082cfe; candidate mirrors the invoking state (tracked+untracked)
+== E0s: gate self-checks (classifier + binding fixtures) ==
+fixture seal-lag: expected=[seal-coordinate-lag,] actual=[seal-coordinate-lag,]
+fixture seal-lag-via-generator: expected=[seal-coordinate-lag,] actual=[seal-coordinate-lag,]
+fixture uncommitted: expected=[uncommitted-source-rejection,] actual=[uncommitted-source-rejection,]
+fixture generator-crash: expected=[UNRECOGNIZED,] actual=[UNRECOGNIZED,]
+fixture bare-wrapper: expected=[UNRECOGNIZED,] actual=[UNRECOGNIZED,]
+fixture mixed-foreign: expected=[UNRECOGNIZED,seal-coordinate-lag,] actual=[UNRECOGNIZED,seal-coordinate-lag,]
+fixture cross-block-mix: expected=[UNRECOGNIZED,seal-coordinate-lag,] actual=[UNRECOGNIZED,seal-coordinate-lag,]
+fixture non-coordinate-guard: expected=[UNRECOGNIZED,] actual=[UNRECOGNIZED,]
+fixture real-missing-coordinate-embedded: expected=[UNRECOGNIZED,] actual=[UNRECOGNIZED,]
+fixture real-missing-coordinate-direct: expected=[UNRECOGNIZED,] actual=[UNRECOGNIZED,]
+fixture real-diff-failed: expected=[UNRECOGNIZED,] actual=[UNRECOGNIZED,]
+fixture real-nonhex-coordinate: expected=[UNRECOGNIZED,] actual=[UNRECOGNIZED,]
+fixture real-noncommit-coordinate: expected=[UNRECOGNIZED,] actual=[UNRECOGNIZED,]
+fixture real-guard-eacces: expected=[UNRECOGNIZED,] actual=[UNRECOGNIZED,]
+fixture truncated-guard: expected=[UNRECOGNIZED,] actual=[UNRECOGNIZED,]
+fixture guard-tail-cut: expected=[UNRECOGNIZED,uncommitted-source-rejection,] actual=[UNRECOGNIZED,uncommitted-source-rejection,]
+fixture guard-direct-full: expected=[UNRECOGNIZED,seal-coordinate-lag,] actual=[UNRECOGNIZED,seal-coordinate-lag,]
+fixture guard-direct-full-real: expected=[seal-coordinate-lag,] actual=[seal-coordinate-lag,]
+fixture same-line-known-error: expected=[UNRECOGNIZED,seal-coordinate-lag,] actual=[UNRECOGNIZED,seal-coordinate-lag,]
+fixture mixed-known-fatal: expected=[UNRECOGNIZED,seal-coordinate-lag,] actual=[UNRECOGNIZED,seal-coordinate-lag,]
+fixture zero-payload: expected=[UNRECOGNIZED,] actual=[UNRECOGNIZED,]
+fixture zero-payload-no-suite: expected=[UNRECOGNIZED,] actual=[UNRECOGNIZED,]
+fixture missing-block-rows: UNRECOGNIZED OK
+fixture same-block-known-plus-guard-tail: expected=[UNRECOGNIZED,seal-coordinate-lag,] actual=[UNRECOGNIZED,seal-coordinate-lag,]
+fixture compact-error-mixed: expected=[UNRECOGNIZED,seal-coordinate-lag,] actual=[UNRECOGNIZED,seal-coordinate-lag,]
+fixture list-line-mixed: expected=[UNRECOGNIZED,seal-coordinate-lag,] actual=[UNRECOGNIZED,seal-coordinate-lag,]
+fixture warning-mixed: expected=[UNRECOGNIZED,seal-coordinate-lag,] actual=[UNRECOGNIZED,seal-coordinate-lag,]
+fixture matcher-tail-mixed: expected=[UNRECOGNIZED,seal-coordinate-lag,] actual=[UNRECOGNIZED,seal-coordinate-lag,]
+fixture wrapper-mixed: expected=[UNRECOGNIZED,seal-coordinate-lag,] actual=[UNRECOGNIZED,seal-coordinate-lag,]
+fixture wrapper-foreign-command: expected=[UNRECOGNIZED,] actual=[UNRECOGNIZED,]
+fixture wrapper-not-first-row: expected=[UNRECOGNIZED,] actual=[UNRECOGNIZED,]
+fixture bare-token-without-lead: expected=[UNRECOGNIZED,] actual=[UNRECOGNIZED,]
+fixture listing-without-guard-line: expected=[UNRECOGNIZED,] actual=[UNRECOGNIZED,]
+fixture diff-body-without-lead: expected=[UNRECOGNIZED,] actual=[UNRECOGNIZED,]
+fixture real-matcher-elided: expected=[seal-coordinate-lag,] actual=[seal-coordinate-lag,]
+fixture real-matcher-inline: expected=[seal-coordinate-lag,] actual=[seal-coordinate-lag,]
+fixture uncommitted-bracket-path: expected=[uncommitted-source-rejection,] actual=[uncommitted-source-rejection,]
+fixture uncommitted-escaped-path: expected=[uncommitted-source-rejection,] actual=[uncommitted-source-rejection,]
+fixture uncommitted-nonascii-path: expected=[uncommitted-source-rejection,] actual=[uncommitted-source-rejection,]
+fixture uncommitted-bare-error: expected=[UNRECOGNIZED,uncommitted-source-rejection,] actual=[UNRECOGNIZED,uncommitted-source-rejection,]
+fixture uncommitted-mixed-error: expected=[UNRECOGNIZED,uncommitted-source-rejection,] actual=[UNRECOGNIZED,uncommitted-source-rejection,]
+fixture uncommitted-truncated: expected=[UNRECOGNIZED,uncommitted-source-rejection,] actual=[UNRECOGNIZED,uncommitted-source-rejection,]
+fixture uncommitted-empty-array: expected=[UNRECOGNIZED,uncommitted-source-rejection,] actual=[UNRECOGNIZED,uncommitted-source-rejection,]
+fixture uncommitted-four-elements: expected=[UNRECOGNIZED,uncommitted-source-rejection,] actual=[UNRECOGNIZED,uncommitted-source-rejection,]
+fixture uncommitted-trailing-junk: expected=[UNRECOGNIZED,uncommitted-source-rejection,] actual=[UNRECOGNIZED,uncommitted-source-rejection,]
+fixture guard-window-r2-round2: expected=[seal-coordinate-lag,uncommitted-source-rejection,] actual=[seal-coordinate-lag,uncommitted-source-rejection,]
+fixture guard-window-r2-round3: expected=[seal-coordinate-lag,uncommitted-source-rejection,] actual=[seal-coordinate-lag,uncommitted-source-rejection,]
+fixture guard-window-complete-end: expected=[seal-coordinate-lag,uncommitted-source-rejection,] actual=[seal-coordinate-lag,uncommitted-source-rejection,]
+fixture guard-window-off-by-one: expected=[UNRECOGNIZED,uncommitted-source-rejection,] actual=[UNRECOGNIZED,uncommitted-source-rejection,]
+fixture guard-window-trailing-junk: expected=[UNRECOGNIZED,uncommitted-source-rejection,] actual=[UNRECOGNIZED,uncommitted-source-rejection,]
+fixture guard-window-sentence-fragment: expected=[UNRECOGNIZED,uncommitted-source-rejection,] actual=[UNRECOGNIZED,uncommitted-source-rejection,]
+fixture guard-window-wrong-producer: expected=[UNRECOGNIZED,uncommitted-source-rejection,] actual=[UNRECOGNIZED,uncommitted-source-rejection,]
+fixture guard-window-missing-line: expected=[UNRECOGNIZED,uncommitted-source-rejection,] actual=[UNRECOGNIZED,uncommitted-source-rejection,]
+fixture green-log: zero failed files, zero blocks — legal no-failure state OK
+fixtures parseability: GREEN / UNPARSEABLE(signal exit, no summary) / PARSABLE(red with complete summary; R9-F01: suite-error no-arrow header with zero failed tests, and multi-error headers >= failed count) / CONTRADICTORY(exit 0 with reds / exit 0 summary-counts-failures / nonzero all-passed summary / FAIL-block LOSS: headers < Tests-failed count / R10-F01 FILE-level LOSS: headers < Test-Files-failed count (zero-header suite-error summary is the hole shape; case floor vacuous at tests_failed=0) / R10-F01 summary incoherence: Tests failed > 0 with Test Files failed == 0 / R11-F02 EMPTY file identity: a FAIL header normalizing to an empty name — pure or mixed with real headers — is damaged evidence, CONTRADICTORY, never PARSABLE) / UNPARSEABLE(exit0 empty, exit0 no summary, exit0 bare truncated summary, exit0 sum mismatch, red missing Tests line) + R10-F01 counts side-channel records files_failed/distinct_files/verdict for the E5 cross-check OK
+fixtures membership: exact members pass; .regression.test.ts suffix / unrelated rejected (grep -vxF whole-line identity) OK
+binding: identical-state match OK; untracked content change detected; new untracked file detected (no-commit scratch repo)
+binding exclusion (repair-group5): excluded-subtree changes invisible; non-excluded content change still detected; header row recorded; default binding stays exhaustive without the prefix
+baseline construction: proven by the E0 purity asserts on the real fresh copy (no checkout -f / clean -fd anywhere)
+PASS E0s-gate-self-checks (53 classifier fixtures incl. every REAL guard failure sentence, the zero-payload shapes, the R7 same-line/same-block mixes, the real direct-guard shape, the R8 structural-mixing negatives (compact Error:EACCES token, list/warning/matcher/wrapper tails, foreign/misplaced wrapper) and the producer-binding negatives (body lines without their lead) plus the REAL matcher-summary/diff-body positives, the R9-F01 firstDiff structure fixtures (legal bracket/comma/escape/non-ASCII paths pure, non-JSON/mixed/truncated/empty/4-element/trailing-junk payloads fail closed), the repair-group10 guard-tail-window fixtures (the two gate-r2 round2/round3 REAL 500-point windows + the derived complete-end variant classify seal+uncommitted; single-point mutations — off-by-one char, trailing junk, sentence-material fragment, wrong producer wrapper, deleted listing line — all fail closed to UNRECOGNIZED) + no-block-rows rejection + green positive control + parseability predicate incl. exit-0 summary completeness and summary/exit consistency with the R9-F01 one-directional header-loss rule (suite-error no-arrow header and multi-error headers are PARSABLE; headers < Tests-failed is CONTRADICTORY) and the R10-F01 floors (headers < Test-Files-failed count — the zero-header suite-error summary hole — and Tests-failed>0 with Test-Files-failed==0 incoherence — both CONTRADICTORY; counts side-channel records files_failed/distinct_files/verdict) + exact-identity family membership checks + no-commit binding checks; details in e0s-self-checks.log)
+== E1: default entry not switched (Node/Electron incumbent default) ==
+RECORD E1a-surface-diff (authorized wiring range vs base 201584f2917a7fd96d6ea603bdeddbd420082cfe: 55 file(s) — archived in e1-surface-diff-files.txt, not gated)
+RECORD E1b-binding-surface-intersect (uncommitted/untracked part of the wiring range: 0 path(s) — archived in e1-binding-surface-intersect.txt, not gated)
+PASS E1c-package-main (package.json main = desktop/bootstrap.cjs)
+PASS E1d-1-runtime-default (rustDesktopEnabled: unset/node → false, explicit rust → true)
+PASS E1d-2-no-default-injection (LINGXI_DESKTOP_SERVER_RUNTIME absent from package.json, scripts/launch.js, desktop/bootstrap.cjs, scripts/notarize.cjs)
+PASS E1d-3-branch-guard (main.cjs: 'if (rustDesktopEnabled())' guards the Rust branch; incumbent Node server body with server-info.json handling intact)
+PASS E1d-4-bootstrap-load-chain (bootstrap.cjs: app.isPackaged selects and requires main.bundle.cjs / main.cjs)
+PASS E1d-5-cli-default-node (cli/args.ts default runtime = "node")
+PASS E1d-6-no-double-write-guards (main.cjs RUST_DESKTOP_NODE_SERVER_INFO_PRESENT mutex + rust paths.rs RUNTIME_DIR_NAME runtime-dir layout both present)
+== E2: npm run typecheck (candidate copy) ==
+PASS E2-typecheck (exit 0; tsc x3)
+== E3: npm run typecheck:core-contracts (candidate copy) ==
+PASS E3-core-contracts (exit 0)
+== E4: incumbent boundary gates (candidate copy) ==
+PASS E4-boundary-gates (dependency + tool-invocation, exit 0 each)
+== E4.5: npm run build:renderer (candidate copy) ==
+PASS E4.5-build-renderer (exit 0; vite build --config vite.config.ts)
+SKIP E5 (full npm + seal-family classification) BY SCOPE: directed mode requested; E0–E4.5 all green above; the full chain remains the R02 stage map's a16 command and the controller's ledger item
+RESULT: R02 legacy entry regression DIRECTED (E0–E4.5) ALL GREEN

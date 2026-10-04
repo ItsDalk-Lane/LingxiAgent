@@ -1,0 +1,583 @@
+{
+ "schema": "lingxi.leaf-case-results.v1",
+ "cases": [
+  {
+   "case": "a05-no-credential-read",
+   "expect": 401,
+   "actual": 401,
+   "ok": true
+  },
+  {
+   "case": "a05-no-credential-execute",
+   "expect": 401,
+   "actual": 401,
+   "ok": true
+  },
+  {
+   "case": "a05-no-credential-ws-ticket",
+   "expect": 403,
+   "actual": 403,
+   "ok": true
+  },
+  {
+   "case": "a05-no-credential-me",
+   "expect": 401,
+   "actual": 401,
+   "ok": true
+  },
+  {
+   "case": "a05-me-denied-no-registry-write",
+   "expect": 1,
+   "actual": 1,
+   "ok": true
+  },
+  {
+   "case": "a05-forged-principal-headers",
+   "expect": 401,
+   "actual": 401,
+   "ok": true
+  },
+  {
+   "case": "a05-me-with-forged-header",
+   "expect": 200,
+   "actual": 200,
+   "ok": true
+  },
+  {
+   "case": "a05-me-owner-full-projection",
+   "expect": 1,
+   "actual": 1,
+   "ok": true
+  },
+  {
+   "case": "a05-identity-shaped-body-rejected",
+   "expect": 400,
+   "actual": 400,
+   "ok": true
+  },
+  {
+   "case": "a05-forged-session-id",
+   "expect": 404,
+   "actual": 404,
+   "ok": true
+  },
+  {
+   "case": "a05-forged-session-id-execute",
+   "expect": 404,
+   "actual": 404,
+   "ok": true
+  },
+  {
+   "case": "a05-wrong-token",
+   "expect": 401,
+   "actual": 401,
+   "ok": true
+  },
+  {
+   "case": "a05-issue-expired-credential",
+   "expect": 201,
+   "actual": 201,
+   "ok": true
+  },
+  {
+   "case": "a05-ws-ticket-issue-owner",
+   "expect": 200,
+   "actual": 200,
+   "ok": true
+  },
+  {
+   "case": "a05-devices-credentials-empty-user-id",
+   "expect": 400,
+   "actual": 400,
+   "ok": true
+  },
+  {
+   "case": "a05-devices-credentials-invalid-json",
+   "expect": 400,
+   "actual": 400,
+   "ok": true
+  },
+  {
+   "case": "a05-issue-foreign-credential",
+   "expect": 201,
+   "actual": 201,
+   "ok": true
+  },
+  {
+   "case": "a05-foreign-credential-authenticates",
+   "expect": 200,
+   "actual": 200,
+   "ok": true
+  },
+  {
+   "case": "a05-me-device-full-projection",
+   "expect": 1,
+   "actual": 1,
+   "ok": true
+  },
+  {
+   "case": "a05-issue-no-chat-credential",
+   "expect": 201,
+   "actual": 201,
+   "ok": true
+  },
+  {
+   "case": "a05-ws-ticket-insufficient-scope",
+   "expect": 403,
+   "actual": 403,
+   "ok": true
+  },
+  {
+   "case": "a05-expired-credential",
+   "expect": 401,
+   "actual": 401,
+   "ok": true
+  },
+  {
+   "case": "a05-expired-credential-execute",
+   "expect": 401,
+   "actual": 401,
+   "ok": true
+  },
+  {
+   "case": "a05-cross-principal-read",
+   "expect": 403,
+   "actual": 403,
+   "ok": true
+  },
+  {
+   "case": "a05-cross-principal-execute",
+   "expect": 403,
+   "actual": 403,
+   "ok": true
+  },
+  {
+   "case": "a05-positive-control-owner-execute",
+   "expect": 200,
+   "actual": 200,
+   "ok": true
+  },
+  {
+   "case": "a05-sessions-list-owner",
+   "expect": 200,
+   "actual": 200,
+   "ok": true
+  },
+  {
+   "case": "a05-sessions-list-owner-contains-own-session",
+   "expect": 1,
+   "actual": 1,
+   "ok": true
+  },
+  {
+   "case": "a05-sessions-list-foreign-principal",
+   "expect": 200,
+   "actual": 200,
+   "ok": true
+  },
+  {
+   "case": "a05-sessions-list-foreign-excludes-owner-sessions",
+   "expect": 0,
+   "actual": 0,
+   "ok": true
+  },
+  {
+   "case": "a05-sessions-list-empty-shape",
+   "expect": 1,
+   "actual": 1,
+   "ok": true
+  },
+  {
+   "case": "a05-sessions-list-no-credential",
+   "expect": 401,
+   "actual": 401,
+   "ok": true
+  },
+  {
+   "case": "a05-cli-sessions-owner-list",
+   "expect": 1,
+   "actual": 1,
+   "ok": true,
+   "observed": {
+    "exit": 0,
+    "lineCount": 2,
+    "numberedCount": 2
+   }
+  },
+  {
+   "case": "a05-cli-sessions-foreign-empty",
+   "expect": 1,
+   "actual": 1,
+   "ok": true,
+   "observed": {
+    "exit": 0,
+    "emptyMessage": true
+   }
+  },
+  {
+   "case": "a05-cli-sessions-unauthorized-error",
+   "expect": 1,
+   "actual": 1,
+   "ok": true,
+   "observed": {
+    "exit": 1,
+    "http401": true,
+    "stdoutEmpty": true
+   }
+  },
+  {
+   "case": "a05-cli-sessions-limit-20",
+   "expect": 1,
+   "actual": 1,
+   "ok": true,
+   "observed": {
+    "exitCode": 0,
+    "renderedLines": 20,
+    "errors": 0,
+    "suppliedSessions": 25
+   }
+  },
+  {
+   "case": "a06-evil-origin-health",
+   "expect": 403,
+   "actual": 403,
+   "ok": true
+  },
+  {
+   "case": "a06-evil-origin-with-valid-token",
+   "expect": 403,
+   "actual": 403,
+   "ok": true
+  },
+  {
+   "case": "a06-allowed-origin-http://localhost:61904",
+   "expect": 200,
+   "actual": 200,
+   "ok": true
+  },
+  {
+   "case": "a06-allowed-origin-http://127.0.0.1:61904",
+   "expect": 200,
+   "actual": 200,
+   "ok": true
+  },
+  {
+   "case": "a06-allowed-origin-file://",
+   "expect": 200,
+   "actual": 200,
+   "ok": true
+  },
+  {
+   "case": "a06-allowed-origin-null",
+   "expect": 200,
+   "actual": 200,
+   "ok": true
+  },
+  {
+   "case": "a06-rebinding-origin-http://sub.localhost:1",
+   "expect": 403,
+   "actual": 403,
+   "ok": true
+  },
+  {
+   "case": "a06-rebinding-origin-http://127.0.0.1.evil.example",
+   "expect": 403,
+   "actual": 403,
+   "ok": true
+  },
+  {
+   "case": "a06-foreign-host-health",
+   "expect": 403,
+   "actual": 403,
+   "ok": true
+  },
+  {
+   "case": "a06-foreign-host-with-token",
+   "expect": 403,
+   "actual": 403,
+   "ok": true
+  },
+  {
+   "case": "a06-localhost-host-ok",
+   "expect": 200,
+   "actual": 200,
+   "ok": true
+  },
+  {
+   "case": "a06-cli-no-origin-owner-read",
+   "expect": 200,
+   "actual": 200,
+   "ok": true
+  },
+  {
+   "case": "a06-cli-query-token-local",
+   "expect": 200,
+   "actual": 200,
+   "ok": true
+  },
+  {
+   "case": "ws-evil-origin",
+   "expect": 403,
+   "actual": 403,
+   "ok": true
+  },
+  {
+   "case": "ws-foreign-host",
+   "expect": 403,
+   "actual": 403,
+   "ok": true
+  },
+  {
+   "case": "ws-no-credential",
+   "expect": 401,
+   "actual": 401,
+   "ok": true
+  },
+  {
+   "case": "ws-ticket-legit-origin-upgrade",
+   "expect": 101,
+   "actual": 101,
+   "ok": true
+  },
+  {
+   "case": "ws-server-hello",
+   "expect": 1,
+   "actual": 1,
+   "ok": true
+  },
+  {
+   "case": "ws-session-read-owner",
+   "expect": 1,
+   "actual": 1,
+   "ok": true
+  },
+  {
+   "case": "ws-ticket-replay",
+   "expect": 401,
+   "actual": 401,
+   "ok": true
+  },
+  {
+   "case": "ws-no-origin-cli-bearer",
+   "expect": 101,
+   "actual": 101,
+   "ok": true
+  },
+  {
+   "case": "ws-cli-server-hello",
+   "expect": 1,
+   "actual": 1,
+   "ok": true
+  },
+  {
+   "case": "ws-unmasked-text-upgrade",
+   "expect": 101,
+   "actual": 101,
+   "ok": true
+  },
+  {
+   "case": "ws-unmasked-text-hello",
+   "expect": 0,
+   "actual": 0,
+   "ok": true
+  },
+  {
+   "case": "ws-unmasked-text-protocol-close",
+   "expect": 0,
+   "actual": 0,
+   "ok": true
+  },
+  {
+   "case": "ws-unmasked-close-upgrade",
+   "expect": 101,
+   "actual": 101,
+   "ok": true
+  },
+  {
+   "case": "ws-unmasked-close-hello",
+   "expect": 0,
+   "actual": 0,
+   "ok": true
+  },
+  {
+   "case": "ws-unmasked-close-protocol-close",
+   "expect": 0,
+   "actual": 0,
+   "ok": true
+  },
+  {
+   "case": "ws-unmasked-ping-upgrade",
+   "expect": 101,
+   "actual": 101,
+   "ok": true
+  },
+  {
+   "case": "ws-unmasked-ping-hello",
+   "expect": 0,
+   "actual": 0,
+   "ok": true
+  },
+  {
+   "case": "ws-unmasked-ping-protocol-close",
+   "expect": 0,
+   "actual": 0,
+   "ok": true
+  },
+  {
+   "case": "ws-unmasked-pong-upgrade",
+   "expect": 101,
+   "actual": 101,
+   "ok": true
+  },
+  {
+   "case": "ws-unmasked-pong-hello",
+   "expect": 0,
+   "actual": 0,
+   "ok": true
+  },
+  {
+   "case": "ws-unmasked-pong-protocol-close",
+   "expect": 0,
+   "actual": 0,
+   "ok": true
+  },
+  {
+   "case": "ws-invalid-upgrade-missing-version",
+   "expect": 400,
+   "actual": 400,
+   "ok": true
+  },
+  {
+   "case": "ws-invalid-upgrade-missing-key",
+   "expect": 400,
+   "actual": 400,
+   "ok": true
+  },
+  {
+   "case": "ws-invalid-upgrade-malformed-key",
+   "expect": 400,
+   "actual": 400,
+   "ok": true
+  },
+  {
+   "case": "ws-invalid-upgrade-wrong-upgrade",
+   "expect": 400,
+   "actual": 400,
+   "ok": true
+  },
+  {
+   "case": "ws-invalid-upgrade-substring-connection",
+   "expect": 400,
+   "actual": 400,
+   "ok": true
+  },
+  {
+   "case": "unknown-trailing-slash-/lingxi/v1/health/",
+   "expect": 401,
+   "actual": 401,
+   "ok": true
+  },
+  {
+   "case": "unknown-trailing-slash-/lingxi/v1/web-auth/session/",
+   "expect": 401,
+   "actual": 401,
+   "ok": true
+  },
+  {
+   "case": "ws-live-revoke-issue",
+   "expect": 201,
+   "actual": 201,
+   "ok": true
+  },
+  {
+   "case": "ws-live-revoke-upgrade",
+   "expect": 101,
+   "actual": 101,
+   "ok": true
+  },
+  {
+   "case": "ws-live-revoke-hello",
+   "expect": 0,
+   "actual": 0,
+   "ok": true
+  },
+  {
+   "case": "ws-live-revoke-action",
+   "expect": 200,
+   "actual": 200,
+   "ok": true
+  },
+  {
+   "case": "ws-live-revoke-denial-frame",
+   "expect": 1,
+   "actual": 1,
+   "ok": true
+  },
+  {
+   "case": "ws-live-revoke-idle-close",
+   "expect": 0,
+   "actual": 0,
+   "ok": true
+  },
+  {
+   "case": "ws-web-logout-password-setup",
+   "expect": 200,
+   "actual": 200,
+   "ok": true
+  },
+  {
+   "case": "ws-web-logout-login",
+   "expect": 200,
+   "actual": 200,
+   "ok": true
+  },
+  {
+   "case": "ws-web-logout-cookie-issued",
+   "expect": 1,
+   "actual": 1,
+   "ok": true
+  },
+  {
+   "case": "ws-web-logout-ticket",
+   "expect": 200,
+   "actual": 200,
+   "ok": true
+  },
+  {
+   "case": "ws-web-logout-upgrade",
+   "expect": 101,
+   "actual": 101,
+   "ok": true
+  },
+  {
+   "case": "ws-web-logout-hello",
+   "expect": 0,
+   "actual": 0,
+   "ok": true
+  },
+  {
+   "case": "ws-web-logout-action",
+   "expect": 200,
+   "actual": 200,
+   "ok": true
+  },
+  {
+   "case": "ws-web-logout-denial-frame",
+   "expect": 1,
+   "actual": 1,
+   "ok": true
+  },
+  {
+   "case": "ws-web-logout-idle-close",
+   "expect": 0,
+   "actual": 0,
+   "ok": true
+  },
+  {
+   "case": "ws-ticket-expired",
+   "expect": 401,
+   "actual": 401,
+   "ok": true
+  }
+ ]
+}

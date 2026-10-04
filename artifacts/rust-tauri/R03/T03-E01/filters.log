@@ -1,0 +1,14 @@
+# targeted filters — final (real runs, pass/fail counts, rustup 1.98.1, --locked)
+filter lingxi-service::lib cancel:: -> 6/0
+filter lingxi-service::lib task_supervisor -> 6/0
+filter lingxi-service::lib sessions:: -> 8/0
+filter lingxi-service::lib runs:: -> 4/0
+filter test cancellation_tree -> 8/0
+filter test run_lifecycle -> 12/0
+filter test session_serialization -> 5/0
+filter test execute_concurrency -> 3/0
+filter test event_subscription -> 12/0
+filter test service_persistence -> 2/0
+filter lingxi-kernel lib -> 23/0
+filter lingxi-adapters storage_transactions -> 7/0
+filter lingxi-adapters run_finalize_property -> 2/0

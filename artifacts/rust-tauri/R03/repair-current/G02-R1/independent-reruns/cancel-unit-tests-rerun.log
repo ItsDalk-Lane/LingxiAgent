@@ -1,0 +1,26 @@
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.08s
+     Running unittests src/lib.rs (target/debug/deps/lingxi_service-254d9c3036524e2c)
+
+running 19 tests
+test cancel::tests::degenerate_policy_refuses_validation ... ok
+test cancel::tests::is_cancelled_walks_the_ancestor_chain ... ok
+test cancel::tests::budget_counts_from_the_request_moment ... ok
+test cancel::tests::a_child_scope_never_cancels_its_parent ... ok
+test cancel::tests::late_children_of_a_cancelled_scope_inherit_without_new_reason ... ok
+test cancel::tests::claim_after_an_accepted_cancel_diverts_with_the_first_reason ... ok
+test cancel::tests::fire_landing_after_the_cleaning_leg_writes_nothing_back ... ok
+test cancel::tests::fire_after_the_terminal_claim_is_too_late_and_never_fires_the_tree ... ok
+test cancel::tests::claim_honors_a_parent_tree_cancellation_the_phase_has_not_seen ... ok
+test cancel::tests::cancelling_a_parent_eagerly_cancels_the_whole_tree ... ok
+test cancel::tests::register_linked_under_cancelled_parent_inherits ... ok
+test cancel::tests::registry_fire_tracks_the_first_reason_and_is_idempotent ... ok
+test cancel::tests::linked_run_root_receives_the_parent_cancellation ... ok
+test cancel::tests::settled_verdicts_stay_queryable_and_normal_settles_leave_none ... ok
+test runs::tests::fence_verdict_requires_identity_and_no_cancellation ... ok
+test quotas::tests::cancelled_waiter_releases_its_queue_place_and_racing_grant ... ok
+test task_supervisor::tests::detached_background_survives_a_run_cancellation_and_reaps_cleanly ... ok
+test cancel::tests::claim_and_fire_serialize_consistently_under_real_concurrency ... ok
+test task_supervisor::tests::run_level_child_finishes_its_own_cancellation_within_the_window ... ok
+
+test result: ok. 19 passed; 0 failed; 0 ignored; 0 measured; 215 filtered out; finished in 0.06s
+

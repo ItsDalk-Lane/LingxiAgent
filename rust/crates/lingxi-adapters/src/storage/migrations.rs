@@ -225,6 +225,58 @@ CREATE INDEX idx_run_lineage_parent ON run_lineage(parent_run_id)
     WHERE parent_run_id IS NOT NULL;
 "#;
 
+/// R05-T07 usage ledger (version 5): ONE row per model call — the
+/// per-request correlation (session/run/attempt + host-minted call id),
+/// the route that served it (provider/model/protocol), the purpose and
+/// causal parentage (origin/parent run/cause ref) and the normalized
+/// usage fact with its provenance decomposed into columns
+/// (`usage_state` + `missing_fields`/`estimate_basis`/`invalid_detail`).
+///
+/// Deliberately NO foreign keys: the ledger is an accounting fact table
+/// — rows for worker-callback/auxiliary/operation calls exist without a
+/// run row of their own, and an accounting row must survive even when it
+/// names a parent the runs table never admitted (the audit-first stance
+/// of the T04 stale table, applied to accounting). `model_call_id` is
+/// the host-minted call identity — PRIMARY KEY makes re-recording the
+/// identical row an idempotent replay and a different row under the same
+/// id a loud conflict (a call's accounting is never rewritten).
+///
+/// Token columns are NULLABLE on purpose: NULL means "not reported"
+/// (unknown — never zero). `transport_attempts >= 1` counts the physical
+/// provider requests of the logical call (a 401-refresh resend is a
+/// second billable request, not an invisible one). `cost_basis` NULL =
+/// cost unknown: no price source is configured and none is invented.
+pub const V5_NAME: &str = "model_call_usage_ledger";
+pub const V5_SQL: &str = r#"
+CREATE TABLE model_call_usage (
+    model_call_id       TEXT PRIMARY KEY,
+    session_id          TEXT,
+    run_id              TEXT,
+    attempt             TEXT,
+    purpose             TEXT NOT NULL,
+    origin              TEXT NOT NULL,
+    parent_run_id       TEXT,
+    cause_ref           TEXT,
+    provider            TEXT NOT NULL,
+    model               TEXT NOT NULL,
+    protocol            TEXT NOT NULL,
+    usage_state         TEXT NOT NULL,
+    input_tokens        INTEGER,
+    output_tokens       INTEGER,
+    cache_read_tokens   INTEGER,
+    cache_write_tokens  INTEGER,
+    reasoning_tokens    INTEGER,
+    missing_fields      TEXT,
+    estimate_basis      TEXT,
+    invalid_detail      TEXT,
+    transport_attempts  INTEGER NOT NULL,
+    cost_basis          TEXT,
+    recorded_at_unix_ms INTEGER NOT NULL
+);
+CREATE INDEX idx_model_call_usage_session ON model_call_usage(session_id);
+CREATE INDEX idx_model_call_usage_run ON model_call_usage(run_id);
+"#;
+
 /// The full ordered migration list. Appending a migration is a deliberate,
 /// reviewed act; editing an existing entry changes its fingerprint and is
 /// rejected on every already-migrated database.
@@ -248,6 +300,11 @@ pub const MIGRATIONS: &[Migration] = &[
         version: 4,
         name: V4_NAME,
         sql: V4_SQL,
+    },
+    Migration {
+        version: 5,
+        name: V5_NAME,
+        sql: V5_SQL,
     },
 ];
 

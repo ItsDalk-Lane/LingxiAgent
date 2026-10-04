@@ -1,0 +1,99 @@
+stderr | desktop/src/react/__tests__/app-init.test.ts > initApp bridge indicator > refreshes local token and rebuilds websocket after server restart
+[init] appearance preference sync skipped: TypeError: Cannot read properties of undefined (reading 'getItem')
+    at readBrowserAppearancePreferences (/Users/study_superior/Desktop/Code/LingxiAgent/desktop/src/react/services/appearance-sync.ts:14:59)
+    at persistAppearancePreferences (/Users/study_superior/Desktop/Code/LingxiAgent/desktop/src/react/services/appearance-sync.ts:35:46)
+    at initApp (/Users/study_superior/Desktop/Code/LingxiAgent/desktop/src/react/app-init.ts:200:3)
+    at processTicksAndRejections (node:internal/process/task_queues:104:5)
+    at /Users/study_superior/Desktop/Code/LingxiAgent/desktop/src/react/__tests__/app-init.test.ts:654:5
+    at file:///Users/study_superior/Desktop/Code/LingxiAgent/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:20
+
+stderr | desktop/src/react/__tests__/app-init.test.ts > initApp bridge indicator > refreshes local token and rebuilds websocket after server restart
+[input-drafts] hydrate failed: TypeError: Cannot read properties of undefined (reading 'getAttribute')
+    at resolveWorkspaceUiSurface (/Users/study_superior/Desktop/Code/LingxiAgent/desktop/src/react/stores/workspace-ui-state-actions.ts:91:67)
+    at hydrateInputDrafts (/Users/study_superior/Desktop/Code/LingxiAgent/desktop/src/react/stores/input-draft-persistence.ts:64:64)
+    at initApp (/Users/study_superior/Desktop/Code/LingxiAgent/desktop/src/react/app-init.ts:288:8)
+    at processTicksAndRejections (node:internal/process/task_queues:104:5)
+    at /Users/study_superior/Desktop/Code/LingxiAgent/desktop/src/react/__tests__/app-init.test.ts:654:5
+    at file:///Users/study_superior/Desktop/Code/LingxiAgent/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:20
+
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 2 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  desktop/src/react/__tests__/app-init.test.ts > initApp bridge indicator > refreshes local token and rebuilds websocket after server restart
+AssertionError: expected { connectionId: 'local', …(13) } to be null
+
+- Expected:
+null
+
++ Received:
+{
+  "authState": "paired",
+  "baseUrl": "http://127.0.0.1:63004",
+  "capabilities": [
+    "chat",
+    "resources",
+    "files",
+    "tools",
+  ],
+  "connectionId": "local",
+  "credentialKind": "loopback_token",
+  "kind": "local",
+  "label": "Local Lingxi",
+  "officialServiceKind": null,
+  "platformAccountId": null,
+  "serverId": "local",
+  "studioId": "local",
+  "token": "third-token",
+  "trustState": "local",
+  "wsUrl": "ws://127.0.0.1:63004",
+}
+
+ ❯ desktop/src/react/__tests__/app-init.test.ts:690:46
+    688|
+    689|     (restartHandler as unknown as (data: { port: number; token?: strin…
+    690|     expect(mockState.activeServerConnection).toBeNull();
+       |                                              ^
+    691|     expect(mockState.wsFailureReasonKey).toBe('status.serverRestartInv…
+    692|     expect(mockConnectWebSocket).toHaveBeenCalledTimes(2);
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/2]⎯
+
+ FAIL  desktop/src/react/__tests__/settings/SettingsContent.test.tsx > SettingsContent title placement > keeps activeServerConnection in sync when the settings window hears server restart
+AssertionError: expected { connectionId: 'local', …(13) } to be null
+
+- Expected:
+null
+
++ Received:
+{
+  "authState": "paired",
+  "baseUrl": "http://127.0.0.1:63004",
+  "capabilities": [
+    "chat",
+    "resources",
+    "files",
+    "tools",
+  ],
+  "connectionId": "local",
+  "credentialKind": "loopback_token",
+  "kind": "local",
+  "label": "Local Lingxi",
+  "officialServiceKind": null,
+  "platformAccountId": null,
+  "serverId": "local",
+  "studioId": "local",
+  "token": "fourth-token",
+  "trustState": "local",
+  "wsUrl": "ws://127.0.0.1:63004",
+}
+
+ ❯ desktop/src/react/__tests__/settings/SettingsContent.test.tsx:247:46
+    245|     }));
+    246|     (handler as unknown as (data: { port: number; token?: string }) =>…
+    247|     expect(mockState.activeServerConnection).toBeNull();
+       |                                              ^
+    248|   });
+    249|
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/2]⎯
+

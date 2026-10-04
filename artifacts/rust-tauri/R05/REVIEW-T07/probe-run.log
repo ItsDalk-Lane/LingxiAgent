@@ -1,0 +1,27 @@
+== P0 sanity: valid streams (harness proof) ==
+anthropic valid stream      -> Known(in=Some(25), out=Some(9), provenance=Reported)
+google valid stream         -> Known(in=Some(88), out=Some(19), provenance=Reported)
+
+== P1 anthropic streaming, contract-violating usage fragments ==
+anthropic stream negative output_tokens     -> Known(in=Some(25), out=None, provenance=Partial { missing: ["output_tokens"] })
+anthropic stream float output_tokens        -> Known(in=Some(25), out=None, provenance=Partial { missing: ["output_tokens"] })
+anthropic stream string output_tokens       -> Known(in=Some(25), out=None, provenance=Partial { missing: ["output_tokens"] })
+anthropic stream negative input half   -> Unknown
+
+== P2 google streaming, contract-violating usageMetadata ==
+google stream negative candidatesTokenCount   -> Unknown
+google stream float promptTokenCount          -> Unknown
+google stream string candidatesTokenCount     -> Unknown
+
+== P3 openai-completions streaming (control): same violations ==
+openai stream negative prompt_tokens     -> Invalid(usage field /usage/prompt_tokens is negative (-3): a token count is never negative; the fact is marked invalid, never saturated)
+openai stream float completion_tokens    -> Invalid(usage field /usage/completion_tokens is a non-integer number (5.5): a token count is an integer; the fact is marked invalid, never rounded)
+
+== P4 anthropic mixed: invalid fragment AFTER a valid one ==
+anthropic stream valid-then-invalid delta -> Known(in=Some(25), out=Some(9), provenance=Reported)
+
+== P5 Estimated-state ledger round-trip (doc §10 claims coverage) ==
+estimated round-trip -> usage_state preserved: true (basis Some(Estimated { basis: "probe-basis" }))
+
+== P6 FinalSnapshot fold: identical numbers, different provenance ==
+FinalSnapshot fold reported-then-estimated same numbers -> Err("two different final usage snapshots for one request ((Some(10), Some(3)) then (Some(10), Some(3))): a conflict is never merged")

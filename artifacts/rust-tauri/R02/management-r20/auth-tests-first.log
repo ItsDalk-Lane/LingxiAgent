@@ -1,0 +1,45 @@
+   Compiling lingxi-service v0.0.0 (/Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-service)
+warning: function `browser_cors_response` is never used
+    --> crates/lingxi-service/src/lib.rs:1208:4
+     |
+1208 | fn browser_cors_response(mut response: Response, origin: Option<&str>) -> Response {
+     |    ^^^^^^^^^^^^^^^^^^^^^
+     |
+     = note: `#[warn(dead_code)]` (part of `#[warn(unused)]`) on by default
+
+warning: `lingxi-service` (lib test) generated 1 warning
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 1.43s
+     Running unittests src/lib.rs (rust/target/debug/deps/lingxi_service-277000d85cd574fe)
+
+running 18 tests
+test auth::tests::constant_time_eq_basics ... ok
+test auth::tests::bearer_parsing_mirrors_incumbent ... ok
+test auth::tests::route_policy_table ... ok
+test auth::tests::scope_namespace_expansion ... ok
+test auth::tests::token_file_is_owner_only_and_instance_bound ... ok
+test auth::tests::invalid_device_kind_never_issues_or_creates_pairing ... ok
+test auth::tests::local_token_roundtrip_and_owner_principal ... ok
+test auth::tests::failed_authentication_never_touches_registry_files ... ok
+
+thread 'auth::tests::security_audit_outbox_recovers_after_log_failure_without_duplicate_or_secret' (37569120) panicked at crates/lingxi-service/src/auth.rs:1743:35:
+called `Result::unwrap()` on an `Err` value: Os { code: 2, kind: NotFound, message: "No such file or directory" }
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+test auth::tests::security_audit_outbox_recovers_after_log_failure_without_duplicate_or_secret ... FAILED
+test auth::tests::expired_pairing_records_expiry_without_issuing_credential ... ok
+test auth::tests::registries_reload_across_bootstrap ... ok
+test auth::tests::device_secret_hash_matches_node_and_accepts_earlier_rust_hashes ... ok
+test auth::tests::revoking_device_cascades_to_its_credentials_only ... ok
+test auth::tests::concurrent_pairing_approval_issues_once ... ok
+test auth::tests::pairing_and_issued_device_survive_restart ... ok
+test auth::tests::authorize_order_and_denials ... ok
+test auth::tests::device_credential_lifecycle_create_auth_expire_revoke ... ok
+test auth::tests::failed_device_registry_write_keeps_live_memory_and_disk_unchanged ... ok
+
+failures:
+
+failures:
+    auth::tests::security_audit_outbox_recovers_after_log_failure_without_duplicate_or_secret
+
+test result: FAILED. 17 passed; 1 failed; 0 ignored; 0 measured; 158 filtered out; finished in 8.27s
+
+error: test failed, to rerun pass `-p lingxi-service --lib`

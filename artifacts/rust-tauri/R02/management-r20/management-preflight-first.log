@@ -1,0 +1,21 @@
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.09s
+     Running unittests src/lib.rs (rust/target/debug/deps/lingxi_service-277000d85cd574fe)
+
+running 4 tests
+test management::tests::lan_address_filter_covers_multiple_interfaces_without_default_route ... ok
+test management::tests::persisted_network_read_is_strict_and_read_only ... ok
+test management::tests::web_cookie_expires_and_requires_original_transport ... ok
+
+thread 'management::tests::password_scrypt_matches_node_and_upgrades_legacy_record' (37611847) panicked at crates/lingxi-service/src/management.rs:1845:13:
+写盘失败不得记录成功迁移审计
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+test management::tests::password_scrypt_matches_node_and_upgrades_legacy_record ... FAILED
+
+failures:
+
+failures:
+    management::tests::password_scrypt_matches_node_and_upgrades_legacy_record
+
+test result: FAILED. 3 passed; 1 failed; 0 ignored; 0 measured; 172 filtered out; finished in 2.56s
+
+error: test failed, to rerun pass `-p lingxi-service --lib`

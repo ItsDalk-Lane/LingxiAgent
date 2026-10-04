@@ -1,0 +1,11 @@
+   Compiling lingxi-service v0.0.0 (/Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-service)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.88s
+     Running tests/invocation_journal.rs (/tmp/r03-t07-review-target/debug/deps/invocation_journal-9a192364cb7883d2)
+
+running 3 tests
+test journal_lifecycle_progresses_and_closes_receipts_on_the_live_chain ... ok
+test r03_a09_crash_after_side_effect_does_not_reexecute_and_receipt_is_unknown ... ok
+test r03_a10_idempotent_key_resume_does_not_duplicate_the_external_operation ... ok
+
+test result: ok. 3 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.19s
+

@@ -1,0 +1,6 @@
+== FINAL certification run (2026-09-29T08:46:36Z) ==
+== cargo fmt --all -- --check ==
+EXIT=0 (no diff)
+== cargo clippy --workspace --all-targets --locked -- -D warnings ==
+    Finished `dev` profile [unoptimized + debuginfo] target(s) in 0.18s
+EXIT=0 (0 errors/warnings)

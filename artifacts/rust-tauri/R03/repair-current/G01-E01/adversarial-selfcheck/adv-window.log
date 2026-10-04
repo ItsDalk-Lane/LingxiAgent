@@ -1,0 +1,9 @@
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.07s
+     Running unittests src/lib.rs (rust/target/debug/deps/lingxi_service-254d9c3036524e2c)
+
+running 2 tests
+test task_supervisor::tests::run_level_child_finishes_its_own_cancellation_within_the_window ... ok
+test task_supervisor::tests::run_level_child_ignoring_the_window_is_dropped_at_expiry ... ok
+
+test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 227 filtered out; finished in 0.08s
+

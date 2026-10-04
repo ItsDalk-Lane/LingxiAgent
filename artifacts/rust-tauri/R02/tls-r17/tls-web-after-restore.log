@@ -1,0 +1,9 @@
+   Compiling lingxi-service v0.0.0 (/Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-service)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 1.59s
+     Running tests/tls_web_login.rs (target/debug/deps/tls_web_login-7e3d2e918c15249c)
+
+running 1 test
+test lan_password_login_requires_actual_tls_and_sets_secure_cookie ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 2.64s
+

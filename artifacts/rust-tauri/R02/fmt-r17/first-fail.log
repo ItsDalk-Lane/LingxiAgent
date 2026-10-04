@@ -1,0 +1,1718 @@
+Diff in /Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-service/tests/auth_matrix.rs:1718:
+ async fn r00_account_password_web_cookie_and_logout_have_real_state() {
+     let server = default_server("r00-account-web-cookie").await;
+     let owner = server.bearer();
+-    let path = prepare_layout(&server.home).unwrap().runtime_dir.join("management.json");
++    let path = prepare_layout(&server.home)
++        .unwrap()
++        .runtime_dir
++        .join("management.json");
+     let before = std::fs::read(&path).unwrap();
+-    let (status, _) = http(server.addr, "PUT", "/lingxi/v1/access/account/profile", &[("Authorization", &owner)], Some(r#"{"username":"bad/name"}"#)).await;
++    let (status, _) = http(
++        server.addr,
++        "PUT",
++        "/lingxi/v1/access/account/profile",
++        &[("Authorization", &owner)],
++        Some(r#"{"username":"bad/name"}"#),
++    )
++    .await;
+     assert_eq!(status, 400);
+-    assert_eq!(before, std::fs::read(&path).unwrap(), "无效资料不能改状态或审计");
++    assert_eq!(
++        before,
++        std::fs::read(&path).unwrap(),
++        "无效资料不能改状态或审计"
++    );
+ 
+-    let (status, body) = http(server.addr, "PUT", "/lingxi/v1/access/account/profile", &[("Authorization", &owner)], Some(r#"{"username":"alice","displayName":"Alice"}"#)).await;
++    let (status, body) = http(
++        server.addr,
++        "PUT",
++        "/lingxi/v1/access/account/profile",
++        &[("Authorization", &owner)],
++        Some(r#"{"username":"alice","displayName":"Alice"}"#),
++    )
++    .await;
+     assert_eq!(status, 200, "{body}");
+     let account: serde_json::Value = serde_json::from_str(&body).unwrap();
+     assert_eq!(account["account"]["username"], "alice");
+Diff in /Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-service/tests/auth_matrix.rs:1731:
+-    let (status, body) = http(server.addr, "PUT", "/lingxi/v1/access/account/password", &[("Authorization", &owner)], Some(r#"{"password":"correct horse battery staple"}"#)).await;
++    let (status, body) = http(
++        server.addr,
++        "PUT",
++        "/lingxi/v1/access/account/password",
++        &[("Authorization", &owner)],
++        Some(r#"{"password":"correct horse battery staple"}"#),
++    )
++    .await;
+     assert_eq!(status, 200, "{body}");
+-    assert_eq!(serde_json::from_str::<serde_json::Value>(&body).unwrap()["account"]["passwordSet"], true);
+-    let login_body = r#"{"username":"alice","password":"correct horse battery staple","clientKind":"mobile"}"#;
++    assert_eq!(
++        serde_json::from_str::<serde_json::Value>(&body).unwrap()["account"]["passwordSet"],
++        true
++    );
++    let login_body =
++        r#"{"username":"alice","password":"correct horse battery staple","clientKind":"mobile"}"#;
+     let raw = http_raw(server.addr, &format!("POST /lingxi/v1/web-auth/login HTTP/1.1\r\nHost: {}\r\nContent-Type: application/json\r\nContent-Length: {}\r\nConnection: close\r\n\r\n{}", server.addr, login_body.len(), login_body)).await;
+     assert!(raw.starts_with("HTTP/1.1 200"), "登录应成功: {raw}");
+-    let cookie_line = raw.lines().find(|line| line.to_ascii_lowercase().starts_with("set-cookie:")).unwrap();
+-    assert!(cookie_line.contains("HttpOnly") && cookie_line.contains("SameSite=Strict") && cookie_line.contains("Max-Age=1209600"));
+-    assert!(!cookie_line.contains("; Secure"), "plain HTTP must not advertise a TLS cookie");
+-    let cookie = cookie_line.split_once(':').unwrap().1.trim().split(';').next().unwrap().to_string();
++    let cookie_line = raw
++        .lines()
++        .find(|line| line.to_ascii_lowercase().starts_with("set-cookie:"))
++        .unwrap();
++    assert!(
++        cookie_line.contains("HttpOnly")
++            && cookie_line.contains("SameSite=Strict")
++            && cookie_line.contains("Max-Age=1209600")
++    );
++    assert!(
++        !cookie_line.contains("; Secure"),
++        "plain HTTP must not advertise a TLS cookie"
++    );
++    let cookie = cookie_line
++        .split_once(':')
++        .unwrap()
++        .1
++        .trim()
++        .split(';')
++        .next()
++        .unwrap()
++        .to_string();
+     assert!(cookie.starts_with("hana_session=hana_web_"));
+-    let (status, body) = http(server.addr, "GET", "/lingxi/v1/web-auth/session", &[("Cookie", &cookie)], None).await;
++    let (status, body) = http(
++        server.addr,
++        "GET",
++        "/lingxi/v1/web-auth/session",
++        &[("Cookie", &cookie)],
++        None,
++    )
++    .await;
+     assert_eq!(status, 200);
+     let web: serde_json::Value = serde_json::from_str(&body).unwrap();
+     assert_eq!(web["authenticated"], true);
+Diff in /Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-service/tests/auth_matrix.rs:1746:
+     assert_eq!(web["principal"]["credentialKind"], "web_session");
+-    assert!(!web["principal"]["scopes"].as_array().unwrap().contains(&serde_json::json!("settings.write")), "mobile profile must have restricted scopes");
+-    assert!(!body.contains("hana_web_"), "session secret must not appear in JSON");
++    assert!(
++        !web["principal"]["scopes"]
++            .as_array()
++            .unwrap()
++            .contains(&serde_json::json!("settings.write")),
++        "mobile profile must have restricted scopes"
++    );
++    assert!(
++        !body.contains("hana_web_"),
++        "session secret must not appear in JSON"
++    );
+     let priority = r#"{"credential":"invalid-device-secret","username":"alice","password":"correct horse battery staple"}"#;
+-    let (status, _) = http(server.addr, "POST", "/lingxi/v1/web-auth/login", &[], Some(priority)).await;
+-    assert_eq!(status, 403, "present credential must take precedence over password fallback");
+-    let desktop_login = r#"{"username":"alice","password":"correct horse battery staple","clientKind":"desktop"}"#;
++    let (status, _) = http(
++        server.addr,
++        "POST",
++        "/lingxi/v1/web-auth/login",
++        &[],
++        Some(priority),
++    )
++    .await;
++    assert_eq!(
++        status, 403,
++        "present credential must take precedence over password fallback"
++    );
++    let desktop_login =
++        r#"{"username":"alice","password":"correct horse battery staple","clientKind":"desktop"}"#;
+     let desktop_raw = http_raw(server.addr, &format!("POST /lingxi/v1/web-auth/login HTTP/1.1\r\nHost: {}\r\nX-Forwarded-Proto: https\r\nContent-Type: application/json\r\nContent-Length: {}\r\nConnection: close\r\n\r\n{}", server.addr, desktop_login.len(), desktop_login)).await;
+-    assert!(desktop_raw.starts_with("HTTP/1.1 200"), "desktop login should succeed locally: {desktop_raw}");
+-    let desktop_cookie_line = desktop_raw.lines().find(|line| line.to_ascii_lowercase().starts_with("set-cookie:")).unwrap();
+-    assert!(!desktop_cookie_line.contains("; Secure"), "forwarded header cannot spoof TLS");
+-    let desktop_cookie = desktop_cookie_line.split_once(':').unwrap().1.trim().split(';').next().unwrap().to_string();
+-    let (status, body) = http(server.addr, "GET", "/lingxi/v1/web-auth/session", &[("Cookie", &desktop_cookie)], None).await;
++    assert!(
++        desktop_raw.starts_with("HTTP/1.1 200"),
++        "desktop login should succeed locally: {desktop_raw}"
++    );
++    let desktop_cookie_line = desktop_raw
++        .lines()
++        .find(|line| line.to_ascii_lowercase().starts_with("set-cookie:"))
++        .unwrap();
++    assert!(
++        !desktop_cookie_line.contains("; Secure"),
++        "forwarded header cannot spoof TLS"
++    );
++    let desktop_cookie = desktop_cookie_line
++        .split_once(':')
++        .unwrap()
++        .1
++        .trim()
++        .split(';')
++        .next()
++        .unwrap()
++        .to_string();
++    let (status, body) = http(
++        server.addr,
++        "GET",
++        "/lingxi/v1/web-auth/session",
++        &[("Cookie", &desktop_cookie)],
++        None,
++    )
++    .await;
+     assert_eq!(status, 200);
+-    assert!(serde_json::from_str::<serde_json::Value>(&body).unwrap()["principal"]["scopes"].as_array().unwrap().contains(&serde_json::json!("studio.owner")));
+-    let (status, body) = http(server.addr, "GET", "/lingxi/v1/me", &[("Cookie", &cookie)], None).await;
++    assert!(
++        serde_json::from_str::<serde_json::Value>(&body).unwrap()["principal"]["scopes"]
++            .as_array()
++            .unwrap()
++            .contains(&serde_json::json!("studio.owner"))
++    );
++    let (status, body) = http(
++        server.addr,
++        "GET",
++        "/lingxi/v1/me",
++        &[("Cookie", &cookie)],
++        None,
++    )
++    .await;
+     assert_eq!(status, 200, "{body}");
+     let me: serde_json::Value = serde_json::from_str(&body).unwrap();
+     assert_eq!(me["serverNodeKind"], "lingxi-service");
+Diff in /Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-service/tests/auth_matrix.rs:1765:
+-    assert_eq!(me["capabilities"].as_array().unwrap().contains(&serde_json::json!("chat")), true);
++    assert_eq!(
++        me["capabilities"]
++            .as_array()
++            .unwrap()
++            .contains(&serde_json::json!("chat")),
++        true
++    );
+     let raw = http_raw(server.addr, &format!("POST /lingxi/v1/web-auth/logout HTTP/1.1\r\nHost: {}\r\nCookie: {cookie}\r\nContent-Length: 0\r\nConnection: close\r\n\r\n", server.addr)).await;
+     assert!(raw.starts_with("HTTP/1.1 200") && raw.contains("Max-Age=0"));
+-    let (status, body) = http(server.addr, "GET", "/lingxi/v1/web-auth/session", &[("Cookie", &cookie)], None).await;
++    let (status, body) = http(
++        server.addr,
++        "GET",
++        "/lingxi/v1/web-auth/session",
++        &[("Cookie", &cookie)],
++        None,
++    )
++    .await;
+     assert_eq!(status, 200);
+-    assert_eq!(serde_json::from_str::<serde_json::Value>(&body).unwrap()["authenticated"], false);
+-    let (status, _) = http(server.addr, "GET", "/lingxi/v1/me", &[("Cookie", &cookie)], None).await;
++    assert_eq!(
++        serde_json::from_str::<serde_json::Value>(&body).unwrap()["authenticated"],
++        false
++    );
++    let (status, _) = http(
++        server.addr,
++        "GET",
++        "/lingxi/v1/me",
++        &[("Cookie", &cookie)],
++        None,
++    )
++    .await;
+     assert_eq!(status, 401);
+-    let (status, _) = http(server.addr, "GET", "/lingxi/v1/me", &[("Cookie", &desktop_cookie)], None).await;
+-    assert_eq!(status, 200, "logging out one session must preserve other sessions");
+-    let (status, body) = http(server.addr, "DELETE", "/lingxi/v1/access/account/password", &[("Authorization", &owner)], None).await;
++    let (status, _) = http(
++        server.addr,
++        "GET",
++        "/lingxi/v1/me",
++        &[("Cookie", &desktop_cookie)],
++        None,
++    )
++    .await;
++    assert_eq!(
++        status, 200,
++        "logging out one session must preserve other sessions"
++    );
++    let (status, body) = http(
++        server.addr,
++        "DELETE",
++        "/lingxi/v1/access/account/password",
++        &[("Authorization", &owner)],
++        None,
++    )
++    .await;
+     assert_eq!(status, 200, "{body}");
+-    assert_eq!(serde_json::from_str::<serde_json::Value>(&body).unwrap()["account"]["passwordSet"], false);
+-    let (status, _) = http(server.addr, "POST", "/lingxi/v1/web-auth/login", &[], Some(login_body)).await;
++    assert_eq!(
++        serde_json::from_str::<serde_json::Value>(&body).unwrap()["account"]["passwordSet"],
++        false
++    );
++    let (status, _) = http(
++        server.addr,
++        "POST",
++        "/lingxi/v1/web-auth/login",
++        &[],
++        Some(login_body),
++    )
++    .await;
+     assert_eq!(status, 403, "removed password must reject fresh login");
+     server.stop_and_assert_clean().await;
+ }
+Diff in /Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-service/tests/auth_matrix.rs:1784:
+ async fn r00_access_devices_pairing_thinking_qr_and_static_boundaries() {
+     let server = default_server("r00-management-boundaries").await;
+     let owner = server.bearer();
+-    let (status, body) = http(server.addr, "GET", "/lingxi/v1/access/summary", &[("Authorization", &owner)], None).await;
++    let (status, body) = http(
++        server.addr,
++        "GET",
++        "/lingxi/v1/access/summary",
++        &[("Authorization", &owner)],
++        None,
++    )
++    .await;
+     assert_eq!(status, 200, "{body}");
+     let summary: serde_json::Value = serde_json::from_str(&body).unwrap();
+     assert_eq!(summary["network"]["actualPort"], server.addr.port());
+Diff in /Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-service/tests/auth_matrix.rs:1791:
+     assert_eq!(summary["account"]["passwordSet"], false);
+     let (status, _) = http(server.addr, "GET", "/lingxi/v1/access/summary", &[], None).await;
+     assert_eq!(status, 401);
+-    let (status, body) = http(server.addr, "GET", "/lingxi/v1/access/mobile-qr.svg", &[("Authorization", &owner)], None).await;
++    let (status, body) = http(
++        server.addr,
++        "GET",
++        "/lingxi/v1/access/mobile-qr.svg",
++        &[("Authorization", &owner)],
++        None,
++    )
++    .await;
+     assert_eq!(status, 400, "LAN unavailable must be explicit: {body}");
+-    let manager_file = prepare_layout(&server.home).unwrap().runtime_dir.join("management.json");
++    let manager_file = prepare_layout(&server.home)
++        .unwrap()
++        .runtime_dir
++        .join("management.json");
+     let before_invalid_network = std::fs::read(&manager_file).unwrap();
+-    let (status, _) = http(server.addr, "PUT", "/lingxi/v1/access/network", &[("Authorization", &owner)], Some(r#"{"mode":"lan","listenPort":80}"#)).await;
++    let (status, _) = http(
++        server.addr,
++        "PUT",
++        "/lingxi/v1/access/network",
++        &[("Authorization", &owner)],
++        Some(r#"{"mode":"lan","listenPort":80}"#),
++    )
++    .await;
+     assert_eq!(status, 400);
+-    assert_eq!(std::fs::read(&manager_file).unwrap(), before_invalid_network, "invalid network request must not write state or audit");
+-    let (status, body) = http(server.addr, "PUT", "/lingxi/v1/access/network", &[("Authorization", &owner)], Some(r#"{"mode":"loopback","listenPort":14500,"publicBaseUrl":"https://example.test"}"#)).await;
++    assert_eq!(
++        std::fs::read(&manager_file).unwrap(),
++        before_invalid_network,
++        "invalid network request must not write state or audit"
++    );
++    let (status, body) = http(
++        server.addr,
++        "PUT",
++        "/lingxi/v1/access/network",
++        &[("Authorization", &owner)],
++        Some(r#"{"mode":"loopback","listenPort":14500,"publicBaseUrl":"https://example.test"}"#),
++    )
++    .await;
+     assert_eq!(status, 200, "{body}");
+-    let (status, body) = http(server.addr, "GET", "/lingxi/v1/access/mobile-qr.svg", &[("Authorization", &owner)], None).await;
++    let (status, body) = http(
++        server.addr,
++        "GET",
++        "/lingxi/v1/access/mobile-qr.svg",
++        &[("Authorization", &owner)],
++        None,
++    )
++    .await;
+     assert_eq!(status, 200);
+     assert!(body.starts_with("<svg ") && body.contains("<path fill=\"#000\""));
+-    let (status, body) = http(server.addr, "POST", "/lingxi/v1/access/mobile-credentials", &[("Authorization", &owner)], Some("{}")).await;
++    let (status, body) = http(
++        server.addr,
++        "POST",
++        "/lingxi/v1/access/mobile-credentials",
++        &[("Authorization", &owner)],
++        Some("{}"),
++    )
++    .await;
+     assert_eq!(status, 200, "{body}");
+     let issued: serde_json::Value = serde_json::from_str(&body).unwrap();
+     assert_eq!(issued["accessUrl"], "https://example.test/mobile/");
+Diff in /Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-service/tests/auth_matrix.rs:1810:
+-    let (status, body) = http(server.addr, "PUT", "/lingxi/v1/access/network", &[("Authorization", &owner)], Some(r#"{"mode":"loopback","listenPort":14500}"#)).await;
++    let (status, body) = http(
++        server.addr,
++        "PUT",
++        "/lingxi/v1/access/network",
++        &[("Authorization", &owner)],
++        Some(r#"{"mode":"loopback","listenPort":14500}"#),
++    )
++    .await;
+     assert_eq!(status, 200, "{body}");
+-    assert_eq!(serde_json::from_str::<serde_json::Value>(&body).unwrap()["network"]["publicBaseUrl"], "https://example.test", "omitted public URL must preserve the saved value");
+-    let (status, body) = http(server.addr, "PUT", "/lingxi/v1/access/network", &[("Authorization", &owner)], Some(r#"{"mode":"loopback","listenPort":14500,"publicBaseUrl":null}"#)).await;
++    assert_eq!(
++        serde_json::from_str::<serde_json::Value>(&body).unwrap()["network"]["publicBaseUrl"],
++        "https://example.test",
++        "omitted public URL must preserve the saved value"
++    );
++    let (status, body) = http(
++        server.addr,
++        "PUT",
++        "/lingxi/v1/access/network",
++        &[("Authorization", &owner)],
++        Some(r#"{"mode":"loopback","listenPort":14500,"publicBaseUrl":null}"#),
++    )
++    .await;
+     assert_eq!(status, 200, "{body}");
+-    assert!(serde_json::from_str::<serde_json::Value>(&body).unwrap()["network"]["publicBaseUrl"].is_null());
+-    let (status, body) = http(server.addr, "GET", "/lingxi/v1/access/mobile-qr.svg", &[("Authorization", &owner)], None).await;
+-    assert_eq!(status, 400, "cleared public URL and unavailable LAN must not reuse the old URL: {body}");
++    assert!(
++        serde_json::from_str::<serde_json::Value>(&body).unwrap()["network"]["publicBaseUrl"]
++            .is_null()
++    );
++    let (status, body) = http(
++        server.addr,
++        "GET",
++        "/lingxi/v1/access/mobile-qr.svg",
++        &[("Authorization", &owner)],
++        None,
++    )
++    .await;
++    assert_eq!(
++        status, 400,
++        "cleared public URL and unavailable LAN must not reuse the old URL: {body}"
++    );
+     let secret = issued["secret"].as_str().unwrap();
+     let cred_id = issued["credential"]["credentialId"].as_str().unwrap();
+-    let (status, body) = http(server.addr, "GET", "/lingxi/v1/devices", &[("Authorization", &owner)], None).await;
++    let (status, body) = http(
++        server.addr,
++        "GET",
++        "/lingxi/v1/devices",
++        &[("Authorization", &owner)],
++        None,
++    )
++    .await;
+     assert_eq!(status, 200);
+     assert!(!body.contains(secret) && !body.contains("secretHash") && !body.contains("secretSalt"));
+-    let (status, _) = http(server.addr, "GET", "/lingxi/v1/devices", &[("Authorization", &format!("Bearer {secret}"))], None).await;
++    let (status, _) = http(
++        server.addr,
++        "GET",
++        "/lingxi/v1/devices",
++        &[("Authorization", &format!("Bearer {secret}"))],
++        None,
++    )
++    .await;
+     assert_eq!(status, 403, "device cannot read management list");
+-    let (status, body) = http(server.addr, "POST", "/lingxi/v1/devices/pairing-sessions", &[("Authorization", &owner)], Some(r#"{"requestedDevice":{"deviceKind":"mobile","displayName":"Phone"}}"#)).await;
++    let (status, body) = http(
++        server.addr,
++        "POST",
++        "/lingxi/v1/devices/pairing-sessions",
++        &[("Authorization", &owner)],
++        Some(r#"{"requestedDevice":{"deviceKind":"mobile","displayName":"Phone"}}"#),
++    )
++    .await;
+     assert_eq!(status, 200, "{body}");
+     let pairing: serde_json::Value = serde_json::from_str(&body).unwrap();
+     let pair_id = pairing["pairingSessionId"].as_str().unwrap();
+Diff in /Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-service/tests/auth_matrix.rs:1829:
+     let code = pairing["userCode"].as_str().unwrap();
+     let approve_body = serde_json::json!({"userCode": code}).to_string();
+-    let (status, body) = http(server.addr, "POST", &format!("/lingxi/v1/devices/pairing-sessions/{pair_id}/approve"), &[("Authorization", &owner)], Some(&approve_body)).await;
++    let (status, body) = http(
++        server.addr,
++        "POST",
++        &format!("/lingxi/v1/devices/pairing-sessions/{pair_id}/approve"),
++        &[("Authorization", &owner)],
++        Some(&approve_body),
++    )
++    .await;
+     assert_eq!(status, 200, "{body}");
+     let paired: serde_json::Value = serde_json::from_str(&body).unwrap();
+     assert!(paired["secret"].as_str().unwrap().starts_with("hana_dev_"));
+Diff in /Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-service/tests/auth_matrix.rs:1835:
+-    let (status, _) = http(server.addr, "POST", &format!("/lingxi/v1/devices/pairing-sessions/{pair_id}/approve"), &[("Authorization", &owner)], Some(&approve_body)).await;
++    let (status, _) = http(
++        server.addr,
++        "POST",
++        &format!("/lingxi/v1/devices/pairing-sessions/{pair_id}/approve"),
++        &[("Authorization", &owner)],
++        Some(&approve_body),
++    )
++    .await;
+     assert_eq!(status, 400, "pairing code must be one-time");
+-    let (status, _) = http(server.addr, "POST", &format!("/lingxi/v1/devices/credentials/{cred_id}/revoke"), &[("Authorization", &owner)], Some("{}")).await;
++    let (status, _) = http(
++        server.addr,
++        "POST",
++        &format!("/lingxi/v1/devices/credentials/{cred_id}/revoke"),
++        &[("Authorization", &owner)],
++        Some("{}"),
++    )
++    .await;
+     assert_eq!(status, 200);
+-    let (status, _) = http(server.addr, "GET", "/lingxi/v1/me", &[("Authorization", &format!("Bearer {secret}"))], None).await;
++    let (status, _) = http(
++        server.addr,
++        "GET",
++        "/lingxi/v1/me",
++        &[("Authorization", &format!("Bearer {secret}"))],
++        None,
++    )
++    .await;
+     assert_eq!(status, 401);
+-    let (status, body) = http(server.addr, "GET", "/lingxi/v1/session-thinking-level?pendingNewSession=1", &[("Authorization", &owner)], None).await;
++    let (status, body) = http(
++        server.addr,
++        "GET",
++        "/lingxi/v1/session-thinking-level?pendingNewSession=1",
++        &[("Authorization", &owner)],
++        None,
++    )
++    .await;
+     assert_eq!(status, 503);
+-    assert_eq!(serde_json::from_str::<serde_json::Value>(&body).unwrap()["details"]["reason"], "model_state_unavailable");
+-    let (status, _) = http(server.addr, "POST", "/lingxi/v1/session-thinking-level", &[("Authorization", &owner)], Some(r#"{"sessionPath":"sess_local_alpha","level":"high"}"#)).await;
++    assert_eq!(
++        serde_json::from_str::<serde_json::Value>(&body).unwrap()["details"]["reason"],
++        "model_state_unavailable"
++    );
++    let (status, _) = http(
++        server.addr,
++        "POST",
++        "/lingxi/v1/session-thinking-level",
++        &[("Authorization", &owner)],
++        Some(r#"{"sessionPath":"sess_local_alpha","level":"high"}"#),
++    )
++    .await;
+     assert_eq!(status, 503);
+-    let (status, _) = http(server.addr, "GET", "/lingxi/v1/session-thinking-level?sessionPath=sess_local_alpha", &[("Authorization", &owner)], None).await;
++    let (status, _) = http(
++        server.addr,
++        "GET",
++        "/lingxi/v1/session-thinking-level?sessionPath=sess_local_alpha",
++        &[("Authorization", &owner)],
++        None,
++    )
++    .await;
+     assert_eq!(status, 503);
+-    let (status, _) = http(server.addr, "POST", "/lingxi/v1/session-thinking-level", &[("Authorization", &owner)], Some(r#"{"sessionPath":"sess_local_alpha","level":"nonsense"}"#)).await;
++    let (status, _) = http(
++        server.addr,
++        "POST",
++        "/lingxi/v1/session-thinking-level",
++        &[("Authorization", &owner)],
++        Some(r#"{"sessionPath":"sess_local_alpha","level":"nonsense"}"#),
++    )
++    .await;
+     assert_eq!(status, 400);
+     let (status, _) = http(server.addr, "GET", "/mobile/assets/missing.js", &[], None).await;
+     assert_eq!(status, 404);
+Diff in /Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-service/tests/auth_matrix.rs:1858:
+ #[tokio::test]
+ async fn device_registry_failure_is_not_reported_as_bad_credentials() {
+     let server = default_server("device-registry-error-status").await;
+-    let (status, body) = http(server.addr, "POST", "/lingxi/v1/devices/credentials", &[("Authorization", &server.bearer())], Some("{}")).await;
++    let (status, body) = http(
++        server.addr,
++        "POST",
++        "/lingxi/v1/devices/credentials",
++        &[("Authorization", &server.bearer())],
++        Some("{}"),
++    )
++    .await;
+     assert_eq!(status, 200, "{body}");
+-    let secret = serde_json::from_str::<serde_json::Value>(&body).unwrap()["secret"].as_str().unwrap().to_string();
++    let secret = serde_json::from_str::<serde_json::Value>(&body).unwrap()["secret"]
++        .as_str()
++        .unwrap()
++        .to_string();
+     let credential_login = serde_json::json!({"credential": secret}).to_string();
+     let raw = http_raw(server.addr, &format!("POST /lingxi/v1/web-auth/login HTTP/1.1\r\nHost: {}\r\nContent-Type: application/json\r\nContent-Length: {}\r\nConnection: close\r\n\r\n{}", server.addr, credential_login.len(), credential_login)).await;
+     assert!(raw.starts_with("HTTP/1.1 200"), "{raw}");
+Diff in /Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-service/tests/auth_matrix.rs:1867:
+-    let cookie = raw.lines().find(|line| line.to_ascii_lowercase().starts_with("set-cookie:"))
+-        .unwrap().split_once(':').unwrap().1.trim().split(';').next().unwrap().to_string();
+-    let registry_path = prepare_layout(&server.home).unwrap().runtime_dir.join(lingxi_service::auth::DEVICE_CREDENTIALS_FILE);
++    let cookie = raw
++        .lines()
++        .find(|line| line.to_ascii_lowercase().starts_with("set-cookie:"))
++        .unwrap()
++        .split_once(':')
++        .unwrap()
++        .1
++        .trim()
++        .split(';')
++        .next()
++        .unwrap()
++        .to_string();
++    let registry_path = prepare_layout(&server.home)
++        .unwrap()
++        .runtime_dir
++        .join(lingxi_service::auth::DEVICE_CREDENTIALS_FILE);
+     let original = std::fs::read(&registry_path).unwrap();
+     std::fs::write(&registry_path, b"{corrupt").unwrap();
+-    let (status, body) = http(server.addr, "GET", "/lingxi/v1/me", &[("Authorization", &format!("Bearer {secret}"))], None).await;
++    let (status, body) = http(
++        server.addr,
++        "GET",
++        "/lingxi/v1/me",
++        &[("Authorization", &format!("Bearer {secret}"))],
++        None,
++    )
++    .await;
+     assert_eq!(status, 500, "bearer registry failure: {body}");
+-    let (status, body) = http(server.addr, "POST", "/lingxi/v1/web-auth/login", &[], Some(&credential_login)).await;
++    let (status, body) = http(
++        server.addr,
++        "POST",
++        "/lingxi/v1/web-auth/login",
++        &[],
++        Some(&credential_login),
++    )
++    .await;
+     assert_eq!(status, 500, "web login registry failure: {body}");
+-    let (status, body) = http(server.addr, "GET", "/lingxi/v1/web-auth/session", &[("Cookie", &cookie)], None).await;
++    let (status, body) = http(
++        server.addr,
++        "GET",
++        "/lingxi/v1/web-auth/session",
++        &[("Cookie", &cookie)],
++        None,
++    )
++    .await;
+     assert_eq!(status, 500, "cookie registry failure: {body}");
+     std::fs::write(&registry_path, original).unwrap();
+-    let (status, body) = http(server.addr, "GET", "/lingxi/v1/me", &[("Authorization", &format!("Bearer {secret}"))], None).await;
+-    assert_eq!(status, 200, "valid registry should restore device auth: {body}");
++    let (status, body) = http(
++        server.addr,
++        "GET",
++        "/lingxi/v1/me",
++        &[("Authorization", &format!("Bearer {secret}"))],
++        None,
++    )
++    .await;
++    assert_eq!(
++        status, 200,
++        "valid registry should restore device auth: {body}"
++    );
+     server.stop_and_assert_clean().await;
+ }
+ 
+Diff in /Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-service/tests/shutdown_coordinator.rs:68:
+     assert!(layout.record_path.exists());
+ 
+     let ws = WsShutdown::new();
+-    let report =
+-        graceful_shutdown(&db, &ws, guard, false, budget(Duration::from_secs(10))).await;
++    let report = graceful_shutdown(&db, &ws, guard, false, budget(Duration::from_secs(10))).await;
+ 
+     assert_eq!(report.exit_code(), 0, "{report:?}");
+     assert!(!report.any_timeout());
+Diff in /Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-service/tests/shutdown_coordinator.rs:115:
+     let ws = WsShutdown::new();
+ 
+     let started = std::time::Instant::now();
+-    let report = graceful_shutdown(
+-        &db,
+-        &ws,
+-        guard,
+-        false,
+-        budget(Duration::from_millis(120)),
+-    )
+-    .await;
++    let report =
++        graceful_shutdown(&db, &ws, guard, false, budget(Duration::from_millis(120))).await;
+     let elapsed = started.elapsed();
+ 
+     assert!(report.storage_close_timed_out, "{report:?}");
+Diff in /Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-service/tests/shutdown_coordinator.rs:166:
+         .publish("127.0.0.1:3".parse().unwrap())
+         .expect("publish");
+     let ws = WsShutdown::new();
+-    let report =
+-        graceful_shutdown(&db, &ws, guard, false, budget(Duration::from_secs(5))).await;
++    let report = graceful_shutdown(&db, &ws, guard, false, budget(Duration::from_secs(5))).await;
+ 
+     assert!(report.storage_error.is_some(), "{report:?}");
+     assert_eq!(report.exit_code(), 5, "{report:?}");
+Diff in /Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-service/tests/shutdown_coordinator.rs:191:
+     std::fs::write(&layout.record_path, b"{ not json").unwrap();
+ 
+     let ws = WsShutdown::new();
+-    let report =
+-        graceful_shutdown(&db, &ws, guard, false, budget(Duration::from_secs(5))).await;
++    let report = graceful_shutdown(&db, &ws, guard, false, budget(Duration::from_secs(5))).await;
+ 
+     assert!(report.record_error.is_some(), "{report:?}");
+     assert_eq!(report.exit_code(), 4, "{report:?}");
+Diff in /Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-service/tests/tls_web_login.rs:3:
+ use std::sync::Arc;
+ use std::time::Duration;
+ 
+-use lingxi_service::{prepare_layout, run_with_tls, HomeSource, NetworkMode, ServiceConfig, ServiceState};
++use lingxi_service::{
++    prepare_layout, run_with_tls, HomeSource, NetworkMode, ServiceConfig, ServiceState,
++};
+ use rustls::pki_types::pem::PemObject;
+ use rustls::RootCertStore;
+ use tokio::io::{AsyncReadExt, AsyncWriteExt};
+Diff in /Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-service/tests/tls_web_login.rs:12:
+ struct Running {
+     addr: SocketAddr,
+     stop: tokio::sync::oneshot::Sender<()>,
+-    task: tokio::task::JoinHandle<Result<lingxi_service::ServeOutcome, lingxi_service::ServiceError>>,
++    task:
++        tokio::task::JoinHandle<Result<lingxi_service::ServeOutcome, lingxi_service::ServiceError>>,
+ }
+ 
+ async fn start(home: PathBuf, tls: Option<TlsAcceptor>) -> (Running, String) {
+Diff in /Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-service/tests/tls_web_login.rs:19:
+     let layout = prepare_layout(&home).unwrap();
+-    let state = ServiceState::bootstrap(ServiceConfig {
+-        bind_addr: "127.0.0.1:0".parse().unwrap(),
+-        data_home: home,
+-        home_source: HomeSource::Cli,
+-        network_mode: NetworkMode::Lan,
+-        shutdown_timeout_ms: 10_000,
+-    }, &layout).await.unwrap();
++    let state = ServiceState::bootstrap(
++        ServiceConfig {
++            bind_addr: "127.0.0.1:0".parse().unwrap(),
++            data_home: home,
++            home_source: HomeSource::Cli,
++            network_mode: NetworkMode::Lan,
++            shutdown_timeout_ms: 10_000,
++        },
++        &layout,
++    )
++    .await
++    .unwrap();
+     let token = state.auth().local_token();
+     let (stop_tx, stop_rx) = tokio::sync::oneshot::channel();
+     let (ready_tx, ready_rx) = tokio::sync::oneshot::channel();
+Diff in /Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-service/tests/tls_web_login.rs:30:
+     let task = tokio::spawn(run_with_tls(
+         state,
+-        async move { let _ = stop_rx.await; },
+-        move |addr| { let _ = ready_tx.send(addr); },
++        async move {
++            let _ = stop_rx.await;
++        },
++        move |addr| {
++            let _ = ready_tx.send(addr);
++        },
+         Some(Duration::from_secs(5)),
+         tls,
+     ));
+Diff in /Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-service/tests/tls_web_login.rs:37:
+-    (Running { addr: ready_rx.await.unwrap(), stop: stop_tx, task }, token)
++    (
++        Running {
++            addr: ready_rx.await.unwrap(),
++            stop: stop_tx,
++            task,
++        },
++        token,
++    )
+ }
+ 
+ impl Running {
+Diff in /Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-service/tests/tls_web_login.rs:41:
+     async fn stop(self) {
+         let _ = self.stop.send(());
+-        tokio::time::timeout(Duration::from_secs(10), self.task).await.unwrap().unwrap().unwrap();
++        tokio::time::timeout(Duration::from_secs(10), self.task)
++            .await
++            .unwrap()
++            .unwrap()
++            .unwrap();
+     }
+ }
+ 
+Diff in /Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-service/tests/tls_web_login.rs:50:
+ 
+ async fn over_tls(connector: &TlsConnector, addr: SocketAddr, raw: String) -> String {
+     let stream = tokio::net::TcpStream::connect(addr).await.unwrap();
+-    let mut stream = connector.connect(rustls::pki_types::ServerName::try_from("localhost").unwrap(), stream).await.unwrap();
++    let mut stream = connector
++        .connect(
++            rustls::pki_types::ServerName::try_from("localhost").unwrap(),
++            stream,
++        )
++        .await
++        .unwrap();
+     stream.write_all(raw.as_bytes()).await.unwrap();
+     let mut bytes = Vec::new();
+-    tokio::time::timeout(Duration::from_secs(5), stream.read_to_end(&mut bytes)).await.unwrap().unwrap();
++    tokio::time::timeout(Duration::from_secs(5), stream.read_to_end(&mut bytes))
++        .await
++        .unwrap()
++        .unwrap();
+     String::from_utf8(bytes).unwrap()
+ }
+ 
+Diff in /Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-service/tests/tls_web_login.rs:61:
+     let mut stream = tokio::net::TcpStream::connect(addr).await.unwrap();
+     stream.write_all(raw.as_bytes()).await.unwrap();
+     let mut bytes = Vec::new();
+-    tokio::time::timeout(Duration::from_secs(5), stream.read_to_end(&mut bytes)).await.unwrap().unwrap();
++    tokio::time::timeout(Duration::from_secs(5), stream.read_to_end(&mut bytes))
++        .await
++        .unwrap()
++        .unwrap();
+     String::from_utf8(bytes).unwrap()
+ }
+ 
+Diff in /Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-service/tests/tls_web_login.rs:72:
+         .with_no_client_auth()
+         .with_single_cert(
+             vec![generated.cert.der().clone()],
+-            rustls::pki_types::PrivateKeyDer::from_pem_slice(generated.signing_key.serialize_pem().as_bytes()).unwrap(),
+-        ).unwrap();
++            rustls::pki_types::PrivateKeyDer::from_pem_slice(
++                generated.signing_key.serialize_pem().as_bytes(),
++            )
++            .unwrap(),
++        )
++        .unwrap();
+     let mut roots = RootCertStore::empty();
+     roots.add(generated.cert.der().clone()).unwrap();
+-    let connector = TlsConnector::from(Arc::new(rustls::ClientConfig::builder()
+-        .with_root_certificates(roots).with_no_client_auth()));
+-    let home = std::env::temp_dir().join(format!("lingxi-r02-tls-web-{}-{}", std::process::id(),
+-        std::time::SystemTime::now().duration_since(std::time::UNIX_EPOCH).unwrap().as_nanos()));
++    let connector = TlsConnector::from(Arc::new(
++        rustls::ClientConfig::builder()
++            .with_root_certificates(roots)
++            .with_no_client_auth(),
++    ));
++    let home = std::env::temp_dir().join(format!(
++        "lingxi-r02-tls-web-{}-{}",
++        std::process::id(),
++        std::time::SystemTime::now()
++            .duration_since(std::time::UNIX_EPOCH)
++            .unwrap()
++            .as_nanos()
++    ));
+ 
+-    let (tls, local_token) = start(home.clone(), Some(TlsAcceptor::from(Arc::new(server_config)))).await;
+-    let set_password = over_tls(&connector, tls.addr, request(
+-        "127.0.0.1", "PUT", "/lingxi/v1/access/account/password",
+-        &format!("Authorization: Bearer {local_token}\r\n"),
+-        r#"{"password":"TestPassw0rd!"}"#,
+-    )).await;
++    let (tls, local_token) = start(
++        home.clone(),
++        Some(TlsAcceptor::from(Arc::new(server_config))),
++    )
++    .await;
++    let set_password = over_tls(
++        &connector,
++        tls.addr,
++        request(
++            "127.0.0.1",
++            "PUT",
++            "/lingxi/v1/access/account/password",
++            &format!("Authorization: Bearer {local_token}\r\n"),
++            r#"{"password":"TestPassw0rd!"}"#,
++        ),
++    )
++    .await;
+     assert!(set_password.starts_with("HTTP/1.1 200"), "{set_password}");
+ 
+-    let login = over_tls(&connector, tls.addr, request(
+-        "lan.example.test", "POST", "/lingxi/v1/web-auth/login", "",
+-        r#"{"username":"local","password":"TestPassw0rd!","clientKind":"desktop"}"#,
+-    )).await;
++    let login = over_tls(
++        &connector,
++        tls.addr,
++        request(
++            "lan.example.test",
++            "POST",
++            "/lingxi/v1/web-auth/login",
++            "",
++            r#"{"username":"local","password":"TestPassw0rd!","clientKind":"desktop"}"#,
++        ),
++    )
++    .await;
+     assert!(login.starts_with("HTTP/1.1 200"), "{login}");
+-    let cookie = login.lines().find(|line| line.to_ascii_lowercase().starts_with("set-cookie:"))
++    let cookie = login
++        .lines()
++        .find(|line| line.to_ascii_lowercase().starts_with("set-cookie:"))
+         .expect("successful login must set a cookie");
+-    assert!(cookie.contains("HttpOnly") && cookie.contains("SameSite=Strict")
+-        && cookie.contains("Max-Age=1209600") && cookie.contains("Secure"), "{cookie}");
+-    let cookie_pair = cookie.split_once(':').unwrap().1.trim().split(';').next().unwrap();
+-    let session = over_tls(&connector, tls.addr, request(
+-        "lan.example.test", "GET", "/lingxi/v1/web-auth/session",
+-        &format!("Cookie: {cookie_pair}\r\n"), "",
+-    )).await;
+-    assert!(session.starts_with("HTTP/1.1 200") && session.contains("\"authenticated\":true"), "{session}");
++    assert!(
++        cookie.contains("HttpOnly")
++            && cookie.contains("SameSite=Strict")
++            && cookie.contains("Max-Age=1209600")
++            && cookie.contains("Secure"),
++        "{cookie}"
++    );
++    let cookie_pair = cookie
++        .split_once(':')
++        .unwrap()
++        .1
++        .trim()
++        .split(';')
++        .next()
++        .unwrap();
++    let session = over_tls(
++        &connector,
++        tls.addr,
++        request(
++            "lan.example.test",
++            "GET",
++            "/lingxi/v1/web-auth/session",
++            &format!("Cookie: {cookie_pair}\r\n"),
++            "",
++        ),
++    )
++    .await;
++    assert!(
++        session.starts_with("HTTP/1.1 200") && session.contains("\"authenticated\":true"),
++        "{session}"
++    );
+     tls.stop().await;
+ 
+     let (plain, _) = start(home.clone(), None).await;
+Diff in /Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-service/tests/tls_web_login.rs:110:
+-    let forged = over_http(plain.addr, request(
+-        "lan.example.test", "POST", "/lingxi/v1/web-auth/login",
+-        "X-Forwarded-Proto: https\r\n",
+-        r#"{"username":"local","password":"TestPassw0rd!","clientKind":"desktop"}"#,
+-    )).await;
++    let forged = over_http(
++        plain.addr,
++        request(
++            "lan.example.test",
++            "POST",
++            "/lingxi/v1/web-auth/login",
++            "X-Forwarded-Proto: https\r\n",
++            r#"{"username":"local","password":"TestPassw0rd!","clientKind":"desktop"}"#,
++        ),
++    )
++    .await;
+     assert!(!forged.starts_with("HTTP/1.1 200"), "{forged}");
+-    assert!(forged.contains("password_login_requires_secure_context"), "{forged}");
++    assert!(
++        forged.contains("password_login_requires_secure_context"),
++        "{forged}"
++    );
+     plain.stop().await;
+     std::fs::remove_dir_all(home).unwrap();
+ }
+Diff in /Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/xtask/src/stage_map.rs:381:
+     let supplemental_leaves = match object.get("supplementalLeafScenarios") {
+         None => Vec::new(),
+         Some(value) => {
+-            let list = value.as_array().ok_or_else(|| {
+-                err("supplementalLeafScenarios must be an array of leaf objects")
+-            })?;
++            let list = value
++                .as_array()
++                .ok_or_else(|| err("supplementalLeafScenarios must be an array of leaf objects"))?;
+             if list.is_empty() {
+                 return Err(err(
+                     "supplementalLeafScenarios must not be EMPTY (declaring the \
+Diff in /Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/xtask/src/stage_map.rs:396:
+             let mut leaves = Vec::with_capacity(list.len());
+             for (index, value) in list.iter().enumerate() {
+                 let entry = value.as_object().ok_or_else(|| {
+-                    err(&format!("supplementalLeafScenarios #{index} must be an object"))
++                    err(&format!(
++                        "supplementalLeafScenarios #{index} must be an object"
++                    ))
+                 })?;
+                 let id = non_empty_string(
+-                    entry
+-                        .get("id")
+-                        .ok_or_else(|| err(&format!("supplementalLeafScenarios #{index} missing id")))?,
++                    entry.get("id").ok_or_else(|| {
++                        err(&format!("supplementalLeafScenarios #{index} missing id"))
++                    })?,
+                     &format!("supplementalLeafScenarios #{index} id"),
+                 )?;
+                 if leaves.iter().any(|leaf: &SupplementalLeaf| leaf.id == id) {
+Diff in /Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/xtask/src/stage_map.rs:432:
+                     )));
+                 }
+                 let r02_share = non_empty_string(
+-                    entry
+-                        .get("r02Share")
+-                        .ok_or_else(|| err(&format!("supplemental leaf {id:?} missing r02Share")))?,
++                    entry.get("r02Share").ok_or_else(|| {
++                        err(&format!("supplemental leaf {id:?} missing r02Share"))
++                    })?,
+                     &format!("supplemental leaf {id:?} r02Share"),
+                 )?;
+                 let r07_share = non_empty_string(
+Diff in /Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/xtask/src/stage_map.rs:441:
+-                    entry
+-                        .get("r07Share")
+-                        .ok_or_else(|| err(&format!("supplemental leaf {id:?} missing r07Share")))?,
++                    entry.get("r07Share").ok_or_else(|| {
++                        err(&format!("supplemental leaf {id:?} missing r07Share"))
++                    })?,
+                     &format!("supplemental leaf {id:?} r07Share"),
+                 )?;
+                 let evidence_required = non_empty_string(
+Diff in /Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/xtask/src/stage_map.rs:447:
+                     entry.get("evidenceRequired").ok_or_else(|| {
+-                        err(&format!("supplemental leaf {id:?} missing evidenceRequired"))
++                        err(&format!(
++                            "supplemental leaf {id:?} missing evidenceRequired"
++                        ))
+                     })?,
+                     &format!("supplemental leaf {id:?} evidenceRequired"),
+                 )?;
+Diff in /Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/xtask/src/stage_map.rs:452:
+                 let refs_value = entry.get("evidenceCommandRefs").ok_or_else(|| {
+-                    err(&format!("supplemental leaf {id:?} missing evidenceCommandRefs"))
++                    err(&format!(
++                        "supplemental leaf {id:?} missing evidenceCommandRefs"
++                    ))
+                 })?;
+                 let refs_list = refs_value.as_array().ok_or_else(|| {
+                     err(&format!(
+Diff in /Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/xtask/src/stage_map.rs:518:
+                 // original assertions, or due line to a different object.
+                 let r00_kind = non_empty_string(
+                     entry.get("r00Kind").ok_or_else(|| {
+-                        err(&format!("supplemental leaf {id:?} missing r00Kind (R00 mirror)"))
++                        err(&format!(
++                            "supplemental leaf {id:?} missing r00Kind (R00 mirror)"
++                        ))
+                     })?,
+                     &format!("supplemental leaf {id:?} r00Kind"),
+                 )?;
+Diff in /Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/xtask/src/stage_map.rs:556:
+                 )?;
+                 let r00_then = non_empty_string(
+                     entry.get("r00Then").ok_or_else(|| {
+-                        err(&format!("supplemental leaf {id:?} missing r00Then (R00 mirror)"))
++                        err(&format!(
++                            "supplemental leaf {id:?} missing r00Then (R00 mirror)"
++                        ))
+                     })?,
+                     &format!("supplemental leaf {id:?} r00Then"),
+                 )?;
+Diff in /Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/xtask/src/stage_map.rs:568:
+                 )?;
+                 let r00_due = non_empty_string(
+                     entry.get("r00Due").ok_or_else(|| {
+-                        err(&format!("supplemental leaf {id:?} missing r00Due (R00 mirror)"))
++                        err(&format!(
++                            "supplemental leaf {id:?} missing r00Due (R00 mirror)"
++                        ))
+                     })?,
+                     &format!("supplemental leaf {id:?} r00Due"),
+                 )?;
+Diff in /Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/xtask/src/stage_map.rs:599:
+                                      producerCommand"
+                                 ))
+                             })?,
+-                            &format!(
+-                                "supplemental leaf {id:?} assertionContract producerCommand"
+-                            ),
++                            &format!("supplemental leaf {id:?} assertionContract producerCommand"),
+                         )?;
+                         if !commands_value.contains_key(&producer_command) {
+                             return Err(err(&format!(
+Diff in /Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/xtask/src/stage_map.rs:624:
+                                      evidencePath"
+                                 ))
+                             })?,
+-                            &format!(
+-                                "supplemental leaf {id:?} assertionContract evidencePath"
+-                            ),
++                            &format!("supplemental leaf {id:?} assertionContract evidencePath"),
+                         )?;
+                         let cases_value = contract
+                             .get("cases")
+Diff in /Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/xtask/src/stage_map.rs:664:
+                                          missing case name"
+                                     ))
+                                 })?,
+-                                &format!(
+-                                    "supplemental leaf {id:?} assertionContract case name"
+-                                ),
++                                &format!("supplemental leaf {id:?} assertionContract case name"),
+                             )?;
+-                            if cases.iter().any(|pinned: &LeafCaseExpect| pinned.case == case) {
++                            if cases
++                                .iter()
++                                .any(|pinned: &LeafCaseExpect| pinned.case == case)
++                            {
+                                 return Err(err(&format!(
+                                     "supplemental leaf {id:?} assertionContract repeats \
+                                      case name {case:?} — each pinned observation must \
+Diff in /Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/xtask/src/stage_map.rs:714:
+                             return Err(err(&format!(
+                                 "supplemental leaf {id:?} originalAssertionCases must cover \
+                                  all {} original R00 assertions in order (got {})",
+-                                r00_assertions.len(), groups.len()
++                                r00_assertions.len(),
++                                groups.len()
+                             )));
+                         }
+                         let contract = assertion_contract.as_ref().ok_or_else(|| {
+Diff in /Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/xtask/src/stage_map.rs:1036:
+             {"case":"negative","expect":403}
+         ]);
+         let missing = parse_stage_map(&value.to_string()).unwrap_err();
+-        assert!(missing.contains("requires originalAssertionCases"), "{missing}");
++        assert!(
++            missing.contains("requires originalAssertionCases"),
++            "{missing}"
++        );
+ 
+         value["supplementalLeafScenarios"][0]["originalAssertionCases"] =
+             serde_json::json!([["positive"], ["positive"]]);
+Diff in /Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/xtask/src/stage_map.rs:1046:
+         value["supplementalLeafScenarios"][0]["originalAssertionCases"] =
+             serde_json::json!([["positive"], ["negative"]]);
+         let parsed = parse_stage_map(&value.to_string()).expect("complete assertion coverage");
+-        assert_eq!(parsed.supplemental_leaves[0].original_assertion_cases.len(), 2);
++        assert_eq!(
++            parsed.supplemental_leaves[0].original_assertion_cases.len(),
++            2
++        );
+     }
+ 
+     #[test]
+Diff in /Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/xtask/src/stage_map.rs:1055:
+         // empty array: declaring the section with zero entries would drop
+         // every R00 REQUIRED_SUPPLEMENTAL obligation from the gate.
+         let mut hacked = String::new();
+-        hacked.push_str(SUPPLEMENTAL_VALID.split("\"supplementalLeafScenarios\"").next().unwrap());
++        hacked.push_str(
++            SUPPLEMENTAL_VALID
++                .split("\"supplementalLeafScenarios\"")
++                .next()
++                .unwrap(),
++        );
+         hacked.push_str("\"supplementalLeafScenarios\": []}");
+         let err = parse_stage_map(&hacked).unwrap_err();
+         assert!(err.contains("must not be EMPTY"), "{err}");
+Diff in /Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/xtask/src/stage_map.rs:1063:
+ 
+     #[test]
+     fn unknown_supplemental_basis_kind_is_a_hard_error() {
+-        let text = SUPPLEMENTAL_VALID.replace(r#""basisKind": "protocol_basis""#, r#""basisKind": "mystery""#);
++        let text = SUPPLEMENTAL_VALID.replace(
++            r#""basisKind": "protocol_basis""#,
++            r#""basisKind": "mystery""#,
++        );
+         let err = parse_stage_map(&text).unwrap_err();
+         assert!(err.contains("unknown basisKind"), "{err}");
+     }
+Diff in /Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/xtask/src/stage_map.rs:1070:
+ 
+     #[test]
+     fn supplemental_leaf_without_command_refs_is_a_hard_error() {
+-        let text =
+-            SUPPLEMENTAL_VALID.replace(r#""evidenceCommandRefs": ["a_ok"]"#, r#""evidenceCommandRefs": []"#);
++        let text = SUPPLEMENTAL_VALID.replace(
++            r#""evidenceCommandRefs": ["a_ok"]"#,
++            r#""evidenceCommandRefs": []"#,
++        );
+         let err = parse_stage_map(&text).unwrap_err();
+         assert!(err.contains("hole in the map"), "{err}");
+     }
+Diff in /Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/xtask/src/stage_map.rs:1078:
+ 
+     #[test]
+     fn supplemental_leaf_with_unknown_command_ref_is_a_hard_error() {
+-        let text =
+-            SUPPLEMENTAL_VALID.replace(r#""evidenceCommandRefs": ["a_ok"]"#, r#""evidenceCommandRefs": ["nope"]"#);
++        let text = SUPPLEMENTAL_VALID.replace(
++            r#""evidenceCommandRefs": ["a_ok"]"#,
++            r#""evidenceCommandRefs": ["nope"]"#,
++        );
+         let err = parse_stage_map(&text).unwrap_err();
+         assert!(err.contains("unknown command"), "{err}");
+     }
+Diff in /Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/xtask/src/stage_map.rs:1086:
+ 
+     #[test]
+     fn conflicted_leaf_must_not_bind_evidence() {
+-        let text = SUPPLEMENTAL_VALID
+-            .replace(r#""basisKind": "protocol_basis""#, r#""basisKind": "client_only_stage_boundary_conflict""#);
++        let text = SUPPLEMENTAL_VALID.replace(
++            r#""basisKind": "protocol_basis""#,
++            r#""basisKind": "client_only_stage_boundary_conflict""#,
++        );
+         let err = parse_stage_map(&text).unwrap_err();
+         assert!(err.contains("must not bind evidence commands"), "{err}");
+     }
+Diff in /Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/xtask/src/stage_map.rs:1114:
+                 "",
+             );
+         let map = parse_stage_map(&text).expect("unbound conflicted leaf parses");
+-        assert_eq!(map.supplemental_leaves[0].basis_kind, BASIS_CLIENT_ONLY_STAGE_CONFLICT);
++        assert_eq!(
++            map.supplemental_leaves[0].basis_kind,
++            BASIS_CLIENT_ONLY_STAGE_CONFLICT
++        );
+         assert!(map.supplemental_leaves[0].evidence_command_refs.is_empty());
+         assert!(map.supplemental_leaves[0].assertion_contract.is_none());
+     }
+Diff in /Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/xtask/src/stage_map.rs:1133:
+ 
+     #[test]
+     fn empty_r00_responsibility_mirror_is_a_hard_error() {
+-        let text =
+-            SUPPLEMENTAL_VALID.replace(r#""r00TaskIds": ["R02-T03", "R07-T09"]"#, r#""r00TaskIds": []"#);
++        let text = SUPPLEMENTAL_VALID.replace(
++            r#""r00TaskIds": ["R02-T03", "R07-T09"]"#,
++            r#""r00TaskIds": []"#,
++        );
+         let err = parse_stage_map(&text).unwrap_err();
+         assert!(err.contains("r00TaskIds must not be empty"), "{err}");
+     }
+Diff in /Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/xtask/src/stage_map.rs:1146:
+         // closes.
+         let text = SUPPLEMENTAL_VALID.replace(
+             concat!(
+-                r#"                "assertionContract": {"#, "\n",
+-                r#"                    "producerCommand": "a_ok","#, "\n",
+-                r#"                    "evidencePath": "{EVIDENCE}/RX/leaf-cases.json","#, "\n",
+-                r#"                    "cases": [{"case": "case-no-credential", "expect": 401}]"#, "\n",
+-                r#"                },"#, "\n",
++                r#"                "assertionContract": {"#,
++                "\n",
++                r#"                    "producerCommand": "a_ok","#,
++                "\n",
++                r#"                    "evidencePath": "{EVIDENCE}/RX/leaf-cases.json","#,
++                "\n",
++                r#"                    "cases": [{"case": "case-no-credential", "expect": 401}]"#,
++                "\n",
++                r#"                },"#,
++                "\n",
+             ),
+             "",
+         );
+Diff in /Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/xtask/src/stage_map.rs:1165:
+                 r#""basisKind": "protocol_basis""#,
+                 r#""basisKind": "client_only_stage_boundary_conflict""#,
+             )
+-            .replace(r#""evidenceCommandRefs": ["a_ok"]"#, r#""evidenceCommandRefs": []"#);
++            .replace(
++                r#""evidenceCommandRefs": ["a_ok"]"#,
++                r#""evidenceCommandRefs": []"#,
++            );
+         let err = parse_stage_map(&text).unwrap_err();
+-        assert!(err.contains("must not declare an assertionContract"), "{err}");
++        assert!(
++            err.contains("must not declare an assertionContract"),
++            "{err}"
++        );
+     }
+ 
+     #[test]
+Diff in /Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/xtask/src/stage_map.rs:1187:
+             serde_json::json!("b_two");
+         let text = value.to_string();
+         let err = parse_stage_map(&text).unwrap_err();
+-        assert!(err.contains("is not in the leaf's evidenceCommandRefs"), "{err}");
++        assert!(
++            err.contains("is not in the leaf's evidenceCommandRefs"),
++            "{err}"
++        );
+     }
+ 
+     #[test]
+Diff in /Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/xtask/src/verify/runner_tests.rs:5:
+ use std::time::{SystemTime, UNIX_EPOCH};
+ 
+ use crate::stage_map::{
+-    parse_stage_map, CommandSpec, StageMap, LeafAssertionContract, LeafCaseExpect,
++    parse_stage_map, CommandSpec, LeafAssertionContract, LeafCaseExpect, StageMap,
+ };
+ use crate::verify::{run_command, verify_stage};
+ 
+Diff in /Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/xtask/src/verify/runner_tests.rs:75:
+     std::fs::create_dir_all(&dir).expect("create R00 ledger dir");
+     std::fs::write(
+         dir.join("ACCEPTANCE_MAP.json"),
+-        serde_json::to_string(&serde_json::json!({ "scenarios": scenarios })).expect("ledger serializes"),
++        serde_json::to_string(&serde_json::json!({ "scenarios": scenarios }))
++            .expect("ledger serializes"),
+     )
+     .expect("write minimal R00 acceptance ledger");
+     std::fs::write(
+Diff in /Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/xtask/src/verify/runner_tests.rs:592:
+     }
+ }
+ 
+-fn contract(
+-    producer: &str,
+-    path: &str,
+-    cases: &[(&str, i64)],
+-) -> Option<LeafAssertionContract> {
++fn contract(producer: &str, path: &str, cases: &[(&str, i64)]) -> Option<LeafAssertionContract> {
+     Some(LeafAssertionContract {
+         producer_command: producer.to_string(),
+         evidence_path: path.to_string(),
+Diff in /Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/xtask/src/verify/runner_tests.rs:682:
+             ),
+         ],
+     };
+-    let report = verify_stage(&map, &root, &evidence, "deadbeef", false, 0)
+-        .expect("runs to completion");
++    let report =
++        verify_stage(&map, &root, &evidence, "deadbeef", false, 0).expect("runs to completion");
+     // Base scenario green, supplemental verdicts mixed, overall FAIL.
+     assert_eq!(report["scenarios"][0]["status"], "PASS");
+     let find = |id: &str| {
+Diff in /Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/xtask/src/verify/runner_tests.rs:700:
+     // 案例数值通过只证明当前阶段份额，原叶还绑定后续阶段。
+     assert_eq!(ok_leaf["assertionResults"][0]["case"], "case-ok");
+     assert_eq!(ok_leaf["assertionResults"][0]["status"], "PASS");
+-    assert!(ok_leaf["reason"].as_str().unwrap().contains("another stage"));
+-    assert_eq!(ok_leaf["r00Mirror"]["then"], serde_json::json!(test_then("R00-T02-LA-TESTOK000000000")));
++    assert!(ok_leaf["reason"]
++        .as_str()
++        .unwrap()
++        .contains("another stage"));
++    assert_eq!(
++        ok_leaf["r00Mirror"]["then"],
++        serde_json::json!(test_then("R00-T02-LA-TESTOK000000000"))
++    );
+     let noev_leaf = find("R00-T02-LA-TESTNOEV00000000");
+     assert_eq!(noev_leaf["status"], "FAIL");
+     assert!(
+Diff in /Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/xtask/src/verify/runner_tests.rs:708:
+-        noev_leaf["reason"].as_str().unwrap().contains("evidence commands not passing"),
++        noev_leaf["reason"]
++            .as_str()
++            .unwrap()
++            .contains("evidence commands not passing"),
+         "the failing producer is named: {}",
+         noev_leaf["reason"]
+     );
+Diff in /Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/xtask/src/verify/runner_tests.rs:713:
+     let generic_leaf = find("R00-T02-LA-TESTGENERIC0000");
+     assert_eq!(generic_leaf["assertionResults"][0]["status"], "PASS");
+     assert_eq!(generic_leaf["status"], "BLOCKED");
+-    assert!(generic_leaf["reason"].as_str().unwrap().contains("do not prove"));
+-    assert_eq!(report["supplementalLeafCoverage"]["pass"], serde_json::json!(0));
+-    assert_eq!(report["supplementalLeafCoverage"]["fail"], serde_json::json!(1));
+-    assert_eq!(report["supplementalLeafCoverage"]["blocked"], serde_json::json!(3));
++    assert!(generic_leaf["reason"]
++        .as_str()
++        .unwrap()
++        .contains("do not prove"));
+     assert_eq!(
++        report["supplementalLeafCoverage"]["pass"],
++        serde_json::json!(0)
++    );
++    assert_eq!(
++        report["supplementalLeafCoverage"]["fail"],
++        serde_json::json!(1)
++    );
++    assert_eq!(
++        report["supplementalLeafCoverage"]["blocked"],
++        serde_json::json!(3)
++    );
++    assert_eq!(
+         report["supplementalLeafCoverage"]["expectedFromR00Ledger"],
+         serde_json::json!(4)
+     );
+Diff in /Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/xtask/src/verify/runner_tests.rs:725:
+     // The leaf-only command really ran (two entries with real exit codes);
+     // its failure is what fails the NOEV leaf.
+     assert_eq!(report["commands"].as_array().unwrap().len(), 2);
+-    assert_eq!(report["commands"].as_array().unwrap()[1]["exitCode"], serde_json::json!(9));
++    assert_eq!(
++        report["commands"].as_array().unwrap()[1]["exitCode"],
++        serde_json::json!(9)
++    );
+     std::fs::remove_dir_all(&root).ok();
+ }
+ 
+Diff in /Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/xtask/src/verify/runner_tests.rs:843:
+         let (status, reason, _) =
+             super::roll_up_supplemental_leaf(&item, "RX", &outcomes, &root, &evidence);
+         assert_eq!(status, "FAIL", "{label}: {reason}");
+-        assert!(reason.contains("duplicate evidence case name"), "{label}: {reason}");
++        assert!(
++            reason.contains("duplicate evidence case name"),
++            "{label}: {reason}"
++        );
+         std::fs::remove_dir_all(&root).ok();
+     }
+ }
+Diff in /Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/xtask/src/verify/runner_tests.rs:895:
+     // is 401 while the leaf's original R00 assertion (pinned in the map)
+     // demands 403. Pre-fix the leaf passed on exit 0; now it must FAIL.
+     let root = temp_root("actual401");
+-    write_minimal_r00_ledger(&root, &[("R00-T02-LA-TESTTICKET00000", "REQUIRED_SUPPLEMENTAL")]);
++    write_minimal_r00_ledger(
++        &root,
++        &[("R00-T02-LA-TESTTICKET00000", "REQUIRED_SUPPLEMENTAL")],
++    );
+     let evidence = root.join("evidence");
+     let map = StageMap {
+         stage: "RX".into(),
+Diff in /Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/xtask/src/verify/runner_tests.rs:926:
+             contract("ok", "{EVIDENCE}/leaf-cases.json", &[("no-cred-ticket", 403)]),
+         )],
+     };
+-    let report = verify_stage(&map, &root, &evidence, "deadbeef", false, 0)
+-        .expect("runs to completion");
+-    assert_eq!(report["commands"][0]["status"], "PASS", "the command itself is green");
++    let report =
++        verify_stage(&map, &root, &evidence, "deadbeef", false, 0).expect("runs to completion");
++    assert_eq!(
++        report["commands"][0]["status"], "PASS",
++        "the command itself is green"
++    );
+     let leaf_entry = &report["supplementalLeafScenarios"][0];
+-    assert_eq!(leaf_entry["status"], "FAIL", "the leaf must NOT ride the green exit");
++    assert_eq!(
++        leaf_entry["status"], "FAIL",
++        "the leaf must NOT ride the green exit"
++    );
+     let reason = leaf_entry["reason"].as_str().unwrap();
+     assert!(
+         reason.contains("original-assertion cases not holding"),
+Diff in /Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/xtask/src/verify/runner_tests.rs:947:
+     // expectation in the MAP, so this mismatch must also fail — a producer
+     // that rewrites what it was checking for cannot keep the leaf green.
+     let root = temp_root("softexpect");
+-    write_minimal_r00_ledger(&root, &[("R00-T02-LA-TESTSOFT00000000", "REQUIRED_SUPPLEMENTAL")]);
++    write_minimal_r00_ledger(
++        &root,
++        &[("R00-T02-LA-TESTSOFT00000000", "REQUIRED_SUPPLEMENTAL")],
++    );
+     let evidence = root.join("evidence");
+     let map = StageMap {
+         stage: "RX".into(),
+Diff in /Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/xtask/src/verify/runner_tests.rs:978:
+             contract("ok", "{EVIDENCE}/leaf-cases.json", &[("c1", 403)]),
+         )],
+     };
+-    let report = verify_stage(&map, &root, &evidence, "deadbeef", false, 0)
+-        .expect("runs to completion");
++    let report =
++        verify_stage(&map, &root, &evidence, "deadbeef", false, 0).expect("runs to completion");
+     let leaf_entry = &report["supplementalLeafScenarios"][0];
+     assert_eq!(leaf_entry["status"], "FAIL");
+     assert!(
+Diff in /Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/xtask/src/verify/runner_tests.rs:1045:
+             ),
+         ],
+     };
+-    let report = verify_stage(&map, &root, &evidence, "deadbeef", false, 0)
+-        .expect("runs to completion");
++    let report =
++        verify_stage(&map, &root, &evidence, "deadbeef", false, 0).expect("runs to completion");
+     let leaves = report["supplementalLeafScenarios"].as_array().unwrap();
+     assert_eq!(leaves[0]["status"], "FAIL");
+     assert!(
+Diff in /Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/xtask/src/verify/runner_tests.rs:1056:
+     );
+     assert_eq!(leaves[1]["status"], "FAIL");
+     assert!(
+-        leaves[1]["reason"].as_str().unwrap().contains("not recorded"),
++        leaves[1]["reason"]
++            .as_str()
++            .unwrap()
++            .contains("not recorded"),
+         "missing case named: {}",
+         leaves[1]["reason"]
+     );
+Diff in /Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/xtask/src/verify/runner_tests.rs:1071:
+     // the R13-F01 check passed this shape; the R14-F01 full-record check
+     // must abort on it.
+     let root = temp_root("mirrordrift");
+-    write_minimal_r00_ledger(&root, &[("R00-T02-LA-TESTDRIFT0000000", "REQUIRED_SUPPLEMENTAL")]);
++    write_minimal_r00_ledger(
++        &root,
++        &[("R00-T02-LA-TESTDRIFT0000000", "REQUIRED_SUPPLEMENTAL")],
++    );
+     let evidence = root.join("evidence");
+     let mut drifted = leaf(
+         "R00-T02-LA-TESTDRIFT0000000",
+Diff in /Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/xtask/src/verify/runner_tests.rs:1100:
+     };
+     let err = verify_stage(&map, &root, &evidence, "deadbeef", false, 0)
+         .expect_err("a drifted mirror must abort the gate");
+-    assert!(err.contains("mirrors an R00 record that does not match"), "{err}");
++    assert!(
++        err.contains("mirrors an R00 record that does not match"),
++        "{err}"
++    );
+     assert!(err.contains("r00Then"), "the drifted field is named: {err}");
+     assert!(
+         !evidence.join("ran.marker").exists(),
+Diff in /Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/xtask/src/verify/runner_tests.rs:1115:
+     // empty) evidence root — an absolute-path pin pointing at an old file
+     // — must be refused up front exactly like stale command evidence.
+     let root = temp_root("staleleaf");
+-    write_minimal_r00_ledger(&root, &[("R00-T02-LA-TESTSTALE0000000", "REQUIRED_SUPPLEMENTAL")]);
++    write_minimal_r00_ledger(
++        &root,
++        &[("R00-T02-LA-TESTSTALE0000000", "REQUIRED_SUPPLEMENTAL")],
++    );
+     let evidence = root.join("evidence");
+     let stale_dir = root.join("stale");
+     std::fs::create_dir_all(&stale_dir).unwrap();
+Diff in /Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/xtask/src/verify/runner_tests.rs:1217:
+     };
+     let err = verify_stage(&map, &root, &evidence, "deadbeef", false, 0)
+         .expect_err("a missing R00 ledger must abort the gate");
+-    assert!(err.contains("cannot read the R00 acceptance ledger"), "{err}");
+     assert!(
++        err.contains("cannot read the R00 acceptance ledger"),
++        "{err}"
++    );
++    assert!(
+         !evidence.join("ran.marker").exists(),
+         "the refusal happens before any command runs"
+     );
+Diff in /Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/xtask/src/verify/runner_tests.rs:1233:
+         34,
+         "R02 must declare all 34 R00 REQUIRED_SUPPLEMENTAL leaves"
+     );
+-    let count_kind = |kind: &str| r02.supplemental_leaves.iter().filter(|l| l.basis_kind == kind).count();
++    let count_kind = |kind: &str| {
++        r02.supplemental_leaves
++            .iter()
++            .filter(|l| l.basis_kind == kind)
++            .count()
++    };
+     assert_eq!(
+         count_kind(crate::stage_map::BASIS_ROUTE_PRESENT_STATIC)
+             + count_kind(crate::stage_map::BASIS_PROTOCOL)
+Diff in /Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/xtask/src/verify/runner_tests.rs:1243:
+         34,
+         "every original leaf has exactly one evidence basis"
+     );
+-    assert_eq!(count_kind(crate::stage_map::BASIS_CLIENT_ONLY_STAGE_CONFLICT), 0);
++    assert_eq!(
++        count_kind(crate::stage_map::BASIS_CLIENT_ONLY_STAGE_CONFLICT),
++        0
++    );
+     assert!(count_kind(crate::stage_map::BASIS_FULL_ORIGINAL_BEHAVIOR) >= 18);
+     assert!(r02
+         .supplemental_leaves
+Diff in /Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/xtask/src/verify/runner_tests.rs:1254:
+         l.r00_execution_stage_ids.iter().any(|id| id == "R02")
+             && l.r00_execution_stage_ids.iter().any(|id| id == "R07")
+     }));
+-    for l in r02.supplemental_leaves.iter().filter(|l| l.basis_kind == crate::stage_map::BASIS_CLIENT_ONLY_STAGE_CONFLICT) {
++    for l in r02
++        .supplemental_leaves
++        .iter()
++        .filter(|l| l.basis_kind == crate::stage_map::BASIS_CLIENT_ONLY_STAGE_CONFLICT)
++    {
+         assert!(
+             l.evidence_command_refs.is_empty() && l.evidence_paths.is_empty(),
+             "{}: a BLOCKED conflict leaf must carry no pass-able evidence",
+Diff in /Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/xtask/src/verify/runner_tests.rs:1266:
+             l.id
+         );
+     }
+-    for l in r02.supplemental_leaves.iter().filter(|l| l.basis_kind != crate::stage_map::BASIS_CLIENT_ONLY_STAGE_CONFLICT) {
++    for l in r02
++        .supplemental_leaves
++        .iter()
++        .filter(|l| l.basis_kind != crate::stage_map::BASIS_CLIENT_ONLY_STAGE_CONFLICT)
++    {
+         assert!(
+             !l.evidence_command_refs.is_empty(),
+             "{}: an R02-share leaf must bind evidence commands",
+Diff in /Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/xtask/src/verify/runner_tests.rs:1274:
+         );
+         // R14-F01: every pass-able leaf carries the machine-checked cases
+         // that consume its original R00 assertions.
+-        let contract = l
+-            .assertion_contract
+-            .as_ref()
+-            .unwrap_or_else(|| panic!("{}: non-conflict leaf must declare an assertionContract", l.id));
++        let contract = l.assertion_contract.as_ref().unwrap_or_else(|| {
++            panic!(
++                "{}: non-conflict leaf must declare an assertionContract",
++                l.id
++            )
++        });
+         assert!(
+             l.evidence_command_refs.contains(&contract.producer_command),
+             "{}: the contract's producer must be one of the leaf's bound commands",
+Diff in /Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/xtask/src/verify/runner_tests.rs:1294:
+             l.id
+         );
+     }
+-    for l in r02.supplemental_leaves.iter().filter(|l| l.basis_kind == crate::stage_map::BASIS_FULL_ORIGINAL_BEHAVIOR) {
++    for l in r02
++        .supplemental_leaves
++        .iter()
++        .filter(|l| l.basis_kind == crate::stage_map::BASIS_FULL_ORIGINAL_BEHAVIOR)
++    {
+         assert_eq!(l.original_assertion_cases.len(), l.r00_assertions.len());
+         assert_ne!(
+             l.assertion_contract.as_ref().unwrap().producer_command,
+Diff in /Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/xtask/src/verify.rs:112:
+ /// it owns the leaf's original `assertions` list, the `due` line, and the
+ /// per-A-ID coverage relations (GAP/INDIRECT) that prove the base
+ /// scenarios alone cannot cover a leaf.
+-pub const R00_FEATURE_STAGE_ACCEPTANCE_PATH: &str = "docs/rust-tauri/R00/FEATURE_STAGE_ACCEPTANCE.json";
++pub const R00_FEATURE_STAGE_ACCEPTANCE_PATH: &str =
++    "docs/rust-tauri/R00/FEATURE_STAGE_ACCEPTANCE.json";
+ 
+ /// The R00-side expectation for one supplemental leaf (R14-F01: the FULL
+ /// original record, not just id+requirement). Every field is compared
+Diff in /Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/xtask/src/verify.rs:139:
+ /// leaves it binds to `stage`, sorted by id. Fails closed on every error:
+ /// an unreadable, unparsable, or structurally drifted ledger means leaf
+ /// coverage CANNOT be verified, which must abort the gate — never pass.
+-fn load_r00_supplemental_expectations(repo_root: &Path, stage: &str) -> Result<Vec<R00LeafExpectation>, String> {
++fn load_r00_supplemental_expectations(
++    repo_root: &Path,
++    stage: &str,
++) -> Result<Vec<R00LeafExpectation>, String> {
+     let path = repo_root.join(R00_ACCEPTANCE_MAP_PATH);
+     let text = std::fs::read_to_string(&path).map_err(|e| {
+         format!(
+Diff in /Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/xtask/src/verify.rs:149:
+             path.display()
+         )
+     })?;
+-    let value: Value = serde_json::from_str(&text)
+-        .map_err(|e| format!("R00 acceptance ledger {} is not valid JSON: {e}", path.display()))?;
++    let value: Value = serde_json::from_str(&text).map_err(|e| {
++        format!(
++            "R00 acceptance ledger {} is not valid JSON: {e}",
++            path.display()
++        )
++    })?;
+     let scenarios = value
+         .get("scenarios")
+         .and_then(Value::as_object)
+Diff in /Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/xtask/src/verify.rs:204:
+             .get(field)
+             .and_then(Value::as_str)
+             .map(str::to_string)
+-            .ok_or_else(|| {
+-                format!("R00 ledger {ledger} scenario {id:?} has no {field} string")
+-            })
++            .ok_or_else(|| format!("R00 ledger {ledger} scenario {id:?} has no {field} string"))
+     }
+     /// Reads one required string-array field of an R00 record.
+-    fn req_str_array(entry: &Value, field: &str, id: &str, ledger: &str) -> Result<Vec<String>, String> {
++    fn req_str_array(
++        entry: &Value,
++        field: &str,
++        id: &str,
++        ledger: &str,
++    ) -> Result<Vec<String>, String> {
+         entry
+             .get(field)
+             .and_then(Value::as_array)
+Diff in /Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/xtask/src/verify.rs:430:
+         // this is reached the invariant broke — fail closed, never pass.
+         return (
+             Vec::new(),
+-            "assertion contract missing (parser invariant violated — failing closed)"
+-                .to_string(),
++            "assertion contract missing (parser invariant violated — failing closed)".to_string(),
+         );
+     };
+     // The producer must have PASSED this run. (The refs check below already
+Diff in /Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/xtask/src/verify.rs:545:
+         let ok = recorded.get("ok").and_then(Value::as_bool);
+         let actual = recorded.get("actual").and_then(Value::as_i64);
+         let file_expect = recorded.get("expect").and_then(Value::as_i64);
+-        let case_ok = ok == Some(true)
+-            && actual == Some(pinned.expect)
+-            && file_expect == Some(pinned.expect);
++        let case_ok =
++            ok == Some(true) && actual == Some(pinned.expect) && file_expect == Some(pinned.expect);
+         if !case_ok {
+             failures.push(format!(
+                 "case {:?}: map pins expect {} but evidence records ok={:?} \
+Diff in /Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/xtask/src/verify.rs:627:
+             let pinned: Vec<&str> = leaf
+                 .assertion_contract
+                 .as_ref()
+-                .map(|contract| contract.cases.iter().map(|case| case.case.as_str()).collect())
++                .map(|contract| {
++                    contract
++                        .cases
++                        .iter()
++                        .map(|case| case.case.as_str())
++                        .collect()
++                })
+                 .unwrap_or_default();
+             let covered: Vec<&str> = leaf
+                 .original_assertion_cases
+Diff in /Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/xtask/src/verify.rs:636:
+                 .collect();
+             let coverage_complete = leaf.original_assertion_cases.len()
+                 == leaf.r00_assertions.len()
+-                && leaf.original_assertion_cases.iter().all(|group| !group.is_empty())
++                && leaf
++                    .original_assertion_cases
++                    .iter()
++                    .all(|group| !group.is_empty())
+                 && covered.len() == pinned.len()
+                 && covered.iter().all(|case| pinned.contains(case))
+-                && covered.iter().enumerate().all(|(index, case)| {
+-                    !covered[..index].contains(case)
+-                });
++                && covered
++                    .iter()
++                    .enumerate()
++                    .all(|(index, case)| !covered[..index].contains(case));
+             if !coverage_complete {
+                 return (
+                     "FAIL".to_string(),
+Diff in /Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/xtask/src/verify.rs:1526:
+         };
+         println!(
+             "xtask: verify-stage {} supplemental {} [{}] {}",
+-            map.stage,
+-            leaf.id,
+-            leaf.basis_kind,
+-            status
++            map.stage, leaf.id, leaf.basis_kind, status
+         );
+         match status.as_str() {
+             "PASS" => supplemental_pass += 1,
+Diff in /Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/xtask/src/verify.rs:1575:
+              after the pre-run cross-check — invariant violation, failing closed"
+         ));
+     }
+-    let supplemental_all_pass =
+-        supplemental_pass == map.supplemental_leaves.len() && map.supplemental_leaves.len() == r00_expected.len();
++    let supplemental_all_pass = supplemental_pass == map.supplemental_leaves.len()
++        && map.supplemental_leaves.len() == r00_expected.len();
+ 
+     let overall_pass = scenario_json.iter().all(|s| s["status"] == "PASS") && supplemental_all_pass;
+     let finished = crate::now_ms();

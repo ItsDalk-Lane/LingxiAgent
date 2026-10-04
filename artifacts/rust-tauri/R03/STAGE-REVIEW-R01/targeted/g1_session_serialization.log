@@ -1,0 +1,13 @@
+   Compiling lingxi-service v0.0.0 (/Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-service)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 2.48s
+     Running tests/session_serialization.rs (rust/target/debug/deps/session_serialization-f7d0d62800843354)
+
+running 5 tests
+test failed_tool_path_settles_and_returns_quotas ... ok
+test r03_a03_same_session_serializes_and_steers_per_frozen_semantics ... ok
+test r03_a04_cross_session_parallel_and_quota_release_on_cancel ... ok
+test leftover_steering_survives_into_the_next_run ... ok
+test quota_exhaustion_fails_loudly_and_releases_on_settle ... ok
+
+test result: ok. 5 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.75s
+

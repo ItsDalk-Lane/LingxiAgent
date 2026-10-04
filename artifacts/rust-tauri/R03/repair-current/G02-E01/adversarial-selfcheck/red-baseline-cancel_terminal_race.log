@@ -1,0 +1,71 @@
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.08s
+     Running tests/cancel_terminal_race.rs (target/debug/deps/cancel_terminal_race-7862bed29c7d76a7)
+
+running 11 tests
+test a_fire_after_the_driver_reached_cleaning_never_regresses_the_phase ... ok
+test concurrent_duplicate_fires_keep_the_first_reason_and_a_single_fired ... FAILED
+test cancel_accepted_before_the_terminal_claim_beats_every_terminal_shape ... ok
+test cancel_accepted_while_final_events_persist_beats_the_completed_terminal ... FAILED
+test cancel_at_the_no_provider_early_close_settles_cancelled ... FAILED
+test cancel_racing_the_finalize_transaction_is_too_late_not_accepted ... FAILED
+test started_without_receipt_journals_unknown_receipt_facts ... FAILED
+test cancel_at_the_intent_boundary_dispatches_no_new_external_call ... FAILED
+test cancel_after_the_committed_terminal_reports_already_terminal ... ok
+test cancel_at_the_started_boundary_dispatches_no_new_external_call ... ok
+test cancel_between_tool_iterations_stops_the_second_dispatch ... ok
+
+failures:
+
+---- concurrent_duplicate_fires_keep_the_first_reason_and_a_single_fired stdout ----
+
+thread 'concurrent_duplicate_fires_keep_the_first_reason_and_a_single_fired' (42840660) panicked at crates/lingxi-service/tests/cancel_terminal_race.rs:910:5:
+assertion `left == right` failed: exactly one Fired per run, however the callers interleave
+  left: 114
+ right: 96
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+
+---- cancel_accepted_while_final_events_persist_beats_the_completed_terminal stdout ----
+
+thread 'cancel_accepted_while_final_events_persist_beats_the_completed_terminal' (42840653) panicked at crates/lingxi-service/tests/cancel_terminal_race.rs:670:5:
+assertion `left == right` failed: cancel-before-claim must not complete
+  left: "completed"
+ right: "cancelled"
+
+---- cancel_at_the_no_provider_early_close_settles_cancelled stdout ----
+
+thread 'cancel_at_the_no_provider_early_close_settles_cancelled' (42840656) panicked at crates/lingxi-service/tests/cancel_terminal_race.rs:1106:5:
+assertion `left == right` failed: the providerless early close is subject to the same adjudication
+  left: "completed"
+ right: "cancelled"
+
+---- cancel_racing_the_finalize_transaction_is_too_late_not_accepted stdout ----
+
+thread 'cancel_racing_the_finalize_transaction_is_too_late_not_accepted' (42840659) panicked at crates/lingxi-service/tests/cancel_terminal_race.rs:835:5:
+a cancellation racing the in-flight finalize must never be reported Accepted: Accepted { run_id: "run_000001a0dcba6c00_000001", phase: Requested { reason: "user" } }
+
+---- started_without_receipt_journals_unknown_receipt_facts stdout ----
+
+thread 'started_without_receipt_journals_unknown_receipt_facts' (42840661) panicked at crates/lingxi-service/tests/cancel_terminal_race.rs:1199:5:
+assertion `left == right` failed
+  left: "failed"
+ right: "completed"
+
+---- cancel_at_the_intent_boundary_dispatches_no_new_external_call stdout ----
+
+thread 'cancel_at_the_intent_boundary_dispatches_no_new_external_call' (42840655) panicked at crates/lingxi-service/tests/cancel_terminal_race.rs:1011:5:
+assertion `left == right` failed
+  left: Started
+ right: Prepared
+
+
+failures:
+    cancel_accepted_while_final_events_persist_beats_the_completed_terminal
+    cancel_at_the_intent_boundary_dispatches_no_new_external_call
+    cancel_at_the_no_provider_early_close_settles_cancelled
+    cancel_racing_the_finalize_transaction_is_too_late_not_accepted
+    concurrent_duplicate_fires_keep_the_first_reason_and_a_single_fired
+    started_without_receipt_journals_unknown_receipt_facts
+
+test result: FAILED. 5 passed; 6 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.40s
+
+error: test failed, to rerun pass `-p lingxi-service --test cancel_terminal_race`

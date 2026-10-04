@@ -41,10 +41,11 @@ use std::path::{Path, PathBuf};
 use std::pin::Pin;
 use std::sync::Arc;
 
+use lingxi_kernel::model_exchange::ModelTurnInput;
 use lingxi_kernel::ports::ToolOutcome;
 use lingxi_kernel::ports::{
     ProviderDescriptor, ProviderTurn, ProviderTurnResult, StoragePort, ToolExecutionResult,
-    ToolRequest, TurnProviderPort,
+    ToolRequest, TurnDeltaSink, TurnProviderPort,
 };
 use lingxi_kernel::subagent::SessionPermissionMode;
 use lingxi_kernel::toolcatalog::{SchemaBudget, ToolRegistry, ToolTargetId};
@@ -87,6 +88,7 @@ fn final_turn(text: &str) -> ProviderTurn {
 
 fn tool_request(target: &str, args: serde_json::Value) -> ProviderTurn {
     ProviderTurn::ToolRequests {
+        content: Vec::new(),
         requests: vec![
             ToolRequest::from_effective_arguments(target, args, &budget())
                 .expect("effective request"),
@@ -126,8 +128,9 @@ impl TurnProviderPort for StepsProvider {
         &'a self,
         ctx: &'a RunContext,
         _call: &'a ModelCallId,
-        _turn: u32,
-        _input: &'a str,
+        _input: &'a ModelTurnInput,
+
+        _deltas: &'a dyn TurnDeltaSink,
     ) -> Pin<Box<dyn std::future::Future<Output = ProviderTurnResult> + Send + 'a>> {
         loop {
             let next = self

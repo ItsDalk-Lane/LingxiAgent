@@ -1,0 +1,44 @@
+   Compiling lingxi-service v0.0.0 (/private/tmp/lingxi-g04-redbase/rust/crates/lingxi-service)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 1.03s
+     Running tests/admission_dedup_consistency.rs (target/debug/deps/admission_dedup_consistency-9a04c825c923e96f)
+
+running 5 tests
+test r03_f05_c01_background_spawn_rejection_leaves_no_ghost_replay ... FAILED
+test r03_f05_c02_start_transaction_failure_is_compensated ... FAILED
+test r03_f05_c03_concurrent_same_key_between_reservation_and_commit ... FAILED
+test r03_f05_c04_post_side_effect_response_loss_never_reexecutes ... ok
+test r03_f05_c05_restart_same_key_is_an_explicit_contract_not_a_blind_redo ... FAILED
+
+failures:
+
+---- r03_f05_c01_background_spawn_rejection_leaves_no_ghost_replay stdout ----
+
+thread 'r03_f05_c01_background_spawn_rejection_leaves_no_ghost_replay' (43070658) panicked at crates/lingxi-service/tests/admission_dedup_consistency.rs:586:5:
+no ghost replay: the accepted run id must have a durable row (run_000001a0dcba6c00_000001)
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+
+---- r03_f05_c02_start_transaction_failure_is_compensated stdout ----
+
+thread 'r03_f05_c02_start_transaction_failure_is_compensated' (43070663) panicked at crates/lingxi-service/tests/admission_dedup_consistency.rs:638:5:
+no ghost replay: the retried run id must have a durable row (run_000001a0dcba6c00_000001)
+
+---- r03_f05_c03_concurrent_same_key_between_reservation_and_commit stdout ----
+
+thread 'r03_f05_c03_concurrent_same_key_between_reservation_and_commit' (43070672) panicked at crates/lingxi-service/tests/admission_dedup_consistency.rs:700:13:
+no half-committed fake result: run_000001a0dcba6c00_000001 has no durable row
+
+---- r03_f05_c05_restart_same_key_is_an_explicit_contract_not_a_blind_redo stdout ----
+
+thread 'r03_f05_c05_restart_same_key_is_an_explicit_contract_not_a_blind_redo' (43070682) panicked at crates/lingxi-service/tests/admission_dedup_consistency.rs:853:13:
+a post-restart binding recovery must be an explicit replay
+
+
+failures:
+    r03_f05_c01_background_spawn_rejection_leaves_no_ghost_replay
+    r03_f05_c02_start_transaction_failure_is_compensated
+    r03_f05_c03_concurrent_same_key_between_reservation_and_commit
+    r03_f05_c05_restart_same_key_is_an_explicit_contract_not_a_blind_redo
+
+test result: FAILED. 1 passed; 4 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.37s
+
+error: test failed, to rerun pass `-p lingxi-service --test admission_dedup_consistency`

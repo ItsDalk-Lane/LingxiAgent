@@ -1,0 +1,23 @@
+   Compiling lingxi-service v0.0.0 (/Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-service)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 3.39s
+     Running tests/r00_management_leaves.rs (rust/target/debug/deps/r00_management_leaves-a278d7618b48e1df)
+LINGXI_AUTH_REJECTED request_id=req-d3d3e1f4ff61afdc88f4bd045ecf94d3 method=GET path=/lingxi/v1/access/summary status=401 Unauthorized reason=missing_credential remote=127.0.0.1:55675
+LINGXI_AUTH_REJECTED request_id=req-5c51da3dc8afa6d4194ab7d6b0eaec1c method=PUT path=/lingxi/v1/access/account/profile status=401 Unauthorized reason=missing_credential remote=127.0.0.1:55680
+LINGXI_AUTH_REJECTED request_id=req-627db1e6bee2e747fe5b8ec2917c0c98 method=PUT path=/lingxi/v1/access/network status=401 Unauthorized reason=missing_credential remote=127.0.0.1:55683
+LINGXI_AUTH_REJECTED request_id=req-fe0b14d39b75c72acd605730dfd3b839 method=GET path=/lingxi/v1/access/mobile-qr.svg status=401 Unauthorized reason=missing_credential remote=127.0.0.1:55685
+LINGXI_AUTH_REJECTED request_id=req-592814f83a60a76ee4b31bfc33ccbf5a method=PUT path=/lingxi/v1/access/account/password status=401 Unauthorized reason=missing_credential remote=127.0.0.1:55691
+LINGXI_AUTH_REJECTED request_id=req-9efdef00784934d69550d4988d051002 method=DELETE path=/lingxi/v1/access/account/password status=401 Unauthorized reason=missing_credential remote=127.0.0.1:55699
+LINGXI_AUTH_REJECTED request_id=req-5fb7f377f7e03a4d8c835ecacc793de7 method=POST path=/lingxi/v1/access/mobile-credentials status=401 Unauthorized reason=missing_credential remote=127.0.0.1:55713
+LINGXI_AUTH_REJECTED request_id=req-ebb2bb32580941d9cd928ea57bb9f311 method=POST path=/lingxi/v1/access/desktop-credentials status=401 Unauthorized reason=missing_credential remote=127.0.0.1:55715
+LINGXI_AUTH_REJECTED request_id=req-85cc1d7bfc049a30e5e2f1f79f67cf82 method=GET path=/lingxi/v1/devices status=401 Unauthorized reason=missing_credential remote=127.0.0.1:55718
+LINGXI_AUTH_REJECTED request_id=req-65ad13e5f1803a089a10e8c9a02e4a7a method=GET path=/lingxi/v1/me status=401 Unauthorized reason=invalid_credential remote=127.0.0.1:55721
+LINGXI_AUTH_REJECTED request_id=req-e12a034d289c52457d992e689079408c method=POST path=/lingxi/v1/devices/credentials/cred_b76d9c43163bf43d452e5d61ddd7cd7c/revoke status=401 Unauthorized reason=missing_credential remote=127.0.0.1:55726
+LINGXI_AUTH_REJECTED request_id=req-225d1ee32e220151138931d494ca4eeb method=GET path=/lingxi/v1/me status=401 Unauthorized reason=invalid_credential remote=127.0.0.1:55760
+LINGXI_AUTH_REJECTED request_id=req-e169939e9b58e433f0934137eced2f44 method=POST path=/lingxi/v1/devices/device_7806383609f57efe8699aa8a60ba2eb4/revoke status=401 Unauthorized reason=missing_credential remote=127.0.0.1:55796
+LINGXI_AUTH_REJECTED request_id=req-913c3a9d8a4d289de3af1d94e325ac76 method=POST path=/lingxi/v1/devices/pairing-sessions status=401 Unauthorized reason=missing_credential remote=127.0.0.1:55798
+LINGXI_AUTH_REJECTED request_id=req-49d196625160f1d3bdc0f19d7293dd45 method=POST path=/lingxi/v1/devices/pairing-sessions/pair_qaBHugbxGPrXTcXIINdUPg/approve status=401 Unauthorized reason=missing_credential remote=127.0.0.1:55811
+
+thread 'r00_management_positive_and_negative_branches_on_real_service' (37515571) panicked at crates/lingxi-service/tests/r00_management_leaves.rs:1996:60:
+saved management file: Os { code: 2, kind: NotFound, message: "No such file or directory" }
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+error: test failed, to rerun pass `-p lingxi-service --test r00_management_leaves`

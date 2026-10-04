@@ -1,0 +1,8 @@
+   Compiling lingxi-service v0.0.0 (/Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-service)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 1.60s
+     Running tests/r00_management_leaves.rs (/private/tmp/lingxi-r02-r17-management-target/debug/deps/r00_management_leaves-84f34bf414f4f038)
+
+thread 'r00_management_positive_and_negative_branches_on_real_service' (37338805) panicked at crates/lingxi-service/tests/r00_management_leaves.rs:140:21:
+real service READY failed: channel closed; run result: Ok(Err(Bind { addr: 127.0.0.1:0, source: Os { code: 1, kind: PermissionDenied, message: "Operation not permitted" } }))
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+error: test failed, to rerun pass `-p lingxi-service --test r00_management_leaves`

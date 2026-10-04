@@ -1,0 +1,9 @@
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.08s
+     Running tests/r00_management_leaves.rs (target/debug/deps/r00_management_leaves-812df2ee793b5dda)
+
+running 1 test
+test r00_management_positive_and_negative_branches_on_real_service ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 33.12s
+
+exit: 0

@@ -1,0 +1,36 @@
+== P0 sanity: valid streams (harness proof) ==
+anthropic valid stream      -> Known(in=Some(25), out=Some(9), provenance=Reported)
+google valid stream         -> Known(in=Some(88), out=Some(19), provenance=Reported)
+
+== P1 anthropic streaming, contract-violating usage fragments ==
+anthropic stream negative output_tokens     -> Invalid(usage field /usage/output_tokens is negative (-5): a token count is never negative; the fact is marked invalid, never saturated)
+anthropic stream float output_tokens        -> Invalid(usage field /usage/output_tokens is a non-integer number (1.5): a token count is an integer; the fact is marked invalid, never rounded)
+anthropic stream string output_tokens       -> Invalid(usage field /usage/output_tokens is not a JSON number (string): a token count is never a string or container)
+anthropic stream negative input half   -> Invalid(usage field /usage/input_tokens is negative (-3): a token count is never negative; the fact is marked invalid, never saturated)
+
+== P2 google streaming, contract-violating usageMetadata ==
+google stream negative candidatesTokenCount   -> Invalid(usage field /usageMetadata/candidatesTokenCount is negative (-7): a token count is never negative; the fact is marked invalid, never saturated)
+google stream float promptTokenCount          -> Invalid(usage field /usageMetadata/promptTokenCount is a non-integer number (8.5): a token count is an integer; the fact is marked invalid, never rounded)
+google stream string candidatesTokenCount     -> Invalid(usage field /usageMetadata/candidatesTokenCount is not a JSON number (string): a token count is never a string or container)
+
+== P3 openai-completions streaming (control): same violations ==
+openai stream negative prompt_tokens     -> Invalid(usage field /usage/prompt_tokens is negative (-3): a token count is never negative; the fact is marked invalid, never saturated)
+openai stream float completion_tokens    -> Invalid(usage field /usage/completion_tokens is a non-integer number (5.5): a token count is an integer; the fact is marked invalid, never rounded)
+
+== P4 anthropic mixed: invalid fragment AFTER a valid one ==
+anthropic stream valid-then-invalid delta -> Invalid(usage field /usage/output_tokens is negative (-4): a token count is never negative; the fact is marked invalid, never saturated)
+
+== P5 Estimated-state ledger round-trip (doc §10 claims coverage) ==
+estimated round-trip -> usage_state preserved: true (basis Some(Estimated { basis: "probe-basis" }))
+
+== R02-A fix-regression: violating delta FIRST, then a valid one ==
+anthropic invalid-then-valid delta -> Invalid(usage field /usage/output_tokens is negative (-4): a token count is never negative; the fact is marked invalid, never saturated)
+
+== R02-B fix-regression: TWO violations (sticky first wins, still Invalid) ==
+anthropic two violations       -> Invalid(usage field /usage/output_tokens is negative (-4): a token count is never negative; the fact is marked invalid, never saturated)
+
+== R02-C fix-regression: google violation, then a valid final snapshot ==
+google invalid-then-valid       -> Invalid(usage field /usageMetadata/candidatesTokenCount is negative (-4): a token count is never negative; the fact is marked invalid, never saturated)
+
+== P6 FinalSnapshot fold: identical numbers, different provenance ==
+FinalSnapshot fold reported-then-estimated same numbers -> Err("two different final usage snapshots for one request ((Some(10), Some(3)) then (Some(10), Some(3))): a conflict is never merged")

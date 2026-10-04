@@ -1,0 +1,17 @@
+   Compiling lingxi-protocol v0.0.0 (/Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-protocol)
+   Compiling lingxi-kernel v0.0.0 (/Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-kernel)
+   Compiling lingxi-adapters v0.0.0 (/Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-adapters)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 2.11s
+     Running tests/storage_transactions.rs (target/debug/deps/storage_transactions-55eb35e51f13d372)
+
+running 7 tests
+test bounded_queue_reports_full_instead_of_dropping ... ok
+test wal_mode_is_negotiated_and_reported ... ok
+test read_only_data_dir_is_a_loud_open_failure ... ok
+test graceful_close_checkpoints_and_data_survives_restart ... ok
+test finalize_is_idempotent_and_conflicts_are_diagnosed ... ok
+test a07_crash_windows_distinguish_commit_boundaries ... ok
+test busy_timeout_is_explicit_not_a_hang ... ok
+
+test result: ok. 7 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.20s
+

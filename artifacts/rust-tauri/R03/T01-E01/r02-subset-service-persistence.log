@@ -1,0 +1,10 @@
+   Compiling lingxi-service v0.0.0 (/Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-service)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.53s
+     Running tests/service_persistence.rs (target/debug/deps/service_persistence-b0b0fe761f67a30e)
+
+running 2 tests
+test broken_database_is_a_loud_startup_failure ... ok
+test execute_persists_runs_that_survive_a_full_restart ... ok
+
+test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.14s
+

@@ -1,0 +1,3 @@
+    Finished `dev` profile [unoptimized + debuginfo] target(s) in 0.04s
+     Running `rust/target/debug/xtask verify-stage R05 --evidence artifacts/rust-tauri/R05/REVIEW-T08/n05-stale-evidence/verify-R05`
+error: evidence root /Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/REVIEW-T08/n05-stale-evidence/verify-R05 is not empty; preserving its prior evidence

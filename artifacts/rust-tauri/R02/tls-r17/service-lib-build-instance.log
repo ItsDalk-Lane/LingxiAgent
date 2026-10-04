@@ -1,0 +1,34 @@
+   Compiling lingxi-service v0.0.0 (/Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-service)
+error[E0425]: cannot find function `valid_device_kind` in this scope
+   --> crates/lingxi-service/src/auth.rs:781:9
+    |
+781 |     if !valid_device_kind(device_kind) {
+    |         ^^^^^^^^^^^^^^^^^ not found in this scope
+
+error[E0425]: cannot find function `valid_device_kind` in this scope
+    --> crates/lingxi-service/src/auth.rs:1000:13
+     |
+1000 |         if !valid_device_kind(device_kind) {
+     |             ^^^^^^^^^^^^^^^^^ not found in this scope
+
+error[E0063]: missing field `transport` in initializer of `instance::InstanceRecord`
+   --> crates/lingxi-service/src/instance.rs:643:20
+    |
+643 |         let fake = InstanceRecord {
+    |                    ^^^^^^^^^^^^^^ missing `transport`
+
+error[E0063]: missing field `transport` in initializer of `instance::InstanceRecord`
+   --> crates/lingxi-service/src/instance.rs:692:20
+    |
+692 |         let fake = InstanceRecord {
+    |                    ^^^^^^^^^^^^^^ missing `transport`
+
+error[E0063]: missing field `transport` in initializer of `instance::InstanceRecord`
+   --> crates/lingxi-service/src/instance.rs:760:23
+    |
+760 |         let foreign = InstanceRecord {
+    |                       ^^^^^^^^^^^^^^ missing `transport`
+
+Some errors have detailed explanations: E0063, E0425.
+For more information about an error, try `rustc --explain E0063`.
+error: could not compile `lingxi-service` (lib test) due to 5 previous errors

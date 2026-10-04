@@ -1,0 +1,12 @@
+# R03-T05 verification commands (all via rustup 1.98.1 + --locked; CARGO_TARGET_DIR=/tmp/r03-t05-target)
+generated_utc: 2026-09-29T06:55:22Z
+
+1. cargo fmt --all -- --check                                    EXIT=0 (after cargo fmt --all applied; final check clean)
+2. cargo clippy --workspace --all-targets --locked -- -D warnings EXIT=0
+3. cargo test --workspace --locked                                EXIT=0  (558 passed / 0 failed / 54 suites; T04=539/52, +19)
+4. cargo run -p xtask -- check-contracts                         EXIT=0  (API_COMPAT_MATRIX 626 entries drift-free)
+5. cargo run -p xtask -- check-boundaries                        EXIT=0  (DEP-07/08/D5 PASS)
+
+verify-stage R03: NOT RUN — stage map not registered until R03-T08 (R03-SUP-01); not faked.
+
+Non-gate probe: bash scripts/rust-tauri/r02_t04_storage_tx.sh <probe-dir> EXIT=1 at S4 (pre-existing T04 F-1: hardcoded version==1 assertions; S1-S3 PASS; S4 dump shows on-disk receipts == compiled-in for V1/V2/V3, userVersion==3 — registration/fix deferred to T08 per dispatch).

@@ -1,0 +1,14 @@
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.08s
+     Running tests/recovery_startup_scan.rs (target/debug/deps/recovery_startup_scan-c8ab621d61a48c97)
+
+running 7 tests
+test startup_scan_resolves_a_crashed_running_run_with_explainable_interruption ... ok
+test explicit_recovery_pass_replays_idempotently_after_the_scan ... ok
+test waiting_approval_run_walks_the_legal_path_to_interruption ... ok
+test submissions_work_normally_after_a_recovery_scan ... ok
+test startup_scan_completes_cancelling_runs_and_respects_terminal_rows ... ok
+test startup_scan_is_idempotent_across_double_restarts ... ok
+test startup_scan_classifies_readonly_and_idempotent_unknowns ... ok
+
+test result: ok. 7 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.45s
+

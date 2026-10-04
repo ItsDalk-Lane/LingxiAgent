@@ -1,0 +1,2587 @@
+{
+    "schemaVersion": 1,
+    "resultVersion": "lingxi.xtask.verify-stage.v1",
+    "stage": "R02",
+    "defaultTimeoutSecs": 1200,
+    "supplementalCoverageNote": "R14-F01\uff082026-09-28\uff0c\u4fee\u590d R14\uff1b\u63a5\u66ff R13-F01 \u7684\u95e8\u7981\u5f62\u6001\uff09\uff1a\u672c\u952e\u4e3a\u5386\u53f2\u6ce8\u8bb0\uff1b\u672c\u56fe\u7684\u53ef\u6267\u884c\u95e8\u7981\u73b0\u7531 commands\uff08R14 \u65f6 13\uff0cR17 \u63d0\u524d\u7eb3\u5165\u5ba2\u6237\u7aef\u540e 14\uff09+ scenarios\uff0816 \u57fa\u7840 REQUIRED\uff09+ supplementalLeafScenarios\uff0834 \u9879 R00 REQUIRED_SUPPLEMENTAL \u8865\u5145\u53f6\u573a\u666f\uff0c\u672c\u56fe\u6b63\u5f0f\u95e8\u7981\u6570\u636e\uff09\u7ec4\u6210\u2014\u2014stage_map.rs \u89e3\u6790\u8be5\u8282\uff08\u7a7a\u8282/\u672a\u77e5 basisKind/\u51b2\u7a81\u53f6\u7ed1\u8bc1\u636e/\u975e\u51b2\u7a81\u53f6\u65e0\u8bc1\u636e\u547d\u4ee4/\u975e\u51b2\u7a81\u53f6\u7f3a assertionContract/\u955c\u50cf\u5b57\u6bb5\u7f3a\u5931\u5747\u4e3a\u786c\u89e3\u6790\u9519\u8bef\uff09\uff0cverify-stage \u8fd0\u884c\u65f6\u5148\u4e0e docs/rust-tauri/R00/ACCEPTANCE_MAP.json \u53ca docs/rust-tauri/R00/FEATURE_STAGE_ACCEPTANCE.json \u6309 id \u96c6\u5408\u4e0e\u9010\u53f6\u5168\u5b57\u6bb5\uff08featureId/kind/requirement/task_ids/execution_stage_ids/ledger_status/result_ids/test_ids/then/assertions/due \u7684 r00* \u955c\u50cf\uff09\u5168\u7b49\u6838\u5bf9\uff08\u4efb\u4f55\u7f3a\u5931\u3001\u591a\u4f59\u6216\u6f02\u79fb\u5747\u786c\u5931\u8d25\uff09\uff0c\u518d\u9010\u9879 roll-up\uff1a\u8bc1\u636e\u547d\u4ee4\u672a\u5168\u90e8\u901a\u8fc7\u3001\u5fc5\u9700\u8981\u8bc1\u636e\u6587\u4ef6\u7f3a\u5931\u3001\u9636\u6bb5\u8fb9\u754c\u51b2\u7a81\uff08client_only_stage_boundary_conflict\uff0cR14 \u65f6 2 \u9879\uff1aR00-T02-LA-B8A1AD32A8E1 / R00-T02-LA-32FFEC05BAA7 \u56fa\u5b9a BLOCKED\uff1bR17 \u7528\u6237\u6388\u6743\u63d0\u524d\u5b9e\u65bd\u5176\u5b8c\u6574\u5ba2\u6237\u7aef\u539f\u884c\u4e3a\u540e\u6539\u7531\u4e13\u5c5e\u751f\u4ea7\u8005\u9010\u6848\u5b9e\u6d4b\uff09\u3001\u6216 assertionContract \u6848\u4f8b\u5b9e\u9645\u503c\u4e0e\u539f\u65ad\u8a00\u671f\u671b\u4e0d\u7b26\uff0c\u90fd\u4f7f overall \u4e0d\u80fd PASS\u3002R14-F01 \u5173\u95ed\u7684\u4e09\u6761\u5047\u7eff\u8def\u5f84\uff1a(1) \u6bcf\u53f6 r00* \u955c\u50cf\u5b57\u6bb5\u7531\u95e8\u7981\u4e0e R00 \u4e24\u8d26\u672c\u9010\u5b57\u6838\u5bf9\u2014\u2014\u9519\u7ed1 feature/\u8d23\u4efb/\u4efd\u989d\u5728\u547d\u4ee4\u8fd0\u884c\u524d\u5373\u786c\u5931\u8d25\uff1b(2) \u6bcf\u4e2a\u975e\u51b2\u7a81\u53f6\u5fc5\u987b\u58f0\u660e assertionContract\uff08\u751f\u4ea7\u8005\u547d\u4ee4 + \u8bc1\u636e\u6587\u4ef6 + \u6848\u4f8b\u671f\u671b\u503c\uff09\uff0cverify-stage \u89e3\u6790\u8bc1\u636e JSON \u5e76\u6838\u5bf9\u6bcf\u4e2a\u6848\u4f8b\u7684\u5b9e\u9645\u503c\uff08actual==expect \u4e14\u6587\u4ef6\u5185 expect \u4e0e\u56fe\u9489\u671f\u671b\u4e00\u81f4\uff09\u2014\u2014\u547d\u4ee4 exit 0 \u4e0d\u518d\u662f\u53f6 PASS \u7684\u5145\u5206\u6761\u4ef6\uff0c\u7968\u636e\u53f6 R00-T02-LA-5816DA563ED8 \u7684\u300c\u65e0\u4e3b\u4f53 403\u300d\u539f\u65ad\u8a00\u7531\u670d\u52a1\u4fa7\u4fee\u590d\uff08\u5bf9\u9f50 incumbent server/routes/ws-auth.ts\uff09+ \u811a\u672c\u65ad\u8a00 403 + \u95e8\u7981\u673a\u5668\u6d88\u8d39\u4e09\u91cd\u95ed\u73af\uff1b(3) sessions-list \u53f6 R00-T02-LA-200D4E5D52C9 \u7684\u4e13\u5c5e\u77e9\u9635\u6587\u4ef6\u73b0\u5728\u6709\u6ce8\u518c\u751f\u4ea7\u8005\uff08r02_t03_auth_matrix.sh sessions-list \u6bb5\uff09\u4e14\u95e8\u7981\u6838\u9a8c\u5176\u5185\u5bb9\u5951\u7ea6\uff0c\u4e0d\u518d\u4f9d\u8d56\u6587\u4ef6\u5b58\u5728\u6027\u3002R17 \u5ba2\u6237\u7aef\u3001\u7ba1\u7406\u53ca\u9759\u6001\u9875\u4e13\u5c5e\u8bc1\u636e\u5df2\u628a commands \u589e\u81f3 18 \u4e2a\uff1b16 \u57fa\u7840 REQUIRED \u573a\u666f\u4e0d\u53d8\uff1b\u7528\u6237\u5df2\u6388\u6743\u628a R07-T09 \u7684\u539f\u59cb\u5ba2\u6237\u7aef/UI \u5b8c\u6574\u884c\u4e3a\u63d0\u524d\u7eb3\u5165 R02\uff1b34 \u9879 R02/R07 \u8d23\u4efb\u62c6\u8d26\u89c1 docs/rust-tauri/R02/R02_ACCEPTANCE_LEDGER.json supplemental_leaf_coverage\u3002",
+    "supplementalSemanticLimit": "R15 \u5386\u53f2\u7f3a\u9677\uff1a21 \u9879\u539f\u672c\u53ea\u7528\u901a\u7528\u8ba4\u8bc1\u72b6\u6001\u7801\u652f\u6491\uff0c\u65e0\u6cd5\u8bc1\u660e\u5404\u81ea\u539f\u884c\u4e3a\u3002R17 \u5f53\u524d\u56fe\u5df2\u7ed9 2 \u9879\u5ba2\u6237\u7aef\u300114 \u9879\u7ba1\u7406\u548c 2 \u9879\u9759\u6001\u7f51\u9875\u53f6\u767b\u8bb0\u9010\u6761\u539f\u65ad\u8a00\u6848\u4f8b\u53ca\u72ec\u7acb\u751f\u4ea7\u8005\uff0c\u5171 18 \u9879 full_original_behavior \u5b9a\u4e49\uff1b\u5176\u4f59 16 \u53f6\u4ecd\u5c40\u90e8 BLOCKED\uff087 protocol_basis\u30017 auth_primitive_only\u30012 route_basis_present_static\uff09\u3002\u5b9a\u4e49\u4e0d\u7b49\u4e8e\u9636\u6bb5 PASS\uff1a\u5f53\u524d CLI help/Sharing \u72ec\u7acb\u751f\u4ea7\u8005 7/7 \u4e8e\u5176\u8fd0\u884c\u5feb\u7167 PASS\uff0c\u4f46\u5b8c\u6574 Gate \u672a\u6267\u884c\uff1b\u7ba1\u7406\u539f 58 \u6848\u4f8b\u66fe\u5728\u65e7\u6e90\u7801\u5feb\u7167 PASS\uff1b\u73b0\u9759\u6001\u65b0\u589e\u5ba1\u8ba1\u8def\u5f84\u6545\u969c\u8d1f\u9762\u6848\u4f8b\uff0c\u95e8\u7981\u5171 60 \u6848\u4f8b\u4e14\u65b0\u7248\u5c1a\u672a\u8fd0\u884c\u3002\u5f53\u524d\u771f TCP \u590d\u8dd1\u5728 bind \u65f6\u906d PermissionDenied\u30010 \u6848\u4f8b\uff0c\u72b6\u6001 BLOCKED\uff1b\u9759\u6001\u9875\u771f TCP \u540c\u53d7\u8be5\u5e73\u53f0\u9650\u5236\uff0c\u5148\u524d\u4e24\u8f6e\u4ec5\u6848\u4f8b\u672c\u4f53\u901a\u8fc7\u800c\u6e90\u7801\u6458\u8981\u6f02\u79fb\u3001\u751f\u4ea7\u8005 FAIL\u3002\u7981\u6b62\u7b49\u6548\u91cd\u8bd5\u3002CLI \u804a\u5929\u6a21\u578b/\u5de5\u5177\u6d41\u3001\u79fb\u52a8\u5f15\u5bfc\u6743\u5a01\u6e90\u7b49\u539f\u65ad\u8a00\u4ecd\u672a\u95ed\u5408\u300234 \u539f\u53f6\u5747\u4fdd\u6301 REQUIRED\uff0cR00 \u5408\u540c\u4e0e R02/R07 \u53cc\u5f52\u5c5e\u4e0d\u53d8\uff1b\u5408\u6cd5\u5168 Gate\u3001\u72ec\u7acb\u9a8c\u6536\u3001\u5c01\u5370\u524d\u4e0d\u5f97\u5173\u95ed R02\u3002",
+    "supplementalLeafScenarios": [
+        {
+            "id": "R00-T02-LA-D3710D637C19",
+            "featureId": "F-D20-CLI-CLI-CHAT-D3710D",
+            "requirement": "REQUIRED_SUPPLEMENTAL",
+            "r00Kind": "supplemental",
+            "r00TaskIds": [
+                "R02-T03",
+                "R07-T09"
+            ],
+            "r00ExecutionStageIds": [
+                "R02",
+                "R07"
+            ],
+            "r00LedgerStatus": "SPECIFIED_NOT_EXECUTED",
+            "r00ResultIds": [],
+            "r00TestIds": [],
+            "r00Then": "\u9009\u62e9\u6216\u521b\u5efa\u4f1a\u8bdd\u540e\u901a\u8fc7 WS \u63d0\u4ea4\u6d88\u606f\uff0c\u7ec8\u7aef\u6d41\u5f0f\u663e\u793a\u56de\u590d\u548c\u5de5\u5177\u8fdb\u5ea6",
+            "r00Assertions": [
+                "\u9009\u62e9\u6216\u521b\u5efa\u4f1a\u8bdd\u540e\u901a\u8fc7 WS \u63d0\u4ea4\u6d88\u606f\uff0c\u7ec8\u7aef\u6d41\u5f0f\u663e\u793a\u56de\u590d\u548c\u5de5\u5177\u8fdb\u5ea6",
+                "\u8fde\u63a5/\u8eab\u4efd\u5931\u8d25\u8fd4\u56de\u975e\u96f6\uff1b\u9519\u4f1a\u8bdd\u5e27\u4e0d\u663e\u793a\uff0cCtrl+C \u53ea\u53d6\u6d88\u5f53\u524d stream"
+            ],
+            "r00Due": "R00-T07 \u5efa\u7acb\u6b63\u5f0f\u8d26\u672c\u65f6\u767b\u8bb0\uff1b\u6700\u8fdf\u5728\u6240\u5217\u5b9e\u65bd Task \u7684\u9636\u6bb5\u9a8c\u6536\u524d\u5b8c\u6210\u5e76\u6267\u884c",
+            "assertionContract": {
+                "producerCommand": "a05_a06_auth_matrix",
+                "evidencePath": "{EVIDENCE}/A05_A06/leaf-cases.json",
+                "cases": [
+                    {
+                        "case": "a05-positive-control-owner-execute",
+                        "expect": 200
+                    },
+                    {
+                        "case": "a05-no-credential-execute",
+                        "expect": 401
+                    },
+                    {
+                        "case": "ws-ticket-legit-origin-upgrade",
+                        "expect": 101
+                    },
+                    {
+                        "case": "ws-session-read-owner",
+                        "expect": 1
+                    }
+                ]
+            },
+            "basisKind": "protocol_basis",
+            "r02Share": "\u8ba4\u8bc1 WS/execute \u63d0\u4ea4\u4e0e\u6709\u5e8f\u4e8b\u4ef6\u6d41\u534f\u8bae\u9762\uff08A05/A06/A09/A10/A15 \u6240\u8bc1\u5bb6\u65cf\uff1b\u5f53\u524d\u5019\u9009\u672a\u6267\u884c\uff09",
+            "r07Share": "\u7ec8\u7aef\u804a\u5929\u5ba2\u6237\u7aef\uff1a\u6d41\u5f0f\u663e\u793a\u56de\u590d\u4e0e\u5de5\u5177\u8fdb\u5ea6\u3001Ctrl+C \u53ea\u53d6\u6d88\u5f53\u524d stream\u3001\u8fde\u63a5/\u8eab\u4efd\u5931\u8d25\u975e\u96f6\u9000\u51fa",
+            "evidenceRequired": "A05/A06 \u8ba4\u8bc1\u77e9\u9635\u771f\u5b9e\u6267\u884c\u8bc1\u636e + WS/exec \u8ba4\u8bc1\u6b63\u8d1f\u8def\u5f84\u6267\u884c\u8bb0\u5f55",
+            "evidenceCommandRefs": [
+                "a05_a06_auth_matrix",
+                "a09_a10_events_matrix",
+                "a15_full_chain"
+            ]
+        },
+        {
+            "id": "R00-T02-LA-3B86332B042C",
+            "featureId": "F-D20-CLI-CLI-CONTINUE-3B8633",
+            "requirement": "REQUIRED_SUPPLEMENTAL",
+            "r00Kind": "supplemental",
+            "r00TaskIds": [
+                "R02-T03",
+                "R07-T09"
+            ],
+            "r00ExecutionStageIds": [
+                "R02",
+                "R07"
+            ],
+            "r00LedgerStatus": "SPECIFIED_NOT_EXECUTED",
+            "r00ResultIds": [],
+            "r00TestIds": [],
+            "r00Then": "\u89e3\u6790\u76ee\u6807\u4f1a\u8bdd\u540e\u6062\u590d\u5176\u5386\u53f2\u5e76\u53ef\u7ee7\u7eed\u63d0\u4ea4\uff0c\u7ec8\u7aef\u663e\u793a\u8be5\u4f1a\u8bdd\u56de\u590d",
+            "r00Assertions": [
+                "\u89e3\u6790\u76ee\u6807\u4f1a\u8bdd\u540e\u6062\u590d\u5176\u5386\u53f2\u5e76\u53ef\u7ee7\u7eed\u63d0\u4ea4\uff0c\u7ec8\u7aef\u663e\u793a\u8be5\u4f1a\u8bdd\u56de\u590d",
+                "\u4f1a\u8bdd\u4e0d\u5b58\u5728\u6216\u8de8\u6743\u9650\u65f6\u62d2\u7edd\uff0c\u4e0d\u6084\u6084\u65b0\u5efa\u6216\u4e32\u5230\u5176\u4ed6\u4f1a\u8bdd"
+            ],
+            "r00Due": "R00-T07 \u5efa\u7acb\u6b63\u5f0f\u8d26\u672c\u65f6\u767b\u8bb0\uff1b\u6700\u8fdf\u5728\u6240\u5217\u5b9e\u65bd Task \u7684\u9636\u6bb5\u9a8c\u6536\u524d\u5b8c\u6210\u5e76\u6267\u884c",
+            "assertionContract": {
+                "producerCommand": "a05_a06_auth_matrix",
+                "evidencePath": "{EVIDENCE}/A05_A06/leaf-cases.json",
+                "cases": [
+                    {
+                        "case": "a05-sessions-list-owner",
+                        "expect": 200
+                    },
+                    {
+                        "case": "a05-cross-principal-read",
+                        "expect": 403
+                    },
+                    {
+                        "case": "a05-forged-session-id",
+                        "expect": 404
+                    }
+                ]
+            },
+            "basisKind": "protocol_basis",
+            "r02Share": "\u8ba4\u8bc1\u4f1a\u8bdd\u8eab\u4efd\u4e0e\u5386\u53f2\u8bfb\u53d6\u9762\uff08sessions \u6309 principal \u4f5c\u7528\u57df\uff1b\u5f53\u524d\u5019\u9009\u672a\u6267\u884c\uff09",
+            "r07Share": "CLI \u7eed\u63a5\u547d\u4ee4\uff1a\u76ee\u6807\u4f1a\u8bdd\u89e3\u6790\u3001\u5386\u53f2\u6062\u590d\u663e\u793a\u3001\u4f1a\u8bdd\u4e0d\u5b58\u5728/\u8de8\u6743\u9650\u62d2\u7edd\u4e14\u4e0d\u6084\u6084\u65b0\u5efa",
+            "evidenceRequired": "A05/A06 \u8ba4\u8bc1\u77e9\u9635\u771f\u5b9e\u6267\u884c\u8bc1\u636e + \u8ba4\u8bc1\u4f1a\u8bdd\u8bfb\u53d6\u6b63\u8d1f\u8def\u5f84\u6267\u884c\u8bb0\u5f55",
+            "evidenceCommandRefs": [
+                "a05_a06_auth_matrix"
+            ]
+        },
+        {
+            "id": "R00-T02-LA-B8A1AD32A8E1",
+            "featureId": "F-D20-CLI-CLI-HELP-B8A1AD",
+            "requirement": "REQUIRED_SUPPLEMENTAL",
+            "r00Kind": "supplemental",
+            "r00TaskIds": [
+                "R02-T03",
+                "R07-T09"
+            ],
+            "r00ExecutionStageIds": [
+                "R02",
+                "R07"
+            ],
+            "r00LedgerStatus": "SPECIFIED_NOT_EXECUTED",
+            "r00ResultIds": [],
+            "r00TestIds": [],
+            "r00Then": "\u6253\u5370\u547d\u4ee4\u4e0e\u53c2\u6570\u8bf4\u660e\u5e76\u4ee5 0 \u9000\u51fa",
+            "r00Assertions": [
+                "\u6253\u5370\u547d\u4ee4\u4e0e\u53c2\u6570\u8bf4\u660e\u5e76\u4ee5 0 \u9000\u51fa",
+                "\u672a\u77e5\u53c2\u6570\u6253\u5370\u9519\u8bef\u548c\u5e2e\u52a9\u5e76\u4ee5 1 \u9000\u51fa\uff1b\u4e0d\u542f\u52a8\u670d\u52a1"
+            ],
+            "r00Due": "R00-T07 \u5efa\u7acb\u6b63\u5f0f\u8d26\u672c\u65f6\u767b\u8bb0\uff1b\u6700\u8fdf\u5728\u6240\u5217\u5b9e\u65bd Task \u7684\u9636\u6bb5\u9a8c\u6536\u524d\u5b8c\u6210\u5e76\u6267\u884c",
+            "assertionContract": {
+                "producerCommand": "supplemental_client_matrix",
+                "evidencePath": "{EVIDENCE}/CLIENT/leaf-cases.json",
+                "cases": [
+                    {
+                        "case": "cli-help-exit0-no-start",
+                        "expect": 1
+                    },
+                    {
+                        "case": "cli-unknown-arg-exit1-no-start",
+                        "expect": 1
+                    },
+                    {
+                        "case": "cli-serve-unknown-arg-exit1-no-start",
+                        "expect": 1
+                    }
+                ]
+            },
+            "originalAssertionCases": [
+                [
+                    "cli-help-exit0-no-start"
+                ],
+                [
+                    "cli-unknown-arg-exit1-no-start",
+                    "cli-serve-unknown-arg-exit1-no-start"
+                ]
+            ],
+            "basisKind": "full_original_behavior",
+            "r02Share": "\u7528\u6237\u5df2\u6388\u6743\u628a R07 \u5ba2\u6237\u7aef\u884c\u4e3a\u63d0\u524d\u7eb3\u5165 R02\uff1a\u672c\u9636\u6bb5\u8fd0\u884c\u771f\u5b9e CLI \u5b50\u8fdb\u7a0b\uff0c\u9010\u6848\u6838\u5e2e\u52a9/\u9519\u8bef/\u9000\u51fa\u7801\u548c\u5408\u6210\u6570\u636e\u6839\u65e0\u670d\u52a1\u542f\u52a8\uff1b\u539f R00 \u53cc\u9636\u6bb5\u6807\u6ce8\u4e0d\u6539",
+            "r07Share": "\u539f\u6392 R07-T09 \u7684\u5b8c\u6574 CLI help \u884c\u4e3a\u5728 R02 \u63d0\u524d\u5b9e\u6d4b\uff1b\u540e\u7eed R07 \u4ecd\u987b\u6838\u65b0\u5ba2\u6237\u7aef\u96c6\u6210\uff0c\u4e0d\u590d\u7528\u65e7\u5019\u9009\u8bc1\u636e",
+            "evidenceRequired": "\u672c\u8f6e supplemental_client_matrix \u771f\u5b50\u8fdb\u7a0b\u539f\u59cb stdout/stderr/exit\u3001\u5408\u6210 home \u524d\u540e\u6e05\u5355\u3001\u65e0\u5b58\u6d3b\u670d\u52a1\u8fdb\u7a0b\u7ec4\u4e0e CLI \u6b63\u53cd\u6848\u4f8b\uff1b\u4e24\u6761 R00 \u539f\u65ad\u8a00\u6309 originalAssertionCases \u5168\u8986\u76d6",
+            "evidenceCommandRefs": [
+                "supplemental_client_matrix"
+            ],
+            "evidencePaths": [
+                "{EVIDENCE}/CLIENT/summary.json"
+            ]
+        },
+        {
+            "id": "R00-T02-LA-1B09760C2B1C",
+            "featureId": "F-D20-CLI-CLI-SERVE-1B0976",
+            "requirement": "REQUIRED_SUPPLEMENTAL",
+            "r00Kind": "supplemental",
+            "r00TaskIds": [
+                "R02-T03",
+                "R07-T09"
+            ],
+            "r00ExecutionStageIds": [
+                "R02",
+                "R07"
+            ],
+            "r00LedgerStatus": "SPECIFIED_NOT_EXECUTED",
+            "r00ResultIds": [],
+            "r00TestIds": [],
+            "r00Then": "\u4ee5\u524d\u53f0\u670d\u52a1\u8fdb\u7a0b\u8fd0\u884c\uff0c\u4fdd\u7559\u6307\u5b9a channel \u4e0e\u6570\u636e\u964d\u7ea7\u7ea6\u675f",
+            "r00Assertions": [
+                "\u4ee5\u524d\u53f0\u670d\u52a1\u8fdb\u7a0b\u8fd0\u884c\uff0c\u4fdd\u7559\u6307\u5b9a channel \u4e0e\u6570\u636e\u964d\u7ea7\u7ea6\u675f",
+                "\u542f\u52a8/\u6570\u636e\u7248\u672c\u5931\u8d25\u7ed9\u9519\u8bef\uff0c\u4e0d\u5077\u5077\u5207\u6362\u6570\u636e\u76ee\u5f55"
+            ],
+            "r00Due": "R00-T07 \u5efa\u7acb\u6b63\u5f0f\u8d26\u672c\u65f6\u767b\u8bb0\uff1b\u6700\u8fdf\u5728\u6240\u5217\u5b9e\u65bd Task \u7684\u9636\u6bb5\u9a8c\u6536\u524d\u5b8c\u6210\u5e76\u6267\u884c",
+            "assertionContract": {
+                "producerCommand": "a01_smoke",
+                "evidencePath": "{EVIDENCE}/A01/a01-leaf-cases.json",
+                "cases": [
+                    {
+                        "case": "a01-build-locked-offline",
+                        "expect": 1
+                    },
+                    {
+                        "case": "a01-deptree-desktop-free",
+                        "expect": 1
+                    },
+                    {
+                        "case": "a01-service-start-ready",
+                        "expect": 1
+                    },
+                    {
+                        "case": "a01-health-200",
+                        "expect": 200
+                    },
+                    {
+                        "case": "a01-sigterm-clean-exit-0",
+                        "expect": 0
+                    },
+                    {
+                        "case": "a01-no-leftover-children",
+                        "expect": 1
+                    },
+                    {
+                        "case": "a01-port-closed-after-shutdown",
+                        "expect": 1
+                    },
+                    {
+                        "case": "a01-startup-failure-no-ready",
+                        "expect": 1
+                    },
+                    {
+                        "case": "a01-newer-data-epoch-refused",
+                        "expect": 1
+                    },
+                    {
+                        "case": "a01-newer-data-epoch-explicit-error",
+                        "expect": 1
+                    },
+                    {
+                        "case": "a01-newer-data-epoch-no-root-switch",
+                        "expect": 1
+                    },
+                    {
+                        "case": "a01-newer-env-data-epoch-refused",
+                        "expect": 1
+                    },
+                    {
+                        "case": "a01-newer-env-data-epoch-explicit-error",
+                        "expect": 1
+                    },
+                    {
+                        "case": "a01-newer-env-data-epoch-no-root-switch",
+                        "expect": 1
+                    },
+                    {
+                        "case": "a01-newer-config-data-epoch-refused",
+                        "expect": 1
+                    },
+                    {
+                        "case": "a01-newer-config-data-epoch-explicit-error",
+                        "expect": 1
+                    },
+                    {
+                        "case": "a01-newer-config-data-epoch-no-root-switch",
+                        "expect": 1
+                    }
+                ]
+            },
+            "basisKind": "protocol_basis",
+            "r02Share": "\u524d\u53f0\u670d\u52a1\u8fdb\u7a0b\u672c\u4f53\u4e0e\u914d\u7f6e/\u5b9e\u4f8b\u8fb9\u754c\uff08A01\u2013A03 \u5bb6\u65cf\uff1b\u5f53\u524d\u5019\u9009\u672a\u6267\u884c\uff09",
+            "r07Share": "serve \u547d\u4ee4\u5305\u88c5\u3001channel \u4e0e\u6570\u636e\u964d\u7ea7\u7ea6\u675f\u4fdd\u7559\u3001\u542f\u52a8/\u6570\u636e\u7248\u672c\u5931\u8d25\u8bca\u65ad UX",
+            "evidenceRequired": "A01\u2013A03 \u771f\u5b9e\u6267\u884c\u8bc1\u636e\uff1b\u7248\u672c\u4e0d\u5339\u914d\u5206\u522b\u8986\u76d6 CLI\u3001\u73af\u5883\u53d8\u91cf\u3001\u914d\u7f6e\u6587\u4ef6\u9009\u6839\u4ee5\u53ca\u542f\u52a8\u5931\u8d25\uff0c\u6838 stderr\u3001\u539f\u6570\u636e\u4e0e\u5907\u7528\u6839\u524d\u540e\u5185\u5bb9\u3002\u5ba2\u6237\u7aef serve \u7684 channel/\u964d\u7ea7\u5b8c\u6574\u884c\u4e3a\u4ecd\u9700\u4e13\u5c5e\u8bc1\u636e",
+            "evidenceCommandRefs": [
+                "a01_smoke",
+                "a02_boundary_negative",
+                "a03_dual_instance"
+            ]
+        },
+        {
+            "id": "R00-T02-LA-200D4E5D52C9",
+            "featureId": "F-D20-CLI-CLI-SESSIONS-200D4E",
+            "requirement": "REQUIRED_SUPPLEMENTAL",
+            "r00Kind": "supplemental",
+            "r00TaskIds": [
+                "R02-T03",
+                "R07-T09"
+            ],
+            "r00ExecutionStageIds": [
+                "R02",
+                "R07"
+            ],
+            "r00LedgerStatus": "SPECIFIED_NOT_EXECUTED",
+            "r00ResultIds": [],
+            "r00TestIds": [],
+            "r00Then": "\u4ece\u5df2\u8ba4\u8bc1\u670d\u52a1\u8bfb\u53d6\u5e76\u5217\u51fa\u6700\u591a 20 \u4e2a\u4f1a\u8bdd\uff1b\u7a7a\u5217\u8868\u663e\u793a No sessions yet",
+            "r00Assertions": [
+                "\u4ece\u5df2\u8ba4\u8bc1\u670d\u52a1\u8bfb\u53d6\u5e76\u5217\u51fa\u6700\u591a 20 \u4e2a\u4f1a\u8bdd\uff1b\u7a7a\u5217\u8868\u663e\u793a No sessions yet",
+                "\u670d\u52a1\u672a\u8fde\u63a5\u6216\u672a\u6388\u6743\u65f6\u8fd4\u56de\u9519\u8bef\uff0c\u4e0d\u8bfb\u53d6\u5176\u4ed6\u4e3b\u4f53\u4f1a\u8bdd"
+            ],
+            "r00Due": "R00-T07 \u5efa\u7acb\u6b63\u5f0f\u8d26\u672c\u65f6\u767b\u8bb0\uff1b\u6700\u8fdf\u5728\u6240\u5217\u5b9e\u65bd Task \u7684\u9636\u6bb5\u9a8c\u6536\u524d\u5b8c\u6210\u5e76\u6267\u884c",
+            "assertionContract": {
+                "producerCommand": "a05_a06_auth_matrix",
+                "evidencePath": "{EVIDENCE}/A05_A06/sessions-list-matrix.json",
+                "cases": [
+                    {
+                        "case": "a05-sessions-list-owner",
+                        "expect": 200
+                    },
+                    {
+                        "case": "a05-sessions-list-owner-contains-own-session",
+                        "expect": 1
+                    },
+                    {
+                        "case": "a05-sessions-list-foreign-principal",
+                        "expect": 200
+                    },
+                    {
+                        "case": "a05-sessions-list-foreign-excludes-owner-sessions",
+                        "expect": 0
+                    },
+                    {
+                        "case": "a05-sessions-list-empty-shape",
+                        "expect": 1
+                    },
+                    {
+                        "case": "a05-sessions-list-no-credential",
+                        "expect": 401
+                    }
+                ]
+            },
+            "basisKind": "protocol_basis",
+            "r02Share": "\u8ba4\u8bc1\u4f1a\u8bdd\u5217\u8868\uff08GET /lingxi/v1/sessions \u6309 principal \u8fc7\u6ee4\uff1b\u5f53\u524d\u5019\u9009\u672a\u6267\u884c\uff09",
+            "r07Share": "CLI \u5217\u8868\u547d\u4ee4\uff1a\u226420 \u663e\u793a\u3001\u7a7a\u5217\u8868 No sessions yet\u3001\u672a\u8fde\u63a5/\u672a\u6388\u6743\u9519\u8bef\u4e14\u4e0d\u8bfb\u5176\u4ed6\u4e3b\u4f53\u4f1a\u8bdd",
+            "evidenceRequired": "A05/A06 \u8ba4\u8bc1\u77e9\u9635\u771f\u5b9e\u6267\u884c\u8bc1\u636e + \u8ba4\u8bc1\u5217\u8868\u6b63\u8d1f\u8def\u5f84\u6267\u884c\u8bb0\u5f55\u3002R14-F01 \u95ed\u73af\uff1a\u8ba4\u8bc1\u5217\u8868\u6b63\u8d1f\u8def\u5f84\uff08GET /lingxi/v1/sessions \u6309 principal \u8fc7\u6ee4\u7684\u6b63\u8d1f\u4e24\u4fa7\uff09\u6b64\u524d\u65e0\u6ce8\u518c\u8bc1\u636e\u751f\u4ea7\u8005\uff0c\u73b0\u7531 r02_t03_auth_matrix.sh \u7684 sessions-list \u6bb5\u751f\u4ea7 {EVIDENCE}/A05_A06/sessions-list-matrix.json\uff08owner \u542b\u81ea\u8eab\u4f1a\u8bdd\u3001foreign \u4e3b\u4f53 200 \u4e14\u6392\u9664 owner \u4f1a\u8bdd\u5e76\u5448\u7a7a\u5217\u8868\u5f62\u6001\u3001\u65e0\u51ed\u636e 401\uff09\uff0c\u672c\u53f6 assertionContract \u7531 verify-stage \u673a\u5668\u6d88\u8d39\u8be5\u6587\u4ef6\u5404\u6848\u4f8b\u7684\u5b9e\u9645\u503c\u2014\u2014\u6587\u4ef6\u5b58\u5728\u672c\u8eab\u4e0d\u518d\u8db3\u4ee5\u5224\u5b9a\u672c\u53f6",
+            "evidenceCommandRefs": [
+                "a05_a06_auth_matrix"
+            ],
+            "evidencePaths": [
+                "{EVIDENCE}/A05_A06/sessions-list-matrix.json"
+            ]
+        },
+        {
+            "id": "R00-T02-LA-EEC1A2A5CD04",
+            "featureId": "F-D20-CLI-CLI-STATUS-EEC1A2",
+            "requirement": "REQUIRED_SUPPLEMENTAL",
+            "r00Kind": "supplemental",
+            "r00TaskIds": [
+                "R02-T03",
+                "R07-T09"
+            ],
+            "r00ExecutionStageIds": [
+                "R02",
+                "R07"
+            ],
+            "r00LedgerStatus": "SPECIFIED_NOT_EXECUTED",
+            "r00ResultIds": [],
+            "r00TestIds": [],
+            "r00Then": "\u663e\u793a URL\u3001\u7248\u672c\u3001Studio\u3001Agent\u3001\u6a21\u578b\u548c\u8ba4\u8bc1\u6765\u6e90",
+            "r00Assertions": [
+                "\u663e\u793a URL\u3001\u7248\u672c\u3001Studio\u3001Agent\u3001\u6a21\u578b\u548c\u8ba4\u8bc1\u6765\u6e90",
+                "\u670d\u52a1\u4e0d\u53ef\u8fbe\u65f6\u8fd4\u56de\u8bca\u65ad\u9519\u8bef\uff1b\u8eab\u4efd\u8bfb\u53d6\u5931\u8d25\u53ef\u7528\u5065\u5eb7\u4fe1\u606f\u4f46\u4e0d\u4f2a\u9020\u8ba4\u8bc1\u6765\u6e90"
+            ],
+            "r00Due": "R00-T07 \u5efa\u7acb\u6b63\u5f0f\u8d26\u672c\u65f6\u767b\u8bb0\uff1b\u6700\u8fdf\u5728\u6240\u5217\u5b9e\u65bd Task \u7684\u9636\u6bb5\u9a8c\u6536\u524d\u5b8c\u6210\u5e76\u6267\u884c",
+            "assertionContract": {
+                "producerCommand": "a05_a06_auth_matrix",
+                "evidencePath": "{EVIDENCE}/A05_A06/leaf-cases.json",
+                "cases": [
+                    {
+                        "case": "a05-no-credential-me",
+                        "expect": 401
+                    },
+                    {
+                        "case": "a05-me-with-forged-header",
+                        "expect": 200
+                    },
+                    {
+                        "case": "a06-localhost-host-ok",
+                        "expect": 200
+                    },
+                    {
+                        "case": "a06-cli-query-token-local",
+                        "expect": 200
+                    }
+                ]
+            },
+            "basisKind": "protocol_basis",
+            "r02Share": "/lingxi/v1/health + /lingxi/v1/me + \u672c\u5730 token \u6765\u6e90\u673a\u5236\uff08\u5f53\u524d\u5019\u9009\u672a\u6267\u884c\uff09",
+            "r07Share": "CLI \u72b6\u6001\u547d\u4ee4\uff1aURL/\u7248\u672c/Studio/Agent/\u6a21\u578b/\u8ba4\u8bc1\u6765\u6e90\u663e\u793a\u3001\u4e0d\u53ef\u8fbe\u8bca\u65ad\u3001\u8eab\u4efd\u8bfb\u53d6\u5931\u8d25\u4e0d\u4f2a\u9020\u8ba4\u8bc1\u6765\u6e90",
+            "evidenceRequired": "A05/A06 \u8ba4\u8bc1\u77e9\u9635\u771f\u5b9e\u6267\u884c\u8bc1\u636e + /health\u3001/me \u8ba4\u8bc1\u8def\u5f84\u6267\u884c\u8bb0\u5f55",
+            "evidenceCommandRefs": [
+                "a05_a06_auth_matrix"
+            ]
+        },
+        {
+            "id": "R00-T02-LA-D1BEE19A95BB",
+            "featureId": "F-D20-DESKTOP_BEHAVIOR-DESKTOP-BEHAVIOR-SERVICE-CONNECTION-D1BEE1",
+            "requirement": "REQUIRED_SUPPLEMENTAL",
+            "r00Kind": "supplemental",
+            "r00TaskIds": [
+                "R02-T03",
+                "R07-T09"
+            ],
+            "r00ExecutionStageIds": [
+                "R02",
+                "R07"
+            ],
+            "r00LedgerStatus": "SPECIFIED_NOT_EXECUTED",
+            "r00ResultIds": [],
+            "r00TestIds": [],
+            "r00Then": "\u7aef\u53e3/\u77ed\u671f\u4ee4\u724c\u4f20\u7ed9 renderer \u540e HTTP/WS \u8fde\u63a5\u53ef\u5efa\u7acb",
+            "r00Assertions": [
+                "\u7aef\u53e3/\u77ed\u671f\u4ee4\u724c\u4f20\u7ed9 renderer \u540e HTTP/WS \u8fde\u63a5\u53ef\u5efa\u7acb",
+                "\u670d\u52a1\u91cd\u542f\u9700\u91cd\u53d6\u7aef\u53e3/\u4ee4\u724c\uff1b\u4ee4\u724c\u4e0d\u5e94\u5f53\u4f5c\u7528\u6237\u53ef\u89c1\u8bbe\u7f6e"
+            ],
+            "r00Due": "R00-T07 \u5efa\u7acb\u6b63\u5f0f\u8d26\u672c\u65f6\u767b\u8bb0\uff1b\u6700\u8fdf\u5728\u6240\u5217\u5b9e\u65bd Task \u7684\u9636\u6bb5\u9a8c\u6536\u524d\u5b8c\u6210\u5e76\u6267\u884c",
+            "assertionContract": {
+                "producerCommand": "a05_a06_auth_matrix",
+                "evidencePath": "{EVIDENCE}/A05_A06/leaf-cases.json",
+                "cases": [
+                    {
+                        "case": "a05-ws-ticket-issue-owner",
+                        "expect": 200
+                    },
+                    {
+                        "case": "a05-no-credential-ws-ticket",
+                        "expect": 403
+                    },
+                    {
+                        "case": "ws-ticket-legit-origin-upgrade",
+                        "expect": 101
+                    }
+                ]
+            },
+            "basisKind": "protocol_basis",
+            "r02Share": "\u672c\u5730 token \u5f15\u5bfc\u4e0e ws-ticket \u77ed\u671f\u51ed\u8bc1\u7b7e\u53d1\u539f\u8bed\uff08\u5f53\u524d\u5019\u9009\u672a\u6267\u884c\uff09",
+            "r07Share": "\u684c\u9762\u58f3 renderer \u7aef\u53e3/\u77ed\u671f\u4ee4\u724c\u63a5\u7ebf\u3001HTTP/WS \u8fde\u63a5\u5efa\u7acb\u3001\u91cd\u542f\u91cd\u53d6\u3001\u4ee4\u724c\u4e0d\u4f5c\u7528\u6237\u53ef\u89c1\u8bbe\u7f6e",
+            "evidenceRequired": "A05/A06 \u8ba4\u8bc1\u77e9\u9635\u771f\u5b9e\u6267\u884c\u8bc1\u636e + ws-ticket \u7b7e\u53d1/\u6d88\u8d39\u6267\u884c\u8bb0\u5f55",
+            "evidenceCommandRefs": [
+                "a05_a06_auth_matrix"
+            ]
+        },
+        {
+            "id": "R00-T02-LA-5816DA563ED8",
+            "featureId": "F-D20-SEMANTIC_EFFECT-SEMANTIC-EFFECT-WS-AUTH-WS-TICKET-WEBSOCKET-5816DA",
+            "requirement": "REQUIRED_SUPPLEMENTAL",
+            "r00Kind": "supplemental",
+            "r00TaskIds": [
+                "R02-T03",
+                "R07-T09"
+            ],
+            "r00ExecutionStageIds": [
+                "R02",
+                "R07"
+            ],
+            "r00LedgerStatus": "SPECIFIED_NOT_EXECUTED",
+            "r00ResultIds": [],
+            "r00TestIds": [],
+            "r00Then": "\u8bfb\u53d6\u5df2\u8ba4\u8bc1\u4e3b\u4f53\u5e76\u7b7e\u53d1\u7ed1\u5b9a\u8fde\u63a5\u7c7b\u578b\u53ca /ws \u7684\u77ed\u671f\u7968\u636e\uff1b\u65e0\u4e3b\u4f53\u8fd4\u56de 403",
+            "r00Assertions": [
+                "\u7ed9\u5b9a\u76ee\u6807\u4e0e\u76f8\u5e94\u6743\u9650\uff0c\u6267\u884c\u201c\u7b7e\u53d1 WebSocket \u4e34\u65f6\u7968\u636e\u201d\u540e\u6838\u5bf9\uff1a\u8bfb\u53d6\u5df2\u8ba4\u8bc1\u4e3b\u4f53\u5e76\u7b7e\u53d1\u7ed1\u5b9a\u8fde\u63a5\u7c7b\u578b\u53ca /ws \u7684\u77ed\u671f\u7968\u636e\uff1b\u65e0\u4e3b\u4f53\u8fd4\u56de 403",
+                "\u8f93\u5165\u65e0\u6548\u3001\u6743\u9650\u4e0d\u8db3\u6216\u4e0b\u6e38\u5931\u8d25\u65f6\u5e94\u8fd4\u56de\u660e\u786e\u9519\u8bef\uff0c\u4e0d\u5448\u73b0\u6210\u529f\u7ed3\u679c"
+            ],
+            "r00Due": "R00-T07 \u5efa\u7acb\u6b63\u5f0f\u8d26\u672c\u65f6\u767b\u8bb0\uff1b\u6700\u8fdf\u5728\u6240\u5217\u5b9e\u65bd Task \u7684\u9636\u6bb5\u9a8c\u6536\u524d\u5b8c\u6210\u5e76\u6267\u884c",
+            "assertionContract": {
+                "producerCommand": "a05_a06_auth_matrix",
+                "evidencePath": "{EVIDENCE}/A05_A06/leaf-cases.json",
+                "cases": [
+                    {
+                        "case": "a05-no-credential-ws-ticket",
+                        "expect": 403
+                    },
+                    {
+                        "case": "a05-ws-ticket-issue-owner",
+                        "expect": 200
+                    },
+                    {
+                        "case": "ws-ticket-replay",
+                        "expect": 401
+                    },
+                    {
+                        "case": "ws-ticket-expired",
+                        "expect": 401
+                    }
+                ]
+            },
+            "basisKind": "route_basis_present_static",
+            "r02Share": "POST /lingxi/v1/ws-ticket\uff1a\u8bfb\u53d6\u5df2\u8ba4\u8bc1\u4e3b\u4f53\u7b7e\u53d1\u7ed1\u5b9a\u8fde\u63a5\u7c7b\u578b\u53ca /ws \u7684\u77ed\u671f\u7968\u636e\u3001\u65e0\u4e3b\u4f53 403\uff08\u8def\u7531\u5728\u73b0\u884c\u6e90\u7801\u9759\u6001\u53ef\u89c1\uff1b\u672a\u6267\u884c\u9a8c\u6536\uff09",
+            "r07Share": "\u5ba2\u6237\u7aef\u7968\u636e\u6d88\u8d39\u4e0e\u7aef\u5230\u7aef\u8fde\u63a5\u884c\u4e3a\uff08\u5b8c\u6574\u5165\u53e3\uff09",
+            "evidenceRequired": "\u8be5\u8def\u7531\u8ba4\u8bc1\u6b63\u8d1f\u77e9\u9635\u6267\u884c\u8bb0\u5f55\uff08\u65e0\u4e3b\u4f53 403\u3001\u7ed1\u5b9a\u4f5c\u7528\u57df\uff09+ A05/A06 \u77e9\u9635\u8bc1\u636e\u3002R14-F01 \u95ed\u73af\uff1a\u670d\u52a1\u5df2\u6309 R00 \u539f\u65ad\u8a00\u5c06\u65e0\u4e3b\u4f53 POST /lingxi/v1/ws-ticket \u6539\u4e3a 403\uff08incumbent server/routes/ws-auth.ts \u540c\u884c\u4e3a\uff09\uff0c\u6ce8\u518c\u811a\u672c a05-no-credential-ws-ticket \u65ad\u8a00 403\uff0c\u4e14\u672c\u53f6 assertionContract \u7531 verify-stage \u673a\u5668\u6d88\u8d39\u8be5\u6848\u4f8b\u7684\u5b9e\u9645\u503c\uff08actual==403\uff09\u2014\u2014\u547d\u4ee4 exit 0 \u672c\u8eab\u4e0d\u518d\u8db3\u4ee5\u5224\u5b9a\u672c\u53f6",
+            "evidenceCommandRefs": [
+                "a05_a06_auth_matrix"
+            ]
+        },
+        {
+            "id": "R00-T02-LA-093F22C4FF63",
+            "featureId": "F-D20-SEMANTIC_EFFECT-SEMANTIC-EFFECT-ACCESS-ACCESS-DESKTOP-CREDENTIAL-093F22",
+            "requirement": "REQUIRED_SUPPLEMENTAL",
+            "r00Kind": "supplemental",
+            "r00TaskIds": [
+                "R02-T03",
+                "R07-T09"
+            ],
+            "r00ExecutionStageIds": [
+                "R02",
+                "R07"
+            ],
+            "r00LedgerStatus": "SPECIFIED_NOT_EXECUTED",
+            "r00ResultIds": [],
+            "r00TestIds": [],
+            "r00Then": "\u767b\u8bb0\u8bbe\u5907/\u51ed\u8bc1\u5e76\u8fd4\u56de\u4e00\u6b21\u6027 secret \u548c\u684c\u9762\u8bbf\u95ee\u5730\u5740",
+            "r00Assertions": [
+                "\u6210\u529f\u65f6\u6838\u5bf9\uff1a\u767b\u8bb0\u8bbe\u5907/\u51ed\u8bc1\u5e76\u8fd4\u56de\u4e00\u6b21\u6027 secret \u548c\u684c\u9762\u8bbf\u95ee\u5730\u5740",
+                "\u62d2\u7edd/\u65e0\u6548\u8f93\u5165\u65f6\u6838\u5bf9\uff1a\u65e0\u8d8a\u6743\u6216\u9519\u8bef\u6301\u4e45\u5316\uff0c\u4e14\u9519\u8bef\u5bf9\u7528\u6237\u53ef\u89c1"
+            ],
+            "r00Due": "R00-T07 \u5efa\u7acb\u6b63\u5f0f\u8d26\u672c\u65f6\u767b\u8bb0\uff1b\u6700\u8fdf\u5728\u6240\u5217\u5b9e\u65bd Task \u7684\u9636\u6bb5\u9a8c\u6536\u524d\u5b8c\u6210\u5e76\u6267\u884c",
+            "assertionContract": {
+                "producerCommand": "supplemental_management_matrix",
+                "evidencePath": "{EVIDENCE}/MANAGEMENT/management-cases.json",
+                "cases": [
+                    {
+                        "case": "management-desktop-credential-secret-address-audit",
+                        "expect": 1
+                    },
+                    {
+                        "case": "management-desktop-credential-invalid-unauthorized-unchanged",
+                        "expect": 1
+                    },
+                    {
+                        "case": "management-desktop-credential-store-failure-no-secret",
+                        "expect": 1
+                    },
+                    {
+                        "case": "management-standard-audit-path-failure-no-write-recovery",
+                        "expect": 1
+                    },
+                    {
+                        "case": "management-standard-audit-all-actions-identities-no-secrets",
+                        "expect": 1
+                    }
+                ]
+            },
+            "originalAssertionCases": [
+                [
+                    "management-desktop-credential-secret-address-audit",
+                    "management-standard-audit-all-actions-identities-no-secrets"
+                ],
+                [
+                    "management-desktop-credential-invalid-unauthorized-unchanged",
+                    "management-desktop-credential-store-failure-no-secret",
+                    "management-standard-audit-path-failure-no-write-recovery"
+                ]
+            ],
+            "basisKind": "full_original_behavior",
+            "r02Share": "\u672c\u8f6e\u771f\u670d\u52a1\u751f\u4ea7\u8005\u540c\u65f6\u6838\u4e1a\u52a1\u6b63\u53cd\u3001\u5931\u8d25\u526f\u4f5c\u7528\u4e0e\u6807\u51c6\u5b89\u5168\u5ba1\u8ba1 JSONL \u7684\u4e3b\u4f53/\u76ee\u6807/\u52a8\u4f5c/\u5173\u8054 metadata\u3001\u65e0 secret \u548c\u91cd\u542f\u53bb\u91cd",
+            "r07Share": "\u539f\u6392 R07 \u7684\u5ba2\u6237\u7aef\u6295\u5f71\u4ecd\u987b\u5728\u540e\u7eed\u5ba2\u6237\u7aef\u9636\u6bb5\u6309\u5b9e\u9645\u5019\u9009\u6838\u9a8c\uff1bR02 \u672c\u53f6\u5df2\u63d0\u524d\u63a5\u5165\u771f\u5b9e\u670d\u52a1\u884c\u4e3a\u8bc1\u636e",
+            "evidenceRequired": "\u672c\u8f6e supplemental_management_matrix \u4e13\u5c5e\u6b63\u53cd\u6848\u4f8b\u4e0e\u6807\u51c6\u5b89\u5168\u5ba1\u8ba1 JSONL \u5168\u91cf\u9010\u610f\u56fe\u5bf9\u7167\uff1b\u539f R00 \u4e24\u6761\u65ad\u8a00\u6309 originalAssertionCases \u5168\u8986\u76d6\uff0c\u751f\u4ea7\u8005\u539f\u59cb\u65e5\u5fd7/\u6e90\u7801\u6458\u8981/\u9000\u51fa\u72b6\u6001\u987b\u6709\u6548",
+            "evidenceCommandRefs": [
+                "supplemental_management_matrix"
+            ],
+            "evidencePaths": [
+                "{EVIDENCE}/MANAGEMENT/summary.json"
+            ]
+        },
+        {
+            "id": "R00-T02-LA-747E0ADC941B",
+            "featureId": "F-D20-SEMANTIC_EFFECT-SEMANTIC-EFFECT-ACCESS-ACCESS-MOBILE-CREDENTIALS-747E0A",
+            "requirement": "REQUIRED_SUPPLEMENTAL",
+            "r00Kind": "supplemental",
+            "r00TaskIds": [
+                "R02-T03",
+                "R07-T09"
+            ],
+            "r00ExecutionStageIds": [
+                "R02",
+                "R07"
+            ],
+            "r00LedgerStatus": "SPECIFIED_NOT_EXECUTED",
+            "r00ResultIds": [],
+            "r00TestIds": [],
+            "r00Then": "\u767b\u8bb0\u8bbe\u5907/\u51ed\u8bc1\u5e76\u8fd4\u56de\u4e00\u6b21\u6027 secret \u548c\u624b\u673a\u8bbf\u95ee\u5730\u5740",
+            "r00Assertions": [
+                "\u6210\u529f\u65f6\u6838\u5bf9\uff1a\u767b\u8bb0\u8bbe\u5907/\u51ed\u8bc1\u5e76\u8fd4\u56de\u4e00\u6b21\u6027 secret \u548c\u624b\u673a\u8bbf\u95ee\u5730\u5740",
+                "\u62d2\u7edd/\u65e0\u6548\u8f93\u5165\u65f6\u6838\u5bf9\uff1a\u65e0\u8d8a\u6743\u6216\u9519\u8bef\u6301\u4e45\u5316\uff0c\u4e14\u9519\u8bef\u5bf9\u7528\u6237\u53ef\u89c1"
+            ],
+            "r00Due": "R00-T07 \u5efa\u7acb\u6b63\u5f0f\u8d26\u672c\u65f6\u767b\u8bb0\uff1b\u6700\u8fdf\u5728\u6240\u5217\u5b9e\u65bd Task \u7684\u9636\u6bb5\u9a8c\u6536\u524d\u5b8c\u6210\u5e76\u6267\u884c",
+            "assertionContract": {
+                "producerCommand": "supplemental_management_matrix",
+                "evidencePath": "{EVIDENCE}/MANAGEMENT/management-cases.json",
+                "cases": [
+                    {
+                        "case": "management-mobile-credential-secret-address-audit",
+                        "expect": 1
+                    },
+                    {
+                        "case": "management-mobile-credential-invalid-unauthorized-unchanged",
+                        "expect": 1
+                    },
+                    {
+                        "case": "management-mobile-credential-store-failure-no-secret",
+                        "expect": 1
+                    },
+                    {
+                        "case": "management-standard-audit-path-failure-no-write-recovery",
+                        "expect": 1
+                    },
+                    {
+                        "case": "management-standard-audit-all-actions-identities-no-secrets",
+                        "expect": 1
+                    }
+                ]
+            },
+            "originalAssertionCases": [
+                [
+                    "management-mobile-credential-secret-address-audit",
+                    "management-standard-audit-all-actions-identities-no-secrets"
+                ],
+                [
+                    "management-mobile-credential-invalid-unauthorized-unchanged",
+                    "management-mobile-credential-store-failure-no-secret",
+                    "management-standard-audit-path-failure-no-write-recovery"
+                ]
+            ],
+            "basisKind": "full_original_behavior",
+            "r02Share": "\u672c\u8f6e\u771f\u670d\u52a1\u751f\u4ea7\u8005\u540c\u65f6\u6838\u4e1a\u52a1\u6b63\u53cd\u3001\u5931\u8d25\u526f\u4f5c\u7528\u4e0e\u6807\u51c6\u5b89\u5168\u5ba1\u8ba1 JSONL \u7684\u4e3b\u4f53/\u76ee\u6807/\u52a8\u4f5c/\u5173\u8054 metadata\u3001\u65e0 secret \u548c\u91cd\u542f\u53bb\u91cd",
+            "r07Share": "\u539f\u6392 R07 \u7684\u5ba2\u6237\u7aef\u6295\u5f71\u4ecd\u987b\u5728\u540e\u7eed\u5ba2\u6237\u7aef\u9636\u6bb5\u6309\u5b9e\u9645\u5019\u9009\u6838\u9a8c\uff1bR02 \u672c\u53f6\u5df2\u63d0\u524d\u63a5\u5165\u771f\u5b9e\u670d\u52a1\u884c\u4e3a\u8bc1\u636e",
+            "evidenceRequired": "\u672c\u8f6e supplemental_management_matrix \u4e13\u5c5e\u6b63\u53cd\u6848\u4f8b\u4e0e\u6807\u51c6\u5b89\u5168\u5ba1\u8ba1 JSONL \u5168\u91cf\u9010\u610f\u56fe\u5bf9\u7167\uff1b\u539f R00 \u4e24\u6761\u65ad\u8a00\u6309 originalAssertionCases \u5168\u8986\u76d6\uff0c\u751f\u4ea7\u8005\u539f\u59cb\u65e5\u5fd7/\u6e90\u7801\u6458\u8981/\u9000\u51fa\u72b6\u6001\u987b\u6709\u6548",
+            "evidenceCommandRefs": [
+                "supplemental_management_matrix"
+            ],
+            "evidencePaths": [
+                "{EVIDENCE}/MANAGEMENT/summary.json"
+            ]
+        },
+        {
+            "id": "R00-T02-LA-4BCE8CCFD5DC",
+            "featureId": "F-D20-SEMANTIC_EFFECT-SEMANTIC-EFFECT-SERVER-IDENTITY-SERVER-IDENTITY--4BCE8C",
+            "requirement": "REQUIRED_SUPPLEMENTAL",
+            "r00Kind": "supplemental",
+            "r00TaskIds": [
+                "R02-T03",
+                "R07-T09"
+            ],
+            "r00ExecutionStageIds": [
+                "R02",
+                "R07"
+            ],
+            "r00LedgerStatus": "SPECIFIED_NOT_EXECUTED",
+            "r00ResultIds": [],
+            "r00TestIds": [],
+            "r00Then": "\u8fd4\u56de\u7248\u672c\u3001\u8eab\u4efd\u53ca\u6309 principal \u6295\u5f71\u7684\u80fd\u529b",
+            "r00Assertions": [
+                "\u6210\u529f\u65f6\u6838\u5bf9\uff1a\u8fd4\u56de\u7248\u672c\u3001\u8eab\u4efd\u53ca\u6309 principal \u6295\u5f71\u7684\u80fd\u529b",
+                "\u62d2\u7edd/\u65e0\u6548\u8f93\u5165\u65f6\u6838\u5bf9\uff1a\u65e0\u8d8a\u6743\u6216\u9519\u8bef\u6301\u4e45\u5316\uff0c\u4e14\u9519\u8bef\u5bf9\u7528\u6237\u53ef\u89c1"
+            ],
+            "r00Due": "R00-T07 \u5efa\u7acb\u6b63\u5f0f\u8d26\u672c\u65f6\u767b\u8bb0\uff1b\u6700\u8fdf\u5728\u6240\u5217\u5b9e\u65bd Task \u7684\u9636\u6bb5\u9a8c\u6536\u524d\u5b8c\u6210\u5e76\u6267\u884c",
+            "assertionContract": {
+                "producerCommand": "a05_a06_auth_matrix",
+                "evidencePath": "{EVIDENCE}/A05_A06/leaf-cases.json",
+                "cases": [
+                    {
+                        "case": "a05-me-owner-full-projection",
+                        "expect": 1
+                    },
+                    {
+                        "case": "a05-me-device-full-projection",
+                        "expect": 1
+                    },
+                    {
+                        "case": "a05-me-with-forged-header",
+                        "expect": 200
+                    },
+                    {
+                        "case": "a05-no-credential-me",
+                        "expect": 401
+                    },
+                    {
+                        "case": "a05-me-denied-no-registry-write",
+                        "expect": 1
+                    }
+                ]
+            },
+            "originalAssertionCases": [
+                [
+                    "a05-me-owner-full-projection",
+                    "a05-me-device-full-projection"
+                ],
+                [
+                    "a05-me-with-forged-header",
+                    "a05-no-credential-me",
+                    "a05-me-denied-no-registry-write"
+                ]
+            ],
+            "basisKind": "full_original_behavior",
+            "r02Share": "\u7528\u6237\u6388\u6743\u63d0\u524d\u5b8c\u6574\u5b9e\u65bd\u5e76\u9a8c\u8bc1\u672c\u53f6\uff1a\u771f\u670d\u52a1 /me \u6838\u7248\u672c\u3001\u53cc\u4e3b\u4f53\u8eab\u4efd\u4e0e\u6309 scopes \u6295\u5f71\u7684\u80fd\u529b\uff0c\u62d2\u7edd\u65f6\u9010\u5b57\u8282\u6838\u51ed\u8bc1\u5e93\u65e0\u53d8\u5316",
+            "r07Share": "\u539f\u6392 R07 \u7684\u5ba2\u6237\u7aef\u8eab\u4efd\u5448\u73b0\u4ecd\u9700\u5728\u540e\u7eed\u5ba2\u6237\u7aef\u9636\u6bb5\u6309\u5f53\u524d\u5019\u9009\u6838\u9a8c\uff1bR02 \u672c\u53f6\u5df2\u63d0\u524d\u767b\u8bb0\u5b8c\u6574\u771f\u670d\u52a1\u6b63\u53cd\u884c\u4e3a",
+            "evidenceRequired": "A05/A06 \u771f\u670d\u52a1\u8ba4\u8bc1\u77e9\u9635\u5fc5\u987b\u4ea7\u51fa /me \u4e3b\u4eba\u53ca\u8bbe\u5907\u6295\u5f71\u3001\u4f2a\u8eab\u4efd\u548c\u65e0\u51ed\u8bc1\u62d2\u7edd\u7684\u9010\u9879\u7ed3\u6784\u5316\u8bc1\u636e\u4e0e\u539f\u59cb\u72b6\u6001\u5feb\u7167\uff0c\u5f53\u524d\u5019\u9009\u5408\u6cd5\u8fd0\u884c\u540e\u65b9\u53ef\u901a\u8fc7",
+            "evidenceCommandRefs": [
+                "a05_a06_auth_matrix"
+            ],
+            "evidencePaths": [
+                "{EVIDENCE}/A05_A06/leaf-cases.json",
+                "{EVIDENCE}/A05_A06/me-denied-before.sha256",
+                "{EVIDENCE}/A05_A06/me-denied-after.sha256"
+            ]
+        },
+        {
+            "id": "R00-T02-LA-D2657E4AB5FF",
+            "featureId": "F-D20-UI_BEHAVIOR-UI-BEHAVIOR-SERVICE-CONNECTIVITY-D2657E",
+            "requirement": "REQUIRED_SUPPLEMENTAL",
+            "r00Kind": "supplemental",
+            "r00TaskIds": [
+                "R02-T03",
+                "R07-T09"
+            ],
+            "r00ExecutionStageIds": [
+                "R02",
+                "R07"
+            ],
+            "r00LedgerStatus": "SPECIFIED_NOT_EXECUTED",
+            "r00ResultIds": [],
+            "r00TestIds": [],
+            "r00Then": "\u8fde\u63a5\u72b6\u6001\u3001\u5931\u8d25\u539f\u56e0\u4e0e\u91cd\u8fde\u7ed3\u679c\u5728 UI \u53ef\u89c1",
+            "r00Assertions": [
+                "\u8fde\u63a5\u72b6\u6001\u3001\u5931\u8d25\u539f\u56e0\u4e0e\u91cd\u8fde\u7ed3\u679c\u5728 UI \u53ef\u89c1",
+                "\u7aef\u53e3/\u4ee4\u724c\u65e0\u6548\u3001\u670d\u52a1\u91cd\u542f\u65f6\u663e\u793a\u65ad\u5f00\u5e76\u91cd\u8bd5\uff1b\u4e0d\u80fd\u9759\u9ed8\u5047\u5728\u7ebf"
+            ],
+            "r00Due": "R00-T07 \u5efa\u7acb\u6b63\u5f0f\u8d26\u672c\u65f6\u767b\u8bb0\uff1b\u6700\u8fdf\u5728\u6240\u5217\u5b9e\u65bd Task \u7684\u9636\u6bb5\u9a8c\u6536\u524d\u5b8c\u6210\u5e76\u6267\u884c",
+            "assertionContract": {
+                "producerCommand": "a05_a06_auth_matrix",
+                "evidencePath": "{EVIDENCE}/A05_A06/leaf-cases.json",
+                "cases": [
+                    {
+                        "case": "a06-foreign-host-health",
+                        "expect": 403
+                    },
+                    {
+                        "case": "a06-evil-origin-health",
+                        "expect": 403
+                    },
+                    {
+                        "case": "a06-localhost-host-ok",
+                        "expect": 200
+                    },
+                    {
+                        "case": "a06-evil-origin-with-valid-token",
+                        "expect": 403
+                    }
+                ]
+            },
+            "basisKind": "protocol_basis",
+            "r02Share": "/health \u4e0e\u663e\u5f0f\u62d2\u7edd/\u5931\u8d25\u7801\u9762\uff08UI \u5224\u5b9a\u8fde\u63a5\u72b6\u6001\u7684\u4f9d\u636e\uff1b\u5f53\u524d\u5019\u9009\u672a\u6267\u884c\uff09",
+            "r07Share": "\u8fde\u63a5\u72b6\u6001\u3001\u5931\u8d25\u539f\u56e0\u4e0e\u91cd\u8fde\u7ed3\u679c\u7684\u5b8c\u6574 UI \u884c\u4e3a\uff08\u65ad\u5f00\u663e\u793a\u4e0e\u91cd\u8bd5\u3001\u4e0d\u9759\u9ed8\u5047\u5728\u7ebf\uff09",
+            "evidenceRequired": "A05/A06 + /health \u6267\u884c\u8bb0\u5f55\uff08\u663e\u5f0f\u5931\u8d25\u7801\uff09",
+            "evidenceCommandRefs": [
+                "a05_a06_auth_matrix"
+            ]
+        },
+        {
+            "id": "R00-T02-LA-25AB678E7108",
+            "featureId": "F-D20-ROUTE_BEHAVIOR-BEHAVIOR-ACCESS-ACCESS-ACCOUNT-PASSWORD-DELETE-25AB67",
+            "requirement": "REQUIRED_SUPPLEMENTAL",
+            "r00Kind": "supplemental",
+            "r00TaskIds": [
+                "R02-T03",
+                "R07-T09"
+            ],
+            "r00ExecutionStageIds": [
+                "R02",
+                "R07"
+            ],
+            "r00LedgerStatus": "SPECIFIED_NOT_EXECUTED",
+            "r00ResultIds": [],
+            "r00TestIds": [],
+            "r00Then": "\u4ec5\u672c\u5730\u4e3b\u4eba\u53ef\u6e05\u9664\u5bc6\u7801\uff1b\u66f4\u65b0\u8d26\u53f7\u5e76\u8bb0\u5f55\u5b89\u5168\u5ba1\u8ba1\uff0c\u5931\u8d25\u65f6\u8fd4\u56de\u9519\u8bef",
+            "r00Assertions": [
+                "\u6267\u884c\u201c\u79fb\u9664\u672c\u5730\u8d26\u53f7\u5bc6\u7801\u201d\u540e\u6838\u5bf9\uff1a\u4ec5\u672c\u5730\u4e3b\u4eba\u53ef\u6e05\u9664\u5bc6\u7801\uff1b\u66f4\u65b0\u8d26\u53f7\u5e76\u8bb0\u5f55\u5b89\u5168\u5ba1\u8ba1\uff0c\u5931\u8d25\u65f6\u8fd4\u56de\u9519\u8bef",
+                "\u5931\u8d25\u3001\u51b2\u7a81\u6216\u62d2\u7edd\u65f6\u6838\u5bf9\u8fd4\u56de\u7684\u72b6\u6001\u4e0e\u5b9e\u9645\u526f\u4f5c\u7528\u4e00\u81f4"
+            ],
+            "r00Due": "R00-T07 \u5efa\u7acb\u6b63\u5f0f\u8d26\u672c\u65f6\u767b\u8bb0\uff1b\u6700\u8fdf\u5728\u6240\u5217\u5b9e\u65bd Task \u7684\u9636\u6bb5\u9a8c\u6536\u524d\u5b8c\u6210\u5e76\u6267\u884c",
+            "assertionContract": {
+                "producerCommand": "supplemental_management_matrix",
+                "evidencePath": "{EVIDENCE}/MANAGEMENT/management-cases.json",
+                "cases": [
+                    {
+                        "case": "management-password-clear-account-audit",
+                        "expect": 1
+                    },
+                    {
+                        "case": "management-password-clear-unauthorized-keeps-prior",
+                        "expect": 1
+                    },
+                    {
+                        "case": "management-password-clear-store-failure-unchanged",
+                        "expect": 1
+                    },
+                    {
+                        "case": "management-standard-audit-path-failure-no-write-recovery",
+                        "expect": 1
+                    },
+                    {
+                        "case": "management-standard-audit-all-actions-identities-no-secrets",
+                        "expect": 1
+                    }
+                ]
+            },
+            "originalAssertionCases": [
+                [
+                    "management-password-clear-account-audit",
+                    "management-standard-audit-all-actions-identities-no-secrets"
+                ],
+                [
+                    "management-password-clear-unauthorized-keeps-prior",
+                    "management-password-clear-store-failure-unchanged",
+                    "management-standard-audit-path-failure-no-write-recovery"
+                ]
+            ],
+            "basisKind": "full_original_behavior",
+            "r02Share": "\u672c\u8f6e\u771f\u670d\u52a1\u751f\u4ea7\u8005\u540c\u65f6\u6838\u4e1a\u52a1\u6b63\u53cd\u3001\u5931\u8d25\u526f\u4f5c\u7528\u4e0e\u6807\u51c6\u5b89\u5168\u5ba1\u8ba1 JSONL \u7684\u4e3b\u4f53/\u76ee\u6807/\u52a8\u4f5c/\u5173\u8054 metadata\u3001\u65e0 secret \u548c\u91cd\u542f\u53bb\u91cd",
+            "r07Share": "\u539f\u6392 R07 \u7684\u5ba2\u6237\u7aef\u6295\u5f71\u4ecd\u987b\u5728\u540e\u7eed\u5ba2\u6237\u7aef\u9636\u6bb5\u6309\u5b9e\u9645\u5019\u9009\u6838\u9a8c\uff1bR02 \u672c\u53f6\u5df2\u63d0\u524d\u63a5\u5165\u771f\u5b9e\u670d\u52a1\u884c\u4e3a\u8bc1\u636e",
+            "evidenceRequired": "\u672c\u8f6e supplemental_management_matrix \u4e13\u5c5e\u6b63\u53cd\u6848\u4f8b\u4e0e\u6807\u51c6\u5b89\u5168\u5ba1\u8ba1 JSONL \u5168\u91cf\u9010\u610f\u56fe\u5bf9\u7167\uff1b\u539f R00 \u4e24\u6761\u65ad\u8a00\u6309 originalAssertionCases \u5168\u8986\u76d6\uff0c\u751f\u4ea7\u8005\u539f\u59cb\u65e5\u5fd7/\u6e90\u7801\u6458\u8981/\u9000\u51fa\u72b6\u6001\u987b\u6709\u6548",
+            "evidenceCommandRefs": [
+                "supplemental_management_matrix"
+            ],
+            "evidencePaths": [
+                "{EVIDENCE}/MANAGEMENT/summary.json"
+            ]
+        },
+        {
+            "id": "R00-T02-LA-F1754C6F755B",
+            "featureId": "F-D20-ROUTE_BEHAVIOR-BEHAVIOR-ACCESS-ACCESS-ACCOUNT-PASSWORD-PUT-F1754C",
+            "requirement": "REQUIRED_SUPPLEMENTAL",
+            "r00Kind": "supplemental",
+            "r00TaskIds": [
+                "R02-T03",
+                "R07-T09"
+            ],
+            "r00ExecutionStageIds": [
+                "R02",
+                "R07"
+            ],
+            "r00LedgerStatus": "SPECIFIED_NOT_EXECUTED",
+            "r00ResultIds": [],
+            "r00TestIds": [],
+            "r00Then": "\u4ec5\u672c\u5730\u4e3b\u4eba\u53ef\u8bbe\u7f6e\u5bc6\u7801\uff1b\u66f4\u65b0\u8d26\u53f7\u5e76\u8bb0\u5f55\u5b89\u5168\u5ba1\u8ba1\uff0c\u5931\u8d25\u65f6\u8fd4\u56de\u9519\u8bef",
+            "r00Assertions": [
+                "\u6267\u884c\u201c\u8bbe\u7f6e\u672c\u5730\u8d26\u53f7\u5bc6\u7801\u201d\u540e\u6838\u5bf9\uff1a\u4ec5\u672c\u5730\u4e3b\u4eba\u53ef\u8bbe\u7f6e\u5bc6\u7801\uff1b\u66f4\u65b0\u8d26\u53f7\u5e76\u8bb0\u5f55\u5b89\u5168\u5ba1\u8ba1\uff0c\u5931\u8d25\u65f6\u8fd4\u56de\u9519\u8bef",
+                "\u5931\u8d25\u3001\u51b2\u7a81\u6216\u62d2\u7edd\u65f6\u6838\u5bf9\u8fd4\u56de\u7684\u72b6\u6001\u4e0e\u5b9e\u9645\u526f\u4f5c\u7528\u4e00\u81f4"
+            ],
+            "r00Due": "R00-T07 \u5efa\u7acb\u6b63\u5f0f\u8d26\u672c\u65f6\u767b\u8bb0\uff1b\u6700\u8fdf\u5728\u6240\u5217\u5b9e\u65bd Task \u7684\u9636\u6bb5\u9a8c\u6536\u524d\u5b8c\u6210\u5e76\u6267\u884c",
+            "assertionContract": {
+                "producerCommand": "supplemental_management_matrix",
+                "evidencePath": "{EVIDENCE}/MANAGEMENT/management-cases.json",
+                "cases": [
+                    {
+                        "case": "management-password-set-account-audit",
+                        "expect": 1
+                    },
+                    {
+                        "case": "management-password-invalid-keeps-prior",
+                        "expect": 1
+                    },
+                    {
+                        "case": "management-password-set-store-failure-unchanged",
+                        "expect": 1
+                    },
+                    {
+                        "case": "management-standard-audit-path-failure-no-write-recovery",
+                        "expect": 1
+                    },
+                    {
+                        "case": "management-standard-audit-all-actions-identities-no-secrets",
+                        "expect": 1
+                    }
+                ]
+            },
+            "originalAssertionCases": [
+                [
+                    "management-password-set-account-audit",
+                    "management-standard-audit-all-actions-identities-no-secrets"
+                ],
+                [
+                    "management-password-invalid-keeps-prior",
+                    "management-password-set-store-failure-unchanged",
+                    "management-standard-audit-path-failure-no-write-recovery"
+                ]
+            ],
+            "basisKind": "full_original_behavior",
+            "r02Share": "\u672c\u8f6e\u771f\u670d\u52a1\u751f\u4ea7\u8005\u540c\u65f6\u6838\u4e1a\u52a1\u6b63\u53cd\u3001\u5931\u8d25\u526f\u4f5c\u7528\u4e0e\u6807\u51c6\u5b89\u5168\u5ba1\u8ba1 JSONL \u7684\u4e3b\u4f53/\u76ee\u6807/\u52a8\u4f5c/\u5173\u8054 metadata\u3001\u65e0 secret \u548c\u91cd\u542f\u53bb\u91cd",
+            "r07Share": "\u539f\u6392 R07 \u7684\u5ba2\u6237\u7aef\u6295\u5f71\u4ecd\u987b\u5728\u540e\u7eed\u5ba2\u6237\u7aef\u9636\u6bb5\u6309\u5b9e\u9645\u5019\u9009\u6838\u9a8c\uff1bR02 \u672c\u53f6\u5df2\u63d0\u524d\u63a5\u5165\u771f\u5b9e\u670d\u52a1\u884c\u4e3a\u8bc1\u636e",
+            "evidenceRequired": "\u672c\u8f6e supplemental_management_matrix \u4e13\u5c5e\u6b63\u53cd\u6848\u4f8b\u4e0e\u6807\u51c6\u5b89\u5168\u5ba1\u8ba1 JSONL \u5168\u91cf\u9010\u610f\u56fe\u5bf9\u7167\uff1b\u539f R00 \u4e24\u6761\u65ad\u8a00\u6309 originalAssertionCases \u5168\u8986\u76d6\uff0c\u751f\u4ea7\u8005\u539f\u59cb\u65e5\u5fd7/\u6e90\u7801\u6458\u8981/\u9000\u51fa\u72b6\u6001\u987b\u6709\u6548",
+            "evidenceCommandRefs": [
+                "supplemental_management_matrix"
+            ],
+            "evidencePaths": [
+                "{EVIDENCE}/MANAGEMENT/summary.json"
+            ]
+        },
+        {
+            "id": "R00-T02-LA-F006E094F028",
+            "featureId": "F-D20-SEMANTIC_EFFECT-SEMANTIC-EFFECT-ACCESS-ACCESS-ACCOUNT-PROFILE-PU-F006E0",
+            "requirement": "REQUIRED_SUPPLEMENTAL",
+            "r00Kind": "supplemental",
+            "r00TaskIds": [
+                "R02-T03",
+                "R07-T09"
+            ],
+            "r00ExecutionStageIds": [
+                "R02",
+                "R07"
+            ],
+            "r00LedgerStatus": "SPECIFIED_NOT_EXECUTED",
+            "r00ResultIds": [],
+            "r00TestIds": [],
+            "r00Then": "\u4fdd\u5b58 username/displayName \u5e76\u8fd4\u56de account",
+            "r00Assertions": [
+                "\u6210\u529f\u65f6\u6838\u5bf9\uff1a\u4fdd\u5b58 username/displayName \u5e76\u8fd4\u56de account",
+                "\u62d2\u7edd/\u65e0\u6548\u8f93\u5165\u65f6\u6838\u5bf9\uff1a\u65e0\u8d8a\u6743\u6216\u9519\u8bef\u6301\u4e45\u5316\uff0c\u4e14\u9519\u8bef\u5bf9\u7528\u6237\u53ef\u89c1"
+            ],
+            "r00Due": "R00-T07 \u5efa\u7acb\u6b63\u5f0f\u8d26\u672c\u65f6\u767b\u8bb0\uff1b\u6700\u8fdf\u5728\u6240\u5217\u5b9e\u65bd Task \u7684\u9636\u6bb5\u9a8c\u6536\u524d\u5b8c\u6210\u5e76\u6267\u884c",
+            "assertionContract": {
+                "producerCommand": "supplemental_management_matrix",
+                "evidencePath": "{EVIDENCE}/MANAGEMENT/management-cases.json",
+                "cases": [
+                    {
+                        "case": "management-profile-success-account-audit",
+                        "expect": 1
+                    },
+                    {
+                        "case": "management-profile-invalid-and-unauthorized-unchanged",
+                        "expect": 1
+                    },
+                    {
+                        "case": "management-profile-store-failure-unchanged",
+                        "expect": 1
+                    }
+                ]
+            },
+            "originalAssertionCases": [
+                [
+                    "management-profile-success-account-audit"
+                ],
+                [
+                    "management-profile-invalid-and-unauthorized-unchanged",
+                    "management-profile-store-failure-unchanged"
+                ]
+            ],
+            "basisKind": "full_original_behavior",
+            "r02Share": "\u7528\u6237\u6388\u6743\u63d0\u524d\u5b8c\u6574\u5b9e\u65bd\u5e76\u9a8c\u8bc1\u672c\u53f6\u539f\u59cb R00 \u884c\u4e3a\uff1b\u771f\u670d\u52a1\u7ba1\u7406\u5165\u53e3\u4e0e\u8d1f\u9762\u526f\u4f5c\u7528\u7531\u4e13\u5c5e\u751f\u4ea7\u8005\u9010\u6848\u68c0\u67e5",
+            "r07Share": "\u539f\u6392 R07 \u7684\u5ba2\u6237\u7aef\u6295\u5f71\u4ecd\u987b\u5728\u540e\u7eed\u5ba2\u6237\u7aef\u9636\u6bb5\u6309\u5b9e\u9645\u5019\u9009\u6838\u9a8c\uff1bR02 \u672c\u53f6\u5df2\u63d0\u524d\u63a5\u5165\u771f\u5b9e\u670d\u52a1\u884c\u4e3a\u8bc1\u636e",
+            "evidenceRequired": "\u672c\u8f6e supplemental_management_matrix \u771f\u670d\u52a1 TCP \u7ba1\u7406\u5165\u53e3\u6b63\u53cd\u5206\u652f\u3001\u5408\u6210\u6570\u636e\u6839\u524d\u540e\u6301\u4e45\u5316\u3001\u6e90\u6458\u8981\u53ca\u539f\u59cb\u65e5\u5fd7\uff1b\u539f R00 \u4e24\u6761\u65ad\u8a00\u6309 originalAssertionCases \u5168\u8986\u76d6",
+            "evidenceCommandRefs": [
+                "supplemental_management_matrix"
+            ],
+            "evidencePaths": [
+                "{EVIDENCE}/MANAGEMENT/summary.json"
+            ]
+        },
+        {
+            "id": "R00-T02-LA-73CDC44696D3",
+            "featureId": "F-D20-SEMANTIC_EFFECT-SEMANTIC-EFFECT-ACCESS-ACCESS-NETWORK-PUT-73CDC4",
+            "requirement": "REQUIRED_SUPPLEMENTAL",
+            "r00Kind": "supplemental",
+            "r00TaskIds": [
+                "R02-T03",
+                "R07-T09"
+            ],
+            "r00ExecutionStageIds": [
+                "R02",
+                "R07"
+            ],
+            "r00LedgerStatus": "SPECIFIED_NOT_EXECUTED",
+            "r00ResultIds": [],
+            "r00TestIds": [],
+            "r00Then": "\u4fdd\u5b58\u7f51\u7edc\u914d\u7f6e\u3001\u66f4\u65b0\u8fd0\u884c\u65f6\u6458\u8981\u4e0e\u5b89\u5168\u5ba1\u8ba1",
+            "r00Assertions": [
+                "\u6210\u529f\u65f6\u6838\u5bf9\uff1a\u4fdd\u5b58\u7f51\u7edc\u914d\u7f6e\u3001\u66f4\u65b0\u8fd0\u884c\u65f6\u6458\u8981\u4e0e\u5b89\u5168\u5ba1\u8ba1",
+                "\u62d2\u7edd/\u65e0\u6548\u8f93\u5165\u65f6\u6838\u5bf9\uff1a\u65e0\u8d8a\u6743\u6216\u9519\u8bef\u6301\u4e45\u5316\uff0c\u4e14\u9519\u8bef\u5bf9\u7528\u6237\u53ef\u89c1"
+            ],
+            "r00Due": "R00-T07 \u5efa\u7acb\u6b63\u5f0f\u8d26\u672c\u65f6\u767b\u8bb0\uff1b\u6700\u8fdf\u5728\u6240\u5217\u5b9e\u65bd Task \u7684\u9636\u6bb5\u9a8c\u6536\u524d\u5b8c\u6210\u5e76\u6267\u884c",
+            "assertionContract": {
+                "producerCommand": "supplemental_management_matrix",
+                "evidencePath": "{EVIDENCE}/MANAGEMENT/management-cases.json",
+                "cases": [
+                    {
+                        "case": "management-network-success-summary-audit",
+                        "expect": 1
+                    },
+                    {
+                        "case": "management-network-invalid-and-unauthorized-unchanged",
+                        "expect": 1
+                    },
+                    {
+                        "case": "management-network-store-failure-unchanged",
+                        "expect": 1
+                    },
+                    {
+                        "case": "management-standard-audit-path-failure-no-write-recovery",
+                        "expect": 1
+                    },
+                    {
+                        "case": "management-standard-audit-all-actions-identities-no-secrets",
+                        "expect": 1
+                    },
+                    {
+                        "case": "management-network-saved-restart-real-bind-no-audit-duplicate",
+                        "expect": 1
+                    },
+                    {
+                        "case": "management-network-cli-override-real-bind",
+                        "expect": 1
+                    },
+                    {
+                        "case": "management-network-corrupt-saved-settings-refused",
+                        "expect": 1
+                    }
+                ]
+            },
+            "originalAssertionCases": [
+                [
+                    "management-network-success-summary-audit",
+                    "management-standard-audit-all-actions-identities-no-secrets",
+                    "management-network-saved-restart-real-bind-no-audit-duplicate",
+                    "management-network-cli-override-real-bind"
+                ],
+                [
+                    "management-network-invalid-and-unauthorized-unchanged",
+                    "management-network-store-failure-unchanged",
+                    "management-network-corrupt-saved-settings-refused",
+                    "management-standard-audit-path-failure-no-write-recovery"
+                ]
+            ],
+            "basisKind": "full_original_behavior",
+            "r02Share": "\u672c\u8f6e\u771f\u670d\u52a1\u751f\u4ea7\u8005\u540c\u65f6\u6838\u4e1a\u52a1\u6b63\u53cd\u3001\u5931\u8d25\u526f\u4f5c\u7528\u4e0e\u6807\u51c6\u5b89\u5168\u5ba1\u8ba1 JSONL \u7684\u4e3b\u4f53/\u76ee\u6807/\u52a8\u4f5c/\u5173\u8054 metadata\u3001\u65e0 secret \u548c\u91cd\u542f\u53bb\u91cd",
+            "r07Share": "\u539f\u6392 R07 \u7684\u5ba2\u6237\u7aef\u6295\u5f71\u4ecd\u987b\u5728\u540e\u7eed\u5ba2\u6237\u7aef\u9636\u6bb5\u6309\u5b9e\u9645\u5019\u9009\u6838\u9a8c\uff1bR02 \u672c\u53f6\u5df2\u63d0\u524d\u63a5\u5165\u771f\u5b9e\u670d\u52a1\u884c\u4e3a\u8bc1\u636e",
+            "evidenceRequired": "\u672c\u8f6e supplemental_management_matrix \u4e13\u5c5e\u6b63\u53cd\u6848\u4f8b\u4e0e\u6807\u51c6\u5b89\u5168\u5ba1\u8ba1 JSONL \u5168\u91cf\u9010\u610f\u56fe\u5bf9\u7167\uff1b\u539f R00 \u4e24\u6761\u65ad\u8a00\u6309 originalAssertionCases \u5168\u8986\u76d6\uff0c\u751f\u4ea7\u8005\u539f\u59cb\u65e5\u5fd7/\u6e90\u7801\u6458\u8981/\u9000\u51fa\u72b6\u6001\u987b\u6709\u6548",
+            "evidenceCommandRefs": [
+                "supplemental_management_matrix"
+            ],
+            "evidencePaths": [
+                "{EVIDENCE}/MANAGEMENT/summary.json"
+            ]
+        },
+        {
+            "id": "R00-T02-LA-5E4A9CF58BED",
+            "featureId": "F-D20-SEMANTIC_EFFECT-SEMANTIC-EFFECT-ACCESS-ACCESS-MOBILE-QR-SVG-READ-5E4A9C",
+            "requirement": "REQUIRED_SUPPLEMENTAL",
+            "r00Kind": "supplemental",
+            "r00TaskIds": [
+                "R02-T03",
+                "R07-T09"
+            ],
+            "r00ExecutionStageIds": [
+                "R02",
+                "R07"
+            ],
+            "r00LedgerStatus": "SPECIFIED_NOT_EXECUTED",
+            "r00ResultIds": [],
+            "r00TestIds": [],
+            "r00Then": "\u8fd4\u56de\u624b\u673a\u8bbf\u95ee\u5730\u5740 SVG\uff0cLAN \u5730\u5740\u4e0d\u53ef\u7528\u4e3a 400",
+            "r00Assertions": [
+                "\u6210\u529f\u65f6\u6838\u5bf9\uff1a\u8fd4\u56de\u624b\u673a\u8bbf\u95ee\u5730\u5740 SVG\uff0cLAN \u5730\u5740\u4e0d\u53ef\u7528\u4e3a 400",
+                "\u62d2\u7edd/\u65e0\u6548\u8f93\u5165\u65f6\u6838\u5bf9\uff1a\u65e0\u8d8a\u6743\u6216\u9519\u8bef\u6301\u4e45\u5316\uff0c\u4e14\u9519\u8bef\u5bf9\u7528\u6237\u53ef\u89c1"
+            ],
+            "r00Due": "R00-T07 \u5efa\u7acb\u6b63\u5f0f\u8d26\u672c\u65f6\u767b\u8bb0\uff1b\u6700\u8fdf\u5728\u6240\u5217\u5b9e\u65bd Task \u7684\u9636\u6bb5\u9a8c\u6536\u524d\u5b8c\u6210\u5e76\u6267\u884c",
+            "assertionContract": {
+                "producerCommand": "supplemental_management_matrix",
+                "evidencePath": "{EVIDENCE}/MANAGEMENT/management-cases.json",
+                "cases": [
+                    {
+                        "case": "management-mobile-qr-svg-present",
+                        "expect": 1
+                    },
+                    {
+                        "case": "management-mobile-qr-lan-unavailable-refused",
+                        "expect": 1
+                    },
+                    {
+                        "case": "management-mobile-qr-unauthorized-no-svg",
+                        "expect": 1
+                    }
+                ]
+            },
+            "originalAssertionCases": [
+                [
+                    "management-mobile-qr-svg-present",
+                    "management-mobile-qr-lan-unavailable-refused"
+                ],
+                [
+                    "management-mobile-qr-unauthorized-no-svg"
+                ]
+            ],
+            "basisKind": "full_original_behavior",
+            "r02Share": "\u7528\u6237\u6388\u6743\u63d0\u524d\u5b8c\u6574\u5b9e\u65bd\u5e76\u9a8c\u8bc1\u672c\u53f6\u539f\u59cb R00 \u884c\u4e3a\uff1b\u771f\u670d\u52a1\u7ba1\u7406\u5165\u53e3\u4e0e\u8d1f\u9762\u526f\u4f5c\u7528\u7531\u4e13\u5c5e\u751f\u4ea7\u8005\u9010\u6848\u68c0\u67e5",
+            "r07Share": "\u539f\u6392 R07 \u7684\u5ba2\u6237\u7aef\u6295\u5f71\u4ecd\u987b\u5728\u540e\u7eed\u5ba2\u6237\u7aef\u9636\u6bb5\u6309\u5b9e\u9645\u5019\u9009\u6838\u9a8c\uff1bR02 \u672c\u53f6\u5df2\u63d0\u524d\u63a5\u5165\u771f\u5b9e\u670d\u52a1\u884c\u4e3a\u8bc1\u636e",
+            "evidenceRequired": "\u672c\u8f6e supplemental_management_matrix \u771f\u670d\u52a1 TCP \u7ba1\u7406\u5165\u53e3\u6b63\u53cd\u5206\u652f\u3001\u5408\u6210\u6570\u636e\u6839\u524d\u540e\u6301\u4e45\u5316\u3001\u6e90\u6458\u8981\u53ca\u539f\u59cb\u65e5\u5fd7\uff1b\u539f R00 \u4e24\u6761\u65ad\u8a00\u6309 originalAssertionCases \u5168\u8986\u76d6",
+            "evidenceCommandRefs": [
+                "supplemental_management_matrix"
+            ],
+            "evidencePaths": [
+                "{EVIDENCE}/MANAGEMENT/summary.json"
+            ]
+        },
+        {
+            "id": "R00-T02-LA-229B77A7BA69",
+            "featureId": "F-D20-SEMANTIC_EFFECT-SEMANTIC-EFFECT-ACCESS-ACCESS-SUMMARY-READ-229B77",
+            "requirement": "REQUIRED_SUPPLEMENTAL",
+            "r00Kind": "supplemental",
+            "r00TaskIds": [
+                "R02-T03",
+                "R07-T09"
+            ],
+            "r00ExecutionStageIds": [
+                "R02",
+                "R07"
+            ],
+            "r00LedgerStatus": "SPECIFIED_NOT_EXECUTED",
+            "r00ResultIds": [],
+            "r00TestIds": [],
+            "r00Then": "\u8fd4\u56de\u7f51\u7edc\u3001\u8bbe\u5907\u548c\u8d26\u53f7\u6982\u51b5",
+            "r00Assertions": [
+                "\u6210\u529f\u65f6\u6838\u5bf9\uff1a\u8fd4\u56de\u7f51\u7edc\u3001\u8bbe\u5907\u548c\u8d26\u53f7\u6982\u51b5",
+                "\u62d2\u7edd/\u65e0\u6548\u8f93\u5165\u65f6\u6838\u5bf9\uff1a\u65e0\u8d8a\u6743\u6216\u9519\u8bef\u6301\u4e45\u5316\uff0c\u4e14\u9519\u8bef\u5bf9\u7528\u6237\u53ef\u89c1"
+            ],
+            "r00Due": "R00-T07 \u5efa\u7acb\u6b63\u5f0f\u8d26\u672c\u65f6\u767b\u8bb0\uff1b\u6700\u8fdf\u5728\u6240\u5217\u5b9e\u65bd Task \u7684\u9636\u6bb5\u9a8c\u6536\u524d\u5b8c\u6210\u5e76\u6267\u884c",
+            "assertionContract": {
+                "producerCommand": "supplemental_management_matrix",
+                "evidencePath": "{EVIDENCE}/MANAGEMENT/management-cases.json",
+                "cases": [
+                    {
+                        "case": "management-summary-initial-real-state",
+                        "expect": 1
+                    },
+                    {
+                        "case": "management-summary-populated-matches-stores",
+                        "expect": 1
+                    },
+                    {
+                        "case": "management-summary-unauthorized-no-state-change",
+                        "expect": 1
+                    },
+                    {
+                        "case": "management-summary-registry-failure-not-empty",
+                        "expect": 1
+                    }
+                ]
+            },
+            "originalAssertionCases": [
+                [
+                    "management-summary-initial-real-state",
+                    "management-summary-populated-matches-stores"
+                ],
+                [
+                    "management-summary-unauthorized-no-state-change",
+                    "management-summary-registry-failure-not-empty"
+                ]
+            ],
+            "basisKind": "full_original_behavior",
+            "r02Share": "\u7528\u6237\u6388\u6743\u63d0\u524d\u5b8c\u6574\u5b9e\u65bd\u5e76\u9a8c\u8bc1\u672c\u53f6\u539f\u59cb R00 \u884c\u4e3a\uff1b\u771f\u670d\u52a1\u7ba1\u7406\u5165\u53e3\u4e0e\u8d1f\u9762\u526f\u4f5c\u7528\u7531\u4e13\u5c5e\u751f\u4ea7\u8005\u9010\u6848\u68c0\u67e5",
+            "r07Share": "\u539f\u6392 R07 \u7684\u5ba2\u6237\u7aef\u6295\u5f71\u4ecd\u987b\u5728\u540e\u7eed\u5ba2\u6237\u7aef\u9636\u6bb5\u6309\u5b9e\u9645\u5019\u9009\u6838\u9a8c\uff1bR02 \u672c\u53f6\u5df2\u63d0\u524d\u63a5\u5165\u771f\u5b9e\u670d\u52a1\u884c\u4e3a\u8bc1\u636e",
+            "evidenceRequired": "\u672c\u8f6e supplemental_management_matrix \u771f\u670d\u52a1 TCP \u7ba1\u7406\u5165\u53e3\u6b63\u53cd\u5206\u652f\u3001\u5408\u6210\u6570\u636e\u6839\u524d\u540e\u6301\u4e45\u5316\u3001\u6e90\u6458\u8981\u53ca\u539f\u59cb\u65e5\u5fd7\uff1b\u539f R00 \u4e24\u6761\u65ad\u8a00\u6309 originalAssertionCases \u5168\u8986\u76d6",
+            "evidenceCommandRefs": [
+                "supplemental_management_matrix"
+            ],
+            "evidencePaths": [
+                "{EVIDENCE}/MANAGEMENT/summary.json"
+            ]
+        },
+        {
+            "id": "R00-T02-LA-B8F8CF9E8AF5",
+            "featureId": "F-D20-SEMANTIC_EFFECT-SEMANTIC-EFFECT-DEVICES-DEVICES-B8F8CF",
+            "requirement": "REQUIRED_SUPPLEMENTAL",
+            "r00Kind": "supplemental",
+            "r00TaskIds": [
+                "R02-T03",
+                "R07-T09"
+            ],
+            "r00ExecutionStageIds": [
+                "R02",
+                "R07"
+            ],
+            "r00LedgerStatus": "SPECIFIED_NOT_EXECUTED",
+            "r00ResultIds": [],
+            "r00TestIds": [],
+            "r00Then": "\u4ec5\u672c\u5730\u4e3b\u4eba\u8bfb\u53d6\u8131\u654f\u7684\u8bbe\u5907\u3001\u51ed\u8bc1\u4e0e\u914d\u5bf9\u4f1a\u8bdd\u5217\u8868",
+            "r00Assertions": [
+                "\u7ed9\u5b9a\u76ee\u6807\u4e0e\u76f8\u5e94\u6743\u9650\uff0c\u6267\u884c\u201c\u67e5\u770b\u5df2\u914d\u5bf9\u8bbe\u5907\u548c\u51ed\u8bc1\u201d\u540e\u6838\u5bf9\uff1a\u4ec5\u672c\u5730\u4e3b\u4eba\u8bfb\u53d6\u8131\u654f\u7684\u8bbe\u5907\u3001\u51ed\u8bc1\u4e0e\u914d\u5bf9\u4f1a\u8bdd\u5217\u8868",
+                "\u8f93\u5165\u65e0\u6548\u3001\u6743\u9650\u4e0d\u8db3\u6216\u4e0b\u6e38\u5931\u8d25\u65f6\u5e94\u8fd4\u56de\u660e\u786e\u9519\u8bef\uff0c\u4e0d\u5448\u73b0\u6210\u529f\u7ed3\u679c"
+            ],
+            "r00Due": "R00-T07 \u5efa\u7acb\u6b63\u5f0f\u8d26\u672c\u65f6\u767b\u8bb0\uff1b\u6700\u8fdf\u5728\u6240\u5217\u5b9e\u65bd Task \u7684\u9636\u6bb5\u9a8c\u6536\u524d\u5b8c\u6210\u5e76\u6267\u884c",
+            "assertionContract": {
+                "producerCommand": "supplemental_management_matrix",
+                "evidencePath": "{EVIDENCE}/MANAGEMENT/management-cases.json",
+                "cases": [
+                    {
+                        "case": "management-device-list-redacts-secrets",
+                        "expect": 1
+                    },
+                    {
+                        "case": "management-device-list-includes-pending-pairing-redacted",
+                        "expect": 1
+                    },
+                    {
+                        "case": "management-device-list-unauthorized-refused",
+                        "expect": 1
+                    },
+                    {
+                        "case": "management-device-list-registry-failure-not-empty",
+                        "expect": 1
+                    }
+                ]
+            },
+            "originalAssertionCases": [
+                [
+                    "management-device-list-redacts-secrets",
+                    "management-device-list-includes-pending-pairing-redacted"
+                ],
+                [
+                    "management-device-list-unauthorized-refused",
+                    "management-device-list-registry-failure-not-empty"
+                ]
+            ],
+            "basisKind": "full_original_behavior",
+            "r02Share": "\u7528\u6237\u6388\u6743\u63d0\u524d\u5b8c\u6574\u5b9e\u65bd\u5e76\u9a8c\u8bc1\u672c\u53f6\u539f\u59cb R00 \u884c\u4e3a\uff1b\u771f\u670d\u52a1\u7ba1\u7406\u5165\u53e3\u4e0e\u8d1f\u9762\u526f\u4f5c\u7528\u7531\u4e13\u5c5e\u751f\u4ea7\u8005\u9010\u6848\u68c0\u67e5",
+            "r07Share": "\u539f\u6392 R07 \u7684\u5ba2\u6237\u7aef\u6295\u5f71\u4ecd\u987b\u5728\u540e\u7eed\u5ba2\u6237\u7aef\u9636\u6bb5\u6309\u5b9e\u9645\u5019\u9009\u6838\u9a8c\uff1bR02 \u672c\u53f6\u5df2\u63d0\u524d\u63a5\u5165\u771f\u5b9e\u670d\u52a1\u884c\u4e3a\u8bc1\u636e",
+            "evidenceRequired": "\u672c\u8f6e supplemental_management_matrix \u771f\u670d\u52a1 TCP \u7ba1\u7406\u5165\u53e3\u6b63\u53cd\u5206\u652f\u3001\u5408\u6210\u6570\u636e\u6839\u524d\u540e\u6301\u4e45\u5316\u3001\u6e90\u6458\u8981\u53ca\u539f\u59cb\u65e5\u5fd7\uff1b\u539f R00 \u4e24\u6761\u65ad\u8a00\u6309 originalAssertionCases \u5168\u8986\u76d6",
+            "evidenceCommandRefs": [
+                "supplemental_management_matrix"
+            ],
+            "evidencePaths": [
+                "{EVIDENCE}/MANAGEMENT/summary.json"
+            ]
+        },
+        {
+            "id": "R00-T02-LA-7498024422D7",
+            "featureId": "F-D20-SEMANTIC_EFFECT-SEMANTIC-EFFECT-DEVICES-DEVICES-DEVICEID-REVOKE-749802",
+            "requirement": "REQUIRED_SUPPLEMENTAL",
+            "r00Kind": "supplemental",
+            "r00TaskIds": [
+                "R02-T03",
+                "R07-T09"
+            ],
+            "r00ExecutionStageIds": [
+                "R02",
+                "R07"
+            ],
+            "r00LedgerStatus": "SPECIFIED_NOT_EXECUTED",
+            "r00ResultIds": [],
+            "r00TestIds": [],
+            "r00Then": "\u4ee4\u8bbe\u5907\u5931\u6548\u5e76\u8fd4\u56de\u8131\u654f\u8bbe\u5907\u72b6\u6001\uff0c\u8bb0\u5f55\u5b89\u5168\u5ba1\u8ba1",
+            "r00Assertions": [
+                "\u7ed9\u5b9a\u76ee\u6807\u4e0e\u76f8\u5e94\u6743\u9650\uff0c\u6267\u884c\u201c\u64a4\u9500\u8bbe\u5907\u201d\u540e\u6838\u5bf9\uff1a\u4ee4\u8bbe\u5907\u5931\u6548\u5e76\u8fd4\u56de\u8131\u654f\u8bbe\u5907\u72b6\u6001\uff0c\u8bb0\u5f55\u5b89\u5168\u5ba1\u8ba1",
+                "\u8f93\u5165\u65e0\u6548\u3001\u6743\u9650\u4e0d\u8db3\u6216\u4e0b\u6e38\u5931\u8d25\u65f6\u5e94\u8fd4\u56de\u660e\u786e\u9519\u8bef\uff0c\u4e0d\u5448\u73b0\u6210\u529f\u7ed3\u679c"
+            ],
+            "r00Due": "R00-T07 \u5efa\u7acb\u6b63\u5f0f\u8d26\u672c\u65f6\u767b\u8bb0\uff1b\u6700\u8fdf\u5728\u6240\u5217\u5b9e\u65bd Task \u7684\u9636\u6bb5\u9a8c\u6536\u524d\u5b8c\u6210\u5e76\u6267\u884c",
+            "assertionContract": {
+                "producerCommand": "supplemental_management_matrix",
+                "evidencePath": "{EVIDENCE}/MANAGEMENT/management-cases.json",
+                "cases": [
+                    {
+                        "case": "management-device-revoke-target-auth-rejected",
+                        "expect": 1
+                    },
+                    {
+                        "case": "management-device-revoke-missing-no-side-effect",
+                        "expect": 1
+                    },
+                    {
+                        "case": "management-device-revoke-store-failure-target-still-active",
+                        "expect": 1
+                    },
+                    {
+                        "case": "management-standard-audit-path-failure-no-write-recovery",
+                        "expect": 1
+                    },
+                    {
+                        "case": "management-standard-audit-all-actions-identities-no-secrets",
+                        "expect": 1
+                    }
+                ]
+            },
+            "originalAssertionCases": [
+                [
+                    "management-device-revoke-target-auth-rejected",
+                    "management-standard-audit-all-actions-identities-no-secrets"
+                ],
+                [
+                    "management-device-revoke-missing-no-side-effect",
+                    "management-device-revoke-store-failure-target-still-active",
+                    "management-standard-audit-path-failure-no-write-recovery"
+                ]
+            ],
+            "basisKind": "full_original_behavior",
+            "r02Share": "\u672c\u8f6e\u771f\u670d\u52a1\u751f\u4ea7\u8005\u540c\u65f6\u6838\u4e1a\u52a1\u6b63\u53cd\u3001\u5931\u8d25\u526f\u4f5c\u7528\u4e0e\u6807\u51c6\u5b89\u5168\u5ba1\u8ba1 JSONL \u7684\u4e3b\u4f53/\u76ee\u6807/\u52a8\u4f5c/\u5173\u8054 metadata\u3001\u65e0 secret \u548c\u91cd\u542f\u53bb\u91cd",
+            "r07Share": "\u539f\u6392 R07 \u7684\u5ba2\u6237\u7aef\u6295\u5f71\u4ecd\u987b\u5728\u540e\u7eed\u5ba2\u6237\u7aef\u9636\u6bb5\u6309\u5b9e\u9645\u5019\u9009\u6838\u9a8c\uff1bR02 \u672c\u53f6\u5df2\u63d0\u524d\u63a5\u5165\u771f\u5b9e\u670d\u52a1\u884c\u4e3a\u8bc1\u636e",
+            "evidenceRequired": "\u672c\u8f6e supplemental_management_matrix \u4e13\u5c5e\u6b63\u53cd\u6848\u4f8b\u4e0e\u6807\u51c6\u5b89\u5168\u5ba1\u8ba1 JSONL \u5168\u91cf\u9010\u610f\u56fe\u5bf9\u7167\uff1b\u539f R00 \u4e24\u6761\u65ad\u8a00\u6309 originalAssertionCases \u5168\u8986\u76d6\uff0c\u751f\u4ea7\u8005\u539f\u59cb\u65e5\u5fd7/\u6e90\u7801\u6458\u8981/\u9000\u51fa\u72b6\u6001\u987b\u6709\u6548",
+            "evidenceCommandRefs": [
+                "supplemental_management_matrix"
+            ],
+            "evidencePaths": [
+                "{EVIDENCE}/MANAGEMENT/summary.json"
+            ]
+        },
+        {
+            "id": "R00-T02-LA-43A126149416",
+            "featureId": "F-D20-SEMANTIC_EFFECT-SEMANTIC-EFFECT-DEVICES-DEVICES-CREDENTIALS-CRED-43A126",
+            "requirement": "REQUIRED_SUPPLEMENTAL",
+            "r00Kind": "supplemental",
+            "r00TaskIds": [
+                "R02-T03",
+                "R07-T09"
+            ],
+            "r00ExecutionStageIds": [
+                "R02",
+                "R07"
+            ],
+            "r00LedgerStatus": "SPECIFIED_NOT_EXECUTED",
+            "r00ResultIds": [],
+            "r00TestIds": [],
+            "r00Then": "\u4ee4\u6307\u5b9a\u51ed\u8bc1\u5931\u6548\u5e76\u8fd4\u56de\u8131\u654f\u72b6\u6001\uff0c\u8bb0\u5f55\u5b89\u5168\u5ba1\u8ba1",
+            "r00Assertions": [
+                "\u7ed9\u5b9a\u76ee\u6807\u4e0e\u76f8\u5e94\u6743\u9650\uff0c\u6267\u884c\u201c\u64a4\u9500\u8bbe\u5907\u51ed\u8bc1\u201d\u540e\u6838\u5bf9\uff1a\u4ee4\u6307\u5b9a\u51ed\u8bc1\u5931\u6548\u5e76\u8fd4\u56de\u8131\u654f\u72b6\u6001\uff0c\u8bb0\u5f55\u5b89\u5168\u5ba1\u8ba1",
+                "\u8f93\u5165\u65e0\u6548\u3001\u6743\u9650\u4e0d\u8db3\u6216\u4e0b\u6e38\u5931\u8d25\u65f6\u5e94\u8fd4\u56de\u660e\u786e\u9519\u8bef\uff0c\u4e0d\u5448\u73b0\u6210\u529f\u7ed3\u679c"
+            ],
+            "r00Due": "R00-T07 \u5efa\u7acb\u6b63\u5f0f\u8d26\u672c\u65f6\u767b\u8bb0\uff1b\u6700\u8fdf\u5728\u6240\u5217\u5b9e\u65bd Task \u7684\u9636\u6bb5\u9a8c\u6536\u524d\u5b8c\u6210\u5e76\u6267\u884c",
+            "assertionContract": {
+                "producerCommand": "supplemental_management_matrix",
+                "evidencePath": "{EVIDENCE}/MANAGEMENT/management-cases.json",
+                "cases": [
+                    {
+                        "case": "management-credential-revoke-target-only",
+                        "expect": 1
+                    },
+                    {
+                        "case": "management-credential-revoke-missing-no-side-effect",
+                        "expect": 1
+                    },
+                    {
+                        "case": "management-credential-revoke-store-failure-target-still-active",
+                        "expect": 1
+                    },
+                    {
+                        "case": "management-standard-audit-path-failure-no-write-recovery",
+                        "expect": 1
+                    },
+                    {
+                        "case": "management-standard-audit-all-actions-identities-no-secrets",
+                        "expect": 1
+                    }
+                ]
+            },
+            "originalAssertionCases": [
+                [
+                    "management-credential-revoke-target-only",
+                    "management-standard-audit-all-actions-identities-no-secrets"
+                ],
+                [
+                    "management-credential-revoke-missing-no-side-effect",
+                    "management-credential-revoke-store-failure-target-still-active",
+                    "management-standard-audit-path-failure-no-write-recovery"
+                ]
+            ],
+            "basisKind": "full_original_behavior",
+            "r02Share": "\u672c\u8f6e\u771f\u670d\u52a1\u751f\u4ea7\u8005\u540c\u65f6\u6838\u4e1a\u52a1\u6b63\u53cd\u3001\u5931\u8d25\u526f\u4f5c\u7528\u4e0e\u6807\u51c6\u5b89\u5168\u5ba1\u8ba1 JSONL \u7684\u4e3b\u4f53/\u76ee\u6807/\u52a8\u4f5c/\u5173\u8054 metadata\u3001\u65e0 secret \u548c\u91cd\u542f\u53bb\u91cd",
+            "r07Share": "\u539f\u6392 R07 \u7684\u5ba2\u6237\u7aef\u6295\u5f71\u4ecd\u987b\u5728\u540e\u7eed\u5ba2\u6237\u7aef\u9636\u6bb5\u6309\u5b9e\u9645\u5019\u9009\u6838\u9a8c\uff1bR02 \u672c\u53f6\u5df2\u63d0\u524d\u63a5\u5165\u771f\u5b9e\u670d\u52a1\u884c\u4e3a\u8bc1\u636e",
+            "evidenceRequired": "\u672c\u8f6e supplemental_management_matrix \u4e13\u5c5e\u6b63\u53cd\u6848\u4f8b\u4e0e\u6807\u51c6\u5b89\u5168\u5ba1\u8ba1 JSONL \u5168\u91cf\u9010\u610f\u56fe\u5bf9\u7167\uff1b\u539f R00 \u4e24\u6761\u65ad\u8a00\u6309 originalAssertionCases \u5168\u8986\u76d6\uff0c\u751f\u4ea7\u8005\u539f\u59cb\u65e5\u5fd7/\u6e90\u7801\u6458\u8981/\u9000\u51fa\u72b6\u6001\u987b\u6709\u6548",
+            "evidenceCommandRefs": [
+                "supplemental_management_matrix"
+            ],
+            "evidencePaths": [
+                "{EVIDENCE}/MANAGEMENT/summary.json"
+            ]
+        },
+        {
+            "id": "R00-T02-LA-756217C74101",
+            "featureId": "F-D20-SEMANTIC_EFFECT-SEMANTIC-EFFECT-DEVICES-DEVICES-PAIRING-SESSIONS-756217",
+            "requirement": "REQUIRED_SUPPLEMENTAL",
+            "r00Kind": "supplemental",
+            "r00TaskIds": [
+                "R02-T03",
+                "R07-T09"
+            ],
+            "r00ExecutionStageIds": [
+                "R02",
+                "R07"
+            ],
+            "r00LedgerStatus": "SPECIFIED_NOT_EXECUTED",
+            "r00ResultIds": [],
+            "r00TestIds": [],
+            "r00Then": "\u4ec5\u672c\u5730\u4e3b\u4eba\u5f97\u5230\u914d\u5bf9\u7801\u53ca\u5230\u671f\u65f6\u95f4\uff0c\u6ce8\u518c\u8bb0\u5f55\u5e76\u5199\u5b89\u5168\u5ba1\u8ba1",
+            "r00Assertions": [
+                "\u7ed9\u5b9a\u76ee\u6807\u4e0e\u76f8\u5e94\u6743\u9650\uff0c\u6267\u884c\u201c\u521b\u5efa\u8bbe\u5907\u914d\u5bf9\u4f1a\u8bdd\u201d\u540e\u6838\u5bf9\uff1a\u4ec5\u672c\u5730\u4e3b\u4eba\u5f97\u5230\u914d\u5bf9\u7801\u53ca\u5230\u671f\u65f6\u95f4\uff0c\u6ce8\u518c\u8bb0\u5f55\u5e76\u5199\u5b89\u5168\u5ba1\u8ba1",
+                "\u8f93\u5165\u65e0\u6548\u3001\u6743\u9650\u4e0d\u8db3\u6216\u4e0b\u6e38\u5931\u8d25\u65f6\u5e94\u8fd4\u56de\u660e\u786e\u9519\u8bef\uff0c\u4e0d\u5448\u73b0\u6210\u529f\u7ed3\u679c"
+            ],
+            "r00Due": "R00-T07 \u5efa\u7acb\u6b63\u5f0f\u8d26\u672c\u65f6\u767b\u8bb0\uff1b\u6700\u8fdf\u5728\u6240\u5217\u5b9e\u65bd Task \u7684\u9636\u6bb5\u9a8c\u6536\u524d\u5b8c\u6210\u5e76\u6267\u884c",
+            "assertionContract": {
+                "producerCommand": "supplemental_management_matrix",
+                "evidencePath": "{EVIDENCE}/MANAGEMENT/management-cases.json",
+                "cases": [
+                    {
+                        "case": "management-pairing-create-code-expiry-audit",
+                        "expect": 1
+                    },
+                    {
+                        "case": "management-pairing-create-invalid-unauthorized-unchanged",
+                        "expect": 1
+                    },
+                    {
+                        "case": "management-pairing-create-store-failure-no-code",
+                        "expect": 1
+                    },
+                    {
+                        "case": "management-standard-audit-path-failure-no-write-recovery",
+                        "expect": 1
+                    },
+                    {
+                        "case": "management-standard-audit-all-actions-identities-no-secrets",
+                        "expect": 1
+                    }
+                ]
+            },
+            "originalAssertionCases": [
+                [
+                    "management-pairing-create-code-expiry-audit",
+                    "management-standard-audit-all-actions-identities-no-secrets"
+                ],
+                [
+                    "management-pairing-create-invalid-unauthorized-unchanged",
+                    "management-pairing-create-store-failure-no-code",
+                    "management-standard-audit-path-failure-no-write-recovery"
+                ]
+            ],
+            "basisKind": "full_original_behavior",
+            "r02Share": "\u672c\u8f6e\u771f\u670d\u52a1\u751f\u4ea7\u8005\u540c\u65f6\u6838\u4e1a\u52a1\u6b63\u53cd\u3001\u5931\u8d25\u526f\u4f5c\u7528\u4e0e\u6807\u51c6\u5b89\u5168\u5ba1\u8ba1 JSONL \u7684\u4e3b\u4f53/\u76ee\u6807/\u52a8\u4f5c/\u5173\u8054 metadata\u3001\u65e0 secret \u548c\u91cd\u542f\u53bb\u91cd",
+            "r07Share": "\u539f\u6392 R07 \u7684\u5ba2\u6237\u7aef\u6295\u5f71\u4ecd\u987b\u5728\u540e\u7eed\u5ba2\u6237\u7aef\u9636\u6bb5\u6309\u5b9e\u9645\u5019\u9009\u6838\u9a8c\uff1bR02 \u672c\u53f6\u5df2\u63d0\u524d\u63a5\u5165\u771f\u5b9e\u670d\u52a1\u884c\u4e3a\u8bc1\u636e",
+            "evidenceRequired": "\u672c\u8f6e supplemental_management_matrix \u4e13\u5c5e\u6b63\u53cd\u6848\u4f8b\u4e0e\u6807\u51c6\u5b89\u5168\u5ba1\u8ba1 JSONL \u5168\u91cf\u9010\u610f\u56fe\u5bf9\u7167\uff1b\u539f R00 \u4e24\u6761\u65ad\u8a00\u6309 originalAssertionCases \u5168\u8986\u76d6\uff0c\u751f\u4ea7\u8005\u539f\u59cb\u65e5\u5fd7/\u6e90\u7801\u6458\u8981/\u9000\u51fa\u72b6\u6001\u987b\u6709\u6548",
+            "evidenceCommandRefs": [
+                "supplemental_management_matrix"
+            ],
+            "evidencePaths": [
+                "{EVIDENCE}/MANAGEMENT/summary.json"
+            ]
+        },
+        {
+            "id": "R00-T02-LA-5E1C3363A070",
+            "featureId": "F-D20-SEMANTIC_EFFECT-SEMANTIC-EFFECT-DEVICES-DEVICES-PAIRING-SESSIONS-5E1C33",
+            "requirement": "REQUIRED_SUPPLEMENTAL",
+            "r00Kind": "supplemental",
+            "r00TaskIds": [
+                "R02-T03",
+                "R07-T09"
+            ],
+            "r00ExecutionStageIds": [
+                "R02",
+                "R07"
+            ],
+            "r00LedgerStatus": "SPECIFIED_NOT_EXECUTED",
+            "r00ResultIds": [],
+            "r00TestIds": [],
+            "r00Then": "\u4ec5\u672c\u5730\u4e3b\u4eba\u7528\u914d\u5bf9\u7801\u7b7e\u53d1\u8bbe\u5907\u5bc6\u94a5\uff0c\u8fd4\u56de\u5bc6\u94a5\u4e00\u6b21\u53ca\u8bbe\u5907\u4f5c\u7528\u57df\u5e76\u5199\u5b89\u5168\u5ba1\u8ba1",
+            "r00Assertions": [
+                "\u7ed9\u5b9a\u76ee\u6807\u4e0e\u76f8\u5e94\u6743\u9650\uff0c\u6267\u884c\u201c\u6279\u51c6\u8bbe\u5907\u914d\u5bf9\u201d\u540e\u6838\u5bf9\uff1a\u4ec5\u672c\u5730\u4e3b\u4eba\u7528\u914d\u5bf9\u7801\u7b7e\u53d1\u8bbe\u5907\u5bc6\u94a5\uff0c\u8fd4\u56de\u5bc6\u94a5\u4e00\u6b21\u53ca\u8bbe\u5907\u4f5c\u7528\u57df\u5e76\u5199\u5b89\u5168\u5ba1\u8ba1",
+                "\u8f93\u5165\u65e0\u6548\u3001\u6743\u9650\u4e0d\u8db3\u6216\u4e0b\u6e38\u5931\u8d25\u65f6\u5e94\u8fd4\u56de\u660e\u786e\u9519\u8bef\uff0c\u4e0d\u5448\u73b0\u6210\u529f\u7ed3\u679c"
+            ],
+            "r00Due": "R00-T07 \u5efa\u7acb\u6b63\u5f0f\u8d26\u672c\u65f6\u767b\u8bb0\uff1b\u6700\u8fdf\u5728\u6240\u5217\u5b9e\u65bd Task \u7684\u9636\u6bb5\u9a8c\u6536\u524d\u5b8c\u6210\u5e76\u6267\u884c",
+            "assertionContract": {
+                "producerCommand": "supplemental_management_matrix",
+                "evidencePath": "{EVIDENCE}/MANAGEMENT/management-cases.json",
+                "cases": [
+                    {
+                        "case": "management-pairing-approve-once-scope-secret-audit",
+                        "expect": 1
+                    },
+                    {
+                        "case": "management-pairing-approve-wrong-code-scope-auth-unchanged",
+                        "expect": 1
+                    },
+                    {
+                        "case": "management-pairing-approve-store-failure-still-pending",
+                        "expect": 1
+                    },
+                    {
+                        "case": "management-pairing-replay-does-not-sign",
+                        "expect": 1
+                    },
+                    {
+                        "case": "management-pairing-concurrent-only-one-credential",
+                        "expect": 1
+                    },
+                    {
+                        "case": "management-pairing-expired-code-does-not-sign",
+                        "expect": 1
+                    },
+                    {
+                        "case": "management-standard-audit-path-failure-no-write-recovery",
+                        "expect": 1
+                    },
+                    {
+                        "case": "management-standard-audit-all-actions-identities-no-secrets",
+                        "expect": 1
+                    }
+                ]
+            },
+            "originalAssertionCases": [
+                [
+                    "management-pairing-approve-once-scope-secret-audit",
+                    "management-standard-audit-all-actions-identities-no-secrets"
+                ],
+                [
+                    "management-pairing-approve-wrong-code-scope-auth-unchanged",
+                    "management-pairing-approve-store-failure-still-pending",
+                    "management-pairing-replay-does-not-sign",
+                    "management-pairing-concurrent-only-one-credential",
+                    "management-pairing-expired-code-does-not-sign",
+                    "management-standard-audit-path-failure-no-write-recovery"
+                ]
+            ],
+            "basisKind": "full_original_behavior",
+            "r02Share": "\u672c\u8f6e\u771f\u670d\u52a1\u751f\u4ea7\u8005\u540c\u65f6\u6838\u4e1a\u52a1\u6b63\u53cd\u3001\u5931\u8d25\u526f\u4f5c\u7528\u4e0e\u6807\u51c6\u5b89\u5168\u5ba1\u8ba1 JSONL \u7684\u4e3b\u4f53/\u76ee\u6807/\u52a8\u4f5c/\u5173\u8054 metadata\u3001\u65e0 secret \u548c\u91cd\u542f\u53bb\u91cd",
+            "r07Share": "\u539f\u6392 R07 \u7684\u5ba2\u6237\u7aef\u6295\u5f71\u4ecd\u987b\u5728\u540e\u7eed\u5ba2\u6237\u7aef\u9636\u6bb5\u6309\u5b9e\u9645\u5019\u9009\u6838\u9a8c\uff1bR02 \u672c\u53f6\u5df2\u63d0\u524d\u63a5\u5165\u771f\u5b9e\u670d\u52a1\u884c\u4e3a\u8bc1\u636e",
+            "evidenceRequired": "\u672c\u8f6e supplemental_management_matrix \u4e13\u5c5e\u6b63\u53cd\u6848\u4f8b\u4e0e\u6807\u51c6\u5b89\u5168\u5ba1\u8ba1 JSONL \u5168\u91cf\u9010\u610f\u56fe\u5bf9\u7167\uff1b\u539f R00 \u4e24\u6761\u65ad\u8a00\u6309 originalAssertionCases \u5168\u8986\u76d6\uff0c\u751f\u4ea7\u8005\u539f\u59cb\u65e5\u5fd7/\u6e90\u7801\u6458\u8981/\u9000\u51fa\u72b6\u6001\u987b\u6709\u6548",
+            "evidenceCommandRefs": [
+                "supplemental_management_matrix"
+            ],
+            "evidencePaths": [
+                "{EVIDENCE}/MANAGEMENT/summary.json"
+            ]
+        },
+        {
+            "id": "R00-T02-LA-8BC1A036AFAA",
+            "featureId": "F-D20-SEMANTIC_EFFECT-SEMANTIC-EFFECT-MOBILE-STATIC-DESKTOP-8BC1A0",
+            "requirement": "REQUIRED_SUPPLEMENTAL",
+            "r00Kind": "supplemental",
+            "r00TaskIds": [
+                "R02-T03",
+                "R07-T09"
+            ],
+            "r00ExecutionStageIds": [
+                "R02",
+                "R07"
+            ],
+            "r00LedgerStatus": "SPECIFIED_NOT_EXECUTED",
+            "r00ResultIds": [],
+            "r00TestIds": [],
+            "r00Then": "\u6709\u684c\u9762\u6784\u5efa\u4ea7\u7269\u65f6\u670d\u52a1\u9759\u6001\u9875\u9762\u53ca\u8d44\u6e90\uff0c\u5426\u5219\u6309\u8def\u7531\u8fd4\u56de\u6307\u5f15\u6216\u9519\u8bef",
+            "r00Assertions": [
+                "\u7ed9\u5b9a\u76ee\u6807\u4e0e\u76f8\u5e94\u6743\u9650\uff0c\u6267\u884c\u201c\u6253\u5f00\u6d4f\u89c8\u5668\u684c\u9762\u754c\u9762\u201d\u540e\u6838\u5bf9\uff1a\u6709\u684c\u9762\u6784\u5efa\u4ea7\u7269\u65f6\u670d\u52a1\u9759\u6001\u9875\u9762\u53ca\u8d44\u6e90\uff0c\u5426\u5219\u6309\u8def\u7531\u8fd4\u56de\u6307\u5f15\u6216\u9519\u8bef",
+                "\u8f93\u5165\u65e0\u6548\u3001\u6743\u9650\u4e0d\u8db3\u6216\u4e0b\u6e38\u5931\u8d25\u65f6\u5e94\u8fd4\u56de\u660e\u786e\u9519\u8bef\uff0c\u4e0d\u5448\u73b0\u6210\u529f\u7ed3\u679c"
+            ],
+            "r00Due": "R00-T07 \u5efa\u7acb\u6b63\u5f0f\u8d26\u672c\u65f6\u767b\u8bb0\uff1b\u6700\u8fdf\u5728\u6240\u5217\u5b9e\u65bd Task \u7684\u9636\u6bb5\u9a8c\u6536\u524d\u5b8c\u6210\u5e76\u6267\u884c",
+            "assertionContract": {
+                "producerCommand": "supplemental_static_web_matrix",
+                "evidencePath": "{EVIDENCE}/STATIC_WEB/static-web-cases.json",
+                "cases": [
+                    {
+                        "case": "static-desktop-dist-page-assets",
+                        "expect": 1
+                    },
+                    {
+                        "case": "static-desktop-guide-without-dist",
+                        "expect": 1
+                    },
+                    {
+                        "case": "static-desktop-invalid-explicit-dist-503",
+                        "expect": 1
+                    },
+                    {
+                        "case": "static-web-traversal-secret-refused",
+                        "expect": 1
+                    },
+                    {
+                        "case": "static-web-oversized-asset-explicit-error",
+                        "expect": 1
+                    }
+                ]
+            },
+            "originalAssertionCases": [
+                [
+                    "static-desktop-dist-page-assets",
+                    "static-desktop-guide-without-dist"
+                ],
+                [
+                    "static-web-traversal-secret-refused",
+                    "static-desktop-invalid-explicit-dist-503",
+                    "static-web-oversized-asset-explicit-error"
+                ]
+            ],
+            "basisKind": "full_original_behavior",
+            "r02Share": "\u7528\u6237\u5df2\u6388\u6743\u628a\u539f\u6392 R07 \u7684\u5b8c\u6574\u9759\u6001\u670d\u52a1\u884c\u4e3a\u63d0\u524d\u7eb3\u5165 R02\uff1b\u672c\u9636\u6bb5\u7528\u771f TCP \u6838\u9875\u9762\u3001\u8d44\u6e90\u3001\u7f3a\u6784\u5efa\u6307\u5f15\u53ca\u65e0\u6548\u8def\u5f84/\u635f\u574f\u6784\u5efa\u7684\u660e\u786e\u5931\u8d25",
+            "r07Share": "\u539f\u6392 R07 \u7684\u5ba2\u6237\u7aef\u6784\u5efa\u548c\u754c\u9762\u4ecd\u987b\u5728 R07 \u5bf9\u5176\u5f53\u65f6\u4ea7\u7269\u91cd\u65b0\u6838\u9a8c\uff1b\u672c\u8f6e\u6838\u7684\u662f R00 \u9759\u6001\u670d\u52a1\u53f6",
+            "evidenceRequired": "\u672c\u8f6e supplemental_static_web_matrix \u771f TCP \u9010\u53f6\u6848\u4f8b\u3001\u539f\u59cb\u65e5\u5fd7\u53ca\u5f53\u524d\u6e90\u7801\u6458\u8981\uff1b\u539f R00 \u4e24\u6761\u65ad\u8a00\u6309 originalAssertionCases \u5168\u8986\u76d6",
+            "evidenceCommandRefs": [
+                "supplemental_static_web_matrix"
+            ],
+            "evidencePaths": [
+                "{EVIDENCE}/STATIC_WEB/summary.json"
+            ]
+        },
+        {
+            "id": "R00-T02-LA-3291CFD5F7E2",
+            "featureId": "F-D20-SEMANTIC_EFFECT-SEMANTIC-EFFECT-MOBILE-STATIC-MOBILE-3291CF",
+            "requirement": "REQUIRED_SUPPLEMENTAL",
+            "r00Kind": "supplemental",
+            "r00TaskIds": [
+                "R02-T03",
+                "R07-T09"
+            ],
+            "r00ExecutionStageIds": [
+                "R02",
+                "R07"
+            ],
+            "r00LedgerStatus": "SPECIFIED_NOT_EXECUTED",
+            "r00ResultIds": [],
+            "r00TestIds": [],
+            "r00Then": "\u6709\u79fb\u52a8\u7aef\u6784\u5efa\u4ea7\u7269\u65f6\u670d\u52a1\u9759\u6001\u9875\u9762\u53ca\u8d44\u6e90\uff0c\u5426\u5219\u6309\u8def\u7531\u8fd4\u56de\u6307\u5f15\u6216\u9519\u8bef",
+            "r00Assertions": [
+                "\u7ed9\u5b9a\u76ee\u6807\u4e0e\u76f8\u5e94\u6743\u9650\uff0c\u6267\u884c\u201c\u6253\u5f00\u79fb\u52a8\u7aef\u754c\u9762\u201d\u540e\u6838\u5bf9\uff1a\u6709\u79fb\u52a8\u7aef\u6784\u5efa\u4ea7\u7269\u65f6\u670d\u52a1\u9759\u6001\u9875\u9762\u53ca\u8d44\u6e90\uff0c\u5426\u5219\u6309\u8def\u7531\u8fd4\u56de\u6307\u5f15\u6216\u9519\u8bef",
+                "\u8f93\u5165\u65e0\u6548\u3001\u6743\u9650\u4e0d\u8db3\u6216\u4e0b\u6e38\u5931\u8d25\u65f6\u5e94\u8fd4\u56de\u660e\u786e\u9519\u8bef\uff0c\u4e0d\u5448\u73b0\u6210\u529f\u7ed3\u679c"
+            ],
+            "r00Due": "R00-T07 \u5efa\u7acb\u6b63\u5f0f\u8d26\u672c\u65f6\u767b\u8bb0\uff1b\u6700\u8fdf\u5728\u6240\u5217\u5b9e\u65bd Task \u7684\u9636\u6bb5\u9a8c\u6536\u524d\u5b8c\u6210\u5e76\u6267\u884c",
+            "assertionContract": {
+                "producerCommand": "supplemental_static_web_matrix",
+                "evidencePath": "{EVIDENCE}/STATIC_WEB/static-web-cases.json",
+                "cases": [
+                    {
+                        "case": "static-mobile-dist-page-assets",
+                        "expect": 1
+                    },
+                    {
+                        "case": "static-mobile-guide-without-dist",
+                        "expect": 1
+                    },
+                    {
+                        "case": "static-mobile-invalid-explicit-dist-503",
+                        "expect": 1
+                    },
+                    {
+                        "case": "static-web-traversal-secret-refused",
+                        "expect": 1
+                    },
+                    {
+                        "case": "static-web-oversized-asset-explicit-error",
+                        "expect": 1
+                    }
+                ]
+            },
+            "originalAssertionCases": [
+                [
+                    "static-mobile-dist-page-assets",
+                    "static-mobile-guide-without-dist"
+                ],
+                [
+                    "static-web-traversal-secret-refused",
+                    "static-mobile-invalid-explicit-dist-503",
+                    "static-web-oversized-asset-explicit-error"
+                ]
+            ],
+            "basisKind": "full_original_behavior",
+            "r02Share": "\u7528\u6237\u5df2\u6388\u6743\u628a\u539f\u6392 R07 \u7684\u5b8c\u6574\u9759\u6001\u670d\u52a1\u884c\u4e3a\u63d0\u524d\u7eb3\u5165 R02\uff1b\u672c\u9636\u6bb5\u7528\u771f TCP \u6838\u9875\u9762\u3001\u8d44\u6e90\u3001\u7f3a\u6784\u5efa\u6307\u5f15\u53ca\u65e0\u6548\u8def\u5f84/\u635f\u574f\u6784\u5efa\u7684\u660e\u786e\u5931\u8d25",
+            "r07Share": "\u539f\u6392 R07 \u7684\u5ba2\u6237\u7aef\u6784\u5efa\u548c\u754c\u9762\u4ecd\u987b\u5728 R07 \u5bf9\u5176\u5f53\u65f6\u4ea7\u7269\u91cd\u65b0\u6838\u9a8c\uff1b\u672c\u8f6e\u6838\u7684\u662f R00 \u9759\u6001\u670d\u52a1\u53f6",
+            "evidenceRequired": "\u672c\u8f6e supplemental_static_web_matrix \u771f TCP \u9010\u53f6\u6848\u4f8b\u3001\u539f\u59cb\u65e5\u5fd7\u53ca\u5f53\u524d\u6e90\u7801\u6458\u8981\uff1b\u539f R00 \u4e24\u6761\u65ad\u8a00\u6309 originalAssertionCases \u5168\u8986\u76d6",
+            "evidenceCommandRefs": [
+                "supplemental_static_web_matrix"
+            ],
+            "evidencePaths": [
+                "{EVIDENCE}/STATIC_WEB/summary.json"
+            ]
+        },
+        {
+            "id": "R00-T02-LA-2A1C298F62FC",
+            "featureId": "F-D20-SEMANTIC_EFFECT-SEMANTIC-EFFECT-MOBILE-WORKBENCH-MOBILE-BOOTSTRA-2A1C29",
+            "requirement": "REQUIRED_SUPPLEMENTAL",
+            "r00Kind": "supplemental",
+            "r00TaskIds": [
+                "R02-T03",
+                "R07-T09"
+            ],
+            "r00ExecutionStageIds": [
+                "R02",
+                "R07"
+            ],
+            "r00LedgerStatus": "SPECIFIED_NOT_EXECUTED",
+            "r00ResultIds": [],
+            "r00TestIds": [],
+            "r00Then": "\u8fd4\u56de\u5f53\u524d Agent\u3001\u8bed\u8a00\u3001\u5934\u50cf\u53ef\u7528\u6027\u3001\u5de5\u4f5c\u533a\u548c\u504f\u597d\uff1b\u987a\u5e26\u6e05\u7406\u8fc7\u671f\u6301\u4e45\u5316",
+            "r00Assertions": [
+                "\u7ed9\u5b9a\u76ee\u6807\u4e0e\u76f8\u5e94\u6743\u9650\uff0c\u6267\u884c\u201c\u521d\u59cb\u5316\u79fb\u52a8\u7aef\u754c\u9762\u201d\u540e\u6838\u5bf9\uff1a\u8fd4\u56de\u5f53\u524d Agent\u3001\u8bed\u8a00\u3001\u5934\u50cf\u53ef\u7528\u6027\u3001\u5de5\u4f5c\u533a\u548c\u504f\u597d\uff1b\u987a\u5e26\u6e05\u7406\u8fc7\u671f\u6301\u4e45\u5316",
+                "\u8f93\u5165\u65e0\u6548\u3001\u6743\u9650\u4e0d\u8db3\u6216\u4e0b\u6e38\u5931\u8d25\u65f6\u5e94\u8fd4\u56de\u660e\u786e\u9519\u8bef\uff0c\u4e0d\u5448\u73b0\u6210\u529f\u7ed3\u679c"
+            ],
+            "r00Due": "R00-T07 \u5efa\u7acb\u6b63\u5f0f\u8d26\u672c\u65f6\u767b\u8bb0\uff1b\u6700\u8fdf\u5728\u6240\u5217\u5b9e\u65bd Task \u7684\u9636\u6bb5\u9a8c\u6536\u524d\u5b8c\u6210\u5e76\u6267\u884c",
+            "assertionContract": {
+                "producerCommand": "a05_a06_auth_matrix",
+                "evidencePath": "{EVIDENCE}/A05_A06/leaf-cases.json",
+                "cases": [
+                    {
+                        "case": "a05-no-credential-read",
+                        "expect": 401
+                    },
+                    {
+                        "case": "a05-forged-principal-headers",
+                        "expect": 401
+                    },
+                    {
+                        "case": "a05-cross-principal-read",
+                        "expect": 403
+                    },
+                    {
+                        "case": "a05-positive-control-owner-execute",
+                        "expect": 200
+                    },
+                    {
+                        "case": "a06-evil-origin-health",
+                        "expect": 403
+                    },
+                    {
+                        "case": "a06-foreign-host-health",
+                        "expect": 403
+                    }
+                ]
+            },
+            "basisKind": "auth_primitive_only",
+            "r02Share": "\u8ba4\u8bc1\u539f\u8bed\u57fa\u7840\uff08\u540c LA-25AB678E7108\uff09\uff1b\u79fb\u52a8\u7aef\u5f15\u5bfc\u8def\u7531\u4e0d\u5728 R02 \u73b0\u884c\u9762",
+            "r07Share": "\u79fb\u52a8\u7aef\u521d\u59cb\u5316\u5b8c\u6574\u5165\u53e3\uff08Agent/\u8bed\u8a00/\u5934\u50cf/\u5de5\u4f5c\u533a/\u504f\u597d\u8fd4\u56de\u4e0e\u8fc7\u671f\u6301\u4e45\u5316\u6e05\u7406\uff09",
+            "evidenceRequired": "A05/A06 \u8ba4\u8bc1\u77e9\u9635\u771f\u5b9e\u6267\u884c\u8bc1\u636e\uff1b\u8def\u7531\u5b9e\u73b0\u540e\u53e6\u9700\u5176\u8ba4\u8bc1\u6b63\u8d1f\u77e9\u9635",
+            "evidenceCommandRefs": [
+                "a05_a06_auth_matrix"
+            ]
+        },
+        {
+            "id": "R00-T02-LA-8ED658F9DB9E",
+            "featureId": "F-D20-SEMANTIC_EFFECT-SEMANTIC-EFFECT-SERVER-INDEX-API-SESSION-THINKIN-8ED658",
+            "requirement": "REQUIRED_SUPPLEMENTAL",
+            "r00Kind": "supplemental",
+            "r00TaskIds": [
+                "R02-T03",
+                "R07-T09"
+            ],
+            "r00ExecutionStageIds": [
+                "R02",
+                "R07"
+            ],
+            "r00LedgerStatus": "SPECIFIED_NOT_EXECUTED",
+            "r00ResultIds": [],
+            "r00TestIds": [],
+            "r00Then": "\u8fd4\u56de\u6307\u5b9a\u4f1a\u8bdd\u6216\u65b0\u4f1a\u8bdd\u9ed8\u8ba4\u7ea7\u522b",
+            "r00Assertions": [
+                "\u6210\u529f\uff1a\u6267\u884c\u201c\u67e5\u770b\u4f1a\u8bdd\u601d\u8003\u7ea7\u522b\u201d\u540e\uff0c\u8fd4\u56de\u6307\u5b9a\u4f1a\u8bdd\u6216\u65b0\u4f1a\u8bdd\u9ed8\u8ba4\u7ea7\u522b",
+                "\u62d2\u7edd/\u8fb9\u754c\uff1aquery.sessionPath \u4e0e pendingNewSession=1 \u9009\u62e9\u8303\u56f4\uff1b\u4e0d\u5e94\u9519\u8bef\u6269\u5927\u5199\u5165\u6216\u62ab\u9732\u8303\u56f4"
+            ],
+            "r00Due": "R00-T07 \u5efa\u7acb\u6b63\u5f0f\u8d26\u672c\u65f6\u767b\u8bb0\uff1b\u6700\u8fdf\u5728\u6240\u5217\u5b9e\u65bd Task \u7684\u9636\u6bb5\u9a8c\u6536\u524d\u5b8c\u6210\u5e76\u6267\u884c",
+            "assertionContract": {
+                "producerCommand": "a05_a06_auth_matrix",
+                "evidencePath": "{EVIDENCE}/A05_A06/leaf-cases.json",
+                "cases": [
+                    {
+                        "case": "a05-no-credential-read",
+                        "expect": 401
+                    },
+                    {
+                        "case": "a05-forged-principal-headers",
+                        "expect": 401
+                    },
+                    {
+                        "case": "a05-cross-principal-read",
+                        "expect": 403
+                    },
+                    {
+                        "case": "a05-positive-control-owner-execute",
+                        "expect": 200
+                    },
+                    {
+                        "case": "a06-evil-origin-health",
+                        "expect": 403
+                    },
+                    {
+                        "case": "a06-foreign-host-health",
+                        "expect": 403
+                    }
+                ]
+            },
+            "basisKind": "auth_primitive_only",
+            "r02Share": "\u8ba4\u8bc1\u539f\u8bed\u57fa\u7840\uff08\u540c LA-25AB678E7108\uff09\uff1b\u601d\u8003\u7ea7\u522b\u8bfb\u53d6\u8def\u7531\u4e0d\u5728 R02 \u73b0\u884c\u9762",
+            "r07Share": "\u67e5\u770b\u4f1a\u8bdd\u601d\u8003\u7ea7\u522b\u5b8c\u6574\u5165\u53e3\uff08\u6307\u5b9a\u4f1a\u8bdd\u6216\u65b0\u4f1a\u8bdd\u9ed8\u8ba4\uff1bquery \u8fb9\u754c\u4e0d\u6269\u5927\u62ab\u9732\uff09",
+            "evidenceRequired": "A05/A06 \u8ba4\u8bc1\u77e9\u9635\u771f\u5b9e\u6267\u884c\u8bc1\u636e\uff1b\u8def\u7531\u5b9e\u73b0\u540e\u53e6\u9700\u5176\u8ba4\u8bc1\u6b63\u8d1f\u77e9\u9635",
+            "evidenceCommandRefs": [
+                "a05_a06_auth_matrix"
+            ]
+        },
+        {
+            "id": "R00-T02-LA-F8935B6B0221",
+            "featureId": "F-D20-SEMANTIC_EFFECT-SEMANTIC-EFFECT-SESSION-THINKING-LEVEL-SET-F8935B",
+            "requirement": "REQUIRED_SUPPLEMENTAL",
+            "r00Kind": "supplemental",
+            "r00TaskIds": [
+                "R02-T03",
+                "R07-T09"
+            ],
+            "r00ExecutionStageIds": [
+                "R02",
+                "R07"
+            ],
+            "r00LedgerStatus": "SPECIFIED_NOT_EXECUTED",
+            "r00ResultIds": [],
+            "r00TestIds": [],
+            "r00Then": "\u6709 sessionPath \u65f6\u53ea\u4fee\u6539\u8be5\u4f1a\u8bdd\uff0c\u8fd4\u56de\u89e3\u6790\u540e\u7684\u72b6\u6001",
+            "r00Assertions": [
+                "\u6210\u529f\uff1a\u8bbe\u7f6e\u73b0\u6709\u4f1a\u8bdd\u601d\u8003\u7ea7\u522b\u540e\uff0c\u6709 sessionPath \u65f6\u53ea\u4fee\u6539\u8be5\u4f1a\u8bdd\uff0c\u8fd4\u56de\u89e3\u6790\u540e\u7684\u72b6\u6001",
+                "\u8fb9\u754c\uff1a\u65e0\u6548 level/\u51b2\u7a81 409 \u4e0d\u6539\u53d8\u9ed8\u8ba4\u7ea7\u522b\uff1b\u62d2\u7edd\u65f6\u76ee\u6807\u72b6\u6001\u4e0d\u53d8"
+            ],
+            "r00Due": "R00-T07 \u5efa\u7acb\u6b63\u5f0f\u8d26\u672c\u65f6\u767b\u8bb0\uff1b\u6700\u8fdf\u5728\u6240\u5217\u5b9e\u65bd Task \u7684\u9636\u6bb5\u9a8c\u6536\u524d\u5b8c\u6210\u5e76\u6267\u884c",
+            "assertionContract": {
+                "producerCommand": "a05_a06_auth_matrix",
+                "evidencePath": "{EVIDENCE}/A05_A06/leaf-cases.json",
+                "cases": [
+                    {
+                        "case": "a05-no-credential-read",
+                        "expect": 401
+                    },
+                    {
+                        "case": "a05-forged-principal-headers",
+                        "expect": 401
+                    },
+                    {
+                        "case": "a05-cross-principal-read",
+                        "expect": 403
+                    },
+                    {
+                        "case": "a05-positive-control-owner-execute",
+                        "expect": 200
+                    },
+                    {
+                        "case": "a06-evil-origin-health",
+                        "expect": 403
+                    },
+                    {
+                        "case": "a06-foreign-host-health",
+                        "expect": 403
+                    }
+                ]
+            },
+            "basisKind": "auth_primitive_only",
+            "r02Share": "\u8ba4\u8bc1\u539f\u8bed\u57fa\u7840\uff08\u540c LA-25AB678E7108\uff09\uff1b\u601d\u8003\u7ea7\u522b\u8bbe\u7f6e\u8def\u7531\u4e0d\u5728 R02 \u73b0\u884c\u9762",
+            "r07Share": "\u8bbe\u7f6e\u73b0\u6709\u4f1a\u8bdd\u601d\u8003\u7ea7\u522b\u5b8c\u6574\u5165\u53e3\uff08\u53ea\u6539\u8be5\u4f1a\u8bdd\uff1b\u65e0\u6548 level/409 \u4e0d\u6539\u72b6\u6001\uff09",
+            "evidenceRequired": "A05/A06 \u8ba4\u8bc1\u77e9\u9635\u771f\u5b9e\u6267\u884c\u8bc1\u636e\uff1b\u8def\u7531\u5b9e\u73b0\u540e\u53e6\u9700\u5176\u8ba4\u8bc1\u6b63\u8d1f\u77e9\u9635",
+            "evidenceCommandRefs": [
+                "a05_a06_auth_matrix"
+            ]
+        },
+        {
+            "id": "R00-T02-LA-39AD35E1FD71",
+            "featureId": "F-D20-SEMANTIC_EFFECT-SEMANTIC-EFFECT-SESSION-THINKING-LEVEL-DEFAULT-S-39AD35",
+            "requirement": "REQUIRED_SUPPLEMENTAL",
+            "r00Kind": "supplemental",
+            "r00TaskIds": [
+                "R02-T03",
+                "R07-T09"
+            ],
+            "r00ExecutionStageIds": [
+                "R02",
+                "R07"
+            ],
+            "r00LedgerStatus": "SPECIFIED_NOT_EXECUTED",
+            "r00ResultIds": [],
+            "r00TestIds": [],
+            "r00Then": "\u65e0 sessionPath \u65f6\u4fee\u6539\u9ed8\u8ba4\u7ea7\u522b\uff0c\u4e0d\u8ffd\u6539\u65e7\u4f1a\u8bdd",
+            "r00Assertions": [
+                "\u6210\u529f\uff1a\u8bbe\u7f6e\u65b0\u4f1a\u8bdd\u9ed8\u8ba4\u601d\u8003\u7ea7\u522b\u540e\uff0c\u65e0 sessionPath \u65f6\u4fee\u6539\u9ed8\u8ba4\u7ea7\u522b\uff0c\u4e0d\u8ffd\u6539\u65e7\u4f1a\u8bdd",
+                "\u8fb9\u754c\uff1a\u65e0\u6548 level/\u51b2\u7a81 409 \u4e0d\u6539\u53d8\u5df2\u6709\u4f1a\u8bdd\uff1b\u62d2\u7edd\u65f6\u76ee\u6807\u72b6\u6001\u4e0d\u53d8"
+            ],
+            "r00Due": "R00-T07 \u5efa\u7acb\u6b63\u5f0f\u8d26\u672c\u65f6\u767b\u8bb0\uff1b\u6700\u8fdf\u5728\u6240\u5217\u5b9e\u65bd Task \u7684\u9636\u6bb5\u9a8c\u6536\u524d\u5b8c\u6210\u5e76\u6267\u884c",
+            "assertionContract": {
+                "producerCommand": "a05_a06_auth_matrix",
+                "evidencePath": "{EVIDENCE}/A05_A06/leaf-cases.json",
+                "cases": [
+                    {
+                        "case": "a05-no-credential-read",
+                        "expect": 401
+                    },
+                    {
+                        "case": "a05-forged-principal-headers",
+                        "expect": 401
+                    },
+                    {
+                        "case": "a05-cross-principal-read",
+                        "expect": 403
+                    },
+                    {
+                        "case": "a05-positive-control-owner-execute",
+                        "expect": 200
+                    },
+                    {
+                        "case": "a06-evil-origin-health",
+                        "expect": 403
+                    },
+                    {
+                        "case": "a06-foreign-host-health",
+                        "expect": 403
+                    }
+                ]
+            },
+            "basisKind": "auth_primitive_only",
+            "r02Share": "\u8ba4\u8bc1\u539f\u8bed\u57fa\u7840\uff08\u540c LA-25AB678E7108\uff09\uff1b\u9ed8\u8ba4\u601d\u8003\u7ea7\u522b\u8def\u7531\u4e0d\u5728 R02 \u73b0\u884c\u9762",
+            "r07Share": "\u8bbe\u7f6e\u65b0\u4f1a\u8bdd\u9ed8\u8ba4\u601d\u8003\u7ea7\u522b\u5b8c\u6574\u5165\u53e3\uff08\u4e0d\u8ffd\u6539\u65e7\u4f1a\u8bdd\uff1b\u62d2\u7edd\u65f6\u72b6\u6001\u4e0d\u53d8\uff09",
+            "evidenceRequired": "A05/A06 \u8ba4\u8bc1\u77e9\u9635\u771f\u5b9e\u6267\u884c\u8bc1\u636e\uff1b\u8def\u7531\u5b9e\u73b0\u540e\u53e6\u9700\u5176\u8ba4\u8bc1\u6b63\u8d1f\u77e9\u9635",
+            "evidenceCommandRefs": [
+                "a05_a06_auth_matrix"
+            ]
+        },
+        {
+            "id": "R00-T02-LA-066B54983F6A",
+            "featureId": "F-D20-SEMANTIC_EFFECT-SEMANTIC-EFFECT-WEB-AUTH-WEB-AUTH-SESSION-READ-066B54",
+            "requirement": "REQUIRED_SUPPLEMENTAL",
+            "r00Kind": "supplemental",
+            "r00TaskIds": [
+                "R02-T03",
+                "R07-T09"
+            ],
+            "r00ExecutionStageIds": [
+                "R02",
+                "R07"
+            ],
+            "r00LedgerStatus": "SPECIFIED_NOT_EXECUTED",
+            "r00ResultIds": [],
+            "r00TestIds": [],
+            "r00Then": "\u6709\u6548 cookie \u8fd4\u56de\u51c0\u5316\u540e\u7684 principal\uff1b\u65e0\u6548/\u8fc7\u671f\u8fd4\u56de authenticated:false",
+            "r00Assertions": [
+                "\u6210\u529f\uff1a\u6267\u884c\u201c\u67e5\u770b\u5f53\u524d\u7f51\u9875\u767b\u5f55\u72b6\u6001\u201d\u540e\uff0c\u6709\u6548 cookie \u8fd4\u56de\u51c0\u5316\u540e\u7684 principal\uff1b\u65e0\u6548/\u8fc7\u671f\u8fd4\u56de authenticated:false",
+                "\u62d2\u7edd/\u8fb9\u754c\uff1acookie \u4e0e\u8fde\u63a5\u7c7b\u578b\u51b3\u5b9a\u8eab\u4efd\uff1b\u4e0d\u62ab\u9732 session secret\uff1b\u4e0d\u5e94\u9519\u8bef\u6269\u5927\u5199\u5165\u6216\u62ab\u9732\u8303\u56f4"
+            ],
+            "r00Due": "R00-T07 \u5efa\u7acb\u6b63\u5f0f\u8d26\u672c\u65f6\u767b\u8bb0\uff1b\u6700\u8fdf\u5728\u6240\u5217\u5b9e\u65bd Task \u7684\u9636\u6bb5\u9a8c\u6536\u524d\u5b8c\u6210\u5e76\u6267\u884c",
+            "assertionContract": {
+                "producerCommand": "a05_a06_auth_matrix",
+                "evidencePath": "{EVIDENCE}/A05_A06/leaf-cases.json",
+                "cases": [
+                    {
+                        "case": "a05-no-credential-read",
+                        "expect": 401
+                    },
+                    {
+                        "case": "a05-forged-principal-headers",
+                        "expect": 401
+                    },
+                    {
+                        "case": "a05-cross-principal-read",
+                        "expect": 403
+                    },
+                    {
+                        "case": "a05-positive-control-owner-execute",
+                        "expect": 200
+                    },
+                    {
+                        "case": "a06-evil-origin-health",
+                        "expect": 403
+                    },
+                    {
+                        "case": "a06-foreign-host-health",
+                        "expect": 403
+                    }
+                ]
+            },
+            "basisKind": "auth_primitive_only",
+            "r02Share": "R02 \u771f\u670d\u52a1\u5df2\u5b58\u5728 /lingxi/v1/web-auth/session \u5e76\u6709\u771f\u5b9e TCP \u6b63\u53cd\u6848\u4f8b\uff1b\u4ecd\u6b20\u628a\u6709\u6548/\u65e0\u6548/\u8fc7\u671f cookie\u3001\u8fde\u63a5\u7c7b\u578b\u8eab\u4efd\u53ca secret \u4e0d\u62ab\u9732\u9010\u6761\u9489\u8fdb\u539f\u53f6\u95e8\u7981\uff0c\u5f53\u524d\u901a\u7528\u8ba4\u8bc1\u68c0\u67e5\u4e0d\u80fd\u4ee3\u66ff",
+            "r07Share": "\u67e5\u770b\u7f51\u9875\u767b\u5f55\u72b6\u6001\u5b8c\u6574\u5165\u53e3\uff08\u6709\u6548 cookie \u51c0\u5316 principal\uff1b\u65e0\u6548/\u8fc7\u671f authenticated:false\uff1b\u4e0d\u62ab\u9732 secret\uff09",
+            "evidenceRequired": "\u672c\u8f6e\u771f\u5b9e Web session \u9010\u6761\u4ef6\u6848\u4f8b\u53ca\u539f\u59cb cookie/\u54cd\u5e94/\u78c1\u76d8\u8bc1\u636e\uff1b\u6709\u6548\u3001\u65e0\u6548\u3001\u8fc7\u671f\u3001\u8fde\u63a5\u7c7b\u578b\u4e0e\u65e0 secret \u5747\u8981\u9010\u6761\u5224\u5b9a",
+            "evidenceCommandRefs": [
+                "a05_a06_auth_matrix"
+            ]
+        },
+        {
+            "id": "R00-T02-LA-C4E6F27D7873",
+            "featureId": "F-D20-SEMANTIC_EFFECT-SEMANTIC-EFFECT-WEB-AUTH-WEB-AUTH-LOGIN-POST-C4E6F2",
+            "requirement": "REQUIRED_SUPPLEMENTAL",
+            "r00Kind": "supplemental",
+            "r00TaskIds": [
+                "R02-T03",
+                "R07-T09"
+            ],
+            "r00ExecutionStageIds": [
+                "R02",
+                "R07"
+            ],
+            "r00LedgerStatus": "SPECIFIED_NOT_EXECUTED",
+            "r00ResultIds": [],
+            "r00TestIds": [],
+            "r00Then": "\u6821\u9a8c token \u6216\u672c\u5730\u8d26\u53f7\u5bc6\u7801\uff0c\u521b\u5efa 14 \u65e5 Web session \u5e76\u8bbe HttpOnly cookie",
+            "r00Assertions": [
+                "\u6210\u529f\uff1a\u6267\u884c\u201c\u767b\u5f55\u7f51\u9875/\u79fb\u52a8\u7aef\u201d\u540e\uff0c\u6821\u9a8c token \u6216\u672c\u5730\u8d26\u53f7\u5bc6\u7801\uff0c\u521b\u5efa 14 \u65e5 Web session \u5e76\u8bbe HttpOnly cookie",
+                "\u62d2\u7edd/\u8fb9\u754c\uff1abody.credential \u4f18\u5148 token\uff1b\u5426\u5219 username/password\uff1b\u8fdc\u7aef\u5bc6\u7801\u987b HTTPS\uff1bclientKind \u51b3\u5b9a scope\uff1b\u4e0d\u5e94\u9519\u8bef\u6269\u5927\u5199\u5165\u6216\u62ab\u9732\u8303\u56f4"
+            ],
+            "r00Due": "R00-T07 \u5efa\u7acb\u6b63\u5f0f\u8d26\u672c\u65f6\u767b\u8bb0\uff1b\u6700\u8fdf\u5728\u6240\u5217\u5b9e\u65bd Task \u7684\u9636\u6bb5\u9a8c\u6536\u524d\u5b8c\u6210\u5e76\u6267\u884c",
+            "assertionContract": {
+                "producerCommand": "a05_a06_auth_matrix",
+                "evidencePath": "{EVIDENCE}/A05_A06/leaf-cases.json",
+                "cases": [
+                    {
+                        "case": "a05-no-credential-read",
+                        "expect": 401
+                    },
+                    {
+                        "case": "a05-forged-principal-headers",
+                        "expect": 401
+                    },
+                    {
+                        "case": "a05-cross-principal-read",
+                        "expect": 403
+                    },
+                    {
+                        "case": "a05-positive-control-owner-execute",
+                        "expect": 200
+                    },
+                    {
+                        "case": "a06-evil-origin-health",
+                        "expect": 403
+                    },
+                    {
+                        "case": "a06-foreign-host-health",
+                        "expect": 403
+                    }
+                ]
+            },
+            "basisKind": "auth_primitive_only",
+            "r02Share": "R02 \u771f\u670d\u52a1\u5df2\u5b58\u5728 /lingxi/v1/web-auth/login\uff1b\u5df2\u80fd\u7528\u5bc6\u7801\u767b\u5f55\uff0c\u4f46 token \u4f18\u5148\u7ea7\u300114 \u65e5\u3001HttpOnly\u3001\u8fdc\u7aef HTTPS \u548c clientKind scope \u7684\u5b8c\u6574\u539f\u65ad\u8a00\u5c1a\u672a\u9010\u6761\u8fdb\u5165\u672c\u53f6\u95e8\u7981",
+            "r07Share": "\u7f51\u9875/\u79fb\u52a8\u7aef\u767b\u5f55\u5b8c\u6574\u5165\u53e3\uff08token \u6216\u8d26\u53f7\u5bc6\u7801\u300114 \u65e5 session\u3001HttpOnly cookie\u3001HTTPS/\u4f5c\u7528\u57df\u8fb9\u754c\uff09",
+            "evidenceRequired": "\u672c\u8f6e Web \u767b\u5f55\u7684\u5bc6\u7801/token\u3001\u4f18\u5148\u7ea7\u300114 \u65e5 cookie \u5c5e\u6027\u3001\u8fdc\u7aef HTTP \u62d2\u7edd/HTTPS \u6210\u529f\u3001clientKind scope\u3001\u5931\u8d25\u526f\u4f5c\u7528\u9010\u6761\u4ef6\u771f\u5b9e\u8bc1\u636e",
+            "evidenceCommandRefs": [
+                "a05_a06_auth_matrix"
+            ]
+        },
+        {
+            "id": "R00-T02-LA-4C1A9735CF04",
+            "featureId": "F-D20-ROUTE_BEHAVIOR-BEHAVIOR-WEB-AUTH-WEB-AUTH-LOGOUT-POST-4C1A97",
+            "requirement": "REQUIRED_SUPPLEMENTAL",
+            "r00Kind": "supplemental",
+            "r00TaskIds": [
+                "R02-T03",
+                "R07-T09"
+            ],
+            "r00ExecutionStageIds": [
+                "R02",
+                "R07"
+            ],
+            "r00LedgerStatus": "SPECIFIED_NOT_EXECUTED",
+            "r00ResultIds": [],
+            "r00TestIds": [],
+            "r00Then": "\u64a4\u9500\u5f53\u524d Web \u4f1a\u8bdd\u5e76\u6e05\u9664\u4f1a\u8bdd Cookie\uff0c\u8fd4\u56de\u6210\u529f",
+            "r00Assertions": [
+                "\u6267\u884c\u201c\u9000\u51fa\u7f51\u9875\u767b\u5f55\u201d\u540e\u6838\u5bf9\uff1a\u64a4\u9500\u5f53\u524d Web \u4f1a\u8bdd\u5e76\u6e05\u9664\u4f1a\u8bdd Cookie\uff0c\u8fd4\u56de\u6210\u529f",
+                "\u5931\u8d25\u3001\u51b2\u7a81\u6216\u62d2\u7edd\u65f6\u6838\u5bf9\u8fd4\u56de\u7684\u72b6\u6001\u4e0e\u5b9e\u9645\u526f\u4f5c\u7528\u4e00\u81f4"
+            ],
+            "r00Due": "R00-T07 \u5efa\u7acb\u6b63\u5f0f\u8d26\u672c\u65f6\u767b\u8bb0\uff1b\u6700\u8fdf\u5728\u6240\u5217\u5b9e\u65bd Task \u7684\u9636\u6bb5\u9a8c\u6536\u524d\u5b8c\u6210\u5e76\u6267\u884c",
+            "assertionContract": {
+                "producerCommand": "supplemental_management_matrix",
+                "evidencePath": "{EVIDENCE}/MANAGEMENT/management-cases.json",
+                "cases": [
+                    {
+                        "case": "management-web-logout-only-current-cookie",
+                        "expect": 1
+                    },
+                    {
+                        "case": "management-lan-browser-origin-login-session-logout",
+                        "expect": 1
+                    },
+                    {
+                        "case": "management-web-logout-store-failure-session-alive",
+                        "expect": 1
+                    },
+                    {
+                        "case": "management-web-logout-invalid-cookie-no-other-revoke",
+                        "expect": 1
+                    }
+                ]
+            },
+            "originalAssertionCases": [
+                [
+                    "management-web-logout-only-current-cookie",
+                    "management-lan-browser-origin-login-session-logout"
+                ],
+                [
+                    "management-web-logout-store-failure-session-alive",
+                    "management-web-logout-invalid-cookie-no-other-revoke"
+                ]
+            ],
+            "basisKind": "full_original_behavior",
+            "r02Share": "\u7528\u6237\u6388\u6743\u63d0\u524d\u5b8c\u6574\u5b9e\u65bd\u5e76\u9a8c\u8bc1\u672c\u53f6\u539f\u59cb R00 \u884c\u4e3a\uff1b\u771f\u670d\u52a1\u7ba1\u7406\u5165\u53e3\u4e0e\u8d1f\u9762\u526f\u4f5c\u7528\u7531\u4e13\u5c5e\u751f\u4ea7\u8005\u9010\u6848\u68c0\u67e5",
+            "r07Share": "\u539f\u6392 R07 \u7684\u5ba2\u6237\u7aef\u6295\u5f71\u4ecd\u987b\u5728\u540e\u7eed\u5ba2\u6237\u7aef\u9636\u6bb5\u6309\u5b9e\u9645\u5019\u9009\u6838\u9a8c\uff1bR02 \u672c\u53f6\u5df2\u63d0\u524d\u63a5\u5165\u771f\u5b9e\u670d\u52a1\u884c\u4e3a\u8bc1\u636e",
+            "evidenceRequired": "\u672c\u8f6e supplemental_management_matrix \u771f\u670d\u52a1 TCP \u7ba1\u7406\u5165\u53e3\u6b63\u53cd\u5206\u652f\u3001\u5408\u6210\u6570\u636e\u6839\u524d\u540e\u6301\u4e45\u5316\u3001\u6e90\u6458\u8981\u53ca\u539f\u59cb\u65e5\u5fd7\uff1b\u539f R00 \u4e24\u6761\u65ad\u8a00\u6309 originalAssertionCases \u5168\u8986\u76d6",
+            "evidenceCommandRefs": [
+                "supplemental_management_matrix"
+            ],
+            "evidencePaths": [
+                "{EVIDENCE}/MANAGEMENT/summary.json"
+            ]
+        },
+        {
+            "id": "R00-T02-LA-000E6E1301C0",
+            "featureId": "F-D20-UI-UI-SETTINGS-ACCESS-000E6E",
+            "requirement": "REQUIRED_SUPPLEMENTAL",
+            "r00Kind": "supplemental",
+            "r00TaskIds": [
+                "R02-T03",
+                "R07-T09"
+            ],
+            "r00ExecutionStageIds": [
+                "R02",
+                "R07"
+            ],
+            "r00LedgerStatus": "SPECIFIED_NOT_EXECUTED",
+            "r00ResultIds": [],
+            "r00TestIds": [],
+            "r00Then": "\u9010\u52a8\u4f5c\u6838\u5bf9\u5b9e\u9645\u72b6\u6001\u4e0e\u9875\u9762\u6295\u5f71\uff1b\u5931\u8d25\u4e0d\u4f2a\u88c5\u6210\u7a7a\u6570\u636e",
+            "r00Assertions": [
+                "\u6253\u5f00\u8bbe\u7f6e\u5bb9\u5668\u81ea\u52a8\u521d\u59cb\u5316\uff1a\u8fde\u63a5\u3001\u8bed\u8a00\u3001\u52a9\u624b\u3001\u5feb\u7167\u3001\u6a21\u578b\u548c\u4f9b\u5e94\u5546\u6458\u8981\uff08\u5404\u9875\u5171\u7528\uff09\uff1a\u6210\u529f\u6838\u5bf9 \u51b7\u542f\u52a8\u5b8c\u6210\u540e ready\uff1b\u5df2\u6709\u7f13\u5b58\u76f4\u63a5\u663e\u793a\u65e7\u6570\u636e\u5e76\u540e\u53f0\u5237\u65b0\uff1b\u4f9b\u5e94\u5546\u6458\u8981\u4e0d\u963b\u585e ready\uff1b\u7a7a\u6001/\u672a\u521d\u59cb\u5316\u6838\u5bf9 \u65e0\u7f13\u5b58\u65f6\u663e\u793a loading mask\uff1b15 \u79d2\u8d85\u65f6\u5f3a\u5236 ready\uff1b\u4f9b\u5e94\u5546\u6458\u8981\u53ef\u6682\u7f3a\uff1b\u9519\u8bef/\u65e0\u6743\u9650\u6838\u5bf9 \u521d\u59cb\u5316\u5f02\u5e38\u4f1a log \u5e76 ready=true\uff0c\u53ef\u80fd\u5c55\u793a\u65e7/\u7a7a\u6570\u636e\uff1b\u4f9b\u5e94\u5546\u6458\u8981\u5931\u8d25\u88ab catch \u9759\u9ed8\uff0c\u4e0d\u80fd\u5f53\u7a7a\u5217\u8868\u6210\u529f",
+                "\u6253\u5f00\u9875\u81ea\u52a8\u52a0\u8f7d\u8bbf\u95ee\u603b\u89c8\u53ca\u8d26\u53f7/\u8bbe\u5907\u72b6\u6001\uff1a\u6210\u529f\u6838\u5bf9 \u6253\u5f00\u9875\u53ea\u8bf7\u6c42 /api/access/summary \u5e76\u663e\u793a\u5730\u5740\u3001\u6a21\u5f0f\u3001\u8bbe\u5907\u548c\u51ed\u8bc1\u6458\u8981\uff1b\u8bbe\u5907\u8be6\u60c5\u53e6\u7531\u540e\u7eed\u64cd\u4f5c\u8bfb\u53d6\u3002\uff1bmobileUrl \u53ef\u7528\u4e14\u65e0\u9700\u91cd\u542f\u65f6\u4e8c\u7ef4\u7801\u56fe\u7247\u81ea\u52a8\u8bfb\u53d6\u5e76\u663e\u793a\u3002\uff1b\u7a7a\u6001/\u672a\u521d\u59cb\u5316\u6838\u5bf9 \u5c1a\u672a\u914d\u7f6e\u5bc6\u94a5/\u65e0\u8bbe\u5907\u663e\u793a\u7a7a\u5217\u8868\uff1b\u65e0 mobileUrl \u6216 restartRequired \u4e0d\u6e32\u67d3\u4e8c\u7ef4\u7801\u56fe\uff0c\u4e0d\u53d1\u8be5 GET\u3002\uff1b\u9519\u8bef/\u65e0\u6743\u9650\u6838\u5bf9 \u52a0\u8f7d\u9519\u8bef\u663e\u793a\u8b66\u544a\uff0c\u4e0d\u80fd\u5f53\u65e0\u8bbe\u5907",
+                "\u5c40\u57df\u7f51\u5f00\u5173\u3001\u7aef\u53e3\u53ca\u516c\u5f00\u5730\u5740\u4fdd\u5b58\uff1a\u6210\u529f\u6838\u5bf9 \u4fdd\u5b58\u5e76\u663e\u793a\u91cd\u542f\u9700\u6c42\uff1b\u7a7a\u6001/\u672a\u521d\u59cb\u5316\u6838\u5bf9 \u672a\u52a0\u8f7d summary \u7981\u4fdd\u5b58\uff1b\u9519\u8bef/\u65e0\u6743\u9650\u6838\u5bf9 \u8fdc\u7aef\u8fde\u63a5\u4ec5\u672c\u673a\u8bbe\u7f6e\u63d0\u793a\uff1b\u5931\u8d25 toast",
+                "\u751f\u6210\u624b\u673a/\u684c\u9762\u8fde\u63a5\u51ed\u8bc1\uff1b\u540c\u5c4f\u6709\u5730\u5740\u65f6\u81ea\u52a8\u663e\u793a\u4e8c\u7ef4\u7801\uff1a\u6210\u529f\u6838\u5bf9 \u65b0\u5bc6\u94a5/\u8fde\u63a5\u5730\u5740\u663e\u793a\uff1b\u540c\u5c4f mobileUrl \u53ef\u7528\u4e14\u65e0\u9700\u91cd\u542f\u65f6\u4e8c\u7ef4\u7801\u81ea\u52a8\u663e\u793a\uff0c\u4e0e\u751f\u6210\u51ed\u8bc1\u72ec\u7acb\u3002\uff1b\u51ed\u8bc1\u751f\u6210\u540e\u91cd\u8bfb\u8bbf\u95ee\u603b\u89c8\uff1b\u82e5\u91cd\u8bfb\u5931\u8d25\uff0c\u5373\u4f7f\u751f\u6210\u5df2\u6301\u4e45\u5316\u4ecd\u663e\u793a\u5931\u8d25 toast\u3002\uff1b\u7a7a\u6001/\u672a\u521d\u59cb\u5316\u6838\u5bf9 \u672a\u751f\u6210\u51ed\u8bc1\u663e\u793a\u751f\u6210\u6309\u94ae\uff1b\u65e0 mobileUrl \u6216\u9700\u91cd\u542f\u65f6\u4e0d\u6e32\u67d3\u4e8c\u7ef4\u7801\u3002\uff1b\u9519\u8bef/\u65e0\u6743\u9650\u6838\u5bf9 \u751f\u6210\u5931\u8d25 toast\uff0c\u65e7\u5bc6\u94a5\u4e0d\u6e05\u9664",
+                "\u590d\u5236\u5730\u5740\u548c\u5bc6\u94a5\u3001\u8fde\u63a5\u8fdc\u7aef\u6216\u8fd4\u56de\u672c\u673a\uff1a\u6210\u529f\u6838\u5bf9 \u590d\u5236\u6309\u94ae\u5728\u526a\u8d34\u677f API \u5b58\u5728\u4e14\u5199\u5165\u6210\u529f\u65f6\u663e\u793a copied\uff1b\u8fde\u63a5\u8fdc\u7aef\u6210\u529f\u540e\u5207\u6362\u5f53\u524d\u670d\u52a1\u3002\uff1b\u9009\u62e9\u8fdc\u7aef\u6216\u672c\u673a\u8fde\u63a5\u6210\u529f\u540e\u8c03\u7528 reloadMainWindow \u5e94\u7528\u3002\uff1b\u7a7a\u6001/\u672a\u521d\u59cb\u5316\u6838\u5bf9 \u526a\u8d34\u677f API \u7f3a\u5931\u65f6\u53ef\u8df3\u8fc7\u771f\u5b9e\u5199\u5165\u5374\u4ecd\u663e\u793a copied\uff1b\u8fdc\u7aef\u5730\u5740\u6216\u51ed\u8bc1\u7f3a\u5931\u65f6\u8fde\u63a5\u4e0d\u53ef\u5b8c\u6210\u3002\uff1b\u9519\u8bef/\u65e0\u6743\u9650\u6838\u5bf9 \u526a\u8d34\u677f\u5199\u5165 Promise \u62d2\u7edd\u672a\u6355\u83b7\uff1b\u8fdc\u7aef\u8fde\u63a5\u5931\u8d25\u7531\u8fde\u63a5\u5206\u652f\u6355\u83b7\u63d0\u793a\u4e14\u4e0d\u5207\u6d3b\u8dc3\u670d\u52a1\uff0c\u4e24\u79cd\u5931\u8d25\u4e0d\u80fd\u6df7\u5199\u3002\uff1b\u8fde\u63a5\u5931\u8d25\u6216\u672c\u673a\u8fde\u63a5\u4e0d\u53ef\u7528\u4e0d\u91cd\u8f7d\u3002",
+                "\u64a4\u9500\u8bbe\u5907\u6216\u5355\u6761\u51ed\u8bc1\uff1a\u6210\u529f\u6838\u5bf9 \u8bbe\u5907/\u51ed\u8bc1\u4ece\u603b\u89c8\u79fb\u9664\uff1b\u64a4\u9500\u6210\u529f\u540e\u91cd\u8bfb\u8bbf\u95ee\u603b\u89c8\uff1b\u82e5\u91cd\u8bfb\u5931\u8d25\uff0c\u5373\u4f7f\u64a4\u9500\u5df2\u6301\u4e45\u5316\u4ecd\u663e\u793a\u5931\u8d25 toast\u3002\uff1b\u7a7a\u6001/\u672a\u521d\u59cb\u5316\u6838\u5bf9 \u65e0\u8bbe\u5907\u6ca1\u6709\u64a4\u9500\u63a7\u4ef6\uff1b\u9519\u8bef/\u65e0\u6743\u9650\u6838\u5bf9 \u5931\u8d25\u4fdd\u7559\u6761\u76ee\u5e76\u63d0\u793a",
+                "\u7f16\u8f91\u672c\u5730\u8d26\u53f7\u8d44\u6599\u3001\u8bbe\u7f6e\u6216\u6e05\u9664\u5bc6\u7801\uff1a\u6210\u529f\u6838\u5bf9 \u8d44\u6599/\u5bc6\u7801\u72b6\u6001\u5237\u65b0\uff1b\u7a7a\u6001/\u672a\u521d\u59cb\u5316\u6838\u5bf9 \u7a7a\u5bc6\u7801\u7981\u4fdd\u5b58\uff1b\u9519\u8bef/\u65e0\u6743\u9650\u6838\u5bf9 \u5931\u8d25 toast\uff1b\u65e0\u6743\u9650\u4e0d\u4f1a\u56de\u5199\u6210\u529f\u6001"
+            ],
+            "r00Due": "R00-T07 \u5efa\u7acb\u6b63\u5f0f\u8d26\u672c\u65f6\u767b\u8bb0\uff1b\u6700\u8fdf\u5728\u6240\u5217\u5b9e\u65bd Task \u7684\u9636\u6bb5\u9a8c\u6536\u524d\u5b8c\u6210\u5e76\u6267\u884c",
+            "assertionContract": {
+                "producerCommand": "a05_a06_auth_matrix",
+                "evidencePath": "{EVIDENCE}/A05_A06/leaf-cases.json",
+                "cases": [
+                    {
+                        "case": "a05-no-credential-read",
+                        "expect": 401
+                    },
+                    {
+                        "case": "a05-forged-principal-headers",
+                        "expect": 401
+                    },
+                    {
+                        "case": "a05-cross-principal-read",
+                        "expect": 403
+                    },
+                    {
+                        "case": "a05-positive-control-owner-execute",
+                        "expect": 200
+                    },
+                    {
+                        "case": "a06-evil-origin-health",
+                        "expect": 403
+                    },
+                    {
+                        "case": "a06-foreign-host-health",
+                        "expect": 403
+                    }
+                ]
+            },
+            "basisKind": "auth_primitive_only",
+            "r02Share": "R02 \u5df2\u6709 Rust /lingxi/v1/access/* \u4e0e /devices/* \u7684\u5ba2\u6237\u7aef\u9002\u914d\u53ca AccessTab \u5c40\u90e8\u7ec4\u4ef6\u6d4b\u8bd5\uff1b\u539f 7 \u6761\u8bbe\u7f6e\u9875\u52a8\u4f5c\u5404\u6210\u529f/\u7a7a\u6001/\u9519\u8bef\u5206\u652f\u548c\u771f\u5b9e\u670d\u52a1\u8054\u52a8\u4ecd\u672a\u5b8c\u6574\u9010\u6761\u6267\u884c",
+            "r07Share": "ui:settings:access \u5b8c\u6574\u9875\u9762\u52a8\u4f5c\u77e9\u9635\uff08\u81ea\u52a8\u52a0\u8f7d\u3001\u8bbf\u95ee\u603b\u89c8\u3001LAN \u4fdd\u5b58\u3001\u51ed\u8bc1\u751f\u6210/\u4e8c\u7ef4\u7801\u3001\u590d\u5236/\u8fde\u63a5\u3001\u64a4\u9500\u3001\u8d26\u53f7\u8d44\u6599/\u5bc6\u7801\u7684\u6210\u529f/\u7a7a\u6001/\u9519\u8bef\u6001\u9010\u52a8\u4f5c\u6838\u5bf9\uff09",
+            "evidenceRequired": "\u672c\u8f6e\u8bbf\u95ee\u8bbe\u7f6e\u9875\u539f 7 \u6761\u52a8\u4f5c\u7684\u771f\u5b9e\u7ec4\u4ef6\u4e0e Rust \u670d\u52a1\u9010\u9879\u6b63\u53cd\u8bc1\u636e\uff1b\u521d\u59cb\u5316\u3001\u603b\u89c8\u3001\u7f51\u7edc\u3001\u51ed\u8bc1/\u4e8c\u7ef4\u7801\u3001\u8fde\u63a5\u3001\u64a4\u9500\u3001\u8d26\u53f7\u7684 UI \u4e0e\u670d\u52a1\u72b6\u6001\u53ca\u5931\u8d25\u526f\u4f5c\u7528\u5fc5\u987b\u5bf9\u5e94",
+            "evidenceCommandRefs": [
+                "a05_a06_auth_matrix"
+            ]
+        },
+        {
+            "id": "R00-T02-LA-32FFEC05BAA7",
+            "featureId": "F-D20-UI-UI-SETTINGS-SHARING-32FFEC",
+            "requirement": "REQUIRED_SUPPLEMENTAL",
+            "r00Kind": "supplemental",
+            "r00TaskIds": [
+                "R02-T03",
+                "R07-T09"
+            ],
+            "r00ExecutionStageIds": [
+                "R02",
+                "R07"
+            ],
+            "r00LedgerStatus": "SPECIFIED_NOT_EXECUTED",
+            "r00ResultIds": [],
+            "r00TestIds": [],
+            "r00Then": "\u9010\u52a8\u4f5c\u6838\u5bf9\u5b9e\u9645\u72b6\u6001\u4e0e\u9875\u9762\u6295\u5f71\uff1b\u5931\u8d25\u4e0d\u4f2a\u88c5\u6210\u7a7a\u6570\u636e",
+            "r00Assertions": [
+                "\u6253\u5f00\u8bbe\u7f6e\u5bb9\u5668\u81ea\u52a8\u521d\u59cb\u5316\uff1a\u8fde\u63a5\u3001\u8bed\u8a00\u3001\u52a9\u624b\u3001\u5feb\u7167\u3001\u6a21\u578b\u548c\u4f9b\u5e94\u5546\u6458\u8981\uff08\u5404\u9875\u5171\u7528\uff09\uff1a\u6210\u529f\u6838\u5bf9 \u51b7\u542f\u52a8\u5b8c\u6210\u540e ready\uff1b\u5df2\u6709\u7f13\u5b58\u76f4\u63a5\u663e\u793a\u65e7\u6570\u636e\u5e76\u540e\u53f0\u5237\u65b0\uff1b\u4f9b\u5e94\u5546\u6458\u8981\u4e0d\u963b\u585e ready\uff1b\u7a7a\u6001/\u672a\u521d\u59cb\u5316\u6838\u5bf9 \u65e0\u7f13\u5b58\u65f6\u663e\u793a loading mask\uff1b15 \u79d2\u8d85\u65f6\u5f3a\u5236 ready\uff1b\u4f9b\u5e94\u5546\u6458\u8981\u53ef\u6682\u7f3a\uff1b\u9519\u8bef/\u65e0\u6743\u9650\u6838\u5bf9 \u521d\u59cb\u5316\u5f02\u5e38\u4f1a log \u5e76 ready=true\uff0c\u53ef\u80fd\u5c55\u793a\u65e7/\u7a7a\u6570\u636e\uff1b\u4f9b\u5e94\u5546\u6458\u8981\u5931\u8d25\u88ab catch \u9759\u9ed8\uff0c\u4e0d\u80fd\u5f53\u7a7a\u5217\u8868\u6210\u529f",
+                "\u622a\u56fe\u914d\u8272\u5361\uff08\u4e09\u8272\uff09\uff1a\u6210\u529f\u6838\u5bf9 \u989c\u8272\u5199 localStorage\uff0c\u9884\u89c8\u56fe\u968f\u5373\u5207\u6362\uff1b\u7a7a\u6001/\u672a\u521d\u59cb\u5316\u6838\u5bf9 \u9ed8\u8ba4 light\uff1b\u9519\u8bef/\u65e0\u6743\u9650\u6838\u5bf9 \u5f53\u524d\u540c\u6b65 localStorage \u5199\u5165\u65e0 catch/\u63d0\u793a\uff1b\u6d4f\u89c8\u5668\u7981\u6b62\u5b58\u50a8\u65f6\u8be5\u64cd\u4f5c\u629b\u9519\uff0c\u672a\u89c2\u5bdf\u5230\u6210\u529f\u63d0\u793a\u3002",
+                "\u622a\u56fe\u5bbd\u5ea6\u5361\uff08\u624b\u673a/\u684c\u9762\uff09\uff1a\u6210\u529f\u6838\u5bf9 \u5bbd\u5ea6\u5199 localStorage\uff0c\u9884\u89c8\u56fe\u5207\u6362\uff1b\u7a7a\u6001/\u672a\u521d\u59cb\u5316\u6838\u5bf9 \u9ed8\u8ba4 mobile\uff1b\u9519\u8bef/\u65e0\u6743\u9650\u6838\u5bf9 \u5f53\u524d\u540c\u6b65 localStorage \u5199\u5165\u65e0 catch/\u63d0\u793a\uff1b\u6d4f\u89c8\u5668\u7981\u6b62\u5b58\u50a8\u65f6\u8be5\u64cd\u4f5c\u629b\u9519\uff0c\u672a\u89c2\u5bdf\u5230\u6210\u529f\u63d0\u793a\u3002",
+                "\u622a\u56fe\u5b57\u4f53\u4e0e\u5206\u6bb5\u5b57\u7b26\u4e0a\u9650\uff1a\u6210\u529f\u6838\u5bf9 \u5b57\u4f53\u3001\u4e0a\u9650\u89c4\u8303\u5316\u540e\u5199\u672c\u5730\u5b58\u50a8\uff1b\u7a7a\u6001/\u672a\u521d\u59cb\u5316\u6838\u5bf9 \u9ed8\u8ba4\u8ddf\u968f\u9605\u8bfb\u5b57\u4f53\u3001\u9ed8\u8ba4\u4e0a\u9650\uff1b\u9519\u8bef/\u65e0\u6743\u9650\u6838\u5bf9 \u5f53\u524d\u540c\u6b65 localStorage \u5199\u5165\u65e0 catch/\u63d0\u793a\uff1b\u6d4f\u89c8\u5668\u7981\u6b62\u5b58\u50a8\u65f6\u8be5\u64cd\u4f5c\u629b\u9519\uff0c\u672a\u89c2\u5bdf\u5230\u6210\u529f\u63d0\u793a\u3002"
+            ],
+            "r00Due": "R00-T07 \u5efa\u7acb\u6b63\u5f0f\u8d26\u672c\u65f6\u767b\u8bb0\uff1b\u6700\u8fdf\u5728\u6240\u5217\u5b9e\u65bd Task \u7684\u9636\u6bb5\u9a8c\u6536\u524d\u5b8c\u6210\u5e76\u6267\u884c",
+            "assertionContract": {
+                "producerCommand": "supplemental_client_matrix",
+                "evidencePath": "{EVIDENCE}/CLIENT/leaf-cases.json",
+                "cases": [
+                    {
+                        "case": "sharing-container-cold-cache-timeout-error",
+                        "expect": 1
+                    },
+                    {
+                        "case": "sharing-color-success-default-denied",
+                        "expect": 1
+                    },
+                    {
+                        "case": "sharing-width-success-default-denied",
+                        "expect": 1
+                    },
+                    {
+                        "case": "sharing-font-limit-success-default-denied",
+                        "expect": 1
+                    }
+                ]
+            },
+            "originalAssertionCases": [
+                [
+                    "sharing-container-cold-cache-timeout-error"
+                ],
+                [
+                    "sharing-color-success-default-denied"
+                ],
+                [
+                    "sharing-width-success-default-denied"
+                ],
+                [
+                    "sharing-font-limit-success-default-denied"
+                ]
+            ],
+            "basisKind": "full_original_behavior",
+            "r02Share": "\u7528\u6237\u5df2\u6388\u6743\u628a R07 \u5ba2\u6237\u7aef\u884c\u4e3a\u63d0\u524d\u7eb3\u5165 R02\uff1a\u672c\u9636\u6bb5\u76f4\u63a5\u6e32\u67d3\u771f\u5b9e SettingsContent/SharingTab\uff0c\u9010\u52a8\u4f5c\u6838\u7f13\u5b58/\u7a7a\u6001/\u9519\u8bef\u4e0e localStorage \u5199\u5165\u53ca\u62d2\u7edd\u6295\u5f71\uff1bR00 \u539f\u4ef6\u4e0d\u6539",
+            "r07Share": "\u539f\u6392 R07-T09 \u7684\u5b8c\u6574\u5206\u4eab\u8bbe\u7f6e\u9875\u5728 R02 \u63d0\u524d\u5b9e\u6d4b\uff1b\u540e\u7eed R07 \u65b0\u5ba2\u6237\u7aef\u96c6\u6210\u4ecd\u987b\u91cd\u65b0\u9a8c\u8bc1",
+            "evidenceRequired": "\u672c\u8f6e supplemental_client_matrix \u771f\u5b9e\u7ec4\u4ef6\u4e03\u9879\u68c0\u67e5\u7684\u539f\u59cb Vitest \u8f93\u51fa\u3001\u56db\u6761\u9010\u53f6\u7ed3\u6784\u5316\u6848\u4f8b\u548c UI/\u672c\u5730\u5b58\u50a8\u89c2\u5bdf\uff1b\u56db\u6761 R00 \u539f\u65ad\u8a00\u6309 originalAssertionCases \u5168\u8986\u76d6",
+            "evidenceCommandRefs": [
+                "supplemental_client_matrix"
+            ],
+            "evidencePaths": [
+                "{EVIDENCE}/CLIENT/sharing-cases.json",
+                "{EVIDENCE}/CLIENT/summary.json"
+            ]
+        }
+    ],
+    "commands": {
+        "supplemental_static_web_matrix": {
+            "argv": [
+                "python3",
+                "scripts/rust-tauri/r02_static_web_leaf_matrix.py",
+                "{EVIDENCE}/STATIC_WEB"
+            ],
+            "timeoutSecs": 720,
+            "evidencePaths": [
+                "{EVIDENCE}/STATIC_WEB/summary.json",
+                "{EVIDENCE}/STATIC_WEB/static-web-cases.json",
+                "{EVIDENCE}/STATIC_WEB/cargo.stdout.log",
+                "{EVIDENCE}/STATIC_WEB/cargo.stderr.log"
+            ]
+        },
+        "supplemental_management_matrix": {
+            "argv": [
+                "python3",
+                "scripts/rust-tauri/r02_management_leaf_matrix.py",
+                "{EVIDENCE}/MANAGEMENT"
+            ],
+            "timeoutSecs": 720,
+            "evidencePaths": [
+                "{EVIDENCE}/MANAGEMENT/summary.json",
+                "{EVIDENCE}/MANAGEMENT/management-cases.json",
+                "{EVIDENCE}/MANAGEMENT/security-audit-sources.json",
+                "{EVIDENCE}/MANAGEMENT/security-audit.jsonl",
+                "{EVIDENCE}/MANAGEMENT/cargo.stdout.log",
+                "{EVIDENCE}/MANAGEMENT/cargo.stderr.log"
+            ]
+        },
+        "supplemental_client_matrix": {
+            "argv": [
+                "python3",
+                "scripts/rust-tauri/r02_client_leaf_matrix.py",
+                "{EVIDENCE}/CLIENT"
+            ],
+            "timeoutSecs": 240,
+            "evidencePaths": [
+                "{EVIDENCE}/CLIENT/leaf-cases.json",
+                "{EVIDENCE}/CLIENT/summary.json",
+                "{EVIDENCE}/CLIENT/sharing-cases.json",
+                "{EVIDENCE}/CLIENT/sharing-vitest.stdout.log",
+                "{EVIDENCE}/CLIENT/sharing-vitest.stderr.log",
+                "{EVIDENCE}/CLIENT/cli-help-exit0-no-start/stdout.log",
+                "{EVIDENCE}/CLIENT/cli-help-exit0-no-start/stderr.log",
+                "{EVIDENCE}/CLIENT/cli-unknown-arg-exit1-no-start/stdout.log",
+                "{EVIDENCE}/CLIENT/cli-unknown-arg-exit1-no-start/stderr.log",
+                "{EVIDENCE}/CLIENT/cli-serve-unknown-arg-exit1-no-start/stdout.log",
+                "{EVIDENCE}/CLIENT/cli-serve-unknown-arg-exit1-no-start/stderr.log"
+            ]
+        },
+        "a01_smoke": {
+            "argv": [
+                "bash",
+                "scripts/rust-tauri/r02_t01_service_smoke.sh",
+                "{EVIDENCE}/A01"
+            ],
+            "timeoutSecs": 1800,
+            "evidencePaths": [
+                "{EVIDENCE}/A01/a01-health-check.log",
+                "{EVIDENCE}/A01/a01-shutdown.log",
+                "{EVIDENCE}/A01/a01-deptree-evidence.log",
+                "{EVIDENCE}/A01/a01-leaf-cases.json"
+            ]
+        },
+        "a02_boundary_negative": {
+            "argv": [
+                "bash",
+                "scripts/rust-tauri/r02_t01_boundary_negative.sh",
+                "{EVIDENCE}/A02"
+            ],
+            "timeoutSecs": 1800,
+            "evidencePaths": [
+                "{EVIDENCE}/A02/a02-summary.log",
+                "{EVIDENCE}/A02/a02-residue-check.log"
+            ]
+        },
+        "a03_dual_instance": {
+            "argv": [
+                "bash",
+                "scripts/rust-tauri/r02_t02_dual_instance.sh",
+                "{EVIDENCE}/A03"
+            ],
+            "timeoutSecs": 1800,
+            "evidencePaths": [
+                "{EVIDENCE}/A03/a03-summary.txt"
+            ]
+        },
+        "a04_path_priority": {
+            "argv": [
+                "bash",
+                "scripts/rust-tauri/r02_t02_path_priority.sh",
+                "{EVIDENCE}/A04"
+            ],
+            "timeoutSecs": 1800,
+            "evidencePaths": [
+                "{EVIDENCE}/A04/a04-summary.txt"
+            ]
+        },
+        "a05_a06_auth_matrix": {
+            "argv": [
+                "bash",
+                "scripts/rust-tauri/r02_t03_auth_matrix.sh",
+                "{EVIDENCE}/A05_A06"
+            ],
+            "timeoutSecs": 1800,
+            "evidencePaths": [
+                "{EVIDENCE}/A05_A06/summary.txt",
+                "{EVIDENCE}/A05_A06/ws-matrix.json",
+                "{EVIDENCE}/A05_A06/leaf-cases.json",
+                "{EVIDENCE}/A05_A06/sessions-list-matrix.json"
+            ]
+        },
+        "a07_a08_storage_tx": {
+            "argv": [
+                "bash",
+                "scripts/rust-tauri/r02_t04_storage_tx.sh",
+                "{EVIDENCE}/A07_A08"
+            ],
+            "timeoutSecs": 1800,
+            "evidencePaths": [
+                "{EVIDENCE}/A07_A08/s1-counts-after-stop.json",
+                "{EVIDENCE}/A07_A08/s4-hashes-after.txt"
+            ]
+        },
+        "a07_live_fault_01_test": {
+            "argv": [
+                "env",
+                "CARGO_NET_OFFLINE=true",
+                "R02_A07_LIVE_FAULT_EVIDENCE={EVIDENCE}/A07_LIVE_FAULT/case.json",
+                "cargo",
+                "test",
+                "--manifest-path",
+                "rust/Cargo.toml",
+                "--locked",
+                "--offline",
+                "-p",
+                "lingxi-service",
+                "--test",
+                "execute_concurrency",
+                "http_running_storage_fault_has_no_success_event_or_restart_run",
+                "--",
+                "--exact",
+                "--nocapture"
+            ],
+            "timeoutSecs": 1800,
+            "evidencePaths": [
+                "{EVIDENCE}/A07_LIVE_FAULT/case.json"
+            ]
+        },
+        "a07_live_fault_02_check": {
+            "argv": [
+                "python3",
+                "scripts/rust-tauri/r02_t04_live_fault_evidence.py",
+                "{EVIDENCE}"
+            ],
+            "timeoutSecs": 60,
+            "evidencePaths": [
+                "{EVIDENCE}/A07_LIVE_FAULT/checked.json"
+            ]
+        },
+        "a09_a10_events_matrix": {
+            "argv": [
+                "bash",
+                "scripts/rust-tauri/r02_t05_events_matrix.sh",
+                "{EVIDENCE}/A09_A10"
+            ],
+            "timeoutSecs": 1800,
+            "evidencePaths": [
+                "{EVIDENCE}/A09_A10/probe-matrix.jsonl",
+                "{EVIDENCE}/A09_A10/key-events-dump.json"
+            ]
+        },
+        "a11_backup_restore": {
+            "argv": [
+                "bash",
+                "scripts/rust-tauri/r02_t06_backup_restore.sh",
+                "{EVIDENCE}/A11"
+            ],
+            "timeoutSecs": 1800,
+            "evidencePaths": [
+                "{EVIDENCE}/A11/backup-restore/summary.txt"
+            ]
+        },
+        "a12_recovery_drill": {
+            "argv": [
+                "bash",
+                "scripts/rust-tauri/r02_t06_recovery_drill.sh",
+                "{EVIDENCE}/A12"
+            ],
+            "timeoutSecs": 1800,
+            "evidencePaths": [
+                "{EVIDENCE}/A12/recovery-drill/summary.txt"
+            ]
+        },
+        "a13_redaction_scan": {
+            "argv": [
+                "bash",
+                "scripts/rust-tauri/r02_t07_redaction_scan.sh",
+                "{EVIDENCE}/A13"
+            ],
+            "timeoutSecs": 1800,
+            "evidencePaths": [
+                "{EVIDENCE}/A13/redaction-scan/summary.txt",
+                "{EVIDENCE}/A13/redaction-scan/inventory.txt"
+            ]
+        },
+        "a14_slow_subscriber": {
+            "argv": [
+                "bash",
+                "scripts/rust-tauri/r02_t07_slow_subscriber.sh",
+                "{EVIDENCE}/A14"
+            ],
+            "timeoutSecs": 1800,
+            "evidencePaths": [
+                "{EVIDENCE}/A14/slow-subscriber/storm-results.json"
+            ]
+        },
+        "a15_full_chain": {
+            "argv": [
+                "bash",
+                "scripts/rust-tauri/r02_t08_full_chain_smoke.sh",
+                "{EVIDENCE}/A15"
+            ],
+            "timeoutSecs": 1800,
+            "evidencePaths": [
+                "{EVIDENCE}/A15/full-chain/summary.txt"
+            ]
+        },
+        "a16_legacy_regression": {
+            "argv": [
+                "bash",
+                "scripts/rust-tauri/r02_t08_legacy_entry_regression.sh",
+                "{EVIDENCE}/A16"
+            ],
+            "timeoutSecs": 3600,
+            "evidencePaths": [
+                "{EVIDENCE}/A16/legacy-entry/summary.txt"
+            ]
+        }
+    },
+    "scenarios": [
+        {
+            "id": "R02-A01",
+            "requirement": "REQUIRED",
+            "commandRefs": [
+                "a01_smoke"
+            ]
+        },
+        {
+            "id": "R02-A02",
+            "requirement": "REQUIRED",
+            "commandRefs": [
+                "a02_boundary_negative"
+            ]
+        },
+        {
+            "id": "R02-A03",
+            "requirement": "REQUIRED",
+            "commandRefs": [
+                "a03_dual_instance"
+            ]
+        },
+        {
+            "id": "R02-A04",
+            "requirement": "REQUIRED",
+            "commandRefs": [
+                "a04_path_priority"
+            ]
+        },
+        {
+            "id": "R02-A05",
+            "requirement": "REQUIRED",
+            "commandRefs": [
+                "a05_a06_auth_matrix"
+            ]
+        },
+        {
+            "id": "R02-A06",
+            "requirement": "REQUIRED",
+            "commandRefs": [
+                "a05_a06_auth_matrix"
+            ]
+        },
+        {
+            "id": "R02-A07",
+            "requirement": "REQUIRED",
+            "commandRefs": [
+                "a07_a08_storage_tx",
+                "a07_live_fault_01_test",
+                "a07_live_fault_02_check"
+            ]
+        },
+        {
+            "id": "R02-A08",
+            "requirement": "REQUIRED",
+            "commandRefs": [
+                "a07_a08_storage_tx"
+            ]
+        },
+        {
+            "id": "R02-A09",
+            "requirement": "REQUIRED",
+            "commandRefs": [
+                "a09_a10_events_matrix"
+            ]
+        },
+        {
+            "id": "R02-A10",
+            "requirement": "REQUIRED",
+            "commandRefs": [
+                "a09_a10_events_matrix"
+            ]
+        },
+        {
+            "id": "R02-A11",
+            "requirement": "REQUIRED",
+            "commandRefs": [
+                "a11_backup_restore"
+            ]
+        },
+        {
+            "id": "R02-A12",
+            "requirement": "REQUIRED",
+            "commandRefs": [
+                "a12_recovery_drill"
+            ]
+        },
+        {
+            "id": "R02-A13",
+            "requirement": "REQUIRED",
+            "commandRefs": [
+                "a13_redaction_scan"
+            ]
+        },
+        {
+            "id": "R02-A14",
+            "requirement": "REQUIRED",
+            "commandRefs": [
+                "a14_slow_subscriber"
+            ]
+        },
+        {
+            "id": "R02-A15",
+            "requirement": "REQUIRED",
+            "commandRefs": [
+                "a15_full_chain"
+            ]
+        },
+        {
+            "id": "R02-A16",
+            "requirement": "REQUIRED",
+            "commandRefs": [
+                "a16_legacy_regression"
+            ]
+        }
+    ]
+}

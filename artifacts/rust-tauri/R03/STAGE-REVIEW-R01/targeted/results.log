@@ -1,0 +1,17 @@
+=== g1_session_serialization: cargo test --manifest-path rust/Cargo.toml --locked -p lingxi-service --test session_serialization
+EXIT=0
+=== g2_cancellation_tree: cargo test --manifest-path rust/Cargo.toml --locked -p lingxi-service --test cancellation_tree
+EXIT=0
+=== g2b_subagent_permission_inheritance: cargo test --manifest-path rust/Cargo.toml --locked -p lingxi-service --test subagent_permission_inheritance
+EXIT=0
+=== g3_late_result_fence: cargo test --manifest-path rust/Cargo.toml --locked -p lingxi-service --test late_result_fence
+EXIT=0
+=== g3b_request_dedup: cargo test --manifest-path rust/Cargo.toml --locked -p lingxi-service --test request_dedup
+EXIT=0
+=== g4_invocation_journal: cargo test --manifest-path rust/Cargo.toml --locked -p lingxi-service --test invocation_journal
+EXIT=0
+=== g4b_recovery_crash_points: cargo test --manifest-path rust/Cargo.toml --locked -p lingxi-service --test recovery_crash_points
+EXIT=0
+=== g5_exit_race_rejections: cargo test --manifest-path rust/Cargo.toml --locked -p lingxi-service --test exit_race_rejections
+EXIT=0
+ALL_DONE

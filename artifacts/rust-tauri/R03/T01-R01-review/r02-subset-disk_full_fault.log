@@ -1,0 +1,10 @@
+   Compiling lingxi-adapters v0.0.0 (/Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-adapters)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.40s
+     Running tests/disk_full_fault.rs (/tmp/r03-t01-review-target/debug/deps/disk_full_fault-87b1df125c85872a)
+
+running 2 tests
+test unix_fault::commit_fails_for_real_at_commit_time_without_fake_success ... ok
+test unix_fault::start_commit_also_fails_under_the_fault ... ok
+
+test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.02s
+

@@ -1,0 +1,11 @@
+{
+  "combo": "leaf-parent-cancel",
+  "counts": {
+    "child_final_message_rows": 0,
+    "child_status_after_recovery_scan": "cancelled",
+    "child_status_before_restart": "cancelled",
+    "note": "child run closed out IN-PROCESS by the cooperative-cancel window (durable cancelled + busy cleared + lanes returned); the restart scan only observes the existing terminal — ordinary cancellation never needs a restart",
+    "parent_final_status": "cancelled"
+  },
+  "schema": "lingxi.r03-t08-combo-counts.v1"
+}

@@ -1,0 +1,23 @@
+== [0/4] baseline (pre-injection) must be green
+[green-baseline] gate exit code: 0 (expected 0)
+== [1/4] N-A: inject host TYPE into domain sources (must be rejected, D3)
+[na-source-token] gate exit code: 1 (expected non-zero)
+[na-source-token] localized: DEP-02
+[na-source-token] localized: lingxi-kernel
+[na-source-token] localized: forbidden token 'AppHandle' in rust/crates/lingxi-kernel/src/lib.rs
+[green-na-restored] gate exit code: 0 (expected 0)
+== [2/4] N-B: inject dependency EDGE to desktop stack (must be rejected, D1)
+[nb-dep-edge] gate exit code: 1 (expected non-zero)
+[nb-dep-edge] localized: DEP-02
+[nb-dep-edge] localized: module lingxi-kernel transitively depends on forbidden \['tauri'\]
+[green-nb-restored] gate exit code: 0 (expected 0)
+== [3/4] N-C: inject composition-root INVERSION kernel->lingxi-service (DEP-08)
+[nc-service-inversion] gate exit code: 1 (expected non-zero)
+[nc-service-inversion] localized: lingxi-service
+[nc-service-inversion] localized: cyclic package dependency
+[green-nc-restored] gate exit code: 0 (expected 0)
+== [4/4] residue check: protected files byte-identical to baseline
+rust/crates/lingxi-kernel/src/lib.rs: OK
+rust/crates/lingxi-kernel/Cargo.toml: OK
+rust/Cargo.lock: OK
+A02 RESULT: PASS (3 violations rejected with localized crate/edge; 3 restores back to green; zero residue)

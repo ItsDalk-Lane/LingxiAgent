@@ -2538,6 +2538,348 @@ impl StoragePort for RunDatabase {
             })
             .await
     }
+
+    async fn record_model_call_usage(
+        &self,
+        record: lingxi_kernel::usage::ModelCallUsageRecord,
+        now_unix_ms: u64,
+    ) -> Result<(), StorageError> {
+        // Provenance decomposed into ledger columns (usage_state + the
+        // state's payload); the round trip is pinned by the storage tests.
+        let (usage_state, missing_fields, estimate_basis) = match &record.usage {
+            Some(usage) => match &usage.provenance {
+                lingxi_kernel::usage::UsageProvenance::Reported => ("reported", None, None),
+                lingxi_kernel::usage::UsageProvenance::Partial { missing } => {
+                    ("partial", Some(missing.join(",")), None)
+                }
+                lingxi_kernel::usage::UsageProvenance::Estimated { basis } => {
+                    ("estimated", None, Some(basis.clone()))
+                }
+            },
+            // unknown vs invalid is carried by invalid_detail presence.
+            None => ("unknown", None, None),
+        };
+        let usage_state = if record.invalid_detail.is_some() {
+            "invalid"
+        } else {
+            usage_state
+        }
+        .to_string();
+        // SQLite stores i64; the u64 token counts convert with an explicit
+        // bound (a token count beyond i64::MAX is a corrupted fact, refused
+        // loudly — never truncated).
+        let token_i64 =
+            |field: &'static str, value: Option<u64>| -> Result<Option<i64>, StorageError> {
+                value
+                    .map(|v| {
+                        i64::try_from(v).map_err(|_| StorageError::InvalidRequest {
+                            detail: format!(
+                                "usage token field {field} ({v}) exceeds the storable integer \
+                             range; the fact is refused rather than truncated"
+                            ),
+                        })
+                    })
+                    .transpose()
+            };
+        let (input_tokens, output_tokens, cache_read, cache_write, reasoning) = match &record.usage
+        {
+            Some(usage) => (
+                token_i64("input_tokens", usage.input_tokens)?,
+                token_i64("output_tokens", usage.output_tokens)?,
+                token_i64("cache_read_tokens", usage.cache_read_tokens)?,
+                token_i64("cache_write_tokens", usage.cache_write_tokens)?,
+                token_i64("reasoning_tokens", usage.reasoning_tokens)?,
+            ),
+            None => (None, None, None, None, None),
+        };
+        let busy = self.queue.options().busy_timeout_ms;
+        self.queue
+            .submit(move |conn| {
+                with_write_txn(conn, busy, |conn| {
+                    // Idempotent replay / loud conflict — a call's
+                    // accounting is never rewritten (same stance as the
+                    // lineage rows).
+                    if let Some(existing) = load_usage_row(conn, &record.model_call_id)? {
+                        if existing == record {
+                            return Ok(());
+                        }
+                        let existing_state = if existing.invalid_detail.is_some() {
+                            "invalid"
+                        } else {
+                            existing
+                                .usage
+                                .as_ref()
+                                .map(|u| u.provenance.state_name())
+                                .unwrap_or("unknown")
+                        };
+                        return Err(StorageError::Conflict {
+                            detail: format!(
+                                "model call {} already holds a usage row (state {}, \
+                                 {:?}/{:?}); refusing to rewrite it to (state {}, \
+                                 {:?}/{:?}) — a call's accounting is immutable",
+                                record.model_call_id,
+                                existing_state,
+                                existing.usage.as_ref().and_then(|u| u.input_tokens),
+                                existing.usage.as_ref().and_then(|u| u.output_tokens),
+                                if record.invalid_detail.is_some() {
+                                    "invalid"
+                                } else {
+                                    record
+                                        .usage
+                                        .as_ref()
+                                        .map(|u| u.provenance.state_name())
+                                        .unwrap_or("unknown")
+                                },
+                                input_tokens,
+                                output_tokens,
+                            ),
+                        });
+                    }
+                    conn.execute(
+                        "INSERT INTO model_call_usage \
+                         (model_call_id, session_id, run_id, attempt, purpose, origin, \
+                          parent_run_id, cause_ref, provider, model, protocol, usage_state, \
+                          input_tokens, output_tokens, cache_read_tokens, cache_write_tokens, \
+                          reasoning_tokens, missing_fields, estimate_basis, invalid_detail, \
+                          transport_attempts, cost_basis, recorded_at_unix_ms) \
+                         VALUES (?1, ?2, ?3, ?4, ?5, ?6, ?7, ?8, ?9, ?10, ?11, ?12, ?13, \
+                                 ?14, ?15, ?16, ?17, ?18, ?19, ?20, ?21, ?22, ?23)",
+                        rusqlite::params![
+                            record.model_call_id,
+                            record.session_id,
+                            record.run_id,
+                            record.attempt,
+                            record.purpose,
+                            record.origin,
+                            record.parent_run_id,
+                            record.cause_ref,
+                            record.provider,
+                            record.model,
+                            record.protocol,
+                            usage_state,
+                            input_tokens,
+                            output_tokens,
+                            cache_read,
+                            cache_write,
+                            reasoning,
+                            missing_fields,
+                            estimate_basis,
+                            record.invalid_detail,
+                            record.transport_attempts as i64,
+                            record.cost_basis,
+                            now_unix_ms as i64
+                        ],
+                    )
+                    .map_err(migrations::map_rusqlite)?;
+                    Ok(())
+                })
+            })
+            .await
+    }
+
+    async fn query_model_call_usage(
+        &self,
+        query: lingxi_kernel::usage::ModelUsageQuery,
+    ) -> Result<Vec<lingxi_kernel::usage::ModelCallUsageRecord>, StorageError> {
+        self.queue
+            .submit(move |conn| {
+                // One statement per scope shape; the owner scope joins the
+                // session owner (authorization isolation is part of the
+                // read — a foreign principal's rows are never returned,
+                // and session-less plane rows are internal-only).
+                let sql_base = "SELECT m.model_call_id, m.session_id, m.run_id, m.attempt, \
+                     m.purpose, m.origin, m.parent_run_id, m.cause_ref, m.provider, m.model, \
+                     m.protocol, m.usage_state, m.input_tokens, m.output_tokens, \
+                     m.cache_read_tokens, m.cache_write_tokens, m.reasoning_tokens, \
+                     m.missing_fields, m.estimate_basis, m.invalid_detail, \
+                     m.transport_attempts, m.cost_basis, m.recorded_at_unix_ms \
+                     FROM model_call_usage m";
+                let (sql, params): (String, Vec<Box<dyn rusqlite::ToSql>>) =
+                    match (&query.owner_user_id, &query.session_id, &query.run_id) {
+                        (Some(owner), session, run) => {
+                            let mut sql = format!(
+                                "{sql_base} JOIN sessions s ON s.session_id = m.session_id \
+                                 WHERE s.owner_user_id = ?1"
+                            );
+                            let mut params: Vec<Box<dyn rusqlite::ToSql>> =
+                                vec![Box::new(owner.clone())];
+                            if let Some(session) = session {
+                                sql.push_str(" AND m.session_id = ?2");
+                                params.push(Box::new(session.clone()));
+                            }
+                            if let Some(run) = run {
+                                sql.push_str(&format!(" AND m.run_id = ?{}", params.len() + 1));
+                                params.push(Box::new(run.clone()));
+                            }
+                            sql.push_str(" ORDER BY m.rowid");
+                            (sql, params)
+                        }
+                        (None, Some(session), run) => {
+                            let mut sql = format!("{sql_base} WHERE m.session_id = ?1");
+                            let mut params: Vec<Box<dyn rusqlite::ToSql>> =
+                                vec![Box::new(session.clone())];
+                            if let Some(run) = run {
+                                sql.push_str(" AND m.run_id = ?2");
+                                params.push(Box::new(run.clone()));
+                            }
+                            sql.push_str(" ORDER BY m.rowid");
+                            (sql, params)
+                        }
+                        (None, None, Some(run)) => (
+                            format!("{sql_base} WHERE m.run_id = ?1 ORDER BY m.rowid"),
+                            vec![Box::new(run.clone())],
+                        ),
+                        (None, None, None) => (format!("{sql_base} ORDER BY m.rowid"), Vec::new()),
+                    };
+                let mut stmt = conn.prepare(&sql).map_err(migrations::map_rusqlite)?;
+                let param_refs: Vec<&dyn rusqlite::ToSql> =
+                    params.iter().map(|p| p.as_ref()).collect();
+                let mut rows = stmt
+                    .query(param_refs.as_slice())
+                    .map_err(migrations::map_rusqlite)?;
+                let mut out = Vec::new();
+                while let Some(row) = rows.next().map_err(migrations::map_rusqlite)? {
+                    out.push(usage_row_to_record(row)?);
+                }
+                Ok(out)
+            })
+            .await
+    }
+}
+
+/// Loads one ledger row by call id (None when absent).
+fn load_usage_row(
+    conn: &rusqlite::Connection,
+    model_call_id: &str,
+) -> Result<Option<lingxi_kernel::usage::ModelCallUsageRecord>, StorageError> {
+    let mut stmt = conn
+        .prepare(
+            "SELECT model_call_id, session_id, run_id, attempt, purpose, origin, \
+             parent_run_id, cause_ref, provider, model, protocol, usage_state, input_tokens, \
+             output_tokens, cache_read_tokens, cache_write_tokens, reasoning_tokens, \
+             missing_fields, estimate_basis, invalid_detail, transport_attempts, cost_basis, \
+             recorded_at_unix_ms FROM model_call_usage WHERE model_call_id = ?1",
+        )
+        .map_err(migrations::map_rusqlite)?;
+    let mut rows = stmt
+        .query([model_call_id])
+        .map_err(migrations::map_rusqlite)?;
+    match rows.next().map_err(migrations::map_rusqlite)? {
+        Some(row) => Ok(Some(usage_row_to_record(row)?)),
+        None => Ok(None),
+    }
+}
+
+/// Rebuilds the record from a ledger row. A `usage_state` outside the
+/// vocabulary is [`StorageError::Corrupted`] — never a guess.
+fn usage_row_to_record(
+    row: &rusqlite::Row<'_>,
+) -> Result<lingxi_kernel::usage::ModelCallUsageRecord, StorageError> {
+    use lingxi_kernel::usage::{ModelCallUsage, UsageProvenance};
+    // SQLite returns i64; the columns are u64 facts by contract (a negative
+    // stored value is corruption, never a wrap-around guess).
+    let token_u64 = |index: usize, field: &'static str| -> Result<Option<u64>, StorageError> {
+        row.get::<_, Option<i64>>(index)
+            .map_err(migrations::map_rusqlite)?
+            .map(|value| {
+                u64::try_from(value).map_err(|_| StorageError::Corrupted {
+                    detail: format!("usage row {field} is negative ({value})"),
+                })
+            })
+            .transpose()
+    };
+    let invalid_detail: Option<String> = row.get(19).map_err(migrations::map_rusqlite)?;
+    let missing_fields: Option<String> = row.get(17).map_err(migrations::map_rusqlite)?;
+    let estimate_basis: Option<String> = row.get(18).map_err(migrations::map_rusqlite)?;
+    let usage_state: String = row.get(11).map_err(migrations::map_rusqlite)?;
+    let usage = if invalid_detail.is_some() {
+        if usage_state != "invalid" {
+            return Err(StorageError::Corrupted {
+                detail: format!(
+                    "usage row holds invalid_detail but state {usage_state:?}; the state \
+                     vocabulary is never mixed"
+                ),
+            });
+        }
+        None
+    } else {
+        match usage_state.as_str() {
+            "unknown" => None,
+            "reported" => Some(ModelCallUsage {
+                input_tokens: token_u64(12, "input_tokens")?,
+                output_tokens: token_u64(13, "output_tokens")?,
+                cache_read_tokens: token_u64(14, "cache_read_tokens")?,
+                cache_write_tokens: token_u64(15, "cache_write_tokens")?,
+                reasoning_tokens: token_u64(16, "reasoning_tokens")?,
+                provenance: UsageProvenance::Reported,
+            }),
+            "partial" => {
+                let missing = match missing_fields.as_deref() {
+                    None => Vec::new(),
+                    Some(joined) => joined
+                        .split(',')
+                        .map(|field| match field.trim() {
+                            "input_tokens" => Some("input_tokens"),
+                            "output_tokens" => Some("output_tokens"),
+                            _ => None,
+                        })
+                        .collect::<Option<Vec<&'static str>>>()
+                        .ok_or_else(|| StorageError::Corrupted {
+                            detail: format!(
+                                "partial usage row carries unknown missing-fields \
+                                 {missing_fields:?}"
+                            ),
+                        })?,
+                };
+                Some(ModelCallUsage {
+                    input_tokens: token_u64(12, "input_tokens")?,
+                    output_tokens: token_u64(13, "output_tokens")?,
+                    cache_read_tokens: token_u64(14, "cache_read_tokens")?,
+                    cache_write_tokens: token_u64(15, "cache_write_tokens")?,
+                    reasoning_tokens: token_u64(16, "reasoning_tokens")?,
+                    provenance: UsageProvenance::Partial { missing },
+                })
+            }
+            "estimated" => Some(ModelCallUsage {
+                input_tokens: token_u64(12, "input_tokens")?,
+                output_tokens: token_u64(13, "output_tokens")?,
+                cache_read_tokens: token_u64(14, "cache_read_tokens")?,
+                cache_write_tokens: token_u64(15, "cache_write_tokens")?,
+                reasoning_tokens: token_u64(16, "reasoning_tokens")?,
+                provenance: UsageProvenance::Estimated {
+                    basis: estimate_basis.clone().unwrap_or_default(),
+                },
+            }),
+            other => {
+                return Err(StorageError::Corrupted {
+                    detail: format!(
+                        "usage row state {other:?} is not in the ledger vocabulary \
+                         (reported/partial/estimated/unknown/invalid)"
+                    ),
+                });
+            }
+        }
+    };
+    Ok(lingxi_kernel::usage::ModelCallUsageRecord {
+        session_id: row.get(1).map_err(migrations::map_rusqlite)?,
+        run_id: row.get(2).map_err(migrations::map_rusqlite)?,
+        attempt: row.get(3).map_err(migrations::map_rusqlite)?,
+        model_call_id: row.get(0).map_err(migrations::map_rusqlite)?,
+        purpose: row.get(4).map_err(migrations::map_rusqlite)?,
+        origin: row.get(5).map_err(migrations::map_rusqlite)?,
+        parent_run_id: row.get(6).map_err(migrations::map_rusqlite)?,
+        cause_ref: row.get(7).map_err(migrations::map_rusqlite)?,
+        provider: row.get(8).map_err(migrations::map_rusqlite)?,
+        model: row.get(9).map_err(migrations::map_rusqlite)?,
+        protocol: row.get(10).map_err(migrations::map_rusqlite)?,
+        usage,
+        invalid_detail,
+        transport_attempts: u32::try_from(row.get::<_, i64>(20).map_err(migrations::map_rusqlite)?)
+            .map_err(|_| StorageError::Corrupted {
+                detail: "usage row transport_attempts is negative".to_string(),
+            })?,
+        cost_basis: row.get(21).map_err(migrations::map_rusqlite)?,
+    })
 }
 
 /// One `run_lineage` row (R03-T06).

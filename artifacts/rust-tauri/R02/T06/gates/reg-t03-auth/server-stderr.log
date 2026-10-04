@@ -1,0 +1,32 @@
+2026-09-26T15:12:03.051434Z  INFO lingxi_service: data root resolved effective_home=/tmp/lingxi-r02t03-home-oTk9XQ source=cli ignored_sources=none
+2026-09-26T15:12:03.051950Z  INFO lingxi_service: data root prepared (canonicalized; runtime dir private 0700) canonical_home=/private/tmp/lingxi-r02t03-home-oTk9XQ runtime_dir=/private/tmp/lingxi-r02t03-home-oTk9XQ/lingxi-service
+2026-09-26T15:12:03.052230Z  INFO lingxi_service: single-writer lock acquired instance_id=eb3c05fcc619a77933d3268a5be2311d start_nonce=3befbedbb2595ba2 pid=29604 entropy="os-random-device" lock=/private/tmp/lingxi-r02t03-home-oTk9XQ/lingxi-service/instance.lock network_mode=loopback
+2026-09-26T15:12:03.073378Z  INFO lingxi_service: data-epoch gate passed home=/private/tmp/lingxi-r02t03-home-oTk9XQ decision=ProceedStampedNew(EpochStamp { format: V2, minimum_reader_epoch: 1, committed_data_epoch: 1, last_version: Some("0.0.0") })
+2026-09-26T15:12:03.105348Z  INFO lingxi_adapters::storage::run_store: run database migrated db=/private/tmp/lingxi-r02t03-home-oTk9XQ/lingxi-service/data/runs.db applied=[1] version=1
+2026-09-26T15:12:03.105653Z  INFO lingxi_service: auth service bootstrapped (per-start loopback token, owner-only);          run database migrated and seeded local_token_file=/private/tmp/lingxi-r02t03-home-oTk9XQ/lingxi-service/local-token.json run_database=/private/tmp/lingxi-r02t03-home-oTk9XQ/lingxi-service/data/runs.db
+2026-09-26T15:12:03.114274Z  INFO lingxi_service: instance record published (atomic write) record=/private/tmp/lingxi-r02t03-home-oTk9XQ/lingxi-service/instance.json bind_addr=127.0.0.1:65258
+LINGXI_AUTH_REJECTED method=GET path=/lingxi/v1/sessions/sess_local_alpha status=401 reason=missing_credential remote=127.0.0.1:65259
+LINGXI_AUTH_REJECTED method=POST path=/lingxi/v1/sessions/sess_local_alpha/execute status=401 reason=missing_credential remote=127.0.0.1:65260
+LINGXI_AUTH_REJECTED method=POST path=/lingxi/v1/ws-ticket status=401 reason=missing_credential remote=127.0.0.1:65261
+LINGXI_AUTH_REJECTED method=GET path=/lingxi/v1/me status=401 reason=missing_credential remote=127.0.0.1:65262
+LINGXI_AUTH_REJECTED method=GET path=/lingxi/v1/sessions/sess_local_alpha status=401 reason=missing_credential remote=127.0.0.1:65263
+LINGXI_AUTH_REJECTED method=GET path=/lingxi/v1/sessions/sess_local_alpha status=401 reason=invalid_credential remote=127.0.0.1:65268
+LINGXI_AUTH_REJECTED method=GET path=/lingxi/v1/sessions/sess_local_alpha status=401 reason=invalid_credential remote=127.0.0.1:65274
+LINGXI_AUTH_REJECTED method=POST path=/lingxi/v1/sessions/sess_local_alpha/execute status=401 reason=invalid_credential remote=127.0.0.1:65275
+2026-09-26T15:12:03.982699Z  INFO lingxi_service::sessions: run committed and published (post-commit) run_id=run_000001a0de45fd8d_000001 session_id=sess_local_alpha events=run_000001a0de45fd8d_000001-done input_chars=16
+LINGXI_TRANSPORT_REJECTED method=GET path=/lingxi/v1/health status=403 reason=bad_origin origin=http://evil.example host=127.0.0.1:65258 remote=127.0.0.1:65283
+LINGXI_TRANSPORT_REJECTED method=GET path=/lingxi/v1/me status=403 reason=bad_origin origin=https://attacker.invalid host=127.0.0.1:65258 remote=127.0.0.1:65284
+LINGXI_TRANSPORT_REJECTED method=GET path=/lingxi/v1/health status=403 reason=bad_origin origin=http://sub.localhost:1 host=127.0.0.1:65258 remote=127.0.0.1:65289
+LINGXI_TRANSPORT_REJECTED method=GET path=/lingxi/v1/health status=403 reason=bad_origin origin=http://127.0.0.1.evil.example host=127.0.0.1:65258 remote=127.0.0.1:65290
+LINGXI_TRANSPORT_REJECTED method=GET path=/lingxi/v1/health status=403 reason=loopback_host_mismatch origin=absent host=evil.example remote=127.0.0.1:65291
+LINGXI_TRANSPORT_REJECTED method=GET path=/lingxi/v1/me status=403 reason=loopback_host_mismatch origin=absent host=evil.example remote=127.0.0.1:65292
+LINGXI_TRANSPORT_REJECTED method=GET path=/lingxi/v1/health status=429 reason=rate_limited origin=absent host=127.0.0.1:65258 remote=127.0.0.1:65533
+LINGXI_TRANSPORT_REJECTED method=GET path=/lingxi/v1/ws status=403 reason=bad_origin origin=http://evil.example host=127.0.0.1:65258 remote=127.0.0.1:49158
+LINGXI_TRANSPORT_REJECTED method=GET path=/lingxi/v1/ws status=403 reason=loopback_host_mismatch origin=absent host=rebinder.example remote=127.0.0.1:49159
+LINGXI_AUTH_REJECTED method=GET path=/lingxi/v1/ws status=401 reason=missing_credential remote=127.0.0.1:49160
+LINGXI_AUTH_REJECTED method=GET path=/lingxi/v1/ws status=401 reason=invalid_ws_ticket remote=127.0.0.1:49163
+LINGXI_AUTH_REJECTED method=GET path=/lingxi/v1/ws status=401 reason=invalid_ws_ticket remote=127.0.0.1:49198
+2026-09-26T15:12:48.928577Z  INFO lingxi_service: shutdown signal: SIGTERM
+2026-09-26T15:12:48.929312Z  INFO lingxi_service::shutdown: run database closed (drained, WAL truncated) phase=storage_close
+2026-09-26T15:12:48.929465Z  INFO lingxi_service::shutdown: own instance record removed, lock released phase=record_cleanup
+2026-09-26T15:12:48.929482Z  INFO lingxi_service: lingxi-service stopped cleanly (run database closed, own record removed, lock released)

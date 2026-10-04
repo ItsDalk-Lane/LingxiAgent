@@ -1,0 +1,94 @@
+   Compiling lingxi-service v0.0.0 (/Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-service)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 5.53s
+     Running tests/background_disconnect_recovery.rs (target/debug/deps/background_disconnect_recovery-ad04cd3cac2a2c1c)
+
+running 3 tests
+test r03_a12_background_run_survives_disconnect_reconnect_replays_and_is_queryable ... ok
+test foreground_drive_disappearing_is_abandoned_not_cancelled ... ok
+test exit_hook_drain_reports_live_drives_as_unconfirmed ... ok
+
+test result: ok. 3 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.19s
+
+     Running tests/cancel_link_inheritance.rs (target/debug/deps/cancel_link_inheritance-f437f949ffcfb849)
+
+running 7 tests
+test nodes_created_after_parent_cancellation_inherit_it ... ok
+test linked_run_roots_receive_parent_cancellation_across_mixed_entries ... ok
+test isolation_and_first_reason_survive_repeated_and_concurrent_cancels ... ok
+test registration_racing_cancellation_misses_no_node ... ok
+test subagent_timeout_settles_a_parked_provider_wait ... ok
+test subagent_timeout_settles_a_parked_approval_wait ... ok
+test subagent_timeout_settles_a_parked_quota_wait ... ok
+
+test result: ok. 7 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.56s
+
+     Running tests/cancel_terminal_race.rs (target/debug/deps/cancel_terminal_race-14d38c75359d81ff)
+
+running 13 tests
+test a_fire_after_the_driver_reached_cleaning_never_regresses_the_phase ... ok
+test concurrent_duplicate_fires_keep_the_first_reason_and_a_single_fired ... ok
+test cancel_racing_the_finalize_transaction_is_too_late_not_accepted ... ok
+test cancel_at_the_no_provider_early_close_settles_cancelled ... ok
+test cancel_after_the_committed_terminal_reports_already_terminal ... ok
+test cancel_at_the_started_boundary_dispatches_no_new_external_call ... ok
+test cancel_accepted_while_final_events_persist_beats_the_completed_terminal ... ok
+test cancel_at_the_authorization_boundary_never_opens_the_approval_ask ... ok
+test cancel_accepted_before_the_terminal_claim_beats_every_terminal_shape ... ok
+test cancel_at_the_intent_boundary_dispatches_no_new_external_call ... ok
+test cancel_between_tool_iterations_stops_the_second_dispatch ... ok
+test cancel_accepted_before_the_terminal_claim_beats_the_failed_terminal_too ... ok
+test started_without_receipt_journals_unknown_receipt_facts ... ok
+
+test result: ok. 13 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.38s
+
+     Running tests/cancellation_tree.rs (target/debug/deps/cancellation_tree-f7fa52f02cb66948)
+
+running 8 tests
+test state_change_transaction_commits_legal_legs_and_diagnoses_bad_ones ... ok
+test cancel_surface_is_diagnosable_for_unknown_terminal_foreign_and_dangling ... ok
+test panicking_tool_child_is_supervised_and_the_run_settles_loudly ... ok
+test queue_wait_cancel_leaves_the_unrelated_holder_untouched ... ok
+test r03_a06_cancel_parent_spares_unrelated_background ... ok
+test approval_wait_round_trips_approve_and_reject_legs ... ok
+test r03_a05_cancel_exits_each_wait_state_and_returns_quotas ... ok
+test noncooperating_child_is_reported_unconfirmed_not_fake_quiet ... ok
+
+test result: ok. 8 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.60s
+
+     Running tests/event_subscription.rs (target/debug/deps/event_subscription-1a04b8fe92617fab)
+
+running 12 tests
+test a10_duplicate_event_publication_is_deduped ... ok
+test ws_pre_hello_connection_cannot_hold_the_shutdown_drain ... ok
+test a10_negative_rejections_are_loud ... ok
+test a10_purge_all_stale_cursor_gets_rebuild_directive_not_future_cursor ... ok
+test a09_parallel_subscribers_see_identical_views ... ok
+test a10_expired_cursor_gets_explicit_snapshot_required_and_rebuild_matches_authority ... ok
+test f02_resume_first_event_gap_gets_explicit_snapshot_directive ... ok
+test f02_intra_page_seq_gap_is_loud_corruption_never_a_silent_skip ... ok
+test a09_snapshot_and_subscription_have_no_gap_at_every_commit_boundary ... ok
+test f02_purge_resume_race_never_produces_a_silent_hole ... ok
+test a09_join_window_race_under_concurrent_writer_loses_nothing ... ok
+test ws_subscribe_snapshot_live_and_rejections ... ok
+
+test result: ok. 12 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 3.10s
+
+     Running tests/run_lifecycle.rs (target/debug/deps/run_lifecycle-679a8932547c5866)
+
+running 12 tests
+test tool_request_without_executor_is_a_loud_failure ... ok
+test turn_budget_exhaustion_fails_loudly_never_fake_completes ... ok
+test no_provider_configuration_is_explicit_and_r02_compatible ... ok
+test terminal_run_rejects_late_attempts_and_events_loudly ... ok
+test duplicate_finalize_replays_and_conflicting_finalize_is_diagnosed ... ok
+test empty_reply_completes_without_final_and_names_the_cause ... ok
+test non_retryable_failure_settles_without_extra_attempts ... ok
+test tool_partial_failure_has_its_own_outcome_not_a_fabricated_answer ... ok
+test process_only_run_completes_without_final_and_names_the_cause ... ok
+test r03_a01_three_model_calls_produce_exactly_one_task_terminal ... ok
+test retry_budget_exhaustion_fails_loudly_with_attempt_count_honest ... ok
+test retryable_provider_failure_reopens_attempt_on_the_same_run ... ok
+
+test result: ok. 12 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.92s
+
+exit=0

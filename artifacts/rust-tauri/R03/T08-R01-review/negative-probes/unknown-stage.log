@@ -1,0 +1,3 @@
+    Finished `dev` profile [unoptimized + debuginfo] target(s) in 0.04s
+     Running `rust/target/debug/xtask verify-stage R99 --evidence /tmp/r03t08-r01-negprobe/r99`
+error: unknown stage "R99"; no implementation-acceptance map is registered in xtask (registered stages: R02, R03). A stage without a map is a hard error — never an empty pass.

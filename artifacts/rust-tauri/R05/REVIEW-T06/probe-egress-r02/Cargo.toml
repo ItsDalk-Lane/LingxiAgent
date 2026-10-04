@@ -1,0 +1,19 @@
+[package]
+name = "r05t06-review-probe-egress-r02"
+version = "0.0.0"
+edition = "2021"
+publish = false
+
+# REVIEW-T06 R01 adversarial probe (reviewer-owned, NOT product code).
+# Depends on the REAL uncommitted working-tree lingxi-adapters (the egress
+# guard under review) plus the `url` crate — the exact WHATWG URL parser
+# reqwest hands host strings to — to compare the guard's verdict with the
+# address the HTTP client would actually dial.
+
+[dependencies]
+lingxi-adapters = { path = "../../../../../rust/crates/lingxi-adapters" }
+url = "2"
+
+[[bin]]
+name = "probe"
+path = "src/main.rs"

@@ -1,0 +1,22 @@
+   Compiling lingxi-service v0.0.0 (/Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-service)
+warning: function `read_persisted_network` is never used
+  --> crates/lingxi-service/src/management.rs:99:15
+   |
+99 | pub(crate) fn read_persisted_network(home: &Path) -> Result<Option<PersistedNetwork>, String> {
+   |               ^^^^^^^^^^^^^^^^^^^^^^
+   |
+   = note: `#[warn(dead_code)]` (part of `#[warn(unused)]`) on by default
+
+warning: `lingxi-service` (lib) generated 1 warning
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 2.70s
+     Running tests/r00_management_leaves.rs (/private/tmp/lingxi-r02-r17-management-target/debug/deps/r00_management_leaves-84f34bf414f4f038)
+LINGXI_AUTH_REJECTED request_id=req-c150ad60367150b2b2e6c78fb3f3153e method=GET path=/lingxi/v1/access/summary status=401 Unauthorized reason=missing_credential remote=127.0.0.1:57105
+LINGXI_AUTH_REJECTED request_id=req-39d933fc30334f215e343791ba964230 method=PUT path=/lingxi/v1/access/account/profile status=401 Unauthorized reason=missing_credential remote=127.0.0.1:57108
+LINGXI_AUTH_REJECTED request_id=req-e90a7b286acc8b2111f83b4d3d133252 method=PUT path=/lingxi/v1/access/network status=401 Unauthorized reason=missing_credential remote=127.0.0.1:57111
+LINGXI_AUTH_REJECTED request_id=req-b5efe95865674d83cf3783e7b56da7b0 method=DELETE path=/lingxi/v1/access/account/password status=401 Unauthorized reason=missing_credential remote=127.0.0.1:57119
+LINGXI_AUTH_REJECTED request_id=req-58d8d22ab102520b94c374e7e050d01f method=POST path=/lingxi/v1/access/desktop-credentials status=401 Unauthorized reason=missing_credential remote=127.0.0.1:57123
+LINGXI_AUTH_REJECTED request_id=req-3dc89e34b407c0b8b8aceb1146c91263 method=GET path=/lingxi/v1/devices status=401 Unauthorized reason=missing_credential remote=127.0.0.1:57125
+LINGXI_AUTH_REJECTED request_id=req-c77325f226d1e0732c97c1912487c910 method=GET path=/lingxi/v1/me status=401 Unauthorized reason=invalid_credential remote=127.0.0.1:57128
+LINGXI_AUTH_REJECTED request_id=req-de3212d2f7492a63317c852d2ece8582 method=GET path=/lingxi/v1/me status=401 Unauthorized reason=invalid_credential remote=127.0.0.1:57132
+LINGXI_AUTH_REJECTED request_id=req-ad09785c17c9d8becadbabedecb137f1 method=POST path=/lingxi/v1/devices/pairing-sessions status=401 Unauthorized reason=missing_credential remote=127.0.0.1:57135
+LINGXI_AUTH_REJECTED request_id=req-d5f309e58eda49b2ccb685409490b8dd method=POST path=/lingxi/v1/devices/pairing-sessions/pair_7Zcj9o4SpqQYNK0S5lBRWQ/approve status=401 Unauthorized reason=missing_credential remote=127.0.0.1:57139

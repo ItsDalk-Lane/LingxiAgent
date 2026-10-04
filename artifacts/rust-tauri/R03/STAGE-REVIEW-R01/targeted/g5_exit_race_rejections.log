@@ -1,0 +1,10 @@
+   Compiling lingxi-service v0.0.0 (/Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-service)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 1.04s
+     Running tests/exit_race_rejections.rs (rust/target/debug/deps/exit_race_rejections-6ef4db36cf36b9d5)
+
+running 2 tests
+test http_execute_is_refused_with_503_while_shutting_down ... ok
+test shutdown_window_rejects_concurrent_submissions_and_settles_existing_tasks ... ok
+
+test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.14s
+

@@ -1,0 +1,8 @@
+2026-09-26T09:17:27.324611Z  INFO lingxi_service: data root resolved effective_home=/tmp/lingxi-r02-t01-smoke-home.NgUJiS source=cli ignored_sources=none
+2026-09-26T09:17:27.325089Z  INFO lingxi_service: data root prepared (canonicalized; runtime dir private 0700) canonical_home=/private/tmp/lingxi-r02-t01-smoke-home.NgUJiS runtime_dir=/private/tmp/lingxi-r02-t01-smoke-home.NgUJiS/lingxi-service
+2026-09-26T09:17:27.325335Z  INFO lingxi_service: single-writer lock acquired instance_id=157e3bdecfa1b421a6dd3b921c307be7 start_nonce=c8334e86486c96ff pid=92909 entropy="os-random-device" lock=/private/tmp/lingxi-r02-t01-smoke-home.NgUJiS/lingxi-service/instance.lock network_mode=loopback
+2026-09-26T09:17:27.375689Z  INFO lingxi_adapters::storage::run_store: run database migrated db=/private/tmp/lingxi-r02-t01-smoke-home.NgUJiS/lingxi-service/data/runs.db applied=[1] version=1
+2026-09-26T09:17:27.375944Z  INFO lingxi_service: auth service bootstrapped (per-start loopback token, owner-only);          run database migrated and seeded local_token_file=/private/tmp/lingxi-r02-t01-smoke-home.NgUJiS/lingxi-service/local-token.json run_database=/private/tmp/lingxi-r02-t01-smoke-home.NgUJiS/lingxi-service/data/runs.db
+2026-09-26T09:17:27.384884Z  INFO lingxi_service: instance record published (atomic write) record=/private/tmp/lingxi-r02-t01-smoke-home.NgUJiS/lingxi-service/instance.json bind_addr=127.0.0.1:59142
+2026-09-26T09:17:27.519162Z  INFO lingxi_service: shutdown signal: SIGTERM
+2026-09-26T09:17:27.520223Z  INFO lingxi_service: lingxi-service stopped cleanly (run database closed, own record                          removed, lock released)

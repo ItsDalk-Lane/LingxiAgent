@@ -1,0 +1,122 @@
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.04s
+     Running unittests src/lib.rs (/tmp/r03-t03-target/debug/deps/lingxi_adapters-f4f2f759ac4dc95f)
+
+running 21 tests
+test storage::migrations::tests::migration_sql_avoids_if_not_exists ... ok
+test storage::migrations::tests::not_a_database_maps_to_corrupted ... ok
+test storage::migrations::tests::migrations_are_contiguous_from_one ... ok
+test storage::migrations::tests::fingerprints_are_stable_sha256_hex ... ok
+test storage::migrations::tests::sqlite_error_mapping_by_primary_code ... ok
+test storage::queue::tests::pragma_knobs_above_the_sqlite_i32_range_are_rejected_loudly ... ok
+test storage::queue::tests::queue_wait_budget_above_the_documented_max_is_rejected_loudly ... ok
+test storage::queue::tests::queue_capacity_above_the_tokio_bound_is_rejected_loudly ... ok
+test storage::queue::tests::zero_queue_wait_budget_is_rejected_loudly ... ok
+test storage::run_store::run_id_sequence_tests::foreign_and_malformed_shapes_never_seed ... ok
+test storage::run_store::run_id_sequence_tests::recognizes_only_ids_this_allocator_mints ... ok
+test storage::queue::tests::out_of_range_pragma_knobs_are_rejected_before_any_db_open ... ok
+test storage::migrations::tests::foreign_tables_without_receipts_are_rejected ... ok
+test storage::migrations::tests::newer_database_is_rejected_not_downgraded ... ok
+test storage::queue::tests::accepted_pragma_knobs_round_trip_through_real_sqlite ... ok
+test storage::migrations::tests::tampered_fingerprint_is_rejected ... ok
+test storage::migrations::tests::tampered_user_version_is_rejected ... ok
+test storage::migrations::tests::tampered_version_row_is_rejected ... ok
+test storage::migrations::tests::apply_then_verify_is_idempotent ... ok
+test storage::migrations::tests::integrity_check_passes_a_healthy_db_and_flags_a_broken_one ... ok
+test storage::queue::tests::queue_wait_budget_turns_a_full_queue_into_loud_queue_full ... ok
+
+test result: ok. 21 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.16s
+
+     Running unittests src/bin/lingxi-storage-inspect.rs (/tmp/r03-t03-target/debug/deps/lingxi_storage_inspect-c8d73383cf50f1d2)
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running tests/backup_faults.rs (/tmp/r03-t03-target/debug/deps/backup_faults-3f08cf781bb01425)
+
+running 2 tests
+test backup_faults::checkpoint_fault_fails_the_backup_explicitly_and_leaves_no_artifact ... ok
+test backup_faults::interrupted_backup_copy_fails_explicitly_and_removes_the_partial_file ... ok
+
+test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.02s
+
+     Running tests/backup_restore.rs (/tmp/r03-t03-target/debug/deps/backup_restore-aea68a35a892a569)
+
+running 11 tests
+test backup_validates_the_file_stem ... ok
+test backup_into_unwritable_destination_fails_without_artifacts ... ok
+test database_files_are_tightened_to_owner_only ... ok
+test restore_refuses_a_tampered_backup_file ... ok
+test restore_refuses_an_existing_target ... ok
+test backup_and_restore_artifacts_are_owner_only ... ok
+test a11_pure_online_backup_without_precheckpoint_is_also_complete ... ok
+test a11_transaction_boundary_rolled_back_data_is_absent_from_backup ... ok
+test a11_backup_of_a_started_but_uncommitted_run_is_a_complete_prefix ... ok
+test a11_online_backup_captures_wal_resident_committed_data_and_restores ... ok
+test a11_backup_during_concurrent_commits_is_a_consistent_prefix ... ok
+
+test result: ok. 11 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.16s
+
+     Running tests/disk_full_fault.rs (/tmp/r03-t03-target/debug/deps/disk_full_fault-87b1df125c85872a)
+
+running 2 tests
+test unix_fault::start_commit_also_fails_under_the_fault ... ok
+test unix_fault::commit_fails_for_real_at_commit_time_without_fake_success ... ok
+
+test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.01s
+
+     Running tests/event_store_reads.rs (/tmp/r03-t03-target/debug/deps/event_store_reads-ec8ffa19299c52f1)
+
+running 3 tests
+test event_type_column_tampering_is_loud_corruption ... ok
+test head_floor_and_events_after_read_the_durable_log ... ok
+test purge_moves_the_floor_and_reports_removed_rows ... ok
+
+test result: ok. 3 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.01s
+
+     Running tests/migration_idempotency.rs (/tmp/r03-t03-target/debug/deps/migration_idempotency-77b1745e9db7ca1e)
+
+running 2 tests
+test tampered_version_rollback_is_rejected_not_replayed ... ok
+test repeated_migration_checks_are_idempotent ... ok
+
+test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.01s
+
+     Running tests/run_finalize_property.rs (/tmp/r03-t03-target/debug/deps/run_finalize_property-d4f1c28d16cb2741)
+
+running 2 tests
+test out_of_order_illegal_settlement_is_rejected_and_run_still_settles_once ... ok
+test r03_a02_duplicate_and_out_of_order_settlements_settle_exactly_once ... ok
+
+test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.13s
+
+     Running tests/run_id_allocator.rs (/tmp/r03-t03-target/debug/deps/run_id_allocator-8861613428420be3)
+
+running 5 tests
+test non_minted_hex_tails_do_not_seed_the_high_water_mark ... ok
+test opaque_existing_run_id_never_seeds_and_reopen_allocates_cleanly ... ok
+test reseed_after_failure_gap_never_reissues_a_consumed_id ... ok
+test exhausted_sequence_fails_loudly_instead_of_panicking_or_wrapping ... ok
+test concurrent_allocations_stay_unique_and_reseed_above_all ... ok
+
+test result: ok. 5 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.02s
+
+     Running tests/storage_transactions.rs (/tmp/r03-t03-target/debug/deps/storage_transactions-55eb35e51f13d372)
+
+running 7 tests
+test bounded_queue_reports_full_instead_of_dropping ... ok
+test read_only_data_dir_is_a_loud_open_failure ... ok
+test wal_mode_is_negotiated_and_reported ... ok
+test graceful_close_checkpoints_and_data_survives_restart ... ok
+test finalize_is_idempotent_and_conflicts_are_diagnosed ... ok
+test a07_crash_windows_distinguish_commit_boundaries ... ok
+test busy_timeout_is_explicit_not_a_hang ... ok
+
+test result: ok. 7 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.20s
+
+   Doc-tests lingxi_adapters
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+

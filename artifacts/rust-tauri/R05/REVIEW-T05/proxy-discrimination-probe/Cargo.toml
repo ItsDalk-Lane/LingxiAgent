@@ -1,0 +1,10 @@
+[package]
+name = "review-t05-proxy-discrimination-probe"
+version = "0.0.0"
+edition = "2021"
+
+[dependencies]
+reqwest = { version = "0.13.5", features = ["json"] }
+tokio = { version = "1", features = ["full"] }
+
+[workspace]

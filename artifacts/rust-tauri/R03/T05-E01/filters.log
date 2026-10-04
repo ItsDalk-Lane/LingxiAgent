@@ -1,0 +1,34 @@
+== -p lingxi-kernel --lib invocation ==
+test result: ok. 10 passed; 0 failed; 0 ignored; 0 measured; 25 filtered out; finished in 0.00s
+== -p lingxi-adapters --test invocation_journal_store ==
+test result: ok. 5 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.02s
+== -p lingxi-service --test invocation_journal ==
+test result: ok. 3 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.15s
+== name filter r03_a09 ==
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 2 filtered out; finished in 0.07s
+== name filter r03_a10 ==
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 2 filtered out; finished in 0.06s
+== -p lingxi-service --test run_lifecycle ==
+test result: ok. 12 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.40s
+== -p lingxi-service --test cancellation_tree ==
+test result: ok. 8 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.57s
+== -p lingxi-service --test session_serialization ==
+test result: ok. 5 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.70s
+== -p lingxi-service --test late_result_fence ==
+test result: ok. 5 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.22s
+== -p lingxi-service --test request_dedup ==
+test result: ok. 4 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.17s
+== -p lingxi-adapters --test migration_idempotency ==
+test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.02s
+== -p lingxi-adapters --test storage_transactions ==
+test result: ok. 7 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.22s
+== -p lingxi-adapters --test run_finalize_property ==
+test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.17s
+== -p lingxi-kernel --lib ==
+test result: ok. 35 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+== name filter journal_receipt (runs.rs unit) ==
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 219 filtered out; finished in 0.00s
+== name filter fence_verdict (runs.rs unit, T04 regression) ==
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 219 filtered out; finished in 0.00s
+== name filter invocation:: (kernel classify unit suite) ==
+test result: ok. 10 passed; 0 failed; 0 ignored; 0 measured; 25 filtered out; finished in 0.00s

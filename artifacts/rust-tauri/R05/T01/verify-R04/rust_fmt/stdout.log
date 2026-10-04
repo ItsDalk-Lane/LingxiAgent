@@ -1,0 +1,90 @@
+Diff in /Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-service/src/lib.rs:1001:
+                     &budget,
+                 );
+             }
+-            let provider = lingxi_adapters::models::provider::GatewayedProvider::new(
+-                model_gateway,
+-                budget,
+-            )
+-            .map_err(|err| {
+-                ServiceStartupError::Storage(StorageError::InvalidRequest {
+-                    detail: format!("cannot construct the model provider: {err}"),
+-                })
+-            })?;
++            let provider =
++                lingxi_adapters::models::provider::GatewayedProvider::new(model_gateway, budget)
++                    .map_err(|err| {
++                        ServiceStartupError::Storage(StorageError::InvalidRequest {
++                            detail: format!("cannot construct the model provider: {err}"),
++                        })
++                    })?;
+             // The recovery scan resolves capabilities from the REAL
+             // registry (the file tools' verified capability rows), never
+             // the conservative default, once real tools exist.
+Diff in /Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-service/tests/r05_t01_model_plane.rs:56:
+     /// response says `Connection: close`); canned responses are popped in
+     /// order; an exhausted script is a LOUD 500, never an improvised reply.
+     async fn start(responses: Vec<String>) -> Self {
+-        Self::start_mixed(
+-            responses
+-                .into_iter()
+-                .map(StubResponse::Immediate)
+-                .collect(),
+-        )
+-        .await
++        Self::start_mixed(responses.into_iter().map(StubResponse::Immediate).collect()).await
+     }
+ 
+     async fn start_mixed(responses: Vec<StubResponse>) -> Self {
+Diff in /Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-service/tests/r05_t01_model_plane.rs:987:
+ 
+     // Reload while run 1 is IN FLIGHT (the same ConfigModelGateway::reload
+     // call the management surface makes after re-reading the source).
+-    let new_plane = lingxi_adapters::models::config::ModelPlaneConfig::parse_and_validate(
+-        &format!("{{{}}}", plane_json_for(&stub_b.endpoint(), "stub-model-v2")),
+-    )
+-    .expect("valid plane");
++    let new_plane =
++        lingxi_adapters::models::config::ModelPlaneConfig::parse_and_validate(&format!(
++            "{{{}}}",
++            plane_json_for(&stub_b.endpoint(), "stub-model-v2")
++        ))
++        .expect("valid plane");
+     let generation = boot
+         .state
+         .model_gateway()
+Diff in /Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-service/tests/r05_t01_model_plane.rs:1033:
+     // 2's gated answer, is cancelled, and must settle cancelled; the late
+     // answer, once released, must never be committed.
+     let run_state = boot.state.clone();
+-    let run3 = tokio::spawn(async move { execute_on(&run_state, "sess_local_beta", "cancel me").await });
++    let run3 =
++        tokio::spawn(async move { execute_on(&run_state, "sess_local_beta", "cancel me").await });
+     wait_until_hits(&stub_b, 2).await;
+     let run3_id = boot
+         .state
+Diff in /Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-service/tests/r05_t01_model_plane.rs:1072:
+         "the released late answer must not resurrect the run"
+     );
+     assert!(
+-        final_message_text_opt(&boot.state, &run3_id).await.is_none(),
++        final_message_text_opt(&boot.state, &run3_id)
++            .await
++            .is_none(),
+         "no final message is ever committed for a cancelled run"
+     );
+ 
+Diff in /Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-service/tests/r05_t01_model_plane.rs:1092:
+         }
+     })
+     .await
+-    .unwrap_or_else(|_| panic!("stub never received {expected} requests (has {})", stub.hits()));
++    .unwrap_or_else(|_| {
++        panic!(
++            "stub never received {expected} requests (has {})",
++            stub.hits()
++        )
++    });
+ }
+ 
+ /// The committed final message text of a run (panics when absent).

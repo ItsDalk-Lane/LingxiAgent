@@ -1,0 +1,99 @@
+   Compiling lingxi-service v0.0.0 (/Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-service)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 2.58s
+     Running tests/background_disconnect_recovery.rs (target/debug/deps/background_disconnect_recovery-1f2f7b7a8a40b59f)
+
+running 3 tests
+test r03_a12_background_run_survives_disconnect_reconnect_replays_and_is_queryable ... ok
+test foreground_drive_disappearing_is_abandoned_not_cancelled ... ok
+test exit_hook_drain_reports_live_drives_as_unconfirmed ... ok
+
+test result: ok. 3 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.19s
+
+     Running tests/execute_concurrency.rs (target/debug/deps/execute_concurrency-4d82ca861ea55af2)
+
+running 3 tests
+test http_running_storage_fault_has_no_success_event_or_restart_run ... ok
+test http_concurrent_executes_surface_the_busy_gate_and_mint_distinct_runs ... ok
+test in_process_concurrent_executes_serialize_then_mint_distinct_runs_across_restart ... ok
+
+test result: ok. 3 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.28s
+
+     Running tests/exit_race_rejections.rs (target/debug/deps/exit_race_rejections-fc4222623a9cc7a3)
+
+running 2 tests
+test http_execute_is_refused_with_503_while_shutting_down ... ok
+test shutdown_window_rejects_concurrent_submissions_and_settles_existing_tasks ... ok
+
+test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.13s
+
+     Running tests/invocation_journal.rs (target/debug/deps/invocation_journal-9a192364cb7883d2)
+
+running 3 tests
+test journal_lifecycle_progresses_and_closes_receipts_on_the_live_chain ... ok
+test r03_a10_idempotent_key_resume_does_not_duplicate_the_external_operation ... ok
+test r03_a09_crash_after_side_effect_does_not_reexecute_and_receipt_is_unknown ... ok
+
+test result: ok. 3 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.19s
+
+     Running tests/late_result_fence.rs (target/debug/deps/late_result_fence-ccf25458d1ada71f)
+
+running 5 tests
+test reconnect_resubscribes_only_and_never_restarts_a_model ... ok
+test r03_a07_driver_fences_stale_tagged_model_result_loudly ... ok
+test r03_a07_late_attempt1_result_vs_current_attempt_is_stale_only ... ok
+test r03_a07_late_result_after_cancel_and_next_run_pollutes_nothing ... ok
+test r03_a07_tool_result_with_stale_fence_records_unknown_and_audits ... ok
+
+test result: ok. 5 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.22s
+
+     Running tests/r03_t08_acceptance_matrix.rs (target/debug/deps/r03_t08_acceptance_matrix-608aa6893a591e2c)
+
+running 17 tests
+test leaf_steer_semantics_busy_miss_and_drain ... ok
+test combo_cancel_during_approval_wait ... ok
+test combo_multi_turn_model_one_terminal ... ok
+test combo_duplicate_request_id_replays_and_conflicts ... ok
+test combo_normal_completes_with_final ... ok
+test leaf_reconnect_resume_never_restarts_the_model ... ok
+test combo_timeout_budget_is_a_loud_failure ... ok
+test combo_crash_recovery_is_honestly_interrupted ... ok
+test leaf_escalation_denied_zero_children ... ok
+test leaf_cancel_outcome_shapes ... ok
+test combo_cancel_during_stream_read ... ok
+test leaf_child_cancel_stops_only_the_child ... ok
+test leaf_background_completes_decoupled_and_survives_cancels ... ok
+test combo_cross_session_parallel_both_complete ... ok
+test combo_multi_tool_three_calls ... ok
+test leaf_subagent_dispatch_reply_close ... ok
+test leaf_parent_cancel_stops_child ... ok
+
+test result: ok. 17 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.70s
+
+     Running tests/request_dedup.rs (target/debug/deps/request_dedup-800d56aa22078e17)
+
+running 4 tests
+test same_request_id_same_content_replays_without_new_execution ... ok
+test r03_a08_same_request_id_different_content_is_rejected_as_conflict ... ok
+test invalid_ids_are_refused_and_plain_submissions_are_undeduplicated ... ok
+test request_id_namespace_is_scoped_to_principal_and_session ... ok
+
+test result: ok. 4 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.17s
+
+     Running tests/run_lifecycle.rs (target/debug/deps/run_lifecycle-6411cae2df204729)
+
+running 12 tests
+test retry_budget_exhaustion_fails_loudly_with_attempt_count_honest ... ok
+test non_retryable_failure_settles_without_extra_attempts ... ok
+test turn_budget_exhaustion_fails_loudly_never_fake_completes ... ok
+test duplicate_finalize_replays_and_conflicting_finalize_is_diagnosed ... ok
+test no_provider_configuration_is_explicit_and_r02_compatible ... ok
+test empty_reply_completes_without_final_and_names_the_cause ... ok
+test tool_request_without_executor_is_a_loud_failure ... ok
+test terminal_run_rejects_late_attempts_and_events_loudly ... ok
+test retryable_provider_failure_reopens_attempt_on_the_same_run ... ok
+test tool_partial_failure_has_its_own_outcome_not_a_fabricated_answer ... ok
+test process_only_run_completes_without_final_and_names_the_cause ... ok
+test r03_a01_three_model_calls_produce_exactly_one_task_terminal ... ok
+
+test result: ok. 12 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.49s
+

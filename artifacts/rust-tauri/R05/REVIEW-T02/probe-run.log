@@ -1,0 +1,49 @@
+   Compiling r05-t02-review-probe v0.0.0 (/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/REVIEW-T02/probe)
+warning: field `body` is never read
+  --> tests/full_chain_c09.rs:24:5
+   |
+22 | struct RecordedRequest {
+   |        --------------- field in this struct
+23 |     headers: Vec<(String, String)>,
+24 |     body: String,
+   |     ^^^^
+   |
+   = note: `#[warn(dead_code)]` (part of `#[warn(unused)]`) on by default
+
+warning: field `hits` is never read
+  --> tests/full_chain_c09.rs:29:5
+   |
+27 | struct StubServer {
+   |        ---------- field in this struct
+28 |     addr: SocketAddr,
+29 |     hits: Arc<AtomicUsize>,
+   |     ^^^^
+
+warning: `r05-t02-review-probe` (test "full_chain_c09") generated 2 warnings
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.68s
+     Running tests/full_chain_c09.rs (target/debug/deps/full_chain_c09-924166dc3551d86d)
+
+running 1 test
+PROBE c09 full-chain marker scan: PASS (0 durable leaks, wire carried the marker)
+test probe_c09_full_chain_my_marker_never_persists_or_echoes ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.09s
+
+     Running tests/probes.rs (target/debug/deps/probes-708559cc54c99769)
+
+running 6 tests
+PROBE c09 novel secret forms: PASS
+test probe_c09_novel_base64_secret_forms_never_survive_redaction ... ok
+PROBE c06 persist-failure honesty: PASS
+PROBE c04 all-waiters-cancelled: PASS (token landed, 1 driver call)
+test probe_c06_persist_failure_is_honest_and_recoverable ... PROBE c02 six-way merge: PASS (driver calls = 1)
+ok
+test probe_c04_all_waiters_cancelled_flight_still_lands ... ok
+PROBE c05 revoke fence + restart: PASS
+test probe_c02_six_way_concurrent_401_merge ... ok
+test probe_c05_revoke_midflight_fence_and_restart ... ok
+PROBE resolve-loop guard: resolve DID NOT TERMINATE within 3s; driver calls so far: 265137 (UNBOUNDED refresh loop with pathological still-expired mints)
+test probe_resolve_refreshes_again_when_mints_are_still_expired ... ok
+
+test result: ok. 6 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 3.00s
+

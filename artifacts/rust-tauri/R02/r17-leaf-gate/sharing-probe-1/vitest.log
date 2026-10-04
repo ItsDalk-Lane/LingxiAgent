@@ -1,0 +1,347 @@
+
+ RUN  v4.1.10 /Users/study_superior/Desktop/Code/LingxiAgent
+
+ ❯ desktop/src/react/settings/__tests__/R02SharingLeaf.test.tsx (7 tests | 5 failed) 1248ms
+     × renders the cold mask, then exposes the page after the actual loaders finish 109ms
+     × keeps cached settings visible during background refresh 1030ms
+     × persists color and preview, defaults light, and throws without a false success on denied storage 10ms
+     × persists width and preview, defaults mobile, and keeps the old UI on denied storage 5ms
+     × normalizes font and segment limit, persists both, then rejects denied writes without UI drift 35ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 5 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  desktop/src/react/settings/__tests__/R02SharingLeaf.test.tsx > R02/R00 sharing leaf: real component and storage behavior > renders the cold mask, then exposes the page after the actual loaders finish
+AssertionError: expected undefined to be type of 'function'
+
+Expected: "function"
+Received: "undefined"
+
+ ❯ desktop/src/react/settings/__tests__/R02SharingLeaf.test.tsx:121:27
+    119|     expect(useSettingsStore.getState().ready).toBe(false);
+    120|     expect(document.querySelector('.settings-loading-mask')).toBeTruth…
+    121|     expect(releaseAgents).toBeTypeOf('function');
+       |                           ^
+    122|     releaseAgents?.();
+    123|     await waitFor(() => expect(useSettingsStore.getState().ready).toBe…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/5]⎯
+
+ FAIL  desktop/src/react/settings/__tests__/R02SharingLeaf.test.tsx > R02/R00 sharing leaf: real component and storage behavior > keeps cached settings visible during background refresh
+AssertionError: expected "vi.fn()" to be called at least once
+
+Ignored nodes: comments, script, style
+[36m<html>[39m
+  [36m<head />[39m
+  [36m<body>[39m
+    [36m<div>[39m
+      [36m<div[39m
+        [33mclass[39m=[32m"_settings-content-root_4045f0"[39m
+        [33mdata-input-ctx-zone[39m=[32m"settings"[39m
+      [36m>[39m
+        [36m<div[39m
+          [33mclass[39m=[32m"settings-panel "[39m
+          [33mid[39m=[32m"settingsPanel"[39m
+        [36m>[39m
+          [36m<div[39m
+            [33mclass[39m=[32m"settings-header "[39m
+          [36m>[39m
+            [36m<h1[39m
+              [33mclass[39m=[32m"_settings-title_4045f0"[39m
+            [36m>[39m
+              [0msettings.title[0m
+            [36m</h1>[39m
+          [36m</div>[39m
+          [36m<div[39m
+            [33mclass[39m=[32m"_settings-body_4045f0"[39m
+          [36m>[39m
+            [36m<nav[39m
+              [33mclass[39m=[32m"_settings-nav_4045f0"[39m
+            [36m>[39m
+              [36m<div[39m
+                [33mclass[39m=[32m"_settings-search-shell_4045f0"[39m
+              [36m>[39m
+                [36m<svg[39m
+                  [33maria-hidden[39m=[32m"true"[39m
+                  [33mclass[39m=[32m"_settings-search-icon_4045f0"[39m
+                  [33mfill[39m=[32m"none"[39m
+                  [33mheight[39m=[32m"15"[39m
+                  [33mstroke[39m=[32m"currentColor"[39m
+                  [33mstroke-linecap[39m=[32m"round"[39m
+                  [33mstroke-linejoin[39m=[32m"round"[39m
+                  [33mstroke-width[39m=[32m"1.8"[39m
+                  [33mviewBox[39m=[32m"0 0 24 24"[39m
+                  [33mwidth[39m=[32m"15"[39m
+                [36m>[39m
+                  [36m<circle[39m
+                    [33mcx[39m=[32m"11"[39m
+                    [33mcy[39m=[32m"11"[39m
+                    [33mr[39m=[32m"7"[39m
+                  [36m/>[39m
+                  [36m<path[39m
+                    [33md[39m=[32m"m20 20-3.5-3.5"[39m
+                  [36m/>[39m
+                [36m</svg>[39m
+                [36m<input[39m
+                  [33mclass[39m=[32m"_settings-search-input_4045f0"[39m
+                  [33mplaceholder[39m=[32m"settings.settingsSearch.placeholder"[39m
+                  [33mtype[39m=[32m"search"[39m
+                  [33mvalue[39m=[32m""[39m
+                [36m/>[39m
+              [36m</div>[39m
+              [36m<button[39m
+                [33mclass[39m=[32m"_settings-nav-item_4045f0"[39m
+                [33mdata-tab[39m=[32m"agent"[39m
+              [36m>[39m
+                [36m<svg[39m
+                  [33mfill[39m=[32m"none"[39m
+                  [33mheight[39m=[32m"16"[39m
+                  [33mstroke[39m=[32m"currentColor"[39m
+                  [33mstroke-linecap[39m=[32m"round"[39m
+                  [33mstroke-linejoin[39m=[32m"round"[39m
+                  [33mstroke-width[39m=[32m"1.5"[39m
+                  [33mviewBox[39m=[32m"0 0 24 24"[39m
+                  [33mwidth[39m=[32m"16"[39m
+                [36m>[39m
+                  [36m<path[39m
+                    [33md[39m=[32m"M12 2a5 5 0 0 1 5 5c0 2.76-2.24 5-5 5s-5-2.24-5-5a5 5 0 0 1 5-5z"[39m
+                  [36m/>[39m
+                  [36m<path[39m
+                    [33md[39m=[32m"M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"[39m
+                  [36m/>[39m
+                [36m</svg>[39m
+                [36m<span>[39m
+                  [0msettings.tabs.agent[0m
+                [36m</span>[39m
+              [36m</button>[39m
+              [36m<button[39m
+                [33mclass[39m=[32m"_settings-nav-item_4045f0"[39m
+                [33mdata-tab[39m=[32m"me"[39m
+              [36m>[39m
+                [36m<svg[39m
+                  [33mfill[39m=[32m"none"[39m
+                  [33mheight[39m=[32m"16"[39m
+                  [33mstroke[39m=[32m"currentColor"[39m
+                  [33mstroke-linecap[39m=[32m"round"[39m
+                  [33mstroke-linejoin[39m=[32m"round"[39m
+                  [33mstroke-width[39m=[32m"1.5"[39m
+                  [33mviewBox[39m=[32m"0 0 24 24"[39m
+                  [33mwidth[39m=[32m"16"[39m
+                [36m>[39m
+                  [36m<path[39m
+                    [33md[39m=[32m"M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"[39m
+                  [36m/>[39m
+                  [36m<circle[39m
+                    [33mcx[39m=[32m"12"[39m
+                    [33mcy[39m=[32m"7"[39m
+                    [33mr[39m=[32m"4"[39m
+                  [36m/>[39m
+                [36m</svg>[39m
+                [36m<span>[39m
+                  [0msettings.tabs.me[0m
+                [36m</span>[39m
+              [36m</button>[39m
+              [36m<button[39m
+                [33mclass[39m=[32m"_settings-nav-item_4045f0"[39m
+                [33mdata-tab[39m=[32m"interface"[39m
+              [36m>[39m
+                [36m<svg[39m
+                  [33mfill[39m=[32m"none"[39m
+                  [33mheight[39m=[32m"16"[39m
+                  [33mstroke[39m=[32m"currentColor"[39m
+                  [33mstroke-linecap[39m=[32m"round"[39m
+                  [33mstroke-linejoin[39m=[32m"round"[39m
+                  [33mstroke-width[39m=[32m"1.5"[39m
+                  [33mviewBox[39m=[32m"0 0 24 24"[39m
+                  [33mwidth[39m=[32m"16"[39m
+                [36m>[39m
+                  [36m<circle[39m
+                    [33mcx[39m=[32m"12"[39m
+                    [33mcy[39m=[32m"12"[39m
+                    [33mr[39m=[32m"3"[39m
+                  [36m/>[39m
+                  [36m<path[39m
+                    [33md[39m=[32m"M3 12h3"[39m
+                  [36m/>[39m
+                  [36m<path[39m
+                    [33md[39m=[32m"M18 12h3"[39m
+                  [36m/>[39m
+                  [36m<path[39m
+                    [33md[39m=[32m"M12 3v3"[39m
+                  [36m/>[39m
+                  [36m<path[39m
+                    [33md[39m=[32m"M12 18v3"[39m
+                  [36m/>[39m
+                  [36m<path[39m
+                    [33md[39m=[32m"m5.64 5.64 2.12 2.12"[39m
+                  [36m/>[39m
+                  [36m<path[39m
+                    [33md[39m=[32m"m16.24 16.24 2.12 2.12"[39m
+                  [36m/>[39m
+                  [36m<path[39m
+                    [33md[39m=[32m"m18.36 5.64-2.12 2.12"[39m
+                  [36m/>[39m
+                  [36m<path[39m
+                    [33md[39m=[32m"m7.76 16.24-2.12 2.12"[39m
+                  [36m/>[39m
+                [36m</svg>[39m
+                [36m<span>[39m
+                  [0msettings.tabs.interface[0m
+                [36m</span>[39m
+              [36m</button>[39m
+              [36m<button[39m
+                [33mclass[39m=[32m"_settings-nav-item_4045f0"[39...
+ ❯ desktop/src/react/settings/__tests__/R02SharingLeaf.test.tsx:138:66
+    136|     expect(screen.getByText('settings.screenshot.color')).toBeTruthy();
+    137|     releaseAgents?.();
+    138|     await waitFor(() => expect(actionMocks.loadProvidersSummary).toHav…
+       |                                                                  ^
+    139|     containerBranches.cached = { oldContentVisible: true, backgroundRe…
+    140|   });
+ ❯ runWithExpensiveErrorDiagnosticsDisabled node_modules/@testing-library/dom/dist/config.js:47:12
+ ❯ checkCallback node_modules/@testing-library/dom/dist/wait-for.js:124:77
+ ❯ Timeout.checkRealTimersCallback node_modules/@testing-library/dom/dist/wait-for.js:118:16
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/5]⎯
+
+ FAIL  desktop/src/react/settings/__tests__/R02SharingLeaf.test.tsx > R02/R00 sharing leaf: real component and storage behavior > persists color and preview, defaults light, and throws without a false success on denied storage
+AssertionError: expected [Function] to throw an error
+
+- Expected:
+null
+
++ Received:
+undefined
+
+ ❯ desktop/src/react/settings/__tests__/R02SharingLeaf.test.tsx:195:43
+    193|     expect(after).not.toBe(before);
+    194|     denyWrite = true;
+    195|     expect(() => fireEvent.click(sakura)).toThrow('storage denied');
+       |                                           ^
+    196|     expect(storage.get('hana-screenshot-color')).toBe('dark');
+    197|     expect(selected(dark)).toBe(true);
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[3/5]⎯
+
+ FAIL  desktop/src/react/settings/__tests__/R02SharingLeaf.test.tsx > R02/R00 sharing leaf: real component and storage behavior > persists width and preview, defaults mobile, and keeps the old UI on denied storage
+AssertionError: expected [Function] to throw an error
+
+- Expected:
+null
+
++ Received:
+undefined
+
+ ❯ desktop/src/react/settings/__tests__/R02SharingLeaf.test.tsx:216:43
+    214|     expect(after).not.toBe(before);
+    215|     denyWrite = true;
+    216|     expect(() => fireEvent.click(mobile)).toThrow('storage denied');
+       |                                           ^
+    217|     expect(storage.get('hana-screenshot-width')).toBe('desktop');
+    218|     expect(selected(desktop)).toBe(true);
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[4/5]⎯
+
+ FAIL  desktop/src/react/settings/__tests__/R02SharingLeaf.test.tsx > R02/R00 sharing leaf: real component and storage behavior > normalizes font and segment limit, persists both, then rejects denied writes without UI drift
+AssertionError: expected [Function] to throw an error
+
+- Expected:
+null
+
++ Received:
+undefined
+
+ ❯ desktop/src/react/settings/__tests__/R02SharingLeaf.test.tsx:241:74
+    239|     expect(number.value).toBe('1500');
+    240|     denyWrite = true;
+    241|     expect(() => fireEvent.change(number, { target: { value: '200' } }…
+       |                                                                          ^
+    242|     expect(number.value).toBe('1500');
+    243|     expect(storage.get(SCREENSHOT_SEGMENT_VISIBLE_CHAR_LIMIT_STORAGE_K…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[5/5]⎯
+
+⎯⎯⎯⎯⎯⎯ Unhandled Errors ⎯⎯⎯⎯⎯⎯
+
+Vitest caught 3 unhandled errors during the test run.
+This might cause false positive tests. Resolve unhandled errors to make sure your tests are not affected.
+
+⎯⎯⎯⎯⎯ Uncaught Exception ⎯⎯⎯⎯⎯
+Error: storage denied
+ ❯ Object.<anonymous> desktop/src/react/settings/__tests__/R02SharingLeaf.test.tsx:56:28
+     54|     getItem: vi.fn((key: string) => storage.get(key) ?? null),
+     55|     setItem: vi.fn((key: string, value: string) => {
+     56|       if (denyWrite) throw new Error('storage denied');
+       |                            ^
+     57|       storage.set(key, value);
+     58|     }),
+ ❯ Object.Mock [as setItem] node_modules/@vitest/spy/dist/index.js:332:34
+ ❯ onClick desktop/src/react/settings/tabs/SharingTab.tsx:93:45
+ ❯ executeDispatch node_modules/react-dom/cjs/react-dom-client.development.js:19116:9
+ ❯ runWithFiberInDEV node_modules/react-dom/cjs/react-dom-client.development.js:874:13
+ ❯ processDispatchQueue node_modules/react-dom/cjs/react-dom-client.development.js:19166:19
+ ❯ node_modules/react-dom/cjs/react-dom-client.development.js:19767:9
+ ❯ batchedUpdates$1 node_modules/react-dom/cjs/react-dom-client.development.js:3255:40
+ ❯ dispatchEventForPluginEventSystem node_modules/react-dom/cjs/react-dom-client.development.js:19320:7
+ ❯ dispatchEvent node_modules/react-dom/cjs/react-dom-client.development.js:23585:11
+
+This error originated in "desktop/src/react/settings/__tests__/R02SharingLeaf.test.tsx" test file. It doesn't mean the error was thrown inside the file itself, but while it was running.
+The latest test that might've caused the error is "persists color and preview, defaults light, and throws without a false success on denied storage". It might mean one of the following:
+- The error was thrown, while Vitest was running this test.
+- If the error occurred after the test had been completed, this was the last documented test before it was thrown.
+
+⎯⎯⎯⎯⎯ Uncaught Exception ⎯⎯⎯⎯⎯
+Error: storage denied
+ ❯ Object.<anonymous> desktop/src/react/settings/__tests__/R02SharingLeaf.test.tsx:56:28
+     54|     getItem: vi.fn((key: string) => storage.get(key) ?? null),
+     55|     setItem: vi.fn((key: string, value: string) => {
+     56|       if (denyWrite) throw new Error('storage denied');
+       |                            ^
+     57|       storage.set(key, value);
+     58|     }),
+ ❯ Object.Mock [as setItem] node_modules/@vitest/spy/dist/index.js:332:34
+ ❯ onClick desktop/src/react/settings/tabs/SharingTab.tsx:114:47
+ ❯ executeDispatch node_modules/react-dom/cjs/react-dom-client.development.js:19116:9
+ ❯ runWithFiberInDEV node_modules/react-dom/cjs/react-dom-client.development.js:874:13
+ ❯ processDispatchQueue node_modules/react-dom/cjs/react-dom-client.development.js:19166:19
+ ❯ node_modules/react-dom/cjs/react-dom-client.development.js:19767:9
+ ❯ batchedUpdates$1 node_modules/react-dom/cjs/react-dom-client.development.js:3255:40
+ ❯ dispatchEventForPluginEventSystem node_modules/react-dom/cjs/react-dom-client.development.js:19320:7
+ ❯ dispatchEvent node_modules/react-dom/cjs/react-dom-client.development.js:23585:11
+
+This error originated in "desktop/src/react/settings/__tests__/R02SharingLeaf.test.tsx" test file. It doesn't mean the error was thrown inside the file itself, but while it was running.
+The latest test that might've caused the error is "persists width and preview, defaults mobile, and keeps the old UI on denied storage". It might mean one of the following:
+- The error was thrown, while Vitest was running this test.
+- If the error occurred after the test had been completed, this was the last documented test before it was thrown.
+
+⎯⎯⎯⎯⎯ Uncaught Exception ⎯⎯⎯⎯⎯
+Error: storage denied
+ ❯ Object.<anonymous> desktop/src/react/settings/__tests__/R02SharingLeaf.test.tsx:56:28
+     54|     getItem: vi.fn((key: string) => storage.get(key) ?? null),
+     55|     setItem: vi.fn((key: string, value: string) => {
+     56|       if (denyWrite) throw new Error('storage denied');
+       |                            ^
+     57|       storage.set(key, value);
+     58|     }),
+ ❯ Object.Mock [as setItem] node_modules/@vitest/spy/dist/index.js:332:34
+ ❯ handleSegmentLimitChange desktop/src/react/settings/tabs/SharingTab.tsx:61:20
+ ❯ handleChange desktop/src/react/settings/components/NumberInput.tsx:31:5
+ ❯ executeDispatch node_modules/react-dom/cjs/react-dom-client.development.js:19116:9
+ ❯ runWithFiberInDEV node_modules/react-dom/cjs/react-dom-client.development.js:874:13
+ ❯ processDispatchQueue node_modules/react-dom/cjs/react-dom-client.development.js:19166:19
+ ❯ node_modules/react-dom/cjs/react-dom-client.development.js:19767:9
+ ❯ batchedUpdates$1 node_modules/react-dom/cjs/react-dom-client.development.js:3255:40
+ ❯ dispatchEventForPluginEventSystem node_modules/react-dom/cjs/react-dom-client.development.js:19320:7
+
+This error originated in "desktop/src/react/settings/__tests__/R02SharingLeaf.test.tsx" test file. It doesn't mean the error was thrown inside the file itself, but while it was running.
+The latest test that might've caused the error is "normalizes font and segment limit, persists both, then rejects denied writes without UI drift". It might mean one of the following:
+- The error was thrown, while Vitest was running this test.
+- If the error occurred after the test had been completed, this was the last documented test before it was thrown.
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+
+
+ Test Files  1 failed (1)
+      Tests  5 failed | 2 passed (7)
+     Errors  3 errors
+   Start at  14:37:58
+   Duration  3.12s (transform 940ms, setup 20ms, import 1.31s, tests 1.25s, environment 473ms)
+

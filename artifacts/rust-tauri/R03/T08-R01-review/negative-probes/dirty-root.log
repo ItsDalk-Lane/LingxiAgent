@@ -1,0 +1,3 @@
+    Finished `dev` profile [unoptimized + debuginfo] target(s) in 0.04s
+     Running `rust/target/debug/xtask verify-stage R03 --evidence artifacts/rust-tauri/R03/T08-R01-review/negative-probes/dirty-root`
+error: evidence root /Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R03/T08-R01-review/negative-probes/dirty-root is not empty; preserving its prior evidence

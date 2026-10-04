@@ -1,0 +1,13 @@
+# F02 binary-level permission probe (real lingxi-storage-inspect backup/restore-verify)
+# umask at probe time: 022
+# note: the probe db is created by the backup command itself (RunDatabase::open creates+migrates a fresh store)
+-- backup into a PRE-EXISTING LOOSE dir (0777):
+-- resulting modes (octal):
+700 /tmp/lingxi-r02t06-f02probe-356DsW/bk
+600 /tmp/lingxi-r02t06-f02probe-356DsW/bk/runs.db
+600 /tmp/lingxi-r02t06-f02probe-356DsW/bk/runs.manifest.json
+700 /tmp/lingxi-r02t06-f02probe-356DsW/bk-loose
+600 /tmp/lingxi-r02t06-f02probe-356DsW/bk-loose/runs.db
+700 /tmp/lingxi-r02t06-f02probe-356DsW/restored
+600 /tmp/lingxi-r02t06-f02probe-356DsW/restored/runs.db
+-- sanity: all 0700/0600 => probe PASS

@@ -39,9 +39,10 @@ use std::time::{Duration, Instant};
 use std::collections::VecDeque;
 use std::pin::Pin;
 
+use lingxi_kernel::model_exchange::ModelTurnInput;
 use lingxi_kernel::ports::{
     InvocationJournalEntry, InvocationPhase, ProviderDescriptor, ProviderTurn, ProviderTurnResult,
-    StoragePort, ToolOutcome, ToolRequest, ToolRunStatus, TurnProviderPort,
+    StoragePort, ToolOutcome, ToolRequest, ToolRunStatus, TurnDeltaSink, TurnProviderPort,
 };
 use lingxi_kernel::toolcatalog::{SchemaBudget, ToolRegistry};
 use lingxi_kernel::RunContext;
@@ -958,8 +959,9 @@ impl TurnProviderPort for RunIdCaptureProvider {
         &'a self,
         ctx: &'a RunContext,
         _call: &'a ModelCallId,
-        _turn: u32,
-        _input: &'a str,
+        _input: &'a ModelTurnInput,
+
+        _deltas: &'a dyn TurnDeltaSink,
     ) -> Pin<Box<dyn std::future::Future<Output = ProviderTurnResult> + Send + 'a>> {
         *self.seen_run.lock().unwrap() = Some(ctx.run_id.to_string());
         let next = self
@@ -987,6 +989,7 @@ fn final_turn(text: &str) -> ProviderTurn {
 
 fn tool_request_turn(target: &str, args: serde_json::Value) -> ProviderTurn {
     ProviderTurn::ToolRequests {
+        content: Vec::new(),
         requests: vec![ToolRequest::from_effective_arguments(
             target,
             args,

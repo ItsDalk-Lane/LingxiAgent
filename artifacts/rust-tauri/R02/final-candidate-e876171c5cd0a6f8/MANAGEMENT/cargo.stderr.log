@@ -1,0 +1,21 @@
+   Compiling lingxi-service v0.0.0 (/Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-service)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 1.51s
+     Running tests/r00_management_leaves.rs (/tmp/rust-target-r02-final/debug/deps/r00_management_leaves-44741794072b2374)
+LINGXI_AUTH_REJECTED request_id=req-820fcf8bf795f6e0493272e195fc3eaa method=GET path=/lingxi/v1/me status=401 Unauthorized reason=missing_credential remote=127.0.0.1:62781
+LINGXI_AUTH_REJECTED request_id=req-4e9d38280ca8cb662e6684667a9ed033 method=GET path=/lingxi/v1/access/summary status=401 Unauthorized reason=missing_credential remote=127.0.0.1:62785
+LINGXI_AUTH_REJECTED request_id=req-938871c5f0a8ab064cb602219b1e5361 method=PUT path=/lingxi/v1/access/account/profile status=401 Unauthorized reason=missing_credential remote=127.0.0.1:62790
+LINGXI_AUTH_REJECTED request_id=req-759595886160c69e4587d86c3fe7603b method=PUT path=/lingxi/v1/access/network status=401 Unauthorized reason=missing_credential remote=127.0.0.1:62793
+LINGXI_AUTH_REJECTED request_id=req-3e6ac4f7bc0f92f5652dfbf57b847810 method=GET path=/lingxi/v1/access/mobile-qr.svg status=401 Unauthorized reason=missing_credential remote=127.0.0.1:62795
+LINGXI_AUTH_REJECTED request_id=req-962acb6f9794327b5f37bbd332488fb8 method=PUT path=/lingxi/v1/access/account/password status=401 Unauthorized reason=missing_credential remote=127.0.0.1:62801
+LINGXI_AUTH_REJECTED request_id=req-4df3b7efa2fbb23418d7d0a679724e5c method=DELETE path=/lingxi/v1/access/account/password status=401 Unauthorized reason=missing_credential remote=127.0.0.1:62808
+LINGXI_AUTH_REJECTED request_id=req-1ed4ebad117abaa98e3eebee7885ab03 method=POST path=/lingxi/v1/access/mobile-credentials status=401 Unauthorized reason=missing_credential remote=127.0.0.1:62886
+LINGXI_AUTH_REJECTED request_id=req-97cb5852b12d137e9952720a4524532c method=POST path=/lingxi/v1/access/desktop-credentials status=401 Unauthorized reason=missing_credential remote=127.0.0.1:62888
+LINGXI_AUTH_REJECTED request_id=req-cb8f48e80fea5a0b511807c5aed458e4 method=GET path=/lingxi/v1/devices status=401 Unauthorized reason=missing_credential remote=127.0.0.1:62891
+LINGXI_AUTH_REJECTED request_id=req-e390f5369cc829b67034f705925b6c60 method=GET path=/lingxi/v1/me status=401 Unauthorized reason=invalid_credential remote=127.0.0.1:62894
+LINGXI_AUTH_REJECTED request_id=req-e4802e86d1351839350a2024a99a9467 method=POST path=/lingxi/v1/devices/credentials/cred_0de0c08020bb46ccd9e9689281261879/revoke status=401 Unauthorized reason=missing_credential remote=127.0.0.1:62897
+LINGXI_AUTH_REJECTED request_id=req-2cd647a4d5cd9a29d284f40867166aaa method=GET path=/lingxi/v1/me status=401 Unauthorized reason=invalid_credential remote=127.0.0.1:62901
+LINGXI_AUTH_REJECTED request_id=req-163614d271f32948ef27bf5bd908ed18 method=POST path=/lingxi/v1/devices/device_0515dfe0abea092e9c5be34805a80f7e/revoke status=401 Unauthorized reason=missing_credential remote=127.0.0.1:62904
+LINGXI_AUTH_REJECTED request_id=req-41e6a21d8c06c2fdabba6e048e93cb25 method=POST path=/lingxi/v1/devices/pairing-sessions status=401 Unauthorized reason=missing_credential remote=127.0.0.1:62906
+LINGXI_AUTH_REJECTED request_id=req-838fa4300ec287f660b26a1df144050f method=POST path=/lingxi/v1/devices/pairing-sessions/pair_XdodmPGpn4zIU2IUxK9D1w/approve status=401 Unauthorized reason=missing_credential remote=127.0.0.1:62912
+LINGXI_TRANSPORT_REJECTED request_id=req-91bbfae201cf38d53432dc8a871e3252 method=POST path=/lingxi/v1/web-auth/login status=403 reason=bad_origin origin=http://evil.example host=192.168.3.5:62953 remote=192.168.3.5:62955
+LINGXI_TRANSPORT_REJECTED request_id=req-fc50f66b595c33f7d8199018a94c0743 method=POST path=/lingxi/v1/web-auth/login status=403 reason=bad_origin origin=https://192.168.3.5:62953 host=192.168.3.5:62953 remote=192.168.3.5:62956

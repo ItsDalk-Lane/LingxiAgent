@@ -1,0 +1,55 @@
+   Compiling serde_core v1.0.229
+   Compiling serde_json v1.0.151
+   Compiling futures-channel v0.3.34
+   Compiling futures-task v0.3.34
+   Compiling regex-syntax v0.8.11
+   Compiling slab v0.4.12
+   Compiling hashbrown v0.17.1
+   Compiling num-traits v0.2.19
+   Compiling sync_wrapper v1.0.2
+   Compiling syn v3.0.6
+   Compiling syn v2.0.119
+   Compiling futures-util v0.3.34
+   Compiling hashlink v0.12.2
+   Compiling rusqlite v0.40.2
+   Compiling regex-automata v0.4.18
+   Compiling serde_derive_internals v0.30.0
+   Compiling serde_derive v1.0.229
+   Compiling tokio-macros v2.7.2
+   Compiling ref-cast-impl v1.0.27
+   Compiling chrono v0.4.45
+   Compiling schemars_derive v1.2.2
+   Compiling matchers v0.2.0
+   Compiling ref-cast v1.0.27
+   Compiling tokio v1.53.1
+   Compiling tracing-attributes v0.1.31
+   Compiling serde_path_to_error v0.1.20
+   Compiling tracing v0.1.44
+   Compiling serde v1.0.229
+   Compiling axum-core v0.5.6
+   Compiling tracing-subscriber v0.3.23
+   Compiling schemars v1.2.2
+   Compiling serde_urlencoded v0.7.1
+   Compiling hyper v1.11.1
+   Compiling tower v0.5.3
+   Compiling tokio-rustls v0.26.5
+   Compiling hyper-util v0.1.21
+   Compiling lingxi-protocol v0.0.0 (/Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-protocol)
+   Compiling axum v0.8.9
+   Compiling lingxi-kernel v0.0.0 (/Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-kernel)
+   Compiling lingxi-adapters v0.0.0 (/Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-adapters)
+   Compiling lingxi-service v0.0.0 (/Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-service)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 10.66s
+     Running tests/invocation_journal.rs (/tmp/r03-t05-target/debug/deps/invocation_journal-9a192364cb7883d2)
+
+running 3 tests
+test journal_lifecycle_progresses_and_closes_receipts_on_the_live_chain ... R03_T05_LIFECYCLE_TRACE: run=run_000001a0dcba6c00_000001 entries=3 phases=succeeded,failed,failed(rejected) external_executions=2
+ok
+test r03_a09_crash_after_side_effect_does_not_reexecute_and_receipt_is_unknown ... R03_A09_TRACE: run=run_000001a0dcba6c00_000001 external_executions=1 journal=started→unknown decision=needs_attention run_row=running
+ok
+test r03_a10_idempotent_key_resume_does_not_duplicate_the_external_operation ... R03_A10_TRACE: run=run_000001a0dcba6c00_000001 key=run_000001a0dcba6c00_000001-tc0001 requests=2 executed=1 decision=unknown_resume_with_idempotency_key phase=succeeded
+ok
+
+test result: ok. 3 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.24s
+
+EXIT=0

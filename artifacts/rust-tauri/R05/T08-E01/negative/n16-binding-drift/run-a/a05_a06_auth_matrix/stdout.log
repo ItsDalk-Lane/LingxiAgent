@@ -1,0 +1,75 @@
+== building lingxi-service (rustup 1.98.1, /Users/study_superior/.cache/lingxi-r05-neg-target, --locked) ==
+== service up addr=127.0.0.1:60872 home=/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T//lingxi-r02t03-home-Oxi0tQ ==
+== A05: forged identity is ineffective ==
+PASS a05-no-credential-read (http=401)
+PASS a05-no-credential-read-reason (body contains 'missing_credential')
+PASS a05-no-credential-execute (http=401)
+PASS a05-no-credential-ws-ticket (http=403)
+PASS a05-no-credential-ws-ticket-reason (body contains 'missing_credential')
+c932787ca6903f7e7e6a8356c85139b2801bbdb7fe93e70211a7d7c37d5f843d  devices.json
+5fc18d0bada5f22859b309b85dbf0603d4221b9a3352a02d0ef2afb34f185708  device-credentials.json
+b8447b403d6ed7310ff76451a740ea7a7f810ded2f75a8b231b869575d6c4a6f  local-token.json
+PASS a05-no-credential-me (http=401)
+c932787ca6903f7e7e6a8356c85139b2801bbdb7fe93e70211a7d7c37d5f843d  devices.json
+5fc18d0bada5f22859b309b85dbf0603d4221b9a3352a02d0ef2afb34f185708  device-credentials.json
+b8447b403d6ed7310ff76451a740ea7a7f810ded2f75a8b231b869575d6c4a6f  local-token.json
+PASS a05-forged-principal-headers (http=401)
+PASS a05-me-with-forged-header (http=200)
+PASS a05-me-server-computed (body contains '"kind":"local_user"')
+PASS a05-me-owner-full-projection (version, identity, scoped capabilities)
+PASS a05-me-never-echoes-forged-values
+PASS a05-identity-shaped-body-rejected (http=400)
+PASS a05-identity-shaped-body-reason (body contains 'invalid_message')
+PASS a05-forged-session-id (http=404)
+PASS a05-forged-session-id-reason (body contains 'not_found')
+PASS a05-forged-session-id-execute (http=404)
+PASS a05-wrong-token (http=401)
+PASS a05-wrong-token-reason (body contains 'invalid_credential')
+PASS a05-issue-expired-credential (http=201)
+PASS a05-ws-ticket-issue-owner (http=200)
+PASS a05-ws-ticket-issue-owner-shape (body contains '"ticket":"')
+PASS a05-devices-credentials-empty-user-id (http=400)
+PASS a05-devices-credentials-invalid-json (http=400)
+PASS a05-devices-credentials-invalid-json-reason (body contains 'invalid_message')
+PASS a05-issue-foreign-credential (http=201)
+PASS a05-foreign-credential-authenticates (http=200)
+PASS a05-foreign-principal-kind (body contains '"kind":"device"')
+PASS a05-me-device-full-projection (version, identity, scoped capabilities)
+PASS a05-issue-no-chat-credential (http=201)
+PASS a05-ws-ticket-insufficient-scope (http=403)
+PASS a05-ws-ticket-insufficient-scope-reason (body contains 'insufficient_scope')
+d528097c8f7ecc0c44cba6c2e0b076a837f37c66c1274534c487886708673f96  devices.json
+9fa14435ff96319d156b90e71fba68ba061f8083f9ba90ef2667ba9ae6c2bfca  device-credentials.json
+b8447b403d6ed7310ff76451a740ea7a7f810ded2f75a8b231b869575d6c4a6f  local-token.json
+state before negatives: runCounts=0 0
+PASS a05-expired-credential (http=401)
+PASS a05-expired-credential-reason (body contains 'invalid_credential')
+PASS a05-expired-credential-execute (http=401)
+d528097c8f7ecc0c44cba6c2e0b076a837f37c66c1274534c487886708673f96  devices.json
+9fa14435ff96319d156b90e71fba68ba061f8083f9ba90ef2667ba9ae6c2bfca  device-credentials.json
+b8447b403d6ed7310ff76451a740ea7a7f810ded2f75a8b231b869575d6c4a6f  local-token.json
+PASS a05-authn-failures-registry-files-byte-identical
+d528097c8f7ecc0c44cba6c2e0b076a837f37c66c1274534c487886708673f96  devices.json
+9fa14435ff96319d156b90e71fba68ba061f8083f9ba90ef2667ba9ae6c2bfca  device-credentials.json
+b8447b403d6ed7310ff76451a740ea7a7f810ded2f75a8b231b869575d6c4a6f  local-token.json
+PASS a05-cross-principal-read (http=403)
+PASS a05-cross-principal-read-reason (body contains 'cross_principal_access')
+PASS a05-cross-principal-execute (http=403)
+8d026c7ebaea60f4830113a6e27957eb855c582f72ba504e6402b0ad42abb6a8  devices.json
+acfdece6847fe517830efe4815511703588d31761bc97c5b5cf78c74920aef3d  device-credentials.json
+b8447b403d6ed7310ff76451a740ea7a7f810ded2f75a8b231b869575d6c4a6f  local-token.json
+PASS a05-authz-negatives-audit-only-changes (devices-before-authz.json vs devices-after-authz.json)
+PASS a05-authz-negatives-audit-only-changes (creds-before-authz.json vs creds-after-authz.json)
+state after negatives:  runCounts=0 0
+PASS a05-no-observable-business-state-change (runCounts stable)
+PASS a05-positive-control-owner-execute (http=200)
+PASS a05-positive-control-run-id (body contains '"runId":"run_')
+PASS a05-positive-control-advanced-run-count (owner execute works, denied ones did not)
+PASS a05-sessions-list-owner (http=200)
+PASS a05-sessions-list-owner-contains-own-session
+PASS a05-sessions-list-foreign-principal (http=200)
+PASS a05-sessions-list-foreign-excludes-owner-sessions
+PASS a05-sessions-list-empty-shape
+PASS a05-sessions-list-no-credential (http=401)
+PASS a05-sessions-list-no-credential-reason (body contains 'missing_credential')
+sessions-list-matrix.json: 6 cases

@@ -1,0 +1,15 @@
+   Compiling lingxi-service v0.0.0 (/Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-service)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.80s
+     Running tests/shutdown_coordinator.rs (/tmp/r03-t07-review-target/debug/deps/shutdown_coordinator-c1d1beb52903e453)
+
+running 7 tests
+test open_ws_sessions_block_the_drain_until_closed ... ok
+test exhausted_budget_bounds_every_remaining_phase ... ok
+test clean_shutdown_reports_zero_and_removes_the_own_record ... ok
+test record_cleanup_failure_maps_to_exit_four ... ok
+test storage_close_failure_maps_to_exit_five ... ok
+test storage_close_timeout_is_recorded_and_record_cleanup_still_runs ... ok
+test transport_drain_timeout_abandons_a_stuck_partial_body_connection ... ok
+
+test result: ok. 7 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.27s
+

@@ -1,0 +1,18 @@
+[package]
+name = "r05t03-review-scratch"
+version = "0.0.0"
+edition = "2021"
+publish = false
+
+# Detached from the repo's rust/ workspace: this is REVIEW equipment only
+# (artifacts/rust-tauri/R05/REVIEW-T03/), never product code.
+[workspace]
+
+[dependencies]
+lingxi-service = { path = "../../../../../rust/crates/lingxi-service" }
+lingxi-adapters = { path = "../../../../../rust/crates/lingxi-adapters" }
+lingxi-kernel = { path = "../../../../../rust/crates/lingxi-kernel" }
+lingxi-protocol = { path = "../../../../../rust/crates/lingxi-protocol" }
+tokio = { version = "1.53.1", features = ["macros", "rt-multi-thread", "net", "io-util", "time", "sync"] }
+serde = { version = "1.0.229", features = ["derive"] }
+serde_json = "1.0.151"

@@ -1,0 +1,8 @@
+     Running tests/zz_rev_t04_probe.rs (rust/target/debug/deps/zz_rev_t04_probe-b543b28d8b33b4d1)
+
+running 2 tests
+test rev_c01_fragmentation_invariance_reviewer_seeds ... ok
+test rev_c12_first_delta_arrives_while_the_stream_is_held_open ... ok
+
+test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 4.48s
+

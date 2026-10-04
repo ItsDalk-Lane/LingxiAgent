@@ -1,0 +1,2 @@
+cargo test --workspace --locked --no-fail-fast: 77 binaries ok, 823 passed / 0 assertion failures; 1 environment failure r00_management_leaves (macOS firewall vs unsigned test binary; isolated rerun exit 101 — see ../r00_management_leaves_isolated_rerun.log)
+cargo test --workspace --locked (fail-fast form): stopped at the same r00 environment binary; identical registered item

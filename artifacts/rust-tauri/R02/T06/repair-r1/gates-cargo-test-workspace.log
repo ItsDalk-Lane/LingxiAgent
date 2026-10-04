@@ -1,0 +1,615 @@
+   Compiling memchr v2.8.3
+   Compiling bytes v1.12.1
+   Compiling smallvec v1.16.1
+   Compiling log v0.4.34
+   Compiling allocator-api2 v0.2.21
+   Compiling equivalent v1.0.2
+   Compiling tracing-core v0.1.36
+   Compiling futures-core v0.3.34
+   Compiling futures-sink v0.3.34
+   Compiling slab v0.4.12
+   Compiling core-foundation-sys v0.8.7
+   Compiling futures-task v0.3.34
+   Compiling futures-io v0.3.34
+   Compiling percent-encoding v2.3.2
+   Compiling serde_core v1.0.229
+   Compiling tower-service v0.3.3
+   Compiling try-lock v0.2.5
+   Compiling regex-syntax v0.8.11
+   Compiling atomic-waker v1.1.2
+   Compiling fnv v1.0.7
+   Compiling num-traits v0.2.19
+   Compiling jobserver v0.1.35
+   Compiling errno v0.3.14
+   Compiling mio v1.2.3
+   Compiling socket2 v0.6.5
+   Compiling ref-cast v1.0.27
+   Compiling httparse v1.10.1
+   Compiling httpdate v1.0.3
+   Compiling tower-layer v0.3.3
+   Compiling want v0.3.1
+   Compiling futures-channel v0.3.34
+   Compiling sync_wrapper v1.0.2
+   Compiling zerofrom v0.1.8
+   Compiling stable_deref_trait v1.2.1
+   Compiling ipnet v2.12.2
+   Compiling mime v0.3.17
+   Compiling form_urlencoded v1.2.2
+   Compiling system-configuration-sys v0.6.0
+   Compiling core-foundation v0.9.4
+   Compiling lazy_static v1.5.0
+   Compiling signal-hook-registry v1.4.8
+   Compiling ryu v1.0.23
+   Compiling hashbrown v0.17.1
+   Compiling thread_local v1.1.10
+   Compiling matchit v0.8.4
+   Compiling cc v1.4.7
+   Compiling nu-ansi-term v0.50.3
+   Compiling litemap v0.8.3
+   Compiling futures-util v0.3.34
+   Compiling aho-corasick v1.1.5
+   Compiling yoke v0.8.3
+   Compiling sharded-slab v0.1.7
+   Compiling writeable v0.6.4
+   Compiling zeroize v1.9.0
+   Compiling tokio v1.53.1
+   Compiling tracing v0.1.44
+   Compiling http v1.5.0
+   Compiling tracing-log v0.2.0
+   Compiling system-configuration v0.7.0
+   Compiling zerovec v0.11.8
+   Compiling zerotrie v0.2.5
+   Compiling utf8_iter v1.0.4
+   Compiling icu_properties_data v2.3.0
+   Compiling icu_normalizer_data v2.3.0
+   Compiling num-integer v0.1.47
+   Compiling rustls-pki-types v1.15.1
+   Compiling untrusted v0.9.0
+   Compiling subtle v2.6.1
+   Compiling scopeguard v1.2.0
+   Compiling zerocopy v0.8.58
+   Compiling getrandom v0.3.4
+   Compiling num-complex v0.4.6
+   Compiling security-framework-sys v2.17.0
+   Compiling core-foundation v0.10.1
+   Compiling parking_lot_core v0.9.12
+   Compiling bit-vec v0.8.0
+   Compiling borrow-or-share v0.2.4
+   Compiling simdutf8 v0.1.5
+   Compiling lock_api v0.4.14
+   Compiling getrandom v0.4.3
+   Compiling num-cmp v0.1.0
+   Compiling hashlink v0.12.2
+   Compiling num-bigint v0.4.8
+   Compiling num-iter v0.1.46
+   Compiling vsimd v0.8.0
+   Compiling bytecount v0.6.9
+   Compiling outref v0.5.2
+   Compiling micromap v0.3.0
+   Compiling thiserror v2.0.21
+   Compiling encoding_rs v0.8.42
+   Compiling security-framework v3.7.0
+   Compiling bit-set v0.8.0
+   Compiling uuid v1.26.1
+   Compiling parking_lot v0.12.5
+   Compiling unicode-general-category v1.1.0
+   Compiling strum v0.28.0
+   Compiling data-encoding v2.11.1
+   Compiling tinystr v0.8.4
+   Compiling potential_utf v0.1.6
+   Compiling cmake v0.1.58
+   Compiling http-body v1.1.0
+   Compiling uuid-simd v0.8.0
+   Compiling icu_collections v2.3.0
+   Compiling http-body-util v0.1.5
+   Compiling icu_locale_core v2.3.0
+   Compiling regex-automata v0.4.18
+   Compiling jsonschema-regex v0.57.0
+   Compiling libsqlite3-sys v0.38.2
+   Compiling aws-lc-sys v0.45.0
+   Compiling axum-core v0.5.6
+   Compiling num-rational v0.4.2
+   Compiling serde v1.0.229
+   Compiling serde_json v1.0.151
+   Compiling indexmap v2.14.2
+   Compiling serde_path_to_error v0.1.20
+   Compiling icu_provider v2.3.1
+   Compiling num v0.4.3
+   Compiling fraction v0.17.0
+   Compiling icu_normalizer v2.3.0
+   Compiling icu_properties v2.3.0
+   Compiling chrono v0.4.45
+   Compiling serde_urlencoded v0.7.1
+   Compiling fluent-uri v0.4.1
+   Compiling email_address v0.2.9
+   Compiling futures-executor v0.3.34
+   Compiling futures v0.3.34
+   Compiling lingxi-browser-spike v0.0.0 (/Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-browser-spike)
+   Compiling idna_adapter v1.2.2
+   Compiling schemars v1.2.2
+   Compiling idna v1.1.0
+   Compiling tokio-util v0.7.19
+   Compiling tower v0.5.3
+   Compiling tokio-stream v0.1.19
+   Compiling url v2.5.8
+   Compiling ahash v0.8.12
+   Compiling matchers v0.2.0
+   Compiling regex v1.13.1
+   Compiling fancy-regex v0.19.2
+   Compiling referencing v0.57.0
+   Compiling jsonschema-value v0.57.0
+   Compiling tracing-subscriber v0.3.23
+   Compiling lingxi-protocol v0.0.0 (/Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-protocol)
+   Compiling tower-http v0.6.11
+   Compiling h2 v0.4.19
+   Compiling rmcp v3.4.1
+   Compiling lingxi-kernel v0.0.0 (/Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-kernel)
+   Compiling rusqlite v0.40.2
+   Compiling lingxi-adapters v0.0.0 (/Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-adapters)
+   Compiling hyper v1.11.1
+   Compiling hyper-util v0.1.21
+   Compiling axum v0.8.9
+   Compiling lingxi-service v0.0.0 (/Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-service)
+   Compiling aws-lc-rs v1.18.1
+   Compiling rustls v0.23.45
+   Compiling rustls-webpki v0.103.15
+   Compiling tokio-rustls v0.26.5
+   Compiling rustls-platform-verifier v0.7.1
+   Compiling hyper-rustls v0.27.10
+   Compiling reqwest v0.13.5
+   Compiling jsonschema v0.57.0
+   Compiling lingxi-spike v0.0.0 (/Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-spike)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 14.87s
+     Running unittests src/lib.rs (/tmp/rust-target-r02-t06-repair/debug/deps/lingxi_adapters-467bffc3bf654cea)
+
+running 12 tests
+test storage::migrations::tests::migrations_are_contiguous_from_one ... ok
+test storage::migrations::tests::not_a_database_maps_to_corrupted ... ok
+test storage::migrations::tests::sqlite_error_mapping_by_primary_code ... ok
+test storage::migrations::tests::migration_sql_avoids_if_not_exists ... ok
+test storage::migrations::tests::fingerprints_are_stable_sha256_hex ... ok
+test storage::migrations::tests::foreign_tables_without_receipts_are_rejected ... ok
+test storage::migrations::tests::newer_database_is_rejected_not_downgraded ... ok
+test storage::migrations::tests::tampered_fingerprint_is_rejected ... ok
+test storage::migrations::tests::tampered_version_row_is_rejected ... ok
+test storage::migrations::tests::tampered_user_version_is_rejected ... ok
+test storage::migrations::tests::apply_then_verify_is_idempotent ... ok
+test storage::migrations::tests::integrity_check_passes_a_healthy_db_and_flags_a_broken_one ... ok
+
+test result: ok. 12 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.01s
+
+     Running unittests src/bin/lingxi-storage-inspect.rs (/tmp/rust-target-r02-t06-repair/debug/deps/lingxi_storage_inspect-6fd2ab5296888e74)
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running tests/backup_faults.rs (/tmp/rust-target-r02-t06-repair/debug/deps/backup_faults-42bfe8343c062152)
+
+running 2 tests
+test backup_faults::interrupted_backup_copy_fails_explicitly_and_removes_the_partial_file ... ok
+test backup_faults::checkpoint_fault_fails_the_backup_explicitly_and_leaves_no_artifact ... ok
+
+test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.02s
+
+     Running tests/backup_restore.rs (/tmp/rust-target-r02-t06-repair/debug/deps/backup_restore-5031f8102a2971ef)
+
+running 11 tests
+test backup_validates_the_file_stem ... ok
+test backup_into_unwritable_destination_fails_without_artifacts ... ok
+test database_files_are_tightened_to_owner_only ... ok
+test restore_refuses_a_tampered_backup_file ... ok
+test restore_refuses_an_existing_target ... ok
+test backup_and_restore_artifacts_are_owner_only ... ok
+test a11_transaction_boundary_rolled_back_data_is_absent_from_backup ... ok
+test a11_pure_online_backup_without_precheckpoint_is_also_complete ... ok
+test a11_backup_of_a_started_but_uncommitted_run_is_a_complete_prefix ... ok
+test a11_online_backup_captures_wal_resident_committed_data_and_restores ... ok
+test a11_backup_during_concurrent_commits_is_a_consistent_prefix ... ok
+
+test result: ok. 11 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.17s
+
+     Running tests/disk_full_fault.rs (/tmp/rust-target-r02-t06-repair/debug/deps/disk_full_fault-caddde6ffd348c8b)
+
+running 2 tests
+test unix_fault::commit_fails_for_real_at_commit_time_without_fake_success ... ok
+test unix_fault::start_commit_also_fails_under_the_fault ... ok
+
+test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.01s
+
+     Running tests/event_store_reads.rs (/tmp/rust-target-r02-t06-repair/debug/deps/event_store_reads-c1f052c1bddd8b55)
+
+running 3 tests
+test event_type_column_tampering_is_loud_corruption ... ok
+test head_floor_and_events_after_read_the_durable_log ... ok
+test purge_moves_the_floor_and_reports_removed_rows ... ok
+
+test result: ok. 3 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.02s
+
+     Running tests/migration_idempotency.rs (/tmp/rust-target-r02-t06-repair/debug/deps/migration_idempotency-f8949e2c006e502a)
+
+running 2 tests
+test tampered_version_rollback_is_rejected_not_replayed ... ok
+test repeated_migration_checks_are_idempotent ... ok
+
+test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.02s
+
+     Running tests/storage_transactions.rs (/tmp/rust-target-r02-t06-repair/debug/deps/storage_transactions-fea7799d64c3bd32)
+
+running 7 tests
+test bounded_queue_reports_full_instead_of_dropping ... ok
+test wal_mode_is_negotiated_and_reported ... ok
+test read_only_data_dir_is_a_loud_open_failure ... ok
+test finalize_is_idempotent_and_conflicts_are_diagnosed ... ok
+test graceful_close_checkpoints_and_data_survives_restart ... ok
+test a07_crash_windows_distinguish_commit_boundaries ... ok
+test busy_timeout_is_explicit_not_a_hang ... ok
+
+test result: ok. 7 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.23s
+
+     Running unittests src/lib.rs (/tmp/rust-target-r02-t06-repair/debug/deps/lingxi_browser_spike-d25dbff7ca8425a8)
+
+running 11 tests
+test pdf::tests::page_sizes ... ok
+test pdf::tests::font_css_extract_and_rewrite ... ok
+test snapshot_source::tests::sha256_hex_stable ... ok
+test ops::tests::find_ref_parses_snapshot_lines ... ok
+test pdf::tests::percent_decode ... ok
+test cdp::tests::png_dims_parse ... ok
+test cdp::tests::events_buffered_and_waitable ... ok
+test cdp::tests::roundtrip_command_response ... ok
+test pdf::tests::fetch_policy ... ok
+test snapshot_source::tests::extracts_from_repo ... ok
+test cdp::tests::remote_error_surfaces ... ok
+
+test result: ok. 11 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.05s
+
+     Running unittests src/bin/spike_browser.rs (/tmp/rust-target-r02-t06-repair/debug/deps/spike_browser-6bbdf9f73811746e)
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running unittests src/bin/spike_pdf.rs (/tmp/rust-target-r02-t06-repair/debug/deps/spike_pdf-93ad1486195c4fe6)
+
+running 1 test
+test tests::timeout_exit_code_classification ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running unittests src/lib.rs (/tmp/rust-target-r02-t06-repair/debug/deps/lingxi_kernel-1b1acaed818d95e2)
+
+running 12 tests
+test ports::tests::retryable_classification_is_conservative ... ok
+test ports::tests::principal_storage_vocabulary_is_stable ... ok
+test ports::tests::successful_commit_returns_events_for_post_commit_publication ... ok
+test ports::tests::non_terminal_outcome_is_rejected_before_storage ... ok
+test ports::tests::failed_commit_yields_error_and_no_events ... ok
+test tests::run_context_carries_identity_only ... ok
+test tests::cancelling_cannot_be_revoked_back_to_running ... ok
+test tests::cancellation_resolves_only_to_cancelled ... ok
+test tests::seq_precision_holds_across_kernel_boundary ... ok
+test tests::queued_cannot_skip_to_completed ... ok
+test tests::happy_path_queued_to_completed ... ok
+test tests::terminal_states_reject_every_transition ... ok
+
+test result: ok. 12 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running unittests src/lib.rs (/tmp/rust-target-r02-t06-repair/debug/deps/lingxi_protocol-d90789915c0df003)
+
+running 19 tests
+test tests::r00_baseline_versions_are_one ... ok
+test handshake::tests::intersection_selects_highest_common ... ok
+test handshake::tests::wrong_family_and_malformed_range_are_invalid_message ... ok
+test tests::seq_wire_string_rejects_garbage ... ok
+test handshake::tests::unknown_caps_are_reported_not_dropped ... ok
+test wire::tests::dialect_check_is_explicit ... ok
+test handshake::tests::disjoint_ranges_fail_explicitly ... ok
+test tests::ids_are_opaque_and_preserved ... ok
+test tests::protocol_error_rejects_unknown_fields ... ok
+test tests::terminal_states_are_terminal_and_named_stably ... ok
+test tests::seq_wire_string_roundtrips_beyond_js_safe_integer ... ok
+test canon::tests::canonical_form_has_no_whitespace_or_trailing_newline ... ok
+test canon::tests::canonical_form_sorts_keys_and_keeps_utf8 ... ok
+test tests::error_codes_have_stable_wire_names ... ok
+test handshake::tests::client_hello_rejects_unknown_fields ... ok
+test wire::tests::unknown_event_payload_is_preserved_verbatim ... ok
+test wire::tests::u64_fields_are_decimal_strings ... ok
+test wire::tests::closed_payload_variants_reject_unknown_fields ... ok
+test wire::tests::envelope_roundtrips_and_validates_event_type ... ok
+
+test result: ok. 19 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running unittests src/bin/lingxi-proto-server.rs (/tmp/rust-target-r02-t06-repair/debug/deps/lingxi_proto_server-b386498339ddb0ca)
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running unittests src/bin/lingxi-protocol-gen.rs (/tmp/rust-target-r02-t06-repair/debug/deps/lingxi_protocol_gen-c66177ea2b0ba198)
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running unittests src/bin/lingxi-protocol-verify.rs (/tmp/rust-target-r02-t06-repair/debug/deps/lingxi_protocol_verify-621781e0733a1003)
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running unittests src/lib.rs (/tmp/rust-target-r02-t06-repair/debug/deps/lingxi_service-f7c562d5ea6d750d)
+
+running 107 tests
+test auth::tests::constant_time_eq_basics ... ok
+test auth::tests::route_policy_table ... ok
+test config::tests::test_mode_home_name_is_unique_and_prefixed ... ok
+test config::tests::config_file_missing_is_loud ... ok
+test auth::tests::bearer_parsing_mirrors_incumbent ... ok
+test config::tests::cli_rejects_duplicate_home ... ok
+test config::tests::cli_empty_is_no_flags_not_an_error ... ok
+test config::tests::cli_rejects_flag_shaped_values_instead_of_consuming_them ... ok
+test config::tests::cli_rejects_missing_values ... ok
+test auth::tests::scope_namespace_expansion ... ok
+test config::tests::cli_rejects_equals_form_and_unknown_tokens ... ok
+test config::tests::cli_network_mode_strictness ... ok
+test config::tests::cli_rejects_duplicate_bind_and_config_and_test_mode ... ok
+test config::tests::cli_shutdown_timeout_strictness ... ok
+test config::tests::cli_parses_all_flags ... ok
+test epoch::tests::timestamps_round_trip_and_validate ... ok
+test epoch::tests::symlink_in_unstamped_home_is_ambiguous ... ok
+test events::tests::control_frames_carry_the_control_marker_and_string_seqs ... ok
+test epoch::tests::higher_stamp_refuses_startup ... ok
+test events::tests::cursor_codec_roundtrip_and_strict_rejection ... ok
+test events::tests::drop_guard_unregisters_and_prunes_on_publish ... ok
+test events::tests::delta_overflow_drops_the_delta_but_keeps_key_events ... ok
+test config::tests::precedence_cli_wins_but_broken_config_is_still_loud ... ok
+test epoch::tests::corrupt_stamp_without_journal_refuses_without_claiming_absence ... ok
+test events::tests::event_limits_validation_is_loud ... ok
+test epoch::tests::missing_stamp_with_readable_higher_epoch_journal_refuses_with_truthful_evidence ... ok
+test events::tests::held_delta_above_the_cut_is_delivered_not_counted_lost ... ok
+test events::tests::held_event_above_the_cut_flushes_after_the_hold_advanced_the_watermark ... ok
+test events::tests::hold_buffers_events_and_releases_at_the_cut ... ok
+test events::tests::hub_dedups_duplicate_publication_by_seq_and_event_id ... ok
+test config::tests::test_mode_overrides_all_sources_and_is_unique_per_call ... ok
+test config::tests::precedence_env_wins_over_config ... ok
+test events::tests::hub_delivers_in_seq_order_despite_out_of_order_publish ... ok
+test events::tests::hub_resumes_mid_stream_after_restart_baseline ... ok
+test epoch::tests::stamp_write_failure_is_a_loud_refusal_without_partial_stamp ... ok
+test config::tests::precedence_cli_wins_over_env_and_config ... ok
+test epoch::tests::interrupted_epoch_metadata_tmp_write_is_ambiguous ... ok
+test epoch::tests::barrier_stamp_without_journal_is_inconsistent ... ok
+test config::tests::config_file_reads_absolute_home ... ok
+test events::tests::key_event_overflow_detaches_with_explicit_signal ... ok
+test config::tests::precedence_only_cli_only_env_only_config_and_none ... ok
+test epoch::tests::missing_stamp_with_prepared_higher_epoch_journal_refuses ... ok
+test epoch::tests::unstamped_home_with_foreign_data_refuses_without_stamping ... ok
+test events::tests::reorder_bound_overflow_breaks_the_stream_loudly ... ok
+test events::tests::restart_baseline_drains_a_parked_chain_above_the_head ... ok
+test epoch::tests::corrupt_stamp_with_readable_higher_epoch_journal_refuses_with_truthful_evidence ... ok
+test epoch::tests::corrupt_journal_refuses ... ok
+test epoch::tests::fresh_home_is_stamped_and_subsequent_run_is_steady ... ok
+test epoch::tests::unstamped_home_with_own_runtime_scaffolding_is_provably_new ... ok
+test events::tests::restart_baseline_drains_the_parked_event_at_the_new_next_seq ... ok
+test epoch::tests::committed_tail_is_cleaned_and_gate_continues ... ok
+test config::tests::config_file_rejects_unknown_keys_missing_home_and_bad_types ... ok
+test instance::tests::identity_is_unique_and_well_formed ... ok
+test instance::tests::probe_peer_reports_unreachable_for_dead_port ... ok
+test instance::tests::record_handshake_mismatch_is_reported ... ok
+test instance::tests::record_json_round_trips_camel_case ... ok
+test limits::tests::rate_limiter_fixed_window_behavior ... ok
+test limits::tests::ws_connection_counter_enforces_ceiling_and_frees ... ok
+test auth::tests::failed_authentication_never_touches_registry_files ... ok
+test auth::tests::token_file_is_owner_only_and_instance_bound ... ok
+test auth::tests::local_token_roundtrip_and_owner_principal ... ok
+test sessions::tests::execute_request_rejects_identity_shaped_payload_fields ... ok
+test sessions::tests::same_user_device_principal_can_access ... ok
+test sessions::tests::seed_rows_cover_both_synthetic_sessions_for_the_local_owner ... ok
+test shutdown::tests::exit_code_precedence_is_deterministic ... ok
+test epoch::tests::the_incumbent_lie_string_never_appears_in_rendered_refusals ... ok
+test instance::tests::held_lock_with_live_foreign_pid_still_rejects ... ok
+test shutdown::tests::ws_session_guard_covers_all_drop_paths ... ok
+test tests::config_defaults_to_loopback_ephemeral ... ok
+test tests::config_network_mode_is_explicit_only ... ok
+test paths::tests::layout_rejects_relative_and_root_and_file_as_home ... ok
+test tests::config_parses_bind_and_home ... ok
+test tests::config_rejects_garbage_bind ... ok
+test tests::config_rejects_relative_home ... ok
+test shutdown::tests::ws_drain_times_out_loudly_with_open_sessions ... ok
+test instance::tests::release_never_deletes_a_foreign_record ... ok
+test tests::config_rejects_unknown_and_missing_values ... ok
+test paths::tests::layout_tightens_wide_runtime_dir ... ok
+test instance::tests::second_acquire_in_process_is_rejected_with_diagnostics ... ok
+test tests::config_requires_explicit_home ... ok
+test paths::tests::layout_creates_normalized_dirs_with_private_mode ... ok
+test tests::health_response_serializes_minimal_camel_case ... ok
+test tests::health_response_sources_versions_from_protocol ... ok
+test transport::tests::host_loopback_detection_covers_v4_v6_and_ports ... ok
+test transport::tests::lan_mode_still_recognizes_local_connections ... ok
+test transport::tests::loopback_mode_requires_loopback_host_and_remote ... ok
+test instance::tests::stale_record_is_archived_and_taken_over_regardless_of_pid ... ok
+test instance::tests::unreadable_leftover_record_is_replaced_not_fatal ... ok
+test transport::tests::network_mode_parses_strictly ... ok
+test transport::tests::origin_policy_allowlist ... ok
+test paths::tests::atomic_write_replaces_content_and_leaves_no_tmp ... ok
+test ws::tests::frame_codec_roundtrip_through_memory ... ok
+test instance::tests::stale_record_with_nonexistent_pid_is_still_taken_over ... ok
+test ws::tests::oversized_frame_is_rejected_not_buffered ... ok
+test ws::tests::query_pair_parsing ... ok
+test ws::tests::ticket_lifecycle_single_use_expiry_and_binding ... ok
+test ws::tests::websocket_accept_known_vector ... ok
+test ws::tests::ticket_table_is_bounded_and_prunes_expired ... ok
+test ws::tests::ws_credential_extraction_order ... ok
+test ws::tests::ws_request_vocabulary_parses_and_rejects_unknown ... ok
+test auth::tests::registries_reload_across_bootstrap ... ok
+test sessions::tests::failed_commit_is_a_storage_error_not_a_success ... ok
+test sessions::tests::cross_principal_access_is_forbidden_not_found ... ok
+test sessions::tests::owner_sees_everything_and_execute_records_runs ... ok
+test auth::tests::authorize_order_and_denials ... ok
+test auth::tests::device_credential_lifecycle_create_auth_expire_revoke ... ok
+test paths::tests::atomic_write_many_rounds_do_not_collide ... ok
+
+test result: ok. 107 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.90s
+
+     Running unittests src/main.rs (/tmp/rust-target-r02-t06-repair/debug/deps/lingxi_service-8aca73b72b86d8bb)
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running tests/auth_matrix.rs (/tmp/rust-target-r02-t06-repair/debug/deps/auth_matrix-abe9a20895e882a0)
+
+running 13 tests
+test a05_loopback_mode_refuses_non_loopback_bind_at_config_layer ... ok
+test a05_loopback_token_over_nonlocal_transport_is_denied_at_policy_layer ... ok
+test a06_host_header_tampering_is_rejected ... ok
+test a06_cli_shape_full_business_roundtrip ... ok
+test limits_body_size_and_rate_and_ws_ceiling ... ok
+test a06_ws_origin_and_host_matrix ... ok
+test a05_forged_and_unknown_session_ids ... ok
+test a05_no_credential_is_rejected_without_side_effects ... ok
+test a05_forged_principal_fields_are_ignored_not_trusted ... ok
+test a06_origin_matrix_http ... ok
+test a05_expired_and_revoked_device_credentials_are_rejected_without_side_effects ... ok
+test a06_expired_and_replayed_ws_tickets_are_rejected ... ok
+test a05_cross_principal_session_misuse_is_forbidden_without_side_effects ... ok
+
+test result: ok. 13 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.38s
+
+     Running tests/event_subscription.rs (/tmp/rust-target-r02-t06-repair/debug/deps/event_subscription-a059fbd06b52d8af)
+
+running 8 tests
+test a10_duplicate_event_publication_is_deduped ... ok
+test a10_purge_all_stale_cursor_gets_rebuild_directive_not_future_cursor ... ok
+test a10_negative_rejections_are_loud ... ok
+test a09_parallel_subscribers_see_identical_views ... ok
+test a10_expired_cursor_gets_explicit_snapshot_required_and_rebuild_matches_authority ... ok
+test ws_subscribe_snapshot_live_and_rejections ... ok
+test a09_snapshot_and_subscription_have_no_gap_at_every_commit_boundary ... ok
+test a09_join_window_race_under_concurrent_writer_loses_nothing ... ok
+
+test result: ok. 8 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.56s
+
+     Running tests/instance_lifecycle.rs (/tmp/rust-target-r02-t06-repair/debug/deps/instance_lifecycle-73ba6466d15947a0)
+
+running 3 tests
+test config_source_field_reaches_the_service_config ... ok
+test locked_instance_survives_rejected_second_claim ... ok
+test crashed_owner_leaves_stale_record_and_restart_takes_over ... ok
+
+test result: ok. 3 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.10s
+
+     Running tests/service_health.rs (/tmp/rust-target-r02-t06-repair/debug/deps/service_health-2ebde3d1080999cd)
+
+running 4 tests
+test prepare_data_home_creates_and_is_idempotent ... ok
+test prepare_data_home_rejects_file_as_home ... ok
+test unknown_route_is_not_found_for_owner_but_closed_for_strangers ... ok
+test health_check_over_real_loopback ... ok
+
+test result: ok. 4 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.06s
+
+     Running tests/service_persistence.rs (/tmp/rust-target-r02-t06-repair/debug/deps/service_persistence-040f9e40356d05bd)
+
+running 2 tests
+test broken_database_is_a_loud_startup_failure ... ok
+test execute_persists_runs_that_survive_a_full_restart ... ok
+
+test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.07s
+
+     Running tests/shutdown_coordinator.rs (/tmp/rust-target-r02-t06-repair/debug/deps/shutdown_coordinator-59b55bc943dc1a3a)
+
+running 5 tests
+test record_cleanup_failure_maps_to_exit_four ... ok
+test clean_shutdown_reports_zero_and_removes_the_own_record ... ok
+test storage_close_failure_maps_to_exit_five ... ok
+test open_ws_sessions_block_the_drain_until_closed ... ok
+test storage_close_timeout_is_recorded_and_record_cleanup_still_runs ... ok
+
+test result: ok. 5 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.17s
+
+     Running unittests src/lib.rs (/tmp/rust-target-r02-t06-repair/debug/deps/lingxi_spike-5ee1941a2047d0a7)
+
+running 7 tests
+test queue::tests::zero_capacity_is_rejected ... ok
+test queue::tests::bounded_queue_reports_full_instead_of_dropping ... ok
+test queue::tests::put_get_count_roundtrip_and_wal ... ok
+test schema::tests::golden_server_hello_validates ... ok
+test schema::tests::golden_client_hello_validates_against_generated_schema ... ok
+test schema::tests::tampered_client_hello_is_rejected ... ok
+test queue::tests::many_jobs_all_complete_in_order ... ok
+
+test result: ok. 7 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.06s
+
+     Running unittests src/bin/spike_check_deps.rs (/tmp/rust-target-r02-t06-repair/debug/deps/spike_check_deps-ecd364c9a343969e)
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running unittests src/bin/spike_health.rs (/tmp/rust-target-r02-t06-repair/debug/deps/spike_health-7139456a91d11da8)
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running unittests src/bin/spike_mcp_handshake.rs (/tmp/rust-target-r02-t06-repair/debug/deps/spike_mcp_handshake-157dd664bb539274)
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running unittests src/bin/spike_schema_validate.rs (/tmp/rust-target-r02-t06-repair/debug/deps/spike_schema_validate-90eb7ce1dcd76a76)
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running unittests src/bin/spike_sqlite_queue.rs (/tmp/rust-target-r02-t06-repair/debug/deps/spike_sqlite_queue-64de1ce485714df7)
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running unittests src/bin/spike_tls_probe.rs (/tmp/rust-target-r02-t06-repair/debug/deps/spike_tls_probe-1be7efcac6228d0c)
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+   Doc-tests lingxi_adapters
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+   Doc-tests lingxi_browser_spike
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+   Doc-tests lingxi_kernel
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+   Doc-tests lingxi_protocol
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+   Doc-tests lingxi_service
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+   Doc-tests lingxi_spike
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+

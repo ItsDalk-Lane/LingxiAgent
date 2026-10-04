@@ -1,0 +1,77 @@
+    Finished `dev` profile [unoptimized + debuginfo] target(s) in 0.04s
+     Running `/Users/study_superior/.cache/lingxi-r05-neg-target/debug/xtask verify-stage R02 --evidence /Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/T08-E01/negative/n16-binding-drift/run-b`
+xtask: verify-stage R02 [bash scripts/rust-tauri/r02_t01_service_smoke.sh {EVIDENCE}/A01] > /Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/T08-E01/negative/n16-binding-drift/run-b/a01_smoke
+xtask: verify-stage R02 [a01_smoke] PASS
+xtask: verify-stage R02 [bash scripts/rust-tauri/r02_t01_boundary_negative.sh {EVIDENCE}/A02] > /Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/T08-E01/negative/n16-binding-drift/run-b/a02_boundary_negative
+xtask: verify-stage R02 [a02_boundary_negative] PASS
+xtask: verify-stage R02 [bash scripts/rust-tauri/r02_t02_dual_instance.sh {EVIDENCE}/A03] > /Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/T08-E01/negative/n16-binding-drift/run-b/a03_dual_instance
+xtask: verify-stage R02 [a03_dual_instance] PASS
+xtask: verify-stage R02 [bash scripts/rust-tauri/r02_t02_path_priority.sh {EVIDENCE}/A04] > /Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/T08-E01/negative/n16-binding-drift/run-b/a04_path_priority
+xtask: verify-stage R02 [a04_path_priority] PASS
+xtask: verify-stage R02 [bash scripts/rust-tauri/r02_t03_auth_matrix.sh {EVIDENCE}/A05_A06] > /Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/T08-E01/negative/n16-binding-drift/run-b/a05_a06_auth_matrix
+xtask: verify-stage R02 [a05_a06_auth_matrix] FAIL
+xtask: verify-stage R02 [bash scripts/rust-tauri/r02_t04_storage_tx.sh {EVIDENCE}/A07_A08] > /Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/T08-E01/negative/n16-binding-drift/run-b/a07_a08_storage_tx
+xtask: verify-stage R02 [a07_a08_storage_tx] FAIL
+xtask: verify-stage R02 [env CARGO_NET_OFFLINE=true R02_A07_LIVE_FAULT_EVIDENCE={EVIDENCE}/A07_LIVE_FAULT/case.json cargo test --manifest-path rust/Cargo.toml --locked --offline -p lingxi-service --test execute_concurrency http_running_storage_fault_has_no_success_event_or_restart_run -- --exact --nocapture] > /Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/T08-E01/negative/n16-binding-drift/run-b/a07_live_fault_01_test
+xtask: verify-stage R02 [a07_live_fault_01_test] PASS
+xtask: verify-stage R02 [python3 scripts/rust-tauri/r02_t04_live_fault_evidence.py {EVIDENCE}] > /Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/T08-E01/negative/n16-binding-drift/run-b/a07_live_fault_02_check
+xtask: verify-stage R02 [a07_live_fault_02_check] PASS
+xtask: verify-stage R02 [bash scripts/rust-tauri/r02_t05_events_matrix.sh {EVIDENCE}/A09_A10] > /Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/T08-E01/negative/n16-binding-drift/run-b/a09_a10_events_matrix
+xtask: verify-stage R02 [a09_a10_events_matrix] PASS
+xtask: verify-stage R02 [bash scripts/rust-tauri/r02_t06_backup_restore.sh {EVIDENCE}/A11] > /Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/T08-E01/negative/n16-binding-drift/run-b/a11_backup_restore
+xtask: verify-stage R02 [a11_backup_restore] PASS
+xtask: verify-stage R02 [bash scripts/rust-tauri/r02_t06_recovery_drill.sh {EVIDENCE}/A12] > /Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/T08-E01/negative/n16-binding-drift/run-b/a12_recovery_drill
+xtask: verify-stage R02 [a12_recovery_drill] PASS
+xtask: verify-stage R02 [bash scripts/rust-tauri/r02_t07_redaction_scan.sh {EVIDENCE}/A13] > /Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/T08-E01/negative/n16-binding-drift/run-b/a13_redaction_scan
+xtask: verify-stage R02 [a13_redaction_scan] FAIL
+xtask: verify-stage R02 [bash scripts/rust-tauri/r02_t07_slow_subscriber.sh {EVIDENCE}/A14] > /Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/T08-E01/negative/n16-binding-drift/run-b/a14_slow_subscriber
+xtask: verify-stage R02 [a14_slow_subscriber] PASS
+xtask: verify-stage R02 [bash scripts/rust-tauri/r02_t08_full_chain_smoke.sh {EVIDENCE}/A15] > /Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/T08-E01/negative/n16-binding-drift/run-b/a15_full_chain
+xtask: verify-stage R02 [a15_full_chain] PASS
+xtask: verify-stage R02 [bash scripts/rust-tauri/r02_t08_legacy_entry_regression.sh {EVIDENCE}/A16] > /Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/T08-E01/negative/n16-binding-drift/run-b/a16_legacy_regression
+xtask: verify-stage R02 [a16_legacy_regression] FAIL
+xtask: verify-stage R02 [python3 scripts/rust-tauri/r02_client_leaf_matrix.py {EVIDENCE}/CLIENT] > /Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/T08-E01/negative/n16-binding-drift/run-b/supplemental_client_matrix
+xtask: verify-stage R02 [supplemental_client_matrix] FAIL
+xtask: verify-stage R02 [python3 scripts/rust-tauri/r02_cli_rust_matrix.py {EVIDENCE}/CLI_RUST] > /Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/T08-E01/negative/n16-binding-drift/run-b/supplemental_cli_rust_matrix
+xtask: verify-stage R02 [supplemental_cli_rust_matrix] FAIL
+xtask: verify-stage R02 [python3 scripts/rust-tauri/r02_cli_sessions_leaf_matrix.py {EVIDENCE}/CLI_SESSIONS] > /Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/T08-E01/negative/n16-binding-drift/run-b/supplemental_cli_sessions_matrix
+xtask: verify-stage R02 [supplemental_cli_sessions_matrix] FAIL
+xtask: verify-stage R02 [python3 scripts/rust-tauri/r02_management_leaf_matrix.py {EVIDENCE}/MANAGEMENT] > /Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/T08-E01/negative/n16-binding-drift/run-b/supplemental_management_matrix
+xtask: verify-stage R02 [supplemental_management_matrix] FAIL
+xtask: verify-stage R02 [python3 scripts/rust-tauri/r02_static_web_leaf_matrix.py {EVIDENCE}/STATIC_WEB] > /Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/T08-E01/negative/n16-binding-drift/run-b/supplemental_static_web_matrix
+xtask: verify-stage R02 [supplemental_static_web_matrix] PASS
+xtask: verify-stage R02 supplemental R00-T02-LA-D3710D637C19 [r02_share_satisfied] FAIL
+xtask: verify-stage R02 supplemental R00-T02-LA-3B86332B042C [r02_share_satisfied] FAIL
+xtask: verify-stage R02 supplemental R00-T02-LA-B8A1AD32A8E1 [deferred_to_r07] DEFERRED_TO_R07
+xtask: verify-stage R02 supplemental R00-T02-LA-1B09760C2B1C [r02_share_satisfied] FAIL
+xtask: verify-stage R02 supplemental R00-T02-LA-200D4E5D52C9 [r02_share_satisfied] FAIL
+xtask: verify-stage R02 supplemental R00-T02-LA-EEC1A2A5CD04 [r02_share_satisfied] FAIL
+xtask: verify-stage R02 supplemental R00-T02-LA-D1BEE19A95BB [r02_share_satisfied] FAIL
+xtask: verify-stage R02 supplemental R00-T02-LA-5816DA563ED8 [r02_share_satisfied] FAIL
+xtask: verify-stage R02 supplemental R00-T02-LA-093F22C4FF63 [r02_share_satisfied] FAIL
+xtask: verify-stage R02 supplemental R00-T02-LA-747E0ADC941B [r02_share_satisfied] FAIL
+xtask: verify-stage R02 supplemental R00-T02-LA-4BCE8CCFD5DC [r02_share_satisfied] FAIL
+xtask: verify-stage R02 supplemental R00-T02-LA-D2657E4AB5FF [r02_share_satisfied] FAIL
+xtask: verify-stage R02 supplemental R00-T02-LA-25AB678E7108 [r02_share_satisfied] FAIL
+xtask: verify-stage R02 supplemental R00-T02-LA-F1754C6F755B [r02_share_satisfied] FAIL
+xtask: verify-stage R02 supplemental R00-T02-LA-F006E094F028 [r02_share_satisfied] FAIL
+xtask: verify-stage R02 supplemental R00-T02-LA-73CDC44696D3 [r02_share_satisfied] FAIL
+xtask: verify-stage R02 supplemental R00-T02-LA-5E4A9CF58BED [r02_share_satisfied] FAIL
+xtask: verify-stage R02 supplemental R00-T02-LA-229B77A7BA69 [r02_share_satisfied] FAIL
+xtask: verify-stage R02 supplemental R00-T02-LA-B8F8CF9E8AF5 [r02_share_satisfied] FAIL
+xtask: verify-stage R02 supplemental R00-T02-LA-7498024422D7 [r02_share_satisfied] FAIL
+xtask: verify-stage R02 supplemental R00-T02-LA-43A126149416 [r02_share_satisfied] FAIL
+xtask: verify-stage R02 supplemental R00-T02-LA-756217C74101 [r02_share_satisfied] FAIL
+xtask: verify-stage R02 supplemental R00-T02-LA-5E1C3363A070 [r02_share_satisfied] FAIL
+xtask: verify-stage R02 supplemental R00-T02-LA-8BC1A036AFAA [deferred_to_r07] DEFERRED_TO_R07
+xtask: verify-stage R02 supplemental R00-T02-LA-3291CFD5F7E2 [deferred_to_r07] DEFERRED_TO_R07
+xtask: verify-stage R02 supplemental R00-T02-LA-2A1C298F62FC [deferred_to_r07] DEFERRED_TO_R07
+xtask: verify-stage R02 supplemental R00-T02-LA-8ED658F9DB9E [deferred_to_r07] DEFERRED_TO_R07
+xtask: verify-stage R02 supplemental R00-T02-LA-F8935B6B0221 [deferred_to_r07] DEFERRED_TO_R07
+xtask: verify-stage R02 supplemental R00-T02-LA-39AD35E1FD71 [deferred_to_r07] DEFERRED_TO_R07
+xtask: verify-stage R02 supplemental R00-T02-LA-066B54983F6A [r02_share_satisfied] FAIL
+xtask: verify-stage R02 supplemental R00-T02-LA-C4E6F27D7873 [r02_share_satisfied] FAIL
+xtask: verify-stage R02 supplemental R00-T02-LA-4C1A9735CF04 [r02_share_satisfied] FAIL
+xtask: verify-stage R02 supplemental R00-T02-LA-000E6E1301C0 [deferred_to_r07] DEFERRED_TO_R07
+xtask: verify-stage R02 supplemental R00-T02-LA-32FFEC05BAA7 [deferred_to_r07] DEFERRED_TO_R07
+xtask: verify-stage R02 result written to /Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/T08-E01/negative/n16-binding-drift/run-b/verify-stage-result.json (overall: "FAIL")

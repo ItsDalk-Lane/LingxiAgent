@@ -42,10 +42,11 @@ use std::collections::VecDeque;
 use std::pin::Pin;
 use std::sync::Arc;
 
+use lingxi_kernel::model_exchange::ModelTurnInput;
 use lingxi_kernel::ports::DelegationRequest;
 use lingxi_kernel::ports::{
     ProviderDescriptor, ProviderTurn, ProviderTurnResult, StoragePort, ToolExecutionResult,
-    ToolExecutorPort, ToolRequest, TurnProviderPort,
+    ToolExecutorPort, ToolRequest, TurnDeltaSink, TurnProviderPort,
 };
 use lingxi_kernel::subagent::SessionPermissionMode;
 use lingxi_kernel::toolcatalog::{
@@ -267,8 +268,9 @@ impl TurnProviderPort for ScriptedProvider {
         &'a self,
         ctx: &'a lingxi_kernel::RunContext,
         _call: &'a ModelCallId,
-        _turn: u32,
-        _input: &'a str,
+        _input: &'a ModelTurnInput,
+
+        _deltas: &'a dyn TurnDeltaSink,
     ) -> Pin<Box<dyn std::future::Future<Output = ProviderTurnResult> + Send + 'a>> {
         let next = self
             .script
@@ -329,9 +331,11 @@ impl TurnProviderPort for MarkerScriptedProvider {
         &'a self,
         ctx: &'a lingxi_kernel::RunContext,
         _call: &'a ModelCallId,
-        _turn: u32,
-        input: &'a str,
+        input: &'a ModelTurnInput,
+
+        _deltas: &'a dyn TurnDeltaSink,
     ) -> Pin<Box<dyn std::future::Future<Output = ProviderTurnResult> + Send + 'a>> {
+        let input = input.submission.as_str();
         let next = MarkerScriptedProvider::marker_of(input);
         let turn = self
             .scripts
@@ -347,6 +351,7 @@ impl TurnProviderPort for MarkerScriptedProvider {
 
 fn tool_request(target: &str, args: serde_json::Value) -> ProviderTurn {
     ProviderTurn::ToolRequests {
+        content: Vec::new(),
         requests: vec![
             ToolRequest::from_effective_arguments(target, args, &budget())
                 .expect("effective request"),
@@ -370,6 +375,7 @@ fn delegation_request(task: &str, access: Option<&str>) -> ProviderTurn {
         thread_id: None,
     });
     ProviderTurn::ToolRequests {
+        content: Vec::new(),
         requests: vec![request],
     }
 }

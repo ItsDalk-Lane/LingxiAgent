@@ -1,0 +1,8 @@
+LINGXI_AUTH_REJECTED request_id=req-e90192b8da76ed94d3ef92c18c4b35ef method=GET path=/lingxi/v1/sessions/sess_local_alpha status=401 Unauthorized reason=missing_credential remote=127.0.0.1:58348
+LINGXI_AUTH_REJECTED request_id=req-e660e951f6f094be478d6387961fabb5 method=POST path=/lingxi/v1/sessions/sess_local_alpha/execute status=401 Unauthorized reason=missing_credential remote=127.0.0.1:58349
+LINGXI_AUTH_REJECTED request_id=req-44f9329deeb2984bb95868880a91acb1 method=POST path=/lingxi/v1/ws-ticket status=403 Forbidden reason=missing_credential remote=127.0.0.1:58350
+LINGXI_AUTH_REJECTED request_id=req-bb173f2ed9a99ac13a1b6ac94befcbe3 method=GET path=/lingxi/v1/me status=401 Unauthorized reason=missing_credential remote=127.0.0.1:58351
+LINGXI_AUTH_REJECTED request_id=req-f775946ed8cb9a83c51b1802e1cd7cd0 method=GET path=/lingxi/v1/sessions/sess_local_alpha status=401 Unauthorized reason=missing_credential remote=127.0.0.1:58352
+LINGXI_AUTH_REJECTED request_id=req-92fab045532aedee44549c92ae1dfbf7 method=GET path=/lingxi/v1/sessions/sess_local_alpha status=401 Unauthorized reason=invalid_credential remote=127.0.0.1:58357
+LINGXI_AUTH_REJECTED request_id=req-239346b5df1e7bddb7fd5ae56010e905 method=GET path=/lingxi/v1/sessions/sess_local_alpha status=401 Unauthorized reason=invalid_credential remote=127.0.0.1:58366
+LINGXI_AUTH_REJECTED request_id=req-330f50830524d32798dda7e395461d36 method=POST path=/lingxi/v1/sessions/sess_local_alpha/execute status=401 Unauthorized reason=invalid_credential remote=127.0.0.1:58367

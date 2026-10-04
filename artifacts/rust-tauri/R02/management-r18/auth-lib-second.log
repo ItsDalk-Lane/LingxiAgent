@@ -1,0 +1,29 @@
+   Compiling lingxi-service v0.0.0 (/Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-service)
+warning: function `read_persisted_network` is never used
+  --> crates/lingxi-service/src/management.rs:99:15
+   |
+99 | pub(crate) fn read_persisted_network(home: &Path) -> Result<Option<PersistedNetwork>, String> {
+   |               ^^^^^^^^^^^^^^^^^^^^^^
+   |
+   = note: `#[warn(dead_code)]` (part of `#[warn(unused)]`) on by default
+
+warning: `lingxi-service` (lib test) generated 1 warning
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 3.03s
+     Running unittests src/lib.rs (target/debug/deps/lingxi_service-71fffff1822ed0b1)
+
+running 12 tests
+test auth::tests::constant_time_eq_basics ... ok
+test auth::tests::bearer_parsing_mirrors_incumbent ... ok
+test auth::tests::route_policy_table ... ok
+test auth::tests::scope_namespace_expansion ... ok
+test auth::tests::token_file_is_owner_only_and_instance_bound ... ok
+test auth::tests::local_token_roundtrip_and_owner_principal ... ok
+test auth::tests::failed_authentication_never_touches_registry_files ... ok
+test auth::tests::concurrent_pairing_approval_issues_once ... ok
+test auth::tests::registries_reload_across_bootstrap ... ok
+test auth::tests::failed_device_registry_write_keeps_live_memory_and_disk_unchanged ... ok
+test auth::tests::device_credential_lifecycle_create_auth_expire_revoke ... ok
+test auth::tests::authorize_order_and_denials ... ok
+
+test result: ok. 12 passed; 0 failed; 0 ignored; 0 measured; 149 filtered out; finished in 0.66s
+

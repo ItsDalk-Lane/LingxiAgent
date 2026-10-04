@@ -1,0 +1,21 @@
+== start: 2026-10-02T14:26:15Z ==
+   Compiling lingxi-service v0.0.0 (/Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-service)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 1.13s
+     Running tests/r04_t08_tool_matrix.rs (rust/target/debug/deps/r04_t08_tool_matrix-9c0b8078c5765ff5)
+
+running 10 tests
+test matrix_future_tools_honest_in_catalog ... ok
+test a15_gateway_registration_audit_converts_fake_refs ... ok
+test native_tool_share_cases_on_the_real_chain ... ok
+test terminal_family_share_cases ... ok
+test mcp_mechanism_face_share_cases ... ok
+test a16_disabled_state_covers_every_route ... ok
+test matrix_tools_x_permission_x_entry_consistency ... ok
+test a15_empty_and_invalid_products_never_register ... ok
+test outcome_semantics_and_receipts_unified ... ok
+test approval_face_share_cases has been running for over 60 seconds
+test approval_face_share_cases ... ok
+
+test result: ok. 10 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 300.77s
+
+== exit: 0 at 2026-10-02T14:31:19Z ==

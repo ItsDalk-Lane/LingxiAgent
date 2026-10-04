@@ -1,0 +1,33 @@
+   Compiling lingxi-service v0.0.0 (/Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-service)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 2.64s
+     Running unittests src/lib.rs (/tmp/r02-t03-root-fixes-target/debug/deps/lingxi_service-e78cfdb16d1dcdff)
+
+running 10 tests
+test auth::tests::constant_time_eq_basics ... ok
+test auth::tests::bearer_parsing_mirrors_incumbent ... ok
+test auth::tests::scope_namespace_expansion ... ok
+test auth::tests::route_policy_table ... FAILED
+test auth::tests::local_token_roundtrip_and_owner_principal ... ok
+test auth::tests::token_file_is_owner_only_and_instance_bound ... ok
+test auth::tests::failed_authentication_never_touches_registry_files ... ok
+test auth::tests::registries_reload_across_bootstrap ... ok
+test auth::tests::authorize_order_and_denials ... ok
+test auth::tests::device_credential_lifecycle_create_auth_expire_revoke ... ok
+
+failures:
+
+---- auth::tests::route_policy_table stdout ----
+
+thread 'auth::tests::route_policy_table' (37057477) panicked at crates/lingxi-service/src/auth.rs:1379:13:
+assertion `left == right` failed: unregistered trailing slash must not inherit an endpoint policy
+  left: Scope("chat")
+ right: LocalOnly
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+
+
+failures:
+    auth::tests::route_policy_table
+
+test result: FAILED. 9 passed; 1 failed; 0 ignored; 0 measured; 145 filtered out; finished in 0.30s
+
+error: test failed, to rerun pass `-p lingxi-service --lib`

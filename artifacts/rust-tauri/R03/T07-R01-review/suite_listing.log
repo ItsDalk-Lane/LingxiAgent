@@ -1,0 +1,27 @@
+   Compiling serde_core v1.0.229
+   Compiling serde_json v1.0.151
+   Compiling memchr v2.8.3
+   Compiling smallvec v1.16.1
+   Compiling cc v1.4.7
+   Compiling tracing-core v0.1.36
+   Compiling digest v0.11.3
+   Compiling tokio v1.53.1
+   Compiling sha1 v0.11.0
+   Compiling sha2 v0.11.0
+   Compiling tracing v0.1.44
+   Compiling libsqlite3-sys v0.38.2
+   Compiling serde v1.0.229
+   Compiling schemars v1.2.2
+   Compiling lingxi-protocol v0.0.0 (/Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-protocol)
+   Compiling lingxi-kernel v0.0.0 (/Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-kernel)
+   Compiling rusqlite v0.40.2
+   Compiling lingxi-adapters v0.0.0 (/Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-adapters)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 5.96s
+     Running tests/active_run_listing.rs (/tmp/r03-t07-review-target/debug/deps/active_run_listing-5d2ae55557c6c2b4)
+
+running 2 tests
+test a_run_without_attempt_rows_is_loud_corruption ... ok
+test lists_only_non_terminal_runs_with_full_recovery_facts ... ok
+
+test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.02s
+

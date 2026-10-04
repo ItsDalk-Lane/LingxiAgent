@@ -1,0 +1,20 @@
+2026-09-29T13:12:58.030494Z  INFO lingxi_service: data-epoch gate passed home=/private/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-r02t07-a13.CZuhlm decision=ProceedStampedNew(EpochStamp { format: V2, minimum_reader_epoch: 1, committed_data_epoch: 1, last_version: Some("0.0.0") })
+2026-09-29T13:12:58.084295Z  INFO lingxi_adapters::storage::run_store: run database migrated db=/private/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-r02t07-a13.CZuhlm/lingxi-service/data/runs.db applied=[1, 2, 3, 4] version=4
+2026-09-29T13:12:58.085289Z  INFO lingxi_service: auth service bootstrapped (per-start loopback token, owner-only); run database migrated and seeded local_token_file=/private/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-r02t07-a13.CZuhlm/lingxi-service/local-token.json run_database=/private/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-r02t07-a13.CZuhlm/lingxi-service/data/runs.db
+2026-09-29T13:12:58.095527Z  INFO lingxi_service: instance record published (atomic write) record=/private/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-r02t07-a13.CZuhlm/lingxi-service/instance.json bind_addr=127.0.0.1:57960
+2026-09-29T13:12:58.182277Z  INFO lingxi_service: request handled request_id=req-64d1fba10906cbeb19339fe35b6f51ba method=GET path=/lingxi/v1/me status=200
+2026-09-29T13:12:58.218221Z  INFO lingxi_service::sessions: run settled through the single finalize path run_id=run_000001a0ed4c0869_000001 session_id="sess_local_alpha" outcome=completed.no_final.no_provider_configured input_chars=212
+2026-09-29T13:12:58.218368Z  INFO lingxi_service: request handled request_id=req-ff576b1bf5cc5d652c45fcea3922c49f method=POST path=/lingxi/v1/sessions/sess_local_alpha/execute status=200
+2026-09-29T13:12:59.412037Z  INFO lingxi_service: request handled request_id=req-2ac7cc076b51457d77f08ff831e8bbeb method=POST path=/lingxi/v1/devices/credentials status=201
+2026-09-29T13:12:59.448070Z  INFO lingxi_service: request handled request_id=req-2f82380d31343558a9389038a80ebc9f method=POST path=/lingxi/v1/ws-ticket status=200
+2026-09-29T13:12:59.479323Z  INFO lingxi_service: request handled request_id=req-3568110e693c31a80ebb09e1b08702e0 method=GET path=/lingxi/v1/me status=401
+2026-09-29T13:12:59.490649Z  INFO lingxi_service: request handled request_id=req-120a4ccabc856e2ecd51cc97155afbf6 method=GET path=/lingxi/v1/me status=401
+2026-09-29T13:12:59.502333Z  INFO lingxi_service: request handled request_id=req-70630366ecc6872777ef1d279e26934d method=GET path=/lingxi/v1/ws status=401
+2026-09-29T13:13:00.680011Z  INFO lingxi_service: request handled request_id=req-d0c6cbaa20f2586edf43b652942fd24e method=GET path=/lingxi/v1/sessions/sess_local_alpha status=403
+2026-09-29T13:13:00.696856Z  INFO lingxi_service: request handled request_id=req-4e6223251aa413aaf5c1bdd9d06e57cc method=GET path=/lingxi/v1/sessions/sess_unknown_a13 status=404
+2026-09-29T13:13:00.724283Z  INFO lingxi_service: request handled request_id=req-23e87505e9f08a30eb5f1f4a649d3998 method=GET path=/lingxi/v1/ws status=401
+2026-09-29T13:13:00.724884Z  INFO lingxi_service: request handled request_id=req-6589c663a0aecd1fcfbc3489f23d3f5d method=GET path=/lingxi/v1/ws status=101
+2026-09-29T13:13:00.743860Z  INFO lingxi_service: shutdown signal: SIGTERM
+2026-09-29T13:13:00.744768Z  INFO lingxi_service::shutdown: run database closed (drained, WAL truncated) phase=storage_close
+2026-09-29T13:13:00.745053Z  INFO lingxi_service::shutdown: own instance record removed, lock released phase=record_cleanup
+2026-09-29T13:13:00.745119Z  INFO lingxi_service: lingxi-service stopped cleanly (run database closed, own record removed, lock released)

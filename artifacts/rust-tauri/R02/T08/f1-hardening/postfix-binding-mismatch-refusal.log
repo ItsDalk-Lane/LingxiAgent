@@ -1,0 +1,1 @@
+error: repo-root mismatch: this binary was compiled in "/private/tmp/r02t08-f1/clone-drift", but the current working directory belongs to "/private/tmp/r02t08-f1/clone-clean". Refusing to run a gate across checkouts (RR-T08-F1): the artifacts of one checkout must never validate another checkout's tree. Rebuild inside the checkout you are gating.

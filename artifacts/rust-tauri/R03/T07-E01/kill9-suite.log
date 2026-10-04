@@ -1,0 +1,12 @@
+   Compiling lingxi-service v0.0.0 (/Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-service)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.95s
+     Running tests/recovery_crash_points.rs (/tmp/r03-t07-target/debug/deps/recovery_crash_points-d13f7a91936ae573)
+
+running 2 tests
+test crash_child_boundary_harness ... ok
+test r03_a13_kill9_crash_matrix_honest_restart_presentation ... R03_A13_TRACE: kill9_matrix cases=11 all_honest=true
+ok
+
+test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.85s
+
+EXIT=0

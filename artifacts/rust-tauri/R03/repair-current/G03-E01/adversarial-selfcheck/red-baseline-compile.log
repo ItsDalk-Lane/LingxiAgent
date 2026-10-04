@@ -1,0 +1,40 @@
+   Compiling aws-lc-sys v0.45.0
+   Compiling serde_derive_internals v0.30.0
+   Compiling serde_derive v1.0.229
+   Compiling tokio-macros v2.7.2
+   Compiling ref-cast-impl v1.0.27
+   Compiling schemars_derive v1.2.2
+   Compiling tokio v1.53.1
+   Compiling tracing-attributes v0.1.31
+   Compiling tracing v0.1.44
+   Compiling axum-core v0.5.6
+   Compiling tracing-subscriber v0.3.23
+   Compiling rcgen v0.14.10
+   Compiling schemars v1.2.2
+   Compiling serde_urlencoded v0.7.1
+   Compiling rusqlite v0.40.2
+   Compiling hyper v1.11.1
+   Compiling tower v0.5.3
+   Compiling hyper-util v0.1.21
+   Compiling lingxi-protocol v0.0.0 (/private/tmp/r03-g03-red/rust/crates/lingxi-protocol)
+   Compiling axum v0.8.9
+   Compiling lingxi-kernel v0.0.0 (/private/tmp/r03-g03-red/rust/crates/lingxi-kernel)
+   Compiling lingxi-adapters v0.0.0 (/private/tmp/r03-g03-red/rust/crates/lingxi-adapters)
+   Compiling rustls-webpki v0.103.15
+   Compiling tokio-rustls v0.26.5
+   Compiling lingxi-service v0.0.0 (/private/tmp/r03-g03-red/rust/crates/lingxi-service)
+error[E0599]: no method named `as_deref` found for struct `std::string::String` in the current scope
+   --> crates/lingxi-service/tests/tool_receipt_unknown.rs:626:23
+    |
+626 |     assert_eq!(reason.as_deref(), Some("completed.with_final"));
+    |                       ^^^^^^^^
+    |
+help: there is a method `as_ref` with a similar name
+    |
+626 -     assert_eq!(reason.as_deref(), Some("completed.with_final"));
+626 +     assert_eq!(reason.as_ref(), Some("completed.with_final"));
+    |
+
+For more information about this error, try `rustc --explain E0599`.
+error: could not compile `lingxi-service` (test "tool_receipt_unknown") due to 1 previous error
+warning: build failed, waiting for other jobs to finish...

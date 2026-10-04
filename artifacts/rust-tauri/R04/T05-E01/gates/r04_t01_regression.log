@@ -1,0 +1,14 @@
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.07s
+     Running tests/r04_t01_tool_catalog.rs (rust/target/debug/deps/r04_t01_tool_catalog-0a80e3b54e5fdaf0)
+
+running 6 tests
+test adversarial_alias_and_primary_name_share_one_permission_contract ... ok
+test registry_capabilities_resolve_recovery_classification ... ok
+test r04_a01_catalog_and_execution_share_one_source_of_truth ... ok
+test r04_a02_stale_catalog_generation_is_refused_until_refresh ... ok
+test adversarial_malformed_inputs_never_reach_the_executor ... ok
+test adversarial_forged_digest_is_refused_with_zero_dispatch_on_real_chain ... ok
+
+test result: ok. 6 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.06s
+
+exit 0

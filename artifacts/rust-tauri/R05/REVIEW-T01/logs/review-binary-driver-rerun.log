@@ -1,0 +1,56 @@
+== C02: real binary, real HTTP out, real tool gateway, real result back ==
+  [PASS] ready line names cli home source
+  [PASS] wrong token refused with 401
+  [PASS] authenticated submit accepted
+  [PASS] acceptance carries runId
+  [PASS] exactly two provider turns hit the wire
+  [PASS] path is /v1/chat/completions
+  [PASS] bearer credential is the configured key
+  [PASS] request model is the configured route model
+  [PASS] path is /v1/chat/completions
+  [PASS] bearer credential is the configured key
+  [PASS] request model is the configured route model
+  [PASS] turn 1 declares the read tool
+  [PASS] turn 1 carries only the user submission
+  [PASS] turn 2 = user + assistant(tool_calls) + tool result
+  [PASS] assistant tool call id pairs
+  [PASS] tool message pairs the provider call id
+  [PASS] tool message carries the RUNTIME-CREATED nonce (real tool result)
+  [PASS] run settled completed
+  [PASS] terminal reason completed.with_final
+  [PASS] two model_call_completed events
+  [PASS] one tool_call_completed event
+  [PASS] provider-reported usage persisted
+  [PASS] persisted identity is the route (provider main)
+  [PASS] stub's claimed model never persisted
+  [PASS] committed final carries the stub marker
+  [PASS] graceful SIGTERM shutdown exits 0
+== C03: no model plane => honest unconfigured outcome ==
+  [PASS] submit accepted
+  [PASS] status completed
+  [PASS] terminal reason is the explicit unconfigured outcome
+  [PASS] zero model calls started
+  [PASS] zero tool calls started
+  [PASS] no fabricated message row
+  [PASS] clean shutdown
+== C06: configured-but-unimplemented family => refusal with ZERO requests ==
+  [PASS] submit accepted
+  [PASS] run failed loudly
+  [PASS] reason failed.provider_error
+  [PASS] external request counter is ZERO
+  [PASS] clean shutdown
+== C04: same model id, two providers, DISTINCT keys — attribution never crosses ==
+  [PASS] submit sess_local_alpha accepted
+  [PASS] submit sess_local_beta accepted
+  [PASS] provider A endpoint received ZERO requests
+  [PASS] provider B endpoint served both runs
+  [PASS] B's requests carry ONLY B's key
+  [PASS] B's requests name the shared model id
+  [PASS] B's requests carry ONLY B's key
+  [PASS] B's requests name the shared model id
+  [PASS] A's key never rode any wire
+  [PASS] persisted identity of sess_local_alpha is (beta, shared-review-model)
+  [PASS] persisted identity of sess_local_beta is (beta, shared-review-model)
+  [PASS] clean shutdown
+
+REVIEW DRIVER RESULT: ALL CHECKS PASS

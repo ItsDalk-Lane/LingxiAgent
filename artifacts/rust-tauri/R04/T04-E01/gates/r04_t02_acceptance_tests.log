@@ -1,0 +1,21 @@
+   Compiling lingxi-service v0.0.0 (/Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-service)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.98s
+     Running tests/r04_t02_tool_gateway.rs (rust/target/debug/deps/r04_t02_tool_gateway-192a416d2167304b)
+
+running 13 tests
+test adversarial_summary_a_payload_b_is_refused_at_every_layer ... ok
+test r04_a04_forged_and_stale_handles_are_refused_by_the_real_gateway ... ok
+test f01_delegation_family_routing_is_first_party_only ... ok
+test adversarial_subagent_blocklist_holds_under_registry_target_ids ... ok
+test r04_a03_stricter_subagent_attenuation_is_explicit ... ok
+test r04_a03_delegation_entry_goes_through_the_gateway ... ok
+test f01_access_read_delegation_child_dispatches_registered_read_tools ... ok
+test f01_read_only_subagent_registered_read_tool_dispatches_on_both_wirings ... ok
+test r04_a03_deny_group_unconfigured_policy_refuses_every_entry ... ok
+test f01_read_only_attenuation_still_denies_write_and_blocklist_targets ... ok
+test r04_a04_forged_arguments_never_override_host_facts ... ok
+test r04_a03_needs_approval_group_round_trips_every_entry ... ok
+test r04_a03_allow_group_is_identical_across_all_entries ... ok
+
+test result: ok. 13 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 1.33s
+

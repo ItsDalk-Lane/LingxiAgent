@@ -1,0 +1,8 @@
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.08s
+     Running unittests src/lib.rs (target/debug/deps/lingxi_service-254d9c3036524e2c)
+
+running 1 test
+test management::tests::web_cookie_expires_and_requires_original_transport ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 180 filtered out; finished in 0.08s
+

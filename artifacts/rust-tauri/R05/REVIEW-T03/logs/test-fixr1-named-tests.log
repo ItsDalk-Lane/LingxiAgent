@@ -1,0 +1,9 @@
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.10s
+     Running tests/r05_t03_protocol_adapters.rs (rust/target/debug/deps/r05_t03_protocol_adapters-58666f03dac16790)
+
+running 2 tests
+test c04_same_provider_call_id_in_two_sessions_stays_isolated ... ok
+test c05_runtime_nonce_rides_the_next_request_and_follows_changes ... ok
+
+test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 8 filtered out; finished in 0.69s
+

@@ -34,9 +34,10 @@ use std::path::PathBuf;
 use std::pin::Pin;
 use std::sync::Arc;
 
+use lingxi_kernel::model_exchange::ModelTurnInput;
 use lingxi_kernel::ports::{
     DelegationRequest, ProviderDescriptor, ProviderTurn, ProviderTurnResult, ToolExecutionResult,
-    ToolExecutorPort, ToolOutcome, ToolRequest, TurnProviderPort,
+    ToolExecutorPort, ToolOutcome, ToolRequest, TurnDeltaSink, TurnProviderPort,
 };
 use lingxi_kernel::subagent::{AccessRequest, SessionPermissionMode};
 use lingxi_kernel::RunContext;
@@ -109,9 +110,12 @@ impl TurnProviderPort for ScriptedProvider {
         &'a self,
         ctx: &'a RunContext,
         _call: &'a ModelCallId,
-        turn: u32,
-        input: &'a str,
+        input: &'a ModelTurnInput,
+
+        _deltas: &'a dyn TurnDeltaSink,
     ) -> Pin<Box<dyn std::future::Future<Output = ProviderTurnResult> + Send + 'a>> {
+        let turn = input.turn;
+        let input = input.submission.as_str();
         let marker = Self::marker_of(input);
         let pop = {
             let mut pops = self.pops.lock().unwrap();
@@ -392,6 +396,7 @@ async fn r03_a11_readonly_parent_child_write_is_refused_by_the_real_boundary() {
                 "PARENT-A11",
                 vec![
                     ProviderTurn::ToolRequests {
+                        content: Vec::new(),
                         requests: vec![delegation_request(CHILD_TASK, None, None)],
                     },
                     final_turn("parent done"),
@@ -402,6 +407,7 @@ async fn r03_a11_readonly_parent_child_write_is_refused_by_the_real_boundary() {
                 "CHILD-A11",
                 vec![
                     ProviderTurn::ToolRequests {
+                        content: Vec::new(),
                         requests: vec![write_tool_request()],
                     },
                     final_turn("child done: the write was refused"),
@@ -601,6 +607,7 @@ async fn operate_parent_child_write_is_executed_once() {
                 "PARENT-A11",
                 vec![
                     ProviderTurn::ToolRequests {
+                        content: Vec::new(),
                         requests: vec![delegation_request(CHILD_TASK, None, None)],
                     },
                     final_turn("parent done"),
@@ -610,6 +617,7 @@ async fn operate_parent_child_write_is_executed_once() {
                 "CHILD-A11",
                 vec![
                     ProviderTurn::ToolRequests {
+                        content: Vec::new(),
                         requests: vec![write_tool_request()],
                     },
                     final_turn("child done: the write succeeded"),
@@ -663,6 +671,7 @@ async fn readonly_parent_write_access_request_is_refused_at_dispatch() {
             "PARENT-A11",
             vec![
                 ProviderTurn::ToolRequests {
+                    content: Vec::new(),
                     requests: vec![delegation_request(
                         CHILD_TASK,
                         Some(AccessRequest::Write),
@@ -759,6 +768,7 @@ async fn model_override_cannot_widen_the_readonly_grant() {
                 "PARENT-A11",
                 vec![
                     ProviderTurn::ToolRequests {
+                        content: Vec::new(),
                         requests: vec![delegation_request(
                             CHILD_TASK,
                             None,
@@ -772,6 +782,7 @@ async fn model_override_cannot_widen_the_readonly_grant() {
                 "CHILD-A11",
                 vec![
                     ProviderTurn::ToolRequests {
+                        content: Vec::new(),
                         requests: vec![write_tool_request()],
                     },
                     final_turn("child done: write refused even with the model override"),

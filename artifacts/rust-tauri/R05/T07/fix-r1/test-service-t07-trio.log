@@ -1,0 +1,43 @@
+   Compiling lingxi-service v0.0.0 (/Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-service)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 1.85s
+     Running tests/r05_t06_worker_model.rs (target/debug/deps/r05_t06_worker_model-8cc646fa74ffd027)
+
+running 10 tests
+test c08_an_overcap_token_ask_is_refused_before_any_provider_contact ... ok
+test c11_the_worker_never_sees_credential_material_on_the_real_chain ... ok
+test c04_worker_callback_rides_the_real_gateway_and_trace_joins_parent_and_child ... ok
+test c10_a_failing_usage_trace_refuses_the_callback_reply_never_answers_unaccounted ... ok
+test c07_a_replayed_cb_id_is_answered_from_the_receipt_cache ... ok
+test c09_identity_fields_and_ungranted_purposes_are_refused ... ok
+test c06_main_run_worker_and_callback_complete_under_global_model_concurrency_one ... ok
+test c10_a_hung_callback_kills_the_worker_and_settles_unknown ... ok
+test c06_a_held_global_model_permit_makes_the_callback_refuse_bounded_not_deadlock ... ok
+test c05_single_threaded_runtime_serves_a_delayed_callback_without_starvation ... ok
+
+test result: ok. 10 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.70s
+
+     Running tests/r05_t07_persistence.rs (target/debug/deps/r05_t07_persistence-589add7ec63b41b7)
+
+running 4 tests
+test identical_replay_is_idempotent_and_a_rewrite_is_a_loud_conflict ... ok
+test the_ledger_round_trips_partial_and_invalid_states ... ok
+test migration_v4_to_v5_upgrades_an_isolated_copy_and_keeps_old_rows ... ok
+test old_ledger_rows_survive_a_model_config_reload ... ok
+
+test result: ok. 4 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.12s
+
+     Running tests/r05_t07_usage_trace.rs (target/debug/deps/r05_t07_usage_trace-5686b71809dd6dbf)
+
+running 9 tests
+test c08_cost_stays_unknown_without_a_price_basis ... ok
+test c06_illegal_usage_numbers_mark_the_row_invalid_and_never_distort ... ok
+test c03_refresh_retry_is_two_physical_requests_in_one_honest_row ... ok
+test c09_owner_scoped_queries_isolate_and_secrets_never_enter_the_db ... ok
+test c01_multi_run_session_trace_stays_continuous_and_per_call_queryable ... ok
+test c05_unknown_partial_and_reported_states_stay_distinct_everywhere ... ok
+test c02_background_subagent_and_worker_rows_carry_true_parentage ... ok
+test c10_a_ledger_write_failure_publishes_no_completion_and_the_retry_is_idempotent ... ok
+test c03_retryable_failure_then_success_are_two_rows_and_unknown_is_not_zero ... ok
+
+test result: ok. 9 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.87s
+

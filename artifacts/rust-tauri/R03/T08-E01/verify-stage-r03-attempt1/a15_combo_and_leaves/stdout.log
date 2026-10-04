@@ -1,0 +1,7 @@
+== building the acceptance matrix test (rustup 1.98.1, /tmp/r03-t08-target, --locked) ==
+PASS build (locked, offline)
+== running the combination matrix through the REAL chain (A15) ==
+PASS combination matrix green (real chain, doubles = external responses only)
+assembled 28 leaf cases and 11 combo counters
+PASS case files assembled (leaf-cases.json + combo-counts.json)
+RESULT: R03-T08 matrix evidence ALL GREEN

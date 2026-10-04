@@ -1,0 +1,79 @@
+
+running 62 tests
+test stage_map::map_tests::missing_result_version_is_a_hard_error ... ok
+test stage_map::map_tests::invalid_json_is_a_hard_error ... ok
+test stage_map::map_tests::placeholder_values_are_rejected ... ok
+test stage_map::map_tests::empty_result_version_is_a_hard_error ... ok
+test stage_map::map_tests::empty_supplemental_section_is_a_hard_error ... ok
+test stage_map::map_tests::empty_scenario_set_is_a_hard_error ... ok
+test stage_map::map_tests::command_without_evidence_paths_is_a_hard_error ... ok
+test stage_map::map_tests::scenario_without_command_refs_is_a_hard_error ... ok
+test stage_map::map_tests::duplicate_scenario_ids_are_a_hard_error ... ok
+test stage_map::map_tests::conflicted_leaf_must_not_bind_evidence ... ok
+test stage_map::map_tests::empty_r00_responsibility_mirror_is_a_hard_error ... ok
+test stage_map::map_tests::conflicted_leaf_parses_when_unbound ... ok
+test stage_map::map_tests::non_integer_case_expect_is_a_hard_error ... ok
+test stage_map::map_tests::parses_a_valid_map ... ok
+test stage_map::map_tests::conflicted_leaf_with_assertion_contract_is_a_hard_error ... ok
+test stage_map::map_tests::missing_assertion_contract_is_a_hard_error ... ok
+test stage_map::map_tests::missing_r00_mirror_field_is_a_hard_error ... ok
+test stage_map::map_tests::empty_assertion_contract_cases_is_a_hard_error ... ok
+test stage_map::map_tests::producer_outside_leaf_refs_is_a_hard_error ... ok
+test stage_map::map_tests::duplicate_pinned_case_name_is_a_hard_error ... ok
+test stage_map::map_tests::duplicate_supplemental_leaf_ids_are_a_hard_error ... ok
+test stage_map::map_tests::supplemental_leaf_with_unknown_command_ref_is_a_hard_error ... ok
+test stage_map::map_tests::parses_a_supplemental_leaf_section ... ok
+test stage_map::map_tests::supplemental_leaf_without_command_refs_is_a_hard_error ... ok
+test stage_map::map_tests::unknown_command_ref_is_a_hard_error ... ok
+test stage_map::map_tests::full_original_behavior_requires_distinct_cases_for_every_original_assertion ... ok
+test stage_map::map_tests::unknown_result_version_is_a_hard_error ... ok
+test stage_map::map_tests::unknown_supplemental_basis_kind_is_a_hard_error ... ok
+test stage_map::map_tests::wrong_schema_version_is_a_hard_error ... ok
+test verify::runner_tests::membership_is_decided_from_the_current_snapshot_only ... ok
+test verify::runner_tests::dual_stage_leaf_passes_only_with_complete_original_behavior_cases ... ok
+test verify::runner_tests::embedded_r02_map_declares_the_34_supplemental_leaves ... ok
+test verify::runner_tests::r02_scenario_ids_match_the_taskbook ... ok
+test verify::runner_tests::missing_r00_ledger_aborts_the_gate ... ok
+test verify::runner_tests::embedded_r02_map_is_valid_and_non_empty ... ok
+test verify::runner_tests::unpinned_failed_case_in_shared_leaf_file_is_not_silent ... ok
+test verify::runner_tests::reused_command_dir_is_refused ... ok
+test verify::runner_tests::single_stage_leaf_with_matching_case_can_still_pass ... ok
+test verify::runner_tests::non_empty_evidence_root_is_refused_before_any_command_runs ... ok
+test candidate::tests::refuses_evidence_at_repository_root ... FAILED
+test verify::runner_tests::pre_existing_evidence_refuses_the_spawn_and_fails_loudly ... ok
+test verify::runner_tests::duplicate_leaf_case_identity_cannot_hide_a_failed_record ... ok
+test verify::runner_tests::r00_mirror_drift_aborts_the_gate_before_any_command_runs ... ok
+test verify::runner_tests::r00_ledger_cross_check_refuses_dropped_leaves ... ok
+test verify::runner_tests::stale_leaf_evidence_aborts_the_gate ... ok
+test candidate::tests::evidence_symlink_to_source_or_parent_is_refused ... ok
+test candidate::tests::symlink_is_refused_and_non_utf8_path_identity_is_byte_exact ... ok
+test candidate::tests::a_changed_checkpoint_cannot_be_erased_by_restoring_final_bytes ... ok
+test candidate::tests::evidence_outside_repository_does_not_exclude_candidate_paths ... ok
+test verify::runner_tests::failing_command_propagates_its_real_exit_code ... ok
+test verify::runner_tests::missing_evidence_is_a_failure_even_when_exit_is_zero ... ok
+test verify::runner_tests::green_exit_with_wrong_case_actual_fails_the_leaf ... ok
+test candidate::tests::binds_tracked_and_nonignored_untracked_bytes_without_own_evidence ... ok
+test verify::runner_tests::successful_command_with_existing_evidence_passes ... ok
+test verify::runner_tests::missing_leaf_case_file_or_declared_case_fails_the_leaf ... ok
+test verify::runner_tests::producer_softening_its_own_expectation_fails_the_leaf ... ok
+test verify::runner_tests::stage_rollup_fails_when_one_scenario_fails_and_reports_real_codes ... ok
+test verify::runner_tests::supplemental_leaf_rollup_keeps_partial_evidence_out_of_overall_pass ... ok
+test verify::runner_tests::timeout_cleanup_kills_the_whole_process_tree ... ok
+test verify::runner_tests::timeout_kills_the_command_and_fails ... ok
+test verify::runner_tests::timeout_cleanup_reports_a_group_leaver_without_signalling_it ... ok
+test verify::runner_tests::timeout_cleanup_tracks_reparented_descendants_truthfully ... ok
+
+failures:
+
+---- candidate::tests::refuses_evidence_at_repository_root stdout ----
+
+thread 'candidate::tests::refuses_evidence_at_repository_root' (38163004) panicked at crates/xtask/src/candidate/tests.rs:14:5:
+assertion failed: Command::new("git").arg("init").arg("-q").arg(&root).status().unwrap().success()
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+
+
+failures:
+    candidate::tests::refuses_evidence_at_repository_root
+
+test result: FAILED. 61 passed; 1 failed; 0 ignored; 0 measured; 0 filtered out; finished in 4.29s
+

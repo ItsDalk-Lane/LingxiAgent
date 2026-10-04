@@ -1,0 +1,143 @@
+   Compiling lingxi-service v0.0.0 (/Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-service)
+warning: method `arrivals_for` is never used
+   --> crates/lingxi-service/tests/subagent_closeout.rs:184:8
+    |
+183 | impl ParkingTool {
+    | ---------------- method in this implementation
+184 |     fn arrivals_for(&self, marker: &str) -> usize {
+    |        ^^^^^^^^^^^^
+    |
+    = note: `#[warn(dead_code)]` (part of `#[warn(unused)]`) on by default
+
+warning: function `read_tool_request` is never used
+   --> crates/lingxi-service/tests/subagent_closeout.rs:231:4
+    |
+231 | fn read_tool_request() -> ToolRequest {
+    |    ^^^^^^^^^^^^^^^^^
+
+warning: `lingxi-service` (test "subagent_closeout") generated 2 warnings
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.92s
+     Running tests/cancel_link_inheritance.rs (rust/target/debug/deps/cancel_link_inheritance-7811d07e892d1159)
+
+running 7 tests
+test isolation_and_first_reason_survive_repeated_and_concurrent_cancels ... ok
+test nodes_created_after_parent_cancellation_inherit_it ... FAILED
+test linked_run_roots_receive_parent_cancellation_across_mixed_entries ... FAILED
+test registration_racing_cancellation_misses_no_node ... FAILED
+test subagent_timeout_settles_a_parked_provider_wait ... FAILED
+test subagent_timeout_settles_a_parked_quota_wait ... FAILED
+test subagent_timeout_settles_a_parked_approval_wait ... FAILED
+
+failures:
+
+---- nodes_created_after_parent_cancellation_inherit_it stdout ----
+
+thread 'nodes_created_after_parent_cancellation_inherit_it' (42719009) panicked at crates/lingxi-service/tests/cancel_link_inheritance.rs:498:5:
+a child of an already-cancelled parent starts cancelled
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+
+---- linked_run_roots_receive_parent_cancellation_across_mixed_entries stdout ----
+
+thread 'linked_run_roots_receive_parent_cancellation_across_mixed_entries' (42719008) panicked at crates/lingxi-service/tests/cancel_link_inheritance.rs:450:9:
+cancelling the parent must reach child_entry
+
+---- registration_racing_cancellation_misses_no_node stdout ----
+
+thread 'registration_racing_cancellation_misses_no_node' (42719010) panicked at crates/lingxi-service/tests/cancel_link_inheritance.rs:583:5:
+every node registered (before, during or after the traversal) is cancelled
+
+---- subagent_timeout_settles_a_parked_provider_wait stdout ----
+
+thread 'subagent_timeout_settles_a_parked_provider_wait' (42719012) panicked at crates/lingxi-service/tests/cancel_link_inheritance.rs:672:10:
+the child run exists
+
+---- subagent_timeout_settles_a_parked_quota_wait stdout ----
+
+thread 'subagent_timeout_settles_a_parked_quota_wait' (42719013) panicked at crates/lingxi-service/tests/cancel_link_inheritance.rs:378:9:
+timed out waiting for the child is dispatched and busy
+
+---- subagent_timeout_settles_a_parked_approval_wait stdout ----
+
+thread 'subagent_timeout_settles_a_parked_approval_wait' (42719011) panicked at crates/lingxi-service/tests/cancel_link_inheritance.rs:394:9:
+timed out waiting for the child settles cancelled through its timeout (run run_000001a0dcba6c00_000002 to become cancelled)
+
+
+failures:
+    linked_run_roots_receive_parent_cancellation_across_mixed_entries
+    nodes_created_after_parent_cancellation_inherit_it
+    registration_racing_cancellation_misses_no_node
+    subagent_timeout_settles_a_parked_approval_wait
+    subagent_timeout_settles_a_parked_provider_wait
+    subagent_timeout_settles_a_parked_quota_wait
+
+test result: FAILED. 1 passed; 6 failed; 0 ignored; 0 measured; 0 filtered out; finished in 5.16s
+
+error: test failed, to rerun pass `-p lingxi-service --test cancel_link_inheritance`
+warning: method `arrivals_for` is never used
+   --> crates/lingxi-service/tests/subagent_closeout.rs:184:8
+    |
+183 | impl ParkingTool {
+    | ---------------- method in this implementation
+184 |     fn arrivals_for(&self, marker: &str) -> usize {
+    |        ^^^^^^^^^^^^
+    |
+    = note: `#[warn(dead_code)]` (part of `#[warn(unused)]`) on by default
+
+warning: function `read_tool_request` is never used
+   --> crates/lingxi-service/tests/subagent_closeout.rs:231:4
+    |
+231 | fn read_tool_request() -> ToolRequest {
+    |    ^^^^^^^^^^^^^^^^^
+
+warning: `lingxi-service` (test "subagent_closeout") generated 2 warnings
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.08s
+     Running tests/subagent_closeout.rs (rust/target/debug/deps/subagent_closeout-457ac9f82fee79f3)
+
+running 7 tests
+test panicking_background_exits_are_recorded_and_reaped_without_a_waiter ... FAILED
+test parent_cancel_closes_children_in_process_repeatedly_beyond_the_cap ... FAILED
+test thread_registry_refusal_leaves_no_permanent_reservations ... ok
+test child_provider_panic_closes_out_and_the_thread_continues ... ok
+test drain_expired_child_is_finally_reaped_after_its_actual_exit ... FAILED
+test finished_background_drives_reap_both_registries ... FAILED
+test parent_cancel_before_the_childs_first_provider_call_settles_with_zero_calls ... FAILED
+
+failures:
+
+---- panicking_background_exits_are_recorded_and_reaped_without_a_waiter stdout ----
+
+thread 'panicking_background_exits_are_recorded_and_reaped_without_a_waiter' (42719612) panicked at crates/lingxi-service/tests/subagent_closeout.rs:956:14:
+panicking spawn: SpawnRejected { cap: 3 }
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+
+---- parent_cancel_closes_children_in_process_repeatedly_beyond_the_cap stdout ----
+
+thread 'parent_cancel_closes_children_in_process_repeatedly_beyond_the_cap' (42719614) panicked at crates/lingxi-service/tests/subagent_closeout.rs:380:5:
+assertion failed: matches!(outcome, lingxi_service::CancelRunOutcome::Accepted { .. })
+
+---- drain_expired_child_is_finally_reaped_after_its_actual_exit stdout ----
+
+thread 'drain_expired_child_is_finally_reaped_after_its_actual_exit' (42719610) panicked at crates/lingxi-service/tests/subagent_closeout.rs:324:9:
+timed out waiting for the expired child's exit is finally recorded
+
+---- finished_background_drives_reap_both_registries stdout ----
+
+thread 'finished_background_drives_reap_both_registries' (42719611) panicked at crates/lingxi-service/tests/subagent_closeout.rs:324:9:
+timed out waiting for the supervised drive entry is reaped
+
+---- parent_cancel_before_the_childs_first_provider_call_settles_with_zero_calls stdout ----
+
+thread 'parent_cancel_before_the_childs_first_provider_call_settles_with_zero_calls' (42719613) panicked at crates/lingxi-service/tests/subagent_closeout.rs:340:9:
+timed out waiting for the child settles cancelled before its first provider call (run run_000001a0dcba6c00_000002 to become cancelled)
+
+
+failures:
+    drain_expired_child_is_finally_reaped_after_its_actual_exit
+    finished_background_drives_reap_both_registries
+    panicking_background_exits_are_recorded_and_reaped_without_a_waiter
+    parent_cancel_before_the_childs_first_provider_call_settles_with_zero_calls
+    parent_cancel_closes_children_in_process_repeatedly_beyond_the_cap
+
+test result: FAILED. 2 passed; 5 failed; 0 ignored; 0 measured; 0 filtered out; finished in 5.19s
+
+error: test failed, to rerun pass `-p lingxi-service --test subagent_closeout`

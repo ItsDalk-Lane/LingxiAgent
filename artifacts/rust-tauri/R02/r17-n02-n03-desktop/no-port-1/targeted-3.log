@@ -1,0 +1,811 @@
+
+ RUN  v4.1.10 /Users/study_superior/Desktop/Code/LingxiAgent
+
+ ❯ desktop/src/react/__tests__/components/R02StatusBar.test.tsx (2 tests | 1 failed) 54ms
+     × shows chat unavailability even after a Rust transport handshake 3ms
+stderr | desktop/src/react/__tests__/components/composer-send.transaction.test.ts > R03-09：真实 InputArea StrictMode 卸载撤销 timer，重挂只发一次
+[InputArea] load thinking level failed TypeError: Body is unusable: Body has already been read
+    at consumeBody (node:internal/deps/undici/undici:6979:31)
+    at _Response.json (node:internal/deps/undici/undici:6930:18)
+    at /Users/study_superior/Desktop/Code/LingxiAgent/desktop/src/react/components/InputArea.tsx:1709:22
+
+stderr | desktop/src/react/__tests__/components/composer-send.transaction.test.ts > R03-09：真实 InputArea StrictMode 卸载撤销 timer，重挂只发一次
+[InputArea] load thinking level failed TypeError: Body is unusable: Body has already been read
+    at consumeBody (node:internal/deps/undici/undici:6979:31)
+    at _Response.json (node:internal/deps/undici/undici:6930:18)
+    at /Users/study_superior/Desktop/Code/LingxiAgent/desktop/src/react/components/InputArea.tsx:1709:22
+[InputArea] load thinking level failed TypeError: Body is unusable: Body has already been read
+    at consumeBody (node:internal/deps/undici/undici:6979:31)
+    at _Response.json (node:internal/deps/undici/undici:6930:18)
+    at /Users/study_superior/Desktop/Code/LingxiAgent/desktop/src/react/components/InputArea.tsx:1709:22
+
+ ❯ desktop/src/react/__tests__/components/composer-send.transaction.test.ts (23 tests | 20 failed) 6278ms
+     × S01：普通发送视频预检失败，编辑器、草稿、附件与引用全部保留 1031ms
+     × S02：排队项视频/音频读取失败，队列项原位保留、错误可见、无 ws.send 2ms
+     × S03：视频数超限与格式错误都是明确 blocked，不冒充成功 1ms
+     × S04：ws 不存在 / CONNECTING / CLOSING / CLOSED，明确结果、不清输入、不发消息 1ms
+     × S05：读文件期间会话删除/定位器变化/模型变更，重新验证后旧目标不误发 2ms
+     × S06：准备期间用户继续输入，原快照独立、新草稿不被清除或覆盖 1010ms
+     × S07：文字+文件+skill+agent+quote+notebook 组合，失败与重试保留所有字段 3ms
+     × S08：图片按既有规则退化为文件引用，提示保留、文件身份不丢 2ms
+     × S09：ws.send 同步抛错，正确标失败、完整快照可按同一记录重试 2ms
+     × S10：提交后断线无回执与回执超时，都标 delivery_unknown 且不自动重发 2ms
+     × S11：重连后经恢复/历史找到原 clientMessageId，合并不重复追加 1ms
+     × S12：明确失败后重试，仍是一条逻辑记录、内容与上下文一致 1ms
+     × S13：带首行空格与末尾换行的输入，快照逐字符保留 1ms
+     × S14：首页 ensureSession 期间重复点击，只创建/提交一次 1014ms
+     × S15：入队后改变界面选中的笔记本，已排队消息仍使用入队快照范围 4ms
+     × P08：全空白正文但有附件 → 按已有内容维度发送，wire 保真、附件身份保留 1012ms
+     × P10：排队 → 编辑 → 失败 → 重试 → wire，每次都不 trim 正文 2ms
+     × R03-03：点击编辑同步取消慢附件，保存后仅提交新正文 1017ms
+   × R03-09：真实 InputArea StrictMode 卸载撤销 timer，重挂只发一次 26ms
+   × R03-12：InputArea A 慢附件时切 B 可发送，A 完成不再清 B 编辑器 1011ms
+
+⎯⎯⎯⎯⎯⎯ Failed Tests 21 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  desktop/src/react/__tests__/components/R02StatusBar.test.tsx > R02 connection status visibility > shows chat unavailability even after a Rust transport handshake
+TestingLibraryElementError: Unable to find an element with the text: status.rustCoreUnavailable. This could be because the text is broken up by multiple elements. In this case, you can provide a function for your text matcher to make your matcher more flexible.
+
+Ignored nodes: comments, script, style
+[36m<body>[39m
+  [36m<div>[39m
+    [36m<div[39m
+      [33mclass[39m=[32m"_bar_d52e0b"[39m
+    [36m/>[39m
+  [36m</div>[39m
+[36m</body>[39m
+ ❯ Object.getElementError node_modules/@testing-library/dom/dist/config.js:37:19
+ ❯ node_modules/@testing-library/dom/dist/query-helpers.js:76:38
+ ❯ node_modules/@testing-library/dom/dist/query-helpers.js:52:17
+ ❯ node_modules/@testing-library/dom/dist/query-helpers.js:95:19
+ ❯ desktop/src/react/__tests__/components/R02StatusBar.test.tsx:66:19
+     64|     });
+     65|     render(<StatusBar />);
+     66|     expect(screen.getByText('status.rustCoreUnavailable')).toBeInTheDo…
+       |                   ^
+     67|   });
+     68| });
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/21]⎯
+
+ FAIL  desktop/src/react/__tests__/components/composer-send.transaction.test.ts > composer-send 显式结果与快照（S01–S15） > S01：普通发送视频预检失败，编辑器、草稿、附件与引用全部保留
+AssertionError: expected false to be true // Object.is equality
+
+Ignored nodes: comments, script, style
+[36m<html>[39m
+  [36m<head />[39m
+  [36m<body>[39m
+    [36m<div>[39m
+      [36m<div[39m
+        [33mclass[39m=[32m"_input-surface_1fbae2"[39m
+      [36m>[39m
+        [36m<div[39m
+          [33mclass[39m=[32m"_slash-menu-anchor_1fbae2"[39m
+        [36m/>[39m
+        [36m<div[39m
+          [33mclass[39m=[32m"_slash-menu-anchor_1fbae2"[39m
+        [36m/>[39m
+        [36m<div[39m
+          [33mclass[39m=[32m"_input-stack_1fbae2"[39m
+        [36m>[39m
+          [36m<div[39m
+            [33mclass[39m=[32m"_input-wrapper_1fbae2"[39m
+          [36m>[39m
+            [36m<input[39m
+              [33maccept[39m=[32m"image/png,image/jpeg,image/gif,image/webp,audio/mpeg,audio/wav,audio/x-wav,audio/mp4,audio/ogg,audio/flac,audio/webm,video/mp4,video/quicktime,video/webm"[39m
+              [33mclass[39m=[32m"_browser-file-input_1fbae2"[39m
+              [33mmultiple[39m=[32m""[39m
+              [33mtype[39m=[32m"file"[39m
+            [36m/>[39m
+            [36m<div>[39m
+              [36m<div[39m
+                [33mdata-testid[39m=[32m"editor"[39m
+              [36m/>[39m
+            [36m</div>[39m
+            [36m<div[39m
+              [33mclass[39m=[32m"_input-card-footer_1fbae2"[39m
+            [36m>[39m
+              [36m<button[39m
+                [33mdata-testid[39m=[32m"send"[39m
+                [33mtype[39m=[32m"button"[39m
+              [36m>[39m
+                [0msend[0m
+              [36m</button>[39m
+            [36m</div>[39m
+          [36m</div>[39m
+        [36m</div>[39m
+      [36m</div>[39m
+    [36m</div>[39m
+  [36m</body>[39m
+[36m</html>[39m
+
+- Expected
++ Received
+
+- true
++ false
+
+ ❯ desktop/src/react/__tests__/components/composer-send.transaction.test.ts:424:80
+    422|
+    423|     await waitFor(() => {
+    424|       expect(useStore.getState().toasts.some(toast => toast.type === '…
+       |                                                                                ^
+    425|     });
+    426|     expect(wsMocks.current!.send).not.toHaveBeenCalled();
+ ❯ runWithExpensiveErrorDiagnosticsDisabled node_modules/@testing-library/dom/dist/config.js:47:12
+ ❯ checkCallback node_modules/@testing-library/dom/dist/wait-for.js:124:77
+ ❯ Timeout.checkRealTimersCallback node_modules/@testing-library/dom/dist/wait-for.js:118:16
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/21]⎯
+
+ FAIL  desktop/src/react/__tests__/components/composer-send.transaction.test.ts > composer-send 显式结果与快照（S01–S15） > S02：排队项视频/音频读取失败，队列项原位保留、错误可见、无 ws.send
+AssertionError: expected 'blocked' to be 'failed' // Object.is equality
+
+Expected: "failed"
+Received: "blocked"
+
+ ❯ desktop/src/react/__tests__/components/composer-send.transaction.test.ts:451:29
+    449|     let items = queueOf();
+    450|     expect(items).toHaveLength(1);
+    451|     expect(items[0].status).toBe('failed');
+       |                             ^
+    452|     expect(items[0].errorCode).toBe('video_read_failed');
+    453|     expect(items[0].text).toBe('看视频');
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[3/21]⎯
+
+ FAIL  desktop/src/react/__tests__/components/composer-send.transaction.test.ts > composer-send 显式结果与快照（S01–S15） > S03：视频数超限与格式错误都是明确 blocked，不冒充成功
+AssertionError: expected { kind: 'blocked', …(2) } to deeply equal { kind: 'blocked', …(2) }
+
+- Expected
++ Received
+
+  {
+-   "code": "video_count_exceeded",
++   "code": "rust_core_unavailable",
+    "kind": "blocked",
+    "retryable": false,
+  }
+
+ ❯ desktop/src/react/__tests__/components/composer-send.transaction.test.ts:482:21
+    480|       })),
+    481|     }), makeDeps());
+    482|     expect(tooMany).toEqual({ kind: 'blocked', code: 'video_count_exce…
+       |                     ^
+    483|
+    484|     seedSession({
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[4/21]⎯
+
+ FAIL  desktop/src/react/__tests__/components/composer-send.transaction.test.ts > composer-send 显式结果与快照（S01–S15） > S04：ws 不存在 / CONNECTING / CLOSING / CLOSED，明确结果、不清输入、不发消息
+AssertionError: expected { kind: 'blocked', …(2) } to deeply equal { kind: 'blocked', …(2) }
+
+- Expected
++ Received
+
+  {
+-   "code": "websocket_unavailable",
++   "code": "rust_core_unavailable",
+    "kind": "blocked",
+-   "retryable": true,
++   "retryable": false,
+  }
+
+ ❯ desktop/src/react/__tests__/components/composer-send.transaction.test.ts:505:22
+    503|       wsMocks.current = socket as never;
+    504|       const result = await dispatchComposerSend(makeBundle(`hello ${la…
+    505|       expect(result).toEqual({ kind: 'blocked', code: 'websocket_unava…
+       |                      ^
+    506|       expect(chatItems()).toHaveLength(0);
+    507|     }
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[5/21]⎯
+
+ FAIL  desktop/src/react/__tests__/components/composer-send.transaction.test.ts > composer-send 显式结果与快照（S01–S15） > S05：读文件期间会话删除/定位器变化/模型变更，重新验证后旧目标不误发
+AssertionError: expected "vi.fn()" to be called 1 times, but got 0 times
+ ❯ desktop/src/react/__tests__/components/composer-send.transaction.test.ts:537:45
+    535|     const pending = sendWithLease(acq.leaseId, makeDeps());
+    536|     await flushAsync();
+    537|     expect(window.platform!.readFileBase64).toHaveBeenCalledTimes(1);
+       |                                             ^
+    538|     // 删除证据齐备：投影列表非空但目标会话消失、定位器清空、且不再是当前会话。
+    539|     useStore.setState({
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[6/21]⎯
+
+ FAIL  desktop/src/react/__tests__/components/composer-send.transaction.test.ts > composer-send 显式结果与快照（S01–S15） > S06：准备期间用户继续输入，原快照独立、新草稿不被清除或覆盖
+AssertionError: expected "vi.fn()" to be called 1 times, but got 0 times
+
+Ignored nodes: comments, script, style
+[36m<html>[39m
+  [36m<head />[39m
+  [36m<body>[39m
+    [36m<div>[39m
+      [36m<div[39m
+        [33mclass[39m=[32m"_input-surface_1fbae2"[39m
+      [36m>[39m
+        [36m<div[39m
+          [33mclass[39m=[32m"_slash-menu-anchor_1fbae2"[39m
+        [36m/>[39m
+        [36m<div[39m
+          [33mclass[39m=[32m"_slash-menu-anchor_1fbae2"[39m
+        [36m/>[39m
+        [36m<div[39m
+          [33mclass[39m=[32m"_input-stack_1fbae2"[39m
+        [36m>[39m
+          [36m<div[39m
+            [33mclass[39m=[32m"_input-wrapper_1fbae2"[39m
+          [36m>[39m
+            [36m<input[39m
+              [33maccept[39m=[32m"image/png,image/jpeg,image/gif,image/webp,audio/mpeg,audio/wav,audio/x-wav,audio/mp4,audio/ogg,audio/flac,audio/webm,video/mp4,video/quicktime,video/webm"[39m
+              [33mclass[39m=[32m"_browser-file-input_1fbae2"[39m
+              [33mmultiple[39m=[32m""[39m
+              [33mtype[39m=[32m"file"[39m
+            [36m/>[39m
+            [36m<div>[39m
+              [36m<div[39m
+                [33mdata-testid[39m=[32m"editor"[39m
+              [36m/>[39m
+            [36m</div>[39m
+            [36m<div[39m
+              [33mclass[39m=[32m"_input-card-footer_1fbae2"[39m
+            [36m>[39m
+              [36m<button[39m
+                [33mdata-testid[39m=[32m"send"[39m
+                [33mtype[39m=[32m"button"[39m
+              [36m>[39m
+                [0msend[0m
+              [36m</button>[39m
+            [36m</div>[39m
+          [36m</div>[39m
+        [36m</div>[39m
+      [36m</div>[39m
+    [36m</div>[39m
+  [36m</body>[39m
+[36m</html>[39m
+ ❯ desktop/src/react/__tests__/components/composer-send.transaction.test.ts:583:47
+    581|     fireEvent.click(screen.getByTestId('send'));
+    582|     await waitFor(() => {
+    583|       expect(window.platform!.readFileBase64).toHaveBeenCalledTimes(1);
+       |                                               ^
+    584|     });
+    585|
+ ❯ runWithExpensiveErrorDiagnosticsDisabled node_modules/@testing-library/dom/dist/config.js:47:12
+ ❯ checkCallback node_modules/@testing-library/dom/dist/wait-for.js:124:77
+ ❯ Timeout.checkRealTimersCallback node_modules/@testing-library/dom/dist/wait-for.js:118:16
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[7/21]⎯
+
+ FAIL  desktop/src/react/__tests__/components/composer-send.transaction.test.ts > composer-send 显式结果与快照（S01–S15） > S07：文字+文件+skill+agent+quote+notebook 组合，失败与重试保留所有字段
+AssertionError: expected 'blocked' to be 'failed_before_submit' // Object.is equality
+
+Expected: "failed_before_submit"
+Received: "blocked"
+
+ ❯ desktop/src/react/__tests__/components/composer-send.transaction.test.ts:619:25
+    617|     wsMocks.current!.send.mockImplementationOnce(() => { throw new Err…
+    618|     const failed = await sendWithLease(acq.leaseId, makeDeps());
+    619|     expect(failed.kind).toBe('failed_before_submit');
+       |                         ^
+    620|
+    621|     // 记录内快照完整保留所有字段。
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[8/21]⎯
+
+ FAIL  desktop/src/react/__tests__/components/composer-send.transaction.test.ts > composer-send 显式结果与快照（S01–S15） > S08：图片按既有规则退化为文件引用，提示保留、文件身份不丢
+AssertionError: expected 'blocked' to be 'transport_submitted' // Object.is equality
+
+Expected: "transport_submitted"
+Received: "blocked"
+
+ ❯ desktop/src/react/__tests__/components/composer-send.transaction.test.ts:648:25
+    646|       inputFiles: [{ fileId: 'sf_img', path: '/tmp/a.png', name: 'a.pn…
+    647|     }), makeDeps());
+    648|     expect(result.kind).toBe('transport_submitted');
+       |                         ^
+    649|     const payload = sentPayloads()[0];
+    650|     expect(payload.images).toBeUndefined();
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[9/21]⎯
+
+ FAIL  desktop/src/react/__tests__/components/composer-send.transaction.test.ts > composer-send 显式结果与快照（S01–S15） > S09：ws.send 同步抛错，正确标失败、完整快照可按同一记录重试
+AssertionError: expected { kind: 'blocked', …(2) } to deeply equal { kind: 'failed_before_submit', …(2) }
+
+- Expected
++ Received
+
+  {
+-   "code": "ws_send_threw",
+-   "kind": "failed_before_submit",
+-   "retryable": true,
++   "code": "rust_core_unavailable",
++   "kind": "blocked",
++   "retryable": false,
+  }
+
+ ❯ desktop/src/react/__tests__/components/composer-send.transaction.test.ts:663:20
+    661|     if (!acq.ok) throw new Error('lease');
+    662|     const failed = await sendWithLease(acq.leaseId, makeDeps());
+    663|     expect(failed).toEqual({ kind: 'failed_before_submit', code: 'ws_s…
+       |                    ^
+    664|
+    665|     // 乐观消息被标记失败（同一条记录），快照保留。
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[10/21]⎯
+
+ FAIL  desktop/src/react/__tests__/components/composer-send.transaction.test.ts > composer-send 显式结果与快照（S01–S15） > S10：提交后断线无回执与回执超时，都标 delivery_unknown 且不自动重发
+AssertionError: expected 'blocked' to be 'transport_submitted' // Object.is equality
+
+Expected: "transport_submitted"
+Received: "blocked"
+
+ ❯ desktop/src/react/__tests__/components/composer-send.transaction.test.ts:686:23
+    684|     if (!acq.ok) throw new Error('lease');
+    685|     const sent = await sendWithLease(acq.leaseId, makeDeps());
+    686|     expect(sent.kind).toBe('transport_submitted');
+       |                       ^
+    687|     noteComposerConnectionClosed();
+    688|     const record = getSendRecord(acq.leaseId)!;
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[11/21]⎯
+
+ FAIL  desktop/src/react/__tests__/components/composer-send.transaction.test.ts > composer-send 显式结果与快照（S01–S15） > S11：重连后经恢复/历史找到原 clientMessageId，合并不重复追加
+TypeError: Cannot read properties of undefined (reading 'clientMessageId')
+ ❯ desktop/src/react/__tests__/components/composer-send.transaction.test.ts:732:52
+    730|     if (!acq.ok) throw new Error('lease');
+    731|     await sendWithLease(acq.leaseId, makeDeps());
+    732|     const clientMessageId = String(sentPayloads()[0].clientMessageId);
+       |                                                    ^
+    733|     noteComposerConnectionClosed();
+    734|     expect(getSendRecord(acq.leaseId)?.phase).toBe('delivery_unknown');
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[12/21]⎯
+
+ FAIL  desktop/src/react/__tests__/components/composer-send.transaction.test.ts > composer-send 显式结果与快照（S01–S15） > S12：明确失败后重试，仍是一条逻辑记录、内容与上下文一致
+AssertionError: expected 'blocked' to be 'failed' // Object.is equality
+
+Expected: "failed"
+Received: "blocked"
+
+ ❯ desktop/src/react/__tests__/components/composer-send.transaction.test.ts:756:29
+    754|     let items = queueOf();
+    755|     expect(items).toHaveLength(1);
+    756|     expect(items[0].status).toBe('failed');
+       |                             ^
+    757|
+    758|     const firstClientMessageId = String(sentPayloads()[0].clientMessag…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[13/21]⎯
+
+ FAIL  desktop/src/react/__tests__/components/composer-send.transaction.test.ts > composer-send 显式结果与快照（S01–S15） > S13：带首行空格与末尾换行的输入，快照逐字符保留
+AssertionError: expected undefined to be 'transport_submitted' // Object.is equality
+
+- Expected:
+"transport_submitted"
+
++ Received:
+undefined
+
+ ❯ desktop/src/react/__tests__/components/composer-send.transaction.test.ts:798:27
+    796|     wsMocks.current = { send: vi.fn(), readyState: 1 };
+    797|     const retried = await retrySendRecord(acq.leaseId, makeDeps());
+    798|     expect(retried?.kind).toBe('transport_submitted');
+       |                           ^
+    799|     expect(sentPayloads()[0].text).toBe(rawText);
+    800|
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[14/21]⎯
+
+ FAIL  desktop/src/react/__tests__/components/composer-send.transaction.test.ts > composer-send 显式结果与快照（S01–S15） > S14：首页 ensureSession 期间重复点击，只创建/提交一次
+AssertionError: expected "vi.fn()" to be called 1 times, but got 0 times
+
+Ignored nodes: comments, script, style
+[36m<html>[39m
+  [36m<head />[39m
+  [36m<body>[39m
+    [36m<div>[39m
+      [36m<div[39m
+        [33mclass[39m=[32m"_input-surface_1fbae2"[39m
+      [36m>[39m
+        [36m<div[39m
+          [33mclass[39m=[32m"_slash-menu-anchor_1fbae2"[39m
+        [36m/>[39m
+        [36m<div[39m
+          [33mclass[39m=[32m"_slash-menu-anchor_1fbae2"[39m
+        [36m/>[39m
+        [36m<div[39m
+          [33mclass[39m=[32m"_input-stack_1fbae2"[39m
+        [36m>[39m
+          [36m<div[39m
+            [33mclass[39m=[32m"_input-wrapper_1fbae2"[39m
+          [36m>[39m
+            [36m<input[39m
+              [33maccept[39m=[32m"image/png,image/jpeg,image/gif,image/webp,audio/mpeg,audio/wav,audio/x-wav,audio/mp4,audio/ogg,audio/flac,audio/webm,video/mp4,video/quicktime,video/webm"[39m
+              [33mclass[39m=[32m"_browser-file-input_1fbae2"[39m
+              [33mmultiple[39m=[32m""[39m
+              [33mtype[39m=[32m"file"[39m
+            [36m/>[39m
+            [36m<div>[39m
+              [36m<div[39m
+                [33mdata-testid[39m=[32m"editor"[39m
+              [36m/>[39m
+            [36m</div>[39m
+            [36m<div[39m
+              [33mclass[39m=[32m"_input-card-footer_1fbae2"[39m
+            [36m>[39m
+              [36m<button[39m
+                [33mdata-testid[39m=[32m"send"[39m
+                [33mtype[39m=[32m"button"[39m
+              [36m>[39m
+                [0msend[0m
+              [36m</button>[39m
+            [36m</div>[39m
+          [36m</div>[39m
+        [36m</div>[39m
+      [36m</div>[39m
+    [36m</div>[39m
+  [36m</body>[39m
+[36m</html>[39m
+ ❯ desktop/src/react/__tests__/components/composer-send.transaction.test.ts:854:37
+    852|     releaseCreate();
+    853|     await waitFor(() => {
+    854|       expect(wsMocks.current!.send).toHaveBeenCalledTimes(1);
+       |                                     ^
+    855|     });
+    856|     expect(sentPayloads()[0].sessionId).toBe('sess_a');
+ ❯ runWithExpensiveErrorDiagnosticsDisabled node_modules/@testing-library/dom/dist/config.js:47:12
+ ❯ checkCallback node_modules/@testing-library/dom/dist/wait-for.js:124:77
+ ❯ Timeout.checkRealTimersCallback node_modules/@testing-library/dom/dist/wait-for.js:118:16
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[15/21]⎯
+
+ FAIL  desktop/src/react/__tests__/components/composer-send.transaction.test.ts > composer-send 显式结果与快照（S01–S15） > S15：入队后改变界面选中的笔记本，已排队消息仍使用入队快照范围
+AssertionError: expected "vi.fn()" to be called 1 times, but got 0 times
+ ❯ desktop/src/react/__tests__/components/composer-send.transaction.test.ts:868:35
+    866|
+    867|     await flushQueuedHeadNow(PATH, makeDeps());
+    868|     expect(wsMocks.current!.send).toHaveBeenCalledTimes(1);
+       |                                   ^
+    869|     const payload = sentPayloads()[0];
+    870|     expect(payload.knowledgeRefs).toEqual({ notebookIds: ['nb1'], mode…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[16/21]⎯
+
+ FAIL  desktop/src/react/__tests__/components/composer-send.transaction.test.ts > composer-send 显式结果与快照（S01–S15） > P08：全空白正文但有附件 → 按已有内容维度发送，wire 保真、附件身份保留
+AssertionError: expected "vi.fn()" to be called 1 times, but got 0 times
+
+Ignored nodes: comments, script, style
+[36m<html>[39m
+  [36m<head />[39m
+  [36m<body>[39m
+    [36m<div>[39m
+      [36m<div[39m
+        [33mclass[39m=[32m"_input-surface_1fbae2"[39m
+      [36m>[39m
+        [36m<div[39m
+          [33mclass[39m=[32m"_slash-menu-anchor_1fbae2"[39m
+        [36m/>[39m
+        [36m<div[39m
+          [33mclass[39m=[32m"_slash-menu-anchor_1fbae2"[39m
+        [36m/>[39m
+        [36m<div[39m
+          [33mclass[39m=[32m"_input-stack_1fbae2"[39m
+        [36m>[39m
+          [36m<div[39m
+            [33mclass[39m=[32m"_input-wrapper_1fbae2"[39m
+          [36m>[39m
+            [36m<input[39m
+              [33maccept[39m=[32m"image/png,image/jpeg,image/gif,image/webp,audio/mpeg,audio/wav,audio/x-wav,audio/mp4,audio/ogg,audio/flac,audio/webm,video/mp4,video/quicktime,video/webm"[39m
+              [33mclass[39m=[32m"_browser-file-input_1fbae2"[39m
+              [33mmultiple[39m=[32m""[39m
+              [33mtype[39m=[32m"file"[39m
+            [36m/>[39m
+            [36m<div>[39m
+              [36m<div[39m
+                [33mdata-testid[39m=[32m"editor"[39m
+              [36m/>[39m
+            [36m</div>[39m
+            [36m<div[39m
+              [33mclass[39m=[32m"_input-card-footer_1fbae2"[39m
+            [36m>[39m
+              [36m<button[39m
+                [33mdata-testid[39m=[32m"send"[39m
+                [33mtype[39m=[32m"button"[39m
+              [36m>[39m
+                [0msend[0m
+              [36m</button>[39m
+            [36m</div>[39m
+          [36m</div>[39m
+        [36m</div>[39m
+      [36m</div>[39m
+    [36m</div>[39m
+  [36m</body>[39m
+[36m</html>[39m
+ ❯ desktop/src/react/__tests__/components/composer-send.transaction.test.ts:896:37
+    894|     fireEvent.click(screen.getByTestId('send'));
+    895|     await waitFor(() => {
+    896|       expect(wsMocks.current!.send).toHaveBeenCalledTimes(1);
+       |                                     ^
+    897|     });
+    898|     const payload = sentPayloads()[0];
+ ❯ runWithExpensiveErrorDiagnosticsDisabled node_modules/@testing-library/dom/dist/config.js:47:12
+ ❯ checkCallback node_modules/@testing-library/dom/dist/wait-for.js:124:77
+ ❯ Timeout.checkRealTimersCallback node_modules/@testing-library/dom/dist/wait-for.js:118:16
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[17/21]⎯
+
+ FAIL  desktop/src/react/__tests__/components/composer-send.transaction.test.ts > composer-send 显式结果与快照（S01–S15） > P10：排队 → 编辑 → 失败 → 重试 → wire，每次都不 trim 正文
+AssertionError: expected 'blocked' to be 'failed' // Object.is equality
+
+Expected: "failed"
+Received: "blocked"
+
+ ❯ desktop/src/react/__tests__/components/composer-send.transaction.test.ts:915:33
+    913|     enqueue('q-f10', padded);
+    914|     await flushQueuedHeadNow(PATH, makeDeps());
+    915|     expect(queueOf()[0].status).toBe('failed');
+       |                                 ^
+    916|     expect(queueOf()[0].text).toBe(padded);
+    917|
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[18/21]⎯
+
+ FAIL  desktop/src/react/__tests__/components/composer-send.transaction.test.ts > R03 InputArea 编辑点击接线 > R03-03：点击编辑同步取消慢附件，保存后仅提交新正文
+AssertionError: expected "vi.fn()" to be called at least once
+
+Ignored nodes: comments, script, style
+[36m<html>[39m
+  [36m<head />[39m
+  [36m<body>[39m
+    [36m<div>[39m
+      [36m<div[39m
+        [33mclass[39m=[32m"_input-surface_1fbae2"[39m
+      [36m>[39m
+        [36m<div[39m
+          [33mclass[39m=[32m"_slash-menu-anchor_1fbae2"[39m
+        [36m/>[39m
+        [36m<div[39m
+          [33mclass[39m=[32m"_slash-menu-anchor_1fbae2"[39m
+        [36m/>[39m
+        [36m<div[39m
+          [33mclass[39m=[32m"_input-stack_1fbae2"[39m
+        [36m>[39m
+          [36m<div[39m
+            [33mclass[39m=[32m"_queued-turn-list_1fbae2"[39m
+            [33mdata-testid[39m=[32m"queued-turn-list"[39m
+          [36m>[39m
+            [36m<div[39m
+              [33mclass[39m=[32m"_queued-turn-card_1fbae2"[39m
+            [36m>[39m
+              [36m<div[39m
+                [33mclass[39m=[32m"_queued-turn-body_1fbae2"[39m
+              [36m>[39m
+                [36m<div[39m
+                  [33mclass[39m=[32m"_queued-turn-text_1fbae2"[39m
+                  [33mtitle[39m=[32m"旧正文"[39m
+                [36m>[39m
+                  [0m旧正文[0m
+                [36m</div>[39m
+                [36m<div[39m
+                  [33mclass[39m=[32m"_queued-turn-hint_1fbae2"[39m
+                [36m>[39m
+                  [0minput.queuedSendFailed[0m
+                [36m</div>[39m
+              [36m</div>[39m
+              [36m<div[39m
+                [33mclass[39m=[32m"_queued-turn-actions_1fbae2"[39m
+              [36m>[39m
+                [36m<button[39m
+                  [33mclass[39m=[32m"_queued-turn-insert_1fbae2"[39m
+                  [33mdata-testid[39m=[32m"queued-insert-now"[39m
+                  [33mtitle[39m=[32m"input.queuedInsertNowTitle"[39m
+                  [33mtype[39m=[32m"button"[39m
+                [36m>[39m
+                  [36m<svg[39m
+                    [33maria-hidden[39m=[32m"true"[39m
+                    [33mfill[39m=[32m"none"[39m
+                    [33mheight[39m=[32m"12"[39m
+                    [33mstroke[39m=[32m"currentColor"[39m
+                    [33mstroke-linecap[39m=[32m"round"[39m
+                    [33mstroke-linejoin[39m=[32m"round"[39m
+                    [33mstroke-width[39m=[32m"2.2"[39m
+                    [33mviewBox[39m=[32m"0 0 24 24"[39m
+                    [33mwidth[39m=[32m"12"[39m
+                  [36m>[39m
+                    [36m<line[39m
+                      [33mx1[39m=[32m"12"[39m
+                      [33mx2[39m=[32m"12"[39m
+                      [33my1[39m=[32m"19"[39m
+                      [33my2[39m=[32m"5"[39m
+                    [36m/>[39m
+                    [36m<polyline[39m
+                      [33mpoints[39m=[32m"5 12 12 5 19 12"[39m
+                    [36m/>[39m
+                  [36m</svg>[39m
+                  [0minput.queuedInsertNow[0m
+                [36m</button>[39m
+                [36m<button[39m
+                  [33maria-label[39m=[32m"common.edit"[39m
+                  [33mclass[39m=[32m"_queued-turn-icon-btn_1fbae2"[39m
+                  [33mtitle[39m=[32m"common.edit"[39m
+                  [33mtype[39m=[32m"button"[39m
+                [36m>[39m
+                  [36m<svg[39m
+                    [33maria-hidden[39m=[32m"true"[39m
+                    [33mfill[39m=[32m"none"[39m
+                    [33mheight[39m=[32m"13"[39m
+                    [33mstroke[39m=[32m"currentColor"[39m
+                    [33mstroke-linecap[39m=[32m"round"[39m
+                    [33mstroke-linejoin[39m=[32m"round"[39m
+                    [33mstroke-width[39m=[32m"1.8"[39m
+                    [33mviewBox[39m=[32m"0 0 24 24"[39m
+                    [33mwidth[39m=[32m"13"[39m
+                  [36m>[39m
+                    [36m<path[39m
+                      [33md[39m=[32m"M12 20h9"[39m
+                    [36m/>[39m
+                    [36m<path[39m
+                      [33md[39m=[32m"M16.5 3.5a2.1 2.1 0 013 3L7 19l-4 1 1-4Z"[39m
+                    [36m/>[39m
+                  [36m</svg>[39m
+                [36m</button>[39m
+                [36m<button[39m
+                  [33maria-label[39m=[32m"input.queuedDelete"[39m
+                  [33mclass[39m=[32m"_queued-turn-icon-btn_1fbae2"[39m
+                  [33mtitle[39m=[32m"input.queuedDelete"[39m
+                  [33mtype[39m=[32m"button"[39m
+                [36m>[39m
+                  [36m<svg[39m
+                    [33maria-hidden[39m=[32m"true"[39m
+                    [33mfill[39m=[32m"none"[39m
+                    [33mheight[39m=[32m"13"[39m
+                    [33mstroke[39m=[32m"currentColor"[39m
+                    [33mstroke-linecap[39m=[32m"round"[39m
+                    [33mstroke-linejoin[39m=[32m"round"[39m
+                    [33mstroke-width[39m=[32m"1.8"[39m
+                    [33mviewBox[39m=[32m"0 0 24 24"[39m
+                    [33mwidth[39m=[32m"13"[39m
+                  [36m>[39m
+                    [36m<polyline[39m
+                      [33mpoints[39m=[32m"3 6 5 6 21 6"[39m
+                    [36m/>[39m
+                    [36m<path[39m
+                      [33md[39m=[32m"M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a2 2 0 012-2h4a2 2 0 012 2v2"[39m
+                    [36m/>[39m
+                  [36m</svg>[39m
+                [36m</button>[39m
+              [36m</div>[39m
+            [36m</div>[39m
+          [36m</div>[39m
+          [36m<div[39m
+            [33mclass[39m=[32m"_input-wrapper_1fbae2"[39m
+          [36m>[39m
+            [36m<input[39m
+              [33maccept[39m=[32m"image/png,image/jpeg,image/gif,image/webp,audio/mpeg,audio/wav,audio/x-wav,audio/mp4,audio/ogg,audio/flac,audio/webm,video/mp4,video/quicktime,video/webm"[39m
+              [33mclass[39m=[32m"_browser-file-input_1fbae2"[39m
+              [33mmultiple[39m=[32m""[39m
+              [33mtype[39m=[32m"file"[39m
+            [36m/>[39m
+            [36m<div>[39m
+              [36m<div[39m
+                [33mdata-testid[39m=[32m"editor"[39m
+              [36m/>[39m
+            [36m</div>[39m
+            [36m<div[39m
+              [33mclass[39m=[32m"_input-card-footer_1fbae2"[39m
+            [36m>[39m
+              [36m<button[39m
+                [33mdata-testid[39m=[32m"send"[39m
+                [33mdisabled[39m=[32m""[39m
+                [33mtype[39m=[32m"button"[39m
+              [36m>[39m
+                [0msend[0m
+              [36m</button>[39m
+            [36m</div>[39m
+          [36m</div>[39m
+        [36m</div>[39m
+      [36m</div>[39m
+    [36m</div>[39m
+  [36m</body>[39m
+[36m</html>[39m
+ ❯ desktop/src/react/__tests__/components/composer-send.transaction.test.ts:943:64
+    941|     const view = render(React.createElement(InputArea));
+    942|     const pending = flushQueuedHeadNow(PATH, makeDeps());
+    943|     await waitFor(() => expect(window.platform.readFileBase64).toHaveB…
+       |                                                                ^
+    944|     fireEvent.click(screen.getByRole('button', { name: /编辑|Edit/i }));
+    945|     expect(queueOf()[0].editing).toBe(true);
+ ❯ runWithExpensiveErrorDiagnosticsDisabled node_modules/@testing-library/dom/dist/config.js:47:12
+ ❯ checkCallback node_modules/@testing-library/dom/dist/wait-for.js:124:77
+ ❯ Timeout.checkRealTimersCallback node_modules/@testing-library/dom/dist/wait-for.js:118:16
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[19/21]⎯
+
+ FAIL  desktop/src/react/__tests__/components/composer-send.transaction.test.ts > R03-09：真实 InputArea StrictMode 卸载撤销 timer，重挂只发一次
+AssertionError: expected [] to have a length of 1 but got +0
+
+- Expected
++ Received
+
+- 1
++ 0
+
+ ❯ desktop/src/react/__tests__/components/composer-send.transaction.test.ts:976:26
+    974|   render(React.createElement(React.StrictMode, null, React.createEleme…
+    975|   await act(async () => { await vi.advanceTimersByTimeAsync(400); });
+    976|   expect(sentPayloads()).toHaveLength(1);
+       |                          ^
+    977| });
+    978|
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[20/21]⎯
+
+ FAIL  desktop/src/react/__tests__/components/composer-send.transaction.test.ts > R03-12：InputArea A 慢附件时切 B 可发送，A 完成不再清 B 编辑器
+AssertionError: expected "vi.fn()" to be called at least once
+
+Ignored nodes: comments, script, style
+[36m<html>[39m
+  [36m<head />[39m
+  [36m<body>[39m
+    [36m<div>[39m
+      [36m<div[39m
+        [33mclass[39m=[32m"_input-surface_1fbae2"[39m
+      [36m>[39m
+        [36m<div[39m
+          [33mclass[39m=[32m"_slash-menu-anchor_1fbae2"[39m
+        [36m/>[39m
+        [36m<div[39m
+          [33mclass[39m=[32m"_slash-menu-anchor_1fbae2"[39m
+        [36m/>[39m
+        [36m<div[39m
+          [33mclass[39m=[32m"_input-stack_1fbae2"[39m
+        [36m>[39m
+          [36m<div[39m
+            [33mclass[39m=[32m"_input-wrapper_1fbae2"[39m
+          [36m>[39m
+            [36m<input[39m
+              [33maccept[39m=[32m"image/png,image/jpeg,image/gif,image/webp,audio/mpeg,audio/wav,audio/x-wav,audio/mp4,audio/ogg,audio/flac,audio/webm,video/mp4,video/quicktime,video/webm"[39m
+              [33mclass[39m=[32m"_browser-file-input_1fbae2"[39m
+              [33mmultiple[39m=[32m""[39m
+              [33mtype[39m=[32m"file"[39m
+            [36m/>[39m
+            [36m<div>[39m
+              [36m<div[39m
+                [33mdata-testid[39m=[32m"editor"[39m
+              [36m/>[39m
+            [36m</div>[39m
+            [36m<div[39m
+              [33mclass[39m=[32m"_input-card-footer_1fbae2"[39m
+            [36m>[39m
+              [36m<button[39m
+                [33mdata-testid[39m=[32m"send"[39m
+                [33mtype[39m=[32m"button"[39m
+              [36m>[39m
+                [0msend[0m
+              [36m</button>[39m
+            [36m</div>[39m
+          [36m</div>[39m
+        [36m</div>[39m
+      [36m</div>[39m
+    [36m</div>[39m
+  [36m</body>[39m
+[36m</html>[39m
+ ❯ desktop/src/react/__tests__/components/composer-send.transaction.test.ts:993:62
+    991|   render(React.createElement(InputArea));
+    992|   fireEvent.click(screen.getByTestId('send'));
+    993|   await waitFor(() => expect(window.platform.readFileBase64).toHaveBee…
+       |                                                              ^
+    994|   mocks.editorDoc = buildFaithfulPasteContent('B 正文');
+    995|   act(() => { useStore.setState({ currentSessionPath: otherPath, curre…
+ ❯ runWithExpensiveErrorDiagnosticsDisabled node_modules/@testing-library/dom/dist/config.js:47:12
+ ❯ checkCallback node_modules/@testing-library/dom/dist/wait-for.js:124:77
+ ❯ Timeout.checkRealTimersCallback node_modules/@testing-library/dom/dist/wait-for.js:118:16
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[21/21]⎯
+
+
+ Test Files  2 failed | 4 passed (6)
+      Tests  21 failed | 68 passed (89)
+   Start at  18:46:50
+   Duration  7.52s (transform 1.87s, setup 92ms, import 1.63s, tests 8.29s, environment 944ms)
+

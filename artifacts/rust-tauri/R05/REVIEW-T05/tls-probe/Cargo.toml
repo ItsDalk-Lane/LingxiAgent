@@ -1,0 +1,10 @@
+[package]
+name = "review-t05-tls-probe"
+version = "0.0.0"
+edition = "2021"
+
+[dependencies]
+lingxi-adapters = { path = "../../../../../rust/crates/lingxi-adapters" }
+tokio = { version = "1", features = ["full"] }
+
+[workspace]

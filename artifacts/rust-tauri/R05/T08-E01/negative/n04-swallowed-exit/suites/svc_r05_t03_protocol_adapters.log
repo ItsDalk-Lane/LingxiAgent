@@ -1,0 +1,17 @@
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.10s
+     Running tests/r05_t03_protocol_adapters.rs (/Users/study_superior/.cache/lingxi-r05-neg-target/debug/deps/r05_t03_protocol_adapters-e50c9f080d9e6e18)
+
+running 10 tests
+test c02_anthropic_tool_roundtrip_with_the_real_file_tool ... ok
+test c01_c04_same_model_id_two_families_never_cross_wire_or_credentials ... ok
+test c03_google_parallel_calls_pair_function_responses_by_exchange_mapping ... ok
+test c04_same_provider_call_id_in_two_sessions_stays_isolated ... ok
+test c06_openai_completions_mixed_content_parts_survive_in_order ... ok
+test c05_runtime_nonce_rides_the_next_request_and_follows_changes ... ok
+test c08_a_policy_refusal_rides_the_next_request_as_a_structured_failure ... ok
+test c07_auth_header_goes_verbatim_and_none_sends_nothing ... ok
+test codex_family_runs_end_to_end_over_sse ... ok
+test c12_retry_continues_the_confirmed_exchange_without_rebuild_or_redo ... ok
+
+test result: ok. 10 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 1.21s
+

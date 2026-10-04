@@ -1,0 +1,395 @@
+{
+  "schemaVersion": 1,
+  "artifactKind": "R05_PROGRESS_LEDGER",
+  "stage_id": "R05",
+  "generated_by": "EXECUTOR-R05-T01",
+  "generated_at": "2026-10-03",
+  "baseline": {
+    "branch": "codex/rust-tauri-migration",
+    "head_sha": "c549ff654508ab951e2cf39cf9d309fc9c6b8656",
+    "head_equals_research_baseline": true,
+    "worktree": "R05-T01+T02+T03 changes are an UNCOMMITTED working-tree diff (81 rust/ files); per-file sha256 manifest at artifacts/rust-tauri/R05/T03/working-tree-manifest.txt (manifest sha256 3a6df35a0c90ad567ca2a0b4a365b1079b3c1e01fbf977b52b4d7ced24dfb281, the REV-T03 R01 fix-r1 tree); all five gates re-run on this terminal tree 2026-10-02T17:38:57Z..17:56:07Z",
+    "no_commit_push_authorization": true
+  },
+  "tasks": [
+    {
+      "task": "R05-T01",
+      "name": "ModelGateway、范围清单与模型交换契约",
+      "status": "READY_FOR_INDEPENDENT_REVIEW",
+      "executor": "EXECUTOR-R05-T01",
+      "cases_total": 12,
+      "cases_pass": 12,
+      "cases_not_run": 0,
+      "acceptance_ledger": "docs/rust-tauri/R05/R05_ACCEPTANCE_LEDGER.json",
+      "deliverables": [
+        "docs/rust-tauri/R05/R05_BASELINE.json",
+        "docs/rust-tauri/R05/R05_SCOPE_MATRIX.json",
+        "docs/rust-tauri/R05/PROVIDER_SUPPORT_MATRIX.json",
+        "docs/rust-tauri/R05/MODEL_CALLSITE_MATRIX.json",
+        "docs/rust-tauri/R05/R05_INTERFACE_EVOLUTION.md",
+        "docs/rust-tauri/R05/R05_ACCEPTANCE_LEDGER.json",
+        "docs/rust-tauri/R05/PROGRESS_LEDGER.json",
+        "rust/crates/lingxi-kernel/src/model_exchange.rs",
+        "rust/crates/lingxi-adapters/src/models/config.rs",
+        "rust/crates/lingxi-adapters/src/models/gateway.rs",
+        "rust/crates/lingxi-adapters/src/models/openai_completions.rs",
+        "rust/crates/lingxi-adapters/src/models/provider.rs",
+        "rust/crates/lingxi-adapters/src/models/mod.rs",
+        "rust/crates/lingxi-service/src/config.rs",
+        "rust/crates/lingxi-service/src/lib.rs",
+        "rust/crates/lingxi-service/src/main.rs",
+        "rust/crates/lingxi-service/src/management.rs",
+        "rust/crates/lingxi-service/src/redaction.rs",
+        "rust/crates/lingxi-service/tests/r05_t01_model_plane.rs",
+        "rust/crates/lingxi-service/tests/r05_t01_binary_wiring.rs"
+      ],
+      "evidence_root": "artifacts/rust-tauri/R05/T01/"
+    },
+    {
+      "task": "R05-T02",
+      "name": "凭证、刷新、撤销与秘密保护",
+      "status": "READY_FOR_INDEPENDENT_REVIEW",
+      "executor": "EXECUTOR-R05-T02",
+      "cases_total": 12,
+      "cases_pass": 12,
+      "cases_not_run": 0,
+      "acceptance_ledger": "docs/rust-tauri/R05/R05_ACCEPTANCE_LEDGER.json",
+      "fix_rounds": [
+        {
+          "review": "REV-T02 R01 (artifacts/rust-tauri/R05/REVIEW-T02/R01_REVIEW.md, verdict PENDING)",
+          "fixed": [
+            "F-01: resolve_impl unbounded re-read loop → one flight per resolve, still-expired re-read is a loud Transient (2 service unit regressions + 1 oauth mint-side pin)",
+            "F-02: install_tokens fence-1 (map currency) moved inside the cell lock, closing the reload TOCTOU (1 unit regression; window argued in the code comment)",
+            "F-03: kernel legacy CredentialPort #[deprecated] + ownership pointers (removal stays an R05-T08 ruling)",
+            "F-04: CredentialError::Cancelled (never constructed) removed, enum now 7 variants; resolve_handle time-expiry leg pinned (an_expired_handle_is_refused)"
+          ],
+          "evidence": "artifacts/rust-tauri/R05/T02/fix-r1/",
+          "gates": "all five gates green on the fix-r1 tree (workspace test 1048 passed / 1 failed = the registered ALF environment item only)"
+        }
+      ],
+      "deliverables": [
+        "docs/rust-tauri/R05/CREDENTIAL_FLOW_MATRIX.json",
+        "docs/rust-tauri/R05/R05_INTERFACE_EVOLUTION.md",
+        "docs/rust-tauri/R05/R05_ACCEPTANCE_LEDGER.json",
+        "docs/rust-tauri/R05/PROGRESS_LEDGER.json",
+        "rust/crates/lingxi-kernel/src/model_exchange.rs",
+        "rust/crates/lingxi-adapters/src/models/credentials.rs",
+        "rust/crates/lingxi-adapters/src/models/oauth.rs",
+        "rust/crates/lingxi-adapters/src/models/config.rs",
+        "rust/crates/lingxi-adapters/src/models/gateway.rs",
+        "rust/crates/lingxi-adapters/src/models/openai_completions.rs",
+        "rust/crates/lingxi-adapters/src/models/provider.rs",
+        "rust/crates/lingxi-adapters/src/models/mod.rs",
+        "rust/crates/lingxi-adapters/tests/r05_t02_oauth_flows.rs",
+        "rust/crates/lingxi-service/src/credentials/mod.rs",
+        "rust/crates/lingxi-service/src/credentials/store.rs",
+        "rust/crates/lingxi-service/src/lib.rs",
+        "rust/crates/lingxi-service/src/main.rs",
+        "rust/crates/lingxi-service/src/management.rs",
+        "rust/crates/lingxi-service/src/redaction.rs",
+        "rust/crates/lingxi-service/tests/r05_t02_credentials.rs"
+      ],
+      "evidence_root": "artifacts/rust-tauri/R05/T02/"
+    },
+    {
+      "task": "R05-T03",
+      "name": "实现实际使用的文本协议（anthropic-messages / google-generative-ai / openai-responses / openai-codex-responses 真实适配 + golden + 服务级回环）",
+      "status": "READY_FOR_INDEPENDENT_REVIEW",
+      "executor": "EXECUTOR-R05-T03",
+      "cases_total": 12,
+      "cases_pass": 12,
+      "cases_not_run": 0,
+      "acceptance_ledger": "docs/rust-tauri/R05/R05_ACCEPTANCE_LEDGER.json",
+      "deliverables": [
+        "docs/rust-tauri/R05/PROTOCOL_WIRE_MATRIX.json",
+        "docs/rust-tauri/R05/R05_INTERFACE_EVOLUTION.md",
+        "docs/rust-tauri/R05/R05_ACCEPTANCE_LEDGER.json",
+        "docs/rust-tauri/R05/PROGRESS_LEDGER.json",
+        "rust/crates/lingxi-kernel/src/model_exchange.rs",
+        "rust/crates/lingxi-adapters/src/models/streaming.rs",
+        "rust/crates/lingxi-adapters/src/models/tool_render.rs",
+        "rust/crates/lingxi-adapters/src/models/dispatch.rs",
+        "rust/crates/lingxi-adapters/src/models/anthropic_messages.rs",
+        "rust/crates/lingxi-adapters/src/models/google_generative_ai.rs",
+        "rust/crates/lingxi-adapters/src/models/openai_responses.rs",
+        "rust/crates/lingxi-adapters/src/models/openai_codex_responses.rs",
+        "rust/crates/lingxi-adapters/src/models/openai_completions.rs",
+        "rust/crates/lingxi-adapters/src/models/gateway.rs",
+        "rust/crates/lingxi-adapters/src/models/provider.rs",
+        "rust/crates/lingxi-adapters/tests/r05_t03_goldens.rs",
+        "rust/crates/lingxi-adapters/tests/golden/ (5 families × forward/tool_roundtrip/error, 15 files)",
+        "rust/crates/lingxi-service/src/runs.rs",
+        "rust/crates/lingxi-service/tests/r05_t03_protocol_adapters.rs"
+      ],
+      "evidence_root": "artifacts/rust-tauri/R05/T03/",
+      "fix_rounds": [
+        {
+          "review": "REV-T03 R01 (artifacts/rust-tauri/R05/REVIEW-T03/R01_REVIEW.md, verdict CONDITIONAL GO)",
+          "fixed": [
+            "F-01: ledger C04 accepted the wrong scenario (cancellation) → ported the reviewer's scratch test as c04_same_provider_call_id_in_two_sessions_stays_isolated; C04 entry rewritten to the real task-book scenario; C02 expected cleaned of cross-session wording",
+            "F-02: ledger C05 claimed runtime-nonce evidence over a compile-time constant → ported c05_runtime_nonce_rides_the_next_request_and_follows_changes (runtime pid/nanos/counter nonce, two legs, byte-exact, follows changes)"
+          ],
+          "product_code_changes": "none (test/ledger/documentation only)",
+          "observations": [
+            "N-01 documented in R05_INTERFACE_EVOLUTION.md §19 (owner: T05 render layer)",
+            "N-02 registered as a follow-up obligation (owner: T06 resource refs)",
+            "N-03 documented in R05_INTERFACE_EVOLUTION.md §19 (statement only)"
+          ],
+          "evidence_root": "artifacts/rust-tauri/R05/T03/fix-r1/"
+        }
+      ]
+    },
+    {
+      "task": "R05-T04",
+      "name": "流式解码、规范化与部分结果（生产流式切换 + 事件桥 + 16 检查点）",
+      "status": "READY_FOR_INDEPENDENT_REVIEW",
+      "executor": "EXECUTOR-R05-T04",
+      "cases_total": 16,
+      "cases_pass": 16,
+      "cases_not_run": 0,
+      "acceptance_ledger": "docs/rust-tauri/R05/R05_ACCEPTANCE_LEDGER.json",
+      "deliverables": [
+        "rust/crates/lingxi-kernel/src/ports.rs (next_turn + ModelTurnDelta + TurnDeltaSink)",
+        "rust/crates/lingxi-adapters/src/models/streaming.rs (incremental bounded SseDecoder)",
+        "rust/crates/lingxi-adapters/src/models/dispatch.rs (drive_sse_stream incremental read)",
+        "rust/crates/lingxi-adapters/src/models/{openai_completions,anthropic_messages,google_generative_ai,openai_responses,openai_codex_responses}.rs (streaming production path + accumulators)",
+        "rust/crates/lingxi-service/src/runs.rs (streaming bridge: bounded delta channel, D6 started-before-delta, idle timeout)",
+        "rust/crates/lingxi-service/src/streaming_norm.rs (same-source normalization chain)",
+        "rust/crates/lingxi-adapters/tests/r05_t04_streaming.rs (18 tests)",
+        "rust/crates/lingxi-service/tests/r05_t04_streaming.rs (9 tests)",
+        "docs/rust-tauri/R05/R05_INTERFACE_EVOLUTION.md (§20-24)",
+        "docs/rust-tauri/R05/R05_ACCEPTANCE_LEDGER.json",
+        "docs/rust-tauri/R05/PROGRESS_LEDGER.json"
+      ],
+      "evidence_root": "artifacts/rust-tauri/R05/T04/",
+      "notes": [
+        "消费者同步（断言语义不变）：cancellation_tree stream_read durable 序纳入诚实的 model_call_started（D6）；late_result_fence mc0002 断言排除 started；r05_t01_model_plane/r05_t01_binary_wiring/r05_t02_credentials 的 stub 改答 SSE（生产已切流式，stream:false→true）。",
+        "唯一已知失败：r00_management_leaves LAN 段在本机防火墙/未签名二进制下 stall（任务书允许的唯一 ALF 项；无 R05 断言，未改其测试）。",
+        "live provider 验证保持 BLOCKED_NOT_AUTHORIZED（未获真实外网授权）。"
+      ]
+    },
+    {
+      "task": "R05-T05",
+      "status": "READY_FOR_INDEPENDENT_REVIEW",
+      "name": "网络策略、超时与安全重试",
+      "executor": "EXECUTOR-R05-T05",
+      "cases_total": 14,
+      "cases_pass": 12,
+      "cases_not_run": 2,
+      "acceptance_ledger": "docs/rust-tauri/R05/R05_ACCEPTANCE_LEDGER.json",
+      "evidence_dir": "artifacts/rust-tauri/R05/T05/ (R01 fix round: artifacts/rust-tauri/R05/T05/fix-r1/)",
+      "interface_evolution": "docs/rust-tauri/R05/R05_INTERFACE_EVOLUTION.md §25-§28",
+      "notes": "REVIEW-T05 R01 findings closed: F-01 C12 private-CA rationale corrected (incumbent HAS NODE_EXTRA_CA_CERTS + Windows system-CA merge; Rust lacks an equivalent — real capability gap registered to the network-hardening phase); F-02 oauth.rs OAuthHttp gained .no_proxy() with a counting-proxy regression test (discrimination proven pre/post); F-03 idle-stream leg pinned fast via ServiceDeps.stream_idle_timeout seam (injected 200ms; production 60s signature by reviewer idle-probe); F-04 C11 SSRF/attachment legs split out as C11B NOT_RUN; F-05 wording/count corrections. 12 PASS with executed evidence; NOT_RUN = C11B + C12 (both with blockingReasons). Compat port: 12 modules, 49 TS-generated goldens, structural equality + fixture byte-idempotence."
+    },
+    {
+      "task": "R05-T06",
+      "status": "READY_FOR_INDEPENDENT_REVIEW",
+      "note": null,
+      "executor": "EXECUTOR-R05-T06",
+      "cases_total": 13,
+      "cases_pass": 13,
+      "cases_not_run": 0,
+      "name": "多模态、辅助模型与Worker回调（operations 方言+egress 守卫+OperationService+worker async 桥）",
+      "deliverables": [
+        "docs/rust-tauri/R05/WORKER_MODEL_BOUNDARY.md",
+        "docs/rust-tauri/R05/R05_INTERFACE_EVOLUTION.md (§29 裁决 + §30 实现登记)",
+        "docs/rust-tauri/R05/R05_ACCEPTANCE_LEDGER.json (T06 C01-C12 + C11B; T05-C11B 延期解除)",
+        "rust/crates/lingxi-adapters/src/models/egress.rs (C11B 出口守卫)",
+        "rust/crates/lingxi-adapters/src/models/tool_render.rs (N-02: file:// 不进模型渲染 + 3 golden 收紧)",
+        "rust/crates/lingxi-adapters/src/models/operations/ (speech 格式助手 + trim 空文本守卫修复)",
+        "rust/crates/lingxi-service/src/operations.rs (OperationService §29.9)",
+        "rust/crates/lingxi-service/src/lib.rs / management.rs (bootstrap 接线 + reload egress 换源)",
+        "rust/crates/lingxi-service/src/workermodel.rs / workerrpc.rs (worker async 桥 + 预算键, 前段完成本段复核)",
+        "rust/crates/lingxi-adapters/tests/r05_t06_operations.rs (27 tests)",
+        "rust/crates/lingxi-service/tests/r05_t06_operations.rs (7 tests)",
+        "rust/crates/lingxi-service/tests/r05_t06_worker_model.rs (9 tests)"
+      ],
+      "evidence_root": "artifacts/rust-tauri/R05/T06/",
+      "notes": "C11B counted as the 13th T06 case (the T05-deferred SSRF/attachment legs closed here). All 13 PASS with executed evidence on the T06 terminal tree. LIVE provider verification stays BLOCKED_NOT_AUTHORIZED (RR-BLK-CREDENTIALS, R10 at latest).",
+      "fix_rounds": [
+        {
+          "review": "REV-T06 R01 (artifacts/rust-tauri/R05/REVIEW-T06/R01_REVIEW.md, verdict CONDITIONAL_GO offline; probe 13/17 BYPASS)",
+          "fixed": [
+            "F-01 (mustFix, high): egress literal-IP policy closed at the root — parse_url now classifies the host with the SAME WHATWG parser the HTTP client dials with (reqwest::Url re-export of locked url 2.5.8; zero new dependencies, Cargo.lock untouched), so hex/octal/short-form/integer/leading-zero/trailing-dot IPv4 spellings, percent-encoded hosts, malformed ports/brackets and zone ids are refused or arrive canonicalized; ip_is_guarded's 16-byte arm folds ::ffff:0:0/96 (IPv4-mapped) to the embedded v4 policy and refuses the deprecated IPv4-compatible ::/96 outright; default-port elision is now real on both allowlist sides (Url::port); the guard stays stricter than WHATWG where the parser tolerates redundant slashes (empty raw authority still refuses)"
+          ],
+          "regressions_added": [
+            "egress.rs tests: non_decimal_ipv4_spellings_and_mapped_ipv6_refuse_like_their_normalized_form (the reviewer's 13 BYPASS rows + percent-encoded + ::ffff:0.0.0.0 + ::7f00:1 all REFUSE; mapped/hex spellings of a PUBLIC v4 still pass — the fold is policy-exact, not blanket)",
+            "egress.rs tests: the_same_origin_exception_matches_normalized_origins_across_spellings (exception matches normalized origins across spellings; :443 elision pinned)"
+          ],
+          "checks_run": [
+            "cargo test --manifest-path rust/Cargo.toml --locked -p lingxi-adapters --lib egress → 7 passed / 0 failed, exit 0 (5 pre-existing + 2 new)",
+            "cargo test --manifest-path rust/Cargo.toml --locked -p lingxi-adapters --test r05_t06_operations → 27 passed / 0 failed, exit 0",
+            "cargo test --manifest-path rust/Cargo.toml --locked -p lingxi-service --test r05_t06_operations → 7 passed / 0 failed, exit 0 (C03 egress service leg included)",
+            "reviewer probe battery rerun (REVIEW-T06/probe-egress, CARGO_TARGET_DIR=/tmp/r05t06-fix-probe, --offline): 17/17 ok, bypass rows: 0 (was 13), exit 0",
+            "cargo fmt --manifest-path rust/Cargo.toml --all -- --check → exit 0; cargo clippy --manifest-path rust/Cargo.toml --workspace --all-targets --locked -- -D warnings → exit 0"
+          ],
+          "not_fixed": [
+            "R05-ENV-ALF-UNSIGNED-TEST-BINARY: ledger-registered environment item; no gate loosened, no test changed",
+            "LIVE provider verification stays BLOCKED_NOT_AUTHORIZED (RR-BLK-CREDENTIALS, R10 at latest)",
+            "F-02 (low, suggestion): working-tree manifest re-freeze including untracked files belongs to the terminal-tree ritual; a manifest cut mid-fix would be stale against this change",
+            "F-03 (low, suggestion): say argv voice prefix is reviewer-classified defensive-depth registration (no untrusted input reaches OperationService today); not mustFix, left to the owner noted in the review"
+          ],
+          "note": "Full workspace test + check-contracts/check-boundaries were NOT rerun by this fixer (targeted matrix covers the F-01 regression face; full five-gate rerun belongs to the terminal-tree re-acceptance). REVIEW-T06/ directory untouched (probe rerun used a /tmp target dir). Fixed egress.rs sha256 b52d1534624ccbb6b28c4ac3160362b8d3eb49981ef36053804e7c4f637e1e4c.",
+          "evidence_root": "artifacts/rust-tauri/R05/T06/fix-r1/"
+        }
+      ]
+    },
+    {
+      "task": "R05-T07",
+      "status": "READY_FOR_INDEPENDENT_REVIEW",
+      "executor": "EXECUTOR-R05-T07",
+      "name": "用量、trace及持久化（usage归一/台账migration v5/查询隔离/先提交后发布）",
+      "cases_total": 10,
+      "cases_pass": 10,
+      "cases_not_run": 0,
+      "acceptance_ledger": "docs/rust-tauri/R05/R05_ACCEPTANCE_LEDGER.json",
+      "deliverables": [
+        "docs/rust-tauri/R05/MODEL_USAGE_SEMANTICS.md",
+        "docs/rust-tauri/R05/R05_ACCEPTANCE_LEDGER.json",
+        "docs/rust-tauri/R05/PROGRESS_LEDGER.json",
+        "rust/crates/lingxi-kernel/src/usage.rs (ModelCallUsage/ReportedUsage/UsageProvenance/UsageFolder)",
+        "rust/crates/lingxi-kernel/src/ports.rs (ProviderTurnResult usage_report/served_protocol/transport_attempts + StoragePort record/query_model_call_usage)",
+        "rust/crates/lingxi-adapters/src/models/usage.rs (USAGE_MAPPINGS 公式表 + 严格解码 + decode_operation_usage)",
+        "rust/crates/lingxi-adapters/src/models/{anthropic_messages,google_generative_ai,openai_completions,openai_responses,openai_codex_responses,auxiliary,provider}.rs (五族usage归一+RunningTotal流式折叠+401重试计2物理请求)",
+        "rust/crates/lingxi-adapters/src/storage/{migrations,run_store}.rs (migration v5 model_call_usage + 台账读写/owner范围查询)",
+        "rust/crates/lingxi-service/src/runs.rs (driver台账写入: ledger先于completed事件提交)",
+        "rust/crates/lingxi-service/src/workermodel.rs (LedgerWorkerCallbackTrace: 回调先记账再回话)",
+        "rust/crates/lingxi-service/src/operations.rs (OperationUsageSink + LedgerOperationUsageSink: 操作面每dispatch一行)",
+        "rust/crates/lingxi-service/src/lib.rs (bootstrap接线: worker/operations台账sink)",
+        "rust/crates/lingxi-adapters/tests/r05_t07_usage_families.rs (12 tests)",
+        "rust/crates/lingxi-service/tests/r05_t07_usage_trace.rs (9 tests)",
+        "rust/crates/lingxi-service/tests/r05_t07_persistence.rs (4 tests)"
+      ],
+      "evidence_root": "artifacts/rust-tauri/R05/T07/ (R01 fix round: artifacts/rust-tauri/R05/T07/fix-r1/)",
+      "fix_rounds": [
+        {
+          "review": "REV-T07 R01 (artifacts/rust-tauri/R05/REVIEW-T07/R01_REVIEW.md, verdict CONDITIONAL_GO)",
+          "fixed": [
+            "F-01: anthropic/google流式usage片段违反数字契约时被if-let-Usage静默丢弃(违规零痕迹,最坏情形成品干净reported) → 两族accumulator新增usage_violation槽保留首个违规片段的原始JSON, finish splice将其并回缓冲体, 由同一严格解码器标记整个fact Invalid并点名违规字段(openai族raw-splice同型); 全仓grep确认同类路径仅此两处RunningTotal族(openai_completions/raw保留、openai_responses/终端对象raw重析, 均无此缺陷); 补anthropic(message_start负input半/message_delta负/浮/字符串/先合法后违规最坏情形)+google(usageMetadata负/浮/字符串/先合法后违规)共9条流式腿断言ReportedUsage::Invalid+detail点名字段",
+            "F-02: round-trip测试(the_ledger_round_trips_partial_and_invalid_states)补Estimated{basis}用例, 四态(partial/invalid/unknown/estimated)无损往返, 文档§10覆盖声明由真实测试支撑",
+            "F-03: worker台账失败腿由空引用(原'见C02链路'只测成功路径)改为真实注入测试: r05_t06_worker_model新增FailingTrace double(恒Err的WorkerCallbackTracePort)+c10_a_failing_usage_trace_refuses_the_callback_reply_never_answers_unaccounted, 真实链(stub+子进程worker)断言台账拒绝→worker收到ok=false/model_provider_refused/消息点名usage ledger、stub恰1次物理请求; real_worker_model签名泛化为Arc<dyn WorkerCallbackTracePort>"
+          ],
+          "evidence": "artifacts/rust-tauri/R05/T07/fix-r1/",
+          "gates": "定向: adapters families 14/14绿(exit 0, 含2条新增)、adapters全crate 22组全绿(exit 0)、service trio(persistence 4+worker 10+usage_trace 9)全绿(exit 0, worker含1条新增)、fmt --check exit 0、clippy --all-targets exit 0、check-contracts exit 0、check-boundaries exit 0。全workspace: 首跑(test-workspace-nofailfast.log)仅r04_t08_tool_matrix的terminal-snapshot-current-transcript一条PTY时序腿失败(与本次改动零代码路径重叠; 同测试单跑10/10绿, rerun-r04-t08-full.log), 复跑(test-workspace-nofailfast-rerun.log)105组全绿/1269 passed/0 failed/exit 0(含r04_t08与r00 LAN腿), 判定为负载下瞬时抖动而非回归。审查者探针原样复跑于修复树(probe-rerun-on-fix.log): P1/P2/P4全部Invalid+点名字段, P0合法流仍Reported, P3/P5/P6不变。",
+          "not_fixed_registered": [
+            "F-04/F-05/F-06为审查建议项(非mustFix), 本轮未修, 留待下轮裁决",
+            "R05-ENV-ALF-UNSIGNED-TEST-BINARY环境项与RR-BLK-CREDENTIALS(LIVE未授权, 最迟R10)按台账登记处理, 不改动门禁"
+          ]
+        }
+      ],
+      "notes": "10/10 PASS with executed evidence on the T07 terminal tree. 消费者同步: ProviderTurnResult新增3字段(usage_report/served_protocol/transport_attempts, of_ctx默认值保持旧行为)、ParsedChat改为2字段+usage()方法(r03/r04/r05既有测试已同步); StoragePort新增2方法(5个测试double+sessions双port已转发); anthropic/google流式usage语义按协议修正为RunningTotal(替换不求和,回退响亮,旧conflict-on-any-different行为被C04正确语义取代); T04-C10 openai不同usage=冲突的pinned行为保留。已知边界(登记于MODEL_USAGE_SEMANTICS.md §10): 崩溃窗口内的model call(started无completed)无usage行; 媒体任务状态轮询不记账; estimated状态无生产调用点(序列化就绪,round-trip已覆盖)。LIVE provider验证保持BLOCKED_NOT_AUTHORIZED(RR-BLK-CREDENTIALS, 最迟R10)。ALF环境项本窗口未触发(r00 suite全绿)。"
+    },
+    {
+      "task": "R05-T08",
+      "status": "READY_FOR_INDEPENDENT_REVIEW",
+      "executor": "EXECUTOR-R05-T08",
+      "name": "完整闭环、前序回归和正式交接（二进制闭环/阶段图/负向门禁/交付）",
+      "cases_total": 14,
+      "cases_pass": 14,
+      "cases_not_run": 0,
+      "acceptance_ledger": "docs/rust-tauri/R05/R05_ACCEPTANCE_LEDGER.json",
+      "deliverables": [
+        "rust/crates/lingxi-service/tests/r05_t08_closed_loop.rs (10 二进制测试: C01-C09/C12)",
+        "rust/crates/xtask/src/stage_maps/R05.json (18 场景 + 130 R00 镜像叶 + 7 命令)",
+        "rust/crates/xtask/src/main.rs + runner_identity.rs (R05 双处注册)",
+        "rust/crates/xtask/src/stage_map.rs (7 个 R05 镜像单测)",
+        "scripts/rust-tauri/r05_t08_stage_suites.sh (生产者: 18 套件+64 lib 钉, 91 C-ID + 130 叶案例)",
+        "docs/rust-tauri/R05/r05_stage_pins.tsv (82) / r05_stage_cids.tsv (159) / r05_leaf_case_map.tsv (130)",
+        "scripts/rust-tauri/r05_t08_negative_gate.sh + R05_NEGATIVE_GATE_REPORT.md (16/16 关断)",
+        "scripts/rust-tauri/r05_t08_generate_leaves.py (130 叶生成器, 台账驱动可复现)",
+        "docs/rust-tauri/R02/R02-T04_STORAGE_REGISTRY.json (v5 迁移补登, 指纹自校)",
+        "docs/rust-tauri/R05/{R05_TEST_MAP,R05_LIVE_VERIFICATION,R05_PERFORMANCE_RESULTS}.json + R05_BLOCKERS.md + R05_REPORT.md + R05_HANDOFF.json",
+        "artifacts/rust-tauri/R05/T08-E01/ (门禁/负向/清单证据根)"
+      ],
+      "evidence_root": "artifacts/rust-tauri/R05/T08-E01/ (verify-R05 overall PASS + verify-R05-attempt1-refused + verify-R05-attempt2-r02-registry + negative/)",
+      "gate_result": {
+        "command": "cargo run --manifest-path rust/Cargo.toml --locked -p xtask -- verify-stage R05 --evidence artifacts/rust-tauri/R05/T08-E01/verify-R05",
+        "overall": "PASS",
+        "exit": 0,
+        "commands": "7/7 PASS (workspace 30.2min 106组/1286 passed/0 failed; r05_stage_suites 82/82; fmt/clippy/contracts/boundaries; r04_regression_gate 60.7min 内嵌 R04→R03→R02 全 PASS)",
+        "scenarios": "18/18 PASS",
+        "leaves": "130/130 PASS",
+        "binding": "stable=true, testedSha c549ff654, dirty worktree per-file manifest 0b110d87…(36461 文件)"
+      },
+      "notes": "三次门禁尝试均如实归档：attempt1=130 叶未镜像被 R13-F01 前置硬拒（负向门禁抓到的注册缺口同类）；attempt2=唯一失败为嵌套 R02 storage_tx 的存储注册表缺 v5 登记（R05-T07 合法加表未同步 R02 注册表权威）→ 修复=注册表补登 v5（指纹按注册表 sha256-of-SQL 方法重算并以复现 v4 指纹自校）+ 脚本独立复跑全绿；attempt3=overall PASS。负向门禁另抓两处并修复：R05.json 漏 runner_identity 双处注册；生产者 FAILED 摘要双语序解析回归。r00 LAN 间歇停驻环境项在最终门禁清机窗口未触发（106 组全绿），此前两次窗口失败签名已登记（不放宽门禁、不改测试）。"
+    }
+  ],
+  "gates_terminal_state": {
+    "cargo_fmt": {
+      "exit": 0,
+      "log": "artifacts/rust-tauri/R05/T08-E01/gates-fmt.log"
+    },
+    "cargo_clippy": {
+      "exit": 0,
+      "log": "artifacts/rust-tauri/R05/T08-E01/gates-clippy.log"
+    },
+    "cargo_test_workspace_no_fail_fast": {
+      "exit": "0/101(两次窗口 1 失败=已登记 ALF 环境项签名)/最终门禁内 PASS",
+      "log": "artifacts/rust-tauri/R05/T08-E01/gates-test-workspace.log + -rerun.log + verify-R05/rust_test_workspace/stdout.log",
+      "note": "终门禁内 106 组 ok / 1286 passed / 0 failed（清机窗口；r00 LAN 腿通过）"
+    },
+    "xtask_check_contracts": {
+      "exit": 0,
+      "log": "artifacts/rust-tauri/R05/T08-E01/gates-check-contracts.log"
+    },
+    "xtask_check_boundaries": {
+      "exit": 0,
+      "log": "artifacts/rust-tauri/R05/T08-E01/gates-check-boundaries.log"
+    },
+    "verify_stage_r05": {
+      "overall": "PASS",
+      "log": "artifacts/rust-tauri/R05/T08-E01/verify-R05/verify-stage-result.json"
+    },
+    "verify_stage_r05_final_wfr2_1": {
+      "overall": "PASS",
+      "exit": 0,
+      "log": "artifacts/rust-tauri/R05/FINAL-WFR2-1/verify-R05/verify-stage-result.json",
+      "command": "cargo run --manifest-path rust/Cargo.toml --locked -p xtask -- verify-stage R05 --evidence artifacts/rust-tauri/R05/FINAL-WFR2-1/verify-R05",
+      "note": "2026-10-04T03:08:44–04:37:56Z 终验复跑（wall 89.2min，macOS arm64，toolchain 1.98.1）：7/7 命令 PASS、18/18 场景、130/130 R00 绑定叶（fail=0/blocked=0）；workspace 腿 106 组 ok / 1286 passed / 0 failed（r00 LAN 腿通过，ALF 环境项本窗口未触发）；内嵌 R04 回归 overall PASS；候选前后绑定 stable=true（digest 277ffa31…，per-file manifest sha256 1e463959…，37,541 文件）；testedSha c549ff654（dirty 工作树）。"
+    },
+    "negative_gate_16": {
+      "allRefused": true,
+      "controlsGreen": true,
+      "log": "artifacts/rust-tauri/R05/T08-E01/negative/case-results.json"
+    },
+    "note": "T08 终树五门禁+生产者+verify-stage R05(内嵌 R04→R03→R02 整链)全部真实通过；树绑定 working-tree-manifest.txt sha256 0b110d87…(36461 文件)。"
+  },
+  "environment_items": [
+    {
+      "id": "R05-ENV-ALF-UNSIGNED-TEST-BINARY",
+      "summary": "macOS Application Firewall holds inbound LAN flows to freshly relinked adhoc-signed test binaries (new metadata-hash filename = new per-app verdict). Symptom: TCP connect + write succeed at kernel level, application accept() never fires, client reads 0 bytes until the test's honest bounded stall panic.",
+      "affected": [
+        "r00_management_leaves (R00 suite LAN section; contains no R05 assertions)",
+        "workspace-level cargo test and verify-stage rust_test_workspace/r03_regression_gate on any tree whose dependency graph relinks that test binary (reproduced on the R05-T02 terminal tree: 1043 passed / 1 failed, same 192.168.3.5 stalled-write signature)"
+      ],
+      "decisive_evidence": "artifacts/rust-tauri/R05/T01/alf-investigation/ (zero-Lingxi-code probe zz_probe2 stalls identically; ALF log correlates every failing binary; baseline binary 812df2ee793b5dda passes via a historical user-granted Allow verdict)",
+      "not_a_code_regression": "all loopback requests in the failing test succeed including the same web-auth/login handler and a loopback request to the very same 0.0.0.0-bound server instance immediately before the stalled LAN request; the R05 diffs touch no bind/accept/NetworkMode path",
+      "remediation_requires_user": [
+        "click Allow on the ALF dialog for the test binary (recurs on every relink)",
+        "sudo /usr/libexec/ApplicationFirewall/socketfilterfw --add <test-binary> [--unblockapp <test-binary>]",
+        "temporarily disable the macOS firewall for the gate run",
+        "sign test binaries with a Developer ID identity (auto-allow covers validly signed apps)"
+      ],
+      "executor_self_unblock": "impossible: no passwordless sudo; kimi-cu service unavailable; osascript blocked on AX authorization",
+      "r04_precedent": "docs/rust-tauri/R04/R04-T05_REPORT.md and R04-T07_REPORT.md registered the same environment class"
+    }
+  ],
+  "followup_obligations_for_t03_plus": [
+    "R05-A15 full chain (modify + restart re-read on the real binary) — T08; T01-C02 covers the wiring slice only",
+    "Auxiliary-slot business call entries (27 aux_slot rows in MODEL_CALLSITE_MATRIX.json) — T06; T01-C07 proves independent resolution only",
+    "LIVE provider verification — BLOCKED_NOT_AUTHORIZED (RR-BLK-CREDENTIALS, resolve by R10 at latest); no real credentials were used anywhere in T01/T02",
+    "verify-stage R05 stage map + producers (rust/crates/xtask/src/stage_maps/R05.json) — T08",
+    "R05 negative-gate appendix C injections (16 items) — T08 scope; not executed in T01/T02",
+    "R05-ENV-ALF-UNSIGNED-TEST-BINARY remediation — requires user/GUI/sudo action before any gate involving the r00 suite can go fully green on relinked trees",
+    "kernel ports.rs legacy CredentialPort/CredentialHandle traits remain unimplemented by any production type (superseded by adapters ProviderCredentialPort); keep-or-remove decision deferred to a later stage",
+    "OAuthFlowTransport trait not introduced — the OAuth flow machines use their own no-redirect reqwest client, which satisfies the isolation intent; an independent OAuth login session surface is T03 scope",
+    "Media/worker business call entries through the credential service — T03/T06; their resolution has no alternate credential path by construction (the gateway exposes no material accessor)",
+    "OAuth revoke of a static-seeded provider is runtime-session-scoped by design (config re-seed restores ready on reload/restart); OAuth-store revocation is durable — both semantics documented in CREDENTIAL_FLOW_MATRIX.json and pinned by c11",
+    "Login-flow driving UI (device-code prompt / PKCE browser handoff) — later desktop stage; the flow machines and their management surface are T02-complete",
+    "Production streaming switch (anthropic/google/responses buffered today; SSE decoder + openai-completions/codex stream aggregation implemented and golden-pinned) — T04",
+    "Per-model context/output cap registration (anthropic max_tokens pinned at 16384 today) — T05/T07, registered in PROTOCOL_WIRE_MATRIX.json",
+    "Media/ASR 38 D12 leaves: wire-level facts registered in PROTOCOL_WIRE_MATRIX.json; Rust protocol adaptation + async job semantics — T06 (rule R5)",
+    "REV-T03 R01 N-02: write-tool results carry file:// absolute workspace paths to the model payload (faithful resource_refs upload, correct as-is; whether to expose absolute paths to the model is a product-policy decision) — adjudicate when T06 lands resource references",
+    "R05-T07 usage ledger: a model call killed mid-flight (started event without a completed event) leaves no usage row — accounting granularity is resolved requests; an intent-before-dispatch ledger phase (InvocationJournal-style) is a registered later-stage option, not an R05 obligation (documented in MODEL_USAGE_SEMANTICS.md §5/§10)"
+  ]
+}

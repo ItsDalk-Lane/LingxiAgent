@@ -1,0 +1,11 @@
+   Compiling lingxi-service v0.0.0 (/private/tmp/lingxi-r03-g07-neg-P5Y0n1/rust/crates/lingxi-service)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 1.78s
+  Executable tests/admission_dedup_adversarial.rs (/tmp/rust-target-r03-g07-neg/debug/deps/admission_dedup_adversarial-874804375557d917)
+  Executable tests/admission_dedup_consistency.rs (/tmp/rust-target-r03-g07-neg/debug/deps/admission_dedup_consistency-9a04c825c923e96f)
+  Executable tests/background_steering.rs (/tmp/rust-target-r03-g07-neg/debug/deps/background_steering-75b51d3f2c8d4f81)
+  Executable tests/cancel_link_inheritance.rs (/tmp/rust-target-r03-g07-neg/debug/deps/cancel_link_inheritance-7811d07e892d1159)
+  Executable tests/cancel_terminal_race.rs (/tmp/rust-target-r03-g07-neg/debug/deps/cancel_terminal_race-7862bed29c7d76a7)
+  Executable tests/input_budget_refusal.rs (/tmp/rust-target-r03-g07-neg/debug/deps/input_budget_refusal-65e385d9a1a49ac1)
+  Executable tests/input_payload_fidelity.rs (/tmp/rust-target-r03-g07-neg/debug/deps/input_payload_fidelity-6d468f34bc527a37)
+  Executable tests/subagent_closeout.rs (/tmp/rust-target-r03-g07-neg/debug/deps/subagent_closeout-457ac9f82fee79f3)
+  Executable tests/tool_receipt_unknown.rs (/tmp/rust-target-r03-g07-neg/debug/deps/tool_receipt_unknown-74fc5e83e2a71fc1)

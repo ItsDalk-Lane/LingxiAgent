@@ -1,0 +1,134 @@
+{
+  "family": "google-generative-ai",
+  "case": "forward",
+  "route": {"provider": "google-golden", "model": "gemini-golden-2.5"},
+  "input": {
+    "submission": "总结一下 release 笔记并给出风险点",
+    "system_prompt": "You are the golden harness persona.",
+    "tools": [
+      {
+        "target": "tool:first-party:read",
+        "wire_name": "read",
+        "description": "Read a file 读取文件",
+        "schema": {
+          "type": "object",
+          "properties": {"path": {"type": "string", "description": "absolute path 绝对路径"}},
+          "required": ["path"],
+          "additionalProperties": false
+        }
+      },
+      {
+        "target": "tool:plugin:deep-research",
+        "wire_name": "deep_research_tool__cross_language_long_name____exactly_64_chars",
+        "description": "Deep research 深度研究 with a deliberately long wire name",
+        "schema": {
+          "type": "object",
+          "properties": {
+            "query": {
+              "type": "object",
+              "description": "嵌套查询 deeply nested",
+              "properties": {
+                "filters": {
+                  "type": "object",
+                  "properties": {
+                    "tags": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "name": {"type": "string", "enum": ["alpha", "βeta", "文件", "ガンマ"]},
+                          "weight": {"type": "number"}
+                        },
+                        "required": ["name"]
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "required": ["query"]
+        }
+      }
+    ],
+    "prior": []
+  },
+  "expected_request": {
+    "systemInstruction": {"parts": [{"text": "You are the golden harness persona."}]},
+    "contents": [
+      {"role": "user", "parts": [{"text": "总结一下 release 笔记并给出风险点"}]}
+    ],
+    "tools": [
+      {
+        "functionDeclarations": [
+          {
+            "name": "read",
+            "description": "Read a file 读取文件",
+            "parametersJsonSchema": {
+              "type": "object",
+              "properties": {"path": {"type": "string", "description": "absolute path 绝对路径"}},
+              "required": ["path"],
+              "additionalProperties": false
+            }
+          },
+          {
+            "name": "deep_research_tool__cross_language_long_name____exactly_64_chars",
+            "description": "Deep research 深度研究 with a deliberately long wire name",
+            "parametersJsonSchema": {
+              "type": "object",
+              "properties": {
+                "query": {
+                  "type": "object",
+                  "description": "嵌套查询 deeply nested",
+                  "properties": {
+                    "filters": {
+                      "type": "object",
+                      "properties": {
+                        "tags": {
+                          "type": "array",
+                          "items": {
+                            "type": "object",
+                            "properties": {
+                              "name": {"type": "string", "enum": ["alpha", "βeta", "文件", "ガンマ"]},
+                              "weight": {"type": "number"}
+                            },
+                            "required": ["name"]
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              },
+              "required": ["query"]
+            }
+          }
+        ]
+      }
+    ]
+  },
+  "response_wire": {
+    "candidates": [
+      {
+        "content": {
+          "role": "model",
+          "parts": [
+            {"text": "已总结", "thought": true, "thoughtSignature": "sig-goog-1"},
+            {"text": "Done 完成。"}
+          ]
+        },
+        "finishReason": "STOP"
+      }
+    ],
+    "usageMetadata": {"promptTokenCount": 88, "candidatesTokenCount": 19, "thoughtsTokenCount": 555}
+  },
+  "expected_turn": {
+    "kind": "final",
+    "content": [
+      {"reasoning": "已总结"},
+      {"opaque": {"provider": "google-generative-ai", "data": {"type": "thoughtSignature", "signature": "sig-goog-1"}}},
+      {"text": "Done 完成。"}
+    ],
+    "usage": {"input_tokens": 88, "output_tokens": 19}
+  }
+}

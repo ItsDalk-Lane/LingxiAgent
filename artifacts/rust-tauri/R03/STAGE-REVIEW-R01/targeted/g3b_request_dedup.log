@@ -1,0 +1,12 @@
+   Compiling lingxi-service v0.0.0 (/Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-service)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.67s
+     Running tests/request_dedup.rs (rust/target/debug/deps/request_dedup-97a4d9c9d9fef94d)
+
+running 4 tests
+test same_request_id_same_content_replays_without_new_execution ... ok
+test r03_a08_same_request_id_different_content_is_rejected_as_conflict ... ok
+test request_id_namespace_is_scoped_to_principal_and_session ... ok
+test invalid_ids_are_refused_and_plain_submissions_are_undeduplicated ... ok
+
+test result: ok. 4 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.20s
+

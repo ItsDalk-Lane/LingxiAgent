@@ -1,0 +1,66 @@
+warning: associated function `sse` is never used
+  --> src/harness.rs:46:12
+   |
+42 | impl StubResponse {
+   | ----------------- associated function in this implementation
+...
+46 |     pub fn sse(body: String) -> Self {
+   |            ^^^
+   |
+   = note: `#[warn(dead_code)]` (part of `#[warn(unused)]`) on by default
+
+warning: fields `path` and `headers` are never read
+  --> src/harness.rs:53:9
+   |
+52 | pub struct RecordedRequest {
+   |            --------------- fields in this struct
+53 |     pub path: String,
+   |         ^^^^
+54 |     pub headers: Vec<(String, String)>,
+   |         ^^^^^^^
+   |
+   = note: `RecordedRequest` has derived impls for the traits `Clone` and `Debug`, but these are intentionally ignored during dead code analysis
+
+warning: method `header` is never used
+  --> src/harness.rs:59:12
+   |
+58 | impl RecordedRequest {
+   | -------------------- method in this implementation
+59 |     pub fn header(&self, name: &str) -> Option<&str> {
+   |            ^^^^^^
+
+warning: field `hits` is never read
+  --> src/harness.rs:66:5
+   |
+64 | pub struct StubServer {
+   |            ---------- field in this struct
+65 |     pub addr: SocketAddr,
+66 |     hits: Arc<AtomicUsize>,
+   |     ^^^^
+
+warning: method `hits` is never used
+   --> src/harness.rs:128:12
+    |
+ 72 | impl StubServer {
+    | --------------- method in this implementation
+...
+128 |     pub fn hits(&self) -> usize {
+    |            ^^^^
+
+warning: `r05t03-review-scratch` (bin "r05t03-review-scratch" test) generated 5 warnings
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.09s
+     Running unittests src/main.rs (target/debug/deps/r05t03_review_scratch-0c3f0c0c7dc8825c)
+
+running 8 tests
+test c06_mixed_content_buffered_keeps_every_block_in_order_with_tools ... ok
+C10 openai-responses text-first re-render order: ["reasoning", "message:answer first"]
+test c06_streamed_interleaved_tool_fragments_and_text_pair_independently ... ok
+test c10_opaque_roundtrip_positions_and_cross_family_isolation ... ok
+test c03_reversed_completion_order_pairs_each_result_with_its_own_call_id ... ok
+test c07_real_missing_file_failure_matches_wire_and_journal ... ok
+test c04_same_provider_call_id_in_two_sessions_stays_isolated ... ok
+test c12_retry_carries_real_confirmed_outcomes_cross_checked_with_journal ... ok
+test c05_runtime_nonce_rides_the_next_request_and_follows_changes ... ok
+
+test result: ok. 8 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.24s
+

@@ -1,0 +1,11 @@
+   Compiling lingxi-service v0.0.0 (/Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-service)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 1.28s
+     Running unittests src/lib.rs (rust/target/debug/deps/lingxi_service-859f4a65b7026329)
+
+running 3 tests
+test management::tests::persisted_network_read_is_strict_and_read_only ... ok
+test management::tests::web_cookie_expires_and_requires_original_transport ... ok
+test management::tests::password_scrypt_matches_node_and_upgrades_legacy_record ... ok
+
+test result: ok. 3 passed; 0 failed; 0 ignored; 0 measured; 167 filtered out; finished in 4.90s
+

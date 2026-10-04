@@ -1,0 +1,35 @@
+== run 2026-09-30T11:49:39+0800 (pid 85351) ==
+== R02-T08 / R02-A15 full-chain smoke (toolchain 1.98.1, target /tmp/rust-target-r03-g07-neg) ==
+== building lingxi-service (--locked, offline) ==
+PASS build
+== boot 1: start, authenticate, write, subscribe ==
+PASS boot1-ready addr=127.0.0.1:50367 home=/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T//lingxi-r02t08-a15-home.Ker1LX
+PASS health-200-minimal ({"status":"ok","serverKind":"lingxi-service","serverVersion":"0.0.0","wireProtocolMin":1,"wireProtocolMax":1,"dataEpoch")
+PASS unauthenticated-me-401
+PASS loopback-token-me-200 (principalId=principal_local_user_user_local_no_studio_no_nod)
+PASS execute-write-1-committed (runId=run_000001a0f06eab94_000001)
+PASS ws-subscribed-with-snapshot-boundary (snapshotSeq=2)
+PASS execute-write-2-committed (runId=run_000001a0f06eab98_000002)
+PASS ws-live-event-after-write (seq=3 eventId=run_000001a0f06eab…)
+PASS http-events-page-contiguous (head=4 count=4)
+PASS ws-future-cursor-explicit-reject (invalid_message/future_cursor close)
+PASS phase-boot-write-subscribe-complete (head=4)
+PASS phase1 (health/auth-negative/auth/write/subscribe/live-event/read-your-writes/future-cursor)
+== close 1: SIGTERM graceful shutdown ==
+PASS close1-exit-0 (service exit code 0)
+PASS close1-no-leftover-processes (pgrep -f 'lingxi-service --home <synthetic>' -> empty)
+PASS close1-port-closed (health probe on 127.0.0.1:50367 refused)
+== boot 2: restart on the same home, read back ==
+PASS boot2-ready addr=127.0.0.1:50378
+PASS pre-restart-token-rejected-401
+PASS post-restart-new-token-me-200
+PASS post-restart-session-readback (runCount=2)
+PASS post-restart-events-preserved (head=4 count=4)
+PASS post-restart-health-200
+PASS phase2 (old-token-rejected/new-token auth / session readback / events preserved / health)
+== close 2: SIGTERM graceful shutdown ==
+PASS close2-exit-0 (service exit code 0)
+PASS close2-no-leftover-processes (pgrep -f 'lingxi-service --home <synthetic>' -> empty)
+PASS close2-port-closed (health probe on 127.0.0.1:50378 refused)
+PASS instance-record-removed (single-writer record cleaned on stop)
+== R02-T08 / R02-A15 full chain: ALL GREEN ==

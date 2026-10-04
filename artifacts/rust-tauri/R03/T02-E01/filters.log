@@ -1,0 +1,14 @@
+[quotas] cargo test -p lingxi-service --lib -- quotas => test result: ok. 6 passed; 0 failed; 0 ignored; 0 measured; 194 filtered out; finished in 0.11s
+[session_supervisor] cargo test -p lingxi-service --lib -- session_supervisor => test result: ok. 5 passed; 0 failed; 0 ignored; 0 measured; 195 filtered out; finished in 0.00s
+[session_serialization] cargo test -p lingxi-service --test session_serialization => test result: ok. 5 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.72s
+[sessions_internal] cargo test -p lingxi-service --lib -- sessions:: => test result: ok. 8 passed; 0 failed; 0 ignored; 0 measured; 192 filtered out; finished in 0.01s
+[execute_concurrency] cargo test -p lingxi-service --test execute_concurrency => test result: ok. 3 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.26s
+[run_lifecycle] cargo test -p lingxi-service --test run_lifecycle => test result: ok. 12 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.47s
+[event_subscription] cargo test -p lingxi-service --test event_subscription => test result: ok. 12 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 2.85s
+[service_persistence] cargo test -p lingxi-service --test service_persistence => test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.15s
+[kernel] cargo test -p lingxi-kernel --lib => test result: ok. 22 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.01s
+[finalize_property] cargo test -p lingxi-adapters --test run_finalize_property => test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.18s
+[storage_tx] cargo test -p lingxi-adapters --test storage_transactions => test result: ok. 7 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.24s
+[run_id_alloc] cargo test -p lingxi-adapters --test run_id_allocator => test result: ok. 5 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.04s
+[event_store] cargo test -p lingxi-adapters --test event_store_reads => test result: ok. 3 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.01s
+[backup] cargo test -p lingxi-adapters --test backup_restore => test result: ok. 11 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.20s

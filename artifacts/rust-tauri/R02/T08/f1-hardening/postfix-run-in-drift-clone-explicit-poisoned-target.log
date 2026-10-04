@@ -1,0 +1,5 @@
+== toolchain: rustup run 1.98.1 (rustc 1.98.1 (48a229cea 2026-09-01))
+== [1/2] contracts/generated (lingxi-protocol-gen --check)
+GENERATED DRIFT DETECTED (1 problems):
+  - stale file on disk: ts/protocol.ts
+regenerate with: cargo run -p lingxi-protocol --bin lingxi-protocol-gen

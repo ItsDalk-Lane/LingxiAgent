@@ -1,0 +1,19 @@
+   Compiling lingxi-service v0.0.0 (/Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-service)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 1.08s
+     Running tests/r04_t06_sandbox.rs (rust/target/debug/deps/r04_t06_sandbox-2315168487dcb1f8)
+
+running 10 tests
+test r04_a11_missing_helper_at_composition_is_a_loud_refusal ... ok
+test seatbelt_helper_trust_and_capabilities_are_recorded ... ok
+test r04_a11_unsupported_backend_refuses_through_the_real_chain ... ok
+test adversarial_policy_injection_is_refused_at_both_layers ... ok
+test adversarial_tty_terminals_are_honestly_not_claimed_as_contained ... ok
+test r04_a12_environment_whitelist_holds_through_the_sandbox_wrapper ... ok
+test r04_a11_replaced_helper_is_refused_and_the_impostor_never_runs ... ok
+test r04_a12_network_isolation_against_the_registered_loopback_service ... ok
+test r04_a12_filesystem_write_isolation_holds_with_real_sentinels ... ok
+test r04_a12_sandboxed_process_tree_still_honors_the_cancellation_chain ... ok
+
+test result: ok. 10 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 2.36s
+
+exit=0

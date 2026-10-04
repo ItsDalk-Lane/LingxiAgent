@@ -1,0 +1,37 @@
+
+ RUN  v4.1.10 /Users/study_superior/Desktop/Code/LingxiAgent
+
+ ❯ desktop/src/react/settings/__tests__/R02AccessCredentialLeaf.test.tsx (6 tests | 1 failed) 359ms
+     × does not turn a failed access-summary request into an empty device list 18ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  desktop/src/react/settings/__tests__/R02AccessCredentialLeaf.test.tsx > R02/R00 AccessTab credential UI branches > does not turn a failed access-summary request into an empty device list
+AssertionError: expected <div class="_access-empty_4045f0"></div> to be null
+
+- Expected:
+null
+
++ Received:
+<div
+  class="_access-empty_4045f0"
+>
+  settings.access.noDevices
+</div>
+
+ ❯ desktop/src/react/settings/__tests__/R02AccessCredentialLeaf.test.tsx:93:61
+     91|     render(<AccessTab />);
+     92|     await waitFor(() => expect(toast).toHaveBeenCalledWith(expect.stri…
+     93|     expect(screen.queryByText('settings.access.noDevices')).toBeNull();
+       |                                                             ^
+     94|     record('access-summary-error-is-not-empty', {
+     95|       failureToast: true, emptyDeviceProjection: false,
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  1 failed | 5 passed (6)
+   Start at  15:09:12
+   Duration  939ms (transform 164ms, setup 18ms, import 255ms, tests 359ms, environment 245ms)
+

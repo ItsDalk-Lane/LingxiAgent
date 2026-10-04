@@ -1,0 +1,1 @@
+note: the first fmt --check run (pre-normalization) failed on the new T04 test files; cargo fmt normalized, rerun clean (same semantics, whitespace only).

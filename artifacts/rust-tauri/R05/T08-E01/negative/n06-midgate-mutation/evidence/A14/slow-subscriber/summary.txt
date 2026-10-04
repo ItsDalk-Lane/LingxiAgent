@@ -1,0 +1,16 @@
+== run 2026-10-04T01:46:32+0800 (pid 13722) ==
+== R02-T07 / R02-A14 slow-subscriber storm (toolchain 1.98.1, target /Users/study_superior/.cache/lingxi-r05-neg-target) ==
+== building lingxi-service (--locked, offline) ==
+PASS build
+== starting service (event-subscriber-queue=4, max-ws-connections=8) ==
+PASS service ready at 127.0.0.1:57824 (pid 13741)
+== S1/S2: subscriber A stops reading; B keeps reading; writers commit key events until the subscriber-queue cap is reached ==
+PASS S1: all 1000 concurrent executes were ANSWERED (250x200 + 750x409(session_busy retryable)) — 409 is the R03-T02 frozen busy-gate refusal (served, retryable; not a stall, not a fake success; zero 5xx/timeout/hang); counts read from storm-results.json
+PASS S1: healthy subscriber B's merged view equals the durable head (no silent loss)
+PASS S2: slow subscriber A got the EXPLICIT snapshot_required (reason=slow_consumer) and resubscribed
+== S3: memory bound (real RSS samples during the storm) ==
+PASS S3: RSS stayed bounded during the sustained storm (see rss-samples.csv)
+== S4: server detach line with real queue stats ==
+PASS S4: server logged the detach with queue_capacity=4 and the slow_consumer reason
+== stopping service (graceful; R9-F02: no silent handle retirement; R10-F03: four-state ownership probe) ==
+== R02-A14 evidence complete ==

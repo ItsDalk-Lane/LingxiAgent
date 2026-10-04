@@ -1,0 +1,15 @@
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.11s
+     Running tests/r05_t06_operations.rs (rust/target/debug/deps/r05_t06_operations-b91a57f7f8c045db)
+
+running 7 tests
+test c12_empty_speech_text_refuses_before_any_request ... ok
+test c03_url_products_download_guarded_and_ghost_products_refuse ... ok
+test c12_video_job_acceptance_is_not_completion_and_cancel_is_local_only ... ok
+test c12_dashscope_pending_then_completed_via_registered_product ... ok
+test c02_media_providers_in_one_task_never_cross ... ok
+test c03_reference_and_audio_reads_are_authorized_and_bounded ... ok
+test c12_a_dropped_inflight_call_registers_no_product ... ok
+
+test result: ok. 7 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.42s
+
+EXIT=0

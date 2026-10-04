@@ -1,0 +1,186 @@
+{
+  "candidateSourceBinding": {
+    "after": {
+      "atUnixMs": 1791051497119,
+      "digestSha256": "975087671bcfb4f25a01a6687428b4059547a4f70fad00ac8ce7782f9af52ed9",
+      "fileCount": 36456,
+      "manifestPath": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/T08-E01/verify-R05/candidate-source-after.json",
+      "manifestSha256": "c0dafef26963d7243a5c9490a6b90b8f9bd544bb03c5d6a7d1f265be9abf6c32"
+    },
+    "afterError": null,
+    "before": {
+      "atUnixMs": 1791051437040,
+      "digestSha256": "975087671bcfb4f25a01a6687428b4059547a4f70fad00ac8ce7782f9af52ed9",
+      "fileCount": 36456,
+      "manifestPath": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/T08-E01/verify-R05/candidate-source-before.json",
+      "manifestSha256": "c0dafef26963d7243a5c9490a6b90b8f9bd544bb03c5d6a7d1f265be9abf6c32"
+    },
+    "checkpointAfterEveryCommand": [],
+    "excluded": {
+      "evidenceOutputPathBytesHex": "6172746966616374732f727573742d74617572692f5230352f5430382d4530312f7665726966792d523035",
+      "evidenceOutputRelativePath": "artifacts/rust-tauri/R05/T08-E01/verify-R05",
+      "policy": "Only this invocation's --evidence output subtree is excluded; Git-ignored paths are outside the candidate source set. Tracked paths and non-ignored untracked paths elsewhere are included."
+    },
+    "finalChangedPathBytesHex": [],
+    "headAtEndError": null,
+    "schema": "lingxi-candidate-source-binding-v1",
+    "stable": true,
+    "testedShaAtEnd": "c549ff654508ab951e2cf39cf9d309fc9c6b8656"
+  },
+  "commandOutcomesIncomplete": true,
+  "commands": [],
+  "finishedAtUnixMs": 1791051498394,
+  "gateAbort": {
+    "reason": "stage map for R05 drops 130 REQUIRED_SUPPLEMENTAL leaf scenario(s) that the R00 acceptance ledger binds to this stage: [\"R00-T02-LA-00A769DD0FA3\", \"R00-T02-LA-03E1121574A1\", \"R00-T02-LA-057B048D6C07\", \"R00-T02-LA-05A57775857D\", \"R00-T02-LA-08EB520C2ECC\", \"R00-T02-LA-0949F828BEA3\", \"R00-T02-LA-0BD9E0FFDCF8\", \"R00-T02-LA-0DFFAB20A40B\", \"R00-T02-LA-0E9326840E66\", \"R00-T02-LA-0F28429F329E\", \"R00-T02-LA-16CEB6D12A6A\", \"R00-T02-LA-17702A7B3335\", \"R00-T02-LA-184E03F012D5\", \"R00-T02-LA-1850FE23DD5D\", \"R00-T02-LA-1B65B0793D67\", \"R00-T02-LA-1EA9E4819E27\", \"R00-T02-LA-2045462C0D98\", \"R00-T02-LA-2097E172B42B\", \"R00-T02-LA-22A8DCD792BE\", \"R00-T02-LA-27A9F02FCD58\", \"R00-T02-LA-2E137D5F14B9\", \"R00-T02-LA-2EDB69DA3AE2\", \"R00-T02-LA-3645002066F0\", \"R00-T02-LA-385F593D5622\", \"R00-T02-LA-39733312E5F4\", \"R00-T02-LA-3D8337A8088F\", \"R00-T02-LA-3FE814BB7C56\", \"R00-T02-LA-40DF54BC8F29\", \"R00-T02-LA-419F19D7AA64\", \"R00-T02-LA-43DDCE21A45C\", \"R00-T02-LA-44DC28F20C8A\", \"R00-T02-LA-4629FFC0E72A\", \"R00-T02-LA-477D944DF19B\", \"R00-T02-LA-4D1720CCD10D\", \"R00-T02-LA-504F95068625\", \"R00-T02-LA-51DD4E37E5F4\", \"R00-T02-LA-565BE3400DAC\", \"R00-T02-LA-595235FD7113\", \"R00-T02-LA-5BEFE4A3A61C\", \"R00-T02-LA-5D32356CD275\", \"R00-T02-LA-62106F57675C\", \"R00-T02-LA-668EEC15C958\", \"R00-T02-LA-66FFBF09DEA3\", \"R00-T02-LA-6ADB2A53988A\", \"R00-T02-LA-6C23FF248130\", \"R00-T02-LA-6DA6634C4D7B\", \"R00-T02-LA-71738E50BACA\", \"R00-T02-LA-75DFB815753B\", \"R00-T02-LA-766F5F3C47C3\", \"R00-T02-LA-77812804951F\", \"R00-T02-LA-794DD254406F\", \"R00-T02-LA-7ADA0D0848E0\", \"R00-T02-LA-7BD0C2A8039E\", \"R00-T02-LA-7BFFEC690DC3\", \"R00-T02-LA-7D969CDBF21C\", \"R00-T02-LA-7EC5F0F2FF7C\", \"R00-T02-LA-8060BE8AA02C\", \"R00-T02-LA-80DB4026AF13\", \"R00-T02-LA-834034527694\", \"R00-T02-LA-835CCD55115A\", \"R00-T02-LA-85BCDAD6E3AE\", \"R00-T02-LA-885BA80F4F96\", \"R00-T02-LA-89707E479335\", \"R00-T02-LA-8E933C4BE7D0\", \"R00-T02-LA-8F775B4AA30F\", \"R00-T02-LA-9194C0F0D909\", \"R00-T02-LA-9569C0C0C4D8\", \"R00-T02-LA-96071267A5C5\", \"R00-T02-LA-96CA6DBF8317\", \"R00-T02-LA-97EC58F3099F\", \"R00-T02-LA-9871F51BE25B\", \"R00-T02-LA-990A225D8A35\", \"R00-T02-LA-99D6C304D697\", \"R00-T02-LA-9B809055BF01\", \"R00-T02-LA-9FBBC275BD34\", \"R00-T02-LA-A1F51A12AD61\", \"R00-T02-LA-A48BCE9716A7\", \"R00-T02-LA-A524D3723654\", \"R00-T02-LA-A5B2F5BAD27E\", \"R00-T02-LA-A86068D93F1D\", \"R00-T02-LA-A9ACB7418FC4\", \"R00-T02-LA-AB2CF6B28D08\", \"R00-T02-LA-AB6545B18E22\", \"R00-T02-LA-ABAC28922F7A\", \"R00-T02-LA-AC352BFA3D82\", \"R00-T02-LA-AF4A3588D5DA\", \"R00-T02-LA-AFCCC4FB7DBA\", \"R00-T02-LA-AFDC77ECAE8B\", \"R00-T02-LA-B30DA03C8576\", \"R00-T02-LA-B70FCDCAC1ED\", \"R00-T02-LA-BA4BDB7F7338\", \"R00-T02-LA-BABF0EBA1DE2\", \"R00-T02-LA-BFD9531DEA41\", \"R00-T02-LA-C3CAB2E8B298\", \"R00-T02-LA-C4EFBA7711E1\", \"R00-T02-LA-C7D757226915\", \"R00-T02-LA-CA0BF9A7AEA9\", \"R00-T02-LA-CABCB5355784\", \"R00-T02-LA-CC33172F1B57\", \"R00-T02-LA-CC8E90E00CB6\", \"R00-T02-LA-CCD6BA30F9ED\", \"R00-T02-LA-CFACFCAD88EC\", \"R00-T02-LA-CFEC64F68DDE\", \"R00-T02-LA-D50161CE274A\", \"R00-T02-LA-D61616CAF15F\", \"R00-T02-LA-D656CA656A89\", \"R00-T02-LA-D672EB55CD31\", \"R00-T02-LA-D79C2E204AFB\", \"R00-T02-LA-D86616980926\", \"R00-T02-LA-DA74F52F18A0\", \"R00-T02-LA-DBBDA23AB24F\", \"R00-T02-LA-DE0309EF3F56\", \"R00-T02-LA-DEDBD68525B0\", \"R00-T02-LA-E06C7DDB93D2\", \"R00-T02-LA-E80885395AE1\", \"R00-T02-LA-EB074679FAE5\", \"R00-T02-LA-ECC851003BBF\", \"R00-T02-LA-ED13EB6D0FA6\", \"R00-T02-LA-F1491D612E5D\", \"R00-T02-LA-F6C12F9E54F6\", \"R00-T02-LA-F92121640419\", \"R00-T02-LA-F9EA8D71EE92\", \"R00-T02-LA-FA8EA4339EFF\", \"R00-T02-LA-FBB9392CF926\", \"R00-T02-LA-FBCFA99A89A2\", \"R00-T02-LA-FBF90A1BB572\", \"R00-T02-LA-FC80B6C4FBE4\", \"R00-T02-LA-FE1D56A67D39\", \"R00-T02-LA-FE9588171A23\", \"R00-T02-LA-FF3AD97F8429\"] — required leaves may not be filtered out of the stage gate (R13-F01)",
+    "status": "FAIL"
+  },
+  "overall": "FAIL",
+  "resultVersion": "lingxi.xtask.verify-stage.v1",
+  "runnerSourceBinding": {
+    "after": {
+      "compiledSourceFiles": [
+        {
+          "compiledAndDiskSha256": "30bd54247412030bb750b3bcf86b3a185672507eafb2cafc001256a230e78c28",
+          "path": "rust/crates/xtask/src/main.rs"
+        },
+        {
+          "compiledAndDiskSha256": "c50440de9b01cb4bfbf9748df54d8c65bbc3e9b6fb8c5df9cabbf612a3d35dfe",
+          "path": "rust/crates/xtask/src/verify.rs"
+        },
+        {
+          "compiledAndDiskSha256": "1660c018af79396832d760b6c53d7bedfbe024a1dbc4c01eb1dc75ec4ff53ec4",
+          "path": "rust/crates/xtask/src/stage_map.rs"
+        },
+        {
+          "compiledAndDiskSha256": "fb90af8ed20c651bc90e63226e975d8c1f2e95e3dbc0cdd881c25533988daf05",
+          "path": "rust/crates/xtask/src/candidate.rs"
+        },
+        {
+          "compiledAndDiskSha256": "8cf07fecee891e9ced4353b5e6e12cc65f9f56518c1022ff9527fd5777587639",
+          "path": "rust/crates/xtask/src/runner_identity.rs"
+        },
+        {
+          "compiledAndDiskSha256": "c2781009285dd989a5ee9cd092a95b2f6d0de615f84a46edbf7de628915bd1c2",
+          "path": "rust/crates/xtask/src/stage_maps/R02.json"
+        },
+        {
+          "compiledAndDiskSha256": "6dd02d8897e5f915444cc0fc6a2178ab0fc080e45346ce5ae4039f81bbe105ea",
+          "path": "rust/crates/xtask/src/stage_maps/R03.json"
+        },
+        {
+          "compiledAndDiskSha256": "35888cd868f067f8f87c15a9410217b30040db29866e7e439194cf5e716cae86",
+          "path": "rust/crates/xtask/src/stage_maps/R04.json"
+        },
+        {
+          "compiledAndDiskSha256": "d867c9a0d8e68d415ebbf439643778314d840255f8fe202797df1509ea54e482",
+          "path": "rust/crates/xtask/src/stage_maps/R05.json"
+        },
+        {
+          "compiledAndDiskSha256": "51edb1d897d4fe653e39bc0d92dd3ac7ec2b87bc00a1b9c8433624c196edc776",
+          "path": "rust/crates/xtask/Cargo.toml"
+        },
+        {
+          "compiledAndDiskSha256": "cec902952a04a6bda6296a0f406f12d59ccdb286c13a99282f1aa808751f1096",
+          "path": "rust/Cargo.toml"
+        },
+        {
+          "compiledAndDiskSha256": "eec3410410647a7d39f25371e73dda3ecfd5e7c10359090fff11e83053e11c37",
+          "path": "rust-toolchain.toml"
+        }
+      ],
+      "note": "The executable's embedded implementation and R02 stage map exactly match current disk bytes before any registered command runs.",
+      "schema": "lingxi-xtask-runner-source-v1",
+      "sourceInventory": [
+        "candidate.rs",
+        "candidate/tests.rs",
+        "main.rs",
+        "runner_identity.rs",
+        "stage_map.rs",
+        "stage_maps/R02.json",
+        "stage_maps/R03.json",
+        "stage_maps/R04.json",
+        "stage_maps/R05.json",
+        "verify.rs",
+        "verify/runner_tests.rs"
+      ],
+      "status": "PASS"
+    },
+    "afterError": null,
+    "before": {
+      "compiledSourceFiles": [
+        {
+          "compiledAndDiskSha256": "30bd54247412030bb750b3bcf86b3a185672507eafb2cafc001256a230e78c28",
+          "path": "rust/crates/xtask/src/main.rs"
+        },
+        {
+          "compiledAndDiskSha256": "c50440de9b01cb4bfbf9748df54d8c65bbc3e9b6fb8c5df9cabbf612a3d35dfe",
+          "path": "rust/crates/xtask/src/verify.rs"
+        },
+        {
+          "compiledAndDiskSha256": "1660c018af79396832d760b6c53d7bedfbe024a1dbc4c01eb1dc75ec4ff53ec4",
+          "path": "rust/crates/xtask/src/stage_map.rs"
+        },
+        {
+          "compiledAndDiskSha256": "fb90af8ed20c651bc90e63226e975d8c1f2e95e3dbc0cdd881c25533988daf05",
+          "path": "rust/crates/xtask/src/candidate.rs"
+        },
+        {
+          "compiledAndDiskSha256": "8cf07fecee891e9ced4353b5e6e12cc65f9f56518c1022ff9527fd5777587639",
+          "path": "rust/crates/xtask/src/runner_identity.rs"
+        },
+        {
+          "compiledAndDiskSha256": "c2781009285dd989a5ee9cd092a95b2f6d0de615f84a46edbf7de628915bd1c2",
+          "path": "rust/crates/xtask/src/stage_maps/R02.json"
+        },
+        {
+          "compiledAndDiskSha256": "6dd02d8897e5f915444cc0fc6a2178ab0fc080e45346ce5ae4039f81bbe105ea",
+          "path": "rust/crates/xtask/src/stage_maps/R03.json"
+        },
+        {
+          "compiledAndDiskSha256": "35888cd868f067f8f87c15a9410217b30040db29866e7e439194cf5e716cae86",
+          "path": "rust/crates/xtask/src/stage_maps/R04.json"
+        },
+        {
+          "compiledAndDiskSha256": "d867c9a0d8e68d415ebbf439643778314d840255f8fe202797df1509ea54e482",
+          "path": "rust/crates/xtask/src/stage_maps/R05.json"
+        },
+        {
+          "compiledAndDiskSha256": "51edb1d897d4fe653e39bc0d92dd3ac7ec2b87bc00a1b9c8433624c196edc776",
+          "path": "rust/crates/xtask/Cargo.toml"
+        },
+        {
+          "compiledAndDiskSha256": "cec902952a04a6bda6296a0f406f12d59ccdb286c13a99282f1aa808751f1096",
+          "path": "rust/Cargo.toml"
+        },
+        {
+          "compiledAndDiskSha256": "eec3410410647a7d39f25371e73dda3ecfd5e7c10359090fff11e83053e11c37",
+          "path": "rust-toolchain.toml"
+        }
+      ],
+      "note": "The executable's embedded implementation and R02 stage map exactly match current disk bytes before any registered command runs.",
+      "schema": "lingxi-xtask-runner-source-v1",
+      "sourceInventory": [
+        "candidate.rs",
+        "candidate/tests.rs",
+        "main.rs",
+        "runner_identity.rs",
+        "stage_map.rs",
+        "stage_maps/R02.json",
+        "stage_maps/R03.json",
+        "stage_maps/R04.json",
+        "stage_maps/R05.json",
+        "verify.rs",
+        "verify/runner_tests.rs"
+      ],
+      "status": "PASS"
+    },
+    "beforeError": null,
+    "status": "PASS"
+  },
+  "scenarios": [],
+  "stage": "R05",
+  "startedAtUnixMs": 1791051376908,
+  "supplementalLeafScenarios": [],
+  "testedSha": "c549ff654508ab951e2cf39cf9d309fc9c6b8656",
+  "worktreeDirty": true
+}

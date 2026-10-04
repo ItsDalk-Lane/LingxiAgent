@@ -1,0 +1,49 @@
+== building the nine repair suites (rustup 1.98.1, /tmp/rust-target-r03-g07-neg, --locked, offline) ==
+PASS build (locked, offline)
+== running repair suite cancel_link_inheritance (F-ID F01, pinned 7) ==
+FAIL cancel_link_inheritance (F01): see gaps.txt
+== running repair suite subagent_closeout (F-ID F02, pinned 8) ==
+FAIL subagent_closeout (F02): see gaps.txt
+== running repair suite cancel_terminal_race (F-ID F03, pinned 13) ==
+FAIL cancel_terminal_race (F03): see gaps.txt
+== running repair suite tool_receipt_unknown (F-ID F04, pinned 6) ==
+FAIL tool_receipt_unknown (F04): see gaps.txt
+== running repair suite admission_dedup_consistency (F-ID F05, pinned 5) ==
+FAIL admission_dedup_consistency (F05): see gaps.txt
+== running repair suite admission_dedup_adversarial (F-ID F05, pinned 5) ==
+FAIL admission_dedup_adversarial (F05): see gaps.txt
+== running repair suite input_payload_fidelity (F-ID F06, pinned 5) ==
+FAIL input_payload_fidelity (F06): see gaps.txt
+== running repair suite input_budget_refusal (F-ID F06, pinned 2) ==
+FAIL input_budget_refusal (F06): see gaps.txt
+== running repair suite background_steering (F-ID F07, pinned 8) ==
+FAIL background_steering (F07): see gaps.txt
+assembled 9 repair-suite records
+GAPS (each must be named, none may pass silently):
+  suite cancel_link_inheritance: filter matched 0 tests (running=0, pinned=7) — empty test collections must not pass
+  suite cancel_link_inheritance: executed 0 tests but the stage pin is 7 (filtered subset / renamed or deleted tests)
+  suite cancel_link_inheritance: passed 0 but the stage pin is 7
+  suite subagent_closeout: filter matched 0 tests (running=0, pinned=8) — empty test collections must not pass
+  suite subagent_closeout: executed 0 tests but the stage pin is 8 (filtered subset / renamed or deleted tests)
+  suite subagent_closeout: passed 0 but the stage pin is 8
+  suite cancel_terminal_race: filter matched 0 tests (running=0, pinned=13) — empty test collections must not pass
+  suite cancel_terminal_race: executed 0 tests but the stage pin is 13 (filtered subset / renamed or deleted tests)
+  suite cancel_terminal_race: passed 0 but the stage pin is 13
+  suite tool_receipt_unknown: filter matched 0 tests (running=0, pinned=6) — empty test collections must not pass
+  suite tool_receipt_unknown: executed 0 tests but the stage pin is 6 (filtered subset / renamed or deleted tests)
+  suite tool_receipt_unknown: passed 0 but the stage pin is 6
+  suite admission_dedup_consistency: filter matched 0 tests (running=0, pinned=5) — empty test collections must not pass
+  suite admission_dedup_consistency: executed 0 tests but the stage pin is 5 (filtered subset / renamed or deleted tests)
+  suite admission_dedup_consistency: passed 0 but the stage pin is 5
+  suite admission_dedup_adversarial: filter matched 0 tests (running=0, pinned=5) — empty test collections must not pass
+  suite admission_dedup_adversarial: executed 0 tests but the stage pin is 5 (filtered subset / renamed or deleted tests)
+  suite admission_dedup_adversarial: passed 0 but the stage pin is 5
+  suite input_payload_fidelity: filter matched 0 tests (running=0, pinned=5) — empty test collections must not pass
+  suite input_payload_fidelity: executed 0 tests but the stage pin is 5 (filtered subset / renamed or deleted tests)
+  suite input_payload_fidelity: passed 0 but the stage pin is 5
+  suite input_budget_refusal: filter matched 0 tests (running=0, pinned=2) — empty test collections must not pass
+  suite input_budget_refusal: executed 0 tests but the stage pin is 2 (filtered subset / renamed or deleted tests)
+  suite input_budget_refusal: passed 0 but the stage pin is 2
+  suite background_steering: filter matched 0 tests (running=0, pinned=8) — empty test collections must not pass
+  suite background_steering: executed 0 tests but the stage pin is 8 (filtered subset / renamed or deleted tests)
+  suite background_steering: passed 0 but the stage pin is 8

@@ -1,0 +1,13 @@
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.07s
+     Running unittests src/lib.rs (/tmp/r03-t03-review-target/debug/deps/lingxi_service-254d9c3036524e2c)
+
+running 6 tests
+test task_supervisor::tests::linked_child_is_aborted_by_the_tree_and_returns_its_exit ... ok
+test task_supervisor::tests::registry_cap_refuses_loudly_and_reaps_ended_entries ... ok
+test task_supervisor::tests::drain_confirms_exited_children_within_the_budget ... ok
+test task_supervisor::tests::panicking_child_is_contained_and_returned_as_panicked ... ok
+test task_supervisor::tests::detached_background_survives_a_run_cancellation_and_reaps_cleanly ... ok
+test task_supervisor::tests::noncooperating_child_is_reported_unconfirmed_never_fake_quiet ... ok
+
+test result: ok. 6 passed; 0 failed; 0 ignored; 0 measured; 206 filtered out; finished in 0.30s
+

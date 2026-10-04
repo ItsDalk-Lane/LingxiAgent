@@ -1,0 +1,32 @@
+== R02-T07 / R02-A13 redaction scan (toolchain 1.98.1, target /tmp/rust-target-r02-t08) ==
+== building lingxi-service (--locked, offline) ==
+PASS build
+== P1/P2: normal + error traffic ==
+PASS P1 GET /me -> 200
+PASS P1 execute -> 200 (runId minted; input carried preset secret material)
+PASS P1 issue credential -> 201 (201 issuance body = sanctioned surface, scan-excluded)
+PASS P1 ws-ticket minted -> 200
+PASS P2 401 bad bearer
+PASS P2 401 missing credential
+PASS P2 401 bad query token
+PASS P2 403 cross-principal
+PASS P2 404 unknown session
+PASS P2 WS rejections (bad bearer upgrade 401; malformed frame -> invalid_message + close)
+== P3: storage error via externally-held WAL write lock (busy timeout) ==
+P3 burst results: 200x7, 503x1
+PASS P3 storage error: 1 explicit 503 db_busy (retryable) responses; no fake success
+== P4: epoch gate refusal diagnostics ==
+PASS P4 epoch refusal exit 2 with marker
+== SCAN: preset sensitive values across logs + stderr/stdout + error bodies ==
+SCAN api_key: clean (0 files)
+SCAN device_secret: clean (0 files)
+SCAN oauth_bearer: clean (0 files)
+SCAN query_token: clean (0 files)
+SCAN local_token: clean (0 files)
+SCAN ws_ticket: clean (0 files)
+SCAN RESULT: PASS (0 occurrences of 6 preset/minted secrets across 37 evidence files)
+PASS SCAN: preset + minted sensitive values absent from logs, stderr/stdout captures, error bodies and WS transcripts
+== CORRELATION: 关联 ID 保留 ==
+CORRELATION PASS: requestId req-0ce31b8c0c0ee3fd60534f96e1ecf9a1 present in marker line; session id present in logs; runId run_000001a0df794965_000001 present in response
+PASS CORRELATION: requestId ↔ marker line, session id ↔ logs, runId ↔ response
+== R02-A13 evidence complete ==

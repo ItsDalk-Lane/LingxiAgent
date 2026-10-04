@@ -1,0 +1,87 @@
+    Checking num-conv v0.2.2
+    Checking powerfmt v0.2.0
+    Checking time-core v0.1.9
+    Checking deranged v0.5.8
+    Checking pem v4.0.0
+   Compiling ring v0.17.14
+    Checking lingxi-service v0.0.0 (/Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-service)
+    Checking time v0.3.55
+    Checking yasna v0.6.0
+    Checking rcgen v0.14.10
+error[E0277]: `EndpointError` doesn't implement `Debug`
+    --> crates/lingxi-service/src/management.rs:1763:14
+     |
+1763 |             .unwrap()
+     |              ^^^^^^ the trait `Debug` is not implemented for `EndpointError`
+     |
+note: required by a bound in `Result::<T, E>::unwrap`
+    --> /rustc/48a229ceaefd4985c50990b14116b6d856af0985/library/core/src/result.rs:1225:4
+help: consider annotating `EndpointError` with `#[derive(Debug)]`
+    -->  crates/lingxi-service/src/lib.rs:844:1
+     |
+ 844 + #[derive(Debug)]
+ 845 | pub struct EndpointError {
+     |
+
+error[E0277]: `EndpointError` doesn't implement `Debug`
+    --> crates/lingxi-service/src/management.rs:1766:69
+     |
+1766 |         assert!(state.web_session_current(&live_principal, 1, true).unwrap());
+     |                                                                     ^^^^^^ the trait `Debug` is not implemented for `EndpointError`
+     |
+note: required by a bound in `Result::<T, E>::unwrap`
+    --> /rustc/48a229ceaefd4985c50990b14116b6d856af0985/library/core/src/result.rs:1225:4
+help: consider annotating `EndpointError` with `#[derive(Debug)]`
+    -->  crates/lingxi-service/src/lib.rs:844:1
+     |
+ 844 + #[derive(Debug)]
+ 845 | pub struct EndpointError {
+     |
+
+error[E0277]: `EndpointError` doesn't implement `Debug`
+    --> crates/lingxi-service/src/management.rs:1769:14
+     |
+1769 |             .unwrap());
+     |              ^^^^^^ the trait `Debug` is not implemented for `EndpointError`
+     |
+note: required by a bound in `Result::<T, E>::unwrap`
+    --> /rustc/48a229ceaefd4985c50990b14116b6d856af0985/library/core/src/result.rs:1225:4
+help: consider annotating `EndpointError` with `#[derive(Debug)]`
+    -->  crates/lingxi-service/src/lib.rs:844:1
+     |
+ 844 + #[derive(Debug)]
+ 845 | pub struct EndpointError {
+     |
+
+error[E0277]: `EndpointError` doesn't implement `Debug`
+    --> crates/lingxi-service/src/management.rs:1772:14
+     |
+1772 |             .unwrap());
+     |              ^^^^^^ the trait `Debug` is not implemented for `EndpointError`
+     |
+note: required by a bound in `Result::<T, E>::unwrap`
+    --> /rustc/48a229ceaefd4985c50990b14116b6d856af0985/library/core/src/result.rs:1225:4
+help: consider annotating `EndpointError` with `#[derive(Debug)]`
+    -->  crates/lingxi-service/src/lib.rs:844:1
+     |
+ 844 + #[derive(Debug)]
+ 845 | pub struct EndpointError {
+     |
+
+error[E0277]: `EndpointError` doesn't implement `Debug`
+    --> crates/lingxi-service/src/management.rs:1809:70
+     |
+1809 |         assert!(!state.web_session_current(&live_principal, 1, true).unwrap());
+     |                                                                      ^^^^^^ the trait `Debug` is not implemented for `EndpointError`
+     |
+note: required by a bound in `Result::<T, E>::unwrap`
+    --> /rustc/48a229ceaefd4985c50990b14116b6d856af0985/library/core/src/result.rs:1225:4
+help: consider annotating `EndpointError` with `#[derive(Debug)]`
+    -->  crates/lingxi-service/src/lib.rs:844:1
+     |
+ 844 + #[derive(Debug)]
+ 845 | pub struct EndpointError {
+     |
+
+For more information about this error, try `rustc --explain E0277`.
+error: could not compile `lingxi-service` (lib test) due to 5 previous errors

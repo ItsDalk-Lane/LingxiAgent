@@ -1,0 +1,29 @@
+   Compiling libc v0.2.189
+   Compiling syn v3.0.6
+   Compiling serde_derive_internals v0.30.0
+   Compiling serde_derive v1.0.229
+   Compiling ref-cast-impl v1.0.27
+   Compiling schemars_derive v1.2.2
+   Compiling ref-cast v1.0.27
+   Compiling cpufeatures v0.3.1
+   Compiling sha2 v0.11.0
+   Compiling sha1 v0.11.0
+   Compiling serde v1.0.229
+   Compiling schemars v1.2.2
+   Compiling lingxi-protocol v0.0.0 (/Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-protocol)
+   Compiling lingxi-kernel v0.0.0 (/Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-kernel)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 4.60s
+     Running unittests src/lib.rs (/tmp/r03-t07-review-target/debug/deps/lingxi_kernel-f99620b4fb8292b5)
+
+running 7 tests
+test recovery::tests::category_vocabulary_is_stable ... ok
+test recovery::tests::empty_or_clean_journals_are_recoverable_wait ... ok
+test recovery::tests::read_only_unknowns_are_retryable_read_only ... ok
+test recovery::tests::resumable_unknowns_are_unknown_side_effect_with_their_keys ... ok
+test recovery::tests::needs_attention_governs_over_everything_else ... ok
+test recovery::tests::principal_reconstruction_round_trips_the_ownership_key ... ok
+test recovery::tests::no_category_fabricates_a_final_reply ... ok
+
+test result: ok. 7 passed; 0 failed; 0 ignored; 0 measured; 44 filtered out; finished in 0.00s
+
+EXIT=0

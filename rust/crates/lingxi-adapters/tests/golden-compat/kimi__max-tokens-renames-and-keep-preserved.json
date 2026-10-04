@@ -1,0 +1,38 @@
+{
+  "schema": "r05-t05-compat-golden/v1",
+  "module": "kimi",
+  "case": "max-tokens-renames-and-keep-preserved",
+  "model": {
+    "provider": "kimi-coding",
+    "id": "kimi-for-coding",
+    "baseUrl": "https://api.kimi.com/coding/v1",
+    "api": "openai-completions",
+    "reasoning": true
+  },
+  "payload": {
+    "model": "kimi-for-coding",
+    "messages": [],
+    "max_tokens": 4096,
+    "thinking": {
+      "type": "enabled",
+      "keep": "thread"
+    }
+  },
+  "options": {
+    "mode": "chat"
+  },
+  "expected": {
+    "thinkingFormat": "kimi",
+    "reasoningProfile": "kimi-openai",
+    "matched": "kimi",
+    "result": {
+      "model": "kimi-for-coding",
+      "messages": [],
+      "thinking": {
+        "type": "enabled",
+        "keep": "thread"
+      },
+      "max_completion_tokens": 4096
+    }
+  }
+}

@@ -1,0 +1,72 @@
+== R03-A11: subagent_permission_inheritance (4 tests) ==
+   Compiling lingxi-service v0.0.0 (/Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-service)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.59s
+     Running tests/subagent_permission_inheritance.rs (/tmp/r03-t06-target/debug/deps/subagent_permission_inheritance-0862a5be6e5cf2af)
+
+running 4 tests
+test readonly_parent_write_access_request_is_refused_at_dispatch ... ok
+test model_override_cannot_widen_the_readonly_grant ... ok
+test operate_parent_child_write_is_executed_once ... ok
+test r03_a11_readonly_parent_child_write_is_refused_by_the_real_boundary ... ok
+
+test result: ok. 4 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.21s
+
+EXIT=0
+== R03-A12: background_disconnect_recovery (3 tests) ==
+   Compiling lingxi-service v0.0.0 (/Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-service)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.70s
+     Running tests/background_disconnect_recovery.rs (/tmp/r03-t06-target/debug/deps/background_disconnect_recovery-1f2f7b7a8a40b59f)
+
+running 3 tests
+test r03_a12_background_run_survives_disconnect_reconnect_replays_and_is_queryable ... ok
+test foreground_drive_disappearing_is_abandoned_not_cancelled ... ok
+test exit_hook_drain_reports_live_drives_as_unconfirmed ... ok
+
+test result: ok. 3 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.21s
+
+EXIT=0
+== subagent lifecycle (3 tests) ==
+   Compiling lingxi-service v0.0.0 (/Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-service)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.72s
+     Running tests/subagent_lifecycle.rs (/tmp/r03-t06-target/debug/deps/subagent_lifecycle-f928c851414e12c8)
+
+running 3 tests
+test reply_validations_refuse_unknown_threads_loudly ... ok
+test busy_thread_refuses_reply_with_a_structured_conflict ... ok
+test dispatch_reply_close_round_trip_on_the_real_chain ... ok
+
+test result: ok. 3 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.16s
+
+EXIT=0
+== lineage store (2 tests) ==
+   Compiling lingxi-kernel v0.0.0 (/Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-kernel)
+   Compiling lingxi-adapters v0.0.0 (/Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-adapters)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.95s
+     Running tests/run_lineage_store.rs (/tmp/r03-t06-target/debug/deps/run_lineage_store-6764c383c5aa08ed)
+
+running 2 tests
+test lineage_round_trips_and_is_immutable ... ok
+test lineage_requires_an_existing_owned_active_run ... ok
+
+test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.01s
+
+EXIT=0
+== kernel subagent rules ==
+   Compiling lingxi-kernel v0.0.0 (/Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-kernel)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.37s
+     Running unittests src/lib.rs (/tmp/r03-t06-target/debug/deps/lingxi_kernel-f99620b4fb8292b5)
+
+running 9 tests
+test subagent::tests::access_request_parses_only_the_two_legal_literals ... ok
+test subagent::tests::session_mode_vocabulary_round_trips_and_collapses ... ok
+test subagent::tests::operate_tier_allows_non_blocklisted_targets ... ok
+test subagent::tests::attenuation_matrix_matches_the_incumbent ... ok
+test subagent::tests::origin_vocabulary_is_stable_and_loud_on_unknowns ... ok
+test subagent::tests::read_only_tier_denies_mutating_targets_and_fails_closed_on_unknowns ... ok
+test subagent::tests::user_lineage_carries_only_submission_anchors ... ok
+test subagent::tests::policy_defaults_preserve_the_incumbent_switch_values ... ok
+test subagent::tests::blocklisted_targets_are_denied_regardless_of_tier ... ok
+
+test result: ok. 9 passed; 0 failed; 0 ignored; 0 measured; 35 filtered out; finished in 0.00s
+
+EXIT=0

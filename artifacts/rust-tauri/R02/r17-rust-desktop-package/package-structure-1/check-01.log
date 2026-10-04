@@ -1,0 +1,13 @@
+
+> lingxi@0.1.43 build:splash
+> vite build --config vite.config.splash.ts
+
+vite v7.3.6 building client environment for production...
+<script src="modules/platform.js"> in "/splash.html" can't be bundled without type="module" attribute
+transforming...
+✓ 30 modules transformed.
+rendering chunks...
+computing gzip size...
+../dist-splash/splash.html                  2.23 kB │ gzip:  0.90 kB
+../dist-splash/assets/splash-D4fto8oT.js  196.12 kB │ gzip: 62.04 kB
+✓ built in 322ms

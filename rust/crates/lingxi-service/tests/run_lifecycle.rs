@@ -15,9 +15,10 @@ use std::path::PathBuf;
 use std::pin::Pin;
 use std::sync::Arc;
 
+use lingxi_kernel::model_exchange::ModelTurnInput;
 use lingxi_kernel::ports::{
     ProviderDescriptor, ProviderTurn, ProviderTurnResult, ToolExecutionResult, ToolExecutorPort,
-    ToolOutcome, ToolRequest, TurnProviderPort,
+    ToolOutcome, ToolRequest, TurnDeltaSink, TurnProviderPort,
 };
 use lingxi_protocol::{
     AttemptId, ContentBlock, ErrorCode, ModelCallId, NormalizedMessage, ProtocolError, RunId,
@@ -79,8 +80,9 @@ impl TurnProviderPort for ScriptedProvider {
         &'a self,
         ctx: &'a lingxi_kernel::RunContext,
         call: &'a ModelCallId,
-        _turn: u32,
-        _input: &'a str,
+        _input: &'a ModelTurnInput,
+
+        _deltas: &'a dyn TurnDeltaSink,
     ) -> Pin<Box<dyn std::future::Future<Output = ProviderTurnResult> + Send + 'a>> {
         self.observed
             .lock()
@@ -319,6 +321,7 @@ async fn final_message_content(state: &ServiceState, run_id: &str) -> Option<Str
 async fn r03_a01_three_model_calls_produce_exactly_one_task_terminal() {
     let provider = ScriptedProvider::new(vec![
         ProviderTurn::ToolRequests {
+            content: Vec::new(),
             requests: vec![read_tool_request()],
         },
         ProviderTurn::Continue {
@@ -661,6 +664,7 @@ async fn empty_reply_completes_without_final_and_names_the_cause() {
 async fn process_only_run_completes_without_final_and_names_the_cause() {
     let provider = ScriptedProvider::new(vec![
         ProviderTurn::ToolRequests {
+            content: Vec::new(),
             requests: vec![read_tool_request()],
         },
         ProviderTurn::Empty {
@@ -688,6 +692,7 @@ async fn process_only_run_completes_without_final_and_names_the_cause() {
 async fn tool_partial_failure_has_its_own_outcome_not_a_fabricated_answer() {
     let provider = ScriptedProvider::new(vec![
         ProviderTurn::ToolRequests {
+            content: Vec::new(),
             requests: vec![read_tool_request()],
         },
         ProviderTurn::Empty {
@@ -759,6 +764,7 @@ async fn turn_budget_exhaustion_fails_loudly_never_fake_completes() {
 #[tokio::test]
 async fn tool_request_without_executor_is_a_loud_failure() {
     let provider = ScriptedProvider::new(vec![ProviderTurn::ToolRequests {
+        content: Vec::new(),
         requests: vec![read_tool_request()],
     }]);
     let (state, home) = boot(

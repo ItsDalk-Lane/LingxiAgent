@@ -1,0 +1,68 @@
+    Checking xtask v0.1.0 (/Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/xtask)
+error[E0277]: the trait bound `Array<u8, UInt<UInt<UInt<UInt<..., ...>, ...>, ...>, ...>>: LowerHex` is not satisfied
+  --> crates/xtask/src/runner_identity.rs:78:54
+   |
+78 |             "compiledAndDiskSha256": format!("{:x}", Sha256::digest(compiled)),
+   |                                               ----   ^^^^^^^^^^^^^^^^^^^^^^^^ the trait `LowerHex` is not implemented for `Array<u8, UInt<UInt<UInt<UInt<UInt<..., ...>, ...>, ...>, ...>, ...>>`
+   |                                               |
+   |                                               required by this formatting parameter
+   |
+   = help: the following other types implement trait `LowerHex`:
+             &T
+             &mut T
+             Saturating<T>
+             Wrapping<T>
+             compiler_builtins::math::libm_math::support::big::i256
+             compiler_builtins::math::libm_math::support::big::u256
+             compiler_builtins::math::libm_math::support::hex_float::hex_fmt::Hex<T>
+             i128
+           and 12 others
+   = note: the full name for the type has been written to '/Users/study_superior/Desktop/Code/LingxiAgent/rust/target/debug/deps/xtask-f478d9f6f96d92aa.long-type-13386910780508992242.txt'
+   = note: consider using `--verbose` to print the full type name to the console
+
+error[E0277]: the trait bound `Array<u8, UInt<UInt<UInt<UInt<..., ...>, ...>, ...>, ...>>: LowerHex` is not satisfied
+  --> crates/xtask/src/runner_identity.rs:78:54
+   |
+78 |             "compiledAndDiskSha256": format!("{:x}", Sha256::digest(compiled)),
+   |                                               ----   ^^^^^^^^^^^^^^^^^^^^^^^^ the trait `LowerHex` is not implemented for `Array<u8, UInt<UInt<UInt<UInt<UInt<..., ...>, ...>, ...>, ...>, ...>>`
+   |                                               |
+   |                                               required by this formatting parameter
+   |
+   = help: the following other types implement trait `LowerHex`:
+             &T
+             &mut T
+             Saturating<T>
+             Wrapping<T>
+             compiler_builtins::math::libm_math::support::big::i256
+             compiler_builtins::math::libm_math::support::big::u256
+             compiler_builtins::math::libm_math::support::hex_float::hex_fmt::Hex<T>
+             i128
+           and 12 others
+   = note: the full name for the type has been written to '/Users/study_superior/Desktop/Code/LingxiAgent/rust/target/debug/deps/xtask-cccfb591efa3d0e8.long-type-15674395910428391135.txt'
+   = note: consider using `--verbose` to print the full type name to the console
+
+warning: variable does not need to be mutable
+   --> crates/xtask/src/main.rs:351:16
+    |
+351 |             Ok(mut entries) if entries.next().is_some() => {
+    |                ----^^^^^^^
+    |                |
+    |                help: remove this `mut`
+    |
+    = note: `#[warn(unused_mut)]` (part of `#[warn(unused)]`) on by default
+
+error[E0596]: cannot borrow `entries` as mutable, as it is immutable for the pattern guard
+   --> crates/xtask/src/main.rs:351:32
+    |
+351 |             Ok(mut entries) if entries.next().is_some() => {
+    |                                ^^^^^^^ cannot borrow as mutable
+    |
+    = note: variables bound in patterns are immutable until the end of the pattern guard
+
+Some errors have detailed explanations: E0277, E0596.
+For more information about an error, try `rustc --explain E0277`.
+warning: `xtask` (bin "xtask") generated 1 warning
+error: could not compile `xtask` (bin "xtask") due to 2 previous errors; 1 warning emitted
+warning: build failed, waiting for other jobs to finish...
+warning: `xtask` (bin "xtask" test) generated 1 warning (1 duplicate)
+error: could not compile `xtask` (bin "xtask" test) due to 2 previous errors; 1 warning emitted

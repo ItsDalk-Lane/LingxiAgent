@@ -1,0 +1,38 @@
+# R03-T01 targeted verification (all via rustup 1.98.1, CARGO_TARGET_DIR=/tmp/r03-t01-target-198)
+
+$ cargo test -p lingxi-service --locked --lib sessions
+exit=0
+$ cargo test -p lingxi-service --locked --test execute_concurrency
+exit=0
+$ cargo test -p lingxi-service --locked --test service_persistence
+exit=0
+$ cargo test -p lingxi-service --locked --test event_subscription
+exit=0
+$ cargo test -p lingxi-adapters --locked --test storage_transactions
+exit=0
+$ cargo test -p lingxi-adapters --locked --test run_id_allocator
+exit=0
+$ cargo test -p lingxi-adapters --locked --test migration_idempotency
+exit=0
+$ cargo test -p lingxi-adapters --locked --test event_store_reads
+exit=0
+$ cargo test -p lingxi-adapters --locked --test backup_restore
+exit=0
+$ cargo test -p lingxi-adapters --locked --test disk_full_fault
+exit=0
+$ cargo fmt --all -- --check
+exit=0
+$ cargo clippy --workspace --all-targets --locked -- -D warnings
+exit=0
+$ cargo test --workspace --locked (482 passed / 0 failed / 47 suites ok)
+exit=0
+$ cargo run --locked -p xtask -- check-contracts
+exit=0
+$ cargo run --locked -p xtask -- check-boundaries
+exit=0
+$ cargo test -p lingxi-service --locked --test run_lifecycle -- --nocapture (12 passed)
+exit=0
+$ R03_A02_PROPERTY_EVIDENCE=... cargo test -p lingxi-adapters --locked --test run_finalize_property -- --nocapture (2 passed)
+exit=0
+$ cargo test -p lingxi-kernel --locked (22 passed)
+exit=0

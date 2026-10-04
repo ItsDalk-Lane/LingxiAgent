@@ -1,0 +1,83 @@
+{
+  "family": "openai-codex-responses",
+  "case": "tool_roundtrip",
+  "route": {"provider": "codex-golden", "model": "gpt-codex-golden"},
+  "input": {
+    "submission": "读取 hosts 并写入标记",
+    "system_prompt": "codex golden persona",
+    "tools": [
+      {
+        "target": "tool:first-party:read",
+        "wire_name": "read",
+        "description": "Read a file 读取文件",
+        "schema": {"type": "object", "properties": {"path": {"type": "string"}}, "required": ["path"]}
+      },
+      {
+        "target": "tool:first-party:write",
+        "wire_name": "write",
+        "description": "Write a file 写入文件",
+        "schema": {"type": "object", "properties": {"content": {"type": "string"}, "path": {"type": "string"}}, "required": ["path", "content"]}
+      }
+    ],
+    "prior": [
+      {
+        "assistant": {
+          "call": "mc-golden-1",
+          "content": [
+            {"reasoning": "先读后写"},
+            {"opaque": {"provider": "openai-codex-responses", "data": {"type": "reasoning", "id": "rs_hist_c", "summary": [{"type": "summary_text", "text": "先读后写"}], "encrypted_content": "enc-hist-c"}}},
+            {"text": "执行"}
+          ],
+          "tool_calls": [
+            {"seq": 1, "provider_call_id": "call_cx-α", "target": "tool:first-party:read", "arguments": {"path": "/etc/hosts"}},
+            {"seq": 2, "provider_call_id": "call_cx-β", "target": "tool:first-party:write", "arguments": {"content": "x", "path": "/tmp/z"}}
+          ]
+        }
+      },
+      {
+        "tool_result": {
+          "seq": 1,
+          "provider_call_id": "call_cx-α",
+          "outcome": {"kind": "success_text", "text": "hosts body"}
+        }
+      },
+      {
+        "tool_result": {
+          "seq": 2,
+          "provider_call_id": "call_cx-β",
+          "outcome": {"kind": "cancelled"}
+        }
+      }
+    ]
+  },
+  "wire_mode": "sse",
+  "expected_request": {
+    "model": "gpt-codex-golden",
+    "store": false,
+    "stream": true,
+    "instructions": "codex golden persona",
+    "input": [
+      {"type": "message", "role": "user", "content": [{"type": "input_text", "text": "读取 hosts 并写入标记"}]},
+      {"type": "reasoning", "id": "rs_hist_c", "summary": [{"type": "summary_text", "text": "先读后写"}], "encrypted_content": "enc-hist-c"},
+      {"type": "message", "role": "assistant", "content": [{"type": "output_text", "text": "执行"}]},
+      {"type": "function_call", "call_id": "call_cx-α", "name": "read", "arguments": "{\"path\":\"/etc/hosts\"}"},
+      {"type": "function_call", "call_id": "call_cx-β", "name": "write", "arguments": "{\"content\":\"x\",\"path\":\"/tmp/z\"}"},
+      {"type": "function_call_output", "call_id": "call_cx-α", "output": "hosts body"},
+      {"type": "function_call_output", "call_id": "call_cx-β", "output": "tool call cancelled by the host before completion"}
+    ],
+    "tools": [
+      {"type": "function", "name": "read", "description": "Read a file 读取文件", "parameters": {"type": "object", "properties": {"path": {"type": "string"}}, "required": ["path"]}},
+      {"type": "function", "name": "write", "description": "Write a file 写入文件", "parameters": {"type": "object", "properties": {"content": {"type": "string"}, "path": {"type": "string"}}, "required": ["path", "content"]}}
+    ]
+  },
+  "response_wire": {
+    "sse_frames": [
+      "{\"type\":\"response.completed\",\"response\":{\"id\":\"resp_codex_rt\",\"status\":\"completed\",\"output\":[{\"type\":\"message\",\"role\":\"assistant\",\"content\":[{\"type\":\"output_text\",\"text\":\"codex 完成\"}]}],\"usage\":{\"input_tokens\":21,\"output_tokens\":6}}}"
+    ]
+  },
+  "expected_turn": {
+    "kind": "final",
+    "content": [{"text": "codex 完成"}],
+    "usage": {"input_tokens": 21, "output_tokens": 6}
+  }
+}

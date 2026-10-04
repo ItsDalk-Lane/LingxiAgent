@@ -1,0 +1,32 @@
+Hana CLI
+
+Usage:
+  hana serve [-- server args]        Start a headless LingxiAgent Server (serves the --channel web frontend, if pulled)
+  hana status                       Show local server and agent status
+  hana sessions                     List recent sessions
+  hana continue [index|path]        Continue a recent session
+  hana chat [--plain]               Open chat
+  hana bundle pull                  Pull and activate the latest web frontend
+  hana bundle status                Show the pulled web frontend status
+  hana data diagnose                Read-only data-epoch diagnostics (stamp, journal, checkpoints)
+  hana data checkpoints             List available data-epoch recovery checkpoints
+  hana data restore <transitionId>  Restore data from a checkpoint (asks for confirmation)
+
+Connection options:
+  --runtime <node|rust>            Select the existing Node server or the Rust service (default: node)
+  --url <baseUrl>                   Connect to a specific LingxiAgent Server
+  --token <token>                   Bearer token for that server
+  --session <path>                  Chat in a specific session
+
+Serve options:
+  --allow-data-downgrade            Allow this kernel to open a data directory a newer
+                                     kernel already touched (risk of silent data corruption)
+
+Channel options:
+  --channel <stable|beta>           Release channel for hana serve and hana bundle (default: stable)
+
+Data recovery options:
+  --confirm-token <token>           Non-interactive confirmation for `hana data restore`.
+                                     Must exactly equal "restore <transitionId>". Required
+                                     when stdin is not a TTY; there is no way to skip this.
+

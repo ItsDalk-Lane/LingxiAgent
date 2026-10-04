@@ -1,0 +1,19 @@
+   Compiling typenum v1.20.1
+   Compiling libc v0.2.189
+   Compiling serde_core v1.0.229
+   Compiling zmij v1.0.23
+   Compiling const-oid v0.10.2
+   Compiling serde_json v1.0.151
+   Compiling cfg-if v1.0.5
+   Compiling memchr v2.8.3
+   Compiling itoa v1.0.18
+   Compiling hybrid-array v0.4.15
+   Compiling block-buffer v0.12.1
+   Compiling crypto-common v0.2.2
+   Compiling cpufeatures v0.3.1
+   Compiling digest v0.11.3
+   Compiling sha2 v0.11.0
+   Compiling xtask v0.1.0 (/private/tmp/lingxi-r04-t08-neg-wEGEl1/rust/crates/xtask)
+    Finished `dev` profile [unoptimized + debuginfo] target(s) in 2.47s
+     Running `/Users/study_superior/.cache/lingxi-r04-t08-neg-target/debug/xtask verify-stage R99 --evidence /Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R04/T08-E01/negative-tests/n-unknown-stage/evidence`
+error: unknown stage "R99"; no implementation-acceptance map is registered in xtask (registered stages: R02, R03, R04). A stage without a map is a hard error — never an empty pass.

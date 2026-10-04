@@ -1,0 +1,34 @@
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.07s
+     Running tests/cancellation_tree.rs (/tmp/r03-t03-target/debug/deps/cancellation_tree-44323aec67552ea7)
+
+running 8 tests
+test approval_wait_round_trips_approve_and_reject_legs ... ok
+test cancel_surface_is_diagnosable_for_unknown_terminal_foreign_and_dangling ... ok
+test noncooperating_child_is_reported_unconfirmed_not_fake_quiet ... ok
+test panicking_tool_child_is_supervised_and_the_run_settles_loudly ... 
+thread 'panicking_tool_child_is_supervised_and_the_run_settles_loudly' (40341565) panicked at crates/lingxi-service/tests/cancellation_tree.rs:224:49:
+tool double exploded
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+ok
+test queue_wait_cancel_leaves_the_unrelated_holder_untouched ... ok
+test r03_a05_cancel_exits_each_wait_state_and_returns_quotas ... R03_A05_TRACE === parameter: queue_wait ===
+R03_A05_TRACE [queue_wait] 1: run parked in queue_wait (run run_000001a0dcba6c00_000002)
+R03_A05_TRACE [queue_wait] 2: cancellation fired (phase=requested)
+R03_A05_TRACE [queue_wait] 3: cancelled terminal + quotas returned + zero tool calls (verdict=confirmed_terminated)
+R03_A05_TRACE === parameter: approval_wait ===
+R03_A05_TRACE [approval_wait] 1: run parked in approval_wait (run run_000001a0dcba6c00_000001)
+R03_A05_TRACE [approval_wait] 2: cancellation fired (phase=requested)
+R03_A05_TRACE [approval_wait] 3: cancelled terminal + quotas returned + zero tool calls (verdict=confirmed_terminated)
+R03_A05_TRACE === parameter: stream_read ===
+R03_A05_TRACE [stream_read] 1: run parked in stream_read (run run_000001a0dcba6c00_000001)
+R03_A05_TRACE [stream_read] 2: cancellation fired (phase=requested)
+R03_A05_TRACE [stream_read] 3: cancelled terminal + quotas returned + zero tool calls (verdict=confirmed_terminated)
+ok
+test r03_a06_cancel_parent_spares_unrelated_background ... R03_A06_TRACE 1: parent(run_000001a0dcba6c00_000001) + child_run + background all live (children: ["child_run:demo", "model_call:run_000001a0dcba6c00_000001-mc0001"])
+R03_A06_TRACE 2: parent cancelled, child_run stopped through the tree
+R03_A06_TRACE 3: background completed all 20 ticks after the cancel (ticks at cancel: 1)
+ok
+test state_change_transaction_commits_legal_legs_and_diagnoses_bad_ones ... ok
+
+test result: ok. 8 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.96s
+

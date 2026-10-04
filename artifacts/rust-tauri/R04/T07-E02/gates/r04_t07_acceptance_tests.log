@@ -1,0 +1,27 @@
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.14s
+     Running tests/r04_t07_mcp_and_workers.rs (rust/target/debug/deps/r04_t07_mcp_and_workers-ad720e47860317b1)
+
+running 19 tests
+test adversarial_mcp_pagination_walks_all_pages ... ok
+test adversarial_tools_list_change_updates_generation_and_invalidates_old_shapes ... ok
+test adversarial_error_oversized_schema_violating_and_forged_results ... ok
+test adversarial_endless_paging_is_refused_loudly ... ok
+test adversarial_two_servers_same_tool_name_hit_their_own_targets ... ok
+test adversarial_worker_error_result_and_callback_budget_are_host_owned ... ok
+test adversarial_worker_protocol_violations_are_refused ... ok
+test mcp_stdio_child_transport_and_env_whitelist_hold ... ok
+test mcp_and_worker_tools_follow_the_t03_permission_face ... ok
+test mcp_unsupported_endpoint_refuses_loudly ... ok
+test mcp_tool_success_flows_through_the_full_run_chain ... ok
+test cancelled_call_never_consumes_a_late_response ... ok
+test r04_a13_mcp_reconnect_never_replays_the_side_effect ... ok
+test r04_a13_full_chain_journals_unknown_and_a_new_decision_sees_the_real_count ... ok
+test worker_claim_in_grant_mints_a_verified_resource_ref ... ok
+test r04_a14_worker_cannot_bypass_grants_or_model_credentials ... ok
+test worker_sandbox_binding_denies_out_of_boundary_writes ... ok
+test adversarial_worker_deadline_and_silent_exit_are_unknown_never_clean_failures ... ok
+test worker_concurrency_is_bounded_by_the_runtime_semaphore ... ok
+
+test result: ok. 19 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 1.69s
+
+exit=0

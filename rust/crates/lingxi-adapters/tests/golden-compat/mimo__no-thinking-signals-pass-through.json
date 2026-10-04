@@ -1,0 +1,27 @@
+{
+  "schema": "r05-t05-compat-golden/v1",
+  "module": "mimo",
+  "case": "no-thinking-signals-pass-through",
+  "model": {
+    "provider": "mimo",
+    "id": "mimo-v7-pro",
+    "baseUrl": "https://xiaomimimo.com/v1",
+    "api": "openai-completions"
+  },
+  "payload": {
+    "model": "mimo-v7-pro",
+    "messages": []
+  },
+  "options": {
+    "mode": "chat"
+  },
+  "expected": {
+    "thinkingFormat": "qwen-chat-template",
+    "reasoningProfile": "mimo-openai",
+    "matched": "mimo",
+    "result": {
+      "model": "mimo-v7-pro",
+      "messages": []
+    }
+  }
+}

@@ -1,0 +1,3 @@
+=== cargo fmt --all -- --check (final) ===
+FMT_EXIT=0
+(note: the first check during development reported diff EXIT=1; 'cargo fmt --all' was applied to the candidate before all gate runs; this is the final clean check)

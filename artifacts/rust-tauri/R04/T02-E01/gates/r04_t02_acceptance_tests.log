@@ -1,0 +1,45 @@
+   Compiling lingxi-service v0.0.0 (/Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-service)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 3.11s
+     Running tests/r04_t02_tool_gateway.rs (rust/target/debug/deps/r04_t02_tool_gateway-192a416d2167304b)
+
+running 9 tests
+test r04_a04_forged_and_stale_handles_are_refused_by_the_real_gateway ... ok
+test adversarial_summary_a_payload_b_is_refused_at_every_layer ... ok
+test adversarial_subagent_blocklist_holds_under_registry_target_ids ... ok
+test r04_a03_stricter_subagent_attenuation_is_explicit ... ok
+test r04_a03_delegation_entry_goes_through_the_gateway ... ok
+test r04_a04_forged_arguments_never_override_host_facts ... ok
+test r04_a03_deny_group_unconfigured_policy_refuses_every_entry ... ok
+test r04_a03_needs_approval_group_round_trips_every_entry ... ok
+test r04_a03_allow_group_is_identical_across_all_entries ... ok
+
+test result: ok. 9 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.84s
+
+   Compiling lingxi-service v0.0.0 (/Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-service)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 2.40s
+     Running unittests src/lib.rs (rust/target/debug/deps/lingxi_service-7414b866ed22378d)
+
+running 6 tests
+test toolgateway::tests::fail_closed_policy_allows_read_and_demands_approval_for_execute ... ok
+test toolgateway::tests::expired_and_foreign_handles_are_refused ... ok
+test toolgateway::tests::prepared_handles_are_unique_and_single_use ... ok
+test toolgateway::tests::delegation_and_subagent_surfaces_record_their_entries ... ok
+test toolgateway::tests::schema_defaults_fill_without_digest_forgery_and_reach_the_executor ... ok
+test toolgateway::tests::consumed_records_are_reclaimed_under_cap_pressure ... ok
+
+test result: ok. 6 passed; 0 failed; 0 ignored; 0 measured; 242 filtered out; finished in 0.01s
+
+   Compiling lingxi-service v0.0.0 (/Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-service)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 1.21s
+     Running tests/r04_t01_tool_catalog.rs (rust/target/debug/deps/r04_t01_tool_catalog-d1060013878485e0)
+
+running 6 tests
+test registry_capabilities_resolve_recovery_classification ... ok
+test adversarial_malformed_inputs_never_reach_the_executor ... ok
+test adversarial_alias_and_primary_name_share_one_permission_contract ... ok
+test r04_a02_stale_catalog_generation_is_refused_until_refresh ... ok
+test r04_a01_catalog_and_execution_share_one_source_of_truth ... ok
+test adversarial_forged_digest_is_refused_with_zero_dispatch_on_real_chain ... ok
+
+test result: ok. 6 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.11s
+

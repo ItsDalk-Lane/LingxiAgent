@@ -1,0 +1,14 @@
+== cargo fmt --all -- --check ==
+exit 0
+== cargo clippy --workspace --all-targets --locked -- -D warnings ==
+    Finished `dev` profile [unoptimized + debuginfo] target(s) in 0.17s
+exit 0
+== xtask check-contracts ==
+OK: API_COMPAT_MATRIX.json matches regeneration (626 entries)
+OK: all generated artifacts are drift-free
+xtask: [bash scripts/rust-tauri/r01-t02-check-generated.sh] exit 0 (OK)
+exit 0
+== xtask check-boundaries ==
+RESULT: OK (ownership contract + dependency rules + negative battery)
+xtask: [python3 -B docs/rust-tauri/R01/r01_t01_check_ownership.py] exit 0 (OK)
+exit 0

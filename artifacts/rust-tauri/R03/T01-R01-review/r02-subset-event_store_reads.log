@@ -1,0 +1,11 @@
+   Compiling lingxi-adapters v0.0.0 (/Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-adapters)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.48s
+     Running tests/event_store_reads.rs (/tmp/r03-t01-review-target/debug/deps/event_store_reads-ec8ffa19299c52f1)
+
+running 3 tests
+test event_type_column_tampering_is_loud_corruption ... ok
+test purge_moves_the_floor_and_reports_removed_rows ... ok
+test head_floor_and_events_after_read_the_durable_log ... ok
+
+test result: ok. 3 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.02s
+

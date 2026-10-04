@@ -1,0 +1,78 @@
+{
+  "schemaVersion": 1,
+  "artifactKind": "R05_HANDOFF",
+  "stage_id": "R05",
+  "generated_by": "EXECUTOR-R05-T08",
+  "generated_at": "2026-10-04",
+  "baseline": {
+    "branch": "codex/rust-tauri-migration",
+    "head_sha": "c549ff654508ab951e2cf39cf9d309fc9c6b8656",
+    "delivery_shape": "R05-T01..T08 全部为未提交工作树改动（no_commit_push_authorization=true）；终树按文件 sha256 清单绑定（artifacts/rust-tauri/R05/T08-E01/working-tree-manifest.txt）",
+    "gate_result_ref": "artifacts/rust-tauri/R05/T08-E01/verify-R05/verify-stage-result.json",
+    "stage_status_ref": "docs/rust-tauri/R05/R05_REPORT.md（offline_gate / independent_review / live_verification / stage_readiness）"
+  },
+  "interfaces": {
+    "model_plane": {
+      "config": "rust/crates/lingxi-service/src/config.rs 的 ServiceConfig（providers/models 闭合键集，--config JSON 或 management reload 面）",
+      "gateway": "lingxi-adapters models::gateway（ConfigModelGateway：pin-pair 路由、能力矩阵、reload 代次）",
+      "exchange_contract": "lingxi-kernel model_exchange（ModelTurnInput/ExchangeItem/ToolDeclarationSnapshot/RequestedToolCall：工具声明快照、宿主 ToolCallId、provider 关联、opaque 状态、截止时间）",
+      "provider": "lingxi-adapters models::provider::GatewayedProvider（bootstrap 正式接线：lib.rs wired_real_model_chain——文件工具+审批+统一网关+凭证服务）"
+    },
+    "credentials": {
+      "service": "lingxi-service credentials（CredentialService：per-provider 刷新协调/撤销栅栏/持久化/代次；ProviderCredentialPort 唯一出口）",
+      "oauth": "lingxi-adapters models::oauth + oauth_flows（device/PKCE/state/轮询/刷新分类）",
+      "storage": "credentials store（原子写、版本冲突、未知字段保真；隔离于 home 的 runtime 目录）"
+    },
+    "protocol_families": [
+      "openai-completions", "openai-responses", "openai-codex-responses",
+      "anthropic-messages", "google-generative-ai"
+    ],
+    "streaming": "lingxi-adapters models::streaming（SSE 帧解析）+ accumulators（五族流式累积）+ lingxi-service streaming_norm（规范化事件桥：MOOD/思考块、签名隔离）",
+    "network_policy": "models::dispatch（分阶段超时/重试分类/429-5xx/幂等边界）+ models::egress（URL/内网字面量/同源边界）+ models::compat（incumbent 兼容层）",
+    "worker_and_operations": "lingxi-service workermodel（GatewayWorkerModel：同一 QuotaManager 配额、callback trace 台账先记账后回话）+ operations.rs（operation 面：embedding/speech/transcribe/media/rerank 的统一 dispatch 与 usage sink）",
+    "usage_ledger": "lingxi-kernel usage（UsageFolder/ReportedUsage 四态）+ adapters models::usage（USAGE_MAPPINGS 公式表）+ storage migration v5（model_call_usage 表）+ runs/workermodel/operations 的记账接线（先提交后发布）"
+  },
+  "consumer_guidance_r06": {
+    "ready_to_consume": [
+      "R06 人格/记忆压缩所需的模型操作内核：chat/embedding/辅助槽经由 ModelGateway 与 CredentialService 的稳定入口（R05_SCOPE_MATRIX 的后续归属行）",
+      "统一规范化事件流（streaming_norm）：前端实时/历史直接消费，不需要第二套清洗",
+      "usage 台账 v5：按 owner/session/run/model_call 查询（MODEL_USAGE_SEMANTICS.md §语义）",
+      "正式 Rust 服务入口（--config 模型面）与二进制闭环证据模式（r05_t08_closed_loop 的五方一致/反作弊 nonce 模式可直接复用为 R06+ 的验收骨架）"
+    ],
+    "not_in_scope_r05": [
+      "R06 全量历史压缩/知识检索/人格编译器（R05 只交付最小会话交换层）",
+      "Tauri/React 壳替换（保持现役 Electron 入口，零改动并存）",
+      "真实数据切换与发布（NOT_IN_SCOPE）"
+    ]
+  },
+  "deferred_registrations": [
+    {
+      "id": "RR-BLK-CREDENTIALS",
+      "what": "LIVE 真实供应商验证",
+      "due": "R10（最迟）",
+      "ref": "docs/rust-tauri/R05/R05_LIVE_VERIFICATION.json"
+    },
+    {
+      "id": "R05-T05-C12-CAPABILITY-GAP",
+      "what": "代理配置处理与私有 CA 通道（NODE_EXTRA_CA_CERTS 等价物）",
+      "due": "后续网络加固阶段（REV-T05 复核的显式延期）",
+      "ref": "docs/rust-tauri/R05/R05_BLOCKERS.md §3"
+    },
+    {
+      "id": "PLATFORM-WINDOWS-LINUX",
+      "what": "Windows 进程/沙盒实现与 Linux 真机验证（继承 R04 起）",
+      "due": "具备平台窗口时（不在 R05 清零）",
+      "ref": "docs/rust-tauri/R04/R04_PLATFORM_CAPABILITIES.json + R05_BLOCKERS.md §4"
+    }
+  ],
+  "stage_gate_registration": {
+    "map": "rust/crates/xtask/src/stage_maps/R05.json（18 场景：16 A-ID + SUP-R04REG + SUP-SCOPE；7 命令含 r04_regression_gate 前序整链）",
+    "producer": "scripts/rust-tauri/r05_t08_stage_suites.sh + docs/rust-tauri/R05/r05_stage_pins.tsv（82 钉）/ r05_stage_cids.tsv（159 行、91 C-ID）",
+    "runner_binding": "xtask main.rs STAGE_MAPS + runner_identity.rs EMBEDDED/SOURCE_INVENTORY（R05.json 双处注册——负向 N16 抓到并修正的缺口）",
+    "negative_gate": "scripts/rust-tauri/r05_t08_negative_gate.sh（16 项；报告 docs/rust-tauri/R05/R05_NEGATIVE_GATE_REPORT.md）"
+  },
+  "review_status": {
+    "independent_review": "PENDING（R05_INDEPENDENT_REVIEW.md 由未参与实现的独立审查者按附录D执行；T01–T07 各任务已过独立审查闭环，见 artifacts/rust-tauri/R05/REVIEW-T01..T07/）",
+    "stage_review": "待独立审查后由总控收口"
+  }
+}

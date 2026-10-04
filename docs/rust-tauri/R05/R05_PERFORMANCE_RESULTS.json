@@ -1,0 +1,67 @@
+{
+  "schemaVersion": 1,
+  "artifactKind": "R05_PERFORMANCE_RESULTS",
+  "stage_id": "R05",
+  "generated_by": "EXECUTOR-R05-T08",
+  "generated_at": "2026-10-04",
+  "honestyRule": "每个数值要么是事前冻结的门槛（kind=preregistered_threshold，在实现/测量前登记），要么是实测结果（kind=measured，附命令与证据路径）。没有实测不承诺任何提速、token 节省或费用降低；本文件不含任何臆测收益。",
+  "preregisteredThresholds": {
+    "declaredWhere": "以下门槛在 R05-T08 的 C12 二进制闭环测试落地时、于任何测量执行之前写入测试断言与本文档（双处一致；rust/crates/lingxi-service/tests/r05_t08_closed_loop.rs 的 c12_repeated_cycles_stay_bounded）。",
+    "binary_service_rss_kib_max": {
+      "value": 409600,
+      "human": "400 MiB",
+      "kind": "preregistered_threshold",
+      "enforcedBy": "c12_repeated_cycles_stay_bounded (assert rss_end < 400*1024 KiB)"
+    },
+    "binary_service_rss_growth_kib_max_across_cycles": {
+      "value": 153600,
+      "human": "150 MiB growth from the post-warmup baseline across the mixed cycles",
+      "kind": "preregistered_threshold",
+      "enforcedBy": "c12_repeated_cycles_stay_bounded"
+    },
+    "binary_service_open_fds_max": {
+      "value": 400,
+      "kind": "preregistered_threshold",
+      "enforcedBy": "c12_repeated_cycles_stay_bounded"
+    },
+    "binary_service_open_fds_growth_max": {
+      "value": 64,
+      "kind": "preregistered_threshold",
+      "enforcedBy": "c12_repeated_cycles_stay_bounded (fds_end <= fds_start + 64)"
+    },
+    "rotated_log_files_max": {
+      "value": 3,
+      "note": "--log-max-files 3 显式配置后的稳态日志文件数上限（轮转生效）",
+      "kind": "preregistered_threshold",
+      "enforcedBy": "c12_repeated_cycles_stay_bounded"
+    },
+    "inherited": "docs/rust-tauri/PERFORMANCE_THRESHOLDS.json（R00/R01 现行门槛）在本阶段零放宽；R05-T05 的连接/首片/空闲/总期限、重试与退避上限在 T05 实现前登记（见 R05_ACCEPTANCE_LEDGER.json 的 T05 条目与 rust/crates/lingxi-adapters/tests/r05_t05_timeouts.rs 的 pinned 值），本阶段未调整。"
+  },
+  "measured": {
+    "c12_mixed_cycles_binary_service": {
+      "kind": "measured",
+      "command": "cargo test --manifest-path rust/Cargo.toml --locked -p lingxi-service --test r05_t08_closed_loop -- --test-threads=2",
+      "scope": "同一正式二进制进程：2 轮热身 + 12 轮混合循环（成功/注入 500 失败/幂等重放），采样 ps RSS 与 lsof FD 数",
+      "evidence": "artifacts/rust-tauri/R05/T08-E01/test-service-r05-t08-closed-loop.log（断言内嵌实测值失败才打印；通过即处于门槛内）",
+      "result": "PASS（10/10，含 c12；实测值均在事前门槛内——门槛断言即测量边界，超出即测试失败）",
+      "note": "失败注入腿 ≥4 轮真实发生（run 状态 failed 落库）；重放腿断言 stub 命中数零增长。"
+    },
+    "workspace_gate_duration": {
+      "kind": "measured",
+      "command": "cargo test --manifest-path rust/Cargo.toml --workspace --locked",
+      "evidence": "artifacts/rust-tauri/R05/T08-E01/gates-test-workspace.log",
+      "result": "见该日志尾部（执行窗口内记录）"
+    },
+    "stage_producer_run": {
+      "kind": "measured",
+      "command": "bash scripts/rust-tauri/r05_t08_stage_suites.sh <fresh-dir>",
+      "scope": "18 个集成套件（190 测试）+ 64 个 lib 精确钉（cargo 全真实链）",
+      "evidence": "生产者在最终门禁内的运行产物：artifacts/rust-tauri/R05/T08-E01/verify-R05/R05_SUITES/summary.txt",
+      "result": "82/82 运行全绿（18 套件 + 64 lib 钉，91 C-ID 全通过机器核验）"
+    }
+  },
+  "notClaimed": [
+    "本文件不宣称任何相对旧 Pi/Electron 链路的性能、token 或费用优势——R05 未做对照基准测量，任何此类结论都需在授权的真实负载下另行实测。",
+    "Windows/Linux 的资源稳态未实测（平台项见 R05_LIVE_VERIFICATION.json 的 platformVerification）。"
+  ]
+}

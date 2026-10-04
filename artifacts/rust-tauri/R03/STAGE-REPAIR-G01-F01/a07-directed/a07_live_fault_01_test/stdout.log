@@ -1,0 +1,14 @@
+   Compiling ring v0.17.14
+   Compiling lingxi-kernel v0.0.0 (/Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-kernel)
+   Compiling lingxi-adapters v0.0.0 (/Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-adapters)
+   Compiling lingxi-service v0.0.0 (/Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-service)
+   Compiling rcgen v0.14.10
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 6.41s
+     Running tests/execute_concurrency.rs (rust/target/debug/deps/execute_concurrency-4d82ca861ea55af2)
+
+running 1 test
+R02_A07_LIVE_FAULT busyHttp=503 busyReason=db_busy busyLiveEvents=0 busyRuns=0 busyKeyEvents=0 terminalHttp=500 terminalReason=db_failure terminalLiveEvents=1 terminalRunId=run_000001a0ed3849a5_000002 terminalStoredStatus=running diskRuns=1 diskKeyEvents=1 diskStatus=running restartRuns=1 restartKeyEvents=2 restartStatus=interrupted_needs_attention
+test http_running_storage_fault_has_no_success_event_or_restart_run ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 2 filtered out; finished in 0.10s
+

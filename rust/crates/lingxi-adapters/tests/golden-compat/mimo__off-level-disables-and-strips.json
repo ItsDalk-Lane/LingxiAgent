@@ -1,0 +1,47 @@
+{
+  "schema": "r05-t05-compat-golden/v1",
+  "module": "mimo",
+  "case": "off-level-disables-and-strips",
+  "model": {
+    "provider": "mimo",
+    "id": "mimo-v7-pro",
+    "baseUrl": "https://xiaomimimo.com/v1",
+    "api": "openai-completions",
+    "reasoning": true
+  },
+  "payload": {
+    "model": "mimo-v7-pro",
+    "messages": [
+      {
+        "role": "assistant",
+        "content": "a",
+        "reasoning_content": "trace"
+      }
+    ],
+    "chat_template_kwargs": {
+      "enable_thinking": true,
+      "preserve_thinking": true
+    }
+  },
+  "options": {
+    "mode": "chat",
+    "reasoningLevel": "off"
+  },
+  "expected": {
+    "thinkingFormat": "qwen-chat-template",
+    "reasoningProfile": "mimo-openai",
+    "matched": "mimo",
+    "result": {
+      "model": "mimo-v7-pro",
+      "messages": [
+        {
+          "role": "assistant",
+          "content": "a"
+        }
+      ],
+      "chat_template_kwargs": {
+        "enable_thinking": false
+      }
+    }
+  }
+}

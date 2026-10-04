@@ -1,0 +1,8 @@
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.08s
+     Running unittests src/lib.rs (target/debug/deps/lingxi_service-859f4a65b7026329)
+
+running 1 test
+test serve::tls_tests::secure_marker_requires_a_real_tls_handshake ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 169 filtered out; finished in 0.03s
+

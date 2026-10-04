@@ -1,0 +1,19 @@
+   Compiling lingxi-service v0.0.0 (/Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-service)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 3.66s
+     Running unittests src/lib.rs (target/debug/deps/lingxi_service-859f4a65b7026329)
+
+running 1 test
+
+thread 'serve::tls_tests::secure_marker_requires_a_real_tls_handshake' (37463614) panicked at crates/lingxi-service/src/serve.rs:324:63:
+called `Result::unwrap()` on an `Err` value: Os { code: 1, kind: PermissionDenied, message: "Operation not permitted" }
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+test serve::tls_tests::secure_marker_requires_a_real_tls_handshake ... FAILED
+
+failures:
+
+failures:
+    serve::tls_tests::secure_marker_requires_a_real_tls_handshake
+
+test result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 168 filtered out; finished in 0.00s
+
+error: test failed, to rerun pass `-p lingxi-service --lib`

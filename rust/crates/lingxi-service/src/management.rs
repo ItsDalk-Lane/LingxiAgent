@@ -583,7 +583,191 @@ pub(crate) fn routes() -> Router<ServiceState> {
             "/lingxi/v1/session-thinking-level",
             get(read_thinking_level).post(write_thinking_level),
         )
+        .route("/lingxi/v1/models/reload", post(reload_models))
+        .route("/lingxi/v1/models/credentials", get(list_model_credentials))
+        .route(
+            "/lingxi/v1/models/credentials/{provider}/revoke",
+            post(revoke_model_credential),
+        )
         .route("/lingxi/v1/server/identity", get(server_identity))
+}
+
+/// Reloads the model plane from the SAME source it was loaded from at
+/// startup (R05-T01 C05): re-read + full validation + one atomic snapshot
+/// swap with a bumped generation. A source that no longer carries a valid
+/// plane is a loud 409 — the running snapshot is never silently cleared or
+/// half-swapped, and removing the plane requires a restart (there is no
+/// "unconfigure at runtime" path).
+async fn reload_models(
+    State(state): State<ServiceState>,
+    Extension(principal): Extension<Principal>,
+) -> Response {
+    if principal.kind != PrincipalKind::LocalUser {
+        return EndpointError::local_only().into_response();
+    }
+    let (source, gateway) = match (state.model_plane_source(), state.model_gateway()) {
+        (Some(source), Some(gateway)) => (source.clone(), gateway.clone()),
+        _ => {
+            return EndpointError::not_found()
+                .with_reason("model_plane_unconfigured")
+                .with_cause("models.unconfigured")
+                .into_response()
+        }
+    };
+    let plane = match &source {
+        crate::config::ModelPlaneSource::EmbeddedInConfigFile { path } => {
+            match crate::config::read_service_config(path) {
+                Ok(file) => match file.model_plane {
+                    Some(plane) => plane,
+                    None => {
+                        return reload_invalid(
+                            &source,
+                            "the config file no longer carries providers/models sections \
+                             (removing the model plane requires a restart)",
+                        );
+                    }
+                },
+                Err(err) => return reload_invalid(&source, &err.to_string()),
+            }
+        }
+        crate::config::ModelPlaneSource::ModelsFile { path } => {
+            let raw = match std::fs::read_to_string(path) {
+                Ok(raw) => raw,
+                Err(err) => {
+                    return reload_invalid(
+                        &source,
+                        &format!("cannot read {}: {err}", path.display()),
+                    );
+                }
+            };
+            match lingxi_adapters::models::config::ModelPlaneConfig::parse_and_validate(&raw) {
+                Ok(plane) => plane,
+                Err(err) => return reload_invalid(&source, &err.to_string()),
+            }
+        }
+    };
+    // R05-T02: the credential service re-seeds from the SAME freshly
+    // validated plane FIRST (its cells keep unchanged providers' tokens and
+    // in-flight flights; a changed provider gets a fresh cell), then the
+    // gateway swaps — one consistent plane across both.
+    if let Some(credentials) = state.credential_service() {
+        credentials.reload(&plane).await;
+    }
+    let generation = gateway.reload(plane);
+    // R05-T06: the operation plane's egress allowlist follows the CURRENT
+    // provider endpoints (a same-origin media-product destination that a
+    // reload moved is no longer same-origin — the swap is atomic with the
+    // gateway's).
+    if let Some(operations) = state.operations() {
+        let endpoints: Vec<String> = gateway
+            .provider_endpoints()
+            .into_iter()
+            .map(|(_, endpoint)| endpoint)
+            .collect();
+        if let Err(err) = operations.refresh_egress_origins(&endpoints) {
+            return reload_invalid(&source, &err.to_string());
+        }
+    }
+    let now = state.clock.now_unix_ms();
+    if let Err(err) = state.management.change(|next| {
+        audit_with_metadata(
+            next,
+            "models.reload",
+            "model-plane",
+            now,
+            serde_json::json!({"generation": generation}),
+        );
+        Ok(())
+    }) {
+        return err.into_response();
+    }
+    Json(serde_json::json!({"ok": true, "generation": generation})).into_response()
+}
+
+/// The material-free credential status of every configured provider
+/// (R05-T02 C06/C09): kind, state, expiry ledger, refresh-in-flight, and
+/// the honest persistence flags — never any material.
+async fn list_model_credentials(
+    State(state): State<ServiceState>,
+    Extension(principal): Extension<Principal>,
+) -> Response {
+    if principal.kind != PrincipalKind::LocalUser {
+        return EndpointError::local_only().into_response();
+    }
+    let Some(credentials) = state.credential_service() else {
+        return EndpointError::not_found()
+            .with_reason("model_plane_unconfigured")
+            .with_cause("models.unconfigured")
+            .into_response();
+    };
+    Json(serde_json::json!({"providers": credentials.status().await})).into_response()
+}
+
+/// Revokes one provider's credential (R05-T02 C05): the stored OAuth token
+/// set is deleted and the in-memory material flips to revoked with a
+/// generation bump that fences any in-flight refresh's write-back. A
+/// persistence failure is a loud 409 (the credential stays active — never
+/// a pretend-revocation).
+async fn revoke_model_credential(
+    State(state): State<ServiceState>,
+    Extension(principal): Extension<Principal>,
+    RoutePath(provider): RoutePath<String>,
+) -> Response {
+    if principal.kind != PrincipalKind::LocalUser {
+        return EndpointError::local_only().into_response();
+    }
+    let Some(credentials) = state.credential_service() else {
+        return EndpointError::not_found()
+            .with_reason("model_plane_unconfigured")
+            .with_cause("models.unconfigured")
+            .into_response();
+    };
+    match credentials.revoke(&provider).await {
+        Ok(()) => {
+            let now = state.clock.now_unix_ms();
+            if let Err(err) = state.management.change(|next| {
+                audit_with_metadata(
+                    next,
+                    "models.credentials.revoke",
+                    "model-plane",
+                    now,
+                    serde_json::json!({"provider": provider}),
+                );
+                Ok(())
+            }) {
+                return err.into_response();
+            }
+            Json(serde_json::json!({"ok": true, "provider": provider})).into_response()
+        }
+        Err(lingxi_adapters::models::credentials::CredentialError::NotConfigured { .. }) => {
+            EndpointError::not_found()
+                .with_reason("model_provider_unknown")
+                .with_cause("models.provider_unknown")
+                .into_response()
+        }
+        Err(err) => EndpointError::new(
+            StatusCode::CONFLICT,
+            ErrorCode::Internal,
+            format!("credential revocation refused: {err}"),
+        )
+        .with_reason("credential_revoke_failed")
+        .with_cause("models.credentials_revoke_failed")
+        .into_response(),
+    }
+}
+
+fn reload_invalid(source: &crate::config::ModelPlaneSource, detail: &str) -> Response {
+    EndpointError::new(
+        StatusCode::CONFLICT,
+        ErrorCode::InvalidMessage,
+        format!(
+            "model plane reload from {} refused: {detail}",
+            source.path().display()
+        ),
+    )
+    .with_reason("model_plane_reload_invalid")
+    .with_cause("models.reload_invalid")
+    .into_response()
 }
 
 async fn server_identity(

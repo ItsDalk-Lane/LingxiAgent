@@ -1,0 +1,24 @@
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.08s
+     Running tests/r03_t08_acceptance_matrix.rs (target/debug/deps/r03_t08_acceptance_matrix-608aa6893a591e2c)
+
+running 17 tests
+test combo_cross_session_parallel_both_complete ... ok
+test combo_timeout_budget_is_a_loud_failure ... ok
+test combo_cancel_during_stream_read ... ok
+test leaf_cancel_outcome_shapes ... ok
+test leaf_background_completes_decoupled_and_survives_cancels ... ok
+test combo_multi_turn_model_one_terminal ... ok
+test leaf_subagent_dispatch_reply_close ... ok
+test combo_cancel_during_approval_wait ... ok
+test leaf_steer_semantics_busy_miss_and_drain ... ok
+test leaf_reconnect_resume_never_restarts_the_model ... ok
+test combo_duplicate_request_id_replays_and_conflicts ... ok
+test combo_normal_completes_with_final ... ok
+test leaf_escalation_denied_zero_children ... ok
+test leaf_child_cancel_stops_only_the_child ... ok
+test combo_crash_recovery_is_honestly_interrupted ... ok
+test combo_multi_tool_three_calls ... ok
+test leaf_parent_cancel_stops_child ... ok
+
+test result: ok. 17 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.69s
+

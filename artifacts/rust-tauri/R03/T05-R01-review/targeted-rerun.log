@@ -1,0 +1,21 @@
+== targeted: -p lingxi-kernel --lib invocation ==
+
+test result: ok. 10 passed; 0 failed; 0 ignored; 0 measured; 25 filtered out; finished in 0.00s
+
+== targeted: -p lingxi-adapters --test invocation_journal_store ==
+
+test result: ok. 5 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.02s
+
+== targeted: -p lingxi-service --test invocation_journal -- --test-threads=1 ==
+test r03_a10_idempotent_key_resume_does_not_duplicate_the_external_operation ... ok
+
+test result: ok. 3 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.18s
+
+== targeted: name r03_a09 ==
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 2 filtered out; finished in 0.06s
+
+== targeted: name r03_a10 ==
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 2 filtered out; finished in 0.06s
+

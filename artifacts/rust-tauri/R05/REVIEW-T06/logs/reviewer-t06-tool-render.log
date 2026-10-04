@@ -1,0 +1,11 @@
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.08s
+     Running unittests src/lib.rs (rust/target/debug/deps/lingxi_adapters-1eeffceeed15e270)
+
+running 3 tests
+test models::tool_render::tests::running_and_stop_unconfirmed_statuses_are_honest ... ok
+test models::tool_render::tests::the_four_base_states_keep_the_t01_vocabulary ... ok
+test models::tool_render::tests::success_renders_resources_status_and_truncation_last ... ok
+
+test result: ok. 3 passed; 0 failed; 0 ignored; 0 measured; 97 filtered out; finished in 0.00s
+
+EXIT=0

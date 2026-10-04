@@ -1,0 +1,20 @@
+   Compiling lingxi-service v0.0.0 (/Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-service)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 1.13s
+     Running tests/event_subscription.rs (/tmp/r03-t01-review-target/debug/deps/event_subscription-464e095aaf0192a3)
+
+running 12 tests
+test a10_negative_rejections_are_loud ... ok
+test a10_expired_cursor_gets_explicit_snapshot_required_and_rebuild_matches_authority ... ok
+test ws_pre_hello_connection_cannot_hold_the_shutdown_drain ... ok
+test a10_duplicate_event_publication_is_deduped ... ok
+test a10_purge_all_stale_cursor_gets_rebuild_directive_not_future_cursor ... ok
+test f02_intra_page_seq_gap_is_loud_corruption_never_a_silent_skip ... ok
+test a09_parallel_subscribers_see_identical_views ... ok
+test f02_resume_first_event_gap_gets_explicit_snapshot_directive ... ok
+test f02_purge_resume_race_never_produces_a_silent_hole ... ok
+test a09_snapshot_and_subscription_have_no_gap_at_every_commit_boundary ... ok
+test a09_join_window_race_under_concurrent_writer_loses_nothing ... ok
+test ws_subscribe_snapshot_live_and_rejections ... ok
+
+test result: ok. 12 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 2.86s
+

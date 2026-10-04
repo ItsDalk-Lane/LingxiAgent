@@ -1,0 +1,48 @@
+Diff in /Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-service/tests/auth_matrix.rs:786:
+     .await;
+     assert_eq!(status, 200, "repaired registry must restore access: {body}");
+ 
+-    let devices_path = layout
+-        .runtime_dir
+-        .join(lingxi_service::auth::DEVICES_FILE);
++    let devices_path = layout.runtime_dir.join(lingxi_service::auth::DEVICES_FILE);
+     let valid_devices = std::fs::read(&devices_path).unwrap();
+     std::fs::remove_file(&devices_path).unwrap();
+     let (status, body) = http(
+Diff in /Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-service/tests/auth_matrix.rs:843:
+         .find(|record| record["credentialId"] == credential_id)
+         .unwrap();
+     record["expiresAtUnixMs"] = serde_json::json!(1);
+-    std::fs::write(&credentials_path, serde_json::to_vec_pretty(&credentials).unwrap()).unwrap();
++    std::fs::write(
++        &credentials_path,
++        serde_json::to_vec_pretty(&credentials).unwrap(),
++    )
++    .unwrap();
+     let (status, body) = http(
+         server.addr,
+         "GET",
+Diff in /Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-service/tests/auth_matrix.rs:860:
+         .iter_mut()
+         .find(|record| record["credentialId"] == credential_id)
+         .unwrap()["expiresAtUnixMs"] = serde_json::Value::Null;
+-    std::fs::write(&credentials_path, serde_json::to_vec_pretty(&credentials).unwrap()).unwrap();
++    std::fs::write(
++        &credentials_path,
++        serde_json::to_vec_pretty(&credentials).unwrap(),
++    )
++    .unwrap();
+     let (status, body) = http(
+         server.addr,
+         "GET",
+Diff in /Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-service/tests/auth_matrix.rs:871:
+     .await;
+     assert_eq!(status, 200, "restored expiry must restore access: {body}");
+ 
+-    let devices_path = layout
+-        .runtime_dir
+-        .join(lingxi_service::auth::DEVICES_FILE);
++    let devices_path = layout.runtime_dir.join(lingxi_service::auth::DEVICES_FILE);
+     let mut devices: serde_json::Value =
+         serde_json::from_slice(&std::fs::read(&devices_path).unwrap()).unwrap();
+     let device = devices["devices"]

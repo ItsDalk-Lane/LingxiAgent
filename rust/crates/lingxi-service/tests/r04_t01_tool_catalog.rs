@@ -26,9 +26,10 @@
 use std::pin::Pin;
 use std::sync::Arc;
 
+use lingxi_kernel::model_exchange::ModelTurnInput;
 use lingxi_kernel::ports::{
     ProviderDescriptor, ProviderTurn, ProviderTurnResult, StoragePort, ToolExecutionResult,
-    ToolExecutorPort, ToolOutcome, ToolRequest, TurnProviderPort,
+    ToolExecutorPort, ToolOutcome, ToolRequest, TurnDeltaSink, TurnProviderPort,
 };
 use lingxi_kernel::toolcatalog::{
     Availability, CatalogPin, DeclaredPermission, PermissionContract, PermissionKind, SchemaBudget,
@@ -606,8 +607,9 @@ async fn adversarial_forged_digest_is_refused_with_zero_dispatch_on_real_chain()
             &'a self,
             ctx: &'a lingxi_kernel::RunContext,
             _call: &'a ModelCallId,
-            _turn: u32,
-            _input: &'a str,
+            _input: &'a ModelTurnInput,
+
+            _deltas: &'a dyn TurnDeltaSink,
         ) -> Pin<Box<dyn std::future::Future<Output = ProviderTurnResult> + Send + 'a>> {
             let ctx_at_issue = ctx.clone();
             let next = match self.forged.lock().unwrap().take() {
@@ -617,6 +619,7 @@ async fn adversarial_forged_digest_is_refused_with_zero_dispatch_on_real_chain()
                         .unwrap()
                         .push(request.target.clone());
                     ProviderTurn::ToolRequests {
+                        content: Vec::new(),
                         requests: vec![request],
                     }
                 }

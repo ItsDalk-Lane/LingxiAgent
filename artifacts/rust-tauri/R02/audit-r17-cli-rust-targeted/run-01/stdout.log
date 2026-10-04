@@ -1,0 +1,11 @@
+
+ RUN  v4.1.10 /Users/study_superior/Desktop/Code/LingxiAgent
+
+ ❯ tests/cli-rust-service.test.ts (7 tests | 1 failed) 41ms
+     × binds a local token to the matching instance and home 29ms
+
+ Test Files  1 failed | 3 passed (4)
+      Tests  1 failed | 35 passed (36)
+   Start at  15:11:14
+   Duration  270ms (transform 243ms, setup 73ms, import 248ms, tests 208ms, environment 0ms)
+

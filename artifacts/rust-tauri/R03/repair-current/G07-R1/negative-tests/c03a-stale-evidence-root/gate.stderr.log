@@ -1,0 +1,4 @@
+   Compiling xtask v0.1.0 (/private/tmp/lingxi-r03-g07-neg-Y9bhvn/rust/crates/xtask)
+    Finished `dev` profile [unoptimized + debuginfo] target(s) in 0.42s
+     Running `/tmp/rust-target-r03-g07-neg/debug/xtask verify-stage R03 --evidence /Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R03/repair-current/G07-R1/negative-tests/c03a-stale-evidence-root/evidence`
+error: evidence root /Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R03/repair-current/G07-R1/negative-tests/c03a-stale-evidence-root/evidence is not empty; preserving its prior evidence

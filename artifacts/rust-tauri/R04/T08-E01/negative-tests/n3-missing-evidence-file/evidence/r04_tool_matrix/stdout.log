@@ -1,0 +1,7 @@
+== building the tool-matrix test (rustup 1.98.1, /Users/study_superior/.cache/lingxi-r04-t08-neg-target, --locked) ==
+PASS build (locked, offline)
+== running the full tool matrix through the REAL chain (A15/A16 + matrix cells) ==
+PASS tool matrix green (real chain; doubles = external responses only)
+assembled 56 leaf cases
+PASS case files assembled (leaf-cases.json + matrix-counts.json)
+RESULT: R04-T08 matrix evidence ALL GREEN

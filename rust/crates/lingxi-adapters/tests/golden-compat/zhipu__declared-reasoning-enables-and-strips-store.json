@@ -1,0 +1,35 @@
+{
+  "schema": "r05-t05-compat-golden/v1",
+  "module": "zhipu",
+  "case": "declared-reasoning-enables-and-strips-store",
+  "model": {
+    "provider": "zhipu",
+    "id": "glm-4.7",
+    "baseUrl": "https://open.bigmodel.cn/api/paas/v4",
+    "api": "openai-completions",
+    "reasoning": true
+  },
+  "payload": {
+    "model": "glm-4.7",
+    "messages": [],
+    "store": true,
+    "stream_options": {
+      "include_usage": true
+    }
+  },
+  "options": {
+    "mode": "chat"
+  },
+  "expected": {
+    "thinkingFormat": "zhipu",
+    "reasoningProfile": "zhipu-openai",
+    "matched": "zhipu",
+    "result": {
+      "model": "glm-4.7",
+      "messages": [],
+      "thinking": {
+        "type": "enabled"
+      }
+    }
+  }
+}

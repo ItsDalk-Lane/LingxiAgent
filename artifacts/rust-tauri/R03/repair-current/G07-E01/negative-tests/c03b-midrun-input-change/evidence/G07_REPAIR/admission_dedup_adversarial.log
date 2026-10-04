@@ -1,0 +1,13 @@
+   Compiling lingxi-service v0.0.0 (/private/tmp/lingxi-r03-g07-neg-P5Y0n1/rust/crates/lingxi-service)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 1.62s
+     Running tests/admission_dedup_adversarial.rs (/tmp/rust-target-r03-g07-neg/debug/deps/admission_dedup_adversarial-874804375557d917)
+
+running 5 tests
+test adv_c01_spawn_window_failure_and_retraction_leave_no_sticky_state ... ok
+test adv_c03_isolation_controls_hold_while_a_key_is_mid_admission ... ok
+test adv_c04_response_lost_before_any_external_effect_replays_real_run ... ok
+test adv_c02_response_lost_inside_start_window_resolves_lazily ... ok
+test adv_c05_restart_with_unknown_side_effects_refuses_explicitly ... ok
+
+test result: ok. 5 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.36s
+

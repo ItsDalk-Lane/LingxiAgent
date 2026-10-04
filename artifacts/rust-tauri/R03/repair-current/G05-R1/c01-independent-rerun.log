@@ -1,0 +1,9 @@
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.08s
+     Running tests/input_payload_fidelity.rs (rust/target/debug/deps/input_payload_fidelity-6d468f34bc527a37)
+
+running 2 tests
+test c01_foreground_boundary_lengths_deliver_the_full_input ... ok
+test c01_background_boundary_lengths_deliver_the_full_input ... ok
+
+test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 3 filtered out; finished in 0.11s
+

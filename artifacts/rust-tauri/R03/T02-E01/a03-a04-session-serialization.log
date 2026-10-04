@@ -1,0 +1,21 @@
+   Compiling lingxi-service v0.0.0 (/Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-service)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 2.26s
+     Running tests/session_serialization.rs (/tmp/r03-t02-target/debug/deps/session_serialization-ba918f8a010dc0ee)
+
+running 5 tests
+R03_A03_TRACE 1: submission1 running, turn1 arrived (session busy)
+R03_A03_TRACE 2: submission2 (normal) REJECTED session_busy, zero side effects
+R03_A03_TRACE 3: steering ACCEPTED into the running turn (loop not interrupted)
+R03_A03_TRACE 4: turn2 input observed with steered text (steer -> NEXT model call)
+R03_A04_TRACE 1: sessionA parked in tool call (tool permit held, alpha busy)
+R03_A04_TRACE 2: sessionB completed while sessionA still parked (no global lock)
+R03_A04_TRACE 3: cancelA -> tool/model permits 0, alpha lease freed; run row honestly 'running' (cancelled-terminal = R03-T03)
+R03_A03_TRACE 5: session idle after settle; next submission ACCEPTED (run run_000001a0dcba6c00_000002)
+test failed_tool_path_settles_and_returns_quotas ... ok
+test r03_a04_cross_session_parallel_and_quota_release_on_cancel ... ok
+test r03_a03_same_session_serializes_and_steers_per_frozen_semantics ... ok
+test leftover_steering_survives_into_the_next_run ... ok
+test quota_exhaustion_fails_loudly_and_releases_on_settle ... ok
+
+test result: ok. 5 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.75s
+

@@ -1,0 +1,16 @@
+
+ RUN  v4.1.10 /Users/study_superior/Desktop/Code/LingxiAgent
+
+stdout | desktop/src/react/__tests__/app-init.test.ts > initApp bridge indicator > refreshes local token and rebuilds websocket after server restart
+[hana-launch] app-ready
+
+ ❯ desktop/src/react/__tests__/app-init.test.ts (15 tests | 1 failed) 453ms
+     × refreshes local token and rebuilds websocket after server restart 5ms
+ ❯ desktop/src/react/__tests__/settings/SettingsContent.test.tsx (9 tests | 1 failed) 951ms
+     × keeps activeServerConnection in sync when the settings window hears server restart 59ms
+
+ Test Files  2 failed | 3 passed (5)
+      Tests  2 failed | 61 passed (63)
+   Start at  18:13:53
+   Duration  1.39s (transform 1.11s, setup 84ms, import 675ms, tests 1.80s, environment 585ms)
+

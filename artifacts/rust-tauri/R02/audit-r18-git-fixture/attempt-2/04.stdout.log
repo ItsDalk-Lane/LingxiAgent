@@ -1,0 +1,4 @@
+[main (root-commit) 45f62b5] baseline
+ 2 files changed, 2 insertions(+)
+ create mode 100644 .gitignore
+ create mode 100644 src/tracked.rs

@@ -1,0 +1,10 @@
+   Compiling lingxi-adapters v0.0.0 (/Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-adapters)
+   Compiling lingxi-service v0.0.0 (/Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-service)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 7.79s
+     Running tests/r04_t08_tool_matrix.rs (target/debug/deps/r04_t08_tool_matrix-41a0efe61e213765)
+
+running 1 test
+test terminal_family_share_cases ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 9 filtered out; finished in 0.22s
+

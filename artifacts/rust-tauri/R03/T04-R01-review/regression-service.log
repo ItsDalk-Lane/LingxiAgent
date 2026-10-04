@@ -1,0 +1,120 @@
+   Compiling serde_core v1.0.229
+   Compiling serde v1.0.229
+   Compiling serde_json v1.0.151
+   Compiling futures-channel v0.3.34
+   Compiling slab v0.4.12
+   Compiling futures-task v0.3.34
+   Compiling sync_wrapper v1.0.2
+   Compiling num-traits v0.2.19
+   Compiling hashbrown v0.17.1
+   Compiling regex-syntax v0.8.11
+   Compiling syn v3.0.6
+   Compiling syn v2.0.119
+   Compiling futures-util v0.3.34
+   Compiling hashlink v0.12.2
+   Compiling rusqlite v0.40.2
+   Compiling regex-automata v0.4.18
+   Compiling serde_derive_internals v0.30.0
+   Compiling tokio-macros v2.7.2
+   Compiling serde_derive v1.0.229
+   Compiling ref-cast-impl v1.0.27
+   Compiling schemars_derive v1.2.2
+   Compiling matchers v0.2.0
+   Compiling ref-cast v1.0.27
+   Compiling tokio v1.53.1
+   Compiling tracing-attributes v0.1.31
+   Compiling tracing v0.1.44
+   Compiling chrono v0.4.45
+   Compiling axum-core v0.5.6
+   Compiling tracing-subscriber v0.3.23
+   Compiling serde_path_to_error v0.1.20
+   Compiling hyper v1.11.1
+   Compiling tower v0.5.3
+   Compiling tokio-rustls v0.26.5
+   Compiling schemars v1.2.2
+   Compiling serde_urlencoded v0.7.1
+   Compiling hyper-util v0.1.21
+   Compiling axum v0.8.9
+   Compiling lingxi-protocol v0.0.0 (/Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-protocol)
+   Compiling lingxi-kernel v0.0.0 (/Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-kernel)
+   Compiling lingxi-adapters v0.0.0 (/Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-adapters)
+   Compiling lingxi-service v0.0.0 (/Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-service)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 11.93s
+     Running tests/cancellation_tree.rs (/tmp/r03-t04-r01-review-target/debug/deps/cancellation_tree-44323aec67552ea7)
+
+running 8 tests
+test state_change_transaction_commits_legal_legs_and_diagnoses_bad_ones ... ok
+test panicking_tool_child_is_supervised_and_the_run_settles_loudly ... ok
+test cancel_surface_is_diagnosable_for_unknown_terminal_foreign_and_dangling ... ok
+test queue_wait_cancel_leaves_the_unrelated_holder_untouched ... ok
+test r03_a06_cancel_parent_spares_unrelated_background ... ok
+test approval_wait_round_trips_approve_and_reject_legs ... ok
+test r03_a05_cancel_exits_each_wait_state_and_returns_quotas ... ok
+test noncooperating_child_is_reported_unconfirmed_not_fake_quiet ... ok
+
+test result: ok. 8 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.60s
+
+     Running tests/event_subscription.rs (/tmp/r03-t04-r01-review-target/debug/deps/event_subscription-464e095aaf0192a3)
+
+running 12 tests
+test a10_negative_rejections_are_loud ... ok
+test ws_pre_hello_connection_cannot_hold_the_shutdown_drain ... ok
+test a09_parallel_subscribers_see_identical_views ... ok
+test a10_purge_all_stale_cursor_gets_rebuild_directive_not_future_cursor ... ok
+test f02_intra_page_seq_gap_is_loud_corruption_never_a_silent_skip ... ok
+test a10_duplicate_event_publication_is_deduped ... ok
+test a10_expired_cursor_gets_explicit_snapshot_required_and_rebuild_matches_authority ... ok
+test f02_resume_first_event_gap_gets_explicit_snapshot_directive ... ok
+test a09_snapshot_and_subscription_have_no_gap_at_every_commit_boundary ... ok
+test f02_purge_resume_race_never_produces_a_silent_hole ... ok
+test a09_join_window_race_under_concurrent_writer_loses_nothing ... ok
+test ws_subscribe_snapshot_live_and_rejections ... ok
+
+test result: ok. 12 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 2.85s
+
+     Running tests/execute_concurrency.rs (/tmp/r03-t04-r01-review-target/debug/deps/execute_concurrency-4d82ca861ea55af2)
+
+running 3 tests
+test http_running_storage_fault_has_no_success_event_or_restart_run ... ok
+test http_concurrent_executes_surface_the_busy_gate_and_mint_distinct_runs ... ok
+test in_process_concurrent_executes_serialize_then_mint_distinct_runs_across_restart ... ok
+
+test result: ok. 3 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.25s
+
+     Running tests/run_lifecycle.rs (/tmp/r03-t04-r01-review-target/debug/deps/run_lifecycle-6411cae2df204729)
+
+running 12 tests
+test turn_budget_exhaustion_fails_loudly_never_fake_completes ... ok
+test empty_reply_completes_without_final_and_names_the_cause ... ok
+test no_provider_configuration_is_explicit_and_r02_compatible ... ok
+test tool_request_without_executor_is_a_loud_failure ... ok
+test retry_budget_exhaustion_fails_loudly_with_attempt_count_honest ... ok
+test duplicate_finalize_replays_and_conflicting_finalize_is_diagnosed ... ok
+test process_only_run_completes_without_final_and_names_the_cause ... ok
+test non_retryable_failure_settles_without_extra_attempts ... ok
+test terminal_run_rejects_late_attempts_and_events_loudly ... ok
+test retryable_provider_failure_reopens_attempt_on_the_same_run ... ok
+test tool_partial_failure_has_its_own_outcome_not_a_fabricated_answer ... ok
+test r03_a01_three_model_calls_produce_exactly_one_task_terminal ... ok
+
+test result: ok. 12 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.41s
+
+     Running tests/service_persistence.rs (/tmp/r03-t04-r01-review-target/debug/deps/service_persistence-b0b0fe761f67a30e)
+
+running 2 tests
+test broken_database_is_a_loud_startup_failure ... ok
+test execute_persists_runs_that_survive_a_full_restart ... ok
+
+test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.11s
+
+     Running tests/session_serialization.rs (/tmp/r03-t04-r01-review-target/debug/deps/session_serialization-ba918f8a010dc0ee)
+
+running 5 tests
+test failed_tool_path_settles_and_returns_quotas ... ok
+test r03_a04_cross_session_parallel_and_quota_release_on_cancel ... ok
+test r03_a03_same_session_serializes_and_steers_per_frozen_semantics ... ok
+test leftover_steering_survives_into_the_next_run ... ok
+test quota_exhaustion_fails_loudly_and_releases_on_settle ... ok
+
+test result: ok. 5 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.71s
+

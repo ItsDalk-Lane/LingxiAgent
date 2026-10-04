@@ -1,0 +1,60 @@
+   Compiling serde_json v1.0.151
+   Compiling serde_core v1.0.229
+   Compiling num-traits v0.2.19
+   Compiling errno v0.3.14
+   Compiling sha2 v0.11.0
+   Compiling sha1 v0.11.0
+   Compiling tracing v0.1.44
+   Compiling futures-util v0.3.34
+   Compiling getrandom v0.4.3
+   Compiling thiserror v2.0.21
+   Compiling ring v0.17.14
+   Compiling if-addrs v0.15.0
+   Compiling rustls v0.23.45
+   Compiling uuid v1.26.1
+   Compiling signal-hook-registry v1.4.8
+   Compiling axum-core v0.5.6
+   Compiling tracing-subscriber v0.3.23
+   Compiling scrypt v0.12.0
+   Compiling serde v1.0.229
+   Compiling indexmap v2.14.2
+   Compiling serde_path_to_error v0.1.20
+   Compiling futures-executor v0.3.34
+   Compiling rustls-platform-verifier v0.7.1
+   Compiling tokio v1.53.1
+   Compiling futures v0.3.34
+   Compiling chrono v0.4.45
+   Compiling serde_urlencoded v0.7.1
+   Compiling rcgen v0.14.10
+   Compiling schemars v1.2.2
+   Compiling tokio-util v0.7.19
+   Compiling tower v0.5.3
+   Compiling tokio-rustls v0.26.5
+   Compiling tokio-stream v0.1.19
+   Compiling lingxi-protocol v0.0.0 (/Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-protocol)
+   Compiling tower-http v0.6.11
+   Compiling h2 v0.4.19
+   Compiling rmcp v3.4.1
+   Compiling lingxi-kernel v0.0.0 (/Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-kernel)
+   Compiling hyper v1.11.1
+   Compiling hyper-util v0.1.21
+   Compiling hyper-rustls v0.27.10
+   Compiling axum v0.8.9
+   Compiling reqwest v0.13.5
+   Compiling lingxi-adapters v0.0.0 (/Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-adapters)
+   Compiling lingxi-service v0.0.0 (/Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-service)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 29.05s
+     Running tests/r05_t03_protocol_adapters.rs (rust/target/debug/deps/r05_t03_protocol_adapters-58666f03dac16790)
+
+running 8 tests
+test c06_openai_completions_mixed_content_parts_survive_in_order ... ok
+test codex_family_runs_end_to_end_over_sse ... ok
+test c08_a_policy_refusal_rides_the_next_request_as_a_structured_failure ... ok
+test c02_anthropic_tool_roundtrip_with_the_real_file_tool ... ok
+test c03_google_parallel_calls_pair_function_responses_by_exchange_mapping ... ok
+test c12_retry_continues_the_confirmed_exchange_without_rebuild_or_redo ... ok
+test c07_auth_header_goes_verbatim_and_none_sends_nothing ... ok
+test c01_c04_same_model_id_two_families_never_cross_wire_or_credentials ... ok
+
+test result: ok. 8 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 4.38s
+

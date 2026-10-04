@@ -1,0 +1,2827 @@
+diff --git a/rust/Cargo.lock b/rust/Cargo.lock
+index 12fea4ba5..b3dfcf834 100644
+--- a/rust/Cargo.lock
++++ b/rust/Cargo.lock
+@@ -1198,6 +1198,7 @@ dependencies = [
+  "libc",
+  "lingxi-kernel",
+  "lingxi-protocol",
++ "reqwest",
+  "rusqlite",
+  "serde",
+  "serde_json",
+diff --git a/rust/crates/lingxi-adapters/Cargo.toml b/rust/crates/lingxi-adapters/Cargo.toml
+index 8d7297962..8c3da36cf 100644
+--- a/rust/crates/lingxi-adapters/Cargo.toml
++++ b/rust/crates/lingxi-adapters/Cargo.toml
+@@ -22,9 +22,15 @@ publish.workspace = true
+ #   - tracing 0.1.44: worker diagnostics (never payloads/secrets).
+ #   - serde/serde_json 1.0.229/1.0.151: canonical payload serialization via
+ #     lingxi-protocol's canonical JSON profile.
++#   - reqwest 0.13.5 + `json` (R05-T01, models/openai_completions.rs): the
++#     HTTP client of the openai-completions adapter. Same locked version and
++#     TLS stack as lingxi-spike (default-tls on 0.13 = rustls + aws-lc-rs +
++#     rustls-platform-verifier); the lock gains only this dependency edge on
++#     an already-locked version — zero new third-party versions.
+ [dependencies]
+ lingxi-kernel = { path = "../lingxi-kernel" }
+ lingxi-protocol = { path = "../lingxi-protocol" }
++reqwest = { version = "0.13.5", features = ["json"] }
+ rusqlite = { version = "0.40.2", features = ["bundled", "backup"] }
+ serde = { version = "1.0.229", features = ["derive"] }
+ serde_json = "1.0.151"
+diff --git a/rust/crates/lingxi-adapters/src/lib.rs b/rust/crates/lingxi-adapters/src/lib.rs
+index 8f17bb085..c9b650737 100644
+--- a/rust/crates/lingxi-adapters/src/lib.rs
++++ b/rust/crates/lingxi-adapters/src/lib.rs
+@@ -7,7 +7,10 @@
+ //!   depend on `lingxi-service` (DEP-09) and never on any desktop stack
+ //!   (DEP-07).
+ //! - Current surface: the storage port ([`storage::RunDatabase`]) backed by
+-//!   the new Rust run/message SQLite database. Model/tool/browser/
+-//!   integrations adapters arrive with their owning stages (R04/R05/R07).
++//!   the new Rust run/message SQLite database; the model plane
++//!   ([`models`]) — the config-backed model gateway, the openai-completions
++//!   real HTTP adapter and the gateway-backed turn provider (R05-T01).
++//!   Browser/integrations adapters arrive with their owning stages (R07).
+ 
++pub mod models;
+ pub mod storage;
+diff --git a/rust/crates/lingxi-kernel/src/lib.rs b/rust/crates/lingxi-kernel/src/lib.rs
+index b5192eb50..989fed124 100644
+--- a/rust/crates/lingxi-kernel/src/lib.rs
++++ b/rust/crates/lingxi-kernel/src/lib.rs
+@@ -19,6 +19,7 @@
+ use lingxi_protocol::{AttemptId, NormalizedMessage, RunId, RunStatus, SessionId, ToolCallId};
+ 
+ pub mod invocation;
++pub mod model_exchange;
+ pub mod ports;
+ pub mod recovery;
+ pub mod subagent;
+diff --git a/rust/crates/lingxi-kernel/src/ports.rs b/rust/crates/lingxi-kernel/src/ports.rs
+index 55526a9a0..5531bf304 100644
+--- a/rust/crates/lingxi-kernel/src/ports.rs
++++ b/rust/crates/lingxi-kernel/src/ports.rs
+@@ -11,12 +11,13 @@
+ //! ownership contract is declared. Method surfaces grow in R02+.
+ 
+ use lingxi_protocol::{
+-    EventEnvelope, EventId, EventPayload, ModelCallId, NormalizedMessage, ProtocolError, RunId,
+-    RunStatus, Seq, SessionId, ToolCallId,
++    ContentBlock, EventEnvelope, EventId, EventPayload, ModelCallId, NormalizedMessage,
++    ProtocolError, RunId, RunStatus, Seq, SessionId, ToolCallId, UsageRecord,
+ };
+ // ProtocolError is the error surface of the provider/tool ports below;
+ // StoragePort deliberately uses the richer StorageError.
+ 
++use crate::model_exchange::ModelTurnInput;
+ use crate::RunContext;
+ 
+ /// Persistent record of one run's lifecycle, owned by the kernel's
+@@ -553,8 +554,15 @@ pub enum ProviderTurn {
+     /// outcome instead of committing an empty final message).
+     Final { message: NormalizedMessage },
+     /// The provider requested tool calls; the RUN continues after they
+-    /// execute (a model call ending here does NOT end the run).
+-    ToolRequests { requests: Vec<ToolRequest> },
++    /// execute (a model call ending here does NOT end the run). `content`
++    /// carries the turn's own content blocks (text / reasoning /
++    /// provider-opaque) — a mixed response (content AND tool calls, the
++    /// real shape of OpenAI/Anthropic turns) keeps every block for the
++    /// exchange history instead of dropping the content half.
++    ToolRequests {
++        requests: Vec<ToolRequest>,
++        content: Vec<ContentBlock>,
++    },
+     /// Process-only content (reasoning / partial output): this model call
+     /// ended, the run continues with another turn.
+     Continue { process_note: String },
+@@ -610,21 +618,55 @@ impl ResultFence {
+ /// turn PLUS the identity fence the driver verifies before using it. A real
+ /// adapter (R05) echoes the context it was called with; a deferred/raced
+ /// delivery carries the identity of the ORIGINAL request and is fenced.
++///
++/// R05-T01: `usage` carries the provider-reported token usage of the call
++/// when the protocol reports one (the OpenAI `usage` object). `None` means
++/// the provider did not report usage — the driver persists `None`, never a
++/// fabricated estimate.
+ #[derive(Debug, Clone, PartialEq)]
+ pub struct ProviderTurnResult {
+     pub fence: ResultFence,
+     pub turn: ProviderTurn,
++    pub usage: Option<UsageRecord>,
++    /// The identity of the route that ACTUALLY served this turn, when the
++    /// adapter reports it (R05-T01: the real gateway-backed adapter fills it
++    /// from the resolved route, so a mid-run config reload never mislabels
++    /// the persisted `model_call_*` facts — the driver persists THIS, not a
++    /// pre-call guess; doubles leave it `None` and the driver falls back to
++    /// the port's static descriptor, which for a deterministic double is
++    /// exact).
++    pub served_by: Option<ProviderDescriptor>,
+ }
+ 
+ impl ProviderTurnResult {
+     /// A result echoing the context it was issued under (the honest default
+     /// every adapter uses unless it is delivering a late/raced result).
++    /// Usage defaults to `None` (not reported), `served_by` to `None`
++    /// (the caller falls back to the port descriptor).
+     pub fn of_ctx(ctx: &RunContext, turn: ProviderTurn) -> Self {
+         Self {
+             fence: ResultFence::of_ctx(ctx),
+             turn,
++            usage: None,
++            served_by: None,
++        }
++    }
++
++    /// The same echo with the provider-reported usage attached.
++    pub fn of_ctx_with_usage(ctx: &RunContext, turn: ProviderTurn, usage: UsageRecord) -> Self {
++        Self {
++            fence: ResultFence::of_ctx(ctx),
++            turn,
++            usage: Some(usage),
++            served_by: None,
+         }
+     }
++
++    /// Attaches the serving route's identity (see the field docs).
++    pub fn with_served_by(mut self, descriptor: ProviderDescriptor) -> Self {
++        self.served_by = Some(descriptor);
++        self
++    }
+ }
+ 
+ /// What `ToolExecutorPort::execute` resolves with (R03-T04): the structured
+@@ -867,6 +909,13 @@ pub struct ToolRequest {
+     /// output: the trusted boundary's own summaries are shape-only
+     /// ([`crate::toolcatalog::summarize_arguments`]).
+     pub args_summary: Option<String>,
++    /// The provider's own correlation id for this call (R05-T01; e.g. an
++    /// OpenAI `tool_calls[].id`). Protocol correlation data ONLY: it never
++    /// binds journal/receipt/state writes (the driver-minted
++    /// [`ToolCallId`] is the only host identity); the exchange history
++    /// carries it so the adapter can emit the protocol-required pairing on
++    /// the result message.
++    pub provider_call_id: Option<String>,
+     /// The structured delegation payload when (and only when) the target
+     /// is a `subagent`-family tool — `subagent` (fresh dispatch),
+     /// `subagent_reply` (continuation) or `subagent_close` (R03-T06).
+@@ -897,6 +946,7 @@ impl ToolRequest {
+             arguments,
+             args_digest,
+             args_summary: None,
++            provider_call_id: None,
+             delegation: None,
+         })
+     }
+@@ -908,6 +958,13 @@ impl ToolRequest {
+         self
+     }
+ 
++    /// Attaches the provider's own correlation id (R05-T01; protocol
++    /// correlation data only — never a host identity).
++    pub fn with_provider_call_id(mut self, provider_call_id: impl Into<String>) -> Self {
++        self.provider_call_id = Some(provider_call_id.into());
++        self
++    }
++
+     /// Attaches the subagent-family delegation payload (R03-T06).
+     pub fn with_delegation(mut self, delegation: DelegationRequest) -> Self {
+         self.delegation = Some(delegation);
+@@ -949,11 +1006,15 @@ pub struct DelegationRequest {
+     pub thread_id: Option<String>,
+ }
+ 
+-/// Provider access for the run driver (R03-T01; the R05 handoff surface).
++/// Provider access for the run driver (R03-T01; evolved to the typed
++/// per-turn exchange at R05-T01).
+ ///
+-/// R03 wires deterministic doubles through the REAL run chain; R05 replaces
+-/// the double with real protocol adapters behind this same port. Every call
+-/// is pinned to its run/attempt context and its own `ModelCallId`.
++/// R03/R04 wired deterministic doubles through the REAL run chain with a
++/// bare `&str` input; R05-T01 replaces that parameter list with the typed
++/// [`ModelTurnInput`] (submission + complete prior exchange + the send-time
++/// tool declaration snapshot + deadline facts) — there is ONE signature and
++/// real protocol adapters sit behind this same port. Every call is pinned
++/// to its run/attempt context and its own `ModelCallId`.
+ ///
+ /// The futures are boxed so the trait is object-safe: the supervisor holds
+ /// `Arc<dyn TurnProviderPort>` (one injection point, doubles in tests /
+@@ -962,17 +1023,18 @@ pub trait TurnProviderPort: Send + Sync {
+     /// Stable identity of what this provider simulates / serves.
+     fn descriptor(&self) -> ProviderDescriptor;
+ 
+-    /// Produces the next model turn for the run. `input` is the user
+-    /// submission that started the run (the full context assembly is R06;
+-    /// the port stays minimal here). The result carries the identity fence
+-    /// of the request it answers; the driver verifies it against the
+-    /// CURRENT context before any state write (R03-T04).
++    /// Produces the next model turn for the run. `input` is the typed
++    /// per-turn exchange ([`ModelTurnInput`]: the run's submission with
++    /// drained steering, the 1-based turn index, the complete prior
++    /// exchange of this attempt, and the tool declaration snapshot taken
++    /// from the live registry at send time). The result carries the
++    /// identity fence of the request it answers; the driver verifies it
++    /// against the CURRENT context before any state write (R03-T04).
+     fn next_turn<'a>(
+         &'a self,
+         ctx: &'a RunContext,
+         call: &'a ModelCallId,
+-        turn: u32,
+-        input: &'a str,
++        input: &'a ModelTurnInput,
+     ) -> std::pin::Pin<Box<dyn std::future::Future<Output = ProviderTurnResult> + Send + 'a>>;
+ }
+ 
+diff --git a/rust/crates/lingxi-kernel/src/toolcatalog.rs b/rust/crates/lingxi-kernel/src/toolcatalog.rs
+index 580f6091e..f0b7751a6 100644
+--- a/rust/crates/lingxi-kernel/src/toolcatalog.rs
++++ b/rust/crates/lingxi-kernel/src/toolcatalog.rs
+@@ -1570,6 +1570,7 @@ impl PreparedToolCall {
+             arguments: self.effective,
+             args_digest: self.args_digest,
+             args_summary: Some(self.args_summary),
++            provider_call_id: None,
+             delegation: None,
+         }
+     }
+diff --git a/rust/crates/lingxi-service/src/config.rs b/rust/crates/lingxi-service/src/config.rs
+index b4095fcc1..a0ff6c272 100644
+--- a/rust/crates/lingxi-service/src/config.rs
++++ b/rust/crates/lingxi-service/src/config.rs
+@@ -17,9 +17,12 @@
+ //! - The config file is opt-in via an explicit `--config <PATH>`; there is
+ //!   no conventional-location discovery, because silently reading files out
+ //!   of a real user directory is exactly what this task forbids. The file is
+-//!   strict JSON: exactly `{"home": "<absolute path>"}` — unknown keys,
+-//!   missing `home`, non-string values and unreadable/unparsable files are
+-//!   loud errors, never silently skipped.
++//!   strict JSON with the closed key set `{home, workspace?, providers?,
++//!   models?}` (R05-T01 widened the original exactly-`{"home"}` set):
++//!   `home` is required; `workspace` is the optional tool-plane root;
++//!   `providers` / `models` embed the model plane. Unknown keys, missing
++//!   `home`, non-string values and unreadable/unparsable files are loud
++//!   errors, never silently skipped.
+ //! - No source at all => [`ConfigError::MissingHome`] (exit 2 in the binary).
+ //!
+ //! CLI parsing is strict (T01 REVIEW_R1 F03): duplicate flags, flag-shaped
+@@ -45,6 +48,7 @@ use std::fmt;
+ use std::path::{Path, PathBuf};
+ use std::sync::atomic::{AtomicU64, Ordering};
+ 
++use lingxi_adapters::models::config::ModelPlaneConfig;
+ use lingxi_adapters::storage::{MAX_QUEUE_CAPACITY, MAX_QUEUE_WAIT_TIMEOUT_MS};
+ 
+ /// Inclusive upper bound of every millisecond time-budget flag
+@@ -770,12 +774,32 @@ where
+     })
+ }
+ 
+-/// Reads the `home` value from a strict JSON config file
+-/// (`{"home": "/absolute/path"}`). Anything else — missing file, unparsable
+-/// JSON, missing `home` key, non-string value, unknown extra keys — is a
+-/// loud error: the caller pointed at this file explicitly, so silently
+-/// skipping it would be a silent downgrade.
+-pub fn read_config_home(path: &Path) -> Result<PathBuf, ConfigError> {
++/// The strict `--config` file, fully parsed. The closed key set is
++/// `{home, workspace?, providers?, models?}` (R05-T01 widened the original
++/// exactly-`{"home"}` contract): anything outside that set, a missing
++/// `home`, non-string `home`/`workspace` values and unreadable/unparsable
++/// files are loud errors, never silently skipped.
++#[derive(Debug, Clone)]
++pub struct ServiceConfigFile {
++    /// The data root (still pre-validation-as-home; the caller resolves and
++    /// canonicalizes it like every other home source).
++    pub home: PathBuf,
++    /// The workspace root the production tool plane is scoped to. This is
++    /// the ONLY workspace source (R05-T01): an implicit current-directory
++    /// workspace is exactly the silent downgrade this field exists to
++    /// prevent, so a relative value is a loud error here.
++    pub workspace: Option<PathBuf>,
++    /// The embedded model plane — present iff the file declares `providers`
++    /// and/or `models`, already validated against the closed model-plane
++    /// schema (a half-valid plane never reaches the composition root).
++    pub model_plane: Option<ModelPlaneConfig>,
++}
++
++/// Reads and validates the whole strict config file. Unknown keys and every
++/// malformed section are loud errors: the caller pointed at this file
++/// explicitly, so silently skipping any part of it would be a silent
++/// downgrade.
++pub fn read_service_config(path: &Path) -> Result<ServiceConfigFile, ConfigError> {
+     let raw =
+         std::fs::read_to_string(path).map_err(|source| ConfigError::ConfigFileUnreadable {
+             path: path.to_path_buf(),
+@@ -793,20 +817,162 @@ pub fn read_config_home(path: &Path) -> Result<PathBuf, ConfigError> {
+     let object = value
+         .as_object()
+         .ok_or_else(|| detail_of("top level must be a JSON object".to_string()))?;
+-    if object.len() != 1 || !object.contains_key("home") {
+-        return Err(detail_of(format!(
+-            "expected exactly one key \"home\", got {}",
+-            object
+-                .keys()
+-                .map(String::as_str)
+-                .collect::<Vec<_>>()
+-                .join(", ")
+-        )));
++    for key in object.keys() {
++        if !matches!(key.as_str(), "home" | "workspace" | "providers" | "models") {
++            return Err(detail_of(format!(
++                "unknown key {key:?} (the closed key set is \"home\", \"workspace\", \
++                 \"providers\", \"models\")"
++            )));
++        }
++    }
++    let home = object
++        .get("home")
++        .ok_or_else(|| detail_of("missing required key \"home\"".to_string()))?
++        .as_str()
++        .ok_or_else(|| {
++            detail_of("\"home\" must be a string containing an absolute path".to_string())
++        })?;
++    let workspace = match object.get("workspace") {
++        None => None,
++        Some(value) => {
++            let text = value.as_str().ok_or_else(|| {
++                detail_of("\"workspace\" must be a string containing an absolute path".to_string())
++            })?;
++            let workspace = PathBuf::from(text);
++            if !workspace.is_absolute() {
++                return Err(detail_of(format!(
++                    "\"workspace\" must be an absolute path, got {text:?}"
++                )));
++            }
++            Some(workspace)
++        }
++    };
++    let model_plane = match (object.get("providers"), object.get("models")) {
++        (None, None) => None,
++        (providers, models) => {
++            // Hand exactly the two model-plane keys to the closed-schema
++            // validator — everything else in the envelope is this module's
++            // own contract, and the plane validator must never see it.
++            let mut plane = serde_json::Map::new();
++            if let Some(providers) = providers {
++                plane.insert("providers".to_string(), providers.clone());
++            }
++            if let Some(models) = models {
++                plane.insert("models".to_string(), models.clone());
++            }
++            Some(
++                ModelPlaneConfig::from_value(serde_json::Value::Object(plane))
++                    .map_err(|err| detail_of(err.to_string()))?,
++            )
++        }
++    };
++    Ok(ServiceConfigFile {
++        home: PathBuf::from(home),
++        workspace,
++        model_plane,
++    })
++}
++
++/// Reads the `home` value from the strict JSON config file. Anything
++/// outside the closed schema — missing file, unparsable JSON, missing
++/// `home`, non-string values, unknown extra keys — is a loud error: the
++/// caller pointed at this file explicitly, so silently skipping it would be
++/// a silent downgrade.
++pub fn read_config_home(path: &Path) -> Result<PathBuf, ConfigError> {
++    Ok(read_service_config(path)?.home)
++}
++
++/// Where the model plane (R05-T01: provider credentials + per-operation
++/// route bindings) was loaded from. Remembered by the composition root so
++/// the management reload surface re-reads the SAME source.
++#[derive(Debug, Clone, PartialEq, Eq)]
++pub enum ModelPlaneSource {
++    /// Embedded `providers` / `models` sections of the `--config` file.
++    EmbeddedInConfigFile { path: PathBuf },
++    /// The standalone `models.json` inside the runtime dir.
++    ModelsFile { path: PathBuf },
++}
++
++impl ModelPlaneSource {
++    pub fn path(&self) -> &Path {
++        match self {
++            ModelPlaneSource::EmbeddedInConfigFile { path } => path,
++            ModelPlaneSource::ModelsFile { path } => path,
++        }
++    }
++}
++
++/// The standalone model-plane file name inside the runtime dir.
++pub const MODELS_FILE_NAME: &str = "models.json";
++
++/// Resolves the model plane from its two loud sources (never merged, never
++/// guessed):
++///
++/// - the `providers` / `models` sections embedded in the `--config` file, or
++/// - a standalone `models.json` inside the runtime dir (the whole file IS
++///   the model-plane document).
++///
++/// Both present at once is ambiguous — a loud [`ConfigError::ConfigFileInvalid`],
++/// because picking one silently would be a silent downgrade. Neither present
++/// is the explicit unconfigured state (`Ok(None)`, C03): the service runs
++/// and every model call fails loudly with `no_provider_configured`. A
++/// present-but-broken source is likewise loud (unreadable →
++/// [`ConfigError::ConfigFileUnreadable`], malformed →
++/// [`ConfigError::ConfigFileInvalid`]); a broken plane never starts the
++/// service silently degraded.
++pub fn resolve_model_plane(
++    config_file: Option<&Path>,
++    runtime_dir: &Path,
++) -> Result<Option<(ModelPlaneSource, ModelPlaneConfig)>, ConfigError> {
++    let embedded = match config_file {
++        Some(path) => read_service_config(path)?.model_plane.map(|plane| {
++            (
++                ModelPlaneSource::EmbeddedInConfigFile {
++                    path: path.to_path_buf(),
++                },
++                plane,
++            )
++        }),
++        None => None,
++    };
++    let models_path = runtime_dir.join(MODELS_FILE_NAME);
++    let standalone = match std::fs::read_to_string(&models_path) {
++        Ok(raw) => {
++            let plane = ModelPlaneConfig::parse_and_validate(&raw).map_err(|err| {
++                ConfigError::ConfigFileInvalid {
++                    path: models_path.clone(),
++                    detail: err.to_string(),
++                }
++            })?;
++            Some((
++                ModelPlaneSource::ModelsFile {
++                    path: models_path.clone(),
++                },
++                plane,
++            ))
++        }
++        Err(err) if err.kind() == std::io::ErrorKind::NotFound => None,
++        Err(err) => {
++            return Err(ConfigError::ConfigFileUnreadable {
++                path: models_path,
++                source: err.to_string(),
++            })
++        }
++    };
++    match (embedded, standalone) {
++        (Some(_), Some((source, _))) => Err(ConfigError::ConfigFileInvalid {
++            path: source.path().to_path_buf(),
++            detail: format!(
++                "a model plane is already embedded in the --config file {:?}; the two \
++                 sources are never merged and precedence is never guessed — remove one \
++                 of them",
++                config_file.expect("embedded implies --config").display()
++            ),
++        }),
++        (Some(plane), None) => Ok(Some(plane)),
++        (None, Some(plane)) => Ok(Some(plane)),
++        (None, None) => Ok(None),
+     }
+-    let home = object["home"].as_str().ok_or_else(|| {
+-        detail_of("\"home\" must be a string containing an absolute path".to_string())
+-    })?;
+-    Ok(PathBuf::from(home))
+ }
+ 
+ /// Builds a unique synthetic home directory name for test mode.
+@@ -1380,6 +1546,178 @@ mod tests {
+         std::fs::remove_dir_all(&dir).ok();
+     }
+ 
++    // ── R05-T01: workspace + embedded model plane ──────────────────────────
++
++    fn unique_dir(tag: &str) -> PathBuf {
++        let dir = std::env::temp_dir().join(format!(
++            "lingxi-r05t01-{tag}-{}-{line}",
++            std::process::id(),
++            line = line!()
++        ));
++        std::fs::create_dir_all(&dir).unwrap();
++        dir
++    }
++
++    const VALID_PLANE: &str = r#""providers": {
++            "main": {
++                "protocol": "openai-completions",
++                "endpoint": "https://api.example.test/v1",
++                "auth": {"kind": "apiKey", "apiKey": "sk-test"}
++            }
++        },
++        "models": {"chat": {"provider": "main", "model": "gpt-test"}}"#;
++
++    #[test]
++    fn service_config_reads_workspace_and_embedded_model_plane() {
++        let dir = unique_dir("full");
++        let path = dir.join("service.json");
++        std::fs::write(
++            &path,
++            format!(
++                r#"{{"home": "/tmp/r05t01-home", "workspace": "/tmp/r05t01-ws", {VALID_PLANE}}}"#
++            ),
++        )
++        .unwrap();
++        let parsed = read_service_config(&path).unwrap();
++        assert_eq!(parsed.home, PathBuf::from("/tmp/r05t01-home"));
++        assert_eq!(parsed.workspace, Some(PathBuf::from("/tmp/r05t01-ws")));
++        let plane = parsed.model_plane.expect("embedded plane");
++        assert_eq!(
++            plane.models.chat.as_ref().map(|b| b.model.as_str()),
++            Some("gpt-test")
++        );
++        std::fs::remove_dir_all(&dir).ok();
++    }
++
++    #[test]
++    fn service_config_without_optional_sections_keeps_them_none() {
++        let dir = unique_dir("minimal");
++        let path = dir.join("service.json");
++        std::fs::write(&path, br#"{"home": "/tmp/r05t01-home"}"#).unwrap();
++        let parsed = read_service_config(&path).unwrap();
++        assert_eq!(parsed.workspace, None);
++        assert!(parsed.model_plane.is_none());
++        // providers-only also yields a (valid) plane with no route bindings.
++        std::fs::write(
++            &path,
++            r#"{"home": "/tmp/r05t01-home", "providers": {
++                "main": {
++                    "protocol": "openai-completions",
++                    "endpoint": "https://api.example.test/v1",
++                    "auth": {"kind": "none"}
++                }
++            }}"#,
++        )
++        .unwrap();
++        let parsed = read_service_config(&path).unwrap();
++        let plane = parsed.model_plane.expect("providers-only plane");
++        assert_eq!(plane.providers.len(), 1);
++        assert!(plane.models.chat.is_none());
++        std::fs::remove_dir_all(&dir).ok();
++    }
++
++    #[test]
++    fn service_config_rejects_bad_workspace_and_bad_plane_loudly() {
++        let dir = unique_dir("bad");
++        let cases: Vec<(&str, String)> = vec![
++            (
++                "relative-workspace",
++                r#"{"home": "/tmp/a", "workspace": "relative/ws"}"#.to_string(),
++            ),
++            (
++                "non-string-workspace",
++                r#"{"home": "/tmp/a", "workspace": 42}"#.to_string(),
++            ),
++            // The embedded plane is validated eagerly at load: an unknown
++            // protocol family is a config-file error, never a deferred one.
++            (
++                "bad-plane-protocol",
++                r#"{"home": "/tmp/a", "providers": {"main": {
++                        "protocol": "made-up", "endpoint": "https://api.example.test/v1",
++                        "auth": {"kind": "none"}
++                    }}}"#
++                    .to_string(),
++            ),
++            // A route binding naming an undefined provider is loud at load.
++            (
++                "bad-plane-route",
++                r#"{"home": "/tmp/a", "models": {"chat": {"provider": "ghost", "model": "m"}}}"#
++                    .to_string(),
++            ),
++        ];
++        for (name, content) in cases {
++            let path = dir.join(format!("{name}.json"));
++            std::fs::write(&path, content).unwrap();
++            let err = read_service_config(&path).unwrap_err();
++            assert!(
++                matches!(err, ConfigError::ConfigFileInvalid { .. }),
++                "{name}: expected ConfigFileInvalid, got {err:?}"
++            );
++        }
++        std::fs::remove_dir_all(&dir).ok();
++    }
++
++    #[test]
++    fn resolve_model_plane_sources_and_conflicts() {
++        // Neither source -> the explicit unconfigured state.
++        let dir = unique_dir("none");
++        let resolved = resolve_model_plane(None, &dir).unwrap();
++        assert!(resolved.is_none());
++
++        // Standalone models.json only.
++        let models_path = dir.join(MODELS_FILE_NAME);
++        std::fs::write(&models_path, format!("{{{VALID_PLANE}}}")).unwrap();
++        let (source, plane) = resolve_model_plane(None, &dir)
++            .unwrap()
++            .expect("standalone");
++        assert_eq!(
++            source,
++            ModelPlaneSource::ModelsFile {
++                path: models_path.clone()
++            }
++        );
++        assert_eq!(
++            plane.models.chat.as_ref().map(|b| b.model.as_str()),
++            Some("gpt-test")
++        );
++
++        // Both sources -> loud ambiguity, never a guessed precedence.
++        let cfg = dir.join("service.json");
++        std::fs::write(&cfg, format!(r#"{{"home": "/tmp/a", {VALID_PLANE}}}"#)).unwrap();
++        let err = resolve_model_plane(Some(&cfg), &dir).unwrap_err();
++        assert!(
++            matches!(err, ConfigError::ConfigFileInvalid { .. }),
++            "both sources present must be loud, got {err:?}"
++        );
++
++        // Removing the standalone file leaves the embedded plane.
++        std::fs::remove_file(&models_path).unwrap();
++        let (source, _) = resolve_model_plane(Some(&cfg), &dir)
++            .unwrap()
++            .expect("embedded");
++        assert_eq!(
++            source,
++            ModelPlaneSource::EmbeddedInConfigFile { path: cfg.clone() }
++        );
++
++        // A malformed standalone file is loud (never silently ignored).
++        std::fs::write(&models_path, "not json").unwrap();
++        let err = resolve_model_plane(None, &dir).unwrap_err();
++        assert!(
++            matches!(err, ConfigError::ConfigFileInvalid { .. }),
++            "malformed models.json must be loud, got {err:?}"
++        );
++        // An unreadable one (a directory) is ConfigFileUnreadable.
++        std::fs::remove_file(&models_path).unwrap();
++        std::fs::create_dir(&models_path).unwrap();
++        let err = resolve_model_plane(None, &dir).unwrap_err();
++        assert!(
++            matches!(err, ConfigError::ConfigFileUnreadable { .. }),
++            "unreadable models.json must be loud, got {err:?}"
++        );
++        std::fs::remove_dir_all(&dir).ok();
++    }
++
+     #[test]
+     fn test_mode_home_name_is_unique_and_prefixed() {
+         // Tight-loop N generations: even when the clock never advances
+diff --git a/rust/crates/lingxi-service/src/lib.rs b/rust/crates/lingxi-service/src/lib.rs
+index e91ae18ab..ff665bdad 100644
+--- a/rust/crates/lingxi-service/src/lib.rs
++++ b/rust/crates/lingxi-service/src/lib.rs
+@@ -450,6 +450,13 @@ pub struct ServiceState {
+     /// bootstrap (`None` only via `Default`-shaped construction paths that
+     /// bypass the scan — none exist in production).
+     recovery_report: Arc<std::sync::OnceLock<recovery::RecoveryScanReport>>,
++    /// The config-backed model gateway (R05-T01), present when a model
++    /// plane is configured: the management reload surface swaps its
++    /// snapshot atomically (in-flight calls keep their resolved snapshot).
++    model_gateway: Option<Arc<lingxi_adapters::models::gateway::ConfigModelGateway>>,
++    /// Where the model plane was loaded from (R05-T01) — the reload
++    /// surface re-reads the SAME source, never a guessed location.
++    model_plane_source: Option<config::ModelPlaneSource>,
+ }
+ 
+ impl std::fmt::Debug for ServiceState {
+@@ -570,6 +577,22 @@ pub struct ServiceDeps {
+     /// driven by the supervisor is prepared and dispatched through the
+     /// gateway — the raw port is not consulted on the gateway wiring.
+     pub tool_gateway: Option<std::sync::Arc<toolgateway::ToolInvocationGateway>>,
++    /// The config-backed model gateway (R05-T01). When `Some` AND no
++    /// `turn_provider` was injected, the bootstrap wires the REAL
++    /// production chain: tool registry + approval service + unified
++    /// invocation gateway + the core file tools (scoped to
++    /// `workspace_root`) + the gateway-backed provider. Injected test
++    /// doubles always win over this wiring. `None` keeps the R03/R04
++    /// default shape exactly (`no_provider_configured`).
++    pub model_gateway: Option<std::sync::Arc<lingxi_adapters::models::gateway::ConfigModelGateway>>,
++    /// Where the model plane was loaded from (R05-T01): remembered so the
++    /// management reload surface re-reads the SAME source (never a guessed
++    /// location).
++    pub model_plane_source: Option<config::ModelPlaneSource>,
++    /// The workspace root from the strict `--config` file (R05-T01) — the
++    /// ONLY workspace source. When present together with a model plane,
++    /// the core file tools are registered scoped to it.
++    pub workspace_root: Option<std::path::PathBuf>,
+ }
+ 
+ impl Default for ServiceDeps {
+@@ -596,6 +619,9 @@ impl Default for ServiceDeps {
+             subagent_policy: lingxi_kernel::subagent::SubagentPolicy::default(),
+             recovery_capabilities: std::sync::Arc::new(invocations::ConservativeCapabilities),
+             tool_gateway: None,
++            model_gateway: None,
++            model_plane_source: None,
++            workspace_root: None,
+         }
+     }
+ }
+@@ -635,6 +661,12 @@ impl std::fmt::Debug for ServiceDeps {
+                 "tool_gateway",
+                 &self.tool_gateway.as_ref().map(|_| "injected"),
+             )
++            .field(
++                "model_gateway",
++                &self.model_gateway.as_ref().map(|_| "injected"),
++            )
++            .field("model_plane_source", &self.model_plane_source)
++            .field("workspace_root", &self.workspace_root)
+             .finish()
+     }
+ }
+@@ -844,7 +876,7 @@ impl ServiceState {
+     async fn bootstrap_with_instance_identity(
+         config: ServiceConfig,
+         layout: &DataRootLayout,
+-        deps: ServiceDeps,
++        mut deps: ServiceDeps,
+         identity: InstanceIdentity,
+     ) -> Result<Self, ServiceStartupError> {
+         deps.event_limits
+@@ -918,6 +950,72 @@ impl ServiceState {
+                 ),
+             })
+         })?;
++        // R05-T01: the production model plane. When a model plane is
++        // configured AND no turn provider was injected (injected test
++        // doubles always win), wire the REAL chain here — tool registry +
++        // approval service + the unified invocation gateway + the core
++        // file tools (scoped to the --config workspace, the ONLY workspace
++        // source; T01 wires file tools only, process tools stay
++        // unregistered) + the gateway-backed provider. Without a
++        // configured plane every layer keeps the R03/R04 default shape
++        // exactly: no provider, conservative recovery, no tool executors.
++        let model_gateway_for_wiring = if deps.turn_provider.is_none() {
++            deps.model_gateway.clone()
++        } else {
++            None
++        };
++        if let Some(model_gateway) = model_gateway_for_wiring {
++            let registry = Arc::new(lingxi_kernel::toolcatalog::ToolRegistry::new());
++            let approvals = Arc::new(approval_service::ApprovalService::new(Arc::clone(
++                &deps.clock,
++            )));
++            let budget = lingxi_kernel::toolcatalog::SchemaBudget::default();
++            let gateway = Arc::new(toolgateway::ToolInvocationGateway::new(
++                Arc::clone(&registry),
++                Arc::clone(&approvals) as Arc<dyn toolgateway::ToolPolicyPort>,
++                Arc::clone(&deps.clock),
++                budget,
++                toolgateway::DEFAULT_PREPARED_TTL_MS,
++                toolgateway::DEFAULT_LIVE_PREPARED_CAP,
++            ));
++            if let Some(workspace) = deps.workspace_root.clone() {
++                let access = Arc::new(
++                    resourceaccess::ResourceAccess::new(std::slice::from_ref(&workspace)).map_err(
++                        |refusal| {
++                            ServiceStartupError::Storage(StorageError::InvalidRequest {
++                                detail: format!(
++                                    "workspace root {} is not a usable resource root: {refusal}",
++                                    workspace.display()
++                                ),
++                            })
++                        },
++                    )?,
++                );
++                let _core_file_tools = filetools::register_core_file_tools(
++                    &registry,
++                    gateway.as_ref(),
++                    access,
++                    workspace,
++                    Arc::clone(&deps.clock),
++                    Arc::new(filetools::NoopChangeLog),
++                    &budget,
++                );
++            }
++            let provider =
++                lingxi_adapters::models::provider::GatewayedProvider::new(model_gateway, budget)
++                    .map_err(|err| {
++                        ServiceStartupError::Storage(StorageError::InvalidRequest {
++                            detail: format!("cannot construct the model provider: {err}"),
++                        })
++                    })?;
++            // The recovery scan resolves capabilities from the REAL
++            // registry (the file tools' verified capability rows), never
++            // the conservative default, once real tools exist.
++            deps.recovery_capabilities = Arc::new(invocations::RegistryCapabilities::new(registry));
++            deps.approval_gate = Some(Arc::clone(&approvals) as Arc<dyn approval::ApprovalGate>);
++            deps.tool_gateway = Some(gateway);
++            deps.turn_provider = Some(Arc::new(provider));
++        }
+         // R03-T01: the run lifecycle supervisor. Degenerate bounds are a
+         // loud startup error (never clamped silently); a missing provider is
+         // EXPLICIT (no-provider outcome), never a fabricated reply.
+@@ -1017,6 +1115,8 @@ impl ServiceState {
+             background,
+             intake,
+             recovery_report,
++            model_gateway: deps.model_gateway.clone(),
++            model_plane_source: deps.model_plane_source.clone(),
+         })
+     }
+ 
+@@ -1056,6 +1156,20 @@ impl ServiceState {
+         &self.storage
+     }
+ 
++    /// The config-backed model gateway (R05-T01), when a model plane is
++    /// configured — the management reload surface swaps its snapshot.
++    pub fn model_gateway(
++        &self,
++    ) -> Option<&Arc<lingxi_adapters::models::gateway::ConfigModelGateway>> {
++        self.model_gateway.as_ref()
++    }
++
++    /// Where the model plane was loaded from (R05-T01): the reload surface
++    /// re-reads the SAME source.
++    pub fn model_plane_source(&self) -> Option<&config::ModelPlaneSource> {
++        self.model_plane_source.as_ref()
++    }
++
+     /// The managed-task shutdown handle (R02-T06): the binary subscribes
+     /// once for the shutdown broadcast; every WS session task subscribes
+     /// per connection.
+diff --git a/rust/crates/lingxi-service/src/main.rs b/rust/crates/lingxi-service/src/main.rs
+index df6b4be41..f4dca1ded 100644
+--- a/rust/crates/lingxi-service/src/main.rs
++++ b/rust/crates/lingxi-service/src/main.rs
+@@ -45,7 +45,10 @@ const USAGE: &str = r#"usage: lingxi-service [--bind <SOCKADDR>] [--home <DIR>]
+ Options:
+   --bind <SOCKADDR>       Listen address (default 127.0.0.1:0, loopback + ephemeral).
+   --home <DIR>            Absolute service data root (created if missing).
+-  --config <FILE>         Strict JSON config file ({"home": "/absolute/path"}).
++  --config <FILE>         Strict JSON config file; closed key set
++                          {"home", "workspace"?, "providers"?, "models"?}
++                          ("home" required; providers/models embed the model
++                          plane, R05-T01).
+   --test-mode             Force an isolated synthetic home under the system temp
+                           dir; --home/LINGXI_HOME/--config home are ignored.
+   --network-mode <MODE>   loopback (default) or lan. LAN exposure is an explicit
+@@ -314,7 +317,7 @@ async fn main() -> ExitCode {
+     // override it explicitly. Validation happens in bootstrap_with_deps
+     // (a degenerate limit is a loud startup error, exit 2 — never a silent
+     // unbounded fallback).
+-    let deps = lingxi_service::ServiceDeps {
++    let mut deps = lingxi_service::ServiceDeps {
+         ws_max_connections: cli
+             .max_ws_connections
+             .unwrap_or(lingxi_service::limits::DEFAULT_WS_MAX_CONNECTIONS),
+@@ -403,6 +406,42 @@ async fn main() -> ExitCode {
+         "data root prepared (canonicalized; runtime dir private 0700)"
+     );
+ 
++    // ---- model plane + workspace (R05-T01) ----
++    // Resolved BEFORE the instance lock so a broken plane refuses startup
++    // with exit 2 like every other configuration error — a configured-but-
++    // broken plane never serves silently degraded. The workspace rides the
++    // strict --config file only (there is no implicit-cwd workspace).
++    if let Some(config_path) = cli.config.as_deref() {
++        match lingxi_service::config::read_service_config(config_path) {
++            Ok(file) => deps.workspace_root = file.workspace,
++            Err(err) => {
++                eprintln!("error: {err}");
++                return ExitCode::from(2);
++            }
++        }
++    }
++    let model_plane = match lingxi_service::config::resolve_model_plane(
++        cli.config.as_deref(),
++        &layout.runtime_dir,
++    ) {
++        Ok(plane) => plane,
++        Err(err) => {
++            eprintln!("error: {err}");
++            return ExitCode::from(2);
++        }
++    };
++    if let Some((source, plane)) = model_plane {
++        tracing::info!(
++            model_plane_source = %source.path().display(),
++            providers = plane.providers.len(),
++            "model plane resolved (credentials never logged)"
++        );
++        deps.model_gateway = Some(std::sync::Arc::new(
++            lingxi_adapters::models::gateway::ConfigModelGateway::from_validated(plane),
++        ));
++        deps.model_plane_source = Some(source);
++    }
++
+     // ---- single-writer lock + instance identity (steps 3–4) ----
+     let (guard, stale) = match acquire(&layout) {
+         Ok(acquired) => acquired,
+diff --git a/rust/crates/lingxi-service/src/management.rs b/rust/crates/lingxi-service/src/management.rs
+index 0466b66aa..a6120ecde 100644
+--- a/rust/crates/lingxi-service/src/management.rs
++++ b/rust/crates/lingxi-service/src/management.rs
+@@ -583,9 +583,95 @@ pub(crate) fn routes() -> Router<ServiceState> {
+             "/lingxi/v1/session-thinking-level",
+             get(read_thinking_level).post(write_thinking_level),
+         )
++        .route("/lingxi/v1/models/reload", post(reload_models))
+         .route("/lingxi/v1/server/identity", get(server_identity))
+ }
+ 
++/// Reloads the model plane from the SAME source it was loaded from at
++/// startup (R05-T01 C05): re-read + full validation + one atomic snapshot
++/// swap with a bumped generation. A source that no longer carries a valid
++/// plane is a loud 409 — the running snapshot is never silently cleared or
++/// half-swapped, and removing the plane requires a restart (there is no
++/// "unconfigure at runtime" path).
++async fn reload_models(
++    State(state): State<ServiceState>,
++    Extension(principal): Extension<Principal>,
++) -> Response {
++    if principal.kind != PrincipalKind::LocalUser {
++        return EndpointError::local_only().into_response();
++    }
++    let (source, gateway) = match (state.model_plane_source(), state.model_gateway()) {
++        (Some(source), Some(gateway)) => (source.clone(), gateway.clone()),
++        _ => {
++            return EndpointError::not_found()
++                .with_reason("model_plane_unconfigured")
++                .with_cause("models.unconfigured")
++                .into_response()
++        }
++    };
++    let plane = match &source {
++        crate::config::ModelPlaneSource::EmbeddedInConfigFile { path } => {
++            match crate::config::read_service_config(path) {
++                Ok(file) => match file.model_plane {
++                    Some(plane) => plane,
++                    None => {
++                        return reload_invalid(
++                            &source,
++                            "the config file no longer carries providers/models sections \
++                             (removing the model plane requires a restart)",
++                        );
++                    }
++                },
++                Err(err) => return reload_invalid(&source, &err.to_string()),
++            }
++        }
++        crate::config::ModelPlaneSource::ModelsFile { path } => {
++            let raw = match std::fs::read_to_string(path) {
++                Ok(raw) => raw,
++                Err(err) => {
++                    return reload_invalid(
++                        &source,
++                        &format!("cannot read {}: {err}", path.display()),
++                    );
++                }
++            };
++            match lingxi_adapters::models::config::ModelPlaneConfig::parse_and_validate(&raw) {
++                Ok(plane) => plane,
++                Err(err) => return reload_invalid(&source, &err.to_string()),
++            }
++        }
++    };
++    let generation = gateway.reload(plane);
++    let now = state.clock.now_unix_ms();
++    if let Err(err) = state.management.change(|next| {
++        audit_with_metadata(
++            next,
++            "models.reload",
++            "model-plane",
++            now,
++            serde_json::json!({"generation": generation}),
++        );
++        Ok(())
++    }) {
++        return err.into_response();
++    }
++    Json(serde_json::json!({"ok": true, "generation": generation})).into_response()
++}
++
++fn reload_invalid(source: &crate::config::ModelPlaneSource, detail: &str) -> Response {
++    EndpointError::new(
++        StatusCode::CONFLICT,
++        ErrorCode::InvalidMessage,
++        format!(
++            "model plane reload from {} refused: {detail}",
++            source.path().display()
++        ),
++    )
++    .with_reason("model_plane_reload_invalid")
++    .with_cause("models.reload_invalid")
++    .into_response()
++}
++
+ async fn server_identity(
+     State(state): State<ServiceState>,
+     Extension(principal): Extension<Principal>,
+diff --git a/rust/crates/lingxi-service/src/redaction.rs b/rust/crates/lingxi-service/src/redaction.rs
+index 153be67ca..1f3da9248 100644
+--- a/rust/crates/lingxi-service/src/redaction.rs
++++ b/rust/crates/lingxi-service/src/redaction.rs
+@@ -46,6 +46,18 @@
+ //!    never contain `/`, so R02 surfaces are safe; an R05 provider token
+ //!    that is standard base64 WITH padding/literal `/` would NOT be
+ //!    redacted here — re-verify before R05 logs any provider material.
++//!
++//!    R05-T01 re-verification result: the re-check found and fixed a REAL
++//!    defect in the case-insensitive plumbing — the direct `replace_each_ci`
++//!    passes handed the original-case text to the finders where the
++//!    lowercased haystack belonged, so mixed-case KEYS (`apiKey`,
++//!    `Password`, `TOKEN`) escaped the assignment/query/header-word scans
++//!    (and redacted heads came out lowercased). Fixed at the call sites;
++//!    pinned by `r05_secret_key_words_match_case_insensitively` and
++//!    `r05_provider_api_key_shapes_are_redacted`, which also prove the
++//!    divergence-#1 base64-with-padding gap stays closed for every keyed
++//!    shape R05 actually handles (the ASSIGNMENT rule, not the long-token
++//!    rule, covers them).
+ //! 2. INCUMBENT RULES NOT PORTED (omissions, currently unreachable because
+ //!    this service never logs CLI arguments, message bodies or PII):
+ //!    the incumbent's PII rules (email / credit-card / CN-ID / SSN),
+@@ -145,11 +157,15 @@ pub fn redact_text(text: &str, home: Option<&std::path::Path>) -> String {
+     // Personal user path segments (mirror of the incumbent /Users,/home rules).
+     out = replace_each(&out, find_user_path);
+     // data:…;base64 blobs.
+-    out = replace_each_ci(&out, find_data_uri);
++    out = replace_each_ci(&out, |lower, rest, from| find_data_uri(rest, lower, from));
+     // URL credentials scheme://user:password@.
+-    out = replace_each_ci(&out, find_url_credentials);
++    out = replace_each_ci(&out, |lower, rest, from| {
++        find_url_credentials(rest, lower, from)
++    });
+     // Secret-bearing URL query parameters.
+-    out = replace_each_ci(&out, find_url_query_secret);
++    out = replace_each_ci(&out, |lower, rest, from| {
++        find_url_query_secret(rest, lower, from)
++    });
+     // Authorization / Cookie header values (leftmost key wins, then the
+     // scanner resumes after it — several headers on one line are all
+     // redacted).
+@@ -160,9 +176,13 @@ pub fn redact_text(text: &str, home: Option<&std::path::Path>) -> String {
+         find_header_value(rest, lower, from, &["set-cookie", "cookie"])
+     });
+     // Bare Bearer tokens.
+-    out = replace_each_ci(&out, find_bare_bearer);
++    out = replace_each_ci(&out, |lower, rest, from| {
++        find_bare_bearer(rest, lower, from)
++    });
+     // secret key=value / key: value assignments.
+-    out = replace_each_ci(&out, find_secret_assignment);
++    out = replace_each_ci(&out, |lower, rest, from| {
++        find_secret_assignment(rest, lower, from)
++    });
+     // Well-known credential value shapes anywhere.
+     out = replace_each(&out, find_credential_value);
+     // Long random tokens (40+ base64-ish chars, word-bounded).
+@@ -823,6 +843,57 @@ mod tests {
+         assert_eq!(red, line, "short tails must not count as credential values");
+     }
+ 
++    // ── R05-T01: re-verification of the divergence-#1 note for the provider
++    //    credential shapes the model plane actually handles (the config
++    //    `apiKey` material and the `Authorization: Bearer` header the
++    //    openai-completions adapter sends). Provider credentials never enter
++    //    diagnostics by construction (the adapter logs nothing; the
++    //    bootstrap log prints a provider COUNT) — these tests pin the
++    //    defense-in-depth net for the day an exception appears. ────────────
++
++    #[test]
++    fn r05_provider_api_key_shapes_are_redacted() {
++        // The exact config-file fragment shape.
++        let line = r#"plane invalid near {"kind": "apiKey", "apiKey": "sk-live-0123456789abcdef"}"#;
++        let red = redact_line(line);
++        assert!(!red.contains("sk-live-0123456789abcdef"), "leaked: {red}");
++        // The Authorization header the adapter sends.
++        let line = "upstream saw Authorization: Bearer sk-live-0123456789abcdef";
++        let red = redact_line(line);
++        assert!(!red.contains("sk-live-0123456789abcdef"), "leaked: {red}");
++        assert!(red.contains("Bearer [redacted]"), "{red}");
++        // A standard-base64 key (contains `/` and `=` — the divergence-#1
++        // long-token miss): the ASSIGNMENT rule still redacts it because
++        // the value is keyed, closing the divergence for the shapes R05
++        // actually handles.
++        let key = "k7+9/ab=0123456789abcdef0123456789ab==";
++        let line = format!(r#"auth rejected for apiKey = "{key}" status=401"#);
++        let red = redact_line(&line);
++        assert!(!red.contains(key), "leaked base64 key: {red}");
++    }
++
++    #[test]
++    fn r05_secret_key_words_match_case_insensitively() {
++        // Regression pin for the R05 re-verification fix: the
++        // case-insensitive finder plumbing passed the original-case text
++        // where the lowercased haystack belonged, so a mixed-case KEY
++        // ("apiKey", "Password", "TOKEN") silently escaped redaction while
++        // the preserved replacement head came out lowercased. Every casing
++        // must redact and keep its original casing outside the value.
++        for key_word in ["apiKey", "API_KEY", "Password", "TOKEN", "Client_Secret"] {
++            let line = format!(r#"cfg {key_word}: "hunter2hunter2""#);
++            let red = redact_line(&line);
++            assert!(
++                !red.contains("hunter2hunter2"),
++                "{key_word}: leaked value: {red}"
++            );
++            assert!(
++                red.contains(key_word),
++                "{key_word}: key casing must survive: {red}"
++            );
++        }
++    }
++
+     // ── R2-F02 regression: multi-byte UTF-8 must never split a char ────────
+ 
+     #[test]
+diff --git a/rust/crates/lingxi-service/src/runs.rs b/rust/crates/lingxi-service/src/runs.rs
+index b6726294f..26f576f30 100644
+--- a/rust/crates/lingxi-service/src/runs.rs
++++ b/rust/crates/lingxi-service/src/runs.rs
+@@ -45,6 +45,7 @@
+ use std::sync::Arc;
+ use std::time::Duration;
+ 
++use lingxi_kernel::model_exchange::{ExchangeItem, ModelTurnInput, RequestedToolCall};
+ use lingxi_kernel::ports::{
+     CommittedOutcome, InvocationIntent, InvocationPhase, InvocationReceipt, KeyEvent,
+     LateResultReason, ReceiptOutcome, ResultFence, StaleResultFact, StorageError, StoragePort,
+@@ -59,10 +60,10 @@ use lingxi_kernel::{
+     RunStateMachine,
+ };
+ use lingxi_protocol::{
+-    ErrorCode, EventId, EventPayload, KnownEventPayload, ModelCallCompletedPayload, ModelCallId,
+-    ModelCallStartedPayload, ProtocolError, RunId, RunStateChangedPayload, RunStatus,
++    ContentBlock, ErrorCode, EventId, EventPayload, KnownEventPayload, ModelCallCompletedPayload,
++    ModelCallId, ModelCallStartedPayload, ProtocolError, RunId, RunStateChangedPayload, RunStatus,
+     ToolCallCompletedPayload, ToolCallDescriptor, ToolCallStartedPayload, ToolResultStatus,
+-    ToolResultWire,
++    ToolResultWire, UsageRecord,
+ };
+ 
+ use crate::approval::{ApprovalDecision, ApprovalGate, ApprovalRequest};
+@@ -734,11 +735,16 @@ impl RunSupervisor {
+             return Ok(finish);
+         };
+ 
+-        let descriptor = provider.descriptor();
+         let mut turn: u32 = 0;
+         let mut tool_call_seq: u32 = 0;
+         let mut saw_tool_failure = false;
+         let mut saw_process_content = false;
++        // R05-T01: the run's typed model exchange (assistant turns with
++        // their requested tool calls interleaved with the REAL tool
++        // outcomes) — the `prior` half of every next turn's
++        // [`ModelTurnInput`]. A retried attempt starts a FRESH exchange:
++        // the old attempt's content never leaks into the retry.
++        let mut exchange: Vec<ExchangeItem> = Vec::new();
+         // The driver-observed live status (the durable leg of the
+         // waiting_approval round trip; the cancelling entry uses it as the
+         // `from` of the two-phase cancellation).
+@@ -773,6 +779,19 @@ impl RunSupervisor {
+                 }
+             };
+         }
++        // R05-T01: every tool outcome that closes a tool-loop iteration —
++        // all four [`ToolOutcome`] states, including every zero-dispatch
++        // refusal — joins the run's exchange history, so the NEXT model
++        // call's typed input carries the REAL outcome (never a guess).
++        macro_rules! record_tool_result {
++            ($call_id:expr, $request:expr, $outcome:expr) => {
++                exchange.push(ExchangeItem::ToolResult {
++                    tool_call_id: $call_id.clone(),
++                    provider_call_id: $request.provider_call_id.clone(),
++                    outcome: $outcome.clone(),
++                })
++            };
++        }
+         let finish = 'turns: loop {
+             gate_cancel!();
+             turn += 1;
+@@ -786,13 +805,46 @@ impl RunSupervisor {
+             // Steering (frozen incumbent semantics): drain the session's
+             // steering channel BEFORE the turn — steered text reaches this
+             // model call's input; the loop itself is never interrupted.
+-            let mut turn_input = input.to_string();
++            let mut submission = input.to_string();
+             if let Some(inbox) = steering {
+                 if let Some(steered) = inbox.drain_joined() {
+-                    turn_input = format!("{input}\n\n[steering]\n{steered}");
++                    submission = format!("{input}\n\n[steering]\n{steered}");
+                 }
+             }
+             let call = model_call_id(&run_id, turn);
++            // R05-T01 (C08): the tool declaration snapshot is rebuilt from
++            // the LIVE registry at every send — the adapter declares exactly
++            // this set to the provider, never a cached or fabricated one. A
++            // build failure (a wire-name conflict) is a LOUD run failure,
++            // never a silently narrowed tool list. Without a gateway wired
++            // (the R03 double wiring) the snapshot is explicitly empty.
++            let tool_snapshot = match self.tool_gateway.as_ref() {
++                Some(gateway) => {
++                    match lingxi_kernel::model_exchange::ToolDeclarationSnapshot::from_registry(
++                        gateway.registry(),
++                    ) {
++                        Ok(snapshot) => snapshot,
++                        Err(err) => {
++                            break RunFinish::Failed {
++                                cause: FailureCause::ProviderFailed {
++                                    code: format!("tool_declaration_snapshot: {err}"),
++                                    retryable: false,
++                                },
++                            };
++                        }
++                    }
++                }
++                None => lingxi_kernel::model_exchange::ToolDeclarationSnapshot::empty(),
++            };
++            // The typed per-turn exchange (R05-T01): submission + complete
++            // prior exchange of this attempt + the send-time tool snapshot.
++            let turn_input = ModelTurnInput {
++                submission,
++                turn,
++                prior: exchange.clone(),
++                tools: tool_snapshot,
++                deadline_unix_ms: None,
++            };
+             // Admission (R03-T02): one model-call permit (global → agent →
+             // session) held across the model I/O only. A quota failure is
+             // a LOUD run failure — never an unbounded wait, never a fake
+@@ -845,7 +897,6 @@ impl RunSupervisor {
+             );
+             let call_ctx = ctx.clone();
+             let call_id = call.clone();
+-            let stream_input = turn_input.clone();
+             let provider_clone = Arc::clone(&provider);
+             let model_child = self
+                 .tasks
+@@ -855,7 +906,7 @@ impl RunSupervisor {
+                     format!("model_call:{}", call.as_str()),
+                     async move {
+                         provider_clone
+-                            .next_turn(&call_ctx, &call_id, turn, &stream_input)
++                            .next_turn(&call_ctx, &call_id, &turn_input)
+                             .await
+                     },
+                 )
+@@ -945,6 +996,19 @@ impl RunSupervisor {
+                     };
+                 }
+             };
++            // R05-T01: the provider-reported token usage (when the protocol
++            // reports one) rides the call's `model_call_completed` fact;
++            // None stays None — never a fabricated estimate.
++            let usage = provider_result.usage.clone();
++            // R05-T01: the persisted call identity is the route that
++            // ACTUALLY served the turn when the adapter reports it (a
++            // mid-run reload never mislabels the model_call facts); doubles
++            // report None and the port's static descriptor is exact for
++            // them.
++            let descriptor = provider_result
++                .served_by
++                .clone()
++                .unwrap_or_else(|| provider.descriptor());
+             let provider_turn = provider_result.turn;
+             match provider_turn {
+                 lingxi_kernel::ports::ProviderTurn::Final { message } => {
+@@ -960,12 +1024,13 @@ impl RunSupervisor {
+                         &call,
+                         &descriptor,
+                         "final_answer",
++                        usage.clone(),
+                         now_ms,
+                     )
+                     .await?;
+                     break RunFinish::CompletedWithFinal { message };
+                 }
+-                lingxi_kernel::ports::ProviderTurn::ToolRequests { requests } => {
++                lingxi_kernel::ports::ProviderTurn::ToolRequests { requests, content } => {
+                     if requests.is_empty() {
+                         // A tool-request turn with zero calls is a protocol
+                         // violation of the double/adapter, not "no tools
+@@ -977,6 +1042,39 @@ impl RunSupervisor {
+                             },
+                         };
+                     }
++                    // R05-T01: pre-mint the tool call ids of EVERY request of
++                    // this turn before any execution (minting order ==
++                    // execution order, so the tc0001.. sequence is exactly
++                    // the one the per-iteration minting produced before).
++                    // The exchange history's assistant turn pairs each
++                    // request with the host identity the driver binds it to
++                    // PLUS the provider's own correlation id.
++                    let planned: Vec<(lingxi_protocol::ToolCallId, RequestedToolCall)> = requests
++                        .iter()
++                        .map(|request| {
++                            tool_call_seq += 1;
++                            let planned_id = tool_call_id(&run_id, tool_call_seq);
++                            (
++                                planned_id.clone(),
++                                RequestedToolCall {
++                                    tool_call_id: planned_id,
++                                    provider_call_id: request.provider_call_id.clone(),
++                                    target: request.target.clone(),
++                                    arguments: request.arguments.clone(),
++                                    args_digest: request.args_digest.clone(),
++                                    args_summary: request.args_summary.clone(),
++                                },
++                            )
++                        })
++                        .collect();
++                    exchange.push(ExchangeItem::AssistantTurn {
++                        call: call.clone(),
++                        content,
++                        tool_calls: planned
++                            .iter()
++                            .map(|(_, requested)| requested.clone())
++                            .collect(),
++                    });
+                     self.persist_model_call(
+                         port,
+                         events,
+@@ -984,6 +1082,7 @@ impl RunSupervisor {
+                         &call,
+                         &descriptor,
+                         "tool_request",
++                        usage.clone(),
+                         now_ms,
+                     )
+                     .await?;
+@@ -1005,14 +1104,13 @@ impl RunSupervisor {
+                         Some(tools)
+                     };
+                     let tool_gateway = self.tool_gateway.clone();
+-                    for request in &requests {
++                    for (request, (planned_id, _)) in requests.iter().zip(planned.iter()) {
+                         // F03-C04: each tool-loop iteration re-checks — a
+                         // cancellation accepted during the previous
+                         // iteration's receipt/event writes stops the loop
+                         // before any new admission or intent.
+                         gate_cancel!();
+-                        tool_call_seq += 1;
+-                        let call_id = tool_call_id(&run_id, tool_call_seq);
++                        let call_id = planned_id.clone();
+                         // Admission (R03-T02): one tool-call permit per
+                         // call, held across the approval wait AND the tool
+                         // I/O (the incumbent registers the execution for
+@@ -1129,6 +1227,7 @@ impl RunSupervisor {
+                                 now_ms,
+                             )
+                             .await?;
++                            record_tool_result!(call_id, request, outcome);
+                             drop(tool_permit);
+                             continue;
+                         }
+@@ -1219,6 +1318,7 @@ impl RunSupervisor {
+                                             now_ms,
+                                         )
+                                         .await?;
++                                        record_tool_result!(call_id, request, outcome);
+                                         drop(tool_permit);
+                                         continue;
+                                     }
+@@ -1349,6 +1449,7 @@ impl RunSupervisor {
+                                 now_ms,
+                             )
+                             .await?;
++                            record_tool_result!(call_id, request, outcome);
+                             drop(tool_permit);
+                             continue;
+                         }
+@@ -1445,6 +1546,7 @@ impl RunSupervisor {
+                                         now_ms,
+                                     )
+                                     .await?;
++                                    record_tool_result!(call_id, request, outcome);
+                                     drop(tool_permit);
+                                     continue;
+                                 };
+@@ -1613,6 +1715,7 @@ impl RunSupervisor {
+                                             now_ms,
+                                         )
+                                         .await?;
++                                        record_tool_result!(call_id, request, outcome);
+                                         drop(tool_permit);
+                                         continue;
+                                     }
+@@ -1808,6 +1911,7 @@ impl RunSupervisor {
+                                 saw_tool_failure = true;
+                             }
+                             saw_process_content = true;
++                            record_tool_result!(call_id, request, outcome);
+                             drop(tool_permit);
+                             continue;
+                         }
+@@ -1985,6 +2089,7 @@ impl RunSupervisor {
+                                     now_ms,
+                                 )
+                                 .await?;
++                                record_tool_result!(call_id, request, outcome);
+                                 drop(tool_permit);
+                                 continue;
+                             }
+@@ -2068,11 +2173,20 @@ impl RunSupervisor {
+                             now_ms,
+                         )
+                         .await?;
++                        record_tool_result!(call_id, request, outcome);
+                         drop(tool_permit);
+                     }
+                 }
+-                lingxi_kernel::ports::ProviderTurn::Continue { .. } => {
++                lingxi_kernel::ports::ProviderTurn::Continue { process_note } => {
+                     saw_process_content = true;
++                    // R05-T01: a process-only turn is still an exchange item
++                    // — the next turn's typed input carries the reasoning
++                    // block (never dropped silently).
++                    exchange.push(ExchangeItem::AssistantTurn {
++                        call: call.clone(),
++                        content: vec![ContentBlock::Reasoning { text: process_note }],
++                        tool_calls: Vec::new(),
++                    });
+                     self.persist_model_call(
+                         port,
+                         events,
+@@ -2080,6 +2194,7 @@ impl RunSupervisor {
+                         &call,
+                         &descriptor,
+                         "process_only",
++                        usage.clone(),
+                         now_ms,
+                     )
+                     .await?;
+@@ -2092,6 +2207,7 @@ impl RunSupervisor {
+                         &call,
+                         &descriptor,
+                         "empty_reply",
++                        usage.clone(),
+                         now_ms,
+                     )
+                     .await?;
+@@ -2105,15 +2221,19 @@ impl RunSupervisor {
+                         &call,
+                         &descriptor,
+                         "failed",
++                        usage.clone(),
+                         now_ms,
+                     )
+                     .await?;
+                     if retryable && attempt_seq < self.limits.max_attempts {
+                         // Retry = NEW ATTEMPT on the SAME run (the run id is
+                         // fixed at creation; a provider reconnect never
+-                        // becomes a new user task).
++                        // becomes a new user task). The retried attempt
++                        // starts a FRESH exchange: the failed attempt's
++                        // content never leaks into the retry's first input.
+                         attempt_seq += 1;
+                         ctx.attempt = attempt_id(&run_id, attempt_seq);
++                        exchange.clear();
+                         port.record_attempt_started(&ctx, now_ms)
+                             .await
+                             .map_err(DriveError::Storage)?;
+@@ -2394,6 +2514,7 @@ impl RunSupervisor {
+         call: &ModelCallId,
+         descriptor: &lingxi_kernel::ports::ProviderDescriptor,
+         finish_kind: &'static str,
++        usage: Option<UsageRecord>,
+         now_ms: u64,
+     ) -> Result<(), DriveError> {
+         let run_id = ctx.run_id.to_string();
+@@ -2414,9 +2535,10 @@ impl RunSupervisor {
+                 payload: EventPayload::Known(KnownEventPayload::ModelCallCompleted(
+                     ModelCallCompletedPayload {
+                         model_call_id: call.clone(),
+-                        // Usage is filled by real providers (R05); a
+-                        // deterministic double never invents token counts.
+-                        usage: None,
++                        // R05-T01: the usage the provider ACTUALLY reported
++                        // (None = the protocol/double reported none — never
++                        // a fabricated estimate).
++                        usage,
+                     },
+                 )),
+             },
+diff --git a/rust/crates/lingxi-service/src/toolgateway.rs b/rust/crates/lingxi-service/src/toolgateway.rs
+index 8fb380d39..b26e82a7c 100644
+--- a/rust/crates/lingxi-service/src/toolgateway.rs
++++ b/rust/crates/lingxi-service/src/toolgateway.rs
+@@ -1249,6 +1249,9 @@ impl ToolInvocationGateway {
+             args_summary: Some(lingxi_kernel::toolcatalog::summarize_arguments(
+                 &record.effective,
+             )),
++            // The gateway re-dispatch is internal: no provider correlation
++            // id applies (the caller's `ToolRequest` keeps its own).
++            provider_call_id: None,
+             delegation: None,
+         };
+         tracing::info!(
+diff --git a/rust/crates/lingxi-service/tests/admission_dedup_adversarial.rs b/rust/crates/lingxi-service/tests/admission_dedup_adversarial.rs
+index 1aa884707..1b0ae8160 100644
+--- a/rust/crates/lingxi-service/tests/admission_dedup_adversarial.rs
++++ b/rust/crates/lingxi-service/tests/admission_dedup_adversarial.rs
+@@ -20,6 +20,7 @@ use std::pin::Pin;
+ use std::sync::atomic::{AtomicBool, Ordering};
+ use std::sync::Arc;
+ 
++use lingxi_kernel::model_exchange::ModelTurnInput;
+ use lingxi_kernel::ports::{
+     CommittedOutcome, InvocationIntent, InvocationPhase, InvocationReceipt, KeyEvent,
+     ProviderDescriptor, ProviderTurn, ProviderTurnResult, RunOutcome, StaleResultFact,
+@@ -70,9 +71,9 @@ impl TurnProviderPort for ScriptedProvider {
+         &'a self,
+         ctx: &'a RunContext,
+         _call: &'a ModelCallId,
+-        _turn: u32,
+-        input: &'a str,
++        input: &'a ModelTurnInput,
+     ) -> Pin<Box<dyn std::future::Future<Output = ProviderTurnResult> + Send + 'a>> {
++        let input = input.submission.as_str();
+         let marker = input.split(':').next().unwrap_or(input).trim().to_string();
+         let ctx_at_issue = ctx.clone();
+         let turn = self
+@@ -186,6 +187,7 @@ fn final_turn(text: &str) -> ProviderTurn {
+ fn scripted_steps() -> Vec<ProviderTurn> {
+     vec![
+         ProviderTurn::ToolRequests {
++            content: Vec::new(),
+             requests: vec![tool_request()],
+         },
+         final_turn("g04adv done"),
+diff --git a/rust/crates/lingxi-service/tests/admission_dedup_consistency.rs b/rust/crates/lingxi-service/tests/admission_dedup_consistency.rs
+index 59e991331..f330acb1b 100644
+--- a/rust/crates/lingxi-service/tests/admission_dedup_consistency.rs
++++ b/rust/crates/lingxi-service/tests/admission_dedup_consistency.rs
+@@ -27,6 +27,7 @@ use std::pin::Pin;
+ use std::sync::atomic::{AtomicBool, AtomicUsize, Ordering};
+ use std::sync::Arc;
+ 
++use lingxi_kernel::model_exchange::ModelTurnInput;
+ use lingxi_kernel::ports::{
+     CommittedOutcome, InvocationIntent, InvocationPhase, InvocationReceipt, KeyEvent,
+     ProviderDescriptor, ProviderTurn, ProviderTurnResult, RunOutcome, StaleResultFact,
+@@ -81,9 +82,9 @@ impl TurnProviderPort for ScriptedProvider {
+         &'a self,
+         ctx: &'a RunContext,
+         _call: &'a ModelCallId,
+-        _turn: u32,
+-        input: &'a str,
++        input: &'a ModelTurnInput,
+     ) -> Pin<Box<dyn std::future::Future<Output = ProviderTurnResult> + Send + 'a>> {
++        let input = input.submission.as_str();
+         let marker = Self::marker_of(input);
+         let ctx_at_issue = ctx.clone();
+         let turn = self
+@@ -168,6 +169,7 @@ fn final_turn(text: &str) -> ProviderTurn {
+ fn scripted_steps() -> Vec<ProviderTurn> {
+     vec![
+         ProviderTurn::ToolRequests {
++            content: Vec::new(),
+             requests: vec![tool_request()],
+         },
+         final_turn("g04 done"),
+diff --git a/rust/crates/lingxi-service/tests/background_disconnect_recovery.rs b/rust/crates/lingxi-service/tests/background_disconnect_recovery.rs
+index 12c8ec9f1..dcc1b4108 100644
+--- a/rust/crates/lingxi-service/tests/background_disconnect_recovery.rs
++++ b/rust/crates/lingxi-service/tests/background_disconnect_recovery.rs
+@@ -29,6 +29,7 @@ use std::path::PathBuf;
+ use std::pin::Pin;
+ use std::sync::Arc;
+ 
++use lingxi_kernel::model_exchange::ModelTurnInput;
+ use lingxi_kernel::ports::{
+     ProviderDescriptor, ProviderTurn, ProviderTurnResult, ToolExecutionResult, ToolExecutorPort,
+     ToolOutcome, ToolRequest, TurnProviderPort,
+@@ -81,9 +82,9 @@ impl TurnProviderPort for ScriptedProvider {
+         &'a self,
+         ctx: &'a RunContext,
+         _call: &'a ModelCallId,
+-        _turn: u32,
+-        input: &'a str,
++        input: &'a ModelTurnInput,
+     ) -> Pin<Box<dyn std::future::Future<Output = ProviderTurnResult> + Send + 'a>> {
++        let input = input.submission.as_str();
+         let marker = Self::marker_of(input);
+         let ctx_at_issue = ctx.clone();
+         let turn = self
+@@ -282,6 +283,7 @@ async fn r03_a12_background_run_survives_disconnect_reconnect_replays_and_is_que
+         "BG-A12",
+         vec![
+             ProviderTurn::ToolRequests {
++                content: Vec::new(),
+                 requests: vec![read_tool_request()],
+             },
+             final_turn("background work finished"),
+@@ -416,6 +418,7 @@ async fn foreground_drive_disappearing_is_abandoned_not_cancelled() {
+         "FG-A12",
+         vec![
+             ProviderTurn::ToolRequests {
++                content: Vec::new(),
+                 requests: vec![read_tool_request()],
+             },
+             final_turn("never reached"),
+@@ -505,6 +508,7 @@ async fn exit_hook_drain_reports_live_drives_as_unconfirmed() {
+         "BG-A12",
+         vec![
+             ProviderTurn::ToolRequests {
++                content: Vec::new(),
+                 requests: vec![read_tool_request()],
+             },
+             final_turn("settled after the drain window"),
+diff --git a/rust/crates/lingxi-service/tests/background_steering.rs b/rust/crates/lingxi-service/tests/background_steering.rs
+index 694835ad5..06c82d2f6 100644
+--- a/rust/crates/lingxi-service/tests/background_steering.rs
++++ b/rust/crates/lingxi-service/tests/background_steering.rs
+@@ -35,6 +35,7 @@ use std::path::PathBuf;
+ use std::pin::Pin;
+ use std::sync::Arc;
+ 
++use lingxi_kernel::model_exchange::ModelTurnInput;
+ use lingxi_kernel::ports::{
+     ProviderDescriptor, ProviderTurn, ProviderTurnResult, ToolExecutionResult, ToolExecutorPort,
+     ToolOutcome, ToolRequest, TurnProviderPort,
+@@ -125,9 +126,9 @@ impl TurnProviderPort for GatedProvider {
+         &'a self,
+         ctx: &'a lingxi_kernel::RunContext,
+         _call: &'a ModelCallId,
+-        _turn: u32,
+-        input: &'a str,
++        input: &'a ModelTurnInput,
+     ) -> Pin<Box<dyn std::future::Future<Output = ProviderTurnResult> + Send + 'a>> {
++        let input = input.submission.as_str();
+         let session = ctx.session_id.to_string();
+         let run = ctx.run_id.to_string();
+         let pop = {
+diff --git a/rust/crates/lingxi-service/tests/cancel_link_inheritance.rs b/rust/crates/lingxi-service/tests/cancel_link_inheritance.rs
+index 237a3662d..67d2f4340 100644
+--- a/rust/crates/lingxi-service/tests/cancel_link_inheritance.rs
++++ b/rust/crates/lingxi-service/tests/cancel_link_inheritance.rs
+@@ -34,6 +34,7 @@ use std::pin::Pin;
+ use std::sync::{Arc, Mutex};
+ use std::time::Duration;
+ 
++use lingxi_kernel::model_exchange::ModelTurnInput;
+ use lingxi_kernel::ports::{
+     DelegationRequest, ProviderDescriptor, ProviderTurn, ProviderTurnResult, ToolExecutionResult,
+     ToolExecutorPort, ToolOutcome, ToolRequest, TurnProviderPort,
+@@ -103,9 +104,9 @@ impl TurnProviderPort for ScriptedProvider {
+         &'a self,
+         ctx: &'a RunContext,
+         _call: &'a ModelCallId,
+-        _turn: u32,
+-        input: &'a str,
++        input: &'a ModelTurnInput,
+     ) -> Pin<Box<dyn std::future::Future<Output = ProviderTurnResult> + Send + 'a>> {
++        let input = input.submission.as_str();
+         let marker = Self::marker_of(input);
+         {
+             let mut calls = self.calls.lock().unwrap();
+@@ -132,6 +133,7 @@ impl TurnProviderPort for ScriptedProvider {
+             let turn = match step {
+                 Some(Step::Turn(turn)) => turn,
+                 Some(Step::Dispatch { task }) => ProviderTurn::ToolRequests {
++                    content: Vec::new(),
+                     requests: vec![ToolRequest::from_effective_arguments(
+                         "subagent",
+                         serde_json::json!({
+@@ -729,6 +731,7 @@ async fn subagent_timeout_settles_a_parked_approval_wait() {
+             (
+                 "KID",
+                 vec![Step::Turn(ProviderTurn::ToolRequests {
++                    content: Vec::new(),
+                     requests: vec![read_tool_request()],
+                 })],
+             ),
+diff --git a/rust/crates/lingxi-service/tests/cancel_terminal_race.rs b/rust/crates/lingxi-service/tests/cancel_terminal_race.rs
+index c5e722733..74709442f 100644
+--- a/rust/crates/lingxi-service/tests/cancel_terminal_race.rs
++++ b/rust/crates/lingxi-service/tests/cancel_terminal_race.rs
+@@ -35,6 +35,7 @@ use std::pin::Pin;
+ use std::sync::Arc;
+ 
+ use lingxi_adapters::storage::RunDatabase;
++use lingxi_kernel::model_exchange::ModelTurnInput;
+ use lingxi_kernel::ports::{CommittedOutcome, KeyEvent, RunOutcome};
+ use lingxi_kernel::ports::{
+     InvocationIntent, InvocationPhase, InvocationReceipt, ProviderDescriptor, ReceiptOutcome,
+@@ -94,8 +95,7 @@ impl TurnProviderPort for CountingScriptedProvider {
+         &'a self,
+         ctx: &'a RunContext,
+         _call: &'a ModelCallId,
+-        _turn: u32,
+-        _input: &'a str,
++        _input: &'a ModelTurnInput,
+     ) -> Pin<
+         Box<dyn std::future::Future<Output = lingxi_kernel::ports::ProviderTurnResult> + Send + 'a>,
+     > {
+@@ -746,6 +746,7 @@ async fn cancel_accepted_before_the_terminal_claim_beats_the_failed_terminal_too
+         "sess_local_alpha",
+         vec![
+             lingxi_kernel::ports::ProviderTurn::ToolRequests {
++                content: Vec::new(),
+                 requests: vec![read_tool_request()],
+             },
+             lingxi_kernel::ports::ProviderTurn::Failed {
+@@ -819,6 +820,7 @@ async fn cancel_accepted_before_the_terminal_claim_beats_every_terminal_shape()
+         "sess_local_alpha",
+         vec![
+             lingxi_kernel::ports::ProviderTurn::ToolRequests {
++                content: Vec::new(),
+                 requests: vec![read_tool_request()],
+             },
+             lingxi_kernel::ports::ProviderTurn::Final {
+@@ -1108,6 +1110,7 @@ async fn cancel_at_the_intent_boundary_dispatches_no_new_external_call() {
+     let provider = CountingScriptedProvider::new(vec![(
+         "sess_local_alpha",
+         vec![lingxi_kernel::ports::ProviderTurn::ToolRequests {
++            content: Vec::new(),
+             requests: vec![read_tool_request(), read_tool_request()],
+         }],
+     )]);
+@@ -1181,6 +1184,7 @@ async fn cancel_at_the_started_boundary_dispatches_no_new_external_call() {
+     let provider = CountingScriptedProvider::new(vec![(
+         "sess_local_alpha",
+         vec![lingxi_kernel::ports::ProviderTurn::ToolRequests {
++            content: Vec::new(),
+             requests: vec![read_tool_request()],
+         }],
+     )]);
+@@ -1286,6 +1290,7 @@ async fn cancel_between_tool_iterations_stops_the_second_dispatch() {
+     let provider = CountingScriptedProvider::new(vec![(
+         "sess_local_alpha",
+         vec![lingxi_kernel::ports::ProviderTurn::ToolRequests {
++            content: Vec::new(),
+             requests: vec![read_tool_request(), read_tool_request()],
+         }],
+     )]);
+@@ -1348,6 +1353,7 @@ async fn cancel_at_the_authorization_boundary_never_opens_the_approval_ask() {
+     let provider = CountingScriptedProvider::new(vec![(
+         "sess_local_alpha",
+         vec![lingxi_kernel::ports::ProviderTurn::ToolRequests {
++            content: Vec::new(),
+             requests: vec![read_tool_request()],
+         }],
+     )]);
+@@ -1415,6 +1421,7 @@ async fn started_without_receipt_journals_unknown_receipt_facts() {
+         "sess_local_alpha",
+         vec![
+             lingxi_kernel::ports::ProviderTurn::ToolRequests {
++                content: Vec::new(),
+                 requests: vec![read_tool_request()],
+             },
+             lingxi_kernel::ports::ProviderTurn::Final {
+diff --git a/rust/crates/lingxi-service/tests/cancellation_tree.rs b/rust/crates/lingxi-service/tests/cancellation_tree.rs
+index a5e211619..348657fec 100644
+--- a/rust/crates/lingxi-service/tests/cancellation_tree.rs
++++ b/rust/crates/lingxi-service/tests/cancellation_tree.rs
+@@ -43,6 +43,7 @@ use std::pin::Pin;
+ use std::sync::Arc;
+ use std::time::Duration;
+ 
++use lingxi_kernel::model_exchange::ModelTurnInput;
+ use lingxi_kernel::ports::{
+     ProviderDescriptor, ProviderTurn, ProviderTurnResult, StoragePort, ToolExecutionResult,
+     ToolExecutorPort, ToolOutcome, ToolRequest, TurnProviderPort,
+@@ -104,8 +105,7 @@ impl TurnProviderPort for GatedProvider {
+         &'a self,
+         ctx: &'a RunContext,
+         _call: &'a ModelCallId,
+-        _turn: u32,
+-        _input: &'a str,
++        _input: &'a ModelTurnInput,
+     ) -> Pin<Box<dyn std::future::Future<Output = ProviderTurnResult> + Send + 'a>> {
+         let session = ctx.session_id.to_string();
+         let pop = {
+@@ -632,6 +632,7 @@ async fn a05_case(state_kind: WaitState) {
+                     (
+                         "sess_local_alpha",
+                         vec![ProviderTurn::ToolRequests {
++                            content: Vec::new(),
+                             requests: vec![read_tool_request()],
+                         }],
+                     ),
+@@ -639,6 +640,7 @@ async fn a05_case(state_kind: WaitState) {
+                         "sess_local_beta",
+                         vec![
+                             ProviderTurn::ToolRequests {
++                                content: Vec::new(),
+                                 requests: vec![read_tool_request()],
+                             },
+                             ProviderTurn::Final {
+@@ -693,6 +695,7 @@ async fn a05_case(state_kind: WaitState) {
+                     "sess_local_alpha",
+                     vec![
+                         ProviderTurn::ToolRequests {
++                            content: Vec::new(),
+                             requests: vec![read_tool_request()],
+                         },
+                         ProviderTurn::Final {
+@@ -733,6 +736,7 @@ async fn a05_case(state_kind: WaitState) {
+                             process_note: "reading the stream".to_string(),
+                         },
+                         ProviderTurn::ToolRequests {
++                            content: Vec::new(),
+                             requests: vec![read_tool_request()],
+                         },
+                     ],
+@@ -1044,6 +1048,7 @@ async fn queue_wait_cancel_leaves_the_unrelated_holder_untouched() {
+             (
+                 "sess_local_alpha",
+                 vec![ProviderTurn::ToolRequests {
++                    content: Vec::new(),
+                     requests: vec![read_tool_request()],
+                 }],
+             ),
+@@ -1051,6 +1056,7 @@ async fn queue_wait_cancel_leaves_the_unrelated_holder_untouched() {
+                 "sess_local_beta",
+                 vec![
+                     ProviderTurn::ToolRequests {
++                        content: Vec::new(),
+                         requests: vec![read_tool_request()],
+                     },
+                     ProviderTurn::Final {
+@@ -1382,6 +1388,7 @@ async fn noncooperating_child_is_reported_unconfirmed_not_fake_quiet() {
+         vec![(
+             "sess_local_alpha",
+             vec![ProviderTurn::ToolRequests {
++                content: Vec::new(),
+                 requests: vec![read_tool_request()],
+             }],
+         )],
+@@ -1480,6 +1487,7 @@ async fn panicking_tool_child_is_supervised_and_the_run_settles_loudly() {
+             "sess_local_alpha",
+             vec![
+                 ProviderTurn::ToolRequests {
++                    content: Vec::new(),
+                     requests: vec![read_tool_request()],
+                 },
+                 ProviderTurn::Empty {
+@@ -1718,6 +1726,7 @@ async fn approval_wait_round_trips_approve_and_reject_legs() {
+             "sess_local_alpha",
+             vec![
+                 ProviderTurn::ToolRequests {
++                    content: Vec::new(),
+                     requests: vec![read_tool_request()],
+                 },
+                 ProviderTurn::Final {
+@@ -1788,6 +1797,7 @@ async fn approval_wait_round_trips_approve_and_reject_legs() {
+             "sess_local_alpha",
+             vec![
+                 ProviderTurn::ToolRequests {
++                    content: Vec::new(),
+                     requests: vec![read_tool_request()],
+                 },
+                 ProviderTurn::Empty {
+diff --git a/rust/crates/lingxi-service/tests/exit_race_rejections.rs b/rust/crates/lingxi-service/tests/exit_race_rejections.rs
+index 1e2def487..0eb6d4909 100644
+--- a/rust/crates/lingxi-service/tests/exit_race_rejections.rs
++++ b/rust/crates/lingxi-service/tests/exit_race_rejections.rs
+@@ -26,6 +26,7 @@ use std::pin::Pin;
+ use std::sync::Arc;
+ use std::time::Duration;
+ 
++use lingxi_kernel::model_exchange::ModelTurnInput;
+ use lingxi_kernel::ports::{
+     ProviderDescriptor, ProviderTurnResult, ToolExecutionResult, ToolExecutorPort, ToolOutcome,
+     ToolRequest, TurnProviderPort,
+@@ -61,13 +62,14 @@ impl TurnProviderPort for OneToolThenFinalProvider {
+         &'a self,
+         ctx: &'a RunContext,
+         _call: &'a ModelCallId,
+-        turn: u32,
+-        _input: &'a str,
++        input: &'a ModelTurnInput,
+     ) -> Pin<Box<dyn std::future::Future<Output = ProviderTurnResult> + Send + 'a>> {
++        let turn = input.turn;
+         let ctx_at_issue = ctx.clone();
+         Box::pin(async move {
+             let out = if turn == 1 {
+                 lingxi_kernel::ports::ProviderTurn::ToolRequests {
++                    content: Vec::new(),
+                     requests: vec![ToolRequest::from_effective_arguments(
+                         "park.tool",
+                         serde_json::json!({
+diff --git a/rust/crates/lingxi-service/tests/input_budget_refusal.rs b/rust/crates/lingxi-service/tests/input_budget_refusal.rs
+index 75c6f3b08..254640436 100644
+--- a/rust/crates/lingxi-service/tests/input_budget_refusal.rs
++++ b/rust/crates/lingxi-service/tests/input_budget_refusal.rs
+@@ -24,6 +24,7 @@ use std::path::{Path, PathBuf};
+ use std::pin::Pin;
+ use std::sync::Arc;
+ 
++use lingxi_kernel::model_exchange::ModelTurnInput;
+ use lingxi_kernel::ports::{
+     ProviderDescriptor, ProviderTurn, ProviderTurnResult, ToolExecutionResult, ToolExecutorPort,
+     ToolOutcome, TurnProviderPort,
+@@ -72,9 +73,9 @@ impl TurnProviderPort for RecordingProvider {
+         &'a self,
+         ctx: &'a RunContext,
+         _call: &'a ModelCallId,
+-        _turn: u32,
+-        input: &'a str,
++        input: &'a ModelTurnInput,
+     ) -> Pin<Box<dyn std::future::Future<Output = ProviderTurnResult> + Send + 'a>> {
++        let input = input.submission.as_str();
+         self.inputs
+             .lock()
+             .unwrap_or_else(|poisoned| poisoned.into_inner())
+diff --git a/rust/crates/lingxi-service/tests/input_payload_fidelity.rs b/rust/crates/lingxi-service/tests/input_payload_fidelity.rs
+index 2d4633dff..5a9c9e44a 100644
+--- a/rust/crates/lingxi-service/tests/input_payload_fidelity.rs
++++ b/rust/crates/lingxi-service/tests/input_payload_fidelity.rs
+@@ -23,6 +23,7 @@ use std::path::{Path, PathBuf};
+ use std::pin::Pin;
+ use std::sync::Arc;
+ 
++use lingxi_kernel::model_exchange::ModelTurnInput;
+ use lingxi_kernel::ports::{
+     ProviderDescriptor, ProviderTurn, ProviderTurnResult, ToolExecutionResult, ToolExecutorPort,
+     ToolOutcome, TurnProviderPort,
+@@ -80,9 +81,9 @@ impl TurnProviderPort for RecordingProvider {
+         &'a self,
+         ctx: &'a RunContext,
+         _call: &'a ModelCallId,
+-        _turn: u32,
+-        input: &'a str,
++        input: &'a ModelTurnInput,
+     ) -> Pin<Box<dyn std::future::Future<Output = ProviderTurnResult> + Send + 'a>> {
++        let input = input.submission.as_str();
+         // Record the EXACT bytes received — the only observation channel.
+         self.inputs
+             .lock()
+diff --git a/rust/crates/lingxi-service/tests/invocation_journal.rs b/rust/crates/lingxi-service/tests/invocation_journal.rs
+index ae283f165..e5b1e3ee6 100644
+--- a/rust/crates/lingxi-service/tests/invocation_journal.rs
++++ b/rust/crates/lingxi-service/tests/invocation_journal.rs
+@@ -42,6 +42,7 @@ use std::sync::Arc;
+ use std::time::Duration;
+ 
+ use lingxi_kernel::invocation::{RecoveryDecision, ToolRecoveryCapability};
++use lingxi_kernel::model_exchange::ModelTurnInput;
+ use lingxi_kernel::ports::{
+     InvocationPhase, InvocationReceipt, ProviderDescriptor, ProviderTurnResult, ReceiptOutcome,
+     StoragePort, ToolExecutionResult, ToolExecutorPort, ToolOutcome, ToolRequest, TurnProviderPort,
+@@ -276,8 +277,7 @@ impl TurnProviderPort for ScriptedProvider {
+         &'a self,
+         ctx: &'a RunContext,
+         _call: &'a ModelCallId,
+-        _turn: u32,
+-        _input: &'a str,
++        _input: &'a ModelTurnInput,
+     ) -> Pin<Box<dyn std::future::Future<Output = ProviderTurnResult> + Send + 'a>> {
+         let session = ctx.session_id.to_string();
+         let pop = {
+@@ -488,6 +488,7 @@ async fn r03_a09_crash_after_side_effect_does_not_reexecute_and_receipt_is_unkno
+             "sess_local_alpha",
+             vec![
+                 lingxi_kernel::ports::ProviderTurn::ToolRequests {
++                    content: Vec::new(),
+                     requests: vec![tool_request("notify.double")],
+                 },
+                 lingxi_kernel::ports::ProviderTurn::Final {
+@@ -714,6 +715,7 @@ async fn r03_a10_idempotent_key_resume_does_not_duplicate_the_external_operation
+             "sess_local_alpha",
+             vec![
+                 lingxi_kernel::ports::ProviderTurn::ToolRequests {
++                    content: Vec::new(),
+                     requests: vec![tool_request("ledger.double")],
+                 },
+                 lingxi_kernel::ports::ProviderTurn::Final {
+@@ -1034,9 +1036,11 @@ async fn journal_lifecycle_progresses_and_closes_receipts_on_the_live_chain() {
+             "sess_local_alpha",
+             vec![
+                 lingxi_kernel::ports::ProviderTurn::ToolRequests {
++                    content: Vec::new(),
+                     requests: vec![tool_request("notify.double"), tool_request("notify.double")],
+                 },
+                 lingxi_kernel::ports::ProviderTurn::ToolRequests {
++                    content: Vec::new(),
+                     requests: vec![tool_request("notify.double")],
+                 },
+                 lingxi_kernel::ports::ProviderTurn::Final {
+diff --git a/rust/crates/lingxi-service/tests/late_result_fence.rs b/rust/crates/lingxi-service/tests/late_result_fence.rs
+index 6155de751..0da84cf3c 100644
+--- a/rust/crates/lingxi-service/tests/late_result_fence.rs
++++ b/rust/crates/lingxi-service/tests/late_result_fence.rs
+@@ -35,6 +35,7 @@ use std::pin::Pin;
+ use std::sync::Arc;
+ use std::time::Duration;
+ 
++use lingxi_kernel::model_exchange::ModelTurnInput;
+ use lingxi_kernel::ports::{
+     ProviderDescriptor, ProviderTurnResult, ResultFence, StorageError, StoragePort,
+     ToolExecutionResult, ToolExecutorPort, ToolOutcome, ToolRequest, TurnProviderPort,
+@@ -119,8 +120,7 @@ impl TurnProviderPort for FencedProvider {
+         &'a self,
+         ctx: &'a RunContext,
+         _call: &'a ModelCallId,
+-        _turn: u32,
+-        _input: &'a str,
++        _input: &'a ModelTurnInput,
+     ) -> Pin<Box<dyn std::future::Future<Output = ProviderTurnResult> + Send + 'a>> {
+         let session = ctx.session_id.to_string();
+         let pop = {
+@@ -162,6 +162,8 @@ impl TurnProviderPort for FencedProvider {
+                 Some(fence) => ProviderTurnResult {
+                     fence,
+                     turn: step.turn,
++                    usage: None,
++                    served_by: None,
+                 },
+                 None => ProviderTurnResult::of_ctx(&ctx_at_issue, step.turn),
+             }
+@@ -804,8 +806,7 @@ async fn r03_a07_driver_fences_stale_tagged_model_result_loudly() {
+             &'a self,
+             ctx: &'a RunContext,
+             _call: &'a ModelCallId,
+-            _turn: u32,
+-            _input: &'a str,
++            _input: &'a ModelTurnInput,
+         ) -> Pin<Box<dyn std::future::Future<Output = ProviderTurnResult> + Send + 'a>> {
+             let session = ctx.session_id.to_string();
+             let pop = {
+@@ -849,6 +850,8 @@ async fn r03_a07_driver_fences_stale_tagged_model_result_loudly() {
+                         turn: lingxi_kernel::ports::ProviderTurn::Final {
+                             message: assistant_final("stale attempt1 content"),
+                         },
++                        usage: None,
++                        served_by: None,
+                     }
+                 })
+             }
+@@ -930,6 +933,7 @@ async fn r03_a07_tool_result_with_stale_fence_records_unknown_and_audits() {
+             "sess_local_alpha",
+             vec![
+                 FencedProvider::step(lingxi_kernel::ports::ProviderTurn::ToolRequests {
++                    content: Vec::new(),
+                     requests: vec![read_tool_request()],
+                 })
+                 .0,
+diff --git a/rust/crates/lingxi-service/tests/r03_t08_acceptance_matrix.rs b/rust/crates/lingxi-service/tests/r03_t08_acceptance_matrix.rs
+index 0dea3a50a..12ce3e57a 100644
+--- a/rust/crates/lingxi-service/tests/r03_t08_acceptance_matrix.rs
++++ b/rust/crates/lingxi-service/tests/r03_t08_acceptance_matrix.rs
+@@ -30,6 +30,7 @@ use std::path::PathBuf;
+ use std::pin::Pin;
+ use std::sync::{Arc, Mutex};
+ 
++use lingxi_kernel::model_exchange::ModelTurnInput;
+ use lingxi_kernel::ports::ProviderTurn::ToolRequests;
+ use lingxi_kernel::ports::{
+     DelegationRequest, ProviderDescriptor, ProviderTurn, ProviderTurnResult, ToolExecutionResult,
+@@ -186,9 +187,9 @@ impl TurnProviderPort for ScriptedProvider {
+         &'a self,
+         ctx: &'a lingxi_kernel::RunContext,
+         _call: &'a ModelCallId,
+-        _turn: u32,
+-        input: &'a str,
++        input: &'a ModelTurnInput,
+     ) -> Pin<Box<dyn std::future::Future<Output = ProviderTurnResult> + Send + 'a>> {
++        let input = input.submission.as_str();
+         let marker = marker_of(input);
+         let pop = {
+             let mut pops = self.pops.lock().unwrap();
+@@ -257,6 +258,7 @@ fn delegation_turn(
+     thread_id: Option<String>,
+ ) -> ProviderTurn {
+     ToolRequests {
++        content: Vec::new(),
+         requests: vec![ToolRequest::from_effective_arguments(
+             target,
+             serde_json::json!({
+@@ -305,6 +307,7 @@ fn read_tool(n: u32) -> ToolRequest {
+ 
+ fn tool_requests(count: u32) -> ProviderTurn {
+     ProviderTurn::ToolRequests {
++        content: Vec::new(),
+         requests: (1..=count).map(read_tool).collect(),
+     }
+ }
+diff --git a/rust/crates/lingxi-service/tests/r04_rr1_f03_stop_honesty.rs b/rust/crates/lingxi-service/tests/r04_rr1_f03_stop_honesty.rs
+index e7cfffef6..a933472cf 100644
+--- a/rust/crates/lingxi-service/tests/r04_rr1_f03_stop_honesty.rs
++++ b/rust/crates/lingxi-service/tests/r04_rr1_f03_stop_honesty.rs
+@@ -39,6 +39,7 @@ use std::time::{Duration, Instant};
+ use std::collections::VecDeque;
+ use std::pin::Pin;
+ 
++use lingxi_kernel::model_exchange::ModelTurnInput;
+ use lingxi_kernel::ports::{
+     InvocationJournalEntry, InvocationPhase, ProviderDescriptor, ProviderTurn, ProviderTurnResult,
+     StoragePort, ToolOutcome, ToolRequest, ToolRunStatus, TurnProviderPort,
+@@ -958,8 +959,7 @@ impl TurnProviderPort for RunIdCaptureProvider {
+         &'a self,
+         ctx: &'a RunContext,
+         _call: &'a ModelCallId,
+-        _turn: u32,
+-        _input: &'a str,
++        _input: &'a ModelTurnInput,
+     ) -> Pin<Box<dyn std::future::Future<Output = ProviderTurnResult> + Send + 'a>> {
+         *self.seen_run.lock().unwrap() = Some(ctx.run_id.to_string());
+         let next = self
+@@ -987,6 +987,7 @@ fn final_turn(text: &str) -> ProviderTurn {
+ 
+ fn tool_request_turn(target: &str, args: serde_json::Value) -> ProviderTurn {
+     ProviderTurn::ToolRequests {
++        content: Vec::new(),
+         requests: vec![ToolRequest::from_effective_arguments(
+             target,
+             args,
+diff --git a/rust/crates/lingxi-service/tests/r04_t01_tool_catalog.rs b/rust/crates/lingxi-service/tests/r04_t01_tool_catalog.rs
+index dd4fa55ac..1e9cb7f95 100644
+--- a/rust/crates/lingxi-service/tests/r04_t01_tool_catalog.rs
++++ b/rust/crates/lingxi-service/tests/r04_t01_tool_catalog.rs
+@@ -26,6 +26,7 @@
+ use std::pin::Pin;
+ use std::sync::Arc;
+ 
++use lingxi_kernel::model_exchange::ModelTurnInput;
+ use lingxi_kernel::ports::{
+     ProviderDescriptor, ProviderTurn, ProviderTurnResult, StoragePort, ToolExecutionResult,
+     ToolExecutorPort, ToolOutcome, ToolRequest, TurnProviderPort,
+@@ -606,8 +607,7 @@ async fn adversarial_forged_digest_is_refused_with_zero_dispatch_on_real_chain()
+             &'a self,
+             ctx: &'a lingxi_kernel::RunContext,
+             _call: &'a ModelCallId,
+-            _turn: u32,
+-            _input: &'a str,
++            _input: &'a ModelTurnInput,
+         ) -> Pin<Box<dyn std::future::Future<Output = ProviderTurnResult> + Send + 'a>> {
+             let ctx_at_issue = ctx.clone();
+             let next = match self.forged.lock().unwrap().take() {
+@@ -617,6 +617,7 @@ async fn adversarial_forged_digest_is_refused_with_zero_dispatch_on_real_chain()
+                         .unwrap()
+                         .push(request.target.clone());
+                     ProviderTurn::ToolRequests {
++                        content: Vec::new(),
+                         requests: vec![request],
+                     }
+                 }
+diff --git a/rust/crates/lingxi-service/tests/r04_t02_tool_gateway.rs b/rust/crates/lingxi-service/tests/r04_t02_tool_gateway.rs
+index 7e2732925..dca30c841 100644
+--- a/rust/crates/lingxi-service/tests/r04_t02_tool_gateway.rs
++++ b/rust/crates/lingxi-service/tests/r04_t02_tool_gateway.rs
+@@ -43,6 +43,7 @@ use std::collections::VecDeque;
+ use std::pin::Pin;
+ use std::sync::Arc;
+ 
++use lingxi_kernel::model_exchange::ModelTurnInput;
+ use lingxi_kernel::ports::DelegationRequest;
+ use lingxi_kernel::ports::{
+     ProviderDescriptor, ProviderTurn, ProviderTurnResult, StoragePort, ToolExecutionResult,
+@@ -312,8 +313,7 @@ impl TurnProviderPort for ScriptedProvider {
+         &'a self,
+         ctx: &'a lingxi_kernel::RunContext,
+         _call: &'a ModelCallId,
+-        _turn: u32,
+-        _input: &'a str,
++        _input: &'a ModelTurnInput,
+     ) -> Pin<Box<dyn std::future::Future<Output = ProviderTurnResult> + Send + 'a>> {
+         let next = self
+             .script
+@@ -377,9 +377,9 @@ impl TurnProviderPort for MarkerScriptedProvider {
+         &'a self,
+         ctx: &'a lingxi_kernel::RunContext,
+         _call: &'a ModelCallId,
+-        _turn: u32,
+-        input: &'a str,
++        input: &'a ModelTurnInput,
+     ) -> Pin<Box<dyn std::future::Future<Output = ProviderTurnResult> + Send + 'a>> {
++        let input = input.submission.as_str();
+         let next = MarkerScriptedProvider::marker_of(input);
+         let turn = self
+             .scripts
+@@ -395,6 +395,7 @@ impl TurnProviderPort for MarkerScriptedProvider {
+ 
+ fn tool_request(target: &str, args: serde_json::Value) -> ProviderTurn {
+     ProviderTurn::ToolRequests {
++        content: Vec::new(),
+         requests: vec![
+             ToolRequest::from_effective_arguments(target, args, &budget())
+                 .expect("effective request"),
+@@ -1029,6 +1030,7 @@ async fn r04_a03_delegation_entry_goes_through_the_gateway() {
+         None,
+         vec![
+             ProviderTurn::ToolRequests {
++                content: Vec::new(),
+                 requests: vec![request],
+             },
+             final_turn("done"),
+@@ -1457,6 +1459,7 @@ async fn adversarial_subagent_blocklist_holds_under_registry_target_ids() {
+         None,
+         vec![
+             ProviderTurn::ToolRequests {
++                content: Vec::new(),
+                 requests: vec![request],
+             },
+             final_turn("done"),
+@@ -1647,6 +1650,7 @@ async fn f01_read_only_attenuation_still_denies_write_and_blocklist_targets() {
+         None,
+         vec![
+             ProviderTurn::ToolRequests {
++                content: Vec::new(),
+                 requests: vec![request],
+             },
+             final_turn("done"),
+@@ -1709,6 +1713,7 @@ async fn f01_access_read_delegation_child_dispatches_registered_read_tools() {
+                 "PARENT-F01C",
+                 vec![
+                     ProviderTurn::ToolRequests {
++                        content: Vec::new(),
+                         requests: vec![request],
+                     },
+                     final_turn("parent done"),
+@@ -1839,6 +1844,7 @@ async fn f01_delegation_family_routing_is_first_party_only() {
+         None,
+         ScriptedProvider::new(vec![
+             ProviderTurn::ToolRequests {
++                content: Vec::new(),
+                 requests: vec![request],
+             },
+             final_turn("done"),
+diff --git a/rust/crates/lingxi-service/tests/r04_t03_approval_service.rs b/rust/crates/lingxi-service/tests/r04_t03_approval_service.rs
+index c0c9b720d..558bb0a82 100644
+--- a/rust/crates/lingxi-service/tests/r04_t03_approval_service.rs
++++ b/rust/crates/lingxi-service/tests/r04_t03_approval_service.rs
+@@ -42,6 +42,7 @@ use std::collections::VecDeque;
+ use std::pin::Pin;
+ use std::sync::Arc;
+ 
++use lingxi_kernel::model_exchange::ModelTurnInput;
+ use lingxi_kernel::ports::DelegationRequest;
+ use lingxi_kernel::ports::{
+     ProviderDescriptor, ProviderTurn, ProviderTurnResult, StoragePort, ToolExecutionResult,
+@@ -267,8 +268,7 @@ impl TurnProviderPort for ScriptedProvider {
+         &'a self,
+         ctx: &'a lingxi_kernel::RunContext,
+         _call: &'a ModelCallId,
+-        _turn: u32,
+-        _input: &'a str,
++        _input: &'a ModelTurnInput,
+     ) -> Pin<Box<dyn std::future::Future<Output = ProviderTurnResult> + Send + 'a>> {
+         let next = self
+             .script
+@@ -329,9 +329,9 @@ impl TurnProviderPort for MarkerScriptedProvider {
+         &'a self,
+         ctx: &'a lingxi_kernel::RunContext,
+         _call: &'a ModelCallId,
+-        _turn: u32,
+-        input: &'a str,
++        input: &'a ModelTurnInput,
+     ) -> Pin<Box<dyn std::future::Future<Output = ProviderTurnResult> + Send + 'a>> {
++        let input = input.submission.as_str();
+         let next = MarkerScriptedProvider::marker_of(input);
+         let turn = self
+             .scripts
+@@ -347,6 +347,7 @@ impl TurnProviderPort for MarkerScriptedProvider {
+ 
+ fn tool_request(target: &str, args: serde_json::Value) -> ProviderTurn {
+     ProviderTurn::ToolRequests {
++        content: Vec::new(),
+         requests: vec![
+             ToolRequest::from_effective_arguments(target, args, &budget())
+                 .expect("effective request"),
+@@ -370,6 +371,7 @@ fn delegation_request(task: &str, access: Option<&str>) -> ProviderTurn {
+         thread_id: None,
+     });
+     ProviderTurn::ToolRequests {
++        content: Vec::new(),
+         requests: vec![request],
+     }
+ }
+diff --git a/rust/crates/lingxi-service/tests/r04_t04_file_tools.rs b/rust/crates/lingxi-service/tests/r04_t04_file_tools.rs
+index 995d13ecb..d50116002 100644
+--- a/rust/crates/lingxi-service/tests/r04_t04_file_tools.rs
++++ b/rust/crates/lingxi-service/tests/r04_t04_file_tools.rs
+@@ -41,6 +41,7 @@ use std::path::{Path, PathBuf};
+ use std::pin::Pin;
+ use std::sync::Arc;
+ 
++use lingxi_kernel::model_exchange::ModelTurnInput;
+ use lingxi_kernel::ports::ToolOutcome;
+ use lingxi_kernel::ports::{
+     ProviderDescriptor, ProviderTurn, ProviderTurnResult, StoragePort, ToolExecutionResult,
+@@ -87,6 +88,7 @@ fn final_turn(text: &str) -> ProviderTurn {
+ 
+ fn tool_request(target: &str, args: serde_json::Value) -> ProviderTurn {
+     ProviderTurn::ToolRequests {
++        content: Vec::new(),
+         requests: vec![
+             ToolRequest::from_effective_arguments(target, args, &budget())
+                 .expect("effective request"),
+@@ -126,8 +128,7 @@ impl TurnProviderPort for StepsProvider {
+         &'a self,
+         ctx: &'a RunContext,
+         _call: &'a ModelCallId,
+-        _turn: u32,
+-        _input: &'a str,
++        _input: &'a ModelTurnInput,
+     ) -> Pin<Box<dyn std::future::Future<Output = ProviderTurnResult> + Send + 'a>> {
+         loop {
+             let next = self
+diff --git a/rust/crates/lingxi-service/tests/r04_t05_process_tools.rs b/rust/crates/lingxi-service/tests/r04_t05_process_tools.rs
+index f054f0de2..8491fe577 100644
+--- a/rust/crates/lingxi-service/tests/r04_t05_process_tools.rs
++++ b/rust/crates/lingxi-service/tests/r04_t05_process_tools.rs
+@@ -49,6 +49,7 @@ use std::pin::Pin;
+ use std::sync::Arc;
+ use std::time::{Duration, Instant};
+ 
++use lingxi_kernel::model_exchange::ModelTurnInput;
+ use lingxi_kernel::ports::{
+     InvocationJournalEntry, InvocationPhase, ProviderDescriptor, ProviderTurn, ProviderTurnResult,
+     StoragePort, ToolExecutionResult, ToolOutcome, ToolRequest, ToolRunStatus, TurnProviderPort,
+@@ -128,8 +129,7 @@ impl TurnProviderPort for RunIdCaptureProvider {
+         &'a self,
+         ctx: &'a RunContext,
+         _call: &'a ModelCallId,
+-        _turn: u32,
+-        _input: &'a str,
++        _input: &'a ModelTurnInput,
+     ) -> Pin<Box<dyn std::future::Future<Output = ProviderTurnResult> + Send + 'a>> {
+         *self.seen_run.lock().unwrap() = Some(ctx.run_id.to_string());
+         let next = self
+@@ -145,6 +145,7 @@ impl TurnProviderPort for RunIdCaptureProvider {
+ 
+ fn tool_request(target: &str, args: serde_json::Value) -> ProviderTurn {
+     ProviderTurn::ToolRequests {
++        content: Vec::new(),
+         requests: vec![
+             ToolRequest::from_effective_arguments(target, args, &budget())
+                 .expect("effective request"),
+diff --git a/rust/crates/lingxi-service/tests/r04_t06_sandbox.rs b/rust/crates/lingxi-service/tests/r04_t06_sandbox.rs
+index d528a90d8..30e67cd31 100644
+--- a/rust/crates/lingxi-service/tests/r04_t06_sandbox.rs
++++ b/rust/crates/lingxi-service/tests/r04_t06_sandbox.rs
+@@ -36,6 +36,7 @@ use std::pin::Pin;
+ use std::sync::Arc;
+ use std::time::Duration;
+ 
++use lingxi_kernel::model_exchange::ModelTurnInput;
+ use lingxi_kernel::ports::{
+     ProviderDescriptor, ProviderTurn, ProviderTurnResult, ToolExecutionResult, ToolOutcome,
+     ToolRequest, TurnProviderPort,
+@@ -105,8 +106,7 @@ impl TurnProviderPort for IdleProvider {
+         &'a self,
+         ctx: &'a RunContext,
+         _call: &'a ModelCallId,
+-        _turn: u32,
+-        _input: &'a str,
++        _input: &'a ModelTurnInput,
+     ) -> Pin<Box<dyn std::future::Future<Output = ProviderTurnResult> + Send + 'a>> {
+         let next = self
+             .steps
+diff --git a/rust/crates/lingxi-service/tests/r04_t07_mcp_and_workers.rs b/rust/crates/lingxi-service/tests/r04_t07_mcp_and_workers.rs
+index 21c235c49..4ab459e0a 100644
+--- a/rust/crates/lingxi-service/tests/r04_t07_mcp_and_workers.rs
++++ b/rust/crates/lingxi-service/tests/r04_t07_mcp_and_workers.rs
+@@ -32,6 +32,7 @@ use std::sync::atomic::{AtomicBool, AtomicUsize, Ordering};
+ use std::sync::{Arc, Mutex};
+ use std::time::Duration;
+ 
++use lingxi_kernel::model_exchange::ModelTurnInput;
+ use lingxi_kernel::ports::{
+     ProviderDescriptor, ProviderTurn, ProviderTurnResult, StoragePort, ToolExecutionResult,
+     ToolOutcome, ToolRequest, TurnProviderPort,
+@@ -482,8 +483,7 @@ impl TurnProviderPort for StepsProvider {
+         &'a self,
+         ctx: &'a RunContext,
+         _call: &'a ModelCallId,
+-        _turn: u32,
+-        _input: &'a str,
++        _input: &'a ModelTurnInput,
+     ) -> Pin<Box<dyn std::future::Future<Output = ProviderTurnResult> + Send + 'a>> {
+         let next = self
+             .steps
+@@ -510,6 +510,7 @@ fn final_turn(text: &str) -> ProviderTurn {
+ 
+ fn tool_turn(target: &str, args: serde_json::Value) -> ProviderTurn {
+     ProviderTurn::ToolRequests {
++        content: Vec::new(),
+         requests: vec![
+             ToolRequest::from_effective_arguments(target, args, &budget())
+                 .expect("effective request"),
+diff --git a/rust/crates/lingxi-service/tests/r04_t08_tool_matrix.rs b/rust/crates/lingxi-service/tests/r04_t08_tool_matrix.rs
+index 08b7df3d5..3c73b2e6f 100644
+--- a/rust/crates/lingxi-service/tests/r04_t08_tool_matrix.rs
++++ b/rust/crates/lingxi-service/tests/r04_t08_tool_matrix.rs
+@@ -30,6 +30,7 @@ use std::sync::atomic::{AtomicUsize, Ordering};
+ use std::sync::{Arc, Mutex};
+ use std::time::Duration;
+ 
++use lingxi_kernel::model_exchange::ModelTurnInput;
+ use lingxi_kernel::ports::{
+     ProviderDescriptor, ProviderTurn, ProviderTurnResult, StoragePort, ToolExecutionResult,
+     ToolExecutorPort, ToolOutcome, ToolRequest, ToolSuccess, TurnProviderPort,
+@@ -156,8 +157,7 @@ impl TurnProviderPort for StepsProvider {
+         &'a self,
+         ctx: &'a RunContext,
+         _call: &'a ModelCallId,
+-        _turn: u32,
+-        _input: &'a str,
++        _input: &'a ModelTurnInput,
+     ) -> Pin<Box<dyn std::future::Future<Output = ProviderTurnResult> + Send + 'a>> {
+         let next = self
+             .steps
+@@ -185,6 +185,7 @@ fn final_turn(text: &str) -> ProviderTurn {
+ 
+ fn tool_turn(target: &str, args: serde_json::Value) -> ProviderTurn {
+     ProviderTurn::ToolRequests {
++        content: Vec::new(),
+         requests: vec![
+             ToolRequest::from_effective_arguments(target, args, &budget())
+                 .expect("effective request"),
+diff --git a/rust/crates/lingxi-service/tests/recovery_crash_points.rs b/rust/crates/lingxi-service/tests/recovery_crash_points.rs
+index 97d7e71c6..ed6307355 100644
+--- a/rust/crates/lingxi-service/tests/recovery_crash_points.rs
++++ b/rust/crates/lingxi-service/tests/recovery_crash_points.rs
+@@ -48,6 +48,7 @@ use std::path::{Path, PathBuf};
+ use std::pin::Pin;
+ use std::sync::Arc;
+ 
++use lingxi_kernel::model_exchange::ModelTurnInput;
+ use lingxi_kernel::ports::{
+     InvocationPhase, KeyEvent, ProviderDescriptor, ProviderTurnResult, RunOutcome, StorageError,
+     StoragePort, ToolExecutionResult, ToolExecutorPort, ToolOutcome, ToolRequest, TurnProviderPort,
+@@ -474,13 +475,14 @@ impl TurnProviderPort for OneToolThenFinalProvider {
+         &'a self,
+         ctx: &'a RunContext,
+         _call: &'a ModelCallId,
+-        turn: u32,
+-        _input: &'a str,
++        input: &'a ModelTurnInput,
+     ) -> Pin<Box<dyn std::future::Future<Output = ProviderTurnResult> + Send + 'a>> {
++        let turn = input.turn;
+         let ctx_at_issue = ctx.clone();
+         Box::pin(async move {
+             let out = if turn == 1 {
+                 lingxi_kernel::ports::ProviderTurn::ToolRequests {
++                    content: Vec::new(),
+                     requests: vec![ToolRequest::from_effective_arguments(
+                         TARGET,
+                         serde_json::json!({
+diff --git a/rust/crates/lingxi-service/tests/request_id_canonicalization.rs b/rust/crates/lingxi-service/tests/request_id_canonicalization.rs
+index 99c7b53bc..5f3951b43 100644
+--- a/rust/crates/lingxi-service/tests/request_id_canonicalization.rs
++++ b/rust/crates/lingxi-service/tests/request_id_canonicalization.rs
+@@ -44,6 +44,7 @@ use std::pin::Pin;
+ use std::sync::atomic::{AtomicBool, AtomicUsize, Ordering};
+ use std::sync::Arc;
+ 
++use lingxi_kernel::model_exchange::ModelTurnInput;
+ use lingxi_kernel::ports::{
+     CommittedOutcome, InvocationIntent, InvocationPhase, InvocationReceipt, KeyEvent,
+     ProviderDescriptor, ProviderTurn, ProviderTurnResult, RunOutcome, StaleResultFact,
+@@ -97,9 +98,9 @@ impl TurnProviderPort for ScriptedProvider {
+         &'a self,
+         ctx: &'a RunContext,
+         _call: &'a ModelCallId,
+-        _turn: u32,
+-        input: &'a str,
++        input: &'a ModelTurnInput,
+     ) -> Pin<Box<dyn std::future::Future<Output = ProviderTurnResult> + Send + 'a>> {
++        let input = input.submission.as_str();
+         let marker = input.split(':').next().unwrap_or(input).trim().to_string();
+         let ctx_at_issue = ctx.clone();
+         let turn = self
+@@ -211,6 +212,7 @@ fn final_turn(text: &str) -> ProviderTurn {
+ fn scripted_steps() -> Vec<ProviderTurn> {
+     vec![
+         ProviderTurn::ToolRequests {
++            content: Vec::new(),
+             requests: vec![tool_request()],
+         },
+         final_turn("rr2f05 done"),
+diff --git a/rust/crates/lingxi-service/tests/run_lifecycle.rs b/rust/crates/lingxi-service/tests/run_lifecycle.rs
+index af3e968f8..450a435e0 100644
+--- a/rust/crates/lingxi-service/tests/run_lifecycle.rs
++++ b/rust/crates/lingxi-service/tests/run_lifecycle.rs
+@@ -15,6 +15,7 @@ use std::path::PathBuf;
+ use std::pin::Pin;
+ use std::sync::Arc;
+ 
++use lingxi_kernel::model_exchange::ModelTurnInput;
+ use lingxi_kernel::ports::{
+     ProviderDescriptor, ProviderTurn, ProviderTurnResult, ToolExecutionResult, ToolExecutorPort,
+     ToolOutcome, ToolRequest, TurnProviderPort,
+@@ -79,8 +80,7 @@ impl TurnProviderPort for ScriptedProvider {
+         &'a self,
+         ctx: &'a lingxi_kernel::RunContext,
+         call: &'a ModelCallId,
+-        _turn: u32,
+-        _input: &'a str,
++        _input: &'a ModelTurnInput,
+     ) -> Pin<Box<dyn std::future::Future<Output = ProviderTurnResult> + Send + 'a>> {
+         self.observed
+             .lock()
+@@ -319,6 +319,7 @@ async fn final_message_content(state: &ServiceState, run_id: &str) -> Option<Str
+ async fn r03_a01_three_model_calls_produce_exactly_one_task_terminal() {
+     let provider = ScriptedProvider::new(vec![
+         ProviderTurn::ToolRequests {
++            content: Vec::new(),
+             requests: vec![read_tool_request()],
+         },
+         ProviderTurn::Continue {
+@@ -661,6 +662,7 @@ async fn empty_reply_completes_without_final_and_names_the_cause() {
+ async fn process_only_run_completes_without_final_and_names_the_cause() {
+     let provider = ScriptedProvider::new(vec![
+         ProviderTurn::ToolRequests {
++            content: Vec::new(),
+             requests: vec![read_tool_request()],
+         },
+         ProviderTurn::Empty {
+@@ -688,6 +690,7 @@ async fn process_only_run_completes_without_final_and_names_the_cause() {
+ async fn tool_partial_failure_has_its_own_outcome_not_a_fabricated_answer() {
+     let provider = ScriptedProvider::new(vec![
+         ProviderTurn::ToolRequests {
++            content: Vec::new(),
+             requests: vec![read_tool_request()],
+         },
+         ProviderTurn::Empty {
+@@ -759,6 +762,7 @@ async fn turn_budget_exhaustion_fails_loudly_never_fake_completes() {
+ #[tokio::test]
+ async fn tool_request_without_executor_is_a_loud_failure() {
+     let provider = ScriptedProvider::new(vec![ProviderTurn::ToolRequests {
++        content: Vec::new(),
+         requests: vec![read_tool_request()],
+     }]);
+     let (state, home) = boot(
+diff --git a/rust/crates/lingxi-service/tests/session_serialization.rs b/rust/crates/lingxi-service/tests/session_serialization.rs
+index 56a9ce358..abf745727 100644
+--- a/rust/crates/lingxi-service/tests/session_serialization.rs
++++ b/rust/crates/lingxi-service/tests/session_serialization.rs
+@@ -28,6 +28,7 @@ use std::path::PathBuf;
+ use std::pin::Pin;
+ use std::sync::Arc;
+ 
++use lingxi_kernel::model_exchange::ModelTurnInput;
+ use lingxi_kernel::ports::{
+     ProviderDescriptor, ProviderTurn, ProviderTurnResult, ToolExecutionResult, ToolExecutorPort,
+     ToolOutcome, ToolRequest, TurnProviderPort,
+@@ -95,9 +96,9 @@ impl TurnProviderPort for GatedProvider {
+         &'a self,
+         ctx: &'a lingxi_kernel::RunContext,
+         _call: &'a ModelCallId,
+-        _turn: u32,
+-        input: &'a str,
++        input: &'a ModelTurnInput,
+     ) -> Pin<Box<dyn std::future::Future<Output = ProviderTurnResult> + Send + 'a>> {
++        let input = input.submission.as_str();
+         let session = ctx.session_id.to_string();
+         let pop = {
+             let mut counters = self.next_pop.lock().unwrap();
+@@ -563,6 +564,7 @@ async fn r03_a04_cross_session_parallel_and_quota_release_on_cancel() {
+             (
+                 "sess_local_alpha",
+                 vec![ProviderTurn::ToolRequests {
++                    content: Vec::new(),
+                     requests: vec![read_tool_request()],
+                 }],
+             ),
+@@ -703,6 +705,7 @@ async fn failed_tool_path_settles_and_returns_quotas() {
+             "sess_local_alpha",
+             vec![
+                 ProviderTurn::ToolRequests {
++                    content: Vec::new(),
+                     requests: vec![read_tool_request()],
+                 },
+                 ProviderTurn::Empty {
+@@ -773,6 +776,7 @@ async fn quota_exhaustion_fails_loudly_and_releases_on_settle() {
+                 "sess_local_alpha",
+                 vec![
+                     ProviderTurn::ToolRequests {
++                        content: Vec::new(),
+                         requests: vec![read_tool_request()],
+                     },
+                     ProviderTurn::Final {
+@@ -784,6 +788,7 @@ async fn quota_exhaustion_fails_loudly_and_releases_on_settle() {
+             (
+                 "sess_local_beta",
+                 vec![ProviderTurn::ToolRequests {
++                    content: Vec::new(),
+                     requests: vec![read_tool_request()],
+                 }],
+             ),
+diff --git a/rust/crates/lingxi-service/tests/subagent_closeout.rs b/rust/crates/lingxi-service/tests/subagent_closeout.rs
+index 87652f7ae..56e1e45de 100644
+--- a/rust/crates/lingxi-service/tests/subagent_closeout.rs
++++ b/rust/crates/lingxi-service/tests/subagent_closeout.rs
+@@ -28,6 +28,7 @@ use std::pin::Pin;
+ use std::sync::{Arc, Mutex};
+ use std::time::Duration;
+ 
++use lingxi_kernel::model_exchange::ModelTurnInput;
+ use lingxi_kernel::ports::{
+     DelegationRequest, ProviderDescriptor, ProviderTurn, ProviderTurnResult, ToolExecutionResult,
+     ToolExecutorPort, ToolOutcome, ToolRequest, TurnProviderPort,
+@@ -100,9 +101,9 @@ impl TurnProviderPort for ScriptedProvider {
+         &'a self,
+         ctx: &'a RunContext,
+         _call: &'a ModelCallId,
+-        _turn: u32,
+-        input: &'a str,
++        input: &'a ModelTurnInput,
+     ) -> Pin<Box<dyn std::future::Future<Output = ProviderTurnResult> + Send + 'a>> {
++        let input = input.submission.as_str();
+         let marker = Self::marker_of(input);
+         let pop = {
+             let mut pops = self.pops.lock().unwrap();
+@@ -147,6 +148,7 @@ impl TurnProviderPort for ScriptedProvider {
+ 
+ fn delegation_turn(target: &'static str, task: &str, thread_id: Option<String>) -> ProviderTurn {
+     ProviderTurn::ToolRequests {
++        content: Vec::new(),
+         requests: vec![ToolRequest::from_effective_arguments(
+             target,
+             serde_json::json!({
+diff --git a/rust/crates/lingxi-service/tests/subagent_lifecycle.rs b/rust/crates/lingxi-service/tests/subagent_lifecycle.rs
+index 24c3271d7..ec77c6ffe 100644
+--- a/rust/crates/lingxi-service/tests/subagent_lifecycle.rs
++++ b/rust/crates/lingxi-service/tests/subagent_lifecycle.rs
+@@ -15,6 +15,7 @@ use std::path::PathBuf;
+ use std::pin::Pin;
+ use std::sync::{Arc, Mutex};
+ 
++use lingxi_kernel::model_exchange::ModelTurnInput;
+ use lingxi_kernel::ports::{
+     DelegationRequest, ProviderDescriptor, ProviderTurn, ProviderTurnResult, ToolExecutionResult,
+     ToolExecutorPort, ToolOutcome, ToolRequest, TurnProviderPort,
+@@ -119,9 +120,9 @@ impl TurnProviderPort for ScriptedProvider {
+         &'a self,
+         ctx: &'a RunContext,
+         _call: &'a ModelCallId,
+-        _turn: u32,
+-        input: &'a str,
++        input: &'a ModelTurnInput,
+     ) -> Pin<Box<dyn std::future::Future<Output = ProviderTurnResult> + Send + 'a>> {
++        let input = input.submission.as_str();
+         let marker = Self::marker_of(input);
+         let pop = {
+             let mut pops = self.pops.lock().unwrap();
+@@ -180,6 +181,7 @@ fn delegation_step_static(
+     thread_id: Option<String>,
+ ) -> ProviderTurn {
+     ProviderTurn::ToolRequests {
++        content: Vec::new(),
+         requests: vec![ToolRequest::from_effective_arguments(
+             target,
+             serde_json::json!({
+diff --git a/rust/crates/lingxi-service/tests/subagent_permission_inheritance.rs b/rust/crates/lingxi-service/tests/subagent_permission_inheritance.rs
+index d1f7f2f2d..99a1d5e42 100644
+--- a/rust/crates/lingxi-service/tests/subagent_permission_inheritance.rs
++++ b/rust/crates/lingxi-service/tests/subagent_permission_inheritance.rs
+@@ -34,6 +34,7 @@ use std::path::PathBuf;
+ use std::pin::Pin;
+ use std::sync::Arc;
+ 
++use lingxi_kernel::model_exchange::ModelTurnInput;
+ use lingxi_kernel::ports::{
+     DelegationRequest, ProviderDescriptor, ProviderTurn, ProviderTurnResult, ToolExecutionResult,
+     ToolExecutorPort, ToolOutcome, ToolRequest, TurnProviderPort,
+@@ -109,9 +110,10 @@ impl TurnProviderPort for ScriptedProvider {
+         &'a self,
+         ctx: &'a RunContext,
+         _call: &'a ModelCallId,
+-        turn: u32,
+-        input: &'a str,
++        input: &'a ModelTurnInput,
+     ) -> Pin<Box<dyn std::future::Future<Output = ProviderTurnResult> + Send + 'a>> {
++        let turn = input.turn;
++        let input = input.submission.as_str();
+         let marker = Self::marker_of(input);
+         let pop = {
+             let mut pops = self.pops.lock().unwrap();
+@@ -392,6 +394,7 @@ async fn r03_a11_readonly_parent_child_write_is_refused_by_the_real_boundary() {
+                 "PARENT-A11",
+                 vec![
+                     ProviderTurn::ToolRequests {
++                        content: Vec::new(),
+                         requests: vec![delegation_request(CHILD_TASK, None, None)],
+                     },
+                     final_turn("parent done"),
+@@ -402,6 +405,7 @@ async fn r03_a11_readonly_parent_child_write_is_refused_by_the_real_boundary() {
+                 "CHILD-A11",
+                 vec![
+                     ProviderTurn::ToolRequests {
++                        content: Vec::new(),
+                         requests: vec![write_tool_request()],
+                     },
+                     final_turn("child done: the write was refused"),
+@@ -601,6 +605,7 @@ async fn operate_parent_child_write_is_executed_once() {
+                 "PARENT-A11",
+                 vec![
+                     ProviderTurn::ToolRequests {
++                        content: Vec::new(),
+                         requests: vec![delegation_request(CHILD_TASK, None, None)],
+                     },
+                     final_turn("parent done"),
+@@ -610,6 +615,7 @@ async fn operate_parent_child_write_is_executed_once() {
+                 "CHILD-A11",
+                 vec![
+                     ProviderTurn::ToolRequests {
++                        content: Vec::new(),
+                         requests: vec![write_tool_request()],
+                     },
+                     final_turn("child done: the write succeeded"),
+@@ -663,6 +669,7 @@ async fn readonly_parent_write_access_request_is_refused_at_dispatch() {
+             "PARENT-A11",
+             vec![
+                 ProviderTurn::ToolRequests {
++                    content: Vec::new(),
+                     requests: vec![delegation_request(
+                         CHILD_TASK,
+                         Some(AccessRequest::Write),
+@@ -759,6 +766,7 @@ async fn model_override_cannot_widen_the_readonly_grant() {
+                 "PARENT-A11",
+                 vec![
+                     ProviderTurn::ToolRequests {
++                        content: Vec::new(),
+                         requests: vec![delegation_request(
+                             CHILD_TASK,
+                             None,
+@@ -772,6 +780,7 @@ async fn model_override_cannot_widen_the_readonly_grant() {
+                 "CHILD-A11",
+                 vec![
+                     ProviderTurn::ToolRequests {
++                        content: Vec::new(),
+                         requests: vec![write_tool_request()],
+                     },
+                     final_turn("child done: write refused even with the model override"),
+diff --git a/rust/crates/lingxi-service/tests/tool_receipt_unknown.rs b/rust/crates/lingxi-service/tests/tool_receipt_unknown.rs
+index 135f3b52f..e8b5400bc 100644
+--- a/rust/crates/lingxi-service/tests/tool_receipt_unknown.rs
++++ b/rust/crates/lingxi-service/tests/tool_receipt_unknown.rs
+@@ -35,6 +35,7 @@ use std::sync::Arc;
+ use std::time::Duration;
+ 
+ use lingxi_kernel::invocation::{RecoveryClass, RecoveryDecision, ToolRecoveryCapability};
++use lingxi_kernel::model_exchange::ModelTurnInput;
+ use lingxi_kernel::ports::{
+     InvocationPhase, ProviderDescriptor, ProviderTurnResult, ReceiptOutcome, StoragePort,
+     ToolExecutionResult, ToolExecutorPort, ToolOutcome, ToolRequest, TurnProviderPort,
+@@ -259,8 +260,7 @@ impl TurnProviderPort for ScriptedProvider {
+         &'a self,
+         ctx: &'a RunContext,
+         _call: &'a ModelCallId,
+-        _turn: u32,
+-        _input: &'a str,
++        _input: &'a ModelTurnInput,
+     ) -> Pin<Box<dyn std::future::Future<Output = ProviderTurnResult> + Send + 'a>> {
+         assert_eq!(
+             ctx.session_id.to_string(),
+@@ -312,8 +312,7 @@ impl TurnProviderPort for ParkAfterToolsProvider {
+         &'a self,
+         ctx: &'a RunContext,
+         _call: &'a ModelCallId,
+-        _turn: u32,
+-        _input: &'a str,
++        _input: &'a ModelTurnInput,
+     ) -> Pin<Box<dyn std::future::Future<Output = ProviderTurnResult> + Send + 'a>> {
+         assert_eq!(
+             ctx.session_id.to_string(),
+@@ -333,7 +332,10 @@ impl TurnProviderPort for ParkAfterToolsProvider {
+             if step == 1 {
+                 return ProviderTurnResult::of_ctx(
+                     &ctx_at_issue,
+-                    lingxi_kernel::ports::ProviderTurn::ToolRequests { requests },
++                    lingxi_kernel::ports::ProviderTurn::ToolRequests {
++                        requests,
++                        content: Vec::new(),
++                    },
+                 );
+             }
+             // Turn 2+ parks: the process "dies" here from the run's view.
+@@ -528,6 +530,7 @@ async fn f04_c01_panic_after_side_effect_journals_unknown_not_confirmed_failure(
+     let provider = Arc::new(ScriptedProvider {
+         turns: vec![
+             lingxi_kernel::ports::ProviderTurn::ToolRequests {
++                content: Vec::new(),
+                 requests: vec![tool_request("notify.fault")],
+             },
+             lingxi_kernel::ports::ProviderTurn::Final {
+@@ -681,6 +684,7 @@ async fn f04_c01_adv_panic_before_side_effect_is_still_unknown() {
+     let provider = Arc::new(ScriptedProvider {
+         turns: vec![
+             lingxi_kernel::ports::ProviderTurn::ToolRequests {
++                content: Vec::new(),
+                 requests: vec![tool_request("notify.fault")],
+             },
+             lingxi_kernel::ports::ProviderTurn::Final {
+@@ -778,6 +782,7 @@ async fn f04_c02_dispatched_no_result_variants_classify_consistently_unknown() {
+     let provider = Arc::new(ScriptedProvider {
+         turns: vec![
+             lingxi_kernel::ports::ProviderTurn::ToolRequests {
++                content: Vec::new(),
+                 requests: vec![tool_request("lost.after"), tool_request("lost.before")],
+             },
+             lingxi_kernel::ports::ProviderTurn::Final {
+@@ -909,6 +914,7 @@ async fn f04_c03_trusted_negatives_survive_alongside_the_unknown() {
+     let provider = Arc::new(ScriptedProvider {
+         turns: vec![
+             lingxi_kernel::ports::ProviderTurn::ToolRequests {
++                content: Vec::new(),
+                 requests: vec![
+                     tool_request("reject.me"),
+                     tool_request("fail.external"),
+@@ -1247,6 +1253,7 @@ async fn f04_c04_adv_control_verified_idempotent_recovery_uses_only_the_original
+     let provider = Arc::new(ScriptedProvider {
+         turns: vec![
+             lingxi_kernel::ports::ProviderTurn::ToolRequests {
++                content: Vec::new(),
+                 requests: vec![tool_request("ledger.idem")],
+             },
+             lingxi_kernel::ports::ProviderTurn::Final {

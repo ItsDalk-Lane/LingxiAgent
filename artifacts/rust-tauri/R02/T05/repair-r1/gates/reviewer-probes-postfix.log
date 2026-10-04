@@ -1,0 +1,14 @@
+   Compiling lingxi-kernel v0.0.0 (/Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-kernel)
+   Compiling lingxi-adapters v0.0.0 (/Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-adapters)
+   Compiling lingxi-service v0.0.0 (/Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-service)
+   Compiling r02t05-review-probe v0.0.0 (/private/tmp/r02t05-review-probe)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 1.08s
+     Running tests/hold_join_probes.rs (/tmp/rust-target-r02t05-probe-repro/debug/deps/hold_join_probes-4c1469223a35b171)
+
+running 3 tests
+test probe_a_control_delta_tail_also_lost_when_held_above_cut ... ok
+test probe_b_restart_baseline_leaves_parked_next_seq_undrained ... ok
+test probe_a_held_event_above_the_cut_is_silently_lost ... ok
+
+test result: ok. 3 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+

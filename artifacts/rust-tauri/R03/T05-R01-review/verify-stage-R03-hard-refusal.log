@@ -1,0 +1,3 @@
+    Finished `dev` profile [unoptimized + debuginfo] target(s) in 0.04s
+     Running `target/debug/xtask verify-stage R03 --evidence /tmp/r03t05-review-vstage-probe`
+error: unknown stage "R03"; no implementation-acceptance map is registered in xtask (registered stages: R02). A stage without a map is a hard error — never an empty pass.

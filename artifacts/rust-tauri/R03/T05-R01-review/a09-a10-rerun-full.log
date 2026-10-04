@@ -1,0 +1,13 @@
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.09s
+     Running tests/invocation_journal.rs (target/debug/deps/invocation_journal-9a192364cb7883d2)
+
+running 3 tests
+test journal_lifecycle_progresses_and_closes_receipts_on_the_live_chain ... R03_T05_LIFECYCLE_TRACE: run=run_000001a0dcba6c00_000001 entries=3 phases=succeeded,failed,failed(rejected) external_executions=2
+ok
+test r03_a09_crash_after_side_effect_does_not_reexecute_and_receipt_is_unknown ... R03_A09_TRACE: run=run_000001a0dcba6c00_000001 external_executions=1 journal=started→unknown decision=needs_attention run_row=running
+ok
+test r03_a10_idempotent_key_resume_does_not_duplicate_the_external_operation ... R03_A10_TRACE: run=run_000001a0dcba6c00_000001 key=run_000001a0dcba6c00_000001-tc0001 requests=2 executed=1 decision=unknown_resume_with_idempotency_key phase=succeeded
+ok
+
+test result: ok. 3 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.17s
+

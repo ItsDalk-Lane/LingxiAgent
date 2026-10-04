@@ -1,0 +1,19 @@
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.08s
+     Running tests/r04_t03_approval_service.rs (rust/target/debug/deps/r04_t03_approval_service-b1bc9c56d424e015)
+
+running 11 tests
+test alias_cannot_reuse_a_single_use_grant ... ok
+test restart_invalidates_old_approvals_and_grants ... ok
+test cancel_during_wait_then_late_approval_never_resurrects ... ok
+test approval_timeout_is_a_definite_rejection_and_late_approval_is_refused ... ok
+test one_approval_cannot_be_spent_by_two_concurrent_requests ... ok
+test o05_policy_allowed_never_re_prompts_the_wired_gate ... ok
+test user_session_mode_matrix_on_the_real_chain ... ok
+test r04_a05_approved_digest_a_cannot_execute_payload_b ... ok
+test r04_a06_wait_disabled_then_approved_still_refuses ... ok
+test sup01_ask_tier_subagent_matrix_on_the_real_chain ... ok
+test concurrent_spends_of_one_grant_produce_exactly_one_winner ... ok
+
+test result: ok. 11 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 8.41s
+
+exit 0

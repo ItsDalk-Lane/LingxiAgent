@@ -1,0 +1,59 @@
+$ cargo tree -p lingxi-kernel --edges normal --prefix none
+lingxi-kernel v0.0.0 (/Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-kernel)
+lingxi-protocol v0.0.0 (/Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-protocol)
+base64 v0.23.1
+schemars v1.2.2
+dyn-clone v1.0.20
+ref-cast v1.0.27
+ref-cast-impl v1.0.27 (proc-macro)
+proc-macro2 v1.0.107
+unicode-ident v1.0.26
+quote v1.0.47
+proc-macro2 v1.0.107 (*)
+syn v3.0.6
+proc-macro2 v1.0.107 (*)
+quote v1.0.47 (*)
+unicode-ident v1.0.26
+schemars_derive v1.2.2 (proc-macro)
+proc-macro2 v1.0.107 (*)
+quote v1.0.47 (*)
+serde_derive_internals v0.30.0
+proc-macro2 v1.0.107 (*)
+quote v1.0.47 (*)
+syn v3.0.6 (*)
+syn v3.0.6 (*)
+serde v1.0.229
+serde_core v1.0.229
+serde_derive v1.0.229 (proc-macro)
+proc-macro2 v1.0.107 (*)
+quote v1.0.47 (*)
+syn v3.0.6 (*)
+serde_json v1.0.151
+itoa v1.0.18
+memchr v2.8.3
+serde_core v1.0.229
+zmij v1.0.23
+serde v1.0.229 (*)
+serde_json v1.0.151 (*)
+sha1 v0.11.0
+cfg-if v1.0.5
+cpufeatures v0.3.1
+libc v0.2.189
+digest v0.11.3
+block-buffer v0.12.1
+hybrid-array v0.4.15
+typenum v1.20.1
+const-oid v0.10.2
+crypto-common v0.2.2
+hybrid-array v0.4.15 (*)
+sha2 v0.11.0
+cfg-if v1.0.5
+cpufeatures v0.3.1 (*)
+digest v0.11.3 (*)
+serde_json v1.0.151 (*)
+
+kernel forbidden-dep scan (tauri/reqwest/hyper/secret):
+NONE (no HTTP client, no Tauri, no secret store)
+
+$ cargo metadata workspace members
+['lingxi-protocol', 'lingxi-kernel', 'lingxi-spike', 'lingxi-browser-spike', 'lingxi-service', 'lingxi-adapters', 'xtask']

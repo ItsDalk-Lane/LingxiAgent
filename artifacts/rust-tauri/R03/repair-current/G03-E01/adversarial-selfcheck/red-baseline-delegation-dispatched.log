@@ -1,0 +1,23 @@
+
+running 4 tests
+test readonly_parent_write_access_request_is_refused_at_dispatch ... FAILED
+test model_override_cannot_widen_the_readonly_grant ... ok
+test operate_parent_child_write_is_executed_once ... ok
+test r03_a11_readonly_parent_child_write_is_refused_by_the_real_boundary ... ok
+
+failures:
+
+---- readonly_parent_write_access_request_is_refused_at_dispatch stdout ----
+
+thread 'readonly_parent_write_access_request_is_refused_at_dispatch' (43014679) panicked at crates/lingxi-service/tests/subagent_permission_inheritance.rs:736:5:
+assertion `left == right` failed: a refused delegation journals dispatched=false (fact classes stay distinct)
+  left: "1"
+ right: "0"
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+
+
+failures:
+    readonly_parent_write_access_request_is_refused_at_dispatch
+
+test result: FAILED. 3 passed; 1 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.20s
+

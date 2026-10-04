@@ -1,0 +1,35 @@
+{
+  "schema": "r05-t05-compat-golden/v1",
+  "module": "ollama",
+  "case": "num-ctx-bridge-merges-options",
+  "model": {
+    "provider": "ollama",
+    "id": "qwen3",
+    "baseUrl": "http://127.0.0.1:11434/v1",
+    "api": "openai-completions",
+    "contextWindow": 32768
+  },
+  "payload": {
+    "model": "qwen3",
+    "messages": [],
+    "options": {
+      "temperature": 0.1
+    }
+  },
+  "options": {
+    "mode": "chat"
+  },
+  "expected": {
+    "thinkingFormat": null,
+    "reasoningProfile": null,
+    "matched": "ollama",
+    "result": {
+      "model": "qwen3",
+      "messages": [],
+      "options": {
+        "temperature": 0.1,
+        "num_ctx": 32768
+      }
+    }
+  }
+}

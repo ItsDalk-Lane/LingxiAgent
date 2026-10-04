@@ -1,0 +1,16 @@
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.08s
+     Running tests/r04_t04_file_tools.rs (rust/target/debug/deps/r04_t04_file_tools-024f491035714a12)
+
+running 9 tests
+test r04_a08_symlinks_are_judged_by_their_real_targets ... ok
+test adversarial_prefix_parent_switch_and_unicode_names ... ok
+test adversarial_write_records_conflicts_and_atomicity ... ok
+test adversarial_mid_mutation_swap_is_a_conflict_not_a_lost_update ... ok
+test r04_a08_resource_refusal_on_the_full_chain_is_never_dispatched ... ok
+test read_only_session_denies_file_writes_at_the_policy_face ... ok
+test approval_record_binds_real_file_scope_and_alias_resolves_to_the_executor ... ok
+test adversarial_read_pagination_truncation_and_edit_vocabulary ... ok
+test r04_a07_concurrent_edit_never_overwrites_the_user_version ... ok
+
+test result: ok. 9 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.47s
+

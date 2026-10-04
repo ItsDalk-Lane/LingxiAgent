@@ -1,0 +1,243 @@
+{
+ "nonce": "NONCE-1d0eabefb59f4480adbf58815ccfa378",
+ "marker": "REVIEW-FINAL-b6579b88f616",
+ "requests": [
+  {
+   "path": "/v1/chat/completions",
+   "authorization": "Bearer sk-review-t01-A",
+   "body": {
+    "messages": [
+     {
+      "content": "read the nonce probe",
+      "role": "user"
+     }
+    ],
+    "model": "stub-model-review",
+    "stream": false,
+    "tools": [
+     {
+      "function": {
+       "description": "edit",
+       "name": "edit",
+       "parameters": {
+        "additionalProperties": false,
+        "properties": {
+         "edits": {
+          "items": {
+           "additionalProperties": false,
+           "properties": {
+            "newText": {
+             "type": "string"
+            },
+            "oldText": {
+             "type": "string"
+            }
+           },
+           "required": [
+            "oldText",
+            "newText"
+           ],
+           "type": "object"
+          },
+          "minItems": 1,
+          "type": "array"
+         },
+         "path": {
+          "minLength": 1,
+          "type": "string"
+         }
+        },
+        "required": [
+         "path",
+         "edits"
+        ],
+        "type": "object"
+       }
+      },
+      "type": "function"
+     },
+     {
+      "function": {
+       "description": "read",
+       "name": "read",
+       "parameters": {
+        "additionalProperties": false,
+        "properties": {
+         "limit": {
+          "minimum": 1,
+          "type": "integer"
+         },
+         "offset": {
+          "minimum": 1,
+          "type": "integer"
+         },
+         "path": {
+          "minLength": 1,
+          "type": "string"
+         }
+        },
+        "required": [
+         "path"
+        ],
+        "type": "object"
+       }
+      },
+      "type": "function"
+     },
+     {
+      "function": {
+       "description": "write",
+       "name": "write",
+       "parameters": {
+        "additionalProperties": false,
+        "properties": {
+         "content": {
+          "type": "string"
+         },
+         "path": {
+          "minLength": 1,
+          "type": "string"
+         }
+        },
+        "required": [
+         "path",
+         "content"
+        ],
+        "type": "object"
+       }
+      },
+      "type": "function"
+     }
+    ]
+   }
+  },
+  {
+   "path": "/v1/chat/completions",
+   "authorization": "Bearer sk-review-t01-A",
+   "body": {
+    "messages": [
+     {
+      "content": "read the nonce probe",
+      "role": "user"
+     },
+     {
+      "content": null,
+      "role": "assistant",
+      "tool_calls": [
+       {
+        "function": {
+         "arguments": "{\"path\":\"nonce_probe.txt\"}",
+         "name": "read"
+        },
+        "id": "call_rev_1",
+        "type": "function"
+       }
+      ]
+     },
+     {
+      "content": "review runtime nonce: NONCE-1d0eabefb59f4480adbf58815ccfa378\n",
+      "role": "tool",
+      "tool_call_id": "call_rev_1"
+     }
+    ],
+    "model": "stub-model-review",
+    "stream": false,
+    "tools": [
+     {
+      "function": {
+       "description": "edit",
+       "name": "edit",
+       "parameters": {
+        "additionalProperties": false,
+        "properties": {
+         "edits": {
+          "items": {
+           "additionalProperties": false,
+           "properties": {
+            "newText": {
+             "type": "string"
+            },
+            "oldText": {
+             "type": "string"
+            }
+           },
+           "required": [
+            "oldText",
+            "newText"
+           ],
+           "type": "object"
+          },
+          "minItems": 1,
+          "type": "array"
+         },
+         "path": {
+          "minLength": 1,
+          "type": "string"
+         }
+        },
+        "required": [
+         "path",
+         "edits"
+        ],
+        "type": "object"
+       }
+      },
+      "type": "function"
+     },
+     {
+      "function": {
+       "description": "read",
+       "name": "read",
+       "parameters": {
+        "additionalProperties": false,
+        "properties": {
+         "limit": {
+          "minimum": 1,
+          "type": "integer"
+         },
+         "offset": {
+          "minimum": 1,
+          "type": "integer"
+         },
+         "path": {
+          "minLength": 1,
+          "type": "string"
+         }
+        },
+        "required": [
+         "path"
+        ],
+        "type": "object"
+       }
+      },
+      "type": "function"
+     },
+     {
+      "function": {
+       "description": "write",
+       "name": "write",
+       "parameters": {
+        "additionalProperties": false,
+        "properties": {
+         "content": {
+          "type": "string"
+         },
+         "path": {
+          "minLength": 1,
+          "type": "string"
+         }
+        },
+        "required": [
+         "path",
+         "content"
+        ],
+        "type": "object"
+       }
+      },
+      "type": "function"
+     }
+    ]
+   }
+  }
+ ]
+}

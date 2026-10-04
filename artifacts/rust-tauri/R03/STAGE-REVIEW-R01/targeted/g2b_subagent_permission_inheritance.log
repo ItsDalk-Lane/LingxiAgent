@@ -1,0 +1,12 @@
+   Compiling lingxi-service v0.0.0 (/Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-service)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.73s
+     Running tests/subagent_permission_inheritance.rs (rust/target/debug/deps/subagent_permission_inheritance-c3952e989e5309be)
+
+running 4 tests
+test readonly_parent_write_access_request_is_refused_at_dispatch ... ok
+test operate_parent_child_write_is_executed_once ... ok
+test model_override_cannot_widen_the_readonly_grant ... ok
+test r03_a11_readonly_parent_child_write_is_refused_by_the_real_boundary ... ok
+
+test result: ok. 4 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.21s
+

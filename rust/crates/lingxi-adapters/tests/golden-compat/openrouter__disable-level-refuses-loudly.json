@@ -1,0 +1,26 @@
+{
+  "schema": "r05-t05-compat-golden/v1",
+  "module": "openrouter",
+  "case": "disable-level-refuses-loudly",
+  "model": {
+    "provider": "openrouter",
+    "id": "anthropic/claude-opus-5",
+    "baseUrl": "https://openrouter.ai/api/v1",
+    "api": "openai-completions",
+    "reasoning": true
+  },
+  "payload": {
+    "model": "anthropic/claude-opus-5",
+    "messages": []
+  },
+  "options": {
+    "mode": "chat",
+    "reasoningLevel": "off"
+  },
+  "expected": {
+    "thinkingFormat": "openrouter",
+    "reasoningProfile": "openrouter-anthropic-adaptive",
+    "matched": "openrouter",
+    "error": "The Claude 5 adaptive model family does not support disabling adaptive thinking."
+  }
+}

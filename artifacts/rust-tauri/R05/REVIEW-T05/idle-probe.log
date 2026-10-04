@@ -1,0 +1,11 @@
+   Compiling review-t05-idle-probe v0.0.0 (/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/REVIEW-T05/idle-probe)
+    Finished `dev` profile [unoptimized + debuginfo] target(s) in 1.17s
+     Running `/Users/study_superior/Desktop/Code/LingxiAgent/rust/target/debug/review-t05-idle-probe`
+RUN_ID=run_000001a0dcba6c00_000001
+STATUS=failed
+REASON=Some("failed.provider_error")
+ELAPSED_MS=181531
+DELTA_EVENTS=Some("20")
+ATTEMPTS=Some("3")
+IDLE_BOUND_FIRED=true WINDOW_170_230S=true
+VERDICT=idle_stream_bound_enforced_at_production_default

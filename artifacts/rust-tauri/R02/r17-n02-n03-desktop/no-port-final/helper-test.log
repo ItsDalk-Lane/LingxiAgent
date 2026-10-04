@@ -1,0 +1,11 @@
+✔ 桌面 Rust 模式必须显式选择，未知值拒绝 (0.416458ms)
+✔ 打包 Rust 模式缺少明确二进制时拒绝 (0.074042ms)
+✔ 只接受本轮进程、数据根、READY 地址和短令牌一致的 Rust 记录 (2.894625ms)
+ℹ tests 3
+ℹ suites 0
+ℹ pass 3
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 40.586292

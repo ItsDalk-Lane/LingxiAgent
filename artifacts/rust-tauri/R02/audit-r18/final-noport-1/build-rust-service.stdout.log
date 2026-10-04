@@ -1,0 +1,6 @@
+
+> lingxi@0.1.43 build:rust-service
+> node scripts/build-rust-desktop-service.mjs
+
+[rust-desktop-service] pinned toolchain 1.98.1; cargo 1.98.1 (797e8a9bc 2026-08-05); target aarch64-apple-darwin
+[rust-desktop-service] verified /Users/study_superior/Desktop/Code/LingxiAgent/dist-rust-service/mac-arm64/lingxi-service sha256=689ac2dbcbb68d4db0794a91d47c6a4e909c1a910b9ea1ead36cad45b12eac5b

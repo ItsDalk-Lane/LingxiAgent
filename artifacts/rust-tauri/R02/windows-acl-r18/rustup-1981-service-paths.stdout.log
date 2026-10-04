@@ -1,0 +1,10 @@
+
+running 5 tests
+test paths::tests::layout_rejects_relative_and_root_and_file_as_home ... ok
+test paths::tests::layout_tightens_wide_runtime_dir ... ok
+test paths::tests::layout_creates_normalized_dirs_with_private_mode ... ok
+test paths::tests::atomic_write_replaces_content_and_leaves_no_tmp ... ok
+test paths::tests::atomic_write_many_rounds_do_not_collide ... ok
+
+test result: ok. 5 passed; 0 failed; 0 ignored; 0 measured; 173 filtered out; finished in 0.71s
+

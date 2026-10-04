@@ -1,0 +1,34 @@
+R05-T07 evidence window
+======================
+
+- source SHA (branch codex/rust-tauri-migration): c549ff654508ab951e2cf39cf9d309fc9c6b8656
+  (all R05 work is an uncommitted working-tree delta; no commit/push executed)
+- window (UTC): 2026-10-03T11:00:00Z .. 2026-10-03T13:30:38Z
+- platform: macOS 27.0.0 (Darwin 27.0.0 arm64)
+- toolchain: cargo/rustc 1.93.0 (254b59607 2026-01-19) via /opt/homebrew/bin (PATH-first)
+- lockfile: rust/Cargo.lock sha256 259f983e98a4da13eab1b592c2efd7b79579ad6678a08995a4b9e3fca618eff3
+  (unchanged by T07 — no new dependencies)
+- terminal-tree manifest: working-tree-manifest.txt (70 files)
+  sha256 ae42a1200438452fa3a8d7383ac59044787fe19e9b51c6bf14675f66839b36fa
+
+Targeted test logs (exit 0)
+---------------------------
+- test-adapters-r05-t07-usage-families.log ......... 12 passed / 0 failed
+- test-service-r05-t07-usage-trace.log .............  9 passed / 0 failed
+- test-service-r05-t07-persistence.log .............  4 passed / 0 failed
+
+Five gates (all exit 0)
+-----------------------
+- gates-fmt.log ......................... cargo fmt --all -- --check
+- gates-clippy.log ...................... cargo clippy --workspace --all-targets --locked -- -D warnings
+- gates-test-workspace-nofailfast.log .. cargo test --workspace --locked --no-fail-fast
+                                           105 test groups ok, 1266 passed / 0 failed / 0 ignored
+                                           (r00_management_leaves incl. its LAN legs PASSED this
+                                           window — the R05-ENV-ALF-UNSIGNED-TEST-BINARY item did
+                                           not trigger)
+- gates-check-contracts.log ............. cargo run -p xtask -- check-contracts
+- gates-check-boundaries.log ............ cargo run -p xtask -- check-boundaries
+
+LIVE verification: NOT AUTHORIZED — no real provider request left the machine in
+this window (RR-BLK-CREDENTIALS, resolve by R10 at latest). All model far-ends
+are loopback stubs; recorded per-entry in mockBoundary.

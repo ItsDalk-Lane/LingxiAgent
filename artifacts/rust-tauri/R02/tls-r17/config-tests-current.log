@@ -1,0 +1,33 @@
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.07s
+     Running unittests src/lib.rs (target/debug/deps/lingxi_service-859f4a65b7026329)
+
+running 26 tests
+test config::tests::cli_empty_is_no_flags_not_an_error ... ok
+test config::tests::cli_network_mode_strictness ... ok
+test config::tests::cli_rejects_duplicate_bind_and_config_and_test_mode ... ok
+test config::tests::cli_parses_all_flags ... ok
+test config::tests::cli_rejects_duplicate_home ... ok
+test config::tests::cli_rejects_missing_values ... ok
+test config::tests::cli_rejects_equals_form_and_unknown_tokens ... ok
+test config::tests::cli_rejects_flag_shaped_values_instead_of_consuming_them ... ok
+test config::tests::cli_shutdown_timeout_strictness ... ok
+test config::tests::config_file_missing_is_loud ... ok
+test config::tests::limit_flags_parse_strictly ... ok
+test config::tests::limit_flag_ranges_accept_the_documented_boundaries ... ok
+test config::tests::log_flag_range_violations_are_parse_time_errors ... ok
+test config::tests::limit_flag_ranges_reject_below_the_documented_minima ... ok
+test config::tests::limit_flags_reject_garbage_zero_and_flag_shaped_values ... ok
+test config::tests::limit_flag_ranges_reject_above_the_documented_maxima ... ok
+test config::tests::limit_flag_ranges_accept_native_maxima_losslessly ... ok
+test config::tests::test_mode_home_name_is_unique_and_prefixed ... ok
+test config::tests::tls_certificate_and_key_are_explicit_absolute_pairs ... ok
+test config::tests::config_file_reads_absolute_home ... ok
+test config::tests::precedence_cli_wins_over_env_and_config ... ok
+test config::tests::precedence_cli_wins_but_broken_config_is_still_loud ... ok
+test config::tests::precedence_env_wins_over_config ... ok
+test config::tests::precedence_only_cli_only_env_only_config_and_none ... ok
+test config::tests::test_mode_overrides_all_sources_and_is_unique_per_call ... ok
+test config::tests::config_file_rejects_unknown_keys_missing_home_and_bad_types ... ok
+
+test result: ok. 26 passed; 0 failed; 0 ignored; 0 measured; 146 filtered out; finished in 0.00s
+

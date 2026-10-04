@@ -1,0 +1,60 @@
+   Compiling serde_core v1.0.229
+   Compiling serde_json v1.0.151
+   Compiling futures-channel v0.3.34
+   Compiling regex-syntax v0.8.11
+   Compiling futures-task v0.3.34
+   Compiling num-traits v0.2.19
+   Compiling hashbrown v0.17.1
+   Compiling sync_wrapper v1.0.2
+   Compiling slab v0.4.12
+   Compiling syn v3.0.6
+   Compiling syn v2.0.119
+   Compiling futures-util v0.3.34
+   Compiling hashlink v0.12.2
+   Compiling rusqlite v0.40.2
+   Compiling regex-automata v0.4.18
+   Compiling serde_derive_internals v0.30.0
+   Compiling chrono v0.4.45
+   Compiling tokio-macros v2.7.2
+   Compiling serde_derive v1.0.229
+   Compiling ref-cast-impl v1.0.27
+   Compiling schemars_derive v1.2.2
+   Compiling matchers v0.2.0
+   Compiling ref-cast v1.0.27
+   Compiling tokio v1.53.1
+   Compiling tracing-attributes v0.1.31
+   Compiling serde_path_to_error v0.1.20
+   Compiling tracing v0.1.44
+   Compiling serde v1.0.229
+   Compiling axum-core v0.5.6
+   Compiling tracing-subscriber v0.3.23
+   Compiling schemars v1.2.2
+   Compiling serde_urlencoded v0.7.1
+   Compiling hyper v1.11.1
+   Compiling tower v0.5.3
+   Compiling tokio-rustls v0.26.5
+   Compiling hyper-util v0.1.21
+   Compiling axum v0.8.9
+   Compiling lingxi-protocol v0.0.0 (/Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-protocol)
+   Compiling lingxi-kernel v0.0.0 (/Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-kernel)
+   Compiling lingxi-adapters v0.0.0 (/Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-adapters)
+   Compiling lingxi-service v0.0.0 (/Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-service)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 9.93s
+     Running tests/run_lifecycle.rs (/tmp/r03-t01-target-198/debug/deps/run_lifecycle-6411cae2df204729)
+
+running 12 tests
+test non_retryable_failure_settles_without_extra_attempts ... ok
+test tool_request_without_executor_is_a_loud_failure ... ok
+test terminal_run_rejects_late_attempts_and_events_loudly ... ok
+test retry_budget_exhaustion_fails_loudly_with_attempt_count_honest ... ok
+test retryable_provider_failure_reopens_attempt_on_the_same_run ... ok
+test no_provider_configuration_is_explicit_and_r02_compatible ... ok
+test duplicate_finalize_replays_and_conflicting_finalize_is_diagnosed ... ok
+test empty_reply_completes_without_final_and_names_the_cause ... ok
+test process_only_run_completes_without_final_and_names_the_cause ... ok
+test turn_budget_exhaustion_fails_loudly_never_fake_completes ... ok
+test tool_partial_failure_has_its_own_outcome_not_a_fabricated_answer ... ok
+test r03_a01_three_model_calls_produce_exactly_one_task_terminal ... ok
+
+test result: ok. 12 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.40s
+

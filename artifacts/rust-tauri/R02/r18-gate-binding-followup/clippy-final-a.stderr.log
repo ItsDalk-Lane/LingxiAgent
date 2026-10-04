@@ -1,0 +1,32 @@
+    Checking xtask v0.1.0 (/Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/xtask)
+error: this function has too many arguments (8/7)
+    --> crates/xtask/src/verify.rs:1436:1
+     |
+1436 | / fn verify_stage_with_runner<F, G>(
+1437 | |     map: &StageMap,
+1438 | |     repo_root: &Path,
+1439 | |     evidence_root: &Path,
+...    |
+1447 | |     F: FnMut(&str),
+1448 | |     G: FnMut(&crate::stage_map::CommandSpec, &Path, &Path, &Path) -> Result<CommandOutcome, String>,
+     | |____________________________________________________________________________________________________^
+     |
+     = help: for further information visit https://rust-lang.github.io/rust-clippy/rust-1.98.0/index.html#too_many_arguments
+     = note: `-D clippy::too-many-arguments` implied by `-D warnings`
+     = help: to override `-D warnings` add `#[allow(clippy::too_many_arguments)]`
+
+error: called `.err().expect()` on a `Result` value
+   --> crates/xtask/src/main.rs:395:14
+    |
+395 |               .err()
+    |  ______________^
+396 | |             .expect("runner error exists")
+    | |___________________^ help: try: `expect_err`
+    |
+    = help: for further information visit https://rust-lang.github.io/rust-clippy/rust-1.98.0/index.html#err_expect
+    = note: `-D clippy::err-expect` implied by `-D warnings`
+    = help: to override `-D warnings` add `#[allow(clippy::err_expect)]`
+
+error: could not compile `xtask` (bin "xtask") due to 2 previous errors
+warning: build failed, waiting for other jobs to finish...
+error: could not compile `xtask` (bin "xtask" test) due to 2 previous errors

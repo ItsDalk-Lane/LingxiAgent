@@ -35,7 +35,8 @@ use std::pin::Pin;
 use std::sync::Arc;
 
 use lingxi_adapters::storage::RunDatabase;
-use lingxi_kernel::ports::{CommittedOutcome, KeyEvent, RunOutcome};
+use lingxi_kernel::model_exchange::ModelTurnInput;
+use lingxi_kernel::ports::{CommittedOutcome, KeyEvent, RunOutcome, TurnDeltaSink};
 use lingxi_kernel::ports::{
     InvocationIntent, InvocationPhase, InvocationReceipt, ProviderDescriptor, ReceiptOutcome,
     StaleResultFact, StorageError, StoragePort, ToolExecutionResult, ToolExecutorPort, ToolOutcome,
@@ -94,8 +95,9 @@ impl TurnProviderPort for CountingScriptedProvider {
         &'a self,
         ctx: &'a RunContext,
         _call: &'a ModelCallId,
-        _turn: u32,
-        _input: &'a str,
+        _input: &'a ModelTurnInput,
+
+        _deltas: &'a dyn TurnDeltaSink,
     ) -> Pin<
         Box<dyn std::future::Future<Output = lingxi_kernel::ports::ProviderTurnResult> + Send + 'a>,
     > {
@@ -319,6 +321,21 @@ impl StoragePort for GatedStorage {
         let inner = Arc::clone(&self.inner);
         let run_id = run_id.clone();
         async move { inner.load_run(&run_id).await }
+    }
+    async fn record_model_call_usage(
+        &self,
+        record: lingxi_kernel::usage::ModelCallUsageRecord,
+        now_unix_ms: u64,
+    ) -> Result<(), StorageError> {
+        self.inner
+            .record_model_call_usage(record, now_unix_ms)
+            .await
+    }
+    async fn query_model_call_usage(
+        &self,
+        query: lingxi_kernel::usage::ModelUsageQuery,
+    ) -> Result<Vec<lingxi_kernel::usage::ModelCallUsageRecord>, StorageError> {
+        self.inner.query_model_call_usage(query).await
     }
 
     fn record_run_events(
@@ -746,6 +763,7 @@ async fn cancel_accepted_before_the_terminal_claim_beats_the_failed_terminal_too
         "sess_local_alpha",
         vec![
             lingxi_kernel::ports::ProviderTurn::ToolRequests {
+                content: Vec::new(),
                 requests: vec![read_tool_request()],
             },
             lingxi_kernel::ports::ProviderTurn::Failed {
@@ -819,6 +837,7 @@ async fn cancel_accepted_before_the_terminal_claim_beats_every_terminal_shape() 
         "sess_local_alpha",
         vec![
             lingxi_kernel::ports::ProviderTurn::ToolRequests {
+                content: Vec::new(),
                 requests: vec![read_tool_request()],
             },
             lingxi_kernel::ports::ProviderTurn::Final {
@@ -1108,6 +1127,7 @@ async fn cancel_at_the_intent_boundary_dispatches_no_new_external_call() {
     let provider = CountingScriptedProvider::new(vec![(
         "sess_local_alpha",
         vec![lingxi_kernel::ports::ProviderTurn::ToolRequests {
+            content: Vec::new(),
             requests: vec![read_tool_request(), read_tool_request()],
         }],
     )]);
@@ -1181,6 +1201,7 @@ async fn cancel_at_the_started_boundary_dispatches_no_new_external_call() {
     let provider = CountingScriptedProvider::new(vec![(
         "sess_local_alpha",
         vec![lingxi_kernel::ports::ProviderTurn::ToolRequests {
+            content: Vec::new(),
             requests: vec![read_tool_request()],
         }],
     )]);
@@ -1286,6 +1307,7 @@ async fn cancel_between_tool_iterations_stops_the_second_dispatch() {
     let provider = CountingScriptedProvider::new(vec![(
         "sess_local_alpha",
         vec![lingxi_kernel::ports::ProviderTurn::ToolRequests {
+            content: Vec::new(),
             requests: vec![read_tool_request(), read_tool_request()],
         }],
     )]);
@@ -1348,6 +1370,7 @@ async fn cancel_at_the_authorization_boundary_never_opens_the_approval_ask() {
     let provider = CountingScriptedProvider::new(vec![(
         "sess_local_alpha",
         vec![lingxi_kernel::ports::ProviderTurn::ToolRequests {
+            content: Vec::new(),
             requests: vec![read_tool_request()],
         }],
     )]);
@@ -1415,6 +1438,7 @@ async fn started_without_receipt_journals_unknown_receipt_facts() {
         "sess_local_alpha",
         vec![
             lingxi_kernel::ports::ProviderTurn::ToolRequests {
+                content: Vec::new(),
                 requests: vec![read_tool_request()],
             },
             lingxi_kernel::ports::ProviderTurn::Final {

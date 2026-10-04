@@ -1,0 +1,14 @@
+   Compiling lingxi-service v0.0.0 (/Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-service)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 1.44s
+     Running tests/r00_management_leaves.rs (rust/target/debug/deps/r00_management_leaves-a278d7618b48e1df)
+LINGXI_AUTH_REJECTED request_id=req-1c44f1846c70ab968568bfb3576fd85b method=GET path=/lingxi/v1/access/summary status=401 Unauthorized reason=missing_credential remote=127.0.0.1:55064
+LINGXI_AUTH_REJECTED request_id=req-45741def2308cff40eab187de302768e method=PUT path=/lingxi/v1/access/account/profile status=401 Unauthorized reason=missing_credential remote=127.0.0.1:55069
+LINGXI_AUTH_REJECTED request_id=req-2f52ba7a4a53799e7381dff21987242d method=PUT path=/lingxi/v1/access/network status=401 Unauthorized reason=missing_credential remote=127.0.0.1:55072
+LINGXI_AUTH_REJECTED request_id=req-9327d005ddedab1655726b3d68f342fa method=GET path=/lingxi/v1/access/mobile-qr.svg status=401 Unauthorized reason=missing_credential remote=127.0.0.1:55074
+LINGXI_AUTH_REJECTED request_id=req-0c7cc4ccb18ecdb2a59849bcb055ea7d method=PUT path=/lingxi/v1/access/account/password status=401 Unauthorized reason=missing_credential remote=127.0.0.1:55082
+LINGXI_AUTH_REJECTED request_id=req-ea5030ffb36b316d63f05fd863a641d8 method=DELETE path=/lingxi/v1/access/account/password status=401 Unauthorized reason=missing_credential remote=127.0.0.1:55090
+
+thread 'r00_management_positive_and_negative_branches_on_real_service' (37505468) panicked at crates/lingxi-service/tests/r00_management_leaves.rs:763:5:
+assertion failed: failed_mobile.body.contains("device_registry_failure")
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+error: test failed, to rerun pass `-p lingxi-service --test r00_management_leaves`

@@ -1,0 +1,12 @@
+   Compiling lingxi-service v0.0.0 (/Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-service)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.99s
+     Running tests/exit_race_rejections.rs (/tmp/r03-t07-target/debug/deps/exit_race_rejections-fc4222623a9cc7a3)
+
+running 2 tests
+test http_execute_is_refused_with_503_while_shutting_down ... ok
+test shutdown_window_rejects_concurrent_submissions_and_settles_existing_tasks ... R03_A14_TRACE: existing_run=run_000001a0dcba6c00_000001 refused_before=10 refused_during_drain=4 replay=answered terminal=cancelled exit_code=0
+ok
+
+test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.15s
+
+EXIT=0

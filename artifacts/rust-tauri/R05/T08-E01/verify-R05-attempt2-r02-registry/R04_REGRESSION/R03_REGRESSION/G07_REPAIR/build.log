@@ -1,0 +1,16 @@
+   Compiling lingxi-protocol v0.0.0 (/Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-protocol)
+   Compiling reqwest v0.13.5
+   Compiling lingxi-kernel v0.0.0 (/Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-kernel)
+   Compiling lingxi-adapters v0.0.0 (/Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-adapters)
+   Compiling lingxi-service v0.0.0 (/Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-service)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 17.00s
+  Executable tests/admission_dedup_adversarial.rs (/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T//rust-target-r03-g07-repair/debug/deps/admission_dedup_adversarial-bc033dbe9df1f87b)
+  Executable tests/admission_dedup_consistency.rs (/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T//rust-target-r03-g07-repair/debug/deps/admission_dedup_consistency-c233576b9fb5bff1)
+  Executable tests/background_steering.rs (/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T//rust-target-r03-g07-repair/debug/deps/background_steering-87cb8bc150bec48c)
+  Executable tests/cancel_link_inheritance.rs (/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T//rust-target-r03-g07-repair/debug/deps/cancel_link_inheritance-b9ececfab474227f)
+  Executable tests/cancel_terminal_race.rs (/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T//rust-target-r03-g07-repair/debug/deps/cancel_terminal_race-017bedf77412d885)
+  Executable tests/input_budget_refusal.rs (/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T//rust-target-r03-g07-repair/debug/deps/input_budget_refusal-12efbedc5a5091fe)
+  Executable tests/input_payload_fidelity.rs (/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T//rust-target-r03-g07-repair/debug/deps/input_payload_fidelity-0de9831986f673a4)
+  Executable tests/request_id_canonicalization.rs (/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T//rust-target-r03-g07-repair/debug/deps/request_id_canonicalization-d80959ddc17bbee9)
+  Executable tests/subagent_closeout.rs (/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T//rust-target-r03-g07-repair/debug/deps/subagent_closeout-121b0d2a539ac0d7)
+  Executable tests/tool_receipt_unknown.rs (/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T//rust-target-r03-g07-repair/debug/deps/tool_receipt_unknown-4e9d760cf6acad58)

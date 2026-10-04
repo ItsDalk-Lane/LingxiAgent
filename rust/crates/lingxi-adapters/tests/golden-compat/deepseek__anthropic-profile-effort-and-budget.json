@@ -1,0 +1,41 @@
+{
+  "schema": "r05-t05-compat-golden/v1",
+  "module": "deepseek",
+  "case": "anthropic-profile-effort-and-budget",
+  "model": {
+    "provider": "deepseek",
+    "baseUrl": "https://api.deepseek.com",
+    "id": "deepseek-v4.2",
+    "reasoning": true,
+    "api": "anthropic-messages"
+  },
+  "payload": {
+    "model": "deepseek-v4.2",
+    "messages": [],
+    "thinking": {
+      "type": "enabled",
+      "budget_tokens": 5000
+    },
+    "reasoning_effort": "low"
+  },
+  "options": {
+    "mode": "chat",
+    "reasoningLevel": "medium"
+  },
+  "expected": {
+    "thinkingFormat": "anthropic",
+    "reasoningProfile": "deepseek-v4-anthropic",
+    "matched": "deepseek",
+    "result": {
+      "model": "deepseek-v4.2",
+      "messages": [],
+      "thinking": {
+        "type": "enabled",
+        "budget_tokens": 5000
+      },
+      "output_config": {
+        "effort": "high"
+      }
+    }
+  }
+}

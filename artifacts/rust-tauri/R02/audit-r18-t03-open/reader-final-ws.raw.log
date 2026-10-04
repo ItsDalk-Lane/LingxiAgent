@@ -1,0 +1,20 @@
+   Compiling lingxi-service v0.0.0 (/Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-service)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 1.43s
+     Running unittests src/lib.rs (target/debug/deps/lingxi_service-254d9c3036524e2c)
+
+running 12 tests
+test ws::tests::websocket_accept_known_vector ... ok
+test ws::tests::query_pair_parsing_unicode_and_bad_escapes_never_panic ... ok
+test ws::tests::query_pair_parsing ... ok
+test ws::tests::ws_credential_extraction_order ... ok
+test ws::tests::ws_request_vocabulary_parses_and_rejects_unknown ... ok
+test ws::tests::oversized_frame_is_rejected_not_buffered ... ok
+test ws::tests::malformed_client_frames_fail_closed ... ok
+test ws::tests::upgrade_rejection_preserves_its_status ... ok
+test ws::tests::client_frames_require_mask_for_text_and_control_opcodes ... ok
+test ws::tests::ticket_table_is_bounded_and_prunes_expired ... ok
+test ws::tests::ticket_lifecycle_single_use_expiry_and_binding ... ok
+test ws::tests::frame_codec_roundtrip_through_memory ... ok
+
+test result: ok. 12 passed; 0 failed; 0 ignored; 0 measured; 169 filtered out; finished in 0.00s
+

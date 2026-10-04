@@ -1,0 +1,6 @@
+=== cargo fmt --all -- --check
+fmt exit=0
+=== xtask check-contracts
+check-contracts exit=0
+=== xtask check-boundaries
+check-boundaries exit=0

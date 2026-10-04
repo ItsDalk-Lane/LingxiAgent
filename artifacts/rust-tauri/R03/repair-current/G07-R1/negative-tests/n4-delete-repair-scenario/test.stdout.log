@@ -1,0 +1,38 @@
+   Compiling xtask v0.1.0 (/private/tmp/lingxi-r03-g07-neg-Y9bhvn/rust/crates/xtask)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 1.26s
+     Running unittests src/main.rs (/tmp/rust-target-r03-g07-neg/debug/deps/xtask-ad766de8ea03e62c)
+
+running 9 tests
+test stage_map::map_tests::r03_repair_producer_pin_table_matches_the_registered_suites ... ok
+test verify::runner_tests::embedded_r03_map_declares_the_48_supplemental_leaves ... ok
+test stage_map::map_tests::r03_production_map_keeps_the_sixteen_a_scenarios_verbatim ... ok
+test stage_map::map_tests::r03_production_map_keeps_forty_eight_leaves_seventeen_share ... ok
+test stage_map::map_tests::r03_production_map_keeps_the_seven_directed_r02_chains ... ok
+test verify::runner_tests::embedded_r03_map_uses_the_taskbook_scenarios ... FAILED
+test stage_map::map_tests::r03_production_map_registers_the_repair_scenario_and_producer ... FAILED
+test verify::runner_tests::r03_map_mirrors_match_the_real_r00_ledgers ... ok
+test verify::runner_tests::r03_share_and_deferred_coverage_makes_overall_pass ... ok
+
+failures:
+
+---- verify::runner_tests::embedded_r03_map_uses_the_taskbook_scenarios stdout ----
+
+thread 'verify::runner_tests::embedded_r03_map_uses_the_taskbook_scenarios' (43785424) panicked at crates/xtask/src/verify/runner_tests.rs:1903:5:
+assertion `left == right` failed: scenario ids must be exactly R03-A01..R03-A16 + the R03-RP01 repair scenario
+  left: ["R03-A01", "R03-A02", "R03-A03", "R03-A04", "R03-A05", "R03-A06", "R03-A07", "R03-A08", "R03-A09", "R03-A10", "R03-A11", "R03-A12", "R03-A13", "R03-A14", "R03-A15", "R03-A16"]
+ right: ["R03-A01", "R03-A02", "R03-A03", "R03-A04", "R03-A05", "R03-A06", "R03-A07", "R03-A08", "R03-A09", "R03-A10", "R03-A11", "R03-A12", "R03-A13", "R03-A14", "R03-A15", "R03-A16", "R03-RP01"]
+
+---- stage_map::map_tests::r03_production_map_registers_the_repair_scenario_and_producer stdout ----
+
+thread 'stage_map::map_tests::r03_production_map_registers_the_repair_scenario_and_producer' (43785421) panicked at crates/xtask/src/stage_map.rs:1961:17:
+R03 map dropped the G07/F08 repair scenario R03-RP01 — the F01-F07 adversarial-repair counterexamples would leave the formal acceptance
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+
+
+failures:
+    stage_map::map_tests::r03_production_map_registers_the_repair_scenario_and_producer
+    verify::runner_tests::embedded_r03_map_uses_the_taskbook_scenarios
+
+test result: FAILED. 7 passed; 2 failed; 0 ignored; 0 measured; 91 filtered out; finished in 0.12s
+
+error: test failed, to rerun pass `-p xtask --bin xtask`

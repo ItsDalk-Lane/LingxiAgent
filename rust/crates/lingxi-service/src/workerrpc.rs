@@ -96,17 +96,36 @@ pub const WORKER_KILL_GRACE_MS: u64 = 2_000;
 
 /// Max model callbacks per invocation (a worker that loops on callbacks
 /// is refused at the cap — the budget is host-owned).
-pub const WORKER_MAX_CALLBACKS_PER_CALL: u32 = 4;
+///
+/// R05-T06: raised 4→8 to the value R05_BASELINE preregistered
+/// (`worker_callbacks_max_per_invocation = 8`).
+pub const WORKER_MAX_CALLBACKS_PER_CALL: u32 = 8;
+
+/// R05-T06 (C08): the host-owned output-token cap of ONE callback
+/// (`worker_callback_max_output_tokens` in R05_BASELINE).
+pub const WORKER_CALLBACK_MAX_OUTPUT_TOKENS: u32 = 4096;
+
+/// R05-T06 (C08): the host-owned prompt-size cap of ONE callback. The
+/// wire line cap ([`WORKER_MAX_LINE_BYTES`]) bounds the whole line; this
+/// bound pins the prompt field itself so a callback cannot smuggle an
+/// invocation-sized prompt past the model budget checks.
+pub const WORKER_CALLBACK_MAX_PROMPT_BYTES: usize = 64 * 1024;
 
 // ── the host model port (the R05 boundary) ─────────────────────────────────
 
 /// What a worker asks the host's ModelGateway for. The payload carries
 /// NO credentials — resolving providers/keys is host-only.
+///
+/// `deadline_unix_ms` is HOST-computed (the invocation deadline the
+/// executor minted from its own clock), clamping the port's own network
+/// budget — it is never read from the worker's line.
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
 pub struct WorkerModelRequest {
     pub purpose: String,
     pub prompt: String,
     pub max_output_tokens: u32,
+    #[serde(default)]
+    pub deadline_unix_ms: Option<u64>,
 }
 
 /// The host's reply to a model callback.
@@ -118,11 +137,32 @@ pub struct WorkerModelReply {
 /// Why the host refused a model callback. With no real ModelGateway (the
 /// R04 shape) the answer is `CapabilityNotConfigured` — an honest
 /// refusal, never a fake completion and never a leaked key.
+///
+/// R05-T06: `PurposeNotGranted` / `IdentityNotNegotiable` are the C09
+/// fail-closed answers — the worker's payload is not an authority: the
+/// purpose must be one the HOST granted this worker at registration, and
+/// identity-claiming fields (provider/model/endpoint/auth/run ids) are
+/// refused outright, never consulted.
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub enum WorkerModelRefusal {
     CapabilityNotConfigured,
-    BudgetExceeded { detail: String },
-    ProviderRefused { detail: String },
+    BudgetExceeded {
+        detail: String,
+    },
+    ProviderRefused {
+        detail: String,
+    },
+    /// The callback's `purpose` is not in the host-granted purpose set of
+    /// this worker (C09: the payload never widens the grant).
+    PurposeNotGranted {
+        purpose: String,
+    },
+    /// The callback carried identity-claiming fields (provider / model /
+    /// endpoint / auth / run ids) — the host resolves identity itself and
+    /// refuses to negotiate it with an untrusted worker (C09).
+    IdentityNotNegotiable {
+        field: String,
+    },
 }
 
 impl WorkerModelRefusal {
@@ -131,6 +171,8 @@ impl WorkerModelRefusal {
             WorkerModelRefusal::CapabilityNotConfigured => "model_capability_not_configured",
             WorkerModelRefusal::BudgetExceeded { .. } => "model_budget_exceeded",
             WorkerModelRefusal::ProviderRefused { .. } => "model_provider_refused",
+            WorkerModelRefusal::PurposeNotGranted { .. } => "model_purpose_not_granted",
+            WorkerModelRefusal::IdentityNotNegotiable { .. } => "worker_identity_not_negotiable",
         }
     }
 
@@ -147,6 +189,20 @@ impl WorkerModelRefusal {
             WorkerModelRefusal::ProviderRefused { detail } => {
                 format!("model provider refused the callback: {detail}")
             }
+            WorkerModelRefusal::PurposeNotGranted { purpose } => {
+                format!(
+                    "model callback purpose {purpose:?} is not granted to this worker; the \
+                     payload is not an authority — the host resolves purpose, route and \
+                     credentials itself"
+                )
+            }
+            WorkerModelRefusal::IdentityNotNegotiable { field } => {
+                format!(
+                    "model callback carries the identity-claiming field {field:?}; a worker \
+                     never chooses provider/model/endpoint/auth/run identity — the host \
+                     resolves them from its own configuration"
+                )
+            }
         }
     }
 }
@@ -155,13 +211,41 @@ impl WorkerModelRefusal {
 /// capability calls BACK into this port. R05 will implement the real
 /// gateway; until then [`UnconfiguredWorkerModel`] is the production
 /// shape and refuses everything.
+///
+/// R05-T06: the port is ASYNC (boxed future, the `TurnProviderPort`
+/// shape) — the executor's async read loop awaits a callback under the
+/// invocation deadline; no `block_on`, no lock held across a network
+/// wait (spec §2.3). `invocation` is the host-minted CSPRNG request id
+/// of the execute() the callback rides on and `cb_id` the worker's
+/// correlation id: the budget/dedup identity is THIS pair (the real
+/// call identity), never a `run_id/worker` string (C07). The port's own
+/// network budget is clamped to `request.deadline_unix_ms` (host-computed,
+/// never worker-supplied).
 pub trait WorkerModelPort: Send + Sync {
-    fn complete(
-        &self,
-        ctx: &RunContext,
-        worker: &str,
-        request: &WorkerModelRequest,
-    ) -> Result<WorkerModelReply, WorkerModelRefusal>;
+    fn complete<'a>(
+        &'a self,
+        ctx: &'a RunContext,
+        worker: &'a str,
+        invocation: &'a str,
+        cb_id: &'a str,
+        request: &'a WorkerModelRequest,
+    ) -> Pin<
+        Box<
+            dyn std::future::Future<Output = Result<WorkerModelReply, WorkerModelRefusal>>
+                + Send
+                + 'a,
+        >,
+    >;
+
+    /// Marks a fresh invocation (its callback budget starts at zero).
+    /// Default no-op: ports without per-invocation state ignore it.
+    fn begin_invocation(&self, _invocation: &str) {}
+
+    /// Reclaims every per-invocation counter/receipt. Called on EVERY
+    /// settlement path of the invocation (success, failure, deadline,
+    /// cancellation — the executor holds an RAII guard so a dropped
+    /// execute-future reclaims too). Default no-op.
+    fn end_invocation(&self, _invocation: &str) {}
 }
 
 /// The R04 production shape: no model capability is configured. Every
@@ -169,24 +253,50 @@ pub trait WorkerModelPort: Send + Sync {
 pub struct UnconfiguredWorkerModel;
 
 impl WorkerModelPort for UnconfiguredWorkerModel {
-    fn complete(
-        &self,
-        _ctx: &RunContext,
-        _worker: &str,
-        _request: &WorkerModelRequest,
-    ) -> Result<WorkerModelReply, WorkerModelRefusal> {
-        Err(WorkerModelRefusal::CapabilityNotConfigured)
+    fn complete<'a>(
+        &'a self,
+        _ctx: &'a RunContext,
+        _worker: &'a str,
+        _invocation: &'a str,
+        _cb_id: &'a str,
+        _request: &'a WorkerModelRequest,
+    ) -> Pin<
+        Box<
+            dyn std::future::Future<Output = Result<WorkerModelReply, WorkerModelRefusal>>
+                + Send
+                + 'a,
+        >,
+    > {
+        Box::pin(async { Err(WorkerModelRefusal::CapabilityNotConfigured) })
     }
 }
 
 /// The budget-enforcing wrapper: even when a real gateway exists (R05+),
-/// per-invocation callback counts and output-token caps are enforced
-/// HOST-SIDE before the inner port is consulted.
+/// per-invocation callback counts and output-token/prompt caps are
+/// enforced HOST-SIDE before the inner port is consulted.
+///
+/// R05-T06 (C07): the counter key is the host-minted INVOCATION id (one
+/// per execute() call), never `run_id/worker` — two invocations of the
+/// same worker in the same run can never mis-charge or reset each other,
+/// and `end_invocation` reclaims every per-invocation entry (the R04 map
+/// grew without bound). A repeated `cb_id` within one invocation is
+/// answered from the invocation-local receipt cache: the inner port (and
+/// therefore the provider) is consulted AT MOST ONCE per cb_id (C07's
+/// "a duplicate callback never leaves the process twice").
 pub struct BoundedWorkerModel {
     inner: Option<Arc<dyn WorkerModelPort>>,
     max_callbacks: u32,
     max_output_tokens: u32,
-    counters: std::sync::Mutex<BTreeMap<String, u32>>,
+    max_prompt_bytes: usize,
+    state: std::sync::Mutex<BoundedWorkerModelState>,
+}
+
+#[derive(Default)]
+struct BoundedWorkerModelState {
+    /// invocation id → callbacks dispatched so far.
+    counters: BTreeMap<String, u32>,
+    /// invocation id → (cb_id → the receipt the FIRST dispatch produced).
+    receipts: BTreeMap<String, BTreeMap<String, Result<WorkerModelReply, WorkerModelRefusal>>>,
 }
 
 impl BoundedWorkerModel {
@@ -195,59 +305,137 @@ impl BoundedWorkerModel {
         max_callbacks: u32,
         max_output_tokens: u32,
     ) -> Arc<Self> {
+        Self::with_prompt_cap(
+            inner,
+            max_callbacks,
+            max_output_tokens,
+            WORKER_CALLBACK_MAX_PROMPT_BYTES,
+        )
+    }
+
+    pub fn with_prompt_cap(
+        inner: Option<Arc<dyn WorkerModelPort>>,
+        max_callbacks: u32,
+        max_output_tokens: u32,
+        max_prompt_bytes: usize,
+    ) -> Arc<Self> {
         Arc::new(Self {
             inner,
             max_callbacks,
             max_output_tokens,
-            counters: std::sync::Mutex::new(BTreeMap::new()),
+            max_prompt_bytes,
+            state: std::sync::Mutex::new(BoundedWorkerModelState::default()),
         })
     }
 
-    /// Marks a fresh invocation (its callback budget starts at zero).
-    pub fn begin_invocation(&self, invocation: &str) {
-        self.counters
+    /// Live counter snapshot (invocation → used). Test/diagnostic surface:
+    /// proves per-invocation isolation and post-settlement reclamation.
+    #[cfg(test)]
+    pub(crate) fn counter_snapshot(&self) -> BTreeMap<String, u32> {
+        self.state
             .lock()
             .unwrap_or_else(|p| p.into_inner())
-            .insert(invocation.to_string(), 0);
+            .counters
+            .clone()
     }
 }
 
 impl WorkerModelPort for BoundedWorkerModel {
-    fn complete(
-        &self,
-        ctx: &RunContext,
-        worker: &str,
-        request: &WorkerModelRequest,
-    ) -> Result<WorkerModelReply, WorkerModelRefusal> {
-        // The invocation key is the run/worker identity the call runs
-        // under (the executor begins a per-request budget too — the two
-        // keys agree because the executor keys on its own request id and
-        // passes `worker` = plugin id; the host-side cap holds either
-        // way since BOTH are bounded).
-        let invocation = format!("{}/{}", ctx.run_id, worker);
-        let used = {
-            let mut counters = self.counters.lock().unwrap_or_else(|p| p.into_inner());
-            let used = counters.entry(invocation.clone()).or_insert(0);
-            if *used >= self.max_callbacks {
-                return Err(WorkerModelRefusal::BudgetExceeded {
-                    detail: format!("{used} callbacks already used (cap {})", self.max_callbacks),
-                });
+    fn complete<'a>(
+        &'a self,
+        ctx: &'a RunContext,
+        worker: &'a str,
+        invocation: &'a str,
+        cb_id: &'a str,
+        request: &'a WorkerModelRequest,
+    ) -> Pin<
+        Box<
+            dyn std::future::Future<Output = Result<WorkerModelReply, WorkerModelRefusal>>
+                + Send
+                + 'a,
+        >,
+    > {
+        Box::pin(async move {
+            {
+                let mut state = self.state.lock().unwrap_or_else(|p| p.into_inner());
+                // C07 dedup FIRST: a replayed cb_id gets the first
+                // dispatch's receipt verbatim — no second provider call,
+                // no extra budget unit.
+                if let Some(receipt) = state
+                    .receipts
+                    .get(invocation)
+                    .and_then(|by_cb| by_cb.get(cb_id))
+                {
+                    return receipt.clone();
+                }
+                let used = state.counters.entry(invocation.to_string()).or_insert(0);
+                if *used >= self.max_callbacks {
+                    return Err(WorkerModelRefusal::BudgetExceeded {
+                        detail: format!(
+                            "{used} callbacks already used in this invocation (cap {})",
+                            self.max_callbacks
+                        ),
+                    });
+                }
+                *used += 1;
             }
-            *used += 1;
-            *used
-        };
-        let _ = used;
-        if request.max_output_tokens > self.max_output_tokens {
-            return Err(WorkerModelRefusal::BudgetExceeded {
-                detail: format!(
-                    "requested {} output tokens over the {} cap",
-                    request.max_output_tokens, self.max_output_tokens
-                ),
-            });
-        }
-        match &self.inner {
-            None => Err(WorkerModelRefusal::CapabilityNotConfigured),
-            Some(inner) => inner.complete(ctx, worker, request),
+            // C08: the payload can never widen the budget — a zero or
+            // over-cap token request and an over-cap prompt are loud
+            // refusals BEFORE the inner port (and the network) runs.
+            let refusal = if request.max_output_tokens == 0 {
+                Some(WorkerModelRefusal::BudgetExceeded {
+                    detail: "requested 0 output tokens (minimum 1)".to_string(),
+                })
+            } else if request.max_output_tokens > self.max_output_tokens {
+                Some(WorkerModelRefusal::BudgetExceeded {
+                    detail: format!(
+                        "requested {} output tokens over the {} cap",
+                        request.max_output_tokens, self.max_output_tokens
+                    ),
+                })
+            } else if request.prompt.len() > self.max_prompt_bytes {
+                Some(WorkerModelRefusal::BudgetExceeded {
+                    detail: format!(
+                        "prompt of {} bytes over the {} byte cap",
+                        request.prompt.len(),
+                        self.max_prompt_bytes
+                    ),
+                })
+            } else {
+                None
+            };
+            let receipt = match (refusal, &self.inner) {
+                (Some(refusal), _) => Err(refusal),
+                (None, None) => Err(WorkerModelRefusal::CapabilityNotConfigured),
+                (None, Some(inner)) => {
+                    inner
+                        .complete(ctx, worker, invocation, cb_id, request)
+                        .await
+                }
+            };
+            self.state
+                .lock()
+                .unwrap_or_else(|p| p.into_inner())
+                .receipts
+                .entry(invocation.to_string())
+                .or_default()
+                .insert(cb_id.to_string(), receipt.clone());
+            receipt
+        })
+    }
+
+    fn begin_invocation(&self, invocation: &str) {
+        let mut state = self.state.lock().unwrap_or_else(|p| p.into_inner());
+        state.counters.insert(invocation.to_string(), 0);
+        state.receipts.entry(invocation.to_string()).or_default();
+    }
+
+    fn end_invocation(&self, invocation: &str) {
+        let mut state = self.state.lock().unwrap_or_else(|p| p.into_inner());
+        state.counters.remove(invocation);
+        state.receipts.remove(invocation);
+        if let Some(inner) = &self.inner {
+            inner.end_invocation(invocation);
         }
     }
 }
@@ -574,6 +762,11 @@ pub struct WorkerToolSpec {
     pub cwd: std::path::PathBuf,
     /// The model callback port (the R05 boundary face).
     pub model: Arc<dyn WorkerModelPort>,
+    /// R05-T06 (C09): the host-granted model-callback purposes of this
+    /// worker (the whitelist the host approved at registration). A
+    /// callback whose `purpose` is not listed is refused with
+    /// `model_purpose_not_granted` — the payload never widens the grant.
+    pub allowed_model_purposes: Vec<String>,
     /// R04-A15: the content contract every `claimed_files` entry must
     /// satisfy before it becomes a local ResourceRef. `None` = the basic
     /// contract (inside a grant + exists + regular file); a tool that
@@ -663,6 +856,36 @@ fn mint_request_id() -> Result<String, ProtocolError> {
     Ok(bytes.iter().map(|b| format!("{b:02x}")).collect())
 }
 
+/// RAII reclamation of one invocation's callback budget (C07): every
+/// settlement path — including a dropped (cancelled) execute future —
+/// ends the invocation exactly once.
+struct InvocationBudgetGuard {
+    port: Arc<dyn WorkerModelPort>,
+    invocation: String,
+}
+
+impl Drop for InvocationBudgetGuard {
+    fn drop(&mut self) {
+        self.port.end_invocation(&self.invocation);
+    }
+}
+
+/// The callback fields a worker must NEVER set (C09): identity-claiming
+/// keys. The payload is not an authority — provider/model/endpoint/auth
+/// and run identity resolve host-side only.
+const FORBIDDEN_CALLBACK_IDENTITY_KEYS: &[&str] = &[
+    "provider",
+    "model",
+    "endpoint",
+    "auth",
+    "api_key",
+    "apiKey",
+    "run_id",
+    "parent_run_id",
+    "credential",
+    "credentials",
+];
+
 /// Reads ONE newline-terminated line while ENFORCING the byte cap DURING
 /// the read: a hostile worker streaming an endless line (no newline,
 /// gigabytes) cannot push host memory past the cap — the read aborts
@@ -737,6 +960,16 @@ impl ToolExecutorPort for WorkerToolExecutor {
                 Err(e) => {
                     return ToolExecutionResult::of_ctx(ctx, ToolOutcome::Failed { error: e });
                 }
+            };
+            // C07: the invocation's callback budget lives under the
+            // host-minted request id from birth to settlement; the guard
+            // reclaims it on EVERY exit path — success, violation,
+            // deadline, and the future-drop cancellation path (a dropped
+            // execute-future never leaks counters or receipt caches).
+            self.spec.model.begin_invocation(&request_id);
+            let _invocation_guard = InvocationBudgetGuard {
+                port: Arc::clone(&self.spec.model),
+                invocation: request_id.clone(),
             };
             let limits = self.runtime.limits();
             let now = self.runtime.clock.now_unix_ms();
@@ -933,6 +1166,40 @@ impl ToolExecutorPort for WorkerToolExecutor {
                         };
                         match parsed.get("kind").and_then(|k| k.as_str()) {
                             Some("callback") => {
+                                // C09: identity-claiming fields make the
+                                // callback a loud refusal (the invocation
+                                // survives; the worker learns the host —
+                                // not the payload — owns identity).
+                                let forged = parsed.as_object().and_then(|obj| {
+                                    obj.keys().find(|key| {
+                                        FORBIDDEN_CALLBACK_IDENTITY_KEYS.contains(&key.as_str())
+                                    })
+                                });
+                                if let Some(field) = forged {
+                                    let refusal = WorkerModelRefusal::IdentityNotNegotiable {
+                                        field: field.clone(),
+                                    };
+                                    let reply_line = serde_json::json!({
+                                        "kind": "callback_result",
+                                        "cb_id": parsed.get("cb_id").and_then(|v| v.as_str()).unwrap_or(""),
+                                        "ok": false,
+                                        "error": {
+                                            "code": refusal.code(),
+                                            "message": refusal.message(),
+                                        },
+                                    });
+                                    let serialized = serde_json::to_string(&reply_line)
+                                        .expect("callback reply serializes");
+                                    if let Err(e) =
+                                        stdin.write_all(format!("{serialized}\n").as_bytes()).await
+                                    {
+                                        violation =
+                                            Some(format!("callback reply write failed: {e}"));
+                                        break;
+                                    }
+                                    let _ = stdin.flush().await;
+                                    continue;
+                                }
                                 let cb: WorkerCallbackLine = match serde_json::from_value(parsed) {
                                     Ok(cb) => cb,
                                     Err(e) => {
@@ -948,15 +1215,91 @@ impl ToolExecutorPort for WorkerToolExecutor {
                                     ));
                                     break;
                                 }
-                                let answer = self.spec.model.complete(
-                                    ctx,
-                                    &self.spec.plugin_id,
-                                    &WorkerModelRequest {
-                                        purpose: cb.purpose,
-                                        prompt: cb.prompt,
-                                        max_output_tokens: cb.max_output_tokens,
-                                    },
-                                );
+                                // C09: the purpose must be one the HOST
+                                // granted this worker at registration —
+                                // the payload never widens the grant. The
+                                // refusal is a normal callback_result (the
+                                // invocation survives; the count was
+                                // already charged above).
+                                if !self.spec.allowed_model_purposes.contains(&cb.purpose) {
+                                    let refusal = WorkerModelRefusal::PurposeNotGranted {
+                                        purpose: cb.purpose.clone(),
+                                    };
+                                    let reply_line = serde_json::json!({
+                                        "kind": "callback_result",
+                                        "cb_id": cb.cb_id,
+                                        "ok": false,
+                                        "error": {
+                                            "code": refusal.code(),
+                                            "message": refusal.message(),
+                                        },
+                                    });
+                                    let serialized = serde_json::to_string(&reply_line)
+                                        .expect("callback reply serializes");
+                                    if let Err(e) =
+                                        stdin.write_all(format!("{serialized}\n").as_bytes()).await
+                                    {
+                                        violation =
+                                            Some(format!("callback reply write failed: {e}"));
+                                        break;
+                                    }
+                                    let _ = stdin.flush().await;
+                                    continue;
+                                }
+                                // R05-T06 (spec §2.3 / C05 / C10): the
+                                // callback is an ASYNC host port call
+                                // awaited under the SAME invocation
+                                // deadline as the reads — a hung model
+                                // side ends the invocation with the
+                                // honest Unknown settlement, and the
+                                // async read loop never blocks on a
+                                // synchronous network wait.
+                                let answer = match tokio::time::timeout_at(
+                                    deadline,
+                                    self.spec.model.complete(
+                                        ctx,
+                                        &self.spec.plugin_id,
+                                        &request_id,
+                                        &cb.cb_id,
+                                        &WorkerModelRequest {
+                                            purpose: cb.purpose,
+                                            prompt: cb.prompt,
+                                            max_output_tokens: cb.max_output_tokens,
+                                            deadline_unix_ms: Some(envelope.deadline_unix_ms),
+                                        },
+                                    ),
+                                )
+                                .await
+                                {
+                                    Ok(answer) => answer,
+                                    Err(_) => {
+                                        let _ = stdin
+                                            .write_all(
+                                                format!(
+                                                    "{{\"kind\":\"cancel\",\"id\":\"{request_id}\"}}\n"
+                                                )
+                                                .as_bytes(),
+                                            )
+                                            .await;
+                                        let _ = stdin.flush().await;
+                                        child.kill_if_alive().await;
+                                        let _ = child.wait_bounded().await;
+                                        return ToolExecutionResult::of_ctx(
+                                            ctx,
+                                            ToolOutcome::Unknown {
+                                                reason: WorkerFailure::DeadlineExceeded {
+                                                    detail: format!(
+                                                        "the model callback did not settle within \
+                                                         the {}ms invocation deadline; the worker \
+                                                         was killed — side effects unconfirmed",
+                                                        limits.deadline_ms
+                                                    ),
+                                                }
+                                                .message(),
+                                            },
+                                        );
+                                    }
+                                };
                                 let reply_line = match answer {
                                     Ok(reply) => serde_json::json!({
                                         "kind": "callback_result",
@@ -1200,15 +1543,25 @@ mod tests {
     }
 
     impl WorkerModelPort for RecordingModel {
-        fn complete(
-            &self,
-            _ctx: &RunContext,
-            _worker: &str,
-            _request: &WorkerModelRequest,
-        ) -> Result<WorkerModelReply, WorkerModelRefusal> {
-            self.replies.lock().unwrap().push("ok".to_string());
-            Ok(WorkerModelReply {
-                text: "ok".to_string(),
+        fn complete<'a>(
+            &'a self,
+            _ctx: &'a RunContext,
+            _worker: &'a str,
+            _invocation: &'a str,
+            _cb_id: &'a str,
+            _request: &'a WorkerModelRequest,
+        ) -> Pin<
+            Box<
+                dyn std::future::Future<Output = Result<WorkerModelReply, WorkerModelRefusal>>
+                    + Send
+                    + 'a,
+            >,
+        > {
+            Box::pin(async move {
+                self.replies.lock().unwrap().push("ok".to_string());
+                Ok(WorkerModelReply {
+                    text: "ok".to_string(),
+                })
             })
         }
     }
@@ -1220,12 +1573,16 @@ mod tests {
             .complete(
                 &ctx(),
                 "w",
+                "inv-1",
+                "cb-1",
                 &WorkerModelRequest {
                     purpose: "summarize".into(),
                     prompt: "p".into(),
                     max_output_tokens: 16,
+                    deadline_unix_ms: None,
                 },
             )
+            .await
             .expect_err("unconfigured refuses");
         assert_eq!(refusal, WorkerModelRefusal::CapabilityNotConfigured);
         assert_eq!(refusal.code(), "model_capability_not_configured");
@@ -1237,15 +1594,24 @@ mod tests {
             replies: std::sync::Mutex::new(Vec::new()),
         });
         let port = BoundedWorkerModel::new(Some(inner.clone()), 2, 32);
+        port.begin_invocation("inv-1");
         let request = WorkerModelRequest {
             purpose: "p".into(),
             prompt: "q".into(),
             max_output_tokens: 8,
+            deadline_unix_ms: None,
         };
-        assert!(port.complete(&ctx(), "w", &request).is_ok());
-        assert!(port.complete(&ctx(), "w", &request).is_ok());
+        assert!(port
+            .complete(&ctx(), "w", "inv-1", "cb-1", &request)
+            .await
+            .is_ok());
+        assert!(port
+            .complete(&ctx(), "w", "inv-1", "cb-2", &request)
+            .await
+            .is_ok());
         let third = port
-            .complete(&ctx(), "w", &request)
+            .complete(&ctx(), "w", "inv-1", "cb-3", &request)
+            .await
             .expect_err("cap reached");
         assert!(
             matches!(third, WorkerModelRefusal::BudgetExceeded { .. }),
@@ -1257,12 +1623,111 @@ mod tests {
             purpose: "p".into(),
             prompt: "q".into(),
             max_output_tokens: 33,
+            deadline_unix_ms: None,
         };
         let refusal = port
-            .complete(&ctx(), "w2", &oversized)
+            .complete(&ctx(), "w2", "inv-2", "cb-9", &oversized)
+            .await
             .expect_err("token cap");
         assert!(matches!(refusal, WorkerModelRefusal::BudgetExceeded { .. }));
         assert_eq!(inner.replies.lock().unwrap().len(), 2);
+    }
+
+    #[tokio::test]
+    async fn bounded_model_keys_budgets_per_invocation_and_reclaims_on_end() {
+        let inner = Arc::new(RecordingModel {
+            replies: std::sync::Mutex::new(Vec::new()),
+        });
+        let port = BoundedWorkerModel::new(Some(inner.clone()), 1, 32);
+        let request = WorkerModelRequest {
+            purpose: "p".into(),
+            prompt: "q".into(),
+            max_output_tokens: 8,
+            deadline_unix_ms: None,
+        };
+        // Two invocations of the SAME worker in the SAME run: each owns
+        // its independent budget (C07 — no mis-charge, no reset).
+        port.begin_invocation("inv-a");
+        port.begin_invocation("inv-b");
+        assert!(port
+            .complete(&ctx(), "w", "inv-a", "cb-1", &request)
+            .await
+            .is_ok());
+        assert!(
+            port.complete(&ctx(), "w", "inv-b", "cb-1", &request)
+                .await
+                .is_ok(),
+            "the second invocation holds its own budget"
+        );
+        let overflow = port
+            .complete(&ctx(), "w", "inv-b", "cb-2", &request)
+            .await
+            .expect_err("inv-b is at its own cap");
+        assert!(matches!(
+            overflow,
+            WorkerModelRefusal::BudgetExceeded { .. }
+        ));
+        // A repeated cb_id within one invocation replays the cached
+        // receipt: the inner port (and the network) never runs twice.
+        let replayed = port
+            .complete(&ctx(), "w", "inv-a", "cb-1", &request)
+            .await
+            .expect("replay of cb-1");
+        assert_eq!(replayed.text, "ok");
+        assert_eq!(
+            inner.replies.lock().unwrap().len(),
+            2,
+            "the duplicate cb_id never re-dispatched"
+        );
+        // Reclamation: ending an invocation frees its counter AND its
+        // receipts; a fresh invocation under a recycled id starts clean.
+        port.end_invocation("inv-a");
+        assert!(port.counter_snapshot().contains_key("inv-b"));
+        assert!(!port.counter_snapshot().contains_key("inv-a"));
+        port.begin_invocation("inv-a");
+        assert!(
+            port.complete(&ctx(), "w", "inv-a", "cb-1", &request)
+                .await
+                .is_ok(),
+            "a recycled invocation id starts with a fresh budget"
+        );
+        assert_eq!(inner.replies.lock().unwrap().len(), 3);
+    }
+
+    #[tokio::test]
+    async fn bounded_model_refuses_zero_tokens_and_oversized_prompts() {
+        let inner = Arc::new(RecordingModel {
+            replies: std::sync::Mutex::new(Vec::new()),
+        });
+        let port = BoundedWorkerModel::with_prompt_cap(Some(inner.clone()), 4, 32, 16);
+        port.begin_invocation("inv-1");
+        let zero = WorkerModelRequest {
+            purpose: "p".into(),
+            prompt: "q".into(),
+            max_output_tokens: 0,
+            deadline_unix_ms: None,
+        };
+        let refusal = port
+            .complete(&ctx(), "w", "inv-1", "cb-1", &zero)
+            .await
+            .expect_err("zero tokens refused");
+        assert!(matches!(refusal, WorkerModelRefusal::BudgetExceeded { .. }));
+        let oversized_prompt = WorkerModelRequest {
+            purpose: "p".into(),
+            prompt: "x".repeat(17),
+            max_output_tokens: 8,
+            deadline_unix_ms: None,
+        };
+        let refusal = port
+            .complete(&ctx(), "w", "inv-1", "cb-2", &oversized_prompt)
+            .await
+            .expect_err("oversized prompt refused");
+        assert!(matches!(refusal, WorkerModelRefusal::BudgetExceeded { .. }));
+        assert_eq!(
+            inner.replies.lock().unwrap().len(),
+            0,
+            "neither refusal reached the inner port"
+        );
     }
 
     #[tokio::test]
@@ -1272,12 +1737,16 @@ mod tests {
             .complete(
                 &ctx(),
                 "w",
+                "inv-1",
+                "cb-1",
                 &WorkerModelRequest {
                     purpose: "p".into(),
                     prompt: "q".into(),
                     max_output_tokens: 8,
+                    deadline_unix_ms: None,
                 },
             )
+            .await
             .expect_err("no inner gateway");
         assert_eq!(refusal, WorkerModelRefusal::CapabilityNotConfigured);
     }

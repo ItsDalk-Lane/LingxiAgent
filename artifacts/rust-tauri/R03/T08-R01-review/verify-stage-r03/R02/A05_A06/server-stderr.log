@@ -1,0 +1,114 @@
+2026-09-29T12:31:44.774530Z  INFO lingxi_service: data root resolved effective_home=/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T//lingxi-r02t03-home-4720hq source=cli ignored_sources=none
+2026-09-29T12:31:44.775220Z  INFO lingxi_service: data root prepared (canonicalized; runtime dir private 0700) canonical_home=/private/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-r02t03-home-4720hq runtime_dir=/private/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-r02t03-home-4720hq/lingxi-service
+2026-09-29T12:31:44.775509Z  INFO lingxi_service: single-writer lock acquired instance_id=4ff645980f5f29e43191584428dcead1 start_nonce=a33c5b11caf18d4d pid=54281 entropy="os-random-device" lock=/private/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-r02t03-home-4720hq/lingxi-service/instance.lock network_mode=loopback
+2026-09-29T12:31:44.817768Z  INFO lingxi_service: data-epoch gate passed home=/private/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-r02t03-home-4720hq decision=ProceedStampedNew(EpochStamp { format: V2, minimum_reader_epoch: 1, committed_data_epoch: 1, last_version: Some("0.0.0") })
+2026-09-29T12:31:44.876693Z  INFO lingxi_adapters::storage::run_store: run database migrated db=/private/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-r02t03-home-4720hq/lingxi-service/data/runs.db applied=[1, 2, 3, 4] version=4
+2026-09-29T12:31:44.877983Z  INFO lingxi_service: auth service bootstrapped (per-start loopback token, owner-only); run database migrated and seeded local_token_file=/private/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-r02t03-home-4720hq/lingxi-service/local-token.json run_database=/private/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-r02t03-home-4720hq/lingxi-service/data/runs.db
+2026-09-29T12:31:44.888553Z  INFO lingxi_service: instance record published (atomic write) record=/private/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-r02t03-home-4720hq/lingxi-service/instance.json bind_addr=127.0.0.1:49375
+LINGXI_AUTH_REJECTED request_id=req-7cec24db5b65a9639f622a72688d46e0 method=GET path=/lingxi/v1/sessions/sess_local_alpha status=401 Unauthorized reason=missing_credential remote=127.0.0.1:49376
+2026-09-29T12:31:45.073629Z  INFO lingxi_service: request handled request_id=req-7cec24db5b65a9639f622a72688d46e0 method=GET path=/lingxi/v1/sessions/sess_local_alpha status=401
+LINGXI_AUTH_REJECTED request_id=req-63e311dece544c8129610f431e6f2e09 method=POST path=/lingxi/v1/sessions/sess_local_alpha/execute status=401 Unauthorized reason=missing_credential remote=127.0.0.1:49377
+2026-09-29T12:31:45.118627Z  INFO lingxi_service: request handled request_id=req-63e311dece544c8129610f431e6f2e09 method=POST path=/lingxi/v1/sessions/sess_local_alpha/execute status=401
+LINGXI_AUTH_REJECTED request_id=req-9c5882ec818644d8fe1aa41f3f09fec4 method=POST path=/lingxi/v1/ws-ticket status=403 Forbidden reason=missing_credential remote=127.0.0.1:49378
+2026-09-29T12:31:45.155196Z  INFO lingxi_service: request handled request_id=req-9c5882ec818644d8fe1aa41f3f09fec4 method=POST path=/lingxi/v1/ws-ticket status=403
+LINGXI_AUTH_REJECTED request_id=req-c32dc7af72995659f9c5ddd4035bbcd5 method=GET path=/lingxi/v1/me status=401 Unauthorized reason=missing_credential remote=127.0.0.1:49379
+2026-09-29T12:31:45.213684Z  INFO lingxi_service: request handled request_id=req-c32dc7af72995659f9c5ddd4035bbcd5 method=GET path=/lingxi/v1/me status=401
+LINGXI_AUTH_REJECTED request_id=req-9d5ef6490d192cdb63fa0c5ba06a4588 method=GET path=/lingxi/v1/sessions/sess_local_alpha status=401 Unauthorized reason=missing_credential remote=127.0.0.1:49380
+2026-09-29T12:31:45.281740Z  INFO lingxi_service: request handled request_id=req-9d5ef6490d192cdb63fa0c5ba06a4588 method=GET path=/lingxi/v1/sessions/sess_local_alpha status=401
+2026-09-29T12:31:45.314796Z  INFO lingxi_service: request handled request_id=req-5a1bda03327a654c11f12bfecd867347 method=GET path=/lingxi/v1/me status=200
+2026-09-29T12:31:45.405254Z  INFO lingxi_service: request handled request_id=req-050b392beeb1b7c9ed71741f886b33dd method=POST path=/lingxi/v1/sessions/sess_local_alpha/execute status=400
+2026-09-29T12:31:45.445422Z  INFO lingxi_service: request handled request_id=req-e4f253531f12c198d96a131dc14fbc7f method=GET path=/lingxi/v1/sessions/sess_does_not_exist status=404
+2026-09-29T12:31:45.485616Z  INFO lingxi_service: request handled request_id=req-c39641a377d488ee2b7d756bdb83d4d7 method=POST path=/lingxi/v1/sessions/sess_does_not_exist/execute status=404
+LINGXI_AUTH_REJECTED request_id=req-440d854afcc254e577a6a5ae8471b467 method=GET path=/lingxi/v1/sessions/sess_local_alpha status=401 Unauthorized reason=invalid_credential remote=127.0.0.1:49385
+2026-09-29T12:31:45.522714Z  INFO lingxi_service: request handled request_id=req-440d854afcc254e577a6a5ae8471b467 method=GET path=/lingxi/v1/sessions/sess_local_alpha status=401
+2026-09-29T12:31:46.760735Z  INFO lingxi_service: request handled request_id=req-a6bd5bbe23005ba3dd1de8763668a7bd method=POST path=/lingxi/v1/devices/credentials status=201
+2026-09-29T12:31:46.823153Z  INFO lingxi_service: request handled request_id=req-adf16eb3c0102318a05b5af370d402b5 method=POST path=/lingxi/v1/ws-ticket status=200
+2026-09-29T12:31:46.863697Z  INFO lingxi_service: request handled request_id=req-584f9677065e8a137a9c4415edf89dcf method=POST path=/lingxi/v1/devices/credentials status=400
+2026-09-29T12:31:46.897143Z  INFO lingxi_service: request handled request_id=req-0ff1f81da1e9c9060e0dbba8cdc26651 method=POST path=/lingxi/v1/devices/credentials status=400
+2026-09-29T12:31:48.125957Z  INFO lingxi_service: request handled request_id=req-d6a58fc9e90e29d228df87d8ba9b177e method=POST path=/lingxi/v1/devices/credentials status=201
+2026-09-29T12:31:49.403750Z  INFO lingxi_service: request handled request_id=req-f6bd93eb7f3908fe8dc1b655efe69247 method=GET path=/lingxi/v1/me status=200
+2026-09-29T12:31:50.689641Z  INFO lingxi_service: request handled request_id=req-30bed7aa6d40ab04f29ba67b75c62469 method=POST path=/lingxi/v1/devices/credentials status=201
+LINGXI_AUTH_REJECTED request_id=req-8511267fef45c624a3150561c89f39c7 method=POST path=/lingxi/v1/ws-ticket status=403 reason=insufficient_scope remote=127.0.0.1:49423
+2026-09-29T12:31:51.955020Z  INFO lingxi_service: request handled request_id=req-8511267fef45c624a3150561c89f39c7 method=POST path=/lingxi/v1/ws-ticket status=403
+2026-09-29T12:31:52.015886Z  INFO lingxi_service: request handled request_id=req-cde6410596a0e364c0e5d9817fb73c7f method=GET path=/lingxi/v1/sessions/sess_local_alpha status=200
+2026-09-29T12:31:52.046346Z  INFO lingxi_service: request handled request_id=req-74d726a0a33582aed01c820236093876 method=GET path=/lingxi/v1/sessions/sess_local_beta status=200
+LINGXI_AUTH_REJECTED request_id=req-b59370890b19b744af8c3f400f811386 method=GET path=/lingxi/v1/sessions/sess_local_alpha status=401 Unauthorized reason=invalid_credential remote=127.0.0.1:49426
+2026-09-29T12:31:53.227974Z  INFO lingxi_service: request handled request_id=req-b59370890b19b744af8c3f400f811386 method=GET path=/lingxi/v1/sessions/sess_local_alpha status=401
+LINGXI_AUTH_REJECTED request_id=req-c3704bfe13fcf75bfccaf8866cbcafc2 method=POST path=/lingxi/v1/sessions/sess_local_alpha/execute status=401 Unauthorized reason=invalid_credential remote=127.0.0.1:49427
+2026-09-29T12:31:54.406143Z  INFO lingxi_service: request handled request_id=req-c3704bfe13fcf75bfccaf8866cbcafc2 method=POST path=/lingxi/v1/sessions/sess_local_alpha/execute status=401
+2026-09-29T12:31:55.666049Z  INFO lingxi_service: request handled request_id=req-bf0cbfeb0ae4dc84c1d492d726361e4f method=GET path=/lingxi/v1/sessions/sess_local_alpha status=403
+2026-09-29T12:31:56.901183Z  INFO lingxi_service: request handled request_id=req-ea70f1ac26e9b401646fcbe54e314dd3 method=POST path=/lingxi/v1/sessions/sess_local_alpha/execute status=403
+2026-09-29T12:31:56.979714Z  INFO lingxi_service: request handled request_id=req-868457ba7c07ae2d0abdd01665b5c0c2 method=GET path=/lingxi/v1/sessions/sess_local_alpha status=200
+2026-09-29T12:31:57.010250Z  INFO lingxi_service: request handled request_id=req-334e70bb0edcc30a7b82febc8da4992b method=GET path=/lingxi/v1/sessions/sess_local_beta status=200
+2026-09-29T12:31:57.048982Z  INFO lingxi_service::sessions: run settled through the single finalize path run_id=run_000001a0ed267a77_000001 session_id="sess_local_alpha" outcome=completed.no_final.no_provider_configured input_chars=16
+2026-09-29T12:31:57.049124Z  INFO lingxi_service: request handled request_id=req-1841570aeb1319a038e70d9bef383030 method=POST path=/lingxi/v1/sessions/sess_local_alpha/execute status=200
+2026-09-29T12:31:57.090118Z  INFO lingxi_service: request handled request_id=req-fb9c7eb5cf8342734ebbdfa2dd2ccca9 method=GET path=/lingxi/v1/sessions/sess_local_alpha status=200
+2026-09-29T12:31:57.119840Z  INFO lingxi_service: request handled request_id=req-25c92d589c69cdd110626b3e11ed5455 method=GET path=/lingxi/v1/sessions/sess_local_beta status=200
+2026-09-29T12:31:57.164590Z  INFO lingxi_service: request handled request_id=req-02e38f627222d56622eb69fd4cb192ab method=GET path=/lingxi/v1/sessions status=200
+2026-09-29T12:31:58.419009Z  INFO lingxi_service: request handled request_id=req-b9b31003f8483d66c8af938e1472fd59 method=GET path=/lingxi/v1/sessions status=200
+LINGXI_AUTH_REJECTED request_id=req-4c5a9ea1b901743dc7f9d3f834672abe method=GET path=/lingxi/v1/sessions status=401 Unauthorized reason=missing_credential remote=127.0.0.1:49438
+2026-09-29T12:31:58.510949Z  INFO lingxi_service: request handled request_id=req-4c5a9ea1b901743dc7f9d3f834672abe method=GET path=/lingxi/v1/sessions status=401
+2026-09-29T12:31:58.649895Z  INFO lingxi_service: request handled request_id=req-fd9493a24f57aa8829040a82306726ad method=GET path=/lingxi/v1/sessions status=200
+2026-09-29T12:31:59.949173Z  INFO lingxi_service: request handled request_id=req-9aa37d77045ee262c7d13b64933954dc method=GET path=/lingxi/v1/sessions status=200
+LINGXI_AUTH_REJECTED request_id=req-ff09e69c32904eef9aa6ffdbde1f82d2 method=GET path=/lingxi/v1/sessions status=401 Unauthorized reason=missing_credential remote=127.0.0.1:49441
+2026-09-29T12:32:00.074859Z  INFO lingxi_service: request handled request_id=req-ff09e69c32904eef9aa6ffdbde1f82d2 method=GET path=/lingxi/v1/sessions status=401
+LINGXI_TRANSPORT_REJECTED request_id=req-3c962a991f3f3fb1b6d69692389b6ca0 method=GET path=/lingxi/v1/health status=403 reason=bad_origin origin=http://evil.example host=127.0.0.1:49375 remote=127.0.0.1:49442
+LINGXI_TRANSPORT_REJECTED request_id=req-e6fd7b07071dc6878ee55f0e26715e12 method=GET path=/lingxi/v1/me status=403 reason=bad_origin origin=https://attacker.invalid host=127.0.0.1:49375 remote=127.0.0.1:49443
+2026-09-29T12:32:00.293215Z  INFO lingxi_service: request handled request_id=req-e6fd7b07071dc6878ee55f0e26715e12 method=GET path=/lingxi/v1/me status=403
+LINGXI_TRANSPORT_REJECTED request_id=req-9dfb042cc637884d274201e36143594a method=GET path=/lingxi/v1/health status=403 reason=bad_origin origin=http://sub.localhost:1 host=127.0.0.1:49375 remote=127.0.0.1:49448
+LINGXI_TRANSPORT_REJECTED request_id=req-a779b4ee2a7bcf3c9c419eba2405f297 method=GET path=/lingxi/v1/health status=403 reason=bad_origin origin=http://127.0.0.1.evil.example host=127.0.0.1:49375 remote=127.0.0.1:49449
+LINGXI_TRANSPORT_REJECTED request_id=req-0097cd27014048806d2e686cdeea75d6 method=GET path=/lingxi/v1/health status=403 reason=loopback_host_mismatch origin=absent host=evil.example remote=127.0.0.1:49450
+LINGXI_TRANSPORT_REJECTED request_id=req-16ec307170f015551087c77fa9e7c634 method=GET path=/lingxi/v1/me status=403 reason=loopback_host_mismatch origin=absent host=evil.example remote=127.0.0.1:49451
+2026-09-29T12:32:00.539781Z  INFO lingxi_service: request handled request_id=req-16ec307170f015551087c77fa9e7c634 method=GET path=/lingxi/v1/me status=403
+LINGXI_TRANSPORT_REJECTED request_id=req-7941ac7b30d49339545da49b28622fc2 method=GET path=/lingxi/v1/health status=429 reason=rate_limited origin=absent host=127.0.0.1:49375 remote=127.0.0.1:49680
+2026-09-29T12:32:13.186723Z  INFO lingxi_service: request handled request_id=req-5ad47e97867b3e4f8faacc291305ecf5 method=POST path=/lingxi/v1/sessions/sess_local_alpha/execute status=413
+LINGXI_TRANSPORT_REJECTED request_id=req-269c01a01d41fb17f6a0a9729006309c method=GET path=/lingxi/v1/ws status=403 reason=bad_origin origin=http://evil.example host=127.0.0.1:49375 remote=127.0.0.1:49694
+2026-09-29T12:32:13.231120Z  INFO lingxi_service: request handled request_id=req-269c01a01d41fb17f6a0a9729006309c method=GET path=/lingxi/v1/ws status=403
+LINGXI_TRANSPORT_REJECTED request_id=req-a5bba55f14a1549f1a31462fc12cb35b method=GET path=/lingxi/v1/ws status=403 reason=loopback_host_mismatch origin=absent host=rebinder.example remote=127.0.0.1:49695
+2026-09-29T12:32:13.231846Z  INFO lingxi_service: request handled request_id=req-a5bba55f14a1549f1a31462fc12cb35b method=GET path=/lingxi/v1/ws status=403
+LINGXI_AUTH_REJECTED request_id=req-bd4e19b5cb6866610d11a2027448dd9f method=GET path=/lingxi/v1/ws status=401 reason=missing_credential remote=127.0.0.1:49696
+2026-09-29T12:32:13.232427Z  INFO lingxi_service: request handled request_id=req-bd4e19b5cb6866610d11a2027448dd9f method=GET path=/lingxi/v1/ws status=401
+2026-09-29T12:32:13.232979Z  INFO lingxi_service: request handled request_id=req-079e33b57b60ac7579d09faebf7f41b3 method=POST path=/lingxi/v1/ws-ticket status=200
+2026-09-29T12:32:13.233410Z  INFO lingxi_service: request handled request_id=req-8a7308627e24ba1f1fd1db8b47be77cd method=GET path=/lingxi/v1/ws status=101
+LINGXI_AUTH_REJECTED request_id=req-73fbaec385f0cef07cbfa999c910e16f method=GET path=/lingxi/v1/ws status=401 reason=invalid_ws_ticket remote=127.0.0.1:49699
+2026-09-29T12:32:13.234945Z  INFO lingxi_service: request handled request_id=req-73fbaec385f0cef07cbfa999c910e16f method=GET path=/lingxi/v1/ws status=401
+2026-09-29T12:32:13.235483Z  INFO lingxi_service: request handled request_id=req-f129577521c1aa1d60c0677c682b414c method=GET path=/lingxi/v1/ws status=101
+2026-09-29T12:32:13.236292Z  INFO lingxi_service: request handled request_id=req-db8ea63d3d07757412f5fee90ed7750b method=GET path=/lingxi/v1/ws status=101
+2026-09-29T12:32:13.236791Z  WARN lingxi_service: ws session read failed err=unmasked client frame
+2026-09-29T12:32:13.237130Z  INFO lingxi_service: request handled request_id=req-8cc75b75a11fb27029de85136e5afbc2 method=GET path=/lingxi/v1/ws status=101
+2026-09-29T12:32:13.237601Z  WARN lingxi_service: ws session read failed err=unmasked client frame
+2026-09-29T12:32:13.237915Z  INFO lingxi_service: request handled request_id=req-15a29d76150ad9653bc7beee24f142f0 method=GET path=/lingxi/v1/ws status=101
+2026-09-29T12:32:13.238419Z  WARN lingxi_service: ws session read failed err=unmasked client frame
+2026-09-29T12:32:13.238731Z  INFO lingxi_service: request handled request_id=req-78f2bd0229310bfc19d39916979362f9 method=GET path=/lingxi/v1/ws status=101
+2026-09-29T12:32:13.239194Z  WARN lingxi_service: ws session read failed err=unmasked client frame
+LINGXI_TRANSPORT_REJECTED request_id=req-604448de8a11106561ee1ef3cc5276f1 method=GET path=/lingxi/v1/ws status=400 reason=unsupported Sec-WebSocket-Version
+2026-09-29T12:32:13.239551Z  INFO lingxi_service: request handled request_id=req-604448de8a11106561ee1ef3cc5276f1 method=GET path=/lingxi/v1/ws status=400
+LINGXI_TRANSPORT_REJECTED request_id=req-a3f1728080a72fcc294694b9db01b1e4 method=GET path=/lingxi/v1/ws status=400 reason=missing or invalid Sec-WebSocket-Key
+2026-09-29T12:32:13.240098Z  INFO lingxi_service: request handled request_id=req-a3f1728080a72fcc294694b9db01b1e4 method=GET path=/lingxi/v1/ws status=400
+LINGXI_TRANSPORT_REJECTED request_id=req-98ccd5ec8886f1831f6c962d0a41f498 method=GET path=/lingxi/v1/ws status=400 reason=missing or invalid Sec-WebSocket-Key
+2026-09-29T12:32:13.240629Z  INFO lingxi_service: request handled request_id=req-98ccd5ec8886f1831f6c962d0a41f498 method=GET path=/lingxi/v1/ws status=400
+LINGXI_TRANSPORT_REJECTED request_id=req-2b8cb5f4954af72b28423cb1efece72a method=GET path=/lingxi/v1/ws status=400 reason=missing Upgrade: websocket
+2026-09-29T12:32:13.241146Z  INFO lingxi_service: request handled request_id=req-2b8cb5f4954af72b28423cb1efece72a method=GET path=/lingxi/v1/ws status=400
+LINGXI_TRANSPORT_REJECTED request_id=req-de6d2beef6fa5f2de9b7ec90fa847141 method=GET path=/lingxi/v1/ws status=400 reason=missing Connection: upgrade
+2026-09-29T12:32:13.241667Z  INFO lingxi_service: request handled request_id=req-de6d2beef6fa5f2de9b7ec90fa847141 method=GET path=/lingxi/v1/ws status=400
+LINGXI_AUTH_REJECTED request_id=req-9d1c11d276f22117d96f7d68129487ab method=GET path=/lingxi/v1/health/ status=401 Unauthorized reason=missing_credential remote=127.0.0.1:49710
+2026-09-29T12:32:13.242141Z  INFO lingxi_service: request handled request_id=req-9d1c11d276f22117d96f7d68129487ab method=GET path=/lingxi/v1/health/ status=401
+LINGXI_AUTH_REJECTED request_id=req-11a785306c8cb42609fb85535287d806 method=GET path=/lingxi/v1/web-auth/session/ status=401 Unauthorized reason=missing_credential remote=127.0.0.1:49711
+2026-09-29T12:32:13.242671Z  INFO lingxi_service: request handled request_id=req-11a785306c8cb42609fb85535287d806 method=GET path=/lingxi/v1/web-auth/session/ status=401
+2026-09-29T12:32:14.410527Z  INFO lingxi_service: request handled request_id=req-243eccfd1e7e86372fef2af45982cbf7 method=POST path=/lingxi/v1/devices/credentials status=201
+2026-09-29T12:32:15.585161Z  INFO lingxi_service: request handled request_id=req-dfe2aad645b5fd37df2536f31ddb3ded method=GET path=/lingxi/v1/ws status=101
+2026-09-29T12:32:15.639023Z  INFO lingxi_service: request handled request_id=req-fcdba77875a1016f4e4ed6dabd45062b method=POST path=/lingxi/v1/devices/credentials/cred_795785af495bcddf5b30f8970039e7e2/revoke status=200
+2026-09-29T12:32:17.761065Z  INFO lingxi_service: request handled request_id=req-fff5190bcb58e9b0cac1087fb427651a method=PUT path=/lingxi/v1/access/account/password status=200
+2026-09-29T12:32:18.904277Z  INFO lingxi_service: request handled request_id=req-73c1c8a064ecfe49da7820e86bfed17d method=POST path=/lingxi/v1/web-auth/login status=200
+2026-09-29T12:32:18.915600Z  INFO lingxi_service: request handled request_id=req-0c6e397053a304c92b62a321fbd7fb57 method=POST path=/lingxi/v1/ws-ticket status=200
+2026-09-29T12:32:18.916212Z  INFO lingxi_service: request handled request_id=req-edba3e4ae98da893b0b07ed9fe1238ad method=GET path=/lingxi/v1/ws status=101
+2026-09-29T12:32:18.937013Z  INFO lingxi_service: request handled request_id=req-bdd220af6bced926aecd620e5db3bf4b method=POST path=/lingxi/v1/web-auth/logout status=200
+2026-09-29T12:32:19.921459Z  INFO lingxi_service: request handled request_id=req-8af413373097201b07015f73b0615847 method=POST path=/lingxi/v1/ws-ticket status=200
+LINGXI_AUTH_REJECTED request_id=req-f17cb7dbc7f857cf3860189fbd9d281d method=GET path=/lingxi/v1/ws status=401 reason=invalid_ws_ticket remote=127.0.0.1:49756
+2026-09-29T12:32:51.634643Z  INFO lingxi_service: request handled request_id=req-f17cb7dbc7f857cf3860189fbd9d281d method=GET path=/lingxi/v1/ws status=401
+2026-09-29T12:32:51.690591Z  INFO lingxi_service: request handled request_id=req-43aa06a10c233b93927d2734b7ab3571 method=GET path=/lingxi/v1/sessions/sess_local_alpha status=200
+2026-09-29T12:32:51.728923Z  INFO lingxi_service: request handled request_id=req-0f614c70672dfb00664c3aa0daae7ef8 method=GET path=/lingxi/v1/me status=200
+2026-09-29T12:32:51.805436Z  INFO lingxi_service: shutdown signal: SIGTERM
+2026-09-29T12:32:51.806559Z  INFO lingxi_service::shutdown: run database closed (drained, WAL truncated) phase=storage_close
+2026-09-29T12:32:51.806832Z  INFO lingxi_service::shutdown: own instance record removed, lock released phase=record_cleanup
+2026-09-29T12:32:51.806925Z  INFO lingxi_service: lingxi-service stopped cleanly (run database closed, own record removed, lock released)

@@ -1,0 +1,282 @@
+
+> lingxi@0.1.43 test
+> vitest run --exclude '**/.claude/**' --exclude '**/.cache/**' --exclude '**/dist/**' --exclude '**/dist-server/**' --exclude '**/dist-computer-use/**' --exclude '**/dist-sandbox/**' --run tests/post-verification-audit-seal.test.ts
+
+
+ RUN  v4.1.10 /Users/study_superior/Desktop/Code/LingxiAgent
+
+ ❯ tests/post-verification-audit-seal.test.ts (3 tests | 1 failed) 113ms
+     ✓ VERIFIED_SOURCE_SHA is a valid 40-hex commit object in this repo 82ms
+     × changes since VERIFIED_SOURCE_SHA are audit-only (allowlist enforced) 30ms
+     ✓ the audit-seal test and generator are both present for the guard to be self-consistent 0ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  tests/post-verification-audit-seal.test.ts > post-verification audit seal (diff guard) > changes since VERIFIED_SOURCE_SHA are audit-only (allowlist enforced)
+AssertionError: VERIFIED_SOURCE_SHA 之后出现了非审计文件改动（禁止修改生产代码/测试逻辑/runtime artifacts）:
+.gitignore
+artifacts/rust-tauri/R02/T01/a01-cargo-metadata.json
+artifacts/rust-tauri/R02/T01/a01-deptree-evidence.txt
+artifacts/rust-tauri/R02/T01/a01-health-body.json
+artifacts/rust-tauri/R02/T01/a01-shutdown.txt
+artifacts/rust-tauri/R02/T01/a01-smoke-summary.txt
+artifacts/rust-tauri/R02/T01/a02-negative-summary.txt
+artifacts/rust-tauri/R02/T02/a03-forged-record.json
+artifacts/rust-tauri/R02/T02/a03-inst1-health.json
+artifacts/rust-tauri/R02/T02/a03-inst2-marker.txt
+artifacts/rust-tauri/R02/T02/a03-summary.txt
+artifacts/rust-tauri/R02/T02/a04-summary.txt
+artifacts/rust-tauri/R02/T03/.last-body
+artifacts/rust-tauri/R02/T03/body-limit.txt
+artifacts/rust-tauri/R02/T03/creds-after-authz.json
+artifacts/rust-tauri/R02/T03/creds-before-authz.json
+artifacts/rust-tauri/R02/T03/devices-after-authz.json
+artifacts/rust-tauri/R02/T03/devices-before-authz.json
+artifacts/rust-tauri/R02/T03/server-stderr-markers.txt
+artifacts/rust-tauri/R02/T03/state-after-authn.txt
+artifacts/rust-tauri/R02/T03/state-after.txt
+artifacts/rust-tauri/R02/T03/state-before-authz.txt
+artifacts/rust-tauri/R02/T03/state-before.txt
+artifacts/rust-tauri/R02/T03/summary.txt
+artifacts/rust-tauri/R02/T03/ws-matrix.json
+artifacts/rust-tauri/R02/T04/gates/r02_t01_service_smoke/a01-cargo-metadata.err
+artifacts/rust-tauri/R02/T04/gates/r02_t01_service_smoke/a01-cargo-metadata.json
+artifacts/rust-tauri/R02/T04/gates/r02_t01_service_smoke/a01-health-body.json
+artifacts/rust-tauri/R02/T04/gates/r02_t02_dual_instance/a03-forged-record.json
+artifacts/rust-tauri/R02/T04/gates/r02_t02_dual_instance/a03-inst1-health.json
+artifacts/rust-tauri/R02/T04/gates/r02_t02_dual_instance/a03-inst2-marker.txt
+artifacts/rust-tauri/R02/T04/gates/r02_t02_dual_instance/a03-summary.txt
+artifacts/rust-tauri/R02/T04/gates/r02_t02_path_priority/a04-summary.txt
+artifacts/rust-tauri/R02/T04/gates/r02_t03_auth_matrix/.last-body
+artifacts/rust-tauri/R02/T04/gates/r02_t03_auth_matrix/body-limit.txt
+artifacts/rust-tauri/R02/T04/gates/r02_t03_auth_matrix/creds-after-authz.json
+artifacts/rust-tauri/R02/T04/gates/r02_t03_auth_matrix/creds-before-authz.json
+artifacts/rust-tauri/R02/T04/gates/r02_t03_auth_matrix/devices-after-authz.json
+artifacts/rust-tauri/R02/T04/gates/r02_t03_auth_matrix/devices-before-authz.json
+artifacts/rust-tauri/R02/T04/gates/r02_t03_auth_matrix/state-after-authn.txt
+artifacts/rust-tauri/R02/T04/gates/r02_t03_auth_matrix/state-after.txt
+artifacts/rust-tauri/R02/T04/gates/r02_t03_auth_matrix/state-before-authz.txt
+artifacts/rust-tauri/R02/T04/gates/r02_t03_auth_matrix/state-before.txt
+artifacts/rust-tauri/R02/T04/gates/r02_t03_auth_matrix/summary.txt
+artifacts/rust-tauri/R02/T04/gates/r02_t03_auth_matrix/ws-matrix.json
+artifacts/rust-tauri/R02/T04/last-db-hashes.txt
+artifacts/rust-tauri/R02/T04/s1-counts-after-stop.json
+artifacts/rust-tauri/R02/T04/s2-counts-after-crash.json
+artifacts/rust-tauri/R02/T04/s2-runs-dump.jsonl
+artifacts/rust-tauri/R02/T04/s3-fault.err
+artifacts/rust-tauri/R02/T04/s3-fault.out
+artifacts/rust-tauri/R02/T04/s4-hashes-after.txt
+artifacts/rust-tauri/R02/T04/s4-hashes-before.txt
+artifacts/rust-tauri/R02/T04/s4-migrations-round1.json
+artifacts/rust-tauri/R02/T04/s4-migrations-round2.json
+artifacts/rust-tauri/R02/T04/s4-migrations-round3.json
+artifacts/rust-tauri/R02/T04/service-s1.err
+artifacts/rust-tauri/R02/T04/service-s1.out
+artifacts/rust-tauri/R02/T04/service-s1b.err
+artifacts/rust-tauri/R02/T04/service-s1b.out
+artifacts/rust-tauri/R02/T04/service-s2.err
+artifacts/rust-tauri/R02/T04/service-s2.out
+artifacts/rust-tauri/R02/T04/service-s2b.err
+artifacts/rust-tauri/R02/T04/service-s2b.out
+artifacts/rust-tauri/R02/T04/service-s4-1.err
+artifacts/rust-tauri/R02/T04/service-s4-1.out
+artifacts/rust-tauri/R02/T04/service-s4-2.err
+artifacts/rust-tauri/R02/T04/service-s4-2.out
+artifacts/rust-tauri/R02/T04/service-s4-3.err
+artifacts/rust-tauri/R02/T04/service-s4-3.out
+artifacts/rust-tauri/R02/T04/service.addr
+artifacts/rust-tauri/R02/T04/service.pid
+artifacts/rust-tauri/R02/T04/summary.txt
+docs/rust-tauri/ORCHESTRATOR_PROGRESS.json
+docs/rust-tauri/R01/DEPENDENCY_RULES.json
+docs/rust-tauri/R02/R02-T01_REPORT.md
+docs/rust-tauri/R02/R02-T01_REVIEW_R1.md
+docs/rust-tauri/R02/R02-T02_REPORT.md
+docs/rust-tauri/R02/R02-T02_REVIEW_R1.md
+docs/rust-tauri/R02/R02-T03_REPORT.md
+docs/rust-tauri/R02/R02-T03_REVIEW_R1.md
+docs/rust-tauri/R02/R02-T04_REPORT.md
+docs/rust-tauri/R02/R02-T04_REVIEW_R1.md
+docs/rust-tauri/R02/R02-T04_STORAGE_REGISTRY.json
+rust/Cargo.lock
+rust/Cargo.toml
+rust/crates/lingxi-adapters/Cargo.toml
+rust/crates/lingxi-adapters/src/bin/lingxi-storage-inspect.rs
+rust/crates/lingxi-adapters/src/lib.rs
+rust/crates/lingxi-adapters/src/storage/migrations.rs
+rust/crates/lingxi-adapters/src/storage/mod.rs
+rust/crates/lingxi-adapters/src/storage/queue.rs
+rust/crates/lingxi-adapters/src/storage/run_store.rs
+rust/crates/lingxi-adapters/tests/disk_full_fault.rs
+rust/crates/lingxi-adapters/tests/migration_idempotency.rs
+rust/crates/lingxi-adapters/tests/storage_transactions.rs
+rust/crates/lingxi-kernel/src/lib.rs
+rust/crates/lingxi-kernel/src/ports.rs
+rust/crates/lingxi-service/Cargo.toml
+rust/crates/lingxi-service/src/auth.rs
+rust/crates/lingxi-service/src/config.rs
+rust/crates/lingxi-service/src/instance.rs
+rust/crates/lingxi-service/src/lib.rs
+rust/crates/lingxi-service/src/limits.rs
+rust/crates/lingxi-service/src/main.rs
+rust/crates/lingxi-service/src/paths.rs
+rust/crates/lingxi-service/src/sessions.rs
+rust/crates/lingxi-service/src/transport.rs
+rust/crates/lingxi-service/src/ws.rs
+rust/crates/lingxi-service/tests/auth_matrix.rs
+rust/crates/lingxi-service/tests/instance_lifecycle.rs
+rust/crates/lingxi-service/tests/service_health.rs
+rust/crates/lingxi-service/tests/service_persistence.rs
+scripts/rust-tauri/r02_t01_boundary_negative.sh
+scripts/rust-tauri/r02_t01_service_smoke.sh
+scripts/rust-tauri/r02_t02_dual_instance.sh
+scripts/rust-tauri/r02_t02_f01_env_token_negative.sh
+scripts/rust-tauri/r02_t02_path_priority.sh
+scripts/rust-tauri/r02_t03_auth_matrix.sh
+scripts/rust-tauri/r02_t03_ws_probe.py
+scripts/rust-tauri/r02_t04_storage_tx.sh: expected [ '.gitignore', …(120) ] to deeply equal []
+
+- Expected
++ Received
+
+- []
++ [
++   ".gitignore",
++   "artifacts/rust-tauri/R02/T01/a01-cargo-metadata.json",
++   "artifacts/rust-tauri/R02/T01/a01-deptree-evidence.txt",
++   "artifacts/rust-tauri/R02/T01/a01-health-body.json",
++   "artifacts/rust-tauri/R02/T01/a01-shutdown.txt",
++   "artifacts/rust-tauri/R02/T01/a01-smoke-summary.txt",
++   "artifacts/rust-tauri/R02/T01/a02-negative-summary.txt",
++   "artifacts/rust-tauri/R02/T02/a03-forged-record.json",
++   "artifacts/rust-tauri/R02/T02/a03-inst1-health.json",
++   "artifacts/rust-tauri/R02/T02/a03-inst2-marker.txt",
++   "artifacts/rust-tauri/R02/T02/a03-summary.txt",
++   "artifacts/rust-tauri/R02/T02/a04-summary.txt",
++   "artifacts/rust-tauri/R02/T03/.last-body",
++   "artifacts/rust-tauri/R02/T03/body-limit.txt",
++   "artifacts/rust-tauri/R02/T03/creds-after-authz.json",
++   "artifacts/rust-tauri/R02/T03/creds-before-authz.json",
++   "artifacts/rust-tauri/R02/T03/devices-after-authz.json",
++   "artifacts/rust-tauri/R02/T03/devices-before-authz.json",
++   "artifacts/rust-tauri/R02/T03/server-stderr-markers.txt",
++   "artifacts/rust-tauri/R02/T03/state-after-authn.txt",
++   "artifacts/rust-tauri/R02/T03/state-after.txt",
++   "artifacts/rust-tauri/R02/T03/state-before-authz.txt",
++   "artifacts/rust-tauri/R02/T03/state-before.txt",
++   "artifacts/rust-tauri/R02/T03/summary.txt",
++   "artifacts/rust-tauri/R02/T03/ws-matrix.json",
++   "artifacts/rust-tauri/R02/T04/gates/r02_t01_service_smoke/a01-cargo-metadata.err",
++   "artifacts/rust-tauri/R02/T04/gates/r02_t01_service_smoke/a01-cargo-metadata.json",
++   "artifacts/rust-tauri/R02/T04/gates/r02_t01_service_smoke/a01-health-body.json",
++   "artifacts/rust-tauri/R02/T04/gates/r02_t02_dual_instance/a03-forged-record.json",
++   "artifacts/rust-tauri/R02/T04/gates/r02_t02_dual_instance/a03-inst1-health.json",
++   "artifacts/rust-tauri/R02/T04/gates/r02_t02_dual_instance/a03-inst2-marker.txt",
++   "artifacts/rust-tauri/R02/T04/gates/r02_t02_dual_instance/a03-summary.txt",
++   "artifacts/rust-tauri/R02/T04/gates/r02_t02_path_priority/a04-summary.txt",
++   "artifacts/rust-tauri/R02/T04/gates/r02_t03_auth_matrix/.last-body",
++   "artifacts/rust-tauri/R02/T04/gates/r02_t03_auth_matrix/body-limit.txt",
++   "artifacts/rust-tauri/R02/T04/gates/r02_t03_auth_matrix/creds-after-authz.json",
++   "artifacts/rust-tauri/R02/T04/gates/r02_t03_auth_matrix/creds-before-authz.json",
++   "artifacts/rust-tauri/R02/T04/gates/r02_t03_auth_matrix/devices-after-authz.json",
++   "artifacts/rust-tauri/R02/T04/gates/r02_t03_auth_matrix/devices-before-authz.json",
++   "artifacts/rust-tauri/R02/T04/gates/r02_t03_auth_matrix/state-after-authn.txt",
++   "artifacts/rust-tauri/R02/T04/gates/r02_t03_auth_matrix/state-after.txt",
++   "artifacts/rust-tauri/R02/T04/gates/r02_t03_auth_matrix/state-before-authz.txt",
++   "artifacts/rust-tauri/R02/T04/gates/r02_t03_auth_matrix/state-before.txt",
++   "artifacts/rust-tauri/R02/T04/gates/r02_t03_auth_matrix/summary.txt",
++   "artifacts/rust-tauri/R02/T04/gates/r02_t03_auth_matrix/ws-matrix.json",
++   "artifacts/rust-tauri/R02/T04/last-db-hashes.txt",
++   "artifacts/rust-tauri/R02/T04/s1-counts-after-stop.json",
++   "artifacts/rust-tauri/R02/T04/s2-counts-after-crash.json",
++   "artifacts/rust-tauri/R02/T04/s2-runs-dump.jsonl",
++   "artifacts/rust-tauri/R02/T04/s3-fault.err",
++   "artifacts/rust-tauri/R02/T04/s3-fault.out",
++   "artifacts/rust-tauri/R02/T04/s4-hashes-after.txt",
++   "artifacts/rust-tauri/R02/T04/s4-hashes-before.txt",
++   "artifacts/rust-tauri/R02/T04/s4-migrations-round1.json",
++   "artifacts/rust-tauri/R02/T04/s4-migrations-round2.json",
++   "artifacts/rust-tauri/R02/T04/s4-migrations-round3.json",
++   "artifacts/rust-tauri/R02/T04/service-s1.err",
++   "artifacts/rust-tauri/R02/T04/service-s1.out",
++   "artifacts/rust-tauri/R02/T04/service-s1b.err",
++   "artifacts/rust-tauri/R02/T04/service-s1b.out",
++   "artifacts/rust-tauri/R02/T04/service-s2.err",
++   "artifacts/rust-tauri/R02/T04/service-s2.out",
++   "artifacts/rust-tauri/R02/T04/service-s2b.err",
++   "artifacts/rust-tauri/R02/T04/service-s2b.out",
++   "artifacts/rust-tauri/R02/T04/service-s4-1.err",
++   "artifacts/rust-tauri/R02/T04/service-s4-1.out",
++   "artifacts/rust-tauri/R02/T04/service-s4-2.err",
++   "artifacts/rust-tauri/R02/T04/service-s4-2.out",
++   "artifacts/rust-tauri/R02/T04/service-s4-3.err",
++   "artifacts/rust-tauri/R02/T04/service-s4-3.out",
++   "artifacts/rust-tauri/R02/T04/service.addr",
++   "artifacts/rust-tauri/R02/T04/service.pid",
++   "artifacts/rust-tauri/R02/T04/summary.txt",
++   "docs/rust-tauri/ORCHESTRATOR_PROGRESS.json",
++   "docs/rust-tauri/R01/DEPENDENCY_RULES.json",
++   "docs/rust-tauri/R02/R02-T01_REPORT.md",
++   "docs/rust-tauri/R02/R02-T01_REVIEW_R1.md",
++   "docs/rust-tauri/R02/R02-T02_REPORT.md",
++   "docs/rust-tauri/R02/R02-T02_REVIEW_R1.md",
++   "docs/rust-tauri/R02/R02-T03_REPORT.md",
++   "docs/rust-tauri/R02/R02-T03_REVIEW_R1.md",
++   "docs/rust-tauri/R02/R02-T04_REPORT.md",
++   "docs/rust-tauri/R02/R02-T04_REVIEW_R1.md",
++   "docs/rust-tauri/R02/R02-T04_STORAGE_REGISTRY.json",
++   "rust/Cargo.lock",
++   "rust/Cargo.toml",
++   "rust/crates/lingxi-adapters/Cargo.toml",
++   "rust/crates/lingxi-adapters/src/bin/lingxi-storage-inspect.rs",
++   "rust/crates/lingxi-adapters/src/lib.rs",
++   "rust/crates/lingxi-adapters/src/storage/migrations.rs",
++   "rust/crates/lingxi-adapters/src/storage/mod.rs",
++   "rust/crates/lingxi-adapters/src/storage/queue.rs",
++   "rust/crates/lingxi-adapters/src/storage/run_store.rs",
++   "rust/crates/lingxi-adapters/tests/disk_full_fault.rs",
++   "rust/crates/lingxi-adapters/tests/migration_idempotency.rs",
++   "rust/crates/lingxi-adapters/tests/storage_transactions.rs",
++   "rust/crates/lingxi-kernel/src/lib.rs",
++   "rust/crates/lingxi-kernel/src/ports.rs",
++   "rust/crates/lingxi-service/Cargo.toml",
++   "rust/crates/lingxi-service/src/auth.rs",
++   "rust/crates/lingxi-service/src/config.rs",
++   "rust/crates/lingxi-service/src/instance.rs",
++   "rust/crates/lingxi-service/src/lib.rs",
++   "rust/crates/lingxi-service/src/limits.rs",
++   "rust/crates/lingxi-service/src/main.rs",
++   "rust/crates/lingxi-service/src/paths.rs",
++   "rust/crates/lingxi-service/src/sessions.rs",
++   "rust/crates/lingxi-service/src/transport.rs",
++   "rust/crates/lingxi-service/src/ws.rs",
++   "rust/crates/lingxi-service/tests/auth_matrix.rs",
++   "rust/crates/lingxi-service/tests/instance_lifecycle.rs",
++   "rust/crates/lingxi-service/tests/service_health.rs",
++   "rust/crates/lingxi-service/tests/service_persistence.rs",
++   "scripts/rust-tauri/r02_t01_boundary_negative.sh",
++   "scripts/rust-tauri/r02_t01_service_smoke.sh",
++   "scripts/rust-tauri/r02_t02_dual_instance.sh",
++   "scripts/rust-tauri/r02_t02_f01_env_token_negative.sh",
++   "scripts/rust-tauri/r02_t02_path_priority.sh",
++   "scripts/rust-tauri/r02_t03_auth_matrix.sh",
++   "scripts/rust-tauri/r02_t03_ws_probe.py",
++   "scripts/rust-tauri/r02_t04_storage_tx.sh",
++ ]
+
+ ❯ tests/post-verification-audit-seal.test.ts:104:7
+    102|       `VERIFIED_SOURCE_SHA 之后出现了非审计文件改动（禁止修改生产代码/测试逻辑/runtime artifact…
+    103|         violators.join("\n"),
+    104|     ).toEqual([]);
+       |       ^
+    105|   });
+    106|
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  1 failed | 2 passed (3)
+   Start at  19:11:04
+   Duration  220ms (transform 24ms, setup 20ms, import 7ms, tests 113ms, environment 0ms)
+

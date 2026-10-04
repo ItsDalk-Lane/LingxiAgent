@@ -1,0 +1,13 @@
+[package]
+name = "review-t05-idle-probe"
+version = "0.0.0"
+edition = "2021"
+
+[dependencies]
+lingxi-service = { path = "../../../../../rust/crates/lingxi-service" }
+lingxi-kernel = { path = "../../../../../rust/crates/lingxi-kernel" }
+lingxi-protocol = { path = "../../../../../rust/crates/lingxi-protocol" }
+tokio = { version = "1", features = ["full"] }
+serde_json = { version = "1", features = ["preserve_order"] }
+
+[workspace]

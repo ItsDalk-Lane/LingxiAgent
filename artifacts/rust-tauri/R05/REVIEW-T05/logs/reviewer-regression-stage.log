@@ -1,0 +1,30 @@
+=== cargo test --manifest-path rust/Cargo.toml -p lingxi-service --test r05_t01_model_plane
+test c05_reload_through_management_surface_swaps_atomically ... ok
+
+test result: ok. 7 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 1.30s
+
+exit=0
+=== cargo test --manifest-path rust/Cargo.toml -p lingxi-service --test r05_t02_credentials
+test c07_a_transient_refresh_failure_is_bounded_by_the_attempt_policy ... ok
+
+test result: ok. 16 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 3.03s
+
+exit=0
+=== cargo test --manifest-path rust/Cargo.toml -p lingxi-service --test r05_t03_protocol_adapters
+test c12_retry_continues_the_confirmed_exchange_without_rebuild_or_redo ... ok
+
+test result: ok. 10 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 1.80s
+
+exit=0
+=== cargo test --manifest-path rust/Cargo.toml -p lingxi-service --test r05_t04_streaming
+test c15_anthropic_in_stream_error_event_retries_cleanly ... ok
+
+test result: ok. 9 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 1.77s
+
+exit=0
+=== cargo test --manifest-path rust/Cargo.toml -p lingxi-service --test r04_t08_tool_matrix
+test approval_face_share_cases ... ok
+
+test result: ok. 10 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 300.77s
+
+exit=0

@@ -1,0 +1,25 @@
+   Compiling lingxi-adapters v0.0.0 (/private/tmp/r03-g04-redcheck/rust/crates/lingxi-adapters)
+   Compiling lingxi-service v0.0.0 (/private/tmp/r03-g04-redcheck/rust/crates/lingxi-service)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 5.80s
+     Running tests/admission_dedup_adversarial.rs (target/debug/deps/admission_dedup_adversarial-874804375557d917)
+
+running 5 tests
+test adv_c01_spawn_window_failure_and_retraction_leave_no_sticky_state ... ok
+test adv_c02_response_lost_inside_start_window_resolves_lazily ... ok
+test adv_c03_isolation_controls_hold_while_a_key_is_mid_admission ... ok
+test adv_c04_response_lost_before_any_external_effect_replays_real_run ... ok
+test adv_c05_restart_with_unknown_side_effects_refuses_explicitly ... ok
+
+test result: ok. 5 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.44s
+
+     Running tests/admission_dedup_consistency.rs (target/debug/deps/admission_dedup_consistency-9a04c825c923e96f)
+
+running 5 tests
+test r03_f05_c01_background_spawn_rejection_leaves_no_ghost_replay ... ok
+test r03_f05_c02_start_transaction_failure_is_compensated ... ok
+test r03_f05_c03_concurrent_same_key_between_reservation_and_commit ... ok
+test r03_f05_c04_post_side_effect_response_loss_never_reexecutes ... ok
+test r03_f05_c05_restart_same_key_is_an_explicit_contract_not_a_blind_redo ... ok
+
+test result: ok. 5 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.38s
+

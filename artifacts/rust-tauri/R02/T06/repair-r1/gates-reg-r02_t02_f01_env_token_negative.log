@@ -1,0 +1,11 @@
+== [1/4] green baseline
+RESULT: OK (ownership contract + dependency rules + negative battery)
+== [2/4] inject std::env::var into lingxi-kernel source (non-comment)
+checker exit with injection: 1
+FAIL [D3] DEP-08: forbidden token 'std::env::' in rust/crates/lingxi-kernel/src/lib.rs
+== [3/4] restore and verify byte equality against pre-run sha256
+cleanup: restored injected kernel lib.rs from backup
+kernel lib.rs byte-identical to pre-run state: OK
+== [4/4] checker green again
+RESULT: OK (ownership contract + dependency rules + negative battery)
+F01 RESULT: PASS (env token in kernel is machine-rejected; restoration byte-verified; checker green)

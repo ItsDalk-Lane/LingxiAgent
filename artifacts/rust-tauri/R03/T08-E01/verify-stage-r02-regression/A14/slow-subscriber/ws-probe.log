@@ -1,0 +1,6 @@
+A subscribed: {'frameKind': 'control', 'fromSeq': '0', 'mode': 'snapshot', 'snapshotSeq': '0', 'streamId': 'sess_local_alpha', 'type': 'subscribed'}
+B subscribed: {'frameKind': 'control', 'fromSeq': '0', 'mode': 'snapshot', 'snapshotSeq': '0', 'streamId': 'sess_local_alpha', 'type': 'subscribed'}
+writer storm done: 1000 requests, statuses ['200', "<HTTPError 409: 'Conflict'>"]
+Traceback (most recent call last):
+  File "<stdin>", line 183, in <module>
+AssertionError: every execute must answer 200 (no stall, no fake success)

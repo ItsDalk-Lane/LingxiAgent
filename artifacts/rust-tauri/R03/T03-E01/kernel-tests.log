@@ -1,0 +1,30 @@
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.03s
+     Running unittests src/lib.rs (/tmp/r03-t03-target/debug/deps/lingxi_kernel-f99620b4fb8292b5)
+
+running 23 tests
+test ports::tests::failed_commit_yields_error_and_no_events ... ok
+test ports::tests::non_terminal_outcome_is_rejected_before_storage ... ok
+test ports::tests::non_terminal_state_change_surface_is_kernel_gated ... ok
+test ports::tests::principal_storage_vocabulary_is_stable ... ok
+test tests::cancellation_resolves_only_to_cancelled ... ok
+test tests::cancelling_cannot_be_revoked_back_to_running ... ok
+test ports::tests::retryable_classification_is_conservative ... ok
+test tests::final_message_exists_only_when_truly_produced ... ok
+test ports::tests::successful_commit_returns_events_for_post_commit_publication ... ok
+test tests::finalize_diagnoses_self_disagreeing_stored_state ... ok
+test tests::finalize_from_running_commits_legal_terminal ... ok
+test tests::finalize_is_idempotent_only_for_completely_identical_settlements ... ok
+test tests::finalize_rejects_illegal_pre_terminal_transition ... ok
+test tests::finalize_rejects_non_terminal_request ... ok
+test tests::happy_path_queued_to_completed ... ok
+test tests::identity_layers_are_distinct_and_stable ... ok
+test tests::queued_cannot_skip_to_completed ... ok
+test tests::run_context_carries_identity_only ... ok
+test tests::run_finish_maps_every_variant_to_its_status_and_reason_code ... ok
+test tests::seq_precision_holds_across_kernel_boundary ... ok
+test tests::settlement_of_with_final_carries_the_message_and_stable_reason ... ok
+test tests::terminal_states_reject_every_transition ... ok
+test tests::finalize_property_first_settlement_wins_and_never_flips ... ok
+
+test result: ok. 23 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+

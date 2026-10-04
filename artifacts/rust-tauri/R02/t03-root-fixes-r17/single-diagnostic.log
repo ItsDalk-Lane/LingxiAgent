@@ -1,0 +1,19 @@
+   Compiling lingxi-service v0.0.0 (/Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-service)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.79s
+     Running tests/auth_matrix.rs (/tmp/r02-t03-root-fixes-target/debug/deps/auth_matrix-6834fbcf9868a4a4)
+
+running 1 test
+
+thread 'a06_unmasked_client_frame_closes_with_protocol_error' (37053990) panicked at crates/lingxi-service/tests/auth_matrix.rs:113:21:
+readiness: channel closed; service result: Ok(Err(Bind { addr: 127.0.0.1:0, source: Os { code: 1, kind: PermissionDenied, message: "Operation not permitted" } }))
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+test a06_unmasked_client_frame_closes_with_protocol_error ... FAILED
+
+failures:
+
+failures:
+    a06_unmasked_client_frame_closes_with_protocol_error
+
+test result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 17 filtered out; finished in 0.05s
+
+error: test failed, to rerun pass `-p lingxi-service --test auth_matrix`

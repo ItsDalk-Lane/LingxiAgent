@@ -1,0 +1,20 @@
+   Compiling lingxi-adapters v0.0.0 (/private/tmp/r03-g04-redcheck/rust/crates/lingxi-adapters)
+   Compiling lingxi-service v0.0.0 (/private/tmp/r03-g04-redcheck/rust/crates/lingxi-service)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 5.24s
+     Running tests/g04r1_reviewer_probe.rs (target/debug/deps/g04r1_reviewer_probe-92780b46fdb7b9fc)
+
+running 1 test
+test g04r1_probe_background_internal_start_failure_is_compensated ... 
+thread 'g04r1_probe_background_internal_start_failure_is_compensated' (43197547) panicked at crates/lingxi-service/tests/g04r1_reviewer_probe.rs:363:5:
+the retry must be a fresh admission
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+FAILED
+
+failures:
+
+failures:
+    g04r1_probe_background_internal_start_failure_is_compensated
+
+test result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 0 filtered out; finished in 5.38s
+
+error: test failed, to rerun pass `-p lingxi-service --test g04r1_reviewer_probe`

@@ -1,0 +1,8 @@
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.19s
+  Executable unittests src/lib.rs (/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T//rust-target-r04-rr1-g05/debug/deps/lingxi_service-2efee771bac256a2)
+  Executable tests/r04_rr1_f02_reaper_cleanup.rs (/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T//rust-target-r04-rr1-g05/debug/deps/r04_rr1_f02_reaper_cleanup-63b3fadf6236d10c)
+  Executable tests/r04_rr1_f03_stop_honesty.rs (/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T//rust-target-r04-rr1-g05/debug/deps/r04_rr1_f03_stop_honesty-ce53dd7aad2c6de6)
+  Executable tests/r04_rr1_f04_pty_consumption.rs (/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T//rust-target-r04-rr1-g05/debug/deps/r04_rr1_f04_pty_consumption-404cead91f195ee2)
+  Executable tests/r04_rr1_f05_output_integrity.rs (/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T//rust-target-r04-rr1-g05/debug/deps/r04_rr1_f05_output_integrity-344623c78921d99a)
+  Executable tests/r04_rr1_f05_spill_failure.rs (/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T//rust-target-r04-rr1-g05/debug/deps/r04_rr1_f05_spill_failure-d4f7ecfeaff8f4b3)
+  Executable tests/r04_t05_registry_capacity.rs (/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T//rust-target-r04-rr1-g05/debug/deps/r04_t05_registry_capacity-90233b75f77616ae)

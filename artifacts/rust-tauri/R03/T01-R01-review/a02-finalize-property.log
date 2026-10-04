@@ -1,0 +1,27 @@
+   Compiling serde_core v1.0.229
+   Compiling serde_json v1.0.151
+   Compiling memchr v2.8.3
+   Compiling smallvec v1.16.1
+   Compiling cc v1.4.7
+   Compiling tracing-core v0.1.36
+   Compiling digest v0.11.3
+   Compiling tokio v1.53.1
+   Compiling sha1 v0.11.0
+   Compiling sha2 v0.11.0
+   Compiling tracing v0.1.44
+   Compiling libsqlite3-sys v0.38.2
+   Compiling serde v1.0.229
+   Compiling schemars v1.2.2
+   Compiling lingxi-protocol v0.0.0 (/Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-protocol)
+   Compiling lingxi-kernel v0.0.0 (/Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-kernel)
+   Compiling rusqlite v0.40.2
+   Compiling lingxi-adapters v0.0.0 (/Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-adapters)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 6.97s
+     Running tests/run_finalize_property.rs (/tmp/r03-t01-review-target/debug/deps/run_finalize_property-d4f1c28d16cb2741)
+
+running 2 tests
+test out_of_order_illegal_settlement_is_rejected_and_run_still_settles_once ... ok
+test r03_a02_duplicate_and_out_of_order_settlements_settle_exactly_once ... ok
+
+test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.19s
+

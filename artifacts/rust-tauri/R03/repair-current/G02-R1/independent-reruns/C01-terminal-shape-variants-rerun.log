@@ -1,0 +1,9 @@
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.08s
+     Running tests/cancel_terminal_race.rs (target/debug/deps/cancel_terminal_race-7862bed29c7d76a7)
+
+running 2 tests
+test cancel_accepted_before_the_terminal_claim_beats_every_terminal_shape ... ok
+test cancel_accepted_before_the_terminal_claim_beats_the_failed_terminal_too ... ok
+
+test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 11 filtered out; finished in 0.10s
+

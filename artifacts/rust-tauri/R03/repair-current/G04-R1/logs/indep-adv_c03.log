@@ -1,0 +1,8 @@
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.08s
+     Running tests/admission_dedup_adversarial.rs (target/debug/deps/admission_dedup_adversarial-874804375557d917)
+
+running 1 test
+test adv_c03_isolation_controls_hold_while_a_key_is_mid_admission ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 4 filtered out; finished in 0.05s
+

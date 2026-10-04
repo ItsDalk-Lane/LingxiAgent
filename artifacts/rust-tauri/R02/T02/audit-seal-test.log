@@ -1,0 +1,74 @@
+
+ RUN  v4.1.10 /Users/study_superior/Desktop/Code/LingxiAgent
+
+ ❯ tests/post-verification-audit-seal.test.ts (3 tests | 1 failed) 60ms
+     ✓ VERIFIED_SOURCE_SHA is a valid 40-hex commit object in this repo 43ms
+     × changes since VERIFIED_SOURCE_SHA are audit-only (allowlist enforced) 16ms
+     ✓ the audit-seal test and generator are both present for the guard to be self-consistent 0ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  tests/post-verification-audit-seal.test.ts > post-verification audit seal (diff guard) > changes since VERIFIED_SOURCE_SHA are audit-only (allowlist enforced)
+AssertionError: VERIFIED_SOURCE_SHA 之后出现了非审计文件改动（禁止修改生产代码/测试逻辑/runtime artifacts）:
+.gitignore
+artifacts/rust-tauri/R02/T01/a01-cargo-metadata.json
+artifacts/rust-tauri/R02/T01/a01-deptree-evidence.txt
+artifacts/rust-tauri/R02/T01/a01-health-body.json
+artifacts/rust-tauri/R02/T01/a01-shutdown.txt
+artifacts/rust-tauri/R02/T01/a01-smoke-summary.txt
+artifacts/rust-tauri/R02/T01/a02-negative-summary.txt
+docs/rust-tauri/ORCHESTRATOR_PROGRESS.json
+docs/rust-tauri/R01/DEPENDENCY_RULES.json
+docs/rust-tauri/R02/R02-T01_REPORT.md
+docs/rust-tauri/R02/R02-T01_REVIEW_R1.md
+rust/Cargo.lock
+rust/Cargo.toml
+rust/crates/lingxi-service/Cargo.toml
+rust/crates/lingxi-service/src/lib.rs
+rust/crates/lingxi-service/src/main.rs
+rust/crates/lingxi-service/tests/service_health.rs
+scripts/rust-tauri/r02_t01_boundary_negative.sh
+scripts/rust-tauri/r02_t01_service_smoke.sh: expected [ '.gitignore', …(18) ] to deeply equal []
+
+- Expected
++ Received
+
+- []
++ [
++   ".gitignore",
++   "artifacts/rust-tauri/R02/T01/a01-cargo-metadata.json",
++   "artifacts/rust-tauri/R02/T01/a01-deptree-evidence.txt",
++   "artifacts/rust-tauri/R02/T01/a01-health-body.json",
++   "artifacts/rust-tauri/R02/T01/a01-shutdown.txt",
++   "artifacts/rust-tauri/R02/T01/a01-smoke-summary.txt",
++   "artifacts/rust-tauri/R02/T01/a02-negative-summary.txt",
++   "docs/rust-tauri/ORCHESTRATOR_PROGRESS.json",
++   "docs/rust-tauri/R01/DEPENDENCY_RULES.json",
++   "docs/rust-tauri/R02/R02-T01_REPORT.md",
++   "docs/rust-tauri/R02/R02-T01_REVIEW_R1.md",
++   "rust/Cargo.lock",
++   "rust/Cargo.toml",
++   "rust/crates/lingxi-service/Cargo.toml",
++   "rust/crates/lingxi-service/src/lib.rs",
++   "rust/crates/lingxi-service/src/main.rs",
++   "rust/crates/lingxi-service/tests/service_health.rs",
++   "scripts/rust-tauri/r02_t01_boundary_negative.sh",
++   "scripts/rust-tauri/r02_t01_service_smoke.sh",
++ ]
+
+ ❯ tests/post-verification-audit-seal.test.ts:104:7
+    102|       `VERIFIED_SOURCE_SHA 之后出现了非审计文件改动（禁止修改生产代码/测试逻辑/runtime artifact…
+    103|         violators.join("\n"),
+    104|     ).toEqual([]);
+       |       ^
+    105|   });
+    106|
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  1 failed | 2 passed (3)
+   Start at  15:02:10
+   Duration  161ms (transform 26ms, setup 22ms, import 7ms, tests 60ms, environment 0ms)
+

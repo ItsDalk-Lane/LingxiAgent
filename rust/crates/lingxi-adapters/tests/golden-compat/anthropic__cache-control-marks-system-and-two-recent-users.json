@@ -1,0 +1,94 @@
+{
+  "schema": "r05-t05-compat-golden/v1",
+  "module": "anthropic",
+  "case": "cache-control-marks-system-and-two-recent-users",
+  "model": {
+    "provider": "anthropic",
+    "id": "claude-sonnet-5",
+    "baseUrl": "https://api.anthropic.com",
+    "api": "anthropic-messages"
+  },
+  "payload": {
+    "model": "claude-sonnet-5",
+    "system": "you are helpful",
+    "messages": [
+      {
+        "role": "user",
+        "content": "one"
+      },
+      {
+        "role": "assistant",
+        "content": "reply"
+      },
+      {
+        "role": "user",
+        "content": [
+          {
+            "type": "text",
+            "text": "two"
+          }
+        ]
+      },
+      {
+        "role": "user",
+        "content": "three"
+      }
+    ],
+    "max_tokens": 16384
+  },
+  "options": {
+    "mode": "chat"
+  },
+  "expected": {
+    "thinkingFormat": "anthropic",
+    "reasoningProfile": null,
+    "matched": "anthropic",
+    "result": {
+      "model": "claude-sonnet-5",
+      "system": [
+        {
+          "type": "text",
+          "text": "you are helpful",
+          "cache_control": {
+            "type": "ephemeral"
+          }
+        }
+      ],
+      "messages": [
+        {
+          "role": "user",
+          "content": "one"
+        },
+        {
+          "role": "assistant",
+          "content": "reply"
+        },
+        {
+          "role": "user",
+          "content": [
+            {
+              "type": "text",
+              "text": "two",
+              "cache_control": {
+                "type": "ephemeral"
+              }
+            }
+          ]
+        },
+        {
+          "role": "user",
+          "content": [
+            {
+              "type": "text",
+              "text": "three",
+              "cache_control": {
+                "type": "ephemeral"
+              }
+            }
+          ]
+        }
+      ],
+      "max_tokens": 16384
+    }
+  }
+}

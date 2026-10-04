@@ -1,0 +1,1 @@
+{"schema": "lingxi.r02-a07-live-fault-check.v1", "case": "http_running_storage_fault_has_no_success_event_or_restart_run", "status": "FAIL", "issues": ["restart.keyEvents mismatch"]}

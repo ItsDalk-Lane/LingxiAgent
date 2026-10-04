@@ -1,0 +1,11 @@
+   Compiling lingxi-service v0.0.0 (/Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-service)
+error[E0433]: failed to resolve: use of unresolved module or unlinked crate `rand`
+   --> crates/lingxi-service/src/security_audit.rs:169:112
+    |
+169 |         let path = std::env::temp_dir().join(format!("lingxi-security-audit-{name}-{}-{}", std::process::id(), rand::random::<u64>()));
+    |                                                                                                                ^^^^ use of unresolved module or unlinked crate `rand`
+    |
+    = help: if you wanted to use a crate named `rand`, use `cargo add rand` to add it to your `Cargo.toml`
+
+For more information about this error, try `rustc --explain E0433`.
+error: could not compile `lingxi-service` (lib test) due to 1 previous error

@@ -1,0 +1,32 @@
+{
+  "schema": "r05-t05-compat-golden/v1",
+  "module": "deepseek",
+  "case": "utility-mode-disables",
+  "model": {
+    "provider": "deepseek",
+    "baseUrl": "https://api.deepseek.com",
+    "id": "deepseek-reasoner",
+    "reasoning": true,
+    "api": "openai-completions"
+  },
+  "payload": {
+    "model": "deepseek-reasoner",
+    "messages": [],
+    "reasoning_effort": "high"
+  },
+  "options": {
+    "mode": "utility"
+  },
+  "expected": {
+    "thinkingFormat": "deepseek",
+    "reasoningProfile": null,
+    "matched": "deepseek",
+    "result": {
+      "model": "deepseek-reasoner",
+      "messages": [],
+      "thinking": {
+        "type": "disabled"
+      }
+    }
+  }
+}

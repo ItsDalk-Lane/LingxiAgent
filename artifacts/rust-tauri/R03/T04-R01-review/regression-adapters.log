@@ -1,0 +1,48 @@
+   Compiling serde_core v1.0.229
+   Compiling serde_json v1.0.151
+   Compiling memchr v2.8.3
+   Compiling smallvec v1.16.1
+   Compiling cc v1.4.7
+   Compiling tracing-core v0.1.36
+   Compiling digest v0.11.3
+   Compiling tokio v1.53.1
+   Compiling sha2 v0.11.0
+   Compiling sha1 v0.11.0
+   Compiling tracing v0.1.44
+   Compiling libsqlite3-sys v0.38.2
+   Compiling serde v1.0.229
+   Compiling schemars v1.2.2
+   Compiling lingxi-protocol v0.0.0 (/Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-protocol)
+   Compiling rusqlite v0.40.2
+   Compiling lingxi-kernel v0.0.0 (/Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-kernel)
+   Compiling lingxi-adapters v0.0.0 (/Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-adapters)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 4.41s
+     Running tests/migration_idempotency.rs (/tmp/r03-t04-r01-review-target/debug/deps/migration_idempotency-77b1745e9db7ca1e)
+
+running 2 tests
+test tampered_version_rollback_is_rejected_not_replayed ... ok
+test repeated_migration_checks_are_idempotent ... ok
+
+test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.03s
+
+     Running tests/run_finalize_property.rs (/tmp/r03-t04-r01-review-target/debug/deps/run_finalize_property-d4f1c28d16cb2741)
+
+running 2 tests
+test out_of_order_illegal_settlement_is_rejected_and_run_still_settles_once ... ok
+test r03_a02_duplicate_and_out_of_order_settlements_settle_exactly_once ... ok
+
+test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.16s
+
+     Running tests/storage_transactions.rs (/tmp/r03-t04-r01-review-target/debug/deps/storage_transactions-55eb35e51f13d372)
+
+running 7 tests
+test bounded_queue_reports_full_instead_of_dropping ... ok
+test wal_mode_is_negotiated_and_reported ... ok
+test read_only_data_dir_is_a_loud_open_failure ... ok
+test graceful_close_checkpoints_and_data_survives_restart ... ok
+test finalize_is_idempotent_and_conflicts_are_diagnosed ... ok
+test a07_crash_windows_distinguish_commit_boundaries ... ok
+test busy_timeout_is_explicit_not_a_hang ... ok
+
+test result: ok. 7 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.24s
+

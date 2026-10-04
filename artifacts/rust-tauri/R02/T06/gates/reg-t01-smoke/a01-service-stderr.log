@@ -1,0 +1,11 @@
+2026-09-26T15:11:39.470299Z  INFO lingxi_service: data root resolved effective_home=/tmp/lingxi-r02-t01-smoke-home.UpyB2H source=cli ignored_sources=none
+2026-09-26T15:11:39.471000Z  INFO lingxi_service: data root prepared (canonicalized; runtime dir private 0700) canonical_home=/private/tmp/lingxi-r02-t01-smoke-home.UpyB2H runtime_dir=/private/tmp/lingxi-r02-t01-smoke-home.UpyB2H/lingxi-service
+2026-09-26T15:11:39.471489Z  INFO lingxi_service: single-writer lock acquired instance_id=c58c78b66df296e7c91c6762ef1a7ed9 start_nonce=57fcfe1f0edd2ec7 pid=28829 entropy="os-random-device" lock=/private/tmp/lingxi-r02-t01-smoke-home.UpyB2H/lingxi-service/instance.lock network_mode=loopback
+2026-09-26T15:11:39.499941Z  INFO lingxi_service: data-epoch gate passed home=/private/tmp/lingxi-r02-t01-smoke-home.UpyB2H decision=ProceedStampedNew(EpochStamp { format: V2, minimum_reader_epoch: 1, committed_data_epoch: 1, last_version: Some("0.0.0") })
+2026-09-26T15:11:39.533398Z  INFO lingxi_adapters::storage::run_store: run database migrated db=/private/tmp/lingxi-r02-t01-smoke-home.UpyB2H/lingxi-service/data/runs.db applied=[1] version=1
+2026-09-26T15:11:39.533693Z  INFO lingxi_service: auth service bootstrapped (per-start loopback token, owner-only);          run database migrated and seeded local_token_file=/private/tmp/lingxi-r02-t01-smoke-home.UpyB2H/lingxi-service/local-token.json run_database=/private/tmp/lingxi-r02-t01-smoke-home.UpyB2H/lingxi-service/data/runs.db
+2026-09-26T15:11:39.541930Z  INFO lingxi_service: instance record published (atomic write) record=/private/tmp/lingxi-r02-t01-smoke-home.UpyB2H/lingxi-service/instance.json bind_addr=127.0.0.1:65097
+2026-09-26T15:11:39.626240Z  INFO lingxi_service: shutdown signal: SIGTERM
+2026-09-26T15:11:39.627053Z  INFO lingxi_service::shutdown: run database closed (drained, WAL truncated) phase=storage_close
+2026-09-26T15:11:39.627267Z  INFO lingxi_service::shutdown: own instance record removed, lock released phase=record_cleanup
+2026-09-26T15:11:39.627291Z  INFO lingxi_service: lingxi-service stopped cleanly (run database closed, own record removed, lock released)

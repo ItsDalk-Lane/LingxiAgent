@@ -26,9 +26,10 @@ use std::pin::Pin;
 use std::sync::Arc;
 use std::time::Duration;
 
+use lingxi_kernel::model_exchange::ModelTurnInput;
 use lingxi_kernel::ports::{
     ProviderDescriptor, ProviderTurnResult, ToolExecutionResult, ToolExecutorPort, ToolOutcome,
-    ToolRequest, TurnProviderPort,
+    ToolRequest, TurnDeltaSink, TurnProviderPort,
 };
 use lingxi_kernel::RunContext;
 use lingxi_protocol::{
@@ -61,13 +62,16 @@ impl TurnProviderPort for OneToolThenFinalProvider {
         &'a self,
         ctx: &'a RunContext,
         _call: &'a ModelCallId,
-        turn: u32,
-        _input: &'a str,
+        input: &'a ModelTurnInput,
+
+        _deltas: &'a dyn TurnDeltaSink,
     ) -> Pin<Box<dyn std::future::Future<Output = ProviderTurnResult> + Send + 'a>> {
+        let turn = input.turn;
         let ctx_at_issue = ctx.clone();
         Box::pin(async move {
             let out = if turn == 1 {
                 lingxi_kernel::ports::ProviderTurn::ToolRequests {
+                    content: Vec::new(),
                     requests: vec![ToolRequest::from_effective_arguments(
                         "park.tool",
                         serde_json::json!({

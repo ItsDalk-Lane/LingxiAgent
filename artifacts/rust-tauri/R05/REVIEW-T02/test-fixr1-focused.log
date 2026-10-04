@@ -1,0 +1,68 @@
+== start: 2026-10-02T14:24:21Z ==
+== r05_t02_credentials ==
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.09s
+     Running tests/r05_t02_credentials.rs (rust/target/debug/deps/r05_t02_credentials-c4e2fc9a5d7713b1)
+
+running 16 tests
+test c07_a_second_401_after_refresh_never_retriggers_a_refresh ... ok
+test c07_a_transient_refresh_failure_is_bounded_by_the_attempt_policy ... ok
+test c06_a_persist_failure_is_reported_honestly_full_chain ... ok
+test c12_management_surface_is_local_only_and_forgery_is_refused ... ok
+test c09_marker_secret_never_reaches_durable_state_and_echoes_are_scrubbed ... ok
+test c11_store_concurrency_fidelity_and_restart_semantics ... ok
+test c05_a_revoked_credential_never_resurrects_full_chain ... ok
+test c04_a_cancelled_waiter_leaves_the_shared_refresh_intact ... ok
+test c07_oauth_without_a_login_fails_before_any_request ... ok
+test c07_a_static_key_401_is_terminal_without_any_refresh ... ok
+test c07_invalid_grant_is_terminal_reauthorization_never_a_retry ... ok
+test c10_a_redirect_is_never_followed_with_credentials ... ok
+test c01_all_purposes_resolve_through_the_single_credential_service ... ok
+test c03_a_blocked_refresh_never_blocks_other_providers ... ok
+test c02_concurrent_401s_merge_into_one_refresh_full_chain ... ok
+test o1_same_model_id_on_two_keyed_providers_never_crosses_material ... ok
+
+test result: ok. 16 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 4.40s
+
+== exit: 0 ==
+== r05_t02_oauth_flows ==
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.08s
+     Running tests/r05_t02_oauth_flows.rs (rust/target/debug/deps/r05_t02_oauth_flows-45599c2a5c670775)
+
+running 20 tests
+test pkce_each_begin_mints_fresh_state_and_verifier ... ok
+test pkce_cancellation_while_waiting_is_clean ... ok
+test pkce_duplicate_callback_is_refused_by_the_closed_listener ... ok
+test pkce_error_callback_and_codeless_callback_are_terminal_and_loud ... ok
+test pkce_expired_state_is_rejected_at_the_loop_top_and_after_accept ... ok
+test device_code_cancellation_wins_at_the_wait ... ok
+test pkce_wrong_state_is_a_400_and_the_flow_survives_for_the_valid_one ... ok
+test token_endpoint_redirect_is_never_followed ... ok
+test device_code_untrusted_verification_uri_is_a_loud_protocol_failure ... ok
+test pkce_happy_path_binds_state_and_verifier_to_the_exchange ... ok
+test sub_second_expires_in_mints_an_immediately_expired_token ... ok
+test missing_expires_in_falls_back_to_jwt_exp_and_refuses_when_absent ... ok
+test refresh_happy_path_and_refresh_token_rollover_rule ... ok
+test device_code_endpoint_echoes_are_scrubbed_of_in_play_material ... ok
+test device_code_deadline_expires_the_flow ... ok
+test device_code_happy_path_prompts_once_and_mints_tokens ... ok
+test device_code_slow_down_grows_the_interval_by_five_seconds ... ok
+test refresh_classification_invalid_grant_401_transient_and_scrub ... ok
+test device_code_denial_and_expired_token_are_terminal_and_distinct ... ok
+test refresh_timeout_is_transient_never_terminal ... ok
+
+test result: ok. 20 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.55s
+
+== exit: 0 ==
+== start: 2026-10-02T14:24:48Z ==
+== lingxi-service --lib ==
+
+test result: ok. 334 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 7.71s
+
+== lingxi-adapters --lib ==
+
+test result: ok. 45 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.16s
+
+== lingxi-kernel --lib ==
+
+test result: ok. 82 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.01s
+

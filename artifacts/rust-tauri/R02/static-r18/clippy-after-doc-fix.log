@@ -1,0 +1,160 @@
+   Compiling serde_derive v1.0.229
+   Compiling ref-cast-impl v1.0.27
+   Compiling tokio-macros v2.7.2
+   Compiling serde_derive_internals v0.30.0
+   Compiling tracing-attributes v0.1.31
+   Compiling futures-macro v0.3.34
+   Compiling synstructure v0.14.0
+   Compiling zerovec-derive v0.11.6
+   Compiling displaydoc v0.2.7
+   Compiling libsqlite3-sys v0.38.2
+   Compiling aws-lc-sys v0.45.0
+    Checking num v0.4.3
+   Compiling strum_macros v0.28.0
+   Compiling ring v0.17.14
+   Compiling thiserror-impl v2.0.21
+   Compiling encoding_rs v0.8.42
+    Checking unicode-general-category v1.1.0
+    Checking yasna v0.6.0
+    Checking xtask v0.1.0 (/Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/xtask)
+    Checking fraction v0.17.0
+   Compiling zerofrom-derive v0.1.8
+   Compiling yoke-derive v0.8.3
+    Checking ref-cast v1.0.27
+    Checking tokio v1.53.1
+   Compiling schemars_derive v1.2.2
+    Checking futures-util v0.3.34
+    Checking tracing v0.1.44
+    Checking thiserror v2.0.21
+    Checking zerofrom v0.1.8
+    Checking strum v0.28.0
+    Checking serde v1.0.229
+    Checking axum-core v0.5.6
+    Checking tracing-subscriber v0.3.23
+    Checking yoke v0.8.3
+    Checking rcgen v0.14.10
+    Checking chrono v0.4.45
+    Checking serde_urlencoded v0.7.1
+    Checking ahash v0.8.12
+    Checking fluent-uri v0.4.1
+    Checking email_address v0.2.9
+    Checking lingxi-browser-spike v0.0.0 (/Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-browser-spike)
+    Checking zerovec v0.11.8
+    Checking zerotrie v0.2.5
+    Checking futures-executor v0.3.34
+    Checking jsonschema-value v0.57.0
+    Checking futures v0.3.34
+    Checking referencing v0.57.0
+    Checking rusqlite v0.40.2
+    Checking tokio-util v0.7.19
+    Checking tower v0.5.3
+    Checking tokio-stream v0.1.19
+    Checking schemars v1.2.2
+    Checking h2 v0.4.19
+    Checking tinystr v0.8.4
+    Checking potential_utf v0.1.6
+    Checking icu_locale_core v2.3.0
+    Checking icu_collections v2.3.0
+    Checking lingxi-protocol v0.0.0 (/Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-protocol)
+    Checking rmcp v3.4.1
+    Checking icu_provider v2.3.1
+    Checking icu_normalizer v2.3.0
+    Checking icu_properties v2.3.0
+    Checking idna_adapter v1.2.2
+    Checking lingxi-kernel v0.0.0 (/Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-kernel)
+    Checking idna v1.1.0
+    Checking lingxi-adapters v0.0.0 (/Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-adapters)
+    Checking hyper v1.11.1
+    Checking url v2.5.8
+    Checking tower-http v0.6.11
+    Checking hyper-util v0.1.21
+   Compiling aws-lc-rs v1.18.1
+    Checking axum v0.8.9
+   Compiling rustls v0.23.45
+    Checking rustls-webpki v0.103.15
+    Checking tokio-rustls v0.26.5
+    Checking rustls-platform-verifier v0.7.1
+    Checking hyper-rustls v0.27.10
+    Checking lingxi-service v0.0.0 (/Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-service)
+    Checking reqwest v0.13.5
+    Checking jsonschema v0.57.0
+error: usage of `bool::then` in `filter_map`
+    --> crates/lingxi-service/src/management.rs:1389:14
+     |
+1389 |               .filter_map(|&scope| {
+     |  ______________^
+1390 | |                 (scope == "resources.read" || requested.iter().any(|item| item == scope))
+1391 | |                     .then(|| scope.into())
+1392 | |             })
+     | |______________^ help: use `filter` then `map` instead: `filter(|&&scope| (scope == "resources.read" || requested.iter().any(|item| item == scope))).map(|&scope| scope.into())`
+     |
+     = help: for further information visit https://rust-lang.github.io/rust-clippy/rust-1.98.0/index.html#filter_map_bool_then
+     = note: `-D clippy::filter-map-bool-then` implied by `-D warnings`
+     = help: to override `-D warnings` add `#[allow(clippy::filter_map_bool_then)]`
+
+error: unneeded `return` statement
+   --> crates/lingxi-service/src/security_audit.rs:105:9
+    |
+105 |         return Ok(file);
+    |         ^^^^^^^^^^^^^^^
+    |
+    = help: for further information visit https://rust-lang.github.io/rust-clippy/rust-1.98.0/index.html#needless_return
+    = note: `-D clippy::needless-return` implied by `-D warnings`
+    = help: to override `-D warnings` add `#[allow(clippy::needless_return)]`
+help: remove `return`
+    |
+105 -         return Ok(file);
+105 +         Ok(file)
+    |
+
+error: this expression creates a reference which is immediately dereferenced by the compiler
+  --> crates/lingxi-service/src/serve.rs:96:48
+   |
+96 |     let certs = CertificateDer::pem_slice_iter(&cert_pem)
+   |                                                ^^^^^^^^^ help: change this to: `cert_pem`
+   |
+   = help: for further information visit https://rust-lang.github.io/rust-clippy/rust-1.98.0/index.html#needless_borrow
+   = note: `-D clippy::needless-borrow` implied by `-D warnings`
+   = help: to override `-D warnings` add `#[allow(clippy::needless_borrow)]`
+
+error: this expression creates a reference which is immediately dereferenced by the compiler
+   --> crates/lingxi-service/src/serve.rs:110:45
+    |
+110 |     let key = PrivateKeyDer::from_pem_slice(&key_pem).map_err(|err| {
+    |                                             ^^^^^^^^ help: change this to: `key_pem`
+    |
+    = help: for further information visit https://rust-lang.github.io/rust-clippy/rust-1.98.0/index.html#needless_borrow
+
+error: this function has too many arguments (8/7)
+   --> crates/lingxi-service/src/serve.rs:218:1
+    |
+218 | / fn handle_connection(
+219 | |     router: Router,
+220 | |     signal_tx: &watch::Sender<()>,
+221 | |     close_rx: &watch::Receiver<()>,
+...   |
+226 | |     tls_acceptor: Option<TlsAcceptor>,
+227 | | ) {
+    | |_^
+    |
+    = help: for further information visit https://rust-lang.github.io/rust-clippy/rust-1.98.0/index.html#too_many_arguments
+    = note: `-D clippy::too-many-arguments` implied by `-D warnings`
+    = help: to override `-D warnings` add `#[allow(clippy::too_many_arguments)]`
+
+error: this function has too many arguments (8/7)
+   --> crates/lingxi-service/src/transport.rs:261:1
+    |
+261 | / pub fn check_service_origin(
+262 | |     origin_header: Option<&str>,
+263 | |     host_header: &str,
+264 | |     mode: NetworkMode,
+...   |
+269 | |     public_base_url: Option<&str>,
+270 | | ) -> OriginVerdict {
+    | |__________________^
+    |
+    = help: for further information visit https://rust-lang.github.io/rust-clippy/rust-1.98.0/index.html#too_many_arguments
+
+error: could not compile `lingxi-service` (lib) due to 6 previous errors
+warning: build failed, waiting for other jobs to finish...
+error: could not compile `lingxi-service` (lib test) due to 6 previous errors

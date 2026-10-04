@@ -1,0 +1,13 @@
+
+> lingxi@0.1.43 test
+> vitest run --exclude '**/.claude/**' --exclude '**/.cache/**' --exclude '**/dist/**' --exclude '**/dist-server/**' --exclude '**/dist-computer-use/**' --exclude '**/dist-sandbox/**' --run desktop/src/react/__tests__/services/server-connection.test.ts desktop/src/react/__tests__/services/websocket.test.ts desktop/src/react/__tests__/services/R02RustWebSocket.test.ts desktop/src/react/__tests__/app-init.test.ts
+
+
+ RUN  v4.1.10 /Users/study_superior/Desktop/Code/LingxiAgent
+
+
+ Test Files  4 passed (4)
+      Tests  48 passed (48)
+   Start at  17:51:12
+   Duration  650ms (transform 1.03s, setup 74ms, import 975ms, tests 680ms, environment 0ms)
+

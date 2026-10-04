@@ -1,0 +1,86 @@
+
+running 6 tests
+test f04_c02_dispatched_no_result_variants_classify_consistently_unknown ... FAILED
+test f04_c01_panic_after_side_effect_journals_unknown_not_confirmed_failure ... FAILED
+test f04_c01_adv_panic_before_side_effect_is_still_unknown ... FAILED
+test f04_c04_adv_control_verified_idempotent_recovery_uses_only_the_original_key ... FAILED
+test f04_c03_trusted_negatives_survive_alongside_the_unknown ... FAILED
+test f04_c04_recovery_and_repeat_recovery_do_not_redo_unknown ... FAILED
+
+failures:
+
+---- f04_c02_dispatched_no_result_variants_classify_consistently_unknown stdout ----
+
+thread 'f04_c02_dispatched_no_result_variants_classify_consistently_unknown' (42987391) panicked at crates/lingxi-service/tests/tool_receipt_unknown.rs:193:21:
+F04 controlled fault: runner died AFTER the external action (target lost.after, key run_000001a0dcba6c00_000001-tc0001, digest digest-1-run_000001a0dcba6c00_000001-tc0001)
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+
+thread 'f04_c02_dispatched_no_result_variants_classify_consistently_unknown' (42987391) panicked at crates/lingxi-service/tests/tool_receipt_unknown.rs:183:21:
+F04 controlled fault: runner died BEFORE the external action (target lost.before, key run_000001a0dcba6c00_000001-tc0002)
+
+thread 'f04_c02_dispatched_no_result_variants_classify_consistently_unknown' (42987391) panicked at crates/lingxi-service/tests/tool_receipt_unknown.rs:820:9:
+assertion `left == right` failed: entry 0 (lost.after) must classify unknown: Failed
+  left: Failed
+ right: Unknown
+
+---- f04_c01_panic_after_side_effect_journals_unknown_not_confirmed_failure stdout ----
+
+thread 'f04_c01_panic_after_side_effect_journals_unknown_not_confirmed_failure' (42987390) panicked at crates/lingxi-service/tests/tool_receipt_unknown.rs:193:21:
+F04 controlled fault: runner died AFTER the external action (target notify.fault, key run_000001a0dcba6c00_000001-tc0001, digest digest-1-run_000001a0dcba6c00_000001-tc0001)
+
+thread 'f04_c01_panic_after_side_effect_journals_unknown_not_confirmed_failure' (42987390) panicked at crates/lingxi-service/tests/tool_receipt_unknown.rs:563:5:
+assertion `left == right` failed: a dispatched-no-receipt panic must journal unknown, got Failed
+  left: Failed
+ right: Unknown
+
+---- f04_c01_adv_panic_before_side_effect_is_still_unknown stdout ----
+
+thread 'f04_c01_adv_panic_before_side_effect_is_still_unknown' (42987389) panicked at crates/lingxi-service/tests/tool_receipt_unknown.rs:183:21:
+F04 controlled fault: runner died BEFORE the external action (target notify.fault, key run_000001a0dcba6c00_000001-tc0001)
+
+thread 'f04_c01_adv_panic_before_side_effect_is_still_unknown' (42987389) panicked at crates/lingxi-service/tests/tool_receipt_unknown.rs:714:5:
+assertion `left == right` failed: 外部未动作且结果未知 still journals unknown (never a fabricated receipt): Failed
+  left: Failed
+ right: Unknown
+
+---- f04_c04_adv_control_verified_idempotent_recovery_uses_only_the_original_key stdout ----
+
+thread 'f04_c04_adv_control_verified_idempotent_recovery_uses_only_the_original_key' (42987393) panicked at crates/lingxi-service/tests/tool_receipt_unknown.rs:193:21:
+F04 controlled fault: runner died AFTER the external action (target ledger.idem, key run_000001a0dcba6c00_000001-tc0001, digest digest-1-run_000001a0dcba6c00_000001-tc0001)
+
+thread 'f04_c04_adv_control_verified_idempotent_recovery_uses_only_the_original_key' (42987393) panicked at crates/lingxi-service/tests/tool_receipt_unknown.rs:1274:5:
+assertion `left == right` failed
+  left: Failed
+ right: Unknown
+
+---- f04_c03_trusted_negatives_survive_alongside_the_unknown stdout ----
+
+thread 'f04_c03_trusted_negatives_survive_alongside_the_unknown' (42987392) panicked at crates/lingxi-service/tests/tool_receipt_unknown.rs:193:21:
+F04 controlled fault: runner died AFTER the external action (target panic.fault, key run_000001a0dcba6c00_000001-tc0003, digest digest-2-run_000001a0dcba6c00_000001-tc0003)
+
+thread 'f04_c03_trusted_negatives_survive_alongside_the_unknown' (42987392) panicked at crates/lingxi-service/tests/tool_receipt_unknown.rs:972:5:
+assertion `left == right` failed
+  left: Failed
+ right: Unknown
+
+---- f04_c04_recovery_and_repeat_recovery_do_not_redo_unknown stdout ----
+
+thread 'f04_c04_recovery_and_repeat_recovery_do_not_redo_unknown' (42987394) panicked at crates/lingxi-service/tests/tool_receipt_unknown.rs:193:21:
+F04 controlled fault: runner died AFTER the external action (target notify.fault, key run_000001a0dcba6c00_000001-tc0001, digest digest-1-run_000001a0dcba6c00_000001-tc0001)
+
+thread 'f04_c04_recovery_and_repeat_recovery_do_not_redo_unknown' (42987394) panicked at crates/lingxi-service/tests/tool_receipt_unknown.rs:1138:5:
+assertion `left == right` failed: the unknown side effect governs the run: recoverable_wait
+  left: "recoverable_wait"
+ right: "interrupted_needs_attention"
+
+
+failures:
+    f04_c01_adv_panic_before_side_effect_is_still_unknown
+    f04_c01_panic_after_side_effect_journals_unknown_not_confirmed_failure
+    f04_c02_dispatched_no_result_variants_classify_consistently_unknown
+    f04_c03_trusted_negatives_survive_alongside_the_unknown
+    f04_c04_adv_control_verified_idempotent_recovery_uses_only_the_original_key
+    f04_c04_recovery_and_repeat_recovery_do_not_redo_unknown
+
+test result: FAILED. 0 passed; 6 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.27s
+

@@ -1,0 +1,38 @@
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.08s
+     Running tests/r00_management_leaves.rs (rust/target/debug/deps/r00_management_leaves-e69473e77d8869c9)
+
+running 1 test
+test r00_management_positive_and_negative_branches_on_real_service ... FAILED
+
+failures:
+
+---- r00_management_positive_and_negative_branches_on_real_service stdout ----
+LINGXI_AUTH_REJECTED request_id=req-178fa3069b01fa30b3da0bc6e975fe4f method=GET path=/lingxi/v1/me status=401 Unauthorized reason=missing_credential remote=127.0.0.1:63009
+LINGXI_AUTH_REJECTED request_id=req-013c01af4706fd8b288219a6dc95140a method=GET path=/lingxi/v1/access/summary status=401 Unauthorized reason=missing_credential remote=127.0.0.1:63013
+LINGXI_AUTH_REJECTED request_id=req-aac3084413caa072292ac0dbe1d1822e method=PUT path=/lingxi/v1/access/account/profile status=401 Unauthorized reason=missing_credential remote=127.0.0.1:63018
+LINGXI_AUTH_REJECTED request_id=req-d8005564f785cdf84c64dee38021b8ae method=PUT path=/lingxi/v1/access/network status=401 Unauthorized reason=missing_credential remote=127.0.0.1:63021
+LINGXI_AUTH_REJECTED request_id=req-eabf3aa2228a95f074f89c3dce14f109 method=GET path=/lingxi/v1/access/mobile-qr.svg status=401 Unauthorized reason=missing_credential remote=127.0.0.1:63023
+LINGXI_AUTH_REJECTED request_id=req-5e603c0b826f5b895cf6c272b813c3ec method=PUT path=/lingxi/v1/access/account/password status=401 Unauthorized reason=missing_credential remote=127.0.0.1:63029
+LINGXI_AUTH_REJECTED request_id=req-c9e120046ea5008e4be044dabc27690f method=DELETE path=/lingxi/v1/access/account/password status=401 Unauthorized reason=missing_credential remote=127.0.0.1:63036
+LINGXI_AUTH_REJECTED request_id=req-65080bec3d82f6cd19e92f52456d9ac0 method=POST path=/lingxi/v1/access/mobile-credentials status=401 Unauthorized reason=missing_credential remote=127.0.0.1:63059
+LINGXI_AUTH_REJECTED request_id=req-7c9be3d4f7298772a7c25345116f8745 method=POST path=/lingxi/v1/access/desktop-credentials status=401 Unauthorized reason=missing_credential remote=127.0.0.1:63061
+LINGXI_AUTH_REJECTED request_id=req-4f3cd33b8caa7886457c4e26d1eb6fbd method=GET path=/lingxi/v1/devices status=401 Unauthorized reason=missing_credential remote=127.0.0.1:63064
+LINGXI_AUTH_REJECTED request_id=req-7625ec7e8a96aa485667baa15e5f2657 method=GET path=/lingxi/v1/me status=401 Unauthorized reason=invalid_credential remote=127.0.0.1:63067
+LINGXI_AUTH_REJECTED request_id=req-b4196df6a2f818b1244fe76b643ee575 method=POST path=/lingxi/v1/devices/credentials/cred_59fa18d6aae855a09756069815928504/revoke status=401 Unauthorized reason=missing_credential remote=127.0.0.1:63070
+LINGXI_AUTH_REJECTED request_id=req-272d7edcf20a5d05779a3beaa7923daa method=GET path=/lingxi/v1/me status=401 Unauthorized reason=invalid_credential remote=127.0.0.1:63081
+LINGXI_AUTH_REJECTED request_id=req-353ec8c6d739321ae2f285831663f100 method=POST path=/lingxi/v1/devices/device_99395c970250fde1803f113dee0bd985/revoke status=401 Unauthorized reason=missing_credential remote=127.0.0.1:63084
+LINGXI_AUTH_REJECTED request_id=req-6f36e8e2b3fc453d8ad1796713628723 method=POST path=/lingxi/v1/devices/pairing-sessions status=401 Unauthorized reason=missing_credential remote=127.0.0.1:63086
+LINGXI_AUTH_REJECTED request_id=req-aa4db34a58b85bf5feb099a83a5b565b method=POST path=/lingxi/v1/devices/pairing-sessions/pair_xDULR3iNcbyuC8hZ9jYzgw/approve status=401 Unauthorized reason=missing_credential remote=127.0.0.1:63125
+
+thread 'r00_management_positive_and_negative_branches_on_real_service' (1288618) panicked at crates/lingxi-service/tests/r00_management_leaves.rs:49:5:
+request to 192.168.3.5:63183 stalled during write/read exchange (POST /lingxi/v1/web-auth/login, 0 bytes read so far) — if addr is a non-loopback self-address, the macOS application firewall / proxy TUN may be blocking inbound connections to this unsigned test binary; this is an environment failure surfaced honestly, not a skipped assertion
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+
+
+failures:
+    r00_management_positive_and_negative_branches_on_real_service
+
+test result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 0 filtered out; finished in 52.27s
+
+error: test failed, to rerun pass `-p lingxi-service --test r00_management_leaves`
+r00 rerun exit code: 101

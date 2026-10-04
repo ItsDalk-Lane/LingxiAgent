@@ -2869,4 +2869,470 @@ mod map_tests {
              {total_pinned} tests — orphan executions or phantom ownership"
         );
     }
+
+    // ── R05 (registered 2026-10-03 by R05-T08) ─────────────────────────────
+    const R05_PRODUCTION: &str = include_str!("stage_maps/R05.json");
+
+    fn parse_production_r05() -> StageMap {
+        parse_stage_map(R05_PRODUCTION)
+            .expect("the registered R05 stage map must parse with this runner")
+    }
+
+    fn r05_repo_root() -> &'static Path {
+        Path::new(env!("CARGO_MANIFEST_DIR"))
+            .ancestors()
+            .nth(3)
+            .expect("xtask lives at rust/crates/xtask")
+    }
+
+    /// The pinned suite table of the R05 producer (pin <run> <count> <tag>),
+    /// read from the SINGLE source of truth TSV in docs/.
+    fn parse_r05_pin_table() -> Vec<(String, u32, String)> {
+        let text = std::fs::read_to_string(
+            r05_repo_root().join("docs/rust-tauri/R05/r05_stage_pins.tsv"),
+        )
+        .expect("docs/rust-tauri/R05/r05_stage_pins.tsv must exist (the R05 producer's pin table)");
+        let mut pins = Vec::new();
+        for line in text.lines() {
+            let line = line.trim();
+            if let Some(rest) = line.strip_prefix("pin ") {
+                let mut fields = rest.split_whitespace();
+                match (fields.next(), fields.next(), fields.next(), fields.next()) {
+                    (Some(run), Some(count), Some(tag), None) => pins.push((
+                        run.to_string(),
+                        count.parse::<u32>().expect("numeric pin count"),
+                        tag.to_string(),
+                    )),
+                    _ => panic!("unparseable pin line in the R05 pin TSV: {line:?}"),
+                }
+            }
+        }
+        pins
+    }
+
+    /// The C-ID ownership table of the R05 producer
+    /// (cid <C-ID> <run> <name1>+<name2>...), read from the TSV.
+    fn parse_r05_cid_table() -> Vec<(String, String, Vec<String>)> {
+        let text = std::fs::read_to_string(
+            r05_repo_root().join("docs/rust-tauri/R05/r05_stage_cids.tsv"),
+        )
+        .expect("docs/rust-tauri/R05/r05_stage_cids.tsv must exist (the R05 producer's cid table)");
+        let mut declared = Vec::new();
+        for line in text.lines() {
+            let line = line.trim();
+            if let Some(rest) = line.strip_prefix("cid ") {
+                let mut fields = rest.split_whitespace();
+                match (fields.next(), fields.next(), fields.next(), fields.next()) {
+                    (Some(cid), Some(run), Some(names), None) => {
+                        let names: Vec<String> = names.split('+').map(str::to_string).collect();
+                        assert!(
+                            !names.is_empty(),
+                            "cid line {line:?} owns no test name — a case with no \
+                             machine-checked test is the exit-0-only fake-green path"
+                        );
+                        declared.push((cid.to_string(), run.to_string(), names));
+                    }
+                    _ => panic!("unparseable cid line in the R05 cid TSV: {line:?}"),
+                }
+            }
+        }
+        declared
+    }
+
+    #[test]
+    fn r05_production_map_keeps_the_sixteen_a_scenarios_verbatim() {
+        let map = parse_production_r05();
+        // The frozen Appendix-A registration: id → commandRefs. The A15
+        // pattern pins the STANDARD battery; A16 additionally pins the R04
+        // regression gate (关键失败可复原 consumes the recovery chains).
+        let expected: &[(&str, &[&str])] = &[
+            ("R05-A01", &["rust_test_workspace", "r05_stage_suites"]),
+            ("R05-A02", &["rust_test_workspace", "r05_stage_suites"]),
+            ("R05-A03", &["rust_test_workspace", "r05_stage_suites"]),
+            ("R05-A04", &["rust_test_workspace", "r05_stage_suites"]),
+            ("R05-A05", &["rust_test_workspace", "r05_stage_suites"]),
+            ("R05-A06", &["rust_test_workspace", "r05_stage_suites"]),
+            ("R05-A07", &["rust_test_workspace", "r05_stage_suites"]),
+            ("R05-A08", &["rust_test_workspace", "r05_stage_suites"]),
+            ("R05-A09", &["rust_test_workspace", "r05_stage_suites"]),
+            ("R05-A10", &["rust_test_workspace", "r05_stage_suites"]),
+            ("R05-A11", &["rust_test_workspace", "r05_stage_suites"]),
+            ("R05-A12", &["rust_test_workspace", "r05_stage_suites"]),
+            ("R05-A13", &["rust_test_workspace", "r05_stage_suites"]),
+            ("R05-A14", &["rust_test_workspace", "r05_stage_suites"]),
+            (
+                "R05-A15",
+                &[
+                    "r05_stage_suites",
+                    "rust_test_workspace",
+                    "rust_fmt",
+                    "rust_clippy",
+                    "check_contracts",
+                    "check_boundaries",
+                ],
+            ),
+            (
+                "R05-A16",
+                &[
+                    "r05_stage_suites",
+                    "rust_test_workspace",
+                    "r04_regression_gate",
+                ],
+            ),
+        ];
+        for (id, refs) in expected {
+            let scenario = map
+                .scenarios
+                .iter()
+                .find(|s| s.id == *id)
+                .unwrap_or_else(|| panic!("R05 map dropped original scenario {id}"));
+            assert_eq!(scenario.requirement, "REQUIRED", "{id} re-graded");
+            assert_eq!(
+                &scenario
+                    .command_refs
+                    .iter()
+                    .map(String::as_str)
+                    .collect::<Vec<_>>(),
+                refs,
+                "scenario {id} commandRefs drifted from the T08 registration"
+            );
+        }
+        // No scenario beyond the 16 A-IDs + the two supplemental duty ids —
+        // an invented scenario that greens nothing must not register.
+        let known: Vec<&str> = map.scenarios.iter().map(|s| s.id.as_str()).collect();
+        assert_eq!(
+            known.len(),
+            18,
+            "the R05 map must carry exactly 16 A-IDs + 2 supplemental duties, got {known:?}"
+        );
+    }
+
+    #[test]
+    fn r05_production_map_registers_the_supplemental_duty_scenarios() {
+        let map = parse_production_r05();
+        for (id, refs) in [
+            (
+                "R05-SUP-R04REG",
+                vec!["r04_regression_gate", "rust_test_workspace"],
+            ),
+            (
+                "R05-SUP-SCOPE",
+                vec!["check_boundaries", "rust_test_workspace"],
+            ),
+        ] {
+            let scenario = map
+                .scenarios
+                .iter()
+                .find(|s| s.id == id)
+                .unwrap_or_else(|| panic!("R05 map dropped the supplemental-duty scenario {id}"));
+            assert_eq!(scenario.requirement, "REQUIRED");
+            assert_eq!(&scenario.command_refs, &refs, "{id} commandRefs drifted");
+        }
+    }
+
+    #[test]
+    fn r05_production_map_registers_the_suite_producer_and_r04_regression_gate() {
+        let map = parse_production_r05();
+        let producer = map
+            .commands
+            .iter()
+            .find(|c| c.key == "r05_stage_suites")
+            .unwrap_or_else(|| panic!("R05 map dropped the r05_stage_suites producer"));
+        assert_eq!(
+            producer.argv,
+            vec![
+                "bash",
+                "scripts/rust-tauri/r05_t08_stage_suites.sh",
+                "{EVIDENCE}/R05_SUITES"
+            ]
+        );
+        assert!(producer
+            .evidence_paths
+            .contains(&"{EVIDENCE}/R05_SUITES/r05-cases.json".to_string()));
+        let regression = map
+            .commands
+            .iter()
+            .find(|c| c.key == "r04_regression_gate")
+            .unwrap_or_else(|| panic!("R05 map dropped the r04_regression_gate command"));
+        assert!(regression.argv.contains(&"verify-stage".to_string()));
+        assert!(regression.argv.contains(&"R04".to_string()));
+        assert!(regression
+            .evidence_paths
+            .contains(&"{EVIDENCE}/R04_REGRESSION/verify-stage-result.json".to_string()));
+        // The producer script and both TSVs must exist in the tree (a
+        // deleted producer or table is a command that can only ever fail).
+        let root = r05_repo_root();
+        assert!(
+            root.join("scripts/rust-tauri/r05_t08_stage_suites.sh")
+                .is_file(),
+            "the registered r05_stage_suites producer script must exist"
+        );
+        assert!(root
+            .join("docs/rust-tauri/R05/r05_stage_pins.tsv")
+            .is_file());
+        assert!(root
+            .join("docs/rust-tauri/R05/r05_stage_cids.tsv")
+            .is_file());
+    }
+
+    #[test]
+    fn r05_production_map_mirrors_every_r00_supplemental_leaf_bound_to_r05() {
+        let map = parse_production_r05();
+        // The R00 ACCEPTANCE ledger (the runner's binding source) binds 130
+        // REQUIRED_SUPPLEMENTAL leaves to R05; the map must mirror the set
+        // EXACTLY (the runner cross-checks for equality before commands).
+        let ledger = std::fs::read_to_string(
+            r05_repo_root().join("docs/rust-tauri/R00/ACCEPTANCE_MAP.json"),
+        )
+        .expect("the R00 ACCEPTANCE_MAP ledger must be readable");
+        let value: serde_json::Value =
+            serde_json::from_str(&ledger).expect("the R00 ledger is valid JSON");
+        let bound: std::collections::BTreeSet<String> = value["scenarios"]
+            .as_object()
+            .expect("scenarios object")
+            .iter()
+            .filter(|(_, entry)| {
+                entry["execution_stage_ids"]
+                    .as_array()
+                    .is_some_and(|stages| stages.iter().any(|s| s == "R05"))
+            })
+            .map(|(id, _)| id.clone())
+            .collect();
+        assert_eq!(
+            bound.len(),
+            130,
+            "the R00 ledger's R05-bound leaf count drifted (was 130 at registration)"
+        );
+        let declared: std::collections::BTreeSet<&str> = map
+            .supplemental_leaves
+            .iter()
+            .map(|l| l.id.as_str())
+            .collect();
+        let missing: Vec<&str> = bound
+            .iter()
+            .map(String::as_str)
+            .filter(|id| !declared.contains(id))
+            .collect();
+        assert!(
+            missing.is_empty(),
+            "the R05 map dropped R00-bound supplemental leaves {missing:?} (the \
+             runner refuses the map before any command)"
+        );
+        assert_eq!(
+            declared.len(),
+            bound.len(),
+            "the R05 map invents supplemental leaves unknown to the R00 ledger"
+        );
+        // Every R05 leaf is stage_share_satisfied with a per-leaf case pin
+        // against the registered producer (no share is "inherited" without a
+        // machine check, and no delivered share is silently deferred).
+        for leaf in &map.supplemental_leaves {
+            assert_eq!(
+                leaf.basis_kind,
+                crate::stage_map::BASIS_STAGE_SHARE_SATISFIED,
+                "leaf {} must classify its R05 share explicitly",
+                leaf.id
+            );
+            let contract = leaf
+                .assertion_contract
+                .as_ref()
+                .unwrap_or_else(|| panic!("leaf {} lost its assertion contract", leaf.id));
+            assert_eq!(contract.producer_command, "r05_stage_suites");
+            assert_eq!(
+                contract.evidence_path,
+                "{EVIDENCE}/R05_SUITES/leaf-cases.json"
+            );
+            assert!(
+                leaf.evidence_command_refs
+                    .contains(&"r05_stage_suites".to_string()),
+                "leaf {} must reference its producer",
+                leaf.id
+            );
+        }
+        // The leaf-case mapping TSV pins exactly one case per leaf.
+        let tsv = std::fs::read_to_string(
+            r05_repo_root().join("docs/rust-tauri/R05/r05_leaf_case_map.tsv"),
+        )
+        .expect("docs/rust-tauri/R05/r05_leaf_case_map.tsv must exist");
+        let mut case_names: Vec<&str> = tsv
+            .lines()
+            .filter_map(|l| l.strip_prefix("leafcase "))
+            .map(|rest| rest.split_whitespace().next().unwrap_or("?"))
+            .collect();
+        assert_eq!(case_names.len(), 130, "the leaf-case map drifted from 130");
+        case_names.sort_unstable();
+        case_names.dedup();
+        assert_eq!(case_names.len(), 130, "duplicate leaf case names");
+    }
+
+    #[test]
+    fn r05_stage_pin_table_matches_the_registered_suites() {
+        let pins = parse_r05_pin_table();
+        // The 18 integration suites with their EXACT pinned counts (dropping
+        // or re-counting a suite here is the N03 fake-green shape).
+        let expected: &[(&str, u32)] = &[
+            ("adp:r05_t02_oauth_flows", 21),
+            ("adp:r05_t03_goldens", 3),
+            ("adp:r05_t04_streaming", 18),
+            ("adp:r05_t05_compat", 1),
+            ("adp:r05_t05_timeouts", 13),
+            ("adp:r05_t06_operations", 27),
+            ("adp:r05_t07_usage_families", 14),
+            ("svc:r05_t01_binary_wiring", 2),
+            ("svc:r05_t01_model_plane", 7),
+            ("svc:r05_t02_credentials", 16),
+            ("svc:r05_t03_protocol_adapters", 10),
+            ("svc:r05_t04_streaming", 9),
+            ("svc:r05_t05_timeouts", 9),
+            ("svc:r05_t06_operations", 7),
+            ("svc:r05_t06_worker_model", 10),
+            ("svc:r05_t07_persistence", 4),
+            ("svc:r05_t07_usage_trace", 9),
+            ("svc:r05_t08_closed_loop", 10),
+        ];
+        let mut suite_pins: Vec<(String, u32)> = pins
+            .iter()
+            .filter(|(run, _, _)| run.starts_with("svc:") || run.starts_with("adp:"))
+            .map(|(run, count, _)| (run.clone(), *count))
+            .collect();
+        suite_pins.sort();
+        let mut expected_sorted: Vec<(String, u32)> = expected
+            .iter()
+            .map(|(run, count)| (run.to_string(), *count))
+            .collect();
+        expected_sorted.sort();
+        assert_eq!(
+            suite_pins, expected_sorted,
+            "the R05 pin table's suite registrations drifted (dropped, added, or re-counted)"
+        );
+        // The 64 lib pins each execute EXACTLY one test (--exact).
+        let lib_pins: Vec<&(String, u32, String)> = pins
+            .iter()
+            .filter(|(run, _, _)| run.starts_with("lib-"))
+            .collect();
+        assert_eq!(lib_pins.len(), 64, "the registered lib pin count drifted");
+        for (run, count, _) in &lib_pins {
+            assert_eq!(
+                *count, 1,
+                "lib pin {run} must execute exactly one test (--exact)"
+            );
+            let rest = run.strip_prefix("lib-").expect("lib- prefix");
+            let (pkg, _path) = rest.split_once('/').expect("lib-<pkg>/<path> shape");
+            assert!(
+                matches!(pkg, "adapters" | "kernel" | "service"),
+                "unknown lib pin package in {run}"
+            );
+        }
+    }
+
+    #[test]
+    fn r05_stage_cid_table_owns_every_pinned_test_exactly_once() {
+        let pins = parse_r05_pin_table();
+        let declared = parse_r05_cid_table();
+        // (a) The owned C-ID set is exactly the registered 91: 81 T01–T07
+        //     C-IDs whose evidence is cargo-owned, plus the 10 T08 binary
+        //     legs (C01–C09/C12). The T08 C10/C11/C13/C14 are scenario-level
+        //     duties; eight T01–T07 C-IDs (T01-C01/C12 matrix-script
+        //     evidence, T05-C04/C06/C09/C10 supporting-suite evidence,
+        //     T05-C12 registered deferral, T06-C11B alias of T05-C11B) are
+        //     documented in R05_TEST_MAP.json without cid-owned cargo tests.
+        let mut cids: std::collections::BTreeSet<&str> = Default::default();
+        for (cid, _, _) in &declared {
+            assert!(
+                cid.starts_with("R05-T"),
+                "non-R05 case id {cid} in the table"
+            );
+            cids.insert(cid.as_str());
+        }
+        assert_eq!(
+            cids.len(),
+            91,
+            "the R05 cid table must own exactly the 91 registered C-IDs (got {})",
+            cids.len()
+        );
+        for expect in [
+            "R05-T01-C02",
+            "R05-T02-C12",
+            "R05-T03-C12",
+            "R05-T04-C16",
+            "R05-T05-C13",
+            "R05-T06-C12",
+            "R05-T07-C10",
+            "R05-T08-C01",
+            "R05-T08-C12",
+        ] {
+            assert!(cids.contains(expect), "the cid table dropped {expect}");
+        }
+        // (b) Every cid line references a REGISTERED pin-table run.
+        for (cid, run, _) in &declared {
+            assert!(
+                pins.iter().any(|(pinned_run, _, _)| pinned_run == run),
+                "cid {cid} references run {run:?} which the pin table does not register"
+            );
+        }
+        // (c) No test name may be owned by two C-IDs.
+        let mut seen: Vec<(&str, &str)> = Vec::new();
+        for (cid, run, names) in &declared {
+            for name in names {
+                let key = (run.as_str(), name.as_str());
+                assert!(
+                    !seen.contains(&key),
+                    "test {name:?} in run {run:?} is claimed by two C-IDs (last {cid})"
+                );
+                seen.push(key);
+            }
+        }
+        // (d) Every PINNED run's executed tests are fully owned: per-run
+        //     owned names == the run's pinned count.
+        for (run, count, _) in &pins {
+            let owned = declared
+                .iter()
+                .filter(|(_, r, _)| r == run)
+                .map(|(_, _, names)| names.len())
+                .sum::<usize>() as u32;
+            assert_eq!(
+                owned, *count,
+                "run {run:?} pins {count} executed tests but the cid table owns {owned}"
+            );
+        }
+    }
+
+    #[test]
+    fn r05_map_declares_no_live_lane_and_only_offline_commands() {
+        // N14 protection: the R05 gate is offline-only by registration. A
+        // command that picks up real credentials from the environment (or
+        // any command beyond the seven registered offline ones) turns this
+        // mirror red BEFORE any run could silently外发.
+        let map = parse_production_r05();
+        let mut keys: Vec<&str> = map.commands.iter().map(|c| c.key.as_str()).collect();
+        keys.sort_unstable();
+        assert_eq!(
+            keys,
+            vec![
+                "check_boundaries",
+                "check_contracts",
+                "r04_regression_gate",
+                "r05_stage_suites",
+                "rust_clippy",
+                "rust_fmt",
+                "rust_test_workspace",
+            ],
+            "the R05 map's command set drifted — new commands need explicit review \
+             against the offline-only policy"
+        );
+        for command in &map.commands {
+            for arg in &command.argv {
+                let upper = arg.to_ascii_uppercase();
+                assert!(
+                    !upper.contains("API_KEY")
+                        && !upper.contains("TOKEN")
+                        && !upper.contains("SECRET")
+                        && !upper.contains("LIVE"),
+                    "command {} references credential/live material in argv {arg:?} — \
+                     LIVE is a separately-authorized lane, never an env pickup",
+                    command.key
+                );
+            }
+        }
+    }
 }

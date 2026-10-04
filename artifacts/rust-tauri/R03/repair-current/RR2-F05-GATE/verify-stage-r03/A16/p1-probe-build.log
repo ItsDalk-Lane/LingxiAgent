@@ -1,0 +1,58 @@
+     Locking 68 packages to latest compatible versions
+   Compiling proc-macro2 v1.0.107
+   Compiling unicode-ident v1.0.26
+   Compiling quote v1.0.47
+   Compiling typenum v1.20.1
+   Compiling serde_core v1.0.229
+   Compiling libc v0.2.189
+   Compiling zmij v1.0.23
+   Compiling serde_json v1.0.151
+   Compiling serde v1.0.229
+   Compiling find-msvc-tools v0.1.13
+   Compiling const-oid v0.10.2
+   Compiling ref-cast v1.0.27
+   Compiling shlex v2.0.1
+   Compiling pkg-config v0.3.34
+   Compiling vcpkg v0.2.15
+   Compiling cfg-if v1.0.5
+   Compiling memchr v2.8.3
+   Compiling itoa v1.0.18
+   Compiling foldhash v0.2.0
+   Compiling dyn-clone v1.0.20
+   Compiling base64 v0.23.1
+   Compiling once_cell v1.21.4
+   Compiling pin-project-lite v0.2.17
+   Compiling smallvec v1.16.2
+   Compiling fallible-iterator v0.3.0
+   Compiling fallible-streaming-iterator v0.1.9
+   Compiling bitflags v2.13.2
+   Compiling hashbrown v0.17.1
+   Compiling cc v1.4.7
+   Compiling tracing-core v0.1.36
+   Compiling hashlink v0.12.2
+   Compiling hybrid-array v0.4.15
+   Compiling libsqlite3-sys v0.38.2
+   Compiling block-buffer v0.12.1
+   Compiling crypto-common v0.2.2
+   Compiling syn v3.0.6
+   Compiling syn v2.0.119
+   Compiling digest v0.11.3
+   Compiling cpufeatures v0.3.1
+   Compiling sha1 v0.11.0
+   Compiling sha2 v0.11.0
+   Compiling serde_derive_internals v0.30.0
+   Compiling ref-cast-impl v1.0.27
+   Compiling serde_derive v1.0.229
+   Compiling tokio-macros v2.7.2
+   Compiling schemars_derive v1.2.2
+   Compiling tokio v1.53.1
+   Compiling tracing-attributes v0.1.31
+   Compiling rusqlite v0.40.2
+   Compiling tracing v0.1.44
+   Compiling schemars v1.2.2
+   Compiling lingxi-protocol v0.0.0 (/Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-protocol)
+   Compiling lingxi-kernel v0.0.0 (/Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-kernel)
+   Compiling lingxi-adapters v0.0.0 (/Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-adapters)
+   Compiling r03-t08-a16-mutation-probe v0.0.0 (/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-r03t08-a16-vtl4BU/probe)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 6.32s
+  Executable mutation_probe.rs (/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T//rust-target-r03-t08-a16-probe/debug/deps/mutation_probe-27b415dbe7bdc01b)

@@ -1,0 +1,15 @@
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.09s
+     Running tests/subagent_closeout.rs (/tmp/rust-target-r03-g07-neg/debug/deps/subagent_closeout-457ac9f82fee79f3)
+
+running 8 tests
+test drain_expired_child_is_finally_reaped_after_its_actual_exit ... ok
+test panicking_background_exits_are_recorded_and_reaped_without_a_waiter ... ok
+test child_provider_panic_closes_out_and_the_thread_continues ... ok
+test parent_cancel_before_the_childs_first_provider_call_settles_with_zero_calls ... ok
+test finished_background_drives_reap_both_registries ... ok
+test late_and_duplicate_completions_cannot_corrupt_the_closeout ... ok
+test thread_registry_refusal_leaves_no_permanent_reservations ... ok
+test parent_cancel_closes_children_in_process_repeatedly_beyond_the_cap ... ok
+
+test result: ok. 8 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.29s
+

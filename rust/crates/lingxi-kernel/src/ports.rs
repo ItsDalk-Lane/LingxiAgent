@@ -11,12 +11,13 @@
 //! ownership contract is declared. Method surfaces grow in R02+.
 
 use lingxi_protocol::{
-    EventEnvelope, EventId, EventPayload, ModelCallId, NormalizedMessage, ProtocolError, RunId,
-    RunStatus, Seq, SessionId, ToolCallId,
+    ContentBlock, EventEnvelope, EventId, EventPayload, ModelCallId, NormalizedMessage,
+    ProtocolError, RunId, RunStatus, Seq, SessionId, ToolCallId, UsageRecord,
 };
 // ProtocolError is the error surface of the provider/tool ports below;
 // StoragePort deliberately uses the richer StorageError.
 
+use crate::model_exchange::ModelTurnInput;
 use crate::RunContext;
 
 /// Persistent record of one run's lifecycle, owned by the kernel's
@@ -468,6 +469,39 @@ pub trait StoragePort: Send + Sync {
         run_id: &RunId,
     ) -> impl std::future::Future<Output = Result<Option<crate::subagent::RunLineage>, StorageError>>
            + Send;
+
+    // ── R05-T07: the usage ledger ───────────────────────────────────────────
+    //
+    // One row per MODEL CALL (host-minted call identity): identity,
+    // route, purpose, causal parentage and the normalized usage fact.
+    // Written BEFORE the call's completion event is published; a failure
+    // here is a real storage failure (never a silent accounting loss and
+    // never a published success — T07-C10).
+
+    /// Durably records ONE model call's usage/trace fact. Always legal
+    /// (a usage row is an accounting fact, not a run-state transition —
+    /// auxiliary/worker/operation calls have no live run row of their
+    /// own). Idempotent: re-recording the IDENTICAL row (same
+    /// `model_call_id`, same content) is a replay; a DIFFERENT row under
+    /// the same `model_call_id` is a loud [`StorageError::Conflict`] (a
+    /// call's accounting is never rewritten).
+    fn record_model_call_usage(
+        &self,
+        record: crate::usage::ModelCallUsageRecord,
+        now_unix_ms: u64,
+    ) -> impl std::future::Future<Output = Result<(), StorageError>> + Send;
+
+    /// Queries the usage ledger. Rows come back oldest-first. The
+    /// `owner_user_id` scope of [`crate::usage::ModelUsageQuery`] is
+    /// applied against the session owner (authorization isolation is part
+    /// of the read — T07-C09); a scope naming nothing returns an empty
+    /// vec, never another principal's rows.
+    fn query_model_call_usage(
+        &self,
+        query: crate::usage::ModelUsageQuery,
+    ) -> impl std::future::Future<
+        Output = Result<Vec<crate::usage::ModelCallUsageRecord>, StorageError>,
+    > + Send;
 }
 
 /// Read/maintenance surface over the durable key-event log (R02-T05).
@@ -553,8 +587,15 @@ pub enum ProviderTurn {
     /// outcome instead of committing an empty final message).
     Final { message: NormalizedMessage },
     /// The provider requested tool calls; the RUN continues after they
-    /// execute (a model call ending here does NOT end the run).
-    ToolRequests { requests: Vec<ToolRequest> },
+    /// execute (a model call ending here does NOT end the run). `content`
+    /// carries the turn's own content blocks (text / reasoning /
+    /// provider-opaque) — a mixed response (content AND tool calls, the
+    /// real shape of OpenAI/Anthropic turns) keeps every block for the
+    /// exchange history instead of dropping the content half.
+    ToolRequests {
+        requests: Vec<ToolRequest>,
+        content: Vec<ContentBlock>,
+    },
     /// Process-only content (reasoning / partial output): this model call
     /// ended, the run continues with another turn.
     Continue { process_note: String },
@@ -610,20 +651,103 @@ impl ResultFence {
 /// turn PLUS the identity fence the driver verifies before using it. A real
 /// adapter (R05) echoes the context it was called with; a deferred/raced
 /// delivery carries the identity of the ORIGINAL request and is fenced.
+///
+/// R05-T01: `usage` carries the provider-reported token usage of the call
+/// when the protocol reports one (the OpenAI `usage` object). `None` means
+/// the provider did not report usage — the driver persists `None`, never a
+/// fabricated estimate.
+///
+/// R05-T07: `usage_report` carries the RICHER usage fact (component tokens,
+/// provenance, invalid-vs-unknown) the usage ledger persists; `usage`
+/// remains the frozen wire projection. `served_protocol` names the protocol
+/// family that actually served the call (the ledger's `protocol` column —
+/// the descriptor deliberately stays the wire-visible triple).
+/// `transport_attempts` counts the PHYSICAL provider requests the logical
+/// call sent (>= 1; a 401-refresh resend is a second billable request —
+/// T07-C03).
 #[derive(Debug, Clone, PartialEq)]
 pub struct ProviderTurnResult {
     pub fence: ResultFence,
     pub turn: ProviderTurn,
+    pub usage: Option<UsageRecord>,
+    /// The richer usage fact of the usage ledger (R05-T07). Defaults to
+    /// `Unknown`; the driver synthesizes a plain `Reported` fact from
+    /// `usage` when only the legacy projection is set (a double that
+    /// reported usage IS a reported usage).
+    pub usage_report: crate::usage::ReportedUsage,
+    /// The protocol family (config vocabulary) that served the call.
+    pub served_protocol: Option<String>,
+    /// Physical provider requests sent for this logical call (>= 1).
+    pub transport_attempts: u32,
+    /// The identity of the route that ACTUALLY served this turn, when the
+    /// adapter reports it (R05-T01: the real gateway-backed adapter fills it
+    /// from the resolved route, so a mid-run config reload never mislabels
+    /// the persisted `model_call_*` facts — the driver persists THIS, not a
+    /// pre-call guess; doubles leave it `None` and the driver falls back to
+    /// the port's static descriptor, which for a deterministic double is
+    /// exact).
+    pub served_by: Option<ProviderDescriptor>,
 }
 
 impl ProviderTurnResult {
     /// A result echoing the context it was issued under (the honest default
     /// every adapter uses unless it is delivering a late/raced result).
+    /// Usage defaults to `None` (not reported), `served_by` to `None`
+    /// (the caller falls back to the port descriptor).
     pub fn of_ctx(ctx: &RunContext, turn: ProviderTurn) -> Self {
         Self {
             fence: ResultFence::of_ctx(ctx),
             turn,
+            usage: None,
+            usage_report: crate::usage::ReportedUsage::Unknown,
+            served_protocol: None,
+            transport_attempts: 1,
+            served_by: None,
         }
+    }
+
+    /// The same echo with the provider-reported usage attached.
+    pub fn of_ctx_with_usage(ctx: &RunContext, turn: ProviderTurn, usage: UsageRecord) -> Self {
+        Self {
+            fence: ResultFence::of_ctx(ctx),
+            turn,
+            usage_report: crate::usage::ReportedUsage::Known(usage.clone().into()),
+            usage: Some(usage),
+            served_protocol: None,
+            transport_attempts: 1,
+            served_by: None,
+        }
+    }
+
+    /// Attaches the serving route's identity (see the field docs).
+    pub fn with_served_by(mut self, descriptor: ProviderDescriptor) -> Self {
+        self.served_by = Some(descriptor);
+        self
+    }
+
+    /// Attaches the richer usage fact + the wire projection together (the
+    /// only honest way to set them: the projection is DERIVED from the
+    /// fact, never independently asserted).
+    pub fn with_usage_report(mut self, report: crate::usage::ReportedUsage) -> Self {
+        self.usage = match &report {
+            crate::usage::ReportedUsage::Known(usage) => usage.wire_record(),
+            _ => None,
+        };
+        self.usage_report = report;
+        self
+    }
+
+    /// Marks a second physical provider request (the single 401-refresh
+    /// resend) — T07-C03: the possibly-billable request stays countable.
+    pub fn with_transport_attempts(mut self, attempts: u32) -> Self {
+        self.transport_attempts = attempts.max(1);
+        self
+    }
+
+    /// Names the protocol family that served the call.
+    pub fn with_served_protocol(mut self, protocol: impl Into<String>) -> Self {
+        self.served_protocol = Some(protocol.into());
+        self
     }
 }
 
@@ -867,6 +991,13 @@ pub struct ToolRequest {
     /// output: the trusted boundary's own summaries are shape-only
     /// ([`crate::toolcatalog::summarize_arguments`]).
     pub args_summary: Option<String>,
+    /// The provider's own correlation id for this call (R05-T01; e.g. an
+    /// OpenAI `tool_calls[].id`). Protocol correlation data ONLY: it never
+    /// binds journal/receipt/state writes (the driver-minted
+    /// [`ToolCallId`] is the only host identity); the exchange history
+    /// carries it so the adapter can emit the protocol-required pairing on
+    /// the result message.
+    pub provider_call_id: Option<String>,
     /// The structured delegation payload when (and only when) the target
     /// is a `subagent`-family tool — `subagent` (fresh dispatch),
     /// `subagent_reply` (continuation) or `subagent_close` (R03-T06).
@@ -897,6 +1028,7 @@ impl ToolRequest {
             arguments,
             args_digest,
             args_summary: None,
+            provider_call_id: None,
             delegation: None,
         })
     }
@@ -905,6 +1037,13 @@ impl ToolRequest {
     /// shape-only when produced by the catalog boundary).
     pub fn with_summary(mut self, summary: impl Into<String>) -> Self {
         self.args_summary = Some(summary.into());
+        self
+    }
+
+    /// Attaches the provider's own correlation id (R05-T01; protocol
+    /// correlation data only — never a host identity).
+    pub fn with_provider_call_id(mut self, provider_call_id: impl Into<String>) -> Self {
+        self.provider_call_id = Some(provider_call_id.into());
         self
     }
 
@@ -949,11 +1088,78 @@ pub struct DelegationRequest {
     pub thread_id: Option<String>,
 }
 
-/// Provider access for the run driver (R03-T01; the R05 handoff surface).
+/// One in-flight increment of a model turn (R05-T04). The provider emits
+/// these through [`TurnDeltaSink`] AS THE NETWORK STREAM DELIVERS them —
+/// never buffered to the end and re-sliced (the fake-streaming shape the
+/// stage explicitly forbids). Deltas are PROGRESS facts only: they carry
+/// no tool arguments, no signatures and no usage (tools dispatch solely
+/// from the terminal turn's complete batch — R05-T04 batch admission —
+/// and usage rides the final [`ProviderTurnResult`]).
 ///
-/// R03 wires deterministic doubles through the REAL run chain; R05 replaces
-/// the double with real protocol adapters behind this same port. Every call
-/// is pinned to its run/attempt context and its own `ModelCallId`.
+/// The driver's event bridge normalizes this stream into the wire
+/// vocabulary (`model_call_delta` / `assistant_segment_*`); the terminal
+/// [`ProviderTurn`] stays the authority for history.
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub enum ModelTurnDelta {
+    /// A visible-body text increment of the current text block. In-band
+    /// reserved tags (`<think>`, `<mood>`, …) are NOT the adapter's
+    /// concern — the host-side normalization layer structures them; the
+    /// adapter passes the text through verbatim.
+    Text(String),
+    /// A reasoning/thinking increment of the current PROVIDER-NATIVE
+    /// reasoning block (anthropic `thinking_delta`, openai
+    /// `reasoning_content`, google `thought` parts, responses reasoning
+    /// summary deltas).
+    Reasoning(String),
+}
+
+/// The sink's receiver is gone (the run settled or was cancelled while
+/// the provider was mid-stream). The provider must STOP reading the
+/// network stream and wind the call down — it never buffers the remainder
+/// "for later" and never blocks on a dead driver.
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub struct TurnDeltaSinkClosed;
+
+impl std::fmt::Display for TurnDeltaSinkClosed {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(
+            f,
+            "the turn delta sink is closed (the run driver is gone); the provider must stop \
+             reading the stream"
+        )
+    }
+}
+
+impl std::error::Error for TurnDeltaSinkClosed {}
+
+/// The live-delta half of the provider contract (R05-T04): the run
+/// driver's end of one in-flight model turn. Implementations are
+/// bounded-channel senders — `emit` applies backpressure (the provider
+/// awaits capacity), so a slow driver slows the network read instead of
+/// growing memory without bound.
+///
+/// Object safety: `emit` returns a boxed future so `&dyn TurnDeltaSink`
+/// can cross the `Arc<dyn TurnProviderPort>` boundary.
+pub trait TurnDeltaSink: Send + Sync {
+    /// Emits one delta. `Err(TurnDeltaSinkClosed)` once the driver is
+    /// gone — a terminal condition for the stream, never retried.
+    fn emit<'a>(
+        &'a self,
+        delta: ModelTurnDelta,
+    ) -> std::pin::Pin<
+        Box<dyn std::future::Future<Output = Result<(), TurnDeltaSinkClosed>> + Send + 'a>,
+    >;
+}
+
+/// Provider access for the run driver (R03-T01; evolved to the typed
+/// per-turn exchange at R05-T01; gained the live-delta sink at R05-T04).
+///
+/// R03/R04 wired deterministic doubles through the REAL run chain with a
+/// bare `&str` input; R05-T01 replaces that parameter list with the typed
+/// [`ModelTurnInput`] (submission + complete prior exchange + the send-time
+/// tool declaration snapshot + deadline facts) — there is ONE signature and
+/// real protocol adapters sit behind this same port. Every call is pinned
+/// to its run/attempt context and its own `ModelCallId`.
 ///
 /// The futures are boxed so the trait is object-safe: the supervisor holds
 /// `Arc<dyn TurnProviderPort>` (one injection point, doubles in tests /
@@ -962,17 +1168,27 @@ pub trait TurnProviderPort: Send + Sync {
     /// Stable identity of what this provider simulates / serves.
     fn descriptor(&self) -> ProviderDescriptor;
 
-    /// Produces the next model turn for the run. `input` is the user
-    /// submission that started the run (the full context assembly is R06;
-    /// the port stays minimal here). The result carries the identity fence
-    /// of the request it answers; the driver verifies it against the
-    /// CURRENT context before any state write (R03-T04).
+    /// Produces the next model turn for the run. `input` is the typed
+    /// per-turn exchange ([`ModelTurnInput`]: the run's submission with
+    /// drained steering, the 1-based turn index, the complete prior
+    /// exchange of this attempt, and the tool declaration snapshot taken
+    /// from the live registry at send time). The result carries the
+    /// identity fence of the request it answers; the driver verifies it
+    /// against the CURRENT context before any state write (R03-T04).
+    ///
+    /// `deltas` is the live-progress half (R05-T04): a streaming provider
+    /// emits [`ModelTurnDelta`]s through it AS THE WIRE DELIVERS them. A
+    /// provider whose protocol is not streamed simply never emits — that
+    /// is an explicit protocol fact, not a fallback (the terminal turn
+    /// stays complete and authoritative either way). An `Err(
+    /// TurnDeltaSinkClosed)` from `emit` means the driver is gone: stop
+    /// reading, wind down, let the fence classify the late result.
     fn next_turn<'a>(
         &'a self,
         ctx: &'a RunContext,
         call: &'a ModelCallId,
-        turn: u32,
-        input: &'a str,
+        input: &'a ModelTurnInput,
+        deltas: &'a dyn TurnDeltaSink,
     ) -> std::pin::Pin<Box<dyn std::future::Future<Output = ProviderTurnResult> + Send + 'a>>;
 }
 
@@ -1096,9 +1312,25 @@ impl ToolOutcome {
     }
 }
 
-/// Server-side resolution of provider credentials. Only the service
-/// layer may hold credential material; the kernel sees resolved,
-/// scoped handles.
+/// HISTORICAL (R00 era) — zero implementations and zero call sites in the
+/// workspace (REV-T02 R01, grep-verified). The LIVE credential path is
+/// `ProviderCredentialPort` in `lingxi-adapters` (`models::credentials`),
+/// implemented by the service-side `CredentialService`; credential material
+/// never enters the kernel — only `model_exchange::CredentialReference`
+/// (identity + kind) does. Retained pending the R05-T08 keep-or-remove
+/// ruling; do not build new code on this trait.
+///
+/// Original contract: server-side resolution of provider credentials; only
+/// the service layer may hold credential material, the kernel sees
+/// resolved, scoped handles.
+#[deprecated(
+    note = "R00-era remnant with no implementors; the live path is lingxi-adapters' \
+            ProviderCredentialPort — removal is an R05-T08 ruling"
+)]
+// The signature references the historical `CredentialHandle` below, which
+// stays non-deprecated so this definition body itself warns on nothing;
+// the trait's own `deprecated` mark is the fence for any new use.
+#[allow(deprecated)]
 pub trait CredentialPort {
     fn resolve_provider_credential(
         &self,
@@ -1107,7 +1339,11 @@ pub trait CredentialPort {
     ) -> Result<CredentialHandle, ProtocolError>;
 }
 
-/// Opaque, scoped credential handle. Contains no secret material.
+/// HISTORICAL companion of the deprecated [`CredentialPort`] above (R00 era,
+/// zero use sites beyond that trait's own signature — kept warning-free by
+/// `allow(deprecated)` there). The live handle type is `CredentialHandle` in
+/// `lingxi-service` (`credentials`), backed by the service registry.
+/// Opaque, scoped credential handle; contains no secret material.
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct CredentialHandle {
     pub handle_id: String,
@@ -1355,6 +1591,21 @@ mod tests {
             _run_id: &RunId,
         ) -> Result<Option<crate::subagent::RunLineage>, StorageError> {
             Ok(None)
+        }
+
+        async fn record_model_call_usage(
+            &self,
+            _record: crate::usage::ModelCallUsageRecord,
+            _now_unix_ms: u64,
+        ) -> Result<(), StorageError> {
+            Ok(())
+        }
+
+        async fn query_model_call_usage(
+            &self,
+            _query: crate::usage::ModelUsageQuery,
+        ) -> Result<Vec<crate::usage::ModelCallUsageRecord>, StorageError> {
+            Ok(Vec::new())
         }
     }
 

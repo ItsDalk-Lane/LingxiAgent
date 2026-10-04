@@ -1,0 +1,17 @@
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.08s
+     Running unittests src/lib.rs (target/debug/deps/lingxi_service-254d9c3036524e2c)
+
+running 10 tests
+test dedup::tests::request_id_validation_is_loud ... ok
+test dedup::tests::digest_normalizes_line_endings_but_not_content ... ok
+test dedup::tests::same_id_same_digest_replays_only_the_committed_run ... ok
+test dedup::tests::same_id_different_digest_is_an_explicit_conflict ... ok
+test dedup::tests::dropped_owner_without_verdict_is_kept_and_resolved_lazily ... ok
+test dedup::tests::provably_absent_unverified_reservation_is_safely_re_admitted ... ok
+test dedup::tests::a_stale_binding_cannot_touch_a_replaced_entry ... ok
+test dedup::tests::different_principal_or_session_shares_no_namespace ... ok
+test dedup::tests::rejected_admission_records_nothing_and_cap_is_loud ... ok
+test dedup::tests::committed_binding_is_never_released_or_unmarked ... ok
+
+test result: ok. 10 passed; 0 failed; 0 ignored; 0 measured; 231 filtered out; finished in 0.00s
+

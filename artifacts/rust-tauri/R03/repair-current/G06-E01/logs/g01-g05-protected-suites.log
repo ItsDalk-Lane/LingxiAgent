@@ -1,0 +1,30 @@
+     Running tests/admission_dedup_adversarial.rs (target/debug/deps/admission_dedup_adversarial-874804375557d917)
+test result: ok. 5 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.21s
+     Running tests/admission_dedup_consistency.rs (target/debug/deps/admission_dedup_consistency-9a04c825c923e96f)
+test result: ok. 5 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.26s
+     Running tests/background_disconnect_recovery.rs (target/debug/deps/background_disconnect_recovery-1f2f7b7a8a40b59f)
+test result: ok. 3 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.18s
+     Running tests/cancel_link_inheritance.rs (target/debug/deps/cancel_link_inheritance-7811d07e892d1159)
+test result: ok. 7 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.57s
+     Running tests/cancel_terminal_race.rs (target/debug/deps/cancel_terminal_race-7862bed29c7d76a7)
+test result: ok. 13 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.45s
+     Running tests/cancellation_tree.rs (target/debug/deps/cancellation_tree-44323aec67552ea7)
+test result: ok. 8 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.58s
+     Running tests/execute_concurrency.rs (target/debug/deps/execute_concurrency-4d82ca861ea55af2)
+test result: ok. 3 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.26s
+     Running tests/input_budget_refusal.rs (target/debug/deps/input_budget_refusal-65e385d9a1a49ac1)
+test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.10s
+     Running tests/input_payload_fidelity.rs (target/debug/deps/input_payload_fidelity-6d468f34bc527a37)
+test result: ok. 5 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.24s
+     Running tests/r03_t08_acceptance_matrix.rs (target/debug/deps/r03_t08_acceptance_matrix-608aa6893a591e2c)
+test result: ok. 17 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.68s
+     Running tests/session_serialization.rs (target/debug/deps/session_serialization-ba918f8a010dc0ee)
+test result: ok. 5 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.74s
+     Running tests/subagent_closeout.rs (target/debug/deps/subagent_closeout-457ac9f82fee79f3)
+test result: ok. 8 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.29s
+     Running tests/subagent_lifecycle.rs (target/debug/deps/subagent_lifecycle-f928c851414e12c8)
+test result: ok. 3 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.15s
+     Running tests/subagent_permission_inheritance.rs (target/debug/deps/subagent_permission_inheritance-0862a5be6e5cf2af)
+test result: ok. 4 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.17s
+     Running tests/tool_receipt_unknown.rs (target/debug/deps/tool_receipt_unknown-74fc5e83e2a71fc1)
+test result: ok. 6 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.28s

@@ -1,0 +1,20 @@
+   Compiling serde_core v1.0.229
+   Compiling serde_json v1.0.151
+   Compiling memchr v2.8.3
+   Compiling smallvec v1.16.1
+   Compiling cc v1.4.7
+   Compiling tracing-core v0.1.36
+   Compiling digest v0.11.3
+   Compiling tokio v1.53.1
+   Compiling sha2 v0.11.0
+   Compiling sha1 v0.11.0
+   Compiling tracing v0.1.44
+   Compiling libsqlite3-sys v0.38.2
+   Compiling serde v1.0.229
+   Compiling schemars v1.2.2
+   Compiling lingxi-protocol v0.0.0 (/Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-protocol)
+   Compiling rusqlite v0.40.2
+   Compiling lingxi-kernel v0.0.0 (/Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-kernel)
+   Compiling lingxi-adapters v0.0.0 (/Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-adapters)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 4.40s
+     Running tests/backup_restore.rs (rust/target/debug/deps/backup_restore-aea68a35a892a569)

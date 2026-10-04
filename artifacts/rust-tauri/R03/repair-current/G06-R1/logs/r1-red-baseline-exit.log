@@ -1,0 +1,66 @@
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.07s
+     Running tests/background_steering.rs (target/debug/deps/background_steering-75b51d3f2c8d4f81)
+
+running 8 tests
+test c01_background_accepted_steering_reaches_next_turn_exactly_once ... FAILED
+test c03_midflight_steering_is_consumed_not_leaked_into_next_run ... FAILED
+test c04_adversarial_concurrent_steers_respect_the_bound ... FAILED
+test c04_bounded_inbox_same_contract_foreground_and_background ... FAILED
+test c02_steering_stays_in_the_authorized_session_across_parallel_runs ... FAILED
+test c03_too_late_steering_retained_not_claimed_no_auto_trigger ... FAILED
+test c01_adversarial_multi_steer_orders_and_rounds_no_redrain ... FAILED
+test c02_adversarial_cancel_then_quick_new_run_no_misattribution ... ok
+
+failures:
+
+---- c01_background_accepted_steering_reaches_next_turn_exactly_once stdout ----
+
+thread 'c01_background_accepted_steering_reaches_next_turn_exactly_once' (43385296) panicked at crates/lingxi-service/tests/background_steering.rs:500:5:
+turn 2 must carry the steered text: BG-C01: please continue
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+
+---- c03_midflight_steering_is_consumed_not_leaked_into_next_run stdout ----
+
+thread 'c03_midflight_steering_is_consumed_not_leaked_into_next_run' (43385299) panicked at crates/lingxi-service/tests/background_steering.rs:1044:5:
+the run consumed its own steer at its next turn: BG-C03: first task
+
+---- c04_adversarial_concurrent_steers_respect_the_bound stdout ----
+
+thread 'c04_adversarial_concurrent_steers_respect_the_bound' (43385301) panicked at crates/lingxi-service/tests/background_steering.rs:1465:5:
+assertion `left == right` failed: exactly the two accepted texts reach the next turn (no loss, no duplication): BG-C04CONC: concurrent steers
+  left: 0
+ right: 2
+
+---- c04_bounded_inbox_same_contract_foreground_and_background stdout ----
+
+thread 'c04_bounded_inbox_same_contract_foreground_and_background' (43385302) panicked at crates/lingxi-service/tests/background_steering.rs:1297:5:
+in-capacity steering is really consumed by the background run: BG-C04: bounded background
+
+---- c02_steering_stays_in_the_authorized_session_across_parallel_runs stdout ----
+
+thread 'c02_steering_stays_in_the_authorized_session_across_parallel_runs' (43385298) panicked at crates/lingxi-service/tests/background_steering.rs:753:5:
+the authorized session's next turn carries the steer: BG-C02-A: authorized target
+
+---- c03_too_late_steering_retained_not_claimed_no_auto_trigger stdout ----
+
+thread 'c03_too_late_steering_retained_not_claimed_no_auto_trigger' (43385300) panicked at crates/lingxi-service/tests/background_steering.rs:1191:5:
+the next run's first turn receives the retained steer: BG-C03LATE: second task
+
+---- c01_adversarial_multi_steer_orders_and_rounds_no_redrain stdout ----
+
+thread 'c01_adversarial_multi_steer_orders_and_rounds_no_redrain' (43385295) panicked at crates/lingxi-service/tests/background_steering.rs:623:5:
+round 2 drains both round-1 steers in submission order: BG-C01-ADV: loop several rounds
+
+
+failures:
+    c01_adversarial_multi_steer_orders_and_rounds_no_redrain
+    c01_background_accepted_steering_reaches_next_turn_exactly_once
+    c02_steering_stays_in_the_authorized_session_across_parallel_runs
+    c03_midflight_steering_is_consumed_not_leaked_into_next_run
+    c03_too_late_steering_retained_not_claimed_no_auto_trigger
+    c04_adversarial_concurrent_steers_respect_the_bound
+    c04_bounded_inbox_same_contract_foreground_and_background
+
+test result: FAILED. 1 passed; 7 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.30s
+
+error: test failed, to rerun pass `-p lingxi-service --test background_steering`

@@ -1,0 +1,11 @@
+CONST_CONNECT_MS=10000
+CONST_FIRST_BYTE_MS=30000
+RAW_ELAPSED_MS=403
+RAW_IS_CONNECT=true RAW_IS_TIMEOUT=true
+CONNECT_ELAPSED_MS=402
+CONNECT_ERROR_CODE=upstream_unavailable
+CONNECT_RETRYABLE=true
+CONNECT_ERROR_MSG=provider request failed before a response: error sending request for url (https://127.0.0.1:51930/v1/messages)
+CONNECT_SEGMENT_FIRED=true
+VERDICT=connect_hang_segment_distinct_and_consts_pinned
+PROBE_EXIT=0

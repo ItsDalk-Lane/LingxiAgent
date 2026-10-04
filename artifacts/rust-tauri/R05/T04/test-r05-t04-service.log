@@ -1,0 +1,20 @@
+   Compiling lingxi-adapters v0.0.0 (/Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-adapters)
+   Compiling lingxi-service v0.0.0 (/Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-service)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 9.31s
+     Running tests/r05_t04_streaming.rs (target/debug/deps/r05_t04_streaming-8aa009c00142a2fb)
+
+running 9 tests
+test c05_half_json_arguments_dispatch_zero_tools ... ok
+test c11_a_content_refusal_fails_in_place_without_retry ... ok
+test c06_parseable_arguments_do_not_dispatch_before_the_terminal ... ok
+test c12_first_delta_reaches_the_subscriber_before_the_external_stream_ends ... ok
+test c13_live_normalization_and_history_projection_share_the_scanner ... ok
+test c15_anthropic_in_stream_error_event_retries_cleanly ... ok
+test c09_length_truncated_batch_executes_nothing_and_the_retry_is_clean ... ok
+test c15_a08_http200_stream_failures_keep_the_run_honest ... ok
+test c16_a09_midstream_cancel_releases_the_connection_and_settles_once ... ok
+
+test result: ok. 9 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 5.08s
+
+EXIT:0
+2026-10-02T22:02:01Z

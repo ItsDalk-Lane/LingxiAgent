@@ -28,9 +28,10 @@ use std::pin::Pin;
 use std::sync::{Arc, Mutex};
 use std::time::Duration;
 
+use lingxi_kernel::model_exchange::ModelTurnInput;
 use lingxi_kernel::ports::{
     DelegationRequest, ProviderDescriptor, ProviderTurn, ProviderTurnResult, ToolExecutionResult,
-    ToolExecutorPort, ToolOutcome, ToolRequest, TurnProviderPort,
+    ToolExecutorPort, ToolOutcome, ToolRequest, TurnDeltaSink, TurnProviderPort,
 };
 use lingxi_kernel::RunContext;
 use lingxi_protocol::{
@@ -100,9 +101,11 @@ impl TurnProviderPort for ScriptedProvider {
         &'a self,
         ctx: &'a RunContext,
         _call: &'a ModelCallId,
-        _turn: u32,
-        input: &'a str,
+        input: &'a ModelTurnInput,
+
+        _deltas: &'a dyn TurnDeltaSink,
     ) -> Pin<Box<dyn std::future::Future<Output = ProviderTurnResult> + Send + 'a>> {
+        let input = input.submission.as_str();
         let marker = Self::marker_of(input);
         let pop = {
             let mut pops = self.pops.lock().unwrap();
@@ -147,6 +150,7 @@ impl TurnProviderPort for ScriptedProvider {
 
 fn delegation_turn(target: &'static str, task: &str, thread_id: Option<String>) -> ProviderTurn {
     ProviderTurn::ToolRequests {
+        content: Vec::new(),
         requests: vec![ToolRequest::from_effective_arguments(
             target,
             serde_json::json!({

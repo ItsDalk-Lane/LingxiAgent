@@ -1,0 +1,26 @@
+   Compiling lingxi-adapters v0.0.0 (/Users/study_superior/r05t08-work/negcopy/rust/crates/lingxi-adapters)
+   Compiling lingxi-service v0.0.0 (/Users/study_superior/r05t08-work/negcopy/rust/crates/lingxi-service)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 5.93s
+     Running tests/r05_t06_worker_model.rs (/Users/study_superior/.cache/lingxi-r05-neg-target/debug/deps/r05_t06_worker_model-714f01def05f4f79)
+
+running 2 tests
+test c06_a_held_global_model_permit_makes_the_callback_refuse_bounded_not_deadlock ... ok
+test c06_main_run_worker_and_callback_complete_under_global_model_concurrency_one ... FAILED
+
+failures:
+
+---- c06_main_run_worker_and_callback_complete_under_global_model_concurrency_one stdout ----
+
+thread 'c06_main_run_worker_and_callback_complete_under_global_model_concurrency_one' (8248501) panicked at crates/lingxi-service/tests/r05_t06_worker_model.rs:957:5:
+assertion `left == right` failed: the callback reached the provider once
+  left: 0
+ right: 1
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+
+
+failures:
+    c06_main_run_worker_and_callback_complete_under_global_model_concurrency_one
+
+test result: FAILED. 1 passed; 1 failed; 0 ignored; 0 measured; 8 filtered out; finished in 5.31s
+
+error: test failed, to rerun pass `-p lingxi-service --test r05_t06_worker_model`

@@ -1,0 +1,83 @@
+
+ RUN  v4.1.10 /Users/study_superior/Desktop/Code/LingxiAgent
+
+stderr | desktop/src/react/__tests__/app-init.test.ts > initApp bridge indicator > refreshes local token and rebuilds websocket after server restart
+[init] appearance preference sync skipped: TypeError: Cannot read properties of undefined (reading 'getItem')
+    at readBrowserAppearancePreferences (/Users/study_superior/Desktop/Code/LingxiAgent/desktop/src/react/services/appearance-sync.ts:14:59)
+    at persistAppearancePreferences (/Users/study_superior/Desktop/Code/LingxiAgent/desktop/src/react/services/appearance-sync.ts:35:46)
+    at initApp (/Users/study_superior/Desktop/Code/LingxiAgent/desktop/src/react/app-init.ts:238:3)
+    at processTicksAndRejections (node:internal/process/task_queues:104:5)
+    at /Users/study_superior/Desktop/Code/LingxiAgent/desktop/src/react/__tests__/app-init.test.ts:654:5
+    at file:///Users/study_superior/Desktop/Code/LingxiAgent/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:20
+
+stderr | desktop/src/react/__tests__/app-init.test.ts > initApp bridge indicator > refreshes local token and rebuilds websocket after server restart
+[input-drafts] hydrate failed: TypeError: Cannot read properties of undefined (reading 'getAttribute')
+    at resolveWorkspaceUiSurface (/Users/study_superior/Desktop/Code/LingxiAgent/desktop/src/react/stores/workspace-ui-state-actions.ts:91:67)
+    at hydrateInputDrafts (/Users/study_superior/Desktop/Code/LingxiAgent/desktop/src/react/stores/input-draft-persistence.ts:64:64)
+    at initApp (/Users/study_superior/Desktop/Code/LingxiAgent/desktop/src/react/app-init.ts:326:8)
+    at processTicksAndRejections (node:internal/process/task_queues:104:5)
+    at /Users/study_superior/Desktop/Code/LingxiAgent/desktop/src/react/__tests__/app-init.test.ts:654:5
+    at file:///Users/study_superior/Desktop/Code/LingxiAgent/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:20
+
+stdout | desktop/src/react/__tests__/app-init.test.ts > initApp bridge indicator > refreshes local token and rebuilds websocket after server restart
+[hana-launch] app-ready
+
+ ❯ desktop/src/react/__tests__/app-init.test.ts (15 tests | 1 failed) 472ms
+     × refreshes local token and rebuilds websocket after server restart 6ms
+ ❯ desktop/src/react/__tests__/settings/SettingsContent.test.tsx (9 tests | 1 failed) 1108ms
+     × keeps activeServerConnection in sync when the settings window hears server restart 60ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 2 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  desktop/src/react/__tests__/app-init.test.ts > initApp bridge indicator > refreshes local token and rebuilds websocket after server restart
+AssertionError: expected null to deeply equal ObjectContaining{…}
+
+- Expected:
+ObjectContaining {
+  "baseUrl": "http://127.0.0.1:63003",
+  "serverNodeKind": "lingxi-service",
+  "token": "third-token",
+}
+
++ Received:
+null
+
+ ❯ desktop/src/react/__tests__/app-init.test.ts:690:46
+    688|
+    689|     (restartHandler as unknown as (data: { port: number; token?: strin…
+    690|     expect(mockState.activeServerConnection).toEqual(expect.objectCont…
+       |                                              ^
+    691|       baseUrl: 'http://127.0.0.1:63003', token: 'third-token', serverN…
+    692|     }));
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/2]⎯
+
+ FAIL  desktop/src/react/__tests__/settings/SettingsContent.test.tsx > SettingsContent title placement > keeps activeServerConnection in sync when the settings window hears server restart
+AssertionError: expected null to deeply equal ObjectContaining{…}
+
+- Expected:
+ObjectContaining {
+  "baseUrl": "http://127.0.0.1:63002",
+  "serverNodeKind": "lingxi-service",
+  "token": "third-token",
+}
+
++ Received:
+null
+
+ ❯ desktop/src/react/__tests__/settings/SettingsContent.test.tsx:242:46
+    240|
+    241|     (handler as unknown as (data: { port: number; token?: string }) =>…
+    242|     expect(mockState.activeServerConnection).toEqual(expect.objectCont…
+       |                                              ^
+    243|       baseUrl: 'http://127.0.0.1:63002', token: 'third-token', serverN…
+    244|     }));
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/2]⎯
+
+
+ Test Files  2 failed | 4 passed (6)
+      Tests  2 failed | 83 passed (85)
+   Start at  18:43:27
+   Duration  2.12s (transform 1.68s, setup 104ms, import 1.61s, tests 2.73s, environment 1.55s)
+

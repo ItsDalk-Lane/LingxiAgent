@@ -1,0 +1,155 @@
+error: missing data root: pass --home <DIR>, set LINGXI_HOME, or point --config at a config file with an absolute "home"; there is no default into a real user directory
+
+usage: lingxi-service [--bind <SOCKADDR>] [--home <DIR>] \
+[--config <FILE>] [--test-mode] [--network-mode <loopback|lan>] \
+[--tls-cert <ABS_PEM>] [--tls-key <ABS_PEM>] \
+[--shutdown-timeout-ms <MS>] [--max-ws-connections <N>] [--db-queue-bound <N>] \
+[--event-subscriber-queue <N>] [--event-reorder-bound <N>] [--max-subscribers <N>] \
+[--log-max-bytes <N>] [--log-max-files <N>] [--http-rate-max <N>] \
+[--http-max-in-flight <N>] [--http-request-budget-ms <MS>] [--db-wait-budget-ms <MS>]
+
+Options:
+  --bind <SOCKADDR>       Listen address (default 127.0.0.1:0, loopback + ephemeral).
+  --home <DIR>            Absolute service data root (created if missing).
+  --config <FILE>         Strict JSON config file; closed key set
+                          {"home", "workspace"?, "providers"?, "models"?}
+                          ("home" required; providers/models embed the model
+                          plane, R05-T01).
+  --test-mode             Force an isolated synthetic home under the system temp
+                          dir; --home/LINGXI_HOME/--config home are ignored.
+  --network-mode <MODE>   loopback (default) or lan. LAN exposure is an explicit
+                          opt-in: a non-loopback --bind without --network-mode lan
+                          is a startup error, and even loopback requests require
+                          authentication (no loopback-trust exemption).
+  --tls-cert <ABS_PEM>    TLS certificate chain; requires --tls-key.
+  --tls-key <ABS_PEM>     Matching private key; requires --tls-cert. Both paths
+                          must be absolute and are checked before binding.
+  --shutdown-timeout-ms <MS>  TOTAL graceful-shutdown budget, anchored at the
+                          moment the exit signal arrives (default 10000;
+                          supported range 1..=2592000000 = 30 days). One
+                          budget bounds every phase — transport drain, WS drain,
+                          database close, instance-record cleanup — each limited
+                          to what remains. A phase that exceeds the remaining
+                          budget prints the LINGXI_SERVICE_SHUTDOWN_TIMEOUT
+                          marker and the shutdown continues; the exit code
+                          reports it (6), and the process then exits
+                          deterministically even if a foreign thread is wedged.
+  --max-ws-connections <N>    Concurrently-upgraded WebSocket connection ceiling
+                          (default 16; supported range 1..=usize::MAX — a pure
+                          count ceiling, nothing is allocated per configured
+                          slot). Also bounds the managed-task registry:
+                          a session task is spawned only after a slot was
+                          acquired. Over the ceiling the upgrade is rejected
+                          with 503 budget_exceeded (reason=ws_connection_limit).
+  --db-queue-bound <N>        Pending jobs of the bounded single-writer DB
+                          queue (default 64; supported range
+                          1..=2305843009213693951 = tokio's bounded-channel
+                          semaphore maximum — more cannot be served by the
+                          channel and is a parse-time exit-2 error, mirrored by
+                          the library's StoreOptions::validate). Full =
+                          explicit 503 backpressure
+                          (reason=db_queue_full, retryable=true); nothing is
+                          silently buffered without bound.
+  --event-subscriber-queue <N> Per-subscriber event mailbox frames (default 128;
+                          supported range 2..=usize::MAX — one event slot plus
+                          one reserved signal slot; the mailbox grows lazily,
+                          so a large ceiling allocates nothing eagerly).
+                          A key event that cannot fit detaches the subscription
+                          with an explicit snapshot_required (slow_consumer) —
+                          key events are never silently dropped.
+  --event-reorder-bound <N>   Per-stream event reorder buffer (default 64;
+                          supported range 1..=usize::MAX; entries are allocated
+                          per published event, not per configured slot).
+                          Overflow marks the stream broken and detaches its
+                          subscribers with snapshot_required (publication_gap).
+  --max-subscribers <N>       Live event subscribers accepted before explicit
+                          rejection (default 256; per-stream default 32;
+                          supported range 1..=usize::MAX). Over
+                          the cap a subscribe is rejected (503 / budget_exceeded,
+                          reason=subscriber_limit).
+  --log-max-bytes <N>         Bytes per log file before rotation (default
+                          5242880 = 5 MiB; supported range 64..=u64::MAX).
+                          Log files live under
+                          {home}/lingxi-service/logs/ and every line is
+                          redacted before it reaches stderr or the file.
+                          A value below the minimum is a parse-time startup
+                          error (exit 2), like every other limit flag.
+  --log-max-files <N>         Log files kept on disk, oldest pruned (default 7;
+                          supported range 2..=usize::MAX — rotation needs a
+                          successor). Below the
+                          minimum is a parse-time startup error (exit 2).
+  --http-rate-max <N>         Per-peer HTTP request budget per 10 s window
+                          (default 240; supported range 1..=4294967295 — the
+                          limiter's native u32 counter; a larger value is a
+                          parse-time exit-2 error, never a truncation).
+                          Over the budget a request is
+                          explicitly rejected with 429
+                          (reason=rate_limited, retryable=true). The peer
+                          registry itself is hard-capped (4096 distinct
+                          peers); a stranger beyond the cap is rejected 503
+                          (reason=rate_registry_full) — the registry cannot
+                          grow without bound under a peer flood.
+  --http-max-in-flight <N>  Hard cap of concurrently in-flight HTTP
+                          requests (default 64; supported range
+                          1..=usize::MAX/2 — the 2x connection-cap derivation
+                          below uses a CHECKED multiplication and the bound
+                          keeps it overflow-free). Beyond the cap, admission
+                          rejects with 503 (reason=http_in_flight_limit)
+                          instead of letting requests pile up at the
+                          accept/handler boundary. The same knob also
+                          derives the transport CONNECTION cap (R2-F04):
+                          at most 2×N sockets may be open at once
+                          (in-flight requests each hold one; the equal
+                          margin covers arriving/header-wait and
+                          keep-alive-idle sockets, keeping the
+                          request-level 503 reachable). A socket over the
+                          connection cap — including one that has not sent
+                          a header byte — is closed immediately with the
+                          LINGXI_TRANSPORT_REJECTED marker logged.
+  --http-request-budget-ms <MS>
+                          Per-request wall-clock budget (default 30000;
+                          supported range 1..=2592000000 = 30 days — larger
+                          deadlines risk overflowing platform monotonic-clock
+                          timer arithmetic).
+                          A request whose handling — the body read
+                          included — exceeds the budget is cancelled and
+                          answered 408 (reason=request_timeout): a
+                          slow-body client cannot hold a connection and an
+                          admission slot past the deadline. The SAME budget
+                          also bounds the HEADER WAIT of every accepted
+                          connection (R2-F04): complete headers must
+                          arrive inside the budget or the connection is
+                          closed — a slow- or never-headers client is
+                          inside the transport time budget too. R3-F01: the
+                          budget applies from the ACCEPT moment, before the
+                          first byte — connections are served by hyper's
+                          explicit HTTP/1 builder, so no untimed
+                          protocol-version sniffing state sits between the
+                          accept and the timer.
+  --db-wait-budget-ms <MS>  How long ONE DB submission may wait for queue
+                          capacity (default 10000; supported range
+                          1..=2592000000 = 30 days). On expiry the
+                          submission fails with the same explicit 503
+                          (reason=db_queue_full) as a full queue — the
+                          WAITERS are bounded too, not just the channel.
+  --help                  Print this help and exit 0.
+  --version               Print server identity/version and exit 0.
+
+Every limit flag has a documented inclusive supported range (R3-F02): an
+out-of-range, zero, duplicate, non-numeric or flag-shaped value is a
+parse-time startup error (exit 2). Conversions are checked — nothing
+truncates, wraps, saturates, or panics deep inside a library.
+
+Data-root precedence: --test-mode > --home > LINGXI_HOME (env) > --config home.
+Every explicitly given source is validated even when it loses precedence.
+No source at all is a startup error (exit 2) - there is no default into a
+real user directory.
+
+Exit codes: 0 clean stop; 1 serve failure; 2 configuration/startup error
+(including a data-epoch gate refusal: corrupt epoch metadata, a higher-epoch
+stamp, or an incomplete transition - see the LINGXI_DATA_EPOCH_* stderr
+markers); 3 single-writer lock held by another instance (or lock IO failure);
+4 shutdown instance-record cleanup failed;
+5 run database shutdown (drain/checkpoint) failed;
+6 a shutdown phase exceeded --shutdown-timeout-ms (recorded explicitly).
+

@@ -1,0 +1,207 @@
+   Compiling libc v0.2.189
+   Compiling proc-macro2 v1.0.107
+   Compiling quote v1.0.47
+   Compiling unicode-ident v1.0.26
+   Compiling shlex v2.0.1
+   Compiling find-msvc-tools v0.1.13
+   Compiling typenum v1.20.1
+   Compiling itoa v1.0.18
+   Compiling pkg-config v0.3.34
+   Compiling cfg-if v1.0.5
+   Compiling pin-project-lite v0.2.17
+   Compiling bytes v1.12.1
+   Compiling serde_core v1.0.229
+   Compiling once_cell v1.21.4
+   Compiling cmov v0.5.4
+   Compiling dunce v1.0.5
+   Compiling log v0.4.34
+   Compiling fs_extra v1.3.0
+   Compiling const-oid v0.10.2
+   Compiling zmij v1.0.23
+   Compiling serde v1.0.229
+   Compiling futures-core v0.3.34
+   Compiling serde_json v1.0.151
+   Compiling memchr v2.8.3
+   Compiling ref-cast v1.0.27
+   Compiling smallvec v1.16.1
+   Compiling aws-lc-rs v1.18.1
+   Compiling zeroize v1.9.0
+   Compiling vcpkg v0.2.15
+   Compiling httparse v1.10.1
+   Compiling untrusted v0.9.0
+   Compiling base64 v0.23.1
+   Compiling tracing-core v0.1.36
+   Compiling rustls-pki-types v1.15.1
+   Compiling dyn-clone v1.0.20
+   Compiling foldhash v0.2.0
+   Compiling tower-service v0.3.3
+   Compiling autocfg v1.5.1
+   Compiling futures-channel v0.3.34
+   Compiling sync_wrapper v1.0.2
+   Compiling ctutils v0.4.2
+   Compiling regex-syntax v0.8.11
+   Compiling futures-task v0.3.34
+   Compiling hashbrown v0.17.1
+   Compiling rustls v0.23.45
+   Compiling tower-layer v0.3.3
+   Compiling slab v0.4.12
+   Compiling httpdate v1.0.3
+   Compiling percent-encoding v2.3.2
+   Compiling atomic-waker v1.1.2
+   Compiling ryu v1.0.23
+   Compiling core-foundation-sys v0.8.7
+   Compiling fallible-iterator v0.3.0
+   Compiling http v1.5.0
+   Compiling futures-util v0.3.34
+   Compiling lazy_static v1.5.0
+   Compiling fallible-streaming-iterator v0.1.9
+   Compiling mime v0.3.17
+   Compiling form_urlencoded v1.2.2
+   Compiling bitflags v2.13.2
+   Compiling subtle v2.6.1
+   Compiling num-traits v0.2.19
+   Compiling tracing-log v0.2.0
+   Compiling thread_local v1.1.10
+   Compiling sharded-slab v0.1.7
+   Compiling iana-time-zone v0.1.65
+   Compiling num-conv v0.2.2
+   Compiling deranged v0.5.8
+   Compiling matchit v0.8.4
+   Compiling nu-ansi-term v0.50.3
+   Compiling time-core v0.1.9
+   Compiling powerfmt v0.2.0
+   Compiling qrcodegen v1.8.0
+   Compiling hybrid-array v0.4.15
+   Compiling pem v4.0.0
+   Compiling hashlink v0.12.2
+   Compiling http-body v1.1.0
+   Compiling jobserver v0.1.35
+   Compiling errno v0.3.14
+   Compiling mio v1.2.3
+   Compiling socket2 v0.6.5
+   Compiling cpufeatures v0.3.1
+   Compiling getrandom v0.2.17
+   Compiling if-addrs v0.15.0
+   Compiling http-body-util v0.1.5
+   Compiling crypto-common v0.2.2
+   Compiling block-buffer v0.12.1
+   Compiling inout v0.2.2
+   Compiling regex-automata v0.4.18
+   Compiling signal-hook-registry v1.4.8
+   Compiling syn v3.0.6
+   Compiling syn v2.0.119
+   Compiling cc v1.4.7
+   Compiling time v0.3.55
+   Compiling chrono v0.4.45
+   Compiling digest v0.11.3
+   Compiling cipher v0.5.2
+   Compiling yasna v0.6.0
+   Compiling sha2 v0.11.0
+   Compiling sha1 v0.11.0
+   Compiling hmac v0.13.0
+   Compiling salsa20 v0.11.0
+   Compiling pbkdf2 v0.13.0
+   Compiling cmake v0.1.58
+   Compiling libsqlite3-sys v0.38.2
+   Compiling ring v0.17.14
+   Compiling serde_path_to_error v0.1.20
+   Compiling aws-lc-sys v0.45.0
+   Compiling scrypt v0.12.0
+   Compiling matchers v0.2.0
+   Compiling serde_derive_internals v0.30.0
+   Compiling serde_derive v1.0.229
+   Compiling tokio-macros v2.7.2
+   Compiling ref-cast-impl v1.0.27
+   Compiling schemars_derive v1.2.2
+   Compiling tokio v1.53.1
+   Compiling tracing-attributes v0.1.31
+   Compiling tracing v0.1.44
+   Compiling rcgen v0.14.10
+   Compiling axum-core v0.5.6
+   Compiling tracing-subscriber v0.3.23
+   Compiling schemars v1.2.2
+   Compiling rusqlite v0.40.2
+   Compiling serde_urlencoded v0.7.1
+   Compiling hyper v1.11.1
+   Compiling tower v0.5.3
+   Compiling lingxi-protocol v0.0.0 (/private/tmp/lingxi-g02-red2/rust/crates/lingxi-protocol)
+   Compiling hyper-util v0.1.21
+   Compiling axum v0.8.9
+   Compiling lingxi-kernel v0.0.0 (/private/tmp/lingxi-g02-red2/rust/crates/lingxi-kernel)
+   Compiling lingxi-adapters v0.0.0 (/private/tmp/lingxi-g02-red2/rust/crates/lingxi-adapters)
+   Compiling rustls-webpki v0.103.15
+   Compiling tokio-rustls v0.26.5
+   Compiling lingxi-service v0.0.0 (/private/tmp/lingxi-g02-red2/rust/crates/lingxi-service)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 14.34s
+     Running tests/cancel_terminal_race.rs (target/debug/deps/cancel_terminal_race-7862bed29c7d76a7)
+
+running 13 tests
+test a_fire_after_the_driver_reached_cleaning_never_regresses_the_phase ... ok
+test concurrent_duplicate_fires_keep_the_first_reason_and_a_single_fired ... FAILED
+test cancel_accepted_while_final_events_persist_beats_the_completed_terminal ... FAILED
+test cancel_at_the_no_provider_early_close_settles_cancelled ... FAILED
+test cancel_racing_the_finalize_transaction_is_too_late_not_accepted ... FAILED
+test cancel_at_the_intent_boundary_dispatches_no_new_external_call ... FAILED
+test cancel_after_the_committed_terminal_reports_already_terminal ... ok
+test cancel_accepted_before_the_terminal_claim_beats_the_failed_terminal_too ... FAILED
+test cancel_accepted_before_the_terminal_claim_beats_every_terminal_shape ... ok
+test cancel_at_the_authorization_boundary_never_opens_the_approval_ask ... ok
+test cancel_at_the_started_boundary_dispatches_no_new_external_call ... ok
+test cancel_between_tool_iterations_stops_the_second_dispatch ... ok
+test started_without_receipt_journals_unknown_receipt_facts ... ok
+
+failures:
+
+---- concurrent_duplicate_fires_keep_the_first_reason_and_a_single_fired stdout ----
+
+thread 'concurrent_duplicate_fires_keep_the_first_reason_and_a_single_fired' (42891706) panicked at crates/lingxi-service/tests/cancel_terminal_race.rs:1056:5:
+assertion `left == right` failed: exactly one Fired per run, however the callers interleave
+  left: 103
+ right: 96
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+
+---- cancel_accepted_while_final_events_persist_beats_the_completed_terminal stdout ----
+
+thread 'cancel_accepted_while_final_events_persist_beats_the_completed_terminal' (42891698) panicked at crates/lingxi-service/tests/cancel_terminal_race.rs:723:5:
+assertion `left == right` failed: cancel-before-claim must not complete
+  left: "completed"
+ right: "cancelled"
+
+---- cancel_at_the_no_provider_early_close_settles_cancelled stdout ----
+
+thread 'cancel_at_the_no_provider_early_close_settles_cancelled' (42891702) panicked at crates/lingxi-service/tests/cancel_terminal_race.rs:1265:5:
+assertion `left == right` failed: the providerless early close is subject to the same adjudication
+  left: "completed"
+ right: "cancelled"
+
+---- cancel_racing_the_finalize_transaction_is_too_late_not_accepted stdout ----
+
+thread 'cancel_racing_the_finalize_transaction_is_too_late_not_accepted' (42891705) panicked at crates/lingxi-service/tests/cancel_terminal_race.rs:978:5:
+a cancellation racing the in-flight finalize must never be reported Accepted: Accepted { run_id: "run_000001a0dcba6c00_000001", phase: Requested { reason: "user" } }
+
+---- cancel_at_the_intent_boundary_dispatches_no_new_external_call stdout ----
+
+thread 'cancel_at_the_intent_boundary_dispatches_no_new_external_call' (42891701) panicked at crates/lingxi-service/tests/cancel_terminal_race.rs:1164:5:
+assertion `left == right` failed
+  left: Started
+ right: Prepared
+
+---- cancel_accepted_before_the_terminal_claim_beats_the_failed_terminal_too stdout ----
+
+thread 'cancel_accepted_before_the_terminal_claim_beats_the_failed_terminal_too' (42891697) panicked at crates/lingxi-service/tests/cancel_terminal_race.rs:794:5:
+assertion `left == right` failed: a failed terminal must not commit after an accepted cancellation either
+  left: "failed"
+ right: "cancelled"
+
+
+failures:
+    cancel_accepted_before_the_terminal_claim_beats_the_failed_terminal_too
+    cancel_accepted_while_final_events_persist_beats_the_completed_terminal
+    cancel_at_the_intent_boundary_dispatches_no_new_external_call
+    cancel_at_the_no_provider_early_close_settles_cancelled
+    cancel_racing_the_finalize_transaction_is_too_late_not_accepted
+    concurrent_duplicate_fires_keep_the_first_reason_and_a_single_fired
+
+test result: FAILED. 7 passed; 6 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.42s
+
+error: test failed, to rerun pass `-p lingxi-service --test cancel_terminal_race`

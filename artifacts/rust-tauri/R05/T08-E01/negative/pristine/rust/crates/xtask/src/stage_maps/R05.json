@@ -1,0 +1,264 @@
+{
+  "schemaVersion": 1,
+  "resultVersion": "lingxi.xtask.verify-stage.v1",
+  "stage": "R05",
+  "defaultTimeoutSecs": 1200,
+  "supplementalCoverageNote": "R05-T08 阶段图（2026-10-03）：模型协议/凭证/流式/网络取消/多模态与 Worker/用量/无 Pi 真实二进制闭环的正式验收图。原 16 个 A-ID（附录A）全部保留为 REQUIRED 场景；附录B 的 91 个 C-ID（T01–T07 全部 + T08 的 C01–C09/C12 二进制腿）由 r05_stage_suites 生产者经 pin/cid TSV（docs/rust-tauri/R05/r05_stage_pins.tsv 82 行 / r05_stage_cids.tsv 159 行，254 个归属对）逐测试机器核验——场景存在→测试真正运行（精确钉数，0 匹配即失败）→对应断言实际通过（逐名 `... ok` 行校验）→证据匹配候选（每运行新鲜证据 + 源绑定）；T08 其余 C-ID 的绑定：C10/C11（媒体/Worker 链）→ r05_stage_suites 所钉 T06 套件 + rust_test_workspace；C13（前序回归）→ R05-SUP-R04REG 场景在最终候选上完整重跑 verify-stage R04（内嵌 R03/R02 链与 RR1 修复套件）；C14（范围与默认旧产品不变）→ check_boundaries 依赖边界门禁 + rust_test_workspace 旧入口回归（desktop/、shared/、package.json 零 diff 由 R05_TEST_MAP 记录核对）。R00 FEATURE_STAGE_ACCEPTANCE 无绑定 R05 的补充叶（736 叶中 0 叶含 R05），故本图无 supplementalLeafScenarios 节——运行器与 R00 台账做相等性交叉核对后接受空集。附录C 的 16 项负向门禁在 $HOME 隔离副本执行（R05_NEGATIVE_GATE_REPORT.md），其中 N01/N03/N13/N14 由 xtask stage_map 镜像单测与本图的注册结构承担（删 A-ID/C-ID/降钉数/私开 LIVE lane 即红）。",
+  "commands": {
+    "rust_fmt": {
+      "argv": [
+        "cargo",
+        "fmt",
+        "--manifest-path",
+        "rust/Cargo.toml",
+        "--all",
+        "--",
+        "--check"
+      ],
+      "timeoutSecs": 300,
+      "evidencePaths": [
+        "{EVIDENCE}/rust_fmt/stdout.log"
+      ]
+    },
+    "rust_clippy": {
+      "argv": [
+        "cargo",
+        "clippy",
+        "--manifest-path",
+        "rust/Cargo.toml",
+        "--workspace",
+        "--all-targets",
+        "--locked",
+        "--",
+        "-D",
+        "warnings"
+      ],
+      "timeoutSecs": 1200,
+      "evidencePaths": [
+        "{EVIDENCE}/rust_clippy/stdout.log"
+      ]
+    },
+    "rust_test_workspace": {
+      "argv": [
+        "cargo",
+        "test",
+        "--manifest-path",
+        "rust/Cargo.toml",
+        "--workspace",
+        "--locked"
+      ],
+      "timeoutSecs": 2400,
+      "evidencePaths": [
+        "{EVIDENCE}/rust_test_workspace/stdout.log"
+      ]
+    },
+    "check_contracts": {
+      "argv": [
+        "bash",
+        "scripts/rust-tauri/r01-t02-check-generated.sh"
+      ],
+      "timeoutSecs": 900,
+      "evidencePaths": [
+        "{EVIDENCE}/check_contracts/stdout.log"
+      ]
+    },
+    "check_boundaries": {
+      "argv": [
+        "python3",
+        "-B",
+        "docs/rust-tauri/R01/r01_t01_check_ownership.py"
+      ],
+      "timeoutSecs": 600,
+      "evidencePaths": [
+        "{EVIDENCE}/check_boundaries/stdout.log"
+      ]
+    },
+    "r05_stage_suites": {
+      "argv": [
+        "bash",
+        "scripts/rust-tauri/r05_t08_stage_suites.sh",
+        "{EVIDENCE}/R05_SUITES"
+      ],
+      "timeoutSecs": 3600,
+      "evidencePaths": [
+        "{EVIDENCE}/R05_SUITES/r05-cases.json",
+        "{EVIDENCE}/R05_SUITES/summary.txt",
+        "{EVIDENCE}/R05_SUITES/pin-table.txt",
+        "{EVIDENCE}/R05_SUITES/cid-table.txt"
+      ]
+    },
+    "r04_regression_gate": {
+      "argv": [
+        "cargo",
+        "run",
+        "--manifest-path",
+        "rust/Cargo.toml",
+        "--locked",
+        "-p",
+        "xtask",
+        "--",
+        "verify-stage",
+        "R04",
+        "--evidence",
+        "{EVIDENCE}/R04_REGRESSION"
+      ],
+      "timeoutSecs": 10800,
+      "evidencePaths": [
+        "{EVIDENCE}/R04_REGRESSION/verify-stage-result.json"
+      ]
+    }
+  },
+  "scenarios": [
+    {
+      "id": "R05-A01",
+      "requirement": "REQUIRED",
+      "commandRefs": [
+        "rust_test_workspace",
+        "r05_stage_suites"
+      ]
+    },
+    {
+      "id": "R05-A02",
+      "requirement": "REQUIRED",
+      "commandRefs": [
+        "rust_test_workspace",
+        "r05_stage_suites"
+      ]
+    },
+    {
+      "id": "R05-A03",
+      "requirement": "REQUIRED",
+      "commandRefs": [
+        "rust_test_workspace",
+        "r05_stage_suites"
+      ]
+    },
+    {
+      "id": "R05-A04",
+      "requirement": "REQUIRED",
+      "commandRefs": [
+        "rust_test_workspace",
+        "r05_stage_suites"
+      ]
+    },
+    {
+      "id": "R05-A05",
+      "requirement": "REQUIRED",
+      "commandRefs": [
+        "rust_test_workspace",
+        "r05_stage_suites"
+      ]
+    },
+    {
+      "id": "R05-A06",
+      "requirement": "REQUIRED",
+      "commandRefs": [
+        "rust_test_workspace",
+        "r05_stage_suites"
+      ]
+    },
+    {
+      "id": "R05-A07",
+      "requirement": "REQUIRED",
+      "commandRefs": [
+        "rust_test_workspace",
+        "r05_stage_suites"
+      ]
+    },
+    {
+      "id": "R05-A08",
+      "requirement": "REQUIRED",
+      "commandRefs": [
+        "rust_test_workspace",
+        "r05_stage_suites"
+      ]
+    },
+    {
+      "id": "R05-A09",
+      "requirement": "REQUIRED",
+      "commandRefs": [
+        "rust_test_workspace",
+        "r05_stage_suites"
+      ]
+    },
+    {
+      "id": "R05-A10",
+      "requirement": "REQUIRED",
+      "commandRefs": [
+        "rust_test_workspace",
+        "r05_stage_suites"
+      ]
+    },
+    {
+      "id": "R05-A11",
+      "requirement": "REQUIRED",
+      "commandRefs": [
+        "rust_test_workspace",
+        "r05_stage_suites"
+      ]
+    },
+    {
+      "id": "R05-A12",
+      "requirement": "REQUIRED",
+      "commandRefs": [
+        "rust_test_workspace",
+        "r05_stage_suites"
+      ]
+    },
+    {
+      "id": "R05-A13",
+      "requirement": "REQUIRED",
+      "commandRefs": [
+        "rust_test_workspace",
+        "r05_stage_suites"
+      ]
+    },
+    {
+      "id": "R05-A14",
+      "requirement": "REQUIRED",
+      "commandRefs": [
+        "rust_test_workspace",
+        "r05_stage_suites"
+      ]
+    },
+    {
+      "id": "R05-A15",
+      "requirement": "REQUIRED",
+      "commandRefs": [
+        "r05_stage_suites",
+        "rust_test_workspace",
+        "rust_fmt",
+        "rust_clippy",
+        "check_contracts",
+        "check_boundaries"
+      ]
+    },
+    {
+      "id": "R05-A16",
+      "requirement": "REQUIRED",
+      "commandRefs": [
+        "r05_stage_suites",
+        "rust_test_workspace",
+        "r04_regression_gate"
+      ]
+    },
+    {
+      "id": "R05-SUP-R04REG",
+      "requirement": "REQUIRED",
+      "commandRefs": [
+        "r04_regression_gate",
+        "rust_test_workspace"
+      ],
+      "note": "T08-C13 前序回归硬保护：完整 verify-stage R04（其内嵌 verify-stage R03 → R02 链 + r04_tool_matrix + r04_rr1_repair_suites + 五门禁）在本图最终候选上整体重跑，不接受复用旧候选的成功 JSON。"
+    },
+    {
+      "id": "R05-SUP-SCOPE",
+      "requirement": "REQUIRED",
+      "commandRefs": [
+        "check_boundaries",
+        "rust_test_workspace"
+      ],
+      "note": "T08-C14 范围与默认旧产品不变：check_boundaries 证明 kernel 不依赖 Tauri/HTTP 客户端/秘密存储、无 Pi 执行循环或新 Node Agent；workspace 全量测试承载旧 Electron/Node 入口的现役回归（desktop/、shared/、package.json 对 HEAD 的零 diff 由 R05_TEST_MAP.json 记录并核对）；Rust 新入口无旧 Agent 回退由 r05_t01_binary_wiring/r05_t08_closed_loop 套件钉住。"
+    }
+  ]
+}

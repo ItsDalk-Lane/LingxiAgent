@@ -1,0 +1,11 @@
+{"row":[1,"initial_run_message_schema","479b0321494269fca85d9f973b01a8f9d1aa57dc08fc3cf8fddbafeace461bb8",1791050616765,"lingxi-adapters 0.0.0"],"table":"schema_migrations"}
+{"row":[2,"stale_result_audit","64d7edfdab74e13e623a9d8d5f2381dad4803f545fa126d8eda8cc02c3dc889c",1791050616765,"lingxi-adapters 0.0.0"],"table":"schema_migrations"}
+{"row":[3,"invocation_journal","3bd5388f090ab0ae0e137d91d59a8e48f82f409bbd0de657abf29b897a4252c1",1791050616765,"lingxi-adapters 0.0.0"],"table":"schema_migrations"}
+{"row":[4,"run_lineage","371d415462b7e8d698693f50a7b9c9f493fbb4e653ee30e5d3e8930f77e161b5",1791050616765,"lingxi-adapters 0.0.0"],"table":"schema_migrations"}
+{"row":[5,"model_call_usage_ledger","16dce1c9d5106b74ef00df7348591f5fad11bf8a7bc0244effba804dfde7606d",1791050616765,"lingxi-adapters 0.0.0"],"table":"schema_migrations"}
+{"row":["sess_local_alpha","lingxi","user_local","Synthetic session alpha",1791050616768],"table":"sessions"}
+{"row":["sess_local_beta","lingxi","user_local","Synthetic session beta",1791050616768],"table":"sessions"}
+{"row":["run_000001a102ef9033_000001","sess_local_alpha","local_user","user_local","principal_local",1,"interrupted_needs_attention","interrupted_needs_attention.recovery_unsafe",1,1791050616883,1791050616945,2],"table":"runs"}
+{"row":["run_000001a102ef9033_000001","run_000001a102ef9033_000001#a1",1,1791050616883],"table":"run_attempts"}
+{"row":["run_000001a102ef9033_000001-start","sess_local_alpha",1,"sess_local_alpha","run_000001a102ef9033_000001","run_000001a102ef9033_000001#a1","run_state_changed","{\"from\":\"queued\",\"to\":\"running\",\"type\":\"run_state_changed\"}",1791050616883],"table":"key_events"}
+{"row":["run_000001a102ef9033_000001-recovery","sess_local_alpha",2,"sess_local_alpha","run_000001a102ef9033_000001","run_000001a102ef9033_000001#a1","run_state_changed","{\"from\":\"running\",\"reason\":\"interrupted_needs_attention.recovery_unsafe; service restarted while the task was in flight; the invocation journal holds no unresolved external side effect (no tool call was in its crash window), and no final model reply existed when the service stopped; next actions: safe to resubmit the task\",\"to\":\"interrupted_needs_attention\",\"type\":\"run_state_changed\"}",1791050616945],"table":"key_events"}

@@ -1,0 +1,24 @@
+   Compiling lingxi-service v0.0.0 (/Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-service)
+warning: function `read_persisted_network` is never used
+   --> crates/lingxi-service/src/management.rs:104:15
+    |
+104 | pub(crate) fn read_persisted_network(home: &Path) -> Result<Option<PersistedNetwork>, String> {
+    |               ^^^^^^^^^^^^^^^^^^^^^^
+    |
+    = note: `#[warn(dead_code)]` (part of `#[warn(unused)]`) on by default
+
+warning: `lingxi-service` (lib) generated 1 warning
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 4.91s
+     Running tests/r00_management_leaves.rs (rust/target/debug/deps/r00_management_leaves-b4e832a1d0519a3a)
+LINGXI_AUTH_REJECTED request_id=req-d5ca6abb85edcb3c0faea97b8d9f8af6 method=GET path=/lingxi/v1/access/summary status=401 Unauthorized reason=missing_credential remote=127.0.0.1:64791
+LINGXI_AUTH_REJECTED request_id=req-e4cb97deb2210a355b117e21fa336450 method=PUT path=/lingxi/v1/access/account/profile status=401 Unauthorized reason=missing_credential remote=127.0.0.1:64796
+LINGXI_AUTH_REJECTED request_id=req-2add0fb48a952924e338c8e812538417 method=PUT path=/lingxi/v1/access/network status=401 Unauthorized reason=missing_credential remote=127.0.0.1:64799
+LINGXI_AUTH_REJECTED request_id=req-88a38061d3cd11da4b1f2fa32a4f89d9 method=GET path=/lingxi/v1/access/mobile-qr.svg status=401 Unauthorized reason=missing_credential remote=127.0.0.1:64801
+LINGXI_AUTH_REJECTED request_id=req-2de9e2e670998da572e7837809be3d45 method=PUT path=/lingxi/v1/access/account/password status=401 Unauthorized reason=missing_credential remote=127.0.0.1:64809
+
+thread 'r00_management_positive_and_negative_branches_on_real_service' (37435441) panicked at crates/lingxi-service/tests/r00_management_leaves.rs:594:5:
+assertion `left == right` failed
+  left: Null
+ right: 14500
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+error: test failed, to rerun pass `-p lingxi-service --test r00_management_leaves`

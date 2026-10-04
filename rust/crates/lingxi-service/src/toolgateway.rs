@@ -1249,6 +1249,9 @@ impl ToolInvocationGateway {
             args_summary: Some(lingxi_kernel::toolcatalog::summarize_arguments(
                 &record.effective,
             )),
+            // The gateway re-dispatch is internal: no provider correlation
+            // id applies (the caller's `ToolRequest` keeps its own).
+            provider_call_id: None,
             delegation: None,
         };
         tracing::info!(

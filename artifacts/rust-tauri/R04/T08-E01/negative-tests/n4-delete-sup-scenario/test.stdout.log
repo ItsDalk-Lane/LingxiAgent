@@ -1,0 +1,25 @@
+   Compiling xtask v0.1.0 (/private/tmp/lingxi-r04-t08-neg-wEGEl1/rust/crates/xtask)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 1.19s
+     Running unittests src/main.rs (/Users/study_superior/.cache/lingxi-r04-t08-neg-target/debug/deps/xtask-ad766de8ea03e62c)
+
+running 4 tests
+test stage_map::map_tests::r04_production_map_registers_the_matrix_and_regression_producers ... ok
+test stage_map::map_tests::r04_production_map_keeps_the_sixteen_a_scenarios_verbatim ... ok
+test stage_map::map_tests::r04_production_map_keeps_the_124_leaf_split ... ok
+test stage_map::map_tests::r04_production_map_registers_the_supplemental_duty_scenarios ... FAILED
+
+failures:
+
+---- stage_map::map_tests::r04_production_map_registers_the_supplemental_duty_scenarios stdout ----
+
+thread 'stage_map::map_tests::r04_production_map_registers_the_supplemental_duty_scenarios' (2023883) panicked at crates/xtask/src/stage_map.rs:2271:36:
+R04 map dropped the supplemental-duty scenario R04-SUP01
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+
+
+failures:
+    stage_map::map_tests::r04_production_map_registers_the_supplemental_duty_scenarios
+
+test result: FAILED. 3 passed; 1 failed; 0 ignored; 0 measured; 100 filtered out; finished in 0.01s
+
+error: test failed, to rerun pass `-p xtask --bin xtask`

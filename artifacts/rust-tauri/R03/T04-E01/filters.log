@@ -1,0 +1,23 @@
+== directed suite runs (exit 0, counts) ==
+cargo test -p lingxi-service --test late_result_fence: test result: ok. 5 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.17s
+cargo test -p lingxi-service --test request_dedup: test result: ok. 4 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.15s
+cargo test -p lingxi-adapters --test late_result_fencing_property: test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.26s
+cargo test -p lingxi-service --test run_lifecycle: test result: ok. 12 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.48s
+cargo test -p lingxi-service --test cancellation_tree: test result: ok. 8 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.70s
+cargo test -p lingxi-service --test session_serialization: test result: ok. 5 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.76s
+cargo test -p lingxi-service --test execute_concurrency: test result: ok. 3 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.23s
+cargo test -p lingxi-service --test event_subscription: test result: ok. 12 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 2.90s
+cargo test -p lingxi-service --test service_persistence: test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.16s
+cargo test -p lingxi-adapters --test run_finalize_property: test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.17s
+cargo test -p lingxi-adapters --test storage_transactions: test result: ok. 7 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.24s
+cargo test -p lingxi-adapters --test migration_idempotency: test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.04s
+cargo test -p lingxi-kernel --lib: test result: ok. 25 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.01s
+== name filters ==
+name-filter 'r03_a07': 4 hits
+name-filter 'r03_a08': 1 hits
+name-filter 'result_fence': 1 hits
+name-filter 'late_result_reason': 1 hits
+name-filter 'fence_verdict': 1 hits
+name-filter 'runs::': 5 hits
+name-filter 'sessions::': 8 hits
+name-filter 'dedup::': 6 hits

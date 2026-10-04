@@ -1,0 +1,18 @@
+   Compiling lingxi-service v0.0.0 (/Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-service)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.87s
+     Running unittests src/lib.rs (/tmp/r02-t03-root-fixes-target/debug/deps/lingxi_service-e78cfdb16d1dcdff)
+
+running 10 tests
+test auth::tests::constant_time_eq_basics ... ok
+test auth::tests::bearer_parsing_mirrors_incumbent ... ok
+test auth::tests::scope_namespace_expansion ... ok
+test auth::tests::route_policy_table ... ok
+test auth::tests::failed_authentication_never_touches_registry_files ... ok
+test auth::tests::token_file_is_owner_only_and_instance_bound ... ok
+test auth::tests::local_token_roundtrip_and_owner_principal ... ok
+test auth::tests::registries_reload_across_bootstrap ... ok
+test auth::tests::device_credential_lifecycle_create_auth_expire_revoke ... ok
+test auth::tests::authorize_order_and_denials ... ok
+
+test result: ok. 10 passed; 0 failed; 0 ignored; 0 measured; 145 filtered out; finished in 0.29s
+

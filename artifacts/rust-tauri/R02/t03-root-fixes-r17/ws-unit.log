@@ -1,0 +1,17 @@
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.06s
+     Running unittests src/lib.rs (/tmp/r02-t03-root-fixes-target/debug/deps/lingxi_service-e78cfdb16d1dcdff)
+
+running 10 tests
+test ws::tests::websocket_accept_known_vector ... ok
+test ws::tests::query_pair_parsing ... ok
+test ws::tests::query_pair_parsing_unicode_and_bad_escapes_never_panic ... ok
+test ws::tests::ws_credential_extraction_order ... ok
+test ws::tests::ticket_lifecycle_single_use_expiry_and_binding ... ok
+test ws::tests::ws_request_vocabulary_parses_and_rejects_unknown ... ok
+test ws::tests::oversized_frame_is_rejected_not_buffered ... ok
+test ws::tests::client_frames_require_mask_for_text_and_control_opcodes ... ok
+test ws::tests::ticket_table_is_bounded_and_prunes_expired ... ok
+test ws::tests::frame_codec_roundtrip_through_memory ... ok
+
+test result: ok. 10 passed; 0 failed; 0 ignored; 0 measured; 145 filtered out; finished in 0.00s
+

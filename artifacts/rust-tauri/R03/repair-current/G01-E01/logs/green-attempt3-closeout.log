@@ -1,0 +1,32 @@
+   Compiling lingxi-service v0.0.0 (/Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-service)
+warning: method `arrivals_for` is never used
+   --> crates/lingxi-service/tests/subagent_closeout.rs:184:8
+    |
+183 | impl ParkingTool {
+    | ---------------- method in this implementation
+184 |     fn arrivals_for(&self, marker: &str) -> usize {
+    |        ^^^^^^^^^^^^
+    |
+    = note: `#[warn(dead_code)]` (part of `#[warn(unused)]`) on by default
+
+warning: function `read_tool_request` is never used
+   --> crates/lingxi-service/tests/subagent_closeout.rs:231:4
+    |
+231 | fn read_tool_request() -> ToolRequest {
+    |    ^^^^^^^^^^^^^^^^^
+
+warning: `lingxi-service` (test "subagent_closeout") generated 2 warnings
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.87s
+     Running tests/subagent_closeout.rs (rust/target/debug/deps/subagent_closeout-457ac9f82fee79f3)
+
+running 7 tests
+test drain_expired_child_is_finally_reaped_after_its_actual_exit ... ok
+test panicking_background_exits_are_recorded_and_reaped_without_a_waiter ... ok
+test parent_cancel_before_the_childs_first_provider_call_settles_with_zero_calls ... ok
+test thread_registry_refusal_leaves_no_permanent_reservations ... ok
+test child_provider_panic_closes_out_and_the_thread_continues ... ok
+test finished_background_drives_reap_both_registries ... ok
+test parent_cancel_closes_children_in_process_repeatedly_beyond_the_cap ... ok
+
+test result: ok. 7 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.26s
+

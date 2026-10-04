@@ -1,0 +1,7 @@
+   Compiling ring v0.17.14
+   Compiling lingxi-kernel v0.0.0 (/Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-kernel)
+   Compiling lingxi-adapters v0.0.0 (/Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-adapters)
+   Compiling lingxi-service v0.0.0 (/Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-service)
+   Compiling rcgen v0.14.10
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 2.60s
+     Running tests/execute_concurrency.rs (rust/target/debug/deps/execute_concurrency-4d82ca861ea55af2)

@@ -1,0 +1,14 @@
+   Compiling lingxi-service v0.0.0 (/Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-service)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 1.43s
+     Running tests/r04_t01_tool_catalog.rs (rust/target/debug/deps/r04_t01_tool_catalog-d1060013878485e0)
+
+running 6 tests
+test adversarial_alias_and_primary_name_share_one_permission_contract ... ok
+test registry_capabilities_resolve_recovery_classification ... ok
+test adversarial_malformed_inputs_never_reach_the_executor ... ok
+test r04_a01_catalog_and_execution_share_one_source_of_truth ... ok
+test r04_a02_stale_catalog_generation_is_refused_until_refresh ... ok
+test adversarial_forged_digest_is_refused_with_zero_dispatch_on_real_chain ... ok
+
+test result: ok. 6 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.11s
+

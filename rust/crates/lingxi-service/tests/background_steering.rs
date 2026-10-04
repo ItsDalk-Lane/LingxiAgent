@@ -35,9 +35,10 @@ use std::path::PathBuf;
 use std::pin::Pin;
 use std::sync::Arc;
 
+use lingxi_kernel::model_exchange::ModelTurnInput;
 use lingxi_kernel::ports::{
     ProviderDescriptor, ProviderTurn, ProviderTurnResult, ToolExecutionResult, ToolExecutorPort,
-    ToolOutcome, ToolRequest, TurnProviderPort,
+    ToolOutcome, ToolRequest, TurnDeltaSink, TurnProviderPort,
 };
 use lingxi_protocol::{ContentBlock, ModelCallId, NormalizedMessage, ToolCallId};
 use lingxi_service::{
@@ -125,9 +126,11 @@ impl TurnProviderPort for GatedProvider {
         &'a self,
         ctx: &'a lingxi_kernel::RunContext,
         _call: &'a ModelCallId,
-        _turn: u32,
-        input: &'a str,
+        input: &'a ModelTurnInput,
+
+        _deltas: &'a dyn TurnDeltaSink,
     ) -> Pin<Box<dyn std::future::Future<Output = ProviderTurnResult> + Send + 'a>> {
+        let input = input.submission.as_str();
         let session = ctx.session_id.to_string();
         let run = ctx.run_id.to_string();
         let pop = {

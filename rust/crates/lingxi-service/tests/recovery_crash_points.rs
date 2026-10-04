@@ -48,9 +48,11 @@ use std::path::{Path, PathBuf};
 use std::pin::Pin;
 use std::sync::Arc;
 
+use lingxi_kernel::model_exchange::ModelTurnInput;
 use lingxi_kernel::ports::{
     InvocationPhase, KeyEvent, ProviderDescriptor, ProviderTurnResult, RunOutcome, StorageError,
-    StoragePort, ToolExecutionResult, ToolExecutorPort, ToolOutcome, ToolRequest, TurnProviderPort,
+    StoragePort, ToolExecutionResult, ToolExecutorPort, ToolOutcome, ToolRequest, TurnDeltaSink,
+    TurnProviderPort,
 };
 use lingxi_kernel::RunContext;
 use lingxi_protocol::{ContentBlock, ModelCallId, NormalizedMessage, RunId, ToolCallId};
@@ -455,6 +457,23 @@ impl StoragePort for GatedPort {
     ) -> Result<Option<lingxi_kernel::subagent::RunLineage>, StorageError> {
         self.inner.load_run_lineage(run_id).await
     }
+
+    async fn record_model_call_usage(
+        &self,
+        record: lingxi_kernel::usage::ModelCallUsageRecord,
+        now_unix_ms: u64,
+    ) -> Result<(), StorageError> {
+        self.inner
+            .record_model_call_usage(record, now_unix_ms)
+            .await
+    }
+
+    async fn query_model_call_usage(
+        &self,
+        query: lingxi_kernel::usage::ModelUsageQuery,
+    ) -> Result<Vec<lingxi_kernel::usage::ModelCallUsageRecord>, StorageError> {
+        self.inner.query_model_call_usage(query).await
+    }
 }
 
 // ── the child's response-production doubles ──────────────────────────────────
@@ -474,13 +493,16 @@ impl TurnProviderPort for OneToolThenFinalProvider {
         &'a self,
         ctx: &'a RunContext,
         _call: &'a ModelCallId,
-        turn: u32,
-        _input: &'a str,
+        input: &'a ModelTurnInput,
+
+        _deltas: &'a dyn TurnDeltaSink,
     ) -> Pin<Box<dyn std::future::Future<Output = ProviderTurnResult> + Send + 'a>> {
+        let turn = input.turn;
         let ctx_at_issue = ctx.clone();
         Box::pin(async move {
             let out = if turn == 1 {
                 lingxi_kernel::ports::ProviderTurn::ToolRequests {
+                    content: Vec::new(),
                     requests: vec![ToolRequest::from_effective_arguments(
                         TARGET,
                         serde_json::json!({

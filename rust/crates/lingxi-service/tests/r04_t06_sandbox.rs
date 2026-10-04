@@ -36,9 +36,10 @@ use std::pin::Pin;
 use std::sync::Arc;
 use std::time::Duration;
 
+use lingxi_kernel::model_exchange::ModelTurnInput;
 use lingxi_kernel::ports::{
     ProviderDescriptor, ProviderTurn, ProviderTurnResult, ToolExecutionResult, ToolOutcome,
-    ToolRequest, TurnProviderPort,
+    ToolRequest, TurnDeltaSink, TurnProviderPort,
 };
 use lingxi_kernel::subagent::SessionPermissionMode;
 use lingxi_kernel::toolcatalog::{SchemaBudget, ToolRegistry, ToolTargetId};
@@ -105,8 +106,9 @@ impl TurnProviderPort for IdleProvider {
         &'a self,
         ctx: &'a RunContext,
         _call: &'a ModelCallId,
-        _turn: u32,
-        _input: &'a str,
+        _input: &'a ModelTurnInput,
+
+        _deltas: &'a dyn TurnDeltaSink,
     ) -> Pin<Box<dyn std::future::Future<Output = ProviderTurnResult> + Send + 'a>> {
         let next = self
             .steps

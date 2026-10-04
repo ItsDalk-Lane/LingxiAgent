@@ -1,0 +1,27 @@
+xtask: verify-stage R02 [bash scripts/rust-tauri/r02_t01_service_smoke.sh {EVIDENCE}/A01] > /Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R02/T08/verify-stage/a01_smoke
+xtask: verify-stage R02 [a01_smoke] PASS
+xtask: verify-stage R02 [bash scripts/rust-tauri/r02_t01_boundary_negative.sh {EVIDENCE}/A02] > /Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R02/T08/verify-stage/a02_boundary_negative
+xtask: verify-stage R02 [a02_boundary_negative] PASS
+xtask: verify-stage R02 [bash scripts/rust-tauri/r02_t02_dual_instance.sh {EVIDENCE}/A03] > /Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R02/T08/verify-stage/a03_dual_instance
+xtask: verify-stage R02 [a03_dual_instance] PASS
+xtask: verify-stage R02 [bash scripts/rust-tauri/r02_t02_path_priority.sh {EVIDENCE}/A04] > /Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R02/T08/verify-stage/a04_path_priority
+xtask: verify-stage R02 [a04_path_priority] PASS
+xtask: verify-stage R02 [bash scripts/rust-tauri/r02_t03_auth_matrix.sh {EVIDENCE}/A05_A06] > /Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R02/T08/verify-stage/a05_a06_auth_matrix
+xtask: verify-stage R02 [a05_a06_auth_matrix] PASS
+xtask: verify-stage R02 [bash scripts/rust-tauri/r02_t04_storage_tx.sh {EVIDENCE}/A07_A08] > /Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R02/T08/verify-stage/a07_a08_storage_tx
+xtask: verify-stage R02 [a07_a08_storage_tx] PASS
+xtask: verify-stage R02 [bash scripts/rust-tauri/r02_t05_events_matrix.sh {EVIDENCE}/A09_A10] > /Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R02/T08/verify-stage/a09_a10_events_matrix
+xtask: verify-stage R02 [a09_a10_events_matrix] PASS
+xtask: verify-stage R02 [bash scripts/rust-tauri/r02_t06_backup_restore.sh {EVIDENCE}/A11] > /Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R02/T08/verify-stage/a11_backup_restore
+xtask: verify-stage R02 [a11_backup_restore] PASS
+xtask: verify-stage R02 [bash scripts/rust-tauri/r02_t06_recovery_drill.sh {EVIDENCE}/A12] > /Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R02/T08/verify-stage/a12_recovery_drill
+xtask: verify-stage R02 [a12_recovery_drill] PASS
+xtask: verify-stage R02 [bash scripts/rust-tauri/r02_t07_redaction_scan.sh {EVIDENCE}/A13] > /Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R02/T08/verify-stage/a13_redaction_scan
+xtask: verify-stage R02 [a13_redaction_scan] PASS
+xtask: verify-stage R02 [bash scripts/rust-tauri/r02_t07_slow_subscriber.sh {EVIDENCE}/A14] > /Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R02/T08/verify-stage/a14_slow_subscriber
+xtask: verify-stage R02 [a14_slow_subscriber] PASS
+xtask: verify-stage R02 [bash scripts/rust-tauri/r02_t08_full_chain_smoke.sh {EVIDENCE}/A15] > /Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R02/T08/verify-stage/a15_full_chain
+xtask: verify-stage R02 [a15_full_chain] PASS
+xtask: verify-stage R02 [bash scripts/rust-tauri/r02_t08_legacy_entry_regression.sh {EVIDENCE}/A16] > /Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R02/T08/verify-stage/a16_legacy_regression
+xtask: verify-stage R02 [a16_legacy_regression] PASS
+xtask: verify-stage R02 result written to /Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R02/T08/verify-stage/verify-stage-result.json (overall: "PASS")

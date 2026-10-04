@@ -1,0 +1,135 @@
+   Compiling lingxi-service v0.0.0 (/Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-service)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 3.45s
+     Running tests/auth_matrix.rs (/tmp/r02-t03-root-fixes-target/debug/deps/auth_matrix-6834fbcf9868a4a4)
+
+running 18 tests
+test a05_loopback_mode_refuses_non_loopback_bind_at_config_layer ... ok
+test a06_trailing_slashes_do_not_inherit_registered_route_permissions ... FAILED
+test a05_expired_and_revoked_device_credentials_are_rejected_without_side_effects ... FAILED
+test a06_expired_and_replayed_ws_tickets_are_rejected ... FAILED
+test a06_origin_matrix_http ... FAILED
+test a06_host_header_tampering_is_rejected ... FAILED
+test a06_invalid_ws_upgrade_keeps_its_protocol_status ... FAILED
+test a06_unmasked_client_frame_closes_with_protocol_error ... FAILED
+test a05_loopback_token_over_nonlocal_transport_is_denied_at_policy_layer ... FAILED
+test a05_forged_principal_fields_are_ignored_not_trusted ... FAILED
+test a05_unreadable_registry_fails_closed_and_recovers ... FAILED
+test a06_cli_shape_full_business_roundtrip ... FAILED
+test limits_body_size_and_rate_and_ws_ceiling ... FAILED
+test a05_ws_ticket_and_live_socket_observe_external_revocation ... FAILED
+test a06_ws_origin_and_host_matrix ... FAILED
+test a05_cross_principal_session_misuse_is_forbidden_without_side_effects ... FAILED
+test a05_no_credential_is_rejected_without_side_effects ... FAILED
+test a05_forged_and_unknown_session_ids ... FAILED
+
+failures:
+
+---- a06_trailing_slashes_do_not_inherit_registered_route_permissions stdout ----
+
+thread 'a06_trailing_slashes_do_not_inherit_registered_route_permissions' (37050286) panicked at crates/lingxi-service/tests/auth_matrix.rs:111:31:
+readiness: RecvError(())
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+
+---- a05_expired_and_revoked_device_credentials_are_rejected_without_side_effects stdout ----
+
+thread 'a05_expired_and_revoked_device_credentials_are_rejected_without_side_effects' (37050273) panicked at crates/lingxi-service/tests/auth_matrix.rs:111:31:
+readiness: RecvError(())
+
+---- a06_expired_and_replayed_ws_tickets_are_rejected stdout ----
+
+thread 'a06_expired_and_replayed_ws_tickets_are_rejected' (37050282) panicked at crates/lingxi-service/tests/auth_matrix.rs:111:31:
+readiness: RecvError(())
+
+---- a06_origin_matrix_http stdout ----
+
+thread 'a06_origin_matrix_http' (37050285) panicked at crates/lingxi-service/tests/auth_matrix.rs:111:31:
+readiness: RecvError(())
+
+---- a06_host_header_tampering_is_rejected stdout ----
+
+thread 'a06_host_header_tampering_is_rejected' (37050283) panicked at crates/lingxi-service/tests/auth_matrix.rs:111:31:
+readiness: RecvError(())
+
+---- a06_invalid_ws_upgrade_keeps_its_protocol_status stdout ----
+
+thread 'a06_invalid_ws_upgrade_keeps_its_protocol_status' (37050284) panicked at crates/lingxi-service/tests/auth_matrix.rs:111:31:
+readiness: RecvError(())
+
+---- a06_unmasked_client_frame_closes_with_protocol_error stdout ----
+
+thread 'a06_unmasked_client_frame_closes_with_protocol_error' (37050287) panicked at crates/lingxi-service/tests/auth_matrix.rs:111:31:
+readiness: RecvError(())
+
+---- a05_loopback_token_over_nonlocal_transport_is_denied_at_policy_layer stdout ----
+
+thread 'a05_loopback_token_over_nonlocal_transport_is_denied_at_policy_layer' (37050277) panicked at crates/lingxi-service/tests/auth_matrix.rs:111:31:
+readiness: RecvError(())
+
+---- a05_forged_principal_fields_are_ignored_not_trusted stdout ----
+
+thread 'a05_forged_principal_fields_are_ignored_not_trusted' (37050275) panicked at crates/lingxi-service/tests/auth_matrix.rs:111:31:
+readiness: RecvError(())
+
+---- a05_unreadable_registry_fails_closed_and_recovers stdout ----
+
+thread 'a05_unreadable_registry_fails_closed_and_recovers' (37050279) panicked at crates/lingxi-service/tests/auth_matrix.rs:111:31:
+readiness: RecvError(())
+
+---- a06_cli_shape_full_business_roundtrip stdout ----
+
+thread 'a06_cli_shape_full_business_roundtrip' (37050281) panicked at crates/lingxi-service/tests/auth_matrix.rs:111:31:
+readiness: RecvError(())
+
+---- limits_body_size_and_rate_and_ws_ceiling stdout ----
+
+thread 'limits_body_size_and_rate_and_ws_ceiling' (37050289) panicked at crates/lingxi-service/tests/auth_matrix.rs:111:31:
+readiness: RecvError(())
+
+---- a05_ws_ticket_and_live_socket_observe_external_revocation stdout ----
+
+thread 'a05_ws_ticket_and_live_socket_observe_external_revocation' (37050280) panicked at crates/lingxi-service/tests/auth_matrix.rs:111:31:
+readiness: RecvError(())
+
+---- a06_ws_origin_and_host_matrix stdout ----
+
+thread 'a06_ws_origin_and_host_matrix' (37050288) panicked at crates/lingxi-service/tests/auth_matrix.rs:111:31:
+readiness: RecvError(())
+
+---- a05_cross_principal_session_misuse_is_forbidden_without_side_effects stdout ----
+
+thread 'a05_cross_principal_session_misuse_is_forbidden_without_side_effects' (37050272) panicked at crates/lingxi-service/tests/auth_matrix.rs:111:31:
+readiness: RecvError(())
+
+---- a05_no_credential_is_rejected_without_side_effects stdout ----
+
+thread 'a05_no_credential_is_rejected_without_side_effects' (37050278) panicked at crates/lingxi-service/tests/auth_matrix.rs:111:31:
+readiness: RecvError(())
+
+---- a05_forged_and_unknown_session_ids stdout ----
+
+thread 'a05_forged_and_unknown_session_ids' (37050274) panicked at crates/lingxi-service/tests/auth_matrix.rs:111:31:
+readiness: RecvError(())
+
+
+failures:
+    a05_cross_principal_session_misuse_is_forbidden_without_side_effects
+    a05_expired_and_revoked_device_credentials_are_rejected_without_side_effects
+    a05_forged_and_unknown_session_ids
+    a05_forged_principal_fields_are_ignored_not_trusted
+    a05_loopback_token_over_nonlocal_transport_is_denied_at_policy_layer
+    a05_no_credential_is_rejected_without_side_effects
+    a05_unreadable_registry_fails_closed_and_recovers
+    a05_ws_ticket_and_live_socket_observe_external_revocation
+    a06_cli_shape_full_business_roundtrip
+    a06_expired_and_replayed_ws_tickets_are_rejected
+    a06_host_header_tampering_is_rejected
+    a06_invalid_ws_upgrade_keeps_its_protocol_status
+    a06_origin_matrix_http
+    a06_trailing_slashes_do_not_inherit_registered_route_permissions
+    a06_unmasked_client_frame_closes_with_protocol_error
+    a06_ws_origin_and_host_matrix
+    limits_body_size_and_rate_and_ws_ceiling
+
+test result: FAILED. 1 passed; 17 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.33s
+
+error: test failed, to rerun pass `-p lingxi-service --test auth_matrix`

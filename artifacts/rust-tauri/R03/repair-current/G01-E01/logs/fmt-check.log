@@ -1,0 +1,65 @@
+Diff in /Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-service/src/background.rs:213:
+ }
+ 
+ /// Appends one observed drive exit to the bounded ring (oldest dropped).
+-fn record_recent_exit(
+-    ring: &Arc<Mutex<Vec<(String, TaskExit)>>>,
+-    run_id: String,
+-    exit: TaskExit,
+-) {
++fn record_recent_exit(ring: &Arc<Mutex<Vec<(String, TaskExit)>>>, run_id: String, exit: TaskExit) {
+     let mut ring = ring.lock().unwrap_or_else(|poisoned| poisoned.into_inner());
+     if ring.len() >= RECENT_EXITS_CAP {
+         let overflow = ring.len() + 1 - RECENT_EXITS_CAP;
+Diff in /Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-service/src/task_supervisor.rs:639:
+                 std::task::Poll::Ready(SupervisedPoll::Completed(value))
+             }
+             Ok(std::task::Poll::Pending) => std::task::Poll::Pending,
+-            Err(payload) => std::task::Poll::Ready(SupervisedPoll::Panicked(
+-                panic_message_of(&payload),
+-            )),
++            Err(payload) => {
++                std::task::Poll::Ready(SupervisedPoll::Panicked(panic_message_of(&payload)))
++            }
+         }
+     }
+ }
+Diff in /Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-service/src/task_supervisor.rs:1022:
+     /// that ignores the window is force-dropped at expiry (Aborted).
+     #[tokio::test]
+     async fn run_level_child_finishes_its_own_cancellation_within_the_window() {
+-        let supervisor = Arc::new(TaskSupervisor::with_cooperative_grace(8, Duration::from_millis(300)));
++        let supervisor = Arc::new(TaskSupervisor::with_cooperative_grace(
++            8,
++            Duration::from_millis(300),
++        ));
+         let root = CancelScope::run_root("run_coop");
+         let scope = root.child("child_run:coop".to_string(), ScopeKind::ChildRun);
+         let observed_cancel = Arc::new(std::sync::atomic::AtomicBool::new(false));
+Diff in /Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-service/src/task_supervisor.rs:1071:
+     /// honest last resort (never an unbounded wait).
+     #[tokio::test]
+     async fn run_level_child_ignoring_the_window_is_dropped_at_expiry() {
+-        let supervisor = Arc::new(TaskSupervisor::with_cooperative_grace(8, Duration::from_millis(80)));
++        let supervisor = Arc::new(TaskSupervisor::with_cooperative_grace(
++            8,
++            Duration::from_millis(80),
++        ));
+         let root = CancelScope::run_root("run_coop2");
+         let scope = root.child("child_run:stubborn".to_string(), ScopeKind::ChildRun);
+         struct DropProbe(Arc<std::sync::atomic::AtomicBool>);
+Diff in /Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-service/tests/cancel_link_inheritance.rs:42:
+ use lingxi_protocol::{
+     ContentBlock, ErrorCode, ModelCallId, NormalizedMessage, ProtocolError, ToolCallId,
+ };
+-use lingxi_service::{cancel, prepare_layout, CancelPolicy, HomeSource, NetworkMode, ServiceConfig,
+-                     ServiceDeps, ServiceState};
++use lingxi_service::{
++    cancel, prepare_layout, CancelPolicy, HomeSource, NetworkMode, ServiceConfig, ServiceDeps,
++    ServiceState,
++};
+ 
+ const NOW_MS: u64 = 1_790_409_600_000;
+ 
+Diff in /Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-service/tests/cancel_link_inheritance.rs:51:
+ 

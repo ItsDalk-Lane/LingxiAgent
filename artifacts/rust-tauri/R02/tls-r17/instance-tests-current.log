@@ -1,0 +1,17 @@
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.09s
+     Running unittests src/lib.rs (target/debug/deps/lingxi_service-859f4a65b7026329)
+
+running 10 tests
+test instance::tests::record_handshake_mismatch_is_reported ... ok
+test instance::tests::probe_peer_reports_unreachable_for_dead_port ... ok
+test instance::tests::identity_is_unique_and_well_formed ... ok
+test instance::tests::record_json_round_trips_camel_case ... ok
+test instance::tests::second_acquire_in_process_is_rejected_with_diagnostics ... ok
+test instance::tests::stale_record_with_nonexistent_pid_is_still_taken_over ... ok
+test instance::tests::held_lock_with_live_foreign_pid_still_rejects ... ok
+test instance::tests::release_never_deletes_a_foreign_record ... ok
+test instance::tests::unreadable_leftover_record_is_replaced_not_fatal ... ok
+test instance::tests::stale_record_is_archived_and_taken_over_regardless_of_pid ... ok
+
+test result: ok. 10 passed; 0 failed; 0 ignored; 0 measured; 162 filtered out; finished in 0.06s
+

@@ -1,0 +1,9 @@
+2026-10-03T17:42:56.425753Z  INFO lingxi_service: data root resolved effective_home=/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T//lingxi-r02-t01-smoke-home.IHrZsa/negative-newer-config-data source=config-file ignored_sources=none
+2026-10-03T17:42:56.426089Z  INFO lingxi_service: data root prepared (canonicalized; runtime dir private 0700) canonical_home=/private/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-r02-t01-smoke-home.IHrZsa/negative-newer-config-data runtime_dir=/private/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-r02-t01-smoke-home.IHrZsa/negative-newer-config-data/lingxi-service
+2026-10-03T17:42:56.426350Z  INFO lingxi_service: single-writer lock acquired [token] start_nonce=55a9a360ed5da756 pid=10407 entropy="os-random-device" lock=/private/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-r02-t01-smoke-home.IHrZsa/negative-newer-config-data/lingxi-service/instance.lock network_mode=loopback
+LINGXI_DATA_EPOCH_BLOCKED reason=epoch-downgrade-blocked
+[data-epoch] The data safety gate refused startup (epoch-downgrade-blocked): this data home requires a kernel at data epoch 2 or newer (last opened by version 9.9.9); this kernel is epoch 1. Upgrade the service — the new stack refuses instead of opening a possibly newer data format with an older kernel
+[data-epoch] 数据安全闸拒绝启动（epoch-downgrade-blocked）：this data home requires a kernel at data epoch 2 or newer (last opened by version 9.9.9); this kernel is epoch 1. Upgrade the service — the new stack refuses instead of opening a possibly newer data format with an older kernel
+[data-epoch] 请保留现场文件，使用维护/恢复流程处理；不要删除未知状态后强行启动。
+
+2026-10-03T17:42:56.426701Z ERROR lingxi_service: data-epoch gate refused startup (exit 2) reason="epoch-downgrade-blocked" home=/private/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-r02-t01-smoke-home.IHrZsa/negative-newer-config-data

@@ -43,9 +43,10 @@ use std::pin::Pin;
 use std::sync::Arc;
 use std::time::Duration;
 
+use lingxi_kernel::model_exchange::ModelTurnInput;
 use lingxi_kernel::ports::{
     ProviderDescriptor, ProviderTurn, ProviderTurnResult, StoragePort, ToolExecutionResult,
-    ToolExecutorPort, ToolOutcome, ToolRequest, TurnProviderPort,
+    ToolExecutorPort, ToolOutcome, ToolRequest, TurnDeltaSink, TurnProviderPort,
 };
 use lingxi_kernel::RunContext;
 use lingxi_protocol::{
@@ -104,8 +105,9 @@ impl TurnProviderPort for GatedProvider {
         &'a self,
         ctx: &'a RunContext,
         _call: &'a ModelCallId,
-        _turn: u32,
-        _input: &'a str,
+        _input: &'a ModelTurnInput,
+
+        _deltas: &'a dyn TurnDeltaSink,
     ) -> Pin<Box<dyn std::future::Future<Output = ProviderTurnResult> + Send + 'a>> {
         let session = ctx.session_id.to_string();
         let pop = {
@@ -632,6 +634,7 @@ async fn a05_case(state_kind: WaitState) {
                     (
                         "sess_local_alpha",
                         vec![ProviderTurn::ToolRequests {
+                            content: Vec::new(),
                             requests: vec![read_tool_request()],
                         }],
                     ),
@@ -639,6 +642,7 @@ async fn a05_case(state_kind: WaitState) {
                         "sess_local_beta",
                         vec![
                             ProviderTurn::ToolRequests {
+                                content: Vec::new(),
                                 requests: vec![read_tool_request()],
                             },
                             ProviderTurn::Final {
@@ -693,6 +697,7 @@ async fn a05_case(state_kind: WaitState) {
                     "sess_local_alpha",
                     vec![
                         ProviderTurn::ToolRequests {
+                            content: Vec::new(),
                             requests: vec![read_tool_request()],
                         },
                         ProviderTurn::Final {
@@ -733,6 +738,7 @@ async fn a05_case(state_kind: WaitState) {
                             process_note: "reading the stream".to_string(),
                         },
                         ProviderTurn::ToolRequests {
+                            content: Vec::new(),
                             requests: vec![read_tool_request()],
                         },
                     ],
@@ -906,7 +912,10 @@ async fn a05_case(state_kind: WaitState) {
         WaitState::StreamRead => assert_eq!(
             events,
             vec![
-                "run_state_changed", // queued -> running
+                "run_state_changed",  // queued -> running
+                "model_call_started", // D6: started is durable BEFORE the first delta —
+                // the cancelled mid-stream call leaves its honest
+                // started fact (never a fabricated completed)
                 "run_state_changed", // running -> cancelling (mid-stream)
                 "run_state_changed", // cancelling -> cancelled
             ],
@@ -1044,6 +1053,7 @@ async fn queue_wait_cancel_leaves_the_unrelated_holder_untouched() {
             (
                 "sess_local_alpha",
                 vec![ProviderTurn::ToolRequests {
+                    content: Vec::new(),
                     requests: vec![read_tool_request()],
                 }],
             ),
@@ -1051,6 +1061,7 @@ async fn queue_wait_cancel_leaves_the_unrelated_holder_untouched() {
                 "sess_local_beta",
                 vec![
                     ProviderTurn::ToolRequests {
+                        content: Vec::new(),
                         requests: vec![read_tool_request()],
                     },
                     ProviderTurn::Final {
@@ -1382,6 +1393,7 @@ async fn noncooperating_child_is_reported_unconfirmed_not_fake_quiet() {
         vec![(
             "sess_local_alpha",
             vec![ProviderTurn::ToolRequests {
+                content: Vec::new(),
                 requests: vec![read_tool_request()],
             }],
         )],
@@ -1480,6 +1492,7 @@ async fn panicking_tool_child_is_supervised_and_the_run_settles_loudly() {
             "sess_local_alpha",
             vec![
                 ProviderTurn::ToolRequests {
+                    content: Vec::new(),
                     requests: vec![read_tool_request()],
                 },
                 ProviderTurn::Empty {
@@ -1718,6 +1731,7 @@ async fn approval_wait_round_trips_approve_and_reject_legs() {
             "sess_local_alpha",
             vec![
                 ProviderTurn::ToolRequests {
+                    content: Vec::new(),
                     requests: vec![read_tool_request()],
                 },
                 ProviderTurn::Final {
@@ -1788,6 +1802,7 @@ async fn approval_wait_round_trips_approve_and_reject_legs() {
             "sess_local_alpha",
             vec![
                 ProviderTurn::ToolRequests {
+                    content: Vec::new(),
                     requests: vec![read_tool_request()],
                 },
                 ProviderTurn::Empty {

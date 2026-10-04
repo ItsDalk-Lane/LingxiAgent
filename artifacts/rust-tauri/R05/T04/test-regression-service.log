@@ -1,0 +1,89 @@
+   Compiling lingxi-service v0.0.0 (/Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-service)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 3.74s
+     Running tests/cancel_terminal_race.rs (target/debug/deps/cancel_terminal_race-3ef512563e771c72)
+
+running 13 tests
+test a_fire_after_the_driver_reached_cleaning_never_regresses_the_phase ... ok
+test concurrent_duplicate_fires_keep_the_first_reason_and_a_single_fired ... ok
+test cancel_accepted_while_final_events_persist_beats_the_completed_terminal ... ok
+test cancel_at_the_no_provider_early_close_settles_cancelled ... ok
+test cancel_after_the_committed_terminal_reports_already_terminal ... ok
+test cancel_at_the_authorization_boundary_never_opens_the_approval_ask ... ok
+test cancel_at_the_started_boundary_dispatches_no_new_external_call ... ok
+test cancel_racing_the_finalize_transaction_is_too_late_not_accepted ... ok
+test cancel_accepted_before_the_terminal_claim_beats_every_terminal_shape ... ok
+test started_without_receipt_journals_unknown_receipt_facts ... ok
+test cancel_at_the_intent_boundary_dispatches_no_new_external_call ... ok
+test cancel_accepted_before_the_terminal_claim_beats_the_failed_terminal_too ... ok
+test cancel_between_tool_iterations_stops_the_second_dispatch ... ok
+
+test result: ok. 13 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.36s
+
+     Running tests/cancellation_tree.rs (target/debug/deps/cancellation_tree-3950833db08615de)
+
+running 8 tests
+test state_change_transaction_commits_legal_legs_and_diagnoses_bad_ones ... ok
+test cancel_surface_is_diagnosable_for_unknown_terminal_foreign_and_dangling ... ok
+test panicking_tool_child_is_supervised_and_the_run_settles_loudly ... ok
+test queue_wait_cancel_leaves_the_unrelated_holder_untouched ... ok
+test r03_a06_cancel_parent_spares_unrelated_background ... ok
+test approval_wait_round_trips_approve_and_reject_legs ... ok
+test r03_a05_cancel_exits_each_wait_state_and_returns_quotas ... ok
+test noncooperating_child_is_reported_unconfirmed_not_fake_quiet ... ok
+
+test result: ok. 8 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.61s
+
+     Running tests/late_result_fence.rs (target/debug/deps/late_result_fence-635115a6f8a60635)
+
+running 5 tests
+test reconnect_resubscribes_only_and_never_restarts_a_model ... ok
+test r03_a07_driver_fences_stale_tagged_model_result_loudly ... ok
+test r03_a07_late_attempt1_result_vs_current_attempt_is_stale_only ... ok
+test r03_a07_late_result_after_cancel_and_next_run_pollutes_nothing ... ok
+test r03_a07_tool_result_with_stale_fence_records_unknown_and_audits ... ok
+
+test result: ok. 5 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.22s
+
+     Running tests/r05_t01_binary_wiring.rs (target/debug/deps/r05_t01_binary_wiring-7c89112e09c92d5a)
+
+running 2 tests
+test c03_real_binary_without_plane_settles_unconfigured ... ok
+test c02_real_binary_full_chain_through_authenticated_endpoint ... ok
+
+test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 1.00s
+
+     Running tests/r05_t01_model_plane.rs (target/debug/deps/r05_t01_model_plane-61d3c1c51b855145)
+
+running 7 tests
+test c03_no_model_plane_is_the_explicit_unconfigured_outcome ... ok
+test c05_reload_without_a_configured_plane_is_a_loud_404 ... ok
+test c06_unsupported_family_makes_zero_requests ... ok
+test c02_full_chain_real_wiring_real_tool_real_result ... ok
+test c04_same_model_id_different_providers_never_cross_wire ... ok
+test c05_in_flight_call_keeps_its_snapshot_and_cancel_is_unaffected ... ok
+test c05_reload_through_management_surface_swaps_atomically ... ok
+
+test result: ok. 7 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 4.95s
+
+     Running tests/r05_t02_credentials.rs (target/debug/deps/r05_t02_credentials-c4e2fc9a5d7713b1)
+
+running 16 tests
+test c07_a_second_401_after_refresh_never_retriggers_a_refresh ... ok
+test c05_a_revoked_credential_never_resurrects_full_chain ... ok
+test c07_oauth_without_a_login_fails_before_any_request ... ok
+test c06_a_persist_failure_is_reported_honestly_full_chain ... ok
+test c07_invalid_grant_is_terminal_reauthorization_never_a_retry ... ok
+test c07_a_static_key_401_is_terminal_without_any_refresh ... ok
+test c11_store_concurrency_fidelity_and_restart_semantics ... ok
+test c07_a_transient_refresh_failure_is_bounded_by_the_attempt_policy ... ok
+test c10_a_redirect_is_never_followed_with_credentials ... ok
+test c01_all_purposes_resolve_through_the_single_credential_service ... ok
+test c09_marker_secret_never_reaches_durable_state_and_echoes_are_scrubbed ... ok
+test c12_management_surface_is_local_only_and_forgery_is_refused ... ok
+test c03_a_blocked_refresh_never_blocks_other_providers ... ok
+test c04_a_cancelled_waiter_leaves_the_shared_refresh_intact ... ok
+test c02_concurrent_401s_merge_into_one_refresh_full_chain ... ok
+test o1_same_model_id_on_two_keyed_providers_never_crosses_material ... ok
+
+test result: ok. 16 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 5.39s
+

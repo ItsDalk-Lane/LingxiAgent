@@ -1,0 +1,5 @@
+== run 2026-09-28T16:01:14+0800 (pid 91537) ==
+== R02-T08 / R02-A16 legacy-entry regression (SHA-bound baseline/candidate replay, pristine baseline, content-based cause classes) ==
+base SHA:      0000000000000000000000000000000000000000
+candidate SHA: 9b98c679678888b60ff2e32bd67d3da6fc2f5c4f
+scope: regression gate only — PASS here is NOT the formal audit seal (orchestrator step)

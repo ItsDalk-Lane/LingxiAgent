@@ -1,0 +1,36 @@
+{
+  "schema": "r05-t05-compat-golden/v1",
+  "module": "openrouter",
+  "case": "adaptive-verbosity-defaults-high",
+  "model": {
+    "provider": "openrouter",
+    "id": "anthropic/claude-opus-5",
+    "baseUrl": "https://openrouter.ai/api/v1",
+    "api": "openai-completions",
+    "reasoning": true
+  },
+  "payload": {
+    "model": "anthropic/claude-opus-5",
+    "messages": [],
+    "thinking": {
+      "type": "enabled"
+    },
+    "reasoning_effort": "high"
+  },
+  "options": {
+    "mode": "chat"
+  },
+  "expected": {
+    "thinkingFormat": "openrouter",
+    "reasoningProfile": "openrouter-anthropic-adaptive",
+    "matched": "openrouter",
+    "result": {
+      "model": "anthropic/claude-opus-5",
+      "messages": [],
+      "reasoning": {
+        "enabled": true
+      },
+      "verbosity": "high"
+    }
+  }
+}

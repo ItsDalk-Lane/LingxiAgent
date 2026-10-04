@@ -1,0 +1,18 @@
+
+ RUN  v4.1.10 /Users/study_superior/Desktop/Code/LingxiAgent
+
+stdout | desktop/src/react/__tests__/app-init.test.ts > initApp bridge indicator > refreshes local token and rebuilds websocket after server restart
+[hana-launch] app-ready
+
+ ❯ desktop/src/react/__tests__/app-init.test.ts (15 tests | 1 failed) 406ms
+     × refreshes local token and rebuilds websocket after server restart 4ms
+ ❯ desktop/src/react/__tests__/services/R02RustWebSocket.test.ts (2 tests | 1 failed) 141ms
+     × stays offline until the Rust wire handshake succeeds and never opens the Node chat composer 88ms
+ ❯ desktop/src/react/__tests__/settings/SettingsContent.test.tsx (9 tests | 1 failed) 967ms
+     × keeps activeServerConnection in sync when the settings window hears server restart 58ms
+
+ Test Files  3 failed | 1 passed (4)
+      Tests  3 failed | 53 passed (56)
+   Start at  18:06:34
+   Duration  1.49s (transform 1.04s, setup 64ms, import 596ms, tests 1.56s, environment 341ms)
+

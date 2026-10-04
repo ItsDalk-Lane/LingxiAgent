@@ -1,0 +1,23 @@
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.07s
+     Running tests/stage_review_rr1.rs (target/debug/deps/stage_review_rr1-f16064955aa4d654)
+
+running 16 tests
+test rr1_main_f01_linked_tree_and_post_cancel_creation_adapter_zero ... ok
+test rr1_main_f04_side_effect_then_panic_unknown_and_recovery_no_redo ... ok
+test rr1_main_f05a_background_spawn_refusal_retry_starts_for_real ... ok
+test rr1_main_f03_final_persistence_cancel_vs_complete_single_winner ... ok
+test rr1_main_f05b_foreground_start_persistence_failure_retry_fresh ... ok
+test rr1_var_f01c_registration_vs_cancellation_race_barrier ... ok
+test rr1_var_f02b_never_first_polled_closeout ... ok
+test rr1_var_f03c_concurrent_duplicate_cancel_first_reason_no_regress ... ok
+test rr1_main_f02_same_process_parent_cancels_beyond_cap_full_closeout ... ok
+test rr1_main_f07_background_steer_consumed_once_no_crosstalk ... ok
+test rr1_main_f06_in_budget_full_input_arrives_foreground_and_background ... ok
+test rr1_var_f04c_trusted_negatives_dispatched_false_vs_true ... ok
+test rr1_var_f06c_over_budget_explicit_refusal_zero_side_effects ... ok
+test rr1_var_f05c_same_key_conflict_and_cross_session_namespace ... ok
+test rr1_var_f05e_restart_same_key_explicit_binding ... ok
+test rr1_var_f07d_steering_capacity_foreground_background_same_contract ... ok
+
+test result: ok. 16 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.69s
+

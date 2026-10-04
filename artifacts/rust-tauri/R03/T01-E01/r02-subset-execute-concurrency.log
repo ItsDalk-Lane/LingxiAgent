@@ -1,0 +1,11 @@
+   Compiling lingxi-service v0.0.0 (/Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-service)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 5.35s
+     Running tests/execute_concurrency.rs (target/debug/deps/execute_concurrency-4d82ca861ea55af2)
+
+running 3 tests
+test http_running_storage_fault_has_no_success_event_or_restart_run ... ok
+test http_concurrent_executes_at_one_fixed_millisecond_mint_distinct_runs ... ok
+test in_process_concurrent_executes_mint_distinct_runs_and_reseed_on_restart ... ok
+
+test result: ok. 3 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.24s
+

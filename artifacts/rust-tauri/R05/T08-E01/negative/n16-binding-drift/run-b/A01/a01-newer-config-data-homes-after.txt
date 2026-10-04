@@ -1,0 +1,10 @@
+ROOT /var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-r02-t01-smoke-home.kHcRqV/negative-newer-config-data
+DIR app-data
+FILE data-epoch.json fff3feede919307eab19131c6840eae2586f34591c8af945c5b99257432a08a3
+DIR lingxi-service
+FILE app-data/existing.bin c43fe175063ed3bec81dafcd0d914ec43e9e94bfee03dda38a6c35e79c054586
+FILE lingxi-service/instance.lock e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855
+DIR lingxi-service/logs
+DIR lingxi-service/tmp
+FILE lingxi-service/logs/service-000001.log c858ffdb76cb94e5d8814942ba2f897a88ec7b79d654f38a93803394f8c508c6
+ROOT /var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-r02-t01-smoke-home.kHcRqV/negative-fallback

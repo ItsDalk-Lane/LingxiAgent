@@ -1,0 +1,44 @@
+{
+  "schema": "r05-t05-compat-golden/v1",
+  "module": "volcengine",
+  "case": "off-level-disables-and-strips",
+  "model": {
+    "provider": "volcengine",
+    "id": "doubao-seed-1-8",
+    "baseUrl": "https://ark.cn-beijing.volces.com/api/v3",
+    "api": "openai-completions",
+    "reasoning": true
+  },
+  "payload": {
+    "model": "doubao-seed-1-8",
+    "messages": [
+      {
+        "role": "assistant",
+        "content": "a",
+        "reasoning_content": "trace"
+      }
+    ],
+    "reasoning_effort": "high"
+  },
+  "options": {
+    "mode": "chat",
+    "reasoningLevel": "off"
+  },
+  "expected": {
+    "thinkingFormat": "volcengine",
+    "reasoningProfile": null,
+    "matched": "volcengine",
+    "result": {
+      "model": "doubao-seed-1-8",
+      "messages": [
+        {
+          "role": "assistant",
+          "content": "a"
+        }
+      ],
+      "thinking": {
+        "type": "disabled"
+      }
+    }
+  }
+}

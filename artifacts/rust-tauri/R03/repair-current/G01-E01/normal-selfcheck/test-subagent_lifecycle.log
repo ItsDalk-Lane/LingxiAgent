@@ -1,0 +1,11 @@
+   Compiling lingxi-service v0.0.0 (/Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-service)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.78s
+     Running tests/subagent_lifecycle.rs (rust/target/debug/deps/subagent_lifecycle-f928c851414e12c8)
+
+running 3 tests
+test reply_validations_refuse_unknown_threads_loudly ... ok
+test busy_thread_refuses_reply_with_a_structured_conflict ... ok
+test dispatch_reply_close_round_trip_on_the_real_chain ... ok
+
+test result: ok. 3 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.19s
+

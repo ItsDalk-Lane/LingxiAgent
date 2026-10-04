@@ -1,0 +1,155 @@
+   Compiling zeroize v1.9.0
+   Compiling untrusted v0.9.0
+   Compiling deranged v0.5.8
+   Compiling time-core v0.1.9
+   Compiling jobserver v0.1.35
+   Compiling powerfmt v0.2.0
+   Compiling num-conv v0.2.2
+   Compiling subtle v2.6.1
+   Compiling pem v4.0.0
+   Compiling rustls-pki-types v1.15.1
+   Compiling cc v1.4.7
+   Compiling time v0.3.55
+   Compiling cmake v0.1.58
+   Compiling libsqlite3-sys v0.38.2
+   Compiling ring v0.17.14
+   Compiling aws-lc-sys v0.45.0
+   Compiling yasna v0.6.0
+   Compiling rcgen v0.14.10
+   Compiling rusqlite v0.40.2
+   Compiling lingxi-adapters v0.0.0 (/Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-adapters)
+   Compiling aws-lc-rs v1.18.1
+   Compiling rustls v0.23.45
+   Compiling rustls-webpki v0.103.15
+   Compiling tokio-rustls v0.26.5
+   Compiling lingxi-service v0.0.0 (/Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-service)
+error[E0277]: `EndpointError` doesn't implement `std::fmt::Debug`
+   --> crates/lingxi-service/src/management.rs:837:67
+    |
+837 |         assert!(state.authenticate_cookie(Some(&cookie), 1, true).unwrap().is_some());
+    |                                                                   ^^^^^^ the trait `std::fmt::Debug` is not implemented for `EndpointError`
+    |
+    = note: add `#[derive(Debug)]` to `EndpointError` or manually `impl std::fmt::Debug for EndpointError`
+note: required by a bound in `Result::<T, E>::unwrap`
+   --> /private/tmp/rust-20260123-8344-1t53h/rustc-1.93.0-src/library/core/src/result.rs:1227:5
+help: consider annotating `EndpointError` with `#[derive(Debug)]`
+   --> crates/lingxi-service/src/lib.rs:755:1
+    |
+755 + #[derive(Debug)]
+756 | pub struct EndpointError {
+    |
+
+error[E0277]: `EndpointError` doesn't implement `std::fmt::Debug`
+   --> crates/lingxi-service/src/management.rs:838:68
+    |
+838 |         assert!(state.authenticate_cookie(Some(&cookie), 1, false).unwrap().is_none());
+    |                                                                    ^^^^^^ the trait `std::fmt::Debug` is not implemented for `EndpointError`
+    |
+    = note: add `#[derive(Debug)]` to `EndpointError` or manually `impl std::fmt::Debug for EndpointError`
+note: required by a bound in `Result::<T, E>::unwrap`
+   --> /private/tmp/rust-20260123-8344-1t53h/rustc-1.93.0-src/library/core/src/result.rs:1227:5
+help: consider annotating `EndpointError` with `#[derive(Debug)]`
+   --> crates/lingxi-service/src/lib.rs:755:1
+    |
+755 + #[derive(Debug)]
+756 | pub struct EndpointError {
+    |
+
+error[E0277]: `EndpointError` doesn't implement `std::fmt::Debug`
+   --> crates/lingxi-service/src/management.rs:839:76
+    |
+839 |         assert!(state.authenticate_cookie(Some(&cookie), WEB_TTL_MS, true).unwrap().is_none());
+    |                                                                            ^^^^^^ the trait `std::fmt::Debug` is not implemented for `EndpointError`
+    |
+    = note: add `#[derive(Debug)]` to `EndpointError` or manually `impl std::fmt::Debug for EndpointError`
+note: required by a bound in `Result::<T, E>::unwrap`
+   --> /private/tmp/rust-20260123-8344-1t53h/rustc-1.93.0-src/library/core/src/result.rs:1227:5
+help: consider annotating `EndpointError` with `#[derive(Debug)]`
+   --> crates/lingxi-service/src/lib.rs:755:1
+    |
+755 + #[derive(Debug)]
+756 | pub struct EndpointError {
+    |
+
+error[E0277]: `EndpointError` doesn't implement `std::fmt::Debug`
+   --> crates/lingxi-service/src/management.rs:840:80
+    |
+840 |         assert!(state.authenticate_cookie(Some("hana_session=wrong"), 1, true).unwrap().is_none());
+    |                                                                                ^^^^^^ the trait `std::fmt::Debug` is not implemented for `EndpointError`
+    |
+    = note: add `#[derive(Debug)]` to `EndpointError` or manually `impl std::fmt::Debug for EndpointError`
+note: required by a bound in `Result::<T, E>::unwrap`
+   --> /private/tmp/rust-20260123-8344-1t53h/rustc-1.93.0-src/library/core/src/result.rs:1227:5
+help: consider annotating `EndpointError` with `#[derive(Debug)]`
+   --> crates/lingxi-service/src/lib.rs:755:1
+    |
+755 + #[derive(Debug)]
+756 | pub struct EndpointError {
+    |
+
+error[E0277]: `EndpointError` doesn't implement `std::fmt::Debug`
+   --> crates/lingxi-service/src/management.rs:841:73
+    |
+841 |         state.revoke_cookie(secret, crate::ConnectionKind::Local, true).unwrap();
+    |                                                                         ^^^^^^ the trait `std::fmt::Debug` is not implemented for `EndpointError`
+    |
+    = note: add `#[derive(Debug)]` to `EndpointError` or manually `impl std::fmt::Debug for EndpointError`
+note: required by a bound in `Result::<T, E>::unwrap`
+   --> /private/tmp/rust-20260123-8344-1t53h/rustc-1.93.0-src/library/core/src/result.rs:1227:5
+help: consider annotating `EndpointError` with `#[derive(Debug)]`
+   --> crates/lingxi-service/src/lib.rs:755:1
+    |
+755 + #[derive(Debug)]
+756 | pub struct EndpointError {
+    |
+
+error[E0277]: `EndpointError` doesn't implement `std::fmt::Debug`
+   --> crates/lingxi-service/src/management.rs:842:72
+    |
+842 |         state.revoke_cookie(secret, crate::ConnectionKind::Lan, false).unwrap();
+    |                                                                        ^^^^^^ the trait `std::fmt::Debug` is not implemented for `EndpointError`
+    |
+    = note: add `#[derive(Debug)]` to `EndpointError` or manually `impl std::fmt::Debug for EndpointError`
+note: required by a bound in `Result::<T, E>::unwrap`
+   --> /private/tmp/rust-20260123-8344-1t53h/rustc-1.93.0-src/library/core/src/result.rs:1227:5
+help: consider annotating `EndpointError` with `#[derive(Debug)]`
+   --> crates/lingxi-service/src/lib.rs:755:1
+    |
+755 + #[derive(Debug)]
+756 | pub struct EndpointError {
+    |
+
+error[E0277]: `EndpointError` doesn't implement `std::fmt::Debug`
+   --> crates/lingxi-service/src/management.rs:844:71
+    |
+844 |         state.revoke_cookie(secret, crate::ConnectionKind::Lan, true).unwrap();
+    |                                                                       ^^^^^^ the trait `std::fmt::Debug` is not implemented for `EndpointError`
+    |
+    = note: add `#[derive(Debug)]` to `EndpointError` or manually `impl std::fmt::Debug for EndpointError`
+note: required by a bound in `Result::<T, E>::unwrap`
+   --> /private/tmp/rust-20260123-8344-1t53h/rustc-1.93.0-src/library/core/src/result.rs:1227:5
+help: consider annotating `EndpointError` with `#[derive(Debug)]`
+   --> crates/lingxi-service/src/lib.rs:755:1
+    |
+755 + #[derive(Debug)]
+756 | pub struct EndpointError {
+    |
+
+error[E0277]: `EndpointError` doesn't implement `std::fmt::Debug`
+   --> crates/lingxi-service/src/management.rs:845:67
+    |
+845 |         assert!(state.authenticate_cookie(Some(&cookie), 1, true).unwrap().is_none());
+    |                                                                   ^^^^^^ the trait `std::fmt::Debug` is not implemented for `EndpointError`
+    |
+    = note: add `#[derive(Debug)]` to `EndpointError` or manually `impl std::fmt::Debug for EndpointError`
+note: required by a bound in `Result::<T, E>::unwrap`
+   --> /private/tmp/rust-20260123-8344-1t53h/rustc-1.93.0-src/library/core/src/result.rs:1227:5
+help: consider annotating `EndpointError` with `#[derive(Debug)]`
+   --> crates/lingxi-service/src/lib.rs:755:1
+    |
+755 + #[derive(Debug)]
+756 | pub struct EndpointError {
+    |
+
+For more information about this error, try `rustc --explain E0277`.
+error: could not compile `lingxi-service` (lib test) due to 8 previous errors

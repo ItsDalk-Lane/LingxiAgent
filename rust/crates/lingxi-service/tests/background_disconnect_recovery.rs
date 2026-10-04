@@ -29,9 +29,10 @@ use std::path::PathBuf;
 use std::pin::Pin;
 use std::sync::Arc;
 
+use lingxi_kernel::model_exchange::ModelTurnInput;
 use lingxi_kernel::ports::{
     ProviderDescriptor, ProviderTurn, ProviderTurnResult, ToolExecutionResult, ToolExecutorPort,
-    ToolOutcome, ToolRequest, TurnProviderPort,
+    ToolOutcome, ToolRequest, TurnDeltaSink, TurnProviderPort,
 };
 use lingxi_kernel::RunContext;
 use lingxi_protocol::{
@@ -81,9 +82,11 @@ impl TurnProviderPort for ScriptedProvider {
         &'a self,
         ctx: &'a RunContext,
         _call: &'a ModelCallId,
-        _turn: u32,
-        input: &'a str,
+        input: &'a ModelTurnInput,
+
+        _deltas: &'a dyn TurnDeltaSink,
     ) -> Pin<Box<dyn std::future::Future<Output = ProviderTurnResult> + Send + 'a>> {
+        let input = input.submission.as_str();
         let marker = Self::marker_of(input);
         let ctx_at_issue = ctx.clone();
         let turn = self
@@ -282,6 +285,7 @@ async fn r03_a12_background_run_survives_disconnect_reconnect_replays_and_is_que
         "BG-A12",
         vec![
             ProviderTurn::ToolRequests {
+                content: Vec::new(),
                 requests: vec![read_tool_request()],
             },
             final_turn("background work finished"),
@@ -416,6 +420,7 @@ async fn foreground_drive_disappearing_is_abandoned_not_cancelled() {
         "FG-A12",
         vec![
             ProviderTurn::ToolRequests {
+                content: Vec::new(),
                 requests: vec![read_tool_request()],
             },
             final_turn("never reached"),
@@ -505,6 +510,7 @@ async fn exit_hook_drain_reports_live_drives_as_unconfirmed() {
         "BG-A12",
         vec![
             ProviderTurn::ToolRequests {
+                content: Vec::new(),
                 requests: vec![read_tool_request()],
             },
             final_turn("settled after the drain window"),

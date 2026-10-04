@@ -1,0 +1,36 @@
+=== cargo test --manifest-path rust/Cargo.toml -p lingxi-service --test cancellation_tree
+test noncooperating_child_is_reported_unconfirmed_not_fake_quiet ... ok
+
+test result: ok. 8 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.60s
+
+exit=0
+=== cargo test --manifest-path rust/Cargo.toml -p lingxi-service --test cancel_terminal_race
+test cancel_at_the_intent_boundary_dispatches_no_new_external_call ... ok
+
+test result: ok. 13 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.40s
+
+exit=0
+=== cargo test --manifest-path rust/Cargo.toml -p lingxi-service --test cancel_link_inheritance
+test subagent_timeout_settles_a_parked_quota_wait ... ok
+
+test result: ok. 7 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.55s
+
+exit=0
+=== cargo test --manifest-path rust/Cargo.toml -p lingxi-service --test run_lifecycle
+test retryable_provider_failure_reopens_attempt_on_the_same_run ... ok
+
+test result: ok. 12 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.95s
+
+exit=0
+=== cargo test --manifest-path rust/Cargo.toml -p lingxi-service --test background_disconnect_recovery
+test exit_hook_drain_reports_live_drives_as_unconfirmed ... ok
+
+test result: ok. 3 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.16s
+
+exit=0
+=== cargo test --manifest-path rust/Cargo.toml -p lingxi-service --test event_subscription
+test ws_subscribe_snapshot_live_and_rejections ... ok
+
+test result: ok. 12 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 3.03s
+
+exit=0

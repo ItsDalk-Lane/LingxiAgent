@@ -1,0 +1,63 @@
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.11s
+     Running tests/r03_t08_acceptance_matrix.rs (/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T//rust-target-r03-t08-matrix/debug/deps/r03_t08_acceptance_matrix-778e303deaf90493)
+
+running 17 tests
+R03_T08_CASE case=combo-cancel-stream-terminal-cancelled expect=1 actual=1 ok=true
+R03_T08_CASE case=combo-out-of-order-late-result-fenced expect=1 actual=1 ok=true
+R03_T08_CASE case=cancel-live-run-accepted-terminal-cancelled expect=1 actual=1 ok=true
+R03_T08_CASE case=combo-cross-session-both-complete expect=2 actual=2 ok=true
+R03_T08_COMBO cancel-stream-read: {"final_status":"cancelled","late_result_audit_rows":0,"model_call_completed_after_cancel":0,"model_calls":1,"runs":1,"terminal_events":1,"tool_calls":0}
+R03_T08_COMBO cross-session-parallel: {"final_status_alpha":"completed","final_status_beta":"completed","model_calls":2,"runs":2,"tool_calls":0}
+R03_T08_CASE case=cancel-waiting-approval-cancels-cleanly expect=1 actual=1 ok=true
+R03_T08_COMBO cancel-approval-wait: {"final_status":"cancelled","model_calls":1,"runs":1,"terminal_events":1,"tool_calls":0}
+test combo_cancel_during_stream_read ... ok
+test combo_cross_session_parallel_both_complete ... ok
+test combo_cancel_during_approval_wait ... ok
+R03_T08_CASE case=combo-crash-recovery-honest-interrupted expect=1 actual=1 ok=true
+R03_T08_COMBO crash-recovery: {"final_message_rows":0,"final_status":"interrupted_needs_attention","form":"drive-lost + real startup scan (SIGKILL form: recovery_crash_points.rs)","model_calls":1,"runs_scanned":1,"tool_calls":0}
+test combo_crash_recovery_is_honestly_interrupted ... ok
+R03_T08_CASE case=combo-duplicate-replay-no-second-run expect=1 actual=1 ok=true
+R03_T08_CASE case=combo-duplicate-conflict-rejected expect=1 actual=1 ok=true
+R03_T08_COMBO duplicate-submission: {"diagnosed_conflicts":1,"final_status":"completed","idempotent_replays":1,"model_calls":1,"runs":1,"terminal_events":1,"tool_calls":0}
+test combo_duplicate_request_id_replays_and_conflicts ... ok
+R03_T08_CASE case=combo-normal-run-completed expect=1 actual=1 ok=true
+R03_T08_CASE case=combo-events-subscriber-saw-terminal expect=1 actual=1 ok=true
+R03_T08_COMBO normal: {"final_status":"completed","model_calls":1,"runs":1,"terminal_events":2,"tool_calls":0}
+R03_T08_CASE case=combo-multi-turn-one-terminal expect=1 actual=1 ok=true
+R03_T08_COMBO multi-turn-model: {"final_status":"completed","model_calls":3,"runs":1,"terminal_events":1,"tool_calls":1}
+R03_T08_CASE case=combo-multi-tool-three-calls expect=3 actual=3 ok=true
+R03_T08_COMBO multi-tool: {"final_status":"completed","model_calls":2,"runs":1,"terminal_events":1,"tool_calls":3}
+test combo_normal_completes_with_final ... ok
+test combo_multi_turn_model_one_terminal ... ok
+test combo_multi_tool_three_calls ... ok
+R03_T08_CASE case=combo-timeout-budget-loud-failure expect=1 actual=1 ok=true
+R03_T08_COMBO timeout-budget: {"final_reason":"failed.turn_budget_exceeded","final_status":"failed","model_calls":3,"runs":1,"terminal_events":1,"tool_calls":0}
+R03_T08_CASE case=cancel-terminal-run-already-terminal expect=1 actual=1 ok=true
+R03_T08_CASE case=background-run-completes-decoupled expect=1 actual=1 ok=true
+R03_T08_CASE case=background-survives-unrelated-cancel expect=1 actual=1 ok=true
+R03_T08_CASE case=cancel-unknown-run-not-found expect=1 actual=1 ok=true
+test combo_timeout_budget_is_a_loud_failure ... ok
+test leaf_cancel_outcome_shapes ... ok
+test leaf_background_completes_decoupled_and_survives_cancels ... ok
+R03_T08_CASE case=subagent-child-cancel-stops-child-only expect=1 actual=1 ok=true
+test leaf_child_cancel_stops_only_the_child ... ok
+R03_T08_CASE case=subagent-policy-proactive-delegation-default-off expect=1 actual=1 ok=true
+R03_T08_CASE case=reconnect-resume-no-model-restart expect=1 actual=1 ok=true
+test leaf_reconnect_resume_never_restarts_the_model ... ok
+R03_T08_CASE case=subagent-escalation-write-denied-zero-children expect=0 actual=0 ok=true
+R03_T08_CASE case=parent-cancel-stops-child-run expect=1 actual=1 ok=true
+R03_T08_CASE case=steer-busy-accepted expect=1 actual=1 ok=true
+test leaf_escalation_denied_zero_children ... ok
+R03_T08_CASE case=steer-text-drained-into-model-input expect=1 actual=1 ok=true
+R03_T08_CASE case=steer-idle-miss expect=1 actual=1 ok=true
+R03_T08_COMBO leaf-parent-cancel: {"child_final_message_rows":0,"child_status_after_recovery_scan":"cancelled","child_status_before_restart":"cancelled","note":"child run closed out IN-PROCESS by the cooperative-cancel window (durable cancelled + busy cleared + lanes returned); the restart scan only observes the existing terminal — ordinary cancellation never needs a restart","parent_final_status":"cancelled"}
+R03_T08_COMBO leaf-steer: {"final_status":"completed","model_calls":2,"runs":1,"tool_calls":0}
+test leaf_parent_cancel_stops_child ... ok
+test leaf_steer_semantics_busy_miss_and_drain ... ok
+R03_T08_CASE case=subagent-dispatch-child-lineage-recorded expect=1 actual=1 ok=true
+R03_T08_CASE case=subagent-reply-continues-thread expect=1 actual=1 ok=true
+R03_T08_CASE case=subagent-close-thread-closed-status expect=1 actual=1 ok=true
+test leaf_subagent_dispatch_reply_close ... ok
+
+test result: ok. 17 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.91s
+

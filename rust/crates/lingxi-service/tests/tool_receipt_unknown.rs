@@ -35,9 +35,11 @@ use std::sync::Arc;
 use std::time::Duration;
 
 use lingxi_kernel::invocation::{RecoveryClass, RecoveryDecision, ToolRecoveryCapability};
+use lingxi_kernel::model_exchange::ModelTurnInput;
 use lingxi_kernel::ports::{
     InvocationPhase, ProviderDescriptor, ProviderTurnResult, ReceiptOutcome, StoragePort,
-    ToolExecutionResult, ToolExecutorPort, ToolOutcome, ToolRequest, TurnProviderPort,
+    ToolExecutionResult, ToolExecutorPort, ToolOutcome, ToolRequest, TurnDeltaSink,
+    TurnProviderPort,
 };
 use lingxi_kernel::RunContext;
 use lingxi_protocol::{
@@ -259,8 +261,9 @@ impl TurnProviderPort for ScriptedProvider {
         &'a self,
         ctx: &'a RunContext,
         _call: &'a ModelCallId,
-        _turn: u32,
-        _input: &'a str,
+        _input: &'a ModelTurnInput,
+
+        _deltas: &'a dyn TurnDeltaSink,
     ) -> Pin<Box<dyn std::future::Future<Output = ProviderTurnResult> + Send + 'a>> {
         assert_eq!(
             ctx.session_id.to_string(),
@@ -312,8 +315,9 @@ impl TurnProviderPort for ParkAfterToolsProvider {
         &'a self,
         ctx: &'a RunContext,
         _call: &'a ModelCallId,
-        _turn: u32,
-        _input: &'a str,
+        _input: &'a ModelTurnInput,
+
+        _deltas: &'a dyn TurnDeltaSink,
     ) -> Pin<Box<dyn std::future::Future<Output = ProviderTurnResult> + Send + 'a>> {
         assert_eq!(
             ctx.session_id.to_string(),
@@ -333,7 +337,10 @@ impl TurnProviderPort for ParkAfterToolsProvider {
             if step == 1 {
                 return ProviderTurnResult::of_ctx(
                     &ctx_at_issue,
-                    lingxi_kernel::ports::ProviderTurn::ToolRequests { requests },
+                    lingxi_kernel::ports::ProviderTurn::ToolRequests {
+                        requests,
+                        content: Vec::new(),
+                    },
                 );
             }
             // Turn 2+ parks: the process "dies" here from the run's view.
@@ -528,6 +535,7 @@ async fn f04_c01_panic_after_side_effect_journals_unknown_not_confirmed_failure(
     let provider = Arc::new(ScriptedProvider {
         turns: vec![
             lingxi_kernel::ports::ProviderTurn::ToolRequests {
+                content: Vec::new(),
                 requests: vec![tool_request("notify.fault")],
             },
             lingxi_kernel::ports::ProviderTurn::Final {
@@ -681,6 +689,7 @@ async fn f04_c01_adv_panic_before_side_effect_is_still_unknown() {
     let provider = Arc::new(ScriptedProvider {
         turns: vec![
             lingxi_kernel::ports::ProviderTurn::ToolRequests {
+                content: Vec::new(),
                 requests: vec![tool_request("notify.fault")],
             },
             lingxi_kernel::ports::ProviderTurn::Final {
@@ -778,6 +787,7 @@ async fn f04_c02_dispatched_no_result_variants_classify_consistently_unknown() {
     let provider = Arc::new(ScriptedProvider {
         turns: vec![
             lingxi_kernel::ports::ProviderTurn::ToolRequests {
+                content: Vec::new(),
                 requests: vec![tool_request("lost.after"), tool_request("lost.before")],
             },
             lingxi_kernel::ports::ProviderTurn::Final {
@@ -909,6 +919,7 @@ async fn f04_c03_trusted_negatives_survive_alongside_the_unknown() {
     let provider = Arc::new(ScriptedProvider {
         turns: vec![
             lingxi_kernel::ports::ProviderTurn::ToolRequests {
+                content: Vec::new(),
                 requests: vec![
                     tool_request("reject.me"),
                     tool_request("fail.external"),
@@ -1247,6 +1258,7 @@ async fn f04_c04_adv_control_verified_idempotent_recovery_uses_only_the_original
     let provider = Arc::new(ScriptedProvider {
         turns: vec![
             lingxi_kernel::ports::ProviderTurn::ToolRequests {
+                content: Vec::new(),
                 requests: vec![tool_request("ledger.idem")],
             },
             lingxi_kernel::ports::ProviderTurn::Final {

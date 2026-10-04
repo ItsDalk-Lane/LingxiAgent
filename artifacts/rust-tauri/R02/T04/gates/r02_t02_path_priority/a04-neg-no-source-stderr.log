@@ -1,0 +1,28 @@
+error: missing data root: pass --home <DIR>, set LINGXI_HOME, or point --config at a config file with an absolute "home"; there is no default into a real user directory
+
+usage: lingxi-service [--bind <SOCKADDR>] [--home <DIR>] \
+[--config <FILE>] [--test-mode] [--network-mode <loopback|lan>]
+
+Options:
+  --bind <SOCKADDR>       Listen address (default 127.0.0.1:0, loopback + ephemeral).
+  --home <DIR>            Absolute service data root (created if missing).
+  --config <FILE>         Strict JSON config file ({"home": "/absolute/path"}).
+  --test-mode             Force an isolated synthetic home under the system temp
+                          dir; --home/LINGXI_HOME/--config home are ignored.
+  --network-mode <MODE>   loopback (default) or lan. LAN exposure is an explicit
+                          opt-in: a non-loopback --bind without --network-mode lan
+                          is a startup error, and even loopback requests require
+                          authentication (no loopback-trust exemption).
+  --help                  Print this help and exit 0.
+  --version               Print server identity/version and exit 0.
+
+Data-root precedence: --test-mode > --home > LINGXI_HOME (env) > --config home.
+Every explicitly given source is validated even when it loses precedence.
+No source at all is a startup error (exit 2) - there is no default into a
+real user directory.
+
+Exit codes: 0 clean stop; 1 serve failure; 2 configuration/startup error;
+3 single-writer lock held by another instance (or lock IO failure);
+4 shutdown instance-record cleanup failed;
+5 run database shutdown (drain/checkpoint) failed.
+

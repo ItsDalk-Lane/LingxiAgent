@@ -108,6 +108,10 @@ logs/
 # 先红后绿/回归/打包日志必须在干净 checkout 可复核；已逐文件脱敏审计（见
 # recheck-r1-r2/redaction-audit.md），无密钥与真实用户数据。仅放行该证据树。
 !artifacts/refactor-2026/independent-fix/**/*.log
+# rust-tauri 迁移各阶段门禁/回归/审查证据日志例外：R00—R04 已按此惯例入库
+# （R04 含 1401 个 .log 与 200 个 logs/ 目录文件），R05 沿用同一证据分发口径。
+!artifacts/rust-tauri/**/*.log
+!artifacts/rust-tauri/**/logs/
 
 # 系统文件
 .DS_Store
@@ -145,3 +149,6 @@ reviews/
 # GitGraphPanel 开发期设计稿（实现已入库，mockup 留本地）
 /git-graph-panel-mockup*.html
 desktop/native/LingxiSpeechPermissions/build/
+
+# R05 独立审查/终审探针隔离副本的 cargo 构建缓存（门禁惯例：CARGO_TARGET_DIR 仓库外）
+/artifacts/rust-tauri/R05/**/target/

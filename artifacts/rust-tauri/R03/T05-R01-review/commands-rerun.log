@@ -1,0 +1,17 @@
+# R03-T05 R01 review re-run (rustup 1.98.1, --locked, CARGO_TARGET_DIR=rust/target)
+started_utc: 2026-09-29T07:05:45Z
+fmt EXIT=0
+clippy EXIT=0
+workspace-test EXIT=0
+verify-stage-R03 EXIT=2
+r02-probe EXIT=1
+targeted (invocation_journal 3 / invocation_journal_store 5 / kernel invocation 10 / r03_a09 1 / r03_a10 1)  EXIT=0  (targeted-rerun.log + a09-a10-rerun-full.log)
+cargo clippy --workspace --all-targets --locked -- -D warnings                                        EXIT=0  (clippy-rerun.log)
+cargo test --workspace --locked                                                                       EXIT=0  558 passed / 0 failed / 0 ignored / 54 suites (workspace-test-rerun.log)
+cargo run -p xtask --locked -- check-contracts                                                        EXIT=0  API_COMPAT_MATRIX 626 entries drift-free (xtask-rerun.log)
+cargo run -p xtask --locked -- check-boundaries                                                       EXIT=0  DEP-07/08/D5 PASS (xtask-rerun.log)
+cargo run -p xtask -- verify-stage R03 --evidence <probe>                                             EXIT=2  hard refusal: unknown stage "R03" (not registered until T08; not faked)
+bash scripts/rust-tauri/r02_t04_storage_tx.sh <probe> (non-gate)                                      EXIT=1  S1-S3 PASS; S4 dies on hardcoded version==1 (T04 F-1 unchanged; probe dir cleaned)
+post-rerun tracked-diff sha256_16: e78df59386ebe190 (freeze held); status-set sha256_16 (excl. review dispatch file): 34423e3b4fa70cf6
+temp residue: none (/tmp/lingxi-r03t05-* cleaned; no leftover processes)
+finished_utc: 2026-09-29

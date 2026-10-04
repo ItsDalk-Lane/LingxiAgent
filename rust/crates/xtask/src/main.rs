@@ -59,6 +59,7 @@ pub const STAGE_MAPS: &[(&str, &str)] = &[
     ("R02", include_str!("stage_maps/R02.json")),
     ("R03", include_str!("stage_maps/R03.json")),
     ("R04", include_str!("stage_maps/R04.json")),
+    ("R05", include_str!("stage_maps/R05.json")),
 ];
 
 const USAGE: &str = r#"xtask — Lingxi Rust verification orchestrator (R02-T08)

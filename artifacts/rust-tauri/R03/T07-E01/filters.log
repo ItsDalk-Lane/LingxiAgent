@@ -1,0 +1,13 @@
+service::recovery_startup_scan => test result: ok. 7 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.50s
+service::recovery_crash_points => test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.83s
+service::exit_race_rejections => test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.11s
+service::active_run_listing => 
+service::invocation_journal => test result: ok. 3 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.22s
+service::shutdown_coordinator => test result: ok. 7 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.26s
+service::execute_concurrency => test result: ok. 3 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.27s
+kernel::recovery => test result: ok. 7 passed; 0 failed; 0 ignored; 0 measured; 44 filtered out; finished in 0.00s
+kernel::invocation => test result: ok. 10 passed; 0 failed; 0 ignored; 0 measured; 41 filtered out; finished in 0.00s
+service-lib::shutdown => test result: ok. 5 passed; 0 failed; 0 ignored; 0 measured; 217 filtered out; finished in 0.04s
+service-lib::recovery => test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 222 filtered out; finished in 0.00s
+-- corrected: adapters::active_run_listing is an adapters-crate suite (the first filters.log line ran it against -p lingxi-service: 0 hits, not counted) --
+adapters::active_run_listing => test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.02s

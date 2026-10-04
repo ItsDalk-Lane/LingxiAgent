@@ -1,0 +1,7 @@
+
+running 1 test
+R02_A07_LIVE_FAULT busyHttp=503 busyReason=db_busy busyLiveEvents=0 busyRuns=0 busyKeyEvents=0 terminalHttp=500 terminalReason=db_failure terminalLiveEvents=1 terminalRunId=run_000001a0e9283a31_000002 terminalStoredStatus=running diskRuns=1 diskKeyEvents=1 diskStatus=running restartRuns=1 restartKeyEvents=1
+test http_running_storage_fault_has_no_success_event_or_restart_run ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 2 filtered out; finished in 0.10s
+

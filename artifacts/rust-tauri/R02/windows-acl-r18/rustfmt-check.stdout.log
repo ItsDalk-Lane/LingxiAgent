@@ -1,0 +1,418 @@
+Diff in /Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-adapters/src/storage/windows_acl.rs:13:
+     SDDL_REVISION_1, SE_FILE_OBJECT,
+ };
+ use windows_sys::Win32::Security::{
+-    GetSecurityDescriptorDacl, GetTokenInformation, ACL, DACL_SECURITY_INFORMATION,
++    GetSecurityDescriptorDacl, GetTokenInformation, TokenUser, ACL, DACL_SECURITY_INFORMATION,
+     PROTECTED_DACL_SECURITY_INFORMATION, PSECURITY_DESCRIPTOR, SECURITY_ATTRIBUTES, TOKEN_QUERY,
+-    TOKEN_USER, TokenUser,
++    TOKEN_USER,
+ };
+ use windows_sys::Win32::Storage::FileSystem::{
+     CreateDirectoryW, CreateFileW, CREATE_NEW, FILE_ATTRIBUTE_NORMAL, FILE_ATTRIBUTE_REPARSE_POINT,
+Diff in /Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-adapters/src/storage/windows_acl.rs:27:
+ fn wide(path: &Path) -> io::Result<Vec<u16>> {
+     let mut value: Vec<u16> = path.as_os_str().encode_wide().collect();
+     if value.contains(&0) {
+-        return Err(io::Error::new(io::ErrorKind::InvalidInput, "path contains NUL"));
++        return Err(io::Error::new(
++            io::ErrorKind::InvalidInput,
++            "path contains NUL",
++        ));
+     }
+     value.push(0);
+     Ok(value)
+Diff in /Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-adapters/src/storage/windows_acl.rs:42:
+         let mut bytes = 0u32;
+         unsafe { GetTokenInformation(token, TokenUser, std::ptr::null_mut(), 0, &mut bytes) };
+         if bytes < std::mem::size_of::<TOKEN_USER>() as u32 || bytes > 1024 * 1024 {
+-            return Err(io::Error::new(io::ErrorKind::InvalidData, "invalid token user size"));
++            return Err(io::Error::new(
++                io::ErrorKind::InvalidData,
++                "invalid token user size",
++            ));
+         }
+         // TOKEN_USER 的内存必须按指针宽度对齐，不能转用 Vec<u8>。
+         let mut buffer = vec![0usize; (bytes as usize).div_ceil(std::mem::size_of::<usize>())];
+Diff in /Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-adapters/src/storage/windows_acl.rs:116:
+         let mut present = 0;
+         let mut defaulted = 0;
+         let mut acl = std::ptr::null_mut();
+-        if unsafe { GetSecurityDescriptorDacl(self.0, &mut present, &mut acl, &mut defaulted) } == 0 {
++        if unsafe { GetSecurityDescriptorDacl(self.0, &mut present, &mut acl, &mut defaulted) } == 0
++        {
+             return Err(io::Error::last_os_error());
+         }
+         if present == 0 || acl.is_null() {
+Diff in /Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-adapters/src/storage/windows_acl.rs:123:
+-            return Err(io::Error::new(io::ErrorKind::InvalidData, "private DACL missing"));
++            return Err(io::Error::new(
++                io::ErrorKind::InvalidData,
++                "private DACL missing",
++            ));
+         }
+         Ok(acl)
+     }
+Diff in /Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-adapters/src/storage/windows_acl.rs:139:
+         || (directory && !meta.is_dir())
+         || (!directory && (!meta.is_file() || meta.number_of_links() != Some(1)))
+     {
+-        return Err(io::Error::new(io::ErrorKind::InvalidData, "unsafe private path"));
++        return Err(io::Error::new(
++            io::ErrorKind::InvalidData,
++            "unsafe private path",
++        ));
+     }
+     let descriptor = PrivateDescriptor::new(directory)?;
+     let status = unsafe {
+Diff in /Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-adapters/src/storage/windows_acl.rs:162:
+ fn open_for_acl(path: &Path, directory: bool) -> io::Result<File> {
+     let path = wide(path)?;
+     let flags = FILE_FLAG_OPEN_REPARSE_POINT
+-        | if directory { FILE_FLAG_BACKUP_SEMANTICS } else { FILE_ATTRIBUTE_NORMAL };
++        | if directory {
++            FILE_FLAG_BACKUP_SEMANTICS
++        } else {
++            FILE_ATTRIBUTE_NORMAL
++        };
+     let handle = unsafe {
+         CreateFileW(
+             path.as_ptr(),
+Diff in /Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-adapters/src/storage/windows_acl.rs:237:
+     use super::*;
+     use windows_sys::Win32::Security::Authorization::GetSecurityInfo;
+     use windows_sys::Win32::Security::{
+-        GetAclInformation, GetSecurityDescriptorControl, ACL_SIZE_INFORMATION, AclSizeInformation,
++        AclSizeInformation, GetAclInformation, GetSecurityDescriptorControl, ACL_SIZE_INFORMATION,
+         SE_DACL_PROTECTED,
+     };
+ 
+Diff in /Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-adapters/src/storage/windows_acl.rs:246:
+             .duration_since(std::time::UNIX_EPOCH)
+             .unwrap()
+             .as_nanos();
+-        std::env::temp_dir().join(format!("lingxi-win-acl-{tag}-{}-{nonce}", std::process::id()))
++        std::env::temp_dir().join(format!(
++            "lingxi-win-acl-{tag}-{}-{nonce}",
++            std::process::id()
++        ))
+     }
+ 
+     fn assert_private(file: &File, directory: bool) {
+Diff in /Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-adapters/src/storage/windows_acl.rs:267:
+         assert_eq!(status, 0);
+         assert!(!acl.is_null(), "NULL DACL exposes every local user");
+         let mut info = ACL_SIZE_INFORMATION::default();
+-        assert_ne!(unsafe {
+-            GetAclInformation(
+-                acl,
+-                (&mut info as *mut ACL_SIZE_INFORMATION).cast(),
+-                std::mem::size_of::<ACL_SIZE_INFORMATION>() as u32,
+-                AclSizeInformation,
+-            )
+-        }, 0);
+-        assert_eq!(info.AceCount, 2, "only current user and SYSTEM may have ACEs");
++        assert_ne!(
++            unsafe {
++                GetAclInformation(
++                    acl,
++                    (&mut info as *mut ACL_SIZE_INFORMATION).cast(),
++                    std::mem::size_of::<ACL_SIZE_INFORMATION>() as u32,
++                    AclSizeInformation,
++                )
++            },
++            0
++        );
++        assert_eq!(
++            info.AceCount, 2,
++            "only current user and SYSTEM may have ACEs"
++        );
+         let expected = PrivateDescriptor::new(directory).unwrap();
+         let expected_acl = expected.dacl().unwrap();
+         let mut actual_present = 0;
+Diff in /Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-adapters/src/storage/windows_acl.rs:282:
+         let mut actual_defaulted = 0;
+-        assert_ne!(unsafe {
+-            GetSecurityDescriptorDacl(security, &mut actual_present, &mut acl, &mut actual_defaulted)
+-        }, 0);
++        assert_ne!(
++            unsafe {
++                GetSecurityDescriptorDacl(
++                    security,
++                    &mut actual_present,
++                    &mut acl,
++                    &mut actual_defaulted,
++                )
++            },
++            0
++        );
+         assert_eq!(actual_present, 1);
+         assert!(!expected_acl.is_null());
+         let size = unsafe { (*acl).AclSize } as usize;
+Diff in /Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-adapters/src/storage/windows_acl.rs:294:
+         );
+         let mut control = 0;
+         let mut revision = 0;
+-        assert_ne!(unsafe { GetSecurityDescriptorControl(security, &mut control, &mut revision) }, 0);
+-        assert_ne!(control & SE_DACL_PROTECTED, 0, "inherited broad ACEs must stay blocked");
++        assert_ne!(
++            unsafe { GetSecurityDescriptorControl(security, &mut control, &mut revision) },
++            0
++        );
++        assert_ne!(
++            control & SE_DACL_PROTECTED,
++            0,
++            "inherited broad ACEs must stay blocked"
++        );
+         unsafe { LocalFree(security.cast()) };
+     }
+ 
+Diff in /Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-adapters/src/storage/windows_acl.rs:314:
+         let old = open_for_acl(&file_path, false).unwrap();
+         let status = unsafe {
+             SetSecurityInfo(
+-                old.as_raw_handle(), SE_FILE_OBJECT, DACL_SECURITY_INFORMATION,
+-                std::ptr::null_mut(), std::ptr::null_mut(), broad.dacl().unwrap(), std::ptr::null(),
++                old.as_raw_handle(),
++                SE_FILE_OBJECT,
++                DACL_SECURITY_INFORMATION,
++                std::ptr::null_mut(),
++                std::ptr::null_mut(),
++                broad.dacl().unwrap(),
++                std::ptr::null(),
+             )
+         };
+         assert_eq!(status, 0);
+Diff in /Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-service/src/paths.rs:81:
+     }
+     if !home.exists() {
+         #[cfg(windows)]
+-        lingxi_adapters::storage::windows_acl::ensure_private_directory(home).map_err(|source| {
+-            ConfigError::HomeCreateFailed {
++        lingxi_adapters::storage::windows_acl::ensure_private_directory(home).map_err(
++            |source| ConfigError::HomeCreateFailed {
+                 value: home.to_path_buf(),
+                 source: source.to_string(),
+-            }
+-        })?;
++            },
++        )?;
+         #[cfg(not(windows))]
+         std::fs::create_dir_all(home).map_err(|source| ConfigError::HomeCreateFailed {
+             value: home.to_path_buf(),
+Diff in /Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-service/src/paths.rs:168:
+     }
+     #[cfg(not(any(unix, windows)))]
+     {
+-        Err(dir_io_error(path, io::Error::other("private directories unsupported")))
++        Err(dir_io_error(
++            path,
++            io::Error::other("private directories unsupported"),
++        ))
+     }
+ }
+ 
+Diff in /Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-service/src/paths.rs:212:
+         let mut file = if private {
+             lingxi_adapters::storage::windows_acl::create_private_file(&tmp)?
+         } else {
+-            std::fs::OpenOptions::new().write(true).create_new(true).open(&tmp)?
++            std::fs::OpenOptions::new()
++                .write(true)
++                .create_new(true)
++                .open(&tmp)?
+         };
+         #[cfg(not(windows))]
+         let mut file = {
+Diff in /Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-service/src/paths.rs:219:
+             let mut options = std::fs::OpenOptions::new();
+             options.write(true).create_new(true);
+-        #[cfg(unix)]
+-        if private {
+-            use std::os::unix::fs::OpenOptionsExt as _;
+-            options.mode(0o600);
+-        }
++            #[cfg(unix)]
++            if private {
++                use std::os::unix::fs::OpenOptionsExt as _;
++                options.mode(0o600);
++            }
+             options.open(&tmp)?
+         };
+         file.write_all(bytes)?;
+Diff in /Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-adapters/src/storage/backup.rs:198:
+             super::windows_acl::ensure_private_file(path)
+         };
+         result.map_err(|source| StorageError::Io {
+-            detail: format!("cannot protect backup artifact {}: {source}", path.display()),
++            detail: format!(
++                "cannot protect backup artifact {}: {source}",
++                path.display()
++            ),
+         })?;
+     }
+     #[cfg(not(any(unix, windows)))]
+Diff in /Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-adapters/src/storage/backup.rs:246:
+     validate_stem(file_stem)?;
+     #[cfg(windows)]
+     super::windows_acl::ensure_private_directory(dest_dir).map_err(|source| StorageError::Io {
+-        detail: format!("cannot create private backup destination {}: {source}", dest_dir.display()),
++        detail: format!(
++            "cannot create private backup destination {}: {source}",
++            dest_dir.display()
++        ),
+     })?;
+     #[cfg(not(windows))]
+     std::fs::create_dir_all(dest_dir).map_err(|source| StorageError::Io {
+Diff in /Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-adapters/src/storage/backup.rs:369:
+     {
+         use std::io::Write as _;
+         #[cfg(windows)]
+-        let mut file = super::windows_acl::create_private_file(&tmp).map_err(|source| StorageError::Io {
+-            detail: format!("cannot create private manifest temp file {}: {source}", tmp.display()),
+-        })?;
++        let mut file =
++            super::windows_acl::create_private_file(&tmp).map_err(|source| StorageError::Io {
++                detail: format!(
++                    "cannot create private manifest temp file {}: {source}",
++                    tmp.display()
++                ),
++            })?;
+         #[cfg(not(windows))]
+         let mut file = std::fs::File::create(&tmp).map_err(|source| StorageError::Io {
+             detail: format!(
+Diff in /Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-adapters/src/storage/backup.rs:471:
+     }
+ 
+     #[cfg(windows)]
+-    super::windows_acl::ensure_private_directory(target_dir).map_err(|source| StorageError::Io {
+-        detail: format!("cannot create private restore target {}: {source}", target_dir.display()),
++    super::windows_acl::ensure_private_directory(target_dir).map_err(|source| {
++        StorageError::Io {
++            detail: format!(
++                "cannot create private restore target {}: {source}",
++                target_dir.display()
++            ),
++        }
+     })?;
+     #[cfg(not(windows))]
+     std::fs::create_dir_all(target_dir).map_err(|source| StorageError::Io {
+Diff in /Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-adapters/src/storage/queue.rs:515:
+             });
+         }
+         #[cfg(windows)]
+-        super::windows_acl::ensure_private_directory(parent).map_err(|source| StorageError::Io {
+-            detail: format!("cannot protect database directory {}: {source}", parent.display()),
++        super::windows_acl::ensure_private_directory(parent).map_err(|source| {
++            StorageError::Io {
++                detail: format!(
++                    "cannot protect database directory {}: {source}",
++                    parent.display()
++                ),
++            }
+         })?;
+     }
+     #[cfg(windows)]
+Diff in /Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-adapters/src/storage/queue.rs:528:
+         match super::windows_acl::ensure_private_file(&existing) {
+             Ok(()) => {}
+             Err(err) if err.kind() == std::io::ErrorKind::NotFound => {}
+-            Err(source) => return Err(StorageError::Io {
+-                detail: format!("cannot protect existing database file {}: {source}", existing.display()),
+-            }),
++            Err(source) => {
++                return Err(StorageError::Io {
++                    detail: format!(
++                        "cannot protect existing database file {}: {source}",
++                        existing.display()
++                    ),
++                })
++            }
+         }
+     }
+     let conn = rusqlite::Connection::open(path).map_err(migrations::map_rusqlite)?;
+Diff in /Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-adapters/src/storage/queue.rs:641:
+             match super::windows_acl::ensure_private_file(&sidecar) {
+                 Ok(()) => {}
+                 Err(err) if err.kind() == std::io::ErrorKind::NotFound => {}
+-                Err(source) => return Err(StorageError::Io {
+-                    detail: format!("cannot protect database sidecar {}: {source}", sidecar.display()),
+-                }),
++                Err(source) => {
++                    return Err(StorageError::Io {
++                        detail: format!(
++                            "cannot protect database sidecar {}: {source}",
++                            sidecar.display()
++                        ),
++                    })
++                }
+             }
+         }
+     }
+Diff in /Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-adapters/src/storage/queue.rs:650:
+     #[cfg(not(any(unix, windows)))]
+     {
+-        return Err(StorageError::Io { detail: "private database files unsupported".into() });
++        return Err(StorageError::Io {
++            detail: "private database files unsupported".into(),
++        });
+     }
+     Ok(())
+ }
+Diff in /Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-service/src/paths.rs:81:
+     }
+     if !home.exists() {
+         #[cfg(windows)]
+-        lingxi_adapters::storage::windows_acl::ensure_private_directory(home).map_err(|source| {
+-            ConfigError::HomeCreateFailed {
++        lingxi_adapters::storage::windows_acl::ensure_private_directory(home).map_err(
++            |source| ConfigError::HomeCreateFailed {
+                 value: home.to_path_buf(),
+                 source: source.to_string(),
+-            }
+-        })?;
++            },
++        )?;
+         #[cfg(not(windows))]
+         std::fs::create_dir_all(home).map_err(|source| ConfigError::HomeCreateFailed {
+             value: home.to_path_buf(),
+Diff in /Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-service/src/paths.rs:168:
+     }
+     #[cfg(not(any(unix, windows)))]
+     {
+-        Err(dir_io_error(path, io::Error::other("private directories unsupported")))
++        Err(dir_io_error(
++            path,
++            io::Error::other("private directories unsupported"),
++        ))
+     }
+ }
+ 
+Diff in /Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-service/src/paths.rs:212:
+         let mut file = if private {
+             lingxi_adapters::storage::windows_acl::create_private_file(&tmp)?
+         } else {
+-            std::fs::OpenOptions::new().write(true).create_new(true).open(&tmp)?
++            std::fs::OpenOptions::new()
++                .write(true)
++                .create_new(true)
++                .open(&tmp)?
+         };
+         #[cfg(not(windows))]
+         let mut file = {
+Diff in /Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-service/src/paths.rs:219:
+             let mut options = std::fs::OpenOptions::new();
+             options.write(true).create_new(true);
+-        #[cfg(unix)]
+-        if private {
+-            use std::os::unix::fs::OpenOptionsExt as _;
+-            options.mode(0o600);
+-        }
++            #[cfg(unix)]
++            if private {
++                use std::os::unix::fs::OpenOptionsExt as _;
++                options.mode(0o600);
++            }
+             options.open(&tmp)?
+         };
+         file.write_all(bytes)?;

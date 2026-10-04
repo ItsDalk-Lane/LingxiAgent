@@ -1,0 +1,13 @@
+   Compiling lingxi-adapters v0.0.0 (/Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-adapters)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.51s
+     Running tests/run_id_allocator.rs (/tmp/r03-t01-review-target/debug/deps/run_id_allocator-8861613428420be3)
+
+running 5 tests
+test opaque_existing_run_id_never_seeds_and_reopen_allocates_cleanly ... ok
+test non_minted_hex_tails_do_not_seed_the_high_water_mark ... ok
+test reseed_after_failure_gap_never_reissues_a_consumed_id ... ok
+test exhausted_sequence_fails_loudly_instead_of_panicking_or_wrapping ... ok
+test concurrent_allocations_stay_unique_and_reseed_above_all ... ok
+
+test result: ok. 5 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.04s
+

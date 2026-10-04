@@ -35,9 +35,11 @@ use std::pin::Pin;
 use std::sync::Arc;
 use std::time::Duration;
 
+use lingxi_kernel::model_exchange::ModelTurnInput;
 use lingxi_kernel::ports::{
     ProviderDescriptor, ProviderTurnResult, ResultFence, StorageError, StoragePort,
-    ToolExecutionResult, ToolExecutorPort, ToolOutcome, ToolRequest, TurnProviderPort,
+    ToolExecutionResult, ToolExecutorPort, ToolOutcome, ToolRequest, TurnDeltaSink,
+    TurnProviderPort,
 };
 use lingxi_kernel::RunContext;
 use lingxi_protocol::{
@@ -119,8 +121,9 @@ impl TurnProviderPort for FencedProvider {
         &'a self,
         ctx: &'a RunContext,
         _call: &'a ModelCallId,
-        _turn: u32,
-        _input: &'a str,
+        _input: &'a ModelTurnInput,
+
+        _deltas: &'a dyn TurnDeltaSink,
     ) -> Pin<Box<dyn std::future::Future<Output = ProviderTurnResult> + Send + 'a>> {
         let session = ctx.session_id.to_string();
         let pop = {
@@ -160,8 +163,13 @@ impl TurnProviderPort for FencedProvider {
                 // The CLAIMED fence wins — this is the late/raced delivery
                 // shape the driver must fence.
                 Some(fence) => ProviderTurnResult {
+                    usage_report: lingxi_kernel::usage::ReportedUsage::Unknown,
+                    served_protocol: None,
+                    transport_attempts: 1,
                     fence,
                     turn: step.turn,
+                    usage: None,
+                    served_by: None,
                 },
                 None => ProviderTurnResult::of_ctx(&ctx_at_issue, step.turn),
             }
@@ -804,8 +812,9 @@ async fn r03_a07_driver_fences_stale_tagged_model_result_loudly() {
             &'a self,
             ctx: &'a RunContext,
             _call: &'a ModelCallId,
-            _turn: u32,
-            _input: &'a str,
+            _input: &'a ModelTurnInput,
+
+            _deltas: &'a dyn TurnDeltaSink,
         ) -> Pin<Box<dyn std::future::Future<Output = ProviderTurnResult> + Send + 'a>> {
             let session = ctx.session_id.to_string();
             let pop = {
@@ -845,10 +854,15 @@ async fn r03_a07_driver_fences_stale_tagged_model_result_loudly() {
                     .expect("attempt1 was observed first");
                 Box::pin(async move {
                     ProviderTurnResult {
+                        usage_report: lingxi_kernel::usage::ReportedUsage::Unknown,
+                        served_protocol: None,
+                        transport_attempts: 1,
                         fence: ResultFence::of_ctx(&stale_ctx),
                         turn: lingxi_kernel::ports::ProviderTurn::Final {
                             message: assistant_final("stale attempt1 content"),
                         },
+                        usage: None,
+                        served_by: None,
                     }
                 })
             }
@@ -887,10 +901,13 @@ async fn r03_a07_driver_fences_stale_tagged_model_result_loudly() {
     assert_eq!(run_message_count(&state, &run_id).await, 0);
     // Attempt1's FAILED turn was persisted under its own (then-current)
     // attempt — mc0001 events exist; the fenced attempt2 result (mc0002)
-    // never wrote anything.
+    // never wrote anything BEYOND its honest `model_call_started`: D6
+    // (R05-T04) persists started BEFORE the first delta, so attempt2's
+    // real invocation leaves that one fact — the fence forbids the stale
+    // RESULT's state (no delta, no completed, no message).
     let mc2 = query_text(
         &state,
-        "SELECT COUNT(*) FROM key_events WHERE run_id = ?1 AND payload_json LIKE '%mc0002%'",
+        "SELECT COUNT(*) FROM key_events WHERE run_id = ?1 AND payload_json LIKE '%mc0002%' AND event_type <> 'model_call_started'",
         &run_id,
     )
     .await
@@ -930,6 +947,7 @@ async fn r03_a07_tool_result_with_stale_fence_records_unknown_and_audits() {
             "sess_local_alpha",
             vec![
                 FencedProvider::step(lingxi_kernel::ports::ProviderTurn::ToolRequests {
+                    content: Vec::new(),
                     requests: vec![read_tool_request()],
                 })
                 .0,

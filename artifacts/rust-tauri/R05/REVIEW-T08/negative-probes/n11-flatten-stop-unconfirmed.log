@@ -1,0 +1,155 @@
+   Compiling proc-macro2 v1.0.107
+   Compiling unicode-ident v1.0.26
+   Compiling quote v1.0.47
+   Compiling shlex v2.0.1
+   Compiling find-msvc-tools v0.1.13
+   Compiling pkg-config v0.3.34
+   Compiling stable_deref_trait v1.2.1
+   Compiling pin-project-lite v0.2.17
+   Compiling bytes v1.12.1
+   Compiling fs_extra v1.3.0
+   Compiling dunce v1.0.5
+   Compiling futures-core v0.3.34
+   Compiling once_cell v1.21.4
+   Compiling core-foundation-sys v0.8.7
+   Compiling smallvec v1.16.1
+   Compiling litemap v0.8.3
+   Compiling foldhash v0.2.0
+   Compiling writeable v0.6.4
+   Compiling aws-lc-rs v1.18.1
+   Compiling serde_core v1.0.229
+   Compiling slab v0.4.12
+   Compiling bitflags v2.13.2
+   Compiling zeroize v1.9.0
+   Compiling icu_properties_data v2.3.0
+   Compiling icu_normalizer_data v2.3.0
+   Compiling utf8_iter v1.0.4
+   Compiling serde v1.0.229
+   Compiling jobserver v0.1.35
+   Compiling socket2 v0.6.5
+   Compiling mio v1.2.3
+   Compiling percent-encoding v2.3.2
+   Compiling httparse v1.10.1
+   Compiling hashbrown v0.17.1
+   Compiling rustls-pki-types v1.15.1
+   Compiling rustls v0.23.45
+   Compiling serde_json v1.0.151
+   Compiling tracing-core v0.1.36
+   Compiling rustversion v1.0.23
+   Compiling cc v1.4.7
+   Compiling equivalent v1.0.2
+   Compiling system-configuration-sys v0.6.0
+   Compiling untrusted v0.9.0
+   Compiling futures-task v0.3.34
+   Compiling futures-sink v0.3.34
+   Compiling ref-cast v1.0.27
+   Compiling atomic-waker v1.1.2
+   Compiling base64 v0.23.1
+   Compiling fnv v1.0.7
+   Compiling tower-service v0.3.3
+   Compiling subtle v2.6.1
+   Compiling try-lock v0.2.5
+   Compiling core-foundation v0.9.4
+   Compiling futures-channel v0.3.34
+   Compiling vcpkg v0.2.15
+   Compiling security-framework-sys v2.17.0
+   Compiling core-foundation v0.10.1
+   Compiling http v1.5.0
+   Compiling futures-util v0.3.34
+   Compiling form_urlencoded v1.2.2
+   Compiling sync_wrapper v1.0.2
+   Compiling want v0.3.1
+   Compiling dyn-clone v1.0.20
+   Compiling ipnet v2.12.2
+   Compiling tower-layer v0.3.3
+   Compiling sha1 v0.11.0
+   Compiling simdutf8 v0.1.5
+   Compiling log v0.4.34
+   Compiling indexmap v2.14.2
+   Compiling security-framework v3.7.0
+   Compiling multiversion_no_op v1.0.0
+   Compiling scopeguard v1.2.0
+   Compiling ryu v1.0.23
+   Compiling hashlink v0.12.2
+   Compiling fallible-iterator v0.3.0
+   Compiling fallible-streaming-iterator v0.1.9
+   Compiling mime v0.3.17
+   Compiling getrandom v0.2.17
+   Compiling httpdate v1.0.3
+   Compiling cmake v0.1.58
+   Compiling http-body v1.1.0
+   Compiling libsqlite3-sys v0.38.2
+   Compiling system-configuration v0.7.0
+   Compiling http-body-util v0.1.5
+   Compiling aws-lc-sys v0.45.0
+   Compiling encoding_rs v0.8.42
+   Compiling syn v3.0.6
+   Compiling syn v2.0.119
+   Compiling synstructure v0.14.0
+   Compiling serde_derive_internals v0.30.0
+   Compiling tracing-attributes v0.1.31
+   Compiling zerovec-derive v0.11.6
+   Compiling displaydoc v0.2.7
+   Compiling tokio-macros v2.7.2
+   Compiling serde_derive v1.0.229
+   Compiling ref-cast-impl v1.0.27
+   Compiling rusqlite v0.40.2
+   Compiling zerofrom-derive v0.1.8
+   Compiling yoke-derive v0.8.3
+   Compiling tokio v1.53.1
+   Compiling schemars_derive v1.2.2
+   Compiling tracing v0.1.44
+   Compiling zerofrom v0.1.8
+   Compiling schemars v1.2.2
+   Compiling serde_urlencoded v0.7.1
+   Compiling rustls-webpki v0.103.15
+   Compiling tokio-util v0.7.19
+   Compiling tower v0.5.3
+   Compiling yoke v0.8.3
+   Compiling h2 v0.4.19
+   Compiling lingxi-protocol v0.0.0 (/Users/study_superior/Desktop/Code/LingxiAgent-R05-REV-SCRATCH/negcopy-r3/rust/crates/lingxi-protocol)
+   Compiling zerovec v0.11.8
+   Compiling zerotrie v0.2.5
+   Compiling tokio-rustls v0.26.5
+   Compiling rustls-platform-verifier v0.7.1
+   Compiling lingxi-kernel v0.0.0 (/Users/study_superior/Desktop/Code/LingxiAgent-R05-REV-SCRATCH/negcopy-r3/rust/crates/lingxi-kernel)
+   Compiling hyper v1.11.1
+   Compiling tinystr v0.8.4
+   Compiling potential_utf v0.1.6
+   Compiling icu_collections v2.3.0
+   Compiling hyper-util v0.1.21
+   Compiling icu_locale_core v2.3.0
+   Compiling icu_provider v2.3.1
+   Compiling hyper-rustls v0.27.10
+   Compiling icu_normalizer v2.3.0
+   Compiling icu_properties v2.3.0
+   Compiling idna_adapter v1.2.2
+   Compiling idna v1.1.0
+   Compiling url v2.5.8
+   Compiling tower-http v0.6.11
+   Compiling reqwest v0.13.5
+   Compiling lingxi-adapters v0.0.0 (/Users/study_superior/Desktop/Code/LingxiAgent-R05-REV-SCRATCH/negcopy-r3/rust/crates/lingxi-adapters)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 1m 42s
+     Running unittests src/lib.rs (/Users/study_superior/Desktop/Code/LingxiAgent-R05-REV-SCRATCH/negtarget-r3/debug/deps/lingxi_adapters-1eeffceeed15e270)
+
+running 3 tests
+test models::tool_render::tests::success_renders_resources_status_and_truncation_last ... ok
+test models::tool_render::tests::the_four_base_states_keep_the_t01_vocabulary ... ok
+test models::tool_render::tests::running_and_stop_unconfirmed_statuses_are_honest ... FAILED
+
+failures:
+
+---- models::tool_render::tests::running_and_stop_unconfirmed_statuses_are_honest stdout ----
+
+thread 'models::tool_render::tests::running_and_stop_unconfirmed_statuses_are_honest' (9205322) panicked at crates/lingxi-adapters/src/models/tool_render.rs:236:9:
+partial
+[process exited with code 0]
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+
+
+failures:
+    models::tool_render::tests::running_and_stop_unconfirmed_statuses_are_honest
+
+test result: FAILED. 2 passed; 1 failed; 0 ignored; 0 measured; 106 filtered out; finished in 0.00s
+
+error: test failed, to rerun pass `-p lingxi-adapters --lib`

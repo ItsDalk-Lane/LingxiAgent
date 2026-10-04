@@ -1,0 +1,86 @@
+{
+  "schema": "r05-t05-compat-golden/v1",
+  "module": "kimi",
+  "case": "mfjs-root-anyof-folds-into-description",
+  "model": {
+    "provider": "kimi-coding",
+    "id": "kimi-for-coding",
+    "baseUrl": "https://api.kimi.com/coding/v1",
+    "api": "openai-completions",
+    "reasoning": true
+  },
+  "payload": {
+    "model": "kimi-for-coding",
+    "messages": [],
+    "thinking": {
+      "type": "enabled"
+    },
+    "tools": [
+      {
+        "type": "function",
+        "function": {
+          "name": "f",
+          "parameters": {
+            "type": "object",
+            "anyOf": [
+              {
+                "required": [
+                  "a"
+                ]
+              },
+              {
+                "required": [
+                  "b"
+                ]
+              }
+            ],
+            "properties": {
+              "a": {
+                "type": "string"
+              },
+              "b": {
+                "type": "string"
+              }
+            }
+          }
+        }
+      }
+    ]
+  },
+  "options": {
+    "mode": "chat"
+  },
+  "expected": {
+    "thinkingFormat": "kimi",
+    "reasoningProfile": "kimi-openai",
+    "matched": "kimi",
+    "result": {
+      "model": "kimi-for-coding",
+      "messages": [],
+      "thinking": {
+        "type": "enabled",
+        "keep": "all"
+      },
+      "tools": [
+        {
+          "type": "function",
+          "function": {
+            "name": "f",
+            "parameters": {
+              "type": "object",
+              "properties": {
+                "a": {
+                  "type": "string"
+                },
+                "b": {
+                  "type": "string"
+                }
+              },
+              "description": "Arguments must satisfy one of these required field sets: a; b."
+            }
+          }
+        }
+      ]
+    }
+  }
+}

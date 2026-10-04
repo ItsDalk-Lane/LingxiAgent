@@ -1,0 +1,20 @@
+== directed filters (hit counts) ==
+subagent_permission_inheritance: 4 passed
+background_disconnect_recovery: 3 passed
+subagent_lifecycle: 3 passed
+run_lineage_store: 2 passed
+kernel subagent:: 9 passed
+task_supervisor:: 7 passed
+== regression subsets ==
+run_lifecycle: 12 passed
+session_serialization: 5 passed
+execute_concurrency: 3 passed
+event_subscription: 12 passed
+request_dedup: 4 passed
+late_result_fence: 5 passed
+invocation_journal: 3 passed
+invocation_journal_store: 5 passed
+migration_idempotency: 2 passed
+storage_transactions: 7 passed
+shutdown_coordinator: 7 passed
+lingxi-kernel lib: 44 passed

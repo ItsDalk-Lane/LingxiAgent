@@ -1,0 +1,298 @@
+   Compiling serde_core v1.0.229
+   Compiling memchr v2.8.3
+   Compiling serde v1.0.229
+   Compiling core-foundation-sys v0.8.7
+   Compiling serde_json v1.0.151
+   Compiling autocfg v1.5.1
+   Compiling shlex v2.0.1
+   Compiling find-msvc-tools v0.1.13
+   Compiling pin-project-lite v0.2.17
+   Compiling once_cell v1.21.4
+   Compiling bytes v1.12.1
+   Compiling log v0.4.34
+   Compiling pkg-config v0.3.34
+   Compiling smallvec v1.16.1
+   Compiling equivalent v1.0.2
+   Compiling allocator-api2 v0.2.21
+   Compiling cmov v0.5.4
+   Compiling foldhash v0.2.0
+   Compiling bitflags v2.13.2
+   Compiling vcpkg v0.2.15
+   Compiling futures-core v0.3.34
+   Compiling fallible-streaming-iterator v0.1.9
+   Compiling fallible-iterator v0.3.0
+   Compiling syn v3.0.6
+   Compiling jobserver v0.1.35
+   Compiling syn v2.0.119
+   Compiling errno v0.3.14
+   Compiling socket2 v0.6.5
+   Compiling mio v1.2.3
+   Compiling iana-time-zone v0.1.65
+   Compiling signal-hook-registry v1.4.8
+   Compiling futures-sink v0.3.34
+   Compiling slab v0.4.12
+   Compiling tracing-core v0.1.36
+   Compiling ctutils v0.4.2
+   Compiling dunce v1.0.5
+   Compiling fs_extra v1.3.0
+   Compiling futures-io v0.3.34
+   Compiling futures-task v0.3.34
+   Compiling percent-encoding v2.3.2
+   Compiling aws-lc-rs v1.18.1
+   Compiling cc v1.4.7
+   Compiling hashbrown v0.17.1
+   Compiling zeroize v1.9.0
+   Compiling num-traits v0.2.19
+   Compiling untrusted v0.9.0
+   Compiling futures-channel v0.3.34
+   Compiling tower-service v0.3.3
+   Compiling http v1.5.0
+   Compiling system-configuration-sys v0.6.0
+   Compiling httparse v1.10.1
+   Compiling fnv v1.0.7
+   Compiling atomic-waker v1.1.2
+   Compiling digest v0.11.3
+   Compiling regex-syntax v0.8.11
+   Compiling try-lock v0.2.5
+   Compiling rustls v0.23.45
+   Compiling form_urlencoded v1.2.2
+   Compiling aho-corasick v1.1.5
+   Compiling sync_wrapper v1.0.2
+   Compiling core-foundation v0.9.4
+   Compiling subtle v2.6.1
+   Compiling tower-layer v0.3.3
+   Compiling rustls-pki-types v1.15.1
+   Compiling httpdate v1.0.3
+   Compiling ipnet v2.12.2
+   Compiling mime v0.3.17
+   Compiling ryu v1.0.23
+   Compiling lazy_static v1.5.0
+   Compiling tracing-log v0.2.0
+   Compiling thread_local v1.1.10
+   Compiling matchit v0.8.4
+   Compiling want v0.3.1
+   Compiling hashlink v0.12.2
+   Compiling sha2 v0.11.0
+   Compiling sha1 v0.11.0
+   Compiling nu-ansi-term v0.50.3
+   Compiling inout v0.2.2
+   Compiling hmac v0.13.0
+   Compiling sharded-slab v0.1.7
+   Compiling getrandom v0.2.17
+   Compiling cmake v0.1.58
+   Compiling http-body v1.1.0
+   Compiling powerfmt v0.2.0
+   Compiling deranged v0.5.8
+   Compiling time-core v0.1.9
+   Compiling num-conv v0.2.2
+   Compiling cipher v0.5.2
+   Compiling pbkdf2 v0.13.0
+   Compiling if-addrs v0.15.0
+   Compiling qrcodegen v1.8.0
+   Compiling pem v4.0.0
+   Compiling http-body-util v0.1.5
+   Compiling stable_deref_trait v1.2.1
+   Compiling litemap v0.8.3
+   Compiling writeable v0.6.4
+   Compiling system-configuration v0.7.0
+   Compiling icu_normalizer_data v2.3.0
+   Compiling icu_properties_data v2.3.0
+   Compiling utf8_iter v1.0.4
+   Compiling rustversion v1.0.23
+   Compiling zerocopy v0.8.58
+   Compiling scopeguard v1.2.0
+   Compiling getrandom v0.3.4
+   Compiling version_check v0.9.5
+   Compiling salsa20 v0.11.0
+   Compiling parking_lot_core v0.9.12
+   Compiling core-foundation v0.10.1
+   Compiling security-framework-sys v2.17.0
+   Compiling getrandom v0.4.3
+   Compiling lock_api v0.4.14
+   Compiling heck v0.5.0
+   Compiling unicode-general-category v1.1.0
+   Compiling bit-vec v0.8.0
+   Compiling borrow-or-share v0.2.4
+   Compiling regex-automata v0.4.18
+   Compiling libsqlite3-sys v0.38.2
+   Compiling aws-lc-sys v0.45.0
+   Compiling ring v0.17.14
+   Compiling scrypt v0.12.0
+   Compiling time v0.3.55
+   Compiling num-integer v0.1.47
+   Compiling num-complex v0.4.6
+   Compiling thiserror v2.0.21
+   Compiling ahash v0.8.12
+   Compiling security-framework v3.7.0
+   Compiling multiversion_no_op v1.0.0
+   Compiling simdutf8 v0.1.5
+   Compiling bit-set v0.8.0
+   Compiling num-cmp v0.1.0
+   Compiling serde_derive_internals v0.30.0
+   Compiling indexmap v2.14.2
+   Compiling serde_path_to_error v0.1.20
+   Compiling synstructure v0.14.0
+   Compiling num-bigint v0.4.8
+   Compiling num-iter v0.1.46
+   Compiling bytecount v0.6.9
+   Compiling vsimd v0.8.0
+   Compiling micromap v0.3.0
+   Compiling yasna v0.6.0
+   Compiling outref v0.5.2
+   Compiling rmcp v3.4.1
+   Compiling parking_lot v0.12.5
+   Compiling uuid v1.26.1
+   Compiling jsonschema-regex v0.57.0
+   Compiling data-encoding v2.11.1
+   Compiling pastey v0.2.3
+   Compiling uuid-simd v0.8.0
+   Compiling encoding_rs v0.8.42
+   Compiling tracing-attributes v0.1.31
+   Compiling strum_macros v0.28.0
+   Compiling serde_derive v1.0.229
+   Compiling ref-cast-impl v1.0.27
+   Compiling tokio-macros v2.7.2
+   Compiling schemars_derive v1.2.2
+   Compiling futures-macro v0.3.34
+   Compiling zerofrom-derive v0.1.8
+   Compiling yoke-derive v0.8.3
+   Compiling zerovec-derive v0.11.6
+   Compiling displaydoc v0.2.7
+   Compiling thiserror-impl v2.0.21
+   Compiling num-rational v0.4.2
+   Compiling xtask v0.1.0 (/Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/xtask)
+   Compiling ref-cast v1.0.27
+   Compiling num v0.4.3
+   Compiling matchers v0.2.0
+   Compiling fancy-regex v0.19.2
+   Compiling tokio v1.53.1
+   Compiling futures-util v0.3.34
+   Compiling regex v1.13.1
+   Compiling fraction v0.17.0
+   Compiling zerofrom v0.1.8
+   Compiling tracing v0.1.44
+   Compiling strum v0.28.0
+   Compiling yoke v0.8.3
+   Compiling axum-core v0.5.6
+   Compiling tracing-subscriber v0.3.23
+   Compiling rcgen v0.14.10
+   Compiling rusqlite v0.40.2
+   Compiling zerovec v0.11.8
+   Compiling zerotrie v0.2.5
+   Compiling chrono v0.4.45
+   Compiling serde_urlencoded v0.7.1
+   Compiling fluent-uri v0.4.1
+   Compiling email_address v0.2.9
+   Compiling lingxi-browser-spike v0.0.0 (/Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-browser-spike)
+   Compiling futures-executor v0.3.34
+   Compiling jsonschema-value v0.57.0
+   Compiling futures v0.3.34
+   Compiling referencing v0.57.0
+   Compiling tinystr v0.8.4
+   Compiling potential_utf v0.1.6
+   Compiling schemars v1.2.2
+   Compiling icu_collections v2.3.0
+   Compiling icu_locale_core v2.3.0
+   Compiling tokio-util v0.7.19
+   Compiling tower v0.5.3
+   Compiling tokio-stream v0.1.19
+   Compiling h2 v0.4.19
+   Compiling icu_provider v2.3.1
+   Compiling icu_normalizer v2.3.0
+   Compiling icu_properties v2.3.0
+   Compiling lingxi-protocol v0.0.0 (/Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-protocol)
+   Compiling idna_adapter v1.2.2
+   Compiling idna v1.1.0
+   Compiling url v2.5.8
+   Compiling lingxi-kernel v0.0.0 (/Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-kernel)
+   Compiling tower-http v0.6.11
+   Compiling lingxi-adapters v0.0.0 (/Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-adapters)
+   Compiling hyper v1.11.1
+   Compiling hyper-util v0.1.21
+   Compiling axum v0.8.9
+   Compiling rustls-webpki v0.103.15
+   Compiling tokio-rustls v0.26.5
+   Compiling rustls-platform-verifier v0.7.1
+   Compiling lingxi-service v0.0.0 (/Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-service)
+   Compiling hyper-rustls v0.27.10
+   Compiling reqwest v0.13.5
+   Compiling jsonschema v0.57.0
+   Compiling lingxi-spike v0.0.0 (/Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-spike)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 23.48s
+     Running unittests src/lib.rs (/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/rust-target-r03-rr2-f05/debug/deps/lingxi_adapters-93d40561c9c42916)
+     Running unittests src/bin/lingxi-storage-inspect.rs (/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/rust-target-r03-rr2-f05/debug/deps/lingxi_storage_inspect-be1e4fedf8097400)
+     Running tests/active_run_listing.rs (/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/rust-target-r03-rr2-f05/debug/deps/active_run_listing-0ecb792f89488dc5)
+     Running tests/backup_faults.rs (/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/rust-target-r03-rr2-f05/debug/deps/backup_faults-505569b358966182)
+     Running tests/backup_restore.rs (/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/rust-target-r03-rr2-f05/debug/deps/backup_restore-99a6a2c32b3b185c)
+     Running tests/disk_full_fault.rs (/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/rust-target-r03-rr2-f05/debug/deps/disk_full_fault-f53ddf4a430dc705)
+     Running tests/event_store_reads.rs (/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/rust-target-r03-rr2-f05/debug/deps/event_store_reads-37d68bc66ab6dafa)
+     Running tests/invocation_journal_store.rs (/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/rust-target-r03-rr2-f05/debug/deps/invocation_journal_store-9ca17253ead4b340)
+     Running tests/late_result_fencing_property.rs (/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/rust-target-r03-rr2-f05/debug/deps/late_result_fencing_property-9819d844756d1a95)
+     Running tests/migration_idempotency.rs (/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/rust-target-r03-rr2-f05/debug/deps/migration_idempotency-9b9aa21fbefbadf1)
+     Running tests/run_finalize_property.rs (/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/rust-target-r03-rr2-f05/debug/deps/run_finalize_property-12fcce781abdbc16)
+     Running tests/run_id_allocator.rs (/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/rust-target-r03-rr2-f05/debug/deps/run_id_allocator-d6d885fc7d13bd31)
+     Running tests/run_lineage_store.rs (/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/rust-target-r03-rr2-f05/debug/deps/run_lineage_store-b427da167de8fd4a)
+     Running tests/storage_transactions.rs (/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/rust-target-r03-rr2-f05/debug/deps/storage_transactions-aef42ad9a1187fac)
+     Running unittests src/lib.rs (/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/rust-target-r03-rr2-f05/debug/deps/lingxi_browser_spike-0a5903e94ac32244)
+     Running unittests src/bin/spike_browser.rs (/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/rust-target-r03-rr2-f05/debug/deps/spike_browser-afdc398897759a98)
+     Running unittests src/bin/spike_pdf.rs (/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/rust-target-r03-rr2-f05/debug/deps/spike_pdf-e3cb30511e8b4a1e)
+     Running unittests src/lib.rs (/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/rust-target-r03-rr2-f05/debug/deps/lingxi_kernel-5870d7adbc7a2006)
+     Running unittests src/lib.rs (/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/rust-target-r03-rr2-f05/debug/deps/lingxi_protocol-73143661d4635a00)
+     Running unittests src/bin/lingxi-proto-server.rs (/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/rust-target-r03-rr2-f05/debug/deps/lingxi_proto_server-ea4756a4fc26c631)
+     Running unittests src/bin/lingxi-protocol-gen.rs (/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/rust-target-r03-rr2-f05/debug/deps/lingxi_protocol_gen-8459455fdea73203)
+     Running unittests src/bin/lingxi-protocol-verify.rs (/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/rust-target-r03-rr2-f05/debug/deps/lingxi_protocol_verify-49fd3f3ebdb77b89)
+     Running unittests src/lib.rs (/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/rust-target-r03-rr2-f05/debug/deps/lingxi_service-4d3ce4ef9228ce25)
+     Running unittests src/main.rs (/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/rust-target-r03-rr2-f05/debug/deps/lingxi_service-f9b10d41ca2f0414)
+     Running tests/admission_dedup_adversarial.rs (/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/rust-target-r03-rr2-f05/debug/deps/admission_dedup_adversarial-638c7abb8d0992ce)
+     Running tests/admission_dedup_consistency.rs (/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/rust-target-r03-rr2-f05/debug/deps/admission_dedup_consistency-33244358e8c1131e)
+     Running tests/auth_matrix.rs (/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/rust-target-r03-rr2-f05/debug/deps/auth_matrix-f7d6f6ff916ba627)
+     Running tests/background_disconnect_recovery.rs (/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/rust-target-r03-rr2-f05/debug/deps/background_disconnect_recovery-9cb498aeedee3895)
+     Running tests/background_steering.rs (/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/rust-target-r03-rr2-f05/debug/deps/background_steering-349426fc25c3a07e)
+     Running tests/cancel_link_inheritance.rs (/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/rust-target-r03-rr2-f05/debug/deps/cancel_link_inheritance-62ccf3d0165f7163)
+     Running tests/cancel_terminal_race.rs (/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/rust-target-r03-rr2-f05/debug/deps/cancel_terminal_race-a03b59eb07557809)
+     Running tests/cancellation_tree.rs (/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/rust-target-r03-rr2-f05/debug/deps/cancellation_tree-01b95b5fa41a54c7)
+     Running tests/config_bounds.rs (/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/rust-target-r03-rr2-f05/debug/deps/config_bounds-660af23787b52cdc)
+     Running tests/event_subscription.rs (/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/rust-target-r03-rr2-f05/debug/deps/event_subscription-1c82acbb0b03b7f0)
+     Running tests/execute_concurrency.rs (/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/rust-target-r03-rr2-f05/debug/deps/execute_concurrency-4fc35c8427be13f6)
+     Running tests/exit_race_rejections.rs (/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/rust-target-r03-rr2-f05/debug/deps/exit_race_rejections-0194b4ca6418903e)
+     Running tests/input_budget_refusal.rs (/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/rust-target-r03-rr2-f05/debug/deps/input_budget_refusal-0df3f2692472bcba)
+     Running tests/input_payload_fidelity.rs (/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/rust-target-r03-rr2-f05/debug/deps/input_payload_fidelity-f3eceb7b57f4b5f9)
+     Running tests/instance_lifecycle.rs (/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/rust-target-r03-rr2-f05/debug/deps/instance_lifecycle-09121c6e84a1b555)
+     Running tests/invocation_journal.rs (/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/rust-target-r03-rr2-f05/debug/deps/invocation_journal-6ec4b131ac777c35)
+     Running tests/late_result_fence.rs (/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/rust-target-r03-rr2-f05/debug/deps/late_result_fence-f500e9f801e98f8b)
+     Running tests/r00_management_leaves.rs (/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/rust-target-r03-rr2-f05/debug/deps/r00_management_leaves-123611678ad8402e)
+     Running tests/r00_static_web_leaves.rs (/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/rust-target-r03-rr2-f05/debug/deps/r00_static_web_leaves-e4fcdd8254d533f5)
+     Running tests/r03_t08_acceptance_matrix.rs (/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/rust-target-r03-rr2-f05/debug/deps/r03_t08_acceptance_matrix-50e78557f7a4d677)
+     Running tests/recovery_crash_points.rs (/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/rust-target-r03-rr2-f05/debug/deps/recovery_crash_points-6a7f191b3d981441)
+     Running tests/recovery_startup_scan.rs (/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/rust-target-r03-rr2-f05/debug/deps/recovery_startup_scan-576f80212b5d6732)
+     Running tests/request_dedup.rs (/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/rust-target-r03-rr2-f05/debug/deps/request_dedup-bdce0a0105108d9f)
+     Running tests/request_id_canonicalization.rs (/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/rust-target-r03-rr2-f05/debug/deps/request_id_canonicalization-9adf899d216b7a9b)
+     Running tests/resource_limits.rs (/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/rust-target-r03-rr2-f05/debug/deps/resource_limits-87ae1c00b3b3c4a8)
+     Running tests/run_lifecycle.rs (/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/rust-target-r03-rr2-f05/debug/deps/run_lifecycle-3e990b344dd14801)
+     Running tests/service_health.rs (/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/rust-target-r03-rr2-f05/debug/deps/service_health-0a20248bec3923dd)
+     Running tests/service_persistence.rs (/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/rust-target-r03-rr2-f05/debug/deps/service_persistence-4955d36dc9f79b2b)
+     Running tests/session_serialization.rs (/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/rust-target-r03-rr2-f05/debug/deps/session_serialization-8bc5c414bc63c834)
+     Running tests/shutdown_coordinator.rs (/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/rust-target-r03-rr2-f05/debug/deps/shutdown_coordinator-5b35e023b29da107)
+     Running tests/subagent_closeout.rs (/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/rust-target-r03-rr2-f05/debug/deps/subagent_closeout-d600cf8bcd9007f5)
+     Running tests/subagent_lifecycle.rs (/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/rust-target-r03-rr2-f05/debug/deps/subagent_lifecycle-ed4c8f051c624a3c)
+     Running tests/subagent_permission_inheritance.rs (/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/rust-target-r03-rr2-f05/debug/deps/subagent_permission_inheritance-b0fdef3366dae554)
+     Running tests/tls_web_login.rs (/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/rust-target-r03-rr2-f05/debug/deps/tls_web_login-a4a07fd73d334f3b)
+     Running tests/tool_receipt_unknown.rs (/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/rust-target-r03-rr2-f05/debug/deps/tool_receipt_unknown-b9925b637bac0970)
+     Running unittests src/lib.rs (/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/rust-target-r03-rr2-f05/debug/deps/lingxi_spike-c17a9ee965d6ea8a)
+     Running unittests src/bin/spike_check_deps.rs (/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/rust-target-r03-rr2-f05/debug/deps/spike_check_deps-3d03f06d6c62b3e8)
+     Running unittests src/bin/spike_health.rs (/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/rust-target-r03-rr2-f05/debug/deps/spike_health-71049bf841d04f7b)
+     Running unittests src/bin/spike_mcp_handshake.rs (/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/rust-target-r03-rr2-f05/debug/deps/spike_mcp_handshake-7423b22b74cf311a)
+     Running unittests src/bin/spike_schema_validate.rs (/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/rust-target-r03-rr2-f05/debug/deps/spike_schema_validate-48852f4c62f2a81c)
+     Running unittests src/bin/spike_sqlite_queue.rs (/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/rust-target-r03-rr2-f05/debug/deps/spike_sqlite_queue-a31b673f0cd5177a)
+     Running unittests src/bin/spike_tls_probe.rs (/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/rust-target-r03-rr2-f05/debug/deps/spike_tls_probe-a3375a98c1520e2a)
+     Running unittests src/main.rs (/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/rust-target-r03-rr2-f05/debug/deps/xtask-6d02fc0e8bb5a814)
+kill: 74989: No such process
+kill: 74989: No such process
+kill: 74989: No such process
+kill: 74992: No such process
+   Doc-tests lingxi_adapters
+   Doc-tests lingxi_browser_spike
+   Doc-tests lingxi_kernel
+   Doc-tests lingxi_protocol
+   Doc-tests lingxi_service
+   Doc-tests lingxi_spike

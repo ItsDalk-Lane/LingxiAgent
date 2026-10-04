@@ -1,0 +1,28 @@
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.09s
+     Running tests/r05_t02_oauth_flows.rs (/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T//rust-target-r05-t08/debug/deps/r05_t02_oauth_flows-ab136f21c3d7a763)
+
+running 21 tests
+test device_code_cancellation_wins_at_the_wait ... ok
+test device_code_deadline_expires_the_flow ... ok
+test device_code_endpoint_echoes_are_scrubbed_of_in_play_material ... ok
+test device_code_denial_and_expired_token_are_terminal_and_distinct ... ok
+test device_code_happy_path_prompts_once_and_mints_tokens ... ok
+test device_code_untrusted_verification_uri_is_a_loud_protocol_failure ... ok
+test device_code_slow_down_grows_the_interval_by_five_seconds ... ok
+test pkce_cancellation_while_waiting_is_clean ... ok
+test missing_expires_in_falls_back_to_jwt_exp_and_refuses_when_absent ... ok
+test pkce_duplicate_callback_is_refused_by_the_closed_listener ... ok
+test pkce_each_begin_mints_fresh_state_and_verifier ... ok
+test pkce_error_callback_and_codeless_callback_are_terminal_and_loud ... ok
+test pkce_happy_path_binds_state_and_verifier_to_the_exchange ... ok
+test pkce_wrong_state_is_a_400_and_the_flow_survives_for_the_valid_one ... ok
+test refresh_classification_invalid_grant_401_transient_and_scrub ... ok
+test refresh_happy_path_and_refresh_token_rollover_rule ... ok
+test pkce_expired_state_is_rejected_at_the_loop_top_and_after_accept ... ok
+test sub_second_expires_in_mints_an_immediately_expired_token ... ok
+test the_credential_bearing_client_never_consults_the_ambient_proxy ... ok
+test token_endpoint_redirect_is_never_followed ... ok
+test refresh_timeout_is_transient_never_terminal ... ok
+
+test result: ok. 21 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.13s
+

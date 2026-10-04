@@ -1,0 +1,17 @@
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.07s
+     Running unittests src/lib.rs (target/debug/deps/lingxi_service-254d9c3036524e2c)
+
+running 10 tests
+test sessions::tests::execute_request_rejects_identity_shaped_payload_fields ... ok
+test sessions::tests::seed_rows_cover_both_synthetic_sessions_for_the_local_owner ... ok
+test sessions::tests::same_user_device_principal_can_access ... ok
+test sessions::tests::failed_commit_is_a_storage_error_not_a_success ... ok
+test sessions::tests::same_key_duplicate_in_the_start_window_is_in_flight_not_a_ghost ... ok
+test sessions::tests::owner_sees_everything_and_execute_records_runs ... ok
+test sessions::tests::cross_principal_access_is_forbidden_not_found ... ok
+test sessions::tests::start_failure_under_request_id_re_admits_the_same_key_fresh ... ok
+test sessions::tests::busy_rejection_writes_nothing_and_steering_is_distinct ... ok
+test sessions::tests::concurrent_executes_serialize_one_accepted_and_no_run_id_collapse ... ok
+
+test result: ok. 10 passed; 0 failed; 0 ignored; 0 measured; 231 filtered out; finished in 0.02s
+

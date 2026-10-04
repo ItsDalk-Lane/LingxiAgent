@@ -1,0 +1,32 @@
+{
+  "schemaVersion": 1,
+  "artifactKind": "R05_LIVE_VERIFICATION",
+  "stage_id": "R05",
+  "generated_by": "EXECUTOR-R05-T08",
+  "generated_at": "2026-10-04",
+  "policy": {
+    "liveLane": "LIVE is a separately-authorized lane. The R05 stage gate is offline-only by registration (rust/crates/xtask/src/stage_maps/R05.json; the xtask mirror test r05_map_declares_no_live_lane_and_only_offline_commands refuses any command that references credential/live material — negative case R05-GATE-N14 pins this refusal). No environment variable can silently arm real-provider requests.",
+    "authorizationRef": "RR-BLK-CREDENTIALS (registered in docs/rust-tauri/R05/R05_BLOCKERS.md and the progress ledger): real-provider verification was NOT authorized in this stage; the task book allows deferral with an explicit obligation until at latest R10.",
+    "noRealOutbound": "During R05 (T01–T08) no request left the machine to any real provider: every model endpoint in every test and every gate run is a loopback stub (127.0.0.1) spawned by the test itself; all gate cargo runs execute with CARGO_NET_OFFLINE=true (scripts/rust-tauri/r05_t08_stage_suites.sh, r05_t08_negative_gate.sh) and the negative-gate copy additionally strips proxy env vars."
+  },
+  "status": "BLOCKED_NOT_AUTHORIZED",
+  "statusVocabulary": ["VERIFIED", "PARTIAL", "BLOCKED_NOT_AUTHORIZED", "BLOCKED_ENVIRONMENT"],
+  "whatIsBlocked": [
+    "Real provider login (OAuth device/PKCE flows against production IdPs) — implemented and verified against controlled loopback auth servers (adapters r05_t02_oauth_flows, 21 tests; service r05_t02_credentials, 16 tests); LIVE replay against the real endpoints is deferred.",
+    "Real chat/tool-round-trip/streaming/cancellation against production endpoints — protocol wire shapes are pinned by脱敏 goldens (five families, r05_t03_goldens/r05_t05_compat) and loopback full chains; LIVE is deferred.",
+    "Real credential refresh/revocation against production token endpoints — state-machine behavior is loopback-verified; LIVE is deferred.",
+    "Cross-provider media (image/video/speech) LIVE verification — wire contracts are golden-pinned; LIVE is deferred.",
+    "Real usage/billing reconciliation against provider invoices — usage normalization is golden-pinned per family; LIVE is deferred."
+  ],
+  "whatIsNotBlocked": "Everything in the offline scope: see R05_ACCEPTANCE_LEDGER.json (88 PASS entries with executed evidence on the terminal tree) and the R05 stage gate result under artifacts/rust-tauri/R05/T08-E01/verify-R05/.",
+  "deferredObligation": {
+    "id": "RR-BLK-CREDENTIALS",
+    "dueStage": "R10 (at latest)",
+    "requires": "explicitly provided test credentials, target account, endpoints and budget from the user; per the stage book, pasting the prompt does not authorize paid or real outbound traffic."
+  },
+  "platformVerification": {
+    "macOS arm64 (this host)": "all offline gates executed here (see R05_REPORT.md)",
+    "Windows": "not verified in R05 (inherited R04 platform deferrals; process/sandbox legs remain Windows-unimplemented)",
+    "Linux": "not verified in R05 (inherited R04/R05 unverified-on-hardware items)"
+  }
+}

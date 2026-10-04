@@ -1,0 +1,24 @@
+== toolchain: rustup run 1.98.1 (rustc 1.98.1 (48a229cea 2026-09-01))
+== [build] lingxi-service (locked, offline, isolated target dir)
+    Finished `dev` profile [unoptimized + debuginfo] target(s) in 2.75s
+== [A] start instance 1 on the synthetic home
+instance 1: pid=10632 addr=127.0.0.1:57460 home=/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T//lingxi-r02t02-a03-home.jZdsBg
+instance 1 record instanceId=f54a4ff62eeacd4a3fa963279cd5b754
+home tree hash before rejection: 16284bc54ae579b37e15f620f233fe2b188a9939f7f9e0b96d10f8b9b9d679aa
+== [B] second instance, SAME home -> must be rejected (exit 3 + marker)
+instance 2 exit code: 3
+instance 2 rejected as required (marker + diagnostics + no READY)
+LINGXI_SERVICE_SINGLE_WRITER_BLOCKED home=/private/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-r02t02-a03-home.jZdsBg recordedPid=10632 recordedInstanceId=f54a4ff62eeacd4a3fa963279cd5b754 recordedStartNonce=5183e8205ded6077 recordedAddr=127.0.0.1:57460 probe=live authority=os-file-lock
+== [C] instance 1 unaffected; data byte-identical
+home tree hash after rejection:  16284bc54ae579b37e15f620f233fe2b188a9939f7f9e0b96d10f8b9b9d679aa
+instance 1 still healthy and data unchanged: OK
+== [D] aliased second start (macOS /private alias of the same dir) also rejected
+aliased instance exit code: 3
+alias collapsed to the same canonical root: OK
+== [E] SIGKILL crash -> stale record -> takeover restart -> clean stop
+instance 3 took over the stale home and serves: OK
+instance 3 exit after SIGTERM: 0
+graceful stop removed own record, kept lock file: OK
+== [F] forged record with a LIVE unrelated pid does not block takeover
+takeover proceeded despite a live recorded pid (lock is the authority): OK
+A03 RESULT: PASS (dual-instance rejection, first instance intact, stale takeover, pid-reuse adversarial)

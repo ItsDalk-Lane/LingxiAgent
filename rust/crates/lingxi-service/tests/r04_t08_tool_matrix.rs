@@ -30,9 +30,10 @@ use std::sync::atomic::{AtomicUsize, Ordering};
 use std::sync::{Arc, Mutex};
 use std::time::Duration;
 
+use lingxi_kernel::model_exchange::ModelTurnInput;
 use lingxi_kernel::ports::{
     ProviderDescriptor, ProviderTurn, ProviderTurnResult, StoragePort, ToolExecutionResult,
-    ToolExecutorPort, ToolOutcome, ToolRequest, ToolSuccess, TurnProviderPort,
+    ToolExecutorPort, ToolOutcome, ToolRequest, ToolSuccess, TurnDeltaSink, TurnProviderPort,
 };
 use lingxi_kernel::subagent::{SessionPermissionMode, ToolAccessTier};
 use lingxi_kernel::toolcatalog::{
@@ -156,8 +157,9 @@ impl TurnProviderPort for StepsProvider {
         &'a self,
         ctx: &'a RunContext,
         _call: &'a ModelCallId,
-        _turn: u32,
-        _input: &'a str,
+        _input: &'a ModelTurnInput,
+
+        _deltas: &'a dyn TurnDeltaSink,
     ) -> Pin<Box<dyn std::future::Future<Output = ProviderTurnResult> + Send + 'a>> {
         let next = self
             .steps
@@ -185,6 +187,7 @@ fn final_turn(text: &str) -> ProviderTurn {
 
 fn tool_turn(target: &str, args: serde_json::Value) -> ProviderTurn {
     ProviderTurn::ToolRequests {
+        content: Vec::new(),
         requests: vec![
             ToolRequest::from_effective_arguments(target, args, &budget())
                 .expect("effective request"),
@@ -480,6 +483,9 @@ async fn register_fixture_worker_input(
         env: BTreeMap::new(),
         cwd: h.ws.clone(),
         model: Arc::new(UnconfiguredWorkerModel) as Arc<dyn WorkerModelPort>,
+        // R05-T06 (C09): this matrix's workers never issue model
+        // callbacks — the granted purpose set is honestly empty.
+        allowed_model_purposes: Vec::new(),
         claimed_file_contract: contract,
     };
     register_worker_tool(

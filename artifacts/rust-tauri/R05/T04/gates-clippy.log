@@ -1,0 +1,4 @@
+note: the first run failed on T04 code (3× new_without_default on the accumulators, 1× type_complexity on SseStreamHandler, 1× too_many_arguments on persist_norm_events); fixes: Default impls, SseHandleFuture alias, file-convention allow. This rerun is on the terminal tree.
+
+    Checking lingxi-service v0.0.0 (/Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-service)
+    Finished `dev` profile [unoptimized + debuginfo] target(s) in 28.57s

@@ -1,0 +1,31 @@
+   Compiling lingxi-service v0.0.0 (/Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-service)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 1.46s
+     Running unittests src/lib.rs (rust/target/debug/deps/lingxi_service-859f4a65b7026329)
+
+running 3 tests
+test management::tests::web_cookie_expires_and_requires_original_transport ... FAILED
+test management::tests::persisted_network_read_is_strict_and_read_only ... ok
+test management::tests::password_scrypt_matches_node_and_upgrades_legacy_record ... FAILED
+
+failures:
+
+---- management::tests::web_cookie_expires_and_requires_original_transport stdout ----
+
+thread 'management::tests::web_cookie_expires_and_requires_original_transport' (37496233) panicked at crates/lingxi-service/src/management.rs:1018:9:
+assertion failed: matches!(state.authenticate_cookie(Some(&cookie), 1, true), Ok(Some(_)))
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+
+---- management::tests::password_scrypt_matches_node_and_upgrades_legacy_record stdout ----
+
+thread 'management::tests::password_scrypt_matches_node_and_upgrades_legacy_record' (37496231) panicked at crates/lingxi-service/src/management.rs:1058:9:
+assertion failed: matches!(state.verify_password_and_upgrade("alice", "wrong password", 1,
+    crate::ConnectionKind::Lan), Ok(None))
+
+
+failures:
+    management::tests::password_scrypt_matches_node_and_upgrades_legacy_record
+    management::tests::web_cookie_expires_and_requires_original_transport
+
+test result: FAILED. 1 passed; 2 failed; 0 ignored; 0 measured; 167 filtered out; finished in 1.24s
+
+error: test failed, to rerun pass `-p lingxi-service --lib`

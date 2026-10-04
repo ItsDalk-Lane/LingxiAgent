@@ -1,0 +1,31 @@
+   Compiling lingxi-service v0.0.0 (/private/tmp/r03-g01-redcheck/rust/crates/lingxi-service)
+warning: function `wait_for_next_subagent_child` is never used
+   --> crates/lingxi-service/tests/subagent_closeout.rs:319:10
+    |
+319 | async fn wait_for_next_subagent_child(state: &ServiceState, older_than: &[&str]) -> String {
+    |          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    |
+    = note: `#[warn(dead_code)]` (part of `#[warn(unused)]`) on by default
+
+warning: `lingxi-service` (test "subagent_closeout") generated 1 warning
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.97s
+     Running tests/subagent_closeout.rs (/tmp/r03-g01-redcheck-target/debug/deps/subagent_closeout-457ac9f82fee79f3)
+
+running 1 test
+test parent_cancel_closes_children_in_process_repeatedly_beyond_the_cap ... FAILED
+
+failures:
+
+---- parent_cancel_closes_children_in_process_repeatedly_beyond_the_cap stdout ----
+
+thread 'parent_cancel_closes_children_in_process_repeatedly_beyond_the_cap' (42820495) panicked at crates/lingxi-service/tests/subagent_closeout.rs:309:9:
+timed out waiting for round 1: the child settles cancelled in-process (run run_000001a0dcba6c00_000002 to become cancelled)
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+
+
+failures:
+    parent_cancel_closes_children_in_process_repeatedly_beyond_the_cap
+
+test result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 6 filtered out; finished in 5.07s
+
+error: test failed, to rerun pass `-p lingxi-service --test subagent_closeout`

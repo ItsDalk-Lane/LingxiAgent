@@ -1,0 +1,12 @@
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.10s
+     Running unittests src/lib.rs (rust/target/debug/deps/lingxi_service-8c78af55f7759b0c)
+
+running 4 tests
+test workerrpc::tests::request_envelope_serializes_with_every_enforced_field ... ok
+test workerrpc::tests::unconfigured_model_refuses_every_callback_honestly ... ok
+test workerrpc::tests::bounded_model_without_inner_still_refuses_not_configured ... ok
+test workerrpc::tests::bounded_model_enforces_the_callback_budget_host_side ... ok
+
+test result: ok. 4 passed; 0 failed; 0 ignored; 0 measured; 279 filtered out; finished in 0.00s
+
+exit=0

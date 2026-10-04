@@ -1,0 +1,1046 @@
+
+ RUN  v4.1.10 /Users/study_superior/Desktop/Code/LingxiAgent
+
+stderr | desktop/src/react/__tests__/mobile/MobileApp.test.tsx > MobileApp > renders server-broadcast user messages through the desktop websocket handler
+[ws] connection setup failed: Error: websocket ticket response missing ticket
+    at requestConnectionWsTicket (/Users/study_superior/Desktop/Code/LingxiAgent/desktop/src/react/services/server-connection.ts:778:11)
+    at openConnectionWebSocket (/Users/study_superior/Desktop/Code/LingxiAgent/desktop/src/react/services/websocket.ts:214:16)
+
+stderr | desktop/src/react/__tests__/mobile/MobileApp.test.tsx > MobileApp > renders server-broadcast user messages through the desktop websocket handler
+[resource-events] watch failed: { kind: 'local-file', path: '/workspace' }
+
+stderr | desktop/src/react/__tests__/mobile/MobileApp.test.tsx > MobileApp > renders server-broadcast user messages through the desktop websocket handler
+[lm-entry] targetPath= /hana/sessions/one.jsonl preloaded= false
+[cmf-entry] path= /hana/sessions/one.jsonl records.size= 0
+[cmf-dbg] called size= 0 url= /api/sessions/messages?path=%2Fhana%2Fsessions%2Fone.jsonl&s
+
+stderr | desktop/src/react/__tests__/mobile/MobileApp.test.tsx > MobileApp > renders server-broadcast user messages through the desktop websocket handler
+[lm-dbg] before save, etag= null proto= null
+[save-dbg] etag= null proto= null limit= 50
+
+stderr | desktop/src/react/__tests__/mobile/MobileApp.test.tsx > MobileApp > shows server-created sessions from another LAN client without waiting for a refetch payload
+[ws] connection setup failed: Error: websocket ticket response missing ticket
+    at requestConnectionWsTicket (/Users/study_superior/Desktop/Code/LingxiAgent/desktop/src/react/services/server-connection.ts:778:11)
+    at openConnectionWebSocket (/Users/study_superior/Desktop/Code/LingxiAgent/desktop/src/react/services/websocket.ts:214:16)
+
+stderr | desktop/src/react/__tests__/mobile/MobileApp.test.tsx > MobileApp > shows server-created sessions from another LAN client without waiting for a refetch payload
+[resource-events] watch failed: { kind: 'local-file', path: '/workspace' }
+
+ ❯ desktop/src/react/__tests__/mobile/MobileApp.test.tsx (25 tests | 2 failed) 2689ms
+     × renders server-broadcast user messages through the desktop websocket handler 1027ms
+     × shows server-created sessions from another LAN client without waiting for a refetch payload 1024ms
+stderr | desktop/src/react/settings/__tests__/SettingsContent.test.tsx > SettingsContent tab heading > verifies Rust identity and keeps unavailable settings visibly unavailable
+Error: [vitest] No "yuanFallbackAvatar" export is defined on the "../api" mock. Did you forget to return it from "vi.mock"?
+If you need to partially mock a module, you can use "importOriginal" helper inside:
+
+    at VitestMocker.createError (file:///Users/study_superior/Desktop/Code/LingxiAgent/node_modules/vitest/dist/chunks/startVitestModuleRunner.DB-7oCpn.js:62:17)
+    at Object.get (file:///Users/study_superior/Desktop/Code/LingxiAgent/node_modules/vitest/dist/chunks/startVitestModuleRunner.DB-7oCpn.js:327:16)
+    at /Users/study_superior/Desktop/Code/LingxiAgent/desktop/src/react/settings/tabs/agent/AgentCardStack.tsx:346:23
+    at Array.map (<anonymous>)
+    at AgentCardStack (/Users/study_superior/Desktop/Code/LingxiAgent/desktop/src/react/settings/tabs/agent/AgentCardStack.tsx:314:17)
+    at Object.react_stack_bottom_frame (/Users/study_superior/Desktop/Code/LingxiAgent/node_modules/react-dom/cjs/react-dom-client.development.js:25904:20)
+    at renderWithHooks (/Users/study_superior/Desktop/Code/LingxiAgent/node_modules/react-dom/cjs/react-dom-client.development.js:7662:22)
+    at updateFunctionComponent (/Users/study_superior/Desktop/Code/LingxiAgent/node_modules/react-dom/cjs/react-dom-client.development.js:10166:19)
+    at beginWork (/Users/study_superior/Desktop/Code/LingxiAgent/node_modules/react-dom/cjs/react-dom-client.development.js:11778:18)
+    at runWithFiberInDEV (/Users/study_superior/Desktop/Code/LingxiAgent/node_modules/react-dom/cjs/react-dom-client.development.js:874:13) {
+  [stack]: [Getter/Setter],
+  [message]: '[vitest] No "yuanFallbackAvatar" export is defined on the "../api" mock. Did you forget to return it from "vi.mock"?\n' +
+    'If you need to partially mock a module, you can use "importOriginal" helper inside:\n',
+  codeFrame: 'vi.mock(import("../api"), async (importOriginal) => {\n' +
+    '  const actual = await importOriginal()\n' +
+    '  return {\n' +
+    '    ...actual,\n' +
+    '    // your mocked methods\n' +
+    '  }\n' +
+    '})'
+}
+
+The above error occurred in the <AgentCardStack> component.
+
+React will try to recreate this component tree from scratch using the error boundary you provided, ErrorBoundary.
+
+[ErrorBoundary] Error: [vitest] No "yuanFallbackAvatar" export is defined on the "../api" mock. Did you forget to return it from "vi.mock"?
+If you need to partially mock a module, you can use "importOriginal" helper inside:
+
+    at VitestMocker.createError (file:///Users/study_superior/Desktop/Code/LingxiAgent/node_modules/vitest/dist/chunks/startVitestModuleRunner.DB-7oCpn.js:62:17)
+    at Object.get (file:///Users/study_superior/Desktop/Code/LingxiAgent/node_modules/vitest/dist/chunks/startVitestModuleRunner.DB-7oCpn.js:327:16)
+    at /Users/study_superior/Desktop/Code/LingxiAgent/desktop/src/react/settings/tabs/agent/AgentCardStack.tsx:346:23
+    at Array.map (<anonymous>)
+    at AgentCardStack (/Users/study_superior/Desktop/Code/LingxiAgent/desktop/src/react/settings/tabs/agent/AgentCardStack.tsx:314:17)
+    at Object.react_stack_bottom_frame (/Users/study_superior/Desktop/Code/LingxiAgent/node_modules/react-dom/cjs/react-dom-client.development.js:25904:20)
+    at renderWithHooks (/Users/study_superior/Desktop/Code/LingxiAgent/node_modules/react-dom/cjs/react-dom-client.development.js:7662:22)
+    at updateFunctionComponent (/Users/study_superior/Desktop/Code/LingxiAgent/node_modules/react-dom/cjs/react-dom-client.development.js:10166:19)
+    at beginWork (/Users/study_superior/Desktop/Code/LingxiAgent/node_modules/react-dom/cjs/react-dom-client.development.js:11778:18)
+    at runWithFiberInDEV (/Users/study_superior/Desktop/Code/LingxiAgent/node_modules/react-dom/cjs/react-dom-client.development.js:874:13) {
+  codeFrame: 'vi.mock(import("../api"), async (importOriginal) => {\n' +
+    '  const actual = await importOriginal()\n' +
+    '  return {\n' +
+    '    ...actual,\n' +
+    '    // your mocked methods\n' +
+    '  }\n' +
+    '})'
+} 
+    at AgentCardStack (/Users/study_superior/Desktop/Code/LingxiAgent/desktop/src/react/settings/tabs/agent/AgentCardStack.tsx:58:3)
+    at div (<anonymous>)
+    at SettingsSurface (/Users/study_superior/Desktop/Code/LingxiAgent/desktop/src/react/settings/components/SettingsPrimitives.tsx:30:28)
+    at section (<anonymous>)
+    at SettingsSectionBase (/Users/study_superior/Desktop/Code/LingxiAgent/desktop/src/react/settings/components/SettingsSection.tsx:53:3)
+    at div (<anonymous>)
+    at AgentTab (/Users/study_superior/Desktop/Code/LingxiAgent/desktop/src/react/settings/tabs/AgentTab.tsx:49:41)
+    at div (<anonymous>)
+    at SettingsPage (/Users/study_superior/Desktop/Code/LingxiAgent/desktop/src/react/settings/components/SettingsPrimitives.tsx:10:25)
+    at ErrorBoundary (/Users/study_superior/Desktop/Code/LingxiAgent/desktop/src/react/components/ErrorBoundary.tsx:7:1)
+    at div (<anonymous>)
+    at div (<anonymous>)
+    at div (<anonymous>)
+    at div (<anonymous>)
+    at ErrorBoundary (/Users/study_superior/Desktop/Code/LingxiAgent/desktop/src/react/components/ErrorBoundary.tsx:7:1)
+    at SettingsContent (/Users/study_superior/Desktop/Code/LingxiAgent/desktop/src/react/settings/SettingsContent.tsx:164:3)
+
+ ❯ desktop/src/react/settings/__tests__/SettingsContent.test.tsx (11 tests | 1 failed) 1302ms
+     × verifies Rust identity and keeps unavailable settings visibly unavailable 1040ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 3 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  desktop/src/react/__tests__/mobile/MobileApp.test.tsx > MobileApp > renders server-broadcast user messages through the desktop websocket handler
+TestingLibraryElementError: Unable to find an element with the text: 手机端发来的消息. This could be because the text is broken up by multiple elements. In this case, you can provide a function for your text matcher to make your matcher more flexible.
+
+Ignored nodes: comments, script, style
+[36m<body>[39m
+  [36m<div>[39m
+    [36m<main[39m
+      [33mclass[39m=[32m"mobile-desktop-root"[39m
+      [33mdata-mobile-principal[39m=[32m"device_credential"[39m
+    [36m>[39m
+      [36m<div[39m
+        [33mclass[39m=[32m"titlebar"[39m
+      [36m>[39m
+        [36m<div[39m
+          [33mclass[39m=[32m"tb-left-group"[39m
+        [36m>[39m
+          [36m<button[39m
+            [33mclass[39m=[32m"tb-toggle tb-toggle-left active"[39m
+            [33mid[39m=[32m"tbToggleLeft"[39m
+            [33mtitle[39m=[32m"sidebar.toggle"[39m
+          [36m>[39m
+            [36m<svg[39m
+              [33mfill[39m=[32m"none"[39m
+              [33mheight[39m=[32m"14"[39m
+              [33mstroke[39m=[32m"currentColor"[39m
+              [33mstroke-linecap[39m=[32m"round"[39m
+              [33mstroke-linejoin[39m=[32m"round"[39m
+              [33mstroke-width[39m=[32m"1.5"[39m
+              [33mviewBox[39m=[32m"0 0 24 24"[39m
+              [33mwidth[39m=[32m"14"[39m
+            [36m>[39m
+              [36m<rect[39m
+                [33mheight[39m=[32m"18"[39m
+                [33mrx[39m=[32m"2"[39m
+                [33mry[39m=[32m"2"[39m
+                [33mwidth[39m=[32m"18"[39m
+                [33mx[39m=[32m"3"[39m
+                [33my[39m=[32m"3"[39m
+              [36m/>[39m
+              [36m<line[39m
+                [33mx1[39m=[32m"9"[39m
+                [33mx2[39m=[32m"9"[39m
+                [33my1[39m=[32m"3"[39m
+                [33my2[39m=[32m"21"[39m
+              [36m/>[39m
+            [36m</svg>[39m
+          [36m</button>[39m
+          [36m<button[39m
+            [33maria-label[39m=[32m"sidebar.newChat"[39m
+            [33mclass[39m=[32m"tb-toggle tb-new-session"[39m
+            [33mdata-mobile-titlebar-action[39m=[32m"new-session"[39m
+            [33mtitle[39m=[32m"sidebar.newChat"[39m
+            [33mtype[39m=[32m"button"[39m
+          [36m>[39m
+            [36m<svg[39m
+              [33mfill[39m=[32m"none"[39m
+              [33mheight[39m=[32m"17"[39m
+              [33mstroke[39m=[32m"currentColor"[39m
+              [33mstroke-linecap[39m=[32m"round"[39m
+              [33mstroke-linejoin[39m=[32m"round"[39m
+              [33mstroke-width[39m=[32m"2.2"[39m
+              [33mviewBox[39m=[32m"0 0 24 24"[39m
+              [33mwidth[39m=[32m"17"[39m
+            [36m>[39m
+              [36m<line[39m
+                [33mx1[39m=[32m"12"[39m
+                [33mx2[39m=[32m"12"[39m
+                [33my1[39m=[32m"5"[39m
+                [33my2[39m=[32m"19"[39m
+              [36m/>[39m
+              [36m<line[39m
+                [33mx1[39m=[32m"5"[39m
+                [33mx2[39m=[32m"19"[39m
+                [33my1[39m=[32m"12"[39m
+                [33my2[39m=[32m"12"[39m
+              [36m/>[39m
+            [36m</svg>[39m
+          [36m</button>[39m
+        [36m</div>[39m
+        [36m<div[39m
+          [33maria-label[39m=[32m"titlebar.currentChatTitle"[39m
+          [33mclass[39m=[32m"tb-center-title"[39m
+          [33mtitle[39m=[32m"日常记录"[39m
+        [36m>[39m
+          [36m<span>[39m
+            [0m日常记录[0m
+          [36m</span>[39m
+        [36m</div>[39m
+        [36m<div[39m
+          [33mclass[39m=[32m"tb-right-group"[39m
+        [36m>[39m
+          [36m<button[39m
+            [33mclass[39m=[32m"tb-toggle tb-toggle-preview"[39m
+            [33mid[39m=[32m"tbTogglePreview"[39m
+            [33mtitle[39m=[32m"preview.toggle"[39m
+          [36m>[39m
+            [36m<svg[39m
+              [33mfill[39m=[32m"none"[39m
+              [33mheight[39m=[32m"16"[39m
+              [33mstroke[39m=[32m"currentColor"[39m
+              [33mstroke-linecap[39m=[32m"round"[39m
+              [33mstroke-linejoin[39m=[32m"round"[39m
+              [33mstroke-width[39m=[32m"1.6"[39m
+              [33mviewBox[39m=[32m"0 0 24 24"[39m
+              [33mwidth[39m=[32m"16"[39m
+            [36m>[39m
+              [36m<path[39m
+                [33md[39m=[32m"M7 3.5h7l3 3v14H7z"[39m
+              [36m/>[39m
+              [36m<path[39m
+                [33md[39m=[32m"M14 3.5v3h3"[39m
+              [36m/>[39m
+              [36m<path[39m
+                [33md[39m=[32m"M9.5 11h5"[39m
+              [36m/>[39m
+              [36m<path[39m
+                [33md[39m=[32m"M9.5 14.5h5"[39m
+              [36m/>[39m
+            [36m</svg>[39m
+          [36m</button>[39m
+          [36m<button[39m
+            [33mclass[39m=[32m"tb-toggle tb-toggle-right"[39m
+            [33mid[39m=[32m"tbToggleRight"[39m
+            [33mtitle[39m=[32m"sidebar.jian"[39m
+          [36m>[39m
+            [36m<svg[39m
+              [33mfill[39m=[32m"none"[39m
+              [33mheight[39m=[32m"16"[39m
+              [33mstroke[39m=[32m"currentColor"[39m
+              [33mstroke-linecap[39m=[32m"round"[39m
+              [33mstroke-linejoin[39m=[32m"round"[39m
+              [33mstroke-width[39m=[32m"1.6"[39m
+              [33mviewBox[39m=[32m"0 0 24 24"[39m
+              [33mwidth[39m=[32m"16"[39m
+            [36m>[39m
+              [36m<rect[39m
+                [33mheight[39m=[32m"18"[39m
+                [33mrx[39m=[32m"2"[39m
+                [33mry[39m=[32m"2"[39m
+                [33mwidth[39m=[32m"18"[39m
+                [33mx[39m=[32m"3"[39m
+                [33my[39m=[32m"3"[39m
+              [36m/>[39m
+              [36m<line[39m
+                [33mx1[39m=[32m"15"[39m
+                [33mx2[39m=[32m"15"[39m
+                [33my1[39m=[32m"3"[39m
+                [33my2[39m=[32m"21"[39m
+              [36m/>[39m
+            [36m</svg>[39m
+          [36m</button>[39m
+        [36m</div>[39m
+      [36m</div>[39m
+      [36m<div[39m
+        [33mclass[39m=[32m"app mobile-desktop-app"[39m
+      [36m>[39m
+        [36m<aside[39m
+          [33mclass[39m=[32m"sidebar"[39m
+          [33mid[39m=[32m"sidebar"[39m
+        [36m>[39m
+          [36m<div[39m
+            [33mclass[39m=[32m"sidebar-inner"[39m
+          [36m>[39m
+            [36m<div[39m
+              [33mclass[39m=[32m"sidebar-chat-content"[39m
+            [36m>[39m
+              [36m<div[39m
+                [33mclass[39m=[32m"session-list"[39m
+              [36m>[39m
+                [36m<div[39m
+                  [33mclass[39m=[32m"_sessionListScroller_7965d6"[39m
+                [36m>[39m
+                  [36m<section[39m
+                    [33mclass[39m=[32m"_projectSection_7965d6"[39m
+                    [33mdata-project-id[39m=[32m"dir:/workspace"[39m
+                  [36m>[39m
+                    [36m<div[39m
+                      [33mclass[39m=[32m"_projectHeader_7965d6"[39m...
+
+Ignored nodes: comments, script, style
+[36m<body>[39m
+  [36m<div>[39m
+    [36m<main[39m
+      [33mclass[39m=[32m"mobile-desktop-root"[39m
+      [33mdata-mobile-principal[39m=[32m"device_credential"[39m
+    [36m>[39m
+      [36m<div[39m
+        [33mclass[39m=[32m"titlebar"[39m
+      [36m>[39m
+        [36m<div[39m
+          [33mclass[39m=[32m"tb-left-group"[39m
+        [36m>[39m
+          [36m<button[39m
+            [33mclass[39m=[32m"tb-toggle tb-toggle-left active"[39m
+            [33mid[39m=[32m"tbToggleLeft"[39m
+            [33mtitle[39m=[32m"sidebar.toggle"[39m
+          [36m>[39m
+            [36m<svg[39m
+              [33mfill[39m=[32m"none"[39m
+              [33mheight[39m=[32m"14"[39m
+              [33mstroke[39m=[32m"currentColor"[39m
+              [33mstroke-linecap[39m=[32m"round"[39m
+              [33mstroke-linejoin[39m=[32m"round"[39m
+              [33mstroke-width[39m=[32m"1.5"[39m
+              [33mviewBox[39m=[32m"0 0 24 24"[39m
+              [33mwidth[39m=[32m"14"[39m
+            [36m>[39m
+              [36m<rect[39m
+                [33mheight[39m=[32m"18"[39m
+                [33mrx[39m=[32m"2"[39m
+                [33mry[39m=[32m"2"[39m
+                [33mwidth[39m=[32m"18"[39m
+                [33mx[39m=[32m"3"[39m
+                [33my[39m=[32m"3"[39m
+              [36m/>[39m
+              [36m<line[39m
+                [33mx1[39m=[32m"9"[39m
+                [33mx2[39m=[32m"9"[39m
+                [33my1[39m=[32m"3"[39m
+                [33my2[39m=[32m"21"[39m
+              [36m/>[39m
+            [36m</svg>[39m
+          [36m</button>[39m
+          [36m<button[39m
+            [33maria-label[39m=[32m"sidebar.newChat"[39m
+            [33mclass[39m=[32m"tb-toggle tb-new-session"[39m
+            [33mdata-mobile-titlebar-action[39m=[32m"new-session"[39m
+            [33mtitle[39m=[32m"sidebar.newChat"[39m
+            [33mtype[39m=[32m"button"[39m
+          [36m>[39m
+            [36m<svg[39m
+              [33mfill[39m=[32m"none"[39m
+              [33mheight[39m=[32m"17"[39m
+              [33mstroke[39m=[32m"currentColor"[39m
+              [33mstroke-linecap[39m=[32m"round"[39m
+              [33mstroke-linejoin[39m=[32m"round"[39m
+              [33mstroke-width[39m=[32m"2.2"[39m
+              [33mviewBox[39m=[32m"0 0 24 24"[39m
+              [33mwidth[39m=[32m"17"[39m
+            [36m>[39m
+              [36m<line[39m
+                [33mx1[39m=[32m"12"[39m
+                [33mx2[39m=[32m"12"[39m
+                [33my1[39m=[32m"5"[39m
+                [33my2[39m=[32m"19"[39m
+              [36m/>[39m
+              [36m<line[39m
+                [33mx1[39m=[32m"5"[39m
+                [33mx2[39m=[32m"19"[39m
+                [33my1[39m=[32m"12"[39m
+                [33my2[39m=[32m"12"[39m
+              [36m/>[39m
+            [36m</svg>[39m
+          [36m</button>[39m
+        [36m</div>[39m
+        [36m<div[39m
+          [33maria-label[39m=[32m"titlebar.currentChatTitle"[39m
+          [33mclass[39m=[32m"tb-center-title"[39m
+          [33mtitle[39m=[32m"日常记录"[39m
+        [36m>[39m
+          [36m<span>[39m
+            [0m日常记录[0m
+          [36m</span>[39m
+        [36m</div>[39m
+        [36m<div[39m
+          [33mclass[39m=[32m"tb-right-group"[39m
+        [36m>[39m
+          [36m<button[39m
+            [33mclass[39m=[32m"tb-toggle tb-toggle-preview"[39m
+            [33mid[39m=[32m"tbTogglePreview"[39m
+            [33mtitle[39m=[32m"preview.toggle"[39m
+          [36m>[39m
+            [36m<svg[39m
+              [33mfill[39m=[32m"none"[39m
+              [33mheight[39m=[32m"16"[39m
+              [33mstroke[39m=[32m"currentColor"[39m
+              [33mstroke-linecap[39m=[32m"round"[39m
+              [33mstroke-linejoin[39m=[32m"round"[39m
+              [33mstroke-width[39m=[32m"1.6"[39m
+              [33mviewBox[39m=[32m"0 0 24 24"[39m
+              [33mwidth[39m=[32m"16"[39m
+            [36m>[39m
+              [36m<path[39m
+                [33md[39m=[32m"M7 3.5h7l3 3v14H7z"[39m
+              [36m/>[39m
+              [36m<path[39m
+                [33md[39m=[32m"M14 3.5v3h3"[39m
+              [36m/>[39m
+              [36m<path[39m
+                [33md[39m=[32m"M9.5 11h5"[39m
+              [36m/>[39m
+              [36m<path[39m
+                [33md[39m=[32m"M9.5 14.5h5"[39m
+              [36m/>[39m
+            [36m</svg>[39m
+          [36m</button>[39m
+          [36m<button[39m
+            [33mclass[39m=[32m"tb-toggle tb-toggle-right"[39m
+            [33mid[39m=[32m"tbToggleRight"[39m
+            [33mtitle[39m=[32m"sidebar.jian"[39m
+          [36m>[39m
+            [36m<svg[39m
+              [33mfill[39m=[32m"none"[39m
+              [33mheight[39m=[32m"16"[39m
+              [33mstroke[39m=[32m"currentColor"[39m
+              [33mstroke-linecap[39m=[32m"round"[39m
+              [33mstroke-linejoin[39m=[32m"round"[39m
+              [33mstroke-width[39m=[32m"1.6"[39m
+              [33mviewBox[39m=[32m"0 0 24 24"[39m
+              [33mwidth[39m=[32m"16"[39m
+            [36m>[39m
+              [36m<rect[39m
+                [33mheight[39m=[32m"18"[39m
+                [33mrx[39m=[32m"2"[39m
+                [33mry[39m=[32m"2"[39m
+                [33mwidth[39m=[32m"18"[39m
+                [33mx[39m=[32m"3"[39m
+                [33my[39m=[32m"3"[39m
+              [36m/>[39m
+              [36m<line[39m
+                [33mx1[39m=[32m"15"[39m
+                [33mx2[39m=[32m"15"[39m
+                [33my1[39m=[32m"3"[39m
+                [33my2[39m=[32m"21"[39m
+              [36m/>[39m
+            [36m</svg>[39m
+          [36m</button>[39m
+        [36m</div>[39m
+      [36m</div>[39m
+      [36m<div[39m
+        [33mclass[39m=[32m"app mobile-desktop-app"[39m
+      [36m>[39m
+        [36m<aside[39m
+          [33mclass[39m=[32m"sidebar"[39m
+          [33mid[39m=[32m"sidebar"[39m
+        [36m>[39m
+          [36m<div[39m
+            [33mclass[39m=[32m"sidebar-inner"[39m
+          [36m>[39m
+            [36m<div[39m
+              [33mclass[39m=[32m"sidebar-chat-content"[39m
+            [36m>[39m
+              [36m<div[39m
+                [33mclass[39m=[32m"session-list"[39m
+              [36m>[39m
+                [36m<div[39m
+                  [33mclass[39m=[32m"_sessionListScroller_7965d6"[39m
+                [36m>[39m
+                  [36m<section[39m
+                    [33mclass[39m=[32m"_projectSection_7965d6"[39m
+                    [33mdata-project-id[39m=[32m"dir:/workspace"[39m
+                  [36m>[39m
+                    [36m<div[39m
+                      [33mclass[39m=[32m"_projectHeader_7965d6"[39m...
+ ❯ waitForWrapper node_modules/@testing-library/dom/dist/wait-for.js:163:27
+ ❯ node_modules/@testing-library/dom/dist/query-helpers.js:86:33
+ ❯ desktop/src/react/__tests__/mobile/MobileApp.test.tsx:774:25
+    772|     });
+    773|
+    774|     expect(await screen.findAllByText('手机端发来的消息')).not.toHaveLength(0);
+       |                         ^
+    775|   });
+    776|
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/3]⎯
+
+ FAIL  desktop/src/react/__tests__/mobile/MobileApp.test.tsx > MobileApp > shows server-created sessions from another LAN client without waiting for a refetch payload
+AssertionError: expected false to be true // Object.is equality
+
+Ignored nodes: comments, script, style
+[36m<html[39m
+  [33mstyle[39m=[32m"--editor-markdown-font-family: var(--font-serif-text, var(--font-serif)); --editor-markdown-font-size: 16px; --editor-markdown-h1-font-size: 28px; --editor-markdown-h2-font-size: 21px; --editor-markdown-h3-font-size: 18px; --editor-markdown-h4-font-size: 16px; --editor-markdown-h5-font-size: 15px; --editor-markdown-h6-font-size: 14px; --editor-markdown-line-height: 1.5; --editor-markdown-content-padding-x: 24px; --editor-markdown-content-width: 720px; --chat-column-width: 720px; --chat-input-column-width: calc(var(--chat-column-width) + var(--chat-input-column-extra)); --chat-message-font-size: 15px;"[39m
+[36m>[39m
+  [36m<head />[39m
+  [36m<body>[39m
+    [36m<div>[39m
+      [36m<main[39m
+        [33mclass[39m=[32m"mobile-desktop-root"[39m
+        [33mdata-mobile-principal[39m=[32m"device_credential"[39m
+      [36m>[39m
+        [36m<div[39m
+          [33mclass[39m=[32m"titlebar"[39m
+        [36m>[39m
+          [36m<div[39m
+            [33mclass[39m=[32m"tb-left-group"[39m
+          [36m>[39m
+            [36m<button[39m
+              [33mclass[39m=[32m"tb-toggle tb-toggle-left"[39m
+              [33mid[39m=[32m"tbToggleLeft"[39m
+              [33mtitle[39m=[32m"sidebar.toggle"[39m
+            [36m>[39m
+              [36m<svg[39m
+                [33mfill[39m=[32m"none"[39m
+                [33mheight[39m=[32m"14"[39m
+                [33mstroke[39m=[32m"currentColor"[39m
+                [33mstroke-linecap[39m=[32m"round"[39m
+                [33mstroke-linejoin[39m=[32m"round"[39m
+                [33mstroke-width[39m=[32m"1.5"[39m
+                [33mviewBox[39m=[32m"0 0 24 24"[39m
+                [33mwidth[39m=[32m"14"[39m
+              [36m>[39m
+                [36m<rect[39m
+                  [33mheight[39m=[32m"18"[39m
+                  [33mrx[39m=[32m"2"[39m
+                  [33mry[39m=[32m"2"[39m
+                  [33mwidth[39m=[32m"18"[39m
+                  [33mx[39m=[32m"3"[39m
+                  [33my[39m=[32m"3"[39m
+                [36m/>[39m
+                [36m<line[39m
+                  [33mx1[39m=[32m"9"[39m
+                  [33mx2[39m=[32m"9"[39m
+                  [33my1[39m=[32m"3"[39m
+                  [33my2[39m=[32m"21"[39m
+                [36m/>[39m
+              [36m</svg>[39m
+            [36m</button>[39m
+            [36m<button[39m
+              [33maria-label[39m=[32m"sidebar.newChat"[39m
+              [33mclass[39m=[32m"tb-toggle tb-new-session"[39m
+              [33mdata-mobile-titlebar-action[39m=[32m"new-session"[39m
+              [33mtitle[39m=[32m"sidebar.newChat"[39m
+              [33mtype[39m=[32m"button"[39m
+            [36m>[39m
+              [36m<svg[39m
+                [33mfill[39m=[32m"none"[39m
+                [33mheight[39m=[32m"17"[39m
+                [33mstroke[39m=[32m"currentColor"[39m
+                [33mstroke-linecap[39m=[32m"round"[39m
+                [33mstroke-linejoin[39m=[32m"round"[39m
+                [33mstroke-width[39m=[32m"2.2"[39m
+                [33mviewBox[39m=[32m"0 0 24 24"[39m
+                [33mwidth[39m=[32m"17"[39m
+              [36m>[39m
+                [36m<line[39m
+                  [33mx1[39m=[32m"12"[39m
+                  [33mx2[39m=[32m"12"[39m
+                  [33my1[39m=[32m"5"[39m
+                  [33my2[39m=[32m"19"[39m
+                [36m/>[39m
+                [36m<line[39m
+                  [33mx1[39m=[32m"5"[39m
+                  [33mx2[39m=[32m"19"[39m
+                  [33my1[39m=[32m"12"[39m
+                  [33my2[39m=[32m"12"[39m
+                [36m/>[39m
+              [36m</svg>[39m
+            [36m</button>[39m
+          [36m</div>[39m
+          [36m<div[39m
+            [33maria-label[39m=[32m"titlebar.currentChatTitle"[39m
+            [33mclass[39m=[32m"tb-center-title"[39m
+            [33mtitle[39m=[32m"sidebar.newChat"[39m
+          [36m>[39m
+            [36m<span>[39m
+              [0msidebar.newChat[0m
+            [36m</span>[39m
+          [36m</div>[39m
+          [36m<div[39m
+            [33mclass[39m=[32m"tb-right-group"[39m
+          [36m>[39m
+            [36m<button[39m
+              [33mclass[39m=[32m"tb-toggle tb-toggle-preview"[39m
+              [33mid[39m=[32m"tbTogglePreview"[39m
+              [33mtitle[39m=[32m"preview.toggle"[39m
+            [36m>[39m
+              [36m<svg[39m
+                [33mfill[39m=[32m"none"[39m
+                [33mheight[39m=[32m"16"[39m
+                [33mstroke[39m=[32m"currentColor"[39m
+                [33mstroke-linecap[39m=[32m"round"[39m
+                [33mstroke-linejoin[39m=[32m"round"[39m
+                [33mstroke-width[39m=[32m"1.6"[39m
+                [33mviewBox[39m=[32m"0 0 24 24"[39m
+                [33mwidth[39m=[32m"16"[39m
+              [36m>[39m
+                [36m<path[39m
+                  [33md[39m=[32m"M7 3.5h7l3 3v14H7z"[39m
+                [36m/>[39m
+                [36m<path[39m
+                  [33md[39m=[32m"M14 3.5v3h3"[39m
+                [36m/>[39m
+                [36m<path[39m
+                  [33md[39m=[32m"M9.5 11h5"[39m
+                [36m/>[39m
+                [36m<path[39m
+                  [33md[39m=[32m"M9.5 14.5h5"[39m
+                [36m/>[39m
+              [36m</svg>[39m
+            [36m</button>[39m
+            [36m<button[39m
+              [33mclass[39m=[32m"tb-toggle tb-toggle-right"[39m
+              [33mid[39m=[32m"tbToggleRight"[39m
+              [33mtitle[39m=[32m"sidebar.jian"[39m
+            [36m>[39m
+              [36m<svg[39m
+                [33mfill[39m=[32m"none"[39m
+                [33mheight[39m=[32m"16"[39m
+                [33mstroke[39m=[32m"currentColor"[39m
+                [33mstroke-linecap[39m=[32m"round"[39m
+                [33mstroke-linejoin[39m=[32m"round"[39m
+                [33mstroke-width[39m=[32m"1.6"[39m
+                [33mviewBox[39m=[32m"0 0 24 24"[39m
+                [33mwidth[39m=[32m"16"[39m
+              [36m>[39m
+                [36m<rect[39m
+                  [33mheight[39m=[32m"18"[39m
+                  [33mrx[39m=[32m"2"[39m
+                  [33mry[39m=[32m"2"[39m
+                  [33mwidth[39m=[32m"18"[39m
+                  [33mx[39m=[32m"3"[39m
+                  [33my[39m=[32m"3"[39m
+                [36m/>[39m
+                [36m<line[39m
+                  [33mx1[39m=[32m"15"[39m
+                  [33mx2[39m=[32m"15"[39m
+                  [33my1[39m=[32m"3"[39m
+                  [33my2[39m=[32m"21"[39m
+                [36m/>[39m
+              [36m</svg>[39m
+            [36m</button>[39m
+          [36m</div>[39m
+        [36m</div>[39m
+        ...
+
+- Expected
++ Received
+
+- true
++ false
+
+ ❯ desktop/src/react/__tests__/mobile/MobileApp.test.tsx:809:114
+    807|
+    808|     await waitFor(() => {
+    809|       expect(useStore.getState().sessions.some(session => session.path…
+       |                                                                                                                  ^
+    810|       expect(screen.getByText('电脑新会话')).toBeInTheDocument();
+    811|     });
+ ❯ runWithExpensiveErrorDiagnosticsDisabled node_modules/@testing-library/dom/dist/config.js:47:12
+ ❯ checkCallback node_modules/@testing-library/dom/dist/wait-for.js:124:77
+ ❯ Timeout.checkRealTimersCallback node_modules/@testing-library/dom/dist/wait-for.js:118:16
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/3]⎯
+
+ FAIL  desktop/src/react/settings/__tests__/SettingsContent.test.tsx > SettingsContent tab heading > verifies Rust identity and keeps unavailable settings visibly unavailable
+TestingLibraryElementError: Found multiple elements with the role "alert"
+
+Here are the matching elements:
+
+Ignored nodes: comments, script, style
+[36m<div[39m
+  [33mrole[39m=[32m"alert"[39m
+[36m>[39m
+  [0msettings.rustCoreUnavailable[0m
+[36m</div>[39m
+
+Ignored nodes: comments, script, style
+[36m<div[39m
+  [33maria-atomic[39m=[32m"true"[39m
+  [33maria-live[39m=[32m"assertive"[39m
+  [33mclass[39m=[32m"_settings-toast_4045f0 _error_4045f0 _show_4045f0"[39m
+  [33mrole[39m=[32m"alert"[39m
+[36m>[39m
+  [36m<svg[39m
+    [33maria-hidden[39m=[32m"true"[39m
+    [33mclass[39m=[32m"_settings-toast-icon_4045f0"[39m
+    [33mfill[39m=[32m"none"[39m
+    [33mstroke[39m=[32m"currentColor"[39m
+    [33mstroke-linecap[39m=[32m"round"[39m
+    [33mstroke-linejoin[39m=[32m"round"[39m
+    [33mstroke-width[39m=[32m"2"[39m
+    [33mviewBox[39m=[32m"0 0 24 24"[39m
+  [36m>[39m
+    [36m<circle[39m
+      [33mcx[39m=[32m"12"[39m
+      [33mcy[39m=[32m"12"[39m
+      [33mr[39m=[32m"9"[39m
+    [36m/>[39m
+    [36m<path[39m
+      [33md[39m=[32m"M12 7v6M12 17h.01"[39m
+    [36m/>[39m
+  [36m</svg>[39m
+  [36m<span>[39m
+    [0msettings.rustCoreUnavailable[0m
+  [36m</span>[39m
+[36m</div>[39m
+
+(If this is intentional, then use the `*AllBy*` variant of the query (like `queryAllByText`, `getAllByText`, or `findAllByText`)).
+
+Ignored nodes: comments, script, style
+[36m<body>[39m
+  [36m<div>[39m
+    [36m<div[39m
+      [33mclass[39m=[32m"_settings-content-root_4045f0"[39m
+      [33mdata-input-ctx-zone[39m=[32m"settings"[39m
+    [36m>[39m
+      [36m<div[39m
+        [33mclass[39m=[32m"settings-panel "[39m
+        [33mid[39m=[32m"settingsPanel"[39m
+      [36m>[39m
+        [36m<div[39m
+          [33mclass[39m=[32m"settings-header "[39m
+        [36m>[39m
+          [36m<h1[39m
+            [33mclass[39m=[32m"_settings-title_4045f0"[39m
+          [36m>[39m
+            [0msettings.title[0m
+          [36m</h1>[39m
+        [36m</div>[39m
+        [36m<div[39m
+          [33mclass[39m=[32m"_settings-body_4045f0"[39m
+        [36m>[39m
+          [36m<nav[39m
+            [33mclass[39m=[32m"_settings-nav_4045f0"[39m
+          [36m>[39m
+            [36m<div[39m
+              [33mclass[39m=[32m"_settings-search-shell_4045f0"[39m
+            [36m>[39m
+              [36m<svg[39m
+                [33maria-hidden[39m=[32m"true"[39m
+                [33mclass[39m=[32m"_settings-search-icon_4045f0"[39m
+                [33mfill[39m=[32m"none"[39m
+                [33mheight[39m=[32m"15"[39m
+                [33mstroke[39m=[32m"currentColor"[39m
+                [33mstroke-linecap[39m=[32m"round"[39m
+                [33mstroke-linejoin[39m=[32m"round"[39m
+                [33mstroke-width[39m=[32m"1.8"[39m
+                [33mviewBox[39m=[32m"0 0 24 24"[39m
+                [33mwidth[39m=[32m"15"[39m
+              [36m>[39m
+                [36m<circle[39m
+                  [33mcx[39m=[32m"11"[39m
+                  [33mcy[39m=[32m"11"[39m
+                  [33mr[39m=[32m"7"[39m
+                [36m/>[39m
+                [36m<path[39m
+                  [33md[39m=[32m"m20 20-3.5-3.5"[39m
+                [36m/>[39m
+              [36m</svg>[39m
+              [36m<input[39m
+                [33mclass[39m=[32m"_settings-search-input_4045f0"[39m
+                [33mplaceholder[39m=[32m"settings.settingsSearch.placeholder"[39m
+                [33mtype[39m=[32m"search"[39m
+                [33mvalue[39m=[32m""[39m
+              [36m/>[39m
+            [36m</div>[39m
+            [36m<button[39m
+              [33mclass[39m=[32m"_settings-nav-item_4045f0 _active_4045f0"[39m
+              [33mdata-tab[39m=[32m"agent"[39m
+            [36m>[39m
+              [36m<svg[39m
+                [33mfill[39m=[32m"none"[39m
+                [33mheight[39m=[32m"16"[39m
+                [33mstroke[39m=[32m"currentColor"[39m
+                [33mstroke-linecap[39m=[32m"round"[39m
+                [33mstroke-linejoin[39m=[32m"round"[39m
+                [33mstroke-width[39m=[32m"1.5"[39m
+                [33mviewBox[39m=[32m"0 0 24 24"[39m
+                [33mwidth[39m=[32m"16"[39m
+              [36m>[39m
+                [36m<path[39m
+                  [33md[39m=[32m"M12 2a5 5 0 0 1 5 5c0 2.76-2.24 5-5 5s-5-2.24-5-5a5 5 0 0 1 5-5z"[39m
+                [36m/>[39m
+                [36m<path[39m
+                  [33md[39m=[32m"M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"[39m
+                [36m/>[39m
+              [36m</svg>[39m
+              [36m<span>[39m
+                [0msettings.tabs.agent[0m
+              [36m</span>[39m
+            [36m</button>[39m
+            [36m<button[39m
+              [33mclass[39m=[32m"_settings-nav-item_4045f0"[39m
+              [33mdata-tab[39m=[32m"me"[39m
+            [36m>[39m
+              [36m<svg[39m
+                [33mfill[39m=[32m"none"[39m
+                [33mheight[39m=[32m"16"[39m
+                [33mstroke[39m=[32m"currentColor"[39m
+                [33mstroke-linecap[39m=[32m"round"[39m
+                [33mstroke-linejoin[39m=[32m"round"[39m
+                [33mstroke-width[39m=[32m"1.5"[39m
+                [33mviewBox[39m=[32m"0 0 24 24"[39m
+                [33mwidth[39m=[32m"16"[39m
+              [36m>[39m
+                [36m<path[39m
+                  [33md[39m=[32m"M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"[39m
+                [36m/>[39m
+                [36m<circle[39m
+                  [33mcx[39m=[32m"12"[39m
+                  [33mcy[39m=[32m"7"[39m
+                  [33mr[39m=[32m"4"[39m
+                [36m/>[39m
+              [36m</svg>[39m
+              [36m<span>[39m
+                [0msettings.tabs.me[0m
+              [36m</span>[39m
+            [36m</button>[39m
+            [36m<button[39m
+              [33mclass[39m=[32m"_settings-nav-item_4045f0"[39m
+              [33mdata-tab[39m=[32m"interface"[39m
+            [36m>[39m
+              [36m<svg[39m
+                [33mfill[39m=[32m"none"[39m
+                [33mheight[39m=[32m"16"[39m
+                [33mstroke[39m=[32m"currentColor"[39m
+                [33mstroke-linecap[39m=[32m"round"[39m
+                [33mstroke-linejoin[39m=[32m"round"[39m
+                [33mstroke-width[39m=[32m"1.5"[39m
+                [33mviewBox[39m=[32m"0 0 24 24"[39m
+                [33mwidth[39m=[32m"16"[39m
+              [36m>[39m
+                [36m<circle[39m
+                  [33mcx[39m=[32m"12"[39m
+                  [33mcy[39m=[32m"12"[39m
+                  [33mr[39m=[32m"3"[39m
+                [36m/>[39m
+                [36m<path[39m
+                  [33md[39m=[32m"M3 12h3"[39m
+                [36m/>[39m
+                [36m<path[39m
+                  [33md[39m=[32m"M18 12h3"[39m
+                [36m/>[39m
+                [36m<path[39m
+                  [33md[39m=[32m"M12 3v3"[39m
+                [36m/>[39m
+                [36m<path[39m
+                  [33md[39m=[32m"M12 18v3"[39m
+                [36m/>[39m
+                [36m<path[39m
+                  [33md[39m=[32m"m5.64 5.64 2.12 2.12"[39m
+                [36m/>[39m
+                [36m<path[39m
+                  [33md[39m=[32m"m16.24 16.24 2.12 2.12"[39m
+                [36m/>[39m
+                [36m<path[39m
+                  [33md[39m=[32m"m18.36 5.64-2.12 2.12"[39m
+                [36m/>[39m
+                [36m<path[39m
+                  [33md[39m=[32m"m7.76 16.24-2.12 2.12"[39m
+                [36m/>[39m
+              [36m</svg>[39m
+              [36m<span>[39m
+                [0msettings.tabs.interface[0m
+              [36m</span>[39m
+            [36m</button>[39m
+            [36m<button[39m
+              [33mclass[39m=[32m"_settings-nav-item_4045f0"[39m
+              [33mdata-tab[39m=[32m"keybindings"[39m
+            [36m>[39m
+              [36m<svg[39m
+                [33mfill[39m=[32m"none"[39m
+                [33mheight[39m=[32m"16"[39m
+                [33mstroke[39m=[32m"currentColor"[39m
+                [33mstroke-linecap[39m=[32m"round"[39m
+              ...
+
+Ignored nodes: comments, script, style
+[36m<body>[39m
+  [36m<div>[39m
+    [36m<div[39m
+      [33mclass[39m=[32m"_settings-content-root_4045f0"[39m
+      [33mdata-input-ctx-zone[39m=[32m"settings"[39m
+    [36m>[39m
+      [36m<div[39m
+        [33mclass[39m=[32m"settings-panel "[39m
+        [33mid[39m=[32m"settingsPanel"[39m
+      [36m>[39m
+        [36m<div[39m
+          [33mclass[39m=[32m"settings-header "[39m
+        [36m>[39m
+          [36m<h1[39m
+            [33mclass[39m=[32m"_settings-title_4045f0"[39m
+          [36m>[39m
+            [0msettings.title[0m
+          [36m</h1>[39m
+        [36m</div>[39m
+        [36m<div[39m
+          [33mclass[39m=[32m"_settings-body_4045f0"[39m
+        [36m>[39m
+          [36m<nav[39m
+            [33mclass[39m=[32m"_settings-nav_4045f0"[39m
+          [36m>[39m
+            [36m<div[39m
+              [33mclass[39m=[32m"_settings-search-shell_4045f0"[39m
+            [36m>[39m
+              [36m<svg[39m
+                [33maria-hidden[39m=[32m"true"[39m
+                [33mclass[39m=[32m"_settings-search-icon_4045f0"[39m
+                [33mfill[39m=[32m"none"[39m
+                [33mheight[39m=[32m"15"[39m
+                [33mstroke[39m=[32m"currentColor"[39m
+                [33mstroke-linecap[39m=[32m"round"[39m
+                [33mstroke-linejoin[39m=[32m"round"[39m
+                [33mstroke-width[39m=[32m"1.8"[39m
+                [33mviewBox[39m=[32m"0 0 24 24"[39m
+                [33mwidth[39m=[32m"15"[39m
+              [36m>[39m
+                [36m<circle[39m
+                  [33mcx[39m=[32m"11"[39m
+                  [33mcy[39m=[32m"11"[39m
+                  [33mr[39m=[32m"7"[39m
+                [36m/>[39m
+                [36m<path[39m
+                  [33md[39m=[32m"m20 20-3.5-3.5"[39m
+                [36m/>[39m
+              [36m</svg>[39m
+              [36m<input[39m
+                [33mclass[39m=[32m"_settings-search-input_4045f0"[39m
+                [33mplaceholder[39m=[32m"settings.settingsSearch.placeholder"[39m
+                [33mtype[39m=[32m"search"[39m
+                [33mvalue[39m=[32m""[39m
+              [36m/>[39m
+            [36m</div>[39m
+            [36m<button[39m
+              [33mclass[39m=[32m"_settings-nav-item_4045f0 _active_4045f0"[39m
+              [33mdata-tab[39m=[32m"agent"[39m
+            [36m>[39m
+              [36m<svg[39m
+                [33mfill[39m=[32m"none"[39m
+                [33mheight[39m=[32m"16"[39m
+                [33mstroke[39m=[32m"currentColor"[39m
+                [33mstroke-linecap[39m=[32m"round"[39m
+                [33mstroke-linejoin[39m=[32m"round"[39m
+                [33mstroke-width[39m=[32m"1.5"[39m
+                [33mviewBox[39m=[32m"0 0 24 24"[39m
+                [33mwidth[39m=[32m"16"[39m
+              [36m>[39m
+                [36m<path[39m
+                  [33md[39m=[32m"M12 2a5 5 0 0 1 5 5c0 2.76-2.24 5-5 5s-5-2.24-5-5a5 5 0 0 1 5-5z"[39m
+                [36m/>[39m
+                [36m<path[39m
+                  [33md[39m=[32m"M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"[39m
+                [36m/>[39m
+              [36m</svg>[39m
+              [36m<span>[39m
+                [0msettings.tabs.agent[0m
+              [36m</span>[39m
+            [36m</button>[39m
+            [36m<button[39m
+              [33mclass[39m=[32m"_settings-nav-item_4045f0"[39m
+              [33mdata-tab[39m=[32m"me"[39m
+            [36m>[39m
+              [36m<svg[39m
+                [33mfill[39m=[32m"none"[39m
+                [33mheight[39m=[32m"16"[39m
+                [33mstroke[39m=[32m"currentColor"[39m
+                [33mstroke-linecap[39m=[32m"round"[39m
+                [33mstroke-linejoin[39m=[32m"round"[39m
+                [33mstroke-width[39m=[32m"1.5"[39m
+                [33mviewBox[39m=[32m"0 0 24 24"[39m
+                [33mwidth[39m=[32m"16"[39m
+              [36m>[39m
+                [36m<path[39m
+                  [33md[39m=[32m"M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"[39m
+                [36m/>[39m
+                [36m<circle[39m
+                  [33mcx[39m=[32m"12"[39m
+                  [33mcy[39m=[32m"7"[39m
+                  [33mr[39m=[32m"4"[39m
+                [36m/>[39m
+              [36m</svg>[39m
+              [36m<span>[39m
+                [0msettings.tabs.me[0m
+              [36m</span>[39m
+            [36m</button>[39m
+            [36m<button[39m
+              [33mclass[39m=[32m"_settings-nav-item_4045f0"[39m
+              [33mdata-tab[39m=[32m"interface"[39m
+            [36m>[39m
+              [36m<svg[39m
+                [33mfill[39m=[32m"none"[39m
+                [33mheight[39m=[32m"16"[39m
+                [33mstroke[39m=[32m"currentColor"[39m
+                [33mstroke-linecap[39m=[32m"round"[39m
+                [33mstroke-linejoin[39m=[32m"round"[39m
+                [33mstroke-width[39m=[32m"1.5"[39m
+                [33mviewBox[39m=[32m"0 0 24 24"[39m
+                [33mwidth[39m=[32m"16"[39m
+              [36m>[39m
+                [36m<circle[39m
+                  [33mcx[39m=[32m"12"[39m
+                  [33mcy[39m=[32m"12"[39m
+                  [33mr[39m=[32m"3"[39m
+                [36m/>[39m
+                [36m<path[39m
+                  [33md[39m=[32m"M3 12h3"[39m
+                [36m/>[39m
+                [36m<path[39m
+                  [33md[39m=[32m"M18 12h3"[39m
+                [36m/>[39m
+                [36m<path[39m
+                  [33md[39m=[32m"M12 3v3"[39m
+                [36m/>[39m
+                [36m<path[39m
+                  [33md[39m=[32m"M12 18v3"[39m
+                [36m/>[39m
+                [36m<path[39m
+                  [33md[39m=[32m"m5.64 5.64 2.12 2.12"[39m
+                [36m/>[39m
+                [36m<path[39m
+                  [33md[39m=[32m"m16.24 16.24 2.12 2.12"[39m
+                [36m/>[39m
+                [36m<path[39m
+                  [33md[39m=[32m"m18.36 5.64-2.12 2.12"[39m
+                [36m/>[39m
+                [36m<path[39m
+                  [33md[39m=[32m"m7.76 16.24-2.12 2.12"[39m
+                [36m/>[39m
+              [36m</svg>[39m
+              [36m<span>[39m
+                [0msettings.tabs.interface[0m
+              [36m</span>[39m
+            [36m</button>[39m
+            [36m<button[39m
+              [33mclass[39m=[32m"_settings-nav-item_4045f0"[39m
+              [33mdata-tab[39m=[32m"keybindings"[39m
+            [36m>[39m
+              [36m<svg[39m
+                [33mfill[39m=[32m"none"[39m
+                [33mheight[39m=[32m"16"[39m
+                [33mstroke[39m=[32m"currentColor"[39m
+                [33mstroke-linecap[39m=[32m"round"[39m
+              ...
+ ❯ waitForWrapper node_modules/@testing-library/dom/dist/wait-for.js:163:27
+ ❯ node_modules/@testing-library/dom/dist/query-helpers.js:86:33
+ ❯ desktop/src/react/settings/__tests__/SettingsContent.test.tsx:250:25
+    248|     expect(actionMocks.loadSettingsModels).not.toHaveBeenCalled();
+    249|     useSettingsStore.getState().set({ activeTab: 'agent' });
+    250|     expect(await screen.findByRole('alert')).toHaveTextContent('settin…
+       |                         ^
+    251|   });
+    252|
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[3/3]⎯
+
+
+ Test Files  2 failed (2)
+      Tests  3 failed | 33 passed (36)
+   Start at  19:37:09
+   Duration  7.06s (transform 1.90s, setup 23ms, import 2.36s, tests 3.99s, environment 533ms)
+

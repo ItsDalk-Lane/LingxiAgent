@@ -1,0 +1,31 @@
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.08s
+     Running tests/late_result_fence.rs (/tmp/r03-t04-target/debug/deps/late_result_fence-ccf25458d1ada71f)
+
+running 5 tests
+test r03_a07_driver_fences_stale_tagged_model_result_loudly ... R03_A07_TRACE fence_mismatch(model): run=run_000001a0dcba6c00_000001 status=failed audit=fence_mismatch attempt=run_000001a0dcba6c00_000001#a1
+ok
+test r03_a07_late_attempt1_result_vs_current_attempt_is_stale_only ... R03_A07_TRACE attempt_stale: run=run_000001a0dcba6c00_000001 audit=attempt_stale final=completed.with_final leak=0
+ok
+test r03_a07_late_result_after_cancel_and_next_run_pollutes_nothing ... R03_A07_TRACE run_terminal: cancelled=run_000001a0dcba6c00_000001 next=run_000001a0dcba6c00_000002 audit=run_terminal cross_leak=0
+ok
+test r03_a07_tool_result_with_stale_fence_records_unknown_and_audits ... R03_A07_TRACE fence_mismatch(tool): run=run_000001a0dcba6c00_000001 unknown=1 audit=fence_mismatch
+ok
+test reconnect_resubscribes_only_and_never_restarts_a_model ... R03_T04_TRACE reconnect_read_only: runs unchanged, provider calls 0
+ok
+
+test result: ok. 5 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.25s
+
+     Running tests/request_dedup.rs (/tmp/r03-t04-target/debug/deps/request_dedup-800d56aa22078e17)
+
+running 4 tests
+test invalid_ids_are_refused_and_plain_submissions_are_undeduplicated ... R03_A08_TRACE invalid/plain: invalid refused loudly; plain path unchanged
+ok
+test r03_a08_same_request_id_different_content_is_rejected_as_conflict ... R03_A08_TRACE conflict: id=client-req-0001 runs=1 (unchanged)
+ok
+test request_id_namespace_is_scoped_to_principal_and_session ... R03_A08_TRACE namespace: per-principal+session scoping held
+ok
+test same_request_id_same_content_replays_without_new_execution ... R03_A08_TRACE replay: same run id returned, runs_total=1
+ok
+
+test result: ok. 4 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.21s
+

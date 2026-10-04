@@ -1,0 +1,17 @@
+=== r04 regressions ===
+test duplicate_finalize_replays_and_conflicting_finalize_is_diagnosed ... ok
+test empty_reply_completes_without_final_and_names_the_cause ... ok
+test terminal_run_rejects_late_attempts_and_events_loudly ... ok
+test non_retryable_failure_settles_without_extra_attempts ... ok
+test no_provider_configuration_is_explicit_and_r02_compatible ... ok
+test tool_request_without_executor_is_a_loud_failure ... ok
+test retry_budget_exhaustion_fails_loudly_with_attempt_count_honest ... ok
+test turn_budget_exhaustion_fails_loudly_never_fake_completes ... ok
+test retryable_provider_failure_reopens_attempt_on_the_same_run ... ok
+test tool_partial_failure_has_its_own_outcome_not_a_fabricated_answer ... ok
+test process_only_run_completes_without_final_and_names_the_cause ... ok
+test r03_a01_three_model_calls_produce_exactly_one_task_terminal ... ok
+
+test result: ok. 12 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.46s
+
+R04_EXIT=0

@@ -1,0 +1,14 @@
+   Compiling lingxi-service v0.0.0 (/Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-service)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 1.07s
+     Running unittests src/lib.rs (target/debug/deps/lingxi_service-277000d85cd574fe)
+
+running 6 tests
+test transport::tests::network_mode_parses_strictly ... ok
+test transport::tests::origin_policy_allowlist ... ok
+test transport::tests::lan_browser_origin_matches_real_interface_scheme_and_port ... ok
+test transport::tests::loopback_mode_requires_loopback_host_and_remote ... ok
+test transport::tests::lan_mode_still_recognizes_local_connections ... ok
+test transport::tests::host_loopback_detection_covers_v4_v6_and_ports ... ok
+
+test result: ok. 6 passed; 0 failed; 0 ignored; 0 measured; 172 filtered out; finished in 0.00s
+

@@ -1874,6 +1874,22 @@ mod tests {
         ) -> Result<Option<lingxi_kernel::subagent::RunLineage>, StorageError> {
             Ok(None)
         }
+
+        async fn record_model_call_usage(
+            &self,
+            _record: lingxi_kernel::usage::ModelCallUsageRecord,
+            _now_unix_ms: u64,
+        ) -> Result<(), StorageError> {
+            // Usage-ledger durability is covered against the real adapter.
+            Ok(())
+        }
+
+        async fn query_model_call_usage(
+            &self,
+            _query: lingxi_kernel::usage::ModelUsageQuery,
+        ) -> Result<Vec<lingxi_kernel::usage::ModelCallUsageRecord>, StorageError> {
+            Ok(Vec::new())
+        }
     }
 
     fn store_with_runs() -> (SessionStore, SharedRuns) {
@@ -2454,6 +2470,20 @@ mod tests {
                 run_id: &RunId,
             ) -> Result<Option<lingxi_kernel::subagent::RunLineage>, StorageError> {
                 StoragePort::load_run_lineage(&self.inner, run_id).await
+            }
+
+            async fn record_model_call_usage(
+                &self,
+                record: lingxi_kernel::usage::ModelCallUsageRecord,
+                now_unix_ms: u64,
+            ) -> Result<(), StorageError> {
+                StoragePort::record_model_call_usage(&self.inner, record, now_unix_ms).await
+            }
+            async fn query_model_call_usage(
+                &self,
+                query: lingxi_kernel::usage::ModelUsageQuery,
+            ) -> Result<Vec<lingxi_kernel::usage::ModelCallUsageRecord>, StorageError> {
+                StoragePort::query_model_call_usage(&self.inner, query).await
             }
         }
         let port = std::sync::Arc::new(ParkingPort {

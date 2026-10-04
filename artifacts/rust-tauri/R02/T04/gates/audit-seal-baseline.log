@@ -1,0 +1,152 @@
+
+> lingxi@0.1.43 test
+> vitest run --exclude '**/.claude/**' --exclude '**/.cache/**' --exclude '**/dist/**' --exclude '**/dist-server/**' --exclude '**/dist-computer-use/**' --exclude '**/dist-sandbox/**' --run tests/post-verification-audit-seal.test.ts
+
+
+ RUN  v4.1.10 /Users/study_superior/Desktop/Code/LingxiAgent
+
+ ❯ tests/post-verification-audit-seal.test.ts (3 tests | 1 failed) 77ms
+     ✓ VERIFIED_SOURCE_SHA is a valid 40-hex commit object in this repo 49ms
+     × changes since VERIFIED_SOURCE_SHA are audit-only (allowlist enforced) 27ms
+     ✓ the audit-seal test and generator are both present for the guard to be self-consistent 0ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  tests/post-verification-audit-seal.test.ts > post-verification audit seal (diff guard) > changes since VERIFIED_SOURCE_SHA are audit-only (allowlist enforced)
+AssertionError: VERIFIED_SOURCE_SHA 之后出现了非审计文件改动（禁止修改生产代码/测试逻辑/runtime artifacts）:
+.gitignore
+artifacts/rust-tauri/R02/T01/a01-cargo-metadata.json
+artifacts/rust-tauri/R02/T01/a01-deptree-evidence.txt
+artifacts/rust-tauri/R02/T01/a01-health-body.json
+artifacts/rust-tauri/R02/T01/a01-shutdown.txt
+artifacts/rust-tauri/R02/T01/a01-smoke-summary.txt
+artifacts/rust-tauri/R02/T01/a02-negative-summary.txt
+artifacts/rust-tauri/R02/T02/a03-forged-record.json
+artifacts/rust-tauri/R02/T02/a03-inst1-health.json
+artifacts/rust-tauri/R02/T02/a03-inst2-marker.txt
+artifacts/rust-tauri/R02/T02/a03-summary.txt
+artifacts/rust-tauri/R02/T02/a04-summary.txt
+artifacts/rust-tauri/R02/T03/.last-body
+artifacts/rust-tauri/R02/T03/body-limit.txt
+artifacts/rust-tauri/R02/T03/creds-after-authz.json
+artifacts/rust-tauri/R02/T03/creds-before-authz.json
+artifacts/rust-tauri/R02/T03/devices-after-authz.json
+artifacts/rust-tauri/R02/T03/devices-before-authz.json
+artifacts/rust-tauri/R02/T03/server-stderr-markers.txt
+artifacts/rust-tauri/R02/T03/state-after-authn.txt
+artifacts/rust-tauri/R02/T03/state-after.txt
+artifacts/rust-tauri/R02/T03/state-before-authz.txt
+artifacts/rust-tauri/R02/T03/state-before.txt
+artifacts/rust-tauri/R02/T03/summary.txt
+artifacts/rust-tauri/R02/T03/ws-matrix.json
+docs/rust-tauri/ORCHESTRATOR_PROGRESS.json
+docs/rust-tauri/R01/DEPENDENCY_RULES.json
+docs/rust-tauri/R02/R02-T01_REPORT.md
+docs/rust-tauri/R02/R02-T01_REVIEW_R1.md
+docs/rust-tauri/R02/R02-T02_REPORT.md
+docs/rust-tauri/R02/R02-T02_REVIEW_R1.md
+docs/rust-tauri/R02/R02-T03_REPORT.md
+docs/rust-tauri/R02/R02-T03_REVIEW_R1.md
+rust/Cargo.lock
+rust/Cargo.toml
+rust/crates/lingxi-service/Cargo.toml
+rust/crates/lingxi-service/src/auth.rs
+rust/crates/lingxi-service/src/config.rs
+rust/crates/lingxi-service/src/instance.rs
+rust/crates/lingxi-service/src/lib.rs
+rust/crates/lingxi-service/src/limits.rs
+rust/crates/lingxi-service/src/main.rs
+rust/crates/lingxi-service/src/paths.rs
+rust/crates/lingxi-service/src/sessions.rs
+rust/crates/lingxi-service/src/transport.rs
+rust/crates/lingxi-service/src/ws.rs
+rust/crates/lingxi-service/tests/auth_matrix.rs
+rust/crates/lingxi-service/tests/instance_lifecycle.rs
+rust/crates/lingxi-service/tests/service_health.rs
+scripts/rust-tauri/r02_t01_boundary_negative.sh
+scripts/rust-tauri/r02_t01_service_smoke.sh
+scripts/rust-tauri/r02_t02_dual_instance.sh
+scripts/rust-tauri/r02_t02_f01_env_token_negative.sh
+scripts/rust-tauri/r02_t02_path_priority.sh
+scripts/rust-tauri/r02_t03_auth_matrix.sh
+scripts/rust-tauri/r02_t03_ws_probe.py: expected [ '.gitignore', …(55) ] to deeply equal []
+
+- Expected
++ Received
+
+- []
++ [
++   ".gitignore",
++   "artifacts/rust-tauri/R02/T01/a01-cargo-metadata.json",
++   "artifacts/rust-tauri/R02/T01/a01-deptree-evidence.txt",
++   "artifacts/rust-tauri/R02/T01/a01-health-body.json",
++   "artifacts/rust-tauri/R02/T01/a01-shutdown.txt",
++   "artifacts/rust-tauri/R02/T01/a01-smoke-summary.txt",
++   "artifacts/rust-tauri/R02/T01/a02-negative-summary.txt",
++   "artifacts/rust-tauri/R02/T02/a03-forged-record.json",
++   "artifacts/rust-tauri/R02/T02/a03-inst1-health.json",
++   "artifacts/rust-tauri/R02/T02/a03-inst2-marker.txt",
++   "artifacts/rust-tauri/R02/T02/a03-summary.txt",
++   "artifacts/rust-tauri/R02/T02/a04-summary.txt",
++   "artifacts/rust-tauri/R02/T03/.last-body",
++   "artifacts/rust-tauri/R02/T03/body-limit.txt",
++   "artifacts/rust-tauri/R02/T03/creds-after-authz.json",
++   "artifacts/rust-tauri/R02/T03/creds-before-authz.json",
++   "artifacts/rust-tauri/R02/T03/devices-after-authz.json",
++   "artifacts/rust-tauri/R02/T03/devices-before-authz.json",
++   "artifacts/rust-tauri/R02/T03/server-stderr-markers.txt",
++   "artifacts/rust-tauri/R02/T03/state-after-authn.txt",
++   "artifacts/rust-tauri/R02/T03/state-after.txt",
++   "artifacts/rust-tauri/R02/T03/state-before-authz.txt",
++   "artifacts/rust-tauri/R02/T03/state-before.txt",
++   "artifacts/rust-tauri/R02/T03/summary.txt",
++   "artifacts/rust-tauri/R02/T03/ws-matrix.json",
++   "docs/rust-tauri/ORCHESTRATOR_PROGRESS.json",
++   "docs/rust-tauri/R01/DEPENDENCY_RULES.json",
++   "docs/rust-tauri/R02/R02-T01_REPORT.md",
++   "docs/rust-tauri/R02/R02-T01_REVIEW_R1.md",
++   "docs/rust-tauri/R02/R02-T02_REPORT.md",
++   "docs/rust-tauri/R02/R02-T02_REVIEW_R1.md",
++   "docs/rust-tauri/R02/R02-T03_REPORT.md",
++   "docs/rust-tauri/R02/R02-T03_REVIEW_R1.md",
++   "rust/Cargo.lock",
++   "rust/Cargo.toml",
++   "rust/crates/lingxi-service/Cargo.toml",
++   "rust/crates/lingxi-service/src/auth.rs",
++   "rust/crates/lingxi-service/src/config.rs",
++   "rust/crates/lingxi-service/src/instance.rs",
++   "rust/crates/lingxi-service/src/lib.rs",
++   "rust/crates/lingxi-service/src/limits.rs",
++   "rust/crates/lingxi-service/src/main.rs",
++   "rust/crates/lingxi-service/src/paths.rs",
++   "rust/crates/lingxi-service/src/sessions.rs",
++   "rust/crates/lingxi-service/src/transport.rs",
++   "rust/crates/lingxi-service/src/ws.rs",
++   "rust/crates/lingxi-service/tests/auth_matrix.rs",
++   "rust/crates/lingxi-service/tests/instance_lifecycle.rs",
++   "rust/crates/lingxi-service/tests/service_health.rs",
++   "scripts/rust-tauri/r02_t01_boundary_negative.sh",
++   "scripts/rust-tauri/r02_t01_service_smoke.sh",
++   "scripts/rust-tauri/r02_t02_dual_instance.sh",
++   "scripts/rust-tauri/r02_t02_f01_env_token_negative.sh",
++   "scripts/rust-tauri/r02_t02_path_priority.sh",
++   "scripts/rust-tauri/r02_t03_auth_matrix.sh",
++   "scripts/rust-tauri/r02_t03_ws_probe.py",
++ ]
+
+ ❯ tests/post-verification-audit-seal.test.ts:104:7
+    102|       `VERIFIED_SOURCE_SHA 之后出现了非审计文件改动（禁止修改生产代码/测试逻辑/runtime artifact…
+    103|         violators.join("\n"),
+    104|     ).toEqual([]);
+       |       ^
+    105|   });
+    106|
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  1 failed | 2 passed (3)
+   Start at  17:20:02
+   Duration  174ms (transform 23ms, setup 19ms, import 7ms, tests 77ms, environment 0ms)
+

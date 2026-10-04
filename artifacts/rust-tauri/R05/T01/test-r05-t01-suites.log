@@ -1,0 +1,32 @@
+2026-10-02T07:45:54Z
+   Compiling lingxi-service v0.0.0 (/Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-service)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 5.74s
+     Running tests/r05_t01_model_plane.rs (target/debug/deps/r05_t01_model_plane-d527329a626cb489)
+
+running 7 tests
+test c03_no_model_plane_is_the_explicit_unconfigured_outcome ... ok
+test c05_reload_without_a_configured_plane_is_a_loud_404 ... ok
+test c06_unsupported_family_makes_zero_requests ... ok
+test c02_full_chain_real_wiring_real_tool_real_result ... ok
+test c04_same_model_id_different_providers_never_cross_wire ... ok
+test c05_in_flight_call_keeps_its_snapshot_and_cancel_is_unaffected ... ok
+test c05_reload_through_management_surface_swaps_atomically ... ok
+
+test result: ok. 7 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 1.19s
+
+model_plane exit: 0
+    Blocking waiting for file lock on package cache
+    Blocking waiting for file lock on package cache
+    Blocking waiting for file lock on build directory
+   Compiling lingxi-service v0.0.0 (/Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-service)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.65s
+     Running tests/r05_t01_binary_wiring.rs (target/debug/deps/r05_t01_binary_wiring-385976b24c66456b)
+
+running 2 tests
+test c03_real_binary_without_plane_settles_unconfigured ... ok
+test c02_real_binary_full_chain_through_authenticated_endpoint ... ok
+
+test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.93s
+
+binary_wiring exit: 0
+2026-10-02T07:46:05Z

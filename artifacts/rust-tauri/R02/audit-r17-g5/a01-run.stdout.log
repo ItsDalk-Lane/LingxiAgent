@@ -1,0 +1,9 @@
+== toolchain: rustup run 1.98.1 (rustc 1.98.1 (48a229cea 2026-09-01))
+== [1/5] build the service binary (locked, offline, isolated target dir)
+   Compiling lingxi-service v0.0.0 (/Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-service)
+    Finished `dev` profile [unoptimized + debuginfo] target(s) in 8.78s
+== [2/5] dependency-tree desktop proof (cargo metadata resolve graph)
+workspace members (7): ['lingxi-adapters', 'lingxi-browser-spike', 'lingxi-kernel', 'lingxi-protocol', 'lingxi-service', 'lingxi-spike', 'xtask']
+resolve-graph packages: 285
+desktop dependency scan: 0 hits for patterns ['tauri', 'electron', 'tao', 'wry', 'webkit2gtk', 'winit', 'webview']
+== [3/5] start real service process (synthetic /tmp home, loopback, ephemeral port)

@@ -1,0 +1,24 @@
+
+error: test failed, to rerun pass `-p lingxi-service --test r04_t07_mcp_and_workers`
+--- run 1 pipe_exit=101
+test result: ok. 19 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 1.52s
+
+--- run 2 pipe_exit=0
+
+error: test failed, to rerun pass `-p lingxi-service --test r04_t07_mcp_and_workers`
+--- run 3 pipe_exit=101
+test result: ok. 19 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 1.52s
+
+--- run 4 pipe_exit=0
+test result: ok. 19 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 1.58s
+
+--- run 5 pipe_exit=0
+test result: ok. 19 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 1.54s
+
+--- run 6 pipe_exit=0
+test result: ok. 19 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 1.54s
+
+--- run 7 pipe_exit=0
+
+error: test failed, to rerun pass `-p lingxi-service --test r04_t07_mcp_and_workers`
+--- run 8 pipe_exit=101

@@ -30,10 +30,11 @@ use std::path::PathBuf;
 use std::pin::Pin;
 use std::sync::{Arc, Mutex};
 
+use lingxi_kernel::model_exchange::ModelTurnInput;
 use lingxi_kernel::ports::ProviderTurn::ToolRequests;
 use lingxi_kernel::ports::{
     DelegationRequest, ProviderDescriptor, ProviderTurn, ProviderTurnResult, ToolExecutionResult,
-    ToolExecutorPort, ToolOutcome, ToolRequest, TurnProviderPort,
+    ToolExecutorPort, ToolOutcome, ToolRequest, TurnDeltaSink, TurnProviderPort,
 };
 use lingxi_protocol::{ContentBlock, ErrorCode, ModelCallId, NormalizedMessage, ProtocolError};
 use lingxi_service::approval::ApprovalRequest;
@@ -186,9 +187,11 @@ impl TurnProviderPort for ScriptedProvider {
         &'a self,
         ctx: &'a lingxi_kernel::RunContext,
         _call: &'a ModelCallId,
-        _turn: u32,
-        input: &'a str,
+        input: &'a ModelTurnInput,
+
+        _deltas: &'a dyn TurnDeltaSink,
     ) -> Pin<Box<dyn std::future::Future<Output = ProviderTurnResult> + Send + 'a>> {
+        let input = input.submission.as_str();
         let marker = marker_of(input);
         let pop = {
             let mut pops = self.pops.lock().unwrap();
@@ -257,6 +260,7 @@ fn delegation_turn(
     thread_id: Option<String>,
 ) -> ProviderTurn {
     ToolRequests {
+        content: Vec::new(),
         requests: vec![ToolRequest::from_effective_arguments(
             target,
             serde_json::json!({
@@ -305,6 +309,7 @@ fn read_tool(n: u32) -> ToolRequest {
 
 fn tool_requests(count: u32) -> ProviderTurn {
     ProviderTurn::ToolRequests {
+        content: Vec::new(),
         requests: (1..=count).map(read_tool).collect(),
     }
 }

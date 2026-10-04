@@ -1,0 +1,16 @@
+== P0: baseline (real property test, default seed) ==
+PASS P0 real property green under default seed (totals line present)
+== P1: isolated mutation probe (scratch crate, repo tree untouched) ==
+probe crate generated
+PASS P1 probe crate built in scratch (repo tree untouched)
+== P2: seed scan until the mutated copy reports an illegal sequence ==
+P2 anomaly triggered and captured at scan attempt 0 (seed=0xa16d0000000000; failure line + seed file agree)
+PASS P2 capture: seed=0xa16d0000000000
+== P3: fixed-seed reproduction (twice, identical outcome) ==
+PASS P3 replay 1: same seed, same illegal sequence (stable reproduction)
+PASS P3 replay 2: same seed, same illegal sequence (stable reproduction)
+== P4: mutation removed — real test passes under the captured seed + full group ==
+PASS P4 real property green under the captured seed (no mutation present)
+PASS P4 full property group green (replay machinery is part of the long-term regression)
+RESULT: R03-A16 seed mechanism proof ALL GREEN (mechanism proof, honestly labeled)
+exit=0

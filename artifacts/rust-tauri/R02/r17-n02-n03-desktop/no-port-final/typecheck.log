@@ -1,0 +1,5 @@
+
+> lingxi@0.1.43 typecheck
+> tsc --noEmit && tsc --noEmit -p tsconfig.node.json && tsc --noEmit -p tsconfig.test.json
+
+desktop/src/react/onboarding/__tests__/OnboardingApp.test.tsx(140,13): error TS2741: Property 'skipToTutorial' is missing in type '{ preview: false; }' but required in type 'OnboardingAppProps'.

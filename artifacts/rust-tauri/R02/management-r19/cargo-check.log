@@ -1,0 +1,25 @@
+    Checking cmov v0.5.4
+    Checking inout v0.2.2
+    Checking cipher v0.5.2
+    Checking ctutils v0.4.2
+    Checking salsa20 v0.11.0
+    Checking digest v0.11.3
+    Checking sha2 v0.11.0
+    Checking sha1 v0.11.0
+    Checking hmac v0.13.0
+    Checking pbkdf2 v0.13.0
+    Checking lingxi-protocol v0.0.0 (/Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-protocol)
+    Checking scrypt v0.12.0
+    Checking lingxi-kernel v0.0.0 (/Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-kernel)
+    Checking lingxi-adapters v0.0.0 (/Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-adapters)
+    Checking lingxi-service v0.0.0 (/Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-service)
+warning: function `read_persisted_network` is never used
+   --> crates/lingxi-service/src/management.rs:104:15
+    |
+104 | pub(crate) fn read_persisted_network(home: &Path) -> Result<Option<PersistedNetwork>, String> {
+    |               ^^^^^^^^^^^^^^^^^^^^^^
+    |
+    = note: `#[warn(dead_code)]` (part of `#[warn(unused)]`) on by default
+
+warning: `lingxi-service` (lib) generated 1 warning
+    Finished `dev` profile [unoptimized + debuginfo] target(s) in 3.29s

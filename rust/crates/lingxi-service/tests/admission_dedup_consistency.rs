@@ -27,11 +27,12 @@ use std::pin::Pin;
 use std::sync::atomic::{AtomicBool, AtomicUsize, Ordering};
 use std::sync::Arc;
 
+use lingxi_kernel::model_exchange::ModelTurnInput;
 use lingxi_kernel::ports::{
     CommittedOutcome, InvocationIntent, InvocationPhase, InvocationReceipt, KeyEvent,
     ProviderDescriptor, ProviderTurn, ProviderTurnResult, RunOutcome, StaleResultFact,
     StorageError, StoragePort, ToolExecutionResult, ToolExecutorPort, ToolOutcome, ToolRequest,
-    TurnProviderPort,
+    TurnDeltaSink, TurnProviderPort,
 };
 use lingxi_kernel::RunContext;
 use lingxi_protocol::{
@@ -81,9 +82,11 @@ impl TurnProviderPort for ScriptedProvider {
         &'a self,
         ctx: &'a RunContext,
         _call: &'a ModelCallId,
-        _turn: u32,
-        input: &'a str,
+        input: &'a ModelTurnInput,
+
+        _deltas: &'a dyn TurnDeltaSink,
     ) -> Pin<Box<dyn std::future::Future<Output = ProviderTurnResult> + Send + 'a>> {
+        let input = input.submission.as_str();
         let marker = Self::marker_of(input);
         let ctx_at_issue = ctx.clone();
         let turn = self
@@ -168,6 +171,7 @@ fn final_turn(text: &str) -> ProviderTurn {
 fn scripted_steps() -> Vec<ProviderTurn> {
     vec![
         ProviderTurn::ToolRequests {
+            content: Vec::new(),
             requests: vec![tool_request()],
         },
         final_turn("g04 done"),
@@ -257,6 +261,21 @@ macro_rules! delegate_storage_port {
                 now_unix_ms: u64,
             ) -> Result<CommittedOutcome, StorageError> {
                 self.inner.record_attempt_started(ctx, now_unix_ms).await
+            }
+            async fn record_model_call_usage(
+                &self,
+                record: lingxi_kernel::usage::ModelCallUsageRecord,
+                now_unix_ms: u64,
+            ) -> Result<(), StorageError> {
+                self.inner
+                    .record_model_call_usage(record, now_unix_ms)
+                    .await
+            }
+            async fn query_model_call_usage(
+                &self,
+                query: lingxi_kernel::usage::ModelUsageQuery,
+            ) -> Result<Vec<lingxi_kernel::usage::ModelCallUsageRecord>, StorageError> {
+                self.inner.query_model_call_usage(query).await
             }
             async fn record_run_state_change(
                 &self,

@@ -1,0 +1,11 @@
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.08s
+  Executable tests/admission_dedup_adversarial.rs (/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T//rust-target-r03-g07-repair/debug/deps/admission_dedup_adversarial-507995cc8b56aef6)
+  Executable tests/admission_dedup_consistency.rs (/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T//rust-target-r03-g07-repair/debug/deps/admission_dedup_consistency-da9f74ba6f46ba3d)
+  Executable tests/background_steering.rs (/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T//rust-target-r03-g07-repair/debug/deps/background_steering-cb2bc6075c77fc08)
+  Executable tests/cancel_link_inheritance.rs (/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T//rust-target-r03-g07-repair/debug/deps/cancel_link_inheritance-6caaa74c7a2aa592)
+  Executable tests/cancel_terminal_race.rs (/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T//rust-target-r03-g07-repair/debug/deps/cancel_terminal_race-a3c99d1df76d5e6b)
+  Executable tests/input_budget_refusal.rs (/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T//rust-target-r03-g07-repair/debug/deps/input_budget_refusal-e8eeb3a2386d1554)
+  Executable tests/input_payload_fidelity.rs (/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T//rust-target-r03-g07-repair/debug/deps/input_payload_fidelity-e9a0ed1606135faa)
+  Executable tests/request_id_canonicalization.rs (/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T//rust-target-r03-g07-repair/debug/deps/request_id_canonicalization-9ca0ad3b6078b1f2)
+  Executable tests/subagent_closeout.rs (/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T//rust-target-r03-g07-repair/debug/deps/subagent_closeout-c0f2569c54e2d26a)
+  Executable tests/tool_receipt_unknown.rs (/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T//rust-target-r03-g07-repair/debug/deps/tool_receipt_unknown-a1c8b71b50dcf40b)

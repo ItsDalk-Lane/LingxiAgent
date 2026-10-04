@@ -1,0 +1,257 @@
+=== cargo test --manifest-path rust/Cargo.toml -p lingxi-adapters --test r05_t04_streaming --locked 
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.09s
+     Running tests/r05_t04_streaming.rs (rust/target/debug/deps/r05_t04_streaming-45f30f7fc790050f)
+
+running 18 tests
+test c09_openai_length_stop_with_one_complete_tool_dispatches_nothing ... ok
+test c15_decoder_level_stream_failures_are_loud ... ok
+test c09_anthropic_max_tokens_stop_with_one_complete_tool_dispatches_nothing ... ok
+test c05_anthropic_half_json_arguments_close_loud_with_zero_dispatch ... ok
+test c05_openai_half_json_arguments_close_loud_with_zero_dispatch ... ok
+test c08_anthropic_interleaved_tool_blocks_accumulate_independently ... ok
+test c06_parseable_arguments_admit_nothing_before_the_protocol_terminal ... ok
+test c10_anthropic_duplicates_conflicts_and_event_field_agreement ... ok
+test c14_opaque_blocks_roundtrip_and_signatures_never_leak_into_deltas ... ok
+test c10_openai_duplicates_conflicts_and_adjacent_identical_text ... ok
+test c07_duplicate_keys_and_overprecision_numbers_follow_one_canonical_rule ... ok
+test c07_wrong_shaped_arguments_refuse_loudly ... ok
+test c02_invalid_utf8_is_deterministic_at_every_fragmentation ... ok
+test c11_stop_reason_table_is_complete_across_the_fragmenting_families ... ok
+test c04_bounds_are_loud_at_the_preregistered_limits ... ok
+test c01_openai_full_response_is_fragmentation_invariant ... ok
+test c01_split_bom_and_crlf_are_fragmentation_invariant ... ok
+test c01_anthropic_full_response_is_fragmentation_invariant ... ok
+
+test result: ok. 18 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.47s
+
+EXIT:0
+=== cargo test --manifest-path rust/Cargo.toml -p lingxi-service --test r05_t04_streaming --locked 
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.09s
+     Running tests/r05_t04_streaming.rs (rust/target/debug/deps/r05_t04_streaming-8aa009c00142a2fb)
+
+running 9 tests
+test c11_a_content_refusal_fails_in_place_without_retry ... ok
+test c05_half_json_arguments_dispatch_zero_tools ... ok
+test c13_live_normalization_and_history_projection_share_the_scanner ... ok
+test c12_first_delta_reaches_the_subscriber_before_the_external_stream_ends ... ok
+test c09_length_truncated_batch_executes_nothing_and_the_retry_is_clean ... ok
+test c15_anthropic_in_stream_error_event_retries_cleanly ... ok
+test c06_parseable_arguments_do_not_dispatch_before_the_terminal ... ok
+test c15_a08_http200_stream_failures_keep_the_run_honest ... ok
+test c16_a09_midstream_cancel_releases_the_connection_and_settles_once ... ok
+
+test result: ok. 9 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 1.00s
+
+EXIT:0
+=== cargo test --manifest-path rust/Cargo.toml -p lingxi-service --test r05_t01_model_plane --locked 
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.11s
+     Running tests/r05_t01_model_plane.rs (rust/target/debug/deps/r05_t01_model_plane-61d3c1c51b855145)
+
+running 7 tests
+test c03_no_model_plane_is_the_explicit_unconfigured_outcome ... ok
+test c05_reload_without_a_configured_plane_is_a_loud_404 ... ok
+test c06_unsupported_family_makes_zero_requests ... ok
+test c02_full_chain_real_wiring_real_tool_real_result ... ok
+test c04_same_model_id_different_providers_never_cross_wire ... ok
+test c05_in_flight_call_keeps_its_snapshot_and_cancel_is_unaffected ... ok
+test c05_reload_through_management_surface_swaps_atomically ... ok
+
+test result: ok. 7 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.84s
+
+EXIT:0
+=== cargo test --manifest-path rust/Cargo.toml -p lingxi-service --test r05_t01_binary_wiring --locked 
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.11s
+     Running tests/r05_t01_binary_wiring.rs (rust/target/debug/deps/r05_t01_binary_wiring-7c89112e09c92d5a)
+
+running 2 tests
+test c03_real_binary_without_plane_settles_unconfigured ... ok
+test c02_real_binary_full_chain_through_authenticated_endpoint ... ok
+
+test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 1.02s
+
+EXIT:0
+=== cargo test --manifest-path rust/Cargo.toml -p lingxi-service --test r05_t02_credentials --locked 
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.11s
+     Running tests/r05_t02_credentials.rs (rust/target/debug/deps/r05_t02_credentials-c4e2fc9a5d7713b1)
+
+running 16 tests
+test c07_invalid_grant_is_terminal_reauthorization_never_a_retry ... ok
+test c01_all_purposes_resolve_through_the_single_credential_service ... ok
+test c11_store_concurrency_fidelity_and_restart_semantics ... ok
+test c07_oauth_without_a_login_fails_before_any_request ... ok
+test c07_a_static_key_401_is_terminal_without_any_refresh ... ok
+test c05_a_revoked_credential_never_resurrects_full_chain ... ok
+test c07_a_transient_refresh_failure_is_bounded_by_the_attempt_policy ... ok
+test c04_a_cancelled_waiter_leaves_the_shared_refresh_intact ... ok
+test c12_management_surface_is_local_only_and_forgery_is_refused ... ok
+test c06_a_persist_failure_is_reported_honestly_full_chain ... ok
+test c10_a_redirect_is_never_followed_with_credentials ... ok
+test c07_a_second_401_after_refresh_never_retriggers_a_refresh ... ok
+test c03_a_blocked_refresh_never_blocks_other_providers ... ok
+test c09_marker_secret_never_reaches_durable_state_and_echoes_are_scrubbed ... ok
+test o1_same_model_id_on_two_keyed_providers_never_crosses_material ... ok
+test c02_concurrent_401s_merge_into_one_refresh_full_chain ... ok
+
+test result: ok. 16 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 2.56s
+
+EXIT:0
+=== cargo test --manifest-path rust/Cargo.toml -p lingxi-service --test r05_t03_protocol_adapters --locked 
+   Compiling lingxi-service v0.0.0 (/Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-service)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 1.30s
+     Running tests/r05_t03_protocol_adapters.rs (rust/target/debug/deps/r05_t03_protocol_adapters-58666f03dac16790)
+
+running 10 tests
+test codex_family_runs_end_to_end_over_sse ... ok
+test c06_openai_completions_mixed_content_parts_survive_in_order ... ok
+test c08_a_policy_refusal_rides_the_next_request_as_a_structured_failure ... ok
+test c02_anthropic_tool_roundtrip_with_the_real_file_tool ... ok
+test c03_google_parallel_calls_pair_function_responses_by_exchange_mapping ... ok
+test c12_retry_continues_the_confirmed_exchange_without_rebuild_or_redo ... ok
+test c04_same_provider_call_id_in_two_sessions_stays_isolated ... ok
+test c01_c04_same_model_id_two_families_never_cross_wire_or_credentials ... ok
+test c07_auth_header_goes_verbatim_and_none_sends_nothing ... ok
+test c05_runtime_nonce_rides_the_next_request_and_follows_changes ... ok
+
+test result: ok. 10 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 4.46s
+
+EXIT:0
+=== cargo test --manifest-path rust/Cargo.toml -p lingxi-adapters --test r05_t03_goldens --locked 
+   Compiling lingxi-adapters v0.0.0 (/Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-adapters)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.98s
+     Running tests/r05_t03_goldens.rs (rust/target/debug/deps/r05_t03_goldens-b0bf127374eaea3c)
+
+running 3 tests
+test the_golden_set_covers_five_families_times_three_cases ... ok
+test forward_and_roundtrip_goldens_render_and_parse_exactly ... ok
+test error_goldens_classify_and_transport_exactly ... ok
+
+test result: ok. 3 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 4.58s
+
+EXIT:0
+=== cargo test --manifest-path rust/Cargo.toml -p lingxi-adapters --test r05_t02_oauth_flows --locked 
+   Compiling lingxi-adapters v0.0.0 (/Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-adapters)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 1.09s
+     Running tests/r05_t02_oauth_flows.rs (rust/target/debug/deps/r05_t02_oauth_flows-45599c2a5c670775)
+
+running 20 tests
+test pkce_each_begin_mints_fresh_state_and_verifier ... ok
+test pkce_cancellation_while_waiting_is_clean ... ok
+test pkce_duplicate_callback_is_refused_by_the_closed_listener ... ok
+test pkce_error_callback_and_codeless_callback_are_terminal_and_loud ... ok
+test pkce_expired_state_is_rejected_at_the_loop_top_and_after_accept ... ok
+test pkce_wrong_state_is_a_400_and_the_flow_survives_for_the_valid_one ... ok
+test device_code_untrusted_verification_uri_is_a_loud_protocol_failure ... ok
+test device_code_cancellation_wins_at_the_wait ... ok
+test token_endpoint_redirect_is_never_followed ... ok
+test sub_second_expires_in_mints_an_immediately_expired_token ... ok
+test pkce_happy_path_binds_state_and_verifier_to_the_exchange ... ok
+test refresh_happy_path_and_refresh_token_rollover_rule ... ok
+test device_code_endpoint_echoes_are_scrubbed_of_in_play_material ... ok
+test missing_expires_in_falls_back_to_jwt_exp_and_refuses_when_absent ... ok
+test device_code_happy_path_prompts_once_and_mints_tokens ... ok
+test device_code_deadline_expires_the_flow ... ok
+test refresh_classification_invalid_grant_401_transient_and_scrub ... ok
+test device_code_denial_and_expired_token_are_terminal_and_distinct ... ok
+test device_code_slow_down_grows_the_interval_by_five_seconds ... ok
+test refresh_timeout_is_transient_never_terminal ... ok
+
+test result: ok. 20 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 4.68s
+
+EXIT:0
+=== cargo test --manifest-path rust/Cargo.toml -p lingxi-service --test cancel_terminal_race --locked 
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.11s
+     Running tests/cancel_terminal_race.rs (rust/target/debug/deps/cancel_terminal_race-3ef512563e771c72)
+
+running 13 tests
+test a_fire_after_the_driver_reached_cleaning_never_regresses_the_phase ... ok
+test concurrent_duplicate_fires_keep_the_first_reason_and_a_single_fired ... ok
+test cancel_racing_the_finalize_transaction_is_too_late_not_accepted ... ok
+test started_without_receipt_journals_unknown_receipt_facts ... ok
+test cancel_at_the_intent_boundary_dispatches_no_new_external_call ... ok
+test cancel_between_tool_iterations_stops_the_second_dispatch ... ok
+test cancel_at_the_no_provider_early_close_settles_cancelled ... ok
+test cancel_accepted_while_final_events_persist_beats_the_completed_terminal ... ok
+test cancel_after_the_committed_terminal_reports_already_terminal ... ok
+test cancel_at_the_authorization_boundary_never_opens_the_approval_ask ... ok
+test cancel_accepted_before_the_terminal_claim_beats_every_terminal_shape ... ok
+test cancel_at_the_started_boundary_dispatches_no_new_external_call ... ok
+test cancel_accepted_before_the_terminal_claim_beats_the_failed_terminal_too ... ok
+
+test result: ok. 13 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.45s
+
+EXIT:0
+=== cargo test --manifest-path rust/Cargo.toml -p lingxi-service --test late_result_fence --locked 
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.10s
+     Running tests/late_result_fence.rs (rust/target/debug/deps/late_result_fence-635115a6f8a60635)
+
+running 5 tests
+test r03_a07_driver_fences_stale_tagged_model_result_loudly ... ok
+test reconnect_resubscribes_only_and_never_restarts_a_model ... ok
+test r03_a07_late_attempt1_result_vs_current_attempt_is_stale_only ... ok
+test r03_a07_late_result_after_cancel_and_next_run_pollutes_nothing ... ok
+test r03_a07_tool_result_with_stale_fence_records_unknown_and_audits ... ok
+
+test result: ok. 5 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.22s
+
+EXIT:0
+=== cargo test --manifest-path rust/Cargo.toml -p lingxi-service --test cancellation_tree --locked 
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.10s
+     Running tests/cancellation_tree.rs (rust/target/debug/deps/cancellation_tree-3950833db08615de)
+
+running 8 tests
+test state_change_transaction_commits_legal_legs_and_diagnoses_bad_ones ... ok
+test cancel_surface_is_diagnosable_for_unknown_terminal_foreign_and_dangling ... ok
+test panicking_tool_child_is_supervised_and_the_run_settles_loudly ... ok
+test queue_wait_cancel_leaves_the_unrelated_holder_untouched ... ok
+test r03_a06_cancel_parent_spares_unrelated_background ... ok
+test approval_wait_round_trips_approve_and_reject_legs ... ok
+test r03_a05_cancel_exits_each_wait_state_and_returns_quotas ... ok
+test noncooperating_child_is_reported_unconfirmed_not_fake_quiet ... ok
+
+test result: ok. 8 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.62s
+
+EXIT:0
+=== cargo test --manifest-path rust/Cargo.toml -p lingxi-service --lib streaming_norm --locked 
+   Compiling lingxi-service v0.0.0 (/Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-service)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 5.76s
+     Running unittests src/lib.rs (rust/target/debug/deps/lingxi_service-124c4941c3c49cfb)
+
+running 14 tests
+test streaming_norm::tests::escapes_and_code_spans_are_literal ... ok
+test streaming_norm::tests::known_tags_structure_wherever_they_appear ... ok
+test streaming_norm::tests::normalizer_routes_native_reasoning_without_scanning ... ok
+test streaming_norm::tests::comments_cdata_and_declarations_pass_verbatim ... ok
+test streaming_norm::tests::half_tags_pend_across_feeds ... ok
+test streaming_norm::tests::in_vocabulary_orphan_closers_pass_literally ... ok
+test streaming_norm::tests::split_segments_replays_the_stream_structure ... ok
+test streaming_norm::tests::out_of_vocabulary_orphan_closers_drop_only_at_the_final_boundary ... ok
+test streaming_norm::tests::quoted_attributes_do_not_end_tags_and_unknown_markup_is_preserved ... ok
+test streaming_norm::tests::the_unknown_stack_depth_cap_switches_to_conservative_passthrough ... ok
+test streaming_norm::tests::layer_trims_the_layout_newline_after_a_block ... ok
+test streaming_norm::tests::layer_flush_closes_an_unclosed_block ... ok
+test streaming_norm::tests::normalizer_separates_think_mood_and_body ... ok
+test streaming_norm::tests::the_pending_tag_bound_falls_back_to_literal ... ok
+
+test result: ok. 14 passed; 0 failed; 0 ignored; 0 measured; 334 filtered out; finished in 0.01s
+
+EXIT:0
+=== cargo test --manifest-path rust/Cargo.toml -p lingxi-adapters --lib streaming --locked 
+   Compiling lingxi-adapters v0.0.0 (/Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-adapters)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 2.42s
+     Running unittests src/lib.rs (rust/target/debug/deps/lingxi_adapters-782fcbaa5a6532e7)
+
+running 9 tests
+test models::streaming::tests::comments_and_id_and_retry_fields_are_ignored ... ok
+test models::streaming::tests::an_unterminated_event_at_eof_is_discarded_and_reported ... ok
+test models::streaming::tests::multi_line_data_joins_and_chunks_may_split_anywhere ... ok
+test models::streaming::tests::invalid_utf8_is_a_loud_error ... ok
+test models::streaming::tests::a_leading_bom_is_stripped_once ... ok
+test models::streaming::tests::simple_frames_dispatch_on_blank_lines ... ok
+test models::openai_completions::tests::streaming_request_flips_the_wire_mode ... ok
+test models::streaming::tests::the_buffer_bound_is_loud ... ok
+test models::streaming::tests::the_per_frame_bound_is_loud_across_lines_and_chunks ... ok
+
+test result: ok. 9 passed; 0 failed; 0 ignored; 0 measured; 75 filtered out; finished in 0.02s
+
+EXIT:0
+ALL_DONE

@@ -1,0 +1,16 @@
+2026-10-02 17:39:48.541133+0800 0x4fb268   Default     0x0                  746    0    socketfilterfw: [com.apple.ALF.ApplicationFirewall:fw] Handle flow with processPID: 30845 and bundleid: zz_alfprobe_r1
+2026-10-02 17:39:48.548051+0800 0x4fb268   Default     0x0                  746    0    socketfilterfw: [com.apple.ALF.ApplicationFirewall:fw] Enqueuing new inbound flow for zz_alfprobe_r1 with identifier: zz_alfprobe_r1
+2026-10-02 17:39:48.548477+0800 0x4fb268   Default     0x0                  746    0    socketfilterfw: [com.apple.ALF.ApplicationFirewall:fw] Prompting for a filtering decision on: zz_alfprobe_r1
+2026-10-02 17:39:48.550973+0800 0x2080     Default     0x0                  746    0    socketfilterfw: [com.apple.ALF.ApplicationFirewall:fw] doask: sending prompt for a filtering decision on: zz_alfprobe_r1
+2026-10-02 17:39:53.225285+0800 0x2080     Default     0x0                  746    0    socketfilterfw: [com.apple.ALF.ApplicationFirewall:fw] DoAnswer: name: zz_alfprobe_r1 with NULL cfurl
+2026-10-02 17:39:53.226448+0800 0x2080     Default     0x0                  746    0    socketfilterfw: [com.apple.ALF.ApplicationFirewall:fw] Allowing app zz_alfprobe_r1
+    bundleid = "zz_alfprobe_r1";
+    displayname = "zz_alfprobe_r1";
+    path = "file:///Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/REVIEW-T01/alf-reverify/zz_alfprobe_r1";
+
+== ALF global state at reverify ==
+Firewall is enabled. (State = 1)
+== this binary now listed in ALF app list ==
+1 : /Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/REVIEW-T01/alf-reverify/zz_alfprobe_r1 
+== earlier reviewer probe also listed ==
+2 : /Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/REVIEW-T01/alf-reverify/zz_probe2_review 

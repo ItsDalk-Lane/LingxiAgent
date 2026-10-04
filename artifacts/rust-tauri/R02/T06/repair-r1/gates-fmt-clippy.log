@@ -1,0 +1,9 @@
+# REPAIR-R1 gates: fmt + clippy (locked 1.98.1, dedicated target dir, offline)
+$ cargo fmt --all -- --check
+fmt exit=0
+$ cargo clippy --workspace --all-targets --locked -- -D warnings
+    Checking lingxi-kernel v0.0.0 (/Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-kernel)
+    Checking lingxi-adapters v0.0.0 (/Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-adapters)
+    Checking lingxi-service v0.0.0 (/Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-service)
+    Finished `dev` profile [unoptimized + debuginfo] target(s) in 0.82s
+clippy exit=0
