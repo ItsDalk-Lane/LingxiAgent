@@ -1168,9 +1168,13 @@ async fn f24_worker_child_environment_carries_no_credential_material() {
 
 #[tokio::test]
 async fn f24_sigterm_with_parked_callback_reaps_the_worker_child() {
-    // The callback purpose is a unique runtime tag: the fixture child's
-    // argv carries it (ask_model takes the purpose as its extra argv), so
-    // `pgrep -f <tag>` identifies EXACTLY the worker under test.
+    // The unique runtime tag identifies EXACTLY the worker under test: the
+    // fixture child's argv carries it (`ask_model_tagged` takes the tag as
+    // its extra argv), so `pgrep -f <tag>` cannot match anything else. The
+    // CALLBACK PURPOSE is the real host-mapped slot "summarize" — a nonce
+    // purpose is refused by the host's purpose→slot mapping (C09) and the
+    // worker would never park (RR1 F43: 32 instant refusals, the run died
+    // of turn_budget_exceeded and no child was ever parked).
     let tag = runtime_nonce("reap");
     let release = Arc::new(AtomicBool::new(false));
     let release_for_stub = Arc::clone(&release);
@@ -1190,7 +1194,7 @@ async fn f24_sigterm_with_parked_callback_reaps_the_worker_child() {
     let h = Harness::new(
         "wreap",
         &stub.endpoint(),
-        Some(&workers_section("ask_model", &tag, &tag)),
+        Some(&workers_section("ask_model_tagged", &tag, "summarize")),
         &["--shutdown-timeout-ms", "8000"],
     );
     std::fs::write(h.workspace.join("input.txt"), "reap probe input\n").expect("seed input");
@@ -1205,20 +1209,79 @@ async fn f24_sigterm_with_parked_callback_reaps_the_worker_child() {
         "call the worker".to_string(),
     )
     .await;
-    // Wait until the worker child is actually alive in its callback wait.
-    let deadline = Instant::now() + Duration::from_secs(30);
-    while count_processes(&tag) == 0 {
+    // Readiness barrier (RR1 F43 f24): wait for the REAL worker→callback
+    // chain instead of a fixed spawn window. The stub recording the
+    // summarize-model-f24 request proves the worker child spawned, dialed
+    // its callback through the REAL gateway, and is parked in the gated SSE
+    // wait; pgrep then confirms the child process itself. The deadline is
+    // only the honesty bound (the file's other barriers use the same 90s
+    // budget) — readiness fires as soon as the chain is truly up, however
+    // loaded the machine.
+    let ready_deadline = Instant::now() + Duration::from_secs(90);
+    loop {
+        let callback_arrived = stub
+            .requests()
+            .iter()
+            .any(|(_, _, body)| body["model"].as_str() == Some("summarize-model-f24"));
+        if callback_arrived && count_processes(&tag) > 0 {
+            break;
+        }
         assert!(
-            Instant::now() <= deadline,
-            "the config-declared worker child never spawned (tag {tag})"
+            Instant::now() <= ready_deadline,
+            "the worker child never reached its parked callback wait (tag {tag}); stub hits: \
+             {}, worker processes: {}, service stderr so far:\n{}",
+            stub.hits(),
+            count_processes(&tag),
+            child.stderr_lines.lock().expect("stderr log").join("\n"),
         );
         tokio::time::sleep(Duration::from_millis(25)).await;
     }
 
-    // SIGTERM: the service must shut down within its budget AND reap the
-    // worker child (process group + kill_on_drop discipline).
+    // SIGTERM: the service must stay bounded AND reap the worker child
+    // (process group + kill_on_drop discipline). With the callback genuinely
+    // parked (the stub never answers), the in-flight FOREGROUND execute
+    // request cannot settle during the transport drain — the drain waits out
+    // the whole from-signal budget, is abandoned loudly, and the binary
+    // exits deterministically with code 6 (shutdown.rs: bounded at process
+    // level; DB close/record cleanup are the documented overflow residues).
+    // Both ends of the contract are asserted:
+    //   - exit 0  = every phase drained within the budget, or
+    //   - exit 6  = the documented budget-exceeded marker, pinned to the
+    //               transport_drain phase (a DIFFERENT dirty exit — 4/5 or a
+    //               signal death — fails the test);
+    // and NO worker orphan may survive either path.
+    let stderr_tail = Arc::clone(&child.stderr_lines);
     let exit = child.stop().await;
-    assert!(exit.success(), "graceful shutdown, got {exit}");
+    let code = exit.code().unwrap_or(-1);
+    let stderr = || {
+        stderr_tail
+            .lock()
+            .expect("stderr log")
+            .iter()
+            .rev()
+            .take(12)
+            .rev()
+            .cloned()
+            .collect::<Vec<String>>()
+            .join("\n")
+    };
+    assert!(
+        code == 0 || code == 6,
+        "unexpected shutdown exit {exit:?} (expected the bounded 0/6 contract); service stderr \
+         tail:\n{}",
+        stderr()
+    );
+    if code == 6 {
+        let tail = stderr();
+        assert!(
+            tail.contains("shutdown exceeded the unified 8000ms from-signal budget")
+                && tail.contains("transport_drain_timed_out=true"),
+            "the code-6 exit must be the documented transport-drain overflow of the parked \
+             callback, nothing else; service stderr tail:\n{tail}"
+        );
+    }
+    // The load-bearing reclamation assertion: the worker child (parked in
+    // its callback wait at signal time) never survives the service.
     let reap_deadline = Instant::now() + Duration::from_secs(15);
     while count_processes(&tag) > 0 {
         assert!(

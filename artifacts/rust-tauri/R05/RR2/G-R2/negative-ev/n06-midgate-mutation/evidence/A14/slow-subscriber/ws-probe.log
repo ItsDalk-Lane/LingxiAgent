@@ -1,0 +1,10 @@
+A subscribed: {'frameKind': 'control', 'fromSeq': '0', 'mode': 'snapshot', 'snapshotSeq': '0', 'streamId': 'sess_local_alpha', 'type': 'subscribed'}
+B subscribed: {'frameKind': 'control', 'fromSeq': '0', 'mode': 'snapshot', 'snapshotSeq': '0', 'streamId': 'sess_local_alpha', 'type': 'subscribed'}
+writer storm done: 1000 requests, statuses ['200', '409']
+sequential phase done: 1200 requests, statuses ['200']
+B reader ended: TimeoutError('timed out') count=2930
+durable head: 2930 key events
+B merged view complete: 2930/2930 key events (live-only: True)
+A detached explicitly: reason=slow_consumer (buffered key events delivered before the signal: 1328)
+A resubscribed after detach: fresh subscribed control received
+STORM COMPLETE

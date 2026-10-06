@@ -1,0 +1,3 @@
+FAIL: count mismatch: migrations.rs MIGRATIONS has 7 entries, the registry has 6
+FAIL: v6 (model_call_usage_rr1_f21) exists in migrations.rs MIGRATIONS but is MISSING from the registry
+FAIL: registry consistency — migrations.rs MIGRATIONS and R02-T04_STORAGE_REGISTRY.json disagree (root=/private/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-rr2a-mut-ZiKLXF)

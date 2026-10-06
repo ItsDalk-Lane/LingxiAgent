@@ -1,0 +1,19 @@
+{
+  "executes_concurrent": 1000,
+  "executes_sequential": 1200,
+  "durable_key_events": 2930,
+  "executes_answered_200": 265,
+  "executes_answered_409_session_busy": 735,
+  "all_executes_answered_200_or_busy_409": true,
+  "zero_5xx_zero_timeout_zero_hang": true,
+  "b_complete": true,
+  "b_needed_explicit_rebuild": false,
+  "a_buffered_before_detach": 1328,
+  "a_detach_reason": "slow_consumer",
+  "a_resubscribed": true,
+  "rss_min_kb": 22256,
+  "rss_max_kb": 32240,
+  "rss_last_kb": 32240,
+  "health_after": 200,
+  "rss_bounded_ceiling_kb": 512000
+}

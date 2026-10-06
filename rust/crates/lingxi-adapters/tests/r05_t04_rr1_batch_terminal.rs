@@ -1,8 +1,9 @@
-//! R05 RR1 (WP-T04, F11/F12/F33): the permanent regression home of the
-//! adversarial batch/terminal counterexamples migrated from the 2026-10-04
-//! protocol audit (`artifacts/rust-tauri/R05/RR1/INPUT-adversarial-2026-10-04/
-//! audit/protocol/src/lib.rs`, PF05/PF06 legs owned by T04), plus the F33
-//! present-but-unmapped terminal-value legs.
+//! R05 RR1 (WP-T04, F11/F12/F33) + RR2 WP-C (F34): the permanent regression
+//! home of the adversarial batch/terminal counterexamples migrated from the
+//! 2026-10-04 protocol audit (`artifacts/rust-tauri/R05/RR1/
+//! INPUT-adversarial-2026-10-04/audit/protocol/src/lib.rs`, PF05/PF06 legs
+//! owned by T04), the F33 present-but-unmapped terminal-value legs, and the
+//! F34 known-terminal-plus-unclosed-block leg.
 //!
 //! The assertions are the audit's CONTRACT assertions verbatim in intent:
 //! they were red on the frozen candidate (side effects before admission,
@@ -150,6 +151,86 @@ fn anthropic_open_tool_block_cannot_close_as_a_completed_batch() {
         r.is_err(),
         "unclosed tool block is not a trustworthy terminal: actual={r:?}"
     );
+}
+
+// ── F34: KNOWN terminal + unclosed block ────────────────────────────────────
+
+/// F34 (RR2 WP-C): the leg above omits content_block_stop AND message_delta
+/// together, so its rejection is absorbed by the missing-stop_reason defense
+/// — a future removal of the unclosed-block check alone leaves it green.
+/// THIS leg holds everything else legal — a complete schema-valid tool
+/// argument object, a KNOWN mapped terminal
+/// (`message_delta` `stop_reason:"tool_use"`), `message_stop` — and omits
+/// ONLY `content_block_stop`. `finish` must reject the whole batch, NAME the
+/// specific unclosed block index, and admit zero tool requests through the
+/// same formal chain the other legs assert on; the inline positive control
+/// adds only the missing `content_block_stop` and the SAME stream must form
+/// a legal batch producing the complete tool request.
+#[test]
+fn known_stop_reason_with_unclosed_tool_block_is_loud_and_dispatches_nothing() {
+    // The fixture: everything legal except content_block_stop (inserted only
+    // in the positive control).
+    let frames = |with_block_stop: bool| {
+        let mut frames = vec![
+            json!({"type":"message_start","message":{"content":[]}}),
+            json!({"type":"content_block_start","index":0,"content_block":{"type":"tool_use","id":"t1","name":"read","input":{}}}),
+            json!({"type":"content_block_delta","index":0,"delta":{"type":"input_json_delta","partial_json":"{\"path\":\"a.txt\"}"}}),
+        ];
+        if with_block_stop {
+            frames.push(json!({"type":"content_block_stop","index":0}));
+        }
+        frames.push(json!({"type":"message_delta","delta":{"stop_reason":"tool_use"}}));
+        frames.push(json!({"type":"message_stop"}));
+        frames
+    };
+
+    // Counterexample: a known, mapped terminal does NOT license an unclosed
+    // block — nothing dispatches through the formal finish() chain.
+    let mut a = ant::MessagesStreamAccumulator::new();
+    for frame in frames(false) {
+        a.handle_event(&ev(frame)).unwrap();
+    }
+    let r = a.finish(&call(), &snapshot(), &SchemaBudget::default());
+    let err = match r {
+        Ok(parsed) => panic!(
+            "a known stop_reason must not license an unclosed block — zero \
+             tool requests through the formal chain, got {:?}",
+            parsed.turn
+        ),
+        Err(err) => err,
+    };
+    assert_eq!(err.code, ErrorCode::InvalidMessage, "F34: {err}");
+    assert!(!err.retryable, "F34 rejection is not retryable: {err}");
+    assert!(
+        err.message.contains("content block(s) [0]") && err.message.contains("content_block_stop"),
+        "the error must name the specific unclosed block index: {err}"
+    );
+
+    // Positive control: adding ONLY the missing content_block_stop makes the
+    // same stream a legal batch whose single tool request arrives complete.
+    let mut a = ant::MessagesStreamAccumulator::new();
+    for frame in frames(true) {
+        a.handle_event(&ev(frame)).unwrap();
+    }
+    match a
+        .finish(&call(), &snapshot(), &SchemaBudget::default())
+        .expect("positive control: the closed stream is a legal batch")
+        .turn
+    {
+        ProviderTurn::ToolRequests { requests, content } => {
+            assert_eq!(requests.len(), 1, "one closed tool block is one request");
+            assert_eq!(requests[0].provider_call_id.as_deref(), Some("t1"));
+            assert_eq!(requests[0].target, "tool:first-party:read");
+            assert_eq!(
+                requests[0].arguments.as_value(),
+                &json!({"path":"a.txt"}),
+                "the tool arguments arrive complete: {:?}",
+                requests[0].arguments.as_value()
+            );
+            assert!(content.is_empty(), "a tools-only turn carries no content");
+        }
+        other => panic!("positive control: expected ToolRequests, got {other:?}"),
+    }
 }
 
 /// PF05 leg 3 (assertion unchanged): text + [DONE] with NO normal choice

@@ -1,6 +1,6 @@
-# R05_REPORT — 模型协议、凭证、流式处理与完整任务闭环（RR1 修复轮版本）
+# R05_REPORT — 模型协议、凭证、流式处理与完整任务闭环（RR1 修复轮版本；§10 为 RR2 增补）
 
-- 生成：R05-T08-执行者（RR1 WP-T08），2026-10-06。阶段：R05（T01–T08 全部八任务，RR1 对抗修复轮 F01–F39 之后）。
+- 生成：R05-T08-执行者（RR1 WP-T08），2026-10-06。阶段：R05（T01–T08 全部八任务，RR1 对抗修复轮 F01–F39 之后）。§10 由 R05 RR2 收口（WP-F）于 2026-10-06/07 增补——RR2 轮现状与阶段状态以 §10 为准，§1–§9 保留 RR1 轮历史原文。
 - 基线：分支 `codex/rust-tauri-migration`，HEAD `d80737b6cb9186c8a18c0f35923aac00249d45c3`（R05 首轮实施提交）；**RR1 全部修复为该 HEAD 之上的未提交工作树改动**（含 T01–T07 各工作包与 T08 本包；无 commit/push 授权，全程零 git 写操作）。
 - 审查事实：首轮实施（HEAD d80737b6）被 2026-10-04 对抗审查判 **NOT_ACCEPTED**（F01–F28 问题矩阵，见 `docs/rust-tauri/R05/repair-current/RR1_ISSUE_MATRIX.json`）；本报告描述 RR1 修复后的候选状态。首轮报告的全部 PASS 记录是**同一审查基线上的历史事实**，但按 N16 规则（生产源码/协议/配置/lock/生成器/gate 变化 ⇒ 受影响证据过期），其结论**不继承**为 RR1 候选的门禁通过——最终门禁与阶段审查必须在 RR1 候选上重跑。
 - 本报告只陈述真实运行过的命令与结果。
@@ -86,3 +86,31 @@ R06_READY:               false（待阶段门禁+独立终审）
 ## 9. 交接
 
 - 见 `R05_HANDOFF.json`（RR1 版：接口、R06 可消费范围、延期登记、审查状态）。
+
+## 10. RR2 修复轮增补（2026-10-06/07；上方 §1–§9 为 RR1 轮历史记录，原文保留不改写）
+
+- **候选**：分支 `codex/rust-tauri-migration`，HEAD `ad5ec4e9853a51ed929f1e2e077b97d41c951572`（=origin）+ 未提交 RR2 工作树改动；无 commit/push（收口后由总控按既有授权统一处理）。
+- **RR1 终审遗留五项全部关闭（任务级）**，逐项独立验收（全新上下文审查者，非实施者）：
+  - F41（A）：登记册补登 v6/v7+等式自检 S0；`A-R2/REVIEW-r1.md` PASS（指纹三方一致、S0–S4 全绿、三变异精确红）。
+  - F42（B，两轮+微修复轮3）：运行输出归属重写+E5 分类器 patch-too-large 形态演化登记+note 转义修复；`B-R2/R2/REVIEW-r2.md` 四项（F42/F44/B-r2/B-r3）全 PASS；r1 验收 full 轮 E5 unparseable 复析为 vitest worker 负载抖动（非逻辑缺陷）。
+  - F34（C）：永久腿+阳性对照+映射登记；`C-R2/REVIEW-r1.md` PASS（两种审查者自建变异恰新腿红）。
+  - F43（D）：(b)(c) 修复 PASS + **rust_test_workspace 首次完整绿窗 exit 0（115 组 ok / 1476 passed / 0 failed，含 r00 1/1）**，`D-R2/REVIEW-r1.md`+`D-R2/workspace-green-window-REVIEW-r1.log`；实施期「绿窗 BLOCKED」文案已按事实刷新，ALF 环境项登记保留（重链接后的新二进制实例可能需用户再次 Allow）。
+  - F31（E）：OAuth 列表面恢复 404；`E-R2/REVIEW-r1.md` PASS（38/38、404 body 逐字一致零存在性 oracle、变异红绿双向）。
+  - F40+三追加 C 行（F，本收口）：T05-C11B/T05-C13 按 RR1 矩阵 F14/F15/F16 与 F08/F10/F14/F35 的 independentReview 翻绿（RR2 改动未触及 egress/compat/golden，证据未过期）；T06-C11B 以 D 绿窗关闭。
+- **RR2 新发现 F44**（seal 三件套 ENOBUFS 遮蔽诊断）：4 文件纯 maxBuffer 选项修复，经 B 包 REVIEW-r2 §5 PASS；生成器 patch-too-large 由 B-r2 分类器登记处置（登记红不转正式绿）。
+- **G-INT/G-NEG DONE**：I01–I11 全 PASS（`G-R2/I-MAPPING.md`，无新 F-ID）；原 16 负测 16/16 fail-closed+RR2 新增反例 6/6（`G-R2/NEG-GATE-RR2.md`）。
+- **完整链与门禁窗口（RR2 候选实测）**：r02_t08 仓库根完整链 `s5-full-5` exit 0（GREEN，登记红如实）；workspace `cargo test --locked --workspace` exit 0（1476/0，D-R2 REVIEW 绿窗）。
+- **资源口径（§四F）**：原始记录=160 混合轮=60 预算取消+60 错误+40 其他（15 正常+10 长响应+15 worker）；恢复前 active≠已终结、重启已消解≠永久泄漏（原始序列 `RR1/INDEPENDENT-9/verify-R05/R05_SUITES/f27-resource-series.json`，stubDropped=60）。
+- **阶段状态（RR2 候选当前真值，§9 六元组口径）**：
+
+```text
+offline_gate:            PENDING（RR2 候选的正式 verify-stage R05 待 FINAL-01 亲跑；workspace 绿窗与 r02_t08 完整链为窗口级实测，不代位正式门禁）
+independent_review:      任务级全部通过（六工作包+F44 独立验收 PASS、G DONE、三追加 C 行收口）；阶段级终审 PENDING（FINAL-01）
+live_verification:       BLOCKED_NOT_AUTHORIZED（RR-BLK-CREDENTIALS，最迟 R10；不变）
+platform_verification:   macOS arm64 = RR2 各包实测平台；Windows = 未验证（继承）；Linux = 未真机验证
+stage_readiness:         READY_FOR_INDEPENDENT_REVIEW
+release_state:           NOT_IN_SCOPE
+R06_READY:               false（待 FINAL-01 阶段终审；终审通过并完成封印/提交流程前不得翻 true）
+```
+
+- **历史记录边界**：§1–§9 的 RR1 叙述与 RR1_INDEPENDENT-9 FAIL 结论为历史事实原文保留；本节不覆盖、不改动其内容。

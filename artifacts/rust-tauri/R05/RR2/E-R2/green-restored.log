@@ -1,0 +1,9 @@
+   Compiling lingxi-service v0.0.0 (/private/tmp/r05-rr2-e-mut/candidate/rust/crates/lingxi-service)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 4.48s
+     Running tests/r05_t02_credentials.rs (target/debug/deps/r05_t02_credentials-a004bc935b5b00b8)
+
+running 1 test
+test rr1_f04::rr1_f04_oauth_model_listing_and_non_oauth_rejection ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 37 filtered out; finished in 0.16s
+

@@ -4,8 +4,8 @@
   "start_branch": "main",
   "implementation_branch": "codex/rust-tauri-migration",
   "start_head": "7d1a0c6bc28062ff455adcf8f68c3a80b117e90d",
-  "current_head": "0c67b6fc7",
-  "current_head_note": "R04 accepted after independent stage review (STAGE-REVIEWER-R04-R01 PASS, fresh evidence root, candidate binding stable). Closeout docs commit follows; its SHA recorded via remote receipt.",
+  "current_head": "ad5ec4e98",
+  "current_head_note": "R05 RR2 收口（2026-10-06/07）：HEAD=ad5ec4e9853a51ed929f1e2e077b97d41c951572（=origin/codex/rust-tauri-migration），RR2 六工作包（A–E）+G+F44+F 收口全部为该 HEAD 之上的未提交工作树改动；任务级独立验收全部通过，阶段=READY_FOR_INDEPENDENT_REVIEW（待 FINAL-01 全新阶段审查者亲跑 §5.3；终审前不写 accepted/R06_READY=true）。前序 R04 接受记录（0c67b6fc7 时期）保留于 R04 段。",
   "remote": "origin",
   "remote_default_branch": "main",
   "taskbook_manifest_sha256": "49968287f564a2a470d55fe4295a26ef70a71ccb4b16e38933567e89076a5c3f",
@@ -552,7 +552,7 @@
     "R04": "RE-ACCEPTED_AFTER_ADVERSARIAL_REPAIR (RR1 2026-10-01: F01-F05 repaired G01-G05, each with fresh independent R1 PASS; fresh stage reviewer STAGE_VERDICT PASS; commits 1692d2314/da15c4bd9/614fab1af/1285c3bf6/629e15b85 all pushed & remote-confirmed; prior ACCEPTED@0c67b6fc7 history preserved; ledger docs/rust-tauri/R04/repair-current/R04_RR1_FIX_ISSUES.json)",
     "R05": {
       "title": "模型协议、凭证、流式处理与最小完整闭环",
-      "status": "PENDING",
+      "status": "READY_FOR_INDEPENDENT_REVIEW",
       "task_ids": [
         "R05-T01",
         "R05-T02",
@@ -567,7 +567,16 @@
       "stage_review_round": 0,
       "stage_verdict": null,
       "stage_acceptance_commit_sha": null,
-      "blockers": []
+      "blockers": [],
+      "rr2_repair_round": {
+        "recorded_at": "2026-10-06/07",
+        "candidate": "ad5ec4e9853a51ed929f1e2e077b97d41c951572 + 未提交 RR2 工作树（无 commit/push）",
+        "authority": "docs/rust-tauri/R05/repair-current/RR2_ISSUE_MATRIX.json（RR2 状态权威）+ RR2_MASTER_PROMPT_2026-10-06.md",
+        "result": "RR1 终审遗留五项全部任务级关闭：F41/F42/F34/F43/F31/F44 独立验收 INDEPENDENT_PASS（A-R2/REVIEW-r1.md、B-R2/R2/REVIEW-r2.md 两轮、C-R2/REVIEW-r1.md、D-R2/REVIEW-r1.md、E-R2/REVIEW-r1.md）；F40+R05-T05-C11B/C13、R05-T06-C11B 三追加 C 行收口（闭证引用 RR1 矩阵 F08/F10/F14/F15/F16/F35/F26 independentReview + D-R2 绿窗）；G-INT/G-NEG DONE（G-R2/I-MAPPING.md 全 PASS + NEG-GATE-RR2.md 16/16+6/6，零异常零新 F-ID）。",
+        "key_windows": "rust_test_workspace 首次完整绿窗 exit 0（115 组 ok/1476 passed/0 failed，D-R2/workspace-green-window-REVIEW-r1.log）；r02_t08 完整链 s5-full-5 exit 0（GREEN）。",
+        "stage_verdict_note": "任务级全部通过≠阶段接受：最终 accepted/R06_READY 待 FINAL-01 全新阶段审查者亲跑原总控 §5.3（verify-stage R05 --evidence artifacts/rust-tauri/R05/RR2/FINAL-01/verify-R05，入口目录须未存在）；RR1 时期 INDEPENDENT-9 的阶段 FAIL 为历史记录不被覆盖。",
+        "environment_notes": "R05-ENV-ALF-UNSIGNED-TEST-BINARY 保留在册（本轮绿窗依赖当刻二进制实例已授予的 ALF 判定，重链接后的新实例可能需用户再次 Allow）；B 包 r1 验收 full 轮 vitest worker 负载抖动一次，经 REVIEW-r2 复析定性环境型，门禁 fail-closed 行为正确。"
+      }
     },
     "R06": {
       "title": "上下文、会话语义、记忆与知识库",

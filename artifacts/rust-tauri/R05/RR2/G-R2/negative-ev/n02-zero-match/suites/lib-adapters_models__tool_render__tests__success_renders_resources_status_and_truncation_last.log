@@ -1,0 +1,8 @@
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.10s
+     Running unittests src/lib.rs (/Users/study_superior/.cache/lingxi-r05-neg-target/debug/deps/lingxi_adapters-25f1ae8b0ef7c0f1)
+
+running 1 test
+test models::tool_render::tests::success_renders_resources_status_and_truncation_last ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 118 filtered out; finished in 0.00s
+

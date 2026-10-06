@@ -1,0 +1,4 @@
+tests/post-verification-audit-seal.test.ts	UNRECOGNIZED
+tests/round2-delivery-evidence.test.ts	UNRECOGNIZED
+tests/round3-delivery-evidence.test.ts	UNRECOGNIZED
+FAIL: E5: unrecognized CANDIDATE failure cause (a bare command-failed wrapper, a crash, or a foreign diagnostic — not a documented seal class; see e5-candidate-blocks.txt)

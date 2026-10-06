@@ -1,0 +1,46 @@
+Tue Oct  6 16:11:59 CST 2026
+== ALF state (read-only) ==
+Firewall is enabled. (State = 1)
+Firewall has block all state set to disabled.
+Automatically allow built-in signed software ENABLED.
+Automatically allow downloaded signed software ENABLED.
+== interfaces: en0=192.168.3.5 en1=192.168.3.10, utun1024 TUN default routes present, local 192.168.3/24 routes bypass it ==
+default            192.168.3.1        UGScg                 en0       
+default            192.168.3.1        UGScIg                en1       
+64/2               198.18.0.1         UGSc             utun1024       
+128.0/1            198.18.0.1         UGSc             utun1024       
+192.168.3          link#26            UCS                   en0      !
+192.168.3          link#23            UCSI                  en1      !
+192.168.3.1/32     link#26            UCS                   en0      !
+192.168.3.1        bc:3d:85:b0:f3:e0  UHLWIr                en1   1125
+192.168.3.1/32     link#23            UCSI                  en1      !
+192.168.3.1        bc:3d:85:b0:f3:e0  UHLWIir               en0   1089
+192.168.3.5/32     link#26            UCS                   en0      !
+192.168.3.5        1c:1d:d3:db:ba:a7  UHLWIi                lo0       
+192.168.3.8        6a:41:62:3f:ec:db  UHLWIi                en1   1013
+192.168.3.8        6a:41:62:3f:ec:db  UHLWI                 en0   1013
+192.168.3.9        a:65:44:a2:55:9f   UHLWI                 en1      !
+192.168.3.9        a:65:44:a2:55:9f   UHLWI                 en0      !
+192.168.3.10/32    link#23            UCS                   en1      !
+192.168.3.10       ba:8c:15:4e:d1:b2  UHLWI                 lo0       
+
+== clang adhoc-signed probe (verdict-less binary) ==
+Identifier=zz_lanprobe-55554944e2669e698aef36a3ae52dc7915f59972
+CodeDirectory v=20400 size=333 flags=0x2(adhoc) hashes=4+2 location=embedded
+TeamIdentifier=not set
+PROBE RESULT: ok
+-- 192.168.3.5 (en0):
+PROBE RESULT: recv-stalled Resource temporarily unavailable
+-- 192.168.3.10 (en1):
+PROBE RESULT: recv-stalled Resource temporarily unavailable
+-- fe80::14c4:ebc4:8942:59c%en0 (v6 link-local):
+PROBE RESULT: recv-stalled Resource temporarily unavailable
+-- after explicit adhoc codesign --force --sign -, 192.168.3.5:
+PROBE RESULT: recv-stalled Resource temporarily unavailable
+
+== Apple-signed /usr/bin/python3 control on the same 192.168.3.5 ==
+PROBE RESULT: ok (14 bytes)
+
+== ALF verdict for the CURRENT-tree r00 binary path (stalled despite old Allow: relinked after verdict) ==
+2 : /Users/study_superior/Desktop/Code/LingxiAgent/rust/target/debug/deps/r00_management_leaves-294787929158efb0 
+             (Allow incoming connections)

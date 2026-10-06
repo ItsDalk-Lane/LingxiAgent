@@ -28811,5 +28811,130 @@
    ],
    "externalAuthorizationRef": null
   }
- ]
+ ],
+ "rr2_repair_round": {
+  "recorded_by": "R05 RR2 收口（WP-F，2026-10-06/07）",
+  "candidate": "codex/rust-tauri-migration @ ad5ec4e9853a51ed929f1e2e077b97d41c951572 + 未提交 RR2 工作树改动（六工作包+G+F44；未 commit/push）",
+  "stage_status": "READY_FOR_INDEPENDENT_REVIEW——六工作包+F44 独立验收通过、G-INT/G-NEG DONE；最终 accepted/R06_READY 待 FINAL-01 全新阶段审查者亲跑 §5.3（入口 artifacts/rust-tauri/R05/RR2/FINAL-01/verify-R05，目录须未存在）",
+  "scope_note": "本节为 RR2 增补的验收登记；上方 103 条 acceptances 为首轮候选的历史实测记录（baseline c549ff654，其中 T05-C12/T08-C11 曾由 RR1 按 F28 更新），按 N16 其结论不继承为 RR2 候选门禁通过——RR2 候选的有效执行见本节与 RR2_ISSUE_MATRIX.json 各 independentReview。",
+  "items": [
+   {
+    "fId": "F43-window",
+    "title": "rust_test_workspace 首次完整绿窗（含 R05-T06-C11B command 绑定取得有效执行）",
+    "command": "cargo test --manifest-path rust/Cargo.toml --locked --workspace",
+    "exitCode": 0,
+    "observed": "D-R2 REVIEW-r1 独立验收者亲跑（非执行者）：115 个 test result: ok、1476 passed / 0 failed（含 Doc-tests）；r04_t05_process_tools 14/14、r05_t08_production_tools 6/6、r00_management_leaves 1/1（170.25s held 后放行，二进制 590de196dceb15ce 未重链——依赖当刻已授予的 ALF 判定）。RR1 INDEPENDENT-9 同命令为超时+1472/3；此前执行者 17:57/18:2x 两轮 exit 101（唯一失败 r00 环境项），差异已在 REVIEW §4 如实记录。",
+    "evidence": [
+     "artifacts/rust-tauri/R05/RR2/D-R2/workspace-green-window-REVIEW-r1.log",
+     "artifacts/rust-tauri/R05/RR2/D-R2/REVIEW-r1.md"
+    ],
+    "linkedCaseIds": [
+     "R05-T06-C11B",
+     "R05-T01-C01",
+     "R05-T05-C04",
+     "R05-T05-C06",
+     "R05-T05-C09",
+     "R05-T05-C10",
+     "R05-T08-C10"
+    ]
+   },
+   {
+    "fId": "F31",
+    "title": "OAuth 模型列表面非 OAuth 恢复 404（对齐原叶 R00-T02-LA-CFEC64F68DDE）",
+    "command": "cargo test --manifest-path rust/Cargo.toml --locked -p lingxi-service --test r05_t02_credentials",
+    "exitCode": 0,
+    "observed": "E-R2 REVIEW-r1 独立验收亲跑 38/38 exit 0（具名测试 --exact 1/1）：非 OAuth 列表=404 且 body 无 apiKey/authHeader 字样与秘密；未知与非 OAuth 两 404 body 除 requestId 外逐字相等（无存在性 oracle）；被拒前后 credentials.json 字节不变（零写入）；合法 OAuth 列表 200+去重并集保留；其余 OAuth 面（login/callback/poll/logout/add/remove）维持 409+oauth_only_surface 逐字未动。隔离变异 404→409 复现 RR1 形态→具名测试红 left:409/right:404 exit 101，还原绿。",
+    "evidence": [
+     "artifacts/rust-tauri/R05/RR2/E-R2/REVIEW-r1.md",
+     "artifacts/rust-tauri/R05/RR2/E-R2/green-r05t02-credentials-full.log",
+     "artifacts/rust-tauri/R05/RR2/E-R2/red.log",
+     "artifacts/rust-tauri/R05/RR2/E-R2/green-restored.log"
+    ],
+    "linkedCaseIds": [
+     "R05-T02-C08"
+    ]
+   },
+   {
+    "fId": "F41",
+    "title": "R02 存储登记册补登 v6/v7 + 等式自检接入",
+    "command": "bash scripts/rust-tauri/r02_t04_storage_tx.sh <gate-dir>（S0 新增等式自检+S1–S4 原样）",
+    "exitCode": 0,
+    "observed": "A-R2 REVIEW-r1 独立验收亲跑：S0+S1–S4 ALL GREEN exit 0；审查者自有提取代码重算 v1–v7 sha256(SQL) 与登记册、自建 fresh 库 inspector receipts==compiledIn 三方一致；fresh 库 userVersion=7 三轮重开 cmp 字节级幂等；自建 v5 非空 usage 库经真实 service 升级 v7 数据逐字保留+未知值 NULL≠0 语义正确；隔离三变异（删 v6/篡改 v7 指纹/篡改旧 v2 指纹）S0 与 S4 等价断言各精确点名失败 exit 1、恢复后双绿。R04→R03→R02 闭包的确定性红（RR1 INDEPENDENT-9 F41 签名 userVersion 7 vs registry 6）随之解除。",
+    "evidence": [
+     "artifacts/rust-tauri/R05/RR2/A-R2/REVIEW-r1.md",
+     "artifacts/rust-tauri/R05/RR2/A-R2/r02-storage-tx/",
+     "artifacts/rust-tauri/R05/RR2/A-R2/upgrade-v5-to-v7/",
+     "artifacts/rust-tauri/R05/RR2/A-R2/mutations/",
+     "docs/rust-tauri/R02/R02-T04_STORAGE_REGISTRY.json"
+    ],
+    "linkedCaseIds": [
+     "R05-T08-C13"
+    ]
+   },
+   {
+    "fId": "F42",
+    "title": "r02_t08_legacy_entry_regression 运行输出归属重写（仓库根完整链 GREEN）",
+    "command": "bash scripts/rust-tauri/r02_t08_legacy_entry_regression.sh（仓库根完整模式，s5-full-5）",
+    "exitCode": 0,
+    "observed": "B-R2 REVIEW-r2（两轮验收）PASS：进程树 fd-1/2 sink 发现（fail-closed）+DIR 单元四重围栏（artifacts/ 内≥4 层+无 tracked+dedication，否则 FILE 最小归属降级）+TRACKED-SINK 拒+R02_A16_RUN_OUTPUT_ROOTS 同围栏；HEAD/index/工作树绑定、镜像 cmp、复制竞态检出、原始日志留档原样保留；.gitignore 零改动。完整链 s5-full-5：E0/E0s 62 fixtures/E1–E4.5 全 PASS、E5a 候选 exit 1（3 文件 6 失败全部登记 seal-coordinate-lag 族，登记红不转正式绿）、E5b 基线重放 exit 0，末行 GREEN（门禁 exit 0）。r1 验收 full 轮 E5 unparseable 经复析=vitest worker 崩溃的负载型抖动（非逻辑缺陷）。",
+    "evidence": [
+     "artifacts/rust-tauri/R05/RR2/B-R2/R2/REVIEW-r2.md",
+     "artifacts/rust-tauri/R05/RR2/B-R2/R2/s5-full-5/run-root/stdout.log",
+     "artifacts/rust-tauri/R05/RR2/B-R2/R2/classifier-evolution/",
+     "artifacts/rust-tauri/R05/RR2/B-R2/R2/b-r3-note-fix/"
+    ],
+    "linkedCaseIds": []
+   },
+   {
+    "fId": "F34",
+    "title": "Anthropic 未闭块防线永久测试腿",
+    "command": "cargo test --manifest-path rust/Cargo.toml --locked -p lingxi-adapters --test r05_t04_rr1_batch_terminal",
+    "exitCode": 0,
+    "observed": "C-R2 REVIEW-r1 独立验收亲跑 10/10 exit 0（9 旧+新腿 known_stop_reason_with_unclosed_tool_block_is_loud_and_dispatches_nothing：夹具只缺 content_block_stop，Err 点名 content block(s) [0]+content_block_stop、经正式 match 链零工具执行；阳性对照恰一请求完整产出）。审查者自建两种变异（整块删防线/中性化谓词）均恰新腿红 exit 101、旧腿保持绿（复现 F34 事实）、还原绿。映射：r05_stage_pins.tsv 9→10、C11 行并入新腿名、xtask 镜像同步、required_cids 103 不变。",
+    "evidence": [
+     "artifacts/rust-tauri/R05/RR2/C-R2/REVIEW-r1.md",
+     "artifacts/rust-tauri/R05/RR2/C-R2/green-battery-f34.log",
+     "artifacts/rust-tauri/R05/RR2/C-R2/mut-red-unclosed-neutralized.log"
+    ],
+    "linkedCaseIds": [
+     "R05-T04-C11"
+    ]
+   },
+   {
+    "fId": "F44",
+    "title": "seal 三件套 spawnSync maxBuffer 崩溃形态修复（ENOBUFS 遮蔽真实诊断）",
+    "command": "npx vitest run tests/post-verification-audit-seal.test.ts tests/round2-delivery-evidence.test.ts tests/round3-delivery-evidence.test.ts",
+    "exitCode": 1,
+    "observed": "修复语义=纯选项追加（4 文件 7 处调用加 maxBuffer: 64MB，断言/校验零改动）。B-R2 REVIEW-r2 §5 判定 PASS：第 1 轮亲跑 seal 套 52,986 行 grep -c ENOBUFS=0，尾部为完整可分类诊断（违规清单断言 diff+Tests 计数），测试红为真实登记族（seal-coordinate-lag：坐标滞后+工作树未提交 RR2 改动，预期态）。guard 直跑 exit=1 输出完整 ✗ 句+2,799,706B 违规清单；npm run typecheck exit 0。遗留登记：R10-09/round3 生成器重放步 git MAX_APPLY_SIZE（patch too large）由 B-r2 分类器形态演化登记处置（登记红不转正式绿），生成器属 artifacts/f1-f12-repair/ 受审材料未修。",
+    "evidence": [
+     "artifacts/rust-tauri/R05/RR2/B-R2/R2/REVIEW-r2.md",
+     "artifacts/rust-tauri/R05/RR2/F44/f44-three-suite-run.log",
+     "artifacts/rust-tauri/R05/RR2/F44/guard-direct-shape.log",
+     "artifacts/rust-tauri/R05/RR2/F44/f44-typecheck.log"
+    ],
+    "linkedCaseIds": []
+   },
+   {
+    "fId": "G",
+    "title": "I01–I11 映射与负测门禁（G-INT/G-NEG）",
+    "command": "bash scripts/rust-tauri/r05_t08_negative_gate.sh /private/tmp/r05-rr2-g/negative-ev + 6 项 RR2 新增反例手工注入（隔离副本）",
+    "exitCode": 0,
+    "observed": "G-INT：I01–I11 全 PASS（I-MAPPING.md 一行结论表；有效运行锚点=D-R2 绿窗+E/C/A REVIEW+s5-full-5+RR1 F27 原始序列），无新 F-ID；唯一注记=存档资源序列来自 RR1 独立运行（RR2 未改 r05_t08_resources.rs 且于绿窗全绿复验，最终冻结 verify-stage 重产序列）。G-NEG：原 16 项 16/16 fail-closed 且点名（case-results.json allRefused=true/controlsGreen=true）；RR2 新增反例 6/6（F41/F34/F31/F42-N1/F42-illegal/F44 各一次红→还原绿）。两条非缺陷事实登记：N03 锚点过期（7→24，仅隔离副本等效补 24→23，负测脚本维护债）；/tmp 符号链接被 verify-stage 绑定围栏拒=设计行为。待 FINAL-01 终审复核。",
+    "evidence": [
+     "artifacts/rust-tauri/R05/RR2/G-R2/I-MAPPING.md",
+     "artifacts/rust-tauri/R05/RR2/G-R2/NEG-GATE-RR2.md",
+     "artifacts/rust-tauri/R05/RR2/G-R2/negative-ev/"
+    ],
+    "linkedCaseIds": [
+     "R05-T08-C10"
+    ]
+   }
+  ],
+  "resource_accounting_note": "资源原始记录=160 混合轮（60 预算取消+60 错误+40 其他；40 其他=15 正常+10 长响应+15 worker）。恢复前 active≠已终结（dangling active 行待重启 recovery 消解，provider 零重执行），重启已消解≠永久泄漏（post-restart RSS 28.5MiB/FD 15 稳态）。原始序列：artifacts/rust-tauri/R05/RR1/INDEPENDENT-9/verify-R05/R05_SUITES/f27-resource-series.json（load cancelCycles=60/errorCycles=60/okCycles=15/longResponseCycles=10/workerCycles=15、stubDroppedConnections=60）。",
+  "three_appended_c_rows": {
+   "R05-T05-C11B": "INDEPENDENT_PASS（闭证=RR1 矩阵 F14/F15/F16 independentReview；RR2 改动未触及 egress.rs，绿窗内复验）",
+   "R05-T05-C13": "INDEPENDENT_PASS（闭证=RR1 矩阵 F08/F10/F14/F35 independentReview；RR2 改动未触及 compat.rs/golden 输入，绿窗内复验）",
+   "R05-T06-C11B": "INDEPENDENT_PASS（闭证=D-R2 workspace-green-window-REVIEW-r1.log 完整 exit 0+REVIEW-r1.md；command:rust_test_workspace 绑定自此指向有效执行）"
+  }
+ }
 }

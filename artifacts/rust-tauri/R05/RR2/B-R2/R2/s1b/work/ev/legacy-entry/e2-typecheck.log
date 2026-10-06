@@ -1,0 +1,5 @@
+
+> lingxi@0.1.43 typecheck
+> tsc --noEmit && tsc --noEmit -p tsconfig.node.json && tsc --noEmit -p tsconfig.test.json
+
+sh: line 1:  2808 Killed: 9               tsc --noEmit

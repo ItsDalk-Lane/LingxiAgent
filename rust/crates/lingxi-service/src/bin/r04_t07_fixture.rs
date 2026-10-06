@@ -140,6 +140,32 @@ fn worker(mode: &str, extra: &str) {
                 }],
             }));
         }
+        // R05 RR2 F43 (f24 reclamation leg): the callback's purpose MUST be
+        // a real host-mapped auxiliary slot ("summarize") — a runtime nonce
+        // as purpose is refused by the host's purpose→slot mapping (C09),
+        // so the worker would never reach its parked callback wait. The
+        // UNIQUE tag rides `extra` (argv) for exact process identification
+        // and the prompt, never the purpose.
+        "ask_model_tagged" => {
+            send_line(&serde_json::json!({
+                "kind": "callback", "cb_id": "cb-1", "op": "model.complete",
+                "purpose": "summarize",
+                "prompt": format!("Summarize the granted input. (tag {extra})"),
+                "max_output_tokens": 64,
+            }));
+            let reply = read_line_stdin();
+            send_line(&serde_json::json!({
+                "kind": "result", "id": request["id"], "ok": true,
+                "content": [{
+                    "type": "text",
+                    "text": serde_json::to_string(&serde_json::json!({
+                        "request_id": request["id"],
+                        "reply": reply,
+                    }))
+                    .expect("serializes"),
+                }],
+            }));
+        }
         // R05-T06 (C08): one callback whose output-token ask is far over
         // the host cap — the host must refuse it BEFORE any provider
         // contact.

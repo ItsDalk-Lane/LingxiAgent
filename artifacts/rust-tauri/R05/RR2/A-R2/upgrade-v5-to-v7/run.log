@@ -1,0 +1,13 @@
+V5_HOME=/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T//lingxi-rr2a-v5-S9sgt1
+v5 base built: user_version=5 receipts=5 usage_rows=2
+PASS v5 base built (V1..V5 SQL verbatim from migrations.rs, receipts + user_version=5, 2 usage rows)
+Error in 2nd command line argument: NOT NULL constraint failed: model_call_usage.transport_attempts
+PASS v5 refuses NULL transport_attempts (NOT NULL constraint enforced pre-v7)
+PASS service opened the v5 db and became ready (v6+v7 applied at open)
+post-upgrade: userVersion=7, 7 receipts == compiledIn
+PASS post-upgrade userVersion=7, receipts==compiledIn (7)
+data intact: both rows preserved verbatim; v6 defaults outcome='unknown', ts/lineage NULL
+PASS usage data intact across v5->v6->v7 (values verbatim, v6 defaults honest)
+PASS v7 accepts NULL transport_attempts (dropped-call unknown)
+PASS observed=1 kept; unknown=NULL kept (not 0, not 1)
+RESULT: v5(non-empty usage) -> v7 upgrade ALL GREEN

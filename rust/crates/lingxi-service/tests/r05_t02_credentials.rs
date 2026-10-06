@@ -3744,7 +3744,9 @@ mod rr1_f04 {
     }
 
     /// LA-CFEC64F68DDE: the model ids of a specified OAuth provider; a
-    /// non-OAuth provider is EXPLICITLY rejected; an unknown provider 404s.
+    /// non-OAuth provider's listing is the ORIGINAL leaf boundary (R05
+    /// RR2 F31): a 404 with the same minimal body as an unknown provider,
+    /// no credential-state disclosure, zero writes.
     #[tokio::test]
     async fn rr1_f04_oauth_model_listing_and_non_oauth_rejection() {
         let stub = StubServer::start(vec![
@@ -3823,7 +3825,12 @@ mod rr1_f04 {
         );
         assert_eq!(models.len(), 2, "deduplicated union: {models:?}");
 
-        // A NON-OAuth provider is explicitly rejected (not an empty list).
+        // R05 RR2 F31 (LA-CFEC64F68DDE's ORIGINAL boundary restored on the
+        // listing face): a KNOWN non-OAuth provider is a 404 with the SAME
+        // minimal body as an unknown provider — no credential-kind
+        // disclosure, no secret, and ZERO credential writes.
+        let store_before =
+            std::fs::read(boot.runtime_dir.join("credentials.json")).expect("store after login");
         let (status, body) = http_json_request(
             management.addr,
             "GET",
@@ -3833,16 +3840,24 @@ mod rr1_f04 {
         )
         .await;
         assert_eq!(
-            status, 409,
-            "non-OAuth providers are explicitly rejected: {body}"
+            status, 404,
+            "a non-OAuth provider's OAuth model listing is the leaf-mandated 404: {body}"
+        );
+        let rejection = body.to_string();
+        let rejection_lower = rejection.to_lowercase();
+        assert!(
+            !rejection_lower.contains("apikey") && !rejection_lower.contains("authheader"),
+            "the 404 must not disclose the provider's credential kind: {rejection}"
         );
         assert!(
-            body.to_string().to_lowercase().contains("oauth"),
-            "the rejection names the OAuth-only rule: {body}"
+            !rejection.contains("sk-rr1-f04-aux"),
+            "the 404 must not leak the provider's secret: {rejection}"
         );
 
-        // An unknown provider is a 404.
-        let (status, _) = http_json_request(
+        // An unknown provider is the same minimal 404 — one body shape,
+        // no oracle distinguishing "known non-OAuth" from "unknown"
+        // (modulo the per-request requestId correlation id).
+        let (status, ghost_body) = http_json_request(
             management.addr,
             "GET",
             "/lingxi/v1/models/oauth/ghost/models",
@@ -3851,6 +3866,25 @@ mod rr1_f04 {
         )
         .await;
         assert_eq!(status, 404);
+        let strip_request_id = |mut value: serde_json::Value| {
+            if let Some(details) = value["details"].as_object_mut() {
+                details.remove("requestId");
+            }
+            value
+        };
+        assert_eq!(
+            strip_request_id(body),
+            strip_request_id(ghost_body),
+            "known non-OAuth and unknown providers share ONE minimal 404 body"
+        );
+
+        // Both refused listings wrote NOTHING to the credential store.
+        let store_after =
+            std::fs::read(boot.runtime_dir.join("credentials.json")).expect("store still there");
+        assert_eq!(
+            store_before, store_after,
+            "the refused listings change nothing on disk"
+        );
 
         management.stop().await;
         stub.stop().await;

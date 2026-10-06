@@ -27,3 +27,10 @@
   `rr1_f04::rr1_f04_oauth_model_listing_and_non_oauth_rejection`（该测试同时断言已知非 OAuth 409+oauth_only_surface 与未知 provider 404），
   即采用登记的处理指令前一种合法形态——语义等价类"明确拒绝"由具名测试钉住，且该叶在阶段图（R05.json full_original_behavior 叶的
   evidenceRequired）与本文档双向携带偏差说明。R00 叶文本未被修改，断言未放宽，未按 404 误杀实现。
+- 2026-10-06 **状态变更：偏差（就列表而言）已消除**（RR2 WP-E，按 `RR2_MASTER_PROMPT_2026-10-06.md` §四E / F31 执行）：
+  GET `/lingxi/v1/models/oauth/{provider}/models` 对**已知非 OAuth provider 恢复为 404**（与未知 provider 同一最小 body：
+  reason=`model_provider_unknown`，不披露凭证类型/不泄露 provider 存在性差异，零凭证写入），与原 R00 叶文本逐字对齐。
+  钉住测试 `rr1_f04_oauth_model_listing_and_non_oauth_rejection` 同步改为：非 OAuth 列表=404（含零披露/零写入断言）、未知=404（两 body 除
+  requestId 外逐字一致）、合法 OAuth 列表=200+去重并集清单。**其他 OAuth 面接口（login/callback/poll/logout/add/remove model）维持
+  409+oauth_only_surface 不变**——本条目登记的偏差范围自即日起仅覆盖那些非列表接口；其偏差登记原文上方保留，作为历史记录与后续重推导的
+  依据。阶段图 `rust/crates/xtask/src/stage_maps/R05.json` 该叶 evidenceRequired 的偏差说明已最小同步。R00 叶文本仍未被修改。

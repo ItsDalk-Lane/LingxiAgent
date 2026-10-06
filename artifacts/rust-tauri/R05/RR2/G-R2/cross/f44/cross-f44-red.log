@@ -1,0 +1,29 @@
+
+ RUN  v4.1.10 /private/tmp/r05-rr2-g/repo
+
+ ❯ tests/post-verification-audit-seal.test.ts (3 tests | 1 failed) 124ms
+     ✓ VERIFIED_SOURCE_SHA is a valid 40-hex commit object in this repo 64ms
+     × changes since VERIFIED_SOURCE_SHA are audit-only (allowlist enforced) 59ms
+     ✓ the audit-seal test and generator are both present for the guard to be self-consistent 0ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  tests/post-verification-audit-seal.test.ts > post-verification audit seal (diff guard) > changes since VERIFIED_SOURCE_SHA are audit-only (allowlist enforced)
+Error: spawnSync git ENOBUFS
+ ❯ diffNamesSinceVerified tests/post-verification-audit-seal.test.ts:84:15
+     82|   // execFileSync 数组传参（不经 shell）：execSync 在 Windows 走 cmd.exe，
+     83|   // rev-parse 的 `^{commit}` 里 ^ 是 cmd 转义符会被吞掉，导致坐标误判为不可达。
+     84|   const out = execFileSync(
+       |               ^
+     85|     "git",
+     86|     ["diff", "--name-only", `${sha}..HEAD`],
+ ❯ tests/post-verification-audit-seal.test.ts:103:21
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  1 failed | 2 passed (3)
+   Start at  21:58:41
+   Duration  227ms (transform 25ms, setup 20ms, import 7ms, tests 124ms, environment 0ms)
+

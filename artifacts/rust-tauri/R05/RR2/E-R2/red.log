@@ -1,0 +1,24 @@
+   Compiling lingxi-service v0.0.0 (/private/tmp/r05-rr2-e-mut/candidate/rust/crates/lingxi-service)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 14.89s
+     Running tests/r05_t02_credentials.rs (target/debug/deps/r05_t02_credentials-a004bc935b5b00b8)
+
+running 1 test
+test rr1_f04::rr1_f04_oauth_model_listing_and_non_oauth_rejection ... FAILED
+
+failures:
+
+---- rr1_f04::rr1_f04_oauth_model_listing_and_non_oauth_rejection stdout ----
+
+thread 'rr1_f04::rr1_f04_oauth_model_listing_and_non_oauth_rejection' (18290209) panicked at crates/lingxi-service/tests/r05_t02_credentials.rs:3842:9:
+assertion `left == right` failed: a non-OAuth provider's OAuth model listing is the leaf-mandated 404: {"code":"invalid_message","details":{"causeId":"models.oauth_only_surface","reason":"oauth_only_surface","requestId":"req-e53c616eb9bdb4d37058e11803fe813c"},"message":"oauth-only surface refused: provider \"aux\" uses auth kind \"apiKey\"; this surface serves OAuth providers only (explicit rejection, never a fallback)","retryable":false}
+  left: 409
+ right: 404
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+
+
+failures:
+    rr1_f04::rr1_f04_oauth_model_listing_and_non_oauth_rejection
+
+test result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 37 filtered out; finished in 0.13s
+
+error: test failed, to rerun pass `-p lingxi-service --test r05_t02_credentials`

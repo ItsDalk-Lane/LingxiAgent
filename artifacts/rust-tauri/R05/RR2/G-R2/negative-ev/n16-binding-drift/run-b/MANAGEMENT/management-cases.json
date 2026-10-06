@@ -1,0 +1,764 @@
+{
+  "cases": [
+    {
+      "actual": 1,
+      "case": "management-me-denied-no-state-change",
+      "expect": 1,
+      "observed": {
+        "stateUnchanged": true,
+        "status": 401
+      },
+      "ok": true
+    },
+    {
+      "actual": 1,
+      "case": "management-me-owner-version-identity-capabilities",
+      "expect": 1,
+      "observed": {
+        "kind": "local_user",
+        "projectionMatchesScopes": true,
+        "status": 200
+      },
+      "ok": true
+    },
+    {
+      "actual": 1,
+      "case": "management-me-forged-header-ignored",
+      "expect": 1,
+      "observed": {
+        "forgedPrincipalEchoed": false,
+        "status": 200
+      },
+      "ok": true
+    },
+    {
+      "actual": 1,
+      "case": "management-summary-initial-real-state",
+      "expect": 1,
+      "observed": {
+        "emptyDevices": true,
+        "status": 200
+      },
+      "ok": true
+    },
+    {
+      "actual": 1,
+      "case": "management-summary-unauthorized-no-state-change",
+      "expect": 1,
+      "observed": {
+        "stateUnchanged": true,
+        "status": 401
+      },
+      "ok": true
+    },
+    {
+      "actual": 1,
+      "case": "management-summary-registry-failure-not-empty",
+      "expect": 1,
+      "observed": {
+        "falseEmpty": false,
+        "stateUnchanged": true,
+        "status": 500
+      },
+      "ok": true
+    },
+    {
+      "actual": 1,
+      "case": "management-device-list-registry-failure-not-empty",
+      "expect": 1,
+      "observed": {
+        "falseEmpty": false,
+        "stateUnchanged": true,
+        "status": 500
+      },
+      "ok": true
+    },
+    {
+      "actual": 1,
+      "case": "management-profile-success-account-audit",
+      "expect": 1,
+      "observed": {
+        "accountAndAuditPersisted": true,
+        "status": 200
+      },
+      "ok": true
+    },
+    {
+      "actual": 1,
+      "case": "management-profile-invalid-and-unauthorized-unchanged",
+      "expect": 1,
+      "observed": {
+        "invalid": 400,
+        "stateUnchanged": true,
+        "unauthorized": 401
+      },
+      "ok": true
+    },
+    {
+      "actual": 1,
+      "case": "management-network-success-summary-audit",
+      "expect": 1,
+      "observed": {
+        "persisted": true,
+        "restartRequired": true,
+        "status": 200
+      },
+      "ok": true
+    },
+    {
+      "actual": 1,
+      "case": "management-network-invalid-and-unauthorized-unchanged",
+      "expect": 1,
+      "observed": {
+        "invalid": 400,
+        "stateUnchanged": true,
+        "unauthorized": 401
+      },
+      "ok": true
+    },
+    {
+      "actual": 1,
+      "case": "management-mobile-qr-svg-present",
+      "expect": 1,
+      "observed": {
+        "modulesEncodeExactMobileUrl": true,
+        "status": 200,
+        "svg": true
+      },
+      "ok": true
+    },
+    {
+      "actual": 1,
+      "case": "management-mobile-qr-unauthorized-no-svg",
+      "expect": 1,
+      "observed": {
+        "status": 401,
+        "svgDisclosed": false
+      },
+      "ok": true
+    },
+    {
+      "actual": 1,
+      "case": "management-mobile-qr-lan-unavailable-refused",
+      "expect": 1,
+      "observed": {
+        "reason": "lan_address_unavailable",
+        "status": 400
+      },
+      "ok": true
+    },
+    {
+      "actual": 1,
+      "case": "management-password-set-account-audit",
+      "expect": 1,
+      "observed": {
+        "passwordHashPersisted": true,
+        "status": 200
+      },
+      "ok": true
+    },
+    {
+      "actual": 1,
+      "case": "management-password-invalid-keeps-prior",
+      "expect": 1,
+      "observed": {
+        "invalid": 400,
+        "stateUnchanged": true,
+        "unauthorized": 401
+      },
+      "ok": true
+    },
+    {
+      "actual": 1,
+      "case": "management-profile-store-failure-unchanged",
+      "expect": 1,
+      "observed": {
+        "diskAndLiveStateUnchanged": true,
+        "status": 500
+      },
+      "ok": true
+    },
+    {
+      "actual": 1,
+      "case": "management-network-store-failure-unchanged",
+      "expect": 1,
+      "observed": {
+        "diskAndLiveStateUnchanged": true,
+        "status": 500
+      },
+      "ok": true
+    },
+    {
+      "actual": 1,
+      "case": "management-password-set-store-failure-unchanged",
+      "expect": 1,
+      "observed": {
+        "diskAndLiveStateUnchanged": true,
+        "status": 500
+      },
+      "ok": true
+    },
+    {
+      "actual": 1,
+      "case": "management-password-clear-store-failure-unchanged",
+      "expect": 1,
+      "observed": {
+        "diskAndLiveStateUnchanged": true,
+        "status": 500
+      },
+      "ok": true
+    },
+    {
+      "actual": 1,
+      "case": "management-password-clear-account-audit",
+      "expect": 1,
+      "observed": {
+        "passwordRemoved": true,
+        "status": 200
+      },
+      "ok": true
+    },
+    {
+      "actual": 1,
+      "case": "management-password-clear-unauthorized-keeps-prior",
+      "expect": 1,
+      "observed": {
+        "stateUnchanged": true,
+        "status": 401
+      },
+      "ok": true
+    },
+    {
+      "actual": 1,
+      "case": "management-mobile-credential-store-failure-no-secret",
+      "expect": 1,
+      "observed": {
+        "registriesUnchanged": true,
+        "secretAbsent": true,
+        "status": 500
+      },
+      "ok": true
+    },
+    {
+      "actual": 1,
+      "case": "management-desktop-credential-store-failure-no-secret",
+      "expect": 1,
+      "observed": {
+        "registriesUnchanged": true,
+        "secretAbsent": true,
+        "status": 500
+      },
+      "ok": true
+    },
+    {
+      "actual": 1,
+      "case": "management-mobile-credential-secret-address-audit",
+      "expect": 1,
+      "observed": {
+        "accessUrl": "https://r02.example.invalid/mobile/",
+        "persistedWithoutPlainSecret": true,
+        "secretOneTime": true,
+        "status": 200
+      },
+      "ok": true
+    },
+    {
+      "actual": 1,
+      "case": "management-me-device-version-identity-capabilities",
+      "expect": 1,
+      "observed": {
+        "kind": "device",
+        "projectionMatchesScopes": true,
+        "status": 200
+      },
+      "ok": true
+    },
+    {
+      "actual": 1,
+      "case": "management-desktop-credential-secret-address-audit",
+      "expect": 1,
+      "observed": {
+        "accessUrl": "https://r02.example.invalid/desktop/",
+        "persistedWithoutPlainSecret": true,
+        "secretOneTime": true,
+        "status": 200
+      },
+      "ok": true
+    },
+    {
+      "actual": 1,
+      "case": "management-mobile-credential-invalid-unauthorized-unchanged",
+      "expect": 1,
+      "observed": {
+        "invalid": 400,
+        "registriesUnchanged": true,
+        "unauthorized": 401
+      },
+      "ok": true
+    },
+    {
+      "actual": 1,
+      "case": "management-desktop-credential-invalid-unauthorized-unchanged",
+      "expect": 1,
+      "observed": {
+        "invalid": 400,
+        "registriesUnchanged": true,
+        "unauthorized": 401
+      },
+      "ok": true
+    },
+    {
+      "actual": 1,
+      "case": "management-summary-populated-matches-stores",
+      "expect": 1,
+      "observed": {
+        "accountNetworkDevicesCredentialsMatch": true,
+        "status": 200
+      },
+      "ok": true
+    },
+    {
+      "actual": 1,
+      "case": "management-device-list-redacts-secrets",
+      "expect": 1,
+      "observed": {
+        "credentials": 2,
+        "devices": 2,
+        "secretsAbsent": true,
+        "status": 200
+      },
+      "ok": true
+    },
+    {
+      "actual": 1,
+      "case": "management-device-list-unauthorized-refused",
+      "expect": 1,
+      "observed": {
+        "status": 401
+      },
+      "ok": true
+    },
+    {
+      "actual": 1,
+      "case": "management-credential-revoke-store-failure-target-still-active",
+      "expect": 1,
+      "observed": {
+        "registriesUnchanged": true,
+        "status": 500
+      },
+      "ok": true
+    },
+    {
+      "actual": 1,
+      "case": "management-credential-revoke-target-only",
+      "expect": 1,
+      "observed": {
+        "exactAudit": true,
+        "otherCredentialAccepted": true,
+        "revokedCredentialRejected": true,
+        "status": 200
+      },
+      "ok": true
+    },
+    {
+      "actual": 1,
+      "case": "management-credential-revoke-missing-no-side-effect",
+      "expect": 1,
+      "observed": {
+        "missing": 404,
+        "registriesUnchanged": true,
+        "unauthorized": 401
+      },
+      "ok": true
+    },
+    {
+      "actual": 1,
+      "case": "management-device-revoke-store-failure-target-still-active",
+      "expect": 1,
+      "observed": {
+        "registriesUnchanged": true,
+        "status": 500
+      },
+      "ok": true
+    },
+    {
+      "actual": 1,
+      "case": "management-device-revoke-target-auth-rejected",
+      "expect": 1,
+      "observed": {
+        "exactAudit": true,
+        "otherDeviceUnaffected": true,
+        "revokedDeviceCredentialRejected": true,
+        "status": 200
+      },
+      "ok": true
+    },
+    {
+      "actual": 1,
+      "case": "management-device-revoke-missing-no-side-effect",
+      "expect": 1,
+      "observed": {
+        "missing": 404,
+        "registriesUnchanged": true,
+        "unauthorized": 401
+      },
+      "ok": true
+    },
+    {
+      "actual": 1,
+      "case": "management-pairing-create-invalid-unauthorized-unchanged",
+      "expect": 1,
+      "observed": {
+        "invalid": 400,
+        "registriesUnchanged": true,
+        "unauthorized": 401
+      },
+      "ok": true
+    },
+    {
+      "actual": 1,
+      "case": "management-pairing-create-store-failure-no-code",
+      "expect": 1,
+      "observed": {
+        "codeAbsent": true,
+        "registriesUnchanged": true,
+        "status": 500
+      },
+      "ok": true
+    },
+    {
+      "actual": 1,
+      "case": "management-device-list-includes-pending-pairing-redacted",
+      "expect": 1,
+      "observed": {
+        "pendingPairingVisible": true,
+        "status": 200,
+        "userCodeAbsent": true
+      },
+      "ok": true
+    },
+    {
+      "actual": 1,
+      "case": "management-pairing-create-code-expiry-audit",
+      "expect": 1,
+      "observed": {
+        "exactAudit": true,
+        "expiryMs": 1791299295128,
+        "oneTimeCodeNotStored": true,
+        "pendingPersisted": true,
+        "status": 200
+      },
+      "ok": true
+    },
+    {
+      "actual": 1,
+      "case": "management-pairing-approve-wrong-code-scope-auth-unchanged",
+      "expect": 1,
+      "observed": {
+        "invalidScope": 400,
+        "registriesUnchanged": true,
+        "unauthorized": 401,
+        "wrongCode": 403
+      },
+      "ok": true
+    },
+    {
+      "actual": 1,
+      "case": "management-pairing-approve-store-failure-still-pending",
+      "expect": 1,
+      "observed": {
+        "registriesUnchanged": true,
+        "secretAbsent": true,
+        "status": 500
+      },
+      "ok": true
+    },
+    {
+      "actual": 1,
+      "case": "management-pairing-approve-once-scope-secret-audit",
+      "expect": 1,
+      "observed": {
+        "approvedPersisted": true,
+        "credentialAuthenticates": true,
+        "exactAudit": true,
+        "scopeExact": true,
+        "secretNotStored": true,
+        "status": 200
+      },
+      "ok": true
+    },
+    {
+      "actual": 1,
+      "case": "management-pairing-replay-does-not-sign",
+      "expect": 1,
+      "observed": {
+        "registriesUnchanged": true,
+        "status": 400
+      },
+      "ok": true
+    },
+    {
+      "actual": 1,
+      "case": "management-pairing-concurrent-only-one-credential",
+      "expect": 1,
+      "observed": {
+        "newApproveAudit": 1,
+        "newCredentials": 1,
+        "statuses": [
+          200,
+          400
+        ]
+      },
+      "ok": true
+    },
+    {
+      "actual": 1,
+      "case": "management-web-login-password-cookie-14day-desktop-scope",
+      "expect": 1,
+      "observed": {
+        "desktopWriteScope": true,
+        "expiresAtUnixMs": 1792508595128,
+        "httpOnly": true,
+        "maxAgeSeconds": 1209600,
+        "status": 200,
+        "storedWithoutPlainCookie": true
+      },
+      "ok": true
+    },
+    {
+      "actual": 1,
+      "case": "management-web-login-credential-priority-denies-invalid-token",
+      "expect": 1,
+      "observed": {
+        "sessionStoreUnchanged": true,
+        "status": 403
+      },
+      "ok": true
+    },
+    {
+      "actual": 1,
+      "case": "management-web-session-valid-sanitized",
+      "expect": 1,
+      "observed": {
+        "authenticated": true,
+        "connectionKind": "local",
+        "cookieSecretAbsent": true,
+        "desktopWriteScope": true,
+        "status": 200,
+        "storeUnchanged": true
+      },
+      "ok": true
+    },
+    {
+      "actual": 1,
+      "case": "management-web-session-invalid-false",
+      "expect": 1,
+      "observed": {
+        "authenticated": false,
+        "principal": null,
+        "status": 200,
+        "storeUnchanged": true
+      },
+      "ok": true
+    },
+    {
+      "actual": 1,
+      "case": "management-web-login-mobile-scope-restricted",
+      "expect": 1,
+      "observed": {
+        "noSettingsWrite": true,
+        "status": 200
+      },
+      "ok": true
+    },
+    {
+      "actual": 1,
+      "case": "management-web-session-mobile-scope-no-write",
+      "expect": 1,
+      "observed": {
+        "connectionKind": "local",
+        "cookieSecretAbsent": true,
+        "credentialKind": "web_session",
+        "settingsWrite": false,
+        "status": 200,
+        "storeUnchanged": true
+      },
+      "ok": true
+    },
+    {
+      "actual": 1,
+      "case": "management-web-login-store-failure-no-session",
+      "expect": 1,
+      "observed": {
+        "cookieIssued": false,
+        "status": 500,
+        "storeUnchanged": true
+      },
+      "ok": true
+    },
+    {
+      "actual": 1,
+      "case": "management-web-logout-store-failure-session-alive",
+      "expect": 1,
+      "observed": {
+        "sessionStillValid": true,
+        "status": 500,
+        "storeUnchanged": true
+      },
+      "ok": true
+    },
+    {
+      "actual": 1,
+      "case": "management-web-logout-only-current-cookie",
+      "expect": 1,
+      "observed": {
+        "clearedCookie": true,
+        "currentRevoked": true,
+        "otherSessionAlive": true,
+        "status": 200
+      },
+      "ok": true
+    },
+    {
+      "actual": 1,
+      "case": "management-web-logout-invalid-cookie-no-other-revoke",
+      "expect": 1,
+      "observed": {
+        "otherSessionAlive": true,
+        "status": 200,
+        "storeUnchanged": true
+      },
+      "ok": true
+    },
+    {
+      "actual": 1,
+      "case": "management-web-session-expired-false",
+      "expect": 1,
+      "observed": {
+        "advancedClockMs": 1209600001,
+        "authenticated": false,
+        "principal": null,
+        "status": 200,
+        "storeUnchangedAfterRead": true
+      },
+      "ok": true
+    },
+    {
+      "actual": 1,
+      "case": "management-pairing-expired-code-does-not-sign",
+      "expect": 1,
+      "observed": {
+        "credentialStoreUnchanged": true,
+        "pairingMarkedExpired": true,
+        "status": 400
+      },
+      "ok": true
+    },
+    {
+      "actual": 1,
+      "case": "management-standard-audit-path-failure-no-write-recovery",
+      "expect": 1,
+      "observed": {
+        "auditUnchanged": true,
+        "deviceStatus": 500,
+        "managementStatus": 500,
+        "managementUnchanged": true,
+        "noSecretOnFailure": true,
+        "recoveredStatus": 200,
+        "registryUnchanged": true
+      },
+      "ok": true
+    },
+    {
+      "actual": 1,
+      "case": "management-standard-audit-all-actions-identities-no-secrets",
+      "expect": 1,
+      "observed": {
+        "eventIdsUnique": true,
+        "projectionExact": true,
+        "secretsAbsent": true,
+        "sourceIntentCount": 17
+      },
+      "ok": true
+    },
+    {
+      "actual": 1,
+      "case": "management-network-saved-restart-real-bind-no-audit-duplicate",
+      "expect": 1,
+      "observed": {
+        "actualPort": 60724,
+        "auditUnchanged": true,
+        "savedPort": 60724,
+        "summaryPort": 60724
+      },
+      "ok": true
+    },
+    {
+      "actual": 1,
+      "case": "management-network-cli-override-real-bind",
+      "expect": 1,
+      "observed": {
+        "actualPort": 60727,
+        "savedPort": 60724,
+        "savedPortOccupied": true
+      },
+      "ok": true
+    },
+    {
+      "actual": 1,
+      "case": "management-network-corrupt-saved-settings-refused",
+      "expect": 1,
+      "observed": {
+        "explicitError": "saved network configuration invalid: management state invalid: EOF while parsing an object at line 1 column 1",
+        "storedBytesUnchanged": true
+      },
+      "ok": true
+    },
+    {
+      "actual": 1,
+      "case": "management-web-login-token-positive-14day-mobile-scope",
+      "expect": 1,
+      "observed": {
+        "credentialTransport": "token",
+        "expiresAtUnixMs": 1792508595128,
+        "httpOnly": true,
+        "maxAgeSeconds": 1209600,
+        "mobileSettingsWrite": false,
+        "status": 200
+      },
+      "ok": true
+    },
+    {
+      "actual": 1,
+      "case": "management-web-session-connection-mismatch-false",
+      "expect": 1,
+      "observed": {
+        "cookieSecretAbsent": true,
+        "lanConnectionKind": "lan",
+        "loopbackAuthenticated": false,
+        "mobileSettingsWrite": false,
+        "principal": null,
+        "storeUnchanged": true
+      },
+      "ok": true
+    },
+    {
+      "actual": 1,
+      "case": "management-lan-browser-origin-login-session-logout",
+      "expect": 1,
+      "observed": {
+        "foreignStateUnchanged": true,
+        "foreignStatus": 403,
+        "loginStatus": 200,
+        "logoutStatus": 200,
+        "origin": "http://192.168.3.5:60729",
+        "preflightStatus": 204,
+        "revokedSessionAuthenticated": false,
+        "sessionAuthenticated": true,
+        "wrongSchemeStatus": 403
+      },
+      "ok": true
+    }
+  ],
+  "schema": "lingxi.leaf-case-results.v1"
+}

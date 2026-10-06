@@ -1,0 +1,18 @@
+== classifier-evolution replay: r03-g01f01-replay ==
+log: /Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R03/STAGE-REPAIR-G01-F01/verify-stage-r02/A16/legacy-entry/e5-candidate-npm-test.log
+script: scripts/rust-tauri/r02_t08_legacy_entry_regression.sh (working tree)
+
+== per-file classes (union of per-block verdicts) ==
+tests/post-verification-audit-seal.test.ts	seal-coordinate-lag
+tests/round2-delivery-evidence.test.ts	seal-coordinate-lag,uncommitted-source-rejection
+tests/round3-delivery-evidence.test.ts	seal-coordinate-lag
+
+== per-block classes ==
+block 1  tests/post-verification-audit-seal.test.ts    classes=[seal-coordinate-lag]  first-payload: AssertionError: VERIFIED_SOURCE_SHA 之后出现了非审计文件改动（禁止修改生产代码/测试逻辑/runtime artifacts）:
+block 2  tests/round2-delivery-evidence.test.ts        classes=[seal-coordinate-lag]  first-payload: Error: Command failed: node /private/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/r02-a
+block 3  tests/round2-delivery-evidence.test.ts        classes=[seal-coordinate-lag]  first-payload: Error: Command failed: node /private/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/r02-a
+block 4  tests/round2-delivery-evidence.test.ts        classes=[seal-coordinate-lag,uncommitted-source-rejection]  first-payload: Error: Command failed: python3 /private/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/r0
+block 5  tests/round3-delivery-evidence.test.ts        classes=[seal-coordinate-lag]  first-payload: Error: Command failed: node /private/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/r02-a
+block 6  tests/round3-delivery-evidence.test.ts        classes=[seal-coordinate-lag]  first-payload: Error: Command failed: python3 /private/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/r0
+
+OVERALL: only registered-class failures (seal-coordinate-lag / uncommitted-source-rejection) — classified governance state, NOT fail-closed

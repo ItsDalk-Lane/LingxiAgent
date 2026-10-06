@@ -1,0 +1,151 @@
+{
+  "caseId": "R05-T08-C12",
+  "cleanup": {
+    "serviceStopped": true
+  },
+  "environment": {
+    "arch": "aarch64",
+    "binary": "CARGO_BIN_EXE_lingxi-service (debug)",
+    "os": "macos",
+    "stubDroppedConnections": 60,
+    "stubHits": 323
+  },
+  "load": {
+    "cancelCycles": 60,
+    "cancelDanglingActive": 60,
+    "cancelSettled": 0,
+    "errorCycles": 60,
+    "errorRuns": 60,
+    "longResponseCycles": 10,
+    "okCycles": 15,
+    "sessions": [
+      "sess_local_alpha",
+      "sess_local_beta"
+    ],
+    "workerCycles": 15
+  },
+  "sampler": {
+    "controls": "f27_sampler_controls_detect_growth_release_and_failure (+3 exact, release fails loudly, dead/bogus pid errors)",
+    "fds": "lsof -p PID -F fn (f<digits> records; p-record identity checked; exit status checked)",
+    "rss": "ps -o rss= -p PID (exit status + numeric output checked)"
+  },
+  "schema": "lingxi.r05-f27-resource-series.v1",
+  "series": [
+    {
+      "fds": 15,
+      "phase": "baseline",
+      "rssKiB": 27296,
+      "tMs": 65
+    },
+    {
+      "fds": 15,
+      "phase": "cancel",
+      "rssKiB": 27488,
+      "tMs": 35420
+    },
+    {
+      "fds": 15,
+      "phase": "cancel",
+      "rssKiB": 27488,
+      "tMs": 70787
+    },
+    {
+      "fds": 15,
+      "phase": "cancel",
+      "rssKiB": 27552,
+      "tMs": 106161
+    },
+    {
+      "fds": 15,
+      "phase": "cancel",
+      "rssKiB": 27568,
+      "tMs": 141506
+    },
+    {
+      "fds": 15,
+      "phase": "cancel",
+      "rssKiB": 27600,
+      "tMs": 176869
+    },
+    {
+      "fds": 15,
+      "phase": "cancel",
+      "rssKiB": 27632,
+      "tMs": 212210
+    },
+    {
+      "fds": 15,
+      "phase": "error",
+      "rssKiB": 27856,
+      "tMs": 227765
+    },
+    {
+      "fds": 15,
+      "phase": "error",
+      "rssKiB": 27968,
+      "tMs": 243182
+    },
+    {
+      "fds": 15,
+      "phase": "error",
+      "rssKiB": 28032,
+      "tMs": 258588
+    },
+    {
+      "fds": 15,
+      "phase": "error",
+      "rssKiB": 28128,
+      "tMs": 274007
+    },
+    {
+      "fds": 15,
+      "phase": "error",
+      "rssKiB": 28192,
+      "tMs": 289390
+    },
+    {
+      "fds": 15,
+      "phase": "error",
+      "rssKiB": 28320,
+      "tMs": 304802
+    },
+    {
+      "fds": 15,
+      "phase": "ok",
+      "rssKiB": 28384,
+      "tMs": 304873
+    },
+    {
+      "fds": 15,
+      "phase": "ok",
+      "rssKiB": 28432,
+      "tMs": 304950
+    },
+    {
+      "fds": 15,
+      "phase": "ok",
+      "rssKiB": 28480,
+      "tMs": 305020
+    },
+    {
+      "fds": 15,
+      "phase": "worker-final",
+      "rssKiB": 36592,
+      "tMs": 307376
+    },
+    {
+      "fds": 15,
+      "phase": "post-restart",
+      "rssKiB": 29056,
+      "tMs": 307506
+    }
+  ],
+  "thresholds": {
+    "fdBound": 400,
+    "fdGrowthBound": 64,
+    "logFilesBound": 3,
+    "registeredBeforeRun": true,
+    "rssBoundKiB": 409600,
+    "rssGrowthBoundKiB": 153600
+  }
+}

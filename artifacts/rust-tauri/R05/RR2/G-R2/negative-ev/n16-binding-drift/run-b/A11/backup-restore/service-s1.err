@@ -1,0 +1,13 @@
+2026-10-06T14:58:29.214193Z  INFO lingxi_service: data root resolved [token] source=cli ignored_sources=none
+2026-10-06T14:58:29.215727Z  INFO lingxi_service: data root prepared (canonicalized; runtime dir private 0700) [token] [token]
+2026-10-06T14:58:29.216440Z  INFO lingxi_service: single-writer lock acquired [token] start_nonce=96711a87b3a8f64e pid=535 entropy="os-random-device" lock=/private/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-r02t06-bk-0dNoml/lingxi-service/instance.lock network_mode=loopback
+2026-10-06T14:58:29.228468Z  INFO lingxi_service: data-epoch gate passed [token] decision=ProceedStampedNew(EpochStamp { format: V2, minimum_reader_epoch: 1, committed_data_epoch: 1, last_version: Some("0.0.0") })
+2026-10-06T14:58:29.279095Z  INFO lingxi_adapters::storage::run_store: run database migrated db=/private/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-r02t06-bk-0dNoml/lingxi-service/data/runs.db applied=[1, 2, 3, 4, 5, 6, 7] version=7
+2026-10-06T14:58:29.280108Z  INFO lingxi_service: auth service bootstrapped (per-start loopback token, owner-only); run database migrated and seeded local_token_file=/private/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-r02t06-bk-0dNoml/lingxi-service/local-token.json run_database=/private/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-r02t06-bk-0dNoml/lingxi-service/data/runs.db
+2026-10-06T14:58:29.289518Z  INFO lingxi_service: instance record published (atomic write) record=/private/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-r02t06-bk-0dNoml/lingxi-service/instance.json bind_addr=127.0.0.1:57818
+2026-10-06T14:58:29.405101Z  INFO lingxi_service::sessions: run settled through the single finalize path run_id=run_000001a111b9279b_000001 session_id="sess_local_alpha" outcome=completed.no_final.no_provider_configured input_chars=19 input_bytes=19
+2026-10-06T14:58:29.405294Z  INFO lingxi_service: request handled [token] method=POST [token] status=200
+2026-10-06T14:58:29.417071Z  INFO lingxi_service::sessions: run settled through the single finalize path run_id=run_000001a111b927a8_000002 session_id="sess_local_alpha" outcome=completed.no_final.no_provider_configured input_chars=19 input_bytes=19
+2026-10-06T14:58:29.417259Z  INFO lingxi_service: request handled [token] method=POST [token] status=200
+2026-10-06T14:58:29.428026Z  INFO lingxi_service::sessions: run settled through the single finalize path run_id=run_000001a111b927b3_000003 session_id="sess_local_alpha" outcome=completed.no_final.no_provider_configured input_chars=19 input_bytes=19
+2026-10-06T14:58:29.428179Z  INFO lingxi_service: request handled [token] method=POST [token] status=200

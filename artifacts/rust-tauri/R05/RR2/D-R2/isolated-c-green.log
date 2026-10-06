@@ -1,0 +1,20 @@
+   Compiling lingxi-service v0.0.0 (/Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-service)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 34.61s
+     Running tests/r05_t08_production_tools.rs (/Users/study_superior/Desktop/Code/LingxiAgent/rust/target/debug/deps/r05_t08_production_tools-77f8e8539c0a9a3b)
+
+running 1 test
+
+thread 'f24_sigterm_with_parked_callback_reaps_the_worker_child' (18297548) panicked at crates/lingxi-service/tests/r05_t08_production_tools.rs:1243:5:
+graceful shutdown, got exit status: 6
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+test f24_sigterm_with_parked_callback_reaps_the_worker_child ... FAILED
+
+failures:
+
+failures:
+    f24_sigterm_with_parked_callback_reaps_the_worker_child
+
+test result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 5 filtered out; finished in 9.33s
+
+error: test failed, to rerun pass `-p lingxi-service --test r05_t08_production_tools`
+exit=101

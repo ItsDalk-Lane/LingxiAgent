@@ -26,6 +26,12 @@ import { describe, expect, it } from "vitest";
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const VERIFIED_SOURCE_SHA_FILE = path.join(ROOT, ".sync-audit", "verified-source-sha.txt");
 
+// F44（R05 RR2）：RR1 大提交使 VERIFIED_SOURCE_SHA..HEAD 的 name-only 清单
+// （当前 26,481 文件 ≈ 2.6MB）超过 node spawnSync 默认 1MB maxBuffer，git 调用
+// 以 ENOBUFS 崩溃，遮蔽下方断言应产出的违规清单文本（r02_t08 分类器因此
+// fail-closed 于不可识别崩溃形态）。仅抬高缓冲上限，不改变校验语义。
+const GIT_LISTING_MAX_BUFFER = 64 * 1024 * 1024;
+
 // 审计文件 allowlist：VERIFIED_SOURCE_SHA 之后只允许这些文件变化。
 // 若为支持本 guard 本身新增/改名脚本，须同步加入此列表。
 const AUDIT_ALLOWLIST = [
@@ -78,7 +84,7 @@ function diffNamesSinceVerified(): string[] {
   const out = execFileSync(
     "git",
     ["diff", "--name-only", `${sha}..HEAD`],
-    { cwd: ROOT, encoding: "utf-8" },
+    { cwd: ROOT, encoding: "utf-8", maxBuffer: GIT_LISTING_MAX_BUFFER },
   );
   return out.split("\n").map((s) => s.trim()).filter(Boolean);
 }

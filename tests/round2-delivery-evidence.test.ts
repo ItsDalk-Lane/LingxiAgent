@@ -28,6 +28,13 @@ const ROOT = path.resolve(import.meta.dirname, "..");
 const OUT = path.join(ROOT, "artifacts", "f1-f12-repair", "round2");
 const BASE = "89bc0b64bf0a9b84ef3532efaa66c23213affb70";
 
+// F44（R05 RR2）：RR1 大提交后全树名册类子进程输出超过 node spawnSync 默认
+// 1MB maxBuffer（git ls-files ≈ 3.2MB、ls-tree 于 HEAD 坐标 ≈ 3.2MB、diff guard
+// 的 node 形态在被拒路径回吐 ≈ 2.6MB 违规清单），ENOBUFS 崩溃形态会遮蔽
+// manifest 比对应产出的真实差异文本（r02_t08 分类器因此 fail-closed）。
+// 仅抬高缓冲上限，不改变任何断言与校验语义；输出恒小的调用（cat-file -t 等）不动。
+const LARGE_OUTPUT_MAX_BUFFER = 64 * 1024 * 1024;
+
 function bytes(relative: string): Buffer {
   return fs.readFileSync(path.join(OUT, relative));
 }
@@ -48,6 +55,7 @@ function currentSourcePaths(): string[] {
   return execFileSync("git", ["ls-files", "-z", "--cached", "--others", "--exclude-standard"], {
     cwd: ROOT,
     encoding: "utf8",
+    maxBuffer: LARGE_OUTPUT_MAX_BUFFER,
   }).split("\0").filter(Boolean).filter((file) => {
     if (file.startsWith("artifacts/f1-f12-repair/") && !file.endsWith(".py")) return false;
     if (file.endsWith(".patch")) return false;
@@ -59,6 +67,7 @@ function sourcePathsAtCommit(commit: string): string[] {
   return execFileSync("git", ["ls-tree", "-r", "-z", "--name-only", commit], {
     cwd: ROOT,
     encoding: "utf8",
+    maxBuffer: LARGE_OUTPUT_MAX_BUFFER,
   }).split("\0").filter(Boolean).filter((file) => {
     if (file.startsWith("artifacts/f1-f12-repair/") && !file.endsWith(".py")) return false;
     return !file.endsWith(".patch");
@@ -95,6 +104,7 @@ function manifestSourceRef(manifest: any): string | null {
   const guard = execFileSync("node", [path.join(ROOT, ".sync-audit", "verify-post-verification-diff.mjs")], {
     cwd: ROOT,
     encoding: "utf8",
+    maxBuffer: LARGE_OUTPUT_MAX_BUFFER,
   });
   expect(guard).toContain("post-verification diff guard OK");
   return verified;

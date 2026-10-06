@@ -1,0 +1,23 @@
+== run 2026-10-06T17:56:59+0800 (pid 94001) ==
+== R02-T08 / R02-A16 legacy-entry regression (SHA-bound baseline/candidate replay, pristine baseline, content-based cause classes) ==
+base SHA:      201584f2917a7fd96d6ea603bdeddbd420082cfe
+candidate SHA: ad5ec4e9853a51ed929f1e2e077b97d41c951572
+scope: regression gate only — PASS here is NOT the formal audit seal (orchestrator step)
+PASS E0-ancestry (base is an ancestor of candidate)
+NOTE candidate-worktree-dirty: this run binds the WORKTREE (uncommitted changes), tracked diff sha256=402d501de4716230aab6602877ab1d688f1e1ca8270c2fd1c8cc92f1f5001fef, full tracked+untracked binding in e0-candidate-binding.tsv (1349 paths)
+== isolated copies under /var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T//r02-a16.FnTsyD ==
+PASS E0-baseline-purity (baseline = fresh construction of committed 201584f2917a7fd96d6ea603bdeddbd420082cfe content; no prohibited git operations; purity asserts in e0-base-purity.txt)
+isolated copies verified: base pristine at 201584f2917a7fd96d6ea603bdeddbd420082cfe; candidate mirrors the invoking state (tracked+untracked)
+== E0s: gate self-checks (classifier + binding fixtures) ==
+PASS E0s-gate-self-checks (53 classifier fixtures incl. every REAL guard failure sentence, the zero-payload shapes, the R7 same-line/same-block mixes, the real direct-guard shape, the R8 structural-mixing negatives (compact Error:EACCES token, list/warning/matcher/wrapper tails, foreign/misplaced wrapper) and the producer-binding negatives (body lines without their lead) plus the REAL matcher-summary/diff-body positives, the R9-F01 firstDiff structure fixtures (legal bracket/comma/escape/non-ASCII paths pure, non-JSON/mixed/truncated/empty/4-element/trailing-junk payloads fail closed), the repair-group10 guard-tail-window fixtures (the two gate-r2 round2/round3 REAL 500-point windows + the derived complete-end variant classify seal+uncommitted; single-point mutations — off-by-one char, trailing junk, sentence-material fragment, wrong producer wrapper, deleted listing line — all fail closed to UNRECOGNIZED) + no-block-rows rejection + green positive control + parseability predicate incl. exit-0 summary completeness and summary/exit consistency with the R9-F01 one-directional header-loss rule (suite-error no-arrow header and multi-error headers are PARSABLE; headers < Tests-failed is CONTRADICTORY) and the R10-F01 floors (headers < Test-Files-failed count — the zero-header suite-error summary hole — and Tests-failed>0 with Test-Files-failed==0 incoherence — both CONTRADICTORY; counts side-channel records files_failed/distinct_files/verdict) + exact-identity family membership checks + no-commit binding checks + F42 run-output-root validation (fresh artifacts/ dir accepted; tracked source dir / tracked path / repo root / absolute / parent-relative rejected), declared-root fencing (dedicated artifacts/-inside run root accepted; the whole evidence tree, a bare stage dir, rust/, outside-artifacts and non-existent rejected) and multi-unit/FILE-unit exclusion fixtures (growth under any excluded run root invisible, non-excluded and sibling changes still detected, one # header row per unit); details in e0s-self-checks.log)
+== E1: default entry not switched (Node/Electron incumbent default) ==
+RECORD E1a-surface-diff (authorized wiring range vs base 201584f2917a7fd96d6ea603bdeddbd420082cfe: 55 file(s) — archived in e1-surface-diff-files.txt, not gated)
+RECORD E1b-binding-surface-intersect (uncommitted/untracked part of the wiring range: 0 path(s) — archived in e1-binding-surface-intersect.txt, not gated)
+PASS E1c-package-main (package.json main = desktop/bootstrap.cjs)
+PASS E1d-1-runtime-default (rustDesktopEnabled: unset/node → false, explicit rust → true)
+PASS E1d-2-no-default-injection (LINGXI_DESKTOP_SERVER_RUNTIME absent from package.json, scripts/launch.js, desktop/bootstrap.cjs, scripts/notarize.cjs)
+PASS E1d-3-branch-guard (main.cjs: 'if (rustDesktopEnabled())' guards the Rust branch; incumbent Node server body with server-info.json handling intact)
+PASS E1d-4-bootstrap-load-chain (bootstrap.cjs: app.isPackaged selects and requires main.bundle.cjs / main.cjs)
+PASS E1d-5-cli-default-node (cli/args.ts default runtime = "node")
+PASS E1d-6-no-double-write-guards (main.cjs RUST_DESKTOP_NODE_SERVER_INFO_PRESENT mutex + rust paths.rs RUNTIME_DIR_NAME runtime-dir layout both present)
+== E2: npm run typecheck (candidate copy) ==

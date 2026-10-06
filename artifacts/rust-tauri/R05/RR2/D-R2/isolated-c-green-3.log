@@ -1,0 +1,10 @@
+   Compiling lingxi-service v0.0.0 (/Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-service)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 18.17s
+     Running tests/r05_t08_production_tools.rs (/Users/study_superior/Desktop/Code/LingxiAgent/rust/target/debug/deps/r05_t08_production_tools-77f8e8539c0a9a3b)
+
+running 1 test
+test f24_sigterm_with_parked_callback_reaps_the_worker_child ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 5 filtered out; finished in 9.38s
+
+exit=0

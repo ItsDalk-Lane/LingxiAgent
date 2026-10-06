@@ -1,0 +1,20 @@
+ISOLATED_COPY=/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T//lingxi-rr2a-mut-ZiKLXF (checker + registry + migrations.rs only; main tree untouched)
+== baseline (pristine isolated copy) ==
+-- baseline: S0-consistency exit=0 ; S4-equation exit=0
+PASS baseline green (S0 exit=0, S4-equation exit=0)
+== mutation 1: delete registry v6 entry ==
+-- mut1-del-v6: S0-consistency exit=1 ; S4-equation exit=1
+   mut1-del-v6 names v6 in the failure output
+PASS mutation1: both gates FAIL naming v6 (F41 signature reproduced, caught at zero build cost)
+== mutation 2: tamper registry v7 fingerprint ==
+-- mut2-v7-fp: S0-consistency exit=1 ; S4-equation exit=1
+   mut2-v7-fp names v7 in the failure output
+PASS mutation2: both gates FAIL naming v7 fingerprint mismatch
+== mutation 3: tamper OLD registry fingerprint (v2) ==
+-- mut3-v2-fp: S0-consistency exit=1 ; S4-equation exit=1
+   mut3-v2-fp names v2 in the failure output
+PASS mutation3: both gates FAIL naming v2 fingerprint mismatch (old entries protected)
+== restore check ==
+-- restored: S0-consistency exit=0 ; S4-equation exit=0
+PASS restored copy green on both gates
+RESULT: 3/3 counterexamples precise-fail + restore green

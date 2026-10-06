@@ -1,0 +1,12 @@
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.10s
+     Running tests/r05_t07_persistence.rs (/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T//rust-target-r05-t08/debug/deps/r05_t07_persistence-e795e9c3083c072b)
+
+running 5 tests
+test identical_replay_is_idempotent_and_a_rewrite_is_a_loud_conflict ... ok
+test migration_v4_to_v5_upgrades_an_isolated_copy_and_keeps_old_rows ... ok
+test migration_v6_to_v7_makes_attempts_nullable_and_keeps_rows ... ok
+test the_ledger_round_trips_partial_and_invalid_states ... ok
+test old_ledger_rows_survive_a_model_config_reload ... ok
+
+test result: ok. 5 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.14s
+

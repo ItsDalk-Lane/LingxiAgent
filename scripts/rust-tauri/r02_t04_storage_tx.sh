@@ -193,6 +193,21 @@ trap cleanup EXIT
 fail() { echo "FAIL: $*" >&2; exit 1; }
 note() { printf '%s\n' "$*" | tee -a "$EVIDENCE_DIR/summary.txt"; }
 
+# ---- S0 (RR2-F41): registry consistency, zero-build fail-fast ---------------
+# The compiled-in migration set (migrations.rs MIGRATIONS) must EQUAL the
+# R02 fingerprint registry (count + versions + names + sha256(SQL)). F41 was
+# exactly this drift (v6/v7 shipped, registry left at 5 entries) and it only
+# surfaced at the END of this script's expensive S4 binary equation. This
+# cheap source-level equality gate catches it before anything is built; the
+# S4 equation below still proves the BUILT binary's receipts/compiledIn
+# against the same registry (neither check replaces the other).
+note "== S0 (RR2-F41): registry consistency — migrations.rs == registry =="
+python3 scripts/rust-tauri/r02_registry_consistency.py \
+  > "$EVIDENCE_DIR/s0-registry-consistency.log" 2>&1 \
+  || { cat "$EVIDENCE_DIR/s0-registry-consistency.log"; \
+       fail "S0 registry consistency failed"; }
+note "PASS S0 registry consistency (count/versions/names/fingerprints exact)"
+
 # ---- build the real binaries ------------------------------------------------
 note "== building lingxi-service + lingxi-storage-inspect (rustup $TOOLCHAIN, $TARGET_DIR, --locked) =="
 $CARGO build --manifest-path rust/Cargo.toml --locked -p lingxi-service -p lingxi-adapters \

@@ -1,0 +1,4 @@
+WORK=/tmp/b-review-n1.TuttIq
+gate exit=1
+FAIL: candidate copy does not mirror the invoking worktree (tracked+untracked content binding differs)
+REVIEW-N1 PASS (cmp red on real source mutation)

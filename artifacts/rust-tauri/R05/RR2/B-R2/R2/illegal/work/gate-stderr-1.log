@@ -1,0 +1,2 @@
+not a dedicated run-output root strictly inside artifacts/ at run-root depth (>= artifacts/<area>/<stage>/…): excluding the whole evidence tree or foreign directories is forbidden
+FAIL: E0: declared run-output root 'artifacts' is illegal (F42) — run-output roots must be dedicated directories strictly inside artifacts/ covering no tracked content; fix the invocation instead of widening the exclusion

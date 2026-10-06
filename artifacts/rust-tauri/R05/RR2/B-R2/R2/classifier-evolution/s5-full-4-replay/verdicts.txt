@@ -1,0 +1,18 @@
+== classifier-evolution replay: s5-full-4-replay ==
+log: /Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR2/B-R2/R2/s5-full-4/ev/legacy-entry/e5-candidate-npm-test.log
+script: scripts/rust-tauri/r02_t08_legacy_entry_regression.sh (working tree)
+
+== per-file classes (union of per-block verdicts) ==
+tests/post-verification-audit-seal.test.ts	UNRECOGNIZED
+tests/round2-delivery-evidence.test.ts	UNRECOGNIZED,seal-coordinate-lag
+tests/round3-delivery-evidence.test.ts	UNRECOGNIZED,seal-coordinate-lag
+
+== per-block classes ==
+block 1  tests/post-verification-audit-seal.test.ts    classes=[UNRECOGNIZED]  first-payload: Error: spawnSync git ENOBUFS
+block 2  tests/round2-delivery-evidence.test.ts        classes=[UNRECOGNIZED]  first-payload: Error: spawnSync git ENOBUFS
+block 3  tests/round2-delivery-evidence.test.ts        classes=[UNRECOGNIZED]  first-payload: Error: spawnSync git ENOBUFS
+block 4  tests/round2-delivery-evidence.test.ts        classes=[seal-coordinate-lag]  first-payload: Error: Command failed: python3 /private/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/r0
+block 5  tests/round3-delivery-evidence.test.ts        classes=[UNRECOGNIZED]  first-payload: Error: spawnSync git ENOBUFS
+block 6  tests/round3-delivery-evidence.test.ts        classes=[seal-coordinate-lag]  first-payload: Error: Command failed: python3 /private/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/r0
+
+OVERALL: UNRECOGNIZED present — gate would FAIL CLOSED (honest if a crash/foreign shape exists in this log)

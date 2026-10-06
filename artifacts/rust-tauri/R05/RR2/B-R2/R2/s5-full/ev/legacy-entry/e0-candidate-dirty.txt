@@ -1,0 +1,11 @@
+ M docs/rust-tauri/R02/R02-T04_STORAGE_REGISTRY.json
+ M docs/rust-tauri/R05/r05_stage_cids.tsv
+ M docs/rust-tauri/R05/r05_stage_pins.tsv
+ M rust/crates/lingxi-adapters/tests/r05_t04_rr1_batch_terminal.rs
+ M rust/crates/lingxi-service/src/management.rs
+ M rust/crates/lingxi-service/tests/r04_t05_process_tools.rs
+ M rust/crates/lingxi-service/tests/r05_t02_credentials.rs
+ M rust/crates/lingxi-service/tests/r05_t08_production_tools.rs
+ M rust/crates/xtask/src/stage_map.rs
+ M scripts/rust-tauri/r02_t04_storage_tx.sh
+ M scripts/rust-tauri/r02_t08_legacy_entry_regression.sh

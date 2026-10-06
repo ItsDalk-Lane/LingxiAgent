@@ -449,10 +449,18 @@ async fn wait_until<T>(what: &str, deadline: Duration, mut probe: impl FnMut() -
     }
 }
 
-fn read_pid_file(path: &Path) -> Vec<i32> {
-    let text = std::fs::read_to_string(path).expect("pid file readable");
-    text.split_whitespace()
-        .filter_map(|token| token.parse::<i32>().ok())
+/// The pid file's COMPLETE payload: non-empty and every whitespace token
+/// parses as an integer. `None` while the file is missing, empty, or only
+/// partially written (the shell's printf has not landed in full yet).
+fn complete_pid_file(path: &Path) -> Option<Vec<i32>> {
+    let text = std::fs::read_to_string(path).ok()?;
+    let trimmed = text.trim();
+    if trimmed.is_empty() {
+        return None;
+    }
+    trimmed
+        .split_whitespace()
+        .map(|token| token.parse::<i32>().ok())
         .collect()
 }
 
@@ -528,12 +536,19 @@ async fn r04_a09_managed_tree_is_killed_and_the_unrelated_sentinel_survives() {
     .await;
     let sentinel = spawn_sentinel(&h, 300);
     let run = spawn_user_run(&h, "sess_local_alpha", "A09: tree + sentinel");
-    // Barrier 1: the tree published its pids (child + grandchildren alive).
-    wait_until("tree pid file", Duration::from_secs(20), || {
-        pid_file.exists().then_some(())
-    })
+    // Barrier 1: the tree published its COMPLETE pid line (child + two
+    // grandchildren alive). Waiting for the file to merely EXIST races the
+    // shell between creat(2) and the full printf payload (RR1 F43 r04_a09:
+    // the file existed yet parsed to zero pids, failing the count assert).
+    // The barrier returns only when the content is non-empty, fully
+    // parseable, and carries the expected pid count; the count assertion
+    // itself stays.
+    let pids = wait_until(
+        "complete tree pid file (3 parseable pids)",
+        Duration::from_secs(20),
+        || complete_pid_file(&pid_file).filter(|pids| pids.len() == 3),
+    )
     .await;
-    let pids = read_pid_file(&pid_file);
     assert_eq!(pids.len(), 3, "child + two grandchildren: {pids:?}");
     for pid in &pids {
         assert!(process_alive(*pid), "pid {pid} alive before cancel");

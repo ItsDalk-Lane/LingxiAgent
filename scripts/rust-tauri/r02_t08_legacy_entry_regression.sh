@@ -84,6 +84,112 @@
 # The bare `.py` tail and mid-sentence cuts of R6-F01 REMAIN unregistered
 # — fail-closed unchanged.
 #
+# R05 RR2 F42 (WP B, 2026-10-06): run-output attribution. d80737b6's
+# evidence-distribution .gitignore rules (!artifacts/rust-tauri/**/*.log
+# etc.) UN-IGNORE every runner log inside the repo, so under the nested
+# verify-stage chain (verify-stage R05 → R04 → R03 → this gate) the
+# stdout/stderr captures that carry THIS gate's output flow — the gate's
+# own sinks <evidence>/r02_legacy_regression/{stdout,stderr}.log plus
+# every ancestor runner's sink (.../r03_regression_gate/stdout.log,
+# .../r04_regression_gate/stdout.log) — became unignored binding content
+# that keeps growing after the main binding, breaking the E0 mirror cmp
+# BY CONSTRUCTION (RR1 INDEPENDENT-9: four live .log rows in the failing
+# binding; the REVIEW-T08-era chain passed only because c549ff654's
+# .gitignore still ignored *.log). The repair-group5 exclusion covered
+# the gate's evidence subtree alone — too narrow once the ignore rule
+# changed. The gate now attributes "this run's ENTIRE run-time output"
+# EXPLICITLY and symmetrically: it discovers the fd-1/fd-2 FILE sinks of
+# its own process tree (self + ancestors — exactly the files that
+# receive this run's output flow; /proc fast path, lsof fallback on
+# darwin) and attributes each in-repo sink under FENCES, never by trust:
+#   • DIR unit  — the sink's command directory, ONLY when it is a
+#     DEDICATED fresh run-output directory: strictly inside artifacts/
+#     at run-root depth (>= artifacts/<area>/<stage>/… — `artifacts`,
+#     `artifacts/rust-tauri` or a bare stage dir can never be a unit:
+#     excluding the whole evidence tree is forbidden), carries no
+#     index-tracked content, and EVERY file currently under it is
+#     attributable to THIS run (itself a discovered sink, inside the
+#     gate's own evidence subtree, or inside another sink directory) —
+#     a directory that already holds foreign/previous-run files is NOT
+#     dedicated and never becomes a unit;
+#   • FILE unit — otherwise exactly the sink file alone (minimal
+#     attribution: nothing wider is excluded, everything around the
+#     sink stays fully bound).
+# R02_A16_RUN_OUTPUT_ROOTS may declare additional repo-relative run
+# roots — an explicit operator attestation, fenced the same way
+# (artifacts/-inside, run-root depth, existing directory, no tracked
+# content). Sinks redirected ONTO index-tracked content are refused
+# outright (that would corrupt bound candidate/evidence state); if
+# neither /proc nor lsof can resolve ANY pid the gate fails closed
+# rather than silently degrading to the F42 failure. The exclusion can
+# never mask candidate source or committed/old evidence: mid-binding
+# source changes, new files, deletions and old STATIC evidence changes
+# OUTSIDE the attributed units still fail the mirror cmp, and an
+# illegal root (rust/, the whole artifacts tree, anything tracked, any
+# too-shallow artifacts dir) is REJECTED. The unit set is computed ONCE
+# before the first binding, recorded auditable in
+# e0-run-output-sinks.txt / e0-binding-exclusions.txt, and passed
+# UNCHANGED to both bindings. An evidence root outside the repository
+# keeps the exhaustive no-exclusion binding (the historical /tmp form).
+# Concurrent sibling writers OUTSIDE the attributed units remain what
+# they always were: copy-race drift that fails the mirror cmp.
+#
+# R05 RR2 B-R2 R2 (WP B round 2, 2026-10-06): E5 FORM-EVOLUTION
+# registration — the generators' patch-too-large replay crash. The two
+# generator-wrapped block positions registered by repair-group10
+# (round2 R10-09 replay / round3 live replay) have been RED at every
+# candidate since the R02 closeout; the ONLY full-E5 runs that ever
+# passed E5-cause-classification accepted them via the registered
+# guard-tail WINDOW + firstDiff forms (R02 final-candidate-
+# fc9971898df7a9e8 / e876171c5cd0a6f8). As the tree kept growing, the
+# regenerated delivery patch crossed git's OWN apply ceiling (git
+# apply.c MAX_APPLY_SIZE = 1024*1024*1024-1 ≈ 1023 MiB; F44 measured
+# `git diff --binary --full-index 67dee5d2 HEAD` = 3,671,013,696 B
+# uncompressed, committed face only), so `git apply --cached` refuses
+# with `error: patch too large` before the generators reach their
+# guard/uncommitted checkpoints: create-delivery-patch.py:359 raises
+# RuntimeError(f"patch replay failed: {apply.stdout…[:2000]}") — an
+# UNCAUGHT exception, python prints its 6-row traceback (frames 457 in
+# <module> / 359 in replay_and_verify) ending in the complete sentence —
+# while create-round3-patch.py:342 raises SystemExit with the same
+# message, which python prints BARE (no traceback). The round3 form has
+# been visible since the R03 verify-stage chains (round3 block 6/7
+# there) and was honestly UNRECOGNIZED — every chain that reached
+# classification failed E5 fail-closed, and the R04/R05 REVIEW-T08
+# FINAL-R3 chain ran this gate DIRECTED (E5 skipped by scope). F44
+# (RR2) removed the ENOBUFS crash that masked the sibling blocks' true
+# seal-lag shapes, leaving exactly these two blocks as the remaining E5
+# reds (s5-full-4 evidence). Registered as the FIFTH seal-lag shape —
+# the SAME registered family's evolved form (the same governance-lag
+# tree growth that produced the guard's ~2100-violator listing now
+# makes the full patch unreplayable by git itself), still a REGISTERED
+# RED: the raw npm exit stays 1, recorded loudly, never formal green.
+# Anchored end-to-end to the producers' exact geometry, no substring
+# accepted:
+#   • producer binding: ONLY inside a block whose FIRST payload row is
+#     the GENERATOR wrapper, and each form binds to ITS OWN generator —
+#     round2: the complete CONSECUTIVE 6-row traceback whose two File
+#     frames cite the WRAPPED script (line 457 in <module> / line 359
+#     in replay_and_verify) with their real source-context rows, ending
+#     in the complete sentence `RuntimeError: patch replay failed:
+#     error: patch too large`; round3: the bare line `patch replay
+#     failed: error: patch too large` (SystemExit message). A bare
+#     sentence under the round2 wrapper, the traceback under the round3
+#     wrapper, or either shape under the node-guard wrapper is NOT this
+#     class;
+#   • the sentence must end with git's complete refusal text
+#     `error: patch too large` — any OTHER git error (corrupt patch,
+#     unrecognized input, …), a truncated sentence, a mutated frame, or
+#     a bare wrapper is UNRECOGNIZED and fails the gate (fail closed,
+#     R6-F01 discipline).
+# Evidence: artifacts/rust-tauri/R05/RR2/B-R2/R2/s5-full-4/ev/
+# legacy-entry/e5-candidate-blocks.txt (round2 block 4, round3 block 6)
+# + artifacts/rust-tauri/R05/RR2/F44/f44-failure-blocks.txt + the
+# classifier-evolution/ replay. Nine E0s fixtures pin it (two REAL
+# positives; seven negatives — truncated sentence, other git error,
+# foreign SystemExit text, cross-producer both ways, mutated frame,
+# node-guard producer).
+#
 # R02 stage-repair R4 rewrite (review finding R4-F02). The R1 rewrite still
 # built the "baseline" by copying the dirty candidate worktree and running
 # `git checkout -f BASE`: that restores TRACKED files only, so untracked
@@ -251,6 +357,26 @@
 #                                        inside a block whose first payload
 #                                        row is a GENERATOR wrapper; gate-r2
 #                                        round2 block 4 / round3 block 6);
+#                                        RR2 B-R2 R2 form evolution: the
+#                                        generators' patch-too-large replay
+#                                        crash is the FIFTH shape — the
+#                                        tree outgrew git's own apply
+#                                        ceiling (MAX_APPLY_SIZE ≈ 1023 MiB
+#                                        vs a ≥3.67 GB regenerated patch),
+#                                        so round2's complete 6-row
+#                                        RuntimeError traceback (File frames
+#                                        bound to the wrapped generator:
+#                                        line 457 <module> / 359
+#                                        replay_and_verify) ending in
+#                                        `RuntimeError: patch replay failed:
+#                                        error: patch too large`, and
+#                                        round3's bare SystemExit line
+#                                        `patch replay failed: error: patch
+#                                        too large`, each ONLY under ITS
+#                                        OWN generator wrapper, classify
+#                                        here (same registered family, same
+#                                        governance-lag cause; still a
+#                                        registered RED, never green);
 #                                        ANY other guard reason or payload
 #                                        shape (R6-F01: missing coordinate
 #                                        file, non-hex / non-commit
@@ -272,7 +398,9 @@
 #                                        it proves baseline pollution and
 #                                        FAILS the gate.
 #       - anything else — a bare wrapper with no diagnostics, a python
-#         Traceback, a foreign Error line, any other generator/guard
+#         Traceback (RR2: other than the ONE registered round2
+#         patch-too-large traceback shape above), a foreign Error line,
+#         any other generator/guard
 #         refusal, an empty or zero-payload block — is UNRECOGNIZED and
 #         fails the gate CLOSED. The outer `Error: Command failed: ...`
 #         line by itself NEVER passes; a recognized sibling block NEVER
@@ -305,6 +433,14 @@
 #
 # Usage: scripts/rust-tauri/r02_t08_legacy_entry_regression.sh [EVIDENCE_DIR]
 # Env:   R02_A16_BASE_SHA  overrides the baseline commit.
+#        R02_A16_RUN_OUTPUT_ROOTS  optional ':'-separated repo-relative
+#             run-output roots (F42): each must be an EXISTING dedicated
+#             directory strictly inside artifacts/ at run-root depth
+#             (>= artifacts/<area>/<stage>/…) with no index-tracked
+#             content — an illegal root (rust/, artifacts itself, a bare
+#             stage dir, anything tracked) is rejected, never silently
+#             widened.
+#        R02_LEGACY_REGRESSION_MODE  full | directed-no-seal-family.
 # Exit 0 only if every step holds.
 set -euo pipefail
 cd "$(dirname "$0")/../.."
@@ -339,30 +475,29 @@ git merge-base --is-ancestor "$BASE_SHA" "$CANDIDATE_SHA" \
 note "PASS E0-ancestry (base is an ancestor of candidate)"
 
 # ── Complete worktree binding (tracked modifications AND untracked content) ─
-# bind_worktree <repo> <out.tsv> [exclude-prefix]: one line per non-clean
+# bind_worktree <repo> <out.tsv> [exclude-units]: one line per non-clean
 # path — `<sha256|->  <XY>  <path>` sorted by path. Untracked (non-ignored)
 # files are included with their content hash; renames record the new path.
 # This is the full candidate state — never git's tracked-only view
 # (R4-F02: `--untracked-files=no` let four new candidate files slip past
 # the binding and into the baseline).
 #
-# R02 final-closeout repair-group5 (E0 self-reference): the optional
-# exclude-prefix is THIS GATE'S OWN EVIDENCE SUBTREE ($EVIDENCE_DIR,
-# repo-relative), and nothing else. When the evidence root lives inside
-# the repository (the verify-stage layout), the gate itself writes there
-# between the two bindings — summary.txt appends, this very tsv going
-# from empty to populated, the e0-candidate-dirty.* captures — so an
-# exhaustive binding can never mirror byte-identically (the two scans
-# differ BY CONSTRUCTION; see the repair-group5 header block above).
-# Both scans exclude the SAME prefix symmetrically, and the active
-# exclusion is recorded as a `#` header row in BOTH tsv files so the
-# compared artifacts stay self-describing and auditable. Files under
-# the prefix are this run's OUTPUT (runner evidence), never candidate
-# source; every other path — including the other verify-stage evidence
-# directories, static during this gate's run — stays fully bound. With
-# no third argument (the E0s scratch fixtures) or an empty prefix
-# (evidence root outside the repository, the historical /tmp layout)
-# the binding stays exhaustive and emits no header row.
+# R02 final-closeout repair-group5 + R05 RR2 F42: the optional
+# exclude-units argument is the NEWLINE-SEPARATED set of THIS RUN's
+# run-time output units (repo-relative run-output DIRECTORIES or single
+# output FILES) — the gate's own evidence subtree plus every
+# attributed/declared run-output unit (see the F42 header block and the
+# discovery below). Paths under (or equal to) a unit are this
+# run's OUTPUT (runner evidence), never candidate source; both bindings
+# exclude the SAME unit set symmetrically, and every unit is recorded as
+# a `#` header row in BOTH tsv files so the compared artifacts stay
+# self-describing and auditable. Units are validated before use (no
+# index-tracked content under them — candidate source and committed
+# evidence stay fully bound); every OTHER path, including static
+# verify-stage evidence of PAST runs, stays exhaustively bound. With no
+# third argument (the E0s scratch fixtures) or an empty string (evidence
+# root outside the repository, the historical /tmp layout) the binding
+# stays exhaustive and emits no header row.
 bind_worktree() {
   python3 - "$1" "${3:-}" > "$2" <<'PYBIND'
 import hashlib
@@ -371,7 +506,7 @@ import subprocess
 import sys
 
 repo = sys.argv[1]
-exclude = sys.argv[2] if len(sys.argv) > 2 else ""
+exclude_units = [u for u in (sys.argv[2] if len(sys.argv) > 2 else "").split("\n") if u]
 raw = subprocess.run(
     ["git", "-C", repo, "status", "--porcelain=v1", "-z", "--untracked-files=all"],
     check=True, capture_output=True,
@@ -389,10 +524,11 @@ while i < len(records):
     if "R" in xy or "C" in xy:
         # rename/copy records carry the original path in the next record
         i += 1
-    if exclude and (path == exclude or path.startswith(exclude + "/")):
-        # this gate's own run-time evidence output subtree — excluded
-        # SYMMETRICALLY from every binding that passes the same prefix
-        # (repair-group5; see the function header)
+    if any(path == unit or path.startswith(unit + "/") for unit in exclude_units):
+        # this run's own run-time output root (runner output, never
+        # candidate source) — excluded SYMMETRICALLY from every binding
+        # that passes the same unit set (repair-group5 / F42; see the
+        # bind_worktree header)
         continue
     digest = "-"
     full = os.path.join(repo, path)
@@ -401,19 +537,17 @@ while i < len(records):
             digest = hashlib.sha256(fh.read()).hexdigest()
     rows.append((path, xy, digest))
 rows.sort()
-if exclude:
-    print(f"# binding-exclusion: {exclude}/** — this gate's own run-time evidence output subtree (runner output, never candidate source); applied symmetrically to BOTH the main-repo binding and the candidate-copy binding (E0 mirror compare)")
+for unit in exclude_units:
+    print(f"# binding-exclusion: {unit}/** — this run's run-time output root (runner output, never candidate source); applied symmetrically to BOTH the main-repo binding and the candidate-copy binding (E0 mirror compare)")
 for path, xy, digest in rows:
     print(f"{digest}  {xy}  {path}")
 PYBIND
 }
 
-# The exclusion prefix (repair-group5): $EVIDENCE_DIR relative to the
-# repo root, computed ONCE from the two canonical (pwd -P) paths and
-# passed UNCHANGED to both bindings — the candidate copy reproduces the
-# same repo-relative layout, so one prefix serves both scans
-# symmetrically. Empty (no exclusion) when the evidence root lives
-# OUTSIDE the repository: the binding there stays exhaustive.
+# The gate's own evidence subtree relative to the repo root (repair-group5):
+# computed ONCE from the two canonical (pwd -P) paths. Empty when the
+# evidence root lives OUTSIDE the repository — there the binding stays
+# exhaustive for this part.
 EVIDENCE_REL_PREFIX="$(python3 - "$MAIN_REPO" "$EVIDENCE_DIR" <<'PYREL'
 import os
 import sys
@@ -426,11 +560,290 @@ else:
 PYREL
 )"
 
-# Candidate worktree state — recorded COMPLETELY, never hidden. The ONE
-# exclusion is this gate's own evidence subtree (repair-group5: with an
-# in-repo evidence root the gate's own writes between the two scans made
-# the mirror compare fail BY CONSTRUCTION); see bind_worktree's header.
-bind_worktree "$MAIN_REPO" "$EVIDENCE_DIR/e0-candidate-binding.tsv" "$EVIDENCE_REL_PREFIX"
+# ── F42 (R05 RR2 WP B): attribute THIS run's run-time output roots ──────────
+# validate_run_output_unit <repo> <unit>: 0 = legal fresh output root (no
+# index-tracked content under it — candidate source and committed evidence
+# must stay bound), 1 = illegal (reason on stderr). Index-based
+# (git ls-files): works on the no-commit E0s scratch repo too.
+validate_run_output_unit() {
+  local repo="$1" unit="$2"
+  case "$unit" in
+    ""|.|..|../*|/*)
+      printf 'not a repo-relative path (repo root / parent / absolute paths can never be exclusion roots)\n' >&2
+      return 1
+      ;;
+  esac
+  if [ -n "$(git -C "$repo" ls-files -- "$unit")" ]; then
+    printf 'covers INDEX-TRACKED content (candidate source / committed evidence must stay bound)\n' >&2
+    return 1
+  fi
+  return 0
+}
+
+# discover_run_output_sinks: one `<KIND> <repo-relative-path>` row per
+# fd-1/fd-2 FILE sink of this process tree (self + ancestors — exactly the
+# files that receive this run's output flow) that lives inside this repo:
+#   DIR <path>         the sink's command directory — ONLY when it is a
+#                      DEDICATED fresh run-output directory: strictly
+#                      inside artifacts/ at run-root depth (>= 4 path
+#                      components: artifacts/<area>/<stage>/…), no
+#                      index-tracked content under it, and every file
+#                      currently under it attributable to THIS run (itself
+#                      a discovered sink, inside the gate's own evidence
+#                      subtree, or inside another sink directory). The
+#                      verify-stage per-command layout qualifies; a shared
+#                      dir that already holds foreign/previous-run files
+#                      NEVER qualifies (F42: old evidence must stay bound);
+#   FILE <path>        the sink file alone, attributed to itself only
+#                      (sink in a source tree, the repo root, a too-
+#                      shallow artifacts dir, or a non-dedicated directory
+#                      — nothing wider may be excluded);
+#   TRACKED-SINK <p>   run output redirected ONTO tracked content — the
+#                      caller refuses outright (it would corrupt bound
+#                      state);
+#   DISCOVERY-UNAVAILABLE  neither /proc nor lsof could resolve ANY pid —
+#                      the caller fails closed instead of silently
+#                      degrading to the F42 failure.
+# /proc/<pid>/fd is the Linux fast path; lsof (-Fpfn: explicit field
+# request — never rely on a platform implicitly emitting fd rows) is the
+# darwin fallback. argv: <repo-abs> <gate-evidence-dir-abs>.
+discover_run_output_sinks() {
+  python3 - "$MAIN_REPO" "$EVIDENCE_DIR" <<'PYDISC'
+import os
+import subprocess
+import sys
+
+repo = os.path.realpath(sys.argv[1])
+evidence_dir = os.path.realpath(sys.argv[2])
+ev_rel = os.path.relpath(evidence_dir, repo)
+if ev_rel == "." or ev_rel == ".." or ev_rel.startswith(".." + os.sep):
+    ev_rel = ""                                   # evidence root outside the repo
+
+# this process tree: self up to (excluding) pid 1, cycle- and depth-capped
+pids, cur, seen = [], os.getpid(), set()
+while cur > 1 and cur not in seen and len(pids) < 64:
+    seen.add(cur)
+    pids.append(cur)
+    try:
+        out = subprocess.run(
+            ["ps", "-o", "ppid=", "-p", str(cur)],
+            capture_output=True, text=True,
+        ).stdout.strip()
+        cur = int(out.split()[0]) if out else 1
+    except Exception:
+        cur = 1
+
+# fd 1/2 file targets per pid — /proc fast path, lsof fallback (darwin)
+resolved_any = False
+fd_targets = set()
+have_proc = os.path.isdir("/proc")
+for pid in pids:
+    fds = {}
+    if have_proc:
+        for fd in ("1", "2"):
+            try:
+                fds[fd] = os.path.realpath(os.readlink("/proc/%d/fd/%s" % (pid, fd)))
+            except OSError:
+                pass
+    if not fds:
+        try:
+            out = subprocess.run(
+                ["lsof", "-a", "-p", str(pid), "-d", "1,2", "-Fpfn"],
+                capture_output=True, text=True,
+            ).stdout
+        except Exception:
+            out = ""
+        cur_fd = None
+        for line in out.splitlines():
+            if line.startswith("p"):
+                cur_fd = None
+            elif line.startswith("f") and line[1:] in ("1", "2"):
+                cur_fd = line[1:]
+            elif line.startswith("n") and cur_fd is not None:
+                fds[cur_fd] = line[1:]
+                cur_fd = None
+    if fds:
+        resolved_any = True
+        for target in fds.values():
+            fd_targets.add(target)
+
+if not resolved_any:
+    print("DISCOVERY-UNAVAILABLE")
+    sys.exit(0)
+
+def tracked(path):
+    # index-tracked entries under path (ls-files: also works on an
+    # unborn-HEAD scratch repo); an unreadable answer is fail-closed
+    try:
+        out = subprocess.run(
+            ["git", "-C", repo, "ls-files", "--", path],
+            check=True, capture_output=True, text=True,
+        ).stdout
+    except Exception:
+        return True
+    return out.strip() != ""
+
+sinks = []                                        # repo-relative sink files
+for target in sorted(fd_targets):
+    if not target.startswith("/"):
+        continue                                  # pipe / device / unnamed target
+    real = os.path.realpath(target)
+    if real == repo or not real.startswith(repo + os.sep):
+        continue                                  # outside this repository
+    if not os.path.isfile(real):
+        continue                                  # directories/devices carry no output
+    sinks.append(os.path.relpath(real, repo))
+
+for rel in sinks:
+    if tracked(rel):
+        print("TRACKED-SINK %s" % rel)
+
+# DIR-unit candidacy, under the F42 fences. Candidate attribution dirs:
+# every sink's directory plus the gate's own evidence dir — a file under
+# a candidate DIR unit is attributable to THIS run only when it is itself
+# a sink, or some directory STRICTLY BELOW the unit (never the unit
+# itself — loose foreign files directly under a non-dedicated dir must
+# not inherit its candidacy) is an attribution dir.
+attribution_dirs = set(os.path.dirname(r) for r in sinks)
+if ev_rel:
+    attribution_dirs.add(ev_rel)
+sink_set = set(sinks)
+
+def dedicated(unit):
+    base = os.path.join(repo, unit)
+    if not os.path.isdir(base):
+        return False
+    for root, dirs, files in os.walk(base):
+        for d in dirs:
+            if os.path.islink(os.path.join(root, d)):
+                return False                      # a symlinked dir could shadow content
+        for f in files:
+            fr = os.path.relpath(os.path.join(root, f), repo)
+            if fr in sink_set:
+                continue                          # itself a discovered sink
+            d_ = os.path.dirname(fr)
+            attributed = False
+            while d_ and d_ != unit:
+                if d_ in attribution_dirs:
+                    attributed = True
+                    break
+                d_ = os.path.dirname(d_)
+            if not attributed:
+                return False                      # foreign/pre-existing file — not dedicated
+    return True
+
+dir_units = set()
+for cand in sorted(attribution_dirs):
+    if not cand or not cand.startswith("artifacts/"):
+        continue                                  # DIR units only inside the evidence tree
+    if len(cand.split("/")) < 4:
+        continue                                  # artifacts / artifacts/<area> / a bare stage dir can never be a unit
+    if tracked(cand):
+        continue                                  # tracked content must stay bound
+    if cand == ev_rel or dedicated(cand):
+        dir_units.add(cand)
+
+emitted_dir = set()
+for rel in sinks:
+    if tracked(rel):
+        continue                                  # already reported as TRACKED-SINK
+    du = os.path.dirname(rel)
+    if du in dir_units:
+        if du not in emitted_dir:
+            emitted_dir.add(du)
+            print("DIR %s" % du)
+    else:
+        print("FILE %s" % rel)
+PYDISC
+}
+
+# validate_declared_run_root <repo> <unit>: an R02_A16_RUN_OUTPUT_ROOTS
+# entry — an EXPLICIT operator attestation — still passes the same
+# fences: strictly inside artifacts/ at run-root depth (>= 4 components),
+# an existing directory, no index-tracked content under it, and a sane
+# repo-relative path. 0 = legal, 1 = illegal (reason on stderr).
+validate_declared_run_root() {
+  local repo="$1" unit="$2"
+  case "$unit" in
+    ""|.|..|../*|/*|*/)
+      printf 'not a plain repo-relative directory path\n' >&2
+      return 1
+      ;;
+  esac
+  case "$unit" in
+    artifacts/*/*/*) : ;;                        # >= artifacts/<area>/<stage>/<run>: `*` in a case
+                                                 # pattern matches across `/`, so this is a depth
+                                                 # floor of 4 components — artifacts itself, a bare
+                                                 # area, or a bare stage dir can never pass
+    *)
+      printf 'not a dedicated run-output root strictly inside artifacts/ at run-root depth (>= artifacts/<area>/<stage>/…): excluding the whole evidence tree or foreign directories is forbidden\n' >&2
+      return 1
+      ;;
+  esac
+  [ -d "$repo/$unit" ] || { printf 'not an existing directory\n' >&2; return 1; }
+  if [ -n "$(git -C "$repo" ls-files -- "$unit")" ]; then
+    printf 'covers INDEX-TRACKED content (candidate source / committed evidence must stay bound)\n' >&2
+    return 1
+  fi
+  return 0
+}
+
+# Assemble the exclusion-unit set ONCE, before the first binding:
+# discovered sink units + explicitly declared roots + the gate's own
+# evidence subtree — every unit validated, duplicates dropped, the final
+# set recorded auditable in e0-binding-exclusions.txt.
+BINDING_EXCLUSIONS="$EVIDENCE_DIR/e0-binding-exclusions.txt"
+SINKS_FILE="$EVIDENCE_DIR/e0-run-output-sinks.txt"
+CANDIDATES_FILE="$EVIDENCE_DIR/e0-binding-exclusion-candidates.tsv"
+: > "$BINDING_EXCLUSIONS"
+# The discovery call runs in a SUBSHELL whose redirection to $SINKS_FILE
+# applies to the subshell only: redirecting the FUNCTION CALL directly
+# would swap the gate bash's OWN fd-1 to $SINKS_FILE for the duration of
+# the scan, hiding this run's real stdout sink from the walk exactly when
+# it must be attributed (debugged live 2026-10-06: a call-site redirect
+# made the parent's stdout.log invisible, stderr stayed visible via the
+# child — the subshell keeps every ancestor's genuine sinks in view).
+( discover_run_output_sinks ) > "$SINKS_FILE"
+if grep -qx 'DISCOVERY-UNAVAILABLE' "$SINKS_FILE"; then
+  fail "E0: cannot discover this run's output sinks (neither /proc nor lsof resolved any pid) — the run-output attribution would silently degrade to the F42 failure; failing closed"
+fi
+if grep -q '^TRACKED-SINK ' "$SINKS_FILE"; then
+  grep '^TRACKED-SINK ' "$SINKS_FILE" >&2
+  fail "E0: this run's output was redirected ONTO tracked content (see e0-run-output-sinks.txt above) — that would corrupt bound candidate/evidence state; move the run's output to a fresh untracked run root or outside the repository (F42)"
+fi
+{
+  sed -n 's/^DIR /sink-dir\t/p; s/^FILE /sink-file\t/p' "$SINKS_FILE"
+  if [ -n "${R02_A16_RUN_OUTPUT_ROOTS:-}" ]; then
+    printf '%s\n' "$R02_A16_RUN_OUTPUT_ROOTS" | tr ':' '\n' | sed 's/^/declared\t/'
+  fi
+  [ -z "$EVIDENCE_REL_PREFIX" ] || printf 'evidence\t%s\n' "$EVIDENCE_REL_PREFIX"
+} | awk -F '\t' '$2 != "" && !seen[$2]++' > "$CANDIDATES_FILE"
+while IFS=$'\t' read -r kind unit; do
+  [ -n "$unit" ] || continue
+  case "$kind" in
+    declared)
+      # an explicitly declared root is an OPERATOR ATTESTATION, but it
+      # still passes the same fences (artifacts/-inside at run-root
+      # depth, existing directory) — never a source dir, never the
+      # whole evidence tree, never the repo root
+      if ! validate_declared_run_root "$MAIN_REPO" "$unit"; then
+        fail "E0: declared run-output root '$unit' is illegal (F42) — run-output roots must be dedicated directories strictly inside artifacts/ covering no tracked content; fix the invocation instead of widening the exclusion"
+      fi
+      ;;
+  esac
+  if ! validate_run_output_unit "$MAIN_REPO" "$unit"; then
+    fail "E0: illegal binding-exclusion unit '$unit' (kind $kind) — exclusion units must be fresh untracked paths covering no tracked content; fix the invocation instead of widening the exclusion (F42)"
+  fi
+  printf '%s\n' "$unit" >> "$BINDING_EXCLUSIONS"
+done < "$CANDIDATES_FILE"
+
+# Candidate worktree state — recorded COMPLETELY, never hidden. The
+# exclusions are this run's run-time output roots ONLY (repair-group5
+# evidence subtree + F42-attributed runner sinks/roots): with an in-repo
+# evidence root or a nested verify-stage chain, the gate's own writes and
+# the chain's runner captures between the two scans would otherwise make
+# the mirror compare fail BY CONSTRUCTION; see bind_worktree's header.
+bind_worktree "$MAIN_REPO" "$EVIDENCE_DIR/e0-candidate-binding.tsv" "$(cat "$BINDING_EXCLUSIONS")"
 CANDIDATE_BINDING_ROWS="$(grep -vc '^#' "$EVIDENCE_DIR/e0-candidate-binding.tsv" || true)"
 if [ "$CANDIDATE_BINDING_ROWS" -gt 0 ]; then
   git status --porcelain --untracked-files=no > "$EVIDENCE_DIR/e0-candidate-dirty.txt"
@@ -442,8 +855,11 @@ else
   CANDIDATE_DIRTY=0
   note "candidate worktree clean: this run binds commit $CANDIDATE_SHA exactly"
 fi
-if [ -n "$EVIDENCE_REL_PREFIX" ]; then
-  note "NOTE e0-binding-exclusion: $EVIDENCE_REL_PREFIX/** (this gate's own run-time evidence output subtree — in-repo evidence root; runner output, never candidate source; applied symmetrically to both bindings — recorded in the # header row of e0-candidate-binding.tsv)"
+if [ -s "$BINDING_EXCLUSIONS" ]; then
+  note "NOTE e0-binding-exclusion: this run's run-time output roots (runner output, never candidate source; applied symmetrically to BOTH bindings; one # header row per root in e0-candidate-binding.tsv; audit: e0-binding-exclusions.txt + e0-run-output-sinks.txt):"
+  while IFS= read -r unit; do
+    note "NOTE e0-binding-exclusion-root: $unit/**"
+  done < "$BINDING_EXCLUSIONS"
 fi
 
 # ── Isolated copies (APFS copy-on-write; main worktree stays read-only) ────
@@ -466,12 +882,12 @@ note "== isolated copies under $WORK =="
 cp -Rc "$MAIN_REPO" "$CAND_COPY"
 
 # Candidate copy must mirror the invoking worktree EXACTLY — tracked
-# modifications and untracked file contents alike. The exclusion prefix
-# is the SAME one used for the main-repo binding above (repair-group5:
-# symmetric exclusion of this gate's own evidence subtree; everything
+# modifications and untracked file contents alike. The exclusion units
+# are the SAME set used for the main-repo binding above (repair-group5 +
+# F42: symmetric exclusion of this run's run-time output roots; everything
 # else must still match byte for byte).
 [ "$(git -C "$CAND_COPY" rev-parse HEAD)" = "$CANDIDATE_SHA" ] || fail "candidate copy HEAD mismatch"
-bind_worktree "$CAND_COPY" "$WORK/candidate-copy-binding.tsv" "$EVIDENCE_REL_PREFIX"
+bind_worktree "$CAND_COPY" "$WORK/candidate-copy-binding.tsv" "$(cat "$BINDING_EXCLUSIONS")"
 cmp -s "$EVIDENCE_DIR/e0-candidate-binding.tsv" "$WORK/candidate-copy-binding.tsv" \
   || fail "candidate copy does not mirror the invoking worktree (tracked+untracked content binding differs)"
 
@@ -586,9 +1002,9 @@ UNCOMMITTED_DIAG='current source manifest does not match HEAD (uncommitted or un
 # silent corruption of the audit record). The one intended expansion
 # ($UNCOMMITTED_DIAG) is now written literally.
 cat > "$EVIDENCE_DIR/e5-cause-classes.txt" <<'CLASSES'
-seal-coordinate-lag	committed non-audit changes post-date the frozen VERIFIED_SOURCE_SHA — ONLY a payload line that is EXACTLY one of the real producers' complete shapes (the seal test's AssertionError sentence, the guard's direct `✗` sentence line, or the generator's guard-embedded line carrying the COMPLETE sentence) classifies here; each shape may end with the trailing `:` and NOTHING else. repair-group10 (gate-r2 round2 block 4 / round3 block 6): the generator's guard-tail WINDOW is the fourth registered shape — `post-verification diff guard failed: ` + a front-cut printable-ASCII path fragment + the guard's complete `  - path` listing lines (final line possibly mid-token where the guard's output was lost past the 64 KiB pipe buffer), accepted ONLY under a GENERATOR wrapper as the block's first payload row, ONLY with no space/colon/non-ASCII in the fragment (sentence material can never pose as a path fragment), ONLY with at least one complete listing line, and ONLY when the reconstructed window is EXACTLY 500 code points (the literal guard_output[-500:] window). A line that carries the complete sentence PLUS additional content (R7-F01: an appended `Error: EACCES: permission denied`) still records the known cause AND is UNRECOGNIZED for its unexplained remainder; any other guard payload (missing/wrong coordinate file, non-hex/non-commit coordinate, `git diff ..HEAD 失败`, permission failure, truncated sentence, bare or geometry-violating tail window) is NOT this class.
+seal-coordinate-lag	committed non-audit changes post-date the frozen VERIFIED_SOURCE_SHA — ONLY a payload line that is EXACTLY one of the real producers' complete shapes (the seal test's AssertionError sentence, the guard's direct `✗` sentence line, or the generator's guard-embedded line carrying the COMPLETE sentence) classifies here; each shape may end with the trailing `:` and NOTHING else. repair-group10 (gate-r2 round2 block 4 / round3 block 6): the generator's guard-tail WINDOW is the fourth registered shape — `post-verification diff guard failed: ` + a front-cut printable-ASCII path fragment + the guard's complete `  - path` listing lines (final line possibly mid-token where the guard's output was lost past the 64 KiB pipe buffer), accepted ONLY under a GENERATOR wrapper as the block's first payload row, ONLY with no space/colon/non-ASCII in the fragment (sentence material can never pose as a path fragment), ONLY with at least one complete listing line, and ONLY when the reconstructed window is EXACTLY 500 code points (the literal guard_output[-500:] window). RR2 B-R2 R2 form evolution (the tree outgrew git's own apply ceiling — MAX_APPLY_SIZE ≈ 1023 MiB vs the ≥3.67 GB regenerated patch, so `git apply --cached` refuses with `error: patch too large` before the generator reaches its guard/uncommitted checkpoints): the generators' patch-too-large replay crash is the FIFTH registered shape, the same family's evolved form and the same registered RED — round2: the complete CONSECUTIVE 6-row python traceback (Traceback header; File frames citing the WRAPPED generator script at line 457 in <module> and line 359 in replay_and_verify with their real source-context rows) ending in the complete sentence `RuntimeError: patch replay failed: error: patch too large`; round3: the bare SystemExit line `patch replay failed: error: patch too large`; each accepted ONLY under ITS OWN generator wrapper as the block's first payload row — a cross-producer combination, either shape under the node-guard wrapper, any OTHER git error text, a truncated sentence, or a mutated frame is NOT this class. A line that carries the complete sentence PLUS additional content (R7-F01: an appended `Error: EACCES: permission denied`) still records the known cause AND is UNRECOGNIZED for its unexplained remainder; any other guard payload (missing/wrong coordinate file, non-hex/non-commit coordinate, `git diff ..HEAD 失败`, permission failure, truncated sentence, bare or geometry-violating tail window) is NOT this class.
 uncommitted-source-rejection	a patch generator refused: current source manifest does not match HEAD (uncommitted or untracked source changes): firstDiff=[…] — the COMPLETE generator line whose firstDiff body is EXACTLY the producers' json.dumps(diff_paths[:3], ensure_ascii=False) output (a JSON array of 1..3 repo-relative path string literals, nothing else on the line; R9-F01: validated element-by-element, non-JSON/mixed/truncated/empty fail closed) and nothing else; expected at the candidate only while the worktree is dirty; at the base it proves baseline pollution (gate FAILS)
-UNRECOGNIZED	every payload line that is not a COMPLETE recognized shape and not COMPLETELY part of one's body. R8-F01: every structural category is bound to its producer INSIDE the same block — the `  - path` listing only under a complete guard `✗`/embedded line or a VALIDATED guard-tail window (repair-group10: generator-wrapped, ≥1 complete listing line, exactly 500 code points — a bare `.py` tail, a wrong-length run, a mid-sentence fragment, or a window under any other first row stays right here), the bare-path/diff-body/matcher lines only under the complete AssertionError lead, the wrapper only as the first payload row and only for the three real family commands, the warning only as git's complete CRLF sentence. A body line without its producing lead, a `  - path`/warning/matcher/wrapper line with ANY trailing content, a bare token containing `:`, a `fatal:` line, any foreign Error/✗/Traceback, a truncated or unregistered tail-window guard refusal, a zero-payload block, or a block no recognized diagnostic FULLY explains is UNRECOGNIZED (gate FAILS CLOSED, per BLOCK — no "registered unreadable" class exists; an unproven cause never takes the gate green, at either end)
+UNRECOGNIZED	every payload line that is not a COMPLETE recognized shape and not COMPLETELY part of one's body. R8-F01: every structural category is bound to its producer INSIDE the same block — the `  - path` listing only under a complete guard `✗`/embedded line or a VALIDATED guard-tail window (repair-group10: generator-wrapped, ≥1 complete listing line, exactly 500 code points — a bare `.py` tail, a wrong-length run, a mid-sentence fragment, or a window under any other first row stays right here), the bare-path/diff-body/matcher lines only under the complete AssertionError lead, the wrapper only as the first payload row and only for the three real family commands, the warning only as git's complete CRLF sentence. RR2 B-R2 R2: a patch-too-large traceback/sentence row only counts under its OWN generator wrapper with the COMPLETE end-anchored geometry — a truncated `patch replay failed:` sentence, any other git error text, a foreign SystemExit message, a cross-producer combination, a mutated traceback frame, or the shape under the node-guard wrapper stays right here. A body line without its producing lead, a `  - path`/warning/matcher/wrapper line with ANY trailing content, a bare token containing `:`, a `fatal:` line, any foreign Error/✗/Traceback, a truncated or unregistered tail-window guard refusal, a zero-payload block, or a block no recognized diagnostic FULLY explains is UNRECOGNIZED (gate FAILS CLOSED, per BLOCK — no "registered unreadable" class exists; an unproven cause never takes the gate green, at either end)
 CLASSES
 
 # extract_blocks <vitest-log> <copy-path>: prints one
@@ -855,10 +1271,50 @@ classify_file() {
       genwrapper_exact = "^Error: Command failed: (python3 [^ ]+/create-delivery-patch\\.py|python3 [^ ]+/create-round3-patch\\.py)$"
       tail_frag_exact = "^[!-9;-~]*$"
       tail_line_exact = "^  - [!-9;-~]*$"
+      # R05 RR2 B-R2 R2 (form evolution of the repair-group10 family):
+      # the generator patch-too-large replay crash. The tree outgrew
+      # the apply ceiling INSIDE git itself (git apply.c MAX_APPLY_SIZE
+      # = 1024*1024*1024-1 ~ 1023 MiB; F44 measured the regenerated
+      # uncompressed delivery patch at 3,671,013,696 B), so `git apply
+      # --cached` now refuses with `error: patch too large` BEFORE the
+      # generators reach their guard/uncommitted checkpoints. The two
+      # frozen producers surface this differently, and each shape binds
+      # to ITS OWN generator wrapper (the block first payload row):
+      #   • round2 create-delivery-patch.py:359 raises
+      #     RuntimeError(f"patch replay failed: {apply.stdout[:2000]}")
+      #     — an UNCAUGHT exception, so python3 prints its 6-row
+      #     traceback: the Traceback header, the File frame citing the
+      #     WRAPPED script at line 457 in <module> with its source-
+      #     context row, the File frame at line 359 in
+      #     replay_and_verify with the raise line itself, and the
+      #     complete final sentence `RuntimeError: patch replay failed:
+      #     error: patch too large` (the tail IS the complete git
+      #     refusal text — any other git error, a truncated sentence,
+      #     or a mutated frame breaks the anchor);
+      #   • round3 create-round3-patch.py:342 raises SystemExit with the
+      #     same message — python3 prints a string SystemExit BARE (no
+      #     traceback): exactly the line `patch replay failed: error:
+      #     patch too large`. A foreign SystemExit message (`round3
+      #     patch is empty`, cat-file failures, ...) is a DIFFERENT
+      #     failure and never matches.
+      # Cross-producer combinations (a bare sentence under the round2
+      # wrapper, the traceback under the round3 wrapper) and the shapes
+      # under the node-guard wrapper are not real producer outputs and
+      # stay UNRECOGNIZED. A validated form proves the wrapped
+      # generator died at its replay step on the git size ceiling — the
+      # registered family evolved form of the same governance-lag
+      # cause (still a REGISTERED RED, never formal green).
+      ptl_sentence = "patch replay failed: error: patch too large"
+      ptl_r2_final = "RuntimeError: " ptl_sentence
+      qq = sprintf("%c", 39)   # apostrophe, shell-safe (the awk program is single-quoted)
+      ptl_r2_raise = "    raise RuntimeError(f\"patch replay failed: {apply.stdout.decode(errors=" qq "replace" qq ")[:2000]}\")"
       for (b = 1; b <= maxb; b++) {
         win_start[b] = 0; win_end[b] = 0
+        ptl_start[b] = 0; ptl_end[b] = 0
         if (n[b] < 3) continue
         if (payload[b, 2] !~ genwrapper_exact) continue
+        gscript = payload[b, 2]
+        sub(/^Error: Command failed: python3 /, "", gscript)
         for (i = 3; i <= n[b]; i++) {
           if (substr(payload[b, i], 1, length(guard_tail_prefix)) != guard_tail_prefix) continue
           frag = substr(payload[b, i], length(guard_tail_prefix) + 1)
@@ -875,6 +1331,30 @@ classify_file() {
           }
           break   # exactly one guard-prefix line per real generator failure; an unvalidated one stays fail-closed
         }
+        if (gscript ~ /\/create-delivery-patch\.py$/) {
+          # round2: the complete consecutive 6-row traceback, File
+          # frames bound to the WRAPPED script, ending in the complete
+          # sentence (see the shape block above).
+          for (i = 3; i + 5 <= n[b]; i++) {
+            if (payload[b, i] != "Traceback (most recent call last):") continue
+            if (payload[b, i+1] != "  File \"" gscript "\", line 457, in <module>") continue
+            if (payload[b, i+2] != "    outcome = replay_and_verify(patch, stored)") continue
+            if (payload[b, i+3] != "  File \"" gscript "\", line 359, in replay_and_verify") continue
+            if (payload[b, i+4] != ptl_r2_raise) continue
+            if (payload[b, i+5] != ptl_r2_final) continue
+            ptl_start[b] = i; ptl_end[b] = i + 5
+            break
+          }
+        } else if (gscript ~ /\/create-round3-patch\.py$/) {
+          # round3: the bare SystemExit message line, complete and
+          # end-anchored (nothing else on the line).
+          for (i = 3; i <= n[b]; i++) {
+            if (payload[b, i] == ptl_sentence) {
+              ptl_start[b] = i; ptl_end[b] = i
+              break
+            }
+          }
+        }
       }
       seal = 0; uncommitted = 0; unrecognized = 0
       for (b = 1; b <= maxb; b++) {
@@ -889,6 +1369,11 @@ classify_file() {
           # the body of the classified seal-lag diagnostic (see the
           # pre-pass above) — explained, never foreign.
           if (win_start[b] && i >= win_start[b] && i <= win_end[b]) continue
+          # RR2 B-R2 R2: a row inside a VALIDATED patch-too-large form
+          # (round2 traceback / round3 bare SystemExit line) is the body
+          # of the registered family evolved seal-lag diagnostic —
+          # explained, never foreign.
+          if (ptl_start[b] && i >= ptl_start[b] && i <= ptl_end[b]) continue
           if (index(line, sent_assert) || index(line, sent_pre sent_post)) {
             # The COMPLETE known sentence is present (with or without 了).
             # It proves the known cause — but ONLY the exact complete
@@ -973,6 +1458,12 @@ classify_file() {
         # refused with the non-audit-change violator listing (the only
         # fail() sentence that ever prints one) — seal-coordinate-lag.
         if (win_start[b]) b_seal = 1
+        # RR2 B-R2 R2: a validated patch-too-large form proves the
+        # wrapped generator died at its replay step on the apply
+        # ceiling inside git itself — the registered family evolved
+        # form of the same governance-lag cause (registered RED, never
+        # formal green).
+        if (ptl_start[b]) b_seal = 1
         if (b_seal) seal = 1
         if (b_uncommitted) uncommitted = 1
         # An EMPTY block, a zero-payload block (marker only), or an
@@ -1654,6 +2145,146 @@ post-verification diff guard failed: udit-r17-cli-rust-targeted/typecheck-05/exi
 FIX
 sc_expect guard-window-missing-line "$SELFCHECK/guard-window-missing-line.log" uncommitted-source-rejection UNRECOGNIZED
 
+# ── RR2 B-R2 R2: patch-too-large FORM-EVOLUTION fixtures (the family
+# registered by repair-group10, evolved: the tree outgrew git's own
+# apply ceiling — MAX_APPLY_SIZE ≈ 1023 MiB vs the ≥3.67 GB regenerated
+# patch — so `git apply --cached` refuses with `error: patch too large`
+# before the generators reach their guard/uncommitted checkpoints).
+# Producer mechanics: create-delivery-patch.py:359 raises RuntimeError
+# (uncaught → python3 prints the 6-row traceback, File frames citing the
+# wrapped script at lines 457/<module> and 359/replay_and_verify, ending
+# in the complete sentence); create-round3-patch.py:342 raises SystemExit
+# (a string message prints BARE — no traceback). Evidence: artifacts/
+# rust-tauri/R05/RR2/B-R2/R2/s5-full-4/ev/legacy-entry/
+# e5-candidate-blocks.txt round2 block 4 / round3 block 6 + F44. ──────
+# POSITIVE 1 — the real s5-full-4 round2 block-4 shape (wrapper + one
+# real CRLF warning kept + the complete 6-row traceback).
+cat > "$SELFCHECK/ptl-r2-real.log" <<'FIX'
+ FAIL  fixture.ts > round2 > R10-09 replay
+Error: Command failed: python3 /x/artifacts/f1-f12-repair/round2/create-delivery-patch.py
+warning: in the working copy of 'artifacts/rust-tauri/R02/T07/redaction-scan/p1-execute-ok.headers', CRLF will be replaced by LF the next time Git touches it
+Traceback (most recent call last):
+  File "/x/artifacts/f1-f12-repair/round2/create-delivery-patch.py", line 457, in <module>
+    outcome = replay_and_verify(patch, stored)
+  File "/x/artifacts/f1-f12-repair/round2/create-delivery-patch.py", line 359, in replay_and_verify
+    raise RuntimeError(f"patch replay failed: {apply.stdout.decode(errors='replace')[:2000]}")
+RuntimeError: patch replay failed: error: patch too large
+
+ ❯ fixture.ts:255:22
+FIX
+sc_expect ptl-r2-real "$SELFCHECK/ptl-r2-real.log" seal-coordinate-lag
+
+# POSITIVE 2 — the real s5-full-4 round3 block-6 shape (round3 wrapper +
+# one real warning + the bare SystemExit line).
+cat > "$SELFCHECK/ptl-r3-real.log" <<'FIX'
+ FAIL  fixture.ts > round3 > live replay
+Error: Command failed: python3 /x/artifacts/f1-f12-repair/round3-c01-c03/create-round3-patch.py
+warning: in the working copy of 'artifacts/rust-tauri/R02/T07/redaction-scan/p1-execute-ok.headers', CRLF will be replaced by LF the next time Git touches it
+patch replay failed: error: patch too large
+
+ ❯ fixture.ts:220:18
+FIX
+sc_expect ptl-r3-real "$SELFCHECK/ptl-r3-real.log" seal-coordinate-lag
+
+# NEGATIVE 1 — truncated final sentence (`too` cut): the end anchor is
+# gone; the whole traceback stays unexplained.
+cat > "$SELFCHECK/ptl-r2-truncated.log" <<'FIX'
+ FAIL  fixture.ts > round2 > R10-09 replay
+Error: Command failed: python3 /x/artifacts/f1-f12-repair/round2/create-delivery-patch.py
+Traceback (most recent call last):
+  File "/x/artifacts/f1-f12-repair/round2/create-delivery-patch.py", line 457, in <module>
+    outcome = replay_and_verify(patch, stored)
+  File "/x/artifacts/f1-f12-repair/round2/create-delivery-patch.py", line 359, in replay_and_verify
+    raise RuntimeError(f"patch replay failed: {apply.stdout.decode(errors='replace')[:2000]}")
+RuntimeError: patch replay failed: error: patch too
+ ❯ fixture.ts:255:22
+FIX
+sc_expect ptl-r2-truncated "$SELFCHECK/ptl-r2-truncated.log" UNRECOGNIZED
+
+# NEGATIVE 2 — a DIFFERENT git error text (`error: corrupt patch at
+# line 5`): not the size-ceiling family — another failure, fail closed.
+cat > "$SELFCHECK/ptl-r2-other-git-error.log" <<'FIX'
+ FAIL  fixture.ts > round2 > R10-09 replay
+Error: Command failed: python3 /x/artifacts/f1-f12-repair/round2/create-delivery-patch.py
+Traceback (most recent call last):
+  File "/x/artifacts/f1-f12-repair/round2/create-delivery-patch.py", line 457, in <module>
+    outcome = replay_and_verify(patch, stored)
+  File "/x/artifacts/f1-f12-repair/round2/create-delivery-patch.py", line 359, in replay_and_verify
+    raise RuntimeError(f"patch replay failed: {apply.stdout.decode(errors='replace')[:2000]}")
+RuntimeError: patch replay failed: error: corrupt patch at line 5
+ ❯ fixture.ts:255:22
+FIX
+sc_expect ptl-r2-other-git-error "$SELFCHECK/ptl-r2-other-git-error.log" UNRECOGNIZED
+
+# NEGATIVE 3 — a FOREIGN SystemExit message under the round3 wrapper
+# (the generator's line-239 `round3 patch is empty`): a different
+# producer failure, never the size-ceiling sentence.
+cat > "$SELFCHECK/ptl-r3-other-systemexit.log" <<'FIX'
+ FAIL  fixture.ts > round3 > live replay
+Error: Command failed: python3 /x/artifacts/f1-f12-repair/round3-c01-c03/create-round3-patch.py
+round3 patch is empty
+ ❯ fixture.ts:220:18
+FIX
+sc_expect ptl-r3-other-systemexit "$SELFCHECK/ptl-r3-other-systemexit.log" UNRECOGNIZED
+
+# NEGATIVE 4 — cross-producer: the round3 BARE sentence under the
+# round2 wrapper (the round2 producer always prints the traceback).
+cat > "$SELFCHECK/ptl-cross-bare-under-r2.log" <<'FIX'
+ FAIL  fixture.ts > round2 > R10-09 replay
+Error: Command failed: python3 /x/artifacts/f1-f12-repair/round2/create-delivery-patch.py
+patch replay failed: error: patch too large
+ ❯ fixture.ts:255:22
+FIX
+sc_expect ptl-cross-bare-under-r2 "$SELFCHECK/ptl-cross-bare-under-r2.log" UNRECOGNIZED
+
+# NEGATIVE 5 — cross-producer: the complete round2 traceback under the
+# round3 wrapper (the round3 producer raises SystemExit — bare line
+# only).
+cat > "$SELFCHECK/ptl-cross-traceback-under-r3.log" <<'FIX'
+ FAIL  fixture.ts > round3 > live replay
+Error: Command failed: python3 /x/artifacts/f1-f12-repair/round3-c01-c03/create-round3-patch.py
+Traceback (most recent call last):
+  File "/x/artifacts/f1-f12-repair/round2/create-delivery-patch.py", line 457, in <module>
+    outcome = replay_and_verify(patch, stored)
+  File "/x/artifacts/f1-f12-repair/round2/create-delivery-patch.py", line 359, in replay_and_verify
+    raise RuntimeError(f"patch replay failed: {apply.stdout.decode(errors='replace')[:2000]}")
+RuntimeError: patch replay failed: error: patch too large
+ ❯ fixture.ts:220:18
+FIX
+sc_expect ptl-cross-traceback-under-r3 "$SELFCHECK/ptl-cross-traceback-under-r3.log" UNRECOGNIZED
+
+# NEGATIVE 6 — single-point mutation: the first File frame's line number
+# 458 instead of 457 (a different generator build would be a different
+# producer). The frame anchor fails closed.
+cat > "$SELFCHECK/ptl-r2-mutated-frame.log" <<'FIX'
+ FAIL  fixture.ts > round2 > R10-09 replay
+Error: Command failed: python3 /x/artifacts/f1-f12-repair/round2/create-delivery-patch.py
+Traceback (most recent call last):
+  File "/x/artifacts/f1-f12-repair/round2/create-delivery-patch.py", line 458, in <module>
+    outcome = replay_and_verify(patch, stored)
+  File "/x/artifacts/f1-f12-repair/round2/create-delivery-patch.py", line 359, in replay_and_verify
+    raise RuntimeError(f"patch replay failed: {apply.stdout.decode(errors='replace')[:2000]}")
+RuntimeError: patch replay failed: error: patch too large
+ ❯ fixture.ts:255:22
+FIX
+sc_expect ptl-r2-mutated-frame "$SELFCHECK/ptl-r2-mutated-frame.log" UNRECOGNIZED
+
+# NEGATIVE 7 — producer binding: the complete round2 shape under the
+# NODE-guard wrapper (verify-post-verification-diff.mjs never spawns the
+# generators' replay step).
+cat > "$SELFCHECK/ptl-node-guard-wrapper.log" <<'FIX'
+ FAIL  fixture.ts > seal > guard
+Error: Command failed: node /x/.sync-audit/verify-post-verification-diff.mjs
+Traceback (most recent call last):
+  File "/x/artifacts/f1-f12-repair/round2/create-delivery-patch.py", line 457, in <module>
+    outcome = replay_and_verify(patch, stored)
+  File "/x/artifacts/f1-f12-repair/round2/create-delivery-patch.py", line 359, in replay_and_verify
+    raise RuntimeError(f"patch replay failed: {apply.stdout.decode(errors='replace')[:2000]}")
+RuntimeError: patch replay failed: error: patch too large
+ ❯ fixture.ts:95:20
+FIX
+sc_expect ptl-node-guard-wrapper "$SELFCHECK/ptl-node-guard-wrapper.log" UNRECOGNIZED
+
 # Positive control: a GREEN log (no FAIL block at all) parses to an empty
 # failing-file set and zero classes — the legal all-green state the
 # pristine baseline is expected to produce (never an error).
@@ -2056,6 +2687,85 @@ cmp -s "$SELFCHECK/bind-ev2.tsv" "$SELFCHECK/bind-ev3.tsv" \
 bind_worktree "$SCRATCH" "$SELFCHECK/bind-ev4.tsv"
 grep -qF "$SCRATCH_EV/summary.txt" "$SELFCHECK/bind-ev4.tsv" \
   || fail "E0s: without the exclusion prefix the evidence subtree must stay fully bound (default exhaustive)"
+# ── F42 (R05 RR2 WP B): run-output-root VALIDATION fixtures — the
+# exclusion can never cover index-tracked content (candidate source /
+# committed evidence) and never the repo root; a fresh untracked run
+# directory validates. The scratch repo stays at its unborn HEAD (no
+# commit): the tracked fixture paths are STAGED (index entries), which is
+# exactly what validate_run_output_unit reads.
+mkdir -p "$SCRATCH/run-out/fresh-dir" "$SCRATCH/rust"
+printf 'out\n' > "$SCRATCH/run-out/fresh-dir/sink.log"
+printf 'pub fn f() {}\n' > "$SCRATCH/rust/lib.rs"
+printf 'src\n' > "$SCRATCH/rust-main.rs"
+git -C "$SCRATCH" add rust/lib.rs rust-main.rs
+validate_run_output_unit "$SCRATCH" "run-out/fresh-dir" \
+  || fail "E0s: a fresh untracked run-output directory must validate as an exclusion root"
+validate_run_output_unit "$SCRATCH" "rust" 2>/dev/null \
+  && fail "E0s: a SOURCE directory (rust/, carrying tracked content) must be REJECTED as an exclusion root"
+validate_run_output_unit "$SCRATCH" "rust-main.rs" 2>/dev/null \
+  && fail "E0s: an index-tracked path must be REJECTED as an exclusion root"
+validate_run_output_unit "$SCRATCH" "." 2>/dev/null \
+  && fail "E0s: the repo root must be REJECTED as an exclusion root"
+validate_run_output_unit "$SCRATCH" "/abs" 2>/dev/null \
+  && fail "E0s: an absolute path must be REJECTED as an exclusion root"
+validate_run_output_unit "$SCRATCH" ".." 2>/dev/null \
+  && fail "E0s: a parent-relative path must be REJECTED as an exclusion root"
+# ── F42: DECLARED run-output roots (R02_A16_RUN_OUTPUT_ROOTS) are an
+# operator attestation but pass the SAME fences: a dedicated directory
+# strictly inside artifacts/ at run-root depth. The whole evidence tree
+# (artifacts / artifacts/rust-tauri), a bare stage dir, a source dir, a
+# directory outside artifacts/, and a non-existent path are ALL illegal —
+# `不得排除整个 artifacts` is enforced structurally, never by trust.
+mkdir -p "$SCRATCH/artifacts/rust-tauri/R05/rr2-fixture-run-root"
+printf 'run\n' > "$SCRATCH/artifacts/rust-tauri/R05/rr2-fixture-run-root/stdout.log"
+validate_declared_run_root "$SCRATCH" "artifacts/rust-tauri/R05/rr2-fixture-run-root" \
+  || fail "E0s: a dedicated fresh run root strictly inside artifacts/ must validate as a declared run-output root"
+validate_declared_run_root "$SCRATCH" "rust" 2>/dev/null \
+  && fail "E0s: a SOURCE directory (rust/) must be REJECTED as a declared run-output root"
+validate_declared_run_root "$SCRATCH" "artifacts" 2>/dev/null \
+  && fail "E0s: the whole artifacts tree must be REJECTED as a declared run-output root"
+validate_declared_run_root "$SCRATCH" "artifacts/rust-tauri" 2>/dev/null \
+  && fail "E0s: the whole evidence-distribution tree (artifacts/rust-tauri) must be REJECTED as a declared run-output root"
+validate_declared_run_root "$SCRATCH" "artifacts/rust-tauri/R05" 2>/dev/null \
+  && fail "E0s: a bare stage dir (artifacts/rust-tauri/R05) is not a dedicated run root — must be REJECTED"
+validate_declared_run_root "$SCRATCH" "scripts" 2>/dev/null \
+  && fail "E0s: a directory outside artifacts/ must be REJECTED as a declared run-output root"
+validate_declared_run_root "$SCRATCH" "artifacts/rust-tauri/R05/does-not-exist" 2>/dev/null \
+  && fail "E0s: a non-existent declared run-output root must be REJECTED"
+# ── F42: MULTIPLE exclusion units — growth under ANY excluded run root
+# is invisible to the binding (each root is this run's output), a
+# content change OUTSIDE every unit still flips it, and each unit
+# records its own # header row.
+mkdir -p "$SCRATCH/run-root-a/cmd" "$SCRATCH/run-root-b/cmd"
+printf 'a\n' > "$SCRATCH/run-root-a/cmd/stdout.log"
+printf 'b\n' > "$SCRATCH/run-root-b/cmd/stdout.log"
+bind_worktree "$SCRATCH" "$SELFCHECK/bind-mu1.tsv" "$(printf '%s\n%s' run-root-a run-root-b)"
+printf 'a-grew\n' >> "$SCRATCH/run-root-a/cmd/stdout.log"
+printf 'b-grew\n' >> "$SCRATCH/run-root-b/cmd/stdout.log"
+bind_worktree "$SCRATCH" "$SELFCHECK/bind-mu2.tsv" "$(printf '%s\n%s' run-root-a run-root-b)"
+cmp -s "$SELFCHECK/bind-mu1.tsv" "$SELFCHECK/bind-mu2.tsv" \
+  || fail "E0s: multi-unit exclusion broken (growth under an excluded run root changed the binding)"
+[ "$(grep -c '^# binding-exclusion: ' "$SELFCHECK/bind-mu1.tsv")" = "2" ] \
+  || fail "E0s: each exclusion unit must record its own # header row (F42)"
+printf 'changed-outside-units\n' > "$SCRATCH/untracked.rs"
+bind_worktree "$SCRATCH" "$SELFCHECK/bind-mu3.tsv" "$(printf '%s\n%s' run-root-a run-root-b)"
+cmp -s "$SELFCHECK/bind-mu2.tsv" "$SELFCHECK/bind-mu3.tsv" \
+  && fail "E0s: the multi-unit exclusion masked a non-excluded untracked content change"
+# ── F42: FILE units (the demoted minimal attribution) — exactly the
+# sink file is excluded: growth of the sink itself is invisible, growth
+# of its SIBLING in the same directory still flips the binding. The
+# dedication fence demotes a sink in a non-dedicated dir to exactly this
+# shape, so the sibling old-evidence files around it stay fully bound.
+printf 'c\n' > "$SCRATCH/run-root-b/cmd/stderr.log"
+bind_worktree "$SCRATCH" "$SELFCHECK/bind-fu1.tsv" "run-root-b/cmd/stdout.log"
+printf 'c-grew\n' >> "$SCRATCH/run-root-b/cmd/stdout.log"
+bind_worktree "$SCRATCH" "$SELFCHECK/bind-fu2.tsv" "run-root-b/cmd/stdout.log"
+cmp -s "$SELFCHECK/bind-fu1.tsv" "$SELFCHECK/bind-fu2.tsv" \
+  || fail "E0s: a FILE unit must hide its own sink's growth"
+printf 'c-grew-again\n' >> "$SCRATCH/run-root-b/cmd/stderr.log"
+bind_worktree "$SCRATCH" "$SELFCHECK/bind-fu3.tsv" "run-root-b/cmd/stdout.log"
+cmp -s "$SELFCHECK/bind-fu2.tsv" "$SELFCHECK/bind-fu3.tsv" \
+  && fail "E0s: a FILE unit masked a SIBLING file's content change (minimal attribution broken)"
 # The baseline-CONSTRUCTION proof is the E0 purity assert on the real
 # freshly-built base copy (HEAD == BASE_SHA, empty diff, empty status):
 # the R4 scratch-repo rehearsal used `checkout -f` + `clean -fd` and is
@@ -2063,9 +2773,10 @@ grep -qF "$SCRATCH_EV/summary.txt" "$SELFCHECK/bind-ev4.tsv" \
 {
   echo "binding: identical-state match OK; untracked content change detected; new untracked file detected (no-commit scratch repo)"
   echo "binding exclusion (repair-group5): excluded-subtree changes invisible; non-excluded content change still detected; header row recorded; default binding stays exhaustive without the prefix"
+  echo "binding exclusion (F42): run-output-root validation OK — fresh untracked dir accepted; tracked source dir (rust/), tracked path, repo root, absolute and parent-relative paths all REJECTED; declared roots fenced — dedicated artifacts/-inside run root accepted, the whole evidence tree (artifacts / artifacts/rust-tauri), a bare stage dir, rust/, outside-artifacts dirs and non-existent paths all REJECTED; multi-unit exclusion — growth under any excluded run root invisible, non-excluded content change still detected, one # header row per unit; FILE units — own sink growth invisible, sibling content change still detected (minimal attribution)"
   echo "baseline construction: proven by the E0 purity asserts on the real fresh copy (no checkout -f / clean -fd anywhere)"
 } | tee -a "$EVIDENCE_DIR/e0s-self-checks.log"
-note "PASS E0s-gate-self-checks (53 classifier fixtures incl. every REAL guard failure sentence, the zero-payload shapes, the R7 same-line/same-block mixes, the real direct-guard shape, the R8 structural-mixing negatives (compact Error:EACCES token, list/warning/matcher/wrapper tails, foreign/misplaced wrapper) and the producer-binding negatives (body lines without their lead) plus the REAL matcher-summary/diff-body positives, the R9-F01 firstDiff structure fixtures (legal bracket/comma/escape/non-ASCII paths pure, non-JSON/mixed/truncated/empty/4-element/trailing-junk payloads fail closed), the repair-group10 guard-tail-window fixtures (the two gate-r2 round2/round3 REAL 500-point windows + the derived complete-end variant classify seal+uncommitted; single-point mutations — off-by-one char, trailing junk, sentence-material fragment, wrong producer wrapper, deleted listing line — all fail closed to UNRECOGNIZED) + no-block-rows rejection + green positive control + parseability predicate incl. exit-0 summary completeness and summary/exit consistency with the R9-F01 one-directional header-loss rule (suite-error no-arrow header and multi-error headers are PARSABLE; headers < Tests-failed is CONTRADICTORY) and the R10-F01 floors (headers < Test-Files-failed count — the zero-header suite-error summary hole — and Tests-failed>0 with Test-Files-failed==0 incoherence — both CONTRADICTORY; counts side-channel records files_failed/distinct_files/verdict) + exact-identity family membership checks + no-commit binding checks; details in e0s-self-checks.log)"
+note "PASS E0s-gate-self-checks (62 classifier fixtures incl. every REAL guard failure sentence, the zero-payload shapes, the R7 same-line/same-block mixes, the real direct-guard shape, the R8 structural-mixing negatives (compact Error:EACCES token, list/warning/matcher/wrapper tails, foreign/misplaced wrapper) and the producer-binding negatives (body lines without their lead) plus the REAL matcher-summary/diff-body positives, the R9-F01 firstDiff structure fixtures (legal bracket/comma/escape/non-ASCII paths pure, non-JSON/mixed/truncated/empty/4-element/trailing-junk payloads fail closed), the repair-group10 guard-tail-window fixtures (the two gate-r2 round2/round3 REAL 500-point windows + the derived complete-end variant classify seal+uncommitted; single-point mutations — off-by-one char, trailing junk, sentence-material fragment, wrong producer wrapper, deleted listing line — all fail closed to UNRECOGNIZED), the RR2 patch-too-large form-evolution fixtures (the two REAL s5-full-4 shapes — round2's complete 6-row RuntimeError traceback and round3's bare SystemExit line — classify seal; truncated sentence, other git error text, foreign SystemExit message, cross-producer both ways, mutated frame and node-guard producer all fail closed to UNRECOGNIZED) + no-block-rows rejection + green positive control + parseability predicate incl. exit-0 summary completeness and summary/exit consistency with the R9-F01 one-directional header-loss rule (suite-error no-arrow header and multi-error headers are PARSABLE; headers < Tests-failed is CONTRADICTORY) and the R10-F01 floors (headers < Test-Files-failed count — the zero-header suite-error summary hole — and Tests-failed>0 with Test-Files-failed==0 incoherence — both CONTRADICTORY; counts side-channel records files_failed/distinct_files/verdict) + exact-identity family membership checks + no-commit binding checks + F42 run-output-root validation (fresh artifacts/ dir accepted; tracked source dir / tracked path / repo root / absolute / parent-relative rejected), declared-root fencing (dedicated artifacts/-inside run root accepted; the whole evidence tree, a bare stage dir, rust/, outside-artifacts and non-existent rejected) and multi-unit/FILE-unit exclusion fixtures (growth under any excluded run root invisible, non-excluded and sibling changes still detected, one # header row per unit); details in e0s-self-checks.log)"
 
 # ── E1: default-entry-not-switched proofs (inside the candidate copy, so
 #        uncommitted candidate state is included) ────────────────────────────
@@ -2463,7 +3174,7 @@ fi
 # UNRECOGNIZED and has already failed the gate above, at BOTH ends (a
 # pristine base must not trip the guard at all; a candidate guard refusal
 # whose cause cannot be completely read is an unproven failure).
-note "PASS E5-cause-classification (every red BLOCK at both ends independently classified from actual generator/guard diagnostics against COMPLETE end-anchored producer shapes with R8-F01 producer binding: body lines legitimate only under their complete lead, wrapper only first-row-and-only-real-family-commands, structural prefixes never pass-through; repair-group10: the guard-tail WINDOW — generator wrapper + ASCII path fragment + >=1 complete listing line + exactly 500 code points reconstructed — is the registered fourth seal-lag shape, every other window geometry included; no bare wrapper accepted; no recognized block absorbs an unrecognized sibling; a line carrying a complete known sentence PLUS anything else, and any unknown payload line (fatal:, foreign error, truncated/unregistered-tail-window/missing-coordinate guard refusal, zero payload), is UNRECOGNIZED and has failed the gate; no registered-unreadable acceptance exists)"
+note "PASS E5-cause-classification (every red BLOCK at both ends independently classified from actual generator/guard diagnostics against COMPLETE end-anchored producer shapes with R8-F01 producer binding: body lines legitimate only under their complete lead, wrapper only first-row-and-only-real-family-commands, structural prefixes never pass-through; repair-group10: the guard-tail WINDOW — generator wrapper + ASCII path fragment + >=1 complete listing line + exactly 500 code points reconstructed — is the registered fourth seal-lag shape, every other window geometry included; RR2 B-R2 R2 form evolution: the generators' patch-too-large replay crash — round2's complete 6-row RuntimeError traceback (File frames bound to the wrapped generator, lines 457/<module> and 359/replay_and_verify) and round3's bare SystemExit line, each ONLY under its OWN generator wrapper and each ending in git's complete \`error: patch too large\` refusal — is the registered fifth seal-lag shape (the family outgrew git's MAX_APPLY_SIZE apply ceiling; still a registered RED, never formal green), every other payload (other git errors, truncated sentences, cross-producer shapes, mutated frames) included; no bare wrapper accepted; no recognized block absorbs an unrecognized sibling; a line carrying a complete known sentence PLUS anything else, and any unknown payload line (fatal:, foreign error, truncated/unregistered-tail-window/missing-coordinate guard refusal, zero payload), is UNRECOGNIZED and has failed the gate; no registered-unreadable acceptance exists)"
 
 # (3b) Class registration — the two documented classes are recorded
 # separately and loudly; neither is repainted as formal green.
@@ -2475,7 +3186,7 @@ note "PASS E5-cause-classification (every red BLOCK at both ends independently c
   echo "base classes by file:"
   cat "$EVIDENCE_DIR/e5-base-causes.txt"
 } > "$EVIDENCE_DIR/e5-class-registration.txt"
-note "class registration archived in e5-class-registration.txt (seal-coordinate-lag = committed governance lag; uncommitted-source-rejection = dirty-tree generator refusal; every other shape — wrapper-only, crash, foreign error, truncated/tail-window guard refusal, zero payload — is UNRECOGNIZED and fails the gate; registered reds stay red, never formal green)"
+note "class registration archived in e5-class-registration.txt (seal-coordinate-lag = committed governance lag — including, since RR2, the generators' patch-too-large replay crash as the registered family's evolved form: the tree outgrew git's MAX_APPLY_SIZE apply ceiling; uncommitted-source-rejection = dirty-tree generator refusal; every other shape — wrapper-only, crash, foreign error, truncated/tail-window/patch-too-large-with-wrong-geometry guard refusal, zero payload — is UNRECOGNIZED and fails the gate; registered reds stay red, never formal green)"
 
 # (4) Per-file cause sets at base vs candidate are REPORTED, not
 # set-compared: a family file legitimately GAINS classes as the stage's

@@ -3256,7 +3256,7 @@ mod map_tests {
             ("adp:r05_t02_oauth_flows", 21),
             ("adp:r05_t03_goldens", 3),
             ("adp:r05_t03_rr1_replay", 33),
-            ("adp:r05_t04_rr1_batch_terminal", 9),
+            ("adp:r05_t04_rr1_batch_terminal", 10),
             ("adp:r05_t04_streaming", 18),
             ("adp:r05_t05_compat", 1),
             ("adp:r05_t05_timeouts", 13),

@@ -1,0 +1,9 @@
+   Compiling lingxi-service v0.0.0 (/Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-service)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 6.25s
+  Executable unittests src/lib.rs (/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T//rust-target-r04-rr1-g05/debug/deps/lingxi_service-0532c49ca08cc763)
+  Executable tests/r04_rr1_f02_reaper_cleanup.rs (/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T//rust-target-r04-rr1-g05/debug/deps/r04_rr1_f02_reaper_cleanup-c4e97f4824a28218)
+  Executable tests/r04_rr1_f03_stop_honesty.rs (/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T//rust-target-r04-rr1-g05/debug/deps/r04_rr1_f03_stop_honesty-42abc78d2ec6700e)
+  Executable tests/r04_rr1_f04_pty_consumption.rs (/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T//rust-target-r04-rr1-g05/debug/deps/r04_rr1_f04_pty_consumption-f9673c2e16c87aae)
+  Executable tests/r04_rr1_f05_output_integrity.rs (/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T//rust-target-r04-rr1-g05/debug/deps/r04_rr1_f05_output_integrity-e7b1a290353a4060)
+  Executable tests/r04_rr1_f05_spill_failure.rs (/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T//rust-target-r04-rr1-g05/debug/deps/r04_rr1_f05_spill_failure-9aab0581116c3bff)
+  Executable tests/r04_t05_registry_capacity.rs (/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T//rust-target-r04-rr1-g05/debug/deps/r04_t05_registry_capacity-2421d07d7250be91)

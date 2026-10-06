@@ -1,0 +1,35 @@
+   Compiling lingxi-adapters v0.0.0 (/Users/study_superior/r05t08-work/negcopy/rust/crates/lingxi-adapters)
+warning: unused variable: `provider_call_id`
+   --> crates/lingxi-adapters/src/models/openai_completions.rs:536:21
+    |
+536 |                 let provider_call_id = provider_call_id.clone().ok_or_else(|| {
+    |                     ^^^^^^^^^^^^^^^^ help: if this is intentional, prefix it with an underscore: `_provider_call_id`
+    |
+    = note: `#[warn(unused_variables)]` (part of `#[warn(unused)]`) on by default
+
+   Compiling lingxi-service v0.0.0 (/Users/study_superior/r05t08-work/negcopy/rust/crates/lingxi-service)
+warning: `lingxi-adapters` (lib) generated 1 warning (run `cargo fix --lib -p lingxi-adapters` to apply 1 suggestion)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 8.06s
+     Running tests/r05_t01_binary_wiring.rs (/Users/study_superior/.cache/lingxi-r05-neg-target/debug/deps/r05_t01_binary_wiring-accb1ca8bb78e736)
+
+running 2 tests
+test c02_real_binary_full_chain_through_authenticated_endpoint ... FAILED
+test c03_real_binary_without_plane_settles_unconfigured ... ok
+
+failures:
+
+---- c02_real_binary_full_chain_through_authenticated_endpoint stdout ----
+
+thread 'c02_real_binary_full_chain_through_authenticated_endpoint' (19293317) panicked at crates/lingxi-service/tests/r05_t01_binary_wiring.rs:582:5:
+assertion `left == right` failed
+  left: String("call-fixed-mispaired")
+ right: "call_bin_1"
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+
+
+failures:
+    c02_real_binary_full_chain_through_authenticated_endpoint
+
+test result: FAILED. 1 passed; 1 failed; 0 ignored; 0 measured; 0 filtered out; finished in 1.78s
+
+error: test failed, to rerun pass `-p lingxi-service --test r05_t01_binary_wiring`

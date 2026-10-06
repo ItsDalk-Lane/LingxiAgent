@@ -1,0 +1,3 @@
+Traceback (most recent call last):
+  File "<stdin>", line 27, in <module>
+AssertionError: receipt v2 fingerprint 64d7edfdab74e13e623a9d8d5f2381dad4803f545fa126d8eda8cc02c3dc889c != registry ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff

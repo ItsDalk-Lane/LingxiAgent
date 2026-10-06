@@ -1,0 +1,9 @@
+2026-10-06T14:58:50.399991Z  INFO lingxi_service: data root resolved effective_home=/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T//lingxi-r02t06-drill.Ci43Vf/v2-LfbS3n source=cli ignored_sources=none
+2026-10-06T14:58:50.400317Z  INFO lingxi_service: data root prepared (canonicalized; runtime dir private 0700) canonical_home=/private/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-r02t06-drill.Ci43Vf/v2-LfbS3n runtime_dir=/private/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-r02t06-drill.Ci43Vf/v2-LfbS3n/lingxi-service
+2026-10-06T14:58:50.400520Z  INFO lingxi_service: single-writer lock acquired [token] start_nonce=b25469a56a258571 pid=933 entropy="os-random-device" lock=/private/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-r02t06-drill.Ci43Vf/v2-LfbS3n/lingxi-service/instance.lock network_mode=loopback
+LINGXI_DATA_EPOCH_TRANSITION_INCOMPLETE reason=corrupt-journal
+[data-epoch] The data safety gate refused startup (corrupt-journal): the transition journal file is unreadable (EOF while parsing a string at line 1 column 60); its epochs cannot be trusted, so startup is refused instead of guessing
+[data-epoch] 数据安全闸拒绝启动（corrupt-journal）：the transition journal file is unreadable (EOF while parsing a string at line 1 column 60); its epochs cannot be trusted, so startup is refused instead of guessing
+[data-epoch] 请保留现场文件，使用维护/恢复流程处理；不要删除未知状态后强行启动。
+
+2026-10-06T14:58:50.400835Z ERROR lingxi_service: data-epoch gate refused startup (exit 2) reason="corrupt-journal" home=/private/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-r02t06-drill.Ci43Vf/v2-LfbS3n

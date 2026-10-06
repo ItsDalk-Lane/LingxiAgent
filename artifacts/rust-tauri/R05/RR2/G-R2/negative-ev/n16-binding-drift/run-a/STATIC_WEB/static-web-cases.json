@@ -1,0 +1,122 @@
+{
+  "cases": [
+    {
+      "actual": 1,
+      "case": "static-mobile-dist-page-assets",
+      "expect": 1,
+      "observed": {
+        "assetBody": "console.log('R02 static fixture')",
+        "assetStatus": 200,
+        "contentTypesExact": true,
+        "pageBody": "<html>R02 static fixture</html>",
+        "pageStatus": 200
+      },
+      "ok": true
+    },
+    {
+      "actual": 1,
+      "case": "static-desktop-dist-page-assets",
+      "expect": 1,
+      "observed": {
+        "assetBody": "console.log('R02 static fixture')",
+        "assetStatus": 200,
+        "contentTypesExact": true,
+        "pageBody": "<html>R02 static fixture</html>",
+        "pageStatus": 200
+      },
+      "ok": true
+    },
+    {
+      "actual": 1,
+      "case": "static-web-traversal-secret-refused",
+      "expect": 1,
+      "observed": {
+        "desktop": {
+          "encodedTraversal": 404,
+          "missing": 404,
+          "outsideBytesAbsent": true,
+          "outsideRoot": 404
+        },
+        "mobile": {
+          "encodedTraversal": 404,
+          "missing": 404,
+          "outsideBytesAbsent": true,
+          "outsideRoot": 404
+        }
+      },
+      "ok": true
+    },
+    {
+      "actual": 1,
+      "case": "static-web-oversized-asset-explicit-error",
+      "expect": 1,
+      "observed": {
+        "desktop": {
+          "status": 413,
+          "successBodyAbsent": true
+        },
+        "mobile": {
+          "status": 413,
+          "successBodyAbsent": true
+        }
+      },
+      "ok": true
+    },
+    {
+      "actual": 1,
+      "case": "static-mobile-guide-without-dist",
+      "expect": 1,
+      "observed": {
+        "body": "<!doctype html><html lang=\"zh\"><meta charset=\"utf-8\"><title>Lingxi</title><main>网页界面尚未安装。请安装网页构建产物后重启服务。</main></html>",
+        "guideVisible": true,
+        "status": 200
+      },
+      "ok": true
+    },
+    {
+      "actual": 1,
+      "case": "static-desktop-guide-without-dist",
+      "expect": 1,
+      "observed": {
+        "body": "<!doctype html><html lang=\"zh\"><meta charset=\"utf-8\"><title>Lingxi</title><main>网页界面尚未安装。请安装网页构建产物后重启服务。</main></html>",
+        "guideVisible": true,
+        "status": 200
+      },
+      "ok": true
+    },
+    {
+      "actual": 1,
+      "case": "static-web-guide-missing-asset-404",
+      "expect": 1,
+      "observed": {
+        "status": 404
+      },
+      "ok": true
+    },
+    {
+      "actual": 1,
+      "case": "static-mobile-invalid-explicit-dist-503",
+      "expect": 1,
+      "observed": {
+        "body": "<!doctype html><html lang=\"zh\"><meta charset=\"utf-8\"><title>Lingxi</title><main>网页界面目录缺失或损坏，请检查服务配置。</main></html>",
+        "explicitError": true,
+        "privatePathAbsent": true,
+        "status": 503
+      },
+      "ok": true
+    },
+    {
+      "actual": 1,
+      "case": "static-desktop-invalid-explicit-dist-503",
+      "expect": 1,
+      "observed": {
+        "body": "<!doctype html><html lang=\"zh\"><meta charset=\"utf-8\"><title>Lingxi</title><main>网页界面目录缺失或损坏，请检查服务配置。</main></html>",
+        "explicitError": true,
+        "privatePathAbsent": true,
+        "status": 503
+      },
+      "ok": true
+    }
+  ],
+  "schema": "lingxi.leaf-case-results.v1"
+}

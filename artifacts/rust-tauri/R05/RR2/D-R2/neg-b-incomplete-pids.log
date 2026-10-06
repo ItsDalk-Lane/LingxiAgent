@@ -1,0 +1,20 @@
+   Compiling lingxi-service v0.0.0 (/Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-service)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 2m 35s
+     Running tests/r04_t05_process_tools.rs (/Users/study_superior/Desktop/Code/LingxiAgent/rust/target/debug/deps/r04_t05_process_tools-81944a139de8b654)
+
+running 1 test
+
+thread 'r04_a09_managed_tree_is_killed_and_the_unrelated_sentinel_survives' (18308521) panicked at crates/lingxi-service/tests/r04_t05_process_tools.rs:446:13:
+timed out waiting for complete tree pid file (3 parseable pids)
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+test r04_a09_managed_tree_is_killed_and_the_unrelated_sentinel_survives ... FAILED
+
+failures:
+
+failures:
+    r04_a09_managed_tree_is_killed_and_the_unrelated_sentinel_survives
+
+test result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 13 filtered out; finished in 20.13s
+
+error: test failed, to rerun pass `-p lingxi-service --test r04_t05_process_tools`
+exit=101

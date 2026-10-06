@@ -1,0 +1,2113 @@
+diff --git a/.sync-audit/verify-post-verification-diff.mjs b/.sync-audit/verify-post-verification-diff.mjs
+index ea3922152..e9b995eff 100644
+--- a/.sync-audit/verify-post-verification-diff.mjs
++++ b/.sync-audit/verify-post-verification-diff.mjs
+@@ -21,6 +21,12 @@ import { fileURLToPath } from "node:url";
+ const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
+ const VERIFIED_SOURCE_SHA_FILE = path.join(ROOT, ".sync-audit", "verified-source-sha.txt");
+ 
++// F44（R05 RR2）：RR1 大提交使 VERIFIED_SOURCE_SHA..HEAD 的 name-only 清单
++// （当前 ≈ 2.6MB）超过 node execSync 默认 1MB maxBuffer，guard 自身以 ENOBUFS
++// 崩溃而非产出下方违规清单文本（r02_t08 分类器因此 fail-closed 于不可识别
++// 崩溃形态）。仅抬高缓冲上限，不改变白名单与判定语义。
++const GIT_LISTING_MAX_BUFFER = 64 * 1024 * 1024;
++
+ // 审计文件 allowlist：新增/改名审计脚本时须同步维护。
+ // 与 tests/post-verification-audit-seal.test.ts 的 AUDIT_ALLOWLIST 为同一门禁的
+ // 两份副本，必须保持一致（2026-08-23 曾发散：本文件缺 V3 验收文档等条目，
+@@ -92,7 +98,7 @@ if (objectType !== "commit") {
+ 
+ let changed;
+ try {
+-  const out = execSync(`git diff --name-only ${sha}..HEAD`, { cwd: ROOT, encoding: "utf-8" });
++  const out = execSync(`git diff --name-only ${sha}..HEAD`, { cwd: ROOT, encoding: "utf-8", maxBuffer: GIT_LISTING_MAX_BUFFER });
+   changed = out.split("\n").map((s) => s.trim()).filter(Boolean);
+ } catch (err) {
+   fail(`git diff ${sha}..HEAD 失败: ${err.message}`);
+diff --git a/docs/rust-tauri/ORCHESTRATOR_PROGRESS.json b/docs/rust-tauri/ORCHESTRATOR_PROGRESS.json
+index d5772d3c0..121e9a909 100644
+--- a/docs/rust-tauri/ORCHESTRATOR_PROGRESS.json
++++ b/docs/rust-tauri/ORCHESTRATOR_PROGRESS.json
+@@ -4,8 +4,8 @@
+   "start_branch": "main",
+   "implementation_branch": "codex/rust-tauri-migration",
+   "start_head": "7d1a0c6bc28062ff455adcf8f68c3a80b117e90d",
+-  "current_head": "0c67b6fc7",
+-  "current_head_note": "R04 accepted after independent stage review (STAGE-REVIEWER-R04-R01 PASS, fresh evidence root, candidate binding stable). Closeout docs commit follows; its SHA recorded via remote receipt.",
++  "current_head": "ad5ec4e98",
++  "current_head_note": "R05 RR2 收口（2026-10-06/07）：HEAD=ad5ec4e9853a51ed929f1e2e077b97d41c951572（=origin/codex/rust-tauri-migration），RR2 六工作包（A–E）+G+F44+F 收口全部为该 HEAD 之上的未提交工作树改动；任务级独立验收全部通过，阶段=READY_FOR_INDEPENDENT_REVIEW（待 FINAL-01 全新阶段审查者亲跑 §5.3；终审前不写 accepted/R06_READY=true）。前序 R04 接受记录（0c67b6fc7 时期）保留于 R04 段。",
+   "remote": "origin",
+   "remote_default_branch": "main",
+   "taskbook_manifest_sha256": "49968287f564a2a470d55fe4295a26ef70a71ccb4b16e38933567e89076a5c3f",
+@@ -552,7 +552,7 @@
+     "R04": "RE-ACCEPTED_AFTER_ADVERSARIAL_REPAIR (RR1 2026-10-01: F01-F05 repaired G01-G05, each with fresh independent R1 PASS; fresh stage reviewer STAGE_VERDICT PASS; commits 1692d2314/da15c4bd9/614fab1af/1285c3bf6/629e15b85 all pushed & remote-confirmed; prior ACCEPTED@0c67b6fc7 history preserved; ledger docs/rust-tauri/R04/repair-current/R04_RR1_FIX_ISSUES.json)",
+     "R05": {
+       "title": "模型协议、凭证、流式处理与最小完整闭环",
+-      "status": "PENDING",
++      "status": "READY_FOR_INDEPENDENT_REVIEW",
+       "task_ids": [
+         "R05-T01",
+         "R05-T02",
+@@ -567,7 +567,16 @@
+       "stage_review_round": 0,
+       "stage_verdict": null,
+       "stage_acceptance_commit_sha": null,
+-      "blockers": []
++      "blockers": [],
++      "rr2_repair_round": {
++        "recorded_at": "2026-10-06/07",
++        "candidate": "ad5ec4e9853a51ed929f1e2e077b97d41c951572 + 未提交 RR2 工作树（无 commit/push）",
++        "authority": "docs/rust-tauri/R05/repair-current/RR2_ISSUE_MATRIX.json（RR2 状态权威）+ RR2_MASTER_PROMPT_2026-10-06.md",
++        "result": "RR1 终审遗留五项全部任务级关闭：F41/F42/F34/F43/F31/F44 独立验收 INDEPENDENT_PASS（A-R2/REVIEW-r1.md、B-R2/R2/REVIEW-r2.md 两轮、C-R2/REVIEW-r1.md、D-R2/REVIEW-r1.md、E-R2/REVIEW-r1.md）；F40+R05-T05-C11B/C13、R05-T06-C11B 三追加 C 行收口（闭证引用 RR1 矩阵 F08/F10/F14/F15/F16/F35/F26 independentReview + D-R2 绿窗）；G-INT/G-NEG DONE（G-R2/I-MAPPING.md 全 PASS + NEG-GATE-RR2.md 16/16+6/6，零异常零新 F-ID）。",
++        "key_windows": "rust_test_workspace 首次完整绿窗 exit 0（115 组 ok/1476 passed/0 failed，D-R2/workspace-green-window-REVIEW-r1.log）；r02_t08 完整链 s5-full-5 exit 0（GREEN）。",
++        "stage_verdict_note": "任务级全部通过≠阶段接受：最终 accepted/R06_READY 待 FINAL-01 全新阶段审查者亲跑原总控 §5.3（verify-stage R05 --evidence artifacts/rust-tauri/R05/RR2/FINAL-01/verify-R05，入口目录须未存在）；RR1 时期 INDEPENDENT-9 的阶段 FAIL 为历史记录不被覆盖。",
++        "environment_notes": "R05-ENV-ALF-UNSIGNED-TEST-BINARY 保留在册（本轮绿窗依赖当刻二进制实例已授予的 ALF 判定，重链接后的新实例可能需用户再次 Allow）；B 包 r1 验收 full 轮 vitest worker 负载抖动一次，经 REVIEW-r2 复析定性环境型，门禁 fail-closed 行为正确。"
++      }
+     },
+     "R06": {
+       "title": "上下文、会话语义、记忆与知识库",
+diff --git a/docs/rust-tauri/R02/R02-T04_STORAGE_REGISTRY.json b/docs/rust-tauri/R02/R02-T04_STORAGE_REGISTRY.json
+index 72492dc92..bc2bbd439 100644
+--- a/docs/rust-tauri/R02/R02-T04_STORAGE_REGISTRY.json
++++ b/docs/rust-tauri/R02/R02-T04_STORAGE_REGISTRY.json
+@@ -2,7 +2,7 @@
+   "schema_version": "1.0",
+   "task_id": "R02-T04",
+   "stage_id": "R02",
+-  "generated_by": "ZCode:R02-T04 (EXECUTOR-R02-T04, 2026-09-26); fingerprints = sha256 over the migration SQL text, cross-checked against the on-disk receipt produced by lingxi-storage-inspect in artifacts/rust-tauri/R02/T04/s4-migrations-round1.json; V2/V3/V4 fingerprints registered by ZCode:EXECUTOR-R03-T08-E01 (2026-09-29), independently recomputed on disk via lingxi-storage-inspect over a fresh service-created runs.db (userVersion=4, receipts==compiledIn), matching the T04/T05/T06 report prefixes; V1 kept byte-for-byte.",
++  "generated_by": "ZCode:R02-T04 (EXECUTOR-R02-T04, 2026-09-26); fingerprints = sha256 over the migration SQL text, cross-checked against the on-disk receipt produced by lingxi-storage-inspect in artifacts/rust-tauri/R02/T04/s4-migrations-round1.json; V2/V3/V4 fingerprints registered by ZCode:EXECUTOR-R03-T08-E01 (2026-09-29), independently recomputed on disk via lingxi-storage-inspect over a fresh service-created runs.db (userVersion=4, receipts==compiledIn), matching the T04/T05/T06 report prefixes; V1 kept byte-for-byte; V6/V7 registered by ZCode:RR2-WP-A (2026-10-06, F41 repair, branch codex/rust-tauri-migration @ ad5ec4e98): fingerprints taken verbatim from the lingxi-storage-inspect `migrations` output over a fresh service-created runs.db built from this candidate (userVersion=7; receipts and compiledIn agree exactly on version/name/fingerprint; V1–V5 receipts reproduced the previously registered values byte-for-byte), evidence artifacts/rust-tauri/R05/RR2/A-R2/fingerprint-extraction/.",
+   "deterministic": "no timestamps/randomness; identical migration SQL produces identical fingerprints",
+   "new_persistence_points": [
+     {
+@@ -61,6 +61,18 @@
+           "name": "model_call_usage_ledger",
+           "fingerprint_sha256": "16dce1c9d5106b74ef00df7348591f5fad11bf8a7bc0244effba804dfde7606d",
+           "registered_by": "R05-T07 (model_call_usage table; fingerprint recomputed from V5_SQL with the registry's own sha256-of-SQL method, verified by reproducing v4's registered fingerprint)"
++        },
++        {
++          "version": 6,
++          "name": "model_call_usage_rr1_f21",
++          "fingerprint_sha256": "cd875eae835e6a5ecdee8480b7c7c223eea5a180eaf8ee3c2b43416a7deadb86",
++          "registered_by": "R05 RR1 F21 (usage-ledger extension: outcome/started_at_unix_ms/settled_at_unix_ms/parent_tool_call_id/emitted_tool_calls via V6_SQL ALTERs + three indexes; migration fn V6_NAME/V6_SQL in rust/crates/lingxi-adapters/src/storage/migrations.rs; registered by RR2 WP-A per the first-round v5 precedent)"
++        },
++        {
++          "version": 7,
++          "name": "model_call_usage_rr1_f38_attempts_nullable",
++          "fingerprint_sha256": "b3189ef9c77630918436df07291bccd8f5a6a55f21109153ff73841cef58e3fb",
++          "registered_by": "R05 RR1 F38 (transport_attempts NULLABLE: table rebuild preserving every pre-existing row verbatim, indexes recreated identically; NULL = attempts unknown after a drop, never 0; migration fn V7_NAME/V7_SQL in rust/crates/lingxi-adapters/src/storage/migrations.rs; registered by RR2 WP-A per the first-round v5 precedent)"
+         }
+       ],
+       "cutover_strategy": "switch-to-new-authority (new isolated database under the new rust data root; no incumbent store is written by this task)",
+diff --git a/docs/rust-tauri/R05/PROGRESS_LEDGER.json b/docs/rust-tauri/R05/PROGRESS_LEDGER.json
+index 6f67d193b..46ef99e9c 100644
+--- a/docs/rust-tauri/R05/PROGRESS_LEDGER.json
++++ b/docs/rust-tauri/R05/PROGRESS_LEDGER.json
+@@ -420,5 +420,92 @@
+       "remaining_blockers": "F41（R02 存储注册表未补 v6/v7，前序闭包确定性红）；F42（d80737b6 .gitignore 负向规则 × legacy 镜像绑定，标准门禁布局确定性红）；F34（Anthropic 已知 stop_reason+未闭块防线无永久测试腿）；F40 + R05-T05-C11B/C13、R05-T06-C11B 三行台账收口；F43（rust_test_workspace 无有效窗口完整通过记录）",
+       "next_round_input": "docs/rust-tauri/R05/repair-current/RR1_FINAL_REPORT.md（下一修复轮按总控 §3.3 重走修复→任务验收→阶段终审，不得以本 FAIL 结论伪造 PASS）"
+     }
++  },
++  "rr2_repair_round": {
++    "prompt": "docs/rust-tauri/R05/repair-current/RR2_MASTER_PROMPT_2026-10-06.md（2026-10-06）",
++    "candidate": "codex/rust-tauri-migration @ ad5ec4e9853a51ed929f1e2e077b97d41c951572 + RR2 未提交工作树（六工作包+G+F44；无 commit/push 授权）",
++    "matrix": "docs/rust-tauri/R05/repair-current/RR2_ISSUE_MATRIX.json（RR2 状态权威）",
++    "progress": "docs/rust-tauri/R05/repair-current/RR2_PROGRESS.md",
++    "work_packages": [
++      {
++        "wp": "A",
++        "fIds": [
++          "F41"
++        ],
++        "status": "INDEPENDENT_PASS",
++        "summary": "R02 存储登记册补登 v6/v7（指纹逐字取自真实候选构建的 inspector receipts==compiledIn；v1–v5 逐字保留）+scripts/rust-tauri/r02_registry_consistency.py 等式自检挂入 r02_t04_storage_tx.sh S0（S4 原样）；migrations.rs 零改动。R04→R03→R02 闭包确定性红解除。",
++        "review": "artifacts/rust-tauri/R05/RR2/A-R2/REVIEW-r1.md（r1 PASS，2026-10-06，全新审查者：指纹三方重算一致、S0–S4 亲跑全绿、三变异三门禁精确红+恢复绿）",
++        "evidence_root": "artifacts/rust-tauri/R05/RR2/A-R2/"
++      },
++      {
++        "wp": "B",
++        "fIds": [
++          "F42",
++          "F44"
++        ],
++        "status": "INDEPENDENT_PASS",
++        "summary": "F42 运行输出归属重写（进程树 fd sink 发现 fail-closed+DIR 单元四重围栏+dedication+FILE 最小归属降级+attestation 同围栏；.gitignore 零改动）+B-r2 E5 分类器 patch-too-large 形态演化登记+B-r3 note 转义微修复；F44 seal 三件套 4 文件纯 maxBuffer: 64MB 修复（越白名单 tests/**、.sync-audit/** 行级登记并核对授权）。完整链 s5-full-5 exit 0（GREEN）。",
++        "review": "artifacts/rust-tauri/R05/RR2/B-R2/R2/REVIEW-r2.md（两轮验收，F42/F44/B-r2/B-r3 四项全 PASS，2026-10-07 凌晨；r1 验收者超时终止，其 review-r1/ 子项日志经轮 2 核验；full 轮 E5 unparseable 复析=vitest worker 负载型抖动，非逻辑缺陷）",
++        "evidence_root": "artifacts/rust-tauri/R05/RR2/B-R2/R2/"
++      },
++      {
++        "wp": "C",
++        "fIds": [
++          "F34"
++        ],
++        "status": "INDEPENDENT_PASS",
++        "summary": "r05_t04_rr1_batch_terminal.rs 新增永久腿（夹具只缺 content_block_stop、Err 点名未闭块、正式链零工具执行、内联阳性对照）；生产代码零改动；映射 pin 9→10/C11 行并入/xtask 镜像同步/required_cids 103 不变。",
++        "review": "artifacts/rust-tauri/R05/RR2/C-R2/REVIEW-r1.md（r1 PASS，2026-10-06，全新审查者两种自建变异恰新腿红+映射完备性程序化核对）",
++        "evidence_root": "artifacts/rust-tauri/R05/RR2/C-R2/"
++      },
++      {
++        "wp": "D",
++        "fIds": [
++          "F43"
++        ],
++        "status": "INDEPENDENT_PASS",
++        "summary": "(a) ALF 逐实例归因亲测复证（环境项登记，r00_management_leaves.rs 零改动）；(b) complete_pid_file 屏障（20s 有界）；(c) f24 根因=nonce purpose 永不映射辅助插槽→fixture ask_model_tagged 模式+真实回调就绪屏障（90s 诚实上界）+SIGTERM 生产有界契约（0|6）。workspace 首次完整绿窗 exit 0（115 组/1476/0）。",
++        "review": "artifacts/rust-tauri/R05/RR2/D-R2/REVIEW-r1.md（r1 PASS，2026-10-06：(b)(c) PASS+(a) 成立+绿窗亲跑；绿窗日志 artifacts/rust-tauri/R05/RR2/D-R2/workspace-green-window-REVIEW-r1.log；与执行者两轮 exit 101 的差异如实记录）",
++        "evidence_root": "artifacts/rust-tauri/R05/RR2/D-R2/",
++        "environment_note": "R05-ENV-ALF-UNSIGNED-TEST-BINARY 保留在册：本轮绿窗依赖当刻二进制实例（590de196dceb15ce 未重链）已授予的 ALF 判定；ALF 按(路径,cdhash)逐实例拦截、判定不跨 relink——重链接后的新 r00 测试二进制实例可能需用户再次 Allow。"
++      },
++      {
++        "wp": "E",
++        "fIds": [
++          "F31"
++        ],
++        "status": "INDEPENDENT_PASS",
++        "summary": "OAuth 列表面非 OAuth 恢复最小 404（与未知 provider body 逐字一致，无存在性 oracle；其余 OAuth 面 409 逐字未动）；钉住测试同步；RR1_LEAF_DEVIATIONS.md 条目 1 状态变更+stage_maps/R05.json evidenceRequired 最小同步。",
++        "review": "artifacts/rust-tauri/R05/RR2/E-R2/REVIEW-r1.md（r1 PASS，全新审查者亲跑 38/38+变异红绿双向+R00 叶零 diff；文件头日期 2026-10-04 为审查者本地时钟）",
++        "evidence_root": "artifacts/rust-tauri/R05/RR2/E-R2/"
++      },
++      {
++        "wp": "G",
++        "fIds": [
++          "G-INT",
++          "G-NEG"
++        ],
++        "status": "DONE（待 FINAL-01 终审复核）",
++        "summary": "I01–I11 要求→断言→有效运行→结果映射全 PASS（无新 F-ID；I10 逐成分直接证据单列）；原 16 项负测 16/16 fail-closed 且点名+RR2 新增反例 6/6（/tmp 隔离副本，主树零注入）；两条非缺陷事实登记（N03 锚点过期=负测脚本维护债；/tmp 符号链接围栏=xtask 设计行为）。",
++        "review": "待 FINAL-01 阶段终审复核（实施与映射均由全新上下文 WP-G 智能体完成）",
++        "evidence_root": "artifacts/rust-tauri/R05/RR2/G-R2/"
++      },
++      {
++        "wp": "F",
++        "fIds": [
++          "F40",
++          "R05-T05-C11B",
++          "R05-T05-C13",
++          "R05-T06-C11B"
++        ],
++        "status": "INDEPENDENT_PASS（台账收口，引用既有独立证据）",
++        "summary": "三追加 C 行按 RR1 矩阵 F14/F15/F16 与 F08/F10/F14/F35 的 independentReview 翻绿（RR2 改动未触及 egress/compat/golden，证据未过期）；T06-C11B 以 D 绿窗（rust_test_workspace 完整 exit 0）关闭；资源口径写入 F40 行（160 混合轮=60 预算取消+60 错误+40 其他；恢复前 active≠已终结、重启已消解≠永久泄漏；引 RR1 INDEPENDENT-9 f27-resource-series.json）；RR2/R05 全套文档统一。",
++        "review": "闭证全部引用既有独立验收记录（RR1 F40 行预登记核对结论+本轮各 REVIEW），无自验成分；阶段级终审待 FINAL-01",
++        "evidence_root": "docs/rust-tauri/R05/repair-current/（RR2_ISSUE_MATRIX.json 各 independentReview）"
++      }
++    ],
++    "task_level_result": "RR2 矩阵 10 行全部 INDEPENDENT_PASS、G-INT/G-NEG DONE（零异常零新 F-ID）；完整链 s5-full-5 exit 0；workspace 绿窗 exit 0（1476/0）。",
++    "stage_status": "READY_FOR_INDEPENDENT_REVIEW——最终 accepted/R06_READY 待 FINAL-01 全新阶段审查者亲跑原总控 §5.3（证据根 artifacts/rust-tauri/R05/RR2/FINAL-01/verify-R05，目录须未存在）；终审前各文档不得写阶段 PASS。",
++    "recorded_at": "2026-10-06/07"
+   }
+-}
+\ No newline at end of file
++}
+diff --git a/docs/rust-tauri/R05/R05_ACCEPTANCE_LEDGER.json b/docs/rust-tauri/R05/R05_ACCEPTANCE_LEDGER.json
+index 45a3d304b..6406699f7 100644
+--- a/docs/rust-tauri/R05/R05_ACCEPTANCE_LEDGER.json
++++ b/docs/rust-tauri/R05/R05_ACCEPTANCE_LEDGER.json
+@@ -28811,5 +28811,130 @@
+    ],
+    "externalAuthorizationRef": null
+   }
+- ]
+-}
+\ No newline at end of file
++ ],
++ "rr2_repair_round": {
++  "recorded_by": "R05 RR2 收口（WP-F，2026-10-06/07）",
++  "candidate": "codex/rust-tauri-migration @ ad5ec4e9853a51ed929f1e2e077b97d41c951572 + 未提交 RR2 工作树改动（六工作包+G+F44；未 commit/push）",
++  "stage_status": "READY_FOR_INDEPENDENT_REVIEW——六工作包+F44 独立验收通过、G-INT/G-NEG DONE；最终 accepted/R06_READY 待 FINAL-01 全新阶段审查者亲跑 §5.3（入口 artifacts/rust-tauri/R05/RR2/FINAL-01/verify-R05，目录须未存在）",
++  "scope_note": "本节为 RR2 增补的验收登记；上方 103 条 acceptances 为首轮候选的历史实测记录（baseline c549ff654，其中 T05-C12/T08-C11 曾由 RR1 按 F28 更新），按 N16 其结论不继承为 RR2 候选门禁通过——RR2 候选的有效执行见本节与 RR2_ISSUE_MATRIX.json 各 independentReview。",
++  "items": [
++   {
++    "fId": "F43-window",
++    "title": "rust_test_workspace 首次完整绿窗（含 R05-T06-C11B command 绑定取得有效执行）",
++    "command": "cargo test --manifest-path rust/Cargo.toml --locked --workspace",
++    "exitCode": 0,
++    "observed": "D-R2 REVIEW-r1 独立验收者亲跑（非执行者）：115 个 test result: ok、1476 passed / 0 failed（含 Doc-tests）；r04_t05_process_tools 14/14、r05_t08_production_tools 6/6、r00_management_leaves 1/1（170.25s held 后放行，二进制 590de196dceb15ce 未重链——依赖当刻已授予的 ALF 判定）。RR1 INDEPENDENT-9 同命令为超时+1472/3；此前执行者 17:57/18:2x 两轮 exit 101（唯一失败 r00 环境项），差异已在 REVIEW §4 如实记录。",
++    "evidence": [
++     "artifacts/rust-tauri/R05/RR2/D-R2/workspace-green-window-REVIEW-r1.log",
++     "artifacts/rust-tauri/R05/RR2/D-R2/REVIEW-r1.md"
++    ],
++    "linkedCaseIds": [
++     "R05-T06-C11B",
++     "R05-T01-C01",
++     "R05-T05-C04",
++     "R05-T05-C06",
++     "R05-T05-C09",
++     "R05-T05-C10",
++     "R05-T08-C10"
++    ]
++   },
++   {
++    "fId": "F31",
++    "title": "OAuth 模型列表面非 OAuth 恢复 404（对齐原叶 R00-T02-LA-CFEC64F68DDE）",
++    "command": "cargo test --manifest-path rust/Cargo.toml --locked -p lingxi-service --test r05_t02_credentials",
++    "exitCode": 0,
++    "observed": "E-R2 REVIEW-r1 独立验收亲跑 38/38 exit 0（具名测试 --exact 1/1）：非 OAuth 列表=404 且 body 无 apiKey/authHeader 字样与秘密；未知与非 OAuth 两 404 body 除 requestId 外逐字相等（无存在性 oracle）；被拒前后 credentials.json 字节不变（零写入）；合法 OAuth 列表 200+去重并集保留；其余 OAuth 面（login/callback/poll/logout/add/remove）维持 409+oauth_only_surface 逐字未动。隔离变异 404→409 复现 RR1 形态→具名测试红 left:409/right:404 exit 101，还原绿。",
++    "evidence": [
++     "artifacts/rust-tauri/R05/RR2/E-R2/REVIEW-r1.md",
++     "artifacts/rust-tauri/R05/RR2/E-R2/green-r05t02-credentials-full.log",
++     "artifacts/rust-tauri/R05/RR2/E-R2/red.log",
++     "artifacts/rust-tauri/R05/RR2/E-R2/green-restored.log"
++    ],
++    "linkedCaseIds": [
++     "R05-T02-C08"
++    ]
++   },
++   {
++    "fId": "F41",
++    "title": "R02 存储登记册补登 v6/v7 + 等式自检接入",
++    "command": "bash scripts/rust-tauri/r02_t04_storage_tx.sh <gate-dir>（S0 新增等式自检+S1–S4 原样）",
++    "exitCode": 0,
++    "observed": "A-R2 REVIEW-r1 独立验收亲跑：S0+S1–S4 ALL GREEN exit 0；审查者自有提取代码重算 v1–v7 sha256(SQL) 与登记册、自建 fresh 库 inspector receipts==compiledIn 三方一致；fresh 库 userVersion=7 三轮重开 cmp 字节级幂等；自建 v5 非空 usage 库经真实 service 升级 v7 数据逐字保留+未知值 NULL≠0 语义正确；隔离三变异（删 v6/篡改 v7 指纹/篡改旧 v2 指纹）S0 与 S4 等价断言各精确点名失败 exit 1、恢复后双绿。R04→R03→R02 闭包的确定性红（RR1 INDEPENDENT-9 F41 签名 userVersion 7 vs registry 6）随之解除。",
++    "evidence": [
++     "artifacts/rust-tauri/R05/RR2/A-R2/REVIEW-r1.md",
++     "artifacts/rust-tauri/R05/RR2/A-R2/r02-storage-tx/",
++     "artifacts/rust-tauri/R05/RR2/A-R2/upgrade-v5-to-v7/",
++     "artifacts/rust-tauri/R05/RR2/A-R2/mutations/",
++     "docs/rust-tauri/R02/R02-T04_STORAGE_REGISTRY.json"
++    ],
++    "linkedCaseIds": [
++     "R05-T08-C13"
++    ]
++   },
++   {
++    "fId": "F42",
++    "title": "r02_t08_legacy_entry_regression 运行输出归属重写（仓库根完整链 GREEN）",
++    "command": "bash scripts/rust-tauri/r02_t08_legacy_entry_regression.sh（仓库根完整模式，s5-full-5）",
++    "exitCode": 0,
++    "observed": "B-R2 REVIEW-r2（两轮验收）PASS：进程树 fd-1/2 sink 发现（fail-closed）+DIR 单元四重围栏（artifacts/ 内≥4 层+无 tracked+dedication，否则 FILE 最小归属降级）+TRACKED-SINK 拒+R02_A16_RUN_OUTPUT_ROOTS 同围栏；HEAD/index/工作树绑定、镜像 cmp、复制竞态检出、原始日志留档原样保留；.gitignore 零改动。完整链 s5-full-5：E0/E0s 62 fixtures/E1–E4.5 全 PASS、E5a 候选 exit 1（3 文件 6 失败全部登记 seal-coordinate-lag 族，登记红不转正式绿）、E5b 基线重放 exit 0，末行 GREEN（门禁 exit 0）。r1 验收 full 轮 E5 unparseable 经复析=vitest worker 崩溃的负载型抖动（非逻辑缺陷）。",
++    "evidence": [
++     "artifacts/rust-tauri/R05/RR2/B-R2/R2/REVIEW-r2.md",
++     "artifacts/rust-tauri/R05/RR2/B-R2/R2/s5-full-5/run-root/stdout.log",
++     "artifacts/rust-tauri/R05/RR2/B-R2/R2/classifier-evolution/",
++     "artifacts/rust-tauri/R05/RR2/B-R2/R2/b-r3-note-fix/"
++    ],
++    "linkedCaseIds": []
++   },
++   {
++    "fId": "F34",
++    "title": "Anthropic 未闭块防线永久测试腿",
++    "command": "cargo test --manifest-path rust/Cargo.toml --locked -p lingxi-adapters --test r05_t04_rr1_batch_terminal",
++    "exitCode": 0,
++    "observed": "C-R2 REVIEW-r1 独立验收亲跑 10/10 exit 0（9 旧+新腿 known_stop_reason_with_unclosed_tool_block_is_loud_and_dispatches_nothing：夹具只缺 content_block_stop，Err 点名 content block(s) [0]+content_block_stop、经正式 match 链零工具执行；阳性对照恰一请求完整产出）。审查者自建两种变异（整块删防线/中性化谓词）均恰新腿红 exit 101、旧腿保持绿（复现 F34 事实）、还原绿。映射：r05_stage_pins.tsv 9→10、C11 行并入新腿名、xtask 镜像同步、required_cids 103 不变。",
++    "evidence": [
++     "artifacts/rust-tauri/R05/RR2/C-R2/REVIEW-r1.md",
++     "artifacts/rust-tauri/R05/RR2/C-R2/green-battery-f34.log",
++     "artifacts/rust-tauri/R05/RR2/C-R2/mut-red-unclosed-neutralized.log"
++    ],
++    "linkedCaseIds": [
++     "R05-T04-C11"
++    ]
++   },
++   {
++    "fId": "F44",
++    "title": "seal 三件套 spawnSync maxBuffer 崩溃形态修复（ENOBUFS 遮蔽真实诊断）",
++    "command": "npx vitest run tests/post-verification-audit-seal.test.ts tests/round2-delivery-evidence.test.ts tests/round3-delivery-evidence.test.ts",
++    "exitCode": 1,
++    "observed": "修复语义=纯选项追加（4 文件 7 处调用加 maxBuffer: 64MB，断言/校验零改动）。B-R2 REVIEW-r2 §5 判定 PASS：第 1 轮亲跑 seal 套 52,986 行 grep -c ENOBUFS=0，尾部为完整可分类诊断（违规清单断言 diff+Tests 计数），测试红为真实登记族（seal-coordinate-lag：坐标滞后+工作树未提交 RR2 改动，预期态）。guard 直跑 exit=1 输出完整 ✗ 句+2,799,706B 违规清单；npm run typecheck exit 0。遗留登记：R10-09/round3 生成器重放步 git MAX_APPLY_SIZE（patch too large）由 B-r2 分类器形态演化登记处置（登记红不转正式绿），生成器属 artifacts/f1-f12-repair/ 受审材料未修。",
++    "evidence": [
++     "artifacts/rust-tauri/R05/RR2/B-R2/R2/REVIEW-r2.md",
++     "artifacts/rust-tauri/R05/RR2/F44/f44-three-suite-run.log",
++     "artifacts/rust-tauri/R05/RR2/F44/guard-direct-shape.log",
++     "artifacts/rust-tauri/R05/RR2/F44/f44-typecheck.log"
++    ],
++    "linkedCaseIds": []
++   },
++   {
++    "fId": "G",
++    "title": "I01–I11 映射与负测门禁（G-INT/G-NEG）",
++    "command": "bash scripts/rust-tauri/r05_t08_negative_gate.sh /private/tmp/r05-rr2-g/negative-ev + 6 项 RR2 新增反例手工注入（隔离副本）",
++    "exitCode": 0,
++    "observed": "G-INT：I01–I11 全 PASS（I-MAPPING.md 一行结论表；有效运行锚点=D-R2 绿窗+E/C/A REVIEW+s5-full-5+RR1 F27 原始序列），无新 F-ID；唯一注记=存档资源序列来自 RR1 独立运行（RR2 未改 r05_t08_resources.rs 且于绿窗全绿复验，最终冻结 verify-stage 重产序列）。G-NEG：原 16 项 16/16 fail-closed 且点名（case-results.json allRefused=true/controlsGreen=true）；RR2 新增反例 6/6（F41/F34/F31/F42-N1/F42-illegal/F44 各一次红→还原绿）。两条非缺陷事实登记：N03 锚点过期（7→24，仅隔离副本等效补 24→23，负测脚本维护债）；/tmp 符号链接被 verify-stage 绑定围栏拒=设计行为。待 FINAL-01 终审复核。",
++    "evidence": [
++     "artifacts/rust-tauri/R05/RR2/G-R2/I-MAPPING.md",
++     "artifacts/rust-tauri/R05/RR2/G-R2/NEG-GATE-RR2.md",
++     "artifacts/rust-tauri/R05/RR2/G-R2/negative-ev/"
++    ],
++    "linkedCaseIds": [
++     "R05-T08-C10"
++    ]
++   }
++  ],
++  "resource_accounting_note": "资源原始记录=160 混合轮（60 预算取消+60 错误+40 其他；40 其他=15 正常+10 长响应+15 worker）。恢复前 active≠已终结（dangling active 行待重启 recovery 消解，provider 零重执行），重启已消解≠永久泄漏（post-restart RSS 28.5MiB/FD 15 稳态）。原始序列：artifacts/rust-tauri/R05/RR1/INDEPENDENT-9/verify-R05/R05_SUITES/f27-resource-series.json（load cancelCycles=60/errorCycles=60/okCycles=15/longResponseCycles=10/workerCycles=15、stubDroppedConnections=60）。",
++  "three_appended_c_rows": {
++   "R05-T05-C11B": "INDEPENDENT_PASS（闭证=RR1 矩阵 F14/F15/F16 independentReview；RR2 改动未触及 egress.rs，绿窗内复验）",
++   "R05-T05-C13": "INDEPENDENT_PASS（闭证=RR1 矩阵 F08/F10/F14/F35 independentReview；RR2 改动未触及 compat.rs/golden 输入，绿窗内复验）",
++   "R05-T06-C11B": "INDEPENDENT_PASS（闭证=D-R2 workspace-green-window-REVIEW-r1.log 完整 exit 0+REVIEW-r1.md；command:rust_test_workspace 绑定自此指向有效执行）"
++  }
++ }
++}
+diff --git a/docs/rust-tauri/R05/R05_BLOCKERS.md b/docs/rust-tauri/R05/R05_BLOCKERS.md
+index f22844994..35c7fd6f9 100644
+--- a/docs/rust-tauri/R05/R05_BLOCKERS.md
++++ b/docs/rust-tauri/R05/R05_BLOCKERS.md
+@@ -12,7 +12,7 @@
+ 
+ ## 2. R05-ENV-ALF-UNSIGNED-TEST-BINARY — macOS 应用防火墙对未签名测试二进制的 LAN 段拦截（环境项）
+ 
+-- 状态：环境项（T01 已定案，台账 `PROGRESS_LEDGER.json` → environment_items）。R05-T08 窗口内未复现（工作区测试与门禁运行中 r00_management_leaves 全绿）；如最终门禁窗口复现且为唯一失败，按环境项登记，不放宽门禁、不改该测试、不当代码回归修。
++- 状态：环境项（T01 已定案，台账 `PROGRESS_LEDGER.json` → environment_items）。R05-T08 窗口内未复现（工作区测试与门禁运行中 r00_management_leaves 全绿）；如最终门禁窗口复现且为唯一失败，按环境项登记，不放宽门禁、不改该测试、不当代码回归修。〔2026-10-06/07 RR2 状态更新见 §7：本轮 D 包独立验收绿窗已过（1476/0），但绿窗依赖当刻二进制实例已授予的 ALF 判定——重链接后的新二进制实例可能需用户再次 Allow，本环境项继续在册。〕
+ - 负责人：用户（ALF Allow / socketfilterfw / 开发者签名三种解法任一）；执行者无法自解（无免密 sudo）。
+ - 最迟解除：不设阶段期限——它是运行环境项，不是阶段义务；每次复现按台账登记。
+ 
+@@ -35,6 +35,8 @@
+ 
+ ## 6. RR1 阶段终审 FAIL 的阶段阻塞（2026-10-06 增补，INDEPENDENT-9）
+ 
++> 〔2026-10-06/07 状态注记，RR2 收口追加：下列 5 项已全部由 RR2 修复轮关闭（任务级）——F41/F42/F34/F43 独立验收 PASS（A-R2/B-R2/R2/C-R2/D-R2 各 REVIEW），第 5 项 F40+三追加 C 行已收口（RR2_ISSUE_MATRIX.json 10 行全部 INDEPENDENT_PASS）。本节历史原文保留不改写；阶段级结论仍以 FINAL-01 终审为准（READY_FOR_INDEPENDENT_REVIEW，未终审不写 accepted）。〕
++
+ - 背景：RR1 候选（`d80737b6cb9186c8a18c0f35923aac00249d45c3` + 未提交工作树）的首次完整 verify-stage R05 由独立阶段审查者亲跑，**overall FAIL（exit 1）**；结论 offline_gate=FAIL / independent_review=FAIL / stage_readiness=NOT_ACCEPTED / R06_READY=false。权威记录：`docs/rust-tauri/R05/repair-current/RR1_ISSUE_MATRIX.json` → `independentStageReview`；机器记录：`artifacts/rust-tauri/R05/RR1/INDEPENDENT-9/verify-R05/verify-stage-result.json`；总收口：`docs/rust-tauri/R05/repair-current/RR1_FINAL_REPORT.md`。逐项（详情、复现/控制证据与修复方向见矩阵 F 条目）：
+ 
+ 1. **F41 — R02 存储注册表未随 RR1 v6/v7 迁移补登（阶段硬条件，§6.1(5)）**：`docs/rust-tauri/R02/R02-T04_STORAGE_REGISTRY.json` 仍 5 条（v1–v5），二进制 userVersion/supportedVersion=7；`r02_t04_storage_tx.sh` S4 确定性失败（链内+仓库根 standalone 双复现 exit 1）→ R04→R03→R02 闭包红。负责人：待派修复智能体（矩阵建议 T07 修复轮承接、T08 复验）；修法=按首轮 v5 先例补登真实指纹，不得放宽 S4 断言。
+@@ -45,6 +47,12 @@
+ 
+ - 上述 5 项全部登记于 `RR1_ISSUE_MATRIX.json`（counts：OPEN=8 = F34/F40/F41/F42/F43 + 三行 C-ID）；修复后须按总控 §3.3 重走新修复轮→新任务验收→新阶段终审，本 FAIL 结论不得被后续文档静默覆盖。
+ 
++## 7. RR2 环境注记（2026-10-06/07 增补，非新阻塞）
++
++- **R05-ENV-ALF-UNSIGNED-TEST-BINARY（§2 同项的状态更新）**：RR2 轮 D 包绿窗已过——独立验收者亲跑 `cargo test --manifest-path rust/Cargo.toml --locked --workspace` 取得首次完整绿窗 exit 0（115 组 ok/1476 passed/0 failed，`artifacts/rust-tauri/R05/RR2/D-R2/workspace-green-window-REVIEW-r1.log`），其中 r00_management_leaves 1/1 以 170.25s held 后放行形态通过。**边界保留**：该通过依赖当刻二进制实例（590de196dceb15ce，未重链）已存在/被授予的 ALF Allow 判定；ALF 按(路径,cdhash)逐实例拦截且判定不跨 relink（D-R2 REVIEW-r1 同刻全新无判定探针对 192.168.3.5 仍 stalled、Apple 签名 python3 ok 为双向对照）——未来任何重链接产生的新 r00 测试二进制实例可能需要用户再次 Allow（或 `sudo /usr/libexec/ApplicationFirewall/socketfilterfw --add`/临时关防火墙/Developer ID 签名）。仍按环境项处理：不放宽门禁、不改该测试、不当代码回归修。
++- **vitest worker 负载抖动（一次，已定性）**：RR2 B 包第 1 轮验收 full 轮 r02_t08 E5 判 UNPARSEABLE——producer summary 分量之和不等于总数（1477≠1478 文件/15053≠15058 测试）且日志尾部记录 `Vitest caught 1 unhandled error / Worker exited unexpectedly`。经 `artifacts/rust-tauri/R05/RR2/B-R2/R2/REVIEW-r2.md` §2 离线复析定性为高负载下 worker 崩溃丢失一个 worker 结果聚合的环境型抖动（相对同候选 s5-full-5 恰少 1 文件/5 测试=典型签名）；门禁解析器按完备性谓词（分量必须求和等于总数）正确 fail-closed，非 F42/B 逻辑缺陷，无需代码变更。同链 s5-full-5 exit 0 为完整链定案证据。
++- F44 遗留（登记不阻塞）：R10-09/round3 现场重放的生成器 patch replay 步受 git MAX_APPLY_SIZE 限制（未压缩补丁 ≥3.67GB>1023MiB，`error: patch too large`）——生成器属 `artifacts/f1-f12-repair/` 受审材料未修；该形态已由 B-r2 以分类器形态演化登记处置（登记红不转正式绿，历史核实该失败族从未绿过）。
++
+ ## 无其他已知阻塞
+ 
+ R05-T08 终树五门禁与 verify-stage R05 的真实结果见 `R05_REPORT.md`；如门禁失败，失败项按实登记，不以本文件预告。〔2026-10-06 已按此承诺登记 §6：RR1 候选正式门禁 FAIL，首轮（c549ff654 候选）的 T08-E01/FINAL-WFR2-1 PASS 记录为历史事实、按 N16 不继承。〕
+diff --git a/docs/rust-tauri/R05/R05_HANDOFF.json b/docs/rust-tauri/R05/R05_HANDOFF.json
+index c3cfb8a48..4662754dc 100644
+--- a/docs/rust-tauri/R05/R05_HANDOFF.json
++++ b/docs/rust-tauri/R05/R05_HANDOFF.json
+@@ -76,5 +76,47 @@
+     "adversarial_audit": "artifacts/rust-tauri/R05/RR1/INPUT-adversarial-2026-10-04（F01–F28 问题矩阵冻结被审 HEAD d80737b6）",
+     "issue_matrix": "docs/rust-tauri/R05/repair-current/RR1_ISSUE_MATRIX.json（F01–F39 状态以矩阵为准）",
+     "evidence_root": "artifacts/rust-tauri/R05/RR1/WP-T01..T08-*（各工作包旧红/修复/审查证据）"
++  },
++  "rr2_repair_round": {
++    "recorded_by": "R05 RR2 收口（WP-F，2026-10-06/07）",
++    "candidate": {
++      "branch": "codex/rust-tauri-migration",
++      "head_sha": "ad5ec4e9853a51ed929f1e2e077b97d41c951572",
++      "delivery_shape": "RR2 修复（六工作包 A–E+G+F44+F 收口）全部为 HEAD 之上的未提交工作树改动；未 commit/push（待 FINAL-01 终审后由总控按既有有效授权统一精确暂存、提交、推送）",
++      "issue_matrix": "docs/rust-tauri/R05/repair-current/RR2_ISSUE_MATRIX.json（RR2 状态权威：10 行全部 INDEPENDENT_PASS，任务级）",
++      "progress": "docs/rust-tauri/R05/repair-current/RR2_PROGRESS.md（状态表+轮次日志）",
++      "handoff": "docs/rust-tauri/R05/repair-current/RR2_HANDOFF.md（RR2 轮交接）"
++    },
++    "stage_status": "READY_FOR_INDEPENDENT_REVIEW——六工作包+F44 独立验收通过（A-R2/REVIEW-r1.md、B-R2/R2/REVIEW-r2.md、C-R2/REVIEW-r1.md、D-R2/REVIEW-r1.md、E-R2/REVIEW-r1.md）、G-INT/G-NEG DONE（G-R2/I-MAPPING.md+NEG-GATE-RR2.md，16/16+6/6）、三追加 C 行收口；完整链 s5-full-5 exit 0、workspace 绿窗 exit 0（1476/0）。最终 accepted/R06_READY 待 FINAL-01 全新阶段审查者亲跑原总控 §5.3（cargo run --manifest-path rust/Cargo.toml --locked -p xtask -- verify-stage R05 --evidence artifacts/rust-tauri/R05/RR2/FINAL-01/verify-R05；入口目录须未存在）。终审前 R06_READY=false。",
++    "interface_and_behavior_changes_rr2": [
++      "OAuth 模型列表面（GET /lingxi/v1/models/oauth/{provider}/models）：非 OAuth/未配置 provider 由 409+oauth_only_surface 恢复为与未知 provider 完全相同的最小 404（reason=model_provider_unknown、cause=models.provider_unknown、body 除 requestId 外逐字一致，无存在性 oracle）；其余 OAuth 面（login/callback/poll/logout/add/remove model）维持 409——对齐原叶 R00-T02-LA-CFEC64F68DDE（F31，management.rs list_oauth_models 列表路由专属 match 臂）",
++      "R02 存储登记册：R02-T04_STORAGE_REGISTRY.json 补登 v6(model_call_usage_rr1_f21)/v7(model_call_usage_rr1_f38_attempts_nullable)（名称+sha256(SQL) 指纹+来源；v1–v5 逐字保留）；r02_t04_storage_tx.sh 新增 S0 等式自检（scripts/rust-tauri/r02_registry_consistency.py：MIGRATIONS==登记册 精确等式）；migrations.rs 零改动（F41）",
++      "网络面：N/A——RR2 未修改任何网络策略/egress/compat 代码（F31 为管理面状态码对齐，非网络面）",
++      "r02_t08_legacy_entry_regression.sh 运行输出归属机制重写（F42）：进程树 fd-1/2 sink 发现（fail-closed）+DIR 排除单元四重围栏（artifacts/ 内≥4 层+无 tracked+dedication，否则 FILE 最小归属降级）+TRACKED-SINK 拒+R02_A16_RUN_OUTPUT_ROOTS attestation 同围栏+双方对称排除；.gitignore 零改动；E5 分类器登记 patch-too-large 形态演化（登记红不转正式绿）",
++      "F34 永久测试腿：r05_t04_rr1_batch_terminal.rs 新增 known_stop_reason_with_unclosed_tool_block_is_loud_and_dispatches_nothing（生产代码零改动）；映射 r05_stage_pins.tsv 9→10、C11 行并入、xtask stage_map.rs 镜像同步（required_cids 103 不变）",
++      "F44：tests/post-verification-audit-seal.test.ts、tests/round2-delivery-evidence.test.ts、tests/round3-delivery-evidence.test.ts、.sync-audit/verify-post-verification-diff.mjs 共 7 处 git 子进程调用加 maxBuffer: 64MB（纯选项，断言/校验语义零改动；解除 RR1 大提交后 1MB 默认上限的 ENOBUFS 崩溃形态）",
++      "测试基建（F43）：r04_t05_process_tools.rs pid 屏障改 complete_pid_file（完整可解析 3 pid，20s 有界）；r04_t07_fixture.rs 新增 ask_model_tagged 模式（purpose=真实插槽 summarize、tag 走 argv/prompt；additive）；r05_t08_production_tools.rs 就绪屏障改『stub 记录到 summarize-model-f24 回调请求且 pgrep 见 worker』（90s 诚实上界）+SIGTERM 断言改生产真实有界契约（exit 0|6，code 6 钉 transport_drain_timed_out=true）；r00_management_leaves.rs 零改动",
++      "文档/台账（F40 收口）：RR2_ISSUE_MATRIX/RR2_PROGRESS/RR2_HANDOFF、R05_ACCEPTANCE_LEDGER.json（rr2_repair_round 节）、R05_REPORT.md §10、本文件 rr2_repair_round 段、PROGRESS_LEDGER.json（rr2_repair_round 段）、ORCHESTRATOR_PROGRESS.json（current_head+R05 段）、R05_BLOCKERS.md（RR2 环境注记）"
++    ],
++    "green_windows": {
++      "rust_test_workspace": "exit 0，115 组 ok / 1476 passed / 0 failed（D-R2 REVIEW-r1 亲跑，2026-10-06；日志 artifacts/rust-tauri/R05/RR2/D-R2/workspace-green-window-REVIEW-r1.log）",
++      "r02_t08_full_chain": "s5-full-5 exit 0 GREEN（artifacts/rust-tauri/R05/RR2/B-R2/R2/s5-full-5/run-root/stdout.log；E5 候选端登记红如实记录不转正式绿）",
++      "note": "两项为任务级独立验收窗口实测；正式 verify-stage R05（含 fmt/clippy/contracts/boundaries/R04→R03→R02/RR1 闭包整体）仍待 FINAL-01。"
++    },
++    "environment_notes": [
++      "R05-ENV-ALF-UNSIGNED-TEST-BINARY：本轮绿窗已过（r00 1/1，依赖当刻二进制实例已授予的 ALF 判定），但 ALF 按(路径,cdhash)逐实例拦截且判定不跨 relink——未来重链接的新 r00 测试二进制实例可能需用户再次 Allow（或 socketfilterfw --add/临时关防火墙/Developer ID 签名）",
++      "vitest worker 负载抖动一次的记录：B 包 r1 验收 full 轮 E5 unparseable（summary 分量和≠总数+Worker exited unexpectedly）经 REVIEW-r2 复析定性为环境型负载抖动，门禁 fail-closed 方向正确；同链 s5-full-5 求和一致 exit 0"
++    ],
++    "r06_inputs": [
++      "docs/rust-tauri/R05/R05_HANDOFF.json（本文件，含 rr2_repair_round 段）",
++      "docs/rust-tauri/R05/R05_REPORT.md（§10 RR2 增补）",
++      "docs/rust-tauri/R05/repair-current/RR2_ISSUE_MATRIX.json（RR2 状态权威）+ RR2_PROGRESS.md + RR2_HANDOFF.md",
++      "artifacts/rust-tauri/R05/RR2/G-R2/I-MAPPING.md（I01–I11 要求→断言→有效运行→结果映射）",
++      "rust/crates/xtask/src/stage_map.rs + stage_maps/R05.json + docs/rust-tauri/R05/{r05_stage_pins,r05_stage_cids,r05_required_cids,r05_leaf_case_map}.tsv（stage map 权威）",
++      "docs/rust-tauri/R05/CREDENTIAL_FLOW_MATRIX.json + PROTOCOL_WIRE_MATRIX.json + MODEL_USAGE_SEMANTICS.md + WORKER_MODEL_BOUNDARY.md（协议/凭证/台账语义文档）",
++      "docs/rust-tauri/R05/R05_ACCEPTANCE_LEDGER.json（rr2_repair_round 节）+ PROGRESS_LEDGER.json + R05_BLOCKERS.md + R05_TEST_MAP.json",
++      "docs/rust-tauri/ORCHESTRATOR_PROGRESS.json（R05 段 RR2 状态）"
++    ],
++    "next_step": "FINAL-01 阶段终审（全新审查者亲跑 §5.3 全部检查、证据根 artifacts/rust-tauri/R05/RR2/FINAL-01/verify-R05）；终审通过后再由总控按既有授权执行封印/提交/推送并写正式 accepted——本文件不预写。"
+   }
+-}
+\ No newline at end of file
++}
+diff --git a/docs/rust-tauri/R05/R05_REPORT.md b/docs/rust-tauri/R05/R05_REPORT.md
+index 178fdb14c..d53244199 100644
+--- a/docs/rust-tauri/R05/R05_REPORT.md
++++ b/docs/rust-tauri/R05/R05_REPORT.md
+@@ -1,6 +1,6 @@
+-# R05_REPORT — 模型协议、凭证、流式处理与完整任务闭环（RR1 修复轮版本）
++# R05_REPORT — 模型协议、凭证、流式处理与完整任务闭环（RR1 修复轮版本；§10 为 RR2 增补）
+ 
+-- 生成：R05-T08-执行者（RR1 WP-T08），2026-10-06。阶段：R05（T01–T08 全部八任务，RR1 对抗修复轮 F01–F39 之后）。
++- 生成：R05-T08-执行者（RR1 WP-T08），2026-10-06。阶段：R05（T01–T08 全部八任务，RR1 对抗修复轮 F01–F39 之后）。§10 由 R05 RR2 收口（WP-F）于 2026-10-06/07 增补——RR2 轮现状与阶段状态以 §10 为准，§1–§9 保留 RR1 轮历史原文。
+ - 基线：分支 `codex/rust-tauri-migration`，HEAD `d80737b6cb9186c8a18c0f35923aac00249d45c3`（R05 首轮实施提交）；**RR1 全部修复为该 HEAD 之上的未提交工作树改动**（含 T01–T07 各工作包与 T08 本包；无 commit/push 授权，全程零 git 写操作）。
+ - 审查事实：首轮实施（HEAD d80737b6）被 2026-10-04 对抗审查判 **NOT_ACCEPTED**（F01–F28 问题矩阵，见 `docs/rust-tauri/R05/repair-current/RR1_ISSUE_MATRIX.json`）；本报告描述 RR1 修复后的候选状态。首轮报告的全部 PASS 记录是**同一审查基线上的历史事实**，但按 N16 规则（生产源码/协议/配置/lock/生成器/gate 变化 ⇒ 受影响证据过期），其结论**不继承**为 RR1 候选的门禁通过——最终门禁与阶段审查必须在 RR1 候选上重跑。
+ - 本报告只陈述真实运行过的命令与结果。
+@@ -86,3 +86,31 @@ R06_READY:               false（待阶段门禁+独立终审）
+ ## 9. 交接
+ 
+ - 见 `R05_HANDOFF.json`（RR1 版：接口、R06 可消费范围、延期登记、审查状态）。
++
++## 10. RR2 修复轮增补（2026-10-06/07；上方 §1–§9 为 RR1 轮历史记录，原文保留不改写）
++
++- **候选**：分支 `codex/rust-tauri-migration`，HEAD `ad5ec4e9853a51ed929f1e2e077b97d41c951572`（=origin）+ 未提交 RR2 工作树改动；无 commit/push（收口后由总控按既有授权统一处理）。
++- **RR1 终审遗留五项全部关闭（任务级）**，逐项独立验收（全新上下文审查者，非实施者）：
++  - F41（A）：登记册补登 v6/v7+等式自检 S0；`A-R2/REVIEW-r1.md` PASS（指纹三方一致、S0–S4 全绿、三变异精确红）。
++  - F42（B，两轮+微修复轮3）：运行输出归属重写+E5 分类器 patch-too-large 形态演化登记+note 转义修复；`B-R2/R2/REVIEW-r2.md` 四项（F42/F44/B-r2/B-r3）全 PASS；r1 验收 full 轮 E5 unparseable 复析为 vitest worker 负载抖动（非逻辑缺陷）。
++  - F34（C）：永久腿+阳性对照+映射登记；`C-R2/REVIEW-r1.md` PASS（两种审查者自建变异恰新腿红）。
++  - F43（D）：(b)(c) 修复 PASS + **rust_test_workspace 首次完整绿窗 exit 0（115 组 ok / 1476 passed / 0 failed，含 r00 1/1）**，`D-R2/REVIEW-r1.md`+`D-R2/workspace-green-window-REVIEW-r1.log`；实施期「绿窗 BLOCKED」文案已按事实刷新，ALF 环境项登记保留（重链接后的新二进制实例可能需用户再次 Allow）。
++  - F31（E）：OAuth 列表面恢复 404；`E-R2/REVIEW-r1.md` PASS（38/38、404 body 逐字一致零存在性 oracle、变异红绿双向）。
++  - F40+三追加 C 行（F，本收口）：T05-C11B/T05-C13 按 RR1 矩阵 F14/F15/F16 与 F08/F10/F14/F35 的 independentReview 翻绿（RR2 改动未触及 egress/compat/golden，证据未过期）；T06-C11B 以 D 绿窗关闭。
++- **RR2 新发现 F44**（seal 三件套 ENOBUFS 遮蔽诊断）：4 文件纯 maxBuffer 选项修复，经 B 包 REVIEW-r2 §5 PASS；生成器 patch-too-large 由 B-r2 分类器登记处置（登记红不转正式绿）。
++- **G-INT/G-NEG DONE**：I01–I11 全 PASS（`G-R2/I-MAPPING.md`，无新 F-ID）；原 16 负测 16/16 fail-closed+RR2 新增反例 6/6（`G-R2/NEG-GATE-RR2.md`）。
++- **完整链与门禁窗口（RR2 候选实测）**：r02_t08 仓库根完整链 `s5-full-5` exit 0（GREEN，登记红如实）；workspace `cargo test --locked --workspace` exit 0（1476/0，D-R2 REVIEW 绿窗）。
++- **资源口径（§四F）**：原始记录=160 混合轮=60 预算取消+60 错误+40 其他（15 正常+10 长响应+15 worker）；恢复前 active≠已终结、重启已消解≠永久泄漏（原始序列 `RR1/INDEPENDENT-9/verify-R05/R05_SUITES/f27-resource-series.json`，stubDropped=60）。
++- **阶段状态（RR2 候选当前真值，§9 六元组口径）**：
++
++```text
++offline_gate:            PENDING（RR2 候选的正式 verify-stage R05 待 FINAL-01 亲跑；workspace 绿窗与 r02_t08 完整链为窗口级实测，不代位正式门禁）
++independent_review:      任务级全部通过（六工作包+F44 独立验收 PASS、G DONE、三追加 C 行收口）；阶段级终审 PENDING（FINAL-01）
++live_verification:       BLOCKED_NOT_AUTHORIZED（RR-BLK-CREDENTIALS，最迟 R10；不变）
++platform_verification:   macOS arm64 = RR2 各包实测平台；Windows = 未验证（继承）；Linux = 未真机验证
++stage_readiness:         READY_FOR_INDEPENDENT_REVIEW
++release_state:           NOT_IN_SCOPE
++R06_READY:               false（待 FINAL-01 阶段终审；终审通过并完成封印/提交流程前不得翻 true）
++```
++
++- **历史记录边界**：§1–§9 的 RR1 叙述与 RR1_INDEPENDENT-9 FAIL 结论为历史事实原文保留；本节不覆盖、不改动其内容。
+diff --git a/docs/rust-tauri/R05/r05_stage_cids.tsv b/docs/rust-tauri/R05/r05_stage_cids.tsv
+index 5a0c5e890..dadf76302 100644
+--- a/docs/rust-tauri/R05/r05_stage_cids.tsv
++++ b/docs/rust-tauri/R05/r05_stage_cids.tsv
+@@ -101,7 +101,7 @@ cid R05-T04-C09 svc:r05_t04_streaming c09_length_truncated_batch_executes_nothin
+ cid R05-T04-C10 adp:r05_t04_rr1_batch_terminal duplicate_provider_ids_with_conflicting_arguments_reject_whole_batch+identical_resends_collapse_but_distinct_ids_stay_independent
+ cid R05-T04-C10 adp:r05_t04_streaming c10_anthropic_duplicates_conflicts_and_event_field_agreement+c10_openai_duplicates_conflicts_and_adjacent_identical_text
+ cid R05-T04-C10 svc:r05_t04_streaming rr1_f11_identical_resend_executes_once+rr1_f11_same_provider_id_conflict_is_loud_with_zero_side_effects
+-cid R05-T04-C11 adp:r05_t04_rr1_batch_terminal anthropic_open_tool_block_cannot_close_as_a_completed_batch+buffered_bodies_without_a_normal_stop_reason_are_loud+openai_done_without_finish_reason_does_not_make_final+positive_controls_normal_terminals_and_legal_batches_still_work+present_but_unmapped_terminal_values_are_loud_and_name_the_value+thinking_only_and_opaque_only_do_not_form_final_answers+unmapped_terminal_values_through_the_stream_accumulators_stay_loud
++cid R05-T04-C11 adp:r05_t04_rr1_batch_terminal anthropic_open_tool_block_cannot_close_as_a_completed_batch+buffered_bodies_without_a_normal_stop_reason_are_loud+known_stop_reason_with_unclosed_tool_block_is_loud_and_dispatches_nothing+openai_done_without_finish_reason_does_not_make_final+positive_controls_normal_terminals_and_legal_batches_still_work+present_but_unmapped_terminal_values_are_loud_and_name_the_value+thinking_only_and_opaque_only_do_not_form_final_answers+unmapped_terminal_values_through_the_stream_accumulators_stay_loud
+ cid R05-T04-C11 adp:r05_t04_streaming c11_stop_reason_table_is_complete_across_the_fragmenting_families
+ cid R05-T04-C11 svc:r05_t04_streaming c11_a_content_refusal_fails_in_place_without_retry+rr1_f12_mood_only_text_settles_process_only_without_final+rr1_f12_reasoning_only_turn_settles_process_only_without_final+rr1_f12_unclassified_live_text_is_not_marked_final_pre_terminal+rr1_f12_unclassified_live_text_stays_unresolved_until_the_terminal
+ cid R05-T04-C12 svc:r05_t04_streaming c12_first_delta_reaches_the_subscriber_before_the_external_stream_ends
+diff --git a/docs/rust-tauri/R05/r05_stage_pins.tsv b/docs/rust-tauri/R05/r05_stage_pins.tsv
+index 80c54d477..260c0cffb 100644
+--- a/docs/rust-tauri/R05/r05_stage_pins.tsv
++++ b/docs/rust-tauri/R05/r05_stage_pins.tsv
+@@ -1,7 +1,7 @@
+ pin adp:r05_t02_oauth_flows 21 r05_t02_oauth_flows
+ pin adp:r05_t03_goldens 3 r05_t03_goldens
+ pin adp:r05_t03_rr1_replay 33 r05_t03_rr1_replay
+-pin adp:r05_t04_rr1_batch_terminal 9 r05_t04_rr1_batch_terminal
++pin adp:r05_t04_rr1_batch_terminal 10 r05_t04_rr1_batch_terminal
+ pin adp:r05_t04_streaming 18 r05_t04_streaming
+ pin adp:r05_t05_compat 1 r05_t05_compat
+ pin adp:r05_t05_timeouts 13 r05_t05_timeouts
+diff --git a/docs/rust-tauri/R05/repair-current/RR1_LEAF_DEVIATIONS.md b/docs/rust-tauri/R05/repair-current/RR1_LEAF_DEVIATIONS.md
+index b1f98f492..a3a12ab26 100644
+--- a/docs/rust-tauri/R05/repair-current/RR1_LEAF_DEVIATIONS.md
++++ b/docs/rust-tauri/R05/repair-current/RR1_LEAF_DEVIATIONS.md
+@@ -27,3 +27,10 @@
+   `rr1_f04::rr1_f04_oauth_model_listing_and_non_oauth_rejection`（该测试同时断言已知非 OAuth 409+oauth_only_surface 与未知 provider 404），
+   即采用登记的处理指令前一种合法形态——语义等价类"明确拒绝"由具名测试钉住，且该叶在阶段图（R05.json full_original_behavior 叶的
+   evidenceRequired）与本文档双向携带偏差说明。R00 叶文本未被修改，断言未放宽，未按 404 误杀实现。
++- 2026-10-06 **状态变更：偏差（就列表而言）已消除**（RR2 WP-E，按 `RR2_MASTER_PROMPT_2026-10-06.md` §四E / F31 执行）：
++  GET `/lingxi/v1/models/oauth/{provider}/models` 对**已知非 OAuth provider 恢复为 404**（与未知 provider 同一最小 body：
++  reason=`model_provider_unknown`，不披露凭证类型/不泄露 provider 存在性差异，零凭证写入），与原 R00 叶文本逐字对齐。
++  钉住测试 `rr1_f04_oauth_model_listing_and_non_oauth_rejection` 同步改为：非 OAuth 列表=404（含零披露/零写入断言）、未知=404（两 body 除
++  requestId 外逐字一致）、合法 OAuth 列表=200+去重并集清单。**其他 OAuth 面接口（login/callback/poll/logout/add/remove model）维持
++  409+oauth_only_surface 不变**——本条目登记的偏差范围自即日起仅覆盖那些非列表接口；其偏差登记原文上方保留，作为历史记录与后续重推导的
++  依据。阶段图 `rust/crates/xtask/src/stage_maps/R05.json` 该叶 evidenceRequired 的偏差说明已最小同步。R00 叶文本仍未被修改。
+diff --git a/rust/crates/lingxi-adapters/tests/r05_t04_rr1_batch_terminal.rs b/rust/crates/lingxi-adapters/tests/r05_t04_rr1_batch_terminal.rs
+index d5581f702..f15704101 100644
+--- a/rust/crates/lingxi-adapters/tests/r05_t04_rr1_batch_terminal.rs
++++ b/rust/crates/lingxi-adapters/tests/r05_t04_rr1_batch_terminal.rs
+@@ -1,8 +1,9 @@
+-//! R05 RR1 (WP-T04, F11/F12/F33): the permanent regression home of the
+-//! adversarial batch/terminal counterexamples migrated from the 2026-10-04
+-//! protocol audit (`artifacts/rust-tauri/R05/RR1/INPUT-adversarial-2026-10-04/
+-//! audit/protocol/src/lib.rs`, PF05/PF06 legs owned by T04), plus the F33
+-//! present-but-unmapped terminal-value legs.
++//! R05 RR1 (WP-T04, F11/F12/F33) + RR2 WP-C (F34): the permanent regression
++//! home of the adversarial batch/terminal counterexamples migrated from the
++//! 2026-10-04 protocol audit (`artifacts/rust-tauri/R05/RR1/
++//! INPUT-adversarial-2026-10-04/audit/protocol/src/lib.rs`, PF05/PF06 legs
++//! owned by T04), the F33 present-but-unmapped terminal-value legs, and the
++//! F34 known-terminal-plus-unclosed-block leg.
+ //!
+ //! The assertions are the audit's CONTRACT assertions verbatim in intent:
+ //! they were red on the frozen candidate (side effects before admission,
+@@ -152,6 +153,86 @@ fn anthropic_open_tool_block_cannot_close_as_a_completed_batch() {
+     );
+ }
+ 
++// ── F34: KNOWN terminal + unclosed block ────────────────────────────────────
++
++/// F34 (RR2 WP-C): the leg above omits content_block_stop AND message_delta
++/// together, so its rejection is absorbed by the missing-stop_reason defense
++/// — a future removal of the unclosed-block check alone leaves it green.
++/// THIS leg holds everything else legal — a complete schema-valid tool
++/// argument object, a KNOWN mapped terminal
++/// (`message_delta` `stop_reason:"tool_use"`), `message_stop` — and omits
++/// ONLY `content_block_stop`. `finish` must reject the whole batch, NAME the
++/// specific unclosed block index, and admit zero tool requests through the
++/// same formal chain the other legs assert on; the inline positive control
++/// adds only the missing `content_block_stop` and the SAME stream must form
++/// a legal batch producing the complete tool request.
++#[test]
++fn known_stop_reason_with_unclosed_tool_block_is_loud_and_dispatches_nothing() {
++    // The fixture: everything legal except content_block_stop (inserted only
++    // in the positive control).
++    let frames = |with_block_stop: bool| {
++        let mut frames = vec![
++            json!({"type":"message_start","message":{"content":[]}}),
++            json!({"type":"content_block_start","index":0,"content_block":{"type":"tool_use","id":"t1","name":"read","input":{}}}),
++            json!({"type":"content_block_delta","index":0,"delta":{"type":"input_json_delta","partial_json":"{\"path\":\"a.txt\"}"}}),
++        ];
++        if with_block_stop {
++            frames.push(json!({"type":"content_block_stop","index":0}));
++        }
++        frames.push(json!({"type":"message_delta","delta":{"stop_reason":"tool_use"}}));
++        frames.push(json!({"type":"message_stop"}));
++        frames
++    };
++
++    // Counterexample: a known, mapped terminal does NOT license an unclosed
++    // block — nothing dispatches through the formal finish() chain.
++    let mut a = ant::MessagesStreamAccumulator::new();
++    for frame in frames(false) {
++        a.handle_event(&ev(frame)).unwrap();
++    }
++    let r = a.finish(&call(), &snapshot(), &SchemaBudget::default());
++    let err = match r {
++        Ok(parsed) => panic!(
++            "a known stop_reason must not license an unclosed block — zero \
++             tool requests through the formal chain, got {:?}",
++            parsed.turn
++        ),
++        Err(err) => err,
++    };
++    assert_eq!(err.code, ErrorCode::InvalidMessage, "F34: {err}");
++    assert!(!err.retryable, "F34 rejection is not retryable: {err}");
++    assert!(
++        err.message.contains("content block(s) [0]") && err.message.contains("content_block_stop"),
++        "the error must name the specific unclosed block index: {err}"
++    );
++
++    // Positive control: adding ONLY the missing content_block_stop makes the
++    // same stream a legal batch whose single tool request arrives complete.
++    let mut a = ant::MessagesStreamAccumulator::new();
++    for frame in frames(true) {
++        a.handle_event(&ev(frame)).unwrap();
++    }
++    match a
++        .finish(&call(), &snapshot(), &SchemaBudget::default())
++        .expect("positive control: the closed stream is a legal batch")
++        .turn
++    {
++        ProviderTurn::ToolRequests { requests, content } => {
++            assert_eq!(requests.len(), 1, "one closed tool block is one request");
++            assert_eq!(requests[0].provider_call_id.as_deref(), Some("t1"));
++            assert_eq!(requests[0].target, "tool:first-party:read");
++            assert_eq!(
++                requests[0].arguments.as_value(),
++                &json!({"path":"a.txt"}),
++                "the tool arguments arrive complete: {:?}",
++                requests[0].arguments.as_value()
++            );
++            assert!(content.is_empty(), "a tools-only turn carries no content");
++        }
++        other => panic!("positive control: expected ToolRequests, got {other:?}"),
++    }
++}
++
+ /// PF05 leg 3 (assertion unchanged): text + [DONE] with NO normal choice
+ /// finish reason is a transport end, not a protocol completion — it must not
+ /// make a Final.
+diff --git a/rust/crates/lingxi-service/src/bin/r04_t07_fixture.rs b/rust/crates/lingxi-service/src/bin/r04_t07_fixture.rs
+index 0f8bce018..fac59b348 100644
+--- a/rust/crates/lingxi-service/src/bin/r04_t07_fixture.rs
++++ b/rust/crates/lingxi-service/src/bin/r04_t07_fixture.rs
+@@ -140,6 +140,32 @@ fn worker(mode: &str, extra: &str) {
+                 }],
+             }));
+         }
++        // R05 RR2 F43 (f24 reclamation leg): the callback's purpose MUST be
++        // a real host-mapped auxiliary slot ("summarize") — a runtime nonce
++        // as purpose is refused by the host's purpose→slot mapping (C09),
++        // so the worker would never reach its parked callback wait. The
++        // UNIQUE tag rides `extra` (argv) for exact process identification
++        // and the prompt, never the purpose.
++        "ask_model_tagged" => {
++            send_line(&serde_json::json!({
++                "kind": "callback", "cb_id": "cb-1", "op": "model.complete",
++                "purpose": "summarize",
++                "prompt": format!("Summarize the granted input. (tag {extra})"),
++                "max_output_tokens": 64,
++            }));
++            let reply = read_line_stdin();
++            send_line(&serde_json::json!({
++                "kind": "result", "id": request["id"], "ok": true,
++                "content": [{
++                    "type": "text",
++                    "text": serde_json::to_string(&serde_json::json!({
++                        "request_id": request["id"],
++                        "reply": reply,
++                    }))
++                    .expect("serializes"),
++                }],
++            }));
++        }
+         // R05-T06 (C08): one callback whose output-token ask is far over
+         // the host cap — the host must refuse it BEFORE any provider
+         // contact.
+diff --git a/rust/crates/lingxi-service/src/management.rs b/rust/crates/lingxi-service/src/management.rs
+index 6693bb8b9..bd8768134 100644
+--- a/rust/crates/lingxi-service/src/management.rs
++++ b/rust/crates/lingxi-service/src/management.rs
+@@ -820,9 +820,12 @@ fn credential_surface_error(
+         .with_reason("credential_surface_refused")
+         .with_cause("models.credential_surface_refused")
+         .into_response(),
+-        // R05 RR1 F04: an OAuth-only surface aimed at a KNOWN non-OAuth
+-        // provider is an explicit 409 — never a 404 that would hide the
+-        // provider's existence (the CFEC64F68DDE leaf's explicit refusal).
++        // R05 RR1 F04 / RR2 F31: the login/logout/registry surfaces aimed
++        // at a KNOWN non-OAuth provider keep the explicit 409 naming the
++        // OAuth-only rule. The MODEL LISTING route deliberately does NOT
++        // map NotOAuth through here — RR2 §四E restored that one face to
++        // the original leaf boundary (LA-CFEC64F68DDE: a 404 with a
++        // minimal, non-disclosing body; see `list_oauth_models`).
+         CredentialError::NotOAuth { .. } => EndpointError::new(
+             StatusCode::CONFLICT,
+             ErrorCode::InvalidMessage,
+@@ -1060,7 +1063,12 @@ async fn logout_model_credential(
+ }
+ 
+ /// R05 RR1 F04 (LA-CFEC64F68DDE / LA-CA0BF9A7AEA9): lists the OAuth
+-/// provider's model ids; a non-OAuth provider is explicitly rejected.
++/// provider's model ids. R05 RR2 F31 restores the ORIGINAL leaf boundary
++/// on this one face: a KNOWN non-OAuth provider is a 404 carrying the
++/// SAME minimal body as an unknown provider (no credential-kind, no
++/// existence oracle, no widened disclosure — the leaf's "非 OAuth provider
++/// 404；不应错误扩大写入或披露范围"). The other OAuth surfaces keep the
++/// explicit 409 through `credential_surface_error`.
+ async fn list_oauth_models(
+     State(state): State<ServiceState>,
+     Extension(principal): Extension<Principal>,
+@@ -1083,12 +1091,18 @@ async fn list_oauth_models(
+             "models": listing.models,
+         }))
+         .into_response(),
+-        Err(lingxi_adapters::models::credentials::CredentialError::NotConfigured { .. }) => {
+-            EndpointError::not_found()
+-                .with_reason("model_provider_unknown")
+-                .with_cause("models.provider_unknown")
+-                .into_response()
+-        }
++        // R05 RR2 F31 (LA-CFEC64F68DDE): unknown providers AND known
++        // non-OAuth providers share ONE minimal 404. The OAuth model
++        // listing of such a provider does not exist, and the body must
++        // not disclose that the provider exists or which credential
++        // kind it uses (formatting `err` would leak both).
++        Err(
++            lingxi_adapters::models::credentials::CredentialError::NotConfigured { .. }
++            | lingxi_adapters::models::credentials::CredentialError::NotOAuth { .. },
++        ) => EndpointError::not_found()
++            .with_reason("model_provider_unknown")
++            .with_cause("models.provider_unknown")
++            .into_response(),
+         Err(err) => credential_surface_error(err),
+     }
+ }
+diff --git a/rust/crates/lingxi-service/tests/r04_t05_process_tools.rs b/rust/crates/lingxi-service/tests/r04_t05_process_tools.rs
+index 6ff367077..e0c024049 100644
+--- a/rust/crates/lingxi-service/tests/r04_t05_process_tools.rs
++++ b/rust/crates/lingxi-service/tests/r04_t05_process_tools.rs
+@@ -449,10 +449,18 @@ async fn wait_until<T>(what: &str, deadline: Duration, mut probe: impl FnMut() -
+     }
+ }
+ 
+-fn read_pid_file(path: &Path) -> Vec<i32> {
+-    let text = std::fs::read_to_string(path).expect("pid file readable");
+-    text.split_whitespace()
+-        .filter_map(|token| token.parse::<i32>().ok())
++/// The pid file's COMPLETE payload: non-empty and every whitespace token
++/// parses as an integer. `None` while the file is missing, empty, or only
++/// partially written (the shell's printf has not landed in full yet).
++fn complete_pid_file(path: &Path) -> Option<Vec<i32>> {
++    let text = std::fs::read_to_string(path).ok()?;
++    let trimmed = text.trim();
++    if trimmed.is_empty() {
++        return None;
++    }
++    trimmed
++        .split_whitespace()
++        .map(|token| token.parse::<i32>().ok())
+         .collect()
+ }
+ 
+@@ -528,12 +536,19 @@ async fn r04_a09_managed_tree_is_killed_and_the_unrelated_sentinel_survives() {
+     .await;
+     let sentinel = spawn_sentinel(&h, 300);
+     let run = spawn_user_run(&h, "sess_local_alpha", "A09: tree + sentinel");
+-    // Barrier 1: the tree published its pids (child + grandchildren alive).
+-    wait_until("tree pid file", Duration::from_secs(20), || {
+-        pid_file.exists().then_some(())
+-    })
++    // Barrier 1: the tree published its COMPLETE pid line (child + two
++    // grandchildren alive). Waiting for the file to merely EXIST races the
++    // shell between creat(2) and the full printf payload (RR1 F43 r04_a09:
++    // the file existed yet parsed to zero pids, failing the count assert).
++    // The barrier returns only when the content is non-empty, fully
++    // parseable, and carries the expected pid count; the count assertion
++    // itself stays.
++    let pids = wait_until(
++        "complete tree pid file (3 parseable pids)",
++        Duration::from_secs(20),
++        || complete_pid_file(&pid_file).filter(|pids| pids.len() == 3),
++    )
+     .await;
+-    let pids = read_pid_file(&pid_file);
+     assert_eq!(pids.len(), 3, "child + two grandchildren: {pids:?}");
+     for pid in &pids {
+         assert!(process_alive(*pid), "pid {pid} alive before cancel");
+diff --git a/rust/crates/lingxi-service/tests/r05_t02_credentials.rs b/rust/crates/lingxi-service/tests/r05_t02_credentials.rs
+index f7ad0e53f..b41437c96 100644
+--- a/rust/crates/lingxi-service/tests/r05_t02_credentials.rs
++++ b/rust/crates/lingxi-service/tests/r05_t02_credentials.rs
+@@ -3744,7 +3744,9 @@ mod rr1_f04 {
+     }
+ 
+     /// LA-CFEC64F68DDE: the model ids of a specified OAuth provider; a
+-    /// non-OAuth provider is EXPLICITLY rejected; an unknown provider 404s.
++    /// non-OAuth provider's listing is the ORIGINAL leaf boundary (R05
++    /// RR2 F31): a 404 with the same minimal body as an unknown provider,
++    /// no credential-state disclosure, zero writes.
+     #[tokio::test]
+     async fn rr1_f04_oauth_model_listing_and_non_oauth_rejection() {
+         let stub = StubServer::start(vec![
+@@ -3823,7 +3825,12 @@ mod rr1_f04 {
+         );
+         assert_eq!(models.len(), 2, "deduplicated union: {models:?}");
+ 
+-        // A NON-OAuth provider is explicitly rejected (not an empty list).
++        // R05 RR2 F31 (LA-CFEC64F68DDE's ORIGINAL boundary restored on the
++        // listing face): a KNOWN non-OAuth provider is a 404 with the SAME
++        // minimal body as an unknown provider — no credential-kind
++        // disclosure, no secret, and ZERO credential writes.
++        let store_before =
++            std::fs::read(boot.runtime_dir.join("credentials.json")).expect("store after login");
+         let (status, body) = http_json_request(
+             management.addr,
+             "GET",
+@@ -3833,16 +3840,24 @@ mod rr1_f04 {
+         )
+         .await;
+         assert_eq!(
+-            status, 409,
+-            "non-OAuth providers are explicitly rejected: {body}"
++            status, 404,
++            "a non-OAuth provider's OAuth model listing is the leaf-mandated 404: {body}"
++        );
++        let rejection = body.to_string();
++        let rejection_lower = rejection.to_lowercase();
++        assert!(
++            !rejection_lower.contains("apikey") && !rejection_lower.contains("authheader"),
++            "the 404 must not disclose the provider's credential kind: {rejection}"
+         );
+         assert!(
+-            body.to_string().to_lowercase().contains("oauth"),
+-            "the rejection names the OAuth-only rule: {body}"
++            !rejection.contains("sk-rr1-f04-aux"),
++            "the 404 must not leak the provider's secret: {rejection}"
+         );
+ 
+-        // An unknown provider is a 404.
+-        let (status, _) = http_json_request(
++        // An unknown provider is the same minimal 404 — one body shape,
++        // no oracle distinguishing "known non-OAuth" from "unknown"
++        // (modulo the per-request requestId correlation id).
++        let (status, ghost_body) = http_json_request(
+             management.addr,
+             "GET",
+             "/lingxi/v1/models/oauth/ghost/models",
+@@ -3851,6 +3866,25 @@ mod rr1_f04 {
+         )
+         .await;
+         assert_eq!(status, 404);
++        let strip_request_id = |mut value: serde_json::Value| {
++            if let Some(details) = value["details"].as_object_mut() {
++                details.remove("requestId");
++            }
++            value
++        };
++        assert_eq!(
++            strip_request_id(body),
++            strip_request_id(ghost_body),
++            "known non-OAuth and unknown providers share ONE minimal 404 body"
++        );
++
++        // Both refused listings wrote NOTHING to the credential store.
++        let store_after =
++            std::fs::read(boot.runtime_dir.join("credentials.json")).expect("store still there");
++        assert_eq!(
++            store_before, store_after,
++            "the refused listings change nothing on disk"
++        );
+ 
+         management.stop().await;
+         stub.stop().await;
+diff --git a/rust/crates/lingxi-service/tests/r05_t08_production_tools.rs b/rust/crates/lingxi-service/tests/r05_t08_production_tools.rs
+index 0b29d0fbb..6a66fdbba 100644
+--- a/rust/crates/lingxi-service/tests/r05_t08_production_tools.rs
++++ b/rust/crates/lingxi-service/tests/r05_t08_production_tools.rs
+@@ -1168,9 +1168,13 @@ async fn f24_worker_child_environment_carries_no_credential_material() {
+ 
+ #[tokio::test]
+ async fn f24_sigterm_with_parked_callback_reaps_the_worker_child() {
+-    // The callback purpose is a unique runtime tag: the fixture child's
+-    // argv carries it (ask_model takes the purpose as its extra argv), so
+-    // `pgrep -f <tag>` identifies EXACTLY the worker under test.
++    // The unique runtime tag identifies EXACTLY the worker under test: the
++    // fixture child's argv carries it (`ask_model_tagged` takes the tag as
++    // its extra argv), so `pgrep -f <tag>` cannot match anything else. The
++    // CALLBACK PURPOSE is the real host-mapped slot "summarize" — a nonce
++    // purpose is refused by the host's purpose→slot mapping (C09) and the
++    // worker would never park (RR1 F43: 32 instant refusals, the run died
++    // of turn_budget_exceeded and no child was ever parked).
+     let tag = runtime_nonce("reap");
+     let release = Arc::new(AtomicBool::new(false));
+     let release_for_stub = Arc::clone(&release);
+@@ -1190,7 +1194,7 @@ async fn f24_sigterm_with_parked_callback_reaps_the_worker_child() {
+     let h = Harness::new(
+         "wreap",
+         &stub.endpoint(),
+-        Some(&workers_section("ask_model", &tag, &tag)),
++        Some(&workers_section("ask_model_tagged", &tag, "summarize")),
+         &["--shutdown-timeout-ms", "8000"],
+     );
+     std::fs::write(h.workspace.join("input.txt"), "reap probe input\n").expect("seed input");
+@@ -1205,20 +1209,79 @@ async fn f24_sigterm_with_parked_callback_reaps_the_worker_child() {
+         "call the worker".to_string(),
+     )
+     .await;
+-    // Wait until the worker child is actually alive in its callback wait.
+-    let deadline = Instant::now() + Duration::from_secs(30);
+-    while count_processes(&tag) == 0 {
++    // Readiness barrier (RR1 F43 f24): wait for the REAL worker→callback
++    // chain instead of a fixed spawn window. The stub recording the
++    // summarize-model-f24 request proves the worker child spawned, dialed
++    // its callback through the REAL gateway, and is parked in the gated SSE
++    // wait; pgrep then confirms the child process itself. The deadline is
++    // only the honesty bound (the file's other barriers use the same 90s
++    // budget) — readiness fires as soon as the chain is truly up, however
++    // loaded the machine.
++    let ready_deadline = Instant::now() + Duration::from_secs(90);
++    loop {
++        let callback_arrived = stub
++            .requests()
++            .iter()
++            .any(|(_, _, body)| body["model"].as_str() == Some("summarize-model-f24"));
++        if callback_arrived && count_processes(&tag) > 0 {
++            break;
++        }
+         assert!(
+-            Instant::now() <= deadline,
+-            "the config-declared worker child never spawned (tag {tag})"
++            Instant::now() <= ready_deadline,
++            "the worker child never reached its parked callback wait (tag {tag}); stub hits: \
++             {}, worker processes: {}, service stderr so far:\n{}",
++            stub.hits(),
++            count_processes(&tag),
++            child.stderr_lines.lock().expect("stderr log").join("\n"),
+         );
+         tokio::time::sleep(Duration::from_millis(25)).await;
+     }
+ 
+-    // SIGTERM: the service must shut down within its budget AND reap the
+-    // worker child (process group + kill_on_drop discipline).
++    // SIGTERM: the service must stay bounded AND reap the worker child
++    // (process group + kill_on_drop discipline). With the callback genuinely
++    // parked (the stub never answers), the in-flight FOREGROUND execute
++    // request cannot settle during the transport drain — the drain waits out
++    // the whole from-signal budget, is abandoned loudly, and the binary
++    // exits deterministically with code 6 (shutdown.rs: bounded at process
++    // level; DB close/record cleanup are the documented overflow residues).
++    // Both ends of the contract are asserted:
++    //   - exit 0  = every phase drained within the budget, or
++    //   - exit 6  = the documented budget-exceeded marker, pinned to the
++    //               transport_drain phase (a DIFFERENT dirty exit — 4/5 or a
++    //               signal death — fails the test);
++    // and NO worker orphan may survive either path.
++    let stderr_tail = Arc::clone(&child.stderr_lines);
+     let exit = child.stop().await;
+-    assert!(exit.success(), "graceful shutdown, got {exit}");
++    let code = exit.code().unwrap_or(-1);
++    let stderr = || {
++        stderr_tail
++            .lock()
++            .expect("stderr log")
++            .iter()
++            .rev()
++            .take(12)
++            .rev()
++            .cloned()
++            .collect::<Vec<String>>()
++            .join("\n")
++    };
++    assert!(
++        code == 0 || code == 6,
++        "unexpected shutdown exit {exit:?} (expected the bounded 0/6 contract); service stderr \
++         tail:\n{}",
++        stderr()
++    );
++    if code == 6 {
++        let tail = stderr();
++        assert!(
++            tail.contains("shutdown exceeded the unified 8000ms from-signal budget")
++                && tail.contains("transport_drain_timed_out=true"),
++            "the code-6 exit must be the documented transport-drain overflow of the parked \
++             callback, nothing else; service stderr tail:\n{tail}"
++        );
++    }
++    // The load-bearing reclamation assertion: the worker child (parked in
++    // its callback wait at signal time) never survives the service.
+     let reap_deadline = Instant::now() + Duration::from_secs(15);
+     while count_processes(&tag) > 0 {
+         assert!(
+diff --git a/rust/crates/xtask/src/stage_map.rs b/rust/crates/xtask/src/stage_map.rs
+index 4ba005fd8..3c6a8784e 100644
+--- a/rust/crates/xtask/src/stage_map.rs
++++ b/rust/crates/xtask/src/stage_map.rs
+@@ -3256,7 +3256,7 @@ mod map_tests {
+             ("adp:r05_t02_oauth_flows", 21),
+             ("adp:r05_t03_goldens", 3),
+             ("adp:r05_t03_rr1_replay", 33),
+-            ("adp:r05_t04_rr1_batch_terminal", 9),
++            ("adp:r05_t04_rr1_batch_terminal", 10),
+             ("adp:r05_t04_streaming", 18),
+             ("adp:r05_t05_compat", 1),
+             ("adp:r05_t05_timeouts", 13),
+diff --git a/rust/crates/xtask/src/stage_maps/R05.json b/rust/crates/xtask/src/stage_maps/R05.json
+index b20d6fde9..80b290d88 100644
+--- a/rust/crates/xtask/src/stage_maps/R05.json
++++ b/rust/crates/xtask/src/stage_maps/R05.json
+@@ -4596,7 +4596,7 @@
+       "basisKind": "full_original_behavior",
+       "stageShare": "",
+       "laterShare": "",
+-      "evidenceRequired": "R05 独占叶（r00ExecutionStageIds 仅 R05）按 full_original_behavior 验收：每条原断言各钉一个具名案例，案例证据=映射套件里具名测试的本轮 `... ok` 行（由 r05_stage_suites 生产者按 r05_leaf_case_map.tsv 的测试级 leafcase 行重算，绝不以整套件全绿代替） 偏差登记：原断言的非 OAuth 边界为 404，实现为 409+oauth_only_surface（docs/rust-tauri/R05/repair-current/RR1_LEAF_DEVIATIONS.md 条目 1：总控 2026-10-04 F04 文本要求“非 OAuth 明确拒绝”未规定状态码；404 会掩盖已知 provider 存在）——具名测试按“明确拒绝”语义类钉住该边界。",
++      "evidenceRequired": "R05 独占叶（r00ExecutionStageIds 仅 R05）按 full_original_behavior 验收：每条原断言各钉一个具名案例，案例证据=映射套件里具名测试的本轮 `... ok` 行（由 r05_stage_suites 生产者按 r05_leaf_case_map.tsv 的测试级 leafcase 行重算，绝不以整套件全绿代替） 偏差登记（历史）：原断言的非 OAuth 边界为 404，RR1 一度实现为 409+oauth_only_surface 并登记于 docs/rust-tauri/R05/repair-current/RR1_LEAF_DEVIATIONS.md 条目 1；2026-10-06 RR2 §四E（F31/WP-E）已将列表面恢复为与原断言一致的 404（与未知 provider 同一最小 body，零凭证状态披露），具名测试按 404 直接钉住该边界；其他 OAuth 面接口（login/callback/poll/logout/add/remove）维持 409，见该登记册条目 1 的状态变更说明。",
+       "evidenceCommandRefs": [
+         "r05_stage_suites"
+       ],
+diff --git a/scripts/rust-tauri/r02_t04_storage_tx.sh b/scripts/rust-tauri/r02_t04_storage_tx.sh
+index d3e8d25f8..a9992c4dc 100755
+--- a/scripts/rust-tauri/r02_t04_storage_tx.sh
++++ b/scripts/rust-tauri/r02_t04_storage_tx.sh
+@@ -193,6 +193,21 @@ trap cleanup EXIT
+ fail() { echo "FAIL: $*" >&2; exit 1; }
+ note() { printf '%s\n' "$*" | tee -a "$EVIDENCE_DIR/summary.txt"; }
+ 
++# ---- S0 (RR2-F41): registry consistency, zero-build fail-fast ---------------
++# The compiled-in migration set (migrations.rs MIGRATIONS) must EQUAL the
++# R02 fingerprint registry (count + versions + names + sha256(SQL)). F41 was
++# exactly this drift (v6/v7 shipped, registry left at 5 entries) and it only
++# surfaced at the END of this script's expensive S4 binary equation. This
++# cheap source-level equality gate catches it before anything is built; the
++# S4 equation below still proves the BUILT binary's receipts/compiledIn
++# against the same registry (neither check replaces the other).
++note "== S0 (RR2-F41): registry consistency — migrations.rs == registry =="
++python3 scripts/rust-tauri/r02_registry_consistency.py \
++  > "$EVIDENCE_DIR/s0-registry-consistency.log" 2>&1 \
++  || { cat "$EVIDENCE_DIR/s0-registry-consistency.log"; \
++       fail "S0 registry consistency failed"; }
++note "PASS S0 registry consistency (count/versions/names/fingerprints exact)"
++
+ # ---- build the real binaries ------------------------------------------------
+ note "== building lingxi-service + lingxi-storage-inspect (rustup $TOOLCHAIN, $TARGET_DIR, --locked) =="
+ $CARGO build --manifest-path rust/Cargo.toml --locked -p lingxi-service -p lingxi-adapters \
+diff --git a/scripts/rust-tauri/r02_t08_legacy_entry_regression.sh b/scripts/rust-tauri/r02_t08_legacy_entry_regression.sh
+index e796eebda..61d83d1fd 100755
+--- a/scripts/rust-tauri/r02_t08_legacy_entry_regression.sh
++++ b/scripts/rust-tauri/r02_t08_legacy_entry_regression.sh
+@@ -84,6 +84,112 @@
+ # The bare `.py` tail and mid-sentence cuts of R6-F01 REMAIN unregistered
+ # — fail-closed unchanged.
+ #
++# R05 RR2 F42 (WP B, 2026-10-06): run-output attribution. d80737b6's
++# evidence-distribution .gitignore rules (!artifacts/rust-tauri/**/*.log
++# etc.) UN-IGNORE every runner log inside the repo, so under the nested
++# verify-stage chain (verify-stage R05 → R04 → R03 → this gate) the
++# stdout/stderr captures that carry THIS gate's output flow — the gate's
++# own sinks <evidence>/r02_legacy_regression/{stdout,stderr}.log plus
++# every ancestor runner's sink (.../r03_regression_gate/stdout.log,
++# .../r04_regression_gate/stdout.log) — became unignored binding content
++# that keeps growing after the main binding, breaking the E0 mirror cmp
++# BY CONSTRUCTION (RR1 INDEPENDENT-9: four live .log rows in the failing
++# binding; the REVIEW-T08-era chain passed only because c549ff654's
++# .gitignore still ignored *.log). The repair-group5 exclusion covered
++# the gate's evidence subtree alone — too narrow once the ignore rule
++# changed. The gate now attributes "this run's ENTIRE run-time output"
++# EXPLICITLY and symmetrically: it discovers the fd-1/fd-2 FILE sinks of
++# its own process tree (self + ancestors — exactly the files that
++# receive this run's output flow; /proc fast path, lsof fallback on
++# darwin) and attributes each in-repo sink under FENCES, never by trust:
++#   • DIR unit  — the sink's command directory, ONLY when it is a
++#     DEDICATED fresh run-output directory: strictly inside artifacts/
++#     at run-root depth (>= artifacts/<area>/<stage>/… — `artifacts`,
++#     `artifacts/rust-tauri` or a bare stage dir can never be a unit:
++#     excluding the whole evidence tree is forbidden), carries no
++#     index-tracked content, and EVERY file currently under it is
++#     attributable to THIS run (itself a discovered sink, inside the
++#     gate's own evidence subtree, or inside another sink directory) —
++#     a directory that already holds foreign/previous-run files is NOT
++#     dedicated and never becomes a unit;
++#   • FILE unit — otherwise exactly the sink file alone (minimal
++#     attribution: nothing wider is excluded, everything around the
++#     sink stays fully bound).
++# R02_A16_RUN_OUTPUT_ROOTS may declare additional repo-relative run
++# roots — an explicit operator attestation, fenced the same way
++# (artifacts/-inside, run-root depth, existing directory, no tracked
++# content). Sinks redirected ONTO index-tracked content are refused
++# outright (that would corrupt bound candidate/evidence state); if
++# neither /proc nor lsof can resolve ANY pid the gate fails closed
++# rather than silently degrading to the F42 failure. The exclusion can
++# never mask candidate source or committed/old evidence: mid-binding
++# source changes, new files, deletions and old STATIC evidence changes
++# OUTSIDE the attributed units still fail the mirror cmp, and an
++# illegal root (rust/, the whole artifacts tree, anything tracked, any
++# too-shallow artifacts dir) is REJECTED. The unit set is computed ONCE
++# before the first binding, recorded auditable in
++# e0-run-output-sinks.txt / e0-binding-exclusions.txt, and passed
++# UNCHANGED to both bindings. An evidence root outside the repository
++# keeps the exhaustive no-exclusion binding (the historical /tmp form).
++# Concurrent sibling writers OUTSIDE the attributed units remain what
++# they always were: copy-race drift that fails the mirror cmp.
++#
++# R05 RR2 B-R2 R2 (WP B round 2, 2026-10-06): E5 FORM-EVOLUTION
++# registration — the generators' patch-too-large replay crash. The two
++# generator-wrapped block positions registered by repair-group10
++# (round2 R10-09 replay / round3 live replay) have been RED at every
++# candidate since the R02 closeout; the ONLY full-E5 runs that ever
++# passed E5-cause-classification accepted them via the registered
++# guard-tail WINDOW + firstDiff forms (R02 final-candidate-
++# fc9971898df7a9e8 / e876171c5cd0a6f8). As the tree kept growing, the
++# regenerated delivery patch crossed git's OWN apply ceiling (git
++# apply.c MAX_APPLY_SIZE = 1024*1024*1024-1 ≈ 1023 MiB; F44 measured
++# `git diff --binary --full-index 67dee5d2 HEAD` = 3,671,013,696 B
++# uncompressed, committed face only), so `git apply --cached` refuses
++# with `error: patch too large` before the generators reach their
++# guard/uncommitted checkpoints: create-delivery-patch.py:359 raises
++# RuntimeError(f"patch replay failed: {apply.stdout…[:2000]}") — an
++# UNCAUGHT exception, python prints its 6-row traceback (frames 457 in
++# <module> / 359 in replay_and_verify) ending in the complete sentence —
++# while create-round3-patch.py:342 raises SystemExit with the same
++# message, which python prints BARE (no traceback). The round3 form has
++# been visible since the R03 verify-stage chains (round3 block 6/7
++# there) and was honestly UNRECOGNIZED — every chain that reached
++# classification failed E5 fail-closed, and the R04/R05 REVIEW-T08
++# FINAL-R3 chain ran this gate DIRECTED (E5 skipped by scope). F44
++# (RR2) removed the ENOBUFS crash that masked the sibling blocks' true
++# seal-lag shapes, leaving exactly these two blocks as the remaining E5
++# reds (s5-full-4 evidence). Registered as the FIFTH seal-lag shape —
++# the SAME registered family's evolved form (the same governance-lag
++# tree growth that produced the guard's ~2100-violator listing now
++# makes the full patch unreplayable by git itself), still a REGISTERED
++# RED: the raw npm exit stays 1, recorded loudly, never formal green.
++# Anchored end-to-end to the producers' exact geometry, no substring
++# accepted:
++#   • producer binding: ONLY inside a block whose FIRST payload row is
++#     the GENERATOR wrapper, and each form binds to ITS OWN generator —
++#     round2: the complete CONSECUTIVE 6-row traceback whose two File
++#     frames cite the WRAPPED script (line 457 in <module> / line 359
++#     in replay_and_verify) with their real source-context rows, ending
++#     in the complete sentence `RuntimeError: patch replay failed:
++#     error: patch too large`; round3: the bare line `patch replay
++#     failed: error: patch too large` (SystemExit message). A bare
++#     sentence under the round2 wrapper, the traceback under the round3
++#     wrapper, or either shape under the node-guard wrapper is NOT this
++#     class;
++#   • the sentence must end with git's complete refusal text
++#     `error: patch too large` — any OTHER git error (corrupt patch,
++#     unrecognized input, …), a truncated sentence, a mutated frame, or
++#     a bare wrapper is UNRECOGNIZED and fails the gate (fail closed,
++#     R6-F01 discipline).
++# Evidence: artifacts/rust-tauri/R05/RR2/B-R2/R2/s5-full-4/ev/
++# legacy-entry/e5-candidate-blocks.txt (round2 block 4, round3 block 6)
++# + artifacts/rust-tauri/R05/RR2/F44/f44-failure-blocks.txt + the
++# classifier-evolution/ replay. Nine E0s fixtures pin it (two REAL
++# positives; seven negatives — truncated sentence, other git error,
++# foreign SystemExit text, cross-producer both ways, mutated frame,
++# node-guard producer).
++#
+ # R02 stage-repair R4 rewrite (review finding R4-F02). The R1 rewrite still
+ # built the "baseline" by copying the dirty candidate worktree and running
+ # `git checkout -f BASE`: that restores TRACKED files only, so untracked
+@@ -251,6 +357,26 @@
+ #                                        inside a block whose first payload
+ #                                        row is a GENERATOR wrapper; gate-r2
+ #                                        round2 block 4 / round3 block 6);
++#                                        RR2 B-R2 R2 form evolution: the
++#                                        generators' patch-too-large replay
++#                                        crash is the FIFTH shape — the
++#                                        tree outgrew git's own apply
++#                                        ceiling (MAX_APPLY_SIZE ≈ 1023 MiB
++#                                        vs a ≥3.67 GB regenerated patch),
++#                                        so round2's complete 6-row
++#                                        RuntimeError traceback (File frames
++#                                        bound to the wrapped generator:
++#                                        line 457 <module> / 359
++#                                        replay_and_verify) ending in
++#                                        `RuntimeError: patch replay failed:
++#                                        error: patch too large`, and
++#                                        round3's bare SystemExit line
++#                                        `patch replay failed: error: patch
++#                                        too large`, each ONLY under ITS
++#                                        OWN generator wrapper, classify
++#                                        here (same registered family, same
++#                                        governance-lag cause; still a
++#                                        registered RED, never green);
+ #                                        ANY other guard reason or payload
+ #                                        shape (R6-F01: missing coordinate
+ #                                        file, non-hex / non-commit
+@@ -272,7 +398,9 @@
+ #                                        it proves baseline pollution and
+ #                                        FAILS the gate.
+ #       - anything else — a bare wrapper with no diagnostics, a python
+-#         Traceback, a foreign Error line, any other generator/guard
++#         Traceback (RR2: other than the ONE registered round2
++#         patch-too-large traceback shape above), a foreign Error line,
++#         any other generator/guard
+ #         refusal, an empty or zero-payload block — is UNRECOGNIZED and
+ #         fails the gate CLOSED. The outer `Error: Command failed: ...`
+ #         line by itself NEVER passes; a recognized sibling block NEVER
+@@ -305,6 +433,14 @@
+ #
+ # Usage: scripts/rust-tauri/r02_t08_legacy_entry_regression.sh [EVIDENCE_DIR]
+ # Env:   R02_A16_BASE_SHA  overrides the baseline commit.
++#        R02_A16_RUN_OUTPUT_ROOTS  optional ':'-separated repo-relative
++#             run-output roots (F42): each must be an EXISTING dedicated
++#             directory strictly inside artifacts/ at run-root depth
++#             (>= artifacts/<area>/<stage>/…) with no index-tracked
++#             content — an illegal root (rust/, artifacts itself, a bare
++#             stage dir, anything tracked) is rejected, never silently
++#             widened.
++#        R02_LEGACY_REGRESSION_MODE  full | directed-no-seal-family.
+ # Exit 0 only if every step holds.
+ set -euo pipefail
+ cd "$(dirname "$0")/../.."
+@@ -339,30 +475,29 @@ git merge-base --is-ancestor "$BASE_SHA" "$CANDIDATE_SHA" \
+ note "PASS E0-ancestry (base is an ancestor of candidate)"
+ 
+ # ── Complete worktree binding (tracked modifications AND untracked content) ─
+-# bind_worktree <repo> <out.tsv> [exclude-prefix]: one line per non-clean
++# bind_worktree <repo> <out.tsv> [exclude-units]: one line per non-clean
+ # path — `<sha256|->  <XY>  <path>` sorted by path. Untracked (non-ignored)
+ # files are included with their content hash; renames record the new path.
+ # This is the full candidate state — never git's tracked-only view
+ # (R4-F02: `--untracked-files=no` let four new candidate files slip past
+ # the binding and into the baseline).
+ #
+-# R02 final-closeout repair-group5 (E0 self-reference): the optional
+-# exclude-prefix is THIS GATE'S OWN EVIDENCE SUBTREE ($EVIDENCE_DIR,
+-# repo-relative), and nothing else. When the evidence root lives inside
+-# the repository (the verify-stage layout), the gate itself writes there
+-# between the two bindings — summary.txt appends, this very tsv going
+-# from empty to populated, the e0-candidate-dirty.* captures — so an
+-# exhaustive binding can never mirror byte-identically (the two scans
+-# differ BY CONSTRUCTION; see the repair-group5 header block above).
+-# Both scans exclude the SAME prefix symmetrically, and the active
+-# exclusion is recorded as a `#` header row in BOTH tsv files so the
+-# compared artifacts stay self-describing and auditable. Files under
+-# the prefix are this run's OUTPUT (runner evidence), never candidate
+-# source; every other path — including the other verify-stage evidence
+-# directories, static during this gate's run — stays fully bound. With
+-# no third argument (the E0s scratch fixtures) or an empty prefix
+-# (evidence root outside the repository, the historical /tmp layout)
+-# the binding stays exhaustive and emits no header row.
++# R02 final-closeout repair-group5 + R05 RR2 F42: the optional
++# exclude-units argument is the NEWLINE-SEPARATED set of THIS RUN's
++# run-time output units (repo-relative run-output DIRECTORIES or single
++# output FILES) — the gate's own evidence subtree plus every
++# attributed/declared run-output unit (see the F42 header block and the
++# discovery below). Paths under (or equal to) a unit are this
++# run's OUTPUT (runner evidence), never candidate source; both bindings
++# exclude the SAME unit set symmetrically, and every unit is recorded as
++# a `#` header row in BOTH tsv files so the compared artifacts stay
++# self-describing and auditable. Units are validated before use (no
++# index-tracked content under them — candidate source and committed
++# evidence stay fully bound); every OTHER path, including static
++# verify-stage evidence of PAST runs, stays exhaustively bound. With no
++# third argument (the E0s scratch fixtures) or an empty string (evidence
++# root outside the repository, the historical /tmp layout) the binding
++# stays exhaustive and emits no header row.
+ bind_worktree() {
+   python3 - "$1" "${3:-}" > "$2" <<'PYBIND'
+ import hashlib
+@@ -371,7 +506,7 @@ import subprocess
+ import sys
+ 
+ repo = sys.argv[1]
+-exclude = sys.argv[2] if len(sys.argv) > 2 else ""
++exclude_units = [u for u in (sys.argv[2] if len(sys.argv) > 2 else "").split("\n") if u]
+ raw = subprocess.run(
+     ["git", "-C", repo, "status", "--porcelain=v1", "-z", "--untracked-files=all"],
+     check=True, capture_output=True,
+@@ -389,10 +524,11 @@ while i < len(records):
+     if "R" in xy or "C" in xy:
+         # rename/copy records carry the original path in the next record
+         i += 1
+-    if exclude and (path == exclude or path.startswith(exclude + "/")):
+-        # this gate's own run-time evidence output subtree — excluded
+-        # SYMMETRICALLY from every binding that passes the same prefix
+-        # (repair-group5; see the function header)
++    if any(path == unit or path.startswith(unit + "/") for unit in exclude_units):
++        # this run's own run-time output root (runner output, never
++        # candidate source) — excluded SYMMETRICALLY from every binding
++        # that passes the same unit set (repair-group5 / F42; see the
++        # bind_worktree header)
+         continue
+     digest = "-"
+     full = os.path.join(repo, path)
+@@ -401,19 +537,17 @@ while i < len(records):
+             digest = hashlib.sha256(fh.read()).hexdigest()
+     rows.append((path, xy, digest))
+ rows.sort()
+-if exclude:
+-    print(f"# binding-exclusion: {exclude}/** — this gate's own run-time evidence output subtree (runner output, never candidate source); applied symmetrically to BOTH the main-repo binding and the candidate-copy binding (E0 mirror compare)")
++for unit in exclude_units:
++    print(f"# binding-exclusion: {unit}/** — this run's run-time output root (runner output, never candidate source); applied symmetrically to BOTH the main-repo binding and the candidate-copy binding (E0 mirror compare)")
+ for path, xy, digest in rows:
+     print(f"{digest}  {xy}  {path}")
+ PYBIND
+ }
+ 
+-# The exclusion prefix (repair-group5): $EVIDENCE_DIR relative to the
+-# repo root, computed ONCE from the two canonical (pwd -P) paths and
+-# passed UNCHANGED to both bindings — the candidate copy reproduces the
+-# same repo-relative layout, so one prefix serves both scans
+-# symmetrically. Empty (no exclusion) when the evidence root lives
+-# OUTSIDE the repository: the binding there stays exhaustive.
++# The gate's own evidence subtree relative to the repo root (repair-group5):
++# computed ONCE from the two canonical (pwd -P) paths. Empty when the
++# evidence root lives OUTSIDE the repository — there the binding stays
++# exhaustive for this part.
+ EVIDENCE_REL_PREFIX="$(python3 - "$MAIN_REPO" "$EVIDENCE_DIR" <<'PYREL'
+ import os
+ import sys
+@@ -426,11 +560,290 @@ else:
+ PYREL
+ )"
+ 
+-# Candidate worktree state — recorded COMPLETELY, never hidden. The ONE
+-# exclusion is this gate's own evidence subtree (repair-group5: with an
+-# in-repo evidence root the gate's own writes between the two scans made
+-# the mirror compare fail BY CONSTRUCTION); see bind_worktree's header.
+-bind_worktree "$MAIN_REPO" "$EVIDENCE_DIR/e0-candidate-binding.tsv" "$EVIDENCE_REL_PREFIX"
++# ── F42 (R05 RR2 WP B): attribute THIS run's run-time output roots ──────────
++# validate_run_output_unit <repo> <unit>: 0 = legal fresh output root (no
++# index-tracked content under it — candidate source and committed evidence
++# must stay bound), 1 = illegal (reason on stderr). Index-based
++# (git ls-files): works on the no-commit E0s scratch repo too.
++validate_run_output_unit() {
++  local repo="$1" unit="$2"
++  case "$unit" in
++    ""|.|..|../*|/*)
++      printf 'not a repo-relative path (repo root / parent / absolute paths can never be exclusion roots)\n' >&2
++      return 1
++      ;;
++  esac
++  if [ -n "$(git -C "$repo" ls-files -- "$unit")" ]; then
++    printf 'covers INDEX-TRACKED content (candidate source / committed evidence must stay bound)\n' >&2
++    return 1
++  fi
++  return 0
++}
++
++# discover_run_output_sinks: one `<KIND> <repo-relative-path>` row per
++# fd-1/fd-2 FILE sink of this process tree (self + ancestors — exactly the
++# files that receive this run's output flow) that lives inside this repo:
++#   DIR <path>         the sink's command directory — ONLY when it is a
++#                      DEDICATED fresh run-output directory: strictly
++#                      inside artifacts/ at run-root depth (>= 4 path
++#                      components: artifacts/<area>/<stage>/…), no
++#                      index-tracked content under it, and every file
++#                      currently under it attributable to THIS run (itself
++#                      a discovered sink, inside the gate's own evidence
++#                      subtree, or inside another sink directory). The
++#                      verify-stage per-command layout qualifies; a shared
++#                      dir that already holds foreign/previous-run files
++#                      NEVER qualifies (F42: old evidence must stay bound);
++#   FILE <path>        the sink file alone, attributed to itself only
++#                      (sink in a source tree, the repo root, a too-
++#                      shallow artifacts dir, or a non-dedicated directory
++#                      — nothing wider may be excluded);
++#   TRACKED-SINK <p>   run output redirected ONTO tracked content — the
++#                      caller refuses outright (it would corrupt bound
++#                      state);
++#   DISCOVERY-UNAVAILABLE  neither /proc nor lsof could resolve ANY pid —
++#                      the caller fails closed instead of silently
++#                      degrading to the F42 failure.
++# /proc/<pid>/fd is the Linux fast path; lsof (-Fpfn: explicit field
++# request — never rely on a platform implicitly emitting fd rows) is the
++# darwin fallback. argv: <repo-abs> <gate-evidence-dir-abs>.
++discover_run_output_sinks() {
++  python3 - "$MAIN_REPO" "$EVIDENCE_DIR" <<'PYDISC'
++import os
++import subprocess
++import sys
++
++repo = os.path.realpath(sys.argv[1])
++evidence_dir = os.path.realpath(sys.argv[2])
++ev_rel = os.path.relpath(evidence_dir, repo)
++if ev_rel == "." or ev_rel == ".." or ev_rel.startswith(".." + os.sep):
++    ev_rel = ""                                   # evidence root outside the repo
++
++# this process tree: self up to (excluding) pid 1, cycle- and depth-capped
++pids, cur, seen = [], os.getpid(), set()
++while cur > 1 and cur not in seen and len(pids) < 64:
++    seen.add(cur)
++    pids.append(cur)
++    try:
++        out = subprocess.run(
++            ["ps", "-o", "ppid=", "-p", str(cur)],
++            capture_output=True, text=True,
++        ).stdout.strip()
++        cur = int(out.split()[0]) if out else 1
++    except Exception:
++        cur = 1
++
++# fd 1/2 file targets per pid — /proc fast path, lsof fallback (darwin)
++resolved_any = False
++fd_targets = set()
++have_proc = os.path.isdir("/proc")
++for pid in pids:
++    fds = {}
++    if have_proc:
++        for fd in ("1", "2"):
++            try:
++                fds[fd] = os.path.realpath(os.readlink("/proc/%d/fd/%s" % (pid, fd)))
++            except OSError:
++                pass
++    if not fds:
++        try:
++            out = subprocess.run(
++                ["lsof", "-a", "-p", str(pid), "-d", "1,2", "-Fpfn"],
++                capture_output=True, text=True,
++            ).stdout
++        except Exception:
++            out = ""
++        cur_fd = None
++        for line in out.splitlines():
++            if line.startswith("p"):
++                cur_fd = None
++            elif line.startswith("f") and line[1:] in ("1", "2"):
++                cur_fd = line[1:]
++            elif line.startswith("n") and cur_fd is not None:
++                fds[cur_fd] = line[1:]
++                cur_fd = None
++    if fds:
++        resolved_any = True
++        for target in fds.values():
++            fd_targets.add(target)
++
++if not resolved_any:
++    print("DISCOVERY-UNAVAILABLE")
++    sys.exit(0)
++
++def tracked(path):
++    # index-tracked entries under path (ls-files: also works on an
++    # unborn-HEAD scratch repo); an unreadable answer is fail-closed
++    try:
++        out = subprocess.run(
++            ["git", "-C", repo, "ls-files", "--", path],
++            check=True, capture_output=True, text=True,
++        ).stdout
++    except Exception:
++        return True
++    return out.strip() != ""
++
++sinks = []                                        # repo-relative sink files
++for target in sorted(fd_targets):
++    if not target.startswith("/"):
++        continue                                  # pipe / device / unnamed target
++    real = os.path.realpath(target)
++    if real == repo or not real.startswith(repo + os.sep):
++        continue                                  # outside this repository
++    if not os.path.isfile(real):
++        continue                                  # directories/devices carry no output
++    sinks.append(os.path.relpath(real, repo))
++
++for rel in sinks:
++    if tracked(rel):
++        print("TRACKED-SINK %s" % rel)
++
++# DIR-unit candidacy, under the F42 fences. Candidate attribution dirs:
++# every sink's directory plus the gate's own evidence dir — a file under
++# a candidate DIR unit is attributable to THIS run only when it is itself
++# a sink, or some directory STRICTLY BELOW the unit (never the unit
++# itself — loose foreign files directly under a non-dedicated dir must
++# not inherit its candidacy) is an attribution dir.
++attribution_dirs = set(os.path.dirname(r) for r in sinks)
++if ev_rel:
++    attribution_dirs.add(ev_rel)
++sink_set = set(sinks)
++
++def dedicated(unit):
++    base = os.path.join(repo, unit)
++    if not os.path.isdir(base):
++        return False
++    for root, dirs, files in os.walk(base):
++        for d in dirs:
++            if os.path.islink(os.path.join(root, d)):
++                return False                      # a symlinked dir could shadow content
++        for f in files:
++            fr = os.path.relpath(os.path.join(root, f), repo)
++            if fr in sink_set:
++                continue                          # itself a discovered sink
++            d_ = os.path.dirname(fr)
++            attributed = False
++            while d_ and d_ != unit:
++                if d_ in attribution_dirs:
++                    attributed = True
++                    break
++                d_ = os.path.dirname(d_)
++            if not attributed:
++                return False                      # foreign/pre-existing file — not dedicated
++    return True
++
++dir_units = set()
++for cand in sorted(attribution_dirs):
++    if not cand or not cand.startswith("artifacts/"):
++        continue                                  # DIR units only inside the evidence tree
++    if len(cand.split("/")) < 4:
++        continue                                  # artifacts / artifacts/<area> / a bare stage dir can never be a unit
++    if tracked(cand):
++        continue                                  # tracked content must stay bound
++    if cand == ev_rel or dedicated(cand):
++        dir_units.add(cand)
++
++emitted_dir = set()
++for rel in sinks:
++    if tracked(rel):
++        continue                                  # already reported as TRACKED-SINK
++    du = os.path.dirname(rel)
++    if du in dir_units:
++        if du not in emitted_dir:
++            emitted_dir.add(du)
++            print("DIR %s" % du)
++    else:
++        print("FILE %s" % rel)
++PYDISC
++}
++
++# validate_declared_run_root <repo> <unit>: an R02_A16_RUN_OUTPUT_ROOTS
++# entry — an EXPLICIT operator attestation — still passes the same
++# fences: strictly inside artifacts/ at run-root depth (>= 4 components),
++# an existing directory, no index-tracked content under it, and a sane
++# repo-relative path. 0 = legal, 1 = illegal (reason on stderr).
++validate_declared_run_root() {
++  local repo="$1" unit="$2"
++  case "$unit" in
++    ""|.|..|../*|/*|*/)
++      printf 'not a plain repo-relative directory path\n' >&2
++      return 1
++      ;;
++  esac
++  case "$unit" in
++    artifacts/*/*/*) : ;;                        # >= artifacts/<area>/<stage>/<run>: `*` in a case
++                                                 # pattern matches across `/`, so this is a depth
++                                                 # floor of 4 components — artifacts itself, a bare
++                                                 # area, or a bare stage dir can never pass
++    *)
++      printf 'not a dedicated run-output root strictly inside artifacts/ at run-root depth (>= artifacts/<area>/<stage>/…): excluding the whole evidence tree or foreign directories is forbidden\n' >&2
++      return 1
++      ;;
++  esac
++  [ -d "$repo/$unit" ] || { printf 'not an existing directory\n' >&2; return 1; }
++  if [ -n "$(git -C "$repo" ls-files -- "$unit")" ]; then
++    printf 'covers INDEX-TRACKED content (candidate source / committed evidence must stay bound)\n' >&2
++    return 1
++  fi
++  return 0
++}
++
++# Assemble the exclusion-unit set ONCE, before the first binding:
++# discovered sink units + explicitly declared roots + the gate's own
++# evidence subtree — every unit validated, duplicates dropped, the final
++# set recorded auditable in e0-binding-exclusions.txt.
++BINDING_EXCLUSIONS="$EVIDENCE_DIR/e0-binding-exclusions.txt"
++SINKS_FILE="$EVIDENCE_DIR/e0-run-output-sinks.txt"
++CANDIDATES_FILE="$EVIDENCE_DIR/e0-binding-exclusion-candidates.tsv"
++: > "$BINDING_EXCLUSIONS"
++# The discovery call runs in a SUBSHELL whose redirection to $SINKS_FILE
++# applies to the subshell only: redirecting the FUNCTION CALL directly
++# would swap the gate bash's OWN fd-1 to $SINKS_FILE for the duration of
++# the scan, hiding this run's real stdout sink from the walk exactly when
++# it must be attributed (debugged live 2026-10-06: a call-site redirect
++# made the parent's stdout.log invisible, stderr stayed visible via the
++# child — the subshell keeps every ancestor's genuine sinks in view).
++( discover_run_output_sinks ) > "$SINKS_FILE"
++if grep -qx 'DISCOVERY-UNAVAILABLE' "$SINKS_FILE"; then
++  fail "E0: cannot discover this run's output sinks (neither /proc nor lsof resolved any pid) — the run-output attribution would silently degrade to the F42 failure; failing closed"
++fi
++if grep -q '^TRACKED-SINK ' "$SINKS_FILE"; then
++  grep '^TRACKED-SINK ' "$SINKS_FILE" >&2
++  fail "E0: this run's output was redirected ONTO tracked content (see e0-run-output-sinks.txt above) — that would corrupt bound candidate/evidence state; move the run's output to a fresh untracked run root or outside the repository (F42)"
++fi
++{
++  sed -n 's/^DIR /sink-dir\t/p; s/^FILE /sink-file\t/p' "$SINKS_FILE"
++  if [ -n "${R02_A16_RUN_OUTPUT_ROOTS:-}" ]; then
++    printf '%s\n' "$R02_A16_RUN_OUTPUT_ROOTS" | tr ':' '\n' | sed 's/^/declared\t/'
++  fi
++  [ -z "$EVIDENCE_REL_PREFIX" ] || printf 'evidence\t%s\n' "$EVIDENCE_REL_PREFIX"
++} | awk -F '\t' '$2 != "" && !seen[$2]++' > "$CANDIDATES_FILE"
++while IFS=$'\t' read -r kind unit; do
++  [ -n "$unit" ] || continue
++  case "$kind" in
++    declared)
++      # an explicitly declared root is an OPERATOR ATTESTATION, but it
++      # still passes the same fences (artifacts/-inside at run-root
++      # depth, existing directory) — never a source dir, never the
++      # whole evidence tree, never the repo root
++      if ! validate_declared_run_root "$MAIN_REPO" "$unit"; then
++        fail "E0: declared run-output root '$unit' is illegal (F42) — run-output roots must be dedicated directories strictly inside artifacts/ covering no tracked content; fix the invocation instead of widening the exclusion"
++      fi
++      ;;
++  esac
++  if ! validate_run_output_unit "$MAIN_REPO" "$unit"; then
++    fail "E0: illegal binding-exclusion unit '$unit' (kind $kind) — exclusion units must be fresh untracked paths covering no tracked content; fix the invocation instead of widening the exclusion (F42)"
++  fi
++  printf '%s\n' "$unit" >> "$BINDING_EXCLUSIONS"
++done < "$CANDIDATES_FILE"
++
++# Candidate worktree state — recorded COMPLETELY, never hidden. The
++# exclusions are this run's run-time output roots ONLY (repair-group5
++# evidence subtree + F42-attributed runner sinks/roots): with an in-repo
++# evidence root or a nested verify-stage chain, the gate's own writes and
++# the chain's runner captures between the two scans would otherwise make
++# the mirror compare fail BY CONSTRUCTION; see bind_worktree's header.
++bind_worktree "$MAIN_REPO" "$EVIDENCE_DIR/e0-candidate-binding.tsv" "$(cat "$BINDING_EXCLUSIONS")"
+ CANDIDATE_BINDING_ROWS="$(grep -vc '^#' "$EVIDENCE_DIR/e0-candidate-binding.tsv" || true)"
+ if [ "$CANDIDATE_BINDING_ROWS" -gt 0 ]; then
+   git status --porcelain --untracked-files=no > "$EVIDENCE_DIR/e0-candidate-dirty.txt"
+@@ -442,8 +855,11 @@ else
+   CANDIDATE_DIRTY=0
+   note "candidate worktree clean: this run binds commit $CANDIDATE_SHA exactly"
+ fi
+-if [ -n "$EVIDENCE_REL_PREFIX" ]; then
+-  note "NOTE e0-binding-exclusion: $EVIDENCE_REL_PREFIX/** (this gate's own run-time evidence output subtree — in-repo evidence root; runner output, never candidate source; applied symmetrically to both bindings — recorded in the # header row of e0-candidate-binding.tsv)"
++if [ -s "$BINDING_EXCLUSIONS" ]; then
++  note "NOTE e0-binding-exclusion: this run's run-time output roots (runner output, never candidate source; applied symmetrically to BOTH bindings; one # header row per root in e0-candidate-binding.tsv; audit: e0-binding-exclusions.txt + e0-run-output-sinks.txt):"
++  while IFS= read -r unit; do
++    note "NOTE e0-binding-exclusion-root: $unit/**"
++  done < "$BINDING_EXCLUSIONS"
+ fi
+ 
+ # ── Isolated copies (APFS copy-on-write; main worktree stays read-only) ────
+@@ -466,12 +882,12 @@ note "== isolated copies under $WORK =="
+ cp -Rc "$MAIN_REPO" "$CAND_COPY"
+ 
+ # Candidate copy must mirror the invoking worktree EXACTLY — tracked
+-# modifications and untracked file contents alike. The exclusion prefix
+-# is the SAME one used for the main-repo binding above (repair-group5:
+-# symmetric exclusion of this gate's own evidence subtree; everything
++# modifications and untracked file contents alike. The exclusion units
++# are the SAME set used for the main-repo binding above (repair-group5 +
++# F42: symmetric exclusion of this run's run-time output roots; everything
+ # else must still match byte for byte).
+ [ "$(git -C "$CAND_COPY" rev-parse HEAD)" = "$CANDIDATE_SHA" ] || fail "candidate copy HEAD mismatch"
+-bind_worktree "$CAND_COPY" "$WORK/candidate-copy-binding.tsv" "$EVIDENCE_REL_PREFIX"
++bind_worktree "$CAND_COPY" "$WORK/candidate-copy-binding.tsv" "$(cat "$BINDING_EXCLUSIONS")"
+ cmp -s "$EVIDENCE_DIR/e0-candidate-binding.tsv" "$WORK/candidate-copy-binding.tsv" \
+   || fail "candidate copy does not mirror the invoking worktree (tracked+untracked content binding differs)"
+ 
+@@ -586,9 +1002,9 @@ UNCOMMITTED_DIAG='current source manifest does not match HEAD (uncommitted or un
+ # silent corruption of the audit record). The one intended expansion
+ # ($UNCOMMITTED_DIAG) is now written literally.
+ cat > "$EVIDENCE_DIR/e5-cause-classes.txt" <<'CLASSES'
+-seal-coordinate-lag	committed non-audit changes post-date the frozen VERIFIED_SOURCE_SHA — ONLY a payload line that is EXACTLY one of the real producers' complete shapes (the seal test's AssertionError sentence, the guard's direct `✗` sentence line, or the generator's guard-embedded line carrying the COMPLETE sentence) classifies here; each shape may end with the trailing `:` and NOTHING else. repair-group10 (gate-r2 round2 block 4 / round3 block 6): the generator's guard-tail WINDOW is the fourth registered shape — `post-verification diff guard failed: ` + a front-cut printable-ASCII path fragment + the guard's complete `  - path` listing lines (final line possibly mid-token where the guard's output was lost past the 64 KiB pipe buffer), accepted ONLY under a GENERATOR wrapper as the block's first payload row, ONLY with no space/colon/non-ASCII in the fragment (sentence material can never pose as a path fragment), ONLY with at least one complete listing line, and ONLY when the reconstructed window is EXACTLY 500 code points (the literal guard_output[-500:] window). A line that carries the complete sentence PLUS additional content (R7-F01: an appended `Error: EACCES: permission denied`) still records the known cause AND is UNRECOGNIZED for its unexplained remainder; any other guard payload (missing/wrong coordinate file, non-hex/non-commit coordinate, `git diff ..HEAD 失败`, permission failure, truncated sentence, bare or geometry-violating tail window) is NOT this class.
++seal-coordinate-lag	committed non-audit changes post-date the frozen VERIFIED_SOURCE_SHA — ONLY a payload line that is EXACTLY one of the real producers' complete shapes (the seal test's AssertionError sentence, the guard's direct `✗` sentence line, or the generator's guard-embedded line carrying the COMPLETE sentence) classifies here; each shape may end with the trailing `:` and NOTHING else. repair-group10 (gate-r2 round2 block 4 / round3 block 6): the generator's guard-tail WINDOW is the fourth registered shape — `post-verification diff guard failed: ` + a front-cut printable-ASCII path fragment + the guard's complete `  - path` listing lines (final line possibly mid-token where the guard's output was lost past the 64 KiB pipe buffer), accepted ONLY under a GENERATOR wrapper as the block's first payload row, ONLY with no space/colon/non-ASCII in the fragment (sentence material can never pose as a path fragment), ONLY with at least one complete listing line, and ONLY when the reconstructed window is EXACTLY 500 code points (the literal guard_output[-500:] window). RR2 B-R2 R2 form evolution (the tree outgrew git's own apply ceiling — MAX_APPLY_SIZE ≈ 1023 MiB vs the ≥3.67 GB regenerated patch, so `git apply --cached` refuses with `error: patch too large` before the generator reaches its guard/uncommitted checkpoints): the generators' patch-too-large replay crash is the FIFTH registered shape, the same family's evolved form and the same registered RED — round2: the complete CONSECUTIVE 6-row python traceback (Traceback header; File frames citing the WRAPPED generator script at line 457 in <module> and line 359 in replay_and_verify with their real source-context rows) ending in the complete sentence `RuntimeError: patch replay failed: error: patch too large`; round3: the bare SystemExit line `patch replay failed: error: patch too large`; each accepted ONLY under ITS OWN generator wrapper as the block's first payload row — a cross-producer combination, either shape under the node-guard wrapper, any OTHER git error text, a truncated sentence, or a mutated frame is NOT this class. A line that carries the complete sentence PLUS additional content (R7-F01: an appended `Error: EACCES: permission denied`) still records the known cause AND is UNRECOGNIZED for its unexplained remainder; any other guard payload (missing/wrong coordinate file, non-hex/non-commit coordinate, `git diff ..HEAD 失败`, permission failure, truncated sentence, bare or geometry-violating tail window) is NOT this class.
+ uncommitted-source-rejection	a patch generator refused: current source manifest does not match HEAD (uncommitted or untracked source changes): firstDiff=[…] — the COMPLETE generator line whose firstDiff body is EXACTLY the producers' json.dumps(diff_paths[:3], ensure_ascii=False) output (a JSON array of 1..3 repo-relative path string literals, nothing else on the line; R9-F01: validated element-by-element, non-JSON/mixed/truncated/empty fail closed) and nothing else; expected at the candidate only while the worktree is dirty; at the base it proves baseline pollution (gate FAILS)
+-UNRECOGNIZED	every payload line that is not a COMPLETE recognized shape and not COMPLETELY part of one's body. R8-F01: every structural category is bound to its producer INSIDE the same block — the `  - path` listing only under a complete guard `✗`/embedded line or a VALIDATED guard-tail window (repair-group10: generator-wrapped, ≥1 complete listing line, exactly 500 code points — a bare `.py` tail, a wrong-length run, a mid-sentence fragment, or a window under any other first row stays right here), the bare-path/diff-body/matcher lines only under the complete AssertionError lead, the wrapper only as the first payload row and only for the three real family commands, the warning only as git's complete CRLF sentence. A body line without its producing lead, a `  - path`/warning/matcher/wrapper line with ANY trailing content, a bare token containing `:`, a `fatal:` line, any foreign Error/✗/Traceback, a truncated or unregistered tail-window guard refusal, a zero-payload block, or a block no recognized diagnostic FULLY explains is UNRECOGNIZED (gate FAILS CLOSED, per BLOCK — no "registered unreadable" class exists; an unproven cause never takes the gate green, at either end)
++UNRECOGNIZED	every payload line that is not a COMPLETE recognized shape and not COMPLETELY part of one's body. R8-F01: every structural category is bound to its producer INSIDE the same block — the `  - path` listing only under a complete guard `✗`/embedded line or a VALIDATED guard-tail window (repair-group10: generator-wrapped, ≥1 complete listing line, exactly 500 code points — a bare `.py` tail, a wrong-length run, a mid-sentence fragment, or a window under any other first row stays right here), the bare-path/diff-body/matcher lines only under the complete AssertionError lead, the wrapper only as the first payload row and only for the three real family commands, the warning only as git's complete CRLF sentence. RR2 B-R2 R2: a patch-too-large traceback/sentence row only counts under its OWN generator wrapper with the COMPLETE end-anchored geometry — a truncated `patch replay failed:` sentence, any other git error text, a foreign SystemExit message, a cross-producer combination, a mutated traceback frame, or the shape under the node-guard wrapper stays right here. A body line without its producing lead, a `  - path`/warning/matcher/wrapper line with ANY trailing content, a bare token containing `:`, a `fatal:` line, any foreign Error/✗/Traceback, a truncated or unregistered tail-window guard refusal, a zero-payload block, or a block no recognized diagnostic FULLY explains is UNRECOGNIZED (gate FAILS CLOSED, per BLOCK — no "registered unreadable" class exists; an unproven cause never takes the gate green, at either end)
+ CLASSES
+ 
+ # extract_blocks <vitest-log> <copy-path>: prints one
+@@ -855,10 +1271,50 @@ classify_file() {
+       genwrapper_exact = "^Error: Command failed: (python3 [^ ]+/create-delivery-patch\\.py|python3 [^ ]+/create-round3-patch\\.py)$"
+       tail_frag_exact = "^[!-9;-~]*$"
+       tail_line_exact = "^  - [!-9;-~]*$"
++      # R05 RR2 B-R2 R2 (form evolution of the repair-group10 family):
++      # the generator patch-too-large replay crash. The tree outgrew
++      # the apply ceiling INSIDE git itself (git apply.c MAX_APPLY_SIZE
++      # = 1024*1024*1024-1 ~ 1023 MiB; F44 measured the regenerated
++      # uncompressed delivery patch at 3,671,013,696 B), so `git apply
++      # --cached` now refuses with `error: patch too large` BEFORE the
++      # generators reach their guard/uncommitted checkpoints. The two
++      # frozen producers surface this differently, and each shape binds
++      # to ITS OWN generator wrapper (the block first payload row):
++      #   • round2 create-delivery-patch.py:359 raises
++      #     RuntimeError(f"patch replay failed: {apply.stdout[:2000]}")
++      #     — an UNCAUGHT exception, so python3 prints its 6-row
++      #     traceback: the Traceback header, the File frame citing the
++      #     WRAPPED script at line 457 in <module> with its source-
++      #     context row, the File frame at line 359 in
++      #     replay_and_verify with the raise line itself, and the
++      #     complete final sentence `RuntimeError: patch replay failed:
++      #     error: patch too large` (the tail IS the complete git
++      #     refusal text — any other git error, a truncated sentence,
++      #     or a mutated frame breaks the anchor);
++      #   • round3 create-round3-patch.py:342 raises SystemExit with the
++      #     same message — python3 prints a string SystemExit BARE (no
++      #     traceback): exactly the line `patch replay failed: error:
++      #     patch too large`. A foreign SystemExit message (`round3
++      #     patch is empty`, cat-file failures, ...) is a DIFFERENT
++      #     failure and never matches.
++      # Cross-producer combinations (a bare sentence under the round2
++      # wrapper, the traceback under the round3 wrapper) and the shapes
++      # under the node-guard wrapper are not real producer outputs and
++      # stay UNRECOGNIZED. A validated form proves the wrapped
++      # generator died at its replay step on the git size ceiling — the
++      # registered family evolved form of the same governance-lag
++      # cause (still a REGISTERED RED, never formal green).
++      ptl_sentence = "patch replay failed: error: patch too large"
++      ptl_r2_final = "RuntimeError: " ptl_sentence
++      qq = sprintf("%c", 39)   # apostrophe, shell-safe (the awk program is single-quoted)
++      ptl_r2_raise = "    raise RuntimeError(f\"patch replay failed: {apply.stdout.decode(errors=" qq "replace" qq ")[:2000]}\")"
+       for (b = 1; b <= maxb; b++) {
+         win_start[b] = 0; win_end[b] = 0
++        ptl_start[b] = 0; ptl_end[b] = 0
+         if (n[b] < 3) continue
+         if (payload[b, 2] !~ genwrapper_exact) continue
++        gscript = payload[b, 2]
++        sub(/^Error: Command failed: python3 /, "", gscript)
+         for (i = 3; i <= n[b]; i++) {
+           if (substr(payload[b, i], 1, length(guard_tail_prefix)) != guard_tail_prefix) continue
+           frag = substr(payload[b, i], length(guard_tail_prefix) + 1)
+@@ -875,6 +1331,30 @@ classify_file() {
+           }
+           break   # exactly one guard-prefix line per real generator failure; an unvalidated one stays fail-closed
+         }
++        if (gscript ~ /\/create-delivery-patch\.py$/) {
++          # round2: the complete consecutive 6-row traceback, File
++          # frames bound to the WRAPPED script, ending in the complete
++          # sentence (see the shape block above).
++          for (i = 3; i + 5 <= n[b]; i++) {
++            if (payload[b, i] != "Traceback (most recent call last):") continue
++            if (payload[b, i+1] != "  File \"" gscript "\", line 457, in <module>") continue
++            if (payload[b, i+2] != "    outcome = replay_and_verify(patch, stored)") continue
++            if (payload[b, i+3] != "  File \"" gscript "\", line 359, in replay_and_verify") continue
++            if (payload[b, i+4] != ptl_r2_raise) continue
++            if (payload[b, i+5] != ptl_r2_final) continue
++            ptl_start[b] = i; ptl_end[b] = i + 5
++            break
++          }
++        } else if (gscript ~ /\/create-round3-patch\.py$/) {
++          # round3: the bare SystemExit message line, complete and
++          # end-anchored (nothing else on the line).
++          for (i = 3; i <= n[b]; i++) {
++            if (payload[b, i] == ptl_sentence) {
++              ptl_start[b] = i; ptl_end[b] = i
++              break
++            }
++          }
++        }
+       }
+       seal = 0; uncommitted = 0; unrecognized = 0
+       for (b = 1; b <= maxb; b++) {
+@@ -889,6 +1369,11 @@ classify_file() {
+           # the body of the classified seal-lag diagnostic (see the
+           # pre-pass above) — explained, never foreign.
+           if (win_start[b] && i >= win_start[b] && i <= win_end[b]) continue
++          # RR2 B-R2 R2: a row inside a VALIDATED patch-too-large form
++          # (round2 traceback / round3 bare SystemExit line) is the body
++          # of the registered family evolved seal-lag diagnostic —
++          # explained, never foreign.
++          if (ptl_start[b] && i >= ptl_start[b] && i <= ptl_end[b]) continue
+           if (index(line, sent_assert) || index(line, sent_pre sent_post)) {
+             # The COMPLETE known sentence is present (with or without 了).
+             # It proves the known cause — but ONLY the exact complete
+@@ -973,6 +1458,12 @@ classify_file() {
+         # refused with the non-audit-change violator listing (the only
+         # fail() sentence that ever prints one) — seal-coordinate-lag.
+         if (win_start[b]) b_seal = 1
++        # RR2 B-R2 R2: a validated patch-too-large form proves the
++        # wrapped generator died at its replay step on the apply
++        # ceiling inside git itself — the registered family evolved
++        # form of the same governance-lag cause (registered RED, never
++        # formal green).
++        if (ptl_start[b]) b_seal = 1
+         if (b_seal) seal = 1
+         if (b_uncommitted) uncommitted = 1
+         # An EMPTY block, a zero-payload block (marker only), or an
+@@ -1654,6 +2145,146 @@ post-verification diff guard failed: udit-r17-cli-rust-targeted/typecheck-05/exi
+ FIX
+ sc_expect guard-window-missing-line "$SELFCHECK/guard-window-missing-line.log" uncommitted-source-rejection UNRECOGNIZED
+ 
++# ── RR2 B-R2 R2: patch-too-large FORM-EVOLUTION fixtures (the family
++# registered by repair-group10, evolved: the tree outgrew git's own
++# apply ceiling — MAX_APPLY_SIZE ≈ 1023 MiB vs the ≥3.67 GB regenerated
++# patch — so `git apply --cached` refuses with `error: patch too large`
++# before the generators reach their guard/uncommitted checkpoints).
++# Producer mechanics: create-delivery-patch.py:359 raises RuntimeError
++# (uncaught → python3 prints the 6-row traceback, File frames citing the
++# wrapped script at lines 457/<module> and 359/replay_and_verify, ending
++# in the complete sentence); create-round3-patch.py:342 raises SystemExit
++# (a string message prints BARE — no traceback). Evidence: artifacts/
++# rust-tauri/R05/RR2/B-R2/R2/s5-full-4/ev/legacy-entry/
++# e5-candidate-blocks.txt round2 block 4 / round3 block 6 + F44. ──────
++# POSITIVE 1 — the real s5-full-4 round2 block-4 shape (wrapper + one
++# real CRLF warning kept + the complete 6-row traceback).
++cat > "$SELFCHECK/ptl-r2-real.log" <<'FIX'
++ FAIL  fixture.ts > round2 > R10-09 replay
++Error: Command failed: python3 /x/artifacts/f1-f12-repair/round2/create-delivery-patch.py
++warning: in the working copy of 'artifacts/rust-tauri/R02/T07/redaction-scan/p1-execute-ok.headers', CRLF will be replaced by LF the next time Git touches it
++Traceback (most recent call last):
++  File "/x/artifacts/f1-f12-repair/round2/create-delivery-patch.py", line 457, in <module>
++    outcome = replay_and_verify(patch, stored)
++  File "/x/artifacts/f1-f12-repair/round2/create-delivery-patch.py", line 359, in replay_and_verify
++    raise RuntimeError(f"patch replay failed: {apply.stdout.decode(errors='replace')[:2000]}")
++RuntimeError: patch replay failed: error: patch too large
++
++ ❯ fixture.ts:255:22
++FIX
++sc_expect ptl-r2-real "$SELFCHECK/ptl-r2-real.log" seal-coordinate-lag
++
++# POSITIVE 2 — the real s5-full-4 round3 block-6 shape (round3 wrapper +
++# one real warning + the bare SystemExit line).
++cat > "$SELFCHECK/ptl-r3-real.log" <<'FIX'
++ FAIL  fixture.ts > round3 > live replay
++Error: Command failed: python3 /x/artifacts/f1-f12-repair/round3-c01-c03/create-round3-patch.py
++warning: in the working copy of 'artifacts/rust-tauri/R02/T07/redaction-scan/p1-execute-ok.headers', CRLF will be replaced by LF the next time Git touches it
++patch replay failed: error: patch too large
++
++ ❯ fixture.ts:220:18
++FIX
++sc_expect ptl-r3-real "$SELFCHECK/ptl-r3-real.log" seal-coordinate-lag
++
++# NEGATIVE 1 — truncated final sentence (`too` cut): the end anchor is
++# gone; the whole traceback stays unexplained.
++cat > "$SELFCHECK/ptl-r2-truncated.log" <<'FIX'
++ FAIL  fixture.ts > round2 > R10-09 replay
++Error: Command failed: python3 /x/artifacts/f1-f12-repair/round2/create-delivery-patch.py
++Traceback (most recent call last):
++  File "/x/artifacts/f1-f12-repair/round2/create-delivery-patch.py", line 457, in <module>
++    outcome = replay_and_verify(patch, stored)
++  File "/x/artifacts/f1-f12-repair/round2/create-delivery-patch.py", line 359, in replay_and_verify
++    raise RuntimeError(f"patch replay failed: {apply.stdout.decode(errors='replace')[:2000]}")
++RuntimeError: patch replay failed: error: patch too
++ ❯ fixture.ts:255:22
++FIX
++sc_expect ptl-r2-truncated "$SELFCHECK/ptl-r2-truncated.log" UNRECOGNIZED
++
++# NEGATIVE 2 — a DIFFERENT git error text (`error: corrupt patch at
++# line 5`): not the size-ceiling family — another failure, fail closed.
++cat > "$SELFCHECK/ptl-r2-other-git-error.log" <<'FIX'
++ FAIL  fixture.ts > round2 > R10-09 replay
++Error: Command failed: python3 /x/artifacts/f1-f12-repair/round2/create-delivery-patch.py
++Traceback (most recent call last):
++  File "/x/artifacts/f1-f12-repair/round2/create-delivery-patch.py", line 457, in <module>
++    outcome = replay_and_verify(patch, stored)
++  File "/x/artifacts/f1-f12-repair/round2/create-delivery-patch.py", line 359, in replay_and_verify
++    raise RuntimeError(f"patch replay failed: {apply.stdout.decode(errors='replace')[:2000]}")
++RuntimeError: patch replay failed: error: corrupt patch at line 5
++ ❯ fixture.ts:255:22
++FIX
++sc_expect ptl-r2-other-git-error "$SELFCHECK/ptl-r2-other-git-error.log" UNRECOGNIZED
++
++# NEGATIVE 3 — a FOREIGN SystemExit message under the round3 wrapper
++# (the generator's line-239 `round3 patch is empty`): a different
++# producer failure, never the size-ceiling sentence.
++cat > "$SELFCHECK/ptl-r3-other-systemexit.log" <<'FIX'
++ FAIL  fixture.ts > round3 > live replay
++Error: Command failed: python3 /x/artifacts/f1-f12-repair/round3-c01-c03/create-round3-patch.py
++round3 patch is empty
++ ❯ fixture.ts:220:18
++FIX
++sc_expect ptl-r3-other-systemexit "$SELFCHECK/ptl-r3-other-systemexit.log" UNRECOGNIZED
++
++# NEGATIVE 4 — cross-producer: the round3 BARE sentence under the
++# round2 wrapper (the round2 producer always prints the traceback).
++cat > "$SELFCHECK/ptl-cross-bare-under-r2.log" <<'FIX'
++ FAIL  fixture.ts > round2 > R10-09 replay
++Error: Command failed: python3 /x/artifacts/f1-f12-repair/round2/create-delivery-patch.py
++patch replay failed: error: patch too large
++ ❯ fixture.ts:255:22
++FIX
++sc_expect ptl-cross-bare-under-r2 "$SELFCHECK/ptl-cross-bare-under-r2.log" UNRECOGNIZED
++
++# NEGATIVE 5 — cross-producer: the complete round2 traceback under the
++# round3 wrapper (the round3 producer raises SystemExit — bare line
++# only).
++cat > "$SELFCHECK/ptl-cross-traceback-under-r3.log" <<'FIX'
++ FAIL  fixture.ts > round3 > live replay
++Error: Command failed: python3 /x/artifacts/f1-f12-repair/round3-c01-c03/create-round3-patch.py
++Traceback (most recent call last):
++  File "/x/artifacts/f1-f12-repair/round2/create-delivery-patch.py", line 457, in <module>
++    outcome = replay_and_verify(patch, stored)
++  File "/x/artifacts/f1-f12-repair/round2/create-delivery-patch.py", line 359, in replay_and_verify
++    raise RuntimeError(f"patch replay failed: {apply.stdout.decode(errors='replace')[:2000]}")
++RuntimeError: patch replay failed: error: patch too large
++ ❯ fixture.ts:220:18
++FIX
++sc_expect ptl-cross-traceback-under-r3 "$SELFCHECK/ptl-cross-traceback-under-r3.log" UNRECOGNIZED
++
++# NEGATIVE 6 — single-point mutation: the first File frame's line number
++# 458 instead of 457 (a different generator build would be a different
++# producer). The frame anchor fails closed.
++cat > "$SELFCHECK/ptl-r2-mutated-frame.log" <<'FIX'
++ FAIL  fixture.ts > round2 > R10-09 replay
++Error: Command failed: python3 /x/artifacts/f1-f12-repair/round2/create-delivery-patch.py
++Traceback (most recent call last):
++  File "/x/artifacts/f1-f12-repair/round2/create-delivery-patch.py", line 458, in <module>
++    outcome = replay_and_verify(patch, stored)
++  File "/x/artifacts/f1-f12-repair/round2/create-delivery-patch.py", line 359, in replay_and_verify
++    raise RuntimeError(f"patch replay failed: {apply.stdout.decode(errors='replace')[:2000]}")
++RuntimeError: patch replay failed: error: patch too large
++ ❯ fixture.ts:255:22
++FIX
++sc_expect ptl-r2-mutated-frame "$SELFCHECK/ptl-r2-mutated-frame.log" UNRECOGNIZED
++
++# NEGATIVE 7 — producer binding: the complete round2 shape under the
++# NODE-guard wrapper (verify-post-verification-diff.mjs never spawns the
++# generators' replay step).
++cat > "$SELFCHECK/ptl-node-guard-wrapper.log" <<'FIX'
++ FAIL  fixture.ts > seal > guard
++Error: Command failed: node /x/.sync-audit/verify-post-verification-diff.mjs
++Traceback (most recent call last):
++  File "/x/artifacts/f1-f12-repair/round2/create-delivery-patch.py", line 457, in <module>
++    outcome = replay_and_verify(patch, stored)
++  File "/x/artifacts/f1-f12-repair/round2/create-delivery-patch.py", line 359, in replay_and_verify
++    raise RuntimeError(f"patch replay failed: {apply.stdout.decode(errors='replace')[:2000]}")
++RuntimeError: patch replay failed: error: patch too large
++ ❯ fixture.ts:95:20
++FIX
++sc_expect ptl-node-guard-wrapper "$SELFCHECK/ptl-node-guard-wrapper.log" UNRECOGNIZED
++
+ # Positive control: a GREEN log (no FAIL block at all) parses to an empty
+ # failing-file set and zero classes — the legal all-green state the
+ # pristine baseline is expected to produce (never an error).
+@@ -2056,6 +2687,85 @@ cmp -s "$SELFCHECK/bind-ev2.tsv" "$SELFCHECK/bind-ev3.tsv" \
+ bind_worktree "$SCRATCH" "$SELFCHECK/bind-ev4.tsv"
+ grep -qF "$SCRATCH_EV/summary.txt" "$SELFCHECK/bind-ev4.tsv" \
+   || fail "E0s: without the exclusion prefix the evidence subtree must stay fully bound (default exhaustive)"
++# ── F42 (R05 RR2 WP B): run-output-root VALIDATION fixtures — the
++# exclusion can never cover index-tracked content (candidate source /
++# committed evidence) and never the repo root; a fresh untracked run
++# directory validates. The scratch repo stays at its unborn HEAD (no
++# commit): the tracked fixture paths are STAGED (index entries), which is
++# exactly what validate_run_output_unit reads.
++mkdir -p "$SCRATCH/run-out/fresh-dir" "$SCRATCH/rust"
++printf 'out\n' > "$SCRATCH/run-out/fresh-dir/sink.log"
++printf 'pub fn f() {}\n' > "$SCRATCH/rust/lib.rs"
++printf 'src\n' > "$SCRATCH/rust-main.rs"
++git -C "$SCRATCH" add rust/lib.rs rust-main.rs
++validate_run_output_unit "$SCRATCH" "run-out/fresh-dir" \
++  || fail "E0s: a fresh untracked run-output directory must validate as an exclusion root"
++validate_run_output_unit "$SCRATCH" "rust" 2>/dev/null \
++  && fail "E0s: a SOURCE directory (rust/, carrying tracked content) must be REJECTED as an exclusion root"
++validate_run_output_unit "$SCRATCH" "rust-main.rs" 2>/dev/null \
++  && fail "E0s: an index-tracked path must be REJECTED as an exclusion root"
++validate_run_output_unit "$SCRATCH" "." 2>/dev/null \
++  && fail "E0s: the repo root must be REJECTED as an exclusion root"
++validate_run_output_unit "$SCRATCH" "/abs" 2>/dev/null \
++  && fail "E0s: an absolute path must be REJECTED as an exclusion root"
++validate_run_output_unit "$SCRATCH" ".." 2>/dev/null \
++  && fail "E0s: a parent-relative path must be REJECTED as an exclusion root"
++# ── F42: DECLARED run-output roots (R02_A16_RUN_OUTPUT_ROOTS) are an
++# operator attestation but pass the SAME fences: a dedicated directory
++# strictly inside artifacts/ at run-root depth. The whole evidence tree
++# (artifacts / artifacts/rust-tauri), a bare stage dir, a source dir, a
++# directory outside artifacts/, and a non-existent path are ALL illegal —
++# `不得排除整个 artifacts` is enforced structurally, never by trust.
++mkdir -p "$SCRATCH/artifacts/rust-tauri/R05/rr2-fixture-run-root"
++printf 'run\n' > "$SCRATCH/artifacts/rust-tauri/R05/rr2-fixture-run-root/stdout.log"
++validate_declared_run_root "$SCRATCH" "artifacts/rust-tauri/R05/rr2-fixture-run-root" \
++  || fail "E0s: a dedicated fresh run root strictly inside artifacts/ must validate as a declared run-output root"
++validate_declared_run_root "$SCRATCH" "rust" 2>/dev/null \
++  && fail "E0s: a SOURCE directory (rust/) must be REJECTED as a declared run-output root"
++validate_declared_run_root "$SCRATCH" "artifacts" 2>/dev/null \
++  && fail "E0s: the whole artifacts tree must be REJECTED as a declared run-output root"
++validate_declared_run_root "$SCRATCH" "artifacts/rust-tauri" 2>/dev/null \
++  && fail "E0s: the whole evidence-distribution tree (artifacts/rust-tauri) must be REJECTED as a declared run-output root"
++validate_declared_run_root "$SCRATCH" "artifacts/rust-tauri/R05" 2>/dev/null \
++  && fail "E0s: a bare stage dir (artifacts/rust-tauri/R05) is not a dedicated run root — must be REJECTED"
++validate_declared_run_root "$SCRATCH" "scripts" 2>/dev/null \
++  && fail "E0s: a directory outside artifacts/ must be REJECTED as a declared run-output root"
++validate_declared_run_root "$SCRATCH" "artifacts/rust-tauri/R05/does-not-exist" 2>/dev/null \
++  && fail "E0s: a non-existent declared run-output root must be REJECTED"
++# ── F42: MULTIPLE exclusion units — growth under ANY excluded run root
++# is invisible to the binding (each root is this run's output), a
++# content change OUTSIDE every unit still flips it, and each unit
++# records its own # header row.
++mkdir -p "$SCRATCH/run-root-a/cmd" "$SCRATCH/run-root-b/cmd"
++printf 'a\n' > "$SCRATCH/run-root-a/cmd/stdout.log"
++printf 'b\n' > "$SCRATCH/run-root-b/cmd/stdout.log"
++bind_worktree "$SCRATCH" "$SELFCHECK/bind-mu1.tsv" "$(printf '%s\n%s' run-root-a run-root-b)"
++printf 'a-grew\n' >> "$SCRATCH/run-root-a/cmd/stdout.log"
++printf 'b-grew\n' >> "$SCRATCH/run-root-b/cmd/stdout.log"
++bind_worktree "$SCRATCH" "$SELFCHECK/bind-mu2.tsv" "$(printf '%s\n%s' run-root-a run-root-b)"
++cmp -s "$SELFCHECK/bind-mu1.tsv" "$SELFCHECK/bind-mu2.tsv" \
++  || fail "E0s: multi-unit exclusion broken (growth under an excluded run root changed the binding)"
++[ "$(grep -c '^# binding-exclusion: ' "$SELFCHECK/bind-mu1.tsv")" = "2" ] \
++  || fail "E0s: each exclusion unit must record its own # header row (F42)"
++printf 'changed-outside-units\n' > "$SCRATCH/untracked.rs"
++bind_worktree "$SCRATCH" "$SELFCHECK/bind-mu3.tsv" "$(printf '%s\n%s' run-root-a run-root-b)"
++cmp -s "$SELFCHECK/bind-mu2.tsv" "$SELFCHECK/bind-mu3.tsv" \
++  && fail "E0s: the multi-unit exclusion masked a non-excluded untracked content change"
++# ── F42: FILE units (the demoted minimal attribution) — exactly the
++# sink file is excluded: growth of the sink itself is invisible, growth
++# of its SIBLING in the same directory still flips the binding. The
++# dedication fence demotes a sink in a non-dedicated dir to exactly this
++# shape, so the sibling old-evidence files around it stay fully bound.
++printf 'c\n' > "$SCRATCH/run-root-b/cmd/stderr.log"
++bind_worktree "$SCRATCH" "$SELFCHECK/bind-fu1.tsv" "run-root-b/cmd/stdout.log"
++printf 'c-grew\n' >> "$SCRATCH/run-root-b/cmd/stdout.log"
++bind_worktree "$SCRATCH" "$SELFCHECK/bind-fu2.tsv" "run-root-b/cmd/stdout.log"
++cmp -s "$SELFCHECK/bind-fu1.tsv" "$SELFCHECK/bind-fu2.tsv" \
++  || fail "E0s: a FILE unit must hide its own sink's growth"
++printf 'c-grew-again\n' >> "$SCRATCH/run-root-b/cmd/stderr.log"
++bind_worktree "$SCRATCH" "$SELFCHECK/bind-fu3.tsv" "run-root-b/cmd/stdout.log"
++cmp -s "$SELFCHECK/bind-fu2.tsv" "$SELFCHECK/bind-fu3.tsv" \
++  && fail "E0s: a FILE unit masked a SIBLING file's content change (minimal attribution broken)"
+ # The baseline-CONSTRUCTION proof is the E0 purity assert on the real
+ # freshly-built base copy (HEAD == BASE_SHA, empty diff, empty status):
+ # the R4 scratch-repo rehearsal used `checkout -f` + `clean -fd` and is
+@@ -2063,9 +2773,10 @@ grep -qF "$SCRATCH_EV/summary.txt" "$SELFCHECK/bind-ev4.tsv" \
+ {
+   echo "binding: identical-state match OK; untracked content change detected; new untracked file detected (no-commit scratch repo)"
+   echo "binding exclusion (repair-group5): excluded-subtree changes invisible; non-excluded content change still detected; header row recorded; default binding stays exhaustive without the prefix"
++  echo "binding exclusion (F42): run-output-root validation OK — fresh untracked dir accepted; tracked source dir (rust/), tracked path, repo root, absolute and parent-relative paths all REJECTED; declared roots fenced — dedicated artifacts/-inside run root accepted, the whole evidence tree (artifacts / artifacts/rust-tauri), a bare stage dir, rust/, outside-artifacts dirs and non-existent paths all REJECTED; multi-unit exclusion — growth under any excluded run root invisible, non-excluded content change still detected, one # header row per unit; FILE units — own sink growth invisible, sibling content change still detected (minimal attribution)"
+   echo "baseline construction: proven by the E0 purity asserts on the real fresh copy (no checkout -f / clean -fd anywhere)"
+ } | tee -a "$EVIDENCE_DIR/e0s-self-checks.log"
+-note "PASS E0s-gate-self-checks (53 classifier fixtures incl. every REAL guard failure sentence, the zero-payload shapes, the R7 same-line/same-block mixes, the real direct-guard shape, the R8 structural-mixing negatives (compact Error:EACCES token, list/warning/matcher/wrapper tails, foreign/misplaced wrapper) and the producer-binding negatives (body lines without their lead) plus the REAL matcher-summary/diff-body positives, the R9-F01 firstDiff structure fixtures (legal bracket/comma/escape/non-ASCII paths pure, non-JSON/mixed/truncated/empty/4-element/trailing-junk payloads fail closed), the repair-group10 guard-tail-window fixtures (the two gate-r2 round2/round3 REAL 500-point windows + the derived complete-end variant classify seal+uncommitted; single-point mutations — off-by-one char, trailing junk, sentence-material fragment, wrong producer wrapper, deleted listing line — all fail closed to UNRECOGNIZED) + no-block-rows rejection + green positive control + parseability predicate incl. exit-0 summary completeness and summary/exit consistency with the R9-F01 one-directional header-loss rule (suite-error no-arrow header and multi-error headers are PARSABLE; headers < Tests-failed is CONTRADICTORY) and the R10-F01 floors (headers < Test-Files-failed count — the zero-header suite-error summary hole — and Tests-failed>0 with Test-Files-failed==0 incoherence — both CONTRADICTORY; counts side-channel records files_failed/distinct_files/verdict) + exact-identity family membership checks + no-commit binding checks; details in e0s-self-checks.log)"
++note "PASS E0s-gate-self-checks (62 classifier fixtures incl. every REAL guard failure sentence, the zero-payload shapes, the R7 same-line/same-block mixes, the real direct-guard shape, the R8 structural-mixing negatives (compact Error:EACCES token, list/warning/matcher/wrapper tails, foreign/misplaced wrapper) and the producer-binding negatives (body lines without their lead) plus the REAL matcher-summary/diff-body positives, the R9-F01 firstDiff structure fixtures (legal bracket/comma/escape/non-ASCII paths pure, non-JSON/mixed/truncated/empty/4-element/trailing-junk payloads fail closed), the repair-group10 guard-tail-window fixtures (the two gate-r2 round2/round3 REAL 500-point windows + the derived complete-end variant classify seal+uncommitted; single-point mutations — off-by-one char, trailing junk, sentence-material fragment, wrong producer wrapper, deleted listing line — all fail closed to UNRECOGNIZED), the RR2 patch-too-large form-evolution fixtures (the two REAL s5-full-4 shapes — round2's complete 6-row RuntimeError traceback and round3's bare SystemExit line — classify seal; truncated sentence, other git error text, foreign SystemExit message, cross-producer both ways, mutated frame and node-guard producer all fail closed to UNRECOGNIZED) + no-block-rows rejection + green positive control + parseability predicate incl. exit-0 summary completeness and summary/exit consistency with the R9-F01 one-directional header-loss rule (suite-error no-arrow header and multi-error headers are PARSABLE; headers < Tests-failed is CONTRADICTORY) and the R10-F01 floors (headers < Test-Files-failed count — the zero-header suite-error summary hole — and Tests-failed>0 with Test-Files-failed==0 incoherence — both CONTRADICTORY; counts side-channel records files_failed/distinct_files/verdict) + exact-identity family membership checks + no-commit binding checks + F42 run-output-root validation (fresh artifacts/ dir accepted; tracked source dir / tracked path / repo root / absolute / parent-relative rejected), declared-root fencing (dedicated artifacts/-inside run root accepted; the whole evidence tree, a bare stage dir, rust/, outside-artifacts and non-existent rejected) and multi-unit/FILE-unit exclusion fixtures (growth under any excluded run root invisible, non-excluded and sibling changes still detected, one # header row per unit); details in e0s-self-checks.log)"
+ 
+ # ── E1: default-entry-not-switched proofs (inside the candidate copy, so
+ #        uncommitted candidate state is included) ────────────────────────────
+@@ -2463,7 +3174,7 @@ fi
+ # UNRECOGNIZED and has already failed the gate above, at BOTH ends (a
+ # pristine base must not trip the guard at all; a candidate guard refusal
+ # whose cause cannot be completely read is an unproven failure).
+-note "PASS E5-cause-classification (every red BLOCK at both ends independently classified from actual generator/guard diagnostics against COMPLETE end-anchored producer shapes with R8-F01 producer binding: body lines legitimate only under their complete lead, wrapper only first-row-and-only-real-family-commands, structural prefixes never pass-through; repair-group10: the guard-tail WINDOW — generator wrapper + ASCII path fragment + >=1 complete listing line + exactly 500 code points reconstructed — is the registered fourth seal-lag shape, every other window geometry included; no bare wrapper accepted; no recognized block absorbs an unrecognized sibling; a line carrying a complete known sentence PLUS anything else, and any unknown payload line (fatal:, foreign error, truncated/unregistered-tail-window/missing-coordinate guard refusal, zero payload), is UNRECOGNIZED and has failed the gate; no registered-unreadable acceptance exists)"
++note "PASS E5-cause-classification (every red BLOCK at both ends independently classified from actual generator/guard diagnostics against COMPLETE end-anchored producer shapes with R8-F01 producer binding: body lines legitimate only under their complete lead, wrapper only first-row-and-only-real-family-commands, structural prefixes never pass-through; repair-group10: the guard-tail WINDOW — generator wrapper + ASCII path fragment + >=1 complete listing line + exactly 500 code points reconstructed — is the registered fourth seal-lag shape, every other window geometry included; RR2 B-R2 R2 form evolution: the generators' patch-too-large replay crash — round2's complete 6-row RuntimeError traceback (File frames bound to the wrapped generator, lines 457/<module> and 359/replay_and_verify) and round3's bare SystemExit line, each ONLY under its OWN generator wrapper and each ending in git's complete \`error: patch too large\` refusal — is the registered fifth seal-lag shape (the family outgrew git's MAX_APPLY_SIZE apply ceiling; still a registered RED, never formal green), every other payload (other git errors, truncated sentences, cross-producer shapes, mutated frames) included; no bare wrapper accepted; no recognized block absorbs an unrecognized sibling; a line carrying a complete known sentence PLUS anything else, and any unknown payload line (fatal:, foreign error, truncated/unregistered-tail-window/missing-coordinate guard refusal, zero payload), is UNRECOGNIZED and has failed the gate; no registered-unreadable acceptance exists)"
+ 
+ # (3b) Class registration — the two documented classes are recorded
+ # separately and loudly; neither is repainted as formal green.
+@@ -2475,7 +3186,7 @@ note "PASS E5-cause-classification (every red BLOCK at both ends independently c
+   echo "base classes by file:"
+   cat "$EVIDENCE_DIR/e5-base-causes.txt"
+ } > "$EVIDENCE_DIR/e5-class-registration.txt"
+-note "class registration archived in e5-class-registration.txt (seal-coordinate-lag = committed governance lag; uncommitted-source-rejection = dirty-tree generator refusal; every other shape — wrapper-only, crash, foreign error, truncated/tail-window guard refusal, zero payload — is UNRECOGNIZED and fails the gate; registered reds stay red, never formal green)"
++note "class registration archived in e5-class-registration.txt (seal-coordinate-lag = committed governance lag — including, since RR2, the generators' patch-too-large replay crash as the registered family's evolved form: the tree outgrew git's MAX_APPLY_SIZE apply ceiling; uncommitted-source-rejection = dirty-tree generator refusal; every other shape — wrapper-only, crash, foreign error, truncated/tail-window/patch-too-large-with-wrong-geometry guard refusal, zero payload — is UNRECOGNIZED and fails the gate; registered reds stay red, never formal green)"
+ 
+ # (4) Per-file cause sets at base vs candidate are REPORTED, not
+ # set-compared: a family file legitimately GAINS classes as the stage's
+diff --git a/tests/post-verification-audit-seal.test.ts b/tests/post-verification-audit-seal.test.ts
+index 168646545..9ea8e0b1a 100644
+--- a/tests/post-verification-audit-seal.test.ts
++++ b/tests/post-verification-audit-seal.test.ts
+@@ -26,6 +26,12 @@ import { describe, expect, it } from "vitest";
+ const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
+ const VERIFIED_SOURCE_SHA_FILE = path.join(ROOT, ".sync-audit", "verified-source-sha.txt");
+ 
++// F44（R05 RR2）：RR1 大提交使 VERIFIED_SOURCE_SHA..HEAD 的 name-only 清单
++// （当前 26,481 文件 ≈ 2.6MB）超过 node spawnSync 默认 1MB maxBuffer，git 调用
++// 以 ENOBUFS 崩溃，遮蔽下方断言应产出的违规清单文本（r02_t08 分类器因此
++// fail-closed 于不可识别崩溃形态）。仅抬高缓冲上限，不改变校验语义。
++const GIT_LISTING_MAX_BUFFER = 64 * 1024 * 1024;
++
+ // 审计文件 allowlist：VERIFIED_SOURCE_SHA 之后只允许这些文件变化。
+ // 若为支持本 guard 本身新增/改名脚本，须同步加入此列表。
+ const AUDIT_ALLOWLIST = [
+@@ -78,7 +84,7 @@ function diffNamesSinceVerified(): string[] {
+   const out = execFileSync(
+     "git",
+     ["diff", "--name-only", `${sha}..HEAD`],
+-    { cwd: ROOT, encoding: "utf-8" },
++    { cwd: ROOT, encoding: "utf-8", maxBuffer: GIT_LISTING_MAX_BUFFER },
+   );
+   return out.split("\n").map((s) => s.trim()).filter(Boolean);
+ }
+diff --git a/tests/round2-delivery-evidence.test.ts b/tests/round2-delivery-evidence.test.ts
+index 0f4a5a809..52d4f3b29 100644
+--- a/tests/round2-delivery-evidence.test.ts
++++ b/tests/round2-delivery-evidence.test.ts
+@@ -28,6 +28,13 @@ const ROOT = path.resolve(import.meta.dirname, "..");
+ const OUT = path.join(ROOT, "artifacts", "f1-f12-repair", "round2");
+ const BASE = "89bc0b64bf0a9b84ef3532efaa66c23213affb70";
+ 
++// F44（R05 RR2）：RR1 大提交后全树名册类子进程输出超过 node spawnSync 默认
++// 1MB maxBuffer（git ls-files ≈ 3.2MB、ls-tree 于 HEAD 坐标 ≈ 3.2MB、diff guard
++// 的 node 形态在被拒路径回吐 ≈ 2.6MB 违规清单），ENOBUFS 崩溃形态会遮蔽
++// manifest 比对应产出的真实差异文本（r02_t08 分类器因此 fail-closed）。
++// 仅抬高缓冲上限，不改变任何断言与校验语义；输出恒小的调用（cat-file -t 等）不动。
++const LARGE_OUTPUT_MAX_BUFFER = 64 * 1024 * 1024;
++
+ function bytes(relative: string): Buffer {
+   return fs.readFileSync(path.join(OUT, relative));
+ }
+@@ -48,6 +55,7 @@ function currentSourcePaths(): string[] {
+   return execFileSync("git", ["ls-files", "-z", "--cached", "--others", "--exclude-standard"], {
+     cwd: ROOT,
+     encoding: "utf8",
++    maxBuffer: LARGE_OUTPUT_MAX_BUFFER,
+   }).split("\0").filter(Boolean).filter((file) => {
+     if (file.startsWith("artifacts/f1-f12-repair/") && !file.endsWith(".py")) return false;
+     if (file.endsWith(".patch")) return false;
+@@ -59,6 +67,7 @@ function sourcePathsAtCommit(commit: string): string[] {
+   return execFileSync("git", ["ls-tree", "-r", "-z", "--name-only", commit], {
+     cwd: ROOT,
+     encoding: "utf8",
++    maxBuffer: LARGE_OUTPUT_MAX_BUFFER,
+   }).split("\0").filter(Boolean).filter((file) => {
+     if (file.startsWith("artifacts/f1-f12-repair/") && !file.endsWith(".py")) return false;
+     return !file.endsWith(".patch");
+@@ -95,6 +104,7 @@ function manifestSourceRef(manifest: any): string | null {
+   const guard = execFileSync("node", [path.join(ROOT, ".sync-audit", "verify-post-verification-diff.mjs")], {
+     cwd: ROOT,
+     encoding: "utf8",
++    maxBuffer: LARGE_OUTPUT_MAX_BUFFER,
+   });
+   expect(guard).toContain("post-verification diff guard OK");
+   return verified;
+diff --git a/tests/round3-delivery-evidence.test.ts b/tests/round3-delivery-evidence.test.ts
+index ae15fc0fd..3cefc15f5 100644
+--- a/tests/round3-delivery-evidence.test.ts
++++ b/tests/round3-delivery-evidence.test.ts
+@@ -42,6 +42,13 @@ const OUT = path.join(ROOT, "artifacts", "f1-f12-repair", "round3-c01-c03");
+ const ROUND2 = path.join(ROOT, "artifacts", "f1-f12-repair", "round2");
+ const BASE = "67dee5d2de9d3b9fc75ec5ef5c555e93c65b3ccd";
+ 
++// F44（R05 RR2）：RR1 大提交后全树名册类子进程输出超过 node spawnSync 默认
++// 1MB maxBuffer（git ls-files ≈ 3.2MB、ls-tree 于 HEAD 坐标 ≈ 3.2MB、diff guard
++// 的 node 形态在被拒路径回吐 ≈ 2.6MB 违规清单），ENOBUFS 崩溃形态会遮蔽
++// manifest 比对应产出的真实差异文本（r02_t08 分类器因此 fail-closed）。
++// 仅抬高缓冲上限，不改变任何断言与校验语义；输出恒小的调用（cat-file -t 等）不动。
++const LARGE_OUTPUT_MAX_BUFFER = 64 * 1024 * 1024;
++
+ function bytes(relative: string, base = OUT): Buffer {
+   return fs.readFileSync(path.join(base, relative));
+ }
+@@ -56,7 +63,7 @@ function readJson(relative: string, base = OUT): any {
+ 
+ function currentSourcePaths(): string[] {
+   return execFileSync("git", ["ls-files", "-z", "--cached", "--others", "--exclude-standard"], {
+-    cwd: ROOT, encoding: "utf8",
++    cwd: ROOT, encoding: "utf8", maxBuffer: LARGE_OUTPUT_MAX_BUFFER,
+   }).split("\0").filter(Boolean)
+     .filter(file => !(file.startsWith("artifacts/f1-f12-repair/") && !file.endsWith(".py")))
+     .filter(file => !file.endsWith(".patch"))
+@@ -66,7 +73,7 @@ function currentSourcePaths(): string[] {
+ 
+ function sourcePathsAtCommit(commit: string): string[] {
+   return execFileSync("git", ["ls-tree", "-r", "-z", "--name-only", commit], {
+-    cwd: ROOT, encoding: "utf8",
++    cwd: ROOT, encoding: "utf8", maxBuffer: LARGE_OUTPUT_MAX_BUFFER,
+   }).split("\0").filter(Boolean)
+     .filter(file => !(file.startsWith("artifacts/f1-f12-repair/") && !file.endsWith(".py")))
+     .filter(file => !file.endsWith(".patch"))
+@@ -125,7 +132,7 @@ function manifestSourceRef(manifest: any): string | null {
+       return content.byteLength === row.bytes && sha256(content) === row.sha256;
+     })) return null;
+   const guard = execFileSync("node", [path.join(ROOT, ".sync-audit", "verify-post-verification-diff.mjs")], {
+-    cwd: ROOT, encoding: "utf8",
++    cwd: ROOT, encoding: "utf8", maxBuffer: LARGE_OUTPUT_MAX_BUFFER,
+   });
+   expect(guard).toContain("post-verification diff guard OK");
+   return verified;

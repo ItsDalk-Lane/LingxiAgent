@@ -1,0 +1,2 @@
+FAIL: v2 fingerprint mismatch: sha256(SQL) from migrations.rs is 64d7edfdab74e13e623a9d8d5f2381dad4803f545fa126d8eda8cc02c3dc889c, registry has ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff
+FAIL: registry consistency — migrations.rs MIGRATIONS and R02-T04_STORAGE_REGISTRY.json disagree (root=/private/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-rr2a-mut-ZiKLXF)

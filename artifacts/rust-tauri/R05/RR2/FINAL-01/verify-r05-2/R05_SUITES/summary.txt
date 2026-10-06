@@ -1,0 +1,187 @@
+== building the R05 stage suites (rustup 1.98.1, /var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T//rust-target-r05-t08, --locked, offline) ==
+PASS build (locked, offline)
+== running adp:r05_t02_oauth_flows (pinned 21) ==
+PASS adp:r05_t02_oauth_flows: 21/21 tests green
+== running adp:r05_t03_goldens (pinned 3) ==
+PASS adp:r05_t03_goldens: 3/3 tests green
+== running adp:r05_t03_rr1_replay (pinned 33) ==
+PASS adp:r05_t03_rr1_replay: 33/33 tests green
+== running adp:r05_t04_rr1_batch_terminal (pinned 10) ==
+PASS adp:r05_t04_rr1_batch_terminal: 10/10 tests green
+== running adp:r05_t04_streaming (pinned 18) ==
+PASS adp:r05_t04_streaming: 18/18 tests green
+== running adp:r05_t05_compat (pinned 1) ==
+PASS adp:r05_t05_compat: 1/1 tests green
+== running adp:r05_t05_timeouts (pinned 13) ==
+PASS adp:r05_t05_timeouts: 13/13 tests green
+== running adp:r05_t06_operations (pinned 27) ==
+PASS adp:r05_t06_operations: 27/27 tests green
+== running adp:r05_t07_rr1_usage_strict (pinned 7) ==
+PASS adp:r05_t07_rr1_usage_strict: 7/7 tests green
+== running adp:r05_t07_usage_families (pinned 14) ==
+PASS adp:r05_t07_usage_families: 14/14 tests green
+== running lib-adapters/models::anthropic_messages::tests::cross_family_opaque_state_is_never_echoed (pinned 1) ==
+PASS lib-adapters/models::anthropic_messages::tests::cross_family_opaque_state_is_never_echoed: 1/1 tests green
+== running lib-adapters/models::anthropic_messages::tests::thinking_and_signature_roundtrip_as_state_never_text (pinned 1) ==
+PASS lib-adapters/models::anthropic_messages::tests::thinking_and_signature_roundtrip_as_state_never_text: 1/1 tests green
+== running lib-adapters/models::compat::tests::anthropic_marks_system_and_two_recent_user_messages (pinned 1) ==
+PASS lib-adapters/models::compat::tests::anthropic_marks_system_and_two_recent_user_messages: 1/1 tests green
+== running lib-adapters/models::compat::tests::anthropic_max_effort_raises_the_implicit_one_third_cap (pinned 1) ==
+PASS lib-adapters/models::compat::tests::anthropic_max_effort_raises_the_implicit_one_third_cap: 1/1 tests green
+== running lib-adapters/models::compat::tests::codex_strips_budget_and_temperature_fields (pinned 1) ==
+PASS lib-adapters/models::compat::tests::codex_strips_budget_and_temperature_fields: 1/1 tests green
+== running lib-adapters/models::compat::tests::dispatch_is_first_match_in_incumbent_order (pinned 1) ==
+PASS lib-adapters/models::compat::tests::dispatch_is_first_match_in_incumbent_order: 1/1 tests green
+== running lib-adapters/models::compat::tests::ollama_bridges_response_format_and_num_ctx (pinned 1) ==
+PASS lib-adapters/models::compat::tests::ollama_bridges_response_format_and_num_ctx: 1/1 tests green
+== running lib-adapters/models::compat::tests::openrouter_adaptive_disable_is_a_loud_refusal (pinned 1) ==
+PASS lib-adapters/models::compat::tests::openrouter_adaptive_disable_is_a_loud_refusal: 1/1 tests green
+== running lib-adapters/models::compat::tests::volcengine_disable_guard_passes_through_without_controls (pinned 1) ==
+PASS lib-adapters/models::compat::tests::volcengine_disable_guard_passes_through_without_controls: 1/1 tests green
+== running lib-adapters/models::config::tests::credential_is_explicit_and_never_defaulted (pinned 1) ==
+PASS lib-adapters/models::config::tests::credential_is_explicit_and_never_defaulted: 1/1 tests green
+== running lib-adapters/models::dispatch::tests::error_status_classification_matches_the_incumbent (pinned 1) ==
+PASS lib-adapters/models::dispatch::tests::error_status_classification_matches_the_incumbent: 1/1 tests green
+== running lib-adapters/models::egress::tests::guarded_ipv4_literals_refuse_outside_the_endpoint_exception (pinned 1) ==
+PASS lib-adapters/models::egress::tests::guarded_ipv4_literals_refuse_outside_the_endpoint_exception: 1/1 tests green
+== running lib-adapters/models::egress::tests::https_public_passes_and_plain_http_is_same_origin_only (pinned 1) ==
+PASS lib-adapters/models::egress::tests::https_public_passes_and_plain_http_is_same_origin_only: 1/1 tests green
+== running lib-adapters/models::egress::tests::ipv4_parsing_is_strict_and_default_ports_elide (pinned 1) ==
+PASS lib-adapters/models::egress::tests::ipv4_parsing_is_strict_and_default_ports_elide: 1/1 tests green
+== running lib-adapters/models::egress::tests::scheme_userinfo_and_host_shapes_refuse (pinned 1) ==
+PASS lib-adapters/models::egress::tests::scheme_userinfo_and_host_shapes_refuse: 1/1 tests green
+== running lib-adapters/models::egress::tests::the_endpoint_origin_exception_lets_the_loopback_stub_through (pinned 1) ==
+PASS lib-adapters/models::egress::tests::the_endpoint_origin_exception_lets_the_loopback_stub_through: 1/1 tests green
+== running lib-adapters/models::gateway::tests::a_family_outside_the_operations_matrix_is_loud (pinned 1) ==
+PASS lib-adapters/models::gateway::tests::a_family_outside_the_operations_matrix_is_loud: 1/1 tests green
+== running lib-adapters/models::gateway::tests::chat_and_auxiliary_routes_resolve_independently (pinned 1) ==
+PASS lib-adapters/models::gateway::tests::chat_and_auxiliary_routes_resolve_independently: 1/1 tests green
+== running lib-adapters/models::gateway::tests::reload_swaps_atomically_and_bumps_the_generation (pinned 1) ==
+PASS lib-adapters/models::gateway::tests::reload_swaps_atomically_and_bumps_the_generation: 1/1 tests green
+== running lib-adapters/models::gateway::tests::the_pin_pair_rule_never_guesses_a_provider_from_a_model (pinned 1) ==
+PASS lib-adapters/models::gateway::tests::the_pin_pair_rule_never_guesses_a_provider_from_a_model: 1/1 tests green
+== running lib-adapters/models::gateway::tests::unconfigured_operations_are_loud_route_gaps (pinned 1) ==
+PASS lib-adapters/models::gateway::tests::unconfigured_operations_are_loud_route_gaps: 1/1 tests green
+== running lib-adapters/models::google_generative_ai::tests::thoughts_signatures_and_function_calls_parse_in_order (pinned 1) ==
+PASS lib-adapters/models::google_generative_ai::tests::thoughts_signatures_and_function_calls_parse_in_order: 1/1 tests green
+== running lib-adapters/models::openai_codex_responses::tests::codex_body_pins_store_stream_and_instructions (pinned 1) ==
+PASS lib-adapters/models::openai_codex_responses::tests::codex_body_pins_store_stream_and_instructions: 1/1 tests green
+== running lib-adapters/models::openai_completions::tests::a_history_target_missing_from_the_snapshot_fails_loudly (pinned 1) ==
+PASS lib-adapters/models::openai_completions::tests::a_history_target_missing_from_the_snapshot_fails_loudly: 1/1 tests green
+== running lib-adapters/models::openai_completions::tests::final_answer_identity_comes_from_the_driver_not_the_response (pinned 1) ==
+PASS lib-adapters/models::openai_completions::tests::final_answer_identity_comes_from_the_driver_not_the_response: 1/1 tests green
+== running lib-adapters/models::openai_completions::tests::parses_tool_calls_with_usage_and_identity_from_the_driver (pinned 1) ==
+PASS lib-adapters/models::openai_completions::tests::parses_tool_calls_with_usage_and_identity_from_the_driver: 1/1 tests green
+== running lib-adapters/models::openai_completions::tests::unknown_wire_names_are_protocol_violations_never_guesses (pinned 1) ==
+PASS lib-adapters/models::openai_completions::tests::unknown_wire_names_are_protocol_violations_never_guesses: 1/1 tests green
+== running lib-adapters/models::openai_responses::tests::reasoning_items_roundtrip_verbatim_with_summary_as_reasoning (pinned 1) ==
+PASS lib-adapters/models::openai_responses::tests::reasoning_items_roundtrip_verbatim_with_summary_as_reasoning: 1/1 tests green
+== running lib-adapters/models::openai_responses::tests::request_shape_instructions_tools_and_no_server_state (pinned 1) ==
+PASS lib-adapters/models::openai_responses::tests::request_shape_instructions_tools_and_no_server_state: 1/1 tests green
+== running lib-adapters/models::streaming::tests::a_leading_bom_is_stripped_once (pinned 1) ==
+PASS lib-adapters/models::streaming::tests::a_leading_bom_is_stripped_once: 1/1 tests green
+== running lib-adapters/models::streaming::tests::comments_and_id_and_retry_fields_are_ignored (pinned 1) ==
+PASS lib-adapters/models::streaming::tests::comments_and_id_and_retry_fields_are_ignored: 1/1 tests green
+== running lib-adapters/models::streaming::tests::multi_line_data_joins_and_chunks_may_split_anywhere (pinned 1) ==
+PASS lib-adapters/models::streaming::tests::multi_line_data_joins_and_chunks_may_split_anywhere: 1/1 tests green
+== running lib-adapters/models::streaming::tests::simple_frames_dispatch_on_blank_lines (pinned 1) ==
+PASS lib-adapters/models::streaming::tests::simple_frames_dispatch_on_blank_lines: 1/1 tests green
+== running lib-adapters/models::streaming::tests::the_buffer_bound_is_loud (pinned 1) ==
+PASS lib-adapters/models::streaming::tests::the_buffer_bound_is_loud: 1/1 tests green
+== running lib-adapters/models::streaming::tests::the_per_frame_bound_is_loud_across_lines_and_chunks (pinned 1) ==
+PASS lib-adapters/models::streaming::tests::the_per_frame_bound_is_loud_across_lines_and_chunks: 1/1 tests green
+== running lib-adapters/models::tool_render::tests::running_and_stop_unconfirmed_statuses_are_honest (pinned 1) ==
+PASS lib-adapters/models::tool_render::tests::running_and_stop_unconfirmed_statuses_are_honest: 1/1 tests green
+== running lib-adapters/models::tool_render::tests::success_renders_resources_status_and_truncation_last (pinned 1) ==
+PASS lib-adapters/models::tool_render::tests::success_renders_resources_status_and_truncation_last: 1/1 tests green
+== running lib-adapters/models::tool_render::tests::the_four_base_states_keep_the_t01_vocabulary (pinned 1) ==
+PASS lib-adapters/models::tool_render::tests::the_four_base_states_keep_the_t01_vocabulary: 1/1 tests green
+== running lib-kernel/model_exchange::tests::empty_snapshot_is_generation_zero (pinned 1) ==
+PASS lib-kernel/model_exchange::tests::empty_snapshot_is_generation_zero: 1/1 tests green
+== running lib-kernel/model_exchange::tests::snapshot_declares_only_callable_resident_targets_at_the_pinned_generation (pinned 1) ==
+PASS lib-kernel/model_exchange::tests::snapshot_declares_only_callable_resident_targets_at_the_pinned_generation: 1/1 tests green
+== running lib-kernel/model_exchange::tests::wire_name_collisions_resolve_deterministically_or_fail_loudly (pinned 1) ==
+PASS lib-kernel/model_exchange::tests::wire_name_collisions_resolve_deterministically_or_fail_loudly: 1/1 tests green
+== running lib-kernel/model_exchange::tests::wire_name_sanitization_fits_the_strictest_protocol_face (pinned 1) ==
+PASS lib-kernel/model_exchange::tests::wire_name_sanitization_fits_the_strictest_protocol_face: 1/1 tests green
+== running lib-kernel/toolcatalog::tests::aliases_resolve_to_the_authoritative_identity_and_share_permissions (pinned 1) ==
+PASS lib-kernel/toolcatalog::tests::aliases_resolve_to_the_authoritative_identity_and_share_permissions: 1/1 tests green
+== running lib-kernel/toolcatalog::tests::disable_and_uninstall_change_callability_and_generation (pinned 1) ==
+PASS lib-kernel/toolcatalog::tests::disable_and_uninstall_change_callability_and_generation: 1/1 tests green
+== running lib-kernel/toolcatalog::tests::same_name_two_sources_never_overwrites_and_name_only_is_ambiguous (pinned 1) ==
+PASS lib-kernel/toolcatalog::tests::same_name_two_sources_never_overwrites_and_name_only_is_ambiguous: 1/1 tests green
+== running lib-kernel/toolcatalog::tests::stale_catalog_generation_refuses_and_requires_refresh (pinned 1) ==
+PASS lib-kernel/toolcatalog::tests::stale_catalog_generation_refuses_and_requires_refresh: 1/1 tests green
+== running lib-kernel/toolcatalog::tests::update_cannot_change_the_target_identity (pinned 1) ==
+PASS lib-kernel/toolcatalog::tests::update_cannot_change_the_target_identity: 1/1 tests green
+== running lib-service/credentials::store::tests::a_failed_write_keeps_the_previous_state_and_reports (pinned 1) ==
+PASS lib-service/credentials::store::tests::a_failed_write_keeps_the_previous_state_and_reports: 1/1 tests green
+== running lib-service/credentials::store::tests::a_version_conflict_is_loud (pinned 1) ==
+PASS lib-service/credentials::store::tests::a_version_conflict_is_loud: 1/1 tests green
+== running lib-service/credentials::store::tests::missing_file_loads_empty_and_round_trips (pinned 1) ==
+PASS lib-service/credentials::store::tests::missing_file_loads_empty_and_round_trips: 1/1 tests green
+== running lib-service/credentials::store::tests::unknown_fields_survive_a_write (pinned 1) ==
+PASS lib-service/credentials::store::tests::unknown_fields_survive_a_write: 1/1 tests green
+== running lib-service/credentials::tests::a_cancelled_waiter_does_not_disturb_the_flight (pinned 1) ==
+PASS lib-service/credentials::tests::a_cancelled_waiter_does_not_disturb_the_flight: 1/1 tests green
+== running lib-service/credentials::tests::a_reload_replacing_the_cell_discards_the_late_writeback (pinned 1) ==
+PASS lib-service/credentials::tests::a_reload_replacing_the_cell_discards_the_late_writeback: 1/1 tests green
+== running lib-service/credentials::tests::a_rotated_credential_is_reused_without_a_second_refresh (pinned 1) ==
+PASS lib-service/credentials::tests::a_rotated_credential_is_reused_without_a_second_refresh: 1/1 tests green
+== running lib-service/credentials::tests::an_expired_handle_is_refused (pinned 1) ==
+PASS lib-service/credentials::tests::an_expired_handle_is_refused: 1/1 tests green
+== running lib-service/credentials::tests::concurrent_401s_merge_into_one_refresh (pinned 1) ==
+PASS lib-service/credentials::tests::concurrent_401s_merge_into_one_refresh: 1/1 tests green
+== running lib-service/credentials::tests::forged_handles_and_provider_references_are_refused (pinned 1) ==
+PASS lib-service/credentials::tests::forged_handles_and_provider_references_are_refused: 1/1 tests green
+== running lib-service/credentials::tests::handle_refusal_texts_carry_no_material (pinned 1) ==
+PASS lib-service/credentials::tests::handle_refusal_texts_carry_no_material: 1/1 tests green
+== running lib-service/credentials::tests::resolve_refreshes_at_most_once_when_a_one_second_grant_dies_in_transit (pinned 1) ==
+PASS lib-service/credentials::tests::resolve_refreshes_at_most_once_when_a_one_second_grant_dies_in_transit: 1/1 tests green
+== running lib-service/credentials::tests::resolve_refreshes_at_most_once_when_every_mint_is_already_expired (pinned 1) ==
+PASS lib-service/credentials::tests::resolve_refreshes_at_most_once_when_every_mint_is_already_expired: 1/1 tests green
+== running lib-service/credentials::tests::revoke_fences_a_late_writeback (pinned 1) ==
+PASS lib-service/credentials::tests::revoke_fences_a_late_writeback: 1/1 tests green
+== running lib-service/redaction::tests::r05_provider_api_key_shapes_are_redacted (pinned 1) ==
+PASS lib-service/redaction::tests::r05_provider_api_key_shapes_are_redacted: 1/1 tests green
+== running lib-service/redaction::tests::r05_secret_key_words_match_case_insensitively (pinned 1) ==
+PASS lib-service/redaction::tests::r05_secret_key_words_match_case_insensitively: 1/1 tests green
+== running lib-service/redaction::tests::r05_t02_base64_tokens_with_slash_and_padding_are_redacted (pinned 1) ==
+PASS lib-service/redaction::tests::r05_t02_base64_tokens_with_slash_and_padding_are_redacted: 1/1 tests green
+== running svc:r05_t01_binary_wiring (pinned 2) ==
+PASS svc:r05_t01_binary_wiring: 2/2 tests green
+== running svc:r05_t01_model_plane (pinned 24) ==
+PASS svc:r05_t01_model_plane: 24/24 tests green
+== running svc:r05_t02_credentials (pinned 38) ==
+PASS svc:r05_t02_credentials: 38/38 tests green
+== running svc:r05_t03_protocol_adapters (pinned 12) ==
+PASS svc:r05_t03_protocol_adapters: 12/12 tests green
+== running svc:r05_t04_streaming (pinned 18) ==
+PASS svc:r05_t04_streaming: 18/18 tests green
+== running svc:r05_t05_network (pinned 21) ==
+PASS svc:r05_t05_network: 21/21 tests green
+== running svc:r05_t05_timeouts (pinned 9) ==
+PASS svc:r05_t05_timeouts: 9/9 tests green
+== running svc:r05_t06_operations (pinned 7) ==
+PASS svc:r05_t06_operations: 7/7 tests green
+== running svc:r05_t06_rr1_media_resource (pinned 17) ==
+PASS svc:r05_t06_rr1_media_resource: 17/17 tests green
+== running svc:r05_t06_rr1_system_speech (pinned 10) ==
+PASS svc:r05_t06_rr1_system_speech: 10/10 tests green
+== running svc:r05_t06_worker_model (pinned 10) ==
+PASS svc:r05_t06_worker_model: 10/10 tests green
+== running svc:r05_t07_persistence (pinned 5) ==
+PASS svc:r05_t07_persistence: 5/5 tests green
+== running svc:r05_t07_rr1_usage_ledger (pinned 15) ==
+PASS svc:r05_t07_rr1_usage_ledger: 15/15 tests green
+== running svc:r05_t07_usage_trace (pinned 9) ==
+PASS svc:r05_t07_usage_trace: 9/9 tests green
+== running svc:r05_t08_closed_loop (pinned 11) ==
+PASS svc:r05_t08_closed_loop: 11/11 tests green
+== running svc:r05_t08_production_tools (pinned 6) ==
+PASS svc:r05_t08_production_tools: 6/6 tests green
+== running svc:r05_t08_resources (pinned 2) ==
+PASS svc:r05_t08_resources: 2/2 tests green
+PASS case files assembled (r05-cases.json + leaf-cases.json; every executed test owned by exactly one C-ID)
+RESULT: all R05 stage runs green with exact pinned counts (27 suites + 64 lib pins; 93 cid-owned + 10 command-bound = 103 required C-IDs; 130 leaves / 137 leaf cases)
+PASS F27 raw resource series preserved (/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR2/FINAL-01/verify-r05-2/R05_SUITES/f27-resource-series.json)

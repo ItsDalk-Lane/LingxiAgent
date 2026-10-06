@@ -1,0 +1,639 @@
+diff --git a/docs/rust-tauri/R02/R02-T04_STORAGE_REGISTRY.json b/docs/rust-tauri/R02/R02-T04_STORAGE_REGISTRY.json
+index 72492dc92..bc2bbd439 100644
+--- a/docs/rust-tauri/R02/R02-T04_STORAGE_REGISTRY.json
++++ b/docs/rust-tauri/R02/R02-T04_STORAGE_REGISTRY.json
+@@ -2,7 +2,7 @@
+   "schema_version": "1.0",
+   "task_id": "R02-T04",
+   "stage_id": "R02",
+-  "generated_by": "ZCode:R02-T04 (EXECUTOR-R02-T04, 2026-09-26); fingerprints = sha256 over the migration SQL text, cross-checked against the on-disk receipt produced by lingxi-storage-inspect in artifacts/rust-tauri/R02/T04/s4-migrations-round1.json; V2/V3/V4 fingerprints registered by ZCode:EXECUTOR-R03-T08-E01 (2026-09-29), independently recomputed on disk via lingxi-storage-inspect over a fresh service-created runs.db (userVersion=4, receipts==compiledIn), matching the T04/T05/T06 report prefixes; V1 kept byte-for-byte.",
++  "generated_by": "ZCode:R02-T04 (EXECUTOR-R02-T04, 2026-09-26); fingerprints = sha256 over the migration SQL text, cross-checked against the on-disk receipt produced by lingxi-storage-inspect in artifacts/rust-tauri/R02/T04/s4-migrations-round1.json; V2/V3/V4 fingerprints registered by ZCode:EXECUTOR-R03-T08-E01 (2026-09-29), independently recomputed on disk via lingxi-storage-inspect over a fresh service-created runs.db (userVersion=4, receipts==compiledIn), matching the T04/T05/T06 report prefixes; V1 kept byte-for-byte; V6/V7 registered by ZCode:RR2-WP-A (2026-10-06, F41 repair, branch codex/rust-tauri-migration @ ad5ec4e98): fingerprints taken verbatim from the lingxi-storage-inspect `migrations` output over a fresh service-created runs.db built from this candidate (userVersion=7; receipts and compiledIn agree exactly on version/name/fingerprint; V1–V5 receipts reproduced the previously registered values byte-for-byte), evidence artifacts/rust-tauri/R05/RR2/A-R2/fingerprint-extraction/.",
+   "deterministic": "no timestamps/randomness; identical migration SQL produces identical fingerprints",
+   "new_persistence_points": [
+     {
+@@ -61,6 +61,18 @@
+           "name": "model_call_usage_ledger",
+           "fingerprint_sha256": "16dce1c9d5106b74ef00df7348591f5fad11bf8a7bc0244effba804dfde7606d",
+           "registered_by": "R05-T07 (model_call_usage table; fingerprint recomputed from V5_SQL with the registry's own sha256-of-SQL method, verified by reproducing v4's registered fingerprint)"
++        },
++        {
++          "version": 6,
++          "name": "model_call_usage_rr1_f21",
++          "fingerprint_sha256": "cd875eae835e6a5ecdee8480b7c7c223eea5a180eaf8ee3c2b43416a7deadb86",
++          "registered_by": "R05 RR1 F21 (usage-ledger extension: outcome/started_at_unix_ms/settled_at_unix_ms/parent_tool_call_id/emitted_tool_calls via V6_SQL ALTERs + three indexes; migration fn V6_NAME/V6_SQL in rust/crates/lingxi-adapters/src/storage/migrations.rs; registered by RR2 WP-A per the first-round v5 precedent)"
++        },
++        {
++          "version": 7,
++          "name": "model_call_usage_rr1_f38_attempts_nullable",
++          "fingerprint_sha256": "b3189ef9c77630918436df07291bccd8f5a6a55f21109153ff73841cef58e3fb",
++          "registered_by": "R05 RR1 F38 (transport_attempts NULLABLE: table rebuild preserving every pre-existing row verbatim, indexes recreated identically; NULL = attempts unknown after a drop, never 0; migration fn V7_NAME/V7_SQL in rust/crates/lingxi-adapters/src/storage/migrations.rs; registered by RR2 WP-A per the first-round v5 precedent)"
+         }
+       ],
+       "cutover_strategy": "switch-to-new-authority (new isolated database under the new rust data root; no incumbent store is written by this task)",
+diff --git a/docs/rust-tauri/R05/r05_stage_cids.tsv b/docs/rust-tauri/R05/r05_stage_cids.tsv
+index 5a0c5e890..dadf76302 100644
+--- a/docs/rust-tauri/R05/r05_stage_cids.tsv
++++ b/docs/rust-tauri/R05/r05_stage_cids.tsv
+@@ -101,7 +101,7 @@ cid R05-T04-C09 svc:r05_t04_streaming c09_length_truncated_batch_executes_nothin
+ cid R05-T04-C10 adp:r05_t04_rr1_batch_terminal duplicate_provider_ids_with_conflicting_arguments_reject_whole_batch+identical_resends_collapse_but_distinct_ids_stay_independent
+ cid R05-T04-C10 adp:r05_t04_streaming c10_anthropic_duplicates_conflicts_and_event_field_agreement+c10_openai_duplicates_conflicts_and_adjacent_identical_text
+ cid R05-T04-C10 svc:r05_t04_streaming rr1_f11_identical_resend_executes_once+rr1_f11_same_provider_id_conflict_is_loud_with_zero_side_effects
+-cid R05-T04-C11 adp:r05_t04_rr1_batch_terminal anthropic_open_tool_block_cannot_close_as_a_completed_batch+buffered_bodies_without_a_normal_stop_reason_are_loud+openai_done_without_finish_reason_does_not_make_final+positive_controls_normal_terminals_and_legal_batches_still_work+present_but_unmapped_terminal_values_are_loud_and_name_the_value+thinking_only_and_opaque_only_do_not_form_final_answers+unmapped_terminal_values_through_the_stream_accumulators_stay_loud
++cid R05-T04-C11 adp:r05_t04_rr1_batch_terminal anthropic_open_tool_block_cannot_close_as_a_completed_batch+buffered_bodies_without_a_normal_stop_reason_are_loud+known_stop_reason_with_unclosed_tool_block_is_loud_and_dispatches_nothing+openai_done_without_finish_reason_does_not_make_final+positive_controls_normal_terminals_and_legal_batches_still_work+present_but_unmapped_terminal_values_are_loud_and_name_the_value+thinking_only_and_opaque_only_do_not_form_final_answers+unmapped_terminal_values_through_the_stream_accumulators_stay_loud
+ cid R05-T04-C11 adp:r05_t04_streaming c11_stop_reason_table_is_complete_across_the_fragmenting_families
+ cid R05-T04-C11 svc:r05_t04_streaming c11_a_content_refusal_fails_in_place_without_retry+rr1_f12_mood_only_text_settles_process_only_without_final+rr1_f12_reasoning_only_turn_settles_process_only_without_final+rr1_f12_unclassified_live_text_is_not_marked_final_pre_terminal+rr1_f12_unclassified_live_text_stays_unresolved_until_the_terminal
+ cid R05-T04-C12 svc:r05_t04_streaming c12_first_delta_reaches_the_subscriber_before_the_external_stream_ends
+diff --git a/docs/rust-tauri/R05/r05_stage_pins.tsv b/docs/rust-tauri/R05/r05_stage_pins.tsv
+index 80c54d477..260c0cffb 100644
+--- a/docs/rust-tauri/R05/r05_stage_pins.tsv
++++ b/docs/rust-tauri/R05/r05_stage_pins.tsv
+@@ -1,7 +1,7 @@
+ pin adp:r05_t02_oauth_flows 21 r05_t02_oauth_flows
+ pin adp:r05_t03_goldens 3 r05_t03_goldens
+ pin adp:r05_t03_rr1_replay 33 r05_t03_rr1_replay
+-pin adp:r05_t04_rr1_batch_terminal 9 r05_t04_rr1_batch_terminal
++pin adp:r05_t04_rr1_batch_terminal 10 r05_t04_rr1_batch_terminal
+ pin adp:r05_t04_streaming 18 r05_t04_streaming
+ pin adp:r05_t05_compat 1 r05_t05_compat
+ pin adp:r05_t05_timeouts 13 r05_t05_timeouts
+diff --git a/rust/crates/lingxi-adapters/tests/r05_t04_rr1_batch_terminal.rs b/rust/crates/lingxi-adapters/tests/r05_t04_rr1_batch_terminal.rs
+index d5581f702..f15704101 100644
+--- a/rust/crates/lingxi-adapters/tests/r05_t04_rr1_batch_terminal.rs
++++ b/rust/crates/lingxi-adapters/tests/r05_t04_rr1_batch_terminal.rs
+@@ -1,8 +1,9 @@
+-//! R05 RR1 (WP-T04, F11/F12/F33): the permanent regression home of the
+-//! adversarial batch/terminal counterexamples migrated from the 2026-10-04
+-//! protocol audit (`artifacts/rust-tauri/R05/RR1/INPUT-adversarial-2026-10-04/
+-//! audit/protocol/src/lib.rs`, PF05/PF06 legs owned by T04), plus the F33
+-//! present-but-unmapped terminal-value legs.
++//! R05 RR1 (WP-T04, F11/F12/F33) + RR2 WP-C (F34): the permanent regression
++//! home of the adversarial batch/terminal counterexamples migrated from the
++//! 2026-10-04 protocol audit (`artifacts/rust-tauri/R05/RR1/
++//! INPUT-adversarial-2026-10-04/audit/protocol/src/lib.rs`, PF05/PF06 legs
++//! owned by T04), the F33 present-but-unmapped terminal-value legs, and the
++//! F34 known-terminal-plus-unclosed-block leg.
+ //!
+ //! The assertions are the audit's CONTRACT assertions verbatim in intent:
+ //! they were red on the frozen candidate (side effects before admission,
+@@ -152,6 +153,86 @@ fn anthropic_open_tool_block_cannot_close_as_a_completed_batch() {
+     );
+ }
+ 
++// ── F34: KNOWN terminal + unclosed block ────────────────────────────────────
++
++/// F34 (RR2 WP-C): the leg above omits content_block_stop AND message_delta
++/// together, so its rejection is absorbed by the missing-stop_reason defense
++/// — a future removal of the unclosed-block check alone leaves it green.
++/// THIS leg holds everything else legal — a complete schema-valid tool
++/// argument object, a KNOWN mapped terminal
++/// (`message_delta` `stop_reason:"tool_use"`), `message_stop` — and omits
++/// ONLY `content_block_stop`. `finish` must reject the whole batch, NAME the
++/// specific unclosed block index, and admit zero tool requests through the
++/// same formal chain the other legs assert on; the inline positive control
++/// adds only the missing `content_block_stop` and the SAME stream must form
++/// a legal batch producing the complete tool request.
++#[test]
++fn known_stop_reason_with_unclosed_tool_block_is_loud_and_dispatches_nothing() {
++    // The fixture: everything legal except content_block_stop (inserted only
++    // in the positive control).
++    let frames = |with_block_stop: bool| {
++        let mut frames = vec![
++            json!({"type":"message_start","message":{"content":[]}}),
++            json!({"type":"content_block_start","index":0,"content_block":{"type":"tool_use","id":"t1","name":"read","input":{}}}),
++            json!({"type":"content_block_delta","index":0,"delta":{"type":"input_json_delta","partial_json":"{\"path\":\"a.txt\"}"}}),
++        ];
++        if with_block_stop {
++            frames.push(json!({"type":"content_block_stop","index":0}));
++        }
++        frames.push(json!({"type":"message_delta","delta":{"stop_reason":"tool_use"}}));
++        frames.push(json!({"type":"message_stop"}));
++        frames
++    };
++
++    // Counterexample: a known, mapped terminal does NOT license an unclosed
++    // block — nothing dispatches through the formal finish() chain.
++    let mut a = ant::MessagesStreamAccumulator::new();
++    for frame in frames(false) {
++        a.handle_event(&ev(frame)).unwrap();
++    }
++    let r = a.finish(&call(), &snapshot(), &SchemaBudget::default());
++    let err = match r {
++        Ok(parsed) => panic!(
++            "a known stop_reason must not license an unclosed block — zero \
++             tool requests through the formal chain, got {:?}",
++            parsed.turn
++        ),
++        Err(err) => err,
++    };
++    assert_eq!(err.code, ErrorCode::InvalidMessage, "F34: {err}");
++    assert!(!err.retryable, "F34 rejection is not retryable: {err}");
++    assert!(
++        err.message.contains("content block(s) [0]") && err.message.contains("content_block_stop"),
++        "the error must name the specific unclosed block index: {err}"
++    );
++
++    // Positive control: adding ONLY the missing content_block_stop makes the
++    // same stream a legal batch whose single tool request arrives complete.
++    let mut a = ant::MessagesStreamAccumulator::new();
++    for frame in frames(true) {
++        a.handle_event(&ev(frame)).unwrap();
++    }
++    match a
++        .finish(&call(), &snapshot(), &SchemaBudget::default())
++        .expect("positive control: the closed stream is a legal batch")
++        .turn
++    {
++        ProviderTurn::ToolRequests { requests, content } => {
++            assert_eq!(requests.len(), 1, "one closed tool block is one request");
++            assert_eq!(requests[0].provider_call_id.as_deref(), Some("t1"));
++            assert_eq!(requests[0].target, "tool:first-party:read");
++            assert_eq!(
++                requests[0].arguments.as_value(),
++                &json!({"path":"a.txt"}),
++                "the tool arguments arrive complete: {:?}",
++                requests[0].arguments.as_value()
++            );
++            assert!(content.is_empty(), "a tools-only turn carries no content");
++        }
++        other => panic!("positive control: expected ToolRequests, got {other:?}"),
++    }
++}
++
+ /// PF05 leg 3 (assertion unchanged): text + [DONE] with NO normal choice
+ /// finish reason is a transport end, not a protocol completion — it must not
+ /// make a Final.
+diff --git a/rust/crates/xtask/src/stage_map.rs b/rust/crates/xtask/src/stage_map.rs
+index 4ba005fd8..3c6a8784e 100644
+--- a/rust/crates/xtask/src/stage_map.rs
++++ b/rust/crates/xtask/src/stage_map.rs
+@@ -3256,7 +3256,7 @@ mod map_tests {
+             ("adp:r05_t02_oauth_flows", 21),
+             ("adp:r05_t03_goldens", 3),
+             ("adp:r05_t03_rr1_replay", 33),
+-            ("adp:r05_t04_rr1_batch_terminal", 9),
++            ("adp:r05_t04_rr1_batch_terminal", 10),
+             ("adp:r05_t04_streaming", 18),
+             ("adp:r05_t05_compat", 1),
+             ("adp:r05_t05_timeouts", 13),
+diff --git a/scripts/rust-tauri/r02_t04_storage_tx.sh b/scripts/rust-tauri/r02_t04_storage_tx.sh
+index d3e8d25f8..a9992c4dc 100755
+--- a/scripts/rust-tauri/r02_t04_storage_tx.sh
++++ b/scripts/rust-tauri/r02_t04_storage_tx.sh
+@@ -193,6 +193,21 @@ trap cleanup EXIT
+ fail() { echo "FAIL: $*" >&2; exit 1; }
+ note() { printf '%s\n' "$*" | tee -a "$EVIDENCE_DIR/summary.txt"; }
+ 
++# ---- S0 (RR2-F41): registry consistency, zero-build fail-fast ---------------
++# The compiled-in migration set (migrations.rs MIGRATIONS) must EQUAL the
++# R02 fingerprint registry (count + versions + names + sha256(SQL)). F41 was
++# exactly this drift (v6/v7 shipped, registry left at 5 entries) and it only
++# surfaced at the END of this script's expensive S4 binary equation. This
++# cheap source-level equality gate catches it before anything is built; the
++# S4 equation below still proves the BUILT binary's receipts/compiledIn
++# against the same registry (neither check replaces the other).
++note "== S0 (RR2-F41): registry consistency — migrations.rs == registry =="
++python3 scripts/rust-tauri/r02_registry_consistency.py \
++  > "$EVIDENCE_DIR/s0-registry-consistency.log" 2>&1 \
++  || { cat "$EVIDENCE_DIR/s0-registry-consistency.log"; \
++       fail "S0 registry consistency failed"; }
++note "PASS S0 registry consistency (count/versions/names/fingerprints exact)"
++
+ # ---- build the real binaries ------------------------------------------------
+ note "== building lingxi-service + lingxi-storage-inspect (rustup $TOOLCHAIN, $TARGET_DIR, --locked) =="
+ $CARGO build --manifest-path rust/Cargo.toml --locked -p lingxi-service -p lingxi-adapters \
+diff --git a/scripts/rust-tauri/r02_t08_legacy_entry_regression.sh b/scripts/rust-tauri/r02_t08_legacy_entry_regression.sh
+index e796eebda..5f92a9ce7 100755
+--- a/scripts/rust-tauri/r02_t08_legacy_entry_regression.sh
++++ b/scripts/rust-tauri/r02_t08_legacy_entry_regression.sh
+@@ -84,6 +84,39 @@
+ # The bare `.py` tail and mid-sentence cuts of R6-F01 REMAIN unregistered
+ # — fail-closed unchanged.
+ #
++# R05 RR2 F42 (WP B, 2026-10-06): run-output attribution. d80737b6's
++# evidence-distribution .gitignore rules (!artifacts/rust-tauri/**/*.log
++# etc.) UN-IGNORE every runner log inside the repo, so under the nested
++# verify-stage chain (verify-stage R05 → R04 → R03 → this gate) the
++# stdout/stderr captures that carry THIS gate's output flow — the gate's
++# own sinks <evidence>/r02_legacy_regression/{stdout,stderr}.log plus
++# every ancestor runner's sink (.../r03_regression_gate/stdout.log,
++# .../r04_regression_gate/stdout.log) — became unignored binding content
++# that keeps growing after the main binding, breaking the E0 mirror cmp
++# BY CONSTRUCTION (RR1 INDEPENDENT-9: four live .log rows in the failing
++# binding; the REVIEW-T08-era chain passed only because c549ff654's
++# .gitignore still ignored *.log). The repair-group5 exclusion covered
++# the gate's evidence subtree alone — too narrow once the ignore rule
++# changed. The gate now attributes "this run's ENTIRE run-time output"
++# EXPLICITLY and symmetrically: it discovers the fd-1/fd-2 FILE sinks of
++# its own process tree (self + ancestors — exactly the files that
++# receive this run's output flow; /proc fast path, lsof fallback on
++# darwin), takes each sink's command directory as a run-output root when
++# that directory provably sits under artifacts/ AND carries no
++# index-tracked content, and otherwise attributes ONLY the sink file
++# itself; R02_A16_RUN_OUTPUT_ROOTS may declare additional repo-relative
++# roots (same validation, artifacts/-fenced). Every unit is validated —
++# no tracked content under it, never the repo root — so the exclusion
++# can never mask candidate source or committed evidence: mid-binding
++# source changes, new files, deletions and old STATIC (tracked) evidence
++# changes still fail the mirror cmp, and an illegal root (rust/, the
++# whole artifacts tree, anything tracked) is REJECTED. Sinks redirected
++# ONTO tracked content are refused outright. The unit set is computed
++# ONCE before the first binding, recorded auditable in
++# e0-run-output-sinks.txt / e0-binding-exclusions.txt, and passed
++# UNCHANGED to both bindings. An evidence root outside the repository
++# keeps the exhaustive no-exclusion binding (the historical /tmp form).
++#
+ # R02 stage-repair R4 rewrite (review finding R4-F02). The R1 rewrite still
+ # built the "baseline" by copying the dirty candidate worktree and running
+ # `git checkout -f BASE`: that restores TRACKED files only, so untracked
+@@ -305,6 +338,11 @@
+ #
+ # Usage: scripts/rust-tauri/r02_t08_legacy_entry_regression.sh [EVIDENCE_DIR]
+ # Env:   R02_A16_BASE_SHA  overrides the baseline commit.
++#        R02_A16_RUN_OUTPUT_ROOTS  optional ':'-separated repo-relative
++#             directories under artifacts/ declaring additional run-output
++#             roots (F42): fresh, untracked, no tracked content under them
++#             — an illegal root is rejected, never silently widened.
++#        R02_LEGACY_REGRESSION_MODE  full | directed-no-seal-family.
+ # Exit 0 only if every step holds.
+ set -euo pipefail
+ cd "$(dirname "$0")/../.."
+@@ -339,30 +377,28 @@ git merge-base --is-ancestor "$BASE_SHA" "$CANDIDATE_SHA" \
+ note "PASS E0-ancestry (base is an ancestor of candidate)"
+ 
+ # ── Complete worktree binding (tracked modifications AND untracked content) ─
+-# bind_worktree <repo> <out.tsv> [exclude-prefix]: one line per non-clean
++# bind_worktree <repo> <out.tsv> [exclude-units]: one line per non-clean
+ # path — `<sha256|->  <XY>  <path>` sorted by path. Untracked (non-ignored)
+ # files are included with their content hash; renames record the new path.
+ # This is the full candidate state — never git's tracked-only view
+ # (R4-F02: `--untracked-files=no` let four new candidate files slip past
+ # the binding and into the baseline).
+ #
+-# R02 final-closeout repair-group5 (E0 self-reference): the optional
+-# exclude-prefix is THIS GATE'S OWN EVIDENCE SUBTREE ($EVIDENCE_DIR,
+-# repo-relative), and nothing else. When the evidence root lives inside
+-# the repository (the verify-stage layout), the gate itself writes there
+-# between the two bindings — summary.txt appends, this very tsv going
+-# from empty to populated, the e0-candidate-dirty.* captures — so an
+-# exhaustive binding can never mirror byte-identically (the two scans
+-# differ BY CONSTRUCTION; see the repair-group5 header block above).
+-# Both scans exclude the SAME prefix symmetrically, and the active
+-# exclusion is recorded as a `#` header row in BOTH tsv files so the
+-# compared artifacts stay self-describing and auditable. Files under
+-# the prefix are this run's OUTPUT (runner evidence), never candidate
+-# source; every other path — including the other verify-stage evidence
+-# directories, static during this gate's run — stays fully bound. With
+-# no third argument (the E0s scratch fixtures) or an empty prefix
+-# (evidence root outside the repository, the historical /tmp layout)
+-# the binding stays exhaustive and emits no header row.
++# R02 final-closeout repair-group5 + R05 RR2 F42: the optional
++# exclude-units argument is the NEWLINE-SEPARATED set of THIS RUN's
++# run-time output roots (repo-relative) — the gate's own evidence
++# subtree plus every attributed/declared run-output root (see the F42
++# header block and the discovery below). Files under a unit are this
++# run's OUTPUT (runner evidence), never candidate source; both bindings
++# exclude the SAME unit set symmetrically, and every unit is recorded as
++# a `#` header row in BOTH tsv files so the compared artifacts stay
++# self-describing and auditable. Units are validated before use (no
++# index-tracked content under them — candidate source and committed
++# evidence stay fully bound); every OTHER path, including static
++# verify-stage evidence of PAST runs, stays exhaustively bound. With no
++# third argument (the E0s scratch fixtures) or an empty string (evidence
++# root outside the repository, the historical /tmp layout) the binding
++# stays exhaustive and emits no header row.
+ bind_worktree() {
+   python3 - "$1" "${3:-}" > "$2" <<'PYBIND'
+ import hashlib
+@@ -371,7 +407,7 @@ import subprocess
+ import sys
+ 
+ repo = sys.argv[1]
+-exclude = sys.argv[2] if len(sys.argv) > 2 else ""
++exclude_units = [u for u in (sys.argv[2] if len(sys.argv) > 2 else "").split("\n") if u]
+ raw = subprocess.run(
+     ["git", "-C", repo, "status", "--porcelain=v1", "-z", "--untracked-files=all"],
+     check=True, capture_output=True,
+@@ -389,10 +425,11 @@ while i < len(records):
+     if "R" in xy or "C" in xy:
+         # rename/copy records carry the original path in the next record
+         i += 1
+-    if exclude and (path == exclude or path.startswith(exclude + "/")):
+-        # this gate's own run-time evidence output subtree — excluded
+-        # SYMMETRICALLY from every binding that passes the same prefix
+-        # (repair-group5; see the function header)
++    if any(path == unit or path.startswith(unit + "/") for unit in exclude_units):
++        # this run's own run-time output root (runner output, never
++        # candidate source) — excluded SYMMETRICALLY from every binding
++        # that passes the same unit set (repair-group5 / F42; see the
++        # bind_worktree header)
+         continue
+     digest = "-"
+     full = os.path.join(repo, path)
+@@ -401,19 +438,17 @@ while i < len(records):
+             digest = hashlib.sha256(fh.read()).hexdigest()
+     rows.append((path, xy, digest))
+ rows.sort()
+-if exclude:
+-    print(f"# binding-exclusion: {exclude}/** — this gate's own run-time evidence output subtree (runner output, never candidate source); applied symmetrically to BOTH the main-repo binding and the candidate-copy binding (E0 mirror compare)")
++for unit in exclude_units:
++    print(f"# binding-exclusion: {unit}/** — this run's run-time output root (runner output, never candidate source); applied symmetrically to BOTH the main-repo binding and the candidate-copy binding (E0 mirror compare)")
+ for path, xy, digest in rows:
+     print(f"{digest}  {xy}  {path}")
+ PYBIND
+ }
+ 
+-# The exclusion prefix (repair-group5): $EVIDENCE_DIR relative to the
+-# repo root, computed ONCE from the two canonical (pwd -P) paths and
+-# passed UNCHANGED to both bindings — the candidate copy reproduces the
+-# same repo-relative layout, so one prefix serves both scans
+-# symmetrically. Empty (no exclusion) when the evidence root lives
+-# OUTSIDE the repository: the binding there stays exhaustive.
++# The gate's own evidence subtree relative to the repo root (repair-group5):
++# computed ONCE from the two canonical (pwd -P) paths. Empty when the
++# evidence root lives OUTSIDE the repository — there the binding stays
++# exhaustive for this part.
+ EVIDENCE_REL_PREFIX="$(python3 - "$MAIN_REPO" "$EVIDENCE_DIR" <<'PYREL'
+ import os
+ import sys
+@@ -426,11 +461,184 @@ else:
+ PYREL
+ )"
+ 
+-# Candidate worktree state — recorded COMPLETELY, never hidden. The ONE
+-# exclusion is this gate's own evidence subtree (repair-group5: with an
+-# in-repo evidence root the gate's own writes between the two scans made
+-# the mirror compare fail BY CONSTRUCTION); see bind_worktree's header.
+-bind_worktree "$MAIN_REPO" "$EVIDENCE_DIR/e0-candidate-binding.tsv" "$EVIDENCE_REL_PREFIX"
++# ── F42 (R05 RR2 WP B): attribute THIS run's run-time output roots ──────────
++# validate_run_output_unit <repo> <unit>: 0 = legal fresh output root (no
++# index-tracked content under it — candidate source and committed evidence
++# must stay bound), 1 = illegal (reason on stderr). Index-based
++# (git ls-files): works on the no-commit E0s scratch repo too.
++validate_run_output_unit() {
++  local repo="$1" unit="$2"
++  case "$unit" in
++    ""|.|..|../*|/*)
++      printf 'not a repo-relative path (repo root / parent / absolute paths can never be exclusion roots)\n' >&2
++      return 1
++      ;;
++  esac
++  if [ -n "$(git -C "$repo" ls-files -- "$unit")" ]; then
++    printf 'covers INDEX-TRACKED content (candidate source / committed evidence must stay bound)\n' >&2
++    return 1
++  fi
++  return 0
++}
++
++# discover_run_output_sinks: one `<KIND> <repo-relative-path>` row per
++# fd-1/fd-2 FILE sink of this process tree (self + ancestors — exactly the
++# files that receive this run's output flow) that lives inside this repo:
++#   DIR <path>         the sink's command directory, when it is a fresh
++#                      untracked run-output directory under artifacts/
++#                      (the verify-stage per-command layout);
++#   FILE <path>        the sink file alone, attributed to itself only
++#                      (sink in a tracked directory, a source tree, or the
++#                      repo root — nothing wider may be excluded);
++#   TRACKED-SINK <p>   run output redirected ONTO tracked content — the
++#                      caller refuses outright (it would corrupt bound
++#                      state);
++#   DISCOVERY-UNAVAILABLE  neither /proc nor lsof could resolve ANY pid —
++#                      the caller fails closed instead of silently
++#                      degrading to the F42 bug.
++# /proc/<pid>/fd is the Linux fast path; lsof -Fn is the darwin fallback.
++discover_run_output_sinks() {
++  python3 - "$MAIN_REPO" <<'PYDISC'
++import os
++import subprocess
++import sys
++
++repo = os.path.realpath(sys.argv[1])
++
++# this process tree: self up to (excluding) pid 1, cycle- and depth-capped
++pids, cur, seen = [], os.getpid(), set()
++while cur > 1 and cur not in seen and len(pids) < 64:
++    seen.add(cur)
++    pids.append(cur)
++    try:
++        out = subprocess.run(
++            ["ps", "-o", "ppid=", "-p", str(cur)],
++            capture_output=True, text=True,
++        ).stdout.strip()
++        cur = int(out.split()[0]) if out else 1
++    except Exception:
++        cur = 1
++
++# fd 1/2 file targets per pid — /proc fast path, lsof fallback (darwin)
++resolved_any = False
++fd_targets = set()
++have_proc = os.path.isdir("/proc")
++for pid in pids:
++    fds = {}
++    if have_proc:
++        for fd in ("1", "2"):
++            try:
++                fds[fd] = os.path.realpath(os.readlink("/proc/%d/fd/%s" % (pid, fd)))
++            except OSError:
++                pass
++    if not fds:
++        try:
++            out = subprocess.run(
++                ["lsof", "-a", "-p", str(pid), "-d", "1,2", "-Fn"],
++                capture_output=True, text=True,
++            ).stdout
++        except Exception:
++            out = ""
++        cur_fd = None
++        for line in out.splitlines():
++            if line.startswith("p"):
++                cur_fd = None
++            elif line.startswith("f") and line[1:] in ("1", "2"):
++                cur_fd = line[1:]
++            elif line.startswith("n") and cur_fd is not None:
++                fds[cur_fd] = line[1:]
++                cur_fd = None
++    if fds:
++        resolved_any = True
++        for target in fds.values():
++            fd_targets.add(target)
++
++if not resolved_any:
++    print("DISCOVERY-UNAVAILABLE")
++    sys.exit(0)
++
++def tracked(path):
++    # index-tracked entries under path (ls-files: also works on an
++    # unborn-HEAD scratch repo); an unreadable answer is fail-closed
++    try:
++        out = subprocess.run(
++            ["git", "-C", repo, "ls-files", "--", path],
++            check=True, capture_output=True, text=True,
++        ).stdout
++    except Exception:
++        return True
++    return out.strip() != ""
++
++for target in sorted(fd_targets):
++    if not target.startswith("/"):
++        continue                              # pipe / device / unnamed target
++    real = os.path.realpath(target)
++    if real == repo or not real.startswith(repo + os.sep):
++        continue                              # outside this repository
++    if not os.path.isfile(real):
++        continue                              # directories/devices carry no output
++    rel = os.path.relpath(real, repo)
++    rel_dir = os.path.dirname(rel)
++    if (rel_dir == "artifacts" or rel_dir.startswith("artifacts" + os.sep)) and not tracked(rel_dir):
++        print("DIR %s" % rel_dir)
++        continue
++    if tracked(rel):
++        print("TRACKED-SINK %s" % rel)
++        continue
++    print("FILE %s" % rel)
++PYDISC
++}
++
++# Assemble the exclusion-unit set ONCE, before the first binding:
++# discovered sink units + explicitly declared roots + the gate's own
++# evidence subtree — every unit validated, duplicates dropped, the final
++# set recorded auditable in e0-binding-exclusions.txt.
++BINDING_EXCLUSIONS="$EVIDENCE_DIR/e0-binding-exclusions.txt"
++SINKS_FILE="$EVIDENCE_DIR/e0-run-output-sinks.txt"
++CANDIDATES_FILE="$EVIDENCE_DIR/e0-binding-exclusion-candidates.tsv"
++: > "$BINDING_EXCLUSIONS"
++discover_run_output_sinks > "$SINKS_FILE"
++if grep -qx 'DISCOVERY-UNAVAILABLE' "$SINKS_FILE"; then
++  fail "E0: cannot discover this run's output sinks (neither /proc nor lsof resolved any pid) — the run-output attribution would silently degrade to the F42 failure; failing closed"
++fi
++if grep -q '^TRACKED-SINK ' "$SINKS_FILE"; then
++  grep '^TRACKED-SINK ' "$SINKS_FILE" >&2
++  fail "E0: this run's output was redirected ONTO tracked content (see e0-run-output-sinks.txt above) — that would corrupt bound candidate/evidence state; move the run's output to a fresh untracked run root or outside the repository (F42)"
++fi
++{
++  sed -n 's/^DIR /sink-dir\t/p; s/^FILE /sink-file\t/p' "$SINKS_FILE"
++  if [ -n "${R02_A16_RUN_OUTPUT_ROOTS:-}" ]; then
++    printf '%s\n' "$R02_A16_RUN_OUTPUT_ROOTS" | tr ':' '\n' | sed 's/^/declared\t/'
++  fi
++  [ -z "$EVIDENCE_REL_PREFIX" ] || printf 'evidence\t%s\n' "$EVIDENCE_REL_PREFIX"
++} | awk -F '\t' '$2 != "" && !seen[$2]++' > "$CANDIDATES_FILE"
++while IFS=$'\t' read -r kind unit; do
++  [ -n "$unit" ] || continue
++  case "$kind" in
++    declared)
++      # an explicitly declared root is a DIRECTORY under artifacts/ (the
++      # repo's run-output tree) — never a source dir, never the repo root
++      case "$unit" in
++        artifacts|artifacts/*) : ;;
++        *) fail "E0: declared run-output root '$unit' must live under artifacts/ — refusing a wider exclusion (F42)";;
++      esac
++      [ -d "$MAIN_REPO/$unit" ] \
++        || fail "E0: declared run-output root '$unit' is not an existing directory (F42)"
++      ;;
++  esac
++  if ! validate_run_output_unit "$MAIN_REPO" "$unit"; then
++    fail "E0: illegal binding-exclusion unit '$unit' (kind $kind) — exclusion roots must be fresh untracked paths covering no tracked content; fix the invocation instead of widening the exclusion (F42)"
++  fi
++  printf '%s\n' "$unit" >> "$BINDING_EXCLUSIONS"
++done < "$CANDIDATES_FILE"
++
++# Candidate worktree state — recorded COMPLETELY, never hidden. The
++# exclusions are this run's run-time output roots ONLY (repair-group5
++# evidence subtree + F42-attributed runner sinks/roots): with an in-repo
++# evidence root or a nested verify-stage chain, the gate's own writes and
++# the chain's runner captures between the two scans would otherwise make
++# the mirror compare fail BY CONSTRUCTION; see bind_worktree's header.
++bind_worktree "$MAIN_REPO" "$EVIDENCE_DIR/e0-candidate-binding.tsv" "$(cat "$BINDING_EXCLUSIONS")"
+ CANDIDATE_BINDING_ROWS="$(grep -vc '^#' "$EVIDENCE_DIR/e0-candidate-binding.tsv" || true)"
+ if [ "$CANDIDATE_BINDING_ROWS" -gt 0 ]; then
+   git status --porcelain --untracked-files=no > "$EVIDENCE_DIR/e0-candidate-dirty.txt"
+@@ -442,8 +650,11 @@ else
+   CANDIDATE_DIRTY=0
+   note "candidate worktree clean: this run binds commit $CANDIDATE_SHA exactly"
+ fi
+-if [ -n "$EVIDENCE_REL_PREFIX" ]; then
+-  note "NOTE e0-binding-exclusion: $EVIDENCE_REL_PREFIX/** (this gate's own run-time evidence output subtree — in-repo evidence root; runner output, never candidate source; applied symmetrically to both bindings — recorded in the # header row of e0-candidate-binding.tsv)"
++if [ -s "$BINDING_EXCLUSIONS" ]; then
++  note "NOTE e0-binding-exclusion: this run's run-time output roots (runner output, never candidate source; applied symmetrically to BOTH bindings; one # header row per root in e0-candidate-binding.tsv; audit: e0-binding-exclusions.txt + e0-run-output-sinks.txt):"
++  while IFS= read -r unit; do
++    note "NOTE e0-binding-exclusion-root: $unit/**"
++  done < "$BINDING_EXCLUSIONS"
+ fi
+ 
+ # ── Isolated copies (APFS copy-on-write; main worktree stays read-only) ────
+@@ -466,12 +677,12 @@ note "== isolated copies under $WORK =="
+ cp -Rc "$MAIN_REPO" "$CAND_COPY"
+ 
+ # Candidate copy must mirror the invoking worktree EXACTLY — tracked
+-# modifications and untracked file contents alike. The exclusion prefix
+-# is the SAME one used for the main-repo binding above (repair-group5:
+-# symmetric exclusion of this gate's own evidence subtree; everything
++# modifications and untracked file contents alike. The exclusion units
++# are the SAME set used for the main-repo binding above (repair-group5 +
++# F42: symmetric exclusion of this run's run-time output roots; everything
+ # else must still match byte for byte).
+ [ "$(git -C "$CAND_COPY" rev-parse HEAD)" = "$CANDIDATE_SHA" ] || fail "candidate copy HEAD mismatch"
+-bind_worktree "$CAND_COPY" "$WORK/candidate-copy-binding.tsv" "$EVIDENCE_REL_PREFIX"
++bind_worktree "$CAND_COPY" "$WORK/candidate-copy-binding.tsv" "$(cat "$BINDING_EXCLUSIONS")"
+ cmp -s "$EVIDENCE_DIR/e0-candidate-binding.tsv" "$WORK/candidate-copy-binding.tsv" \
+   || fail "candidate copy does not mirror the invoking worktree (tracked+untracked content binding differs)"
+ 
+@@ -2056,6 +2267,48 @@ cmp -s "$SELFCHECK/bind-ev2.tsv" "$SELFCHECK/bind-ev3.tsv" \
+ bind_worktree "$SCRATCH" "$SELFCHECK/bind-ev4.tsv"
+ grep -qF "$SCRATCH_EV/summary.txt" "$SELFCHECK/bind-ev4.tsv" \
+   || fail "E0s: without the exclusion prefix the evidence subtree must stay fully bound (default exhaustive)"
++# ── F42 (R05 RR2 WP B): run-output-root VALIDATION fixtures — the
++# exclusion can never cover index-tracked content (candidate source /
++# committed evidence) and never the repo root; a fresh untracked run
++# directory under artifacts/ validates. The scratch repo stays at its
++# unborn HEAD (no commit): the tracked fixture paths are STAGED (index
++# entries), which is exactly what validate_run_output_unit reads.
++mkdir -p "$SCRATCH/run-out/fresh-dir" "$SCRATCH/rust"
++printf 'out\n' > "$SCRATCH/run-out/fresh-dir/sink.log"
++printf 'pub fn f() {}\n' > "$SCRATCH/rust/lib.rs"
++printf 'src\n' > "$SCRATCH/rust-main.rs"
++git -C "$SCRATCH" add rust/lib.rs rust-main.rs
++validate_run_output_unit "$SCRATCH" "run-out/fresh-dir" \
++  || fail "E0s: a fresh untracked run-output directory must validate as an exclusion root"
++validate_run_output_unit "$SCRATCH" "rust" 2>/dev/null \
++  && fail "E0s: a SOURCE directory (rust/, carrying tracked content) must be REJECTED as an exclusion root"
++validate_run_output_unit "$SCRATCH" "rust-main.rs" 2>/dev/null \
++  && fail "E0s: an index-tracked path must be REJECTED as an exclusion root"
++validate_run_output_unit "$SCRATCH" "." 2>/dev/null \
++  && fail "E0s: the repo root must be REJECTED as an exclusion root"
++validate_run_output_unit "$SCRATCH" "/abs" 2>/dev/null \
++  && fail "E0s: an absolute path must be REJECTED as an exclusion root"
++validate_run_output_unit "$SCRATCH" ".." 2>/dev/null \
++  && fail "E0s: a parent-relative path must be REJECTED as an exclusion root"
++# ── F42: MULTIPLE exclusion units — growth under ANY excluded run root
++# is invisible to the binding (each root is this run's output), a
++# content change OUTSIDE every unit still flips it, and each unit
++# records its own # header row.
++mkdir -p "$SCRATCH/run-root-a/cmd" "$SCRATCH/run-root-b/cmd"
++printf 'a\n' > "$SCRATCH/run-root-a/cmd/stdout.log"
++printf 'b\n' > "$SCRATCH/run-root-b/cmd/stdout.log"
++bind_worktree "$SCRATCH" "$SELFCHECK/bind-mu1.tsv" "$(printf '%s\n%s' run-root-a run-root-b)"
++printf 'a-grew\n' >> "$SCRATCH/run-root-a/cmd/stdout.log"
++printf 'b-grew\n' >> "$SCRATCH/run-root-b/cmd/stdout.log"
++bind_worktree "$SCRATCH" "$SELFCHECK/bind-mu2.tsv" "$(printf '%s\n%s' run-root-a run-root-b)"
++cmp -s "$SELFCHECK/bind-mu1.tsv" "$SELFCHECK/bind-mu2.tsv" \
++  || fail "E0s: multi-unit exclusion broken (growth under an excluded run root changed the binding)"
++[ "$(grep -c '^# binding-exclusion: ' "$SELFCHECK/bind-mu1.tsv")" = "2" ] \
++  || fail "E0s: each exclusion unit must record its own # header row (F42)"
++printf 'changed-outside-units\n' > "$SCRATCH/untracked.rs"
++bind_worktree "$SCRATCH" "$SELFCHECK/bind-mu3.tsv" "$(printf '%s\n%s' run-root-a run-root-b)"
++cmp -s "$SELFCHECK/bind-mu2.tsv" "$SELFCHECK/bind-mu3.tsv" \
++  && fail "E0s: the multi-unit exclusion masked a non-excluded untracked content change"
+ # The baseline-CONSTRUCTION proof is the E0 purity assert on the real
+ # freshly-built base copy (HEAD == BASE_SHA, empty diff, empty status):
+ # the R4 scratch-repo rehearsal used `checkout -f` + `clean -fd` and is
+@@ -2063,9 +2316,10 @@ grep -qF "$SCRATCH_EV/summary.txt" "$SELFCHECK/bind-ev4.tsv" \
+ {
+   echo "binding: identical-state match OK; untracked content change detected; new untracked file detected (no-commit scratch repo)"
+   echo "binding exclusion (repair-group5): excluded-subtree changes invisible; non-excluded content change still detected; header row recorded; default binding stays exhaustive without the prefix"
++  echo "binding exclusion (F42): run-output-root validation OK — fresh untracked dir under artifacts/ accepted; tracked source dir (rust/), tracked path, repo root, absolute and parent-relative paths all REJECTED; multi-unit exclusion — growth under any excluded run root invisible, non-excluded content change still detected, one # header row per unit"
+   echo "baseline construction: proven by the E0 purity asserts on the real fresh copy (no checkout -f / clean -fd anywhere)"
+ } | tee -a "$EVIDENCE_DIR/e0s-self-checks.log"
+-note "PASS E0s-gate-self-checks (53 classifier fixtures incl. every REAL guard failure sentence, the zero-payload shapes, the R7 same-line/same-block mixes, the real direct-guard shape, the R8 structural-mixing negatives (compact Error:EACCES token, list/warning/matcher/wrapper tails, foreign/misplaced wrapper) and the producer-binding negatives (body lines without their lead) plus the REAL matcher-summary/diff-body positives, the R9-F01 firstDiff structure fixtures (legal bracket/comma/escape/non-ASCII paths pure, non-JSON/mixed/truncated/empty/4-element/trailing-junk payloads fail closed), the repair-group10 guard-tail-window fixtures (the two gate-r2 round2/round3 REAL 500-point windows + the derived complete-end variant classify seal+uncommitted; single-point mutations — off-by-one char, trailing junk, sentence-material fragment, wrong producer wrapper, deleted listing line — all fail closed to UNRECOGNIZED) + no-block-rows rejection + green positive control + parseability predicate incl. exit-0 summary completeness and summary/exit consistency with the R9-F01 one-directional header-loss rule (suite-error no-arrow header and multi-error headers are PARSABLE; headers < Tests-failed is CONTRADICTORY) and the R10-F01 floors (headers < Test-Files-failed count — the zero-header suite-error summary hole — and Tests-failed>0 with Test-Files-failed==0 incoherence — both CONTRADICTORY; counts side-channel records files_failed/distinct_files/verdict) + exact-identity family membership checks + no-commit binding checks; details in e0s-self-checks.log)"
++note "PASS E0s-gate-self-checks (53 classifier fixtures incl. every REAL guard failure sentence, the zero-payload shapes, the R7 same-line/same-block mixes, the real direct-guard shape, the R8 structural-mixing negatives (compact Error:EACCES token, list/warning/matcher/wrapper tails, foreign/misplaced wrapper) and the producer-binding negatives (body lines without their lead) plus the REAL matcher-summary/diff-body positives, the R9-F01 firstDiff structure fixtures (legal bracket/comma/escape/non-ASCII paths pure, non-JSON/mixed/truncated/empty/4-element/trailing-junk payloads fail closed), the repair-group10 guard-tail-window fixtures (the two gate-r2 round2/round3 REAL 500-point windows + the derived complete-end variant classify seal+uncommitted; single-point mutations — off-by-one char, trailing junk, sentence-material fragment, wrong producer wrapper, deleted listing line — all fail closed to UNRECOGNIZED) + no-block-rows rejection + green positive control + parseability predicate incl. exit-0 summary completeness and summary/exit consistency with the R9-F01 one-directional header-loss rule (suite-error no-arrow header and multi-error headers are PARSABLE; headers < Tests-failed is CONTRADICTORY) and the R10-F01 floors (headers < Test-Files-failed count — the zero-header suite-error summary hole — and Tests-failed>0 with Test-Files-failed==0 incoherence — both CONTRADICTORY; counts side-channel records files_failed/distinct_files/verdict) + exact-identity family membership checks + no-commit binding checks + F42 run-output-root validation (fresh artifacts/ dir accepted; tracked source dir / tracked path / repo root / absolute / parent-relative rejected) and multi-unit exclusion fixtures (growth under any excluded run root invisible, non-excluded change still detected, one # header row per unit); details in e0s-self-checks.log)"
+ 
+ # ── E1: default-entry-not-switched proofs (inside the candidate copy, so
+ #        uncommitted candidate state is included) ────────────────────────────

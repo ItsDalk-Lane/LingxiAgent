@@ -820,9 +820,12 @@ fn credential_surface_error(
         .with_reason("credential_surface_refused")
         .with_cause("models.credential_surface_refused")
         .into_response(),
-        // R05 RR1 F04: an OAuth-only surface aimed at a KNOWN non-OAuth
-        // provider is an explicit 409 — never a 404 that would hide the
-        // provider's existence (the CFEC64F68DDE leaf's explicit refusal).
+        // R05 RR1 F04 / RR2 F31: the login/logout/registry surfaces aimed
+        // at a KNOWN non-OAuth provider keep the explicit 409 naming the
+        // OAuth-only rule. The MODEL LISTING route deliberately does NOT
+        // map NotOAuth through here — RR2 §四E restored that one face to
+        // the original leaf boundary (LA-CFEC64F68DDE: a 404 with a
+        // minimal, non-disclosing body; see `list_oauth_models`).
         CredentialError::NotOAuth { .. } => EndpointError::new(
             StatusCode::CONFLICT,
             ErrorCode::InvalidMessage,
@@ -1060,7 +1063,12 @@ async fn logout_model_credential(
 }
 
 /// R05 RR1 F04 (LA-CFEC64F68DDE / LA-CA0BF9A7AEA9): lists the OAuth
-/// provider's model ids; a non-OAuth provider is explicitly rejected.
+/// provider's model ids. R05 RR2 F31 restores the ORIGINAL leaf boundary
+/// on this one face: a KNOWN non-OAuth provider is a 404 carrying the
+/// SAME minimal body as an unknown provider (no credential-kind, no
+/// existence oracle, no widened disclosure — the leaf's "非 OAuth provider
+/// 404；不应错误扩大写入或披露范围"). The other OAuth surfaces keep the
+/// explicit 409 through `credential_surface_error`.
 async fn list_oauth_models(
     State(state): State<ServiceState>,
     Extension(principal): Extension<Principal>,
@@ -1083,12 +1091,18 @@ async fn list_oauth_models(
             "models": listing.models,
         }))
         .into_response(),
-        Err(lingxi_adapters::models::credentials::CredentialError::NotConfigured { .. }) => {
-            EndpointError::not_found()
-                .with_reason("model_provider_unknown")
-                .with_cause("models.provider_unknown")
-                .into_response()
-        }
+        // R05 RR2 F31 (LA-CFEC64F68DDE): unknown providers AND known
+        // non-OAuth providers share ONE minimal 404. The OAuth model
+        // listing of such a provider does not exist, and the body must
+        // not disclose that the provider exists or which credential
+        // kind it uses (formatting `err` would leak both).
+        Err(
+            lingxi_adapters::models::credentials::CredentialError::NotConfigured { .. }
+            | lingxi_adapters::models::credentials::CredentialError::NotOAuth { .. },
+        ) => EndpointError::not_found()
+            .with_reason("model_provider_unknown")
+            .with_cause("models.provider_unknown")
+            .into_response(),
         Err(err) => credential_surface_error(err),
     }
 }

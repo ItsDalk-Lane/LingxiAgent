@@ -12,7 +12,7 @@
 
 ## 2. R05-ENV-ALF-UNSIGNED-TEST-BINARY — macOS 应用防火墙对未签名测试二进制的 LAN 段拦截（环境项）
 
-- 状态：环境项（T01 已定案，台账 `PROGRESS_LEDGER.json` → environment_items）。R05-T08 窗口内未复现（工作区测试与门禁运行中 r00_management_leaves 全绿）；如最终门禁窗口复现且为唯一失败，按环境项登记，不放宽门禁、不改该测试、不当代码回归修。
+- 状态：环境项（T01 已定案，台账 `PROGRESS_LEDGER.json` → environment_items）。R05-T08 窗口内未复现（工作区测试与门禁运行中 r00_management_leaves 全绿）；如最终门禁窗口复现且为唯一失败，按环境项登记，不放宽门禁、不改该测试、不当代码回归修。〔2026-10-06/07 RR2 状态更新见 §7：本轮 D 包独立验收绿窗已过（1476/0），但绿窗依赖当刻二进制实例已授予的 ALF 判定——重链接后的新二进制实例可能需用户再次 Allow，本环境项继续在册。〕
 - 负责人：用户（ALF Allow / socketfilterfw / 开发者签名三种解法任一）；执行者无法自解（无免密 sudo）。
 - 最迟解除：不设阶段期限——它是运行环境项，不是阶段义务；每次复现按台账登记。
 
@@ -35,6 +35,8 @@
 
 ## 6. RR1 阶段终审 FAIL 的阶段阻塞（2026-10-06 增补，INDEPENDENT-9）
 
+> 〔2026-10-06/07 状态注记，RR2 收口追加：下列 5 项已全部由 RR2 修复轮关闭（任务级）——F41/F42/F34/F43 独立验收 PASS（A-R2/B-R2/R2/C-R2/D-R2 各 REVIEW），第 5 项 F40+三追加 C 行已收口（RR2_ISSUE_MATRIX.json 10 行全部 INDEPENDENT_PASS）。本节历史原文保留不改写；阶段级结论仍以 FINAL-01 终审为准（READY_FOR_INDEPENDENT_REVIEW，未终审不写 accepted）。〕
+
 - 背景：RR1 候选（`d80737b6cb9186c8a18c0f35923aac00249d45c3` + 未提交工作树）的首次完整 verify-stage R05 由独立阶段审查者亲跑，**overall FAIL（exit 1）**；结论 offline_gate=FAIL / independent_review=FAIL / stage_readiness=NOT_ACCEPTED / R06_READY=false。权威记录：`docs/rust-tauri/R05/repair-current/RR1_ISSUE_MATRIX.json` → `independentStageReview`；机器记录：`artifacts/rust-tauri/R05/RR1/INDEPENDENT-9/verify-R05/verify-stage-result.json`；总收口：`docs/rust-tauri/R05/repair-current/RR1_FINAL_REPORT.md`。逐项（详情、复现/控制证据与修复方向见矩阵 F 条目）：
 
 1. **F41 — R02 存储注册表未随 RR1 v6/v7 迁移补登（阶段硬条件，§6.1(5)）**：`docs/rust-tauri/R02/R02-T04_STORAGE_REGISTRY.json` 仍 5 条（v1–v5），二进制 userVersion/supportedVersion=7；`r02_t04_storage_tx.sh` S4 确定性失败（链内+仓库根 standalone 双复现 exit 1）→ R04→R03→R02 闭包红。负责人：待派修复智能体（矩阵建议 T07 修复轮承接、T08 复验）；修法=按首轮 v5 先例补登真实指纹，不得放宽 S4 断言。
@@ -44,6 +46,12 @@
 5. **F40 + R05-T05-C11B/C13、R05-T06-C11B 三行**：LOW 台账收口项——底层义务已有独立证据、行状态未按证据翻 INDEPENDENT_PASS。负责人：总控收口/下一轮（不得无证据空翻）。
 
 - 上述 5 项全部登记于 `RR1_ISSUE_MATRIX.json`（counts：OPEN=8 = F34/F40/F41/F42/F43 + 三行 C-ID）；修复后须按总控 §3.3 重走新修复轮→新任务验收→新阶段终审，本 FAIL 结论不得被后续文档静默覆盖。
+
+## 7. RR2 环境注记（2026-10-06/07 增补，非新阻塞）
+
+- **R05-ENV-ALF-UNSIGNED-TEST-BINARY（§2 同项的状态更新）**：RR2 轮 D 包绿窗已过——独立验收者亲跑 `cargo test --manifest-path rust/Cargo.toml --locked --workspace` 取得首次完整绿窗 exit 0（115 组 ok/1476 passed/0 failed，`artifacts/rust-tauri/R05/RR2/D-R2/workspace-green-window-REVIEW-r1.log`），其中 r00_management_leaves 1/1 以 170.25s held 后放行形态通过。**边界保留**：该通过依赖当刻二进制实例（590de196dceb15ce，未重链）已存在/被授予的 ALF Allow 判定；ALF 按(路径,cdhash)逐实例拦截且判定不跨 relink（D-R2 REVIEW-r1 同刻全新无判定探针对 192.168.3.5 仍 stalled、Apple 签名 python3 ok 为双向对照）——未来任何重链接产生的新 r00 测试二进制实例可能需要用户再次 Allow（或 `sudo /usr/libexec/ApplicationFirewall/socketfilterfw --add`/临时关防火墙/Developer ID 签名）。仍按环境项处理：不放宽门禁、不改该测试、不当代码回归修。
+- **vitest worker 负载抖动（一次，已定性）**：RR2 B 包第 1 轮验收 full 轮 r02_t08 E5 判 UNPARSEABLE——producer summary 分量之和不等于总数（1477≠1478 文件/15053≠15058 测试）且日志尾部记录 `Vitest caught 1 unhandled error / Worker exited unexpectedly`。经 `artifacts/rust-tauri/R05/RR2/B-R2/R2/REVIEW-r2.md` §2 离线复析定性为高负载下 worker 崩溃丢失一个 worker 结果聚合的环境型抖动（相对同候选 s5-full-5 恰少 1 文件/5 测试=典型签名）；门禁解析器按完备性谓词（分量必须求和等于总数）正确 fail-closed，非 F42/B 逻辑缺陷，无需代码变更。同链 s5-full-5 exit 0 为完整链定案证据。
+- F44 遗留（登记不阻塞）：R10-09/round3 现场重放的生成器 patch replay 步受 git MAX_APPLY_SIZE 限制（未压缩补丁 ≥3.67GB>1023MiB，`error: patch too large`）——生成器属 `artifacts/f1-f12-repair/` 受审材料未修；该形态已由 B-r2 以分类器形态演化登记处置（登记红不转正式绿，历史核实该失败族从未绿过）。
 
 ## 无其他已知阻塞
 

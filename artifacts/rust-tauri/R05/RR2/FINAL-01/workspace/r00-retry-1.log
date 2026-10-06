@@ -1,0 +1,37 @@
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.30s
+     Running tests/r00_management_leaves.rs (rust/target/debug/deps/r00_management_leaves-294787929158efb0)
+
+running 1 test
+test r00_management_positive_and_negative_branches_on_real_service ... FAILED
+
+failures:
+
+---- r00_management_positive_and_negative_branches_on_real_service stdout ----
+LINGXI_AUTH_REJECTED [token] method=GET path=/lingxi/v1/me status=401 Unauthorized reason=missing_credential remote=127.0.0.1:56559
+LINGXI_AUTH_REJECTED [token] method=GET path=/lingxi/v1/access/summary status=401 Unauthorized reason=missing_credential remote=127.0.0.1:56563
+LINGXI_AUTH_REJECTED [token] method=PUT path=/lingxi/v1/access/account/profile status=401 Unauthorized reason=missing_credential remote=127.0.0.1:56568
+LINGXI_AUTH_REJECTED [token] method=PUT path=/lingxi/v1/access/network status=401 Unauthorized reason=missing_credential remote=127.0.0.1:56571
+LINGXI_AUTH_REJECTED [token] method=GET path=/lingxi/v1/access/mobile-qr.svg status=401 Unauthorized reason=missing_credential remote=127.0.0.1:56573
+LINGXI_AUTH_REJECTED [token] method=PUT path=/lingxi/v1/access/account/password status=401 Unauthorized reason=missing_credential remote=127.0.0.1:56581
+LINGXI_AUTH_REJECTED [token] method=DELETE path=/lingxi/v1/access/account/password status=401 Unauthorized reason=missing_credential remote=127.0.0.1:56592
+LINGXI_AUTH_REJECTED [token] method=POST [token] status=401 Unauthorized reason=missing_credential remote=127.0.0.1:56599
+LINGXI_AUTH_REJECTED [token] method=POST [token] status=401 Unauthorized reason=missing_credential remote=127.0.0.1:56601
+LINGXI_AUTH_REJECTED [token] method=GET path=/lingxi/v1/devices status=401 Unauthorized reason=missing_credential remote=127.0.0.1:56604
+LINGXI_AUTH_REJECTED [token] method=GET path=/lingxi/v1/me status=401 Unauthorized reason=invalid_credential remote=127.0.0.1:56607
+LINGXI_AUTH_REJECTED [token] method=POST [token] status=401 Unauthorized reason=missing_credential remote=127.0.0.1:56610
+LINGXI_AUTH_REJECTED [token] method=GET path=/lingxi/v1/me status=401 Unauthorized reason=invalid_credential remote=127.0.0.1:56614
+LINGXI_AUTH_REJECTED [token] method=POST [token] status=401 Unauthorized reason=missing_credential remote=127.0.0.1:56617
+LINGXI_AUTH_REJECTED [token] method=POST [token] status=401 Unauthorized reason=missing_credential remote=127.0.0.1:56619
+LINGXI_AUTH_REJECTED [token] method=POST [token] status=401 Unauthorized reason=missing_credential remote=127.0.0.1:56625
+
+thread 'r00_management_positive_and_negative_branches_on_real_service' (19520628) panicked at crates/lingxi-service/tests/r00_management_leaves.rs:49:5:
+request to 192.168.3.5:56681 stalled during write/read exchange (POST /lingxi/v1/web-auth/login, 0 bytes read so far) — if addr is a non-loopback self-address, the macOS application firewall / proxy TUN may be blocking inbound connections to this unsigned test binary; this is an environment failure surfaced honestly, not a skipped assertion
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+
+
+failures:
+    r00_management_positive_and_negative_branches_on_real_service
+
+test result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 0 filtered out; finished in 51.28s
+
+error: test failed, to rerun pass `-p lingxi-service --test r00_management_leaves`
