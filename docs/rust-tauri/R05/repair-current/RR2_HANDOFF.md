@@ -29,7 +29,19 @@
 
 ## Git 提交/推送回执
 
-- 待阶段终审后由总控执行并填写（本轮 F 收口未执行任何 git commit/push/branch/tag）。
+- 2026-10-07 总控执行（既有有效授权；终审结论=NOT_ACCEPTED〔仅 ALF 环境项〕，如实提交不掩盖）：
+  - 提交 `e8c0672e5`（fix(rust-tauri): R05 RR2 closeout — 6 items closed + F44, stage review NOT_ACCEPTED on ALF env item only）：2816 文件，含全部 RR2 代码/测试/脚本/文档/证据（A-R2/B-R2/C-R2/D-R2/E-R2/F44/G-R2/FINAL-01）；提交前秘密扫描 0 命中（合成测试 key 仅在运行日志）。回执细化见推送记录。
+  - 本回执文件随第二个 docs 提交入库；两提交一并推送 `origin/codex/rust-tauri-migration`。
+- 封印（VERIFIED_SOURCE_SHA=ab4f2281…）**未推进**：完整门禁未全绿（ALF 环境项），按 PROGRESS.md 封印流程纪律，此时推进=无证据绑定，不做。
+- 解除阻断后的下一棒（用户动作 → 总控）：见下方「ALF 解除路径」。
+
+## ALF 解除路径（唯一剩余阻断）
+
+1. 用户任选其一，对测试二进制 `rust/target/debug/deps/r00_management_leaves-590de196dceb15ce`（及后续重链新实例）授予「允许传入连接」：
+   - 系统设置 → 网络 → 防火墙 → 选项 → 添加该二进制并设为允许；或
+   - `sudo /usr/libexec/ApplicationFirewall/socketfilterfw --add <二进制绝对路径>` 且 `sudo /usr/libexec/ApplicationFirewall/socketfilterfw --unblockapp <同路径>`。
+2. 之后换新编号重跑正式终审入口（FINAL-02）：`cargo run --manifest-path rust/Cargo.toml --locked -p xtask -- verify-stage R05 --evidence artifacts/rust-tauri/R05/RR2/FINAL-02/verify-R05`；预期=其余子门禁已全部在本轮 FINAL-01 亲跑通过（fmt/clippy/契约/边界/R05 套件/R02-R04 链/130 叶/F27 资源序列），仅 workspace 级联待环境解锁。
+3. 终审 PASS 后：阶段六元组翻 accepted、R06_READY=true、按封印流程推进 VERIFIED_SOURCE_SHA 绑定终审证据。
 
 ## R06 输入文件清单（终审通过后交接 R06 使用）
 
