@@ -1,0 +1,308 @@
+{
+  "streamId": "sess_local_alpha",
+  "mode": "snapshot",
+  "fromSeq": "0",
+  "snapshotSeq": "15",
+  "items": [
+    {
+      "schemaVersion": 1,
+      "eventId": "run_000001a1055a6b7b_000001-start",
+      "streamId": "sess_local_alpha",
+      "seq": "1",
+      "sessionId": "sess_local_alpha",
+      "runId": "run_000001a1055a6b7b_000001",
+      "attempt": "run_000001a1055a6b7b_000001#a1",
+      "eventType": "run_state_changed",
+      "payload": {
+        "type": "run_state_changed",
+        "from": "queued",
+        "to": "running"
+      }
+    },
+    {
+      "schemaVersion": 1,
+      "eventId": "run_000001a1055a6b7b_000001-run_000001a1055a6b7b_000001-mc0001-start",
+      "streamId": "sess_local_alpha",
+      "seq": "2",
+      "sessionId": "sess_local_alpha",
+      "runId": "run_000001a1055a6b7b_000001",
+      "attempt": "run_000001a1055a6b7b_000001#a1",
+      "eventType": "model_call_started",
+      "payload": {
+        "type": "model_call_started",
+        "modelCallId": "run_000001a1055a6b7b_000001-mc0001",
+        "provider": "main",
+        "model": "batch-probe",
+        "operation": "chat"
+      }
+    },
+    {
+      "schemaVersion": 1,
+      "eventId": "run_000001a1055a6b7b_000001-run_000001a1055a6b7b_000001-mc0001-done",
+      "streamId": "sess_local_alpha",
+      "seq": "3",
+      "sessionId": "sess_local_alpha",
+      "runId": "run_000001a1055a6b7b_000001",
+      "attempt": "run_000001a1055a6b7b_000001#a1",
+      "eventType": "model_call_completed",
+      "payload": {
+        "type": "model_call_completed",
+        "modelCallId": "run_000001a1055a6b7b_000001-mc0001"
+      }
+    },
+    {
+      "schemaVersion": 1,
+      "eventId": "run_000001a1055a6b7b_000001-run_000001a1055a6b7b_000001-tc0001-start",
+      "streamId": "sess_local_alpha",
+      "seq": "4",
+      "sessionId": "sess_local_alpha",
+      "runId": "run_000001a1055a6b7b_000001",
+      "attempt": "run_000001a1055a6b7b_000001#a1",
+      "eventType": "tool_call_started",
+      "payload": {
+        "type": "tool_call_started",
+        "toolCall": {
+          "toolCallId": "run_000001a1055a6b7b_000001-tc0001",
+          "target": "tool:first-party:write",
+          "argsDigest": {
+            "algorithm": "sha256",
+            "canonicalization": "lingxi-canonical-json-v1",
+            "hex": "db60c5fcdf5e315abde06a30ac7db0d79f7698518cee2383207e31adf20b9633"
+          }
+        }
+      }
+    },
+    {
+      "schemaVersion": 1,
+      "eventId": "run_000001a1055a6b7b_000001-run_000001a1055a6b7b_000001-tc0001-done",
+      "streamId": "sess_local_alpha",
+      "seq": "5",
+      "sessionId": "sess_local_alpha",
+      "runId": "run_000001a1055a6b7b_000001",
+      "attempt": "run_000001a1055a6b7b_000001#a1",
+      "eventType": "tool_call_completed",
+      "payload": {
+        "type": "tool_call_completed",
+        "toolCallId": "run_000001a1055a6b7b_000001-tc0001",
+        "result": {
+          "status": "success",
+          "content": [
+            {
+              "type": "text",
+              "text": "Successfully wrote to a.txt"
+            }
+          ],
+          "resourceRefs": [
+            {
+              "resourceId": "file:/workspace/scratch/9b4397d87a13/audit/closed_loop/batch-duplicate-id-hn02gf0_/workspace/a.txt",
+              "kind": "artifact",
+              "displayName": "a.txt",
+              "uri": "file:///workspace/scratch/9b4397d87a13/audit/closed_loop/batch-duplicate-id-hn02gf0_/workspace/a.txt",
+              "digest": {
+                "algorithm": "sha256",
+                "canonicalization": "raw-bytes",
+                "hex": "559aead08264d5795d3909718cdd05abd49572e84fe55590eef31a88a08fdffd"
+              },
+              "sizeBytes": "1"
+            }
+          ],
+          "truncated": false
+        }
+      }
+    },
+    {
+      "schemaVersion": 1,
+      "eventId": "run_000001a1055a6b7b_000001-run_000001a1055a6b7b_000001-tc0002-start",
+      "streamId": "sess_local_alpha",
+      "seq": "6",
+      "sessionId": "sess_local_alpha",
+      "runId": "run_000001a1055a6b7b_000001",
+      "attempt": "run_000001a1055a6b7b_000001#a1",
+      "eventType": "tool_call_started",
+      "payload": {
+        "type": "tool_call_started",
+        "toolCall": {
+          "toolCallId": "run_000001a1055a6b7b_000001-tc0002",
+          "target": "tool:first-party:write",
+          "argsDigest": {
+            "algorithm": "sha256",
+            "canonicalization": "lingxi-canonical-json-v1",
+            "hex": "fc1eeff39cf429eef7fa2bc7a8c86018e1fd5ef646b06d48242173128c4e8fd1"
+          }
+        }
+      }
+    },
+    {
+      "schemaVersion": 1,
+      "eventId": "run_000001a1055a6b7b_000001-run_000001a1055a6b7b_000001-tc0002-done",
+      "streamId": "sess_local_alpha",
+      "seq": "7",
+      "sessionId": "sess_local_alpha",
+      "runId": "run_000001a1055a6b7b_000001",
+      "attempt": "run_000001a1055a6b7b_000001#a1",
+      "eventType": "tool_call_completed",
+      "payload": {
+        "type": "tool_call_completed",
+        "toolCallId": "run_000001a1055a6b7b_000001-tc0002",
+        "result": {
+          "status": "success",
+          "content": [
+            {
+              "type": "text",
+              "text": "Successfully wrote to b.txt"
+            }
+          ],
+          "resourceRefs": [
+            {
+              "resourceId": "file:/workspace/scratch/9b4397d87a13/audit/closed_loop/batch-duplicate-id-hn02gf0_/workspace/b.txt",
+              "kind": "artifact",
+              "displayName": "b.txt",
+              "uri": "file:///workspace/scratch/9b4397d87a13/audit/closed_loop/batch-duplicate-id-hn02gf0_/workspace/b.txt",
+              "digest": {
+                "algorithm": "sha256",
+                "canonicalization": "raw-bytes",
+                "hex": "df7e70e5021544f4834bbee64a9e3789febc4be81470df629cad6ddb03320a5c"
+              },
+              "sizeBytes": "1"
+            }
+          ],
+          "truncated": false
+        }
+      }
+    },
+    {
+      "schemaVersion": 1,
+      "eventId": "run_000001a1055a6b7b_000001-run_000001a1055a6b7b_000001-mc0002-start",
+      "streamId": "sess_local_alpha",
+      "seq": "8",
+      "sessionId": "sess_local_alpha",
+      "runId": "run_000001a1055a6b7b_000001",
+      "attempt": "run_000001a1055a6b7b_000001#a1",
+      "eventType": "model_call_started",
+      "payload": {
+        "type": "model_call_started",
+        "modelCallId": "run_000001a1055a6b7b_000001-mc0002",
+        "provider": "main",
+        "model": "batch-probe",
+        "operation": "chat"
+      }
+    },
+    {
+      "schemaVersion": 1,
+      "eventId": "run_000001a1055a6b7b_000001-run_000001a1055a6b7b_000001-mc0002-ev1",
+      "streamId": "sess_local_alpha",
+      "seq": "9",
+      "sessionId": "sess_local_alpha",
+      "runId": "run_000001a1055a6b7b_000001",
+      "attempt": "run_000001a1055a6b7b_000001#a1",
+      "eventType": "assistant_segment_start",
+      "payload": {
+        "type": "assistant_segment_start",
+        "segmentId": "assistant:2:text:default",
+        "kind": "text",
+        "semanticPhase": "final_answer"
+      }
+    },
+    {
+      "schemaVersion": 1,
+      "eventId": "run_000001a1055a6b7b_000001-run_000001a1055a6b7b_000001-mc0002-ev2",
+      "streamId": "sess_local_alpha",
+      "seq": "10",
+      "sessionId": "sess_local_alpha",
+      "runId": "run_000001a1055a6b7b_000001",
+      "attempt": "run_000001a1055a6b7b_000001#a1",
+      "eventType": "model_call_delta",
+      "payload": {
+        "type": "model_call_delta",
+        "modelCallId": "run_000001a1055a6b7b_000001-mc0002",
+        "phase": "final_answer",
+        "delta": "DONE"
+      }
+    },
+    {
+      "schemaVersion": 1,
+      "eventId": "run_000001a1055a6b7b_000001-run_000001a1055a6b7b_000001-mc0002-ev3",
+      "streamId": "sess_local_alpha",
+      "seq": "11",
+      "sessionId": "sess_local_alpha",
+      "runId": "run_000001a1055a6b7b_000001",
+      "attempt": "run_000001a1055a6b7b_000001#a1",
+      "eventType": "assistant_segment_delta",
+      "payload": {
+        "type": "assistant_segment_delta",
+        "segmentId": "assistant:2:text:default",
+        "delta": "DONE",
+        "semanticPhase": "final_answer"
+      }
+    },
+    {
+      "schemaVersion": 1,
+      "eventId": "run_000001a1055a6b7b_000001-run_000001a1055a6b7b_000001-mc0002-ev4",
+      "streamId": "sess_local_alpha",
+      "seq": "12",
+      "sessionId": "sess_local_alpha",
+      "runId": "run_000001a1055a6b7b_000001",
+      "attempt": "run_000001a1055a6b7b_000001#a1",
+      "eventType": "assistant_segment_end",
+      "payload": {
+        "type": "assistant_segment_end",
+        "segmentId": "assistant:2:text:default",
+        "semanticPhase": "final_answer"
+      }
+    },
+    {
+      "schemaVersion": 1,
+      "eventId": "run_000001a1055a6b7b_000001-run_000001a1055a6b7b_000001-mc0002-done",
+      "streamId": "sess_local_alpha",
+      "seq": "13",
+      "sessionId": "sess_local_alpha",
+      "runId": "run_000001a1055a6b7b_000001",
+      "attempt": "run_000001a1055a6b7b_000001#a1",
+      "eventType": "model_call_completed",
+      "payload": {
+        "type": "model_call_completed",
+        "modelCallId": "run_000001a1055a6b7b_000001-mc0002"
+      }
+    },
+    {
+      "schemaVersion": 1,
+      "eventId": "run_000001a1055a6b7b_000001-done",
+      "streamId": "sess_local_alpha",
+      "seq": "14",
+      "sessionId": "sess_local_alpha",
+      "runId": "run_000001a1055a6b7b_000001",
+      "attempt": "run_000001a1055a6b7b_000001#a1",
+      "eventType": "run_state_changed",
+      "payload": {
+        "type": "run_state_changed",
+        "from": "running",
+        "to": "completed",
+        "reason": "completed.with_final"
+      }
+    },
+    {
+      "schemaVersion": 1,
+      "eventId": "run_000001a1055a6b7b_000001-final",
+      "streamId": "sess_local_alpha",
+      "seq": "15",
+      "sessionId": "sess_local_alpha",
+      "runId": "run_000001a1055a6b7b_000001",
+      "attempt": "run_000001a1055a6b7b_000001#a1",
+      "eventType": "final_message_committed",
+      "payload": {
+        "type": "final_message_committed",
+        "message": {
+          "role": "assistant",
+          "content": [
+            {
+              "type": "text",
+              "text": "DONE"
+            }
+          ],
+          "modelCallId": "run_000001a1055a6b7b_000001-mc0002"
+        }
+      }
+    }
+  ],
+  "nextCursor": null
+}

@@ -1,0 +1,22 @@
+# R05 RR1 WP-T05 old-red probe (F14/F15/F16 counterexamples).
+#
+# Asserts the CORRECT behavior against the CURRENT candidate tree; every
+# test here is expected to FAIL on the unfixed tree (the audit's defect
+# evidence) and to PASS on the fixed tree. This crate is EVIDENCE ONLY —
+# it is not part of the workspace and never enters the product build.
+#
+# Path deps walk up to the repository root (six levels from this file's
+# directory to LingxiAgent/, matching the audit pack's ../../LingxiAgent
+# layout convention).
+[package]
+name = "r05-t05-old-red-probe"
+version = "0.0.0"
+edition = "2021"
+publish = false
+
+[dependencies]
+lingxi-adapters = { path = "../../../../../../rust/crates/lingxi-adapters" }
+serde_json = "=1.0.151"
+tokio = { version = "=1.53.1", features = ["rt", "macros", "net", "time", "io-util"] }
+
+[workspace]

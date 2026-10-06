@@ -1,0 +1,212 @@
+   Compiling lingxi-service v0.0.0 (/private/tmp/r05-rr1-wp-t02-redhead/rust/crates/lingxi-service)
+error[E0308]: mismatched types
+    --> crates/lingxi-service/tests/r05_t02_credentials.rs:2607:9
+     |
+2606 |       ) -> (u16, String) {
+     |            ------------- expected `(u16, std::string::String)` because of return type
+2607 | /         tokio::time::timeout(Duration::from_secs(10), async {
+2608 | |             let mut socket = tokio::net::TcpStream::connect(addr)
+2609 | |                 .await
+2610 | |                 .expect("connect");
+...    |
+2642 | |         .await
+2643 | |         .expect("bounded")
+     | |__________________________^ expected `(u16, String)`, found `String`
+     |
+     = note: expected tuple `(u16, std::string::String)`
+               found struct `std::string::String`
+
+error[E0308]: mismatched types
+    --> crates/lingxi-service/tests/r05_t02_credentials.rs:2674:23
+     |
+2674 |             status_of(&raw),
+     |             --------- ^^^^ expected `&str`, found `&(u16, String)`
+     |             |
+     |             arguments to this function are incorrect
+     |
+     = note: expected reference `&str`
+                found reference `&(u16, std::string::String)`
+note: function defined here
+    --> crates/lingxi-service/tests/r05_t02_credentials.rs:2646:8
+     |
+2646 |     fn status_of(text: &str) -> u16 {
+     |        ^^^^^^^^^ ----------
+
+error[E0277]: `(u16, std::string::String)` doesn't implement `std::fmt::Display`
+    --> crates/lingxi-service/tests/r05_t02_credentials.rs:2676:68
+     |
+2676 |             "LA-99D6C304D697 start: the login surface must answer: {raw}"
+     |                                                                    ^^^^^ `(u16, std::string::String)` cannot be formatted with the default formatter
+     |
+     = help: the trait `std::fmt::Display` is not implemented for `(u16, std::string::String)`
+     = note: in format strings you may be able to use `{:?}` (or {:#?} for pretty-print) instead
+
+error[E0308]: mismatched types
+    --> crates/lingxi-service/tests/r05_t02_credentials.rs:2689:23
+     |
+2689 |             status_of(&raw),
+     |             --------- ^^^^ expected `&str`, found `&(u16, String)`
+     |             |
+     |             arguments to this function are incorrect
+     |
+     = note: expected reference `&str`
+                found reference `&(u16, std::string::String)`
+note: function defined here
+    --> crates/lingxi-service/tests/r05_t02_credentials.rs:2646:8
+     |
+2646 |     fn status_of(text: &str) -> u16 {
+     |        ^^^^^^^^^ ----------
+
+error[E0277]: `(u16, std::string::String)` doesn't implement `std::fmt::Display`
+    --> crates/lingxi-service/tests/r05_t02_credentials.rs:2691:76
+     |
+2691 |             "LA-99D6C304D697 callback: the completing surface must answer: {raw}"
+     |                                                                            ^^^^^ `(u16, std::string::String)` cannot be formatted with the default formatter
+     |
+     = help: the trait `std::fmt::Display` is not implemented for `(u16, std::string::String)`
+     = note: in format strings you may be able to use `{:?}` (or {:#?} for pretty-print) instead
+
+error[E0308]: mismatched types
+    --> crates/lingxi-service/tests/r05_t02_credentials.rs:2704:23
+     |
+2704 |             status_of(&raw),
+     |             --------- ^^^^ expected `&str`, found `&(u16, String)`
+     |             |
+     |             arguments to this function are incorrect
+     |
+     = note: expected reference `&str`
+                found reference `&(u16, std::string::String)`
+note: function defined here
+    --> crates/lingxi-service/tests/r05_t02_credentials.rs:2646:8
+     |
+2646 |     fn status_of(text: &str) -> u16 {
+     |        ^^^^^^^^^ ----------
+
+error[E0277]: `(u16, std::string::String)` doesn't implement `std::fmt::Display`
+    --> crates/lingxi-service/tests/r05_t02_credentials.rs:2706:73
+     |
+2706 |             "LA-99D6C304D697 poll: the device poll surface must answer: {raw}"
+     |                                                                         ^^^^^ `(u16, std::string::String)` cannot be formatted with the default formatter
+     |
+     = help: the trait `std::fmt::Display` is not implemented for `(u16, std::string::String)`
+     = note: in format strings you may be able to use `{:?}` (or {:#?} for pretty-print) instead
+
+error[E0599]: no method named `split_once` found for tuple `(u16, std::string::String)` in the current scope
+    --> crates/lingxi-service/tests/r05_t02_credentials.rs:2718:24
+     |
+2718 |         let body = raw.split_once("\r\n\r\n").expect("split").1;
+     |                        ^^^^^^^^^^
+     |
+help: there is a method `split` with a similar name, but with different arguments
+    --> /Users/study_superior/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/serde_core-1.0.229/src/de/value.rs:1882:9
+     |
+1882 |         fn split(self) -> (Self::First, Self::Second);
+     |         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+help: one of the expressions' fields has a method of the same name
+     |
+2718 |         let body = raw.1.split_once("\r\n\r\n").expect("split").1;
+     |                        ++
+
+error[E0308]: mismatched types
+    --> crates/lingxi-service/tests/r05_t02_credentials.rs:2745:23
+     |
+2745 |             status_of(&raw),
+     |             --------- ^^^^ expected `&str`, found `&(u16, String)`
+     |             |
+     |             arguments to this function are incorrect
+     |
+     = note: expected reference `&str`
+                found reference `&(u16, std::string::String)`
+note: function defined here
+    --> crates/lingxi-service/tests/r05_t02_credentials.rs:2646:8
+     |
+2646 |     fn status_of(text: &str) -> u16 {
+     |        ^^^^^^^^^ ----------
+
+error[E0277]: `(u16, std::string::String)` doesn't implement `std::fmt::Display`
+    --> crates/lingxi-service/tests/r05_t02_credentials.rs:2747:68
+     |
+2747 |             "LA-CFEC64F68DDE: the OAuth model listing must answer: {raw}"
+     |                                                                    ^^^^^ `(u16, std::string::String)` cannot be formatted with the default formatter
+     |
+     = help: the trait `std::fmt::Display` is not implemented for `(u16, std::string::String)`
+     = note: in format strings you may be able to use `{:?}` (or {:#?} for pretty-print) instead
+
+error[E0308]: mismatched types
+    --> crates/lingxi-service/tests/r05_t02_credentials.rs:2760:23
+     |
+2760 |             status_of(&raw),
+     |             --------- ^^^^ expected `&str`, found `&(u16, String)`
+     |             |
+     |             arguments to this function are incorrect
+     |
+     = note: expected reference `&str`
+                found reference `&(u16, std::string::String)`
+note: function defined here
+    --> crates/lingxi-service/tests/r05_t02_credentials.rs:2646:8
+     |
+2646 |     fn status_of(text: &str) -> u16 {
+     |        ^^^^^^^^^ ----------
+
+error[E0277]: `(u16, std::string::String)` doesn't implement `std::fmt::Display`
+    --> crates/lingxi-service/tests/r05_t02_credentials.rs:2762:65
+     |
+2762 |             "LA-16CEB6D12A6A: the custom model add must answer: {raw}"
+     |                                                                 ^^^^^ `(u16, std::string::String)` cannot be formatted with the default formatter
+     |
+     = help: the trait `std::fmt::Display` is not implemented for `(u16, std::string::String)`
+     = note: in format strings you may be able to use `{:?}` (or {:#?} for pretty-print) instead
+
+error[E0308]: mismatched types
+    --> crates/lingxi-service/tests/r05_t02_credentials.rs:2775:23
+     |
+2775 |             status_of(&raw),
+     |             --------- ^^^^ expected `&str`, found `&(u16, String)`
+     |             |
+     |             arguments to this function are incorrect
+     |
+     = note: expected reference `&str`
+                found reference `&(u16, std::string::String)`
+note: function defined here
+    --> crates/lingxi-service/tests/r05_t02_credentials.rs:2646:8
+     |
+2646 |     fn status_of(text: &str) -> u16 {
+     |        ^^^^^^^^^ ----------
+
+error[E0277]: `(u16, std::string::String)` doesn't implement `std::fmt::Display`
+    --> crates/lingxi-service/tests/r05_t02_credentials.rs:2777:68
+     |
+2777 |             "LA-8060BE8AA02C: the custom model remove must answer: {raw}"
+     |                                                                    ^^^^^ `(u16, std::string::String)` cannot be formatted with the default formatter
+     |
+     = help: the trait `std::fmt::Display` is not implemented for `(u16, std::string::String)`
+     = note: in format strings you may be able to use `{:?}` (or {:#?} for pretty-print) instead
+
+error[E0308]: mismatched types
+    --> crates/lingxi-service/tests/r05_t02_credentials.rs:2790:23
+     |
+2790 |             status_of(&raw),
+     |             --------- ^^^^ expected `&str`, found `&(u16, String)`
+     |             |
+     |             arguments to this function are incorrect
+     |
+     = note: expected reference `&str`
+                found reference `&(u16, std::string::String)`
+note: function defined here
+    --> crates/lingxi-service/tests/r05_t02_credentials.rs:2646:8
+     |
+2646 |     fn status_of(text: &str) -> u16 {
+     |        ^^^^^^^^^ ----------
+
+error[E0277]: `(u16, std::string::String)` doesn't implement `std::fmt::Display`
+    --> crates/lingxi-service/tests/r05_t02_credentials.rs:2792:63
+     |
+2792 |             "LA-FC80B6C4FBE4: the logout surface must answer: {raw}"
+     |                                                               ^^^^^ `(u16, std::string::String)` cannot be formatted with the default formatter
+     |
+     = help: the trait `std::fmt::Display` is not implemented for `(u16, std::string::String)`
+     = note: in format strings you may be able to use `{:?}` (or {:#?} for pretty-print) instead
+
+Some errors have detailed explanations: E0277, E0308, E0599.
+For more information about an error, try `rustc --explain E0277`.
+error: could not compile `lingxi-service` (test "r05_t02_credentials") due to 16 previous errors

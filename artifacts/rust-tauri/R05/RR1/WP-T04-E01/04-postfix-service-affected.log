@@ -1,0 +1,125 @@
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.10s
+     Running tests/r04_t01_tool_catalog.rs (rust/target/debug/deps/r04_t01_tool_catalog-f84133b8f4a5fdf0)
+
+running 6 tests
+test adversarial_alias_and_primary_name_share_one_permission_contract ... ok
+test registry_capabilities_resolve_recovery_classification ... ok
+test r04_a01_catalog_and_execution_share_one_source_of_truth ... ok
+test r04_a02_stale_catalog_generation_is_refused_until_refresh ... ok
+test adversarial_malformed_inputs_never_reach_the_executor ... ok
+test adversarial_forged_digest_is_refused_with_zero_dispatch_on_real_chain ... ok
+
+test result: ok. 6 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.07s
+
+     Running tests/r04_t02_tool_gateway.rs (rust/target/debug/deps/r04_t02_tool_gateway-5ba814d820994155)
+
+running 13 tests
+test r04_a03_stricter_subagent_attenuation_is_explicit ... ok
+test adversarial_summary_a_payload_b_is_refused_at_every_layer ... ok
+test r04_a04_forged_and_stale_handles_are_refused_by_the_real_gateway ... ok
+test f01_delegation_family_routing_is_first_party_only ... ok
+test adversarial_subagent_blocklist_holds_under_registry_target_ids ... ok
+test r04_a03_delegation_entry_goes_through_the_gateway ... ok
+test f01_access_read_delegation_child_dispatches_registered_read_tools ... ok
+test f01_read_only_subagent_registered_read_tool_dispatches_on_both_wirings ... ok
+test r04_a04_forged_arguments_never_override_host_facts ... ok
+test f01_read_only_attenuation_still_denies_write_and_blocklist_targets ... ok
+test r04_a03_deny_group_unconfigured_policy_refuses_every_entry ... ok
+test r04_a03_needs_approval_group_round_trips_every_entry ... ok
+test r04_a03_allow_group_is_identical_across_all_entries ... ok
+
+test result: ok. 13 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 1.20s
+
+     Running tests/r04_t03_approval_service.rs (rust/target/debug/deps/r04_t03_approval_service-a363984adecba4ba)
+
+running 11 tests
+test alias_cannot_reuse_a_single_use_grant ... ok
+test restart_invalidates_old_approvals_and_grants ... ok
+test cancel_during_wait_then_late_approval_never_resurrects ... ok
+test one_approval_cannot_be_spent_by_two_concurrent_requests ... ok
+test approval_timeout_is_a_definite_rejection_and_late_approval_is_refused ... ok
+test o05_policy_allowed_never_re_prompts_the_wired_gate ... ok
+test r04_a05_approved_digest_a_cannot_execute_payload_b ... ok
+test user_session_mode_matrix_on_the_real_chain ... ok
+test r04_a06_wait_disabled_then_approved_still_refuses ... ok
+test sup01_ask_tier_subagent_matrix_on_the_real_chain ... ok
+test concurrent_spends_of_one_grant_produce_exactly_one_winner ... ok
+
+test result: ok. 11 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 8.43s
+
+     Running tests/r04_t04_file_tools.rs (rust/target/debug/deps/r04_t04_file_tools-2c1e11fcbd952fa7)
+
+running 10 tests
+test edit_duplicate_counting_runs_in_the_fuzzy_space_like_the_incumbent ... ok
+test adversarial_prefix_parent_switch_and_unicode_names ... ok
+test adversarial_write_records_conflicts_and_atomicity ... ok
+test adversarial_mid_mutation_swap_is_a_conflict_not_a_lost_update ... ok
+test r04_a08_symlinks_are_judged_by_their_real_targets ... ok
+test r04_a08_resource_refusal_on_the_full_chain_is_never_dispatched ... ok
+test adversarial_read_pagination_truncation_and_edit_vocabulary ... ok
+test read_only_session_denies_file_writes_at_the_policy_face ... ok
+test r04_a07_concurrent_edit_never_overwrites_the_user_version ... ok
+test approval_record_binds_real_file_scope_and_alias_resolves_to_the_executor ... ok
+
+test result: ok. 10 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.50s
+
+     Running tests/r05_t03_protocol_adapters.rs (rust/target/debug/deps/r05_t03_protocol_adapters-e50c9f080d9e6e18)
+
+running 12 tests
+test codex_family_runs_end_to_end_over_sse ... ok
+test rr1_f08_deepseek_reasoning_replays_onto_the_next_wire_request ... ok
+test c06_openai_completions_mixed_content_parts_survive_in_order ... ok
+test c03_google_parallel_calls_pair_function_responses_by_exchange_mapping ... ok
+test c08_a_policy_refusal_rides_the_next_request_as_a_structured_failure ... ok
+test rr1_f08_missing_required_reasoning_fails_closed_before_the_wire ... ok
+test c02_anthropic_tool_roundtrip_with_the_real_file_tool ... ok
+test c04_same_provider_call_id_in_two_sessions_stays_isolated ... ok
+test c07_auth_header_goes_verbatim_and_none_sends_nothing ... ok
+test c01_c04_same_model_id_two_families_never_cross_wire_or_credentials ... ok
+test c05_runtime_nonce_rides_the_next_request_and_follows_changes ... ok
+test c12_retry_continues_the_confirmed_exchange_without_rebuild_or_redo ... ok
+
+test result: ok. 12 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 1.10s
+
+     Running tests/r05_t04_streaming.rs (rust/target/debug/deps/r05_t04_streaming-d024e6d7e68e1e81)
+
+running 18 tests
+test rr1_f12_unclassified_live_text_is_not_marked_final_pre_terminal ... ok
+test rr1_f12_unclassified_live_text_stays_unresolved_until_the_terminal ... ok
+test rr1_f12_mood_only_text_settles_process_only_without_final ... ok
+test c05_half_json_arguments_dispatch_zero_tools ... ok
+test rr1_f11_legal_then_schema_invalid_batch_has_zero_side_effects ... ok
+test c15_a08_http200_stream_failures_keep_the_run_honest ... ok
+test rr1_f11_same_provider_id_conflict_is_loud_with_zero_side_effects ... ok
+test c11_a_content_refusal_fails_in_place_without_retry ... ok
+test rr1_f12_reasoning_only_turn_settles_process_only_without_final ... ok
+test c13_live_normalization_and_history_projection_share_the_scanner ... ok
+test c06_parseable_arguments_do_not_dispatch_before_the_terminal ... ok
+test rr1_f13_final_message_projection_is_normalized_same_source ... ok
+test c16_a09_midstream_cancel_releases_the_connection_and_settles_once ... ok
+test c12_first_delta_reaches_the_subscriber_before_the_external_stream_ends ... ok
+test rr1_f11_identical_resend_executes_once ... ok
+test rr1_f11_distinct_ids_with_equal_arguments_both_execute ... ok
+test c09_length_truncated_batch_executes_nothing_and_the_retry_is_clean ... ok
+test c15_anthropic_in_stream_error_event_retries_cleanly ... ok
+
+test result: ok. 18 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 1.19s
+
+     Running tests/r05_t08_closed_loop.rs (rust/target/debug/deps/r05_t08_closed_loop-e0929dd01025b45a)
+
+running 11 tests
+test c04_request_id_replay_and_conflict ... ok
+test c09_live_stream_and_history_projection_agree ... ok
+test c03_allowed_and_denied_file_sentinels ... ok
+test rr1_f13_normalized_final_survives_restart_on_the_real_binary ... ok
+test c02_two_full_chain_runs_different_runtime_nonces ... ok
+test c08_two_sessions_shared_callid_isolated ... ok
+test c01_read_edit_read_final_restart_five_way_chain ... ok
+test c05_restart_reads_history_zero_reexecution ... ok
+test c07_crash_midstream_honest_terminal ... ok
+test c06_crash_after_tool_effect_no_blind_redo ... ok
+test c12_repeated_cycles_stay_bounded ... ok
+
+test result: ok. 11 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 8.33s
+
+service exit: 0

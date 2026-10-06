@@ -39,13 +39,17 @@ publish.workspace = true
 #   - httpdate 1.x (R05-T05, models/dispatch.rs): the Retry-After HTTP-date
 #     form's parser. Already locked as a reqwest dependency; the lock gains
 #     only this dependency edge — zero new third-party versions.
+#     R05 RR1 F14 additionally enables reqwest's `socks` feature flag: the
+#     unified network policy accepts socks/socks5 proxy URLs (the incumbent
+#     ALLOWED_PROXY_PROTOCOLS), and the flag is an EMPTY cfg gate inside the
+#     already-locked reqwest 0.13.5 — no new crates, no version changes.
 [dependencies]
 lingxi-kernel = { path = "../lingxi-kernel" }
 lingxi-protocol = { path = "../lingxi-protocol" }
 base64 = "0.23.1"
 getrandom = "0.2"
 httpdate = "1"
-reqwest = { version = "0.13.5", features = ["json", "form"] }
+reqwest = { version = "0.13.5", features = ["json", "form", "socks"] }
 rusqlite = { version = "0.40.2", features = ["bundled", "backup"] }
 serde = { version = "1.0.229", features = ["derive"] }
 serde_json = "1.0.151"

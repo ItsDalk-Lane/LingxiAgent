@@ -1,0 +1,21 @@
+# WP-T07 R2 mutation verification (isolated /tmp copy, working tree untouched)
+# toolchain: rustup proxy /Users/study_superior/.cargo/bin/cargo -> 1.98.1 (rust-toolchain.toml)
+
+## MUT-A: runs.rs persist_model_call_cancelled_in_flight body neutralized (no row write)
+command: CARGO_TARGET_DIR=/tmp/r05t07r2-mut-target cargo test --manifest-path /tmp/r05t07r2-mut/rust/Cargo.toml --locked -p lingxi-service --test r05_t07_rr1_usage_ledger rr1_f38_driver -- --test-threads=1
+exit: 101 (expected red)
+
+thread 'rr1_f38_driver_cancel_of_in_flight_stream_leads_a_cancelled_row_across_restart' (12212731) panicked at crates/lingxi-service/tests/r05_t07_rr1_usage_ledger.rs:1546:5:
+assertion `left == right` failed: the cancelled in-flight call still accounts
+  left: 0
+ right: 1
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+
+## MUT-B: GatewayWorkerModel::abandoned early-returns (no abandoned row; compiles)
+command: CARGO_TARGET_DIR=/tmp/r05t07r2-mut-target cargo test --manifest-path /tmp/r05t07r2-mut/rust/Cargo.toml --locked -p lingxi-service --test r05_t07_rr1_usage_ledger rr1_f38_worker -- --test-threads=1
+exit: 101 (expected red)
+thread 'rr1_f38_worker_deadline_expiry_of_in_flight_callback_leads_a_cancelled_row' (12215025) panicked at crates/lingxi-service/tests/r05_t07_rr1_usage_ledger.rs:1844:10:
+the deadline-dropped callback leaves its cancelled row
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+
+## note: an earlier MUT-B stub attempt failed to COMPILE (unreachable!() inferred ()) — discarded as invalid (a compile failure is not a mutation proof); the clean early-return MUT-B above is the recorded one.

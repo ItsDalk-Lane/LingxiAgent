@@ -99,7 +99,7 @@ pub fn extract_account_id_from_token(token: &str) -> Option<String> {
 /// The real HTTP adapter for the openai-codex-responses family. Stateless
 /// per call; no redirects (C10); always streamed.
 pub struct OpenAiCodexResponsesAdapter {
-    client: reqwest::Client,
+    client: dispatch::NetworkClient,
     schema_budget: SchemaBudget,
     timeouts: dispatch::HttpTimeouts,
 }
@@ -114,8 +114,24 @@ impl OpenAiCodexResponsesAdapter {
         schema_budget: SchemaBudget,
         timeouts: dispatch::HttpTimeouts,
     ) -> Result<Self, ProtocolError> {
+        Self::new_with_timeouts_and_network(
+            schema_budget,
+            timeouts,
+            super::network::NetworkPlane::direct_isolated(),
+        )
+    }
+
+    /// R05 RR1 F14: the client is BOUND to the model plane's reloadable
+    /// network policy (proxy / NO_PROXY / explicit CA per configuration
+    /// generation; the legacy constructors keep the pre-F14 direct
+    /// behavior for isolated tests).
+    pub fn new_with_timeouts_and_network(
+        schema_budget: SchemaBudget,
+        timeouts: dispatch::HttpTimeouts,
+        network: std::sync::Arc<super::network::NetworkPlane>,
+    ) -> Result<Self, ProtocolError> {
         Ok(Self {
-            client: dispatch::build_client_with_timeouts(&timeouts)?,
+            client: network.client_handle(timeouts)?,
             schema_budget,
             timeouts,
         })
@@ -199,8 +215,11 @@ impl OpenAiCodexResponsesAdapter {
             Err(error) => return fail(error, false),
         };
         let url = resolve_codex_responses_url(&route.endpoint);
-        let request = self
-            .client
+        let client = match self.client.client() {
+            Ok(client) => client,
+            Err(error) => return fail(error, false),
+        };
+        let request = client
             .post(&url)
             .bearer_auth(token)
             .header("OpenAI-Beta", "responses=experimental")
@@ -232,6 +251,12 @@ impl OpenAiCodexResponsesAdapter {
         if let Err((error, retryable)) = drive {
             return fail(error, retryable);
         }
+        // R05 RR1 F38 (F21 same-path fix): capture the usage the stream
+        // observed BEFORE `finish` consumes the accumulator — a parse
+        // failure must not erase it.
+        let salvaged_usage = drive_handler.accumulator.observed_usage_report(
+            lingxi_kernel::model_exchange::ProtocolFamily::OpenAiCodexResponses,
+        );
         match drive_handler
             .accumulator
             .finish(call, &input.tools, &self.schema_budget)
@@ -251,7 +276,7 @@ impl OpenAiCodexResponsesAdapter {
             },
             Err(error) => {
                 let retryable = error.retryable;
-                fail(error, retryable)
+                fail(error, retryable).with_usage_report(salvaged_usage)
             }
         }
     }
@@ -264,7 +289,7 @@ pub fn render_codex_request(
     input: &ModelTurnInput,
     route: &ResolvedModelRoute,
 ) -> Result<serde_json::Value, ProtocolError> {
-    let items = render_input_items(input, FAMILY)?;
+    let items = render_input_items(input, FAMILY, route)?;
     let tools: Vec<serde_json::Value> = input
         .tools
         .declarations

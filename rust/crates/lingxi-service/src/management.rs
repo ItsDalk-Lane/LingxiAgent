@@ -7,7 +7,7 @@ use std::sync::Mutex;
 use axum::extract::{Path as RoutePath, Query, State};
 use axum::http::{header, HeaderMap, HeaderValue, StatusCode};
 use axum::response::{IntoResponse, Response};
-use axum::routing::{get, post, put};
+use axum::routing::{delete, get, post, put};
 use axum::{Extension, Json, Router};
 use qrcodegen::{QrCode, QrCodeEcc};
 use serde::{Deserialize, Serialize};
@@ -589,6 +589,34 @@ pub(crate) fn routes() -> Router<ServiceState> {
             "/lingxi/v1/models/credentials/{provider}/revoke",
             post(revoke_model_credential),
         )
+        // R05 RR1 F04: the OAuth login surface — start/callback/poll to a
+        // credential installed through the SAME authority (the six
+        // R00-T02 exclusive leaves), plus logout and the OAuth model
+        // registry.
+        .route(
+            "/lingxi/v1/models/credentials/{provider}/login",
+            post(start_model_login),
+        )
+        .route(
+            "/lingxi/v1/models/credentials/{provider}/login/callback",
+            post(complete_model_login),
+        )
+        .route(
+            "/lingxi/v1/models/credentials/{provider}/login/poll",
+            post(poll_model_login),
+        )
+        .route(
+            "/lingxi/v1/models/credentials/{provider}/logout",
+            post(logout_model_credential),
+        )
+        .route(
+            "/lingxi/v1/models/oauth/{provider}/models",
+            get(list_oauth_models).post(add_oauth_model),
+        )
+        .route(
+            "/lingxi/v1/models/oauth/{provider}/models/{model_id}",
+            delete(remove_oauth_model),
+        )
         .route("/lingxi/v1/server/identity", get(server_identity))
 }
 
@@ -646,14 +674,32 @@ async fn reload_models(
             }
         }
     };
-    // R05-T02: the credential service re-seeds from the SAME freshly
-    // validated plane FIRST (its cells keep unchanged providers' tokens and
-    // in-flight flights; a changed provider gets a fresh cell), then the
-    // gateway swaps — one consistent plane across both.
+    // R05 RR1 F02: the credential service re-seeds from the SAME freshly
+    // validated plane FIRST, stamped with the configuration generation
+    // this reload is ABOUT to publish (the number `gateway.reload` below
+    // installs — `upcoming_generation` is that single source). With the
+    // credential re-seed leading the gateway swap there is no window in
+    // which a NEW-generation route can meet OLD-generation material (the
+    // gateway has not published the new routes yet), and the re-seeded
+    // cells' epoch refuses to hand NEW material to OLD-generation routes
+    // — the reload can never mix credential material across generations.
+    // Swapping the two reloads alone would NOT close either window; the
+    // generation binding is the fix.
+    let next_generation = gateway.upcoming_generation();
     if let Some(credentials) = state.credential_service() {
-        credentials.reload(&plane).await;
+        credentials.reload(&plane, next_generation).await;
     }
-    let generation = gateway.reload(plane);
+    let generation = gateway.reload(plane.clone());
+    // R05 RR1 F14: the freshly validated plane's network policy publishes
+    // on the SHARED policy plane atomically with the route swap — every
+    // model-plane consumer's NEXT request observes the new proxy / NO_PROXY
+    // / explicit-CA generation (in-flight requests keep the client they
+    // started with; system mode re-snapshots the exported proxy
+    // environment here, once per reload).
+    if let Some(network_plane) = state.network_plane() {
+        network_plane
+            .apply(lingxi_adapters::models::network::NetworkPolicy::from_config(&plane.network));
+    }
     // R05-T06: the operation plane's egress allowlist follows the CURRENT
     // provider endpoints (a same-origin media-product destination that a
     // reload moved is no longer same-origin — the swap is atomic with the
@@ -753,6 +799,423 @@ async fn revoke_model_credential(
         .with_reason("credential_revoke_failed")
         .with_cause("models.credentials_revoke_failed")
         .into_response(),
+    }
+}
+
+/// R05 RR1 F04: maps a credential-surface failure onto the management
+/// error vocabulary. `NotConfigured` doubles as the explicit non-OAuth /
+/// invalid-input rejection (a 409 naming the reason); a persistence
+/// failure is a 409 (the state changed nothing); everything else keeps
+/// the classification of the login surface.
+fn credential_surface_error(
+    err: lingxi_adapters::models::credentials::CredentialError,
+) -> Response {
+    use lingxi_adapters::models::credentials::CredentialError;
+    match err {
+        CredentialError::NotConfigured { .. } => EndpointError::new(
+            StatusCode::CONFLICT,
+            ErrorCode::InvalidMessage,
+            format!("credential surface refused the request: {err}"),
+        )
+        .with_reason("credential_surface_refused")
+        .with_cause("models.credential_surface_refused")
+        .into_response(),
+        // R05 RR1 F04: an OAuth-only surface aimed at a KNOWN non-OAuth
+        // provider is an explicit 409 — never a 404 that would hide the
+        // provider's existence (the CFEC64F68DDE leaf's explicit refusal).
+        CredentialError::NotOAuth { .. } => EndpointError::new(
+            StatusCode::CONFLICT,
+            ErrorCode::InvalidMessage,
+            format!("oauth-only surface refused: {err}"),
+        )
+        .with_reason("oauth_only_surface")
+        .with_cause("models.oauth_only_surface")
+        .into_response(),
+        CredentialError::HandleRefused { .. } => EndpointError::new(
+            StatusCode::CONFLICT,
+            ErrorCode::InvalidMessage,
+            format!("login transaction refused: {err}"),
+        )
+        .with_reason("oauth_login_refused")
+        .with_cause("models.oauth_login_refused")
+        .into_response(),
+        CredentialError::NotLoggedIn { .. } | CredentialError::ReauthorizationRequired { .. } => {
+            EndpointError::new(
+                StatusCode::CONFLICT,
+                ErrorCode::Unauthorized,
+                format!("oauth login required or failed: {err}"),
+            )
+            .with_reason("oauth_reauthorization_required")
+            .with_cause("models.oauth_reauthorization_required")
+            .into_response()
+        }
+        CredentialError::PersistenceFailed { .. } => EndpointError::new(
+            StatusCode::CONFLICT,
+            ErrorCode::Internal,
+            format!("credential persistence failed: {err}"),
+        )
+        .with_reason("credential_persist_failed")
+        .with_cause("models.credentials_persist_failed")
+        .into_response(),
+        CredentialError::Revoked { .. } => EndpointError::new(
+            StatusCode::CONFLICT,
+            ErrorCode::Unauthorized,
+            format!("credential revoked: {err}"),
+        )
+        .with_reason("credential_revoked")
+        .with_cause("models.credentials_revoked")
+        .into_response(),
+        CredentialError::StaleRoute { .. } => EndpointError::new(
+            StatusCode::CONFLICT,
+            ErrorCode::UpstreamUnavailable,
+            format!("configuration changed mid-flight: {err}"),
+        )
+        .with_reason("model_plane_reloaded")
+        .with_cause("models.plane_reloaded")
+        .into_response(),
+        CredentialError::Transient { .. } => EndpointError::new(
+            StatusCode::BAD_GATEWAY,
+            ErrorCode::UpstreamUnavailable,
+            format!("oauth transport failed: {err}"),
+        )
+        .with_reason("oauth_transport_failed")
+        .with_cause("models.oauth_transport_failed")
+        .into_response(),
+    }
+}
+
+/// R05 RR1 F04 (LA-99D6C304D697, start half): starts an OAuth login for
+/// one provider through the single credential authority. Local-only.
+async fn start_model_login(
+    State(state): State<ServiceState>,
+    Extension(principal): Extension<Principal>,
+    RoutePath(provider): RoutePath<String>,
+) -> Response {
+    if principal.kind != PrincipalKind::LocalUser {
+        return EndpointError::local_only().into_response();
+    }
+    let Some(credentials) = state.credential_service() else {
+        return EndpointError::not_found()
+            .with_reason("model_plane_unconfigured")
+            .with_cause("models.unconfigured")
+            .into_response();
+    };
+    let started = credentials
+        .oauth_start(&principal.principal_id, &provider)
+        .await;
+    match started {
+        Ok(start) => {
+            let now = state.clock.now_unix_ms();
+            if let Err(err) = state.management.change(|next| {
+                audit_with_metadata(
+                    next,
+                    "models.credentials.login.start",
+                    "model-plane",
+                    now,
+                    serde_json::json!({"provider": provider}),
+                );
+                Ok(())
+            }) {
+                return err.into_response();
+            }
+            Json(serde_json::json!({"ok": true, "provider": provider, "start": start}))
+                .into_response()
+        }
+        Err(err) => credential_surface_error(err),
+    }
+}
+
+#[derive(Deserialize)]
+#[serde(rename_all = "camelCase")]
+struct LoginCallbackInput {
+    state: String,
+    code: String,
+}
+
+/// R05 RR1 F04 (LA-99D6C304D697, 手输码 callback half): completes an
+/// authorization-code login with a manually supplied (state, code).
+/// One-shot: a wrong state, a replay or an expired transaction refuses
+/// with ZERO writes.
+async fn complete_model_login(
+    State(state): State<ServiceState>,
+    Extension(principal): Extension<Principal>,
+    RoutePath(provider): RoutePath<String>,
+    input: Result<Json<LoginCallbackInput>, axum::extract::rejection::JsonRejection>,
+) -> Response {
+    if principal.kind != PrincipalKind::LocalUser {
+        return EndpointError::local_only().into_response();
+    }
+    let Json(input) = match input {
+        Ok(v) => v,
+        Err(e) => return EndpointError::from_json_rejection(&e).into_response(),
+    };
+    let Some(credentials) = state.credential_service() else {
+        return EndpointError::not_found()
+            .with_reason("model_plane_unconfigured")
+            .with_cause("models.unconfigured")
+            .into_response();
+    };
+    match credentials
+        .oauth_complete_code(
+            &principal.principal_id,
+            &provider,
+            &input.state,
+            &input.code,
+        )
+        .await
+    {
+        Ok(outcome) => {
+            let now = state.clock.now_unix_ms();
+            if let Err(err) = state.management.change(|next| {
+                audit_with_metadata(
+                    next,
+                    "models.credentials.login.callback",
+                    "model-plane",
+                    now,
+                    serde_json::json!({"provider": provider}),
+                );
+                Ok(())
+            }) {
+                return err.into_response();
+            }
+            Json(serde_json::json!({"ok": true, "provider": provider, "outcome": outcome}))
+                .into_response()
+        }
+        Err(err) => credential_surface_error(err),
+    }
+}
+
+/// R05 RR1 F04 (LA-99D6C304D697, device half): drives ONE device-code
+/// poll round. The client loops this endpoint until `loggedIn` or an
+/// honest failure.
+async fn poll_model_login(
+    State(state): State<ServiceState>,
+    Extension(principal): Extension<Principal>,
+    RoutePath(provider): RoutePath<String>,
+) -> Response {
+    if principal.kind != PrincipalKind::LocalUser {
+        return EndpointError::local_only().into_response();
+    }
+    let Some(credentials) = state.credential_service() else {
+        return EndpointError::not_found()
+            .with_reason("model_plane_unconfigured")
+            .with_cause("models.unconfigured")
+            .into_response();
+    };
+    match credentials
+        .oauth_poll_device(&principal.principal_id, &provider)
+        .await
+    {
+        Ok(outcome) => {
+            Json(serde_json::json!({"ok": true, "provider": provider, "outcome": outcome}))
+                .into_response()
+        }
+        Err(err) => credential_surface_error(err),
+    }
+}
+
+/// R05 RR1 F04 (LA-FC80B6C4FBE4): logout — deletes the credential, clears
+/// the auth cache, refreshes the model list; the honest result (and the
+/// refreshed listing) is the response.
+async fn logout_model_credential(
+    State(state): State<ServiceState>,
+    Extension(principal): Extension<Principal>,
+    RoutePath(provider): RoutePath<String>,
+) -> Response {
+    if principal.kind != PrincipalKind::LocalUser {
+        return EndpointError::local_only().into_response();
+    }
+    let Some(credentials) = state.credential_service() else {
+        return EndpointError::not_found()
+            .with_reason("model_plane_unconfigured")
+            .with_cause("models.unconfigured")
+            .into_response();
+    };
+    match credentials.logout(&provider).await {
+        Ok(listing) => {
+            let now = state.clock.now_unix_ms();
+            if let Err(err) = state.management.change(|next| {
+                audit_with_metadata(
+                    next,
+                    "models.credentials.logout",
+                    "model-plane",
+                    now,
+                    serde_json::json!({"provider": provider}),
+                );
+                Ok(())
+            }) {
+                return err.into_response();
+            }
+            Json(serde_json::json!({"ok": true, "provider": provider, "models": listing.models}))
+                .into_response()
+        }
+        Err(lingxi_adapters::models::credentials::CredentialError::NotConfigured { .. }) => {
+            EndpointError::not_found()
+                .with_reason("model_provider_unknown")
+                .with_cause("models.provider_unknown")
+                .into_response()
+        }
+        Err(err) => credential_surface_error(err),
+    }
+}
+
+/// R05 RR1 F04 (LA-CFEC64F68DDE / LA-CA0BF9A7AEA9): lists the OAuth
+/// provider's model ids; a non-OAuth provider is explicitly rejected.
+async fn list_oauth_models(
+    State(state): State<ServiceState>,
+    Extension(principal): Extension<Principal>,
+    RoutePath(provider): RoutePath<String>,
+) -> Response {
+    if principal.kind != PrincipalKind::LocalUser {
+        return EndpointError::local_only().into_response();
+    }
+    let Some(credentials) = state.credential_service() else {
+        return EndpointError::not_found()
+            .with_reason("model_plane_unconfigured")
+            .with_cause("models.unconfigured")
+            .into_response();
+    };
+    match credentials.oauth_models(&provider).await {
+        Ok(listing) => Json(serde_json::json!({
+            "ok": true,
+            "provider": listing.provider,
+            "loggedIn": listing.logged_in,
+            "models": listing.models,
+        }))
+        .into_response(),
+        Err(lingxi_adapters::models::credentials::CredentialError::NotConfigured { .. }) => {
+            EndpointError::not_found()
+                .with_reason("model_provider_unknown")
+                .with_cause("models.provider_unknown")
+                .into_response()
+        }
+        Err(err) => credential_surface_error(err),
+    }
+}
+
+#[derive(Deserialize)]
+#[serde(rename_all = "camelCase")]
+struct OAuthModelInput {
+    model_id: String,
+}
+
+/// R05 RR1 F04 (LA-16CEB6D12A6A): adds a custom modelId to the OAuth
+/// provider's registry; the response carries the refreshed listing.
+async fn add_oauth_model(
+    State(state): State<ServiceState>,
+    Extension(principal): Extension<Principal>,
+    RoutePath(provider): RoutePath<String>,
+    input: Result<Json<OAuthModelInput>, axum::extract::rejection::JsonRejection>,
+) -> Response {
+    if principal.kind != PrincipalKind::LocalUser {
+        return EndpointError::local_only().into_response();
+    }
+    let Json(input) = match input {
+        Ok(v) => v,
+        Err(e) => return EndpointError::from_json_rejection(&e).into_response(),
+    };
+    let Some(credentials) = state.credential_service() else {
+        return EndpointError::not_found()
+            .with_reason("model_plane_unconfigured")
+            .with_cause("models.unconfigured")
+            .into_response();
+    };
+    match credentials
+        .oauth_add_model(&provider, &input.model_id)
+        .await
+    {
+        Ok(listing) => {
+            let now = state.clock.now_unix_ms();
+            if let Err(err) = state.management.change(|next| {
+                audit_with_metadata(
+                    next,
+                    "models.oauth.model.add",
+                    "model-plane",
+                    now,
+                    serde_json::json!({"provider": provider, "modelId": input.model_id}),
+                );
+                Ok(())
+            }) {
+                return err.into_response();
+            }
+            Json(serde_json::json!({
+                "ok": true,
+                "provider": listing.provider,
+                "loggedIn": listing.logged_in,
+                "models": listing.models,
+            }))
+            .into_response()
+        }
+        Err(lingxi_adapters::models::credentials::CredentialError::NotConfigured { .. }) => {
+            EndpointError::new(
+                StatusCode::CONFLICT,
+                ErrorCode::InvalidMessage,
+                format!(
+                    "provider {provider:?}: the model registry serves OAuth providers only, \
+                     or the model id is invalid"
+                ),
+            )
+            .with_reason("oauth_model_refused")
+            .with_cause("models.oauth_model_refused")
+            .into_response()
+        }
+        Err(err) => credential_surface_error(err),
+    }
+}
+
+/// R05 RR1 F04 (LA-8060BE8AA02C): removes a custom modelId from the OAuth
+/// provider's registry; the response carries the refreshed listing.
+async fn remove_oauth_model(
+    State(state): State<ServiceState>,
+    Extension(principal): Extension<Principal>,
+    RoutePath((provider, model_id)): RoutePath<(String, String)>,
+) -> Response {
+    if principal.kind != PrincipalKind::LocalUser {
+        return EndpointError::local_only().into_response();
+    }
+    let Some(credentials) = state.credential_service() else {
+        return EndpointError::not_found()
+            .with_reason("model_plane_unconfigured")
+            .with_cause("models.unconfigured")
+            .into_response();
+    };
+    match credentials.oauth_remove_model(&provider, &model_id).await {
+        Ok(listing) => {
+            let now = state.clock.now_unix_ms();
+            if let Err(err) = state.management.change(|next| {
+                audit_with_metadata(
+                    next,
+                    "models.oauth.model.remove",
+                    "model-plane",
+                    now,
+                    serde_json::json!({"provider": provider, "modelId": model_id}),
+                );
+                Ok(())
+            }) {
+                return err.into_response();
+            }
+            Json(serde_json::json!({
+                "ok": true,
+                "provider": listing.provider,
+                "loggedIn": listing.logged_in,
+                "models": listing.models,
+            }))
+            .into_response()
+        }
+        Err(lingxi_adapters::models::credentials::CredentialError::NotConfigured { .. }) => {
+            EndpointError::new(
+                StatusCode::CONFLICT,
+                ErrorCode::InvalidMessage,
+                format!(
+                    "provider {provider:?}: model id {model_id:?} is not in the registry \
+                     (or the provider is not OAuth)"
+                ),
+            )
+            .with_reason("oauth_model_refused")
+            .with_cause("models.oauth_model_refused")
+            .into_response()
+        }
+        Err(err) => credential_surface_error(err),
     }
 }
 

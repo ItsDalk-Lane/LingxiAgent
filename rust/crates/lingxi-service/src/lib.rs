@@ -477,6 +477,10 @@ pub struct ServiceState {
     /// model chain was wired — an injected `turn_provider` keeps the
     /// plane test-owned and the operation entry absent.
     operations: Option<Arc<operations::OperationService>>,
+    /// The model plane's shared network policy plane (R05 RR1 F14):
+    /// present exactly when the production model chain was wired; the
+    /// management reload surface publishes new policy generations on it.
+    network_plane: Option<Arc<lingxi_adapters::models::network::NetworkPlane>>,
 }
 
 impl std::fmt::Debug for ServiceState {
@@ -627,6 +631,13 @@ pub struct ServiceDeps {
     /// — a configured model plane without its credential service is a loud
     /// startup error, never an anonymous-key fallback (C01).
     pub credential_service: Option<std::sync::Arc<credentials::CredentialService>>,
+    /// The model plane's shared network policy plane (R05 RR1 F14): every
+    /// outbound model-plane consumer (the five chat families, the
+    /// operations dispatcher, the egress downloads, the OAuth transport)
+    /// holds a client handle bound to it, and the management reload
+    /// surface publishes new policy generations on it. `None` keeps the
+    /// pre-F14 direct behavior (the isolated default).
+    pub network_plane: Option<std::sync::Arc<lingxi_adapters::models::network::NetworkPlane>>,
     /// The workspace root from the strict `--config` file (R05-T01) — the
     /// ONLY workspace source. When present together with a model plane,
     /// the core file tools are registered scoped to it.
@@ -636,7 +647,27 @@ pub struct ServiceDeps {
     /// budget wrapper) when the production model chain is wired; an
     /// injected port always wins, mirroring `turn_provider`.
     pub worker_model: Option<std::sync::Arc<dyn workerrpc::WorkerModelPort>>,
+    /// The config-declared single-operation worker (R05 RR1 F24). Consumed
+    /// ONLY by the real model chain wiring: when the production chain is
+    /// wired (and a workspace is scoped), the composition root registers
+    /// this ONE controlled worker through the R04 discipline (approval,
+    /// resource grants, process supervision, the trusted-worker protocol
+    /// checks and the host model-callback port). A registration without
+    /// the real chain — or alongside an injected `turn_provider` — is a
+    /// loud startup error, never a silently skipped or test-owned plane.
+    pub worker_tool_registration: Option<config::WorkerToolRegistration>,
 }
+
+/// The formal tool plane's shared handles (R05 RR1 F24): what the real
+/// model chain wired for the later worker registration — the live tool
+/// registry, the unified invocation gateway, the workspace-scoped resource
+/// access and the workspace root itself.
+type ToolPlaneHandles = (
+    Arc<lingxi_kernel::toolcatalog::ToolRegistry>,
+    Arc<toolgateway::ToolInvocationGateway>,
+    Arc<resourceaccess::ResourceAccess>,
+    std::path::PathBuf,
+);
 
 impl Default for ServiceDeps {
     fn default() -> Self {
@@ -667,8 +698,10 @@ impl Default for ServiceDeps {
             model_gateway: None,
             model_plane_source: None,
             credential_service: None,
+            network_plane: None,
             workspace_root: None,
             worker_model: None,
+            worker_tool_registration: None,
         }
     }
 }
@@ -723,6 +756,13 @@ impl std::fmt::Debug for ServiceDeps {
             .field(
                 "worker_model",
                 &self.worker_model.as_ref().map(|_| "injected"),
+            )
+            .field(
+                "worker_tool_registration",
+                &self
+                    .worker_tool_registration
+                    .as_ref()
+                    .map(|w| w.local_name.as_str()),
             )
             .finish()
     }
@@ -1016,11 +1056,12 @@ impl ServiceState {
         // configured AND no turn provider was injected (injected test
         // doubles always win), wire the REAL chain here — tool registry +
         // approval service + the unified invocation gateway + the core
-        // file tools (scoped to the --config workspace, the ONLY workspace
-        // source; T01 wires file tools only, process tools stay
-        // unregistered) + the gateway-backed provider. Without a
-        // configured plane every layer keeps the R03/R04 default shape
-        // exactly: no provider, conservative recovery, no tool executors.
+        // file tools AND the R04 process tools (exec_command/write_stdin,
+        // both scoped to the --config workspace, the ONLY workspace
+        // source — R05 RR1 F24: the formal "四工具" of the stage gate) + the
+        // gateway-backed provider. Without a configured plane every layer
+        // keeps the R03/R04 default shape exactly: no provider,
+        // conservative recovery, no tool executors.
         let model_gateway_for_wiring = if deps.turn_provider.is_none() {
             deps.model_gateway.clone()
         } else {
@@ -1030,6 +1071,10 @@ impl ServiceState {
         // the worker model-callback port is built from it below (an
         // injected `turn_provider` keeps the whole plane test-owned).
         let wired_real_model_chain = model_gateway_for_wiring.is_some();
+        // R05 RR1 F24: the tool-plane handles the worker registration below
+        // consumes (registry + gateway + access + workspace). Present
+        // exactly when the real chain was wired with a scoped workspace.
+        let mut tool_plane: Option<ToolPlaneHandles> = None;
         if let Some(model_gateway) = model_gateway_for_wiring {
             // R05-T02 (C01): the production chain dispatches through the
             // credential service — the SINGLE material exit. A configured
@@ -1072,18 +1117,67 @@ impl ServiceState {
                 let _core_file_tools = filetools::register_core_file_tools(
                     &registry,
                     gateway.as_ref(),
-                    access,
-                    workspace,
+                    Arc::clone(&access),
+                    workspace.clone(),
                     Arc::clone(&deps.clock),
                     Arc::new(filetools::NoopChangeLog),
                     &budget,
                 );
+                // R05 RR1 F24 (CL-05): the FOURTH basic tool of the formal
+                // gate's "四工具真实闭环" — exec_command (+ write_stdin, its
+                // interactive-terminal pair) — registers through the SAME
+                // R04 discipline the file tools use: the unified invocation
+                // gateway (prepare → policy/approval → execute), the
+                // prepare-time resource derivation (workdir must be an
+                // authorized directory) and the REAL ProcessSupervisor
+                // (process groups, reaper, spill files, kill receipts).
+                // The sandbox face stays `None` — the R04-verified tool-
+                // plane shape (the OS-sandbox lane is the separately
+                // verified T06 discipline, not a silently widened default).
+                let exec_supervisor = Arc::new(
+                    procsupervisor::ProcessSupervisor::new(
+                        Arc::clone(&deps.clock),
+                        procsupervisor::SupervisorLimits::with_spill_dir(
+                            layout.runtime_dir.join("exec-tool-spill"),
+                        ),
+                    )
+                    .map_err(|err| {
+                        ServiceStartupError::Storage(StorageError::InvalidRequest {
+                            detail: format!(
+                                "cannot construct the tool plane's process supervisor: {err}"
+                            ),
+                        })
+                    })?,
+                );
+                let _core_process_tools = exectools::register_process_tools(
+                    &registry,
+                    gateway.as_ref(),
+                    exec_supervisor,
+                    Arc::clone(&access),
+                    workspace.clone(),
+                    None,
+                    Arc::clone(&deps.clock),
+                    &budget,
+                );
+                tool_plane = Some((
+                    Arc::clone(&registry),
+                    Arc::clone(&gateway),
+                    access,
+                    workspace,
+                ));
             }
-            let provider = lingxi_adapters::models::provider::GatewayedProvider::new(
+            let provider = lingxi_adapters::models::provider::GatewayedProvider::new_with_network(
                 model_gateway,
                 credential_service
                     as Arc<dyn lingxi_adapters::models::credentials::ProviderCredentialPort>,
                 budget,
+                // R05 RR1 F14: the five chat families' clients are bound to
+                // the model plane's shared network policy (the plane was
+                // built from the loaded config; `None` keeps the direct
+                // default).
+                deps.network_plane.clone().unwrap_or_else(
+                    lingxi_adapters::models::network::NetworkPlane::direct_isolated,
+                ),
             )
             .map_err(|err| {
                 ServiceStartupError::Storage(StorageError::InvalidRequest {
@@ -1155,54 +1249,203 @@ impl ServiceState {
         // is no port here — a worker tool that still registered one gets
         // the honest `model_capability_not_configured` answer only when it
         // binds the R04 default itself.
-        let worker_model: Option<Arc<dyn workerrpc::WorkerModelPort>> = match deps
-            .worker_model
-            .clone()
-        {
-            Some(injected) => Some(injected),
-            None if wired_real_model_chain => {
-                let gateway = deps.model_gateway.clone().ok_or_else(|| {
-                    ServiceStartupError::Storage(StorageError::InvalidRequest {
-                        detail: "the real model chain was wired without a model gateway"
-                            .to_string(),
-                    })
-                })?;
-                let credential_service = deps.credential_service.clone().ok_or_else(|| {
-                    ServiceStartupError::Storage(StorageError::InvalidRequest {
-                        detail: "the real model chain was wired without a credential service"
-                            .to_string(),
-                    })
-                })?;
-                let executor = lingxi_adapters::models::auxiliary::AuxiliaryExecutor::new(
-                    gateway,
-                    credential_service
-                        as Arc<dyn lingxi_adapters::models::credentials::ProviderCredentialPort>,
-                    lingxi_kernel::toolcatalog::SchemaBudget::default(),
+        let worker_model: Option<Arc<dyn workerrpc::WorkerModelPort>> =
+            match deps.worker_model.clone() {
+                Some(injected) => Some(injected),
+                None if wired_real_model_chain => {
+                    let gateway = deps.model_gateway.clone().ok_or_else(|| {
+                        ServiceStartupError::Storage(StorageError::InvalidRequest {
+                            detail: "the real model chain was wired without a model gateway"
+                                .to_string(),
+                        })
+                    })?;
+                    let credential_service = deps.credential_service.clone().ok_or_else(|| {
+                        ServiceStartupError::Storage(StorageError::InvalidRequest {
+                            detail: "the real model chain was wired without a credential service"
+                                .to_string(),
+                        })
+                    })?;
+                    let executor =
+                    lingxi_adapters::models::auxiliary::AuxiliaryExecutor::new_with_network(
+                        gateway,
+                        credential_service
+                            as Arc<
+                                dyn lingxi_adapters::models::credentials::ProviderCredentialPort,
+                            >,
+                        lingxi_kernel::toolcatalog::SchemaBudget::default(),
+                        // R05 RR1 F14: the auxiliary slots share the SAME
+                        // network policy plane as the chat loop.
+                        deps.network_plane.clone().unwrap_or_else(
+                            lingxi_adapters::models::network::NetworkPlane::direct_isolated,
+                        ),
+                    )
+                    .map_err(|err| {
+                        ServiceStartupError::Storage(StorageError::InvalidRequest {
+                            detail: format!("cannot construct the auxiliary executor: {err}"),
+                        })
+                    })?;
+                    let gateway_model = workermodel::GatewayWorkerModel::with_trace(
+                        Arc::new(executor),
+                        runs.quotas_shared(),
+                        // R05-T07: the production trace sink — every settled
+                        // callback's usage/trace fact lands in the usage ledger
+                        // before the worker sees its reply.
+                        Arc::new(workermodel::LedgerWorkerCallbackTrace::new(
+                            std::sync::Arc::clone(&storage),
+                            deps.clock.clone(),
+                        )),
+                    );
+                    Some(workerrpc::BoundedWorkerModel::new(
+                        Some(Arc::new(gateway_model)),
+                        workerrpc::WORKER_MAX_CALLBACKS_PER_CALL,
+                        workerrpc::WORKER_CALLBACK_MAX_OUTPUT_TOKENS,
+                    ))
+                }
+                None => None,
+            };
+        // R05 RR1 F24 (CL-04): the config-declared single-operation worker
+        // registers on the REAL tool plane — the production call site of
+        // `register_worker_tool` the frozen candidate never had. The worker
+        // rides the same R04 discipline as every other tool (unified
+        // gateway prepare/policy/approval, resource grants derived from
+        // `path_args`, claimed-file verification, trusted-worker protocol
+        // checks, bounded WorkerRuntime with process-group kills) and its
+        // model callbacks go through the PRODUCTION port built above (the
+        // aux-slot route + shared quotas + the usage-ledger trace). A
+        // registration that cannot reach this boundary — no real chain, an
+        // injected turn provider, or no scoped workspace — is a LOUD
+        // startup error, never a silently skipped config entry.
+        if let Some(worker_registration) = deps.worker_tool_registration.clone() {
+            let (registry, gateway, access, workspace) = tool_plane.clone().ok_or_else(|| {
+                ServiceStartupError::Storage(StorageError::InvalidRequest {
+                    detail: "a config-declared worker requires the real model chain with a \
+                             scoped workspace (got neither: an injected turn_provider or a \
+                             missing workspace keeps the plane test-owned/no-tool — declare \
+                             providers/models/workspace or remove the workers section)"
+                        .to_string(),
+                })
+            })?;
+            let model_port = worker_model.clone().ok_or_else(|| {
+                ServiceStartupError::Storage(StorageError::InvalidRequest {
+                    detail: "a config-declared worker requires the production worker \
+                             model-callback port (an injected worker_model double cannot \
+                             back a formal registration)"
+                        .to_string(),
+                })
+            })?;
+            // The declared executable and cwd must actually exist NOW — a
+            // config pointing at nothing is a broken config (fail-closed,
+            // never a call-time surprise).
+            let argv0 = std::path::PathBuf::from(&worker_registration.argv[0]);
+            let argv0_meta = std::fs::metadata(&argv0).map_err(|err| {
+                ServiceStartupError::Storage(StorageError::InvalidRequest {
+                    detail: format!(
+                        "the declared worker executable {} is not usable: {err}",
+                        argv0.display()
+                    ),
+                })
+            })?;
+            if !argv0_meta.is_file() {
+                return Err(ServiceStartupError::Storage(StorageError::InvalidRequest {
+                    detail: format!(
+                        "the declared worker executable {} is not a regular file",
+                        argv0.display()
+                    ),
+                }));
+            }
+            #[cfg(unix)]
+            {
+                use std::os::unix::fs::PermissionsExt as _;
+                if argv0_meta.permissions().mode() & 0o111 == 0 {
+                    return Err(ServiceStartupError::Storage(StorageError::InvalidRequest {
+                        detail: format!(
+                            "the declared worker executable {} is not executable",
+                            argv0.display()
+                        ),
+                    }));
+                }
+            }
+            let worker_cwd = worker_registration.cwd.clone().unwrap_or(workspace);
+            let cwd_meta = std::fs::metadata(&worker_cwd).map_err(|err| {
+                ServiceStartupError::Storage(StorageError::InvalidRequest {
+                    detail: format!(
+                        "the declared worker cwd {} is not usable: {err}",
+                        worker_cwd.display()
+                    ),
+                })
+            })?;
+            if !cwd_meta.is_dir() {
+                return Err(ServiceStartupError::Storage(StorageError::InvalidRequest {
+                    detail: format!(
+                        "the declared worker cwd {} is not a directory",
+                        worker_cwd.display()
+                    ),
+                }));
+            }
+            let runtime = workerrpc::WorkerRuntime::new(
+                workerrpc::WorkerLimits::default(),
+                // The sandbox face stays `None` — the R04/R05-T06 verified
+                // tool-plane shape (grant + claimed-file verification are
+                // the controlled boundary; the OS-sandbox lane is not a
+                // silently widened default).
+                None,
+                Arc::clone(&deps.clock),
+            );
+            let registered = workerrpc::register_worker_tool(
+                &registry,
+                gateway.as_ref(),
+                &runtime,
+                &access,
+                &lingxi_kernel::toolcatalog::SchemaBudget::default(),
+                workerrpc::WorkerToolSpec {
+                    plugin_id: "builtin".to_string(),
+                    op: worker_registration.op.clone(),
+                    local_name: worker_registration.local_name.clone(),
+                    description: worker_registration.description.clone(),
+                    input_schema: worker_registration.input_schema.clone(),
+                    path_args: worker_registration.path_args.clone(),
+                    argv: worker_registration.argv.clone(),
+                    env: std::collections::BTreeMap::new(),
+                    cwd: worker_cwd,
+                    model: model_port,
+                    allowed_model_purposes: worker_registration.allowed_model_purposes.clone(),
+                    claimed_file_contract: None,
+                },
+            )
+            .map_err(|err| {
+                ServiceStartupError::Storage(StorageError::InvalidRequest {
+                    detail: format!(
+                        "cannot register the config-declared worker {}: {err}",
+                        worker_registration.local_name
+                    ),
+                })
+            })?;
+            // The R05 formal chain is MODEL-DRIVEN (T08-C11: 模型 → 工具 →
+            // worker → callback → 最终回复), so the config-declared worker
+            // must be RESIDENT — declared on the model wire like the four
+            // basic tools. `register_worker_tool`'s own default is the R04
+            // on-demand shape (callable via the discovery catalog, never in
+            // the model-facing declaration); the explicit flip keeps that
+            // R04 default intact for every other caller.
+            registry
+                .set_availability(
+                    &registered.target,
+                    lingxi_kernel::toolcatalog::Availability::Available,
                 )
                 .map_err(|err| {
                     ServiceStartupError::Storage(StorageError::InvalidRequest {
-                        detail: format!("cannot construct the auxiliary executor: {err}"),
+                        detail: format!(
+                            "cannot make the config-declared worker {} resident: {err}",
+                            worker_registration.local_name
+                        ),
                     })
                 })?;
-                let gateway_model = workermodel::GatewayWorkerModel::with_trace(
-                    Arc::new(executor),
-                    runs.quotas_shared(),
-                    // R05-T07: the production trace sink — every settled
-                    // callback's usage/trace fact lands in the usage ledger
-                    // before the worker sees its reply.
-                    Arc::new(workermodel::LedgerWorkerCallbackTrace::new(
-                        std::sync::Arc::clone(&storage),
-                        deps.clock.clone(),
-                    )),
-                );
-                Some(workerrpc::BoundedWorkerModel::new(
-                    Some(Arc::new(gateway_model)),
-                    workerrpc::WORKER_MAX_CALLBACKS_PER_CALL,
-                    workerrpc::WORKER_CALLBACK_MAX_OUTPUT_TOKENS,
-                ))
-            }
-            None => None,
-        };
+            tracing::info!(
+                worker_tool = %registered.spec.local_name,
+                op = %registered.spec.op,
+                "config-declared single-operation worker registered on the formal tool plane"
+            );
+        }
         // R05-T06 §29.9: the operation service (the real Rust operation
         // entry of the non-chat plane) rides the SAME gateway, credential
         // service and quota manager — present exactly when the REAL model
@@ -1219,13 +1462,16 @@ impl ServiceState {
                 .map(|(_, endpoint)| endpoint)
                 .collect();
             Some(Arc::new(
-                operations::OperationService::new(
+                operations::OperationService::new_with_network(
                     gateway,
                     credential_service
                         as Arc<dyn lingxi_adapters::models::credentials::ProviderCredentialPort>,
                     runs.quotas_shared(),
                     endpoints,
                     layout.runtime_dir.join("media-products"),
+                    // R05 RR1 F14: the operation plane's dispatcher and the
+                    // egress download client share the SAME policy plane.
+                    deps.network_plane.clone(),
                 )
                 .map_err(|failure| {
                     ServiceStartupError::Storage(StorageError::InvalidRequest {
@@ -1234,6 +1480,31 @@ impl ServiceState {
                         ),
                     })
                 })?
+                // R05 RR1 F20: the system-speech platform lane spawns
+                // through the SAME supervised process discipline as exec
+                // (process group, reaper, RAII ownership, honest kill
+                // receipts). This supervisor instance serves the
+                // operation lane; its termination tail carries the §29.13
+                // grace.
+                .with_process_supervisor(Arc::new(
+                    procsupervisor::ProcessSupervisor::new(Arc::clone(&deps.clock), {
+                        let mut limits = procsupervisor::SupervisorLimits::with_spill_dir(
+                            layout.runtime_dir.join("media-exec-spill"),
+                        );
+                        limits.cleanup_timeout = std::time::Duration::from_millis(
+                            operations::SYSTEM_SPEECH_KILL_GRACE_MS,
+                        );
+                        limits
+                    })
+                    .map_err(|err| {
+                        ServiceStartupError::Storage(StorageError::InvalidRequest {
+                            detail: format!(
+                                "cannot construct the operation lane's process supervisor: \
+                                 {err}"
+                            ),
+                        })
+                    })?,
+                ))
                 // R05-T07: every operation-plane provider request lands in
                 // the usage ledger before its outcome returns.
                 .with_usage_sink(Arc::new(
@@ -1313,6 +1584,7 @@ impl ServiceState {
             credential_service: deps.credential_service.clone(),
             worker_model,
             operations: operations_entry,
+            network_plane: deps.network_plane.clone(),
         })
     }
 
@@ -1385,6 +1657,12 @@ impl ServiceState {
     /// chain was wired at bootstrap.
     pub fn operations(&self) -> Option<&Arc<operations::OperationService>> {
         self.operations.as_ref()
+    }
+
+    /// The model plane's shared network policy plane (R05 RR1 F14) — the
+    /// reload surface publishes new policy generations on it.
+    pub fn network_plane(&self) -> Option<&Arc<lingxi_adapters::models::network::NetworkPlane>> {
+        self.network_plane.as_ref()
     }
 
     /// The managed-task shutdown handle (R02-T06): the binary subscribes

@@ -2638,12 +2638,16 @@ impl StoragePort for RunDatabase {
                     conn.execute(
                         "INSERT INTO model_call_usage \
                          (model_call_id, session_id, run_id, attempt, purpose, origin, \
-                          parent_run_id, cause_ref, provider, model, protocol, usage_state, \
-                          input_tokens, output_tokens, cache_read_tokens, cache_write_tokens, \
-                          reasoning_tokens, missing_fields, estimate_basis, invalid_detail, \
-                          transport_attempts, cost_basis, recorded_at_unix_ms) \
-                         VALUES (?1, ?2, ?3, ?4, ?5, ?6, ?7, ?8, ?9, ?10, ?11, ?12, ?13, \
-                                 ?14, ?15, ?16, ?17, ?18, ?19, ?20, ?21, ?22, ?23)",
+                          parent_run_id, cause_ref, parent_tool_call_id, provider, model, \
+                          protocol, usage_state, input_tokens, output_tokens, \
+                          cache_read_tokens, cache_write_tokens, reasoning_tokens, \
+                          missing_fields, estimate_basis, invalid_detail, \
+                          transport_attempts, outcome, started_at_unix_ms, \
+                          settled_at_unix_ms, emitted_tool_calls, cost_basis, \
+                          recorded_at_unix_ms) \
+                         VALUES (?1, ?2, ?3, ?4, ?5, ?6, ?7, ?8, ?9, ?10, ?11, ?12, ?13, ?14, \
+                                 ?15, ?16, ?17, ?18, ?19, ?20, ?21, ?22, ?23, ?24, ?25, ?26, \
+                                 ?27, ?28)",
                         rusqlite::params![
                             record.model_call_id,
                             record.session_id,
@@ -2653,6 +2657,7 @@ impl StoragePort for RunDatabase {
                             record.origin,
                             record.parent_run_id,
                             record.cause_ref,
+                            record.parent_tool_call_id,
                             record.provider,
                             record.model,
                             record.protocol,
@@ -2665,7 +2670,18 @@ impl StoragePort for RunDatabase {
                             missing_fields,
                             estimate_basis,
                             record.invalid_detail,
-                            record.transport_attempts as i64,
+                            // R05 RR1 F38: NULL = attempts unknown after a
+                            // drop (the column is nullable since v7); a
+                            // present count binds as i64.
+                            record.transport_attempts.map(|attempts| attempts as i64),
+                            record.outcome.wire_name(),
+                            record.started_at_unix_ms.map(|v| v as i64),
+                            record.settled_at_unix_ms.map(|v| v as i64),
+                            if record.emitted_tool_calls.is_empty() {
+                                None
+                            } else {
+                                Some(record.emitted_tool_calls.join(","))
+                            },
                             record.cost_basis,
                             now_unix_ms as i64
                         ],
@@ -2687,50 +2703,105 @@ impl StoragePort for RunDatabase {
                 // session owner (authorization isolation is part of the
                 // read — a foreign principal's rows are never returned,
                 // and session-less plane rows are internal-only).
+                //
+                // R05 RR1 F21: purpose/model/date-window filters append to
+                // every scope shape (the taskbook's 按日期/类别/模型/会话
+                // 筛选).
                 let sql_base = "SELECT m.model_call_id, m.session_id, m.run_id, m.attempt, \
-                     m.purpose, m.origin, m.parent_run_id, m.cause_ref, m.provider, m.model, \
-                     m.protocol, m.usage_state, m.input_tokens, m.output_tokens, \
-                     m.cache_read_tokens, m.cache_write_tokens, m.reasoning_tokens, \
-                     m.missing_fields, m.estimate_basis, m.invalid_detail, \
-                     m.transport_attempts, m.cost_basis, m.recorded_at_unix_ms \
+                     m.purpose, m.origin, m.parent_run_id, m.cause_ref, m.parent_tool_call_id, \
+                     m.provider, m.model, m.protocol, m.usage_state, m.input_tokens, \
+                     m.output_tokens, m.cache_read_tokens, m.cache_write_tokens, \
+                     m.reasoning_tokens, m.missing_fields, m.estimate_basis, m.invalid_detail, \
+                     m.transport_attempts, m.cost_basis, m.recorded_at_unix_ms, m.outcome, \
+                     m.started_at_unix_ms, m.settled_at_unix_ms, m.emitted_tool_calls \
                      FROM model_call_usage m";
-                let (sql, params): (String, Vec<Box<dyn rusqlite::ToSql>>) =
-                    match (&query.owner_user_id, &query.session_id, &query.run_id) {
-                        (Some(owner), session, run) => {
-                            let mut sql = format!(
-                                "{sql_base} JOIN sessions s ON s.session_id = m.session_id \
-                                 WHERE s.owner_user_id = ?1"
-                            );
-                            let mut params: Vec<Box<dyn rusqlite::ToSql>> =
-                                vec![Box::new(owner.clone())];
-                            if let Some(session) = session {
-                                sql.push_str(" AND m.session_id = ?2");
-                                params.push(Box::new(session.clone()));
-                            }
-                            if let Some(run) = run {
-                                sql.push_str(&format!(" AND m.run_id = ?{}", params.len() + 1));
-                                params.push(Box::new(run.clone()));
-                            }
-                            sql.push_str(" ORDER BY m.rowid");
-                            (sql, params)
+                let mut params: Vec<Box<dyn rusqlite::ToSql>> = Vec::new();
+                let mut sql = match (&query.owner_user_id, &query.session_id, &query.run_id) {
+                    (Some(owner), session, run) => {
+                        let mut sql = format!(
+                            "{sql_base} JOIN sessions s ON s.session_id = m.session_id \
+                             WHERE s.owner_user_id = ?{}",
+                            params.len() + 1
+                        );
+                        params.push(Box::new(owner.clone()));
+                        if let Some(session) = session {
+                            sql.push_str(&format!(" AND m.session_id = ?{}", params.len() + 1));
+                            params.push(Box::new(session.clone()));
                         }
-                        (None, Some(session), run) => {
-                            let mut sql = format!("{sql_base} WHERE m.session_id = ?1");
-                            let mut params: Vec<Box<dyn rusqlite::ToSql>> =
-                                vec![Box::new(session.clone())];
-                            if let Some(run) = run {
-                                sql.push_str(" AND m.run_id = ?2");
-                                params.push(Box::new(run.clone()));
-                            }
-                            sql.push_str(" ORDER BY m.rowid");
-                            (sql, params)
+                        if let Some(run) = run {
+                            sql.push_str(&format!(" AND m.run_id = ?{}", params.len() + 1));
+                            params.push(Box::new(run.clone()));
                         }
-                        (None, None, Some(run)) => (
-                            format!("{sql_base} WHERE m.run_id = ?1 ORDER BY m.rowid"),
-                            vec![Box::new(run.clone())],
-                        ),
-                        (None, None, None) => (format!("{sql_base} ORDER BY m.rowid"), Vec::new()),
-                    };
+                        sql
+                    }
+                    (None, Some(session), run) => {
+                        let mut sql =
+                            format!("{sql_base} WHERE m.session_id = ?{}", params.len() + 1);
+                        params.push(Box::new(session.clone()));
+                        if let Some(run) = run {
+                            sql.push_str(&format!(" AND m.run_id = ?{}", params.len() + 1));
+                            params.push(Box::new(run.clone()));
+                        }
+                        sql
+                    }
+                    (None, None, Some(run)) => {
+                        let sql = format!("{sql_base} WHERE m.run_id = ?{}", params.len() + 1);
+                        params.push(Box::new(run.clone()));
+                        sql
+                    }
+                    (None, None, None) => sql_base.to_string(),
+                };
+                // The F21 filters append to whichever shape above; the
+                // first one opens its own WHERE when the scope was empty.
+                let append = |sql: &mut String,
+                              params: &mut Vec<Box<dyn rusqlite::ToSql>>,
+                              condition: String,
+                              value: Box<dyn rusqlite::ToSql>| {
+                    if sql.contains(" WHERE ") {
+                        sql.push_str(" AND ");
+                    } else {
+                        sql.push_str(" WHERE ");
+                    }
+                    sql.push_str(&condition);
+                    params.push(value);
+                };
+                if let Some(purpose) = &query.purpose {
+                    let index = params.len() + 1;
+                    append(
+                        &mut sql,
+                        &mut params,
+                        format!("m.purpose = ?{index}"),
+                        Box::new(purpose.clone()),
+                    );
+                }
+                if let Some(model) = &query.model {
+                    let index = params.len() + 1;
+                    append(
+                        &mut sql,
+                        &mut params,
+                        format!("m.model = ?{index}"),
+                        Box::new(model.clone()),
+                    );
+                }
+                if let Some(from) = query.recorded_from_unix_ms {
+                    let index = params.len() + 1;
+                    append(
+                        &mut sql,
+                        &mut params,
+                        format!("m.recorded_at_unix_ms >= ?{index}"),
+                        Box::new(from as i64),
+                    );
+                }
+                if let Some(to) = query.recorded_to_unix_ms {
+                    let index = params.len() + 1;
+                    append(
+                        &mut sql,
+                        &mut params,
+                        format!("m.recorded_at_unix_ms <= ?{index}"),
+                        Box::new(to as i64),
+                    );
+                }
+                sql.push_str(" ORDER BY m.rowid");
                 let mut stmt = conn.prepare(&sql).map_err(migrations::map_rusqlite)?;
                 let param_refs: Vec<&dyn rusqlite::ToSql> =
                     params.iter().map(|p| p.as_ref()).collect();
@@ -2755,10 +2826,12 @@ fn load_usage_row(
     let mut stmt = conn
         .prepare(
             "SELECT model_call_id, session_id, run_id, attempt, purpose, origin, \
-             parent_run_id, cause_ref, provider, model, protocol, usage_state, input_tokens, \
-             output_tokens, cache_read_tokens, cache_write_tokens, reasoning_tokens, \
-             missing_fields, estimate_basis, invalid_detail, transport_attempts, cost_basis, \
-             recorded_at_unix_ms FROM model_call_usage WHERE model_call_id = ?1",
+             parent_run_id, cause_ref, parent_tool_call_id, provider, model, protocol, \
+             usage_state, input_tokens, output_tokens, cache_read_tokens, cache_write_tokens, \
+             reasoning_tokens, missing_fields, estimate_basis, invalid_detail, \
+             transport_attempts, cost_basis, recorded_at_unix_ms, outcome, \
+             started_at_unix_ms, settled_at_unix_ms, emitted_tool_calls \
+             FROM model_call_usage WHERE model_call_id = ?1",
         )
         .map_err(migrations::map_rusqlite)?;
     let mut rows = stmt
@@ -2788,10 +2861,13 @@ fn usage_row_to_record(
             })
             .transpose()
     };
-    let invalid_detail: Option<String> = row.get(19).map_err(migrations::map_rusqlite)?;
-    let missing_fields: Option<String> = row.get(17).map_err(migrations::map_rusqlite)?;
-    let estimate_basis: Option<String> = row.get(18).map_err(migrations::map_rusqlite)?;
-    let usage_state: String = row.get(11).map_err(migrations::map_rusqlite)?;
+    // Column order of the SELECT statements above (RR1 F21 added
+    // parent_tool_call_id at 8 and outcome/started/settled/emitted at
+    // 24..=27 — every later index shifted).
+    let invalid_detail: Option<String> = row.get(20).map_err(migrations::map_rusqlite)?;
+    let missing_fields: Option<String> = row.get(18).map_err(migrations::map_rusqlite)?;
+    let estimate_basis: Option<String> = row.get(19).map_err(migrations::map_rusqlite)?;
+    let usage_state: String = row.get(12).map_err(migrations::map_rusqlite)?;
     let usage = if invalid_detail.is_some() {
         if usage_state != "invalid" {
             return Err(StorageError::Corrupted {
@@ -2806,11 +2882,11 @@ fn usage_row_to_record(
         match usage_state.as_str() {
             "unknown" => None,
             "reported" => Some(ModelCallUsage {
-                input_tokens: token_u64(12, "input_tokens")?,
-                output_tokens: token_u64(13, "output_tokens")?,
-                cache_read_tokens: token_u64(14, "cache_read_tokens")?,
-                cache_write_tokens: token_u64(15, "cache_write_tokens")?,
-                reasoning_tokens: token_u64(16, "reasoning_tokens")?,
+                input_tokens: token_u64(13, "input_tokens")?,
+                output_tokens: token_u64(14, "output_tokens")?,
+                cache_read_tokens: token_u64(15, "cache_read_tokens")?,
+                cache_write_tokens: token_u64(16, "cache_write_tokens")?,
+                reasoning_tokens: token_u64(17, "reasoning_tokens")?,
                 provenance: UsageProvenance::Reported,
             }),
             "partial" => {
@@ -2832,20 +2908,20 @@ fn usage_row_to_record(
                         })?,
                 };
                 Some(ModelCallUsage {
-                    input_tokens: token_u64(12, "input_tokens")?,
-                    output_tokens: token_u64(13, "output_tokens")?,
-                    cache_read_tokens: token_u64(14, "cache_read_tokens")?,
-                    cache_write_tokens: token_u64(15, "cache_write_tokens")?,
-                    reasoning_tokens: token_u64(16, "reasoning_tokens")?,
+                    input_tokens: token_u64(13, "input_tokens")?,
+                    output_tokens: token_u64(14, "output_tokens")?,
+                    cache_read_tokens: token_u64(15, "cache_read_tokens")?,
+                    cache_write_tokens: token_u64(16, "cache_write_tokens")?,
+                    reasoning_tokens: token_u64(17, "reasoning_tokens")?,
                     provenance: UsageProvenance::Partial { missing },
                 })
             }
             "estimated" => Some(ModelCallUsage {
-                input_tokens: token_u64(12, "input_tokens")?,
-                output_tokens: token_u64(13, "output_tokens")?,
-                cache_read_tokens: token_u64(14, "cache_read_tokens")?,
-                cache_write_tokens: token_u64(15, "cache_write_tokens")?,
-                reasoning_tokens: token_u64(16, "reasoning_tokens")?,
+                input_tokens: token_u64(13, "input_tokens")?,
+                output_tokens: token_u64(14, "output_tokens")?,
+                cache_read_tokens: token_u64(15, "cache_read_tokens")?,
+                cache_write_tokens: token_u64(16, "cache_write_tokens")?,
+                reasoning_tokens: token_u64(17, "reasoning_tokens")?,
                 provenance: UsageProvenance::Estimated {
                     basis: estimate_basis.clone().unwrap_or_default(),
                 },
@@ -2860,6 +2936,26 @@ fn usage_row_to_record(
             }
         }
     };
+    let outcome_name: String = row.get(24).map_err(migrations::map_rusqlite)?;
+    let outcome = lingxi_kernel::usage::CallOutcome::parse(&outcome_name).ok_or_else(|| {
+        StorageError::Corrupted {
+            detail: format!(
+                "usage row outcome {outcome_name:?} is not in the vocabulary \
+                 (succeeded/failed/cancelled/unknown)"
+            ),
+        }
+    })?;
+    let timestamp_u64 = |index: usize, field: &'static str| -> Result<Option<u64>, StorageError> {
+        row.get::<_, Option<i64>>(index)
+            .map_err(migrations::map_rusqlite)?
+            .map(|value| {
+                u64::try_from(value).map_err(|_| StorageError::Corrupted {
+                    detail: format!("usage row {field} is negative ({value})"),
+                })
+            })
+            .transpose()
+    };
+    let emitted_tool_calls: Option<String> = row.get(27).map_err(migrations::map_rusqlite)?;
     Ok(lingxi_kernel::usage::ModelCallUsageRecord {
         session_id: row.get(1).map_err(migrations::map_rusqlite)?,
         run_id: row.get(2).map_err(migrations::map_rusqlite)?,
@@ -2869,16 +2965,34 @@ fn usage_row_to_record(
         origin: row.get(5).map_err(migrations::map_rusqlite)?,
         parent_run_id: row.get(6).map_err(migrations::map_rusqlite)?,
         cause_ref: row.get(7).map_err(migrations::map_rusqlite)?,
-        provider: row.get(8).map_err(migrations::map_rusqlite)?,
-        model: row.get(9).map_err(migrations::map_rusqlite)?,
-        protocol: row.get(10).map_err(migrations::map_rusqlite)?,
+        parent_tool_call_id: row.get(8).map_err(migrations::map_rusqlite)?,
+        provider: row.get(9).map_err(migrations::map_rusqlite)?,
+        model: row.get(10).map_err(migrations::map_rusqlite)?,
+        protocol: row.get(11).map_err(migrations::map_rusqlite)?,
         usage,
         invalid_detail,
-        transport_attempts: u32::try_from(row.get::<_, i64>(20).map_err(migrations::map_rusqlite)?)
-            .map_err(|_| StorageError::Corrupted {
-                detail: "usage row transport_attempts is negative".to_string(),
-            })?,
-        cost_basis: row.get(21).map_err(migrations::map_rusqlite)?,
+        transport_attempts: row
+            .get::<_, Option<i64>>(21)
+            .map_err(migrations::map_rusqlite)?
+            .map(|value| {
+                u32::try_from(value).map_err(|_| StorageError::Corrupted {
+                    detail: format!("usage row transport_attempts is negative ({value})"),
+                })
+            })
+            .transpose()?,
+        outcome,
+        started_at_unix_ms: timestamp_u64(25, "started_at_unix_ms")?,
+        settled_at_unix_ms: timestamp_u64(26, "settled_at_unix_ms")?,
+        emitted_tool_calls: emitted_tool_calls
+            .map(|joined| {
+                joined
+                    .split(',')
+                    .map(str::to_string)
+                    .filter(|id| !id.is_empty())
+                    .collect()
+            })
+            .unwrap_or_default(),
+        cost_basis: row.get(22).map_err(migrations::map_rusqlite)?,
     })
 }
 

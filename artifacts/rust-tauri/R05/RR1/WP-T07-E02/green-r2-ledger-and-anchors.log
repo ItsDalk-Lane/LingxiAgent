@@ -1,0 +1,85 @@
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.17s
+     Running tests/cancellation_tree.rs (rust/target/debug/deps/cancellation_tree-e1cbeaac8f9d7e57)
+
+running 8 tests
+test state_change_transaction_commits_legal_legs_and_diagnoses_bad_ones ... ok
+test cancel_surface_is_diagnosable_for_unknown_terminal_foreign_and_dangling ... ok
+test panicking_tool_child_is_supervised_and_the_run_settles_loudly ... ok
+test queue_wait_cancel_leaves_the_unrelated_holder_untouched ... ok
+test r03_a06_cancel_parent_spares_unrelated_background ... ok
+test approval_wait_round_trips_approve_and_reject_legs ... ok
+test r03_a05_cancel_exits_each_wait_state_and_returns_quotas ... ok
+test noncooperating_child_is_reported_unconfirmed_not_fake_quiet ... ok
+
+test result: ok. 8 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.60s
+
+     Running tests/r05_t04_streaming.rs (rust/target/debug/deps/r05_t04_streaming-f7a3b5f35a1d4a62)
+
+running 18 tests
+test rr1_f12_unclassified_live_text_is_not_marked_final_pre_terminal ... ok
+test rr1_f13_final_message_projection_is_normalized_same_source ... ok
+test c16_a09_midstream_cancel_releases_the_connection_and_settles_once ... ok
+test rr1_f11_same_provider_id_conflict_is_loud_with_zero_side_effects ... ok
+test c05_half_json_arguments_dispatch_zero_tools ... ok
+test rr1_f12_mood_only_text_settles_process_only_without_final ... ok
+test rr1_f12_unclassified_live_text_stays_unresolved_until_the_terminal ... ok
+test c12_first_delta_reaches_the_subscriber_before_the_external_stream_ends ... ok
+test rr1_f11_legal_then_schema_invalid_batch_has_zero_side_effects ... ok
+test c11_a_content_refusal_fails_in_place_without_retry ... ok
+test rr1_f12_reasoning_only_turn_settles_process_only_without_final ... ok
+test c06_parseable_arguments_do_not_dispatch_before_the_terminal ... ok
+test c13_live_normalization_and_history_projection_share_the_scanner ... ok
+test rr1_f11_identical_resend_executes_once ... ok
+test rr1_f11_distinct_ids_with_equal_arguments_both_execute ... ok
+test c15_a08_http200_stream_failures_keep_the_run_honest ... ok
+test c09_length_truncated_batch_executes_nothing_and_the_retry_is_clean ... ok
+test c15_anthropic_in_stream_error_event_retries_cleanly ... ok
+
+test result: ok. 18 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 1.11s
+
+     Running tests/r05_t07_persistence.rs (rust/target/debug/deps/r05_t07_persistence-e795e9c3083c072b)
+
+running 5 tests
+test identical_replay_is_idempotent_and_a_rewrite_is_a_loud_conflict ... ok
+test the_ledger_round_trips_partial_and_invalid_states ... ok
+test migration_v4_to_v5_upgrades_an_isolated_copy_and_keeps_old_rows ... ok
+test migration_v6_to_v7_makes_attempts_nullable_and_keeps_rows ... ok
+test old_ledger_rows_survive_a_model_config_reload ... ok
+
+test result: ok. 5 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.09s
+
+     Running tests/r05_t07_rr1_usage_ledger.rs (rust/target/debug/deps/r05_t07_rr1_usage_ledger-a03ec952c9e3f530)
+
+running 13 tests
+test rr1_f21_worker_failed_physical_request_must_leave_unknown_usage_row ... ok
+test rr1_f21_worker_pre_send_refusal_records_zero_attempts ... ok
+test rr1_f21_unexpected_tool_response_failure_keeps_the_reported_usage ... ok
+test rr1_f21_empty_answer_failure_keeps_the_reported_usage ... ok
+test rr1_f21_partial_usage_survives_a_failed_aux_settlement ... ok
+test rr1_f22_operation_invalid_usage_must_not_persist_secret_payload ... ok
+test rr1_f21_operation_context_carries_session_run_and_cause ... ok
+test rr1_f21_usage_query_filters_by_date_purpose_and_model ... ok
+test rr1_f38_driver_cancel_of_in_flight_stream_leads_a_cancelled_row_across_restart ... ok
+test rr1_f21_worker_parent_join_through_the_real_subprocess_chain ... ok
+test rr1_f38_run_cancel_drop_of_in_flight_callback_leads_a_cancelled_row ... ok
+test rr1_f21_operation_queue_timeout_never_invents_an_http_attempt ... ok
+test rr1_f38_worker_deadline_expiry_of_in_flight_callback_leads_a_cancelled_row ... ok
+
+test result: ok. 13 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 1.98s
+
+     Running tests/r05_t07_usage_trace.rs (rust/target/debug/deps/r05_t07_usage_trace-378feba1c0ca011a)
+
+running 9 tests
+test c08_cost_stays_unknown_without_a_price_basis ... ok
+test c06_illegal_usage_numbers_mark_the_row_invalid_and_never_distort ... ok
+test c02_background_subagent_and_worker_rows_carry_true_parentage ... ok
+test c03_refresh_retry_is_two_physical_requests_in_one_honest_row ... ok
+test c01_multi_run_session_trace_stays_continuous_and_per_call_queryable ... ok
+test c09_owner_scoped_queries_isolate_and_secrets_never_enter_the_db ... ok
+test c05_unknown_partial_and_reported_states_stay_distinct_everywhere ... ok
+test c10_a_ledger_write_failure_publishes_no_completion_and_the_retry_is_idempotent ... ok
+test c03_retryable_failure_then_success_are_two_rows_and_unknown_is_not_zero ... ok
+
+test result: ok. 9 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.85s
+
+EXIT: 0

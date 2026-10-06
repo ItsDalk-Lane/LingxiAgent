@@ -1,0 +1,32 @@
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.09s
+     Running tests/r05_t07_rr1_usage_ledger.rs (/tmp/r05t07-f39-mut-target/debug/deps/r05_t07_rr1_usage_ledger-a03ec952c9e3f530)
+
+running 2 tests
+test rr1_f39_fence_mismatch_cancelled_during_audit_keeps_the_turns_real_usage_row ... FAILED
+test rr1_f39_fence_cancelled_before_write_keeps_the_turns_real_usage_row ... FAILED
+
+failures:
+
+---- rr1_f39_fence_mismatch_cancelled_during_audit_keeps_the_turns_real_usage_row stdout ----
+
+thread 'rr1_f39_fence_mismatch_cancelled_during_audit_keeps_the_turns_real_usage_row' (12315184) panicked at crates/lingxi-service/tests/r05_t07_rr1_usage_ledger.rs:3143:5:
+assertion `left == right` failed: exactly the fenced call's row
+  left: 0
+ right: 1
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+
+---- rr1_f39_fence_cancelled_before_write_keeps_the_turns_real_usage_row stdout ----
+
+thread 'rr1_f39_fence_cancelled_before_write_keeps_the_turns_real_usage_row' (12315183) panicked at crates/lingxi-service/tests/r05_t07_rr1_usage_ledger.rs:3030:5:
+assertion `left == right` failed: exactly the fenced call's row
+  left: 0
+ right: 1
+
+
+failures:
+    rr1_f39_fence_cancelled_before_write_keeps_the_turns_real_usage_row
+    rr1_f39_fence_mismatch_cancelled_during_audit_keeps_the_turns_real_usage_row
+
+test result: FAILED. 0 passed; 2 failed; 0 ignored; 0 measured; 13 filtered out; finished in 0.11s
+
+error: test failed, to rerun pass `-p lingxi-service --test r05_t07_rr1_usage_ledger`

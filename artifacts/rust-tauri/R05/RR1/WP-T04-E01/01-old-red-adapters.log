@@ -1,0 +1,33 @@
+01-old-red-adapters.log — 旧行为反例（修复前）捕获摘录
+=====================================================
+
+命令（本会话真实执行，rustup 1.98.1 代理；执行于修复实现之前）：
+  cargo test --manifest-path rust/Cargo.toml --locked -p lingxi-adapters --test r05_t04_rr1_batch_terminal
+
+结果回显（尾部摘录；完整 stdout 未逐字节落盘，以本文件与 README 说明为准）：
+
+failures:
+    anthropic_open_tool_block_cannot_close_as_a_completed_batch
+    buffered_bodies_without_a_normal_stop_reason_are_loud
+    duplicate_provider_ids_with_conflicting_arguments_reject_whole_batch
+    identical_resends_collapse_but_distinct_ids_stay_independent
+    openai_done_without_finish_reason_does_not_make_final
+    thinking_only_and_opaque_only_do_not_form_final_answers
+
+test result: FAILED. 1 passed; 6 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+（通过的一项 = positive_controls_normal_terminals_and_legal_batches_still_work，正常对照。）
+
+关键 panic 事实（节选自回显）：
+- duplicate_provider_ids_with_conflicting_arguments_reject_whole_batch：
+  panic "conflicting same-ID calls must never be admitted"——四族同 ID 异形均返回
+  ToolRequests（duplicate_id_results 显示 4×2 条同 id="same" 请求成功进入批次）。
+- thinking_only_and_opaque_only_do_not_form_final_answers：
+  panic "a completed request carrying only non-answer state is not a final answer"——
+  process_only_family_0..4 全部 = Final {…}（仅 Reasoning/Opaque 也判 Final）。
+- openai_done_without_finish_reason_does_not_make_final：实际 Ok(Final)。
+- anthropic_open_tool_block_cannot_close_as_a_completed_batch：实际 Ok（未闭合
+  tool 块 + 仅 message_stop 仍生成 ToolRequests）。
+- buffered_bodies_without_a_normal_stop_reason_are_loud：四族缺终态理由均 Ok。
+- identical_resends_collapse_but_distinct_ids_stay_independent：同 ID 同参两条
+  请求未折叠（requests.len()==2，断言要求 1）。

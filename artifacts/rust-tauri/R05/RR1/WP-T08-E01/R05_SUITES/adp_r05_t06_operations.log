@@ -1,0 +1,34 @@
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.08s
+     Running tests/r05_t06_operations.rs (/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T//rust-target-r05-t08/debug/deps/r05_t06_operations-c69e26bfcf0c8091)
+
+running 27 tests
+test c01_embedding_gemini_voyage_minimax_wire ... ok
+test c01_embedding_ollama_wire ... ok
+test c01_embedding_openai_wire ... ok
+test c01_embedding_parse_contracts ... ok
+test c01_image_agnes_wire ... ok
+test c01_image_codex_sse_aggregate_parses ... ok
+test c01_image_dashscope_submit_pending_and_query_states ... ok
+test c01_image_gemini_wire_and_remote_url_refusal ... ok
+test c01_image_minimax_refusals_envelope_and_parse ... ok
+test c01_image_openai_wire_and_parse ... ok
+test c01_image_volcengine_wire_and_parse ... ok
+test c01_minimax_speech_parse_hex_envelope_and_refusals ... ok
+test c01_rerank_wire_and_parse ... ok
+test c01_speech_dashscope_wire ... ok
+test c01_speech_minimax_wire_and_group_id_refusal ... ok
+test c01_speech_openai_wire ... ok
+test c01_tiers_golden_sizes_match_the_incumbent_search ... ok
+test c01_tiers_refusal_texts_are_verbatim ... ok
+test c01_transcribe_bigasr_wire ... ok
+test c01_transcribe_mimo_and_dashscope_wire ... ok
+test c01_transcribe_openai_multipart_wire ... ok
+test c01_video_submit_wire_and_parse ... ok
+test c02_agnes_video_query_legacy_fallback_only_under_exact_conditions ... ok
+test c02_bigasr_status_header_gates_the_answer ... ok
+test c01_embedding_validation_texts_are_verbatim ... ok
+test c02_openai_image_roundtrip_bytes_out_bytes_in ... ok
+test c02_operation_body_cap_trips_mid_read_with_one_request ... ok
+
+test result: ok. 27 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.02s
+

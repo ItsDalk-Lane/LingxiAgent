@@ -3,7 +3,7 @@
  "artifactKind": "R05_TEST_MAP",
  "stage_id": "R05",
  "generated_by": "EXECUTOR-R05-T08",
- "generated_at": "2026-10-04",
+ "generated_at": "2026-10-06",
  "structure": "原 A-ID → 细化 C-ID → 具体运行测试。ownedBy 的键是生产者 pin 表的 run 键（svc:/adp: 套件或 lib-<pkg>/<test>），值是该 C-ID 拥有的测试（每个测试恰归一个 C-ID——唯一归属由生产者与 xtask 镜像单测机器核验）；scenario-level 条目按阶段图场景绑定。A-ID 到 C-ID 的汇聚视图见 aIndex。",
  "aIndex": {
   "R05-A15": [
@@ -118,7 +118,7 @@
    "ledgerStatus": "PASS",
    "ownedBy": {},
    "citedAlsoBy": null,
-   "binding": "范围矩阵证据＝三份矩阵生成脚本在终树重跑（SCOPE/CALLSITE/PROVIDER），经 REV-T01 审查核对；非 cargo 测试，未注册为门禁命令（R05_BLOCKERS.md §5 登记为可选增强）。",
+   "binding": "command:rust_test_workspace（生产者=xtask 镜像 r05_scope_matrix_covers_every_r05_bound_leaf_honestly：130 叶集合互核+六独占叶 full+单阶段不 defer；RR1 F25 起为具名生产者）（RR1 F26 重登记；权威登记册=r05_required_cids.tsv）",
    "gateCommands": [
     "rust_test_workspace"
    ]
@@ -353,9 +353,9 @@
    "ledgerStatus": "PASS",
    "ownedBy": {},
    "citedAlsoBy": null,
-   "binding": "依赖方向证据＝check-contracts/check-boundaries 门禁（门禁命令本体）+ cargo metadata 边界检查脚本；非独立 cargo 测试。",
+   "binding": "command:check_boundaries（依赖方向门禁本体；RR1 F26 登记册 command 绑定）（RR1 F26 重登记；权威登记册=r05_required_cids.tsv）",
    "gateCommands": [
-    "rust_test_workspace"
+    "check_boundaries"
    ]
   },
   {
@@ -1287,7 +1287,7 @@
    "additionalCitations": [
     "svc:r05_t05_timeouts"
    ],
-   "binding": "重试身份记账证据＝svc:r05_t07_usage_trace 的 c03_refresh_retry_is_two_physical_requests（该测试归 T07-C03 cid 行）+ adapters r05_t05_timeouts 全套；本 C-ID 的补充腿在非 r05 套件（run_lifecycle 系），由 rust_test_workspace 场景级承载。",
+   "binding": "command:rust_test_workspace（生产者=run_lifecycle 重试腿 retryable_provider_failure_reopens_attempt_on_the_same_run 等）（RR1 F26 重登记；权威登记册=r05_required_cids.tsv）",
    "gateCommands": [
     "rust_test_workspace"
    ]
@@ -1327,7 +1327,7 @@
     "adp:r05_t05_timeouts",
     "svc:r05_t04_streaming"
    ],
-   "binding": "部分文本重试证据＝r05_t04_streaming/r05_t05_timeouts 的截断与重开尝试腿 + 非 r05 套件（run_lifecycle::retryable_provider_failure_reopens_attempt_on_the_same_run 等）由 rust_test_workspace 场景级承载。",
+   "binding": "command:rust_test_workspace（生产者=svc:r05_t05_timeouts/adp:r05_t05_timeouts+run_lifecycle 部分文本/断流腿）（RR1 F26 重登记；权威登记册=r05_required_cids.tsv）",
    "gateCommands": [
     "rust_test_workspace"
    ],
@@ -1380,7 +1380,7 @@
    "ledgerStatus": "PASS",
    "ownedBy": {},
    "citedAlsoBy": null,
-   "binding": "自然结束与取消结算＝cancel_terminal_race/cancellation_tree 等非 r05 套件，由 rust_test_workspace 场景级承载（R03 修复链）。",
+   "binding": "command:rust_test_workspace（生产者=cancellation_tree/cancel_terminal_race/cancel_link_inheritance）（RR1 F26 重登记；权威登记册=r05_required_cids.tsv）",
    "gateCommands": [
     "rust_test_workspace"
    ],
@@ -1393,7 +1393,7 @@
    "ledgerStatus": "PASS",
    "ownedBy": {},
    "citedAlsoBy": null,
-   "binding": "断连重连＝background_steering/r03_t08_acceptance_matrix 等非 r05 套件，由 rust_test_workspace 场景级承载。",
+   "binding": "command:rust_test_workspace（生产者=background_disconnect_recovery/event_subscription）（RR1 F26 重登记；权威登记册=r05_required_cids.tsv）",
    "gateCommands": [
     "rust_test_workspace"
    ]
@@ -1447,12 +1447,12 @@
    "caseId": "R05-T05-C12",
    "formalScenarioIds": [],
    "scope": "OFFLINE_LOGIC",
-   "ledgerStatus": "NOT_RUN",
+   "ledgerStatus": "PASS",
    "ownedBy": {},
    "citedAlsoBy": null,
-   "binding": "登记延期（代理/私有 CA 能力差距，REV-T05 复核；见 R05_BLOCKERS.md §3）。",
+   "binding": "RR1 F14 关闭原 NOT_RUN：统一网络策略 NetworkPlane（system/manual/direct、NO_PROXY+环回 bypass、显式 trusted CA）受控计数代理+源服务+生成 CA 正反对照，cid 拥有=svc:r05_t05_network rr1_f14 九测（RR1 F26 重登记；权威登记册=r05_required_cids.tsv）",
    "gateCommands": [
-    "rust_test_workspace"
+    "r05_stage_suites"
    ]
   },
   {
@@ -1722,7 +1722,7 @@
     "lib-adapters/models::egress::tests::scheme_userinfo_and_host_shapes_refuse",
     "lib-adapters/models::egress::tests::the_endpoint_origin_exception_lets_the_loopback_stub_through"
    ],
-   "binding": "与 R05-T05-C11B 同一 egress 边界测试组（lib-adapters/models::egress），cid 归属唯一化后归 T05-C11B；本 C-ID 引用同一组测试（citations 记录）。",
+   "binding": "command:rust_test_workspace（与 R05-T05-C11B 同一 egress 测试组的 additional citations，cid 归属唯一化归 C11B）（RR1 F26 重登记；权威登记册=r05_required_cids.tsv）",
    "gateCommands": [
     "rust_test_workspace"
    ]
@@ -2102,16 +2102,16 @@
     "R05-A11"
    ],
    "scope": "OFFLINE_SERVICE/BINARY（混合）",
-   "binding": "scenario-level：媒体最小链由 T06 交付并被生产者逐测试钉住（adp:r05_t06_operations 27 测试 + svc:r05_t06_operations 7 测试，T06-C01/C02/C03/C12 的 cid 行）+ rust_test_workspace；R05_TEST_MAP 在 T08 层引用同一批套件，不重复归属。",
+   "binding": "command:rust_test_workspace（媒体链腿与 T06-C12 共享 adp:r05_t06_operations 一次有效执行）（RR1 F26 重登记；权威登记册=r05_required_cids.tsv）",
    "gateCommands": [
-    "r05_stage_suites",
     "rust_test_workspace"
    ],
    "representativeTests": [
     "adp:r05_t06_operations::c12_dashscope_pending_then_completed_via_registered_product",
     "adp:r05_t06_operations::c12_video_job_acceptance_is_not_completion_and_cancel_is_local_only",
     "adp:r05_t06_operations::c03_url_products_download_guarded_and_ghost_products_refuse"
-   ]
+   ],
+   "ledgerStatus": "PASS"
   },
   {
    "caseId": "R05-T08-C11",
@@ -2119,15 +2119,15 @@
     "R05-A15"
    ],
    "scope": "OFFLINE_SERVICE/BINARY（混合）",
-   "binding": "scenario-level：worker 嵌套链（真实子进程 worker、模型配额=1、主模型→工具→callback→模型→工具结果→final）由 T06 交付并被生产者钉住（svc:r05_t06_worker_model 10 测试，T06-C04..C11 的 cid 行）+ rust_test_workspace；正式 bootstrap 的 worker 端口接线在 lib.rs（wired_real_model_chain）。",
+   "binding": "RR1 F24 关闭场景级绑定：cid 拥有=svc:r05_t08_production_tools f24_worker_nested_chain_under_global_permit_one（正式二进制、permit=1、真实子进程 worker、父子 usage JOIN）（RR1 F26 重登记；权威登记册=r05_required_cids.tsv）",
    "gateCommands": [
-    "r05_stage_suites",
-    "rust_test_workspace"
+    "r05_stage_suites"
    ],
    "representativeTests": [
     "svc:r05_t06_worker_model::c06_main_run_worker_and_callback_complete_under_global_model_concurrency_one",
     "svc:r05_t06_worker_model::c04_worker_callback_rides_the_real_gateway_and_trace_joins_parent_and_child"
-   ]
+   ],
+   "ledgerStatus": "PASS"
   },
   {
    "caseId": "R05-T08-C12",
@@ -2149,25 +2149,25 @@
    "caseId": "R05-T08-C13",
    "formalScenarioIds": [],
    "scope": "OFFLINE_SERVICE/BINARY（混合）",
-   "binding": "scenario-level：R05-SUP-R04REG 在最终候选上完整重跑 verify-stage R04（内嵌 verify-stage R03 → R02 链、r04_tool_matrix、r04_rr1_repair_suites 与五门禁）——不接受复用旧候选 JSON；负向 R05-GATE-N07 钉住该引用不可删除。",
+   "binding": "command:r04_regression_gate（verify-stage R04 内嵌 R03/R02/RR1 闭包；RR1 F26 登记册 command 绑定）（RR1 F26 重登记；权威登记册=r05_required_cids.tsv）",
    "gateCommands": [
-    "r04_regression_gate",
-    "rust_test_workspace"
+    "r04_regression_gate"
    ],
-   "representativeTests": []
+   "representativeTests": [],
+   "ledgerStatus": "PASS"
   },
   {
    "caseId": "R05-T08-C14",
    "formalScenarioIds": [],
    "scope": "OFFLINE_SERVICE/BINARY（混合）",
-   "binding": "scenario-level：check_boundaries（kernel 无 Tauri/HTTP 客户端/秘密存储依赖、无 Pi 执行循环/新 Node Agent）+ workspace 全量旧入口回归；desktop/、shared/、package.json 对 HEAD 零 diff 由本文件 oldProductUntouchedDiff 核对；Rust 新入口无旧 Agent 回退由 r05_t01_binary_wiring/r05_t08_closed_loop 钉住。",
+   "binding": "command:check_boundaries（范围/依赖方向+workspace 测试；旧产品零改动 diff 证据）（RR1 F26 重登记；权威登记册=r05_required_cids.tsv）",
    "gateCommands": [
-    "check_boundaries",
-    "rust_test_workspace"
+    "check_boundaries"
    ],
    "representativeTests": [
     "svc:r05_t01_binary_wiring::c02_real_binary_full_chain_through_authenticated_endpoint"
-   ]
+   ],
+   "ledgerStatus": "PASS"
   }
  ],
  "oldProductUntouchedDiff": {
@@ -2177,5 +2177,6 @@
  "ledgerNameCorrections": [
   "R05-T01-C06 台账原引用 models::gateway::tests::unsupported_capabilities_refuse_before_any_resolution 与 unimplemented_families_refuse_loudly 两个旧名（测试在 T01/T06 演进中更名为 unconfigured_operations_are_loud_route_gaps 与 a_family_outside_the_operations_matrix_is_loud）；R05-T08 建立 cid 表时按 --list 实名归一，语义不变（路由/能力不支持即响亮拒绝）。台账 T01-C06 条目同步修正。"
  ],
- "aIndexNote": "16 个 A-ID 全部有 ≥1 个 C-ID 归属；T01–T07 台账条目自带的 formalScenarioIds 保留原样，空白处由 T08 补充归属（见各 entry 的 formalMappingSource）。"
+ "aIndexNote": "16 个 A-ID 全部有 ≥1 个 C-ID 归属；T01–T07 台账条目自带的 formalScenarioIds 保留原样，空白处由 T08 补充归属（见各 entry 的 formalMappingSource）。",
+ "registryNote": "RR1 F26：103 必需 C-ID 的权威登记册为 docs/rust-tauri/R05/r05_required_cids.tsv（93 cid 拥有〔r05_stage_cids.tsv 逐测试唯一归属〕+10 command 绑定）；assembler 预跑与 xtask 镜像双处精确集合校验。"
 }

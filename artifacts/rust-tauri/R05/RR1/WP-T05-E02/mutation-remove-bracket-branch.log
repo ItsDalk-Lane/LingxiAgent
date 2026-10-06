@@ -1,0 +1,180 @@
+   Compiling proc-macro2 v1.0.107
+   Compiling unicode-ident v1.0.26
+   Compiling quote v1.0.47
+   Compiling libc v0.2.189
+   Compiling shlex v2.0.1
+   Compiling find-msvc-tools v0.1.13
+   Compiling pkg-config v0.3.34
+   Compiling stable_deref_trait v1.2.1
+   Compiling itoa v1.0.18
+   Compiling bytes v1.12.1
+   Compiling pin-project-lite v0.2.17
+   Compiling fs_extra v1.3.0
+   Compiling futures-core v0.3.34
+   Compiling dunce v1.0.5
+   Compiling smallvec v1.16.1
+   Compiling core-foundation-sys v0.8.7
+   Compiling once_cell v1.21.4
+   Compiling litemap v0.8.3
+   Compiling aws-lc-rs v1.18.1
+   Compiling serde_core v1.0.229
+   Compiling foldhash v0.2.0
+   Compiling writeable v0.6.4
+   Compiling typenum v1.20.1
+   Compiling bitflags v2.13.2
+   Compiling zeroize v1.9.0
+   Compiling icu_normalizer_data v2.3.0
+   Compiling utf8_iter v1.0.4
+   Compiling icu_properties_data v2.3.0
+   Compiling slab v0.4.12
+   Compiling zmij v1.0.23
+   Compiling percent-encoding v2.3.2
+   Compiling serde v1.0.229
+   Compiling cfg-if v1.0.5
+   Compiling equivalent v1.0.2
+   Compiling rustls-pki-types v1.15.1
+   Compiling hashbrown v0.17.1
+   Compiling tracing-core v0.1.36
+   Compiling httparse v1.10.1
+   Compiling futures-sink v0.3.34
+   Compiling serde_json v1.0.151
+   Compiling futures-task v0.3.34
+   Compiling rustls v0.23.45
+   Compiling rustversion v1.0.23
+   Compiling system-configuration-sys v0.6.0
+   Compiling untrusted v0.9.0
+   Compiling try-lock v0.2.5
+   Compiling atomic-waker v1.1.2
+   Compiling tower-service v0.3.3
+   Compiling base64 v0.23.1
+   Compiling memchr v2.8.3
+   Compiling fnv v1.0.7
+   Compiling futures-util v0.3.34
+   Compiling ref-cast v1.0.27
+   Compiling const-oid v0.10.2
+   Compiling subtle v2.6.1
+   Compiling want v0.3.1
+   Compiling form_urlencoded v1.2.2
+   Compiling futures-channel v0.3.34
+   Compiling http v1.5.0
+   Compiling vcpkg v0.2.15
+   Compiling sync_wrapper v1.0.2
+   Compiling tower-layer v0.3.3
+   Compiling ipnet v2.12.2
+   Compiling dyn-clone v1.0.20
+   Compiling simdutf8 v0.1.5
+   Compiling ryu v1.0.23
+   Compiling log v0.4.34
+   Compiling multiversion_no_op v1.0.0
+   Compiling indexmap v2.14.2
+   Compiling scopeguard v1.2.0
+   Compiling hashlink v0.12.2
+   Compiling hybrid-array v0.4.15
+   Compiling fallible-iterator v0.3.0
+   Compiling mime v0.3.17
+   Compiling fallible-streaming-iterator v0.1.9
+   Compiling httpdate v1.0.3
+   Compiling http-body v1.1.0
+   Compiling crypto-common v0.2.2
+   Compiling block-buffer v0.12.1
+   Compiling http-body-util v0.1.5
+   Compiling syn v3.0.6
+   Compiling syn v2.0.119
+   Compiling digest v0.11.3
+   Compiling jobserver v0.1.35
+   Compiling socket2 v0.6.5
+   Compiling mio v1.2.3
+   Compiling core-foundation v0.9.4
+   Compiling cpufeatures v0.3.1
+   Compiling core-foundation v0.10.1
+   Compiling security-framework-sys v2.17.0
+   Compiling getrandom v0.2.17
+   Compiling encoding_rs v0.8.42
+   Compiling sha1 v0.11.0
+   Compiling sha2 v0.11.0
+   Compiling cc v1.4.7
+   Compiling system-configuration v0.7.0
+   Compiling security-framework v3.7.0
+   Compiling cmake v0.1.58
+   Compiling libsqlite3-sys v0.38.2
+   Compiling aws-lc-sys v0.45.0
+   Compiling synstructure v0.14.0
+   Compiling serde_derive_internals v0.30.0
+   Compiling tracing-attributes v0.1.31
+   Compiling zerovec-derive v0.11.6
+   Compiling displaydoc v0.2.7
+   Compiling tokio-macros v2.7.2
+   Compiling serde_derive v1.0.229
+   Compiling ref-cast-impl v1.0.27
+   Compiling zerofrom-derive v0.1.8
+   Compiling yoke-derive v0.8.3
+   Compiling schemars_derive v1.2.2
+   Compiling tokio v1.53.1
+   Compiling tracing v0.1.44
+   Compiling zerofrom v0.1.8
+   Compiling yoke v0.8.3
+   Compiling zerovec v0.11.8
+   Compiling zerotrie v0.2.5
+   Compiling schemars v1.2.2
+   Compiling serde_urlencoded v0.7.1
+   Compiling rusqlite v0.40.2
+   Compiling tinystr v0.8.4
+   Compiling potential_utf v0.1.6
+   Compiling icu_collections v2.3.0
+   Compiling icu_locale_core v2.3.0
+   Compiling tokio-util v0.7.19
+   Compiling tower v0.5.3
+   Compiling icu_provider v2.3.1
+   Compiling icu_normalizer v2.3.0
+   Compiling icu_properties v2.3.0
+   Compiling lingxi-protocol v0.0.0 (/tmp/r05-t05-r2-mutation/rust/crates/lingxi-protocol)
+   Compiling h2 v0.4.19
+   Compiling idna_adapter v1.2.2
+   Compiling idna v1.1.0
+   Compiling url v2.5.8
+   Compiling lingxi-kernel v0.0.0 (/tmp/r05-t05-r2-mutation/rust/crates/lingxi-kernel)
+   Compiling tower-http v0.6.11
+   Compiling hyper v1.11.1
+   Compiling hyper-util v0.1.21
+   Compiling rustls-webpki v0.103.15
+   Compiling tokio-rustls v0.26.5
+   Compiling rustls-platform-verifier v0.7.1
+   Compiling hyper-rustls v0.27.10
+   Compiling reqwest v0.13.5
+   Compiling lingxi-adapters v0.0.0 (/tmp/r05-t05-r2-mutation/rust/crates/lingxi-adapters)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 12.82s
+     Running unittests src/lib.rs (/tmp/r05-t05-r2-mutation-target/debug/deps/lingxi_adapters-25f1ae8b0ef7c0f1)
+
+running 8 tests
+test models::network::tests::forced_local_bypass_beats_every_list ... ok
+test models::network::tests::scheme_selection_prefers_the_scheme_proxy ... ok
+test models::network::tests::system_mode_resolves_the_environment_snapshot ... ok
+test models::network::tests::no_proxy_grammar_matches_the_incumbent_forms ... ok
+test models::network::tests::loopback_bracket_entries_are_pinned_at_the_entry_level ... FAILED
+test models::network::tests::bracketed_ipv6_no_proxy_entries_bypass_public_literals ... FAILED
+test models::network::tests::config_validation_is_loud_on_every_incumbent_rule ... ok
+test models::network::tests::plane_generations_rebuild_the_client_lazily ... ok
+
+failures:
+
+---- models::network::tests::loopback_bracket_entries_are_pinned_at_the_entry_level stdout ----
+
+thread 'models::network::tests::loopback_bracket_entries_are_pinned_at_the_entry_level' (11355113) panicked at crates/lingxi-adapters/src/models/network.rs:853:9:
+assertion failed: no_proxy_list_matches("::1", "9443", "[::1]:9443")
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+
+---- models::network::tests::bracketed_ipv6_no_proxy_entries_bypass_public_literals stdout ----
+
+thread 'models::network::tests::bracketed_ipv6_no_proxy_entries_bypass_public_literals' (11355110) panicked at crates/lingxi-adapters/src/models/network.rs:794:9:
+assertion `left == right` failed
+  left: Some("http://p.invalid:1")
+ right: None
+
+
+failures:
+    models::network::tests::bracketed_ipv6_no_proxy_entries_bypass_public_literals
+    models::network::tests::loopback_bracket_entries_are_pinned_at_the_entry_level
+
+test result: FAILED. 6 passed; 2 failed; 0 ignored; 0 measured; 111 filtered out; finished in 0.01s
+
+error: test failed, to rerun pass `-p lingxi-adapters --lib`

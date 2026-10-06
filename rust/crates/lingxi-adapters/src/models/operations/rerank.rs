@@ -163,41 +163,50 @@ pub fn build_rerank(
     }
 }
 
-/// The incumbent `normalizeRerankUsage`: `meta.tokens` (object) →
-/// `{input_tokens?, output_tokens?, total_tokens = sum of the finite
-/// parts}`; otherwise `usage.total_tokens` (Number-coerced) →
-/// `{total_tokens}`; otherwise absent.
+/// The incumbent `normalizeRerankUsage` SHAPE, made strict (R05 RR1 F22):
+/// `meta.tokens` (object) → `{input_tokens?, output_tokens?,
+/// total_tokens}`; otherwise `usage.total_tokens` → `{total_tokens}`;
+/// otherwise absent.
+///
+/// The normalizer is a shape SELECTOR, never a numeric coercion: the
+/// supplier's raw values pass through untouched — a JSON null stays null
+/// (the strict decoder reads it as ABSENT), a string/float/container
+/// reaches [`super::super::usage::decode_operation_usage`] as itself and
+/// marks the whole fact invalid. The only synthesized value is
+/// `total_tokens`, and only when BOTH halves are genuine non-negative
+/// JSON integers (a total is never synthesized from a missing half — that
+/// would silently bill the missing half as 0; and no f64 round-trip ever
+/// touches an integer).
 fn normalize_rerank_usage(body: &serde_json::Value) -> Option<serde_json::Value> {
-    let finite = |value: Option<&serde_json::Value>| -> Option<f64> {
-        let number = parse::js_number(value?);
-        number.is_finite().then_some(number)
-    };
     if let Some(tokens) = body
         .pointer("/meta/tokens")
         .filter(|v| v.is_object() || v.is_array())
     {
-        let input = finite(tokens.get("input_tokens"));
-        let output = finite(tokens.get("output_tokens"));
+        let input = tokens.get("input_tokens");
+        let output = tokens.get("output_tokens");
+        let genuine = |value: Option<&serde_json::Value>| -> Option<u64> {
+            value.filter(|v| v.is_u64()).and_then(|v| v.as_u64())
+        };
         let mut usage = serde_json::Map::new();
         if let Some(input) = input {
-            usage.insert("input_tokens".to_string(), parse::js_number_to_json(input));
+            usage.insert("input_tokens".to_string(), input.clone());
         }
         if let Some(output) = output {
-            usage.insert(
-                "output_tokens".to_string(),
-                parse::js_number_to_json(output),
-            );
+            usage.insert("output_tokens".to_string(), output.clone());
         }
-        if input.is_some() || output.is_some() {
-            let total = input.unwrap_or(0.0) + output.unwrap_or(0.0);
-            usage.insert("total_tokens".to_string(), parse::js_number_to_json(total));
+        if let (Some(input), Some(output)) = (genuine(input), genuine(output)) {
+            usage.insert(
+                "total_tokens".to_string(),
+                serde_json::json!(input.saturating_add(output)),
+            );
         }
         return Some(serde_json::Value::Object(usage));
     }
-    let total = finite(body.pointer("/usage/total_tokens"))?;
-    let mut usage = serde_json::Map::new();
-    usage.insert("total_tokens".to_string(), parse::js_number_to_json(total));
-    Some(serde_json::Value::Object(usage))
+    // The `usage.total_tokens` branch: RAW passthrough — the strict
+    // decoder judges the value's type (never a JS `Number()` coercion of
+    // strings/floats).
+    body.pointer("/usage/total_tokens")
+        .map(|total| serde_json::json!({"total_tokens": total}))
 }
 
 /// Parses and validates a rerank response: exactly top_n rows, legal

@@ -1,0 +1,24 @@
+   Compiling lingxi-service v0.0.0 (/Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-service)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 2.13s
+     Running tests/r05_t02_credentials.rs (rust/target/debug/deps/r05_t02_credentials-febbad0532f4c8d4)
+
+running 1 test
+test rr1_f04::rr1_f04_browser_completion_then_manual_replay_refused_zero_new_exchanges ... FAILED
+
+failures:
+
+---- rr1_f04::rr1_f04_browser_completion_then_manual_replay_refused_zero_new_exchanges stdout ----
+
+thread 'rr1_f04::rr1_f04_browser_completion_then_manual_replay_refused_zero_new_exchanges' (10194754) panicked at crates/lingxi-service/tests/r05_t02_credentials.rs:3211:9:
+assertion `left == right` failed: the manual replay of a browser-completed login must be refused: {"ok":true,"outcome":{"persisted":true,"status":"loggedIn"},"provider":"main"}
+  left: 200
+ right: 409
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+
+
+failures:
+    rr1_f04::rr1_f04_browser_completion_then_manual_replay_refused_zero_new_exchanges
+
+test result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 37 filtered out; finished in 0.19s
+
+error: test failed, to rerun pass `-p lingxi-service --test r05_t02_credentials`

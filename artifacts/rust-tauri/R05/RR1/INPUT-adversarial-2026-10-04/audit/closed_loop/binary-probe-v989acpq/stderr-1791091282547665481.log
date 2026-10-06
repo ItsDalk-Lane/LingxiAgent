@@ -1,0 +1,12 @@
+2026-10-04T05:21:22.550427Z  INFO lingxi_service: data root resolved [token] source=cli ignored_sources=config-file=/workspace/scratch/9b4397d87a13/audit/closed_loop/binary-probe-v989acpq/config.json
+2026-10-04T05:21:22.550619Z  INFO lingxi_service: data root prepared (canonicalized; runtime dir private 0700) [token] [token][user]
+2026-10-04T05:21:22.550824Z  INFO lingxi_service: model plane resolved (credentials never logged) model_plane_source=/workspace/scratch/9b4397d87a13/audit/closed_loop/binary-probe-v989acpq/config.json providers=1
+2026-10-04T05:21:22.551177Z  INFO lingxi_service: single-writer lock acquired [token] start_nonce=70ba79d34d58c483 pid=24 entropy="os-random-device" [token][user]/instance.lock network_mode=loopback
+2026-10-04T05:21:22.551387Z  INFO lingxi_service: data-epoch gate passed [token] decision=ProceedSteady(EpochStamp { format: V2, minimum_reader_epoch: 1, committed_data_epoch: 1, last_version: Some("0.0.0") })
+2026-10-04T05:21:22.555942Z  INFO lingxi_service: auth service bootstrapped (per-start loopback token, owner-only); run database migrated and seeded [token][user]/local-token.json [token][user]/data/runs.db
+2026-10-04T05:21:22.556211Z  INFO lingxi_service: instance record published (atomic write) [token][user]/instance.json bind_addr=127.0.0.1:42065
+2026-10-04T05:21:22.559385Z  INFO lingxi_service: request handled [token] method=GET [token] status=200
+2026-10-04T05:21:22.806985Z  INFO lingxi_service: shutdown signal: SIGTERM
+2026-10-04T05:21:22.808111Z  INFO lingxi_service::shutdown: run database closed (drained, WAL truncated) phase=storage_close
+2026-10-04T05:21:22.808359Z  INFO lingxi_service::shutdown: own instance record removed, lock released phase=record_cleanup
+2026-10-04T05:21:22.808412Z  INFO lingxi_service: lingxi-service stopped cleanly (run database closed, own record removed, lock released)

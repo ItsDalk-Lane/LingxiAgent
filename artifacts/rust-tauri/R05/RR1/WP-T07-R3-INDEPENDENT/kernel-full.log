@@ -1,0 +1,100 @@
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.05s
+     Running unittests src/lib.rs (rust/target/debug/deps/lingxi_kernel-bbaf5ee71e61807b)
+
+running 87 tests
+test invocation::tests::conservative_capability_is_fully_closed ... ok
+test recovery::tests::category_vocabulary_is_stable ... ok
+test ports::tests::retryable_classification_is_conservative ... ok
+test model_exchange::tests::protocol_family_vocabulary_round_trips ... ok
+test ports::tests::principal_storage_vocabulary_is_stable ... ok
+test ports::tests::late_result_reason_vocabulary_is_stable ... ok
+test invocation::tests::not_executed_entries_are_safe_to_reexecute_regardless_of_capability ... ok
+test invocation::tests::unknown_with_honored_idempotency_key_resumes_with_the_same_key ... ok
+test invocation::tests::read_only_takes_precedence_over_key_and_verify ... ok
+test model_exchange::tests::empty_snapshot_is_generation_zero ... ok
+test invocation::tests::four_state_classification_follows_the_durable_phase ... ok
+test invocation::tests::unknown_read_only_tool_allows_bounded_reexecution ... ok
+test ports::tests::non_terminal_state_change_surface_is_kernel_gated ... ok
+test model_exchange::tests::wire_name_sanitization_fits_the_strictest_protocol_face ... ok
+test ports::tests::non_terminal_outcome_is_rejected_before_storage ... ok
+test ports::tests::failed_commit_yields_error_and_no_events ... ok
+test invocation::tests::unknown_non_idempotent_side_effect_needs_attention_never_retry ... ok
+test invocation::tests::honored_capability_without_a_journaled_key_cannot_resume ... ok
+test ports::tests::result_fence_admits_only_the_current_identity_triple ... ok
+test invocation::tests::decision_vocabulary_is_stable ... ok
+test subagent::tests::access_request_parses_only_the_two_legal_literals ... ok
+test recovery::tests::needs_attention_governs_over_everything_else ... ok
+test recovery::tests::read_only_unknowns_are_retryable_read_only ... ok
+test recovery::tests::principal_reconstruction_round_trips_the_ownership_key ... ok
+test ports::tests::successful_commit_returns_events_for_post_commit_publication ... ok
+test invocation::tests::settled_receipts_need_no_recovery_action ... ok
+test recovery::tests::empty_or_clean_journals_are_recoverable_wait ... ok
+test recovery::tests::resumable_unknowns_are_unknown_side_effect_with_their_keys ... ok
+test recovery::tests::no_category_fabricates_a_final_reply ... ok
+test subagent::tests::attenuation_matrix_matches_the_incumbent ... ok
+test subagent::tests::blocklisted_targets_are_denied_regardless_of_tier ... ok
+test subagent::tests::canonical_request_id_trims_the_full_unicode_whitespace_set ... ok
+test subagent::tests::operate_tier_allows_non_blocklisted_targets ... ok
+test subagent::tests::origin_vocabulary_is_stable_and_loud_on_unknowns ... ok
+test model_exchange::tests::snapshot_declares_only_callable_resident_targets_at_the_pinned_generation ... ok
+test model_exchange::tests::wire_name_collisions_resolve_deterministically_or_fail_loudly ... ok
+test subagent::tests::policy_defaults_preserve_the_incumbent_switch_values ... ok
+test subagent::tests::read_only_tier_denies_mutating_targets_and_fails_closed_on_unknowns ... ok
+test subagent::tests::registry_id_wiring_keeps_registered_read_tools_open_under_read_only ... ok
+test subagent::tests::registry_id_wiring_keeps_the_blocklist_tier_independent_and_first ... ok
+test subagent::tests::registry_id_wiring_still_denies_write_and_unknown_local_names ... ok
+test subagent::tests::registry_id_wiring_matches_the_bare_name_judgment_for_every_listed_name ... ok
+test subagent::tests::registry_id_wiring_uses_the_id_as_blocklist_depth_defense_only ... ok
+test subagent::tests::request_cause_id_prefix_is_the_single_sourced_anchor_format ... ok
+test subagent::tests::session_mode_vocabulary_round_trips_and_collapses ... ok
+test subagent::tests::user_lineage_carries_only_submission_anchors ... ok
+test tests::cancellation_resolves_only_to_cancelled ... ok
+test tests::cancelling_cannot_be_revoked_back_to_running ... ok
+test tests::final_message_exists_only_when_truly_produced ... ok
+test tests::finalize_diagnoses_self_disagreeing_stored_state ... ok
+test tests::finalize_from_running_commits_legal_terminal ... ok
+test tests::finalize_is_idempotent_only_for_completely_identical_settlements ... ok
+test tests::finalize_rejects_illegal_pre_terminal_transition ... ok
+test tests::finalize_rejects_non_terminal_request ... ok
+test tests::happy_path_queued_to_completed ... ok
+test tests::identity_layers_are_distinct_and_stable ... ok
+test tests::queued_cannot_skip_to_completed ... ok
+test tests::run_context_carries_identity_only ... ok
+test tests::run_finish_maps_every_variant_to_its_status_and_reason_code ... ok
+test tests::seq_precision_holds_across_kernel_boundary ... ok
+test tests::settlement_of_with_final_carries_the_message_and_stable_reason ... ok
+test tests::terminal_states_reject_every_transition ... ok
+test toolcatalog::tests::declared_read_only_does_not_grant_verified_recovery ... ok
+test toolcatalog::tests::empty_arguments_on_defaultless_schema_are_legal ... ok
+test toolcatalog::tests::disable_and_uninstall_change_callability_and_generation ... ok
+test toolcatalog::tests::aliases_resolve_to_the_authoritative_identity_and_share_permissions ... ok
+test toolcatalog::tests::array_length_bounds_are_enforced_without_items_subschema ... ok
+test toolcatalog::tests::manifest_names_are_validated ... ok
+test toolcatalog::tests::floats_and_unsafe_integers_are_rejected_parity_with_ts ... ok
+test toolcatalog::tests::future_capabilities_register_as_not_callable ... ok
+test toolcatalog::tests::explicit_default_and_omitted_default_share_one_identity ... ok
+test toolcatalog::tests::reference_and_unsupported_keywords_fail_loudly ... ok
+test toolcatalog::tests::prepare_validates_applies_defaults_and_derives_digest_and_summary ... ok
+test toolcatalog::tests::overly_deep_arguments_are_refused ... ok
+test toolcatalog::tests::summary_never_carries_values ... ok
+test toolcatalog::tests::target_ids_are_origin_namespaced_and_ts_compatible ... ok
+test toolcatalog::tests::snapshots_are_frozen_copies ... ok
+test toolcatalog::tests::same_name_two_sources_never_overwrites_and_name_only_is_ambiguous ... ok
+test usage::tests::an_input_half_then_output_half_is_partial_never_zero ... ok
+test usage::tests::final_mode_conflicts_on_a_different_snapshot ... ok
+test toolcatalog::tests::stale_catalog_generation_refuses_and_requires_refresh ... ok
+test toolcatalog::tests::update_cannot_change_the_target_identity ... ok
+test usage::tests::identical_repeats_are_idempotent_in_both_modes ... ok
+test usage::tests::running_mode_replaces_growth_and_refuses_shrink ... ok
+test usage::tests::wire_projection_requires_both_totals ... ok
+test tests::finalize_property_first_settlement_wins_and_never_flips ... ok
+test toolcatalog::tests::schema_budget_and_depth_are_enforced ... ok
+
+test result: ok. 87 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.03s
+
+   Doc-tests lingxi_kernel
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+

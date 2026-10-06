@@ -1,0 +1,84 @@
+   Compiling lingxi-service v0.0.0 (/Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-service)
+warning: unused import: `std::sync::atomic::Ordering`
+  --> crates/lingxi-service/tests/r05_t07_rr1_usage_ledger.rs:17:5
+   |
+17 | use std::sync::atomic::Ordering;
+   |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+   |
+   = note: `#[warn(unused_imports)]` (part of `#[warn(unused)]`) on by default
+
+warning: unused import: `AtomicUsize`
+  --> crates/lingxi-service/tests/r05_t07_rr1_usage_ledger.rs:18:25
+   |
+18 | use std::sync::atomic::{AtomicUsize};
+   |                         ^^^^^^^^^^^
+
+warning: unused import: `ReportedUsage`
+  --> crates/lingxi-service/tests/r05_t07_rr1_usage_ledger.rs:23:67
+   |
+23 | use lingxi_kernel::usage::{ModelCallUsageRecord, ModelUsageQuery, ReportedUsage};
+   |                                                                   ^^^^^^^^^^^^^
+
+warning: field `body` is never read
+  --> crates/lingxi-service/tests/r05_t07_rr1_usage_ledger.rs:36:5
+   |
+32 | struct RecordedRequest {
+   |        --------------- field in this struct
+...
+36 |     body: String,
+   |     ^^^^
+   |
+   = note: `#[warn(dead_code)]` (part of `#[warn(unused)]`) on by default
+
+warning: method `header` is never used
+  --> crates/lingxi-service/tests/r05_t07_rr1_usage_ledger.rs:40:8
+   |
+39 | impl RecordedRequest {
+   | -------------------- method in this implementation
+40 |     fn header(&self, name: &str) -> Option<&str> {
+   |        ^^^^^^
+
+warning: `lingxi-service` (test "r05_t07_rr1_usage_ledger") generated 5 warnings (run `cargo fix --test "r05_t07_rr1_usage_ledger" -p lingxi-service` to apply 3 suggestions)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 2.36s
+     Running tests/r05_t07_rr1_usage_ledger.rs (rust/target/debug/deps/r05_t07_rr1_usage_ledger-a03ec952c9e3f530)
+
+running 3 tests
+test rr1_f21_operation_queue_timeout_never_invents_an_http_attempt ... FAILED
+test rr1_f21_worker_failed_physical_request_must_leave_unknown_usage_row ... FAILED
+test rr1_f22_operation_invalid_usage_must_not_persist_secret_payload ... FAILED
+
+failures:
+
+---- rr1_f21_operation_queue_timeout_never_invents_an_http_attempt stdout ----
+RR1 operation deadline: elapsed_ms=28, http=0, rows=0, attempts=[], result=Err(OperationFailure { code: BudgetExceeded, message: "model-plane admission wait outlived the call's total budget (deadline_unix_ms reached while queued for a model permit); not retryable under the same budget", retryable: false })
+
+thread 'rr1_f21_operation_queue_timeout_never_invents_an_http_attempt' (11889619) panicked at crates/lingxi-service/tests/r05_t07_rr1_usage_ledger.rs:584:5:
+assertion `left == right` failed: the refused call still leaves its accounting row (a real invocation was made and settled pre-send — the fact is not-sent, not absent)
+  left: 0
+ right: 1
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+
+---- rr1_f21_worker_failed_physical_request_must_leave_unknown_usage_row stdout ----
+RR1 worker failure: provider_requests=1, usage_rows=0, reply=Err(ProviderRefused { detail: "auxiliary slot summarize failed: provider returned HTTP 500 Internal Server Error: {\"error\":{\"message\":\"audit upstream failure\"}}" })
+
+thread 'rr1_f21_worker_failed_physical_request_must_leave_unknown_usage_row' (11889624) panicked at crates/lingxi-service/tests/r05_t07_rr1_usage_ledger.rs:435:5:
+assertion `left == right` failed: a physically sent failed worker request must be accounted, unknown rather than vanished
+  left: 0
+ right: 1
+
+---- rr1_f22_operation_invalid_usage_must_not_persist_secret_payload stdout ----
+RR1 operation secret: result_ok=true, rows=1, leaked=true, invalid_detail=Some("operation usage is [{\"authorization\":\"Bearer RR1_T07_AUDIT_ONLY_EMBEDDING_CREDENTIAL\"}] but must be an object; the fact is marked invalid, never coerced")
+
+thread 'rr1_f22_operation_invalid_usage_must_not_persist_secret_payload' (11889629) panicked at crates/lingxi-service/tests/r05_t07_rr1_usage_ledger.rs:501:5:
+even malformed usage must not copy credential-bearing provider payload into the permanent ledger
+
+
+failures:
+    rr1_f21_operation_queue_timeout_never_invents_an_http_attempt
+    rr1_f21_worker_failed_physical_request_must_leave_unknown_usage_row
+    rr1_f22_operation_invalid_usage_must_not_persist_secret_payload
+
+test result: FAILED. 0 passed; 3 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.39s
+
+error: test failed, to rerun pass `-p lingxi-service --test r05_t07_rr1_usage_ledger`
+exit=101

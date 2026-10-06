@@ -1,0 +1,107 @@
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.08s
+     Running tests/r05_t03_goldens.rs (rust/target/debug/deps/r05_t03_goldens-cad6b458bf769f4d)
+
+running 3 tests
+test the_golden_set_covers_five_families_times_three_cases ... ok
+test forward_and_roundtrip_goldens_render_and_parse_exactly ... ok
+test error_goldens_classify_and_transport_exactly ... ok
+
+test result: ok. 3 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.01s
+
+     Running tests/r05_t03_rr1_replay.rs (rust/target/debug/deps/r05_t03_rr1_replay-ccc948fd6b015f32)
+
+running 33 tests
+test rr1_f06_stream_absent_placeholder_signature_accepts_the_final_delta ... ok
+test rr1_f06_stream_identical_signature_resend_is_tolerated ... ok
+test rr1_f06_stream_two_different_final_signatures_are_a_true_conflict ... ok
+test rr1_f07_empty_text_signature_part_round_trips_verbatim ... ok
+test rr1_f08_buffered_reasoning_content_reaches_the_canonical ... ok
+test rr1_f06_stream_placeholder_signature_accepts_the_final_signature_delta ... ok
+test rr1_f07_f10_unmatched_or_duplicated_anchors_fail_loudly ... ok
+test rr1_f09_responses_reasoning_item_never_crosses_providers ... ok
+test rr1_f09_same_provider_other_model_refuses ... ok
+test rr1_f09_same_family_other_provider_never_receives_the_signature ... ok
+test rr1_f06_buffered_empty_thinking_preserves_signature_on_next_request ... ok
+test rr1_f09_same_origin_replays_the_signature_verbatim ... ok
+test rr1_f09_same_model_id_different_provider_refuses ... ok
+test rr1_f07_parallel_results_form_one_user_content ... ok
+test rr1_f10_responses_multi_segment_interleave_keeps_positions ... ok
+test rr1_f10_codex_replay_keeps_text_reasoning_tool_order ... ok
+test rr1_f07_interleaved_parts_keep_original_order ... ok
+test rr1_f10_responses_keep_reasoning_text_tool_order ... ok
+test rr1_f10_responses_keep_text_reasoning_tool_order ... ok
+test rr1_f07_consecutive_rounds_and_reverse_results_group_per_round ... ok
+test rr1_f07_function_call_signature_survives_both_wire_modes ... ok
+test rr1_f08_missing_required_reasoning_fails_closed_before_dispatch ... ok
+test rr1_f10_responses_tools_interspersed_keep_positions ... ok
+test rr1_f08_deepseek_reasoning_replays_through_renderer_and_compat ... ok
+test rr1_f32_off_level_deepseek_round_without_carrier_is_exempt ... ok
+test rr1_f32_responses_duplicated_function_call_anchor_is_refused ... ok
+test rr1_f32_declared_non_reasoning_model_strips_the_carrier ... ok
+test rr1_f08_no_contract_provider_never_receives_the_carrier ... ok
+test rr1_f32_utility_mode_deepseek_round_without_carrier_is_exempt ... ok
+test rr1_f32_no_origin_family_state_refused_on_all_three_gated_families ... ok
+test rr1_f06_byte_split_stream_keeps_the_signed_thinking_block ... ok
+test rr1_f32_off_level_strips_a_present_deepseek_carrier ... ok
+test rr1_f32_utility_mode_strips_a_present_deepseek_carrier ... ok
+
+test result: ok. 33 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running tests/r05_t04_rr1_batch_terminal.rs (rust/target/debug/deps/r05_t04_rr1_batch_terminal-e52d94a9fb0bc03c)
+
+running 7 tests
+test anthropic_open_tool_block_cannot_close_as_a_completed_batch ... ok
+test buffered_bodies_without_a_normal_stop_reason_are_loud ... ok
+test openai_done_without_finish_reason_does_not_make_final ... ok
+test identical_resends_collapse_but_distinct_ids_stay_independent ... ok
+test thinking_only_and_opaque_only_do_not_form_final_answers ... ok
+test duplicate_provider_ids_with_conflicting_arguments_reject_whole_batch ... ok
+test positive_controls_normal_terminals_and_legal_batches_still_work ... ok
+
+test result: ok. 7 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running tests/r05_t04_streaming.rs (rust/target/debug/deps/r05_t04_streaming-c1970d86f7113ed3)
+
+running 18 tests
+test c15_decoder_level_stream_failures_are_loud ... ok
+test c05_openai_half_json_arguments_close_loud_with_zero_dispatch ... ok
+test c05_anthropic_half_json_arguments_close_loud_with_zero_dispatch ... ok
+test c09_openai_length_stop_with_one_complete_tool_dispatches_nothing ... ok
+test c09_anthropic_max_tokens_stop_with_one_complete_tool_dispatches_nothing ... ok
+test c06_parseable_arguments_admit_nothing_before_the_protocol_terminal ... ok
+test c08_anthropic_interleaved_tool_blocks_accumulate_independently ... ok
+test c10_openai_duplicates_conflicts_and_adjacent_identical_text ... ok
+test c14_opaque_blocks_roundtrip_and_signatures_never_leak_into_deltas ... ok
+test c10_anthropic_duplicates_conflicts_and_event_field_agreement ... ok
+test c07_wrong_shaped_arguments_refuse_loudly ... ok
+test c07_duplicate_keys_and_overprecision_numbers_follow_one_canonical_rule ... ok
+test c02_invalid_utf8_is_deterministic_at_every_fragmentation ... ok
+test c11_stop_reason_table_is_complete_across_the_fragmenting_families ... ok
+test c04_bounds_are_loud_at_the_preregistered_limits ... ok
+test c01_openai_full_response_is_fragmentation_invariant ... ok
+test c01_split_bom_and_crlf_are_fragmentation_invariant ... ok
+test c01_anthropic_full_response_is_fragmentation_invariant ... ok
+
+test result: ok. 18 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.49s
+
+     Running tests/r05_t07_usage_families.rs (rust/target/debug/deps/r05_t07_usage_families-d777bfe6399f5fb7)
+
+running 14 tests
+test c04_anthropic_interrupted_before_output_is_partial_never_zero ... ok
+test c07_every_chat_family_declares_its_formula_and_inclusion_semantics ... ok
+test c05_absent_usage_is_unknown_and_a_half_reported_usage_is_partial ... ok
+test c04_responds_families_carry_one_final_snapshot_on_the_terminal_object ... ok
+test c07_anthropic_cache_categories_stay_separate_from_the_input_total ... ok
+test c07_gemini_thoughts_and_cache_map_inside_their_totals ... ok
+test c07_openai_families_normalize_cache_and_reasoning_without_re_adding ... ok
+test c06_negative_float_string_and_overflow_counts_mark_the_fact_invalid ... ok
+test c04_anthropic_running_total_going_backwards_is_loud ... ok
+test c04_gemini_streaming_running_metadata_replaces_not_sums ... ok
+test c04_openai_final_usage_repeats_are_idempotent_and_conflicts_are_loud ... ok
+test c04_anthropic_running_output_replaces_never_sums ... ok
+test c06_gemini_streaming_violating_usage_metadata_marks_the_fact_invalid ... ok
+test c06_anthropic_streaming_violating_usage_fragments_mark_the_fact_invalid ... ok
+
+test result: ok. 14 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+adapters exit: 0

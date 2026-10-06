@@ -102,7 +102,9 @@ fn c07_every_chat_family_declares_its_formula_and_inclusion_semantics() {
                 assert_eq!(
                     mapping.reasoning_included_in_output,
                     Some(true),
-                    "gemini thoughtsTokenCount is inside candidatesTokenCount"
+                    "RR1 F23: the wire splits candidates/thoughts; the decoder normalizes the \
+                     unified output to their sum, so the unified total INCLUDES the reasoning \
+                     component (never re-added, never dropped)"
                 );
             }
             _ => unreachable!("only chat families carry mappings"),
@@ -193,11 +195,14 @@ fn c07_gemini_thoughts_and_cache_map_inside_their_totals() {
         panic!("decodes");
     };
     assert_eq!(usage.input_tokens, Some(88));
-    assert_eq!(usage.output_tokens, Some(19));
+    // RR1 F23: Google splits candidates (19) and thoughts (7) on the wire;
+    // the unified output is the TOTAL generated output — 26, matching the
+    // provider's own totalTokenCount arithmetic (88 + 26 = 114).
+    assert_eq!(usage.output_tokens, Some(26));
     assert_eq!(usage.reasoning_tokens, Some(7));
     assert_eq!(usage.cache_read_tokens, Some(50));
     let wire = usage.wire_record().expect("both totals");
-    assert_eq!((wire.input_tokens, wire.output_tokens), (88, 19));
+    assert_eq!((wire.input_tokens, wire.output_tokens), (88, 26));
 }
 
 // ── C06: illegal or out-of-range counts are invalid, never distorted ─────────
@@ -243,6 +248,9 @@ fn anthropic_usage_stream(
         serde_json::json!({"type":"message_start","message":{"usage": start_usage}}),
         serde_json::json!({"type":"content_block_start","index":0,"content_block":{"type":"text","text":"a"}}),
         serde_json::json!({"type":"content_block_delta","index":0,"delta":{"type":"text_delta","text":"b"}}),
+        // R05 RR1 F12: a completed batch closes its blocks (an unclosed
+        // block is a protocol violation independent of usage folding).
+        serde_json::json!({"type":"content_block_stop","index":0}),
     ];
     for delta in deltas {
         frames.push(delta.clone());
@@ -421,6 +429,8 @@ fn c04_anthropic_running_output_replaces_never_sums() {
             "input_tokens": 25, "cache_read_input_tokens": 400}}}),
         serde_json::json!({"type":"content_block_start","index":0,"content_block":{"type":"text","text":"a"}}),
         serde_json::json!({"type":"content_block_delta","index":0,"delta":{"type":"text_delta","text":"b"}}),
+        // R05 RR1 F12: a completed batch closes its blocks.
+        serde_json::json!({"type":"content_block_stop","index":0}),
         // Two message_delta frames: the running output total GROWS (each
         // frame reports the cumulative count — per the family's streaming
         // contract they are snapshots, not increments).
@@ -537,8 +547,11 @@ fn c04_gemini_streaming_running_metadata_replaces_not_sums() {
         .expect("finish");
     match parsed.usage_report {
         ReportedUsage::Known(usage) => {
-            // 4 → 19 REPLACES (never 23).
-            assert_eq!(usage.output_tokens, Some(19));
+            // RR1 F23: each frame's unified output is candidates + thoughts
+            // of THAT snapshot — frame 2 (candidates 4, no thoughts) → 4;
+            // frame 3 (candidates 19 + thoughts 7) → 26. 4 → 26 REPLACES
+            // (never sums): a cumulative snapshot is never added up.
+            assert_eq!(usage.output_tokens, Some(26));
             assert_eq!(usage.input_tokens, Some(88));
             assert_eq!(usage.reasoning_tokens, Some(7));
         }

@@ -1,0 +1,4 @@
+fmt --check: exit 0
+clippy -D warnings: exit 0
+xtask: [bash scripts/rust-tauri/r01-t02-check-generated.sh] exit 0 (OK)
+xtask: [python3 -B docs/rust-tauri/R01/r01_t01_check_ownership.py] exit 0 (OK)

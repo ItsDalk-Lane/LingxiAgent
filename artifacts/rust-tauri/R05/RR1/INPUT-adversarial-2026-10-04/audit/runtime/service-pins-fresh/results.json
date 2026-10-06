@@ -1,0 +1,359 @@
+[
+  {
+    "test": "credentials::store::tests::a_failed_write_keeps_the_previous_state_and_reports",
+    "command": [
+      "cargo",
+      "test",
+      "--manifest-path",
+      "rust/Cargo.toml",
+      "--locked",
+      "--offline",
+      "-p",
+      "lingxi-service",
+      "--lib",
+      "credentials::store::tests::a_failed_write_keeps_the_previous_state_and_reports",
+      "--",
+      "--exact"
+    ],
+    "exit_code": 0,
+    "seconds": 0.2632341130001805,
+    "log": "/workspace/scratch/9b4397d87a13/audit/runtime/service-pins-fresh/credentials__store__tests__a_failed_write_keeps_the_previous_state_and_reports.log",
+    "passed": true
+  },
+  {
+    "test": "credentials::store::tests::a_version_conflict_is_loud",
+    "command": [
+      "cargo",
+      "test",
+      "--manifest-path",
+      "rust/Cargo.toml",
+      "--locked",
+      "--offline",
+      "-p",
+      "lingxi-service",
+      "--lib",
+      "credentials::store::tests::a_version_conflict_is_loud",
+      "--",
+      "--exact"
+    ],
+    "exit_code": 0,
+    "seconds": 0.1698276590000205,
+    "log": "/workspace/scratch/9b4397d87a13/audit/runtime/service-pins-fresh/credentials__store__tests__a_version_conflict_is_loud.log",
+    "passed": true
+  },
+  {
+    "test": "credentials::store::tests::missing_file_loads_empty_and_round_trips",
+    "command": [
+      "cargo",
+      "test",
+      "--manifest-path",
+      "rust/Cargo.toml",
+      "--locked",
+      "--offline",
+      "-p",
+      "lingxi-service",
+      "--lib",
+      "credentials::store::tests::missing_file_loads_empty_and_round_trips",
+      "--",
+      "--exact"
+    ],
+    "exit_code": 0,
+    "seconds": 0.1580478599998969,
+    "log": "/workspace/scratch/9b4397d87a13/audit/runtime/service-pins-fresh/credentials__store__tests__missing_file_loads_empty_and_round_trips.log",
+    "passed": true
+  },
+  {
+    "test": "credentials::store::tests::unknown_fields_survive_a_write",
+    "command": [
+      "cargo",
+      "test",
+      "--manifest-path",
+      "rust/Cargo.toml",
+      "--locked",
+      "--offline",
+      "-p",
+      "lingxi-service",
+      "--lib",
+      "credentials::store::tests::unknown_fields_survive_a_write",
+      "--",
+      "--exact"
+    ],
+    "exit_code": 0,
+    "seconds": 0.16077747999997882,
+    "log": "/workspace/scratch/9b4397d87a13/audit/runtime/service-pins-fresh/credentials__store__tests__unknown_fields_survive_a_write.log",
+    "passed": true
+  },
+  {
+    "test": "credentials::tests::a_cancelled_waiter_does_not_disturb_the_flight",
+    "command": [
+      "cargo",
+      "test",
+      "--manifest-path",
+      "rust/Cargo.toml",
+      "--locked",
+      "--offline",
+      "-p",
+      "lingxi-service",
+      "--lib",
+      "credentials::tests::a_cancelled_waiter_does_not_disturb_the_flight",
+      "--",
+      "--exact"
+    ],
+    "exit_code": 0,
+    "seconds": 0.16349480200005928,
+    "log": "/workspace/scratch/9b4397d87a13/audit/runtime/service-pins-fresh/credentials__tests__a_cancelled_waiter_does_not_disturb_the_flight.log",
+    "passed": true
+  },
+  {
+    "test": "credentials::tests::a_reload_replacing_the_cell_discards_the_late_writeback",
+    "command": [
+      "cargo",
+      "test",
+      "--manifest-path",
+      "rust/Cargo.toml",
+      "--locked",
+      "--offline",
+      "-p",
+      "lingxi-service",
+      "--lib",
+      "credentials::tests::a_reload_replacing_the_cell_discards_the_late_writeback",
+      "--",
+      "--exact"
+    ],
+    "exit_code": 0,
+    "seconds": 0.17329123400031676,
+    "log": "/workspace/scratch/9b4397d87a13/audit/runtime/service-pins-fresh/credentials__tests__a_reload_replacing_the_cell_discards_the_late_writeback.log",
+    "passed": true
+  },
+  {
+    "test": "credentials::tests::a_rotated_credential_is_reused_without_a_second_refresh",
+    "command": [
+      "cargo",
+      "test",
+      "--manifest-path",
+      "rust/Cargo.toml",
+      "--locked",
+      "--offline",
+      "-p",
+      "lingxi-service",
+      "--lib",
+      "credentials::tests::a_rotated_credential_is_reused_without_a_second_refresh",
+      "--",
+      "--exact"
+    ],
+    "exit_code": 0,
+    "seconds": 0.1719988789996023,
+    "log": "/workspace/scratch/9b4397d87a13/audit/runtime/service-pins-fresh/credentials__tests__a_rotated_credential_is_reused_without_a_second_refresh.log",
+    "passed": true
+  },
+  {
+    "test": "credentials::tests::an_expired_handle_is_refused",
+    "command": [
+      "cargo",
+      "test",
+      "--manifest-path",
+      "rust/Cargo.toml",
+      "--locked",
+      "--offline",
+      "-p",
+      "lingxi-service",
+      "--lib",
+      "credentials::tests::an_expired_handle_is_refused",
+      "--",
+      "--exact"
+    ],
+    "exit_code": 0,
+    "seconds": 0.15983002299981308,
+    "log": "/workspace/scratch/9b4397d87a13/audit/runtime/service-pins-fresh/credentials__tests__an_expired_handle_is_refused.log",
+    "passed": true
+  },
+  {
+    "test": "credentials::tests::concurrent_401s_merge_into_one_refresh",
+    "command": [
+      "cargo",
+      "test",
+      "--manifest-path",
+      "rust/Cargo.toml",
+      "--locked",
+      "--offline",
+      "-p",
+      "lingxi-service",
+      "--lib",
+      "credentials::tests::concurrent_401s_merge_into_one_refresh",
+      "--",
+      "--exact"
+    ],
+    "exit_code": 0,
+    "seconds": 0.16976070800001253,
+    "log": "/workspace/scratch/9b4397d87a13/audit/runtime/service-pins-fresh/credentials__tests__concurrent_401s_merge_into_one_refresh.log",
+    "passed": true
+  },
+  {
+    "test": "credentials::tests::forged_handles_and_provider_references_are_refused",
+    "command": [
+      "cargo",
+      "test",
+      "--manifest-path",
+      "rust/Cargo.toml",
+      "--locked",
+      "--offline",
+      "-p",
+      "lingxi-service",
+      "--lib",
+      "credentials::tests::forged_handles_and_provider_references_are_refused",
+      "--",
+      "--exact"
+    ],
+    "exit_code": 0,
+    "seconds": 0.17432578299985835,
+    "log": "/workspace/scratch/9b4397d87a13/audit/runtime/service-pins-fresh/credentials__tests__forged_handles_and_provider_references_are_refused.log",
+    "passed": true
+  },
+  {
+    "test": "credentials::tests::handle_refusal_texts_carry_no_material",
+    "command": [
+      "cargo",
+      "test",
+      "--manifest-path",
+      "rust/Cargo.toml",
+      "--locked",
+      "--offline",
+      "-p",
+      "lingxi-service",
+      "--lib",
+      "credentials::tests::handle_refusal_texts_carry_no_material",
+      "--",
+      "--exact"
+    ],
+    "exit_code": 0,
+    "seconds": 0.16528029099981723,
+    "log": "/workspace/scratch/9b4397d87a13/audit/runtime/service-pins-fresh/credentials__tests__handle_refusal_texts_carry_no_material.log",
+    "passed": true
+  },
+  {
+    "test": "credentials::tests::resolve_refreshes_at_most_once_when_a_one_second_grant_dies_in_transit",
+    "command": [
+      "cargo",
+      "test",
+      "--manifest-path",
+      "rust/Cargo.toml",
+      "--locked",
+      "--offline",
+      "-p",
+      "lingxi-service",
+      "--lib",
+      "credentials::tests::resolve_refreshes_at_most_once_when_a_one_second_grant_dies_in_transit",
+      "--",
+      "--exact"
+    ],
+    "exit_code": 0,
+    "seconds": 0.17330428400009623,
+    "log": "/workspace/scratch/9b4397d87a13/audit/runtime/service-pins-fresh/credentials__tests__resolve_refreshes_at_most_once_when_a_one_second_grant_dies_in_transit.log",
+    "passed": true
+  },
+  {
+    "test": "credentials::tests::resolve_refreshes_at_most_once_when_every_mint_is_already_expired",
+    "command": [
+      "cargo",
+      "test",
+      "--manifest-path",
+      "rust/Cargo.toml",
+      "--locked",
+      "--offline",
+      "-p",
+      "lingxi-service",
+      "--lib",
+      "credentials::tests::resolve_refreshes_at_most_once_when_every_mint_is_already_expired",
+      "--",
+      "--exact"
+    ],
+    "exit_code": 0,
+    "seconds": 0.1688371529999131,
+    "log": "/workspace/scratch/9b4397d87a13/audit/runtime/service-pins-fresh/credentials__tests__resolve_refreshes_at_most_once_when_every_mint_is_already_expired.log",
+    "passed": true
+  },
+  {
+    "test": "credentials::tests::revoke_fences_a_late_writeback",
+    "command": [
+      "cargo",
+      "test",
+      "--manifest-path",
+      "rust/Cargo.toml",
+      "--locked",
+      "--offline",
+      "-p",
+      "lingxi-service",
+      "--lib",
+      "credentials::tests::revoke_fences_a_late_writeback",
+      "--",
+      "--exact"
+    ],
+    "exit_code": 0,
+    "seconds": 0.16385354700014432,
+    "log": "/workspace/scratch/9b4397d87a13/audit/runtime/service-pins-fresh/credentials__tests__revoke_fences_a_late_writeback.log",
+    "passed": true
+  },
+  {
+    "test": "redaction::tests::r05_provider_api_key_shapes_are_redacted",
+    "command": [
+      "cargo",
+      "test",
+      "--manifest-path",
+      "rust/Cargo.toml",
+      "--locked",
+      "--offline",
+      "-p",
+      "lingxi-service",
+      "--lib",
+      "redaction::tests::r05_provider_api_key_shapes_are_redacted",
+      "--",
+      "--exact"
+    ],
+    "exit_code": 0,
+    "seconds": 0.16514193300008628,
+    "log": "/workspace/scratch/9b4397d87a13/audit/runtime/service-pins-fresh/redaction__tests__r05_provider_api_key_shapes_are_redacted.log",
+    "passed": true
+  },
+  {
+    "test": "redaction::tests::r05_secret_key_words_match_case_insensitively",
+    "command": [
+      "cargo",
+      "test",
+      "--manifest-path",
+      "rust/Cargo.toml",
+      "--locked",
+      "--offline",
+      "-p",
+      "lingxi-service",
+      "--lib",
+      "redaction::tests::r05_secret_key_words_match_case_insensitively",
+      "--",
+      "--exact"
+    ],
+    "exit_code": 0,
+    "seconds": 0.1896445219999805,
+    "log": "/workspace/scratch/9b4397d87a13/audit/runtime/service-pins-fresh/redaction__tests__r05_secret_key_words_match_case_insensitively.log",
+    "passed": true
+  },
+  {
+    "test": "redaction::tests::r05_t02_base64_tokens_with_slash_and_padding_are_redacted",
+    "command": [
+      "cargo",
+      "test",
+      "--manifest-path",
+      "rust/Cargo.toml",
+      "--locked",
+      "--offline",
+      "-p",
+      "lingxi-service",
+      "--lib",
+      "redaction::tests::r05_t02_base64_tokens_with_slash_and_padding_are_redacted",
+      "--",
+      "--exact"
+    ],
+    "exit_code": 0,
+    "seconds": 0.1653584040000169,
+    "log": "/workspace/scratch/9b4397d87a13/audit/runtime/service-pins-fresh/redaction__tests__r05_t02_base64_tokens_with_slash_and_padding_are_redacted.log",
+    "passed": true
+  }
+]

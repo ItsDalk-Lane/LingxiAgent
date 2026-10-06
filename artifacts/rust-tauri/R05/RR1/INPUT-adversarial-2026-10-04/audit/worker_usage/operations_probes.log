@@ -1,0 +1,34 @@
+    Blocking waiting for file lock on build directory
+   Compiling r05-worker-usage-audit v0.0.0 (/workspace/scratch/9b4397d87a13/audit/worker_usage)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 1.62s
+     Running tests/operations_audit.rs (audit/runtime/target/debug/deps/operations_audit-5fd69b846c446148)
+
+running 3 tests
+AUDIT authorized resource: type=png, authorized="/tmp/lingxi-r05t06ops-audit-authorized-path-177-0/authorized-workspace/audit-relative-path-177.png", actual_read_is_outside_workspace=true
+AUDIT authorized resource: type=wav, authorized="/tmp/lingxi-r05t06ops-audit-authorized-path-177-0/authorized-workspace/audit-relative-path-177.wav", actual_read_is_outside_workspace=true
+
+thread 'audit_resource_read_must_use_the_same_authorized_canonical_path' (179) panicked at tests/operations_audit.rs:1007:5:
+authorization validates cwd+relative path but read uses process cwd instead, exposing unauthorized same-named file: ["png", "wav"]
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+test audit_resource_read_must_use_the_same_authorized_canonical_path ... FAILED
+AUDIT video poll: receipt=MediaJobAccepted { task_id: "local-track", provider_task_id: "provider-vid", remote_cancel: "unsupported" }, paths=["/v1/videos", "/agnesapi?video_id=local-track"], result=Ok(Generating)
+
+thread 'audit_video_poll_must_use_provider_job_id_and_preserve_legacy_tracker' (180) panicked at tests/operations_audit.rs:955:5:
+must send provider-facing video_id; local tracker is only legacy fallback
+test audit_video_poll_must_use_provider_job_id_and_preserve_legacy_tracker ... FAILED
+AUDIT cancellation race: cancel_ack=CancelledLocally { remote_cancel: "unsupported" }; late_result=Ok(Completed { products: [RegisteredProduct { resource_id: "video-1791091152623-afb97f35a036b4dc", path: "/tmp/lingxi-r05t06ops-chain-products-177-3/video-1791091152623-afb97f35a036b4dc", mime: "video/mp4", size_bytes: 4, sha256: "9f64a747e1b97f131fabb6b447296c9b6f0201e79fb3c5356e6c77e89b6a806a" }] }); requests=["/v1/videos", "/agnesapi?video_id=cancel-track", "/audit-product.mp4"]; registered_products=1
+
+thread 'audit_cancelled_media_poll_must_not_download_or_publish_completed' (178) panicked at tests/operations_audit.rs:977:5:
+acknowledged local cancellation must fence an in-flight poll, not let it overwrite cancelled with Completed
+test audit_cancelled_media_poll_must_not_download_or_publish_completed ... FAILED
+
+failures:
+
+failures:
+    audit_cancelled_media_poll_must_not_download_or_publish_completed
+    audit_resource_read_must_use_the_same_authorized_canonical_path
+    audit_video_poll_must_use_provider_job_id_and_preserve_legacy_tracker
+
+test result: FAILED. 0 passed; 3 failed; 0 ignored; 0 measured; 7 filtered out; finished in 0.29s
+
+error: test failed, to rerun pass `--test operations_audit`

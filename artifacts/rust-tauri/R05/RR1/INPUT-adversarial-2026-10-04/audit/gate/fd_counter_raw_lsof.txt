@@ -1,0 +1,8 @@
+COMMAND   PID USER   FD      TYPE DEVICE SIZE NODE NAME
+sync_shar   5 root  cwd   unknown                  /proc/5/cwd (readlink: Permission denied)
+sync_shar   5 root  rtd   unknown                  /proc/5/root (readlink: Permission denied)
+sync_shar   5 root  txt   unknown                  /proc/5/exe (readlink: Permission denied)
+sync_shar   5 root    0   unknown                  /proc/5/fd/0 (readlink: Permission denied)
+sync_shar   5 root    1   unknown                  /proc/5/fd/1 (readlink: Permission denied)
+sync_shar   5 root    2   unknown                  /proc/5/fd/2 (readlink: Permission denied)
+sync_shar   5 root  255   unknown                  /proc/5/fd/255 (readlink: Permission denied)

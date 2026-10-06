@@ -1,0 +1,47 @@
+{
+  "at": "2026-10-04T05:12:51.438153+00:00",
+  "records": [
+    {
+      "command": [
+        "rustc",
+        "-Vv"
+      ],
+      "exit_code": 0,
+      "output": "rustc 1.98.1 (48a229cea 2026-09-01)\nbinary: rustc\ncommit-hash: 48a229ceaefd4985c50990b14116b6d856af0985\ncommit-date: 2026-09-01\nhost: x86_64-unknown-linux-gnu\nrelease: 1.98.1\nLLVM version: 22.1.8\n"
+    },
+    {
+      "command": [
+        "cargo",
+        "-Vv"
+      ],
+      "exit_code": 0,
+      "output": "cargo 1.98.1 (797e8a9bc 2026-08-05)\nrelease: 1.98.1\ncommit-hash: 797e8a9bca276c1c9f9f738d2a20f484fa4eea9d\ncommit-date: 2026-08-05\nhost: x86_64-unknown-linux-gnu\nlibgit2: 1.9.4 (sys:0.21.0 vendored)\nlibcurl: 8.21.0-DEV (sys:0.4.90+curl-8.21.0 vendored ssl:OpenSSL/3.6.3)\nssl: OpenSSL 3.6.3 9 Jun 2026\nos: Ubuntu 24.4.0 (noble) [64-bit]\n"
+    },
+    {
+      "command": [
+        "git",
+        "rev-parse",
+        "HEAD"
+      ],
+      "exit_code": 0,
+      "output": "d80737b6cb9186c8a18c0f35923aac00249d45c3\n"
+    },
+    {
+      "command": [
+        "git",
+        "status",
+        "--porcelain=v1"
+      ],
+      "exit_code": 0,
+      "output": ""
+    }
+  ],
+  "resource_limits": {
+    "/sys/fs/cgroup/memory.max": "8589934592\n",
+    "/sys/fs/cgroup/cpu.max": "800000 100000\n"
+  },
+  "hashes": {
+    "rust-toolchain.toml": "eec3410410647a7d39f25371e73dda3ecfd5e7c10359090fff11e83053e11c37",
+    "rust/Cargo.lock": "259f983e98a4da13eab1b592c2efd7b79579ad6678a08995a4b9e3fca618eff3"
+  }
+}

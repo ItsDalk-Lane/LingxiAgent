@@ -1,0 +1,17 @@
+2026-10-04T05:19:33.712886Z  INFO lingxi_service: data root resolved [token] source=cli ignored_sources=config-file=/workspace/scratch/9b4397d87a13/audit/closed_loop/batch-invalid-second-e6lgh43x/config.json
+2026-10-04T05:19:33.713363Z  INFO lingxi_service: data root prepared (canonicalized; runtime dir private 0700) [token] [token][user]
+2026-10-04T05:19:33.713656Z  INFO lingxi_service: model plane resolved (credentials never logged) model_plane_source=/workspace/scratch/9b4397d87a13/audit/closed_loop/batch-invalid-second-e6lgh43x/config.json providers=1
+2026-10-04T05:19:33.714201Z  INFO lingxi_service: single-writer lock acquired [token] start_nonce=1cdeac540c049254 pid=7 entropy="os-random-device" [token][user]/instance.lock network_mode=loopback
+2026-10-04T05:19:33.714666Z  INFO lingxi_service: data-epoch gate passed [token] decision=ProceedStampedNew(EpochStamp { format: V2, minimum_reader_epoch: 1, committed_data_epoch: 1, last_version: Some("0.0.0") })
+2026-10-04T05:19:33.719523Z  INFO lingxi_adapters::storage::run_store: run database migrated [token][user]/data/runs.db applied=[1, 2, 3, 4, 5] version=5
+2026-10-04T05:19:33.721406Z  INFO lingxi_service: auth service bootstrapped (per-start loopback token, owner-only); run database migrated and seeded [token][user]/local-token.json [token][user]/data/runs.db
+2026-10-04T05:19:33.721872Z  INFO lingxi_service: instance record published (atomic write) [token][user]/instance.json bind_addr=127.0.0.1:39149
+2026-10-04T05:19:33.732274Z  INFO lingxi_service::toolgateway: gateway dispatch: every re-verification passed; dispatching the server-bound effective arguments to the bound executor target=tool:first-party:write entry="direct" permission_context="user_session" capability=write.files permission_kind="execute" target_generation=1 catalog_generation=3 prepared_at_unix_ms=1791091173730 binding_reason=R04-T04 native write executor (atomic temp+rename, freshness conflicts)
+2026-10-04T05:19:33.733960Z  WARN lingxi_service::runs: tool gateway refused the preparation (zero dispatch); the journal closes a never-dispatched failure run_id=run_000001a1055a695d_000001 [token] target="tool:first-party:read" code="gateway_arguments_invalid"
+2026-10-04T05:19:33.739477Z  INFO lingxi_service::sessions: run settled through the single finalize path run_id=run_000001a1055a695d_000001 session_id="sess_local_alpha" outcome=completed.with_final input_chars=25 input_bytes=25
+2026-10-04T05:19:33.739802Z  INFO lingxi_service: request handled [token] method=POST [token] status=200
+2026-10-04T05:19:33.742214Z  INFO lingxi_service: request handled [token] method=GET [token] status=200
+2026-10-04T05:19:33.744134Z  INFO lingxi_service: shutdown signal: SIGTERM
+2026-10-04T05:19:33.745301Z  INFO lingxi_service::shutdown: run database closed (drained, WAL truncated) phase=storage_close
+2026-10-04T05:19:33.745678Z  INFO lingxi_service::shutdown: own instance record removed, lock released phase=record_cleanup
+2026-10-04T05:19:33.745734Z  INFO lingxi_service: lingxi-service stopped cleanly (run database closed, own record removed, lock released)

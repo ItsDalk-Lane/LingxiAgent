@@ -1,0 +1,14 @@
+{
+  "probe": "same lsof command and predicate as r05_t08_closed_loop.rs:2212–2223; Python process opens 100 additional handles",
+  "exit": 0,
+  "lsof_data_rows": 7,
+  "open_fds_from_proc": 104,
+  "r05_implemented_count": 0,
+  "sample": [
+    "COMMAND   PID USER   FD      TYPE DEVICE SIZE NODE NAME",
+    "sync_shar   5 root  cwd   unknown                  /proc/5/cwd (readlink: Permission denied)",
+    "sync_shar   5 root  rtd   unknown                  /proc/5/root (readlink: Permission denied)",
+    "sync_shar   5 root  txt   unknown                  /proc/5/exe (readlink: Permission denied)"
+  ],
+  "limitation": "The execution environment exposes different process-id namespaces to lsof and Python; lsof rows identify sync_shar/PID 5 and cannot be compared to the Python /proc/self/fd count. The observed defect is the checked-in row predicate: ordinary lsof stdout begins with COMMAND text, and all supplied real default-format rows are counted as zero. Do NOT report this as lsof reading 104 handles and returning zero."
+}

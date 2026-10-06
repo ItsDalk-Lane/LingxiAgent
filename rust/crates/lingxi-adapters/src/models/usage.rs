@@ -18,8 +18,16 @@
 //!   `cache_creation_input_tokens` are SEPARATE input categories — they
 //!   are NOT included in `input_tokens`.
 //! - Google generative-ai: `cachedContentTokenCount` is included in
-//!   `promptTokenCount`; `thoughtsTokenCount` is included in
-//!   `candidatesTokenCount`.
+//!   `promptTokenCount`. `thoughtsTokenCount` is a SEPARATE wire field
+//!   from `candidatesTokenCount` (R05 RR1 F23: Google bills candidate
+//!   output AND thoughts, e.g.
+//!   `totalTokenCount = promptTokenCount + candidatesTokenCount +
+//!   thoughtsTokenCount`); the decoder normalizes the unified
+//!   `output_tokens` to the TOTAL generated output
+//!   (`candidatesTokenCount + thoughtsTokenCount`) so one convention —
+//!   "the output total already contains the reasoning component" — holds
+//!   across every family, and no consumer ever under-bills by the
+//!   thoughts half.
 //!
 //! Numeric contract (taskbook T07-C06): a token count must be a
 //! non-negative JSON integer within `u64`. Negative values, floats,
@@ -50,6 +58,15 @@ pub struct FamilyUsageMapping {
     /// `Some(true)` = the component is ALREADY included in the input
     /// total; `Some(false)` = a separate category (Anthropic cache);
     /// `None` = the family has no such component field.
+    ///
+    /// R05 RR1 F23: the flags describe the UNIFIED fact
+    /// ([`ModelCallUsage`]) — whether the component is part of the
+    /// unified total. For OpenAI the wire total natively contains the
+    /// component; for Google the wire SPLITS candidates and thoughts and
+    /// the decoder normalizes the unified output to their sum, so the
+    /// flag is `Some(true)` there too. A consumer NEVER re-adds a
+    /// component when the flag says included — one convention, every
+    /// family.
     pub cache_read_included_in_input: Option<bool>,
     pub cache_write_included_in_input: Option<bool>,
     pub reasoning_included_in_output: Option<bool>,
@@ -96,6 +113,9 @@ pub const USAGE_MAPPINGS: &[FamilyUsageMapping] = &[
         // Streaming chunks carry a running cumulative usageMetadata.
         streaming: UsageAggregationMode::RunningTotal,
         input: "/usageMetadata/promptTokenCount",
+        // The CANDIDATE field; the unified output the decoder produces is
+        // `candidatesTokenCount + thoughtsTokenCount` (R05 RR1 F23 — see
+        // the module docs and `decode_family_usage`).
         output: "/usageMetadata/candidatesTokenCount",
         cache_read: Some("/usageMetadata/cachedContentTokenCount"),
         cache_write: None,
@@ -248,6 +268,19 @@ pub fn decode_family_usage(family: ProtocolFamily, body: &serde_json::Value) -> 
     if let Some(detail) = invalid {
         return UsageDecode::Invalid { detail };
     }
+    // R05 RR1 F23: Google reports candidate output and thoughts as
+    // SEPARATE wire fields (`totalTokenCount = prompt + candidates +
+    // thoughts`); the unified `output_tokens` is normalized to the TOTAL
+    // generated output (candidates + thoughts, saturating) so the
+    // "output total contains the reasoning component" convention matches
+    // the OpenAI families and the mapping's inclusion flag. A missing
+    // thoughts field keeps the candidates as-is (missing ≠ 0).
+    if matches!(family, ProtocolFamily::GoogleGenerativeAi) {
+        values[1] = match (values[1], values[4]) {
+            (Some(candidates), Some(thoughts)) => Some(candidates.saturating_add(thoughts)),
+            (candidates, thoughts) => candidates.or(thoughts),
+        };
+    }
     let mut missing: Vec<&'static str> = Vec::new();
     if values[0].is_none() {
         missing.push("input_tokens");
@@ -270,6 +303,37 @@ pub fn decode_family_usage(family: ProtocolFamily, body: &serde_json::Value) -> 
     })
 }
 
+/// R05 RR1 F38 (the F21 "unexpected tool response has usage" same-path
+/// fix): salvages the usage fact of a stream turn whose buffered PARSE
+/// failed — e.g. a tool-call turn a tools-less call cannot map, or a
+/// malformed batch. The turn still fails LOUDLY; the usage the wire DID
+/// deliver with that very turn must not vanish with the parse error (a
+/// possibly-billable request keeps its accounting). `raw_usage` is the
+/// usage container exactly as the family's accumulator observed it,
+/// wrapped into the family's buffered body shape for the SAME strict
+/// decoder (no leniency is added — an invalid salvaged fact stays
+/// `Invalid`, a half-known one stays `Partial`, absent stays `Unknown`).
+pub fn salvage_usage_report(
+    family: lingxi_kernel::model_exchange::ProtocolFamily,
+    raw_usage: Option<&serde_json::Value>,
+) -> lingxi_kernel::usage::ReportedUsage {
+    use lingxi_kernel::usage::ReportedUsage;
+    let Some(raw) = raw_usage else {
+        return ReportedUsage::Unknown;
+    };
+    let body = match family {
+        lingxi_kernel::model_exchange::ProtocolFamily::GoogleGenerativeAi => {
+            serde_json::json!({ "usageMetadata": raw })
+        }
+        _ => serde_json::json!({ "usage": raw }),
+    };
+    match decode_family_usage(family, &body) {
+        UsageDecode::Absent => ReportedUsage::Unknown,
+        UsageDecode::Usage(usage) => ReportedUsage::Known(usage),
+        UsageDecode::Invalid { detail } => ReportedUsage::Invalid { detail },
+    }
+}
+
 /// Decodes one OPERATION-plane usage object (the incumbent-normalized
 /// shapes the operation dialects return: embedding `{prompt_tokens?,
 /// total_tokens?}`, rerank `{input_tokens?, output_tokens?, total_tokens?}`).
@@ -277,10 +341,19 @@ pub fn decode_family_usage(family: ProtocolFamily, body: &serde_json::Value) -> 
 /// `Partial` fact naming both halves (a total is never split by guessing).
 pub fn decode_operation_usage(usage: &serde_json::Value) -> UsageDecode {
     if !usage.is_object() {
+        // R05 RR1 F22: the diagnostic names the received TYPE and SIZE
+        // only — the payload itself (which may carry provider-echoed
+        // credential material) is NEVER copied into a diagnostic, and the
+        // text is bounded by construction.
         return UsageDecode::Invalid {
             detail: format!(
-                "operation usage is {usage} but must be an object; the fact is marked \
-                 invalid, never coerced"
+                "operation usage must be an object; the payload arrived as a {} of {} \
+                 serialized bytes (never echoed into diagnostics) — the fact is marked \
+                 invalid, never coerced",
+                type_of(usage),
+                serde_json::to_string(usage)
+                    .map(|text| text.len())
+                    .unwrap_or(0)
             ),
         };
     }

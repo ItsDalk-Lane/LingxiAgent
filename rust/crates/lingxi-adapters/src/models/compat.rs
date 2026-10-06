@@ -35,11 +35,15 @@
 //!   never selected by `PROVIDER_MODULES`). The center-layer generic
 //!   patches (stripEmptyTools / stripIncompatibleThinking /
 //!   normalizeAutoReasoningEffort / stripDisabledReasoningEffort /
-//!   stripOrphanToolMessages / reasoning-replay center validation / media
-//!   marker stripping) are likewise not ported: the Rust renderers never
-//!   emit `thinking` / `reasoning_effort` / empty `tools` / SDK-serialized
-//!   orphan shapes, so those patches are the identity function on this
-//!   pipeline.
+//!   stripOrphanToolMessages / media marker stripping) are likewise not
+//!   ported: the Rust renderers never emit `thinking` / `reasoning_effort`
+//!   / empty `tools` / SDK-serialized orphan shapes, so those patches are
+//!   the identity function on this pipeline. The reasoning-replay center
+//!   half IS ported (R05 RR1 F08): see
+//!   [`normalize_provider_payload`] — the Rust completions renderer
+//!   materializes the canonical reasoning as `reasoning_content` and the
+//!   center strips/validates it per the resolved
+//!   [`replay_contract`].
 //! - The `deepseek` roleplay-marker injection is not ported: its trigger
 //!   (`options.deepseekRoleplayReasoningPatch`) is a session/agent-runtime
 //!   product setting with no Rust-side source (owner: persona/session
@@ -2687,6 +2691,259 @@ pub fn apply(
     }
 }
 
+// ── R05 RR1 F08: the reasoning replay contract (the incumbent
+//    reasoning-content-replay.ts + getReasoningReplayContract derivation) ────
+
+/// How assistant reasoning state must ride the wire for one model.
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum ReplayCarrier {
+    /// The ChatCompletions `reasoning_content` message field (the
+    /// DeepSeek/Kimi/MiMo/Zhipu vocabulary) — compat owns its replay.
+    ReasoningContent,
+    /// The family-NATIVE carriers (anthropic thinking blocks, responses
+    /// reasoning items, google thought signatures, openrouter
+    /// reasoning_details): the family adapters already preserve them; the
+    /// compat layer takes no replay action (and a materialized
+    /// `reasoning_content` never belongs on those wires).
+    Native,
+}
+
+/// The resolved replay contract of one model view.
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub struct ReplayContract {
+    pub carrier: ReplayCarrier,
+    /// Whether a `reasoning_replay: "clear"` option may drop the carrier.
+    pub clearable: bool,
+}
+
+/// The Rust-relevant half of `getReasoningReplayContract` (the explicit
+/// `compat.reasoningReplay` config override is not ported — its config-side
+/// owner stage has not landed; derivation covers the served families).
+pub fn replay_contract(view: &ModelView) -> Option<ReplayContract> {
+    if reasoning_declared(view) == Some(false) {
+        return None;
+    }
+    let native = ReplayContract {
+        carrier: ReplayCarrier::Native,
+        clearable: false,
+    };
+    let require = |clearable| ReplayContract {
+        carrier: ReplayCarrier::ReasoningContent,
+        clearable,
+    };
+    match reasoning_profile(view).as_deref() {
+        Some("deepseek-v4-anthropic") | Some("deepseek-v4-responses") => return Some(native),
+        Some("deepseek-v4-openai") | Some("mimo-openai") | Some("kimi-openai") => {
+            return Some(require(false))
+        }
+        Some("zhipu-openai") => return Some(require(true)),
+        _ => {}
+    }
+    match thinking_format(view).as_deref() {
+        Some("anthropic") | Some("openrouter") => return Some(native),
+        Some("deepseek") | Some("kimi") => return Some(require(false)),
+        Some("zhipu") => return Some(require(true)),
+        _ => {}
+    }
+    match view_api(view).as_str() {
+        "openai-responses" | "openai-codex-responses" | "google-generative-ai"
+            if reasoning_declared(view) == Some(true) =>
+        {
+            Some(native)
+        }
+        _ => None,
+    }
+}
+
+/// `requestUsesReasoning`: whether THIS request runs thinking mode (the
+/// replay obligations only bind a request that actually uses reasoning).
+fn request_uses_reasoning(payload: &Value, view: &ModelView, options: &CompatOptions) -> bool {
+    if options.mode == CompatMode::Utility {
+        return false;
+    }
+    if matches!(
+        options.reasoning_level.as_deref(),
+        Some("off") | Some("none") | Some("disabled")
+    ) {
+        return false;
+    }
+    if view.hints.and_then(|hints| hints.reasoning) == Some(false) {
+        return false;
+    }
+    if payload
+        .get("thinking")
+        .and_then(|t| t.get("type"))
+        .and_then(Value::as_str)
+        == Some("disabled")
+    {
+        return false;
+    }
+    if payload.get("enable_thinking") == Some(&Value::Bool(false)) {
+        return false;
+    }
+    if payload
+        .get("chat_template_kwargs")
+        .and_then(|k| k.get("enable_thinking"))
+        == Some(&Value::Bool(false))
+    {
+        return false;
+    }
+    if let Some(reasoning) = payload.get("reasoning").and_then(|r| r.as_object()) {
+        if reasoning.get("enabled") == Some(&Value::Bool(false)) {
+            return false;
+        }
+        if matches!(
+            reasoning.get("effort").and_then(Value::as_str),
+            Some("off") | Some("none") | Some("disabled")
+        ) {
+            return false;
+        }
+    }
+    true
+}
+
+/// `providerLabel` (the refusal texts name the provider family).
+fn provider_label(view: &ModelView) -> String {
+    if let Some(profile) = reasoning_profile(view) {
+        for (prefix, label) in [
+            ("kimi-", "Kimi"),
+            ("deepseek-", "DeepSeek"),
+            ("mimo-", "MiMo"),
+            ("zhipu-", "Zhipu"),
+        ] {
+            if profile.starts_with(prefix) {
+                return label.to_string();
+            }
+        }
+    }
+    let provider = view.provider.trim();
+    if provider.is_empty() {
+        return "Provider".to_string();
+    }
+    let lowered = provider.to_lowercase();
+    if lowered == "kimi-coding" {
+        return "Kimi".to_string();
+    }
+    if lowered.contains("deepseek") {
+        return "DeepSeek".to_string();
+    }
+    if lowered.contains("mimo") || lowered.contains("xiaomi") {
+        return "MiMo".to_string();
+    }
+    if lowered.contains("zhipu") {
+        return "Zhipu".to_string();
+    }
+    provider.to_string()
+}
+
+/// `ensureReasoningContentForToolCalls`: every assistant message carrying
+/// tool calls must carry the REAL reasoning carrier — a missing/empty one
+/// is the incumbent's fail-closed refusal (never a fabricated empty
+/// carrier, never a silently degraded request). The canonical-block
+/// recovery half (a signed `thinking` part inside a parts-array content)
+/// is ported verbatim for hand-built payload shapes.
+fn ensure_reasoning_content_for_tool_calls(
+    payload: &mut Value,
+    label: &str,
+) -> Result<(), ProtocolError> {
+    let Some(messages) = payload.get_mut("messages").and_then(Value::as_array_mut) else {
+        return Ok(());
+    };
+    for message in messages.iter_mut() {
+        if message.get("role").and_then(Value::as_str) != Some("assistant") {
+            continue;
+        }
+        if !message_has_tool_calls(message) {
+            continue;
+        }
+        let has_carrier = message
+            .get("reasoning_content")
+            .and_then(Value::as_str)
+            .is_some_and(|carrier| !carrier.is_empty());
+        if has_carrier {
+            continue;
+        }
+        // The canonical recovery: a signed thinking part inside the
+        // parts-array content carries the carrier value.
+        let recovered = message
+            .get("content")
+            .and_then(Value::as_array)
+            .and_then(|parts| {
+                parts.iter().find_map(|part| {
+                    if part.get("type").and_then(Value::as_str) == Some("thinking")
+                        && part.get("thinkingSignature").and_then(Value::as_str)
+                            == Some("reasoning_content")
+                    {
+                        part.get("thinking")
+                            .and_then(Value::as_str)
+                            .filter(|text| !text.is_empty())
+                            .map(str::to_string)
+                    } else {
+                        None
+                    }
+                })
+            });
+        match recovered {
+            Some(text) => {
+                message["reasoning_content"] = Value::String(text);
+            }
+            None => {
+                return Err(refusal(&format!(
+                    "{label} thinking mode reasoning_content is missing for tool_calls history \
+                     (assistant tool call). Compact this session or start a new session before \
+                     continuing with {label} thinking mode."
+                )));
+            }
+        }
+    }
+    Ok(())
+}
+
+/// The production compat entry (the incumbent `normalizeProviderPayload`'s
+/// reasoning-replay half around the module dispatch):
+/// 1. a `reasoning_content` carrier the model's contract does not own never
+///    rides the wire (the Rust completions renderer materializes the
+///    canonical reasoning; providers without the contract never see it —
+///    the incumbent achieves the same by never materializing it);
+/// 2. the FIRST matching module's patch (unchanged);
+/// 3. the replay validation: a require-tool-call contract under a
+///    thinking-mode request fail-closes when a tool-call message lacks the
+///    REAL carrier; a `clear` option drops it only where the contract is
+///    clearable.
+pub fn normalize_provider_payload(
+    payload: Value,
+    view: &ModelView,
+    options: &CompatOptions,
+) -> Result<Value, ProtocolError> {
+    if !payload.get("messages").is_some_and(Value::is_array) {
+        return apply(payload, view, options);
+    }
+    let contract = replay_contract(view);
+    let mut payload = payload;
+    if !matches!(
+        &contract,
+        Some(contract) if contract.carrier == ReplayCarrier::ReasoningContent
+    ) {
+        strip_payload_reasoning_content(&mut payload);
+    }
+    let mut patched = apply(payload, view, options)?;
+    if let Some(contract) = contract.filter(|c| c.carrier == ReplayCarrier::ReasoningContent) {
+        if options.reasoning_replay.as_deref() == Some("clear") {
+            if !contract.clearable {
+                return Err(refusal(&format!(
+                    "{} reasoning replay cannot be cleared for this protocol.",
+                    provider_label(view)
+                )));
+            }
+            strip_payload_reasoning_content(&mut patched);
+        } else if request_uses_reasoning(&patched, view, options) {
+            let label = provider_label(view);
+            ensure_reasoning_content_for_tool_calls(&mut patched, &label)?;
+        }
+    }
+    Ok(patched)
+}
+
 /// The adapter-side seam: apply the compat layer to a rendered envelope
 /// when the call carries a compat context. `None` is the byte-exact
 /// golden/diagnostic path (the T03/T04 harnesses) — no module runs and the
@@ -2699,7 +2956,7 @@ pub fn apply_for_call(
     match call {
         Some(call) => {
             let view = ModelView::of_route(route, call.hints.as_ref());
-            apply(payload, &view, &call.options)
+            normalize_provider_payload(payload, &view, &call.options)
         }
         None => Ok(payload),
     }
@@ -2730,6 +2987,219 @@ mod tests {
             reasoning_level: level.map(str::to_string),
             ..CompatOptions::default()
         }
+    }
+
+    /// R05 RR1 F08: the replay-contract derivation over the four served
+    /// reasoning_content families plus the no-contract and native cases
+    /// (the incumbent getReasoningReplayContract chain).
+    #[test]
+    fn replay_contract_covers_the_served_families() {
+        // Official DeepSeek ChatCompletions thinking model → require.
+        let deepseek = view(
+            "deepseek",
+            "deepseek-reasoner",
+            "https://api.deepseek.com",
+            "openai-completions",
+            None,
+        );
+        assert_eq!(
+            replay_contract(&deepseek),
+            Some(ReplayContract {
+                carrier: ReplayCarrier::ReasoningContent,
+                clearable: false
+            })
+        );
+        // Kimi (Moonshot) official endpoint with declared reasoning → require.
+        let reasoning_on = RouteCompatHints {
+            reasoning: Some(true),
+            ..RouteCompatHints::default()
+        };
+        let kimi = view(
+            "kimi-coding",
+            "kimi-for-coding",
+            "https://api.kimi.com/coding/v1",
+            "openai-completions",
+            Some(&reasoning_on),
+        );
+        assert_eq!(
+            replay_contract(&kimi),
+            Some(ReplayContract {
+                carrier: ReplayCarrier::ReasoningContent,
+                clearable: false
+            })
+        );
+        // MiMo official endpoint with declared reasoning → require.
+        let mimo = view(
+            "mimo",
+            "mimo-v7-pro",
+            "https://xiaomimimo.com/v1",
+            "openai-completions",
+            Some(&reasoning_on),
+        );
+        assert_eq!(
+            replay_contract(&mimo),
+            Some(ReplayContract {
+                carrier: ReplayCarrier::ReasoningContent,
+                clearable: false
+            })
+        );
+        // Zhipu official endpoint with declared reasoning → require + clearable.
+        let zhipu = view(
+            "zhipu",
+            "glm-4.7",
+            "https://open.bigmodel.cn/api/paas/v4",
+            "openai-completions",
+            Some(&reasoning_on),
+        );
+        assert_eq!(
+            replay_contract(&zhipu),
+            Some(ReplayContract {
+                carrier: ReplayCarrier::ReasoningContent,
+                clearable: true
+            })
+        );
+        // A generic provider with no derivation → no contract (the carrier
+        // never rides its wire).
+        let generic = view(
+            "acme",
+            "acme-1",
+            "https://api.acme.test/v1",
+            "openai-completions",
+            None,
+        );
+        assert_eq!(replay_contract(&generic), None);
+        // Anthropic / Responses / Google carriers are family-native.
+        let anthropic = view(
+            "anthropic",
+            "claude-x",
+            "https://api.anthropic.test",
+            "anthropic-messages",
+            None,
+        );
+        assert_eq!(
+            replay_contract(&anthropic),
+            Some(ReplayContract {
+                carrier: ReplayCarrier::Native,
+                clearable: false
+            })
+        );
+        // An explicitly non-reasoning model has no contract at all.
+        let reasoning_off = RouteCompatHints {
+            reasoning: Some(false),
+            ..RouteCompatHints::default()
+        };
+        let off = view(
+            "deepseek",
+            "deepseek-chat",
+            "https://api.deepseek.com",
+            "openai-completions",
+            Some(&reasoning_off),
+        );
+        assert_eq!(replay_contract(&off), None);
+    }
+
+    /// R05 RR1 F08: the fail-closed refusal text is the incumbent's, and a
+    /// present REAL carrier passes; zhipu's clear option strips where
+    /// clearable and refuses where not.
+    #[test]
+    fn replay_center_validates_clears_and_refuses() {
+        let reasoning_on = RouteCompatHints {
+            reasoning: Some(true),
+            ..RouteCompatHints::default()
+        };
+        let deepseek = view(
+            "deepseek",
+            "deepseek-reasoner",
+            "https://api.deepseek.com",
+            "openai-completions",
+            None,
+        );
+        // The module enables thinking for the known thinking model; the
+        // center then fail-closes on a tool-call history without a carrier.
+        let payload = json!({
+            "model": "deepseek-reasoner",
+            "messages": [
+                {"role": "assistant", "content": "a", "tool_calls": [
+                    {"id": "c1", "type": "function", "function": {"name": "f", "arguments": "{}"}}
+                ]}
+            ]
+        });
+        let err = normalize_provider_payload(payload.clone(), &deepseek, &CompatOptions::default())
+            .expect_err("missing carrier refuses");
+        assert!(
+            err.message.starts_with(
+                "DeepSeek thinking mode reasoning_content is missing for tool_calls history"
+            ),
+            "incumbent refusal text: {err:?}"
+        );
+        // A REAL carrier passes and rides the wire.
+        let payload = json!({
+            "model": "deepseek-reasoner",
+            "messages": [
+                {"role": "assistant", "content": "a", "reasoning_content": "real trace",
+                 "tool_calls": [
+                    {"id": "c1", "type": "function", "function": {"name": "f", "arguments": "{}"}}
+                ]}
+            ]
+        });
+        let ok = normalize_provider_payload(payload, &deepseek, &CompatOptions::default())
+            .expect("real carrier passes");
+        assert_eq!(ok["messages"][0]["reasoning_content"], "real trace");
+        // A non-clearable contract refuses the clear option (incumbent text).
+        let clear = CompatOptions {
+            reasoning_replay: Some("clear".to_string()),
+            ..CompatOptions::default()
+        };
+        let err = normalize_provider_payload(
+            json!({"model": "deepseek-reasoner", "messages": []}),
+            &deepseek,
+            &clear,
+        )
+        .expect_err("deepseek replay cannot be cleared");
+        assert_eq!(
+            err.message,
+            "DeepSeek reasoning replay cannot be cleared for this protocol."
+        );
+        // A clearable contract (zhipu) strips the carrier on clear.
+        let zhipu = view(
+            "zhipu",
+            "glm-4.7",
+            "https://open.bigmodel.cn/api/paas/v4",
+            "openai-completions",
+            Some(&reasoning_on),
+        );
+        let cleared = normalize_provider_payload(
+            json!({"model": "glm-4.7", "messages": [
+                {"role": "assistant", "content": "a", "reasoning_content": "trace"}
+            ]}),
+            &zhipu,
+            &clear,
+        )
+        .expect("zhipu clear strips");
+        assert!(
+            cleared["messages"][0].get("reasoning_content").is_none(),
+            "{cleared}"
+        );
+        // A no-contract provider never receives a materialized carrier.
+        let generic = view(
+            "acme",
+            "acme-1",
+            "https://api.acme.test/v1",
+            "openai-completions",
+            None,
+        );
+        let stripped = normalize_provider_payload(
+            json!({"model": "acme-1", "messages": [
+                {"role": "assistant", "content": "a", "reasoning_content": "trace"}
+            ]}),
+            &generic,
+            &CompatOptions::default(),
+        )
+        .expect("no contract strips the carrier");
+        assert!(
+            stripped["messages"][0].get("reasoning_content").is_none(),
+            "{stripped}"
+        );
     }
 
     #[test]

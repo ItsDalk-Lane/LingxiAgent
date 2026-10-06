@@ -1,0 +1,58 @@
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.08s
+     Running tests/r05_t07_rr1_usage_strict.rs (rust/target/debug/deps/r05_t07_rr1_usage_strict-9b309ac31c98ae36)
+
+running 7 tests
+test rr1_f22_legal_rerank_usage_still_reports ... ok
+test rr1_f22_invalid_detail_never_echoes_the_payload ... FAILED
+test rr1_f22_minimax_total_tokens_keeps_its_raw_type ... FAILED
+test rr1_f22_operation_usage_type_table ... ok
+test rr1_f22_rerank_non_numeric_usage_must_not_be_coerced_to_reported_zero ... FAILED
+test rr1_f23_gemini_component_matrix_and_family_controls ... FAILED
+test rr1_f23_gemini_thoughts_are_separate_from_candidate_tokens ... FAILED
+
+failures:
+
+---- rr1_f22_invalid_detail_never_echoes_the_payload stdout ----
+
+thread 'rr1_f22_invalid_detail_never_echoes_the_payload' (11887431) panicked at crates/lingxi-adapters/tests/r05_t07_rr1_usage_strict.rs:204:13:
+the diagnostic must not echo the payload: operation usage is [{"authorization":"Bearer RR1_F22_AUDIT_ONLY_EMBEDDING_CREDENTIAL"}] but must be an object; the fact is marked invalid, never coerced
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+
+---- rr1_f22_minimax_total_tokens_keeps_its_raw_type stdout ----
+
+thread 'rr1_f22_minimax_total_tokens_keeps_its_raw_type' (11887433) panicked at crates/lingxi-adapters/tests/r05_t07_rr1_usage_strict.rs:252:9:
+assertion `left == right` failed: raw "41": invalid=true, got Usage(ModelCallUsage { input_tokens: None, output_tokens: None, cache_read_tokens: None, cache_write_tokens: None, reasoning_tokens: None, provenance: Partial { missing: ["input_tokens", "output_tokens"] } })
+  left: false
+ right: true
+
+---- rr1_f22_rerank_non_numeric_usage_must_not_be_coerced_to_reported_zero stdout ----
+
+thread 'rr1_f22_rerank_non_numeric_usage_must_not_be_coerced_to_reported_zero' (11887435) panicked at crates/lingxi-adapters/tests/r05_t07_rr1_usage_strict.rs:135:5:
+null must remain absent and a string token count invalid; conversion to reported 0/7 falsifies supplier facts (got Usage(ModelCallUsage { input_tokens: Some(0), output_tokens: Some(7), cache_read_tokens: None, cache_write_tokens: None, reasoning_tokens: None, provenance: Reported }))
+
+---- rr1_f23_gemini_component_matrix_and_family_controls stdout ----
+
+thread 'rr1_f23_gemini_component_matrix_and_family_controls' (11887436) panicked at crates/lingxi-adapters/tests/r05_t07_rr1_usage_strict.rs:81:5:
+assertion `left == right` failed: 3 candidates + 97 thoughts
+  left: 3
+ right: 100
+
+---- rr1_f23_gemini_thoughts_are_separate_from_candidate_tokens stdout ----
+
+thread 'rr1_f23_gemini_thoughts_are_separate_from_candidate_tokens' (11887437) panicked at crates/lingxi-adapters/tests/r05_t07_rr1_usage_strict.rs:40:5:
+assertion `left == right` failed: candidate output 10 plus separate thought output 40 must total 50, not 10
+  left: 10
+ right: 50
+
+
+failures:
+    rr1_f22_invalid_detail_never_echoes_the_payload
+    rr1_f22_minimax_total_tokens_keeps_its_raw_type
+    rr1_f22_rerank_non_numeric_usage_must_not_be_coerced_to_reported_zero
+    rr1_f23_gemini_component_matrix_and_family_controls
+    rr1_f23_gemini_thoughts_are_separate_from_candidate_tokens
+
+test result: FAILED. 2 passed; 5 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+error: test failed, to rerun pass `-p lingxi-adapters --test r05_t07_rr1_usage_strict`
+exit=101

@@ -1,0 +1,35 @@
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.07s
+     Running unittests src/lib.rs (target/debug/deps/r05_t05_old_red_probe-89224ded2df4f153)
+
+running 4 tests
+test tests::domain_resolving_to_loopback_must_not_be_connected ... 
+thread 'tests::domain_resolving_to_loopback_must_not_be_connected' (11088955) panicked at src/lib.rs:180:9:
+egress connected to an unauthorized private TCP destination after resolving the hostname localhost; no credential or TLS bypass was used
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+FAILED
+test tests::error_body_must_obey_total_deadline ... 
+thread 'tests::error_body_must_obey_total_deadline' (11088957) panicked at src/lib.rs:227:9:
+error body read exceeded its absolute deadline by >200ms
+FAILED
+test tests::network_policy_section_parses_and_validates ... 
+thread 'tests::network_policy_section_parses_and_validates' (11088959) panicked at src/lib.rs:68:9:
+the model plane must carry a validated network policy section: Err(InvalidJson { detail: "unknown field `network`, expected `providers` or `models`" })
+FAILED
+test tests::system_proxy_environment_routes_the_shared_client_through_the_proxy ... 
+thread 'tests::system_proxy_environment_routes_the_shared_client_through_the_proxy' (11088960) panicked at src/lib.rs:140:9:
+assertion `left == right` failed: the shared HTTP client must route the request through the exported system proxy (the connection target must actually change)
+  left: 0
+ right: 1
+FAILED
+
+failures:
+
+failures:
+    tests::domain_resolving_to_loopback_must_not_be_connected
+    tests::error_body_must_obey_total_deadline
+    tests::network_policy_section_parses_and_validates
+    tests::system_proxy_environment_routes_the_shared_client_through_the_proxy
+
+test result: FAILED. 0 passed; 4 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.47s
+
+error: test failed, to rerun pass `--lib`

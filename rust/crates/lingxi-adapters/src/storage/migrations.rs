@@ -277,6 +277,101 @@ CREATE INDEX idx_model_call_usage_session ON model_call_usage(session_id);
 CREATE INDEX idx_model_call_usage_run ON model_call_usage(run_id);
 "#;
 
+/// R05 RR1 F21 usage-ledger extension (version 6): the per-physical-attempt
+/// and causal-join columns the T07 taskbook's query/export contract needs —
+/// the call's settlement `outcome` (succeeded/failed/cancelled/unknown),
+/// the start/settle timestamps (`started_at_unix_ms`/`settled_at_unix_ms`
+/// — 耗时 is their difference, both stored so a reader can show either),
+/// the child→parent-tool JOIN key (`parent_tool_call_id`) and the parent
+/// model row's batch listing (`emitted_tool_calls`) that closes the second
+/// hop (child callback → parent tool → parent MODEL call, all inside the
+/// ledger — never inferred from timing).
+///
+/// `outcome` defaults to `'unknown'` because SQLite ALTER cannot add a
+/// non-constant NOT NULL column; rows written by older builds honestly
+/// hold the unknown settlement.
+pub const V6_NAME: &str = "model_call_usage_rr1_f21";
+pub const V6_SQL: &str = r#"
+ALTER TABLE model_call_usage ADD COLUMN outcome TEXT NOT NULL DEFAULT 'unknown';
+ALTER TABLE model_call_usage ADD COLUMN started_at_unix_ms INTEGER;
+ALTER TABLE model_call_usage ADD COLUMN settled_at_unix_ms INTEGER;
+ALTER TABLE model_call_usage ADD COLUMN parent_tool_call_id TEXT;
+ALTER TABLE model_call_usage ADD COLUMN emitted_tool_calls TEXT;
+CREATE INDEX idx_model_call_usage_recorded_at ON model_call_usage(recorded_at_unix_ms);
+CREATE INDEX idx_model_call_usage_purpose ON model_call_usage(purpose);
+CREATE INDEX idx_model_call_usage_parent_tool ON model_call_usage(parent_tool_call_id)
+    WHERE parent_tool_call_id IS NOT NULL;
+"#;
+
+/// R05 RR1 F38 usage-ledger `transport_attempts` nullability (version 7):
+/// the column becomes NULLABLE so a row written for a call whose future
+/// was DROPPED before settlement (a cancellation fence dropping an
+/// in-flight model call / worker callback) can state "attempts UNKNOWN"
+/// honestly. SQLite cannot `ALTER` a column's NOT NULL constraint away, so
+/// the migration REBUILDS the table: every pre-existing row keeps its
+/// value verbatim (all historical rows carry an observed count —
+/// `Some(n)` semantics; none is rewritten, none is dropped), the indexes
+/// are recreated identically (they vanish with the old table).
+///
+/// Column semantics after v7: NULL = attempts unknown after a drop
+/// (never 0, never 1 — never a fabricated count); 0 = not-sent; ≥1 the
+/// observed physical request count.
+pub const V7_NAME: &str = "model_call_usage_rr1_f38_attempts_nullable";
+pub const V7_SQL: &str = r#"
+CREATE TABLE model_call_usage_v7 (
+    model_call_id       TEXT PRIMARY KEY,
+    session_id          TEXT,
+    run_id              TEXT,
+    attempt             TEXT,
+    purpose             TEXT NOT NULL,
+    origin              TEXT NOT NULL,
+    parent_run_id       TEXT,
+    cause_ref           TEXT,
+    provider            TEXT NOT NULL,
+    model               TEXT NOT NULL,
+    protocol            TEXT NOT NULL,
+    usage_state         TEXT NOT NULL,
+    input_tokens        INTEGER,
+    output_tokens       INTEGER,
+    cache_read_tokens   INTEGER,
+    cache_write_tokens  INTEGER,
+    reasoning_tokens    INTEGER,
+    missing_fields      TEXT,
+    estimate_basis      TEXT,
+    invalid_detail      TEXT,
+    transport_attempts  INTEGER,
+    cost_basis          TEXT,
+    recorded_at_unix_ms INTEGER NOT NULL,
+    outcome             TEXT NOT NULL DEFAULT 'unknown',
+    started_at_unix_ms  INTEGER,
+    settled_at_unix_ms  INTEGER,
+    parent_tool_call_id TEXT,
+    emitted_tool_calls  TEXT
+);
+INSERT INTO model_call_usage_v7
+    (model_call_id, session_id, run_id, attempt, purpose, origin,
+     parent_run_id, cause_ref, parent_tool_call_id, provider, model,
+     protocol, usage_state, input_tokens, output_tokens, cache_read_tokens,
+     cache_write_tokens, reasoning_tokens, missing_fields, estimate_basis,
+     invalid_detail, transport_attempts, cost_basis, recorded_at_unix_ms,
+     outcome, started_at_unix_ms, settled_at_unix_ms, emitted_tool_calls)
+SELECT model_call_id, session_id, run_id, attempt, purpose, origin,
+       parent_run_id, cause_ref, parent_tool_call_id, provider, model,
+       protocol, usage_state, input_tokens, output_tokens, cache_read_tokens,
+       cache_write_tokens, reasoning_tokens, missing_fields, estimate_basis,
+       invalid_detail, transport_attempts, cost_basis, recorded_at_unix_ms,
+       outcome, started_at_unix_ms, settled_at_unix_ms, emitted_tool_calls
+FROM model_call_usage;
+DROP TABLE model_call_usage;
+ALTER TABLE model_call_usage_v7 RENAME TO model_call_usage;
+CREATE INDEX idx_model_call_usage_session ON model_call_usage(session_id);
+CREATE INDEX idx_model_call_usage_run ON model_call_usage(run_id);
+CREATE INDEX idx_model_call_usage_recorded_at ON model_call_usage(recorded_at_unix_ms);
+CREATE INDEX idx_model_call_usage_purpose ON model_call_usage(purpose);
+CREATE INDEX idx_model_call_usage_parent_tool ON model_call_usage(parent_tool_call_id)
+    WHERE parent_tool_call_id IS NOT NULL;
+"#;
+
 /// The full ordered migration list. Appending a migration is a deliberate,
 /// reviewed act; editing an existing entry changes its fingerprint and is
 /// rejected on every already-migrated database.
@@ -305,6 +400,16 @@ pub const MIGRATIONS: &[Migration] = &[
         version: 5,
         name: V5_NAME,
         sql: V5_SQL,
+    },
+    Migration {
+        version: 6,
+        name: V6_NAME,
+        sql: V6_SQL,
+    },
+    Migration {
+        version: 7,
+        name: V7_NAME,
+        sql: V7_SQL,
     },
 ];
 
@@ -675,7 +780,16 @@ mod tests {
         for (index, m) in MIGRATIONS.iter().enumerate() {
             assert_eq!(m.version, index as u64 + 1);
             assert!(!m.name.is_empty());
-            assert!(m.sql.contains("CREATE TABLE"));
+            // Every migration carries real DDL. An ADDITIVE migration may
+            // legitimately be ALTER-based (R05 RR1 F21's v6 appends usage
+            // ledger columns — SQLite cannot add non-constant NOT NULL
+            // columns to an existing table by table rebuild either); the
+            // guard still refuses DDL-free "migration" entries.
+            assert!(
+                m.sql.contains("CREATE TABLE") || m.sql.contains("ALTER TABLE"),
+                "migration {} carries no DDL",
+                m.version
+            );
         }
     }
 

@@ -400,9 +400,9 @@
     "R05"
    ],
    "r00_then": "把 modelId 加入 provider 注册表并刷新模型，返回新清单",
-   "disposition": "share",
+   "disposition": "full",
    "rule": "R4",
-   "r05_share": "OAuth/CredentialService 服务端全份额离线替身验证（start/callback/poll/state/PKCE/logout/custom modelId 管理按该叶 then 文本逐项）：R05-T02。",
+   "r05_share": "R05 独占叶：R05-T02 CredentialService/OAuth 交付全部原行为（start/callback/poll/state/PKCE/logout/custom modelId 管理按该叶 then 文本逐项），每条原断言由 r05_t02_credentials 套件的 rr1_f04 具名测试逐项钉住（阶段图 full_original_behavior）；无后续阶段余额。",
    "deferred_to": null,
    "deferred_reason": null,
    "r07_remainder": null
@@ -1369,9 +1369,9 @@
     "R05"
    ],
    "r00_then": "从 provider 注册表移除 modelId 并刷新模型，返回新清单",
-   "disposition": "share",
+   "disposition": "full",
    "rule": "R4",
-   "r05_share": "OAuth/CredentialService 服务端全份额离线替身验证（start/callback/poll/state/PKCE/logout/custom modelId 管理按该叶 then 文本逐项）：R05-T02。",
+   "r05_share": "R05 独占叶：R05-T02 CredentialService/OAuth 交付全部原行为（start/callback/poll/state/PKCE/logout/custom modelId 管理按该叶 then 文本逐项），每条原断言由 r05_t02_credentials 套件的 rr1_f04 具名测试逐项钉住（阶段图 full_original_behavior）；无后续阶段余额。",
    "deferred_to": null,
    "deferred_reason": null,
    "r07_remainder": null
@@ -1701,9 +1701,9 @@
     "R05"
    ],
    "r00_then": "start 返回登录指引；手输授权码经 callback 完成登录，设备码经 poll 进入 done 后刷新 provider；失败不报告已登录",
-   "disposition": "share",
+   "disposition": "full",
    "rule": "R4",
-   "r05_share": "OAuth/CredentialService 服务端全份额离线替身验证（start/callback/poll/state/PKCE/logout/custom modelId 管理按该叶 then 文本逐项）：R05-T02。",
+   "r05_share": "R05 独占叶：R05-T02 CredentialService/OAuth 交付全部原行为（start/callback/poll/state/PKCE/logout/custom modelId 管理按该叶 then 文本逐项），每条原断言由 r05_t02_credentials 套件的 rr1_f04 具名测试逐项钉住（阶段图 full_original_behavior）；无后续阶段余额。",
    "deferred_to": null,
    "deferred_reason": null,
    "r07_remainder": null
@@ -2203,9 +2203,9 @@
     "R05"
    ],
    "r00_then": "返回每个 OAuth provider 的 loggedIn 与可用模型数量",
-   "disposition": "share",
+   "disposition": "full",
    "rule": "R4",
-   "r05_share": "OAuth/CredentialService 服务端全份额离线替身验证（start/callback/poll/state/PKCE/logout/custom modelId 管理按该叶 then 文本逐项）：R05-T02。",
+   "r05_share": "R05 独占叶：R05-T02 CredentialService/OAuth 交付全部原行为（start/callback/poll/state/PKCE/logout/custom modelId 管理按该叶 then 文本逐项），每条原断言由 r05_t02_credentials 套件的 rr1_f04 具名测试逐项钉住（阶段图 full_original_behavior）；无后续阶段余额。",
    "deferred_to": null,
    "deferred_reason": null,
    "r07_remainder": null
@@ -2324,9 +2324,9 @@
     "R05"
    ],
    "r00_then": "返回指定 OAuth provider 的模型 ID",
-   "disposition": "share",
+   "disposition": "full",
    "rule": "R4",
-   "r05_share": "OAuth/CredentialService 服务端全份额离线替身验证（start/callback/poll/state/PKCE/logout/custom modelId 管理按该叶 then 文本逐项）：R05-T02。",
+   "r05_share": "R05 独占叶：R05-T02 CredentialService/OAuth 交付全部原行为（start/callback/poll/state/PKCE/logout/custom modelId 管理按该叶 then 文本逐项），每条原断言由 r05_t02_credentials 套件的 rr1_f04 具名测试逐项钉住（阶段图 full_original_behavior）；无后续阶段余额。",
    "deferred_to": null,
    "deferred_reason": null,
    "r07_remainder": null
@@ -2828,9 +2828,9 @@
     "R05"
    ],
    "r00_then": "删除指定供应商凭证、清空认证缓存并刷新模型列表，返回成功或错误",
-   "disposition": "share",
+   "disposition": "full",
    "rule": "R4",
-   "r05_share": "OAuth/CredentialService 服务端全份额离线替身验证（start/callback/poll/state/PKCE/logout/custom modelId 管理按该叶 then 文本逐项）：R05-T02。",
+   "r05_share": "R05 独占叶：R05-T02 CredentialService/OAuth 交付全部原行为（start/callback/poll/state/PKCE/logout/custom modelId 管理按该叶 then 文本逐项），每条原断言由 r05_t02_credentials 套件的 rr1_f04 具名测试逐项钉住（阶段图 full_original_behavior）；无后续阶段余额。",
    "deferred_to": null,
    "deferred_reason": null,
    "r07_remainder": null
@@ -2904,7 +2904,8 @@
  "counts": {
   "base": 16,
   "supplemental_total": 130,
-  "share": 125,
+  "share": 119,
+  "full": 6,
   "deferred": 5,
   "single_stage_r05_only": 6,
   "dual_stage_r05_r07": 124

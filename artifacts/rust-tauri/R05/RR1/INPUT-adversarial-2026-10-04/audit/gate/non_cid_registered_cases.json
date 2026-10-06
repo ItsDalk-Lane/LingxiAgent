@@ -1,0 +1,130 @@
+[
+  {
+    "id": "R05-T01-C01",
+    "status": "PASS",
+    "command": "python3 docs/rust-tauri/R05/r05_t01_build_scope_matrix.py; node docs/rust-tauri/R05/r05_t01_extract_provider_matrix.mjs; python3 docs/rust-tauri/R05/r05_t01_build_callsite_matrix.py (terminal-tree regeneration run)",
+    "testNames": [],
+    "executedCount": 3,
+    "gate_cid": false
+  },
+  {
+    "id": "R05-T01-C12",
+    "status": "PASS",
+    "command": "cargo run --manifest-path rust/Cargo.toml --locked -p xtask -- check-boundaries; cargo tree -p lingxi-kernel --edges normal --prefix none",
+    "testNames": [],
+    "executedCount": 2,
+    "gate_cid": false
+  },
+  {
+    "id": "R05-T05-C04",
+    "status": "PASS",
+    "command": "cargo test --manifest-path rust/Cargo.toml -p lingxi-service --test run_lifecycle && cargo test --manifest-path rust/Cargo.toml -p lingxi-service --test r05_t05_timeouts",
+    "testNames": [
+      "retryable_provider_failure_reopens_attempt_on_the_same_run",
+      "retry_budget_exhaustion_fails_loudly_with_attempt_count_honest",
+      "retry_after_hint_overrides_the_computed_backoff"
+    ],
+    "executedCount": 3,
+    "gate_cid": false
+  },
+  {
+    "id": "R05-T05-C06",
+    "status": "PASS",
+    "command": "cargo test --manifest-path rust/Cargo.toml -p lingxi-adapters --test r05_t05_timeouts && cargo test --manifest-path rust/Cargo.toml -p lingxi-service --test r05_t04_streaming && cargo test --manifest-path rust/Cargo.toml -p lingxi-service --test run_lifecycle",
+    "testNames": [
+      "mid_stream_transport_break_is_terminal_and_never_resent",
+      "deadline_hit_mid_stream_abandons_the_read_without_rewind",
+      "c15_a08_http200_stream_failures_keep_the_run_honest",
+      "retryable_provider_failure_reopens_attempt_on_the_same_run"
+    ],
+    "executedCount": 4,
+    "gate_cid": false
+  },
+  {
+    "id": "R05-T05-C09",
+    "status": "PASS",
+    "command": "cargo test --manifest-path rust/Cargo.toml -p lingxi-service --test cancellation_tree --test cancel_terminal_race --test cancel_link_inheritance",
+    "testNames": [
+      "cancel_accepted_while_final_events_persist_beats_the_completed_terminal",
+      "cancel_accepted_before_the_terminal_claim_beats_every_terminal_shape",
+      "cancel_racing_the_finalize_transaction_is_too_late_not_accepted",
+      "concurrent_duplicate_fires_keep_the_first_reason_and_a_single_fired"
+    ],
+    "executedCount": 4,
+    "gate_cid": false
+  },
+  {
+    "id": "R05-T05-C10",
+    "status": "PASS",
+    "command": "cargo test --manifest-path rust/Cargo.toml -p lingxi-service --test background_disconnect_recovery --test event_subscription",
+    "testNames": [
+      "r03_a12_background_run_survives_disconnect_reconnect_replays_and_is_queryable",
+      "a09_snapshot_and_subscription_have_no_gap_at_every_commit_boundary",
+      "a09_parallel_subscribers_see_identical_views"
+    ],
+    "executedCount": 3,
+    "gate_cid": false
+  },
+  {
+    "id": "R05-T05-C12",
+    "status": "NOT_RUN",
+    "command": "n/a（范围裁决 + F-01 更正登记）",
+    "testNames": [],
+    "executedCount": 0,
+    "gate_cid": false
+  },
+  {
+    "id": "R05-T06-C11B",
+    "status": "PASS",
+    "command": "cargo test --manifest-path rust/Cargo.toml -p lingxi-adapters --lib egress",
+    "testNames": [
+      "models::egress::tests::guarded_ipv4_literals_refuse_outside_the_endpoint_exception",
+      "models::egress::tests::the_endpoint_origin_exception_lets_the_loopback_stub_through",
+      "models::egress::tests::scheme_userinfo_and_host_shapes_refuse",
+      "models::egress::tests::https_public_passes_and_plain_http_is_same_origin_only",
+      "models::egress::tests::ipv4_parsing_is_strict_and_default_ports_elide"
+    ],
+    "executedCount": 5,
+    "gate_cid": false
+  },
+  {
+    "id": "R05-T08-C10",
+    "status": "PASS",
+    "command": "r05_stage_suites 生产者（T06 套件精确钉数）+ rust_test_workspace（门禁内真实重跑）",
+    "testNames": [
+      "adp:r05_t06_operations::c12_dashscope_pending_then_completed_via_registered_product",
+      "adp:r05_t06_operations::c12_video_job_acceptance_is_not_completion_and_cancel_is_local_only",
+      "adp:r05_t06_operations::c03_url_products_download_guarded_and_ghost_products_refuse"
+    ],
+    "executedCount": 3,
+    "gate_cid": false
+  },
+  {
+    "id": "R05-T08-C11",
+    "status": "PASS",
+    "command": "r05_stage_suites 生产者（T06 worker 套件精确钉数）+ rust_test_workspace",
+    "testNames": [
+      "svc:r05_t06_worker_model::c06_main_run_worker_and_callback_complete_under_global_model_concurrency_one",
+      "svc:r05_t06_worker_model::c04_worker_callback_rides_the_real_gateway_and_trace_joins_parent_and_child",
+      "svc:r05_t06_worker_model::c05_single_threaded_runtime_serves_a_delayed_callback_without_starvation"
+    ],
+    "executedCount": 3,
+    "gate_cid": false
+  },
+  {
+    "id": "R05-T08-C13",
+    "status": "PASS",
+    "command": "r04_regression_gate（完整 verify-stage R04 内嵌 R03→R02 链+r04_tool_matrix+r04_rr1_repair_suites+五门禁）",
+    "testNames": [],
+    "executedCount": 1,
+    "gate_cid": false
+  },
+  {
+    "id": "R05-T08-C14",
+    "status": "PASS",
+    "command": "check_boundaries + rust_test_workspace + git diff --name-only c549ff654 -- desktop/ shared/ package.json（空集）",
+    "testNames": [],
+    "executedCount": 1,
+    "gate_cid": false
+  }
+]

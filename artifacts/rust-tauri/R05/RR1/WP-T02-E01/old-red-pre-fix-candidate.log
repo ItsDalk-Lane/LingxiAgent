@@ -1,0 +1,57 @@
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.10s
+     Running tests/r05_t02_credentials.rs (rust/target/debug/deps/r05_t02_credentials-febbad0532f4c8d4)
+
+running 7 tests
+test rr1_t02::rr1_f03_old_handle_must_not_resolve_reloaded_secret ... FAILED
+test rr1_t02::rr1_f03_hot_added_oauth_provider_seeds_tokens_and_survives_restart ... FAILED
+test rr1_t02::rr1_f05_encoded_echos_of_the_material_are_scrubbed ... FAILED
+test rr1_t02::rr1_f05_protocol_error_echo_must_not_carry_complete_secret_into_kernel ... FAILED
+test rr1_t02::rr1_f03_removed_then_readded_provider_must_not_revive_old_handle ... FAILED
+test rr1_t02::rr1_f05_truncation_never_exposes_a_credential_prefix_at_any_boundary ... FAILED
+test rr1_t02::rr1_f05_provider_echo_full_chain_never_reaches_durable_state ... ok
+
+failures:
+
+---- rr1_t02::rr1_f03_old_handle_must_not_resolve_reloaded_secret stdout ----
+
+thread 'rr1_t02::rr1_f03_old_handle_must_not_resolve_reloaded_secret' (9868847) panicked at crates/lingxi-service/tests/r05_t02_credentials.rs:2215:9:
+old credential handle survived key rotation and returned Ok(Bearer("dummy-new-key"))
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+
+---- rr1_t02::rr1_f03_hot_added_oauth_provider_seeds_tokens_and_survives_restart stdout ----
+
+thread 'rr1_t02::rr1_f03_hot_added_oauth_provider_seeds_tokens_and_survives_restart' (9868846) panicked at crates/lingxi-service/tests/r05_t02_credentials.rs:2375:43:
+hot-added OAuth material: NotLoggedIn { provider: "main" }
+
+---- rr1_t02::rr1_f05_encoded_echos_of_the_material_are_scrubbed stdout ----
+
+thread 'rr1_t02::rr1_f05_encoded_echos_of_the_material_are_scrubbed' (9868909) panicked at crates/lingxi-service/tests/r05_t02_credentials.rs:2451:13:
+encoded echo of the material survived: "upstream echoed %73%65%63%72%65%74%2B%63%6F%62%61%6C%74%2F%70%65%61%72%6C%3D%78 in its error"
+
+---- rr1_t02::rr1_f05_protocol_error_echo_must_not_carry_complete_secret_into_kernel stdout ----
+
+thread 'rr1_t02::rr1_f05_protocol_error_echo_must_not_carry_complete_secret_into_kernel' (9868910) panicked at crates/lingxi-service/tests/r05_t02_credentials.rs:2550:9:
+full credential escaped into the kernel ProtocolError and survived service redaction: provider requested unknown tool "dummy-cobalt-key": not a name this call declared (a wire name maps to a target through the send-time snapshot only — never a guess)
+
+---- rr1_t02::rr1_f03_removed_then_readded_provider_must_not_revive_old_handle stdout ----
+
+thread 'rr1_t02::rr1_f03_removed_then_readded_provider_must_not_revive_old_handle' (9868848) panicked at crates/lingxi-service/tests/r05_t02_credentials.rs:2279:9:
+revoked handle revived after provider recreation and returned Ok(Bearer("dummy-rr1-old"))
+
+---- rr1_t02::rr1_f05_truncation_never_exposes_a_credential_prefix_at_any_boundary stdout ----
+
+thread 'rr1_t02::rr1_f05_truncation_never_exposes_a_credential_prefix_at_any_boundary' (9868913) panicked at crates/lingxi-service/tests/r05_t02_credentials.rs:2413:13:
+offset 504: credential prefix leaked after truncation and both redaction layers: "                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        secret-c"
+
+
+failures:
+    rr1_t02::rr1_f03_hot_added_oauth_provider_seeds_tokens_and_survives_restart
+    rr1_t02::rr1_f03_old_handle_must_not_resolve_reloaded_secret
+    rr1_t02::rr1_f03_removed_then_readded_provider_must_not_revive_old_handle
+    rr1_t02::rr1_f05_encoded_echos_of_the_material_are_scrubbed
+    rr1_t02::rr1_f05_protocol_error_echo_must_not_carry_complete_secret_into_kernel
+    rr1_t02::rr1_f05_truncation_never_exposes_a_credential_prefix_at_any_boundary
+
+test result: FAILED. 1 passed; 6 failed; 0 ignored; 0 measured; 16 filtered out; finished in 0.21s
+
+error: test failed, to rerun pass `-p lingxi-service --test r05_t02_credentials`

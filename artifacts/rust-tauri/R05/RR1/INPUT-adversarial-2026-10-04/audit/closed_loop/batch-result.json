@@ -1,0 +1,275 @@
+[
+  {
+    "case": "batch-invalid-second",
+    "configured_calls": [
+      [
+        "call_good",
+        "write",
+        {
+          "path": "output.txt",
+          "content": "BAD_BATCH_WROTE_FILE"
+        }
+      ],
+      [
+        "call_bad",
+        "read",
+        {
+          "path": 123
+        }
+      ]
+    ],
+    "requests": 2,
+    "files_written": {
+      "output.txt": "BAD_BATCH_WROTE_FILE"
+    },
+    "run": [
+      "completed",
+      "completed.with_final"
+    ],
+    "tool_outcomes": [
+      {
+        "type": "tool_call_started",
+        "toolCall": {
+          "toolCallId": "run_000001a1055a695d_000001-tc0001",
+          "target": "tool:first-party:write",
+          "argsDigest": {
+            "algorithm": "sha256",
+            "canonicalization": "lingxi-canonical-json-v1",
+            "hex": "9392b29e91a8692bfea9d1c0da51dd996cd7115fbc84d40e3d9d5865e9290fb1"
+          }
+        }
+      },
+      {
+        "type": "tool_call_completed",
+        "toolCallId": "run_000001a1055a695d_000001-tc0001",
+        "result": {
+          "status": "success",
+          "content": [
+            {
+              "type": "text",
+              "text": "Successfully wrote to output.txt"
+            }
+          ],
+          "resourceRefs": [
+            {
+              "resourceId": "file:/workspace/scratch/9b4397d87a13/audit/closed_loop/batch-invalid-second-e6lgh43x/workspace/output.txt",
+              "kind": "artifact",
+              "displayName": "output.txt",
+              "uri": "file:///workspace/scratch/9b4397d87a13/audit/closed_loop/batch-invalid-second-e6lgh43x/workspace/output.txt",
+              "digest": {
+                "algorithm": "sha256",
+                "canonicalization": "raw-bytes",
+                "hex": "fb2e4277bca89556be31b98fc765679e21685d060a322aed45cd6e017afd8edc"
+              },
+              "sizeBytes": "20"
+            }
+          ],
+          "truncated": false
+        }
+      },
+      {
+        "type": "tool_call_completed",
+        "toolCallId": "run_000001a1055a695d_000001-tc0002",
+        "result": {
+          "status": "failed",
+          "truncated": false,
+          "error": {
+            "code": "invalid_message",
+            "message": "tool arguments violate the current schema: $/path: expected type [\"string\"], found number",
+            "retryable": false
+          }
+        }
+      }
+    ],
+    "second_request_messages": [
+      {
+        "content": "Execute model tool batch.",
+        "role": "user"
+      },
+      {
+        "content": null,
+        "role": "assistant",
+        "tool_calls": [
+          {
+            "function": {
+              "arguments": "{\"content\":\"BAD_BATCH_WROTE_FILE\",\"path\":\"output.txt\"}",
+              "name": "write"
+            },
+            "id": "call_good",
+            "type": "function"
+          },
+          {
+            "function": {
+              "arguments": "{\"path\":123}",
+              "name": "read"
+            },
+            "id": "call_bad",
+            "type": "function"
+          }
+        ]
+      },
+      {
+        "content": "Successfully wrote to output.txt\n[resource: output.txt]",
+        "role": "tool",
+        "tool_call_id": "call_good"
+      },
+      {
+        "content": "tool error [invalid_message]: tool arguments violate the current schema: $/path: expected type [\"string\"], found number",
+        "role": "tool",
+        "tool_call_id": "call_bad"
+      }
+    ],
+    "evidence_dir": "/workspace/scratch/9b4397d87a13/audit/closed_loop/batch-invalid-second-e6lgh43x"
+  },
+  {
+    "case": "batch-duplicate-id",
+    "configured_calls": [
+      [
+        "dup",
+        "write",
+        {
+          "path": "a.txt",
+          "content": "A"
+        }
+      ],
+      [
+        "dup",
+        "write",
+        {
+          "path": "b.txt",
+          "content": "B"
+        }
+      ]
+    ],
+    "requests": 2,
+    "files_written": {
+      "b.txt": "B",
+      "a.txt": "A"
+    },
+    "run": [
+      "completed",
+      "completed.with_final"
+    ],
+    "tool_outcomes": [
+      {
+        "type": "tool_call_started",
+        "toolCall": {
+          "toolCallId": "run_000001a1055a6b7b_000001-tc0001",
+          "target": "tool:first-party:write",
+          "argsDigest": {
+            "algorithm": "sha256",
+            "canonicalization": "lingxi-canonical-json-v1",
+            "hex": "db60c5fcdf5e315abde06a30ac7db0d79f7698518cee2383207e31adf20b9633"
+          }
+        }
+      },
+      {
+        "type": "tool_call_completed",
+        "toolCallId": "run_000001a1055a6b7b_000001-tc0001",
+        "result": {
+          "status": "success",
+          "content": [
+            {
+              "type": "text",
+              "text": "Successfully wrote to a.txt"
+            }
+          ],
+          "resourceRefs": [
+            {
+              "resourceId": "file:/workspace/scratch/9b4397d87a13/audit/closed_loop/batch-duplicate-id-hn02gf0_/workspace/a.txt",
+              "kind": "artifact",
+              "displayName": "a.txt",
+              "uri": "file:///workspace/scratch/9b4397d87a13/audit/closed_loop/batch-duplicate-id-hn02gf0_/workspace/a.txt",
+              "digest": {
+                "algorithm": "sha256",
+                "canonicalization": "raw-bytes",
+                "hex": "559aead08264d5795d3909718cdd05abd49572e84fe55590eef31a88a08fdffd"
+              },
+              "sizeBytes": "1"
+            }
+          ],
+          "truncated": false
+        }
+      },
+      {
+        "type": "tool_call_started",
+        "toolCall": {
+          "toolCallId": "run_000001a1055a6b7b_000001-tc0002",
+          "target": "tool:first-party:write",
+          "argsDigest": {
+            "algorithm": "sha256",
+            "canonicalization": "lingxi-canonical-json-v1",
+            "hex": "fc1eeff39cf429eef7fa2bc7a8c86018e1fd5ef646b06d48242173128c4e8fd1"
+          }
+        }
+      },
+      {
+        "type": "tool_call_completed",
+        "toolCallId": "run_000001a1055a6b7b_000001-tc0002",
+        "result": {
+          "status": "success",
+          "content": [
+            {
+              "type": "text",
+              "text": "Successfully wrote to b.txt"
+            }
+          ],
+          "resourceRefs": [
+            {
+              "resourceId": "file:/workspace/scratch/9b4397d87a13/audit/closed_loop/batch-duplicate-id-hn02gf0_/workspace/b.txt",
+              "kind": "artifact",
+              "displayName": "b.txt",
+              "uri": "file:///workspace/scratch/9b4397d87a13/audit/closed_loop/batch-duplicate-id-hn02gf0_/workspace/b.txt",
+              "digest": {
+                "algorithm": "sha256",
+                "canonicalization": "raw-bytes",
+                "hex": "df7e70e5021544f4834bbee64a9e3789febc4be81470df629cad6ddb03320a5c"
+              },
+              "sizeBytes": "1"
+            }
+          ],
+          "truncated": false
+        }
+      }
+    ],
+    "second_request_messages": [
+      {
+        "content": "Execute model tool batch.",
+        "role": "user"
+      },
+      {
+        "content": null,
+        "role": "assistant",
+        "tool_calls": [
+          {
+            "function": {
+              "arguments": "{\"content\":\"A\",\"path\":\"a.txt\"}",
+              "name": "write"
+            },
+            "id": "dup",
+            "type": "function"
+          },
+          {
+            "function": {
+              "arguments": "{\"content\":\"B\",\"path\":\"b.txt\"}",
+              "name": "write"
+            },
+            "id": "dup",
+            "type": "function"
+          }
+        ]
+      },
+      {
+        "content": "Successfully wrote to a.txt\n[resource: a.txt]",
+        "role": "tool",
+        "tool_call_id": "dup"
+      },
+      {
+        "content": "Successfully wrote to b.txt\n[resource: b.txt]",
+        "role": "tool",
+        "tool_call_id": "dup"
+      }
+    ],
+    "evidence_dir": "/workspace/scratch/9b4397d87a13/audit/closed_loop/batch-duplicate-id-hn02gf0_"
+  }
+]

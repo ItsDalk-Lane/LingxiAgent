@@ -1,1154 +1,1154 @@
 {
- "schema": "lingxi.r05.protocol_wire_matrix/v1",
- "stage_id": "R05-T03",
- "generated_at": "2026-10-03",
- "generated_by": "R05-T03 implementation (hand-authored wire facts, golden-pinned)",
- "incumbent_baselines": [
-  "core/llm-client.ts (per-family request construction; buffered callText path never declares tools)",
-  "lib/llm/provider-client.ts appendProviderApiPath (base-URL join rule)",
-  "codex facts (originator=pi, OpenAI-Beta: responses=experimental, chatgpt-account-id from the JWT claim, /backend-api default, resolveCodexResponsesUrl rule) from the incumbent codex path"
- ],
- "identity_rule": "C10: the driver mints every identity (model call id, tool call ids); provider response identity fields (id/model) are never read; served_by persisted from the resolved route.",
- "families": {
-  "openai-completions": {
-   "endpoint": "{endpoint}/chat/completions (endpoint carries its own /v1 base; trailing slash trimmed; direct concatenation)",
-   "auth_headers": {
-    "apiKey/oauth": "Authorization: Bearer <token>",
-    "authHeader": "verbatim custom header",
-    "none": "no credential header"
-   },
-   "request_body": {
-    "keys": [
-     "model",
-     "messages",
-     "tools?",
-     "stream",
-     "stream_options?"
-    ],
-    "messages": "[system?] + user(submission) + per exchange item: assistant{content text|null, tool_calls[{id, type:function, function{name, arguments JSON-string}}]} / tool{tool_call_id, content}",
-    "tools": "[{type:function, function:{name, description, parameters(verbatim schema)}}]",
-    "stream_modes": "buffered (stream:false, production dispatch) / streaming (stream:true + stream_options.include_usage:true; T04-ready path, golden-pinned)"
-   },
-   "history_render": "text blocks joined with \\n; reasoning and provider-opaque blocks have NO input shape and are not echoed (durable in the exchange, never re-sent); resource refs render as [resource: <uri>] text lines; tool results render via the shared four-state vocabulary",
-   "response_parse": "choices[0].message; content string | parts array | null (parts keep order: text/output_text->Text, reasoning/thinking->Reasoning, unknown->Opaque verbatim, C06); tool_calls -> ToolRequests (name->target via the send-time snapshot only; arguments string-or-object, validated); zero choices / missing message = loud invalid_message; no content and no calls = Empty(finish_reason)",
-   "usage": "usage.prompt_tokens + usage.completion_tokens, both-or-never (a half-reported usage is no usage)",
-   "streaming": "SSE data: frames; delta.content / delta.reasoning_content concatenated; delta.tool_calls fragments keyed by index (id/name from the first fragment, arguments concatenated); terminal usage chunk; [DONE] sentinel REQUIRED (absent = truncated, loud); choice index != 0 is loud; the aggregate is re-validated by the SAME buffered parser",
-   "opaque_policy": "unknown content parts round-trip as Opaque{provider:openai-completions} in the exchange; they are never echoed back onto this wire",
-   "evidence": [
-    "tests/golden/openai-completions/*",
-    "models/openai_completions.rs unit tests",
-    "r05_t01_model_plane (full chain)",
-    "r05_t03_protocol_adapters c06/c12"
-   ]
-  },
-  "anthropic-messages": {
-   "endpoint": "append_provider_api_path(endpoint, \"/v1/messages\") (the incumbent join rule: /v1 dedup, case-insensitive path-suffix match)",
-   "auth_headers": {
-    "apiKey": "x-api-key: <token> (NEVER Authorization)",
-    "authHeader": "verbatim",
-    "none": "nothing",
-    "always": "anthropic-version: 2023-06-01"
-   },
-   "request_body": {
-    "keys": [
-     "model",
-     "max_tokens",
-     "system?",
-     "messages",
-     "tools?",
-     "stream:false"
-    ],
-    "max_tokens": "REQUIRED by the family; pinned constant 16384 (DEFAULT_MAX_OUTPUT_TOKENS) — the per-call budget field is a REGISTERED CONTRACT GAP owned by R05-T05/T07",
-    "messages": "user(submission string) + assistant{content blocks} + user{tool_result blocks}",
-    "tools": "[{name, description, input_schema(verbatim)}]"
-   },
-   "history_render": "assistant content blocks in order: Text->text; Reasoning+adjacent thinking_signature Opaque->thinking block with signature (C10 recombination); redacted_thinking Opaque->verbatim block; unsigned Reasoning and other-family Opaque are never echoed; tool_use blocks appended after content; consecutive ToolResults of one turn MERGE into ONE user message of tool_result blocks (the family pairing rule), is_error = outcome is not Success",
-   "response_parse": "content blocks: text->Text; thinking->Reasoning + adjacent Opaque thinking_signature (the signature is state, never text); redacted_thinking and every unknown block type->Opaque verbatim; tool_use->ToolRequest (id pairing); stop_reason reaches the Empty detail",
-   "usage": "usage.input_tokens + usage.output_tokens, both-or-never",
-   "streaming": "the family speaks SSE in production (message_start / content_block_* / message_delta vocabulary); T03 pins the BUFFERED contract only — the SSE vocabulary is registered here, incremental decode lands with T04",
-   "opaque_policy": "Opaque{provider:anthropic-messages}: thinking_signature and redacted_thinking; recombined/verbatim on the way out; never crossed to another family",
-   "evidence": [
-    "tests/golden/anthropic-messages/*",
-    "models/anthropic_messages.rs unit tests (C10 round-trip, cross-family non-echo)",
-    "r05_t03_protocol_adapters c01_c04/c02"
-   ]
-  },
-  "google-generative-ai": {
-   "endpoint": "append_provider_api_path(endpoint, \"/models/{model}:generateContent\") with the model id percent-encoded (RFC 3986 unreserved pass-through; a configured model id can never smuggle path/query syntax)",
-   "auth_headers": {
-    "apiKey": "x-goog-api-key: <token> (NEVER Authorization)",
-    "authHeader": "verbatim",
-    "none": "nothing"
-   },
-   "request_body": {
-    "keys": [
-     "systemInstruction?",
-     "contents",
-     "tools?"
-    ],
-    "systemInstruction": "{parts:[{text}]} (never a content turn)",
-    "contents": "user{parts} / model{parts} roles",
-    "tools": "[{functionDeclarations:[{name, description, parametersJsonSchema(verbatim)}]}]"
-   },
-   "history_render": "model parts: Text->text part; Reasoning->{text, thought:true}; a thoughtSignature Opaque re-attaches to the SAME part it signed (C10); other-family Opaque never echoed; family-owned unknown Opaque verbatim; functionCall{name, args OBJECT (never a string), id? when the provider issued one}; ToolResult->functionResponse in its OWN user content (no merging), name resolved through the exchange's tool_call_id -> wire-name chain (an unpairable result is a loud render failure, never a guess), response{status: succeeded|failed|cancelled|unknown, content: shared four-state text}, id? round-tripped",
-   "response_parse": "candidates[0].content.parts: functionCall->ToolRequest (args object; id optional); text+thought:true->Reasoning; text->Text; thoughtSignature->adjacent Opaque; unknown part->Opaque verbatim; finishReason reaches the Empty detail",
-   "usage": "usageMetadata.promptTokenCount + candidatesTokenCount, both-or-never; thoughtsTokenCount is NEVER folded in",
-   "streaming": ":streamGenerateContent?alt=sse vocabulary registered; T03 pins the BUFFERED contract only (T04)",
-   "opaque_policy": "Opaque{provider:google-generative-ai}: thoughtSignature + unknown parts; re-attached/verbatim on the way out",
-   "evidence": [
-    "tests/golden/google-generative-ai/*",
-    "models/google_generative_ai.rs unit tests",
-    "r05_t03_protocol_adapters c01_c04/c03"
-   ]
-  },
-  "openai-responses": {
-   "endpoint": "{endpoint}/responses (trailing slash trimmed, direct concatenation)",
-   "auth_headers": {
-    "apiKey/oauth": "Authorization: Bearer <token>",
-    "authHeader": "verbatim",
-    "none": "nothing"
-   },
-   "request_body": {
-    "keys": [
-     "model",
-     "instructions?",
-     "input",
-     "tools?",
-     "stream"
-    ],
-    "instructions": "the host system prompt; absent when unresolved",
-    "input": "message{role:user, content:[input_text]} + per exchange item: family reasoning Opaque re-inserted VERBATIM at its position (C10) / assistant message{content:[output_text]} (text joined \\n) / function_call{call_id, name, arguments JSON-string} / function_call_output{call_id, output}",
-    "tools": "[{type:function, name, description, parameters(verbatim)}]",
-    "server_state": "C11: NO store key, NO previous_response_id — never a server-side session reference"
-   },
-   "response_parse": "output items: message(content: output_text->Text; refusal/unknown parts->Opaque, never answer text); reasoning->summary texts as Reasoning + the WHOLE item as Opaque (encrypted_content preserved); function_call->ToolRequest (call_id pairing); every other item type->Opaque verbatim; status:failed -> honest Failed turn (upstream_unavailable, non-retryable, provider error text); status:incomplete -> Empty with the reason",
-   "usage": "usage.input_tokens + usage.output_tokens, both-or-never",
-   "streaming": "SSE frames; ONLY the terminal response.completed/failed/incomplete event's response object is authoritative (handed to the SAME buffered parser); response error events are loud; a stream without a terminal event is truncated-loud, never half-parsed; delta/progress events are the T04 incremental vocabulary",
-   "opaque_policy": "Opaque{provider:openai-responses}: reasoning items (encrypted_content) + refusal parts + unknown item types",
-   "evidence": [
-    "tests/golden/openai-responses/*",
-    "models/openai_responses.rs unit tests"
-   ]
-  },
-  "openai-codex-responses": {
-   "endpoint": "resolve_codex_responses_url(endpoint): trailing slashes trimmed; a path already ending /codex/responses is used as-is; otherwise /codex/responses is appended (production default endpoint https://chatgpt.com/backend-api — the config carries the endpoint explicitly, no silent default)",
-   "auth_headers": {
-    "oauth_only": "Authorization: Bearer <OAuth JWT> — any other credential shape is a loud non-retryable Unauthorized BEFORE any request",
-    "fixed": [
-     "OpenAI-Beta: responses=experimental",
-     "originator: pi",
-     "chatgpt-account-id: <JWT claim https://api.openai.com/auth.chatgpt_account_id> — a missing/unparseable claim is a loud non-retryable Unauthorized, never a fabricated id"
-    ]
-   },
-   "request_body": {
-    "keys": [
-     "model",
-     "store:false",
-     "stream:true (ALWAYS)",
-     "instructions",
-     "input",
-     "tools?"
-    ],
-    "instructions": "the host system prompt when resolved, otherwise the incumbent constant DEFAULT_CODEX_INSTRUCTIONS",
-    "input": "the SHARED openai-responses input-item rendering (family tag openai-codex-responses for opaque state)"
-   },
-   "response_parse": "always the shared responses SSE stream parse (terminal event authoritative) with the codex family tag",
-   "usage": "terminal event's usage.input_tokens + output_tokens, both-or-never",
-   "streaming": "SSE is the ONLY wire mode of this family",
-   "opaque_policy": "Opaque{provider:openai-codex-responses}: reasoning items + refusal parts + unknown item types; never crossed with the plain openai-responses tag",
-   "evidence": [
-    "tests/golden/openai-codex-responses/*",
-    "models/openai_codex_responses.rs unit tests (URL rule, JWT claim)",
-    "r05_t03_protocol_adapters codex_family_runs_end_to_end_over_sse"
-   ]
-  },
-  "volcengine-bigasr": {
-   "status": "RESOLVED-BUT-UNIMPLEMENTED: ProtocolNotImplemented at the dispatch boundary, BEFORE any request leaves the process (r05_t01_model_plane c06 pins stub.hits()==0); owned by R05-T06"
-  },
-  "system-speech": {
-   "status": "RESOLVED-BUT-UNIMPLEMENTED: same loud-refusal boundary; owned by R05-T06"
-  }
- },
- "shared": {
-  "tool_outcome_rendering": {
-   "vocabulary": {
-    "success": "content blocks (non-text as their JSON) + [resource: name <uri>] lines + process status line + truncation marker LAST (\"\\n[result truncated at the tool's bound]\")",
-    "failed": "tool error [<code wire name>]: <message>",
-    "cancelled": "tool call cancelled by the host before completion",
-    "unknown": "tool outcome could not be determined: <reason>"
-   },
-   "status_words": [
-    "succeeded",
-    "failed",
-    "cancelled",
-    "unknown"
-   ],
-   "owner": "models/tool_render.rs — ONE vocabulary shared by every family (C07/C08)"
-  },
-  "error_classification": {
-   "401": "unauthorized, non-retryable (the caller's single bounded refresh-and-retry applies)",
-   "403": "forbidden, non-retryable (never triggers a refresh)",
-   "3xx": "upstream_unavailable, non-retryable — redirects are NEVER followed with credential-bearing requests and the Location target is never echoed (C10)",
-   "408": "upstream_unavailable, retryable",
-   "429": "budget_exceeded, retryable",
-   "400/404/422": "invalid_message, non-retryable",
-   "5xx": "upstream_unavailable, retryable",
-   "connect/read failure": "upstream_unavailable, retryable",
-   "scrubbing": "the provider error body is attacker-influenceable echo: the excerpt is truncated to 512 chars and scrubbed of every in-play credential material before it travels (C09)",
-   "owner": "models/dispatch.rs classify_error_status — one table, verbatim across families"
-  },
-  "transport": "no-redirect reqwest client; one POST per turn; SSE decoding through models/streaming.rs SseDecoder (8 MiB bound, CR/LF/CRLF, BOM, multi-line data:, comment lines skipped, id:/retry: intentionally ignored, strict UTF-8, a partial trailing frame is discarded and reported). R05-T05: three-segment timeout discipline (connect 10s / first-byte 30s / per-call total budget 300s shared across queue wait + credential refresh + backoff + network + streaming; idle-stream 60s at the driver's delta drain); proxy auto-detection disabled (incumbent parity — Node fetch never consults ambient proxies; an ambient proxy breaks the A10 acceptance proof and sees credential material); Retry-After (both RFC 9110 forms) rides error details.retryAfterMs on 429; retry classes = 429/5xx bounded (driver backoff base*2^(n-1) capped, hint override, deadline veto, cancel-aware sleep), connect-phase failures (provably never accepted); every post-acceptance failure (send/head/mid-stream/408) NON-retryable — no blind resend (A10).",
-  "streaming_scope_decision": "production dispatch is BUFFERED for openai-completions/anthropic-messages/google-generative-ai/openai-responses; the streaming DECODE path is implemented and golden-pinned for openai-completions (execute_chat_streaming) and is the only mode for openai-codex-responses; anthropic/google SSE vocabularies are registered here and land with T04's incremental delivery",
-  "incumbent_tool_gap": "the incumbent buffered callText path NEVER declared tools; every family's tool wire shape in this matrix is the protocol-standard shape pinned by the T03 goldens (recorded as a baseline fact, not a regression)",
-  "contract_gaps": [
-   "anthropic max_tokens pinned constant 16384 (per-call budget is not part of ModelTurnInput; R05-T07 owns it)",
-   "ModelTurnInput.system_prompt is None from the host today (persona wiring is a later stage; codex falls back to its documented constant)",
-   "proxy/TLS configuration surface (system/manual/direct/NO_PROXY, private-CA pinning) deferred — transport is direct-only by T05 decision (see R05_INTERFACE_EVOLUTION.md §25 decision 6)"
+  "schema": "lingxi.r05.protocol_wire_matrix/v1",
+  "stage_id": "R05-T03",
+  "generated_at": "2026-10-03",
+  "generated_by": "R05-T03 implementation (hand-authored wire facts, golden-pinned)",
+  "incumbent_baselines": [
+    "core/llm-client.ts (per-family request construction; buffered callText path never declares tools)",
+    "lib/llm/provider-client.ts appendProviderApiPath (base-URL join rule)",
+    "codex facts (originator=pi, OpenAI-Beta: responses=experimental, chatgpt-account-id from the JWT claim, /backend-api default, resolveCodexResponsesUrl rule) from the incumbent codex path"
   ],
-  "provider_compat_port": {
-   "scope": "R05-T05 item 13 (T03-registered leftover): the provider-specific compat patches",
-   "layer": "rust/crates/lingxi-adapters/src/models/compat.rs — matched at (provider, model) via RouteCompatHints + model-id rules; applied post-render pre-dispatch in all four envelope adapters (openai-completions/anthropic-messages/openai-responses/openai-codex-responses)",
-   "golden_alignment": "docs/rust-tauri/R05/r05_t05_generate_compat_goldens.mjs runs the incumbent TS modules verbatim (Node 24 type-stripping) into rust/crates/lingxi-adapters/tests/golden-compat/*.json (49 fixtures); rust/crates/lingxi-adapters/tests/r05_t05_compat.rs requires byte-exact payload/refusal equality",
-   "ported": [
-    "deepseek",
-    "deepseek-responses",
-    "kimi",
-    "mimo",
-    "qwen",
-    "zhipu",
-    "volcengine",
-    "agnes",
-    "openrouter",
-    "anthropic",
-    "codex (openai-codex-oauth)",
-    "ollama"
-   ],
-   "not_applicable": [
-    {
-     "module": "longcat",
-     "reason": "its only action is DISABLING thinking (utility mode / reasoningLevel=off / pre-existing thinking controls) plus stripping replayed reasoning; none of those triggers can fire on the Rust pipeline (production CompatOptions carry reasoning_level=None — session thinking level is the R05-T07 owner — and the Rust renderers never emit thinking/enable_thinking/reasoning_effort fields), so the module is the identity function here",
-     "source": "core/provider-compat/longcat.ts shouldDisableThinking/disableThinking; core/provider-compat.ts PROVIDER_MODULES"
+  "identity_rule": "C10: the driver mints every identity (model call id, tool call ids); provider response identity fields (id/model) are never read; served_by persisted from the resolved route.",
+  "families": {
+    "openai-completions": {
+      "endpoint": "{endpoint}/chat/completions (endpoint carries its own /v1 base; trailing slash trimmed; direct concatenation)",
+      "auth_headers": {
+        "apiKey/oauth": "Authorization: Bearer <token>",
+        "authHeader": "verbatim custom header",
+        "none": "no credential header"
+      },
+      "request_body": {
+        "keys": [
+          "model",
+          "messages",
+          "tools?",
+          "stream",
+          "stream_options?"
+        ],
+        "messages": "[system?] + user(submission) + per exchange item: assistant{content text|null, tool_calls[{id, type:function, function{name, arguments JSON-string}}]} / tool{tool_call_id, content}",
+        "tools": "[{type:function, function:{name, description, parameters(verbatim schema)}}]",
+        "stream_modes": "buffered (stream:false, production dispatch) / streaming (stream:true + stream_options.include_usage:true; T04-ready path, golden-pinned)"
+      },
+      "history_render": "text blocks joined with \\n; the turn's Reasoning blocks materialize as the assistant message's reasoning_content field (the DeepSeek/Kimi/MiMo/Zhipu carrier, R05 RR1 F08) — the compat replay policy then keeps it (declared reasoning_content contract), refuses without it (require-tool-call) or strips it (no contract / thinking off); a reasoning-only turn emits no message of its own; provider-opaque blocks have no input shape and are not echoed (durable in the exchange, never re-sent); resource refs render as [resource: <uri>] text lines; tool results render via the shared four-state vocabulary",
+      "response_parse": "choices[0].message; content string | parts array | null (parts keep order: text/output_text->Text, reasoning/thinking->Reasoning, unknown->Opaque verbatim, C06); tool_calls -> ToolRequests (name->target via the send-time snapshot only; arguments string-or-object, validated); zero choices / missing message = loud invalid_message; no content and no calls = Empty(finish_reason)",
+      "usage": "usage.prompt_tokens + usage.completion_tokens, both-or-never (a half-reported usage is no usage)",
+      "streaming": "SSE data: frames; delta.content / delta.reasoning_content concatenated; delta.tool_calls fragments keyed by index (id/name from the first fragment, arguments concatenated); terminal usage chunk; [DONE] sentinel REQUIRED (absent = truncated, loud); choice index != 0 is loud; the aggregate is re-validated by the SAME buffered parser",
+      "opaque_policy": "unknown content parts round-trip as Opaque{provider:openai-completions} in the exchange; they are never echoed back onto this wire",
+      "evidence": [
+        "tests/golden/openai-completions/*",
+        "models/openai_completions.rs unit tests",
+        "r05_t01_model_plane (full chain)",
+        "r05_t03_protocol_adapters c06/c12"
+      ]
     },
-    {
-     "module": "openai-input-audio",
-     "reason": "normalizes input_audio message parts; ModelTurnInput carries text-only content blocks today (media/resource-reference inputs are the R05-T06 owner), so no payload ever contains an audio part",
-     "source": "core/provider-compat/openai-input-audio.ts + input-audio.ts normalizeOpenAIInputAudioPayload"
+    "anthropic-messages": {
+      "endpoint": "append_provider_api_path(endpoint, \"/v1/messages\") (the incumbent join rule: /v1 dedup, case-insensitive path-suffix match)",
+      "auth_headers": {
+        "apiKey": "x-api-key: <token> (NEVER Authorization)",
+        "authHeader": "verbatim",
+        "none": "nothing",
+        "always": "anthropic-version: 2023-06-01"
+      },
+      "request_body": {
+        "keys": [
+          "model",
+          "max_tokens",
+          "system?",
+          "messages",
+          "tools?",
+          "stream:false"
+        ],
+        "max_tokens": "REQUIRED by the family; pinned constant 16384 (DEFAULT_MAX_OUTPUT_TOKENS) — the per-call budget field is a REGISTERED CONTRACT GAP owned by R05-T05/T07",
+        "messages": "user(submission string) + assistant{content blocks} + user{tool_result blocks}",
+        "tools": "[{name, description, input_schema(verbatim)}]"
+      },
+      "history_render": "assistant content blocks in order: Text->text; Reasoning+adjacent thinking_signature Opaque->thinking block with signature (C10 recombination); a thinking_signature Opaque with NO preceding Reasoning is the signed EMPTY-thinking shape — reconstructed in place as {type:thinking, thinking:\"\", signature} (R05 RR1 F06, never dropped); redacted_thinking Opaque->verbatim block; unsigned Reasoning and other-family Opaque are never echoed; tool_use blocks appended after content (the registered C06 normalization); consecutive ToolResults of one turn MERGE into ONE user message of tool_result blocks (the family pairing rule), is_error = outcome is not Success; family Opaque state is source-bound: the turn's recorded origin (provider+model) must match the request's route or the render refuses loudly (R05 RR1 F09)",
+      "response_parse": "content blocks: text->Text; thinking->Reasoning + adjacent Opaque thinking_signature (the signature is state, never text); redacted_thinking and every unknown block type->Opaque verbatim; tool_use->ToolRequest (id pairing); stop_reason reaches the Empty detail",
+      "usage": "usage.input_tokens + usage.output_tokens, both-or-never",
+      "streaming": "the family speaks SSE in production (message_start / content_block_* / message_delta vocabulary); T03 pins the BUFFERED contract only — the SSE vocabulary is registered here, incremental decode lands with T04",
+      "opaque_policy": "Opaque{provider:anthropic-messages}: thinking_signature and redacted_thinking; recombined/verbatim on the way out; never crossed to another family",
+      "evidence": [
+        "tests/golden/anthropic-messages/*",
+        "models/anthropic_messages.rs unit tests (C10 round-trip, cross-family non-echo)",
+        "r05_t03_protocol_adapters c01_c04/c02"
+      ]
     },
-    {
-     "module": "openai-video-url",
-     "reason": "sits OUTSIDE the dispatch registry — video-URL handling is centralized capability logic, never selected by PROVIDER_MODULES",
-     "source": "core/provider-compat.ts PROVIDER_MODULES literal"
+    "google-generative-ai": {
+      "endpoint": "append_provider_api_path(endpoint, \"/models/{model}:generateContent\") with the model id percent-encoded (RFC 3986 unreserved pass-through; a configured model id can never smuggle path/query syntax)",
+      "auth_headers": {
+        "apiKey": "x-goog-api-key: <token> (NEVER Authorization)",
+        "authHeader": "verbatim",
+        "none": "nothing"
+      },
+      "request_body": {
+        "keys": [
+          "systemInstruction?",
+          "contents",
+          "tools?"
+        ],
+        "systemInstruction": "{parts:[{text}]} (never a content turn)",
+        "contents": "user{parts} / model{parts} roles",
+        "tools": "[{functionDeclarations:[{name, description, parametersJsonSchema(verbatim)}]}]"
+      },
+      "history_render": "model parts IN ORIGINAL PART ORDER: Text->text part; Reasoning->{text, thought:true}; a thoughtSignature Opaque re-attaches to the SAME part it signed (C10); functionCall parts are POSITION-ANCHORED by the parse (functionCallPart opaque in content) so each call — with its part thoughtSignature when it carried one (R05 RR1 F07) — re-renders at its original position as functionCall{name, args OBJECT (never a string), id? when the provider issued one}; id-less calls and anchor-less exchanges keep the content-first order; other-family Opaque never echoed; family-owned unknown Opaque verbatim (incl. the empty-text signed part); ToolResults of ONE tool round MERGE into ONE user content of functionResponse parts (the official Gemini parallel grouping, R05 RR1 F07), name resolved through the exchange's tool_call_id -> wire-name chain (an unpairable result is a loud render failure, never a guess), response{status: succeeded|failed|cancelled|unknown, content: shared four-state text}, id? round-tripped",
+      "response_parse": "candidates[0].content.parts: functionCall->ToolRequest (args object; id optional); text+thought:true->Reasoning; text->Text; thoughtSignature->adjacent Opaque; unknown part->Opaque verbatim; finishReason reaches the Empty detail",
+      "usage": "usageMetadata.promptTokenCount + candidatesTokenCount, both-or-never; thoughtsTokenCount is NEVER folded in",
+      "streaming": ":streamGenerateContent?alt=sse vocabulary registered; T03 pins the BUFFERED contract only (T04)",
+      "opaque_policy": "Opaque{provider:google-generative-ai}: thoughtSignature + unknown parts; re-attached/verbatim on the way out",
+      "evidence": [
+        "tests/golden/google-generative-ai/*",
+        "models/google_generative_ai.rs unit tests",
+        "r05_t03_protocol_adapters c01_c04/c03"
+      ]
+    },
+    "openai-responses": {
+      "endpoint": "{endpoint}/responses (trailing slash trimmed, direct concatenation)",
+      "auth_headers": {
+        "apiKey/oauth": "Authorization: Bearer <token>",
+        "authHeader": "verbatim",
+        "none": "nothing"
+      },
+      "request_body": {
+        "keys": [
+          "model",
+          "instructions?",
+          "input",
+          "tools?",
+          "stream"
+        ],
+        "instructions": "the host system prompt; absent when unresolved",
+        "input": "message{role:user, content:[input_text]} + per exchange item IN ORIGINAL RELATIVE ORDER (R05 RR1 F10: no re-sorting into a fixed standard order): family reasoning Opaque re-inserted VERBATIM at its position (C10) / assistant message{content:[output_text]} (adjacent text segments join \\n) / function_call{call_id, name, arguments JSON-string} at its anchored position (function_call_item anchor) or, for anchor-less exchanges, after the content / function_call_output{call_id, output}",
+        "tools": "[{type:function, name, description, parameters(verbatim)}]",
+        "server_state": "C11: NO store key, NO previous_response_id — never a server-side session reference"
+      },
+      "response_parse": "output items: message(content: output_text->Text; refusal/unknown parts->Opaque, never answer text); reasoning->summary texts as Reasoning + the WHOLE item as Opaque (encrypted_content preserved); function_call->ToolRequest (call_id pairing); every other item type->Opaque verbatim; status:failed -> honest Failed turn (upstream_unavailable, non-retryable, provider error text); status:incomplete -> Empty with the reason",
+      "usage": "usage.input_tokens + usage.output_tokens, both-or-never",
+      "streaming": "SSE frames; ONLY the terminal response.completed/failed/incomplete event's response object is authoritative (handed to the SAME buffered parser); response error events are loud; a stream without a terminal event is truncated-loud, never half-parsed; delta/progress events are the T04 incremental vocabulary",
+      "opaque_policy": "Opaque{provider:openai-responses}: reasoning items (encrypted_content) + refusal parts + unknown item types + function_call_item position anchors; all family Opaque is source-bound to the minting provider/model (R05 RR1 F09)",
+      "evidence": [
+        "tests/golden/openai-responses/*",
+        "models/openai_responses.rs unit tests"
+      ]
+    },
+    "openai-codex-responses": {
+      "endpoint": "resolve_codex_responses_url(endpoint): trailing slashes trimmed; a path already ending /codex/responses is used as-is; otherwise /codex/responses is appended (production default endpoint https://chatgpt.com/backend-api — the config carries the endpoint explicitly, no silent default)",
+      "auth_headers": {
+        "oauth_only": "Authorization: Bearer <OAuth JWT> — any other credential shape is a loud non-retryable Unauthorized BEFORE any request",
+        "fixed": [
+          "OpenAI-Beta: responses=experimental",
+          "originator: pi",
+          "chatgpt-account-id: <JWT claim https://api.openai.com/auth.chatgpt_account_id> — a missing/unparseable claim is a loud non-retryable Unauthorized, never a fabricated id"
+        ]
+      },
+      "request_body": {
+        "keys": [
+          "model",
+          "store:false",
+          "stream:true (ALWAYS)",
+          "instructions",
+          "input",
+          "tools?"
+        ],
+        "instructions": "the host system prompt when resolved, otherwise the incumbent constant DEFAULT_CODEX_INSTRUCTIONS",
+        "input": "the SHARED openai-responses input-item rendering (family tag openai-codex-responses for opaque state)"
+      },
+      "response_parse": "always the shared responses SSE stream parse (terminal event authoritative) with the codex family tag",
+      "usage": "terminal event's usage.input_tokens + output_tokens, both-or-never",
+      "streaming": "SSE is the ONLY wire mode of this family",
+      "opaque_policy": "Opaque{provider:openai-codex-responses}: reasoning items + refusal parts + unknown item types; never crossed with the plain openai-responses tag",
+      "evidence": [
+        "tests/golden/openai-codex-responses/*",
+        "models/openai_codex_responses.rs unit tests (URL rule, JWT claim)",
+        "r05_t03_protocol_adapters codex_family_runs_end_to_end_over_sse"
+      ]
+    },
+    "volcengine-bigasr": {
+      "status": "RESOLVED-BUT-UNIMPLEMENTED: ProtocolNotImplemented at the dispatch boundary, BEFORE any request leaves the process (r05_t01_model_plane c06 pins stub.hits()==0); owned by R05-T06"
+    },
+    "system-speech": {
+      "status": "RESOLVED-BUT-UNIMPLEMENTED: same loud-refusal boundary; owned by R05-T06"
     }
-   ],
-   "google_generative_ai_deviation": "the google adapter takes NO compat patch layer — no incumbent compat module targets the google envelope (registered deviation, not a gap)"
+  },
+  "shared": {
+    "tool_outcome_rendering": {
+      "vocabulary": {
+        "success": "content blocks (non-text as their JSON) + [resource: name <uri>] lines + process status line + truncation marker LAST (\"\\n[result truncated at the tool's bound]\")",
+        "failed": "tool error [<code wire name>]: <message>",
+        "cancelled": "tool call cancelled by the host before completion",
+        "unknown": "tool outcome could not be determined: <reason>"
+      },
+      "status_words": [
+        "succeeded",
+        "failed",
+        "cancelled",
+        "unknown"
+      ],
+      "owner": "models/tool_render.rs — ONE vocabulary shared by every family (C07/C08)"
+    },
+    "error_classification": {
+      "401": "unauthorized, non-retryable (the caller's single bounded refresh-and-retry applies)",
+      "403": "forbidden, non-retryable (never triggers a refresh)",
+      "3xx": "upstream_unavailable, non-retryable — redirects are NEVER followed with credential-bearing requests and the Location target is never echoed (C10)",
+      "408": "upstream_unavailable, retryable",
+      "429": "budget_exceeded, retryable",
+      "400/404/422": "invalid_message, non-retryable",
+      "5xx": "upstream_unavailable, retryable",
+      "connect/read failure": "upstream_unavailable, retryable",
+      "scrubbing": "the provider error body is attacker-influenceable echo: the excerpt is truncated to 512 chars and scrubbed of every in-play credential material before it travels (C09)",
+      "owner": "models/dispatch.rs classify_error_status — one table, verbatim across families"
+    },
+    "transport": "no-redirect reqwest client; one POST per turn; SSE decoding through models/streaming.rs SseDecoder (8 MiB bound, CR/LF/CRLF, BOM, multi-line data:, comment lines skipped, id:/retry: intentionally ignored, strict UTF-8, a partial trailing frame is discarded and reported). R05-T05: three-segment timeout discipline (connect 10s / first-byte 30s / per-call total budget 300s shared across queue wait + credential refresh + backoff + network + streaming; idle-stream 60s at the driver's delta drain); proxy auto-detection disabled (incumbent parity — Node fetch never consults ambient proxies; an ambient proxy breaks the A10 acceptance proof and sees credential material); Retry-After (both RFC 9110 forms) rides error details.retryAfterMs on 429; retry classes = 429/5xx bounded (driver backoff base*2^(n-1) capped, hint override, deadline veto, cancel-aware sleep), connect-phase failures (provably never accepted); every post-acceptance failure (send/head/mid-stream/408) NON-retryable — no blind resend (A10).",
+    "streaming_scope_decision": "production dispatch is BUFFERED for openai-completions/anthropic-messages/google-generative-ai/openai-responses; the streaming DECODE path is implemented and golden-pinned for openai-completions (execute_chat_streaming) and is the only mode for openai-codex-responses; anthropic/google SSE vocabularies are registered here and land with T04's incremental delivery",
+    "incumbent_tool_gap": "the incumbent buffered callText path NEVER declared tools; every family's tool wire shape in this matrix is the protocol-standard shape pinned by the T03 goldens (recorded as a baseline fact, not a regression)",
+    "contract_gaps": [
+      "anthropic max_tokens pinned constant 16384 (per-call budget is not part of ModelTurnInput; R05-T07 owns it)",
+      "ModelTurnInput.system_prompt is None from the host today (persona wiring is a later stage; codex falls back to its documented constant)",
+      "proxy/TLS configuration surface (system/manual/direct/NO_PROXY, private-CA pinning) deferred — transport is direct-only by T05 decision (see R05_INTERFACE_EVOLUTION.md §25 decision 6)"
+    ],
+    "provider_compat_port": {
+      "scope": "R05-T05 item 13 (T03-registered leftover): the provider-specific compat patches",
+      "layer": "rust/crates/lingxi-adapters/src/models/compat.rs — matched at (provider, model) via RouteCompatHints + model-id rules; applied post-render pre-dispatch in all four envelope adapters (openai-completions/anthropic-messages/openai-responses/openai-codex-responses)",
+      "golden_alignment": "docs/rust-tauri/R05/r05_t05_generate_compat_goldens.mjs runs the incumbent TS modules verbatim (Node 24 type-stripping) into rust/crates/lingxi-adapters/tests/golden-compat/*.json (49 fixtures); rust/crates/lingxi-adapters/tests/r05_t05_compat.rs requires byte-exact payload/refusal equality",
+      "ported": [
+        "deepseek",
+        "deepseek-responses",
+        "kimi",
+        "mimo",
+        "qwen",
+        "zhipu",
+        "volcengine",
+        "agnes",
+        "openrouter",
+        "anthropic",
+        "codex (openai-codex-oauth)",
+        "ollama"
+      ],
+      "not_applicable": [
+        {
+          "module": "longcat",
+          "reason": "its only action is DISABLING thinking (utility mode / reasoningLevel=off / pre-existing thinking controls) plus stripping replayed reasoning; none of those triggers can fire on the Rust pipeline (production CompatOptions carry reasoning_level=None — session thinking level is the R05-T07 owner — and the Rust renderers never emit thinking/enable_thinking/reasoning_effort fields), so the module is the identity function here",
+          "source": "core/provider-compat/longcat.ts shouldDisableThinking/disableThinking; core/provider-compat.ts PROVIDER_MODULES"
+        },
+        {
+          "module": "openai-input-audio",
+          "reason": "normalizes input_audio message parts; ModelTurnInput carries text-only content blocks today (media/resource-reference inputs are the R05-T06 owner), so no payload ever contains an audio part",
+          "source": "core/provider-compat/openai-input-audio.ts + input-audio.ts normalizeOpenAIInputAudioPayload"
+        },
+        {
+          "module": "openai-video-url",
+          "reason": "sits OUTSIDE the dispatch registry — video-URL handling is centralized capability logic, never selected by PROVIDER_MODULES",
+          "source": "core/provider-compat.ts PROVIDER_MODULES literal"
+        }
+      ],
+      "google_generative_ai_deviation": "the google adapter takes NO compat patch layer — no incumbent compat module targets the google envelope (registered deviation, not a gap)"
+    }
+  },
+  "supplemental_leaf_registrations": {
+    "scope": "R05_SCOPE_MATRIX.json supplemental_leaves whose r00_task_ids contain R05-T03",
+    "counts": {
+      "total": 75,
+      "d10_providers": 37,
+      "d12_media": 38,
+      "d12_rule_R5": 37,
+      "d12_rule_R2_deferred": 1
+    },
+    "parity_guard_check": {
+      "conclusion": "no non-media R5 leaf is parked on T06: the only D12 leaf that is not rule R5 is R00-T02-LA-66FFBF09DEA3 (rule R2, disposition deferred->R07, desktop-shell open/cmd/xdg-open business entry, r05_share null); all 37 other D12 leaves are rule R5 media-plane leaves with a non-empty r05_share. The parity_guard condition (a non-media R5 leaf still hanging on T06) does NOT trigger; no silent reordering performed.",
+      "checked_leaf": "R00-T02-LA-66FFBF09DEA3"
+    },
+    "d10_providers": [
+      {
+        "leaf_id": "R00-T02-LA-00A769DD0FA3",
+        "feature_id": "F-D10-PROVIDER-PROVIDER-PERPLEXITY-00A769",
+        "provider_id": "perplexity",
+        "protocol": "openai-completions",
+        "auth": "api-key",
+        "rule": "R3",
+        "registration": "family wire shape pinned by rust/crates/lingxi-adapters/tests/golden/openai-completions/{forward,tool_roundtrip,error}.json; auth-shape mapping pinned by the family error golden (header name verbatim) and r05_t03_protocol_adapters (c01_c04 / c07); provider id is config data — the (provider, model) identity pair rules are pinned by r05_t01_model_plane c04 and r05_t03 c01_c04.",
+        "endpoint": "https://api.perplexity.ai",
+        "incumbent_compat_rules": "none — the incumbent dispatches no provider-specific compat module (first-match-wins registry in core/provider-compat.ts); the family-generic wire shape applies",
+        "rust_t03_compat_parity": "the R05-T03 Rust adapter ships the family-generic shape only; provider-specific compat patches remain incumbent-TS behavior and are NOT yet ported (owner: R05-T05 per-model quirk layer)"
+      },
+      {
+        "leaf_id": "R00-T02-LA-03E1121574A1",
+        "feature_id": "F-D10-PROVIDER-PROVIDER-OPENAI-03E112",
+        "provider_id": "openai",
+        "protocol": "openai-completions",
+        "auth": "api-key",
+        "rule": "R3",
+        "registration": "family wire shape pinned by rust/crates/lingxi-adapters/tests/golden/openai-completions/{forward,tool_roundtrip,error}.json; auth-shape mapping pinned by the family error golden (header name verbatim) and r05_t03_protocol_adapters (c01_c04 / c07); provider id is config data — the (provider, model) identity pair rules are pinned by r05_t01_model_plane c04 and r05_t03 c01_c04.",
+        "endpoint": "https://api.openai.com/v1",
+        "incumbent_compat_rules": "none — the incumbent dispatches no provider-specific compat module (first-match-wins registry in core/provider-compat.ts); the family-generic wire shape applies",
+        "rust_t03_compat_parity": "the R05-T03 Rust adapter ships the family-generic shape only; provider-specific compat patches remain incumbent-TS behavior and are NOT yet ported (owner: R05-T05 per-model quirk layer)"
+      },
+      {
+        "leaf_id": "R00-T02-LA-0DFFAB20A40B",
+        "feature_id": "F-D10-PROVIDER-PROVIDER-MIMO-0DFFAB",
+        "provider_id": "mimo",
+        "protocol": "openai-completions",
+        "auth": "api-key",
+        "rule": "R3",
+        "registration": "family wire shape pinned by rust/crates/lingxi-adapters/tests/golden/openai-completions/{forward,tool_roundtrip,error}.json; auth-shape mapping pinned by the family error golden (header name verbatim) and r05_t03_protocol_adapters (c01_c04 / c07); provider id is config data — the (provider, model) identity pair rules are pinned by r05_t01_model_plane c04 and r05_t03 c01_c04.",
+        "endpoint": "https://api.xiaomimimo.com/v1",
+        "incumbent_compat_rules": "core/provider-compat/mimo.ts (provider==mimo or host xiaomimimo.com): thinking toggle via chat_template_kwargs.enable_thinking, reasoning_content replay on tool-call history, utility mode disables thinking",
+        "rust_t03_compat_parity": "the R05-T03 Rust adapter ships the family-generic shape only; provider-specific compat patches remain incumbent-TS behavior and are NOT yet ported (owner: R05-T05 per-model quirk layer)"
+      },
+      {
+        "leaf_id": "R00-T02-LA-184E03F012D5",
+        "feature_id": "F-D10-PROVIDER-PROVIDER-FIREWORKS-184E03",
+        "provider_id": "fireworks",
+        "protocol": "openai-completions",
+        "auth": "api-key",
+        "rule": "R3",
+        "registration": "family wire shape pinned by rust/crates/lingxi-adapters/tests/golden/openai-completions/{forward,tool_roundtrip,error}.json; auth-shape mapping pinned by the family error golden (header name verbatim) and r05_t03_protocol_adapters (c01_c04 / c07); provider id is config data — the (provider, model) identity pair rules are pinned by r05_t01_model_plane c04 and r05_t03 c01_c04.",
+        "endpoint": "https://api.fireworks.ai/inference/v1",
+        "incumbent_compat_rules": "none — the incumbent dispatches no provider-specific compat module (first-match-wins registry in core/provider-compat.ts); the family-generic wire shape applies",
+        "rust_t03_compat_parity": "the R05-T03 Rust adapter ships the family-generic shape only; provider-specific compat patches remain incumbent-TS behavior and are NOT yet ported (owner: R05-T05 per-model quirk layer)"
+      },
+      {
+        "leaf_id": "R00-T02-LA-2097E172B42B",
+        "feature_id": "F-D10-PROVIDER-PROVIDER-HUNYUAN-2097E1",
+        "provider_id": "hunyuan",
+        "protocol": "openai-completions",
+        "auth": "api-key",
+        "rule": "R3",
+        "registration": "family wire shape pinned by rust/crates/lingxi-adapters/tests/golden/openai-completions/{forward,tool_roundtrip,error}.json; auth-shape mapping pinned by the family error golden (header name verbatim) and r05_t03_protocol_adapters (c01_c04 / c07); provider id is config data — the (provider, model) identity pair rules are pinned by r05_t01_model_plane c04 and r05_t03 c01_c04.",
+        "endpoint": "https://api.hunyuan.cloud.tencent.com/v1",
+        "incumbent_compat_rules": "none — the incumbent dispatches no provider-specific compat module (first-match-wins registry in core/provider-compat.ts); the family-generic wire shape applies",
+        "rust_t03_compat_parity": "the R05-T03 Rust adapter ships the family-generic shape only; provider-specific compat patches remain incumbent-TS behavior and are NOT yet ported (owner: R05-T05 per-model quirk layer)"
+      },
+      {
+        "leaf_id": "R00-T02-LA-2EDB69DA3AE2",
+        "feature_id": "F-D10-PROVIDER-PROVIDER-SILICONFLOW-2EDB69",
+        "provider_id": "siliconflow",
+        "protocol": "openai-completions",
+        "auth": "api-key",
+        "rule": "R3",
+        "registration": "family wire shape pinned by rust/crates/lingxi-adapters/tests/golden/openai-completions/{forward,tool_roundtrip,error}.json; auth-shape mapping pinned by the family error golden (header name verbatim) and r05_t03_protocol_adapters (c01_c04 / c07); provider id is config data — the (provider, model) identity pair rules are pinned by r05_t01_model_plane c04 and r05_t03 c01_c04.",
+        "endpoint": "https://api.siliconflow.cn/v1",
+        "incumbent_compat_rules": "none — the incumbent dispatches no provider-specific compat module (first-match-wins registry in core/provider-compat.ts); the family-generic wire shape applies",
+        "rust_t03_compat_parity": "the R05-T03 Rust adapter ships the family-generic shape only; provider-specific compat patches remain incumbent-TS behavior and are NOT yet ported (owner: R05-T05 per-model quirk layer)"
+      },
+      {
+        "leaf_id": "R00-T02-LA-39733312E5F4",
+        "feature_id": "F-D10-PROVIDER-PROVIDER-DASHSCOPE-397333",
+        "provider_id": "dashscope",
+        "protocol": "openai-completions",
+        "auth": "api-key",
+        "rule": "R3",
+        "registration": "family wire shape pinned by rust/crates/lingxi-adapters/tests/golden/openai-completions/{forward,tool_roundtrip,error}.json; auth-shape mapping pinned by the family error golden (header name verbatim) and r05_t03_protocol_adapters (c01_c04 / c07); provider id is config data — the (provider, model) identity pair rules are pinned by r05_t01_model_plane c04 and r05_t03 c01_c04.",
+        "endpoint": "https://dashscope.aliyuncs.com/compatible-mode/v1",
+        "incumbent_compat_rules": "core/provider-compat/qwen.ts (provider dashscope | baseUrl contains dashscope; only for video-input-capable models): video input payload patch",
+        "rust_t03_compat_parity": "the R05-T03 Rust adapter ships the family-generic shape only; provider-specific compat patches remain incumbent-TS behavior and are NOT yet ported (owner: R05-T05 per-model quirk layer)"
+      },
+      {
+        "leaf_id": "R00-T02-LA-3D8337A8088F",
+        "feature_id": "F-D10-PROVIDER-PROVIDER-XAIOAUTH-3D8337",
+        "provider_id": "xai-oauth",
+        "protocol": "openai-responses",
+        "auth": "oauth",
+        "rule": "R3",
+        "registration": "family wire shape pinned by rust/crates/lingxi-adapters/tests/golden/openai-responses/{forward,tool_roundtrip,error}.json; auth-shape mapping pinned by the family error golden (header name verbatim) and r05_t03_protocol_adapters (c01_c04 / c07); provider id is config data — the (provider, model) identity pair rules are pinned by r05_t01_model_plane c04 and r05_t03 c01_c04.",
+        "endpoint": "https://cli-chat-proxy.grok.com/v1",
+        "incumbent_compat_rules": "none — the incumbent dispatches no provider-specific compat module (first-match-wins registry in core/provider-compat.ts); the family-generic wire shape applies",
+        "rust_t03_compat_parity": "the R05-T03 Rust adapter ships the family-generic shape only; provider-specific compat patches remain incumbent-TS behavior and are NOT yet ported (owner: R05-T05 per-model quirk layer)"
+      },
+      {
+        "leaf_id": "R00-T02-LA-419F19D7AA64",
+        "feature_id": "F-D10-PROVIDER-PROVIDER-DEEPSEEKRESPONSES-419F19",
+        "provider_id": "deepseek-responses",
+        "protocol": "openai-responses",
+        "auth": "api-key",
+        "rule": "R3",
+        "registration": "family wire shape pinned by rust/crates/lingxi-adapters/tests/golden/openai-responses/{forward,tool_roundtrip,error}.json; auth-shape mapping pinned by the family error golden (header name verbatim) and r05_t03_protocol_adapters (c01_c04 / c07); provider id is config data — the (provider, model) identity pair rules are pinned by r05_t01_model_plane c04 and r05_t03 c01_c04.",
+        "endpoint": "https://api.deepseek.com",
+        "incumbent_compat_rules": "core/provider-compat/deepseek-responses.ts (api openai-responses + provider deepseek-responses | host api.deepseek.com): output-cap fields carried to max_output_tokens, chat-completions-only fields stripped",
+        "rust_t03_compat_parity": "the R05-T03 Rust adapter ships the family-generic shape only; provider-specific compat patches remain incumbent-TS behavior and are NOT yet ported (owner: R05-T05 per-model quirk layer)"
+      },
+      {
+        "leaf_id": "R00-T02-LA-43DDCE21A45C",
+        "feature_id": "F-D10-PROVIDER-PROVIDER-OLLAMA-43DDCE",
+        "provider_id": "ollama",
+        "protocol": "openai-completions",
+        "auth": "none",
+        "rule": "R3",
+        "registration": "family wire shape pinned by rust/crates/lingxi-adapters/tests/golden/openai-completions/{forward,tool_roundtrip,error}.json; auth-shape mapping pinned by the family error golden (header name verbatim) and r05_t03_protocol_adapters (c01_c04 / c07); provider id is config data — the (provider, model) identity pair rules are pinned by r05_t01_model_plane c04 and r05_t03 c01_c04.",
+        "endpoint": "http://localhost:11434/v1",
+        "incumbent_compat_rules": "core/provider-compat/ollama.ts (provider ollama): Ollama OpenAI-compatible payload patches",
+        "rust_t03_compat_parity": "the R05-T03 Rust adapter ships the family-generic shape only; provider-specific compat patches remain incumbent-TS behavior and are NOT yet ported (owner: R05-T05 per-model quirk layer)"
+      },
+      {
+        "leaf_id": "R00-T02-LA-477D944DF19B",
+        "feature_id": "F-D10-PROVIDER-PROVIDER-INFINI-477D94",
+        "provider_id": "infini",
+        "protocol": "openai-completions",
+        "auth": "api-key",
+        "rule": "R3",
+        "registration": "family wire shape pinned by rust/crates/lingxi-adapters/tests/golden/openai-completions/{forward,tool_roundtrip,error}.json; auth-shape mapping pinned by the family error golden (header name verbatim) and r05_t03_protocol_adapters (c01_c04 / c07); provider id is config data — the (provider, model) identity pair rules are pinned by r05_t01_model_plane c04 and r05_t03 c01_c04.",
+        "endpoint": "https://cloud.infini-ai.com/maas/v1",
+        "incumbent_compat_rules": "none — the incumbent dispatches no provider-specific compat module (first-match-wins registry in core/provider-compat.ts); the family-generic wire shape applies",
+        "rust_t03_compat_parity": "the R05-T03 Rust adapter ships the family-generic shape only; provider-specific compat patches remain incumbent-TS behavior and are NOT yet ported (owner: R05-T05 per-model quirk layer)"
+      },
+      {
+        "leaf_id": "R00-T02-LA-565BE3400DAC",
+        "feature_id": "F-D10-PROVIDER-PROVIDER-MOONSHOT-565BE3",
+        "provider_id": "moonshot",
+        "protocol": "openai-completions",
+        "auth": "api-key",
+        "rule": "R3",
+        "registration": "family wire shape pinned by rust/crates/lingxi-adapters/tests/golden/openai-completions/{forward,tool_roundtrip,error}.json; auth-shape mapping pinned by the family error golden (header name verbatim) and r05_t03_protocol_adapters (c01_c04 / c07); provider id is config data — the (provider, model) identity pair rules are pinned by r05_t01_model_plane c04 and r05_t03 c01_c04.",
+        "endpoint": "https://api.moonshot.cn/v1",
+        "incumbent_compat_rules": "core/provider-compat/kimi.ts (conditional: thinkingFormat kimi | reasoningProfile kimi-openai): thinking compatibility",
+        "rust_t03_compat_parity": "the R05-T03 Rust adapter ships the family-generic shape only; provider-specific compat patches remain incumbent-TS behavior and are NOT yet ported (owner: R05-T05 per-model quirk layer)"
+      },
+      {
+        "leaf_id": "R00-T02-LA-668EEC15C958",
+        "feature_id": "F-D10-PROVIDER-PROVIDER-OPENCODEGO-668EEC",
+        "provider_id": "opencode-go",
+        "protocol": "openai-completions",
+        "auth": "api-key",
+        "rule": "R3",
+        "registration": "family wire shape pinned by rust/crates/lingxi-adapters/tests/golden/openai-completions/{forward,tool_roundtrip,error}.json; auth-shape mapping pinned by the family error golden (header name verbatim) and r05_t03_protocol_adapters (c01_c04 / c07); provider id is config data — the (provider, model) identity pair rules are pinned by r05_t01_model_plane c04 and r05_t03 c01_c04.",
+        "endpoint": "https://opencode.ai/zen/go/v1",
+        "incumbent_compat_rules": "none — the incumbent dispatches no provider-specific compat module (first-match-wins registry in core/provider-compat.ts); the family-generic wire shape applies",
+        "rust_t03_compat_parity": "the R05-T03 Rust adapter ships the family-generic shape only; provider-specific compat patches remain incumbent-TS behavior and are NOT yet ported (owner: R05-T05 per-model quirk layer)"
+      },
+      {
+        "leaf_id": "R00-T02-LA-71738E50BACA",
+        "feature_id": "F-D10-PROVIDER-PROVIDER-BAIDUCLOUD-71738E",
+        "provider_id": "baidu-cloud",
+        "protocol": "openai-completions",
+        "auth": "api-key",
+        "rule": "R3",
+        "registration": "family wire shape pinned by rust/crates/lingxi-adapters/tests/golden/openai-completions/{forward,tool_roundtrip,error}.json; auth-shape mapping pinned by the family error golden (header name verbatim) and r05_t03_protocol_adapters (c01_c04 / c07); provider id is config data — the (provider, model) identity pair rules are pinned by r05_t01_model_plane c04 and r05_t03 c01_c04.",
+        "endpoint": "https://qianfan.baidubce.com/v2",
+        "incumbent_compat_rules": "none — the incumbent dispatches no provider-specific compat module (first-match-wins registry in core/provider-compat.ts); the family-generic wire shape applies",
+        "rust_t03_compat_parity": "the R05-T03 Rust adapter ships the family-generic shape only; provider-specific compat patches remain incumbent-TS behavior and are NOT yet ported (owner: R05-T05 per-model quirk layer)"
+      },
+      {
+        "leaf_id": "R00-T02-LA-77812804951F",
+        "feature_id": "F-D10-PROVIDER-PROVIDER-MISTRAL-778128",
+        "provider_id": "mistral",
+        "protocol": "openai-completions",
+        "auth": "api-key",
+        "rule": "R3",
+        "registration": "family wire shape pinned by rust/crates/lingxi-adapters/tests/golden/openai-completions/{forward,tool_roundtrip,error}.json; auth-shape mapping pinned by the family error golden (header name verbatim) and r05_t03_protocol_adapters (c01_c04 / c07); provider id is config data — the (provider, model) identity pair rules are pinned by r05_t01_model_plane c04 and r05_t03 c01_c04.",
+        "endpoint": "https://api.mistral.ai/v1",
+        "incumbent_compat_rules": "none — the incumbent dispatches no provider-specific compat module (first-match-wins registry in core/provider-compat.ts); the family-generic wire shape applies",
+        "rust_t03_compat_parity": "the R05-T03 Rust adapter ships the family-generic shape only; provider-specific compat patches remain incumbent-TS behavior and are NOT yet ported (owner: R05-T05 per-model quirk layer)"
+      },
+      {
+        "leaf_id": "R00-T02-LA-7D969CDBF21C",
+        "feature_id": "F-D10-PROVIDER-PROVIDER-STEPFUN-7D969C",
+        "provider_id": "stepfun",
+        "protocol": "openai-completions",
+        "auth": "api-key",
+        "rule": "R3",
+        "registration": "family wire shape pinned by rust/crates/lingxi-adapters/tests/golden/openai-completions/{forward,tool_roundtrip,error}.json; auth-shape mapping pinned by the family error golden (header name verbatim) and r05_t03_protocol_adapters (c01_c04 / c07); provider id is config data — the (provider, model) identity pair rules are pinned by r05_t01_model_plane c04 and r05_t03 c01_c04.",
+        "endpoint": "https://api.stepfun.com/v1",
+        "incumbent_compat_rules": "none — the incumbent dispatches no provider-specific compat module (first-match-wins registry in core/provider-compat.ts); the family-generic wire shape applies",
+        "rust_t03_compat_parity": "the R05-T03 Rust adapter ships the family-generic shape only; provider-specific compat patches remain incumbent-TS behavior and are NOT yet ported (owner: R05-T05 per-model quirk layer)"
+      },
+      {
+        "leaf_id": "R00-T02-LA-80DB4026AF13",
+        "feature_id": "F-D10-PROVIDER-PROVIDER-OPENCODE-80DB40",
+        "provider_id": "opencode",
+        "protocol": "anthropic-messages",
+        "auth": "api-key",
+        "rule": "R3",
+        "registration": "family wire shape pinned by rust/crates/lingxi-adapters/tests/golden/anthropic-messages/{forward,tool_roundtrip,error}.json; auth-shape mapping pinned by the family error golden (header name verbatim) and r05_t03_protocol_adapters (c01_c04 / c07); provider id is config data — the (provider, model) identity pair rules are pinned by r05_t01_model_plane c04 and r05_t03 c01_c04.",
+        "endpoint": "https://opencode.ai/zen",
+        "incumbent_compat_rules": "core/provider-compat/anthropic.ts (conditional on thinkingFormat/cache-control, same rules as anthropic)",
+        "rust_t03_compat_parity": "the R05-T03 Rust adapter ships the family-generic shape only; provider-specific compat patches remain incumbent-TS behavior and are NOT yet ported (owner: R05-T05 per-model quirk layer)"
+      },
+      {
+        "leaf_id": "R00-T02-LA-834034527694",
+        "feature_id": "F-D10-PROVIDER-PROVIDER-ZHIPUCODING-834034",
+        "provider_id": "zhipu-coding",
+        "protocol": "openai-completions",
+        "auth": "api-key",
+        "rule": "R3",
+        "registration": "family wire shape pinned by rust/crates/lingxi-adapters/tests/golden/openai-completions/{forward,tool_roundtrip,error}.json; auth-shape mapping pinned by the family error golden (header name verbatim) and r05_t03_protocol_adapters (c01_c04 / c07); provider id is config data — the (provider, model) identity pair rules are pinned by r05_t01_model_plane c04 and r05_t03 c01_c04.",
+        "endpoint": "https://api.z.ai/api/coding/paas/v4",
+        "incumbent_compat_rules": "core/provider-compat/zhipu.ts (provider zhipu-coding): same rules as zhipu",
+        "rust_t03_compat_parity": "the R05-T03 Rust adapter ships the family-generic shape only; provider-specific compat patches remain incumbent-TS behavior and are NOT yet ported (owner: R05-T05 per-model quirk layer)"
+      },
+      {
+        "leaf_id": "R00-T02-LA-89707E479335",
+        "feature_id": "F-D10-PROVIDER-PROVIDER-DASHSCOPECODING-89707E",
+        "provider_id": "dashscope-coding",
+        "protocol": "openai-completions",
+        "auth": "api-key",
+        "rule": "R3",
+        "registration": "family wire shape pinned by rust/crates/lingxi-adapters/tests/golden/openai-completions/{forward,tool_roundtrip,error}.json; auth-shape mapping pinned by the family error golden (header name verbatim) and r05_t03_protocol_adapters (c01_c04 / c07); provider id is config data — the (provider, model) identity pair rules are pinned by r05_t01_model_plane c04 and r05_t03 c01_c04.",
+        "endpoint": "https://coding.dashscope.aliyuncs.com/v1",
+        "incumbent_compat_rules": "core/provider-compat/qwen.ts (baseUrl contains dashscope; video-input models only): same rules as dashscope",
+        "rust_t03_compat_parity": "the R05-T03 Rust adapter ships the family-generic shape only; provider-specific compat patches remain incumbent-TS behavior and are NOT yet ported (owner: R05-T05 per-model quirk layer)"
+      },
+      {
+        "leaf_id": "R00-T02-LA-9194C0F0D909",
+        "feature_id": "F-D10-PROVIDER-PROVIDER-MINIMAXTOKENPLAN-9194C0",
+        "provider_id": "minimax-token-plan",
+        "protocol": "anthropic-messages",
+        "auth": "api-key",
+        "rule": "R3",
+        "registration": "family wire shape pinned by rust/crates/lingxi-adapters/tests/golden/anthropic-messages/{forward,tool_roundtrip,error}.json; auth-shape mapping pinned by the family error golden (header name verbatim) and r05_t03_protocol_adapters (c01_c04 / c07); provider id is config data — the (provider, model) identity pair rules are pinned by r05_t01_model_plane c04 and r05_t03 c01_c04.",
+        "endpoint": "https://api.minimaxi.com/anthropic",
+        "incumbent_compat_rules": "core/provider-compat/anthropic.ts (conditional on thinkingFormat/cache-control, same rules as anthropic)",
+        "rust_t03_compat_parity": "the R05-T03 Rust adapter ships the family-generic shape only; provider-specific compat patches remain incumbent-TS behavior and are NOT yet ported (owner: R05-T05 per-model quirk layer)"
+      },
+      {
+        "leaf_id": "R00-T02-LA-9871F51BE25B",
+        "feature_id": "F-D10-PROVIDER-PROVIDER-OPENROUTER-9871F5",
+        "provider_id": "openrouter",
+        "protocol": "openai-completions",
+        "auth": "api-key",
+        "rule": "R3",
+        "registration": "family wire shape pinned by rust/crates/lingxi-adapters/tests/golden/openai-completions/{forward,tool_roundtrip,error}.json; auth-shape mapping pinned by the family error golden (header name verbatim) and r05_t03_protocol_adapters (c01_c04 / c07); provider id is config data — the (provider, model) identity pair rules are pinned by r05_t01_model_plane c04 and r05_t03 c01_c04.",
+        "endpoint": "https://openrouter.ai/api/v1",
+        "incumbent_compat_rules": "core/provider-compat/openrouter.ts (conditional: reasoningProfile openrouter-anthropic-adaptive): adaptive reasoning compatibility",
+        "rust_t03_compat_parity": "the R05-T03 Rust adapter ships the family-generic shape only; provider-specific compat patches remain incumbent-TS behavior and are NOT yet ported (owner: R05-T05 per-model quirk layer)"
+      },
+      {
+        "leaf_id": "R00-T02-LA-ABAC28922F7A",
+        "feature_id": "F-D10-PROVIDER-PROVIDER-OPENAICODEXOAUTH-ABAC28",
+        "provider_id": "openai-codex-oauth",
+        "protocol": "openai-codex-responses",
+        "auth": "oauth",
+        "rule": "R3",
+        "registration": "family wire shape pinned by rust/crates/lingxi-adapters/tests/golden/openai-codex-responses/{forward,tool_roundtrip,error}.json; auth-shape mapping pinned by the family error golden (header name verbatim) and r05_t03_protocol_adapters (c01_c04 / c07); provider id is config data — the (provider, model) identity pair rules are pinned by r05_t01_model_plane c04 and r05_t03 c01_c04.",
+        "endpoint": "https://chatgpt.com/backend-api",
+        "incumbent_compat_rules": "core/provider-compat/codex-responses.ts (api openai-codex-responses + provider openai-codex-oauth): unsupported fields stripped (max_output_tokens/max_completion_tokens/max_tokens/maxOutputTokens/temperature/...)",
+        "rust_t03_compat_parity": "the R05-T03 Rust adapter ships the family-generic shape only; provider-specific compat patches remain incumbent-TS behavior and are NOT yet ported (owner: R05-T05 per-model quirk layer)"
+      },
+      {
+        "leaf_id": "R00-T02-LA-AC352BFA3D82",
+        "feature_id": "F-D10-PROVIDER-PROVIDER-TOGETHER-AC352B",
+        "provider_id": "together",
+        "protocol": "openai-completions",
+        "auth": "api-key",
+        "rule": "R3",
+        "registration": "family wire shape pinned by rust/crates/lingxi-adapters/tests/golden/openai-completions/{forward,tool_roundtrip,error}.json; auth-shape mapping pinned by the family error golden (header name verbatim) and r05_t03_protocol_adapters (c01_c04 / c07); provider id is config data — the (provider, model) identity pair rules are pinned by r05_t01_model_plane c04 and r05_t03 c01_c04.",
+        "endpoint": "https://api.together.xyz/v1",
+        "incumbent_compat_rules": "none — the incumbent dispatches no provider-specific compat module (first-match-wins registry in core/provider-compat.ts); the family-generic wire shape applies",
+        "rust_t03_compat_parity": "the R05-T03 Rust adapter ships the family-generic shape only; provider-specific compat patches remain incumbent-TS behavior and are NOT yet ported (owner: R05-T05 per-model quirk layer)"
+      },
+      {
+        "leaf_id": "R00-T02-LA-B70FCDCAC1ED",
+        "feature_id": "F-D10-PROVIDER-PROVIDER-KIMICODING-B70FCD",
+        "provider_id": "kimi-coding",
+        "protocol": "openai-completions",
+        "auth": "api-key",
+        "rule": "R3",
+        "registration": "family wire shape pinned by rust/crates/lingxi-adapters/tests/golden/openai-completions/{forward,tool_roundtrip,error}.json; auth-shape mapping pinned by the family error golden (header name verbatim) and r05_t03_protocol_adapters (c01_c04 / c07); provider id is config data — the (provider, model) identity pair rules are pinned by r05_t01_model_plane c04 and r05_t03 c01_c04.",
+        "endpoint": "https://api.kimi.com/coding/v1",
+        "incumbent_compat_rules": "core/provider-compat/kimi.ts (conditional: thinkingFormat kimi | reasoningProfile kimi-openai): same rules as moonshot",
+        "rust_t03_compat_parity": "the R05-T03 Rust adapter ships the family-generic shape only; provider-specific compat patches remain incumbent-TS behavior and are NOT yet ported (owner: R05-T05 per-model quirk layer)"
+      },
+      {
+        "leaf_id": "R00-T02-LA-BA4BDB7F7338",
+        "feature_id": "F-D10-PROVIDER-PROVIDER-BAICHUAN-BA4BDB",
+        "provider_id": "baichuan",
+        "protocol": "openai-completions",
+        "auth": "api-key",
+        "rule": "R3",
+        "registration": "family wire shape pinned by rust/crates/lingxi-adapters/tests/golden/openai-completions/{forward,tool_roundtrip,error}.json; auth-shape mapping pinned by the family error golden (header name verbatim) and r05_t03_protocol_adapters (c01_c04 / c07); provider id is config data — the (provider, model) identity pair rules are pinned by r05_t01_model_plane c04 and r05_t03 c01_c04.",
+        "endpoint": "https://api.baichuan-ai.com/v1",
+        "incumbent_compat_rules": "none — the incumbent dispatches no provider-specific compat module (first-match-wins registry in core/provider-compat.ts); the family-generic wire shape applies",
+        "rust_t03_compat_parity": "the R05-T03 Rust adapter ships the family-generic shape only; provider-specific compat patches remain incumbent-TS behavior and are NOT yet ported (owner: R05-T05 per-model quirk layer)"
+      },
+      {
+        "leaf_id": "R00-T02-LA-BFD9531DEA41",
+        "feature_id": "F-D10-PROVIDER-PROVIDER-GEMINI-BFD953",
+        "provider_id": "gemini",
+        "protocol": "google-generative-ai",
+        "auth": "api-key",
+        "rule": "R3",
+        "registration": "family wire shape pinned by rust/crates/lingxi-adapters/tests/golden/google-generative-ai/{forward,tool_roundtrip,error}.json; auth-shape mapping pinned by the family error golden (header name verbatim) and r05_t03_protocol_adapters (c01_c04 / c07); provider id is config data — the (provider, model) identity pair rules are pinned by r05_t01_model_plane c04 and r05_t03 c01_c04.",
+        "endpoint": "https://generativelanguage.googleapis.com/v1beta",
+        "incumbent_compat_rules": "none — the incumbent dispatches no provider-specific compat module (first-match-wins registry in core/provider-compat.ts); the family-generic wire shape applies",
+        "rust_t03_compat_parity": "the R05-T03 Rust adapter ships the family-generic shape only; provider-specific compat patches remain incumbent-TS behavior and are NOT yet ported (owner: R05-T05 per-model quirk layer)"
+      },
+      {
+        "leaf_id": "R00-T02-LA-C4EFBA7711E1",
+        "feature_id": "F-D10-PROVIDER-PROVIDER-AGNES-C4EFBA",
+        "provider_id": "agnes",
+        "protocol": "openai-completions",
+        "auth": "api-key",
+        "rule": "R3",
+        "registration": "family wire shape pinned by rust/crates/lingxi-adapters/tests/golden/openai-completions/{forward,tool_roundtrip,error}.json; auth-shape mapping pinned by the family error golden (header name verbatim) and r05_t03_protocol_adapters (c01_c04 / c07); provider id is config data — the (provider, model) identity pair rules are pinned by r05_t01_model_plane c04 and r05_t03 c01_c04.",
+        "endpoint": "https://apihub.agnes-ai.com/v1",
+        "incumbent_compat_rules": "core/provider-compat/agnes.ts (provider agnes | host *.agnes-ai.com): Agnes AI payload compatibility",
+        "rust_t03_compat_parity": "the R05-T03 Rust adapter ships the family-generic shape only; provider-specific compat patches remain incumbent-TS behavior and are NOT yet ported (owner: R05-T05 per-model quirk layer)"
+      },
+      {
+        "leaf_id": "R00-T02-LA-CCD6BA30F9ED",
+        "feature_id": "F-D10-PROVIDER-PROVIDER-VOLCEGINECODING-CCD6BA",
+        "provider_id": "volcengine-coding",
+        "protocol": "openai-completions",
+        "auth": "api-key",
+        "rule": "R3",
+        "registration": "family wire shape pinned by rust/crates/lingxi-adapters/tests/golden/openai-completions/{forward,tool_roundtrip,error}.json; auth-shape mapping pinned by the family error golden (header name verbatim) and r05_t03_protocol_adapters (c01_c04 / c07); provider id is config data — the (provider, model) identity pair rules are pinned by r05_t01_model_plane c04 and r05_t03 c01_c04.",
+        "endpoint": "https://ark.cn-beijing.volces.com/api/coding/v3",
+        "incumbent_compat_rules": "core/provider-compat/volcengine.ts (provider volcengine-coding): same rules as volcengine",
+        "rust_t03_compat_parity": "the R05-T03 Rust adapter ships the family-generic shape only; provider-specific compat patches remain incumbent-TS behavior and are NOT yet ported (owner: R05-T05 per-model quirk layer)"
+      },
+      {
+        "leaf_id": "R00-T02-LA-D61616CAF15F",
+        "feature_id": "F-D10-PROVIDER-PROVIDER-MIMOTOKENPLAN-D61616",
+        "provider_id": "mimo-token-plan",
+        "protocol": "openai-completions",
+        "auth": "api-key",
+        "rule": "R3",
+        "registration": "family wire shape pinned by rust/crates/lingxi-adapters/tests/golden/openai-completions/{forward,tool_roundtrip,error}.json; auth-shape mapping pinned by the family error golden (header name verbatim) and r05_t03_protocol_adapters (c01_c04 / c07); provider id is config data — the (provider, model) identity pair rules are pinned by r05_t01_model_plane c04 and r05_t03 c01_c04.",
+        "endpoint": "https://token-plan-cn.xiaomimimo.com/v1",
+        "incumbent_compat_rules": "core/provider-compat/mimo.ts (host token-plan-cn.xiaomimimo.com): same rules as mimo",
+        "rust_t03_compat_parity": "the R05-T03 Rust adapter ships the family-generic shape only; provider-specific compat patches remain incumbent-TS behavior and are NOT yet ported (owner: R05-T05 per-model quirk layer)"
+      },
+      {
+        "leaf_id": "R00-T02-LA-D79C2E204AFB",
+        "feature_id": "F-D10-PROVIDER-PROVIDER-XAI-D79C2E",
+        "provider_id": "xai",
+        "protocol": "openai-completions",
+        "auth": "api-key",
+        "rule": "R3",
+        "registration": "family wire shape pinned by rust/crates/lingxi-adapters/tests/golden/openai-completions/{forward,tool_roundtrip,error}.json; auth-shape mapping pinned by the family error golden (header name verbatim) and r05_t03_protocol_adapters (c01_c04 / c07); provider id is config data — the (provider, model) identity pair rules are pinned by r05_t01_model_plane c04 and r05_t03 c01_c04.",
+        "endpoint": "https://api.x.ai/v1",
+        "incumbent_compat_rules": "none — the incumbent dispatches no provider-specific compat module (first-match-wins registry in core/provider-compat.ts); the family-generic wire shape applies",
+        "rust_t03_compat_parity": "the R05-T03 Rust adapter ships the family-generic shape only; provider-specific compat patches remain incumbent-TS behavior and are NOT yet ported (owner: R05-T05 per-model quirk layer)"
+      },
+      {
+        "leaf_id": "R00-T02-LA-D86616980926",
+        "feature_id": "F-D10-PROVIDER-PROVIDER-ANTHROPIC-D86616",
+        "provider_id": "anthropic",
+        "protocol": "anthropic-messages",
+        "auth": "api-key",
+        "rule": "R3",
+        "registration": "family wire shape pinned by rust/crates/lingxi-adapters/tests/golden/anthropic-messages/{forward,tool_roundtrip,error}.json; auth-shape mapping pinned by the family error golden (header name verbatim) and r05_t03_protocol_adapters (c01_c04 / c07); provider id is config data — the (provider, model) identity pair rules are pinned by r05_t01_model_plane c04 and r05_t03 c01_c04.",
+        "endpoint": "https://api.anthropic.com",
+        "incumbent_compat_rules": "core/provider-compat/anthropic.ts (conditional: usesAnthropicCacheControl | api anthropic-messages + thinkingFormat anthropic | adaptive-only profile): prompt-cache control compatibility",
+        "rust_t03_compat_parity": "the R05-T03 Rust adapter ships the family-generic shape only; provider-specific compat patches remain incumbent-TS behavior and are NOT yet ported (owner: R05-T05 per-model quirk layer)"
+      },
+      {
+        "leaf_id": "R00-T02-LA-DE0309EF3F56",
+        "feature_id": "F-D10-PROVIDER-PROVIDER-MODELSCOPE-DE0309",
+        "provider_id": "modelscope",
+        "protocol": "openai-completions",
+        "auth": "api-key",
+        "rule": "R3",
+        "registration": "family wire shape pinned by rust/crates/lingxi-adapters/tests/golden/openai-completions/{forward,tool_roundtrip,error}.json; auth-shape mapping pinned by the family error golden (header name verbatim) and r05_t03_protocol_adapters (c01_c04 / c07); provider id is config data — the (provider, model) identity pair rules are pinned by r05_t01_model_plane c04 and r05_t03 c01_c04.",
+        "endpoint": "https://api-inference.modelscope.cn/v1",
+        "incumbent_compat_rules": "none — the incumbent dispatches no provider-specific compat module (first-match-wins registry in core/provider-compat.ts); the family-generic wire shape applies",
+        "rust_t03_compat_parity": "the R05-T03 Rust adapter ships the family-generic shape only; provider-specific compat patches remain incumbent-TS behavior and are NOT yet ported (owner: R05-T05 per-model quirk layer)"
+      },
+      {
+        "leaf_id": "R00-T02-LA-E06C7DDB93D2",
+        "feature_id": "F-D10-PROVIDER-PROVIDER-VOLCENGINE-E06C7D",
+        "provider_id": "volcengine",
+        "protocol": "openai-completions",
+        "auth": "api-key",
+        "rule": "R3",
+        "registration": "family wire shape pinned by rust/crates/lingxi-adapters/tests/golden/openai-completions/{forward,tool_roundtrip,error}.json; auth-shape mapping pinned by the family error golden (header name verbatim) and r05_t03_protocol_adapters (c01_c04 / c07); provider id is config data — the (provider, model) identity pair rules are pinned by r05_t01_model_plane c04 and r05_t03 c01_c04.",
+        "endpoint": "https://ark.cn-beijing.volces.com/api/v3",
+        "incumbent_compat_rules": "core/provider-compat/volcengine.ts (provider volcengine | thinkingFormat volcengine): thinking format normalization",
+        "rust_t03_compat_parity": "the R05-T03 Rust adapter ships the family-generic shape only; provider-specific compat patches remain incumbent-TS behavior and are NOT yet ported (owner: R05-T05 per-model quirk layer)"
+      },
+      {
+        "leaf_id": "R00-T02-LA-ED13EB6D0FA6",
+        "feature_id": "F-D10-PROVIDER-PROVIDER-DEEPSEEK-ED13EB",
+        "provider_id": "deepseek",
+        "protocol": "openai-completions",
+        "auth": "api-key",
+        "rule": "R3",
+        "registration": "family wire shape pinned by rust/crates/lingxi-adapters/tests/golden/openai-completions/{forward,tool_roundtrip,error}.json; auth-shape mapping pinned by the family error golden (header name verbatim) and r05_t03_protocol_adapters (c01_c04 / c07); provider id is config data — the (provider, model) identity pair rules are pinned by r05_t01_model_plane c04 and r05_t03 c01_c04.",
+        "endpoint": "https://api.deepseek.com",
+        "incumbent_compat_rules": "core/provider-compat/deepseek.ts (provider deepseek | host api.deepseek.com; non-responses api): thinking/reasoning handling for chat-completions",
+        "rust_t03_compat_parity": "the R05-T03 Rust adapter ships the family-generic shape only; provider-specific compat patches remain incumbent-TS behavior and are NOT yet ported (owner: R05-T05 per-model quirk layer)"
+      },
+      {
+        "leaf_id": "R00-T02-LA-FBCFA99A89A2",
+        "feature_id": "F-D10-PROVIDER-PROVIDER-GROQ-FBCFA9",
+        "provider_id": "groq",
+        "protocol": "openai-completions",
+        "auth": "api-key",
+        "rule": "R3",
+        "registration": "family wire shape pinned by rust/crates/lingxi-adapters/tests/golden/openai-completions/{forward,tool_roundtrip,error}.json; auth-shape mapping pinned by the family error golden (header name verbatim) and r05_t03_protocol_adapters (c01_c04 / c07); provider id is config data — the (provider, model) identity pair rules are pinned by r05_t01_model_plane c04 and r05_t03 c01_c04.",
+        "endpoint": "https://api.groq.com/openai/v1",
+        "incumbent_compat_rules": "none — the incumbent dispatches no provider-specific compat module (first-match-wins registry in core/provider-compat.ts); the family-generic wire shape applies",
+        "rust_t03_compat_parity": "the R05-T03 Rust adapter ships the family-generic shape only; provider-specific compat patches remain incumbent-TS behavior and are NOT yet ported (owner: R05-T05 per-model quirk layer)"
+      },
+      {
+        "leaf_id": "R00-T02-LA-FE9588171A23",
+        "feature_id": "F-D10-PROVIDER-PROVIDER-MINIMAX-FE9588",
+        "provider_id": "minimax",
+        "protocol": "anthropic-messages",
+        "auth": "api-key",
+        "rule": "R3",
+        "registration": "family wire shape pinned by rust/crates/lingxi-adapters/tests/golden/anthropic-messages/{forward,tool_roundtrip,error}.json; auth-shape mapping pinned by the family error golden (header name verbatim) and r05_t03_protocol_adapters (c01_c04 / c07); provider id is config data — the (provider, model) identity pair rules are pinned by r05_t01_model_plane c04 and r05_t03 c01_c04.",
+        "endpoint": "https://api.minimaxi.com/anthropic",
+        "incumbent_compat_rules": "core/provider-compat/anthropic.ts (conditional on thinkingFormat/cache-control, same rules as anthropic)",
+        "rust_t03_compat_parity": "the R05-T03 Rust adapter ships the family-generic shape only; provider-specific compat patches remain incumbent-TS behavior and are NOT yet ported (owner: R05-T05 per-model quirk layer)"
+      },
+      {
+        "leaf_id": "R00-T02-LA-FF3AD97F8429",
+        "feature_id": "F-D10-PROVIDER-PROVIDER-ZHIPU-FF3AD9",
+        "provider_id": "zhipu",
+        "protocol": "openai-completions",
+        "auth": "api-key",
+        "rule": "R3",
+        "registration": "family wire shape pinned by rust/crates/lingxi-adapters/tests/golden/openai-completions/{forward,tool_roundtrip,error}.json; auth-shape mapping pinned by the family error golden (header name verbatim) and r05_t03_protocol_adapters (c01_c04 / c07); provider id is config data — the (provider, model) identity pair rules are pinned by r05_t01_model_plane c04 and r05_t03 c01_c04.",
+        "endpoint": "https://open.bigmodel.cn/api/paas/v4",
+        "incumbent_compat_rules": "core/provider-compat/zhipu.ts (provider zhipu | thinkingFormat zhipu): thinking format normalization",
+        "rust_t03_compat_parity": "the R05-T03 Rust adapter ships the family-generic shape only; provider-specific compat patches remain incumbent-TS behavior and are NOT yet ported (owner: R05-T05 per-model quirk layer)"
+      }
+    ],
+    "d12_media": [
+      {
+        "leaf_id": "R00-T02-LA-057B048D6C07",
+        "feature_id": "F-D12-SEMANTIC_EFFECT-SEMANTIC-EFFECT-MEDIA-MEDIA-VIDEO-PROVIDERS-PROV-057B04",
+        "rule": "R5",
+        "disposition": "share",
+        "registration": "media-plane leaf (image/video/speech/asr): no chat wire fact for T03; the family's configured-but-unimplemented loud refusal BEFORE any request is pinned by r05_t01_model_plane c06 (volcengine-bigasr, stub.hits()==0) and gateway.rs unimplemented_families_refuse_loudly; wire attribution stays with R05-T06."
+      },
+      {
+        "leaf_id": "R00-T02-LA-0949F828BEA3",
+        "feature_id": "F-D12-SEMANTIC_EFFECT-SEMANTIC-EFFECT-MEDIA-MEDIA-GENERATED-FILENAME-R-0949F8",
+        "rule": "R5",
+        "disposition": "share",
+        "registration": "media-plane leaf (image/video/speech/asr): no chat wire fact for T03; the family's configured-but-unimplemented loud refusal BEFORE any request is pinned by r05_t01_model_plane c06 (volcengine-bigasr, stub.hits()==0) and gateway.rs unimplemented_families_refuse_loudly; wire attribution stays with R05-T06."
+      },
+      {
+        "leaf_id": "R00-T02-LA-17702A7B3335",
+        "feature_id": "F-D12-SEMANTIC_EFFECT-SEMANTIC-EFFECT-MEDIA-MEDIA-SPEECH-CONFIG-READ-17702A",
+        "rule": "R5",
+        "disposition": "share",
+        "registration": "media-plane leaf (image/video/speech/asr): no chat wire fact for T03; the family's configured-but-unimplemented loud refusal BEFORE any request is pinned by r05_t01_model_plane c06 (volcengine-bigasr, stub.hits()==0) and gateway.rs unimplemented_families_refuse_loudly; wire attribution stays with R05-T06."
+      },
+      {
+        "leaf_id": "R00-T02-LA-1B65B0793D67",
+        "feature_id": "F-D12-SEMANTIC_EFFECT-SEMANTIC-EFFECT-MEDIA-MEDIA-IMAGE-CONFIG-PUT-1B65B0",
+        "rule": "R5",
+        "disposition": "share",
+        "registration": "media-plane leaf (image/video/speech/asr): no chat wire fact for T03; the family's configured-but-unimplemented loud refusal BEFORE any request is pinned by r05_t01_model_plane c06 (volcengine-bigasr, stub.hits()==0) and gateway.rs unimplemented_families_refuse_loudly; wire attribution stays with R05-T06."
+      },
+      {
+        "leaf_id": "R00-T02-LA-1EA9E4819E27",
+        "feature_id": "F-D12-SEMANTIC_EFFECT-SEMANTIC-EFFECT-MEDIA-MEDIA-VIDEO-PROVIDERS-READ-1EA9E4",
+        "rule": "R5",
+        "disposition": "share",
+        "registration": "media-plane leaf (image/video/speech/asr): no chat wire fact for T03; the family's configured-but-unimplemented loud refusal BEFORE any request is pinned by r05_t01_model_plane c06 (volcengine-bigasr, stub.hits()==0) and gateway.rs unimplemented_families_refuse_loudly; wire attribution stays with R05-T06."
+      },
+      {
+        "leaf_id": "R00-T02-LA-27A9F02FCD58",
+        "feature_id": "F-D12-SEMANTIC_EFFECT-SEMANTIC-EFFECT-MEDIA-MEDIA-IMAGE-PROVIDERS-READ-27A9F0",
+        "rule": "R5",
+        "disposition": "share",
+        "registration": "media-plane leaf (image/video/speech/asr): no chat wire fact for T03; the family's configured-but-unimplemented loud refusal BEFORE any request is pinned by r05_t01_model_plane c06 (volcengine-bigasr, stub.hits()==0) and gateway.rs unimplemented_families_refuse_loudly; wire attribution stays with R05-T06."
+      },
+      {
+        "leaf_id": "R00-T02-LA-2E137D5F14B9",
+        "feature_id": "F-D12-SEMANTIC_EFFECT-SEMANTIC-EFFECT-MEDIA-MEDIA-SPEECH-PROVIDERS-REA-2E137D",
+        "rule": "R5",
+        "disposition": "share",
+        "registration": "media-plane leaf (image/video/speech/asr): no chat wire fact for T03; the family's configured-but-unimplemented loud refusal BEFORE any request is pinned by r05_t01_model_plane c06 (volcengine-bigasr, stub.hits()==0) and gateway.rs unimplemented_families_refuse_loudly; wire attribution stays with R05-T06."
+      },
+      {
+        "leaf_id": "R00-T02-LA-385F593D5622",
+        "feature_id": "F-D12-SEMANTIC_EFFECT-SEMANTIC-EFFECT-MEDIA-MEDIA-IMAGE-GENERATE-POST-385F59",
+        "rule": "R5",
+        "disposition": "share",
+        "registration": "media-plane leaf (image/video/speech/asr): no chat wire fact for T03; the family's configured-but-unimplemented loud refusal BEFORE any request is pinned by r05_t01_model_plane c06 (volcengine-bigasr, stub.hits()==0) and gateway.rs unimplemented_families_refuse_loudly; wire attribution stays with R05-T06."
+      },
+      {
+        "leaf_id": "R00-T02-LA-3FE814BB7C56",
+        "feature_id": "F-D12-SEMANTIC_EFFECT-SEMANTIC-EFFECT-MEDIA-GENERATE-IMAGE-3FE814",
+        "rule": "R5",
+        "disposition": "share",
+        "registration": "media-plane leaf (image/video/speech/asr): no chat wire fact for T03; the family's configured-but-unimplemented loud refusal BEFORE any request is pinned by r05_t01_model_plane c06 (volcengine-bigasr, stub.hits()==0) and gateway.rs unimplemented_families_refuse_loudly; wire attribution stays with R05-T06."
+      },
+      {
+        "leaf_id": "R00-T02-LA-40DF54BC8F29",
+        "feature_id": "F-D12-SEMANTIC_EFFECT-SEMANTIC-EFFECT-SPEECH-RECOGNITION-SPEECH-RECOGN-40DF54",
+        "rule": "R5",
+        "disposition": "share",
+        "registration": "media-plane leaf (image/video/speech/asr): no chat wire fact for T03; the family's configured-but-unimplemented loud refusal BEFORE any request is pinned by r05_t01_model_plane c06 (volcengine-bigasr, stub.hits()==0) and gateway.rs unimplemented_families_refuse_loudly; wire attribution stays with R05-T06."
+      },
+      {
+        "leaf_id": "R00-T02-LA-44DC28F20C8A",
+        "feature_id": "F-D12-SEMANTIC_EFFECT-SEMANTIC-EFFECT-MEDIA-PROVIDERS-ASR-44DC28",
+        "rule": "R5",
+        "disposition": "share",
+        "registration": "media-plane leaf (image/video/speech/asr): no chat wire fact for T03; the family's configured-but-unimplemented loud refusal BEFORE any request is pinned by r05_t01_model_plane c06 (volcengine-bigasr, stub.hits()==0) and gateway.rs unimplemented_families_refuse_loudly; wire attribution stays with R05-T06."
+      },
+      {
+        "leaf_id": "R00-T02-LA-504F95068625",
+        "feature_id": "F-D12-SEMANTIC_EFFECT-SEMANTIC-EFFECT-MEDIA-PROVIDERS-VIDEO-504F95",
+        "rule": "R5",
+        "disposition": "share",
+        "registration": "media-plane leaf (image/video/speech/asr): no chat wire fact for T03; the family's configured-but-unimplemented loud refusal BEFORE any request is pinned by r05_t01_model_plane c06 (volcengine-bigasr, stub.hits()==0) and gateway.rs unimplemented_families_refuse_loudly; wire attribution stays with R05-T06."
+      },
+      {
+        "leaf_id": "R00-T02-LA-595235FD7113",
+        "feature_id": "F-D12-SEMANTIC_EFFECT-SEMANTIC-EFFECT-MEDIA-MEDIA-SPEECH-CONFIG-PUT-595235",
+        "rule": "R5",
+        "disposition": "share",
+        "registration": "media-plane leaf (image/video/speech/asr): no chat wire fact for T03; the family's configured-but-unimplemented loud refusal BEFORE any request is pinned by r05_t01_model_plane c06 (volcengine-bigasr, stub.hits()==0) and gateway.rs unimplemented_families_refuse_loudly; wire attribution stays with R05-T06."
+      },
+      {
+        "leaf_id": "R00-T02-LA-5D32356CD275",
+        "feature_id": "F-D12-SEMANTIC_EFFECT-SEMANTIC-EFFECT-MEDIA-MEDIA-TASKS-TASKID-RETRY-P-5D3235",
+        "rule": "R5",
+        "disposition": "share",
+        "registration": "media-plane leaf (image/video/speech/asr): no chat wire fact for T03; the family's configured-but-unimplemented loud refusal BEFORE any request is pinned by r05_t01_model_plane c06 (volcengine-bigasr, stub.hits()==0) and gateway.rs unimplemented_families_refuse_loudly; wire attribution stays with R05-T06."
+      },
+      {
+        "leaf_id": "R00-T02-LA-62106F57675C",
+        "feature_id": "F-D12-SEMANTIC_EFFECT-SEMANTIC-EFFECT-SPEECH-RECOGNITION-SPEECH-RECOGN-62106F",
+        "rule": "R5",
+        "disposition": "share",
+        "registration": "media-plane leaf (image/video/speech/asr): no chat wire fact for T03; the family's configured-but-unimplemented loud refusal BEFORE any request is pinned by r05_t01_model_plane c06 (volcengine-bigasr, stub.hits()==0) and gateway.rs unimplemented_families_refuse_loudly; wire attribution stays with R05-T06."
+      },
+      {
+        "leaf_id": "R00-T02-LA-66FFBF09DEA3",
+        "feature_id": "F-D12-SEMANTIC_EFFECT-SEMANTIC-EFFECT-MEDIA-MEDIA-GENERATED-OPEN-FILEN-66FFBF",
+        "rule": "R2",
+        "disposition": "deferred",
+        "registration": "rule R2, disposition deferred->R07 (desktop-shell open/cmd/xdg-open business entry); r05_share is null in the scope matrix. Checked explicitly: this is NOT a non-media R5 leaf parked on T06, so the T03 parity_guard condition does not trigger; registered here for completeness, no T03 action."
+      },
+      {
+        "leaf_id": "R00-T02-LA-6ADB2A53988A",
+        "feature_id": "F-D12-SEMANTIC_EFFECT-SEMANTIC-EFFECT-MEDIA-MEDIA-VIDEO-CONFIG-PUT-6ADB2A",
+        "rule": "R5",
+        "disposition": "share",
+        "registration": "media-plane leaf (image/video/speech/asr): no chat wire fact for T03; the family's configured-but-unimplemented loud refusal BEFORE any request is pinned by r05_t01_model_plane c06 (volcengine-bigasr, stub.hits()==0) and gateway.rs unimplemented_families_refuse_loudly; wire attribution stays with R05-T06."
+      },
+      {
+        "leaf_id": "R00-T02-LA-6C23FF248130",
+        "feature_id": "F-D12-SEMANTIC_EFFECT-SEMANTIC-EFFECT-SPEECH-RECOGNITION-SPEECH-RECOGN-6C23FF",
+        "rule": "R5",
+        "disposition": "share",
+        "registration": "media-plane leaf (image/video/speech/asr): no chat wire fact for T03; the family's configured-but-unimplemented loud refusal BEFORE any request is pinned by r05_t01_model_plane c06 (volcengine-bigasr, stub.hits()==0) and gateway.rs unimplemented_families_refuse_loudly; wire attribution stays with R05-T06."
+      },
+      {
+        "leaf_id": "R00-T02-LA-6DA6634C4D7B",
+        "feature_id": "F-D12-SEMANTIC_EFFECT-SEMANTIC-EFFECT-SPEECH-RECOGNITION-SPEECH-RECOGN-6DA663",
+        "rule": "R5",
+        "disposition": "share",
+        "registration": "media-plane leaf (image/video/speech/asr): no chat wire fact for T03; the family's configured-but-unimplemented loud refusal BEFORE any request is pinned by r05_t01_model_plane c06 (volcengine-bigasr, stub.hits()==0) and gateway.rs unimplemented_families_refuse_loudly; wire attribution stays with R05-T06."
+      },
+      {
+        "leaf_id": "R00-T02-LA-794DD254406F",
+        "feature_id": "F-D12-SEMANTIC_EFFECT-SEMANTIC-EFFECT-MEDIA-MEDIA-SPEECH-GENERATE-POST-794DD2",
+        "rule": "R5",
+        "disposition": "share",
+        "registration": "media-plane leaf (image/video/speech/asr): no chat wire fact for T03; the family's configured-but-unimplemented loud refusal BEFORE any request is pinned by r05_t01_model_plane c06 (volcengine-bigasr, stub.hits()==0) and gateway.rs unimplemented_families_refuse_loudly; wire attribution stays with R05-T06."
+      },
+      {
+        "leaf_id": "R00-T02-LA-8E933C4BE7D0",
+        "feature_id": "F-D12-SEMANTIC_EFFECT-SEMANTIC-EFFECT-MEDIA-MEDIA-SPEECH-PROVIDERS-PRO-8E933C",
+        "rule": "R5",
+        "disposition": "share",
+        "registration": "media-plane leaf (image/video/speech/asr): no chat wire fact for T03; the family's configured-but-unimplemented loud refusal BEFORE any request is pinned by r05_t01_model_plane c06 (volcengine-bigasr, stub.hits()==0) and gateway.rs unimplemented_families_refuse_loudly; wire attribution stays with R05-T06."
+      },
+      {
+        "leaf_id": "R00-T02-LA-9569C0C0C4D8",
+        "feature_id": "F-D12-SEMANTIC_EFFECT-SEMANTIC-EFFECT-MEDIA-MEDIA-IMAGE-PROVIDERS-PROV-9569C0",
+        "rule": "R5",
+        "disposition": "share",
+        "registration": "media-plane leaf (image/video/speech/asr): no chat wire fact for T03; the family's configured-but-unimplemented loud refusal BEFORE any request is pinned by r05_t01_model_plane c06 (volcengine-bigasr, stub.hits()==0) and gateway.rs unimplemented_families_refuse_loudly; wire attribution stays with R05-T06."
+      },
+      {
+        "leaf_id": "R00-T02-LA-96071267A5C5",
+        "feature_id": "F-D12-SEMANTIC_EFFECT-SEMANTIC-EFFECT-MEDIA-PROVIDERS-IMAGE-960712",
+        "rule": "R5",
+        "disposition": "share",
+        "registration": "media-plane leaf (image/video/speech/asr): no chat wire fact for T03; the family's configured-but-unimplemented loud refusal BEFORE any request is pinned by r05_t01_model_plane c06 (volcengine-bigasr, stub.hits()==0) and gateway.rs unimplemented_families_refuse_loudly; wire attribution stays with R05-T06."
+      },
+      {
+        "leaf_id": "R00-T02-LA-97EC58F3099F",
+        "feature_id": "F-D12-SEMANTIC_EFFECT-SEMANTIC-EFFECT-SPEECH-RECOGNITION-SPEECH-RECOGN-97EC58",
+        "rule": "R5",
+        "disposition": "share",
+        "registration": "media-plane leaf (image/video/speech/asr): no chat wire fact for T03; the family's configured-but-unimplemented loud refusal BEFORE any request is pinned by r05_t01_model_plane c06 (volcengine-bigasr, stub.hits()==0) and gateway.rs unimplemented_families_refuse_loudly; wire attribution stays with R05-T06."
+      },
+      {
+        "leaf_id": "R00-T02-LA-9B809055BF01",
+        "feature_id": "F-D12-SEMANTIC_EFFECT-SEMANTIC-EFFECT-MEDIA-MEDIA-TASKS-TASKID-READ-9B8090",
+        "rule": "R5",
+        "disposition": "share",
+        "registration": "media-plane leaf (image/video/speech/asr): no chat wire fact for T03; the family's configured-but-unimplemented loud refusal BEFORE any request is pinned by r05_t01_model_plane c06 (volcengine-bigasr, stub.hits()==0) and gateway.rs unimplemented_families_refuse_loudly; wire attribution stays with R05-T06."
+      },
+      {
+        "leaf_id": "R00-T02-LA-A5B2F5BAD27E",
+        "feature_id": "F-D12-SEMANTIC_EFFECT-SEMANTIC-EFFECT-MEDIA-MEDIA-VIDEO-GENERATE-POST-A5B2F5",
+        "rule": "R5",
+        "disposition": "share",
+        "registration": "media-plane leaf (image/video/speech/asr): no chat wire fact for T03; the family's configured-but-unimplemented loud refusal BEFORE any request is pinned by r05_t01_model_plane c06 (volcengine-bigasr, stub.hits()==0) and gateway.rs unimplemented_families_refuse_loudly; wire attribution stays with R05-T06."
+      },
+      {
+        "leaf_id": "R00-T02-LA-A86068D93F1D",
+        "feature_id": "F-D12-SEMANTIC_EFFECT-SEMANTIC-EFFECT-MEDIA-PROVIDERS-TTS-A86068",
+        "rule": "R5",
+        "disposition": "share",
+        "registration": "media-plane leaf (image/video/speech/asr): no chat wire fact for T03; the family's configured-but-unimplemented loud refusal BEFORE any request is pinned by r05_t01_model_plane c06 (volcengine-bigasr, stub.hits()==0) and gateway.rs unimplemented_families_refuse_loudly; wire attribution stays with R05-T06."
+      },
+      {
+        "leaf_id": "R00-T02-LA-AB6545B18E22",
+        "feature_id": "F-D12-SEMANTIC_EFFECT-SEMANTIC-EFFECT-MEDIA-MEDIA-IMAGE-PROVIDERS-PROV-AB6545",
+        "rule": "R5",
+        "disposition": "share",
+        "registration": "media-plane leaf (image/video/speech/asr): no chat wire fact for T03; the family's configured-but-unimplemented loud refusal BEFORE any request is pinned by r05_t01_model_plane c06 (volcengine-bigasr, stub.hits()==0) and gateway.rs unimplemented_families_refuse_loudly; wire attribution stays with R05-T06."
+      },
+      {
+        "leaf_id": "R00-T02-LA-AF4A3588D5DA",
+        "feature_id": "F-D12-SEMANTIC_EFFECT-SEMANTIC-EFFECT-MEDIA-MEDIA-SPEECH-PROVIDERS-PRO-AF4A35",
+        "rule": "R5",
+        "disposition": "share",
+        "registration": "media-plane leaf (image/video/speech/asr): no chat wire fact for T03; the family's configured-but-unimplemented loud refusal BEFORE any request is pinned by r05_t01_model_plane c06 (volcengine-bigasr, stub.hits()==0) and gateway.rs unimplemented_families_refuse_loudly; wire attribution stays with R05-T06."
+      },
+      {
+        "leaf_id": "R00-T02-LA-AFCCC4FB7DBA",
+        "feature_id": "F-D12-SEMANTIC_EFFECT-SEMANTIC-EFFECT-MEDIA-MEDIA-TASKS-READ-AFCCC4",
+        "rule": "R5",
+        "disposition": "share",
+        "registration": "media-plane leaf (image/video/speech/asr): no chat wire fact for T03; the family's configured-but-unimplemented loud refusal BEFORE any request is pinned by r05_t01_model_plane c06 (volcengine-bigasr, stub.hits()==0) and gateway.rs unimplemented_families_refuse_loudly; wire attribution stays with R05-T06."
+      },
+      {
+        "leaf_id": "R00-T02-LA-BABF0EBA1DE2",
+        "feature_id": "F-D12-SEMANTIC_EFFECT-SEMANTIC-EFFECT-MEDIA-MEDIA-TASKS-BATCH-BATCHID--BABF0E",
+        "rule": "R5",
+        "disposition": "share",
+        "registration": "media-plane leaf (image/video/speech/asr): no chat wire fact for T03; the family's configured-but-unimplemented loud refusal BEFORE any request is pinned by r05_t01_model_plane c06 (volcengine-bigasr, stub.hits()==0) and gateway.rs unimplemented_families_refuse_loudly; wire attribution stays with R05-T06."
+      },
+      {
+        "leaf_id": "R00-T02-LA-C3CAB2E8B298",
+        "feature_id": "F-D12-SEMANTIC_EFFECT-SEMANTIC-EFFECT-MEDIA-GENERATE-SPEECH-C3CAB2",
+        "rule": "R5",
+        "disposition": "share",
+        "registration": "media-plane leaf (image/video/speech/asr): no chat wire fact for T03; the family's configured-but-unimplemented loud refusal BEFORE any request is pinned by r05_t01_model_plane c06 (volcengine-bigasr, stub.hits()==0) and gateway.rs unimplemented_families_refuse_loudly; wire attribution stays with R05-T06."
+      },
+      {
+        "leaf_id": "R00-T02-LA-CC33172F1B57",
+        "feature_id": "F-D12-SEMANTIC_EFFECT-SEMANTIC-EFFECT-MEDIA-MEDIA-SPEECH-PROVIDERS-PRO-CC3317",
+        "rule": "R5",
+        "disposition": "share",
+        "registration": "media-plane leaf (image/video/speech/asr): no chat wire fact for T03; the family's configured-but-unimplemented loud refusal BEFORE any request is pinned by r05_t01_model_plane c06 (volcengine-bigasr, stub.hits()==0) and gateway.rs unimplemented_families_refuse_loudly; wire attribution stays with R05-T06."
+      },
+      {
+        "leaf_id": "R00-T02-LA-D672EB55CD31",
+        "feature_id": "F-D12-SEMANTIC_EFFECT-SEMANTIC-EFFECT-MEDIA-GENERATE-VIDEO-D672EB",
+        "rule": "R5",
+        "disposition": "share",
+        "registration": "media-plane leaf (image/video/speech/asr): no chat wire fact for T03; the family's configured-but-unimplemented loud refusal BEFORE any request is pinned by r05_t01_model_plane c06 (volcengine-bigasr, stub.hits()==0) and gateway.rs unimplemented_families_refuse_loudly; wire attribution stays with R05-T06."
+      },
+      {
+        "leaf_id": "R00-T02-LA-DA74F52F18A0",
+        "feature_id": "F-D12-SEMANTIC_EFFECT-SEMANTIC-EFFECT-MEDIA-MEDIA-VIDEO-PROVIDERS-PROV-DA74F5",
+        "rule": "R5",
+        "disposition": "share",
+        "registration": "media-plane leaf (image/video/speech/asr): no chat wire fact for T03; the family's configured-but-unimplemented loud refusal BEFORE any request is pinned by r05_t01_model_plane c06 (volcengine-bigasr, stub.hits()==0) and gateway.rs unimplemented_families_refuse_loudly; wire attribution stays with R05-T06."
+      },
+      {
+        "leaf_id": "R00-T02-LA-DEDBD68525B0",
+        "feature_id": "F-D12-SEMANTIC_EFFECT-SEMANTIC-EFFECT-MEDIA-GENERATE-ASR-DEDBD6",
+        "rule": "R5",
+        "disposition": "share",
+        "registration": "media-plane leaf (image/video/speech/asr): no chat wire fact for T03; the family's configured-but-unimplemented loud refusal BEFORE any request is pinned by r05_t01_model_plane c06 (volcengine-bigasr, stub.hits()==0) and gateway.rs unimplemented_families_refuse_loudly; wire attribution stays with R05-T06."
+      },
+      {
+        "leaf_id": "R00-T02-LA-F6C12F9E54F6",
+        "feature_id": "F-D12-SEMANTIC_EFFECT-SEMANTIC-EFFECT-MEDIA-MEDIA-VIDEO-PROVIDERS-PROV-F6C12F",
+        "rule": "R5",
+        "disposition": "share",
+        "registration": "media-plane leaf (image/video/speech/asr): no chat wire fact for T03; the family's configured-but-unimplemented loud refusal BEFORE any request is pinned by r05_t01_model_plane c06 (volcengine-bigasr, stub.hits()==0) and gateway.rs unimplemented_families_refuse_loudly; wire attribution stays with R05-T06."
+      },
+      {
+        "leaf_id": "R00-T02-LA-FBF90A1BB572",
+        "feature_id": "F-D12-SEMANTIC_EFFECT-SEMANTIC-EFFECT-MEDIA-MEDIA-IMAGE-PROVIDERS-PROV-FBF90A",
+        "rule": "R5",
+        "disposition": "share",
+        "registration": "media-plane leaf (image/video/speech/asr): no chat wire fact for T03; the family's configured-but-unimplemented loud refusal BEFORE any request is pinned by r05_t01_model_plane c06 (volcengine-bigasr, stub.hits()==0) and gateway.rs unimplemented_families_refuse_loudly; wire attribution stays with R05-T06."
+      }
+    ]
+  },
+  "stop_reason_table": {
+    "rule": "adapters never branch on specific stop-reason values: tool-call content drives ProviderTurn::ToolRequests, non-empty content drives Final, and 'neither' drives ProviderTurn::Empty whose detail carries the wire value VERBATIM; the openai-responses family additionally maps status=failed to an honest ProviderTurn::Failed (never an empty turn). Golden: every family's forward/error fixtures; unit: anthropic stop_reason_reaches_the_empty_detail, responses failed_status_is_an_honest_failure_never_an_empty_turn.",
+    "openai-completions": {
+      "wire_field": "choices[0].finish_reason (stream: aggregated across chunks)",
+      "vocabulary": [
+        "stop",
+        "length",
+        "tool_calls",
+        "content_filter"
+      ],
+      "mapping": "verbatim into Empty detail; tool_calls/content take precedence as above"
+    },
+    "anthropic-messages": {
+      "wire_field": "stop_reason",
+      "vocabulary": [
+        "end_turn",
+        "stop_sequence",
+        "max_tokens",
+        "tool_use",
+        "pause_turn",
+        "refusal"
+      ],
+      "mapping": "verbatim into Empty detail"
+    },
+    "google-generative-ai": {
+      "wire_field": "candidates[0].finishReason",
+      "vocabulary": [
+        "STOP",
+        "MAX_TOKENS",
+        "SAFETY",
+        "RECITATION",
+        "OTHER"
+      ],
+      "mapping": "verbatim into Empty detail"
+    },
+    "openai-responses": {
+      "wire_field": "status + incomplete_details.reason (stream: response.completed terminal event is authoritative)",
+      "vocabulary": [
+        "completed",
+        "incomplete",
+        "failed",
+        "queued",
+        "in_progress"
+      ],
+      "mapping": "failed → honest Failed with the error detail; incomplete → Empty with reason; completed → content/tool mapping"
+    },
+    "openai-codex-responses": {
+      "wire_field": "same as openai-responses (SSE-only transport; response.completed terminal event)",
+      "vocabulary": [
+        "completed",
+        "incomplete",
+        "failed"
+      ],
+      "mapping": "same as openai-responses"
+    }
+  },
+  "field_conversion_table": {
+    "_columns": [
+      "logical field",
+      "openai-completions",
+      "anthropic-messages",
+      "google-generative-ai",
+      "openai-responses",
+      "openai-codex-responses"
+    ],
+    "rows": [
+      [
+        "system prompt",
+        "first {role:system} message (only when Some)",
+        "top-level `system` (absent when None)",
+        "`systemInstruction` (absent when None)",
+        "`instructions` (absent when None)",
+        "`instructions` (incumbent constant when None)"
+      ],
+      [
+        "user submission",
+        "messages[]{role:user, content}",
+        "messages[]{role:user, content}",
+        "contents[]{role:user, parts[]}",
+        "input[]{type:message, role:user, content:[input_text]}",
+        "same as openai-responses"
+      ],
+      [
+        "assistant text",
+        "message.content string | parts array",
+        "content blocks [{type:text}]",
+        "parts[{text}] (role model)",
+        "output message items",
+        "same as openai-responses"
+      ],
+      [
+        "reasoning",
+        "parts reasoning/thinking (buffered); delta.reasoning_content (stream)",
+        "{type:thinking} + adjacent signature",
+        "part{thought:true} + thoughtSignature",
+        "reasoning item (summary → Reasoning blocks)",
+        "same as openai-responses"
+      ],
+      [
+        "opaque state",
+        "unknown content parts verbatim (never re-sent)",
+        "thinking_signature / redacted_thinking at the original position",
+        "thoughtSignature on its own part",
+        "encrypted reasoning item verbatim",
+        "same as openai-responses"
+      ],
+      [
+        "cross-family opaque",
+        "never echoed",
+        "never echoed",
+        "never echoed",
+        "never echoed",
+        "never echoed"
+      ],
+      [
+        "tool declarations",
+        "tools[{type:function, function{name,description,parameters}}]",
+        "tools[{name,description,input_schema}]",
+        "tools[{functionDeclarations[{name,description,parameters}]}]",
+        "tools[{type:function,name,description,parameters}]",
+        "same as openai-responses"
+      ],
+      [
+        "tool call (model→host)",
+        "message.tool_calls[{id,type:function,function{name,arguments}}]",
+        "content block {type:tool_use,id,name,input}",
+        "part{functionCall{name,args}} — NO id; paired by exchange name+order",
+        "output item {type:function_call,call_id,name,arguments}",
+        "same as openai-responses"
+      ],
+      [
+        "tool result (host→model)",
+        "message{role:tool, tool_call_id, content}",
+        "ONE user message merging tool_result blocks {tool_use_id,content,is_error}",
+        "part{functionResponse{name,response}}",
+        "input item {type:function_call_output,call_id,output}",
+        "same as openai-responses"
+      ],
+      [
+        "parallel calls",
+        "multiple tool_calls; results by tool_call_id",
+        "multiple tool_use blocks; merged single user tool_result message",
+        "multiple functionCall parts; responses paired by name+order",
+        "multiple function_call items; results by call_id",
+        "same as openai-responses"
+      ],
+      [
+        "usage",
+        "usage.prompt_tokens + completion_tokens (both-or-never)",
+        "usage.input_tokens + output_tokens (both-or-never)",
+        "usageMetadata.promptTokenCount + candidatesTokenCount (both-or-never)",
+        "usage.input_tokens + output_tokens (both-or-never)",
+        "same as openai-responses"
+      ],
+      [
+        "identity fields",
+        "response id/model IGNORED; identity from the driver/resolved route (C10)",
+        "same",
+        "same",
+        "same",
+        "same"
+      ],
+      [
+        "request path",
+        "{endpoint}/chat/completions",
+        "{endpoint}/v1/messages (incumbent join rule)",
+        "{endpoint}/models/{percent-encoded model}:generateContent",
+        "{endpoint}/responses",
+        "{endpoint}/codex/responses (+ originator/chatgpt-account-id headers)"
+      ],
+      [
+        "streaming",
+        "SSE implemented + golden-pinned; production buffered (T04)",
+        "SSE incumbent fact; T03 buffered only (T04)",
+        "SSE incumbent fact; T03 buffered only (T04)",
+        "SSE decode implemented; production buffered (T04)",
+        "SSE-only: store:false + stream:true pinned; terminal event authoritative"
+      ]
+    ]
   }
- },
- "supplemental_leaf_registrations": {
-  "scope": "R05_SCOPE_MATRIX.json supplemental_leaves whose r00_task_ids contain R05-T03",
-  "counts": {
-   "total": 75,
-   "d10_providers": 37,
-   "d12_media": 38,
-   "d12_rule_R5": 37,
-   "d12_rule_R2_deferred": 1
-  },
-  "parity_guard_check": {
-   "conclusion": "no non-media R5 leaf is parked on T06: the only D12 leaf that is not rule R5 is R00-T02-LA-66FFBF09DEA3 (rule R2, disposition deferred->R07, desktop-shell open/cmd/xdg-open business entry, r05_share null); all 37 other D12 leaves are rule R5 media-plane leaves with a non-empty r05_share. The parity_guard condition (a non-media R5 leaf still hanging on T06) does NOT trigger; no silent reordering performed.",
-   "checked_leaf": "R00-T02-LA-66FFBF09DEA3"
-  },
-  "d10_providers": [
-   {
-    "leaf_id": "R00-T02-LA-00A769DD0FA3",
-    "feature_id": "F-D10-PROVIDER-PROVIDER-PERPLEXITY-00A769",
-    "provider_id": "perplexity",
-    "protocol": "openai-completions",
-    "auth": "api-key",
-    "rule": "R3",
-    "registration": "family wire shape pinned by rust/crates/lingxi-adapters/tests/golden/openai-completions/{forward,tool_roundtrip,error}.json; auth-shape mapping pinned by the family error golden (header name verbatim) and r05_t03_protocol_adapters (c01_c04 / c07); provider id is config data — the (provider, model) identity pair rules are pinned by r05_t01_model_plane c04 and r05_t03 c01_c04.",
-    "endpoint": "https://api.perplexity.ai",
-    "incumbent_compat_rules": "none — the incumbent dispatches no provider-specific compat module (first-match-wins registry in core/provider-compat.ts); the family-generic wire shape applies",
-    "rust_t03_compat_parity": "the R05-T03 Rust adapter ships the family-generic shape only; provider-specific compat patches remain incumbent-TS behavior and are NOT yet ported (owner: R05-T05 per-model quirk layer)"
-   },
-   {
-    "leaf_id": "R00-T02-LA-03E1121574A1",
-    "feature_id": "F-D10-PROVIDER-PROVIDER-OPENAI-03E112",
-    "provider_id": "openai",
-    "protocol": "openai-completions",
-    "auth": "api-key",
-    "rule": "R3",
-    "registration": "family wire shape pinned by rust/crates/lingxi-adapters/tests/golden/openai-completions/{forward,tool_roundtrip,error}.json; auth-shape mapping pinned by the family error golden (header name verbatim) and r05_t03_protocol_adapters (c01_c04 / c07); provider id is config data — the (provider, model) identity pair rules are pinned by r05_t01_model_plane c04 and r05_t03 c01_c04.",
-    "endpoint": "https://api.openai.com/v1",
-    "incumbent_compat_rules": "none — the incumbent dispatches no provider-specific compat module (first-match-wins registry in core/provider-compat.ts); the family-generic wire shape applies",
-    "rust_t03_compat_parity": "the R05-T03 Rust adapter ships the family-generic shape only; provider-specific compat patches remain incumbent-TS behavior and are NOT yet ported (owner: R05-T05 per-model quirk layer)"
-   },
-   {
-    "leaf_id": "R00-T02-LA-0DFFAB20A40B",
-    "feature_id": "F-D10-PROVIDER-PROVIDER-MIMO-0DFFAB",
-    "provider_id": "mimo",
-    "protocol": "openai-completions",
-    "auth": "api-key",
-    "rule": "R3",
-    "registration": "family wire shape pinned by rust/crates/lingxi-adapters/tests/golden/openai-completions/{forward,tool_roundtrip,error}.json; auth-shape mapping pinned by the family error golden (header name verbatim) and r05_t03_protocol_adapters (c01_c04 / c07); provider id is config data — the (provider, model) identity pair rules are pinned by r05_t01_model_plane c04 and r05_t03 c01_c04.",
-    "endpoint": "https://api.xiaomimimo.com/v1",
-    "incumbent_compat_rules": "core/provider-compat/mimo.ts (provider==mimo or host xiaomimimo.com): thinking toggle via chat_template_kwargs.enable_thinking, reasoning_content replay on tool-call history, utility mode disables thinking",
-    "rust_t03_compat_parity": "the R05-T03 Rust adapter ships the family-generic shape only; provider-specific compat patches remain incumbent-TS behavior and are NOT yet ported (owner: R05-T05 per-model quirk layer)"
-   },
-   {
-    "leaf_id": "R00-T02-LA-184E03F012D5",
-    "feature_id": "F-D10-PROVIDER-PROVIDER-FIREWORKS-184E03",
-    "provider_id": "fireworks",
-    "protocol": "openai-completions",
-    "auth": "api-key",
-    "rule": "R3",
-    "registration": "family wire shape pinned by rust/crates/lingxi-adapters/tests/golden/openai-completions/{forward,tool_roundtrip,error}.json; auth-shape mapping pinned by the family error golden (header name verbatim) and r05_t03_protocol_adapters (c01_c04 / c07); provider id is config data — the (provider, model) identity pair rules are pinned by r05_t01_model_plane c04 and r05_t03 c01_c04.",
-    "endpoint": "https://api.fireworks.ai/inference/v1",
-    "incumbent_compat_rules": "none — the incumbent dispatches no provider-specific compat module (first-match-wins registry in core/provider-compat.ts); the family-generic wire shape applies",
-    "rust_t03_compat_parity": "the R05-T03 Rust adapter ships the family-generic shape only; provider-specific compat patches remain incumbent-TS behavior and are NOT yet ported (owner: R05-T05 per-model quirk layer)"
-   },
-   {
-    "leaf_id": "R00-T02-LA-2097E172B42B",
-    "feature_id": "F-D10-PROVIDER-PROVIDER-HUNYUAN-2097E1",
-    "provider_id": "hunyuan",
-    "protocol": "openai-completions",
-    "auth": "api-key",
-    "rule": "R3",
-    "registration": "family wire shape pinned by rust/crates/lingxi-adapters/tests/golden/openai-completions/{forward,tool_roundtrip,error}.json; auth-shape mapping pinned by the family error golden (header name verbatim) and r05_t03_protocol_adapters (c01_c04 / c07); provider id is config data — the (provider, model) identity pair rules are pinned by r05_t01_model_plane c04 and r05_t03 c01_c04.",
-    "endpoint": "https://api.hunyuan.cloud.tencent.com/v1",
-    "incumbent_compat_rules": "none — the incumbent dispatches no provider-specific compat module (first-match-wins registry in core/provider-compat.ts); the family-generic wire shape applies",
-    "rust_t03_compat_parity": "the R05-T03 Rust adapter ships the family-generic shape only; provider-specific compat patches remain incumbent-TS behavior and are NOT yet ported (owner: R05-T05 per-model quirk layer)"
-   },
-   {
-    "leaf_id": "R00-T02-LA-2EDB69DA3AE2",
-    "feature_id": "F-D10-PROVIDER-PROVIDER-SILICONFLOW-2EDB69",
-    "provider_id": "siliconflow",
-    "protocol": "openai-completions",
-    "auth": "api-key",
-    "rule": "R3",
-    "registration": "family wire shape pinned by rust/crates/lingxi-adapters/tests/golden/openai-completions/{forward,tool_roundtrip,error}.json; auth-shape mapping pinned by the family error golden (header name verbatim) and r05_t03_protocol_adapters (c01_c04 / c07); provider id is config data — the (provider, model) identity pair rules are pinned by r05_t01_model_plane c04 and r05_t03 c01_c04.",
-    "endpoint": "https://api.siliconflow.cn/v1",
-    "incumbent_compat_rules": "none — the incumbent dispatches no provider-specific compat module (first-match-wins registry in core/provider-compat.ts); the family-generic wire shape applies",
-    "rust_t03_compat_parity": "the R05-T03 Rust adapter ships the family-generic shape only; provider-specific compat patches remain incumbent-TS behavior and are NOT yet ported (owner: R05-T05 per-model quirk layer)"
-   },
-   {
-    "leaf_id": "R00-T02-LA-39733312E5F4",
-    "feature_id": "F-D10-PROVIDER-PROVIDER-DASHSCOPE-397333",
-    "provider_id": "dashscope",
-    "protocol": "openai-completions",
-    "auth": "api-key",
-    "rule": "R3",
-    "registration": "family wire shape pinned by rust/crates/lingxi-adapters/tests/golden/openai-completions/{forward,tool_roundtrip,error}.json; auth-shape mapping pinned by the family error golden (header name verbatim) and r05_t03_protocol_adapters (c01_c04 / c07); provider id is config data — the (provider, model) identity pair rules are pinned by r05_t01_model_plane c04 and r05_t03 c01_c04.",
-    "endpoint": "https://dashscope.aliyuncs.com/compatible-mode/v1",
-    "incumbent_compat_rules": "core/provider-compat/qwen.ts (provider dashscope | baseUrl contains dashscope; only for video-input-capable models): video input payload patch",
-    "rust_t03_compat_parity": "the R05-T03 Rust adapter ships the family-generic shape only; provider-specific compat patches remain incumbent-TS behavior and are NOT yet ported (owner: R05-T05 per-model quirk layer)"
-   },
-   {
-    "leaf_id": "R00-T02-LA-3D8337A8088F",
-    "feature_id": "F-D10-PROVIDER-PROVIDER-XAIOAUTH-3D8337",
-    "provider_id": "xai-oauth",
-    "protocol": "openai-responses",
-    "auth": "oauth",
-    "rule": "R3",
-    "registration": "family wire shape pinned by rust/crates/lingxi-adapters/tests/golden/openai-responses/{forward,tool_roundtrip,error}.json; auth-shape mapping pinned by the family error golden (header name verbatim) and r05_t03_protocol_adapters (c01_c04 / c07); provider id is config data — the (provider, model) identity pair rules are pinned by r05_t01_model_plane c04 and r05_t03 c01_c04.",
-    "endpoint": "https://cli-chat-proxy.grok.com/v1",
-    "incumbent_compat_rules": "none — the incumbent dispatches no provider-specific compat module (first-match-wins registry in core/provider-compat.ts); the family-generic wire shape applies",
-    "rust_t03_compat_parity": "the R05-T03 Rust adapter ships the family-generic shape only; provider-specific compat patches remain incumbent-TS behavior and are NOT yet ported (owner: R05-T05 per-model quirk layer)"
-   },
-   {
-    "leaf_id": "R00-T02-LA-419F19D7AA64",
-    "feature_id": "F-D10-PROVIDER-PROVIDER-DEEPSEEKRESPONSES-419F19",
-    "provider_id": "deepseek-responses",
-    "protocol": "openai-responses",
-    "auth": "api-key",
-    "rule": "R3",
-    "registration": "family wire shape pinned by rust/crates/lingxi-adapters/tests/golden/openai-responses/{forward,tool_roundtrip,error}.json; auth-shape mapping pinned by the family error golden (header name verbatim) and r05_t03_protocol_adapters (c01_c04 / c07); provider id is config data — the (provider, model) identity pair rules are pinned by r05_t01_model_plane c04 and r05_t03 c01_c04.",
-    "endpoint": "https://api.deepseek.com",
-    "incumbent_compat_rules": "core/provider-compat/deepseek-responses.ts (api openai-responses + provider deepseek-responses | host api.deepseek.com): output-cap fields carried to max_output_tokens, chat-completions-only fields stripped",
-    "rust_t03_compat_parity": "the R05-T03 Rust adapter ships the family-generic shape only; provider-specific compat patches remain incumbent-TS behavior and are NOT yet ported (owner: R05-T05 per-model quirk layer)"
-   },
-   {
-    "leaf_id": "R00-T02-LA-43DDCE21A45C",
-    "feature_id": "F-D10-PROVIDER-PROVIDER-OLLAMA-43DDCE",
-    "provider_id": "ollama",
-    "protocol": "openai-completions",
-    "auth": "none",
-    "rule": "R3",
-    "registration": "family wire shape pinned by rust/crates/lingxi-adapters/tests/golden/openai-completions/{forward,tool_roundtrip,error}.json; auth-shape mapping pinned by the family error golden (header name verbatim) and r05_t03_protocol_adapters (c01_c04 / c07); provider id is config data — the (provider, model) identity pair rules are pinned by r05_t01_model_plane c04 and r05_t03 c01_c04.",
-    "endpoint": "http://localhost:11434/v1",
-    "incumbent_compat_rules": "core/provider-compat/ollama.ts (provider ollama): Ollama OpenAI-compatible payload patches",
-    "rust_t03_compat_parity": "the R05-T03 Rust adapter ships the family-generic shape only; provider-specific compat patches remain incumbent-TS behavior and are NOT yet ported (owner: R05-T05 per-model quirk layer)"
-   },
-   {
-    "leaf_id": "R00-T02-LA-477D944DF19B",
-    "feature_id": "F-D10-PROVIDER-PROVIDER-INFINI-477D94",
-    "provider_id": "infini",
-    "protocol": "openai-completions",
-    "auth": "api-key",
-    "rule": "R3",
-    "registration": "family wire shape pinned by rust/crates/lingxi-adapters/tests/golden/openai-completions/{forward,tool_roundtrip,error}.json; auth-shape mapping pinned by the family error golden (header name verbatim) and r05_t03_protocol_adapters (c01_c04 / c07); provider id is config data — the (provider, model) identity pair rules are pinned by r05_t01_model_plane c04 and r05_t03 c01_c04.",
-    "endpoint": "https://cloud.infini-ai.com/maas/v1",
-    "incumbent_compat_rules": "none — the incumbent dispatches no provider-specific compat module (first-match-wins registry in core/provider-compat.ts); the family-generic wire shape applies",
-    "rust_t03_compat_parity": "the R05-T03 Rust adapter ships the family-generic shape only; provider-specific compat patches remain incumbent-TS behavior and are NOT yet ported (owner: R05-T05 per-model quirk layer)"
-   },
-   {
-    "leaf_id": "R00-T02-LA-565BE3400DAC",
-    "feature_id": "F-D10-PROVIDER-PROVIDER-MOONSHOT-565BE3",
-    "provider_id": "moonshot",
-    "protocol": "openai-completions",
-    "auth": "api-key",
-    "rule": "R3",
-    "registration": "family wire shape pinned by rust/crates/lingxi-adapters/tests/golden/openai-completions/{forward,tool_roundtrip,error}.json; auth-shape mapping pinned by the family error golden (header name verbatim) and r05_t03_protocol_adapters (c01_c04 / c07); provider id is config data — the (provider, model) identity pair rules are pinned by r05_t01_model_plane c04 and r05_t03 c01_c04.",
-    "endpoint": "https://api.moonshot.cn/v1",
-    "incumbent_compat_rules": "core/provider-compat/kimi.ts (conditional: thinkingFormat kimi | reasoningProfile kimi-openai): thinking compatibility",
-    "rust_t03_compat_parity": "the R05-T03 Rust adapter ships the family-generic shape only; provider-specific compat patches remain incumbent-TS behavior and are NOT yet ported (owner: R05-T05 per-model quirk layer)"
-   },
-   {
-    "leaf_id": "R00-T02-LA-668EEC15C958",
-    "feature_id": "F-D10-PROVIDER-PROVIDER-OPENCODEGO-668EEC",
-    "provider_id": "opencode-go",
-    "protocol": "openai-completions",
-    "auth": "api-key",
-    "rule": "R3",
-    "registration": "family wire shape pinned by rust/crates/lingxi-adapters/tests/golden/openai-completions/{forward,tool_roundtrip,error}.json; auth-shape mapping pinned by the family error golden (header name verbatim) and r05_t03_protocol_adapters (c01_c04 / c07); provider id is config data — the (provider, model) identity pair rules are pinned by r05_t01_model_plane c04 and r05_t03 c01_c04.",
-    "endpoint": "https://opencode.ai/zen/go/v1",
-    "incumbent_compat_rules": "none — the incumbent dispatches no provider-specific compat module (first-match-wins registry in core/provider-compat.ts); the family-generic wire shape applies",
-    "rust_t03_compat_parity": "the R05-T03 Rust adapter ships the family-generic shape only; provider-specific compat patches remain incumbent-TS behavior and are NOT yet ported (owner: R05-T05 per-model quirk layer)"
-   },
-   {
-    "leaf_id": "R00-T02-LA-71738E50BACA",
-    "feature_id": "F-D10-PROVIDER-PROVIDER-BAIDUCLOUD-71738E",
-    "provider_id": "baidu-cloud",
-    "protocol": "openai-completions",
-    "auth": "api-key",
-    "rule": "R3",
-    "registration": "family wire shape pinned by rust/crates/lingxi-adapters/tests/golden/openai-completions/{forward,tool_roundtrip,error}.json; auth-shape mapping pinned by the family error golden (header name verbatim) and r05_t03_protocol_adapters (c01_c04 / c07); provider id is config data — the (provider, model) identity pair rules are pinned by r05_t01_model_plane c04 and r05_t03 c01_c04.",
-    "endpoint": "https://qianfan.baidubce.com/v2",
-    "incumbent_compat_rules": "none — the incumbent dispatches no provider-specific compat module (first-match-wins registry in core/provider-compat.ts); the family-generic wire shape applies",
-    "rust_t03_compat_parity": "the R05-T03 Rust adapter ships the family-generic shape only; provider-specific compat patches remain incumbent-TS behavior and are NOT yet ported (owner: R05-T05 per-model quirk layer)"
-   },
-   {
-    "leaf_id": "R00-T02-LA-77812804951F",
-    "feature_id": "F-D10-PROVIDER-PROVIDER-MISTRAL-778128",
-    "provider_id": "mistral",
-    "protocol": "openai-completions",
-    "auth": "api-key",
-    "rule": "R3",
-    "registration": "family wire shape pinned by rust/crates/lingxi-adapters/tests/golden/openai-completions/{forward,tool_roundtrip,error}.json; auth-shape mapping pinned by the family error golden (header name verbatim) and r05_t03_protocol_adapters (c01_c04 / c07); provider id is config data — the (provider, model) identity pair rules are pinned by r05_t01_model_plane c04 and r05_t03 c01_c04.",
-    "endpoint": "https://api.mistral.ai/v1",
-    "incumbent_compat_rules": "none — the incumbent dispatches no provider-specific compat module (first-match-wins registry in core/provider-compat.ts); the family-generic wire shape applies",
-    "rust_t03_compat_parity": "the R05-T03 Rust adapter ships the family-generic shape only; provider-specific compat patches remain incumbent-TS behavior and are NOT yet ported (owner: R05-T05 per-model quirk layer)"
-   },
-   {
-    "leaf_id": "R00-T02-LA-7D969CDBF21C",
-    "feature_id": "F-D10-PROVIDER-PROVIDER-STEPFUN-7D969C",
-    "provider_id": "stepfun",
-    "protocol": "openai-completions",
-    "auth": "api-key",
-    "rule": "R3",
-    "registration": "family wire shape pinned by rust/crates/lingxi-adapters/tests/golden/openai-completions/{forward,tool_roundtrip,error}.json; auth-shape mapping pinned by the family error golden (header name verbatim) and r05_t03_protocol_adapters (c01_c04 / c07); provider id is config data — the (provider, model) identity pair rules are pinned by r05_t01_model_plane c04 and r05_t03 c01_c04.",
-    "endpoint": "https://api.stepfun.com/v1",
-    "incumbent_compat_rules": "none — the incumbent dispatches no provider-specific compat module (first-match-wins registry in core/provider-compat.ts); the family-generic wire shape applies",
-    "rust_t03_compat_parity": "the R05-T03 Rust adapter ships the family-generic shape only; provider-specific compat patches remain incumbent-TS behavior and are NOT yet ported (owner: R05-T05 per-model quirk layer)"
-   },
-   {
-    "leaf_id": "R00-T02-LA-80DB4026AF13",
-    "feature_id": "F-D10-PROVIDER-PROVIDER-OPENCODE-80DB40",
-    "provider_id": "opencode",
-    "protocol": "anthropic-messages",
-    "auth": "api-key",
-    "rule": "R3",
-    "registration": "family wire shape pinned by rust/crates/lingxi-adapters/tests/golden/anthropic-messages/{forward,tool_roundtrip,error}.json; auth-shape mapping pinned by the family error golden (header name verbatim) and r05_t03_protocol_adapters (c01_c04 / c07); provider id is config data — the (provider, model) identity pair rules are pinned by r05_t01_model_plane c04 and r05_t03 c01_c04.",
-    "endpoint": "https://opencode.ai/zen",
-    "incumbent_compat_rules": "core/provider-compat/anthropic.ts (conditional on thinkingFormat/cache-control, same rules as anthropic)",
-    "rust_t03_compat_parity": "the R05-T03 Rust adapter ships the family-generic shape only; provider-specific compat patches remain incumbent-TS behavior and are NOT yet ported (owner: R05-T05 per-model quirk layer)"
-   },
-   {
-    "leaf_id": "R00-T02-LA-834034527694",
-    "feature_id": "F-D10-PROVIDER-PROVIDER-ZHIPUCODING-834034",
-    "provider_id": "zhipu-coding",
-    "protocol": "openai-completions",
-    "auth": "api-key",
-    "rule": "R3",
-    "registration": "family wire shape pinned by rust/crates/lingxi-adapters/tests/golden/openai-completions/{forward,tool_roundtrip,error}.json; auth-shape mapping pinned by the family error golden (header name verbatim) and r05_t03_protocol_adapters (c01_c04 / c07); provider id is config data — the (provider, model) identity pair rules are pinned by r05_t01_model_plane c04 and r05_t03 c01_c04.",
-    "endpoint": "https://api.z.ai/api/coding/paas/v4",
-    "incumbent_compat_rules": "core/provider-compat/zhipu.ts (provider zhipu-coding): same rules as zhipu",
-    "rust_t03_compat_parity": "the R05-T03 Rust adapter ships the family-generic shape only; provider-specific compat patches remain incumbent-TS behavior and are NOT yet ported (owner: R05-T05 per-model quirk layer)"
-   },
-   {
-    "leaf_id": "R00-T02-LA-89707E479335",
-    "feature_id": "F-D10-PROVIDER-PROVIDER-DASHSCOPECODING-89707E",
-    "provider_id": "dashscope-coding",
-    "protocol": "openai-completions",
-    "auth": "api-key",
-    "rule": "R3",
-    "registration": "family wire shape pinned by rust/crates/lingxi-adapters/tests/golden/openai-completions/{forward,tool_roundtrip,error}.json; auth-shape mapping pinned by the family error golden (header name verbatim) and r05_t03_protocol_adapters (c01_c04 / c07); provider id is config data — the (provider, model) identity pair rules are pinned by r05_t01_model_plane c04 and r05_t03 c01_c04.",
-    "endpoint": "https://coding.dashscope.aliyuncs.com/v1",
-    "incumbent_compat_rules": "core/provider-compat/qwen.ts (baseUrl contains dashscope; video-input models only): same rules as dashscope",
-    "rust_t03_compat_parity": "the R05-T03 Rust adapter ships the family-generic shape only; provider-specific compat patches remain incumbent-TS behavior and are NOT yet ported (owner: R05-T05 per-model quirk layer)"
-   },
-   {
-    "leaf_id": "R00-T02-LA-9194C0F0D909",
-    "feature_id": "F-D10-PROVIDER-PROVIDER-MINIMAXTOKENPLAN-9194C0",
-    "provider_id": "minimax-token-plan",
-    "protocol": "anthropic-messages",
-    "auth": "api-key",
-    "rule": "R3",
-    "registration": "family wire shape pinned by rust/crates/lingxi-adapters/tests/golden/anthropic-messages/{forward,tool_roundtrip,error}.json; auth-shape mapping pinned by the family error golden (header name verbatim) and r05_t03_protocol_adapters (c01_c04 / c07); provider id is config data — the (provider, model) identity pair rules are pinned by r05_t01_model_plane c04 and r05_t03 c01_c04.",
-    "endpoint": "https://api.minimaxi.com/anthropic",
-    "incumbent_compat_rules": "core/provider-compat/anthropic.ts (conditional on thinkingFormat/cache-control, same rules as anthropic)",
-    "rust_t03_compat_parity": "the R05-T03 Rust adapter ships the family-generic shape only; provider-specific compat patches remain incumbent-TS behavior and are NOT yet ported (owner: R05-T05 per-model quirk layer)"
-   },
-   {
-    "leaf_id": "R00-T02-LA-9871F51BE25B",
-    "feature_id": "F-D10-PROVIDER-PROVIDER-OPENROUTER-9871F5",
-    "provider_id": "openrouter",
-    "protocol": "openai-completions",
-    "auth": "api-key",
-    "rule": "R3",
-    "registration": "family wire shape pinned by rust/crates/lingxi-adapters/tests/golden/openai-completions/{forward,tool_roundtrip,error}.json; auth-shape mapping pinned by the family error golden (header name verbatim) and r05_t03_protocol_adapters (c01_c04 / c07); provider id is config data — the (provider, model) identity pair rules are pinned by r05_t01_model_plane c04 and r05_t03 c01_c04.",
-    "endpoint": "https://openrouter.ai/api/v1",
-    "incumbent_compat_rules": "core/provider-compat/openrouter.ts (conditional: reasoningProfile openrouter-anthropic-adaptive): adaptive reasoning compatibility",
-    "rust_t03_compat_parity": "the R05-T03 Rust adapter ships the family-generic shape only; provider-specific compat patches remain incumbent-TS behavior and are NOT yet ported (owner: R05-T05 per-model quirk layer)"
-   },
-   {
-    "leaf_id": "R00-T02-LA-ABAC28922F7A",
-    "feature_id": "F-D10-PROVIDER-PROVIDER-OPENAICODEXOAUTH-ABAC28",
-    "provider_id": "openai-codex-oauth",
-    "protocol": "openai-codex-responses",
-    "auth": "oauth",
-    "rule": "R3",
-    "registration": "family wire shape pinned by rust/crates/lingxi-adapters/tests/golden/openai-codex-responses/{forward,tool_roundtrip,error}.json; auth-shape mapping pinned by the family error golden (header name verbatim) and r05_t03_protocol_adapters (c01_c04 / c07); provider id is config data — the (provider, model) identity pair rules are pinned by r05_t01_model_plane c04 and r05_t03 c01_c04.",
-    "endpoint": "https://chatgpt.com/backend-api",
-    "incumbent_compat_rules": "core/provider-compat/codex-responses.ts (api openai-codex-responses + provider openai-codex-oauth): unsupported fields stripped (max_output_tokens/max_completion_tokens/max_tokens/maxOutputTokens/temperature/...)",
-    "rust_t03_compat_parity": "the R05-T03 Rust adapter ships the family-generic shape only; provider-specific compat patches remain incumbent-TS behavior and are NOT yet ported (owner: R05-T05 per-model quirk layer)"
-   },
-   {
-    "leaf_id": "R00-T02-LA-AC352BFA3D82",
-    "feature_id": "F-D10-PROVIDER-PROVIDER-TOGETHER-AC352B",
-    "provider_id": "together",
-    "protocol": "openai-completions",
-    "auth": "api-key",
-    "rule": "R3",
-    "registration": "family wire shape pinned by rust/crates/lingxi-adapters/tests/golden/openai-completions/{forward,tool_roundtrip,error}.json; auth-shape mapping pinned by the family error golden (header name verbatim) and r05_t03_protocol_adapters (c01_c04 / c07); provider id is config data — the (provider, model) identity pair rules are pinned by r05_t01_model_plane c04 and r05_t03 c01_c04.",
-    "endpoint": "https://api.together.xyz/v1",
-    "incumbent_compat_rules": "none — the incumbent dispatches no provider-specific compat module (first-match-wins registry in core/provider-compat.ts); the family-generic wire shape applies",
-    "rust_t03_compat_parity": "the R05-T03 Rust adapter ships the family-generic shape only; provider-specific compat patches remain incumbent-TS behavior and are NOT yet ported (owner: R05-T05 per-model quirk layer)"
-   },
-   {
-    "leaf_id": "R00-T02-LA-B70FCDCAC1ED",
-    "feature_id": "F-D10-PROVIDER-PROVIDER-KIMICODING-B70FCD",
-    "provider_id": "kimi-coding",
-    "protocol": "openai-completions",
-    "auth": "api-key",
-    "rule": "R3",
-    "registration": "family wire shape pinned by rust/crates/lingxi-adapters/tests/golden/openai-completions/{forward,tool_roundtrip,error}.json; auth-shape mapping pinned by the family error golden (header name verbatim) and r05_t03_protocol_adapters (c01_c04 / c07); provider id is config data — the (provider, model) identity pair rules are pinned by r05_t01_model_plane c04 and r05_t03 c01_c04.",
-    "endpoint": "https://api.kimi.com/coding/v1",
-    "incumbent_compat_rules": "core/provider-compat/kimi.ts (conditional: thinkingFormat kimi | reasoningProfile kimi-openai): same rules as moonshot",
-    "rust_t03_compat_parity": "the R05-T03 Rust adapter ships the family-generic shape only; provider-specific compat patches remain incumbent-TS behavior and are NOT yet ported (owner: R05-T05 per-model quirk layer)"
-   },
-   {
-    "leaf_id": "R00-T02-LA-BA4BDB7F7338",
-    "feature_id": "F-D10-PROVIDER-PROVIDER-BAICHUAN-BA4BDB",
-    "provider_id": "baichuan",
-    "protocol": "openai-completions",
-    "auth": "api-key",
-    "rule": "R3",
-    "registration": "family wire shape pinned by rust/crates/lingxi-adapters/tests/golden/openai-completions/{forward,tool_roundtrip,error}.json; auth-shape mapping pinned by the family error golden (header name verbatim) and r05_t03_protocol_adapters (c01_c04 / c07); provider id is config data — the (provider, model) identity pair rules are pinned by r05_t01_model_plane c04 and r05_t03 c01_c04.",
-    "endpoint": "https://api.baichuan-ai.com/v1",
-    "incumbent_compat_rules": "none — the incumbent dispatches no provider-specific compat module (first-match-wins registry in core/provider-compat.ts); the family-generic wire shape applies",
-    "rust_t03_compat_parity": "the R05-T03 Rust adapter ships the family-generic shape only; provider-specific compat patches remain incumbent-TS behavior and are NOT yet ported (owner: R05-T05 per-model quirk layer)"
-   },
-   {
-    "leaf_id": "R00-T02-LA-BFD9531DEA41",
-    "feature_id": "F-D10-PROVIDER-PROVIDER-GEMINI-BFD953",
-    "provider_id": "gemini",
-    "protocol": "google-generative-ai",
-    "auth": "api-key",
-    "rule": "R3",
-    "registration": "family wire shape pinned by rust/crates/lingxi-adapters/tests/golden/google-generative-ai/{forward,tool_roundtrip,error}.json; auth-shape mapping pinned by the family error golden (header name verbatim) and r05_t03_protocol_adapters (c01_c04 / c07); provider id is config data — the (provider, model) identity pair rules are pinned by r05_t01_model_plane c04 and r05_t03 c01_c04.",
-    "endpoint": "https://generativelanguage.googleapis.com/v1beta",
-    "incumbent_compat_rules": "none — the incumbent dispatches no provider-specific compat module (first-match-wins registry in core/provider-compat.ts); the family-generic wire shape applies",
-    "rust_t03_compat_parity": "the R05-T03 Rust adapter ships the family-generic shape only; provider-specific compat patches remain incumbent-TS behavior and are NOT yet ported (owner: R05-T05 per-model quirk layer)"
-   },
-   {
-    "leaf_id": "R00-T02-LA-C4EFBA7711E1",
-    "feature_id": "F-D10-PROVIDER-PROVIDER-AGNES-C4EFBA",
-    "provider_id": "agnes",
-    "protocol": "openai-completions",
-    "auth": "api-key",
-    "rule": "R3",
-    "registration": "family wire shape pinned by rust/crates/lingxi-adapters/tests/golden/openai-completions/{forward,tool_roundtrip,error}.json; auth-shape mapping pinned by the family error golden (header name verbatim) and r05_t03_protocol_adapters (c01_c04 / c07); provider id is config data — the (provider, model) identity pair rules are pinned by r05_t01_model_plane c04 and r05_t03 c01_c04.",
-    "endpoint": "https://apihub.agnes-ai.com/v1",
-    "incumbent_compat_rules": "core/provider-compat/agnes.ts (provider agnes | host *.agnes-ai.com): Agnes AI payload compatibility",
-    "rust_t03_compat_parity": "the R05-T03 Rust adapter ships the family-generic shape only; provider-specific compat patches remain incumbent-TS behavior and are NOT yet ported (owner: R05-T05 per-model quirk layer)"
-   },
-   {
-    "leaf_id": "R00-T02-LA-CCD6BA30F9ED",
-    "feature_id": "F-D10-PROVIDER-PROVIDER-VOLCEGINECODING-CCD6BA",
-    "provider_id": "volcengine-coding",
-    "protocol": "openai-completions",
-    "auth": "api-key",
-    "rule": "R3",
-    "registration": "family wire shape pinned by rust/crates/lingxi-adapters/tests/golden/openai-completions/{forward,tool_roundtrip,error}.json; auth-shape mapping pinned by the family error golden (header name verbatim) and r05_t03_protocol_adapters (c01_c04 / c07); provider id is config data — the (provider, model) identity pair rules are pinned by r05_t01_model_plane c04 and r05_t03 c01_c04.",
-    "endpoint": "https://ark.cn-beijing.volces.com/api/coding/v3",
-    "incumbent_compat_rules": "core/provider-compat/volcengine.ts (provider volcengine-coding): same rules as volcengine",
-    "rust_t03_compat_parity": "the R05-T03 Rust adapter ships the family-generic shape only; provider-specific compat patches remain incumbent-TS behavior and are NOT yet ported (owner: R05-T05 per-model quirk layer)"
-   },
-   {
-    "leaf_id": "R00-T02-LA-D61616CAF15F",
-    "feature_id": "F-D10-PROVIDER-PROVIDER-MIMOTOKENPLAN-D61616",
-    "provider_id": "mimo-token-plan",
-    "protocol": "openai-completions",
-    "auth": "api-key",
-    "rule": "R3",
-    "registration": "family wire shape pinned by rust/crates/lingxi-adapters/tests/golden/openai-completions/{forward,tool_roundtrip,error}.json; auth-shape mapping pinned by the family error golden (header name verbatim) and r05_t03_protocol_adapters (c01_c04 / c07); provider id is config data — the (provider, model) identity pair rules are pinned by r05_t01_model_plane c04 and r05_t03 c01_c04.",
-    "endpoint": "https://token-plan-cn.xiaomimimo.com/v1",
-    "incumbent_compat_rules": "core/provider-compat/mimo.ts (host token-plan-cn.xiaomimimo.com): same rules as mimo",
-    "rust_t03_compat_parity": "the R05-T03 Rust adapter ships the family-generic shape only; provider-specific compat patches remain incumbent-TS behavior and are NOT yet ported (owner: R05-T05 per-model quirk layer)"
-   },
-   {
-    "leaf_id": "R00-T02-LA-D79C2E204AFB",
-    "feature_id": "F-D10-PROVIDER-PROVIDER-XAI-D79C2E",
-    "provider_id": "xai",
-    "protocol": "openai-completions",
-    "auth": "api-key",
-    "rule": "R3",
-    "registration": "family wire shape pinned by rust/crates/lingxi-adapters/tests/golden/openai-completions/{forward,tool_roundtrip,error}.json; auth-shape mapping pinned by the family error golden (header name verbatim) and r05_t03_protocol_adapters (c01_c04 / c07); provider id is config data — the (provider, model) identity pair rules are pinned by r05_t01_model_plane c04 and r05_t03 c01_c04.",
-    "endpoint": "https://api.x.ai/v1",
-    "incumbent_compat_rules": "none — the incumbent dispatches no provider-specific compat module (first-match-wins registry in core/provider-compat.ts); the family-generic wire shape applies",
-    "rust_t03_compat_parity": "the R05-T03 Rust adapter ships the family-generic shape only; provider-specific compat patches remain incumbent-TS behavior and are NOT yet ported (owner: R05-T05 per-model quirk layer)"
-   },
-   {
-    "leaf_id": "R00-T02-LA-D86616980926",
-    "feature_id": "F-D10-PROVIDER-PROVIDER-ANTHROPIC-D86616",
-    "provider_id": "anthropic",
-    "protocol": "anthropic-messages",
-    "auth": "api-key",
-    "rule": "R3",
-    "registration": "family wire shape pinned by rust/crates/lingxi-adapters/tests/golden/anthropic-messages/{forward,tool_roundtrip,error}.json; auth-shape mapping pinned by the family error golden (header name verbatim) and r05_t03_protocol_adapters (c01_c04 / c07); provider id is config data — the (provider, model) identity pair rules are pinned by r05_t01_model_plane c04 and r05_t03 c01_c04.",
-    "endpoint": "https://api.anthropic.com",
-    "incumbent_compat_rules": "core/provider-compat/anthropic.ts (conditional: usesAnthropicCacheControl | api anthropic-messages + thinkingFormat anthropic | adaptive-only profile): prompt-cache control compatibility",
-    "rust_t03_compat_parity": "the R05-T03 Rust adapter ships the family-generic shape only; provider-specific compat patches remain incumbent-TS behavior and are NOT yet ported (owner: R05-T05 per-model quirk layer)"
-   },
-   {
-    "leaf_id": "R00-T02-LA-DE0309EF3F56",
-    "feature_id": "F-D10-PROVIDER-PROVIDER-MODELSCOPE-DE0309",
-    "provider_id": "modelscope",
-    "protocol": "openai-completions",
-    "auth": "api-key",
-    "rule": "R3",
-    "registration": "family wire shape pinned by rust/crates/lingxi-adapters/tests/golden/openai-completions/{forward,tool_roundtrip,error}.json; auth-shape mapping pinned by the family error golden (header name verbatim) and r05_t03_protocol_adapters (c01_c04 / c07); provider id is config data — the (provider, model) identity pair rules are pinned by r05_t01_model_plane c04 and r05_t03 c01_c04.",
-    "endpoint": "https://api-inference.modelscope.cn/v1",
-    "incumbent_compat_rules": "none — the incumbent dispatches no provider-specific compat module (first-match-wins registry in core/provider-compat.ts); the family-generic wire shape applies",
-    "rust_t03_compat_parity": "the R05-T03 Rust adapter ships the family-generic shape only; provider-specific compat patches remain incumbent-TS behavior and are NOT yet ported (owner: R05-T05 per-model quirk layer)"
-   },
-   {
-    "leaf_id": "R00-T02-LA-E06C7DDB93D2",
-    "feature_id": "F-D10-PROVIDER-PROVIDER-VOLCENGINE-E06C7D",
-    "provider_id": "volcengine",
-    "protocol": "openai-completions",
-    "auth": "api-key",
-    "rule": "R3",
-    "registration": "family wire shape pinned by rust/crates/lingxi-adapters/tests/golden/openai-completions/{forward,tool_roundtrip,error}.json; auth-shape mapping pinned by the family error golden (header name verbatim) and r05_t03_protocol_adapters (c01_c04 / c07); provider id is config data — the (provider, model) identity pair rules are pinned by r05_t01_model_plane c04 and r05_t03 c01_c04.",
-    "endpoint": "https://ark.cn-beijing.volces.com/api/v3",
-    "incumbent_compat_rules": "core/provider-compat/volcengine.ts (provider volcengine | thinkingFormat volcengine): thinking format normalization",
-    "rust_t03_compat_parity": "the R05-T03 Rust adapter ships the family-generic shape only; provider-specific compat patches remain incumbent-TS behavior and are NOT yet ported (owner: R05-T05 per-model quirk layer)"
-   },
-   {
-    "leaf_id": "R00-T02-LA-ED13EB6D0FA6",
-    "feature_id": "F-D10-PROVIDER-PROVIDER-DEEPSEEK-ED13EB",
-    "provider_id": "deepseek",
-    "protocol": "openai-completions",
-    "auth": "api-key",
-    "rule": "R3",
-    "registration": "family wire shape pinned by rust/crates/lingxi-adapters/tests/golden/openai-completions/{forward,tool_roundtrip,error}.json; auth-shape mapping pinned by the family error golden (header name verbatim) and r05_t03_protocol_adapters (c01_c04 / c07); provider id is config data — the (provider, model) identity pair rules are pinned by r05_t01_model_plane c04 and r05_t03 c01_c04.",
-    "endpoint": "https://api.deepseek.com",
-    "incumbent_compat_rules": "core/provider-compat/deepseek.ts (provider deepseek | host api.deepseek.com; non-responses api): thinking/reasoning handling for chat-completions",
-    "rust_t03_compat_parity": "the R05-T03 Rust adapter ships the family-generic shape only; provider-specific compat patches remain incumbent-TS behavior and are NOT yet ported (owner: R05-T05 per-model quirk layer)"
-   },
-   {
-    "leaf_id": "R00-T02-LA-FBCFA99A89A2",
-    "feature_id": "F-D10-PROVIDER-PROVIDER-GROQ-FBCFA9",
-    "provider_id": "groq",
-    "protocol": "openai-completions",
-    "auth": "api-key",
-    "rule": "R3",
-    "registration": "family wire shape pinned by rust/crates/lingxi-adapters/tests/golden/openai-completions/{forward,tool_roundtrip,error}.json; auth-shape mapping pinned by the family error golden (header name verbatim) and r05_t03_protocol_adapters (c01_c04 / c07); provider id is config data — the (provider, model) identity pair rules are pinned by r05_t01_model_plane c04 and r05_t03 c01_c04.",
-    "endpoint": "https://api.groq.com/openai/v1",
-    "incumbent_compat_rules": "none — the incumbent dispatches no provider-specific compat module (first-match-wins registry in core/provider-compat.ts); the family-generic wire shape applies",
-    "rust_t03_compat_parity": "the R05-T03 Rust adapter ships the family-generic shape only; provider-specific compat patches remain incumbent-TS behavior and are NOT yet ported (owner: R05-T05 per-model quirk layer)"
-   },
-   {
-    "leaf_id": "R00-T02-LA-FE9588171A23",
-    "feature_id": "F-D10-PROVIDER-PROVIDER-MINIMAX-FE9588",
-    "provider_id": "minimax",
-    "protocol": "anthropic-messages",
-    "auth": "api-key",
-    "rule": "R3",
-    "registration": "family wire shape pinned by rust/crates/lingxi-adapters/tests/golden/anthropic-messages/{forward,tool_roundtrip,error}.json; auth-shape mapping pinned by the family error golden (header name verbatim) and r05_t03_protocol_adapters (c01_c04 / c07); provider id is config data — the (provider, model) identity pair rules are pinned by r05_t01_model_plane c04 and r05_t03 c01_c04.",
-    "endpoint": "https://api.minimaxi.com/anthropic",
-    "incumbent_compat_rules": "core/provider-compat/anthropic.ts (conditional on thinkingFormat/cache-control, same rules as anthropic)",
-    "rust_t03_compat_parity": "the R05-T03 Rust adapter ships the family-generic shape only; provider-specific compat patches remain incumbent-TS behavior and are NOT yet ported (owner: R05-T05 per-model quirk layer)"
-   },
-   {
-    "leaf_id": "R00-T02-LA-FF3AD97F8429",
-    "feature_id": "F-D10-PROVIDER-PROVIDER-ZHIPU-FF3AD9",
-    "provider_id": "zhipu",
-    "protocol": "openai-completions",
-    "auth": "api-key",
-    "rule": "R3",
-    "registration": "family wire shape pinned by rust/crates/lingxi-adapters/tests/golden/openai-completions/{forward,tool_roundtrip,error}.json; auth-shape mapping pinned by the family error golden (header name verbatim) and r05_t03_protocol_adapters (c01_c04 / c07); provider id is config data — the (provider, model) identity pair rules are pinned by r05_t01_model_plane c04 and r05_t03 c01_c04.",
-    "endpoint": "https://open.bigmodel.cn/api/paas/v4",
-    "incumbent_compat_rules": "core/provider-compat/zhipu.ts (provider zhipu | thinkingFormat zhipu): thinking format normalization",
-    "rust_t03_compat_parity": "the R05-T03 Rust adapter ships the family-generic shape only; provider-specific compat patches remain incumbent-TS behavior and are NOT yet ported (owner: R05-T05 per-model quirk layer)"
-   }
-  ],
-  "d12_media": [
-   {
-    "leaf_id": "R00-T02-LA-057B048D6C07",
-    "feature_id": "F-D12-SEMANTIC_EFFECT-SEMANTIC-EFFECT-MEDIA-MEDIA-VIDEO-PROVIDERS-PROV-057B04",
-    "rule": "R5",
-    "disposition": "share",
-    "registration": "media-plane leaf (image/video/speech/asr): no chat wire fact for T03; the family's configured-but-unimplemented loud refusal BEFORE any request is pinned by r05_t01_model_plane c06 (volcengine-bigasr, stub.hits()==0) and gateway.rs unimplemented_families_refuse_loudly; wire attribution stays with R05-T06."
-   },
-   {
-    "leaf_id": "R00-T02-LA-0949F828BEA3",
-    "feature_id": "F-D12-SEMANTIC_EFFECT-SEMANTIC-EFFECT-MEDIA-MEDIA-GENERATED-FILENAME-R-0949F8",
-    "rule": "R5",
-    "disposition": "share",
-    "registration": "media-plane leaf (image/video/speech/asr): no chat wire fact for T03; the family's configured-but-unimplemented loud refusal BEFORE any request is pinned by r05_t01_model_plane c06 (volcengine-bigasr, stub.hits()==0) and gateway.rs unimplemented_families_refuse_loudly; wire attribution stays with R05-T06."
-   },
-   {
-    "leaf_id": "R00-T02-LA-17702A7B3335",
-    "feature_id": "F-D12-SEMANTIC_EFFECT-SEMANTIC-EFFECT-MEDIA-MEDIA-SPEECH-CONFIG-READ-17702A",
-    "rule": "R5",
-    "disposition": "share",
-    "registration": "media-plane leaf (image/video/speech/asr): no chat wire fact for T03; the family's configured-but-unimplemented loud refusal BEFORE any request is pinned by r05_t01_model_plane c06 (volcengine-bigasr, stub.hits()==0) and gateway.rs unimplemented_families_refuse_loudly; wire attribution stays with R05-T06."
-   },
-   {
-    "leaf_id": "R00-T02-LA-1B65B0793D67",
-    "feature_id": "F-D12-SEMANTIC_EFFECT-SEMANTIC-EFFECT-MEDIA-MEDIA-IMAGE-CONFIG-PUT-1B65B0",
-    "rule": "R5",
-    "disposition": "share",
-    "registration": "media-plane leaf (image/video/speech/asr): no chat wire fact for T03; the family's configured-but-unimplemented loud refusal BEFORE any request is pinned by r05_t01_model_plane c06 (volcengine-bigasr, stub.hits()==0) and gateway.rs unimplemented_families_refuse_loudly; wire attribution stays with R05-T06."
-   },
-   {
-    "leaf_id": "R00-T02-LA-1EA9E4819E27",
-    "feature_id": "F-D12-SEMANTIC_EFFECT-SEMANTIC-EFFECT-MEDIA-MEDIA-VIDEO-PROVIDERS-READ-1EA9E4",
-    "rule": "R5",
-    "disposition": "share",
-    "registration": "media-plane leaf (image/video/speech/asr): no chat wire fact for T03; the family's configured-but-unimplemented loud refusal BEFORE any request is pinned by r05_t01_model_plane c06 (volcengine-bigasr, stub.hits()==0) and gateway.rs unimplemented_families_refuse_loudly; wire attribution stays with R05-T06."
-   },
-   {
-    "leaf_id": "R00-T02-LA-27A9F02FCD58",
-    "feature_id": "F-D12-SEMANTIC_EFFECT-SEMANTIC-EFFECT-MEDIA-MEDIA-IMAGE-PROVIDERS-READ-27A9F0",
-    "rule": "R5",
-    "disposition": "share",
-    "registration": "media-plane leaf (image/video/speech/asr): no chat wire fact for T03; the family's configured-but-unimplemented loud refusal BEFORE any request is pinned by r05_t01_model_plane c06 (volcengine-bigasr, stub.hits()==0) and gateway.rs unimplemented_families_refuse_loudly; wire attribution stays with R05-T06."
-   },
-   {
-    "leaf_id": "R00-T02-LA-2E137D5F14B9",
-    "feature_id": "F-D12-SEMANTIC_EFFECT-SEMANTIC-EFFECT-MEDIA-MEDIA-SPEECH-PROVIDERS-REA-2E137D",
-    "rule": "R5",
-    "disposition": "share",
-    "registration": "media-plane leaf (image/video/speech/asr): no chat wire fact for T03; the family's configured-but-unimplemented loud refusal BEFORE any request is pinned by r05_t01_model_plane c06 (volcengine-bigasr, stub.hits()==0) and gateway.rs unimplemented_families_refuse_loudly; wire attribution stays with R05-T06."
-   },
-   {
-    "leaf_id": "R00-T02-LA-385F593D5622",
-    "feature_id": "F-D12-SEMANTIC_EFFECT-SEMANTIC-EFFECT-MEDIA-MEDIA-IMAGE-GENERATE-POST-385F59",
-    "rule": "R5",
-    "disposition": "share",
-    "registration": "media-plane leaf (image/video/speech/asr): no chat wire fact for T03; the family's configured-but-unimplemented loud refusal BEFORE any request is pinned by r05_t01_model_plane c06 (volcengine-bigasr, stub.hits()==0) and gateway.rs unimplemented_families_refuse_loudly; wire attribution stays with R05-T06."
-   },
-   {
-    "leaf_id": "R00-T02-LA-3FE814BB7C56",
-    "feature_id": "F-D12-SEMANTIC_EFFECT-SEMANTIC-EFFECT-MEDIA-GENERATE-IMAGE-3FE814",
-    "rule": "R5",
-    "disposition": "share",
-    "registration": "media-plane leaf (image/video/speech/asr): no chat wire fact for T03; the family's configured-but-unimplemented loud refusal BEFORE any request is pinned by r05_t01_model_plane c06 (volcengine-bigasr, stub.hits()==0) and gateway.rs unimplemented_families_refuse_loudly; wire attribution stays with R05-T06."
-   },
-   {
-    "leaf_id": "R00-T02-LA-40DF54BC8F29",
-    "feature_id": "F-D12-SEMANTIC_EFFECT-SEMANTIC-EFFECT-SPEECH-RECOGNITION-SPEECH-RECOGN-40DF54",
-    "rule": "R5",
-    "disposition": "share",
-    "registration": "media-plane leaf (image/video/speech/asr): no chat wire fact for T03; the family's configured-but-unimplemented loud refusal BEFORE any request is pinned by r05_t01_model_plane c06 (volcengine-bigasr, stub.hits()==0) and gateway.rs unimplemented_families_refuse_loudly; wire attribution stays with R05-T06."
-   },
-   {
-    "leaf_id": "R00-T02-LA-44DC28F20C8A",
-    "feature_id": "F-D12-SEMANTIC_EFFECT-SEMANTIC-EFFECT-MEDIA-PROVIDERS-ASR-44DC28",
-    "rule": "R5",
-    "disposition": "share",
-    "registration": "media-plane leaf (image/video/speech/asr): no chat wire fact for T03; the family's configured-but-unimplemented loud refusal BEFORE any request is pinned by r05_t01_model_plane c06 (volcengine-bigasr, stub.hits()==0) and gateway.rs unimplemented_families_refuse_loudly; wire attribution stays with R05-T06."
-   },
-   {
-    "leaf_id": "R00-T02-LA-504F95068625",
-    "feature_id": "F-D12-SEMANTIC_EFFECT-SEMANTIC-EFFECT-MEDIA-PROVIDERS-VIDEO-504F95",
-    "rule": "R5",
-    "disposition": "share",
-    "registration": "media-plane leaf (image/video/speech/asr): no chat wire fact for T03; the family's configured-but-unimplemented loud refusal BEFORE any request is pinned by r05_t01_model_plane c06 (volcengine-bigasr, stub.hits()==0) and gateway.rs unimplemented_families_refuse_loudly; wire attribution stays with R05-T06."
-   },
-   {
-    "leaf_id": "R00-T02-LA-595235FD7113",
-    "feature_id": "F-D12-SEMANTIC_EFFECT-SEMANTIC-EFFECT-MEDIA-MEDIA-SPEECH-CONFIG-PUT-595235",
-    "rule": "R5",
-    "disposition": "share",
-    "registration": "media-plane leaf (image/video/speech/asr): no chat wire fact for T03; the family's configured-but-unimplemented loud refusal BEFORE any request is pinned by r05_t01_model_plane c06 (volcengine-bigasr, stub.hits()==0) and gateway.rs unimplemented_families_refuse_loudly; wire attribution stays with R05-T06."
-   },
-   {
-    "leaf_id": "R00-T02-LA-5D32356CD275",
-    "feature_id": "F-D12-SEMANTIC_EFFECT-SEMANTIC-EFFECT-MEDIA-MEDIA-TASKS-TASKID-RETRY-P-5D3235",
-    "rule": "R5",
-    "disposition": "share",
-    "registration": "media-plane leaf (image/video/speech/asr): no chat wire fact for T03; the family's configured-but-unimplemented loud refusal BEFORE any request is pinned by r05_t01_model_plane c06 (volcengine-bigasr, stub.hits()==0) and gateway.rs unimplemented_families_refuse_loudly; wire attribution stays with R05-T06."
-   },
-   {
-    "leaf_id": "R00-T02-LA-62106F57675C",
-    "feature_id": "F-D12-SEMANTIC_EFFECT-SEMANTIC-EFFECT-SPEECH-RECOGNITION-SPEECH-RECOGN-62106F",
-    "rule": "R5",
-    "disposition": "share",
-    "registration": "media-plane leaf (image/video/speech/asr): no chat wire fact for T03; the family's configured-but-unimplemented loud refusal BEFORE any request is pinned by r05_t01_model_plane c06 (volcengine-bigasr, stub.hits()==0) and gateway.rs unimplemented_families_refuse_loudly; wire attribution stays with R05-T06."
-   },
-   {
-    "leaf_id": "R00-T02-LA-66FFBF09DEA3",
-    "feature_id": "F-D12-SEMANTIC_EFFECT-SEMANTIC-EFFECT-MEDIA-MEDIA-GENERATED-OPEN-FILEN-66FFBF",
-    "rule": "R2",
-    "disposition": "deferred",
-    "registration": "rule R2, disposition deferred->R07 (desktop-shell open/cmd/xdg-open business entry); r05_share is null in the scope matrix. Checked explicitly: this is NOT a non-media R5 leaf parked on T06, so the T03 parity_guard condition does not trigger; registered here for completeness, no T03 action."
-   },
-   {
-    "leaf_id": "R00-T02-LA-6ADB2A53988A",
-    "feature_id": "F-D12-SEMANTIC_EFFECT-SEMANTIC-EFFECT-MEDIA-MEDIA-VIDEO-CONFIG-PUT-6ADB2A",
-    "rule": "R5",
-    "disposition": "share",
-    "registration": "media-plane leaf (image/video/speech/asr): no chat wire fact for T03; the family's configured-but-unimplemented loud refusal BEFORE any request is pinned by r05_t01_model_plane c06 (volcengine-bigasr, stub.hits()==0) and gateway.rs unimplemented_families_refuse_loudly; wire attribution stays with R05-T06."
-   },
-   {
-    "leaf_id": "R00-T02-LA-6C23FF248130",
-    "feature_id": "F-D12-SEMANTIC_EFFECT-SEMANTIC-EFFECT-SPEECH-RECOGNITION-SPEECH-RECOGN-6C23FF",
-    "rule": "R5",
-    "disposition": "share",
-    "registration": "media-plane leaf (image/video/speech/asr): no chat wire fact for T03; the family's configured-but-unimplemented loud refusal BEFORE any request is pinned by r05_t01_model_plane c06 (volcengine-bigasr, stub.hits()==0) and gateway.rs unimplemented_families_refuse_loudly; wire attribution stays with R05-T06."
-   },
-   {
-    "leaf_id": "R00-T02-LA-6DA6634C4D7B",
-    "feature_id": "F-D12-SEMANTIC_EFFECT-SEMANTIC-EFFECT-SPEECH-RECOGNITION-SPEECH-RECOGN-6DA663",
-    "rule": "R5",
-    "disposition": "share",
-    "registration": "media-plane leaf (image/video/speech/asr): no chat wire fact for T03; the family's configured-but-unimplemented loud refusal BEFORE any request is pinned by r05_t01_model_plane c06 (volcengine-bigasr, stub.hits()==0) and gateway.rs unimplemented_families_refuse_loudly; wire attribution stays with R05-T06."
-   },
-   {
-    "leaf_id": "R00-T02-LA-794DD254406F",
-    "feature_id": "F-D12-SEMANTIC_EFFECT-SEMANTIC-EFFECT-MEDIA-MEDIA-SPEECH-GENERATE-POST-794DD2",
-    "rule": "R5",
-    "disposition": "share",
-    "registration": "media-plane leaf (image/video/speech/asr): no chat wire fact for T03; the family's configured-but-unimplemented loud refusal BEFORE any request is pinned by r05_t01_model_plane c06 (volcengine-bigasr, stub.hits()==0) and gateway.rs unimplemented_families_refuse_loudly; wire attribution stays with R05-T06."
-   },
-   {
-    "leaf_id": "R00-T02-LA-8E933C4BE7D0",
-    "feature_id": "F-D12-SEMANTIC_EFFECT-SEMANTIC-EFFECT-MEDIA-MEDIA-SPEECH-PROVIDERS-PRO-8E933C",
-    "rule": "R5",
-    "disposition": "share",
-    "registration": "media-plane leaf (image/video/speech/asr): no chat wire fact for T03; the family's configured-but-unimplemented loud refusal BEFORE any request is pinned by r05_t01_model_plane c06 (volcengine-bigasr, stub.hits()==0) and gateway.rs unimplemented_families_refuse_loudly; wire attribution stays with R05-T06."
-   },
-   {
-    "leaf_id": "R00-T02-LA-9569C0C0C4D8",
-    "feature_id": "F-D12-SEMANTIC_EFFECT-SEMANTIC-EFFECT-MEDIA-MEDIA-IMAGE-PROVIDERS-PROV-9569C0",
-    "rule": "R5",
-    "disposition": "share",
-    "registration": "media-plane leaf (image/video/speech/asr): no chat wire fact for T03; the family's configured-but-unimplemented loud refusal BEFORE any request is pinned by r05_t01_model_plane c06 (volcengine-bigasr, stub.hits()==0) and gateway.rs unimplemented_families_refuse_loudly; wire attribution stays with R05-T06."
-   },
-   {
-    "leaf_id": "R00-T02-LA-96071267A5C5",
-    "feature_id": "F-D12-SEMANTIC_EFFECT-SEMANTIC-EFFECT-MEDIA-PROVIDERS-IMAGE-960712",
-    "rule": "R5",
-    "disposition": "share",
-    "registration": "media-plane leaf (image/video/speech/asr): no chat wire fact for T03; the family's configured-but-unimplemented loud refusal BEFORE any request is pinned by r05_t01_model_plane c06 (volcengine-bigasr, stub.hits()==0) and gateway.rs unimplemented_families_refuse_loudly; wire attribution stays with R05-T06."
-   },
-   {
-    "leaf_id": "R00-T02-LA-97EC58F3099F",
-    "feature_id": "F-D12-SEMANTIC_EFFECT-SEMANTIC-EFFECT-SPEECH-RECOGNITION-SPEECH-RECOGN-97EC58",
-    "rule": "R5",
-    "disposition": "share",
-    "registration": "media-plane leaf (image/video/speech/asr): no chat wire fact for T03; the family's configured-but-unimplemented loud refusal BEFORE any request is pinned by r05_t01_model_plane c06 (volcengine-bigasr, stub.hits()==0) and gateway.rs unimplemented_families_refuse_loudly; wire attribution stays with R05-T06."
-   },
-   {
-    "leaf_id": "R00-T02-LA-9B809055BF01",
-    "feature_id": "F-D12-SEMANTIC_EFFECT-SEMANTIC-EFFECT-MEDIA-MEDIA-TASKS-TASKID-READ-9B8090",
-    "rule": "R5",
-    "disposition": "share",
-    "registration": "media-plane leaf (image/video/speech/asr): no chat wire fact for T03; the family's configured-but-unimplemented loud refusal BEFORE any request is pinned by r05_t01_model_plane c06 (volcengine-bigasr, stub.hits()==0) and gateway.rs unimplemented_families_refuse_loudly; wire attribution stays with R05-T06."
-   },
-   {
-    "leaf_id": "R00-T02-LA-A5B2F5BAD27E",
-    "feature_id": "F-D12-SEMANTIC_EFFECT-SEMANTIC-EFFECT-MEDIA-MEDIA-VIDEO-GENERATE-POST-A5B2F5",
-    "rule": "R5",
-    "disposition": "share",
-    "registration": "media-plane leaf (image/video/speech/asr): no chat wire fact for T03; the family's configured-but-unimplemented loud refusal BEFORE any request is pinned by r05_t01_model_plane c06 (volcengine-bigasr, stub.hits()==0) and gateway.rs unimplemented_families_refuse_loudly; wire attribution stays with R05-T06."
-   },
-   {
-    "leaf_id": "R00-T02-LA-A86068D93F1D",
-    "feature_id": "F-D12-SEMANTIC_EFFECT-SEMANTIC-EFFECT-MEDIA-PROVIDERS-TTS-A86068",
-    "rule": "R5",
-    "disposition": "share",
-    "registration": "media-plane leaf (image/video/speech/asr): no chat wire fact for T03; the family's configured-but-unimplemented loud refusal BEFORE any request is pinned by r05_t01_model_plane c06 (volcengine-bigasr, stub.hits()==0) and gateway.rs unimplemented_families_refuse_loudly; wire attribution stays with R05-T06."
-   },
-   {
-    "leaf_id": "R00-T02-LA-AB6545B18E22",
-    "feature_id": "F-D12-SEMANTIC_EFFECT-SEMANTIC-EFFECT-MEDIA-MEDIA-IMAGE-PROVIDERS-PROV-AB6545",
-    "rule": "R5",
-    "disposition": "share",
-    "registration": "media-plane leaf (image/video/speech/asr): no chat wire fact for T03; the family's configured-but-unimplemented loud refusal BEFORE any request is pinned by r05_t01_model_plane c06 (volcengine-bigasr, stub.hits()==0) and gateway.rs unimplemented_families_refuse_loudly; wire attribution stays with R05-T06."
-   },
-   {
-    "leaf_id": "R00-T02-LA-AF4A3588D5DA",
-    "feature_id": "F-D12-SEMANTIC_EFFECT-SEMANTIC-EFFECT-MEDIA-MEDIA-SPEECH-PROVIDERS-PRO-AF4A35",
-    "rule": "R5",
-    "disposition": "share",
-    "registration": "media-plane leaf (image/video/speech/asr): no chat wire fact for T03; the family's configured-but-unimplemented loud refusal BEFORE any request is pinned by r05_t01_model_plane c06 (volcengine-bigasr, stub.hits()==0) and gateway.rs unimplemented_families_refuse_loudly; wire attribution stays with R05-T06."
-   },
-   {
-    "leaf_id": "R00-T02-LA-AFCCC4FB7DBA",
-    "feature_id": "F-D12-SEMANTIC_EFFECT-SEMANTIC-EFFECT-MEDIA-MEDIA-TASKS-READ-AFCCC4",
-    "rule": "R5",
-    "disposition": "share",
-    "registration": "media-plane leaf (image/video/speech/asr): no chat wire fact for T03; the family's configured-but-unimplemented loud refusal BEFORE any request is pinned by r05_t01_model_plane c06 (volcengine-bigasr, stub.hits()==0) and gateway.rs unimplemented_families_refuse_loudly; wire attribution stays with R05-T06."
-   },
-   {
-    "leaf_id": "R00-T02-LA-BABF0EBA1DE2",
-    "feature_id": "F-D12-SEMANTIC_EFFECT-SEMANTIC-EFFECT-MEDIA-MEDIA-TASKS-BATCH-BATCHID--BABF0E",
-    "rule": "R5",
-    "disposition": "share",
-    "registration": "media-plane leaf (image/video/speech/asr): no chat wire fact for T03; the family's configured-but-unimplemented loud refusal BEFORE any request is pinned by r05_t01_model_plane c06 (volcengine-bigasr, stub.hits()==0) and gateway.rs unimplemented_families_refuse_loudly; wire attribution stays with R05-T06."
-   },
-   {
-    "leaf_id": "R00-T02-LA-C3CAB2E8B298",
-    "feature_id": "F-D12-SEMANTIC_EFFECT-SEMANTIC-EFFECT-MEDIA-GENERATE-SPEECH-C3CAB2",
-    "rule": "R5",
-    "disposition": "share",
-    "registration": "media-plane leaf (image/video/speech/asr): no chat wire fact for T03; the family's configured-but-unimplemented loud refusal BEFORE any request is pinned by r05_t01_model_plane c06 (volcengine-bigasr, stub.hits()==0) and gateway.rs unimplemented_families_refuse_loudly; wire attribution stays with R05-T06."
-   },
-   {
-    "leaf_id": "R00-T02-LA-CC33172F1B57",
-    "feature_id": "F-D12-SEMANTIC_EFFECT-SEMANTIC-EFFECT-MEDIA-MEDIA-SPEECH-PROVIDERS-PRO-CC3317",
-    "rule": "R5",
-    "disposition": "share",
-    "registration": "media-plane leaf (image/video/speech/asr): no chat wire fact for T03; the family's configured-but-unimplemented loud refusal BEFORE any request is pinned by r05_t01_model_plane c06 (volcengine-bigasr, stub.hits()==0) and gateway.rs unimplemented_families_refuse_loudly; wire attribution stays with R05-T06."
-   },
-   {
-    "leaf_id": "R00-T02-LA-D672EB55CD31",
-    "feature_id": "F-D12-SEMANTIC_EFFECT-SEMANTIC-EFFECT-MEDIA-GENERATE-VIDEO-D672EB",
-    "rule": "R5",
-    "disposition": "share",
-    "registration": "media-plane leaf (image/video/speech/asr): no chat wire fact for T03; the family's configured-but-unimplemented loud refusal BEFORE any request is pinned by r05_t01_model_plane c06 (volcengine-bigasr, stub.hits()==0) and gateway.rs unimplemented_families_refuse_loudly; wire attribution stays with R05-T06."
-   },
-   {
-    "leaf_id": "R00-T02-LA-DA74F52F18A0",
-    "feature_id": "F-D12-SEMANTIC_EFFECT-SEMANTIC-EFFECT-MEDIA-MEDIA-VIDEO-PROVIDERS-PROV-DA74F5",
-    "rule": "R5",
-    "disposition": "share",
-    "registration": "media-plane leaf (image/video/speech/asr): no chat wire fact for T03; the family's configured-but-unimplemented loud refusal BEFORE any request is pinned by r05_t01_model_plane c06 (volcengine-bigasr, stub.hits()==0) and gateway.rs unimplemented_families_refuse_loudly; wire attribution stays with R05-T06."
-   },
-   {
-    "leaf_id": "R00-T02-LA-DEDBD68525B0",
-    "feature_id": "F-D12-SEMANTIC_EFFECT-SEMANTIC-EFFECT-MEDIA-GENERATE-ASR-DEDBD6",
-    "rule": "R5",
-    "disposition": "share",
-    "registration": "media-plane leaf (image/video/speech/asr): no chat wire fact for T03; the family's configured-but-unimplemented loud refusal BEFORE any request is pinned by r05_t01_model_plane c06 (volcengine-bigasr, stub.hits()==0) and gateway.rs unimplemented_families_refuse_loudly; wire attribution stays with R05-T06."
-   },
-   {
-    "leaf_id": "R00-T02-LA-F6C12F9E54F6",
-    "feature_id": "F-D12-SEMANTIC_EFFECT-SEMANTIC-EFFECT-MEDIA-MEDIA-VIDEO-PROVIDERS-PROV-F6C12F",
-    "rule": "R5",
-    "disposition": "share",
-    "registration": "media-plane leaf (image/video/speech/asr): no chat wire fact for T03; the family's configured-but-unimplemented loud refusal BEFORE any request is pinned by r05_t01_model_plane c06 (volcengine-bigasr, stub.hits()==0) and gateway.rs unimplemented_families_refuse_loudly; wire attribution stays with R05-T06."
-   },
-   {
-    "leaf_id": "R00-T02-LA-FBF90A1BB572",
-    "feature_id": "F-D12-SEMANTIC_EFFECT-SEMANTIC-EFFECT-MEDIA-MEDIA-IMAGE-PROVIDERS-PROV-FBF90A",
-    "rule": "R5",
-    "disposition": "share",
-    "registration": "media-plane leaf (image/video/speech/asr): no chat wire fact for T03; the family's configured-but-unimplemented loud refusal BEFORE any request is pinned by r05_t01_model_plane c06 (volcengine-bigasr, stub.hits()==0) and gateway.rs unimplemented_families_refuse_loudly; wire attribution stays with R05-T06."
-   }
-  ]
- },
- "stop_reason_table": {
-  "rule": "adapters never branch on specific stop-reason values: tool-call content drives ProviderTurn::ToolRequests, non-empty content drives Final, and 'neither' drives ProviderTurn::Empty whose detail carries the wire value VERBATIM; the openai-responses family additionally maps status=failed to an honest ProviderTurn::Failed (never an empty turn). Golden: every family's forward/error fixtures; unit: anthropic stop_reason_reaches_the_empty_detail, responses failed_status_is_an_honest_failure_never_an_empty_turn.",
-  "openai-completions": {
-   "wire_field": "choices[0].finish_reason (stream: aggregated across chunks)",
-   "vocabulary": [
-    "stop",
-    "length",
-    "tool_calls",
-    "content_filter"
-   ],
-   "mapping": "verbatim into Empty detail; tool_calls/content take precedence as above"
-  },
-  "anthropic-messages": {
-   "wire_field": "stop_reason",
-   "vocabulary": [
-    "end_turn",
-    "stop_sequence",
-    "max_tokens",
-    "tool_use",
-    "pause_turn",
-    "refusal"
-   ],
-   "mapping": "verbatim into Empty detail"
-  },
-  "google-generative-ai": {
-   "wire_field": "candidates[0].finishReason",
-   "vocabulary": [
-    "STOP",
-    "MAX_TOKENS",
-    "SAFETY",
-    "RECITATION",
-    "OTHER"
-   ],
-   "mapping": "verbatim into Empty detail"
-  },
-  "openai-responses": {
-   "wire_field": "status + incomplete_details.reason (stream: response.completed terminal event is authoritative)",
-   "vocabulary": [
-    "completed",
-    "incomplete",
-    "failed",
-    "queued",
-    "in_progress"
-   ],
-   "mapping": "failed → honest Failed with the error detail; incomplete → Empty with reason; completed → content/tool mapping"
-  },
-  "openai-codex-responses": {
-   "wire_field": "same as openai-responses (SSE-only transport; response.completed terminal event)",
-   "vocabulary": [
-    "completed",
-    "incomplete",
-    "failed"
-   ],
-   "mapping": "same as openai-responses"
-  }
- },
- "field_conversion_table": {
-  "_columns": [
-   "logical field",
-   "openai-completions",
-   "anthropic-messages",
-   "google-generative-ai",
-   "openai-responses",
-   "openai-codex-responses"
-  ],
-  "rows": [
-   [
-    "system prompt",
-    "first {role:system} message (only when Some)",
-    "top-level `system` (absent when None)",
-    "`systemInstruction` (absent when None)",
-    "`instructions` (absent when None)",
-    "`instructions` (incumbent constant when None)"
-   ],
-   [
-    "user submission",
-    "messages[]{role:user, content}",
-    "messages[]{role:user, content}",
-    "contents[]{role:user, parts[]}",
-    "input[]{type:message, role:user, content:[input_text]}",
-    "same as openai-responses"
-   ],
-   [
-    "assistant text",
-    "message.content string | parts array",
-    "content blocks [{type:text}]",
-    "parts[{text}] (role model)",
-    "output message items",
-    "same as openai-responses"
-   ],
-   [
-    "reasoning",
-    "parts reasoning/thinking (buffered); delta.reasoning_content (stream)",
-    "{type:thinking} + adjacent signature",
-    "part{thought:true} + thoughtSignature",
-    "reasoning item (summary → Reasoning blocks)",
-    "same as openai-responses"
-   ],
-   [
-    "opaque state",
-    "unknown content parts verbatim (never re-sent)",
-    "thinking_signature / redacted_thinking at the original position",
-    "thoughtSignature on its own part",
-    "encrypted reasoning item verbatim",
-    "same as openai-responses"
-   ],
-   [
-    "cross-family opaque",
-    "never echoed",
-    "never echoed",
-    "never echoed",
-    "never echoed",
-    "never echoed"
-   ],
-   [
-    "tool declarations",
-    "tools[{type:function, function{name,description,parameters}}]",
-    "tools[{name,description,input_schema}]",
-    "tools[{functionDeclarations[{name,description,parameters}]}]",
-    "tools[{type:function,name,description,parameters}]",
-    "same as openai-responses"
-   ],
-   [
-    "tool call (model→host)",
-    "message.tool_calls[{id,type:function,function{name,arguments}}]",
-    "content block {type:tool_use,id,name,input}",
-    "part{functionCall{name,args}} — NO id; paired by exchange name+order",
-    "output item {type:function_call,call_id,name,arguments}",
-    "same as openai-responses"
-   ],
-   [
-    "tool result (host→model)",
-    "message{role:tool, tool_call_id, content}",
-    "ONE user message merging tool_result blocks {tool_use_id,content,is_error}",
-    "part{functionResponse{name,response}}",
-    "input item {type:function_call_output,call_id,output}",
-    "same as openai-responses"
-   ],
-   [
-    "parallel calls",
-    "multiple tool_calls; results by tool_call_id",
-    "multiple tool_use blocks; merged single user tool_result message",
-    "multiple functionCall parts; responses paired by name+order",
-    "multiple function_call items; results by call_id",
-    "same as openai-responses"
-   ],
-   [
-    "usage",
-    "usage.prompt_tokens + completion_tokens (both-or-never)",
-    "usage.input_tokens + output_tokens (both-or-never)",
-    "usageMetadata.promptTokenCount + candidatesTokenCount (both-or-never)",
-    "usage.input_tokens + output_tokens (both-or-never)",
-    "same as openai-responses"
-   ],
-   [
-    "identity fields",
-    "response id/model IGNORED; identity from the driver/resolved route (C10)",
-    "same",
-    "same",
-    "same",
-    "same"
-   ],
-   [
-    "request path",
-    "{endpoint}/chat/completions",
-    "{endpoint}/v1/messages (incumbent join rule)",
-    "{endpoint}/models/{percent-encoded model}:generateContent",
-    "{endpoint}/responses",
-    "{endpoint}/codex/responses (+ originator/chatgpt-account-id headers)"
-   ],
-   [
-    "streaming",
-    "SSE implemented + golden-pinned; production buffered (T04)",
-    "SSE incumbent fact; T03 buffered only (T04)",
-    "SSE incumbent fact; T03 buffered only (T04)",
-    "SSE decode implemented; production buffered (T04)",
-    "SSE-only: store:false + stream:true pinned; terminal event authoritative"
-   ]
-  ]
- }
 }

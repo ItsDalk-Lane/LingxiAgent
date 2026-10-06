@@ -63,7 +63,7 @@ pub const FAMILY: &str = "google-generative-ai";
 /// per call; no redirects (C10); error classification shared
 /// ([`dispatch::classify_error_status`]).
 pub struct GoogleGenerativeAiAdapter {
-    client: reqwest::Client,
+    client: dispatch::NetworkClient,
     schema_budget: SchemaBudget,
     timeouts: dispatch::HttpTimeouts,
 }
@@ -78,8 +78,24 @@ impl GoogleGenerativeAiAdapter {
         schema_budget: SchemaBudget,
         timeouts: dispatch::HttpTimeouts,
     ) -> Result<Self, ProtocolError> {
+        Self::new_with_timeouts_and_network(
+            schema_budget,
+            timeouts,
+            super::network::NetworkPlane::direct_isolated(),
+        )
+    }
+
+    /// R05 RR1 F14: the client is BOUND to the model plane's reloadable
+    /// network policy (proxy / NO_PROXY / explicit CA per configuration
+    /// generation; the legacy constructors keep the pre-F14 direct
+    /// behavior for isolated tests).
+    pub fn new_with_timeouts_and_network(
+        schema_budget: SchemaBudget,
+        timeouts: dispatch::HttpTimeouts,
+        network: std::sync::Arc<super::network::NetworkPlane>,
+    ) -> Result<Self, ProtocolError> {
         Ok(Self {
-            client: dispatch::build_client_with_timeouts(&timeouts)?,
+            client: network.client_handle(timeouts)?,
             schema_budget,
             timeouts,
         })
@@ -137,8 +153,12 @@ impl GoogleGenerativeAiAdapter {
                 &format!("/models/{encoded_model}:streamGenerateContent"),
             )
         );
+        let client = match self.client.client() {
+            Ok(client) => client,
+            Err(error) => return fail(error, false),
+        };
         let request = dispatch::apply_auth(
-            self.client.post(&url).json(&body),
+            client.post(&url).json(&body),
             auth,
             BearerStyle::NamedHeader("x-goog-api-key"),
         );
@@ -167,6 +187,10 @@ impl GoogleGenerativeAiAdapter {
         if let Err((error, retryable)) = drive {
             return fail(error, retryable);
         }
+        // R05 RR1 F38 (F21 same-path fix): capture the usage the stream
+        // observed BEFORE `finish` consumes the accumulator — a parse
+        // failure must not erase it.
+        let salvaged_usage = drive_handler.accumulator.observed_usage_report();
         match drive_handler
             .accumulator
             .finish(call, &input.tools, &self.schema_budget)
@@ -186,7 +210,7 @@ impl GoogleGenerativeAiAdapter {
             },
             Err(error) => {
                 let retryable = error.retryable;
-                fail(error, retryable)
+                fail(error, retryable).with_usage_report(salvaged_usage)
             }
         }
     }
@@ -209,9 +233,91 @@ fn urlencoding_of(raw: &str) -> String {
 
 // ── outbound rendering (pure) ───────────────────────────────────────────────
 
+/// Whether an assistant turn's content carries THIS family's opaque state
+/// (R05 RR1 F09): thought signatures, functionCall part anchors and unknown
+/// preserved parts are all bound to the provider/model that minted them.
+fn turn_carries_family_state(content: &[ContentBlock]) -> bool {
+    content
+        .iter()
+        .any(|block| matches!(block, ContentBlock::Opaque { provider, .. } if provider == FAMILY))
+}
+
+/// R05 RR1 F09: the source-authorization gate for this family's opaque
+/// state (same contract as the anthropic family's — a family tag is never
+/// source authorization).
+fn enforce_turn_origin(
+    origin: &Option<lingxi_kernel::model_exchange::TurnOrigin>,
+    route: &ResolvedModelRoute,
+) -> Result<(), ProtocolError> {
+    let invalid = |detail: String| ProtocolError::new(ErrorCode::InvalidMessage, detail, false);
+    match origin {
+        Some(origin) if origin.authorizes(&route.provider, &route.model) => Ok(()),
+        Some(origin) => Err(invalid(format!(
+            "the exchange history carries google-generative-ai opaque state (thought signature / \
+             functionCall part state) minted by provider {:?} model {:?}; this request targets \
+             provider {:?} model {:?}. Same-protocol-family is NOT source authorization — \
+             replaying another origin's signed state would corrupt the protocol round-trip. \
+             Restart or compact the session onto one serving model, or re-route the run to the \
+             origin model.",
+            origin.provider, origin.model, route.provider, route.model
+        ))),
+        None => Err(invalid(
+            "the exchange history carries google-generative-ai opaque state (thought signature / \
+             functionCall part state) with no recorded serving origin; unproven protocol state \
+             is never forwarded onto a request (restart or compact the session)"
+                .to_string(),
+        )),
+    }
+}
+
+/// The wire shape of one exchange tool call: `{name, args}` (+ `id` when the
+/// provider issued one), with the part's `thoughtSignature` re-attached
+/// when the anchor carried one (R05 RR1 F07).
+fn render_function_call_part(
+    call: &lingxi_kernel::model_exchange::RequestedToolCall,
+    input: &ModelTurnInput,
+    signature: Option<&str>,
+) -> Result<serde_json::Value, ProtocolError> {
+    let invalid = |detail: String| ProtocolError::new(ErrorCode::InvalidMessage, detail, false);
+    let wire_name = input
+        .tools
+        .wire_name_of_target(&call.target)
+        .ok_or_else(|| {
+            invalid(format!(
+                "exchange history names tool target {:?}, which the current declaration \
+                 snapshot does not contain (the registry moved mid-run); cannot faithfully \
+                 re-render the transcript",
+                call.target
+            ))
+        })?
+        .to_string();
+    let mut function_call = serde_json::json!({
+        "name": wire_name,
+        "args": call.arguments.as_value(),
+    });
+    if let Some(id) = &call.provider_call_id {
+        function_call["id"] = serde_json::Value::String(id.clone());
+    }
+    let mut part = serde_json::json!({"functionCall": function_call});
+    if let Some(signature) = signature {
+        part["thoughtSignature"] = serde_json::Value::String(signature.to_string());
+    }
+    Ok(part)
+}
+
 /// Renders one assistant turn's content blocks into this family's parts,
-/// re-attaching each thoughtSignature opaque to the part it signed.
-fn render_model_parts(content: &[ContentBlock]) -> Vec<serde_json::Value> {
+/// re-attaching each thoughtSignature opaque to the part it signed and
+/// placing every anchored functionCall at its ORIGINAL part position
+/// (R05 RR1 F07 ordering fidelity). `calls_by_id` maps the provider call id
+/// to its exchange entry; a consumed anchor marks its call so the caller
+/// appends the un-anchored remainder after the content parts (the
+/// documented normalization for exchanges built without anchors).
+fn render_model_parts(
+    content: &[ContentBlock],
+    input: &ModelTurnInput,
+    calls_by_id: &mut HashMap<String, (lingxi_kernel::model_exchange::RequestedToolCall, bool)>,
+) -> Result<Vec<serde_json::Value>, ProtocolError> {
+    let invalid = |detail: String| ProtocolError::new(ErrorCode::InvalidMessage, detail, false);
     let mut parts: Vec<serde_json::Value> = Vec::new();
     let mut index = 0;
     while index < content.len() {
@@ -249,12 +355,54 @@ fn render_model_parts(content: &[ContentBlock]) -> Vec<serde_json::Value> {
                 parts.push(part);
             }
             ContentBlock::Opaque { provider, data } => {
-                // A signature orphan has nothing to sign; another family's
-                // state is never echoed (C10).
-                if provider == FAMILY
-                    && data.get("type").and_then(|t| t.as_str()) != Some("thoughtSignature")
-                {
-                    parts.push(data.clone());
+                // Another family's state is never echoed (C10).
+                if provider != FAMILY {
+                    index += 1;
+                    continue;
+                }
+                match data.get("type").and_then(|t| t.as_str()) {
+                    // A bare signature opaque was consumed above (it signed
+                    // its predecessor); reaching it here means it is an
+                    // orphan with nothing to sign — skipped, never
+                    // fabricated onto a part.
+                    Some("thoughtSignature") => {}
+                    // R05 RR1 F07: an anchored functionCall returns AT ITS
+                    // ORIGINAL POSITION, with its signature on the part.
+                    Some("functionCallPart") => {
+                        let id = data
+                            .get("id")
+                            .and_then(|i| i.as_str())
+                            .ok_or_else(|| {
+                                invalid(
+                                    "functionCallPart anchor without an id: the position-bound \
+                                     call cannot be resolved (never a guess)"
+                                        .to_string(),
+                                )
+                            })?
+                            .to_string();
+                        let entry = calls_by_id.get_mut(&id).ok_or_else(|| {
+                            invalid(format!(
+                                "functionCallPart anchor names call id {id:?} which this \
+                                 exchange's tool calls do not contain; the anchor/call pairing \
+                                 is inconsistent (never a guess)"
+                            ))
+                        })?;
+                        if entry.1 {
+                            return Err(invalid(format!(
+                                "functionCallPart anchor names call id {id:?} twice: a \
+                                 duplicated anchor is a conflict, never merged"
+                            )));
+                        }
+                        entry.1 = true;
+                        let signature = data.get("signature").and_then(|s| s.as_str());
+                        parts.push(render_function_call_part(
+                            &entry.0.clone(),
+                            input,
+                            signature,
+                        )?);
+                    }
+                    // Any other preserved part round-trips verbatim.
+                    _ => parts.push(data.clone()),
                 }
             }
             ContentBlock::ResourceRef { resource } => {
@@ -267,7 +415,7 @@ fn render_model_parts(content: &[ContentBlock]) -> Vec<serde_json::Value> {
         }
         index += 1;
     }
-    parts
+    Ok(parts)
 }
 
 /// Builds the request body for one turn (pure — the testable half).
@@ -304,10 +452,38 @@ pub fn render_generate_request(
             ExchangeItem::AssistantTurn {
                 content,
                 tool_calls,
+                origin,
                 ..
             } => {
-                let mut parts = render_model_parts(content);
+                // R05 RR1 F09: opaque state (thought signatures, part
+                // anchors, preserved parts) is source-bound — check before
+                // any of it could be echoed.
+                if turn_carries_family_state(content) {
+                    enforce_turn_origin(origin, route)?;
+                }
+                // The position-anchored rendering map: provider call id →
+                // (the exchange call, consumed-by-anchor yet?).
+                let mut calls_by_id: HashMap<
+                    String,
+                    (lingxi_kernel::model_exchange::RequestedToolCall, bool),
+                > = HashMap::new();
                 for call in tool_calls {
+                    if let Some(id) = &call.provider_call_id {
+                        calls_by_id.insert(id.clone(), (call.clone(), false));
+                    }
+                }
+                let mut parts = render_model_parts(content, input, &mut calls_by_id)?;
+                // R05 RR1 F07: calls WITHOUT a position anchor (id-less
+                // wire shapes, manually built exchanges) keep the
+                // documented content-first order.
+                for call in tool_calls {
+                    let anchored = call
+                        .provider_call_id
+                        .as_ref()
+                        .is_some_and(|id| calls_by_id.get(id).is_some_and(|e| e.1));
+                    if anchored {
+                        continue;
+                    }
                     let wire_name = input
                         .tools
                         .wire_name_of_target(&call.target)
@@ -332,6 +508,32 @@ pub fn render_generate_request(
                         (wire_name.clone(), call.provider_call_id.clone()),
                     );
                     parts.push(serde_json::json!({"functionCall": function_call}));
+                }
+                // Anchored calls still register their result-pairing name.
+                for call in tool_calls {
+                    let anchored = call
+                        .provider_call_id
+                        .as_ref()
+                        .is_some_and(|id| calls_by_id.get(id).is_some_and(|e| e.1));
+                    if !anchored {
+                        continue;
+                    }
+                    let wire_name = input
+                        .tools
+                        .wire_name_of_target(&call.target)
+                        .ok_or_else(|| {
+                            invalid(format!(
+                                "exchange history names tool target {:?}, which the current \
+                                 declaration snapshot does not contain (the registry moved \
+                                 mid-run); cannot faithfully re-render the transcript",
+                                call.target
+                            ))
+                        })?
+                        .to_string();
+                    call_names.insert(
+                        call.tool_call_id.to_string(),
+                        (wire_name, call.provider_call_id.clone()),
+                    );
                 }
                 if parts.is_empty() {
                     continue;
@@ -363,10 +565,33 @@ pub fn render_generate_request(
                 if let Some(id) = provider_id {
                     function_response["id"] = serde_json::Value::String(id);
                 }
-                contents.push(serde_json::json!({
-                    "role": "user",
-                    "parts": [{"functionResponse": function_response}],
-                }));
+                let block = serde_json::json!({"functionResponse": function_response});
+                // R05 RR1 F07: the results of ONE model tool round travel
+                // as the parts of ONE user Content (the family's official
+                // parallel grouping) — consecutive results merge into the
+                // user turn the previous result opened.
+                let merged = matches!(
+                    contents.last(),
+                    Some(last) if last["role"] == "user"
+                        && last["parts"]
+                            .as_array()
+                            .is_some_and(|parts| {
+                                !parts.is_empty()
+                                    && parts.iter().all(|p| p.get("functionResponse").is_some())
+                            })
+                );
+                if merged {
+                    let last = contents.last_mut().expect("checked above");
+                    last["parts"]
+                        .as_array_mut()
+                        .expect("checked above")
+                        .push(block);
+                } else {
+                    contents.push(serde_json::json!({
+                        "role": "user",
+                        "parts": [block],
+                    }));
+                }
             }
         }
     }
@@ -519,7 +744,27 @@ pub fn parse_generate_response(
             if let Some(id) = function_call.get("id").and_then(|i| i.as_str()) {
                 request = request.with_provider_call_id(id);
             }
+            let anchor_id = request.provider_call_id.clone();
             requests.push(request);
+            // R05 RR1 F07: the functionCall PART is an ordered position of
+            // the model turn — the exchange keeps an anchor opaque HERE so
+            // the renderer can put the call (and its signature, when the
+            // part carried one) back at this exact position. A
+            // `thoughtSignature` riding the functionCall part is required
+            // protocol state: it must return ON the function part of the
+            // next request, byte for byte. (An id-less functionCall cannot
+            // be position-bound — those calls keep the documented
+            // content-first normalization.)
+            if let Some(id) = &anchor_id {
+                let mut anchor = serde_json::json!({"type": "functionCallPart", "id": id.clone()});
+                if let Some(signature) = part.get("thoughtSignature").and_then(|s| s.as_str()) {
+                    anchor["signature"] = serde_json::Value::String(signature.to_string());
+                }
+                content.push(ContentBlock::Opaque {
+                    provider: FAMILY.to_string(),
+                    data: anchor,
+                });
+            }
             continue;
         }
         let text = part.get("text").and_then(|t| t.as_str());
@@ -556,14 +801,19 @@ pub fn parse_generate_response(
             });
         }
     }
-    // C11 stop-reason honesty (R05-T04): the parts above already passed
-    // every shape/argument validation (a malformed functionCall stays a
-    // loud InvalidMessage — nothing dispatched), so the CLOSED turn
-    // classifies by its terminal reason. A truncated or safety-stopped
-    // turn never forms a Final and never dispatches its tool batch; the
-    // partial content lives on in the call's delta events (zero side
-    // effects → a truncation retry is safe).
+    // R05 RR1 F11: the batch-level identity admission — a same-id re-send
+    // with identical shape collapses, a same-id CONFLICT rejects the whole
+    // turn (zero requests admitted, zero side effects).
+    let requests = super::batch_admission::admit_provider_call_ids(FAMILY, requests)?;
+    // C11 stop-reason honesty (R05-T04) + R05 RR1 F12: the transport's end
+    // is not protocol completion. The CLOSED turn classifies ONLY by a
+    // KNOWN normal `finishReason`: its absence, or an unmapped value, is a
+    // protocol surprise — never a guessed Final, never a dispatched batch.
+    // A truncated or safety-stopped turn never forms a Final and never
+    // dispatches its tool batch; the partial content lives on in the call's
+    // delta events (zero side effects → a truncation retry is safe).
     match candidate.finish_reason.as_deref() {
+        Some("STOP") => {}
         Some("MAX_TOKENS") => {
             return Ok(ParsedChat {
                 turn: ProviderTurn::Failed {
@@ -615,7 +865,19 @@ pub fn parse_generate_response(
                 usage_report: usage_report.clone(),
             });
         }
-        _ => {}
+        Some(other) => {
+            return Err(invalid(format!(
+                "provider response carries the UNKNOWN finishReason {other:?}: an unmapped \
+                 terminal is never guessed into a completed turn"
+            )));
+        }
+        None => {
+            return Err(invalid(
+                "provider response ended WITHOUT a finishReason: the transport's end is not \
+                 protocol completion — the turn never classifies, nothing dispatches"
+                    .to_string(),
+            ));
+        }
     }
     if !requests.is_empty() {
         return Ok(ParsedChat {
@@ -623,7 +885,12 @@ pub fn parse_generate_response(
             usage_report: usage_report.clone(),
         });
     }
-    if !content.is_empty() {
+    // R05 RR1 F12: a normally-stopped turn whose parts carry NO answer text
+    // (thought/opaque only) is process content, not a final answer.
+    let has_answer_text = content
+        .iter()
+        .any(|block| matches!(block, ContentBlock::Text { .. }));
+    if has_answer_text {
         return Ok(ParsedChat {
             turn: ProviderTurn::Final {
                 message: NormalizedMessage {
@@ -635,12 +902,23 @@ pub fn parse_generate_response(
             usage_report: usage_report.clone(),
         });
     }
+    let detail = if content.is_empty() {
+        format!(
+            "provider returned no content and no tool calls (finishReason: {})",
+            candidate.finish_reason.as_deref().unwrap_or("absent")
+        )
+    } else {
+        format!(
+            "provider turn completed with process-only content (thought/opaque state, no \
+             answer text; finishReason: {})",
+            candidate.finish_reason.as_deref().unwrap_or("absent")
+        )
+    };
     Ok(ParsedChat {
         turn: ProviderTurn::Empty {
-            detail: format!(
-                "provider returned no content and no tool calls (finishReason: {})",
-                candidate.finish_reason.as_deref().unwrap_or("absent")
-            ),
+            detail,
+            // R05 RR1 F12: the process-state blocks ride along for replay.
+            content,
         },
         usage_report: usage_report.clone(),
     })
@@ -702,6 +980,24 @@ impl GenerateStreamAccumulator {
             usage_violation: None,
             prompt_block_reason: None,
             terminal_seen: false,
+        }
+    }
+
+    /// R05 RR1 F38: the usage fact folded so far (the running-total fold
+    /// cloned and finished — a half-known account stays `Partial` naming
+    /// its missing half) — the salvage a parse-failed turn still accounts
+    /// with. A kept violation re-enters the SAME strict decoder as
+    /// `Invalid`. Never a guess: nothing observed stays `Unknown`.
+    pub fn observed_usage_report(&self) -> lingxi_kernel::usage::ReportedUsage {
+        if let Some(violation) = &self.usage_violation {
+            return super::usage::salvage_usage_report(
+                lingxi_kernel::model_exchange::ProtocolFamily::GoogleGenerativeAi,
+                Some(violation),
+            );
+        }
+        match self.usage.clone().finish() {
+            Some(usage) => lingxi_kernel::usage::ReportedUsage::Known(usage),
+            None => lingxi_kernel::usage::ReportedUsage::Unknown,
         }
     }
 
@@ -889,20 +1185,39 @@ impl GenerateStreamAccumulator {
         // the same body — the buffered decode marks the WHOLE fact
         // invalid and names the violation; a violating count never
         // disappears silently.
+        //
+        // R05 RR1 F23 round-trip note: the FOLD is the UNIFIED fact
+        // (`output_tokens` already contains the thoughts component), but
+        // the buffered decode re-applies the family normalization
+        // (`candidates + thoughts`). The splice therefore expresses the
+        // folded output as its CANDIDATE part (`output - reasoning`) so
+        // decoding the spliced body reproduces the fold exactly — no
+        // double add, no lost component. The subtraction is exact by the
+        // fold's own invariant: every folded frame satisfied
+        // `output = candidates + thoughts` with non-negative parts, and
+        // running-total merges only grow fields.
         let folded = self.usage.clone().finish();
         let mut usage_metadata = serde_json::json!({});
         if let Some(folded) = folded {
             if let Some(tokens) = folded.input_tokens {
                 usage_metadata["promptTokenCount"] = serde_json::json!(tokens);
             }
-            if let Some(tokens) = folded.output_tokens {
-                usage_metadata["candidatesTokenCount"] = serde_json::json!(tokens);
+            match (folded.output_tokens, folded.reasoning_tokens) {
+                (Some(output), Some(reasoning)) => {
+                    usage_metadata["candidatesTokenCount"] =
+                        serde_json::json!(output.saturating_sub(reasoning));
+                    usage_metadata["thoughtsTokenCount"] = serde_json::json!(reasoning);
+                }
+                (Some(output), None) => {
+                    usage_metadata["candidatesTokenCount"] = serde_json::json!(output);
+                }
+                (None, Some(reasoning)) => {
+                    usage_metadata["thoughtsTokenCount"] = serde_json::json!(reasoning);
+                }
+                (None, None) => {}
             }
             if let Some(tokens) = folded.cache_read_tokens {
                 usage_metadata["cachedContentTokenCount"] = serde_json::json!(tokens);
-            }
-            if let Some(tokens) = folded.reasoning_tokens {
-                usage_metadata["thoughtsTokenCount"] = serde_json::json!(tokens);
             }
         }
         if let Some(violation) = &self.usage_violation {
@@ -943,6 +1258,13 @@ mod tests {
     use lingxi_kernel::ports::ToolOutcome;
     use lingxi_protocol::ToolCallId;
     use lingxi_protocol::UsageRecord;
+
+    fn origin() -> Option<lingxi_kernel::model_exchange::TurnOrigin> {
+        Some(lingxi_kernel::model_exchange::TurnOrigin {
+            provider: "gemini".to_string(),
+            model: "gemini-test".to_string(),
+        })
+    }
 
     fn route() -> ResolvedModelRoute {
         ResolvedModelRoute {
@@ -1021,6 +1343,7 @@ mod tests {
                 args_digest: request.args_digest.clone(),
                 args_summary: None,
             }],
+            origin: origin(),
         });
         input.prior.push(ExchangeItem::ToolResult {
             tool_call_id: ToolCallId::new("run-tc0001"),
@@ -1079,7 +1402,9 @@ mod tests {
             parsed.usage(),
             Some(UsageRecord {
                 input_tokens: 12,
-                output_tokens: 6
+                // RR1 F23: the unified output is candidates (6) + thoughts
+                // (3) — the total generated output.
+                output_tokens: 9
             })
         );
         let (requests, content) = match parsed.turn {
@@ -1088,11 +1413,18 @@ mod tests {
         };
         assert_eq!(requests[0].provider_call_id.as_deref(), Some("fc-9"));
         assert_eq!(requests[0].target, "tool:first-party:read");
-        assert_eq!(content.len(), 3);
+        // R05 RR1 F07: the functionCall part leaves an ordered anchor opaque
+        // at its part position (after the thought + signature + text).
+        assert_eq!(content.len(), 4);
         assert!(matches!(&content[0], ContentBlock::Reasoning { text } if text == "checking"));
         assert!(
             matches!(&content[1], ContentBlock::Opaque { provider, data }
             if provider == FAMILY && data["type"] == "thoughtSignature" && data["signature"] == "sig-g1")
+        );
+        assert!(matches!(&content[2], ContentBlock::Text { text } if text == "reading it"));
+        assert!(
+            matches!(&content[3], ContentBlock::Opaque { provider, data }
+            if provider == FAMILY && data["type"] == "functionCallPart" && data["id"] == "fc-9")
         );
 
         // The same state re-attaches to the SAME part on the way out (C10).
@@ -1108,6 +1440,7 @@ mod tests {
                 args_digest: requests[0].args_digest.clone(),
                 args_summary: None,
             }],
+            origin: origin(),
         });
         let rendered = render_generate_request(&input, &route()).expect("renders");
         let parts = rendered["contents"][1]["parts"].as_array().expect("parts");

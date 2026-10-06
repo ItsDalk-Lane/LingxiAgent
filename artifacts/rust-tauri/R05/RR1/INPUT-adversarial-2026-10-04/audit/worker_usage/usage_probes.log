@@ -1,0 +1,52 @@
+    Blocking waiting for file lock on package cache
+    Blocking waiting for file lock on package cache
+    Blocking waiting for file lock on package cache
+    Blocking waiting for file lock on build directory
+   Compiling r05-worker-usage-audit v0.0.0 (/workspace/scratch/9b4397d87a13/audit/worker_usage)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 1.97s
+     Running tests/usage_audit.rs (audit/runtime/target/debug/deps/usage_audit-6d33a4d1c34e5cbb)
+
+running 5 tests
+AUDIT Gemini: input=100, candidate_output=10, thought_tokens=Some(40), reasoning_included=Some(true), computed_output_under_registered_contract=10; provider total=150
+
+thread 'audit_gemini_thought_tokens_are_separate_from_candidate_tokens' (247) panicked at tests/usage_audit.rs:1676:5:
+assertion `left == right` failed: candidate output 10 plus separate thought output 40 must total 50, not 10
+  left: 10
+ right: 50
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+AUDIT rerank: raw={"meta":{"tokens":{"input_tokens":null,"output_tokens":"7"}},"results":[{"index":0,"relevance_score":0.5}]}, normalized_usage=Some(Object {"input_tokens": Number(0), "output_tokens": Number(7), "total_tokens": Number(7)}), decoded=Usage(ModelCallUsage { input_tokens: Some(0), output_tokens: Some(7), cache_read_tokens: None, cache_write_tokens: None, reasoning_tokens: None, provenance: Reported })
+
+thread 'audit_rerank_non_numeric_usage_must_not_be_coerced_to_reported_zero' (250) panicked at tests/usage_audit.rs:1687:5:
+null must remain absent and a string token count invalid; conversion to reported 0/7 falsifies supplier facts
+test audit_gemini_thought_tokens_are_separate_from_candidate_tokens ... FAILED
+test audit_rerank_non_numeric_usage_must_not_be_coerced_to_reported_zero ... FAILED
+AUDIT operation invalid usage: result=Ok(EmbeddingOutcome { vectors: [[0.25, 0.75]], usage: Some(Array [Object {"authorization": String("Bearer AUDIT_ONLY_EMBEDDING_CREDENTIAL_91D")}]) }), result_ok=true, rows=1, credential_in_persisted_invalid_detail=true, invalid_detail=Some("operation usage is [{\"authorization\":\"Bearer AUDIT_ONLY_EMBEDDING_CREDENTIAL_91D\"}] but must be an object; the fact is marked invalid, never coerced")
+
+thread 'audit_operation_invalid_usage_must_not_persist_secret_payload' (249) panicked at tests/usage_audit.rs:1663:5:
+even malformed usage must not copy credential-bearing provider payload into the permanent ledger
+test audit_operation_invalid_usage_must_not_persist_secret_payload ... FAILED
+AUDIT worker failure: provider_requests=1, usage_rows=0, reply=Err(ProviderRefused { detail: "auxiliary slot summarize failed: provider returned HTTP 500 Internal Server Error: {\"error\":{\"message\":\"audit upstream failure\"}}" })
+
+thread 'audit_worker_failed_physical_request_must_leave_unknown_usage_row' (251) panicked at tests/usage_audit.rs:1643:5:
+assertion `left == right` failed: a physically sent failed worker request must be accounted, unknown rather than vanished
+  left: 0
+ right: 1
+test audit_worker_failed_physical_request_must_leave_unknown_usage_row ... FAILED
+AUDIT operation deadline: budget_ms=25, elapsed_ms=184, physical_http_requests=0, rows=1, reported_transport_attempts=[1], result=Err(OperationFailure { code: BudgetExceeded, message: "model call total budget (model_call_total_budget_ms) is exhausted before the request could be sent: queue wait / credential refresh / earlier backoff spent it; not retryable under the same budget", retryable: false })
+
+thread 'audit_operation_deadline_includes_quota_queue_and_never_invents_http_attempt' (248) panicked at tests/usage_audit.rs:1713:5:
+25ms deadline must include quota wait, not settle only after a 180ms held permit releases
+test audit_operation_deadline_includes_quota_queue_and_never_invents_http_attempt ... FAILED
+
+failures:
+
+failures:
+    audit_gemini_thought_tokens_are_separate_from_candidate_tokens
+    audit_operation_deadline_includes_quota_queue_and_never_invents_http_attempt
+    audit_operation_invalid_usage_must_not_persist_secret_payload
+    audit_rerank_non_numeric_usage_must_not_be_coerced_to_reported_zero
+    audit_worker_failed_physical_request_must_leave_unknown_usage_row
+
+test result: FAILED. 0 passed; 5 failed; 0 ignored; 0 measured; 9 filtered out; finished in 0.53s
+
+error: test failed, to rerun pass `--test usage_audit`

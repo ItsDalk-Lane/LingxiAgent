@@ -1,0 +1,23 @@
+[
+  {
+    "manifest": "artifacts/rust-tauri/R05/FINAL-WFR2-1/verify-R05/candidate-source-after.json",
+    "matched": 483,
+    "changed": [],
+    "missing_in_sparse_checkout": [],
+    "tracked_now_absent_in_manifest": []
+  },
+  {
+    "manifest": "artifacts/rust-tauri/R05/REVIEW-T08/FINAL-R3/verify-R05/candidate-source-after.json",
+    "matched": 483,
+    "changed": [],
+    "missing_in_sparse_checkout": [],
+    "tracked_now_absent_in_manifest": []
+  },
+  {
+    "manifest": "artifacts/rust-tauri/R05/T08-E01/verify-R05/candidate-source-after.json",
+    "matched": 483,
+    "changed": [],
+    "missing_in_sparse_checkout": [],
+    "tracked_now_absent_in_manifest": []
+  }
+]

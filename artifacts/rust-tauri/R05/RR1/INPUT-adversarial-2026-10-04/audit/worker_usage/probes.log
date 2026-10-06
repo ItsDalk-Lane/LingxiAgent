@@ -1,0 +1,31 @@
+    Blocking waiting for file lock on build directory
+   Compiling lingxi-protocol v0.0.0 (/workspace/scratch/9b4397d87a13/LingxiAgent/rust/crates/lingxi-protocol)
+   Compiling lingxi-kernel v0.0.0 (/workspace/scratch/9b4397d87a13/LingxiAgent/rust/crates/lingxi-kernel)
+   Compiling lingxi-adapters v0.0.0 (/workspace/scratch/9b4397d87a13/LingxiAgent/rust/crates/lingxi-adapters)
+   Compiling lingxi-service v0.0.0 (/workspace/scratch/9b4397d87a13/LingxiAgent/rust/crates/lingxi-service)
+   Compiling r05-worker-usage-audit v0.0.0 (/workspace/scratch/9b4397d87a13/audit/worker_usage)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 39.28s
+     Running tests/operations_audit.rs (audit/runtime/target/debug/deps/operations_audit-5fd69b846c446148)
+
+running 2 tests
+AUDIT video poll: receipt=MediaJobAccepted { task_id: "local-track", provider_task_id: "provider-vid", remote_cancel: "unsupported" }, paths=["/v1/videos", "/agnesapi?video_id=local-track"], result=Ok(Generating)
+
+thread 'audit_video_poll_must_use_provider_job_id_and_preserve_legacy_tracker' (1151) panicked at tests/operations_audit.rs:955:5:
+must send provider-facing video_id; local tracker is only legacy fallback
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+test audit_video_poll_must_use_provider_job_id_and_preserve_legacy_tracker ... FAILED
+AUDIT cancellation race: cancel_ack=CancelledLocally { remote_cancel: "unsupported" }; late_result=Ok(Completed { products: [RegisteredProduct { resource_id: "video-1791091008865-4a519391d5e8f455", path: "/tmp/lingxi-r05t06ops-chain-products-1149-3/video-1791091008865-4a519391d5e8f455", mime: "video/mp4", size_bytes: 4, sha256: "9f64a747e1b97f131fabb6b447296c9b6f0201e79fb3c5356e6c77e89b6a806a" }] }); requests=["/v1/videos", "/agnesapi?video_id=cancel-track", "/audit-product.mp4"]; registered_products=1
+
+thread 'audit_cancelled_media_poll_must_not_download_or_publish_completed' (1150) panicked at tests/operations_audit.rs:977:5:
+acknowledged local cancellation must fence an in-flight poll, not let it overwrite cancelled with Completed
+test audit_cancelled_media_poll_must_not_download_or_publish_completed ... FAILED
+
+failures:
+
+failures:
+    audit_cancelled_media_poll_must_not_download_or_publish_completed
+    audit_video_poll_must_use_provider_job_id_and_preserve_legacy_tracker
+
+test result: FAILED. 0 passed; 2 failed; 0 ignored; 0 measured; 7 filtered out; finished in 0.29s
+
+error: test failed, to rerun pass `--test operations_audit`

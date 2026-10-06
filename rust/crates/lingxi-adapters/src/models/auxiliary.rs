@@ -67,11 +67,30 @@ pub struct AuxiliaryOutcome {
 /// A loud auxiliary failure. The message is already scrubbed of any
 /// in-play credential material (the provider layer scrubs before
 /// classifying).
+///
+/// R05 RR1 F21: the failure carries the SETTLE FACTS of the attempt — a
+/// failed call still accounts. `usage_report`/`transport_attempts`/
+/// `served_by`/`served_protocol` are exactly what the equivalent success
+/// would have carried: a physically-sent 500 holds `transport_attempts =
+/// 1` and an unknown usage (never vanished); a pre-send refusal (route /
+/// capability / credential resolution) holds `transport_attempts = 0`
+/// (not-sent, never a fabricated 1); a provider that answered garbage
+/// WITH a usage object keeps that usage fact.
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct AuxiliaryFailure {
     pub code: ErrorCode,
     pub message: String,
     pub retryable: bool,
+    /// The usage fact of the attempt (unknown when nothing usable
+    /// arrived — never zero).
+    pub usage_report: lingxi_kernel::usage::ReportedUsage,
+    /// Physical provider requests of the attempt (0 = refused before
+    /// anything left the process).
+    pub transport_attempts: u32,
+    /// The RESOLVED route identity the attempt was on (the same fallback
+    /// a success carries).
+    pub served_by: ProviderDescriptor,
+    pub served_protocol: Option<String>,
 }
 
 impl std::fmt::Display for AuxiliaryFailure {
@@ -115,10 +134,35 @@ impl AuxiliaryExecutor {
         })
     }
 
+    /// R05 RR1 F14: the production constructor — the auxiliary slots'
+    /// provider is BOUND to the same shared, reloadable network policy as
+    /// the chat loop (one plane, one policy generation for every model
+    /// consumer).
+    pub fn new_with_network(
+        gateway: Arc<ConfigModelGateway>,
+        credentials: Arc<dyn ProviderCredentialPort>,
+        schema_budget: lingxi_kernel::toolcatalog::SchemaBudget,
+        network: std::sync::Arc<super::network::NetworkPlane>,
+    ) -> Result<Self, ProtocolError> {
+        Ok(Self {
+            provider: GatewayedProvider::new_with_network(
+                gateway,
+                credentials,
+                schema_budget,
+                network,
+            )?,
+        })
+    }
+
     /// Runs ONE auxiliary call to settlement. `call` is the host-minted
     /// correlation id of this invocation (worker callbacks pass
     /// `aux-{slot}-{invocation}-{cb_id}`-shaped identities so a trace can
     /// join parent and child — C04).
+    // R05 RR1 F21: the failure carries the attempt's settle facts (usage
+    // report, attempts, resolved identity) — one construction per settled
+    // call, never in a loop; boxing it would ripple through every caller
+    // for no functional gain.
+    #[allow(clippy::result_large_err)]
     pub async fn complete(
         &self,
         ctx: &RunContext,
@@ -148,11 +192,19 @@ impl AuxiliaryExecutor {
             .await;
         let served_by = result
             .served_by
+            .clone()
             .unwrap_or_else(|| self.provider.descriptor());
+        // R05 RR1 F21: EVERY exit path carries the attempt's settle facts —
+        // the failure is a classified ANSWER about an attempt that really
+        // happened, never a discard of its accounting.
         let fail = |code: ErrorCode, message: String, retryable: bool| AuxiliaryFailure {
             code,
             message,
             retryable,
+            usage_report: result.usage_report.clone(),
+            transport_attempts: result.transport_attempts,
+            served_by: served_by.clone(),
+            served_protocol: result.served_protocol.clone(),
         };
         match result.turn {
             ProviderTurn::Final { message } => {
@@ -206,7 +258,7 @@ impl AuxiliaryExecutor {
                 ),
                 true,
             )),
-            ProviderTurn::Empty { detail } => Err(fail(
+            ProviderTurn::Empty { detail, .. } => Err(fail(
                 ErrorCode::UpstreamUnavailable,
                 format!(
                     "auxiliary slot {} returned an empty turn: {detail}",

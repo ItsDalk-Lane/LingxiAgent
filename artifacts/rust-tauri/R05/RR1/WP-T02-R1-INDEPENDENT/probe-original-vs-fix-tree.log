@@ -1,0 +1,36 @@
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.08s
+     Running unittests src/lib.rs (target/debug/deps/r05_credential_network_audit_current-0649f98c549f4d96)
+
+running 10 tests
+test tests::truncation_must_not_expose_credential_prefix ... ok
+test tests::old_route_must_not_receive_new_endpoint_credential ... ok
+test tests::old_handle_must_not_resolve_reloaded_secret ... ok
+test tests::removed_then_readded_provider_must_not_revive_old_handle ... ok
+test tests::undeclared_image_capability_must_make_zero_requests ... ok
+test tests::undeclared_tool_capability_must_make_zero_requests ... ok
+test tests::protocol_error_echo_must_not_carry_complete_secret_into_kernel ... ok
+test tests::domain_resolving_to_loopback_must_not_be_connected ... FAILED
+test tests::error_body_must_obey_total_deadline ... FAILED
+test tests::reload_during_401_must_not_send_new_key_to_old_endpoint ... ok
+
+failures:
+
+---- tests::domain_resolving_to_loopback_must_not_be_connected stdout ----
+
+thread 'tests::domain_resolving_to_loopback_must_not_be_connected' (10175528) panicked at src/lib.rs:196:9:
+egress guard connected to an unauthorized private TCP destination after resolving hostname localhost; no credential or TLS bypass was used
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+
+---- tests::error_body_must_obey_total_deadline stdout ----
+
+thread 'tests::error_body_must_obey_total_deadline' (10175529) panicked at src/lib.rs:280:9:
+error body read exceeded its absolute deadline by >200ms
+
+
+failures:
+    tests::domain_resolving_to_loopback_must_not_be_connected
+    tests::error_body_must_obey_total_deadline
+
+test result: FAILED. 8 passed; 2 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.50s
+
+error: test failed, to rerun pass `--lib`

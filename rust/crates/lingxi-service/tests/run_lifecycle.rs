@@ -636,6 +636,7 @@ async fn retry_budget_exhaustion_fails_loudly_with_attempt_count_honest() {
 async fn empty_reply_completes_without_final_and_names_the_cause() {
     let provider = ScriptedProvider::new(vec![ProviderTurn::Empty {
         detail: "zero content blocks".to_string(),
+        content: Vec::new(),
     }]);
     let (state, home) = boot(
         "empty",
@@ -669,6 +670,7 @@ async fn process_only_run_completes_without_final_and_names_the_cause() {
         },
         ProviderTurn::Empty {
             detail: "nothing more to say".to_string(),
+            content: Vec::new(),
         },
     ]);
     let (state, home) = boot(
@@ -697,6 +699,7 @@ async fn tool_partial_failure_has_its_own_outcome_not_a_fabricated_answer() {
         },
         ProviderTurn::Empty {
             detail: "cannot answer after tool failure".to_string(),
+            content: Vec::new(),
         },
     ]);
     let (state, home) = boot(

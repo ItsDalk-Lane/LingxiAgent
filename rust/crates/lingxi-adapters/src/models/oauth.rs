@@ -142,37 +142,50 @@ impl std::fmt::Display for OAuthError {
 
 impl std::error::Error for OAuthError {}
 
-/// The OAuth HTTP transport: one shared client, NO redirects (C10), every
-/// request bounded by the flow clock's timeout. Proxy auto-detection is
-/// DISABLED (`no_proxy`, R05-T05 §25 ruling 5): the token/refresh requests
-/// this client sends carry client_secret / refresh_token material, and
-/// reqwest's default `system-proxy` feature would read HTTP(S)_PROXY and the
-/// OS proxy settings — an ambient proxy silently terminating
-/// credential-bearing traffic is a behavior regression against the incumbent
-/// (the pi-sdk OAuth flows use bare `fetch()`, which never consults ambient
-/// proxies) and against the model-plane discipline in
-/// [`super::dispatch::build_client_with_timeouts`].
+/// The OAuth HTTP transport: one shared no-redirect client (C10), every
+/// request bounded by the flow clock's timeout and a hard body-read cap.
+/// R05 RR1 F14: the client is BOUND to the model plane's shared, reloadable
+/// network policy — the token/refresh requests carry client_secret /
+/// refresh_token material, so they route under the SAME frozen proxy /
+/// NO_PROXY / explicit-CA policy as every other model-plane consumer (the
+/// pre-F14 builder pinned `no_proxy()` unconditionally, which silently
+/// ignored the incumbent's configured proxy modes).
 #[derive(Clone)]
 pub struct OAuthHttp {
-    client: reqwest::Client,
+    client: super::dispatch::NetworkClient,
 }
 
 impl OAuthHttp {
     pub fn new() -> Result<Self, OAuthError> {
-        let client = reqwest::Client::builder()
-            .redirect(reqwest::redirect::Policy::none())
-            .no_proxy()
-            .build()
-            .map_err(|err| OAuthError::Protocol {
-                detail: format!("oauth http client construction failed: {err}"),
-            })?;
-        Ok(Self { client })
+        Self::new_with_network(super::network::NetworkPlane::direct_isolated())
+    }
+
+    /// R05 RR1 F14: the production constructor — the OAuth transport bound
+    /// to the model plane's shared network policy.
+    pub fn new_with_network(
+        network: std::sync::Arc<super::network::NetworkPlane>,
+    ) -> Result<Self, OAuthError> {
+        Ok(Self {
+            client: network
+                .client_handle(super::dispatch::HttpTimeouts::default())
+                .map_err(|err| OAuthError::Protocol {
+                    detail: format!("oauth http client construction failed: {err}"),
+                })?,
+        })
+    }
+
+    /// The client of the CURRENT policy generation (rebuilt lazily after a
+    /// model-plane reload publishes a new policy).
+    fn client(&self) -> Result<reqwest::Client, OAuthError> {
+        self.client.client().map_err(|err| OAuthError::Protocol {
+            detail: format!("oauth http client construction failed: {err}"),
+        })
     }
 
     /// POSTs one `application/x-www-form-urlencoded` body and parses the
     /// JSON payload (OAuth endpoints answer JSON even on errors). The
-    /// request timeout is enforced; a redirect status is a loud protocol
-    /// failure (the client follows none).
+    /// request is bounded by the flow clock's window; a redirect status is
+    /// a loud protocol failure (the client follows none).
     async fn post_form(
         &self,
         url: &str,
@@ -180,7 +193,7 @@ impl OAuthHttp {
         clock: &FlowClock<'_>,
         scrub: &[&str],
     ) -> Result<(u16, TokenPayload), OAuthError> {
-        let send = self.client.post(url).form(fields).send();
+        let send = self.client()?.post(url).form(fields).send();
         let response = match tokio::time::timeout(clock.request_timeout, send).await {
             Ok(Ok(response)) => response,
             Ok(Err(err)) => {
@@ -211,19 +224,19 @@ impl OAuthHttp {
                 ),
             });
         }
-        let body = match tokio::time::timeout(clock.request_timeout, response.text()).await {
-            Ok(Ok(body)) => body,
-            Ok(Err(err)) => {
+        // R05 RR1 F16: the body read is bounded BOTH temporally (the flow
+        // clock's window) and in SIZE (`read_oauth_body_bounded`) — a
+        // stalled or oversized token-endpoint body can no longer park the
+        // flow or buffer unboundedly, and the timeout/truncation/failure
+        // fact travels instead of being swallowed.
+        let body = match read_oauth_body_bounded(response, clock.request_timeout).await {
+            Ok(body) => body,
+            Err(detail) => {
                 return Err(OAuthError::Transient {
                     detail: scrub_materials(
-                        &format!("oauth response body read failed: {err}"),
+                        &format!("oauth response body read failed: {detail}"),
                         scrub,
                     ),
-                });
-            }
-            Err(_) => {
-                return Err(OAuthError::Transient {
-                    detail: "oauth endpoint body read timed out".to_string(),
                 });
             }
         };
@@ -235,6 +248,44 @@ impl OAuthHttp {
                 ),
             })?;
         Ok((status, payload))
+    }
+}
+
+/// The hard size cap of one OAuth endpoint body read (R05 RR1 F16): token
+/// and device payloads are a few KiB; 256 KiB is far above any legitimate
+/// grant payload and far below an unbounded buffer.
+const OAUTH_BODY_MAX_BYTES: usize = 256 * 1024;
+
+/// Reads one OAuth endpoint body chunk-by-chunk under the flow clock's
+/// request window and [`OAUTH_BODY_MAX_BYTES`] (R05 RR1 F16). `Err` carries
+/// the honest end-of-read fact (timeout / cap / transport failure); the
+/// pre-fix `response.text()` had no size bound at all.
+async fn read_oauth_body_bounded(
+    mut response: reqwest::Response,
+    window: std::time::Duration,
+) -> Result<String, String> {
+    let mut out = Vec::new();
+    loop {
+        let next = response.chunk();
+        match tokio::time::timeout(window, next).await {
+            Ok(Ok(Some(bytes))) => {
+                if out.len() + bytes.len() > OAUTH_BODY_MAX_BYTES {
+                    return Err(format!(
+                        "the body exceeded the {OAUTH_BODY_MAX_BYTES} byte read cap mid-read"
+                    ));
+                }
+                out.extend_from_slice(&bytes);
+            }
+            Ok(Ok(None)) => return Ok(String::from_utf8_lossy(&out).into_owned()),
+            Ok(Err(err)) => return Err(format!("transport failure mid-body: {err}")),
+            Err(_) => {
+                return Err(format!(
+                    "no body bytes within {}ms (the read is bounded by the flow clock's \
+                     request window)",
+                    window.as_millis()
+                ));
+            }
+        }
     }
 }
 
@@ -416,6 +467,40 @@ pub struct DeviceCodePrompt {
     pub expires_in: Duration,
 }
 
+/// The granted device authorization (R05 RR1 F04): the secret device code
+/// the token polls carry — opaque to every caller that only surfaces the
+/// prompt.
+pub struct DeviceCodeGrant {
+    device_code: String,
+}
+
+impl DeviceCodeGrant {
+    pub fn device_code(&self) -> &str {
+        &self.device_code
+    }
+
+    /// Re-assembles a grant from a stored device code (R05 RR1 F04: the
+    /// service-side login transaction persists the code between poll
+    /// rounds). The code is a SECRET of the in-flight login.
+    pub fn from_device_code(device_code: String) -> Self {
+        Self { device_code }
+    }
+}
+
+/// The outcome of ONE device-token poll (R05 RR1 F04 — the service-side
+/// single-round poll shape the management surface drives).
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub enum DevicePollOutcome {
+    /// `authorization_pending` — keep waiting (sleep the current interval
+    /// before the next round).
+    AuthorizationPending,
+    /// `slow_down` — keep waiting with `interval` (already +5s per the
+    /// incumbent's rule).
+    SlowDown { interval: Duration },
+    /// The grant completed: the minted token set.
+    Done(OAuthTokens),
+}
+
 /// The verification URI rule (mirror of the incumbent's trusted-URL check,
 /// adapted to config-rooted trust): absolute https — or absolute http on a
 /// loopback host (the controlled-stand-in / local-server exception, the
@@ -451,19 +536,14 @@ fn validate_user_facing_uri(label: &str, uri: &str) -> Result<String, OAuthError
     Ok(uri.to_string())
 }
 
-/// Runs the device-code login flow (xai type). `on_prompt` is invoked ONCE
-/// with the user-facing code/URI before polling starts. Polling honors
-/// `authorization_pending` (keep waiting), `slow_down` (+5s per step, the
-/// incumbent's rule), the `expires_in` deadline and cancellation at every
-/// wait; a denial is terminal. Errors never write anything anywhere (the
-/// CredentialService persists only the success).
-pub async fn run_device_code_flow(
+/// Requests one device authorization — the FIRST half of the device-code
+/// flow, extracted (R05 RR1 F04) so the service-side login surface can
+/// start the flow, surface the prompt and poll in separate bounded steps.
+pub async fn request_device_authorization(
     http: &OAuthHttp,
     config: &OAuthFlowConfig,
     clock: &FlowClock<'_>,
-    cancel: &dyn FlowCancel,
-    on_prompt: impl FnOnce(&DeviceCodePrompt),
-) -> Result<OAuthTokens, OAuthError> {
+) -> Result<(DeviceCodeGrant, DeviceCodePrompt), OAuthError> {
     let device_endpoint = config
         .device_authorization_endpoint
         .as_deref()
@@ -472,14 +552,11 @@ pub async fn run_device_code_flow(
                  hole — this must fail at load)"
                 .to_string(),
         })?;
-    if cancel.is_cancelled() {
-        return Err(OAuthError::Cancelled);
-    }
     let mut fields: Vec<(&str, &str)> = vec![("client_id", config.client_id.as_str())];
     if let Some(scopes) = &config.scopes {
         fields.push(("scope", scopes.as_str()));
     }
-    let send = http.client.post(device_endpoint).form(&fields).send();
+    let send = http.client()?.post(device_endpoint).form(&fields).send();
     let device = match tokio::time::timeout(clock.request_timeout, send).await {
         Ok(Ok(response)) => response,
         Ok(Err(err)) => {
@@ -494,16 +571,12 @@ pub async fn run_device_code_flow(
         }
     };
     let status = device.status().as_u16();
-    let body = match tokio::time::timeout(clock.request_timeout, device.text()).await {
-        Ok(Ok(body)) => body,
-        Ok(Err(err)) => {
+    // R05 RR1 F16: bounded in time AND size, like the token-endpoint body.
+    let body = match read_oauth_body_bounded(device, clock.request_timeout).await {
+        Ok(body) => body,
+        Err(detail) => {
             return Err(OAuthError::Transient {
-                detail: format!("device authorization body read failed: {err}"),
-            });
-        }
-        Err(_) => {
-            return Err(OAuthError::Transient {
-                detail: "device authorization body read timed out".to_string(),
+                detail: format!("device authorization body read failed: {detail}"),
             });
         }
     };
@@ -546,18 +619,100 @@ pub async fn run_device_code_flow(
         .ok_or_else(|| OAuthError::Protocol {
             detail: "device authorization response missing a valid expires_in".to_string(),
         })?;
-    let mut interval_seconds = match device.interval.as_ref() {
+    let interval_seconds = match device.interval.as_ref() {
         None => 5, // the incumbent's default
         Some(value) => positive_seconds(value).ok_or_else(|| OAuthError::Protocol {
             detail: "device authorization response carries an invalid interval".to_string(),
         })?,
     };
-    on_prompt(&DeviceCodePrompt {
-        user_code,
-        verification_uri,
-        interval: Duration::from_secs(interval_seconds),
-        expires_in: Duration::from_secs(expires_in),
-    });
+    Ok((
+        DeviceCodeGrant { device_code },
+        DeviceCodePrompt {
+            user_code,
+            verification_uri,
+            interval: Duration::from_secs(interval_seconds),
+            expires_in: Duration::from_secs(expires_in),
+        },
+    ))
+}
+
+/// Polls the token endpoint ONCE with a device grant — the SECOND half of
+/// the device-code flow (R05 RR1 F04). `authorization_pending` and
+/// `slow_down` are OUTCOMES, not errors; every other failure keeps the
+/// incumbent classification; the device code is scrubbed from every error
+/// text (C09).
+pub async fn poll_device_token(
+    http: &OAuthHttp,
+    config: &OAuthFlowConfig,
+    clock: &FlowClock<'_>,
+    grant: &DeviceCodeGrant,
+    slow_down_interval_seconds: u64,
+) -> Result<DevicePollOutcome, OAuthError> {
+    let (status, payload) = http
+        .post_form(
+            &config.token_endpoint,
+            &[
+                ("grant_type", "urn:ietf:params:oauth:grant-type:device_code"),
+                ("device_code", grant.device_code.as_str()),
+                ("client_id", config.client_id.as_str()),
+            ],
+            clock,
+            &[grant.device_code.as_str()],
+        )
+        .await?;
+    if (200..300).contains(&status) && payload.error.is_none() {
+        return Ok(DevicePollOutcome::Done(build_tokens(
+            &payload,
+            clock,
+            None,
+            true,
+            &[grant.device_code.as_str()],
+        )?));
+    }
+    match payload.error.as_deref() {
+        Some("authorization_pending") => Ok(DevicePollOutcome::AuthorizationPending),
+        Some("slow_down") => {
+            let interval =
+                slow_down_interval_seconds
+                    .checked_add(5)
+                    .ok_or_else(|| OAuthError::Protocol {
+                        detail: "polling interval overflowed after slow_down".to_string(),
+                    })?;
+            Ok(DevicePollOutcome::SlowDown {
+                interval: Duration::from_secs(interval),
+            })
+        }
+        _ => Err(classify_token_error(
+            status,
+            &payload,
+            &[grant.device_code.as_str()],
+        )),
+    }
+}
+
+/// Runs the device-code login flow (xai type). `on_prompt` is invoked ONCE
+/// with the user-facing code/URI before polling starts. Polling honors
+/// `authorization_pending` (keep waiting), `slow_down` (+5s per step, the
+/// incumbent's rule), the `expires_in` deadline and cancellation at every
+/// wait; a denial is terminal. Errors never write anything anywhere (the
+/// CredentialService persists only the success). R05 RR1 F04: composed of
+/// the extracted [`request_device_authorization`] / [`poll_device_token`]
+/// halves — one contract, two drive shapes (the loop here and the
+/// service-driven single rounds).
+pub async fn run_device_code_flow(
+    http: &OAuthHttp,
+    config: &OAuthFlowConfig,
+    clock: &FlowClock<'_>,
+    cancel: &dyn FlowCancel,
+    on_prompt: impl FnOnce(&DeviceCodePrompt),
+) -> Result<OAuthTokens, OAuthError> {
+    if cancel.is_cancelled() {
+        return Err(OAuthError::Cancelled);
+    }
+    let (grant, prompt) = request_device_authorization(http, config, clock).await?;
+    on_prompt(&prompt);
+    let expires_in = prompt.expires_in.as_secs();
+    let mut interval_seconds = prompt.interval.as_secs();
     let deadline = (clock.now_unix_ms)() + expires_in * 1000;
     loop {
         if cancel.is_cancelled() {
@@ -578,39 +733,13 @@ pub async fn run_device_code_flow(
                 detail: format!("device code expired after {expires_in}s without authorization"),
             });
         }
-        let (status, payload) = http
-            .post_form(
-                &config.token_endpoint,
-                &[
-                    ("grant_type", "urn:ietf:params:oauth:grant-type:device_code"),
-                    ("device_code", device_code.as_str()),
-                    ("client_id", config.client_id.as_str()),
-                ],
-                clock,
-                &[device_code.as_str()],
-            )
-            .await?;
-        if (200..300).contains(&status) && payload.error.is_none() {
-            return build_tokens(&payload, clock, None, true, &[device_code.as_str()]);
-        }
-        match payload.error.as_deref() {
-            Some("authorization_pending") => continue,
-            Some("slow_down") => {
-                interval_seconds =
-                    interval_seconds
-                        .checked_add(5)
-                        .ok_or_else(|| OAuthError::Protocol {
-                            detail: "polling interval overflowed after slow_down".to_string(),
-                        })?;
+        match poll_device_token(http, config, clock, &grant, interval_seconds).await? {
+            DevicePollOutcome::AuthorizationPending => continue,
+            DevicePollOutcome::SlowDown { interval } => {
+                interval_seconds = interval.as_secs();
                 continue;
             }
-            _ => {
-                return Err(classify_token_error(
-                    status,
-                    &payload,
-                    &[device_code.as_str()],
-                ));
-            }
+            DevicePollOutcome::Done(tokens) => return Ok(tokens),
         }
     }
 }
@@ -714,6 +843,19 @@ impl AuthorizationCodeFlow {
     /// The URL the user agent must open.
     pub fn authorize_url(&self) -> &str {
         &self.authorize_url
+    }
+
+    /// The SECRETS of the pending flow (state, PKCE verifier, redirect
+    /// URI) as owned copies — R05 RR1 F04: the service-side login surface
+    /// stores exactly these in its one-shot transaction so a MANUALLY
+    /// supplied (state, code) pair can be validated and redeemed through
+    /// the same exchange the loopback listener uses. Never render these.
+    pub fn pending_transaction_parts(&self) -> (String, String, String) {
+        (
+            self.state.clone(),
+            self.verifier.clone(),
+            self.redirect_uri.clone(),
+        )
     }
 
     /// The loopback callback address (127.0.0.1:<port>).
@@ -864,6 +1006,21 @@ pub struct CallbackGrant {
     code: String,
     verifier: String,
     redirect_uri: String,
+}
+
+impl CallbackGrant {
+    /// Assembles a grant from a validated callback's parts (R05 RR1 F04:
+    /// the service-side login surface stores the pending transaction and
+    /// redeems a manually-supplied or listener-captured code through the
+    /// SAME exchange). The parts are SECRETS of the in-flight login — never
+    /// rendered, never logged.
+    pub fn new(code: String, verifier: String, redirect_uri: String) -> Self {
+        Self {
+            code,
+            verifier,
+            redirect_uri,
+        }
+    }
 }
 
 /// Material-free by construction: the code and the verifier are secrets of

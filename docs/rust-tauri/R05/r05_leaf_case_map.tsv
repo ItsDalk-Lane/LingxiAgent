@@ -1,3 +1,16 @@
+leafcase r05-full-16CEB6D12A6A-a1 svc:r05_t02_credentials rr1_f04::rr1_f04_add_custom_model_id_refreshes_and_persists
+leafcase r05-full-16CEB6D12A6A-a2 svc:r05_t02_credentials rr1_f04::rr1_f04_add_custom_model_id_refreshes_and_persists
+leafcase r05-full-8060BE8AA02C-a1 svc:r05_t02_credentials rr1_f04::rr1_f04_remove_custom_model_id_refreshes_the_list
+leafcase r05-full-8060BE8AA02C-a2 svc:r05_t02_credentials rr1_f04::rr1_f04_remove_custom_model_id_refreshes_the_list
+leafcase r05-full-99D6C304D697-a1 svc:r05_t02_credentials rr1_f04::rr1_f04_pkce_start_manual_callback_install_and_real_model_call
+leafcase r05-full-99D6C304D697-a2 svc:r05_t02_credentials rr1_f04::rr1_f04_expired_state_refuses_even_with_the_correct_state
+leafcase r05-full-99D6C304D697-a3 svc:r05_t02_credentials rr1_f04::rr1_f04_device_start_poll_done_then_logout
+leafcase r05-full-CA0BF9A7AEA9-a1 svc:r05_t02_credentials rr1_f04::rr1_f04_status_reports_logged_in_and_available_model_counts
+leafcase r05-full-CA0BF9A7AEA9-a2 svc:r05_t02_credentials rr1_f04::rr1_f04_status_reports_logged_in_and_available_model_counts
+leafcase r05-full-CFEC64F68DDE-a1 svc:r05_t02_credentials rr1_f04::rr1_f04_oauth_model_listing_and_non_oauth_rejection
+leafcase r05-full-CFEC64F68DDE-a2 svc:r05_t02_credentials rr1_f04::rr1_f04_oauth_model_listing_and_non_oauth_rejection
+leafcase r05-full-FC80B6C4FBE4-a1 svc:r05_t02_credentials rr1_f04::rr1_f04_logout_clears_credentials_cache_and_refreshes_models
+leafcase r05-full-FC80B6C4FBE4-a2 svc:r05_t02_credentials rr1_f04::rr1_f04_logout_clears_credentials_cache_and_refreshes_models
 leafcase r05-share-00A769DD0FA3 svc:r05_t01_model_plane
 leafcase r05-share-03E1121574A1 svc:r05_t01_model_plane
 leafcase r05-share-057B048D6C07 svc:r05_t03_protocol_adapters
@@ -8,7 +21,6 @@ leafcase r05-share-0BD9E0FFDCF8 svc:r05_t01_model_plane
 leafcase r05-share-0DFFAB20A40B svc:r05_t01_model_plane
 leafcase r05-share-0E9326840E66 svc:r05_t07_usage_trace
 leafcase r05-share-0F28429F329E svc:r05_t07_usage_trace
-leafcase r05-share-16CEB6D12A6A svc:r05_t02_credentials
 leafcase r05-share-17702A7B3335 svc:r05_t03_protocol_adapters
 leafcase r05-share-184E03F012D5 svc:r05_t01_model_plane
 leafcase r05-share-1850FE23DD5D svc:r05_t07_usage_trace
@@ -54,7 +66,6 @@ leafcase r05-share-7BD0C2A8039E svc:r05_t01_model_plane
 leafcase r05-share-7BFFEC690DC3 svc:r05_t01_model_plane
 leafcase r05-share-7D969CDBF21C svc:r05_t01_model_plane
 leafcase r05-share-7EC5F0F2FF7C svc:r05_t01_model_plane
-leafcase r05-share-8060BE8AA02C svc:r05_t02_credentials
 leafcase r05-share-80DB4026AF13 svc:r05_t01_model_plane
 leafcase r05-share-834034527694 svc:r05_t01_model_plane
 leafcase r05-share-835CCD55115A svc:r05_t01_model_plane
@@ -70,7 +81,6 @@ leafcase r05-share-96CA6DBF8317 svc:r05_t07_usage_trace
 leafcase r05-share-97EC58F3099F svc:r05_t03_protocol_adapters
 leafcase r05-share-9871F51BE25B svc:r05_t01_model_plane
 leafcase r05-share-990A225D8A35 svc:r05_t01_model_plane
-leafcase r05-share-99D6C304D697 svc:r05_t02_credentials
 leafcase r05-share-9B809055BF01 svc:r05_t03_protocol_adapters
 leafcase r05-share-9FBBC275BD34 svc:r05_t01_model_plane
 leafcase r05-share-A1F51A12AD61 svc:r05_t01_model_plane
@@ -94,13 +104,11 @@ leafcase r05-share-BFD9531DEA41 svc:r05_t01_model_plane
 leafcase r05-share-C3CAB2E8B298 svc:r05_t03_protocol_adapters
 leafcase r05-share-C4EFBA7711E1 svc:r05_t01_model_plane
 leafcase r05-share-C7D757226915 svc:r05_t07_usage_trace
-leafcase r05-share-CA0BF9A7AEA9 svc:r05_t02_credentials
 leafcase r05-share-CABCB5355784 svc:r05_t01_model_plane
 leafcase r05-share-CC33172F1B57 svc:r05_t03_protocol_adapters
 leafcase r05-share-CC8E90E00CB6 svc:r05_t07_usage_trace
 leafcase r05-share-CCD6BA30F9ED svc:r05_t01_model_plane
 leafcase r05-share-CFACFCAD88EC svc:r05_t07_usage_trace
-leafcase r05-share-CFEC64F68DDE svc:r05_t02_credentials
 leafcase r05-share-D50161CE274A svc:r05_t01_model_plane
 leafcase r05-share-D61616CAF15F svc:r05_t01_model_plane
 leafcase r05-share-D656CA656A89 svc:r05_t07_usage_trace
@@ -124,7 +132,6 @@ leafcase r05-share-FA8EA4339EFF svc:r05_t07_usage_trace
 leafcase r05-share-FBB9392CF926 svc:r05_t01_model_plane
 leafcase r05-share-FBCFA99A89A2 svc:r05_t01_model_plane
 leafcase r05-share-FBF90A1BB572 svc:r05_t03_protocol_adapters
-leafcase r05-share-FC80B6C4FBE4 svc:r05_t02_credentials
 leafcase r05-share-FE1D56A67D39 svc:r05_t01_model_plane
 leafcase r05-share-FE9588171A23 svc:r05_t01_model_plane
 leafcase r05-share-FF3AD97F8429 svc:r05_t01_model_plane

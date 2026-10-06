@@ -154,6 +154,14 @@ enum RequestMessage {
         /// `null` when the turn carried tool calls only (the protocol's
         /// required shape for that case).
         content: Option<String>,
+        /// R05 RR1 F08: the family's reasoning carrier (the
+        /// DeepSeek/Kimi/MiMo/Zhipu `reasoning_content` vocabulary). The
+        /// renderer materializes the turn's REAL canonical reasoning here —
+        /// the compat replay policy then keeps it (a declared
+        /// reasoning_content contract), refuses without it, or strips it
+        /// (no contract / thinking off); a carrier is never fabricated.
+        #[serde(skip_serializing_if = "Option::is_none")]
+        reasoning_content: Option<String>,
         #[serde(skip_serializing_if = "Vec::is_empty")]
         tool_calls: Vec<RequestToolCall>,
     },
@@ -205,6 +213,12 @@ struct ResponseMessage {
     /// [`content_blocks_of`].
     #[serde(default)]
     content: Option<serde_json::Value>,
+    /// R05 RR1 F08: the buffered wire mode's reasoning carrier (the
+    /// DeepSeek-style top-level `message.reasoning_content`; a string or a
+    /// parts array). Parsed to canonical reasoning so BOTH wire modes
+    /// preserve the replay state.
+    #[serde(default)]
+    reasoning_content: Option<serde_json::Value>,
     #[serde(default)]
     tool_calls: Option<Vec<ResponseToolCall>>,
 }
@@ -232,7 +246,7 @@ struct ResponseFunction {
 /// first-byte / total-budget segments of [`dispatch::HttpTimeouts`] +
 /// `ModelTurnInput::deadline_unix_ms` apply on every dispatch.
 pub struct OpenAiCompletionsAdapter {
-    client: reqwest::Client,
+    client: dispatch::NetworkClient,
     schema_budget: SchemaBudget,
     timeouts: dispatch::HttpTimeouts,
 }
@@ -248,8 +262,24 @@ impl OpenAiCompletionsAdapter {
         schema_budget: SchemaBudget,
         timeouts: dispatch::HttpTimeouts,
     ) -> Result<Self, ProtocolError> {
+        Self::new_with_timeouts_and_network(
+            schema_budget,
+            timeouts,
+            super::network::NetworkPlane::direct_isolated(),
+        )
+    }
+
+    /// R05 RR1 F14: the client is BOUND to the model plane's reloadable
+    /// network policy (proxy / NO_PROXY / explicit CA per configuration
+    /// generation; the legacy constructors keep the pre-F14 direct
+    /// behavior for isolated tests).
+    pub fn new_with_timeouts_and_network(
+        schema_budget: SchemaBudget,
+        timeouts: dispatch::HttpTimeouts,
+        network: std::sync::Arc<super::network::NetworkPlane>,
+    ) -> Result<Self, ProtocolError> {
         Ok(Self {
-            client: dispatch::build_client_with_timeouts(&timeouts)?,
+            client: network.client_handle(timeouts)?,
             schema_budget,
             timeouts,
         })
@@ -315,8 +345,12 @@ impl OpenAiCompletionsAdapter {
             Err(error) => return fail(error, false),
         };
         let url = dispatch::append_provider_api_path(&route.endpoint, "/chat/completions");
+        let client = match self.client.client() {
+            Ok(client) => client,
+            Err(error) => return fail(error, false),
+        };
         let request = dispatch::apply_auth(
-            self.client.post(&url).json(&body),
+            client.post(&url).json(&body),
             auth,
             BearerStyle::AuthorizationBearer,
         );
@@ -345,6 +379,11 @@ impl OpenAiCompletionsAdapter {
         if let Err((error, retryable)) = drive {
             return fail(error, retryable);
         }
+        // R05 RR1 F38 (F21 same-path fix): capture the usage the stream
+        // observed BEFORE `finish` consumes the accumulator — a parse
+        // failure must not erase it (an unexpected tool response on a
+        // tools-less call still accounts).
+        let salvaged_usage = drive_handler.accumulator.observed_usage_report();
         match drive_handler
             .accumulator
             .finish(call, &input.tools, &self.schema_budget)
@@ -364,7 +403,7 @@ impl OpenAiCompletionsAdapter {
             },
             Err(error) => {
                 let retryable = error.retryable;
-                fail(error, retryable)
+                fail(error, retryable).with_usage_report(salvaged_usage)
             }
         }
     }
@@ -393,6 +432,14 @@ pub fn render_chat_request(
                 ..
             } => {
                 let mut text = String::new();
+                // R05 RR1 F08: the REAL reasoning carrier. The turn's
+                // Reasoning blocks (in content order) materialize as the
+                // family's `reasoning_content` message field — the compat
+                // replay policy then decides per provider/model/purpose
+                // whether it rides the wire, is refused as missing, or is
+                // stripped. Provider-opaque blocks keep having no
+                // representation in this family's INPUT shape.
+                let mut reasoning: Vec<String> = Vec::new();
                 for block in content {
                     match block {
                         ContentBlock::Text { text: block_text } => {
@@ -401,9 +448,12 @@ pub fn render_chat_request(
                             }
                             text.push_str(block_text);
                         }
-                        // Reasoning / provider-opaque blocks have no
-                        // representation in this family's INPUT shape.
-                        ContentBlock::Reasoning { .. } | ContentBlock::Opaque { .. } => {}
+                        ContentBlock::Reasoning { text: block_text } => {
+                            if !block_text.is_empty() {
+                                reasoning.push(block_text.clone());
+                            }
+                        }
+                        ContentBlock::Opaque { .. } => {}
                         ContentBlock::ResourceRef { resource } => {
                             if !text.is_empty() {
                                 text.push('\n');
@@ -461,15 +511,20 @@ pub fn render_chat_request(
                         },
                     });
                 }
+                let reasoning_content = (!reasoning.is_empty()).then(|| reasoning.join("\n"));
                 if text.is_empty() && rendered_calls.is_empty() {
-                    // A reasoning-only turn has no wire shape in this
-                    // family; skipping it keeps the transcript honest (its
-                    // content stays durable in the run's exchange, it just
-                    // isn't re-sent to this provider).
+                    // A reasoning-only turn carries no wire message of its
+                    // own: the require-tool-call replay contract binds the
+                    // carrier to TOOL-CALL messages (a reasoning-only turn
+                    // has none), and emitting a bare assistant message here
+                    // would leave an EMPTY assistant message on providers
+                    // whose policy strips the carrier. Its content stays
+                    // durable in the run's exchange, not re-sent.
                     continue;
                 }
                 messages.push(RequestMessage::Assistant {
                     content: if text.is_empty() { None } else { Some(text) },
+                    reasoning_content,
                     tool_calls: rendered_calls,
                 });
             }
@@ -525,6 +580,37 @@ pub fn render_chat_request(
             false,
         )
     })
+}
+
+/// R05 RR1 F08: the buffered reasoning carrier's text — a plain string
+/// verbatim, or a parts array joined on each part's reasoning-bearing text
+/// field (the incumbent `reasoningTextFromValue` vocabulary; empty pieces
+/// drop, joined with `\n`).
+fn reasoning_text_of(value: &Option<serde_json::Value>) -> Option<String> {
+    match value {
+        None | Some(serde_json::Value::Null) => None,
+        Some(serde_json::Value::String(text)) => Some(text.clone()),
+        Some(serde_json::Value::Array(parts)) => {
+            let pieces: Vec<String> = parts
+                .iter()
+                .filter_map(|part| {
+                    [
+                        "reasoning",
+                        "reasoning_content",
+                        "reasoning_text",
+                        "thinking",
+                    ]
+                    .iter()
+                    .find_map(|field| part.get(field).and_then(|t| t.as_str()).map(str::to_string))
+                })
+                .filter(|piece| !piece.is_empty())
+                .collect();
+            (!pieces.is_empty()).then(|| pieces.join("\n"))
+        }
+        // A non-string / non-array carrier is unknown provider state — it
+        // stays uninterpreted (never guessed into reasoning text).
+        Some(_) => None,
+    }
 }
 
 /// Normalizes the provider's `content` value (string | parts array | null)
@@ -584,6 +670,8 @@ fn content_blocks_of(content: &Option<serde_json::Value>, provider: &str) -> Vec
     blocks
 }
 
+pub const FAMILY: &str = "openai-completions";
+
 /// Parses a successful response body into the provider turn plus the
 /// reported usage (pure — the testable half of the inbound direction).
 /// Every malformed shape is a loud [`ErrorCode::InvalidMessage`], never a
@@ -620,7 +708,22 @@ pub fn parse_chat_response(
     let message = choice
         .message
         .ok_or_else(|| invalid("provider response choice carries no message".to_string()))?;
-    let content = content_blocks_of(&message.content, "openai-completions");
+    let mut content = content_blocks_of(&message.content, "openai-completions");
+    // R05 RR1 F08: the buffered top-level reasoning carrier (a string, or a
+    // parts array the incumbent's `reasoningTextFromValue` joins) becomes
+    // canonical reasoning — BEFORE the content blocks (the family's arrival
+    // order: the reasoning precedes the visible answer), and only when the
+    // content parts did not already carry the reasoning (never doubled).
+    if !content
+        .iter()
+        .any(|block| matches!(block, ContentBlock::Reasoning { .. }))
+    {
+        if let Some(reasoning) = reasoning_text_of(&message.reasoning_content) {
+            if !reasoning.is_empty() {
+                content.insert(0, ContentBlock::Reasoning { text: reasoning });
+            }
+        }
+    }
     let tool_calls = message.tool_calls.unwrap_or_default();
     let mut requests = Vec::with_capacity(tool_calls.len());
     for tool_call in tool_calls {
@@ -668,14 +771,23 @@ pub fn parse_chat_response(
             .with_provider_call_id(tool_call.id);
         requests.push(request);
     }
-    // C11 stop-reason honesty (R05-T04): every argument/shape validation
-    // above already ran (a half-JSON batch stays a loud InvalidMessage —
-    // nothing dispatched), so what remains classifies the CLOSED turn by
-    // its terminal reason. A truncated turn never forms a Final and never
-    // dispatches its (parseable) tool batch; the partial content lives on
-    // in the call's delta events and the retried attempt re-runs the turn
-    // — this call produced zero side effects, so the retry is safe.
+    // R05 RR1 F11: the batch-level identity admission — a same-id re-send
+    // with identical shape collapses, a same-id CONFLICT rejects the whole
+    // turn (zero requests admitted, zero side effects).
+    let requests = super::batch_admission::admit_provider_call_ids(FAMILY, requests)?;
+    // C11 stop-reason honesty (R05-T04) + R05 RR1 F12: transport end is not
+    // protocol completion. Every argument/shape validation above already
+    // ran (a half-JSON batch stays a loud InvalidMessage — nothing
+    // dispatched), and the CLOSED turn classifies ONLY by a KNOWN normal
+    // terminal reason: a `[DONE]` sentinel (or a buffered body) without a
+    // finish_reason, or an unknown finish value, is a protocol surprise —
+    // never a guessed Final, never a dispatched batch. A truncated turn
+    // (length) never forms a Final and never dispatches its (parseable)
+    // tool batch; the partial content lives on in the call's delta events
+    // and the retried attempt re-runs the turn — this call produced zero
+    // side effects, so the retry is safe.
     match choice.finish_reason.as_deref() {
+        Some("stop") | Some("tool_calls") | Some("function_call") => {}
         Some("length") => {
             return Ok(ParsedChat::with_usage_report(
                 ProviderTurn::Failed {
@@ -707,7 +819,20 @@ pub fn parse_chat_response(
                 usage_report.clone(),
             ));
         }
-        _ => {}
+        Some(other) => {
+            return Err(invalid(format!(
+                "provider response carries the UNKNOWN finish_reason {other:?}: an unmapped \
+                 terminal is never guessed into a completed turn"
+            )));
+        }
+        None => {
+            return Err(invalid(
+                "provider response ended WITHOUT a finish_reason: the transport's end (the \
+                 [DONE] sentinel or the buffered body's last byte) is not protocol completion \
+                 — the turn never classifies, nothing dispatches"
+                    .to_string(),
+            ));
+        }
     }
     if !requests.is_empty() {
         return Ok(ParsedChat::with_usage_report(
@@ -715,7 +840,15 @@ pub fn parse_chat_response(
             usage_report,
         ));
     }
-    if !content.is_empty() {
+    // R05 RR1 F12: a normally-stopped turn whose blocks carry NO answer
+    // text (reasoning/opaque only) is process content, not a final answer —
+    // it settles as an explicit process-only empty outcome; the driver
+    // gives it the honest no-final terminal (nothing is committed as a
+    // final message).
+    let has_answer_text = content
+        .iter()
+        .any(|block| matches!(block, ContentBlock::Text { .. }));
+    if has_answer_text {
         return Ok(ParsedChat::with_usage_report(
             ProviderTurn::Final {
                 message: NormalizedMessage {
@@ -728,12 +861,23 @@ pub fn parse_chat_response(
             usage_report,
         ));
     }
+    let detail = if content.is_empty() {
+        format!(
+            "provider returned no content and no tool calls (finish_reason: {})",
+            choice.finish_reason.as_deref().unwrap_or("absent")
+        )
+    } else {
+        format!(
+            "provider turn completed with process-only content (reasoning/opaque state, no \
+             answer text; finish_reason: {})",
+            choice.finish_reason.as_deref().unwrap_or("absent")
+        )
+    };
     Ok(ParsedChat::with_usage_report(
         ProviderTurn::Empty {
-            detail: format!(
-                "provider returned no content and no tool calls (finish_reason: {})",
-                choice.finish_reason.as_deref().unwrap_or("absent")
-            ),
+            detail,
+            // R05 RR1 F12: the process-state blocks ride along for replay.
+            content,
         },
         usage_report,
     ))
@@ -791,6 +935,17 @@ impl ChatStreamAccumulator {
             usage: None,
             done_seen: false,
         }
+    }
+
+    /// R05 RR1 F38: the usage fact the stream observed so far (the raw
+    /// usage chunk decoded through the SAME strict family decoder) — the
+    /// salvage a parse-failed turn still accounts with. Never a guess:
+    /// absent stays `Unknown`, an invalid object stays `Invalid`.
+    pub fn observed_usage_report(&self) -> lingxi_kernel::usage::ReportedUsage {
+        super::usage::salvage_usage_report(
+            lingxi_kernel::model_exchange::ProtocolFamily::OpenAiCompletions,
+            self.usage.as_ref(),
+        )
     }
 
     /// Consumes one decoded SSE event; returns the live deltas it produced
@@ -1148,6 +1303,9 @@ mod tests {
                 args_digest: request.args_digest.clone(),
                 args_summary: None,
             }],
+            // The completions input shape renders no family-opaque state, so
+            // no origin binding is exercised here.
+            origin: None,
         });
         input.prior.push(ExchangeItem::ToolResult {
             tool_call_id: ToolCallId::new("run-tc0001"),
@@ -1192,6 +1350,7 @@ mod tests {
                 args_digest: request.args_digest.clone(),
                 args_summary: None,
             }],
+            origin: None,
         });
         let err = render_chat_request(&input, &route(), false).unwrap_err();
         assert_eq!(err.code, ErrorCode::InvalidMessage);

@@ -1,0 +1,13 @@
+[package]
+name = "r05-protocol-adversarial-probe"
+version = "0.1.0"
+edition = "2021"
+publish = false
+
+[dependencies]
+lingxi-adapters = { path = "../../LingxiAgent/rust/crates/lingxi-adapters" }
+lingxi-kernel = { path = "../../LingxiAgent/rust/crates/lingxi-kernel" }
+lingxi-protocol = { path = "../../LingxiAgent/rust/crates/lingxi-protocol" }
+lingxi-service = { path = "../../LingxiAgent/rust/crates/lingxi-service" }
+serde_json = "=1.0.151"
+

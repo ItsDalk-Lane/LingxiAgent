@@ -1,0 +1,17 @@
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.10s
+     Running tests/r05_t06_rr1_system_speech.rs (rust/target/debug/deps/r05_t06_rr1_system_speech-e152cf71a0758c14)
+
+running 10 tests
+test rr1_f20_missing_supervisor_refuses_fail_closed ... ok
+test rr1_f20_exhausted_deadline_refuses_before_spawn ... ok
+test rr1_f20_empty_text_refuses_before_spawn ... ok
+test rr1_f20_queued_speech_waits_for_the_unified_permit ... ok
+test rr1_f20_unwritable_output_fails_honestly ... ok
+test rr1_f20_real_say_registers_product_with_zero_transport_attempts ... ok
+test rr1_f20_leading_dash_text_is_message_not_option ... ok
+test rr1_f20_unknown_voice_falls_back_and_delivers ... ok
+test rr1_f20_short_deadline_times_out_kills_and_cleans ... ok
+test rr1_f20_dropped_future_kills_process_and_cleans_output ... ok
+
+test result: ok. 10 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 3.75s
+

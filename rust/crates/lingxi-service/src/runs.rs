@@ -45,7 +45,7 @@
 use std::sync::Arc;
 use std::time::Duration;
 
-use lingxi_kernel::model_exchange::{ExchangeItem, ModelTurnInput, RequestedToolCall};
+use lingxi_kernel::model_exchange::{ExchangeItem, ModelTurnInput, RequestedToolCall, TurnOrigin};
 use lingxi_kernel::ports::{
     CommittedOutcome, InvocationIntent, InvocationPhase, InvocationReceipt, KeyEvent,
     LateResultReason, ModelTurnDelta, ReceiptOutcome, ResultFence, StaleResultFact, StorageError,
@@ -241,13 +241,98 @@ struct ChannelDeltaSink {
 /// wire projection, the richer ledger fact, the serving route's identity
 /// and the physical request count. Carried together so the completed
 /// event's `usage` and the ledger row can never disagree.
+///
+/// R05 RR1 F21: the settlement `outcome`, the host-observed start
+/// timestamp and (for a tool-batch turn) the emitted tool call ids ride
+/// the same facts — one construction point, one ledger row, no second
+/// source of truth.
 #[derive(Debug, Clone)]
 pub struct ModelCallUsageFacts {
     pub usage: Option<lingxi_protocol::UsageRecord>,
     pub usage_report: lingxi_kernel::usage::ReportedUsage,
     pub served_by: Option<lingxi_kernel::ports::ProviderDescriptor>,
     pub served_protocol: Option<String>,
-    pub transport_attempts: u32,
+    /// R05 RR1 F38: `None` = the attempts count is UNKNOWN — the call's
+    /// future was dropped before settling (the cancellation race), so no
+    /// observation of how many physical requests left the process
+    /// exists. A resolved turn always carries `Some(count)`.
+    pub transport_attempts: Option<u32>,
+    pub outcome: lingxi_kernel::usage::CallOutcome,
+    pub started_at_unix_ms: Option<u64>,
+    /// The host-minted tool call ids this turn's batch emitted (the
+    /// ToolRequests arm fills them before persisting — the parent-side
+    /// JOIN listing of the ledger).
+    pub emitted_tool_calls: Vec<String>,
+}
+
+/// The R05 RR1 F09 turn origin recorded on exchange items: the serving
+/// identity of the call that produced the turn (provider+model; the
+/// operation is dropped — replay authorization is source identity, not
+/// purpose). `None` when no identity was reported (a double): turns whose
+/// content carries same-family opaque state then render-refuse downstream,
+/// never silently forward.
+fn turn_origin_of(facts: &ModelCallUsageFacts) -> Option<TurnOrigin> {
+    facts.served_by.as_ref().map(|served| TurnOrigin {
+        provider: served.provider.clone(),
+        model: served.model.clone(),
+    })
+}
+
+/// Builds the usage-ledger row of one driver model call from its settle
+/// facts (the single construction point both the completed-event path and
+/// the R05 RR1 F38 cancelled-in-flight row share — one source, no drift).
+fn model_call_usage_record_of(
+    ctx: &lingxi_kernel::RunContext,
+    call: &ModelCallId,
+    facts: &ModelCallUsageFacts,
+    ledger: &UsageLedgerContext,
+    now_ms: u64,
+) -> lingxi_kernel::usage::ModelCallUsageRecord {
+    let served = facts.served_by.clone().unwrap_or_else(|| {
+        // Unreachable on the driver path (the facts always carry the
+        // descriptor fallback); kept honest rather than fabricating.
+        lingxi_kernel::ports::ProviderDescriptor {
+            provider: "unreported".to_string(),
+            model: "unreported".to_string(),
+            operation: "chat".to_string(),
+        }
+    });
+    lingxi_kernel::usage::ModelCallUsageRecord {
+        session_id: Some(ctx.session_id.to_string()),
+        run_id: Some(ctx.run_id.to_string()),
+        attempt: Some(ctx.attempt.to_string()),
+        model_call_id: call.as_str().to_string(),
+        purpose: "chat".to_string(),
+        origin: ledger.origin.to_string(),
+        parent_run_id: ledger.parent_run_id.clone(),
+        cause_ref: ledger.cause_ref.clone(),
+        parent_tool_call_id: None,
+        provider: served.provider.clone(),
+        model: served.model.clone(),
+        protocol: facts
+            .served_protocol
+            .clone()
+            .unwrap_or_else(|| "unknown".to_string()),
+        usage: match facts.usage_report.clone() {
+            lingxi_kernel::usage::ReportedUsage::Known(usage) => Some(usage),
+            _ => None,
+        },
+        invalid_detail: match &facts.usage_report {
+            lingxi_kernel::usage::ReportedUsage::Invalid { detail } => Some(detail.clone()),
+            _ => None,
+        },
+        transport_attempts: facts.transport_attempts,
+        // R05 RR1 F21: the call's settlement state, its host-observed
+        // timing window and (for a tool batch) the emitted tool call
+        // ids — the ledger's parent-side JOIN listing.
+        outcome: facts.outcome,
+        started_at_unix_ms: facts.started_at_unix_ms,
+        settled_at_unix_ms: Some(now_ms),
+        emitted_tool_calls: facts.emitted_tool_calls.clone(),
+        // T07-C08: no price source exists in this stage's config —
+        // cost stays explicitly unknown, never invented.
+        cost_basis: None,
+    }
 }
 
 /// The run-level ledger context of a drive (R05-T07-C02): the causal
@@ -691,6 +776,12 @@ impl RunSupervisor {
     /// returns the queue place on drop). `Err(())` = cancelled;
     /// `Ok(None)` = quota refused (the run fails loudly with
     /// `failed.quota_exhausted.*`).
+    ///
+    /// R05 RR1 F16: when the call carries an ABSOLUTE deadline, the QUEUE
+    /// WAIT races the REMAINING budget too — the wait exits the moment the
+    /// deadline passes (the caller re-checks the clock to classify its
+    /// `Ok(None)` as the honest `budget_exceeded` instead of waiting the
+    /// quota manager's full `wait_timeout_ms` on an already-spent call).
     async fn acquire_or_break(
         &self,
         resource: &QuotaResource,
@@ -698,10 +789,20 @@ impl RunSupervisor {
         session_id: &str,
         run_id: &RunId,
         scope: &CancelScope,
+        deadline_unix_ms: Option<u64>,
     ) -> Result<Option<crate::quotas::QuotaPermit>, ()> {
+        let budget_sleep = async {
+            match lingxi_adapters::models::dispatch::remaining_budget_ms(deadline_unix_ms) {
+                Some(remaining) => {
+                    tokio::time::sleep(std::time::Duration::from_millis(remaining)).await
+                }
+                None => std::future::pending::<()>().await,
+            }
+        };
         tokio::select! {
             biased;
             _ = scope.cancelled() => Err(()),
+            _ = budget_sleep => Ok(None),
             admitted = self.quotas.acquire(*resource, agent_id, session_id) => {
                 match admitted {
                     Ok(permit) => Ok(Some(permit)),
@@ -1030,6 +1131,10 @@ impl RunSupervisor {
                 }
             }
             let call = model_call_id(&run_id, turn);
+            // R05 RR1 F21: the call's host-observed start moment (real
+            // wall clock — the same convention as `call_deadline`, not
+            // the injected test clock).
+            let turn_started_unix_ms = lingxi_adapters::models::dispatch::unix_ms_now();
             // R05-T01 (C08): the tool declaration snapshot is rebuilt from
             // the LIVE registry at every send — the adapter declares exactly
             // this set to the provider, never a cached or fabricated one. A
@@ -1110,11 +1215,28 @@ impl RunSupervisor {
                     quota_session_lane,
                     &run_id,
                     &root,
+                    call_deadline,
                 )
                 .await
             {
                 Ok(Some(permit)) => Some(permit),
                 Ok(None) => {
+                    // R05 RR1 F16: distinguish the deadline race from a
+                    // genuine quota refusal by a fresh clock read — a
+                    // budget spent IN THE QUEUE settles as the honest
+                    // non-retryable budget failure (same shape as the
+                    // pre-send check above), never a wait for the quota
+                    // manager's own timeout on an already-spent call.
+                    if lingxi_adapters::models::dispatch::remaining_budget_ms(call_deadline)
+                        == Some(0)
+                    {
+                        break RunFinish::Failed {
+                            cause: FailureCause::ProviderFailed {
+                                code: ErrorCode::BudgetExceeded.wire_name().to_string(),
+                                retryable: false,
+                            },
+                        };
+                    }
                     break RunFinish::Failed {
                         cause: FailureCause::QuotaExhausted {
                             resource: QuotaResource::Model,
@@ -1196,6 +1318,40 @@ impl RunSupervisor {
                     biased;
                     _ = root.cancelled() => {
                         drop(model_permit.take());
+                        // R05 RR1 F38: the in-flight call may already have
+                        // left the process — a possibly-billable request
+                        // NEVER vanishes with the cancellation fence. The
+                        // accounting row (outcome=cancelled, usage unknown,
+                        // attempts UNKNOWN — the dropped provider future
+                        // proves nothing about either fact) lands BEFORE
+                        // the cancellation settle. The dispatch-moment
+                        // descriptor is the honest identity: the result's
+                        // `served_by` cannot exist, the turn never resolved.
+                        // NO `model_call_completed` event: the A09/C16
+                        // discipline keeps a cancelled call's started row
+                        // unclosed (the run's own cancelled terminal closes
+                        // the story) — the LEDGER row is the accounting
+                        // fact, never a fabricated completion.
+                        self.persist_model_call_cancelled_in_flight(
+                            port,
+                            &ctx,
+                            &call,
+                            &ModelCallUsageFacts {
+                                usage: None,
+                                usage_report:
+                                    lingxi_kernel::usage::ReportedUsage::Unknown,
+                                served_by: Some(provider.descriptor()),
+                                served_protocol: None,
+                                transport_attempts: None,
+                                outcome:
+                                    lingxi_kernel::usage::CallOutcome::Cancelled,
+                                started_at_unix_ms: Some(turn_started_unix_ms),
+                                emitted_tool_calls: Vec::new(),
+                            },
+                            &usage_ledger,
+                            now_ms,
+                        )
+                        .await?;
                         // The receiver and the pinned wait drop on the way
                         // out: the provider's next emit fails closed and the
                         // scope ends the child at its await point (D8 — no
@@ -1360,6 +1516,35 @@ impl RunSupervisor {
                         // The cancellation won the write race: the completed
                         // turn is stale, the run settles through the cancel
                         // path and the turn's content never lands.
+                        // R05 RR1 F38: the CONTENT is refused, the ACCOUNTING
+                        // is not — the turn DID settle, so its row carries
+                        // the REAL observed facts (usage, physical attempts,
+                        // resolved identity) with outcome=cancelled, landing
+                        // before the cancellation settle (the physical
+                        // requests already happened; a fence never erases a
+                        // billable fact — F-WU02). No completed event (the
+                        // A09/C16 cancelled-call discipline).
+                        self.persist_model_call_cancelled_in_flight(
+                            port,
+                            &ctx,
+                            &call,
+                            &ModelCallUsageFacts {
+                                usage: provider_turn.usage.clone(),
+                                usage_report: provider_turn.usage_report.clone(),
+                                served_by: provider_turn
+                                    .served_by
+                                    .clone()
+                                    .or_else(|| Some(provider.descriptor())),
+                                served_protocol: provider_turn.served_protocol.clone(),
+                                transport_attempts: Some(provider_turn.transport_attempts),
+                                outcome: lingxi_kernel::usage::CallOutcome::Cancelled,
+                                started_at_unix_ms: Some(turn_started_unix_ms),
+                                emitted_tool_calls: Vec::new(),
+                            },
+                            &usage_ledger,
+                            now_ms,
+                        )
+                        .await?;
                         let cancel_reason =
                             root.reason().unwrap_or_else(|| "cancelled".to_string());
                         let finish = self
@@ -1391,7 +1576,28 @@ impl RunSupervisor {
             // BEFORE the completed fact — the tag parsers flush into the
             // current segments and the open segments end, all persisted
             // ahead of `model_call_completed`.
-            let finish_events = normalizer.finish();
+            //
+            // R05 RR1 F12: the text segment's phase resolution needs the
+            // turn's TERMINAL classification, so the turn is inspected
+            // here (before the consuming match) — `final_answer` is only
+            // confirmed when the provider turn is a real final carrying
+            // visible answer text AFTER normalization (F13); anything else
+            // (tools / process-only / failure) closes the text segment as
+            // `unresolved`, never a guessed final_answer.
+            let provider_turn = provider_result.turn;
+            let normalized_final = match &provider_turn {
+                lingxi_kernel::ports::ProviderTurn::Final { message } => {
+                    let normalized =
+                        crate::streaming_norm::normalize_final_message(message.clone());
+                    if crate::streaming_norm::message_has_visible_text(&normalized) {
+                        Some(normalized)
+                    } else {
+                        None
+                    }
+                }
+                _ => None,
+            };
+            let finish_events = normalizer.finish(normalized_final.is_some());
             self.persist_norm_events(
                 port,
                 events,
@@ -1413,7 +1619,7 @@ impl RunSupervisor {
             // component-level usage fact (provenance + invalid-vs-
             // unknown), the protocol family that served the call and the
             // PHYSICAL request count (a 401-refresh resend is 2).
-            let usage_facts = ModelCallUsageFacts {
+            let mut usage_facts = ModelCallUsageFacts {
                 usage: provider_result.usage.clone(),
                 usage_report: provider_result.usage_report.clone(),
                 // The result's served route wins; a double that reports
@@ -1424,9 +1630,24 @@ impl RunSupervisor {
                     .clone()
                     .or_else(|| Some(provider.descriptor())),
                 served_protocol: provider_result.served_protocol.clone(),
-                transport_attempts: provider_result.transport_attempts,
+                // A resolved turn always observed its physical count (F38:
+                // None is exclusively the dropped-before-settlement shape).
+                transport_attempts: Some(provider_result.transport_attempts),
+                // R05 RR1 F21: the outcome of the call — a Failed turn is
+                // a failed call even when its usage is known; every other
+                // terminal (Final/ToolRequests/Continue/Empty) settled
+                // the call itself successfully.
+                outcome: if matches!(
+                    provider_turn,
+                    lingxi_kernel::ports::ProviderTurn::Failed { .. }
+                ) {
+                    lingxi_kernel::usage::CallOutcome::Failed
+                } else {
+                    lingxi_kernel::usage::CallOutcome::Succeeded
+                },
+                started_at_unix_ms: Some(turn_started_unix_ms),
+                emitted_tool_calls: Vec::new(),
             };
-            let provider_turn = provider_result.turn;
             match provider_turn {
                 lingxi_kernel::ports::ProviderTurn::Final { message } => {
                     if message.content.is_empty() {
@@ -1448,6 +1669,30 @@ impl RunSupervisor {
                         .await?;
                         break finish_no_final(saw_tool_failure, saw_process_content);
                     }
+                    // R05 RR1 F12/F13: the committed final message is the
+                    // NORMALIZED projection (the same scanner the live
+                    // delta chain uses) — think-family tags structure as
+                    // reasoning, mood-family content never returns as
+                    // displayable body, fenced/escaped literals stay text.
+                    // A final whose blocks carry NO visible answer text
+                    // after normalization (mood-only body, reasoning-only
+                    // content that slipped past an adapter) is process
+                    // content: no final message is committed and the run
+                    // settles the honest no-final terminal.
+                    let Some(message) = normalized_final else {
+                        self.persist_model_call_completed(
+                            port,
+                            events,
+                            &ctx,
+                            &call,
+                            &usage_facts,
+                            &usage_ledger,
+                            now_ms,
+                        )
+                        .await?;
+                        saw_process_content = true;
+                        break finish_no_final(saw_tool_failure, saw_process_content);
+                    };
                     self.persist_model_call_completed(
                         port,
                         events,
@@ -1513,6 +1758,14 @@ impl RunSupervisor {
                             )
                         })
                         .collect();
+                    // R05 RR1 F21: the parent-side JOIN listing — this
+                    // call's row names the tool call ids its batch emitted
+                    // so a worker-callback child (parent_tool_call_id) can
+                    // reach its parent MODEL call row inside the ledger.
+                    usage_facts.emitted_tool_calls = planned
+                        .iter()
+                        .map(|(id, _)| id.as_str().to_string())
+                        .collect();
                     exchange.push(ExchangeItem::AssistantTurn {
                         call: call.clone(),
                         content,
@@ -1520,6 +1773,11 @@ impl RunSupervisor {
                             .iter()
                             .map(|(_, requested)| requested.clone())
                             .collect(),
+                        // R05 RR1 F09: the turn's provider-opaque state is
+                        // bound to the provider/model that served it — the
+                        // renderer refuses to forward it onto any other
+                        // route identity.
+                        origin: turn_origin_of(&usage_facts),
                     });
                     self.persist_model_call_completed(
                         port,
@@ -1549,13 +1807,247 @@ impl RunSupervisor {
                         Some(tools)
                     };
                     let tool_gateway = self.tool_gateway.clone();
-                    for (request, (planned_id, _)) in requests.iter().zip(planned.iter()) {
+                    // ── R05 RR1 F11: whole-batch admission BEFORE the first
+                    //     side effect ──
+                    // A model tool turn is admitted as ONE batch: protocol
+                    // completeness and per-request shapes were settled by
+                    // the adapter; HERE the driver confirms the batch-level
+                    // facts that no per-request check covers — (a) the
+                    // provider call ids are unambiguous within THIS model
+                    // call (defense in depth over the adapters' admission:
+                    // a direct TurnProviderPort double bypasses it), and
+                    // (b) EVERY request passes the static admission (digest
+                    // gate + gateway target/availability/generations/
+                    // CURRENT-schema/policy verdict — the pure validation
+                    // half of `prepare`, no record minted).
+                    //
+                    // A batch that fails ANY of this executes NOTHING: each
+                    // request closes as a never-dispatched failure and the
+                    // structured refusals travel back to the model (which
+                    // can correct and retry). An identical same-id re-send
+                    // collapses to its first occurrence (one execution, one
+                    // result under the shared id). This pre-validation does
+                    // NOT replace the immediate authorization: the
+                    // per-request execution below still runs the digest
+                    // gate and the FULL gateway prepare (plus permission,
+                    // approval, cancellation and generation re-checks) at
+                    // the moment of dispatch.
+                    let mut batch_collapsed = vec![false; requests.len()];
+                    // Per-slot refusal: the structured outcome (rides to the
+                    // model with its OWN error code) + the journal receipt
+                    // detail (keeps the incumbent per-refusal diagnostic
+                    // vocabulary the R04 receipts pinned).
+                    let mut batch_refusal: Vec<Option<(ToolOutcome, String)>> =
+                        vec![None; requests.len()];
+                    let mut batch_failed = false;
+                    {
+                        let mut seen: std::collections::HashMap<&str, (usize, &str, &str)> =
+                            std::collections::HashMap::new();
+                        for (index, request) in requests.iter().enumerate() {
+                            let Some(id) = request.provider_call_id.as_deref() else {
+                                continue;
+                            };
+                            let shape = (request.target.as_str(), request.args_digest.hex.as_str());
+                            match seen.get(id) {
+                                None => {
+                                    seen.insert(id, (index, shape.0, shape.1));
+                                }
+                                Some(&(_, first_target, first_digest))
+                                    if first_target == shape.0 && first_digest == shape.1 =>
+                                {
+                                    // Identical completed re-send under the
+                                    // same id: no new information — the first
+                                    // occurrence executes once.
+                                    batch_collapsed[index] = true;
+                                }
+                                Some(&(first, ..)) => {
+                                    let outcome = ToolOutcome::Failed {
+                                        error: ProtocolError::new(
+                                            ErrorCode::InvalidMessage,
+                                            format!(
+                                                "the model turn carries the provider call id \
+                                                 {id:?} twice with DIFFERENT shapes (request #{} \
+                                                 vs #{}): the batch is ambiguous — nothing is \
+                                                 admitted or dispatched",
+                                                first + 1,
+                                                index + 1
+                                            ),
+                                            false,
+                                        ),
+                                    };
+                                    let detail = "not dispatched: whole-batch admission refusal \
+                                         (duplicate provider call id with conflicting shapes)"
+                                        .to_string();
+                                    for slot in batch_refusal.iter_mut() {
+                                        *slot = Some((outcome.clone(), detail.clone()));
+                                    }
+                                    batch_failed = true;
+                                    break;
+                                }
+                            }
+                        }
+                    }
+                    if !batch_failed {
+                        let mut own_refusals: Vec<Option<(ToolOutcome, String)>> =
+                            vec![None; requests.len()];
+                        for (index, request) in requests.iter().enumerate() {
+                            if batch_collapsed[index] {
+                                continue;
+                            }
+                            let call_id = planned[index].0.clone();
+                            if !request.digest_matches_arguments() {
+                                own_refusals[index] = Some((
+                                    ToolOutcome::Failed {
+                                        error: ProtocolError::new(
+                                            ErrorCode::InvalidMessage,
+                                            format!(
+                                                "args_digest mismatch (declared {}, computed \
+                                                 {}): forged or adulterated request; not \
+                                                 dispatched",
+                                                request.args_digest.hex,
+                                                request.arguments.digest().hex
+                                            ),
+                                            false,
+                                        ),
+                                    },
+                                    format!(
+                                        "not dispatched: args_digest mismatch (declared {}, \
+                                         computed {})",
+                                        request.args_digest.hex,
+                                        request.arguments.digest().hex
+                                    ),
+                                ));
+                                continue;
+                            }
+                            let Some(gateway) = tool_gateway.as_ref() else {
+                                continue;
+                            };
+                            let surface = if request.delegation.is_some() {
+                                crate::toolgateway::CallerSurface::DelegationDispatch
+                            } else if matches!(authorization.grant, RunGrant::Subagent { .. }) {
+                                crate::toolgateway::CallerSurface::SubagentRun
+                            } else {
+                                crate::toolgateway::CallerSurface::UserRun
+                            };
+                            let permission = authorization.invocation_permission_context();
+                            if let Err(refusal) = gateway.validate_from_request(
+                                &ctx, surface, agent_id, permission, &call_id, request,
+                            ) {
+                                // The refusal keeps its OWN structured code
+                                // and diagnostic (the model must see the
+                                // real reason: policy denial, schema
+                                // violation, unknown target, ...).
+                                own_refusals[index] = Some((
+                                    ToolOutcome::Failed {
+                                        error: refusal.to_tool_error(),
+                                    },
+                                    format!(
+                                        "not dispatched: gateway refused the preparation \
+                                         ({refusal})"
+                                    ),
+                                ));
+                            }
+                        }
+                        let failed: Vec<usize> = own_refusals
+                            .iter()
+                            .enumerate()
+                            .filter_map(|(i, r)| r.is_some().then_some(i))
+                            .collect();
+                        if !failed.is_empty() {
+                            let failed_list = failed
+                                .iter()
+                                .map(|i| format!("#{}", i + 1))
+                                .collect::<Vec<_>>()
+                                .join(", ");
+                            let sibling = (
+                                ToolOutcome::Failed {
+                                    error: ProtocolError::new(
+                                        ErrorCode::InvalidMessage,
+                                        format!(
+                                            "another request of this model turn ({failed_list}) \
+                                             failed the batch admission: the whole batch stays \
+                                             at zero dispatch — correct the request(s) and retry"
+                                        ),
+                                        false,
+                                    ),
+                                },
+                                format!(
+                                    "not dispatched: whole-batch admission refusal (another \
+                                     request of this model turn ({failed_list}) failed the \
+                                     batch admission)"
+                                ),
+                            );
+                            for (index, refusal) in own_refusals.into_iter().enumerate() {
+                                batch_refusal[index] =
+                                    Some(refusal.unwrap_or_else(|| sibling.clone()));
+                            }
+                        }
+                    }
+                    for (index, (request, (planned_id, _))) in
+                        requests.iter().zip(planned.iter()).enumerate()
+                    {
                         // F03-C04: each tool-loop iteration re-checks — a
                         // cancellation accepted during the previous
                         // iteration's receipt/event writes stops the loop
                         // before any new admission or intent.
                         gate_cancel!();
                         let call_id = planned_id.clone();
+                        if batch_collapsed[index] {
+                            // The identical re-send of an earlier request:
+                            // its result is the first occurrence's result —
+                            // no second journal entry, no second execution.
+                            continue;
+                        }
+                        if let Some((outcome, receipt_detail)) = &batch_refusal[index] {
+                            tracing::warn!(
+                                run_id = %run_id,
+                                tool_call = %call_id,
+                                target = request.target,
+                                "whole-batch admission refused this model tool turn (zero \
+                                 dispatch); the journal closes a never-dispatched failure"
+                            );
+                            let trusted_digest = request.arguments.digest();
+                            port.record_invocation_intent(
+                                &ctx,
+                                InvocationIntent {
+                                    journal_id: call_id.clone(),
+                                    target: request.target.clone(),
+                                    args_digest: trusted_digest.hex.clone(),
+                                    args_summary: request.args_summary.clone(),
+                                    idempotency_key: Some(call_id.to_string()),
+                                },
+                                now_ms,
+                            )
+                            .await
+                            .map_err(DriveError::Storage)?;
+                            saw_tool_failure = true;
+                            saw_process_content = true;
+                            port.record_invocation_receipt(
+                                &ctx,
+                                &call_id,
+                                InvocationReceipt {
+                                    outcome: ReceiptOutcome::Failed,
+                                    detail: receipt_detail.clone(),
+                                    dedup_id: None,
+                                    dispatched: false,
+                                },
+                                now_ms,
+                            )
+                            .await
+                            .map_err(DriveError::Storage)?;
+                            self.persist_tool_event(
+                                port,
+                                events,
+                                &ctx,
+                                &call_id,
+                                request,
+                                Some(outcome),
+                                now_ms,
+                            )
+                            .await?;
+                            record_tool_result!(call_id, request, outcome.clone());
+                            continue;
+                        }
                         // Admission (R03-T02): one tool-call permit per
                         // call, held across the approval wait AND the tool
                         // I/O (the incumbent registers the execution for
@@ -1567,6 +2059,10 @@ impl RunSupervisor {
                                 quota_session_lane,
                                 &run_id,
                                 &root,
+                                // The tool lane has no model-call budget;
+                                // its queue wait is cancellation-bounded
+                                // (R03-T03 semantics, unchanged).
+                                None,
                             )
                             .await
                         {
@@ -2635,6 +3131,7 @@ impl RunSupervisor {
                         call: call.clone(),
                         content: vec![ContentBlock::Reasoning { text: process_note }],
                         tool_calls: Vec::new(),
+                        origin: turn_origin_of(&usage_facts),
                     });
                     self.persist_model_call_completed(
                         port,
@@ -3071,15 +3568,6 @@ impl RunSupervisor {
         now_ms: u64,
     ) -> Result<(), DriveError> {
         let run_id = ctx.run_id.to_string();
-        let served = facts.served_by.clone().unwrap_or_else(|| {
-            // Unreachable on the driver path (the facts always carry the
-            // descriptor fallback); kept honest rather than fabricating.
-            lingxi_kernel::ports::ProviderDescriptor {
-                provider: "unreported".to_string(),
-                model: "unreported".to_string(),
-                operation: "chat".to_string(),
-            }
-        });
         // The wire projection and the ledger fact must agree: a Known
         // report projects its own wire record; anything else keeps the
         // legacy projection (doubles) or None.
@@ -3087,34 +3575,7 @@ impl RunSupervisor {
             lingxi_kernel::usage::ReportedUsage::Known(usage) => usage.wire_record(),
             _ => facts.usage.clone(),
         };
-        let record = lingxi_kernel::usage::ModelCallUsageRecord {
-            session_id: Some(ctx.session_id.to_string()),
-            run_id: Some(run_id.clone()),
-            attempt: Some(ctx.attempt.to_string()),
-            model_call_id: call.as_str().to_string(),
-            purpose: "chat".to_string(),
-            origin: ledger.origin.to_string(),
-            parent_run_id: ledger.parent_run_id.clone(),
-            cause_ref: ledger.cause_ref.clone(),
-            provider: served.provider.clone(),
-            model: served.model.clone(),
-            protocol: facts
-                .served_protocol
-                .clone()
-                .unwrap_or_else(|| "unknown".to_string()),
-            usage: match facts.usage_report.clone() {
-                lingxi_kernel::usage::ReportedUsage::Known(usage) => Some(usage),
-                _ => None,
-            },
-            invalid_detail: match &facts.usage_report {
-                lingxi_kernel::usage::ReportedUsage::Invalid { detail } => Some(detail.clone()),
-                _ => None,
-            },
-            transport_attempts: facts.transport_attempts,
-            // T07-C08: no price source exists in this stage's config —
-            // cost stays explicitly unknown, never invented.
-            cost_basis: None,
-        };
+        let record = model_call_usage_record_of(ctx, call, facts, ledger, now_ms);
         port.record_model_call_usage(record, now_ms)
             .await
             .map_err(DriveError::Storage)?;
@@ -3135,6 +3596,32 @@ impl RunSupervisor {
             .await
             .map_err(DriveError::Storage)?;
         events.publish_committed(&committed.events);
+        Ok(())
+    }
+
+    /// R05 RR1 F38: persists ONLY the usage-ledger row of a model call
+    /// that was IN FLIGHT when the run's cancellation fence won — no
+    /// `model_call_completed` run event. The A09/C16 discipline (a
+    /// cancelled call is never closed with a fabricated completed event;
+    /// the run's own `cancelled` terminal closes the story) stays exactly
+    /// as pinned, while the ACCOUNTING fact — the request may already
+    /// have left the process — must not vanish with the fence (F-WU02:
+    /// a normal cancellation never hides behind the crash-window
+    /// registration). The row states `outcome=cancelled` and exactly what
+    /// the driver could observe (see the call sites).
+    async fn persist_model_call_cancelled_in_flight<P: StoragePort>(
+        &self,
+        port: &P,
+        ctx: &lingxi_kernel::RunContext,
+        call: &ModelCallId,
+        facts: &ModelCallUsageFacts,
+        ledger: &UsageLedgerContext,
+        now_ms: u64,
+    ) -> Result<(), DriveError> {
+        let record = model_call_usage_record_of(ctx, call, facts, ledger, now_ms);
+        port.record_model_call_usage(record, now_ms)
+            .await
+            .map_err(DriveError::Storage)?;
         Ok(())
     }
 

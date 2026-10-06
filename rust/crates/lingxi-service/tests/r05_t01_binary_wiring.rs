@@ -506,7 +506,8 @@ async fn c02_real_binary_full_chain_through_authenticated_endpoint() {
                     "auth": {{"kind": "apiKey", "apiKey": "sk-test-binary"}}
                 }}
             }},
-            "models": {{"chat": {{"provider": "main", "model": "stub-model-bin"}}}}}}"#,
+            "models": {{"chat": {{"provider": "main", "model": "stub-model-bin",
+                "capabilities": {{"tools": true}}}}}}}}"#,
             serde_json::to_string(&home.to_string_lossy()).expect("home json"),
             serde_json::to_string(&workspace.to_string_lossy()).expect("ws json"),
             stub.endpoint()

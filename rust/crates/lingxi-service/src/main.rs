@@ -40,13 +40,15 @@ const USAGE: &str = r#"usage: lingxi-service [--bind <SOCKADDR>] [--home <DIR>] 
 [--shutdown-timeout-ms <MS>] [--max-ws-connections <N>] [--db-queue-bound <N>] \
 [--event-subscriber-queue <N>] [--event-reorder-bound <N>] [--max-subscribers <N>] \
 [--log-max-bytes <N>] [--log-max-files <N>] [--http-rate-max <N>] \
-[--http-max-in-flight <N>] [--http-request-budget-ms <MS>] [--db-wait-budget-ms <MS>]
+[--http-max-in-flight <N>] [--http-request-budget-ms <MS>] [--db-wait-budget-ms <MS>] \
+[--model-global-permits <N>]
 
 Options:
   --bind <SOCKADDR>       Listen address (default 127.0.0.1:0, loopback + ephemeral).
   --home <DIR>            Absolute service data root (created if missing).
   --config <FILE>         Strict JSON config file; closed key set
-                          {"home", "workspace"?, "providers"?, "models"?}
+                          {"home", "workspace"?, "providers"?, "models"?,
+                          "workers"?}
                           ("home" required; providers/models embed the model
                           plane, R05-T01).
   --test-mode             Force an isolated synthetic home under the system temp
@@ -123,6 +125,14 @@ Options:
                           peers); a stranger beyond the cap is rejected 503
                           (reason=rate_registry_full) — the registry cannot
                           grow without bound under a peer flood.
+  --http-max-in-flight <N>  Hard cap of concurrently in-flight HTTP requests (default 64; see below).
+  --model-global-permits <N>  Process-wide concurrent MODEL call ceiling
+                          (default 8; supported range 1..=usize::MAX). The
+                          GLOBAL layer of the model quota only; per-agent/
+                          per-session layers keep their defaults. The nested
+                          worker chain (model → tool → worker → host
+                          callback) must stay deadlock-free by construction
+                          even at 1 (T08-C11's adversarial precondition).
   --http-max-in-flight <N>  Hard cap of concurrently in-flight HTTP
                           requests (default 64; supported range
                           1..=usize::MAX/2 — the 2x connection-cap derivation
@@ -340,6 +350,17 @@ async fn main() -> ExitCode {
         http_request_budget_ms: cli
             .http_request_budget_ms
             .unwrap_or(lingxi_service::limits::DEFAULT_HTTP_REQUEST_BUDGET_MS),
+        // R05 RR1 F24 (T08-C11): the explicit global model-permit knob —
+        // `--model-global-permits 1` is the adversarial precondition of the
+        // nested worker chain. Only the GLOBAL quota layer is overridden;
+        // per-agent/per-session layers keep the production defaults.
+        quota_limits: {
+            let mut limits = lingxi_service::quotas::QuotaLimits::default();
+            if let Some(global) = cli.model_global_permits {
+                limits.model.global = global;
+            }
+            limits
+        },
         event_limits: lingxi_service::EventLimits {
             subscriber_queue_capacity: cli
                 .event_subscriber_queue
@@ -413,7 +434,13 @@ async fn main() -> ExitCode {
     // strict --config file only (there is no implicit-cwd workspace).
     if let Some(config_path) = cli.config.as_deref() {
         match lingxi_service::config::read_service_config(config_path) {
-            Ok(file) => deps.workspace_root = file.workspace,
+            Ok(file) => {
+                deps.workspace_root = file.workspace;
+                // R05 RR1 F24: the config-declared single-operation worker
+                // rides the same strict file — the composition root (not the
+                // CLI) owns the loud no-real-chain refusal.
+                deps.worker_tool_registration = file.workers;
+            }
             Err(err) => {
                 eprintln!("error: {err}");
                 return ExitCode::from(2);
@@ -436,16 +463,28 @@ async fn main() -> ExitCode {
             providers = plane.providers.len(),
             "model plane resolved (credentials never logged)"
         );
+        // R05 RR1 F14: the model plane's shared network policy plane —
+        // built from the VALIDATED config section (system mode snapshots
+        // the exported proxy environment here, once per load), consumed by
+        // the chat families, the operations dispatcher, the egress
+        // downloads and the OAuth transport, and re-published by the
+        // management reload surface on every plane reload.
+        let network_plane =
+            std::sync::Arc::new(lingxi_adapters::models::network::NetworkPlane::new(
+                lingxi_adapters::models::network::NetworkPolicy::from_config(&plane.network),
+            ));
+        deps.network_plane = Some(network_plane.clone());
         // R05-T02 (C01): the credential service — the single material exit
         // of the model plane — is seeded from the SAME validated plane and
         // owns the OAuth store inside the private runtime dir. A store that
         // cannot be understood refuses startup (exit 2), never a silent
         // empty store.
         deps.credential_service = Some(std::sync::Arc::new(
-            match lingxi_service::credentials::CredentialService::bootstrap(
+            match lingxi_service::credentials::CredentialService::bootstrap_with_network(
                 &plane,
                 &layout.runtime_dir,
                 std::sync::Arc::new(lingxi_service::inject::SystemClock),
+                Some(network_plane),
             ) {
                 Ok(service) => service,
                 Err(err) => {

@@ -917,11 +917,35 @@ fn roll_up_supplemental_leaf(
                 leaf.r07_share
             )
         } else if leaf.basis_kind == BASIS_STAGE_SHARE_SATISFIED {
+            // R05 RR1 F25 (G01): a stage SHARE is only a legal split when a
+            // LATER stage exists to carry the remainder. A leaf whose R00
+            // execution_stage_ids contain ONLY this stage is EXCLUSIVE to
+            // it: classifying it as a share leaves an unowned remainder
+            // that no later gate will ever check — the six R05-only OAuth
+            // leaves slipped through exactly this hole (suite-green was
+            // copied onto each leaf while deferredToStages=[]). Such a
+            // leaf must be full_original_behavior (its assertions pinned
+            // per-case) or the roll-up FAILS, never passes.
+            let later = later_stages_of(leaf, stage);
+            if later.is_empty() {
+                return LeafRollUp {
+                    status: "FAIL".to_string(),
+                    reason: format!(
+                        "leaf {} is EXCLUSIVE to {stage} (r00ExecutionStageIds={:?}) but is \
+                         classified stage_share_satisfied with deferredToStages=[] — a share \
+                         with no later stage leaves an unowned remainder; pin the leaf's \
+                         original assertions as full_original_behavior instead",
+                        leaf.id, leaf.r00_execution_stage_ids
+                    ),
+                    assertion_results,
+                    deferred_case_results,
+                    early_evidence: None,
+                };
+            }
             format!(
                 "{stage} share satisfied: all share pins held; the remainder stays REQUIRED \
                  and moves with deferredToStages={:?}: {}",
-                later_stages_of(leaf, stage),
-                leaf.later_share
+                later, leaf.later_share
             )
         } else {
             String::new()

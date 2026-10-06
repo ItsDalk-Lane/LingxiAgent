@@ -680,6 +680,7 @@ impl WorkerModelPort for OkModel {
         _worker: &'a str,
         _invocation: &'a str,
         _cb_id: &'a str,
+        _parent_tool_call: &'a lingxi_protocol::ToolCallId,
         _request: &'a lingxi_service::workerrpc::WorkerModelRequest,
     ) -> std::pin::Pin<
         Box<

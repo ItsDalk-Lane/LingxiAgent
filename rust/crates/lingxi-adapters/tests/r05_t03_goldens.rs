@@ -391,7 +391,7 @@ fn host_call_id(seq: u32) -> ToolCallId {
     ToolCallId::new(format!("golden-tc{seq:04}"))
 }
 
-fn build_input(spec: &InputSpec) -> ModelTurnInput {
+fn build_input(spec: &InputSpec, route: &RouteSpec) -> ModelTurnInput {
     let budget = SchemaBudget::default();
     let tools = ToolDeclarationSnapshot {
         catalog_generation: 7,
@@ -444,6 +444,12 @@ fn build_input(spec: &InputSpec) -> ModelTurnInput {
                     call: ModelCallId::new(assistant.call.clone()),
                     content: assistant.content.iter().map(content_block_of).collect(),
                     tool_calls,
+                    // The golden's prior exchange was served by the golden's
+                    // own route (the replay under test targets that route).
+                    origin: Some(lingxi_kernel::model_exchange::TurnOrigin {
+                        provider: route.provider.clone(),
+                        model: route.model.clone(),
+                    }),
                 });
             }
             PriorItem::ToolResult(result) => {
@@ -615,7 +621,7 @@ fn project_parsed(parsed: &ParsedChat) -> serde_json::Value {
                 }))
                 .collect::<Vec<_>>(),
         }),
-        ProviderTurn::Empty { detail } => serde_json::json!({
+        ProviderTurn::Empty { detail, .. } => serde_json::json!({
             "kind": "empty",
             "detail": detail,
         }),
@@ -643,7 +649,7 @@ fn forward_and_roundtrip_goldens_render_and_parse_exactly() {
             continue; // error cases run in the async runner below
         };
         let context = || format!("{}", file.display());
-        let input = build_input(&golden.input);
+        let input = build_input(&golden.input, &golden.route);
         let route = build_route(&golden, "https://golden-endpoint.invalid");
         let sse = golden.wire_mode.as_deref() == Some("sse");
         let rendered = render_for(&golden.family, &input, &route, sse);
@@ -954,7 +960,7 @@ async fn error_goldens_classify_and_transport_exactly() {
             }
         };
         let stub = ErrorStub::start(http_error.status, resolve(&http_error.body)).await;
-        let input = build_input(&golden.input);
+        let input = build_input(&golden.input, &golden.route);
         let route = build_route(&golden, &stub_endpoint_for(&golden.family, &stub.endpoint));
         let result = execute_error_case(&golden, &input, &route, &auth).await;
         match &result.turn {

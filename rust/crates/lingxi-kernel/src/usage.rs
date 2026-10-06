@@ -310,6 +310,47 @@ fn wire_of(usage: &ModelCallUsage) -> (Option<u64>, Option<u64>) {
     (usage.input_tokens, usage.output_tokens)
 }
 
+/// The settlement outcome of the CALL a ledger row accounts (R05 RR1
+/// F21). The usage fact and the call outcome are SEPARATE facts: a call
+/// can fail with a perfectly reported usage object (the provider
+/// answered 500 WITH usage), and a succeeded call can carry an unknown
+/// usage. `Unknown` is the honest state of a row written for a call
+/// whose settlement was never observed (crash-window recovery rows).
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum CallOutcome {
+    Succeeded,
+    Failed,
+    /// The call was cancelled before its settlement was observed. A
+    /// cancellation fence never erases the accounting row of a request
+    /// that may already have left the process.
+    Cancelled,
+    Unknown,
+}
+
+impl CallOutcome {
+    /// Stable ledger vocabulary (the `outcome` column).
+    pub fn wire_name(self) -> &'static str {
+        match self {
+            CallOutcome::Succeeded => "succeeded",
+            CallOutcome::Failed => "failed",
+            CallOutcome::Cancelled => "cancelled",
+            CallOutcome::Unknown => "unknown",
+        }
+    }
+
+    /// Parses the storage vocabulary (unknown values are corruption,
+    /// never a guess).
+    pub fn parse(name: &str) -> Option<Self> {
+        match name {
+            "succeeded" => Some(CallOutcome::Succeeded),
+            "failed" => Some(CallOutcome::Failed),
+            "cancelled" => Some(CallOutcome::Cancelled),
+            "unknown" => Some(CallOutcome::Unknown),
+            _ => None,
+        }
+    }
+}
+
 /// One row of the durable usage ledger (R05-T07): the per-request
 /// correlation of a model call — identity (session/run/attempt/call),
 /// route (provider/model/protocol), purpose, causal parentage (origin +
@@ -339,6 +380,12 @@ pub struct ModelCallUsageRecord {
     /// The precise causal anchor inside the parent: a subagent run's
     /// parent tool call, a worker callback's invocation id.
     pub cause_ref: Option<String>,
+    /// R05 RR1 F21: the REAL host-minted [`ToolCallId`]
+    /// (`lingxi_protocol::ToolCallId`) of the parent tool invocation this
+    /// call rode on — the durable JOIN key from a worker-callback row to
+    /// its parent tool. The parent MODEL call is discoverable through the
+    /// parent row's [`Self::emitted_tool_calls`] on the same run.
+    pub parent_tool_call_id: Option<String>,
     pub provider: String,
     pub model: String,
     pub protocol: String,
@@ -347,11 +394,34 @@ pub struct ModelCallUsageRecord {
     /// A usage object arrived but violated the contract; the detail names
     /// the violation. Mutually exclusive with `usage: Some(_)`.
     pub invalid_detail: Option<String>,
-    /// Physical provider requests this logical call sent (>= 1). A
-    /// credential-refresh retry is a SECOND physical request and is
-    /// counted — a possibly-billable request never vanishes into one row
-    /// (T07-C03).
-    pub transport_attempts: u32,
+    /// Physical provider requests this logical call sent. R05 RR1 F38:
+    /// the column is NULLABLE —
+    /// - `Some(0)` = the call was refused BEFORE anything left the
+    ///   process (R05 RR1 F21: not-sent is never recorded as 1);
+    /// - `Some(n)` n≥1 = n physical requests were observed (a
+    ///   credential-refresh retry is a SECOND physical request and is
+    ///   counted — a possibly-billable request never vanishes into one
+    ///   row, T07-C03);
+    /// - `None` = the attempts count is UNKNOWN — the call's future was
+    ///   dropped before settling (a cancellation fence dropping an
+    ///   in-flight call), so how many physical requests actually left
+    ///   the process cannot be observed. Never `0`, never `1`: both
+    ///   would fabricate a fact the dropper does not have.
+    pub transport_attempts: Option<u32>,
+    /// R05 RR1 F21: the settlement outcome of the call (succeeded /
+    /// failed / cancelled / unknown) — the query/export "status" field.
+    pub outcome: CallOutcome,
+    /// R05 RR1 F21: when the logical call STARTED (host-observed wall
+    /// clock; `None` when the writer could not observe it).
+    pub started_at_unix_ms: Option<u64>,
+    /// R05 RR1 F21: when the call SETTLED into the outcome this row
+    /// records. `None` = not observed (crash-window rows).
+    pub settled_at_unix_ms: Option<u64>,
+    /// R05 RR1 F21: for a parent model call that emitted a tool batch,
+    /// the host-minted tool call ids of that batch — the durable JOIN
+    /// from a child (`parent_tool_call_id`) back to the parent MODEL call
+    /// row of the same run. Empty for calls that emitted no tools.
+    pub emitted_tool_calls: Vec<String>,
     /// Cost basis of the row. `None` = cost unknown — no price source is
     /// configured and NO cost is ever invented (T07-C08). A future priced
     /// basis names its source here; token facts are recorded either way.
@@ -363,12 +433,24 @@ pub struct ModelCallUsageRecord {
 /// owner when set (a query for another principal's session returns
 /// nothing, not filtered content). Session-less plane rows are visible
 /// only to the unscoped internal query.
+///
+/// R05 RR1 F21: the query surface carries the taskbook's
+/// date/category/model filters (`recorded_from/to_unix_ms`,
+/// `purpose`, `model`) alongside session/run/owner scoping.
 #[derive(Debug, Clone, Default, PartialEq, Eq)]
 pub struct ModelUsageQuery {
     /// Owner scoping (`None` = internal diagnostics over all rows).
     pub owner_user_id: Option<String>,
     pub session_id: Option<String>,
     pub run_id: Option<String>,
+    /// Category filter — exact match on the row's `purpose`
+    /// (`chat`, `auxiliary.{slot}`, an operation name, …).
+    pub purpose: Option<String>,
+    /// Model filter — exact match on the row's `model`.
+    pub model: Option<String>,
+    /// Date-window filter (inclusive bounds on `recorded_at_unix_ms`).
+    pub recorded_from_unix_ms: Option<u64>,
+    pub recorded_to_unix_ms: Option<u64>,
 }
 
 #[cfg(test)]

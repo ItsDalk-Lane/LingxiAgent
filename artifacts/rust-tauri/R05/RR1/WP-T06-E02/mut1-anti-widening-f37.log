@@ -1,0 +1,55 @@
+warning: method `open_attachment_nofollow` is never used
+   --> crates/lingxi-service/src/filetools.rs:514:16
+    |
+444 |     impl DirFd {
+    |     ---------- method in this implementation
+...
+514 |         pub fn open_attachment_nofollow(&self, name: &OsStr) -> Option<io::Result<std::fs::File>> {
+    |                ^^^^^^^^^^^^^^^^^^^^^^^^
+    |
+    = note: `#[warn(dead_code)]` (part of `#[warn(unused)]`) on by default
+
+warning: `lingxi-service` (lib) generated 1 warning
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.09s
+     Running tests/r05_t06_rr1_media_resource.rs (/tmp/r05t06-f37-mut-target/debug/deps/r05_t06_rr1_media_resource-a8eec76cae06e894)
+
+running 17 tests
+test rr1_f17_leaf_symlink_to_outside_is_refused_by_real_target ... FAILED
+test rr1_f19_cancel_after_completion_keeps_the_delivered_fact ... ok
+test rr1_f18_f19_dashscope_image_task_still_completes_via_registered_product ... ok
+test rr1_f17_legal_attachment_reads_still_work ... ok
+test rr1_f17_attachment_read_uses_the_authorized_canonical_path ... ok
+test rr1_f18_cross_kind_task_id_is_refused ... ok
+test rr1_f18_old_task_survives_reload_without_retargeting ... ok
+test rr1_f18_video_poll_sends_the_provider_job_id ... ok
+test rr1_f18_duplicate_provider_task_id_is_disambiguated ... ok
+test rr1_f18_legacy_fallback_uses_the_distinct_host_tracker_id ... ok
+test rr1_f17_special_file_is_refused_not_read_unbounded ... ok
+test rr1_f37_parent_dir_swapped_to_outside_symlink_is_refused_by_real_target ... FAILED
+test rr1_f19_concurrent_polls_deliver_once ... ok
+test rr1_f37_parent_dir_swapped_to_inside_symlink_reads_the_real_target ... ok
+test rr1_f17_attachment_size_caps_refuse_loudly ... ok
+test rr1_f19_cancel_during_inflight_poll_fences_download_and_completion ... ok
+test rr1_f19_cancel_during_download_leaves_no_registered_product ... ok
+
+failures:
+
+---- rr1_f17_leaf_symlink_to_outside_is_refused_by_real_target stdout ----
+
+thread 'rr1_f17_leaf_symlink_to_outside_is_refused_by_real_target' (11780170) panicked at crates/lingxi-service/tests/r05_t06_rr1_media_resource.rs:547:10:
+a symlink whose real target is outside every root refuses: Bytes { bytes: [79, 85, 84, 83, 73, 68, 69, 95, 83, 69, 67, 82, 69, 84], mime: "image/png", filename: "secret.png" }
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+
+---- rr1_f37_parent_dir_swapped_to_outside_symlink_is_refused_by_real_target stdout ----
+
+thread 'rr1_f37_parent_dir_swapped_to_outside_symlink_is_refused_by_real_target' (11780184) panicked at crates/lingxi-service/tests/r05_t06_rr1_media_resource.rs:695:10:
+judged by the REAL target outside every authorized root: Bytes { bytes: [79, 85, 84, 83, 73, 68, 69, 95, 82, 69, 68, 73, 82, 69, 67, 84, 95, 83, 69, 67, 82, 69, 84, 95, 80, 78, 71], mime: "image/png", filename: "leak.png" }
+
+
+failures:
+    rr1_f17_leaf_symlink_to_outside_is_refused_by_real_target
+    rr1_f37_parent_dir_swapped_to_outside_symlink_is_refused_by_real_target
+
+test result: FAILED. 15 passed; 2 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.31s
+
+error: test failed, to rerun pass `-p lingxi-service --test r05_t06_rr1_media_resource`

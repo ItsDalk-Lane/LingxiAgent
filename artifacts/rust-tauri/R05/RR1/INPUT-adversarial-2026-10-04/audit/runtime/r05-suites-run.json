@@ -1,0 +1,10 @@
+{
+  "start": "2026-10-04T05:16:06.873940+00:00",
+  "seconds": 210.92326476000017,
+  "command": [
+    "bash",
+    "scripts/rust-tauri/r05_t08_stage_suites.sh",
+    "/workspace/scratch/9b4397d87a13/audit/runtime/r05-suites"
+  ],
+  "exit_code": 1
+}

@@ -1,0 +1,8 @@
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.05s
+     Running unittests src/lib.rs (/workspace/scratch/9b4397d87a13/audit/runtime/target/debug/deps/lingxi_kernel-ef7a646bd63d931c)
+
+running 1 test
+test toolcatalog::tests::same_name_two_sources_never_overwrites_and_name_only_is_ambiguous ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 86 filtered out; finished in 0.00s
+

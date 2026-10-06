@@ -42,11 +42,19 @@ struct StoreFile {
     extra: BTreeMap<String, serde_json::Value>,
 }
 
-/// One provider's persisted OAuth token set; unknown per-provider fields
-/// are preserved verbatim as well.
+/// One provider's persisted row; unknown per-provider fields are preserved
+/// verbatim as well. R05 RR1 F04: `tokens` is OPTIONAL — a logged-out
+/// provider keeps its CUSTOM MODEL REGISTRY (`customModels`) on disk, and
+/// a row may exist with no token material at all. Old (v1) files whose
+/// rows always carry `tokens` load unchanged.
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[serde(rename_all = "camelCase")]
 struct ProviderEntry {
-    tokens: OAuthTokens,
+    #[serde(default)]
+    tokens: Option<OAuthTokens>,
+    /// The provider's custom model registry (R05 RR1 F04, ordered, unique).
+    #[serde(default)]
+    custom_models: Vec<String>,
     #[serde(flatten)]
     extra: BTreeMap<String, serde_json::Value>,
 }
@@ -166,15 +174,15 @@ impl CredentialStore {
         })
     }
 
-    /// The persisted token set of one provider (None = never logged in or
-    /// revoked).
+    /// The persisted token set of one provider (None = never logged in,
+    /// logged out, or revoked).
     pub fn tokens_for(&self, provider: &str) -> Option<OAuthTokens> {
         self.state
             .lock()
             .expect("credential store lock")
             .providers
             .get(provider)
-            .map(|entry| entry.tokens.clone())
+            .and_then(|entry| entry.tokens.clone())
     }
 
     /// Persists a provider's token set (read-modify-write of the full state,
@@ -187,9 +195,10 @@ impl CredentialStore {
         candidate
             .providers
             .entry(provider.to_string())
-            .and_modify(|entry| entry.tokens = tokens.clone())
+            .and_modify(|entry| entry.tokens = Some(tokens.clone()))
             .or_insert_with(|| ProviderEntry {
-                tokens: tokens.clone(),
+                tokens: Some(tokens.clone()),
+                custom_models: Vec::new(),
                 extra: BTreeMap::new(),
             });
         self.persist(&candidate)?;
@@ -198,14 +207,92 @@ impl CredentialStore {
     }
 
     /// Removes a provider's token set (revocation). Same persist-first
-    /// discipline as [`Self::put_tokens`].
+    /// discipline as [`Self::put_tokens`]. R05 RR1 F04: a row that still
+    /// carries a custom model registry (or unknown fields) SURVIVES with
+    /// `tokens: null` — the registry is not credential material; a bare row
+    /// is dropped entirely (the pre-F04 shape).
     pub fn remove_tokens(&self, provider: &str) -> Result<(), String> {
         let mut guard = self.state.lock().expect("credential store lock");
-        if !guard.providers.contains_key(provider) {
+        let Some(entry) = guard.providers.get(provider) else {
             return Ok(());
+        };
+        let mut candidate = guard.clone();
+        if entry.custom_models.is_empty() && entry.extra.is_empty() {
+            candidate.providers.remove(provider);
+        } else {
+            candidate
+                .providers
+                .entry(provider.to_string())
+                .and_modify(|entry| entry.tokens = None);
+        }
+        self.persist(&candidate)?;
+        *guard = candidate;
+        Ok(())
+    }
+
+    /// The provider's custom model registry (R05 RR1 F04) — ordered, unique,
+    /// material-free. An unknown/logged-out provider has an empty registry.
+    pub fn custom_models_for(&self, provider: &str) -> Vec<String> {
+        self.state
+            .lock()
+            .expect("credential store lock")
+            .providers
+            .get(provider)
+            .map(|entry| entry.custom_models.clone())
+            .unwrap_or_default()
+    }
+
+    /// Adds one model id to the provider's custom registry (persist-first;
+    /// a duplicate or the write failure changes nothing and reports). A
+    /// bare row is created for a provider that had none.
+    pub fn add_custom_model(&self, provider: &str, model_id: &str) -> Result<(), String> {
+        let mut guard = self.state.lock().expect("credential store lock");
+        let mut candidate = guard.clone();
+        let entry = candidate
+            .providers
+            .entry(provider.to_string())
+            .or_insert_with(|| ProviderEntry {
+                tokens: None,
+                custom_models: Vec::new(),
+                extra: BTreeMap::new(),
+            });
+        if entry.custom_models.iter().any(|id| id == model_id) {
+            return Err(format!(
+                "model id {model_id:?} is already in the custom registry of provider \
+                 {provider:?}"
+            ));
+        }
+        entry.custom_models.push(model_id.to_string());
+        self.persist(&candidate)?;
+        *guard = candidate;
+        Ok(())
+    }
+
+    /// Removes one model id from the provider's custom registry
+    /// (persist-first; an absent id is a loud no-op-with-error, and a bare
+    /// row disappears again).
+    pub fn remove_custom_model(&self, provider: &str, model_id: &str) -> Result<(), String> {
+        let mut guard = self.state.lock().expect("credential store lock");
+        let Some(entry) = guard.providers.get(provider) else {
+            return Err(format!(
+                "model id {model_id:?} is not in the custom registry of provider {provider:?} \
+                 (the provider has no registry row)"
+            ));
+        };
+        if !entry.custom_models.iter().any(|id| id == model_id) {
+            return Err(format!(
+                "model id {model_id:?} is not in the custom registry of provider {provider:?}"
+            ));
         }
         let mut candidate = guard.clone();
-        candidate.providers.remove(provider);
+        let entry = candidate
+            .providers
+            .get_mut(provider)
+            .expect("presence checked above");
+        entry.custom_models.retain(|id| id != model_id);
+        if entry.tokens.is_none() && entry.custom_models.is_empty() && entry.extra.is_empty() {
+            candidate.providers.remove(provider);
+        }
         self.persist(&candidate)?;
         *guard = candidate;
         Ok(())

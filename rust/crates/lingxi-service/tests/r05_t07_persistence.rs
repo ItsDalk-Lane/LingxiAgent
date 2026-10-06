@@ -50,6 +50,7 @@ fn sample_record(model_call_id: &str, provider: &str) -> ModelCallUsageRecord {
         origin: "user".to_string(),
         parent_run_id: None,
         cause_ref: None,
+        parent_tool_call_id: None,
         provider: provider.to_string(),
         model: "stub-model".to_string(),
         protocol: "openai-completions".to_string(),
@@ -62,7 +63,11 @@ fn sample_record(model_call_id: &str, provider: &str) -> ModelCallUsageRecord {
             provenance: UsageProvenance::Reported,
         }),
         invalid_detail: None,
-        transport_attempts: 1,
+        transport_attempts: Some(1),
+        outcome: lingxi_kernel::usage::CallOutcome::Succeeded,
+        started_at_unix_ms: Some(1_790_409_600_000),
+        settled_at_unix_ms: Some(1_790_409_600_500),
+        emitted_tool_calls: Vec::new(),
         cost_basis: None,
     }
 }
@@ -189,11 +194,112 @@ async fn migration_v4_to_v5_upgrades_an_isolated_copy_and_keeps_old_rows() {
             owner_user_id: Some("user_legacy".to_string()),
             session_id: Some("sess_legacy".to_string()),
             run_id: None,
+            ..ModelUsageQuery::default()
         })
         .await
         .expect("ledger query");
     assert_eq!(rows.len(), 1);
     assert_eq!(rows[0].provider, "legacy-provider");
+
+    db.close().await.expect("close");
+    let _ = std::fs::remove_dir_all(dir);
+}
+
+/// R05 RR1 F38: the v7 migration makes `transport_attempts` NULLABLE by
+/// rebuilding the ledger table. A REAL v6 database (one pre-F38 usage row
+/// carrying an observed count) upgrades in place: every row keeps its
+/// value verbatim, and the post-v7 schema accepts (and round-trips) the
+/// NEW honest state — attempts unknown (NULL) for a call dropped before
+/// settlement.
+#[tokio::test]
+async fn migration_v6_to_v7_makes_attempts_nullable_and_keeps_rows() {
+    let dir = unique_dir("mig-v7");
+    let db_path = dir.join("runs.db");
+    {
+        use lingxi_adapters::storage::migrations::{fingerprint_sql, MIGRATIONS};
+        use rusqlite::Connection;
+        let conn = Connection::open(&db_path).expect("create v6 db");
+        conn.execute_batch(
+            "CREATE TABLE schema_migrations (version INTEGER PRIMARY KEY, name TEXT NOT NULL, \
+             fingerprint TEXT NOT NULL, applied_at_unix_ms INTEGER NOT NULL, \
+             applied_by TEXT NOT NULL);",
+        )
+        .expect("receipts table");
+        let now = 1_790_409_600_000_i64;
+        for migration in MIGRATIONS.iter().take_while(|m| m.version <= 6) {
+            conn.execute(
+                "INSERT INTO schema_migrations (version, name, fingerprint, \
+                 applied_at_unix_ms, applied_by) VALUES (?1, ?2, ?3, ?4, ?5)",
+                rusqlite::params![
+                    migration.version as i64,
+                    migration.name,
+                    fingerprint_sql(migration.sql),
+                    now,
+                    "lingxi-test-seeder"
+                ],
+            )
+            .expect("receipt");
+            conn.execute_batch(migration.sql)
+                .expect("apply v6 migration");
+        }
+        conn.pragma_update(None, "user_version", 6)
+            .expect("user_version 6");
+        // A pre-F38 row: the count was observed (2 = a 401-refresh resend).
+        conn.execute(
+            "INSERT INTO model_call_usage (model_call_id, session_id, run_id, attempt, purpose, \
+             origin, parent_run_id, cause_ref, provider, model, protocol, usage_state, \
+             input_tokens, output_tokens, cache_read_tokens, cache_write_tokens, \
+             reasoning_tokens, missing_fields, estimate_basis, invalid_detail, \
+             transport_attempts, cost_basis, recorded_at_unix_ms, outcome, \
+             started_at_unix_ms, settled_at_unix_ms, parent_tool_call_id, emitted_tool_calls) \
+             VALUES ('run-v6-mc0001', NULL, NULL, NULL, 'chat', 'operation', NULL, NULL, \
+             'legacy-main', 'legacy-model', 'openai-completions', 'reported', 10, 4, NULL, \
+             NULL, NULL, NULL, NULL, NULL, 2, NULL, 1, 'succeeded', 1, 2, NULL, NULL)",
+            [],
+        )
+        .expect("v6 usage row");
+    }
+
+    let db = lingxi_adapters::storage::RunDatabase::open(
+        &db_path,
+        lingxi_adapters::storage::StoreOptions::default(),
+    )
+    .await
+    .expect("v6 db opens and migrates to v7");
+    // The pre-F38 row survived the rebuild verbatim.
+    let rows = db
+        .query_model_call_usage(ModelUsageQuery::default())
+        .await
+        .expect("query after v7");
+    assert_eq!(rows.len(), 1, "the v6 row survived the v7 rebuild");
+    assert_eq!(rows[0].model_call_id, "run-v6-mc0001");
+    assert_eq!(rows[0].transport_attempts, Some(2));
+    assert_eq!(
+        rows[0].outcome,
+        lingxi_kernel::usage::CallOutcome::Succeeded
+    );
+
+    // The post-v7 schema accepts the NEW honest state: attempts unknown
+    // (NULL) — the cancelled-in-flight row shape (F38), round-tripped.
+    let mut unknown_attempts = sample_record("run-v7-cancelled-mc0001", "legacy-main");
+    unknown_attempts.transport_attempts = None;
+    unknown_attempts.outcome = lingxi_kernel::usage::CallOutcome::Cancelled;
+    db.record_model_call_usage(unknown_attempts.clone(), 3)
+        .await
+        .expect("NULL attempts write on the migrated db");
+    let reread = db
+        .query_model_call_usage(ModelUsageQuery::default())
+        .await
+        .expect("reread");
+    let cancelled = reread
+        .iter()
+        .find(|row| row.model_call_id == "run-v7-cancelled-mc0001")
+        .expect("the cancelled row rereads");
+    assert_eq!(cancelled.transport_attempts, None);
+    assert_eq!(
+        cancelled.outcome,
+        lingxi_kernel::usage::CallOutcome::Cancelled
+    );
 
     db.close().await.expect("close");
     let _ = std::fs::remove_dir_all(dir);
@@ -465,7 +571,7 @@ async fn old_ledger_rows_survive_a_model_config_reload() {
                 "auth": {{"kind": "apiKey", "apiKey": "sk-t07p-old"}}
             }}
         }},
-        "models": {{"chat": {{"provider": "old-main", "model": "old-model"}}}}"#,
+        "models": {{"chat": {{"provider": "old-main", "model": "old-model", "capabilities": {{"tools": true}}}}}}"#,
         endpoint = serde_json::to_string(&stub.endpoint()).expect("json"),
     );
     let boot = boot_with_plane("reload-old", &plane_old).await;
@@ -477,6 +583,7 @@ async fn old_ledger_rows_survive_a_model_config_reload() {
             owner_user_id: Some(lingxi_service::LOCAL_OWNER_USER_ID.to_string()),
             session_id: Some("sess_local_alpha".to_string()),
             run_id: None,
+            ..ModelUsageQuery::default()
         })
         .await
         .expect("old rows");
@@ -496,7 +603,7 @@ async fn old_ledger_rows_survive_a_model_config_reload() {
                 "auth": {{"kind": "apiKey", "apiKey": "sk-t07p-new"}}
             }}
         }},
-        "models": {{"chat": {{"provider": "new-main", "model": "new-model"}}}}"#,
+        "models": {{"chat": {{"provider": "new-main", "model": "new-model", "capabilities": {{"tools": true}}}}}}"#,
         endpoint = serde_json::to_string(&stub.endpoint()).expect("json"),
     );
     let home = boot.home.clone();
@@ -519,6 +626,7 @@ async fn old_ledger_rows_survive_a_model_config_reload() {
             owner_user_id: Some(lingxi_service::LOCAL_OWNER_USER_ID.to_string()),
             session_id: Some("sess_local_alpha".to_string()),
             run_id: None,
+            ..ModelUsageQuery::default()
         })
         .await
         .expect("rows after reload");
@@ -535,6 +643,7 @@ async fn old_ledger_rows_survive_a_model_config_reload() {
             owner_user_id: Some(lingxi_service::LOCAL_OWNER_USER_ID.to_string()),
             session_id: Some("sess_local_alpha".to_string()),
             run_id: None,
+            ..ModelUsageQuery::default()
         })
         .await
         .expect("all rows");

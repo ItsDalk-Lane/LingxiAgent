@@ -2,21 +2,21 @@
   "schemaVersion": 1,
   "artifactKind": "R05_HANDOFF",
   "stage_id": "R05",
-  "generated_by": "EXECUTOR-R05-T08",
-  "generated_at": "2026-10-04",
+  "generated_by": "R05-T08-执行者（RR1 WP-T08）",
+  "generated_at": "2026-10-06",
   "baseline": {
     "branch": "codex/rust-tauri-migration",
-    "head_sha": "c549ff654508ab951e2cf39cf9d309fc9c6b8656",
-    "delivery_shape": "R05-T01..T08 全部为未提交工作树改动（no_commit_push_authorization=true）；终树按文件 sha256 清单绑定（artifacts/rust-tauri/R05/T08-E01/working-tree-manifest.txt）",
-    "gate_result_ref": "artifacts/rust-tauri/R05/T08-E01/verify-R05/verify-stage-result.json",
-    "stage_status_ref": "docs/rust-tauri/R05/R05_REPORT.md（offline_gate / independent_review / live_verification / stage_readiness）"
+    "head_sha": "d80737b6cb9186c8a18c0f35923aac00249d45c3",
+    "delivery_shape": "RR1 修复（F01–F39，含 T01–T07 各工作包与 T08 本包）全部为 HEAD 之上的未提交工作树改动；无 commit/push 授权，收口单独汇总提交状态",
+    "gate_result_ref": "RR1 候选的阶段 verify-stage R05 待跑（收口执行后回填 artifacts/rust-tauri/R05/RR1/FINAL-*/verify-R05/）；首轮 PASS（FINAL-WFR2-1）因生产源码与 gate 变化按 N16 过期，不继承",
+    "stage_status_ref": "docs/rust-tauri/R05/R05_REPORT.md §1（RR1 真值：offline_gate PENDING 最终复跑 / independent_review PENDING / live BLOCKED_NOT_AUTHORIZED）"
   },
   "interfaces": {
     "model_plane": {
-      "config": "rust/crates/lingxi-service/src/config.rs 的 ServiceConfig（providers/models 闭合键集，--config JSON 或 management reload 面）",
+      "config": "rust/crates/lingxi-service/src/config.rs 的 ServiceConfig（闭合键集 home/workspace/providers/models/workers——workers 为 RR1 F24 的单条受控 worker 声明；CLI 另有 --model-global-permits）",
       "gateway": "lingxi-adapters models::gateway（ConfigModelGateway：pin-pair 路由、能力矩阵、reload 代次）",
       "exchange_contract": "lingxi-kernel model_exchange（ModelTurnInput/ExchangeItem/ToolDeclarationSnapshot/RequestedToolCall：工具声明快照、宿主 ToolCallId、provider 关联、opaque 状态、截止时间）",
-      "provider": "lingxi-adapters models::provider::GatewayedProvider（bootstrap 正式接线：lib.rs wired_real_model_chain——文件工具+审批+统一网关+凭证服务）"
+      "provider": "lingxi-adapters models::provider::GatewayedProvider（bootstrap 正式接线：lib.rs wired_real_model_chain——四工具（read/write/edit/exec_command+write_stdin）+受控 worker+审批+统一网关+凭证服务；RR1 F24）"
     },
     "credentials": {
       "service": "lingxi-service credentials（CredentialService：per-provider 刷新协调/撤销栅栏/持久化/代次；ProviderCredentialPort 唯一出口）",
@@ -24,13 +24,16 @@
       "storage": "credentials store（原子写、版本冲突、未知字段保真；隔离于 home 的 runtime 目录）"
     },
     "protocol_families": [
-      "openai-completions", "openai-responses", "openai-codex-responses",
-      "anthropic-messages", "google-generative-ai"
+      "openai-completions",
+      "openai-responses",
+      "openai-codex-responses",
+      "anthropic-messages",
+      "google-generative-ai"
     ],
     "streaming": "lingxi-adapters models::streaming（SSE 帧解析）+ accumulators（五族流式累积）+ lingxi-service streaming_norm（规范化事件桥：MOOD/思考块、签名隔离）",
-    "network_policy": "models::dispatch（分阶段超时/重试分类/429-5xx/幂等边界）+ models::egress（URL/内网字面量/同源边界）+ models::compat（incumbent 兼容层）",
+    "network_policy": "models::network（NetworkPlane：RR1 F14 的 system/manual/direct、NO_PROXY+环回 bypass、显式 trusted CA，reload 代次发布）+ models::dispatch（分阶段超时/重试分类/429-5xx/幂等边界、错误 body 有界）+ models::egress（解析候选钉住的 URL/内网边界）+ models::compat（incumbent 兼容层）",
     "worker_and_operations": "lingxi-service workermodel（GatewayWorkerModel：同一 QuotaManager 配额、callback trace 台账先记账后回话）+ operations.rs（operation 面：embedding/speech/transcribe/media/rerank 的统一 dispatch 与 usage sink）",
-    "usage_ledger": "lingxi-kernel usage（UsageFolder/ReportedUsage 四态）+ adapters models::usage（USAGE_MAPPINGS 公式表）+ storage migration v5（model_call_usage 表）+ runs/workermodel/operations 的记账接线（先提交后发布）"
+    "usage_ledger": "lingxi-kernel usage（UsageFolder/ReportedUsage 四态）+ adapters models::usage（USAGE_MAPPINGS 公式表，RR1 F23 统一 output 口径）+ storage migration v5→v7（model_call_usage 表、parent_tool_call_id JOIN 键、transport_attempts nullable）+ runs/workermodel/operations 的记账接线（先提交后发布；取消/abandoned 臂均落行）"
   },
   "consumer_guidance_r06": {
     "ready_to_consume": [
@@ -53,12 +56,6 @@
       "ref": "docs/rust-tauri/R05/R05_LIVE_VERIFICATION.json"
     },
     {
-      "id": "R05-T05-C12-CAPABILITY-GAP",
-      "what": "代理配置处理与私有 CA 通道（NODE_EXTRA_CA_CERTS 等价物）",
-      "due": "后续网络加固阶段（REV-T05 复核的显式延期）",
-      "ref": "docs/rust-tauri/R05/R05_BLOCKERS.md §3"
-    },
-    {
       "id": "PLATFORM-WINDOWS-LINUX",
       "what": "Windows 进程/沙盒实现与 Linux 真机验证（继承 R04 起）",
       "due": "具备平台窗口时（不在 R05 清零）",
@@ -66,13 +63,18 @@
     }
   ],
   "stage_gate_registration": {
-    "map": "rust/crates/xtask/src/stage_maps/R05.json（18 场景：16 A-ID + SUP-R04REG + SUP-SCOPE；7 命令含 r04_regression_gate 前序整链）",
-    "producer": "scripts/rust-tauri/r05_t08_stage_suites.sh + docs/rust-tauri/R05/r05_stage_pins.tsv（82 钉）/ r05_stage_cids.tsv（159 行、91 C-ID）",
-    "runner_binding": "xtask main.rs STAGE_MAPS + runner_identity.rs EMBEDDED/SOURCE_INVENTORY（R05.json 双处注册——负向 N16 抓到并修正的缺口）",
-    "negative_gate": "scripts/rust-tauri/r05_t08_negative_gate.sh（16 项；报告 docs/rust-tauri/R05/R05_NEGATIVE_GATE_REPORT.md）"
+    "map": "rust/crates/xtask/src/stage_maps/R05.json（18 场景：16 A-ID + SUP-R04REG + SUP-SCOPE；7 命令含 r04_regression_gate 前序整链；RR1 F25 后 130 叶=6 full_original_behavior+124 stage_share）",
+    "producer": "scripts/rust-tauri/r05_t08_stage_suites.sh + 三 TSV：r05_stage_pins.tsv（RR1 后 27 套件+64 lib 钉）/ r05_stage_cids.tsv（93 C-ID 逐测试唯一归属）/ r05_required_cids.tsv（RR1 F26 权威登记册 103=100+3，assembler 预跑+xtask 镜像双处精确集合校验）+ r05_leaf_case_map.tsv（137 案例行，13 条测试级）",
+    "runner_binding": "xtask main.rs STAGE_MAPS + runner_identity.rs EMBEDDED/SOURCE_INVENTORY（R05.json 双处注册）",
+    "negative_gate": "scripts/rust-tauri/r05_t08_negative_gate.sh（16 项原负测不降格）+ RR1 新增变异（F25/F26/F27：见 R05_NEGATIVE_GATE_REPORT.md RR1 节）"
   },
   "review_status": {
-    "independent_review": "PENDING（R05_INDEPENDENT_REVIEW.md 由未参与实现的独立审查者按附录D执行；T01–T07 各任务已过独立审查闭环，见 artifacts/rust-tauri/R05/REVIEW-T01..T07/）",
-    "stage_review": "待独立审查后由总控收口"
+    "independent_review": "PENDING（RR1 阶段终审未开始；T01–T07 已逐任务独立验收 PASS（含各 R2/R3 轮），T08 F24–F27 已 IMPLEMENTED 待独立验收——见 docs/rust-tauri/R05/repair-current/RR1_ISSUE_MATRIX.json）",
+    "stage_review": "待阶段门禁+独立终审后由总控收口（ORCHESTRATOR_PROGRESS 回填同时进行）"
+  },
+  "rr1_repair_round": {
+    "adversarial_audit": "artifacts/rust-tauri/R05/RR1/INPUT-adversarial-2026-10-04（F01–F28 问题矩阵冻结被审 HEAD d80737b6）",
+    "issue_matrix": "docs/rust-tauri/R05/repair-current/RR1_ISSUE_MATRIX.json（F01–F39 状态以矩阵为准）",
+    "evidence_root": "artifacts/rust-tauri/R05/RR1/WP-T01..T08-*（各工作包旧红/修复/审查证据）"
   }
 }

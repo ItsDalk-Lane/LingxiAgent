@@ -1,0 +1,32 @@
+01-old-red-service-rr1.log — 旧行为反例（修复前）捕获摘录
+==========================================================
+
+命令（本会话真实执行，rustup 1.98.1 代理；执行于修复实现之前）：
+  cargo test --manifest-path rust/Cargo.toml --locked -p lingxi-service --test r05_t04_streaming rr1_
+
+结果回显（尾部摘录；完整 stdout 未逐字节落盘，以本文件与 README 说明为准）：
+
+failures:
+    rr1_f11_identical_resend_executes_once
+    rr1_f11_legal_then_schema_invalid_batch_has_zero_side_effects
+    rr1_f11_same_provider_id_conflict_is_loud_with_zero_side_effects
+    rr1_f12_mood_only_text_settles_process_only_without_final
+    rr1_f12_reasoning_only_turn_settles_process_only_without_final
+    rr1_f12_unclassified_live_text_is_not_marked_final_pre_terminal
+    rr1_f12_unclassified_live_text_stays_unresolved_until_the_terminal
+    rr1_f13_final_message_projection_is_normalized_same_source
+
+test result: FAILED. 1 passed; 8 failed; 0 ignored; 0 measured; 9 filtered out; finished in 1.92s
+
+（通过的一项 = rr1_f11_distinct_ids_with_equal_arguments_both_execute，正常对照。）
+
+关键 panic 事实（节选自回显）：
+- rr1_f11_legal_then_schema_invalid_batch_has_zero_side_effects：
+  panic "the legal sibling must not execute before the batch passes admission"——
+  output.txt 已被写入（CL-03 反例 A 在当前候选复现）。
+- rr1_f11_same_provider_id_conflict_is_loud_with_zero_side_effects：
+  panic "!boot.workspace.join(\"a.txt\").exists()" 失败——a.txt 已创建（CL-03 反例 B 复现）。
+- rr1_f11_identical_resend_executes_once：tool_call_started 计数 2 ≠ 1（重复执行）。
+- rr1_f12_reasoning_only / mood_only：run 终态为 completed.with_final（假 final）。
+- rr1_f12_unclassified_live_text_*：live 文本即标 FinalAnswer / 事前未标 Unresolved。
+- rr1_f13_final_message_projection：DB final 行包含 <mood>/<think> 原文（CL-02 反例 A 复现）。

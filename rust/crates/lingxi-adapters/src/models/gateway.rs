@@ -16,7 +16,7 @@ use lingxi_kernel::model_exchange::{
     ModelRouteRequest, ProtocolFamily, ResolvedModelRoute,
 };
 
-use super::config::{AuthConfig, ModelPlaneConfig};
+use super::config::{AuthConfig, ModelPlaneConfig, RouteCapabilities, RouteCompatHints};
 
 /// The pre-parsed provider entry of one snapshot (protocol already in the
 /// contract vocabulary; the endpoint already validated).
@@ -93,6 +93,19 @@ impl ConfigModelGateway {
         generation
     }
 
+    /// The generation the NEXT [`Self::reload`] will install (R05 RR1
+    /// F02). Callers that must stamp side tables with the generation a
+    /// reload is ABOUT to publish (the credential service's re-seed
+    /// happens BEFORE the gateway swap, closing both halves of the
+    /// reload window) read this first; `reload` then installs exactly it.
+    pub fn upcoming_generation(&self) -> u64 {
+        self.current
+            .read()
+            .expect("gateway snapshot lock")
+            .generation
+            + 1
+    }
+
     /// The provider entries of the current snapshot (diagnostics/management
     /// surfaces; auth materials are NOT exposed through it).
     ///
@@ -131,6 +144,13 @@ impl ConfigModelGateway {
     /// model NO configured binding names carries no declared hints →
     /// `None` (the compat layer then derives by provider/endpoint/api
     /// only).
+    ///
+    /// R05 RR1 F02: production DISPATCH does NOT use this method — it
+    /// reads the CURRENT snapshot and could mix generations with a route
+    /// resolved a moment earlier. Dispatch resolves through
+    /// [`Self::resolve_dispatch`], which freezes route + compat +
+    /// capabilities under one snapshot read. This accessor remains for
+    /// diagnostics/management surfaces only.
     pub fn compat_hints(
         &self,
         provider: &str,
@@ -167,111 +187,7 @@ impl ModelGatewayPort for ConfigModelGateway {
         request: &ModelRouteRequest,
     ) -> Result<ResolvedModelRoute, ModelGatewayError> {
         let snapshot = self.current.read().expect("gateway snapshot lock");
-        // Every operation resolves its OWN binding (chat, the six
-        // auxiliary slots, and the six T06 operation bindings share one
-        // independent-resolution surface); an operation without a binding
-        // is the explicit unconfigured state — never a silent fallback
-        // onto the chat route (C06/C07).
-        let configured: Option<&super::config::RouteBinding> =
-            snapshot.models.binding_for_operation(request.operation);
-        // The pin pair rule (C04): provider+model are ONE identity unit.
-        let binding = match (&request.provider, &request.model) {
-            (Some(provider), Some(model)) => {
-                if !snapshot.providers.contains_key(provider) {
-                    return Err(ModelGatewayError::UnknownProvider {
-                        provider: provider.clone(),
-                    });
-                }
-                super::config::RouteBinding {
-                    provider: provider.clone(),
-                    model: model.clone(),
-                    // An explicit pair pin onto an unconfigured model carries
-                    // no declared hints (derivation only — see compat_hints)
-                    // and no binding-scoped group id.
-                    compat: None,
-                    group_id: None,
-                }
-            }
-            (Some(provider), None) => match configured {
-                Some(binding) if &binding.provider == provider => binding.clone(),
-                _ => {
-                    return Err(ModelGatewayError::RouteNotConfigured {
-                        operation: format!(
-                            "{} (pinned provider {provider:?} holds no configured route for it)",
-                            request.operation.describe()
-                        ),
-                    });
-                }
-            },
-            (None, Some(model)) => {
-                return Err(ModelGatewayError::ModelPinRequiresProvider {
-                    model: model.clone(),
-                });
-            }
-            (None, None) => match configured {
-                Some(binding) => binding.clone(),
-                None => {
-                    return Err(ModelGatewayError::RouteNotConfigured {
-                        operation: request.operation.describe(),
-                    });
-                }
-            },
-        };
-        let Some(entry) = snapshot.providers.get(&binding.provider) else {
-            return Err(ModelGatewayError::UnknownProvider {
-                provider: binding.provider.clone(),
-            });
-        };
-        // The family↔operation servable matrix (a contract fact): the
-        // resolved provider's family must serve the requested operation
-        // class. Load-time validation already refuses such a binding; a
-        // pinned pair (provider+model) bypasses the binding table, so the
-        // matrix is re-enforced HERE at resolution — never a silent
-        // re-route onto another family's wire shape.
-        if !entry.protocol.serves(request.operation.operation_class()) {
-            return Err(ModelGatewayError::OperationUnsupportedByProvider {
-                operation: request.operation.describe(),
-                provider: binding.provider.clone(),
-                protocol: entry.protocol.config_name(),
-            });
-        }
-        let auth_kind = match &entry.auth {
-            AuthConfig::ApiKey { api_key } => {
-                if api_key.is_empty() {
-                    return Err(ModelGatewayError::MissingCredential {
-                        provider: binding.provider.clone(),
-                    });
-                }
-                CredentialAuthKind::ApiKey
-            }
-            AuthConfig::AuthHeader { value, .. } => {
-                if value.is_empty() {
-                    return Err(ModelGatewayError::MissingCredential {
-                        provider: binding.provider.clone(),
-                    });
-                }
-                CredentialAuthKind::AuthHeader
-            }
-            // OAuth material never lives in the config; the route names the
-            // kind and the credential service owns the token set.
-            AuthConfig::OAuth(_) => CredentialAuthKind::OAuth,
-            AuthConfig::None => CredentialAuthKind::None,
-        };
-        Ok(ResolvedModelRoute {
-            provider: binding.provider.clone(),
-            model: binding.model,
-            operation: request.operation,
-            protocol: entry.protocol,
-            endpoint: entry.endpoint.clone(),
-            credential: CredentialReference {
-                // The reference's provider id is the RESOLVED route's
-                // provider — the identity the material belongs to.
-                provider: binding.provider,
-                auth: auth_kind,
-            },
-            config_generation: snapshot.generation,
-            group_id: binding.group_id,
-        })
+        Ok(resolve_in_snapshot(&snapshot, request)?.0)
     }
 
     fn config_generation(&self) -> u64 {
@@ -280,6 +196,169 @@ impl ModelGatewayPort for ConfigModelGateway {
             .expect("gateway snapshot lock")
             .generation
     }
+}
+
+/// Everything ONE dispatch needs, resolved against a SINGLE configuration
+/// snapshot (R05 RR1 F02): the kernel route, the declared compat hints and
+/// the declared per-model capabilities all carry the SAME
+/// `config_generation` — a reload between resolution and dispatch can
+/// never mix compat or capabilities across generations the way the old
+/// resolve-then-`compat_hints` (current-snapshot) read could.
+#[derive(Debug, Clone)]
+pub struct ResolvedDispatch {
+    pub route: ResolvedModelRoute,
+    /// The binding's declared compat hints at the route's generation
+    /// (`None` = the absent-hints derivation state).
+    pub compat: Option<RouteCompatHints>,
+    /// The binding's declared capabilities at the route's generation
+    /// (all-`None` = the undeclared state).
+    pub capabilities: RouteCapabilities,
+}
+
+impl ConfigModelGateway {
+    /// The production dispatch resolution (R05 RR1 F01/F02): route +
+    /// compat + capabilities from ONE atomic snapshot read. The provider's
+    /// pre-send capability check and the compat layer both consume THIS
+    /// bundle — never a second lookup against the current snapshot.
+    pub fn resolve_dispatch(
+        &self,
+        request: &ModelRouteRequest,
+    ) -> Result<ResolvedDispatch, ModelGatewayError> {
+        let snapshot = self.current.read().expect("gateway snapshot lock");
+        let (route, compat, capabilities) = resolve_in_snapshot(&snapshot, request)?;
+        Ok(ResolvedDispatch {
+            route,
+            compat,
+            capabilities,
+        })
+    }
+}
+
+/// The shared resolution body: runs under ONE snapshot read and returns
+/// the route plus the binding-scoped metadata of the SAME generation.
+fn resolve_in_snapshot(
+    snapshot: &GatewaySnapshot,
+    request: &ModelRouteRequest,
+) -> Result<
+    (
+        ResolvedModelRoute,
+        Option<RouteCompatHints>,
+        RouteCapabilities,
+    ),
+    ModelGatewayError,
+> {
+    // Every operation resolves its OWN binding (chat, the six auxiliary
+    // slots, and the six T06 operation bindings share one
+    // independent-resolution surface); an operation without a binding
+    // is the explicit unconfigured state — never a silent fallback
+    // onto the chat route (C06/C07).
+    let configured: Option<&super::config::RouteBinding> =
+        snapshot.models.binding_for_operation(request.operation);
+    // The pin pair rule (C04): provider+model are ONE identity unit.
+    let binding = match (&request.provider, &request.model) {
+        (Some(provider), Some(model)) => {
+            if !snapshot.providers.contains_key(provider) {
+                return Err(ModelGatewayError::UnknownProvider {
+                    provider: provider.clone(),
+                });
+            }
+            super::config::RouteBinding {
+                provider: provider.clone(),
+                model: model.clone(),
+                // An explicit pair pin onto an unconfigured model carries
+                // no declared hints or capabilities (derivation-only
+                // compat; the undeclared capability state — R05 RR1 F01)
+                // and no binding-scoped group id.
+                compat: None,
+                group_id: None,
+                capabilities: None,
+            }
+        }
+        (Some(provider), None) => match configured {
+            Some(binding) if &binding.provider == provider => binding.clone(),
+            _ => {
+                return Err(ModelGatewayError::RouteNotConfigured {
+                    operation: format!(
+                        "{} (pinned provider {provider:?} holds no configured route for it)",
+                        request.operation.describe()
+                    ),
+                });
+            }
+        },
+        (None, Some(model)) => {
+            return Err(ModelGatewayError::ModelPinRequiresProvider {
+                model: model.clone(),
+            });
+        }
+        (None, None) => match configured {
+            Some(binding) => binding.clone(),
+            None => {
+                return Err(ModelGatewayError::RouteNotConfigured {
+                    operation: request.operation.describe(),
+                });
+            }
+        },
+    };
+    let Some(entry) = snapshot.providers.get(&binding.provider) else {
+        return Err(ModelGatewayError::UnknownProvider {
+            provider: binding.provider.clone(),
+        });
+    };
+    // The family↔operation servable matrix (a contract fact): the
+    // resolved provider's family must serve the requested operation
+    // class. Load-time validation already refuses such a binding; a
+    // pinned pair (provider+model) bypasses the binding table, so the
+    // matrix is re-enforced HERE at resolution — never a silent
+    // re-route onto another family's wire shape.
+    if !entry.protocol.serves(request.operation.operation_class()) {
+        return Err(ModelGatewayError::OperationUnsupportedByProvider {
+            operation: request.operation.describe(),
+            provider: binding.provider.clone(),
+            protocol: entry.protocol.config_name(),
+        });
+    }
+    let auth_kind = match &entry.auth {
+        AuthConfig::ApiKey { api_key } => {
+            if api_key.is_empty() {
+                return Err(ModelGatewayError::MissingCredential {
+                    provider: binding.provider.clone(),
+                });
+            }
+            CredentialAuthKind::ApiKey
+        }
+        AuthConfig::AuthHeader { value, .. } => {
+            if value.is_empty() {
+                return Err(ModelGatewayError::MissingCredential {
+                    provider: binding.provider.clone(),
+                });
+            }
+            CredentialAuthKind::AuthHeader
+        }
+        // OAuth material never lives in the config; the route names the
+        // kind and the credential service owns the token set.
+        AuthConfig::OAuth(_) => CredentialAuthKind::OAuth,
+        AuthConfig::None => CredentialAuthKind::None,
+    };
+    let route = ResolvedModelRoute {
+        provider: binding.provider.clone(),
+        model: binding.model,
+        operation: request.operation,
+        protocol: entry.protocol,
+        endpoint: entry.endpoint.clone(),
+        credential: CredentialReference {
+            // The reference's provider id is the RESOLVED route's
+            // provider — the identity the material belongs to.
+            provider: binding.provider,
+            auth: auth_kind,
+        },
+        config_generation: snapshot.generation,
+        group_id: binding.group_id,
+    };
+    Ok((
+        route,
+        binding.compat.clone(),
+        binding.capabilities.clone().unwrap_or_default(),
+    ))
 }
 
 #[cfg(test)]

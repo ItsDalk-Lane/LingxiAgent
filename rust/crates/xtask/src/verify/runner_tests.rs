@@ -845,6 +845,68 @@ fn supplemental_leaf_rollup_keeps_partial_evidence_out_of_overall_pass() {
 }
 
 #[test]
+fn exclusive_leaf_classified_as_share_fails_with_unowned_remainder() {
+    // R05 RR1 F25 (G01): a stage_share_satisfied leaf whose R00 stages name
+    // ONLY the current stage leaves an unowned remainder — the six R05-only
+    // OAuth leaves slipped through exactly this hole. The roll-up must
+    // FAIL, never pass, regardless of how green the cases are.
+    let root = temp_root("exclusive-share");
+    let evidence = root.join("evidence");
+    std::fs::create_dir_all(&evidence).expect("create evidence root");
+    std::fs::write(
+        evidence.join("leaf-cases.json"),
+        r#"{"schema":"lingxi.leaf-case-results.v1","cases":[{"case":"share-pin","expect":1,"actual":1,"ok":true}]}"#,
+    )
+    .expect("write case evidence");
+    let mut item = leaf(
+        "R00-T02-LA-TESTXCLUSIVE000",
+        crate::stage_map::BASIS_STAGE_SHARE_SATISFIED,
+        &["good"],
+        &[],
+        contract("good", "{EVIDENCE}/leaf-cases.json", &[("share-pin", 1)]),
+    );
+    // EXCLUSIVE to the current stage: no later stage exists.
+    item.r00_execution_stage_ids = vec!["RX".into()];
+    let outcomes = vec![crate::verify::CommandOutcome {
+        key: "good".into(),
+        exit_code: Some(0),
+        timed_out: false,
+        internal_error: None,
+        evidence_missing: Vec::new(),
+        evidence_preexisting: Vec::new(),
+        cleanup: None,
+    }];
+    let roll = super::roll_up_supplemental_leaf(&item, "RX", &outcomes, &root, &evidence);
+    assert_eq!(roll.status, "FAIL", "an exclusive share must not pass");
+    assert!(
+        roll.reason.contains("EXCLUSIVE") && roll.reason.contains("unowned remainder"),
+        "the failure names the unowned-remainder cause: {}",
+        roll.reason
+    );
+    // The MIRROR image: the same exclusive leaf classified as FULL with
+    // per-assertion coverage still passes (the fix, not a blanket veto).
+    let mut full = leaf(
+        "R00-T02-LA-TESTXCLUSIVE001",
+        crate::stage_map::BASIS_FULL_ORIGINAL_BEHAVIOR,
+        &["good"],
+        &[],
+        contract("good", "{EVIDENCE}/leaf-cases.json", &[("own-a", 1)]),
+    );
+    full.r00_execution_stage_ids = vec!["RX".into()];
+    full.original_assertion_cases = vec![vec!["own-a".to_string()]];
+    // one original assertion must be covered 1:1
+    full.r00_assertions = vec!["the original assertion".to_string()];
+    std::fs::write(
+        evidence.join("leaf-cases.json"),
+        r#"{"schema":"lingxi.leaf-case-results.v1","cases":[{"case":"own-a","expect":1,"actual":1,"ok":true}]}"#,
+    )
+    .expect("rewrite case evidence");
+    let roll = super::roll_up_supplemental_leaf(&full, "RX", &outcomes, &root, &evidence);
+    assert_eq!(roll.status, "PASS", "{}", roll.reason);
+    std::fs::remove_dir_all(&root).ok();
+}
+
+#[test]
 fn single_stage_leaf_with_matching_case_can_still_pass() {
     // 跨阶段原叶必须阻断；只归属当前阶段且有对应案例的叶仍可通过。
     let root = temp_root("single-stage-leaf");

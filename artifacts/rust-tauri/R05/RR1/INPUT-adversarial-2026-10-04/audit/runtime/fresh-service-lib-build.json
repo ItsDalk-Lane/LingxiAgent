@@ -1,0 +1,40 @@
+{
+  "command": [
+    "cargo",
+    "test",
+    "--manifest-path",
+    "rust/Cargo.toml",
+    "--locked",
+    "--offline",
+    "-p",
+    "lingxi-service",
+    "--lib",
+    "--no-run"
+  ],
+  "start": "2026-10-04T05:22:05.115501+00:00",
+  "target": "/workspace/scratch/9b4397d87a13/audit/runtime/target-fresh-lib",
+  "seconds": 99.32070556300005,
+  "exit_code": 0,
+  "last_lines": [
+    "   Compiling matchers v0.2.0",
+    "   Compiling axum-core v0.5.6",
+    "   Compiling pem v4.0.0",
+    "   Compiling tokio-stream v0.1.19",
+    "   Compiling tracing-log v0.2.0",
+    "   Compiling serde_path_to_error v0.1.20",
+    "   Compiling thread_local v1.1.10",
+    "   Compiling matchit v0.8.4",
+    "   Compiling nu-ansi-term v0.50.3",
+    "   Compiling pastey v0.2.3",
+    "   Compiling tracing-subscriber v0.3.23",
+    "   Compiling axum v0.8.9",
+    "   Compiling rcgen v0.14.10",
+    "   Compiling scrypt v0.12.0",
+    "   Compiling lingxi-adapters v0.0.0 (/workspace/scratch/9b4397d87a13/LingxiAgent/rust/crates/lingxi-adapters)",
+    "   Compiling if-addrs v0.15.0",
+    "   Compiling qrcodegen v1.8.0",
+    "   Compiling lingxi-service v0.0.0 (/workspace/scratch/9b4397d87a13/LingxiAgent/rust/crates/lingxi-service)",
+    "    Finished `test` profile [unoptimized + debuginfo] target(s) in 1m 39s",
+    "  Executable unittests src/lib.rs (/workspace/scratch/9b4397d87a13/audit/runtime/target-fresh-lib/debug/deps/lingxi_service-d3e945d261dafa5b)"
+  ]
+}

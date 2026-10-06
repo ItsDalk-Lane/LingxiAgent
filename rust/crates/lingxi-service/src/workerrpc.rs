@@ -221,6 +221,12 @@ impl WorkerModelRefusal {
 /// call identity), never a `run_id/worker` string (C07). The port's own
 /// network budget is clamped to `request.deadline_unix_ms` (host-computed,
 /// never worker-supplied).
+///
+/// R05 RR1 F21: `parent_tool_call` is the REAL host-minted
+/// [`lingxi_protocol::ToolCallId`] of the worker tool invocation the
+/// callback rides on — passed through the RPC executor (never minted,
+/// never discarded) so the callback's usage row can carry the durable
+/// parent-tool JOIN key.
 pub trait WorkerModelPort: Send + Sync {
     fn complete<'a>(
         &'a self,
@@ -228,6 +234,7 @@ pub trait WorkerModelPort: Send + Sync {
         worker: &'a str,
         invocation: &'a str,
         cb_id: &'a str,
+        parent_tool_call: &'a lingxi_protocol::ToolCallId,
         request: &'a WorkerModelRequest,
     ) -> Pin<
         Box<
@@ -246,6 +253,48 @@ pub trait WorkerModelPort: Send + Sync {
     /// cancellation — the executor holds an RAII guard so a dropped
     /// execute-future reclaims too). Default no-op.
     fn end_invocation(&self, _invocation: &str) {}
+
+    /// R05 RR1 F38: records the accounting row of one ABANDONED callback —
+    /// a `complete()` future dropped before settling (invocation deadline
+    /// expiry mid-callback, or the run's cancellation dropping the whole
+    /// execute future). The accounting authority stays with the port that
+    /// owns `complete` (the production [`crate::workermodel::GatewayWorkerModel`]
+    /// writes the usage-ledger row through its trace port: outcome
+    /// `cancelled`, usage unknown, attempts unknown, identity honestly
+    /// `unreported`). Failures are logged, never propagated — this is the
+    /// last-write accounting of a future that is already gone, not a
+    /// control-flow fact. Default no-op: ports without a ledger.
+    fn abandoned(
+        &self,
+        _fact: AbandonedWorkerCallback,
+    ) -> Pin<Box<dyn std::future::Future<Output = ()> + Send>> {
+        Box::pin(async {})
+    }
+}
+
+/// The owned accounting fact of one ABANDONED worker model callback
+/// (R05 RR1 F38): the `complete()` future was dropped before settling —
+/// the invocation deadline expired mid-callback (`timeout_at` dropping
+/// the in-flight future) or the run's cancellation dropped the whole
+/// execute future. Owned data so the fact survives into a detached task
+/// when the drop happens without any awaiting context (the run-cancel
+/// path: only `Drop` code runs).
+///
+/// Honesty rules (same vocabulary as `WorkerCallbackTrace`): the route
+/// never resolved for an abandoned callback, so the identity honestly
+/// says `unreported`; the usage is unknown; the physical attempts are
+/// UNKNOWN (`transport_attempts = None` — the dropped future proves
+/// nothing about how many requests left the process; never 0, never 1).
+#[derive(Debug, Clone)]
+pub struct AbandonedWorkerCallback {
+    pub ctx: RunContext,
+    pub worker: String,
+    pub invocation: String,
+    pub cb_id: String,
+    pub parent_tool_call: lingxi_protocol::ToolCallId,
+    pub purpose: String,
+    /// Host-observed dispatch moment of the abandoned `complete()` call.
+    pub started_at_unix_ms: u64,
 }
 
 /// The R04 production shape: no model capability is configured. Every
@@ -259,6 +308,7 @@ impl WorkerModelPort for UnconfiguredWorkerModel {
         _worker: &'a str,
         _invocation: &'a str,
         _cb_id: &'a str,
+        _parent_tool_call: &'a lingxi_protocol::ToolCallId,
         _request: &'a WorkerModelRequest,
     ) -> Pin<
         Box<
@@ -347,6 +397,7 @@ impl WorkerModelPort for BoundedWorkerModel {
         worker: &'a str,
         invocation: &'a str,
         cb_id: &'a str,
+        parent_tool_call: &'a lingxi_protocol::ToolCallId,
         request: &'a WorkerModelRequest,
     ) -> Pin<
         Box<
@@ -409,7 +460,7 @@ impl WorkerModelPort for BoundedWorkerModel {
                 (None, None) => Err(WorkerModelRefusal::CapabilityNotConfigured),
                 (None, Some(inner)) => {
                     inner
-                        .complete(ctx, worker, invocation, cb_id, request)
+                        .complete(ctx, worker, invocation, cb_id, parent_tool_call, request)
                         .await
                 }
             };
@@ -436,6 +487,20 @@ impl WorkerModelPort for BoundedWorkerModel {
         state.receipts.remove(invocation);
         if let Some(inner) = &self.inner {
             inner.end_invocation(invocation);
+        }
+    }
+
+    fn abandoned(
+        &self,
+        fact: AbandonedWorkerCallback,
+    ) -> Pin<Box<dyn std::future::Future<Output = ()> + Send>> {
+        // R05 RR1 F38: forward to the inner port that owns the ledger (an
+        // abandoned callback dispatched THROUGH this wrapper must account
+        // through the same authority that would have written the settled
+        // row). No receipt is cached — the callback never settled.
+        match &self.inner {
+            Some(inner) => inner.abandoned(fact),
+            None => Box::pin(async {}),
         }
     }
 }
@@ -870,6 +935,55 @@ impl Drop for InvocationBudgetGuard {
     }
 }
 
+/// R05 RR1 F38: the RAII accounting guard of ONE in-flight model callback.
+/// Armed before the callback dispatch; disarmed on every path where the
+/// callback SETTLED (the settled row is written inside `complete` itself)
+/// or where the deadline arm writes the abandoned row deterministically.
+///
+/// A drop WITHOUT disarm is the run-cancellation shape: the whole execute
+/// future is being dropped mid-`complete()` and no awaiting code of this
+/// loop will run again — only `Drop` code does. The guard then DETACHES
+/// the abandoned-callback accounting row to the runtime (best-effort,
+/// loudly logged on failure): the row of a possibly-billable request must
+/// not vanish with the cancellation fence (F-WU02).
+struct CallbackAbandonGuard {
+    pending: Option<(Arc<dyn WorkerModelPort>, AbandonedWorkerCallback)>,
+}
+
+impl CallbackAbandonGuard {
+    /// The callback settled (or the row was written deterministically):
+    /// nothing is owed on drop.
+    fn disarm(&mut self) {
+        self.pending = None;
+    }
+}
+
+impl Drop for CallbackAbandonGuard {
+    fn drop(&mut self) {
+        let Some((model, fact)) = self.pending.take() else {
+            return;
+        };
+        match tokio::runtime::Handle::try_current() {
+            Ok(handle) => {
+                handle.spawn(async move {
+                    model.abandoned(fact).await;
+                });
+            }
+            Err(no_runtime) => {
+                // Dropped outside any tokio runtime: the row cannot be
+                // written from here. Loud, never a silent vanish.
+                tracing::error!(
+                    invocation = %fact.invocation,
+                    cb_id = %fact.cb_id,
+                    error = %no_runtime,
+                    "cannot record the abandoned worker callback's accounting row: \
+                     no tokio runtime to detach the write into"
+                );
+            }
+        }
+    }
+}
+
 /// The callback fields a worker must NEVER set (C09): identity-claiming
 /// keys. The payload is not an authority — provider/model/endpoint/auth
 /// and run identity resolve host-side only.
@@ -944,7 +1058,7 @@ impl ToolExecutorPort for WorkerToolExecutor {
     fn execute<'a>(
         &'a self,
         ctx: &'a RunContext,
-        _call: &'a ToolCallId,
+        call: &'a ToolCallId,
         request: &'a ToolRequest,
     ) -> Pin<Box<dyn std::future::Future<Output = ToolExecutionResult> + Send + 'a>> {
         Box::pin(async move {
@@ -961,6 +1075,10 @@ impl ToolExecutorPort for WorkerToolExecutor {
                     return ToolExecutionResult::of_ctx(ctx, ToolOutcome::Failed { error: e });
                 }
             };
+            // R05 RR1 F21: the REAL parent ToolCallId rides the callback
+            // dispatch below — the usage ledger's parent-tool JOIN key is
+            // the driver-minted identity, never the random RPC request id
+            // alone (the audit's discarded `_call`).
             // C07: the invocation's callback budget lives under the
             // host-minted request id from birth to settlement; the guard
             // reclaims it on EVERY exit path — success, violation,
@@ -1254,6 +1372,26 @@ impl ToolExecutorPort for WorkerToolExecutor {
                                 // honest Unknown settlement, and the
                                 // async read loop never blocks on a
                                 // synchronous network wait.
+                                //
+                                // R05 RR1 F38: the abandoned-callback
+                                // accounting guard is armed BEFORE the
+                                // dispatch — a `complete()` future dropped
+                                // without settling (deadline expiry, run
+                                // cancellation) still leaves its row.
+                                let mut abandon_guard = CallbackAbandonGuard {
+                                    pending: Some((
+                                        Arc::clone(&self.spec.model),
+                                        AbandonedWorkerCallback {
+                                            ctx: ctx.clone(),
+                                            worker: self.spec.plugin_id.clone(),
+                                            invocation: request_id.clone(),
+                                            cb_id: cb.cb_id.clone(),
+                                            parent_tool_call: call.clone(),
+                                            purpose: cb.purpose.clone(),
+                                            started_at_unix_ms: self.runtime.clock.now_unix_ms(),
+                                        },
+                                    )),
+                                };
                                 let answer = match tokio::time::timeout_at(
                                     deadline,
                                     self.spec.model.complete(
@@ -1261,6 +1399,7 @@ impl ToolExecutorPort for WorkerToolExecutor {
                                         &self.spec.plugin_id,
                                         &request_id,
                                         &cb.cb_id,
+                                        call,
                                         &WorkerModelRequest {
                                             purpose: cb.purpose,
                                             prompt: cb.prompt,
@@ -1273,6 +1412,17 @@ impl ToolExecutorPort for WorkerToolExecutor {
                                 {
                                     Ok(answer) => answer,
                                     Err(_) => {
+                                        // Deadline expiry: `timeout_at`
+                                        // already dropped the in-flight
+                                        // `complete()` future. The row is
+                                        // written HERE, deterministically
+                                        // awaited — outcome=cancelled,
+                                        // usage unknown, attempts unknown —
+                                        // BEFORE the honest Unknown settle
+                                        // of the invocation.
+                                        if let Some((model, fact)) = abandon_guard.pending.take() {
+                                            model.abandoned(fact).await;
+                                        }
                                         let _ = stdin
                                             .write_all(
                                                 format!(
@@ -1300,6 +1450,11 @@ impl ToolExecutorPort for WorkerToolExecutor {
                                         );
                                     }
                                 };
+                                // The callback SETTLED (a reply or a
+                                // refusal — `complete` wrote the settled
+                                // row internally on both): the guard owes
+                                // nothing.
+                                abandon_guard.disarm();
                                 let reply_line = match answer {
                                     Ok(reply) => serde_json::json!({
                                         "kind": "callback_result",
@@ -1549,6 +1704,7 @@ mod tests {
             _worker: &'a str,
             _invocation: &'a str,
             _cb_id: &'a str,
+            _parent_tool_call: &'a lingxi_protocol::ToolCallId,
             _request: &'a WorkerModelRequest,
         ) -> Pin<
             Box<
@@ -1575,6 +1731,7 @@ mod tests {
                 "w",
                 "inv-1",
                 "cb-1",
+                &lingxi_protocol::ToolCallId::new("tc-rr1-1"),
                 &WorkerModelRequest {
                     purpose: "summarize".into(),
                     prompt: "p".into(),
@@ -1602,15 +1759,36 @@ mod tests {
             deadline_unix_ms: None,
         };
         assert!(port
-            .complete(&ctx(), "w", "inv-1", "cb-1", &request)
+            .complete(
+                &ctx(),
+                "w",
+                "inv-1",
+                "cb-1",
+                &lingxi_protocol::ToolCallId::new("tc-test"),
+                &request
+            )
             .await
             .is_ok());
         assert!(port
-            .complete(&ctx(), "w", "inv-1", "cb-2", &request)
+            .complete(
+                &ctx(),
+                "w",
+                "inv-1",
+                "cb-2",
+                &lingxi_protocol::ToolCallId::new("tc-test"),
+                &request
+            )
             .await
             .is_ok());
         let third = port
-            .complete(&ctx(), "w", "inv-1", "cb-3", &request)
+            .complete(
+                &ctx(),
+                "w",
+                "inv-1",
+                "cb-3",
+                &lingxi_protocol::ToolCallId::new("tc-test"),
+                &request,
+            )
             .await
             .expect_err("cap reached");
         assert!(
@@ -1626,7 +1804,14 @@ mod tests {
             deadline_unix_ms: None,
         };
         let refusal = port
-            .complete(&ctx(), "w2", "inv-2", "cb-9", &oversized)
+            .complete(
+                &ctx(),
+                "w2",
+                "inv-2",
+                "cb-9",
+                &lingxi_protocol::ToolCallId::new("tc-test"),
+                &oversized,
+            )
             .await
             .expect_err("token cap");
         assert!(matches!(refusal, WorkerModelRefusal::BudgetExceeded { .. }));
@@ -1650,17 +1835,38 @@ mod tests {
         port.begin_invocation("inv-a");
         port.begin_invocation("inv-b");
         assert!(port
-            .complete(&ctx(), "w", "inv-a", "cb-1", &request)
+            .complete(
+                &ctx(),
+                "w",
+                "inv-a",
+                "cb-1",
+                &lingxi_protocol::ToolCallId::new("tc-test"),
+                &request
+            )
             .await
             .is_ok());
         assert!(
-            port.complete(&ctx(), "w", "inv-b", "cb-1", &request)
-                .await
-                .is_ok(),
+            port.complete(
+                &ctx(),
+                "w",
+                "inv-b",
+                "cb-1",
+                &lingxi_protocol::ToolCallId::new("tc-test"),
+                &request
+            )
+            .await
+            .is_ok(),
             "the second invocation holds its own budget"
         );
         let overflow = port
-            .complete(&ctx(), "w", "inv-b", "cb-2", &request)
+            .complete(
+                &ctx(),
+                "w",
+                "inv-b",
+                "cb-2",
+                &lingxi_protocol::ToolCallId::new("tc-test"),
+                &request,
+            )
             .await
             .expect_err("inv-b is at its own cap");
         assert!(matches!(
@@ -1670,7 +1876,14 @@ mod tests {
         // A repeated cb_id within one invocation replays the cached
         // receipt: the inner port (and the network) never runs twice.
         let replayed = port
-            .complete(&ctx(), "w", "inv-a", "cb-1", &request)
+            .complete(
+                &ctx(),
+                "w",
+                "inv-a",
+                "cb-1",
+                &lingxi_protocol::ToolCallId::new("tc-test"),
+                &request,
+            )
             .await
             .expect("replay of cb-1");
         assert_eq!(replayed.text, "ok");
@@ -1686,9 +1899,16 @@ mod tests {
         assert!(!port.counter_snapshot().contains_key("inv-a"));
         port.begin_invocation("inv-a");
         assert!(
-            port.complete(&ctx(), "w", "inv-a", "cb-1", &request)
-                .await
-                .is_ok(),
+            port.complete(
+                &ctx(),
+                "w",
+                "inv-a",
+                "cb-1",
+                &lingxi_protocol::ToolCallId::new("tc-test"),
+                &request
+            )
+            .await
+            .is_ok(),
             "a recycled invocation id starts with a fresh budget"
         );
         assert_eq!(inner.replies.lock().unwrap().len(), 3);
@@ -1708,7 +1928,14 @@ mod tests {
             deadline_unix_ms: None,
         };
         let refusal = port
-            .complete(&ctx(), "w", "inv-1", "cb-1", &zero)
+            .complete(
+                &ctx(),
+                "w",
+                "inv-1",
+                "cb-1",
+                &lingxi_protocol::ToolCallId::new("tc-test"),
+                &zero,
+            )
             .await
             .expect_err("zero tokens refused");
         assert!(matches!(refusal, WorkerModelRefusal::BudgetExceeded { .. }));
@@ -1719,7 +1946,14 @@ mod tests {
             deadline_unix_ms: None,
         };
         let refusal = port
-            .complete(&ctx(), "w", "inv-1", "cb-2", &oversized_prompt)
+            .complete(
+                &ctx(),
+                "w",
+                "inv-1",
+                "cb-2",
+                &lingxi_protocol::ToolCallId::new("tc-test"),
+                &oversized_prompt,
+            )
             .await
             .expect_err("oversized prompt refused");
         assert!(matches!(refusal, WorkerModelRefusal::BudgetExceeded { .. }));
@@ -1739,6 +1973,7 @@ mod tests {
                 "w",
                 "inv-1",
                 "cb-1",
+                &lingxi_protocol::ToolCallId::new("tc-rr1-1"),
                 &WorkerModelRequest {
                     purpose: "p".into(),
                     prompt: "q".into(),

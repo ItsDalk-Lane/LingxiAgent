@@ -1,0 +1,18 @@
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.10s
+     Running tests/r04_rr1_f02_reaper_cleanup.rs (/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T//rust-target-r04-rr1-g05/debug/deps/r04_rr1_f02_reaper_cleanup-c4e97f4824a28218)
+
+running 11 tests
+test rr1_f02_c01_grandchild_holding_both_ends_freezes_the_result_and_closes_the_read_ends ... ok
+test rr1_f02_c01_pty_family_grandchild_holding_the_slave_closes_the_master ... ok
+test rr1_f02_c02_adversarial_window_offsets_never_signal_a_stale_group ... ok
+test rr1_f02_c02_terminate_in_the_reaped_undrained_window_signals_nothing ... ok
+test rr1_f02_c03_adversarial_exit_and_cancel_racing_never_signals_unprovably ... ok
+test rr1_f02_c03_adversarial_panicking_pump_is_observed_and_honest ... ok
+test rr1_f02_c03_double_stuck_pumps_complete_within_the_single_budget ... ok
+test rr1_f02_c04_stress_cycles_return_to_the_declared_steady_state ... ok
+test rr1_f02_fast_exiting_child_is_not_refused_by_the_reap_race ... ok
+test rr1_f02_repro_grandchild_pump_outlives_the_grace_and_mutates_the_settled_collector ... ok
+test rr1_f02_c01_adversarial_slow_writer_cannot_mutate_the_settled_collector ... ok
+
+test result: ok. 11 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 13.00s
+

@@ -1,0 +1,165 @@
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.08s
+     Running tests/r05_t03_rr1_replay.rs (rust/target/debug/deps/r05_t03_rr1_replay-ccc948fd6b015f32)
+
+running 24 tests
+test rr1_f06_stream_absent_placeholder_signature_accepts_the_final_delta ... ok
+test rr1_f06_stream_two_different_final_signatures_are_a_true_conflict ... ok
+test rr1_f06_stream_identical_signature_resend_is_tolerated ... FAILED
+test rr1_f06_stream_placeholder_signature_accepts_the_final_signature_delta ... FAILED
+test rr1_f07_empty_text_signature_part_round_trips_verbatim ... ok
+test rr1_f08_buffered_reasoning_content_reaches_the_canonical ... FAILED
+test rr1_f10_responses_multi_segment_interleave_keeps_positions ... FAILED
+test rr1_f06_byte_split_stream_keeps_the_signed_thinking_block ... FAILED
+test rr1_f09_same_origin_replays_the_signature_verbatim ... ok
+test rr1_f09_same_family_other_provider_never_receives_the_signature ... FAILED
+test rr1_f09_same_model_id_different_provider_refuses ... FAILED
+test rr1_f10_responses_keep_reasoning_text_tool_order ... ok
+test rr1_f06_buffered_empty_thinking_preserves_signature_on_next_request ... FAILED
+test rr1_f09_same_provider_other_model_refuses ... FAILED
+test rr1_f10_responses_keep_text_reasoning_tool_order ... FAILED
+test rr1_f10_codex_replay_keeps_text_reasoning_tool_order ... FAILED
+test rr1_f08_deepseek_reasoning_replays_through_renderer_and_compat ... FAILED
+test rr1_f08_no_contract_provider_never_receives_the_carrier ... ok
+test rr1_f09_responses_reasoning_item_never_crosses_providers ... FAILED
+test rr1_f07_parallel_results_form_one_user_content ... FAILED
+test rr1_f08_missing_required_reasoning_fails_closed_before_dispatch ... FAILED
+test rr1_f07_interleaved_parts_keep_original_order ... FAILED
+test rr1_f10_responses_tools_interspersed_keep_positions ... FAILED
+test rr1_f07_function_call_signature_survives_both_wire_modes ... FAILED
+
+failures:
+
+---- rr1_f06_stream_identical_signature_resend_is_tolerated stdout ----
+
+thread 'rr1_f06_stream_identical_signature_resend_is_tolerated' (10345355) panicked at crates/lingxi-adapters/tests/r05_t03_rr1_replay.rs:237:10:
+final signature: ProtocolError { code: InvalidMessage, message: "a thinking block carried two DIFFERENT signatures: a conflict is never merged", retryable: false, details: None }
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+
+---- rr1_f06_stream_placeholder_signature_accepts_the_final_signature_delta stdout ----
+
+thread 'rr1_f06_stream_placeholder_signature_accepts_the_final_signature_delta' (10345356) panicked at crates/lingxi-adapters/tests/r05_t03_rr1_replay.rs:154:5:
+the official empty-signature placeholder must accept the final signature delta, got Err(ProtocolError { code: InvalidMessage, message: "a thinking block carried two DIFFERENT signatures: a conflict is never merged", retryable: false, details: None })
+
+---- rr1_f08_buffered_reasoning_content_reaches_the_canonical stdout ----
+
+thread 'rr1_f08_buffered_reasoning_content_reaches_the_canonical' (10345362) panicked at crates/lingxi-adapters/tests/r05_t03_rr1_replay.rs:511:13:
+the buffered top-level carrier parses to canonical reasoning: []
+
+---- rr1_f10_responses_multi_segment_interleave_keeps_positions stdout ----
+
+thread 'rr1_f10_responses_multi_segment_interleave_keeps_positions' (10345374) panicked at crates/lingxi-adapters/tests/r05_t03_rr1_replay.rs:818:5:
+assertion `left == right` failed: {"input":[{"content":[{"text":"go on","type":"input_text"}],"role":"user","type":"message"},{"encrypted_content":"sig-mid","id":"r1","summary":[{"text":"mid thought","type":"summary_text"}],"type":"reasoning"},{"content":[{"text":"seg one\nseg two","type":"output_text"}],"role":"assistant","type":"message"}],"model":"model","stream":false,"tools":[{"description":"Read a file","name":"read","parameters":{"properties":{"path":{"type":"string"}},"required":["path"],"type":"object"},"type":"function"}]}
+  left: String("reasoning")
+ right: String("message")
+
+---- rr1_f06_byte_split_stream_keeps_the_signed_thinking_block stdout ----
+
+thread 'rr1_f06_byte_split_stream_keeps_the_signed_thinking_block' (10345353) panicked at crates/lingxi-adapters/tests/r05_t03_rr1_replay.rs:311:31:
+event applies: ProtocolError { code: InvalidMessage, message: "a thinking block carried two DIFFERENT signatures: a conflict is never merged", retryable: false, details: None }
+
+---- rr1_f09_same_family_other_provider_never_receives_the_signature stdout ----
+
+thread 'rr1_f09_same_family_other_provider_never_receives_the_signature' (10345367) panicked at crates/lingxi-adapters/tests/r05_t03_rr1_replay.rs:629:21:
+a family tag alone must not authorize cross-provider signature replay: {"max_tokens":16384,"messages":[{"content":"read files","role":"user"},{"content":[{"signature":"provider-a-sig","thinking":"private-to-provider-a","type":"thinking"},{"id":"a1","input":{"path":"a"},"name":"read","type":"tool_use"}],"role":"assistant"},{"content":[{"content":"actual file bytes","is_error":false,"tool_use_id":"a1","type":"tool_result"}],"role":"user"}],"model":"other-model","stream":true,"tools":[{"description":"Read a file","input_schema":{"properties":{"path":{"type":"string"}},"required":["path"],"type":"object"},"name":"read"}]}
+
+---- rr1_f09_same_model_id_different_provider_refuses stdout ----
+
+thread 'rr1_f09_same_model_id_different_provider_refuses' (10345368) panicked at crates/lingxi-adapters/tests/r05_t03_rr1_replay.rs:707:5:
+same modelId under another provider is a source change
+
+---- rr1_f06_buffered_empty_thinking_preserves_signature_on_next_request stdout ----
+
+thread 'rr1_f06_buffered_empty_thinking_preserves_signature_on_next_request' (10345352) panicked at crates/lingxi-adapters/tests/r05_t03_rr1_replay.rs:265:5:
+assertion `left == right` failed: empty visible thinking with a valid signature is live protocol state: {"max_tokens":16384,"messages":[{"content":"read files","role":"user"},{"content":[{"id":"t1","input":{"path":"a"},"name":"read","type":"tool_use"}],"role":"assistant"},{"content":[{"content":"actual file bytes","is_error":false,"tool_use_id":"t1","type":"tool_result"}],"role":"user"}],"model":"claude","stream":false,"tools":[{"description":"Read a file","input_schema":{"properties":{"path":{"type":"string"}},"required":["path"],"type":"object"},"name":"read"}]}
+  left: Object {"id": String("t1"), "input": Object {"path": String("a")}, "name": String("read"), "type": String("tool_use")}
+ right: Object {"signature": String("opaque-sig"), "thinking": String(""), "type": String("thinking")}
+
+---- rr1_f09_same_provider_other_model_refuses stdout ----
+
+thread 'rr1_f09_same_provider_other_model_refuses' (10345370) panicked at crates/lingxi-adapters/tests/r05_t03_rr1_replay.rs:681:5:
+same provider + other model is a source change: Ok(Object {"max_tokens": Number(16384), "messages": Array [Object {"content": String("read files"), "role": String("user")}, Object {"content": Array [Object {"signature": String("model-a-sig"), "thinking": String("text"), "type": String("thinking")}, Object {"id": String("a1"), "input": Object {"path": String("a")}, "name": String("read"), "type": String("tool_use")}], "role": String("assistant")}, Object {"content": Array [Object {"content": String("actual file bytes"), "is_error": Bool(false), "tool_use_id": String("a1"), "type": String("tool_result")}], "role": String("user")}], "model": String("model-b"), "stream": Bool(true), "tools": Array [Object {"description": String("Read a file"), "input_schema": Object {"properties": Object {"path": Object {"type": String("string")}}, "required": Array [String("path")], "type": String("object")}, "name": String("read")}]})
+
+---- rr1_f10_responses_keep_text_reasoning_tool_order stdout ----
+
+thread 'rr1_f10_responses_keep_text_reasoning_tool_order' (10345373) panicked at crates/lingxi-adapters/tests/r05_t03_rr1_replay.rs:755:5:
+assertion `left == right` failed: text preceded reasoning originally: {"input":[{"content":[{"text":"read files","type":"input_text"}],"role":"user","type":"message"},{"encrypted_content":"sig","id":"r1","summary":[{"text":"then thought","type":"summary_text"}],"type":"reasoning"},{"content":[{"text":"first text","type":"output_text"}],"role":"assistant","type":"message"},{"arguments":"{\"path\":\"a\"}","call_id":"t1","name":"read","type":"function_call"},{"call_id":"t1","output":"actual file bytes","type":"function_call_output"}],"model":"model","stream":true,"tools":[{"description":"Read a file","name":"read","parameters":{"properties":{"path":{"type":"string"}},"required":["path"],"type":"object"},"type":"function"}]}
+  left: String("reasoning")
+ right: String("message")
+
+---- rr1_f10_codex_replay_keeps_text_reasoning_tool_order stdout ----
+
+thread 'rr1_f10_codex_replay_keeps_text_reasoning_tool_order' (10345371) panicked at crates/lingxi-adapters/tests/r05_t03_rr1_replay.rs:869:5:
+assertion `left == right` failed: text first, as produced: {"input":[{"content":[{"text":"read files","type":"input_text"}],"role":"user","type":"message"},{"encrypted_content":"codex-sig","id":"r1","summary":[{"text":"codex thought","type":"summary_text"}],"type":"reasoning"},{"content":[{"text":"codex text","type":"output_text"}],"role":"assistant","type":"message"},{"arguments":"{\"path\":\"a\"}","call_id":"t1","name":"read","type":"function_call"},{"call_id":"t1","output":"actual file bytes","type":"function_call_output"}],"instructions":"You are Hana's utility model.\nFollow the user request exactly and return only the requested content.","model":"codex-model","store":false,"stream":true,"tools":[{"description":"Read a file","name":"read","parameters":{"properties":{"path":{"type":"string"}},"required":["path"],"type":"object"},"type":"function"}]}
+  left: String("reasoning")
+ right: String("message")
+
+---- rr1_f08_deepseek_reasoning_replays_through_renderer_and_compat stdout ----
+
+thread 'rr1_f08_deepseek_reasoning_replays_through_renderer_and_compat' (10345363) panicked at crates/lingxi-adapters/tests/r05_t03_rr1_replay.rs:491:5:
+assertion `left == right` failed: the real reasoning rides the assistant tool-call message: {"max_tokens":65536,"messages":[{"content":"read files","role":"user"},{"content":"","role":"assistant","tool_calls":[{"function":{"arguments":"{\"path\":\"a\"}","name":"read"},"id":"ds1","type":"function"}]},{"content":"actual file bytes","role":"tool","tool_call_id":"ds1"}],"model":"deepseek-reasoner","stream":true,"stream_options":{"include_usage":true},"thinking":{"type":"enabled"},"tools":[{"function":{"description":"Read a file","name":"read","parameters":{"properties":{"path":{"type":"string"}},"required":["path"],"type":"object"}},"type":"function"}]}
+  left: Null
+ right: String("original provider reasoning")
+
+---- rr1_f09_responses_reasoning_item_never_crosses_providers stdout ----
+
+thread 'rr1_f09_responses_reasoning_item_never_crosses_providers' (10345366) panicked at crates/lingxi-adapters/tests/r05_t03_rr1_replay.rs:728:5:
+provider A's encrypted reasoning never enters provider B's request: Ok(Object {"input": Array [Object {"content": Array [Object {"text": String("read files"), "type": String("input_text")}], "role": String("user"), "type": String("message")}, Object {"encrypted_content": String("enc-a"), "id": String("r1"), "summary": Array [Object {"text": String("t"), "type": String("summary_text")}], "type": String("reasoning")}, Object {"arguments": String("{\"path\":\"a\"}"), "call_id": String("t1"), "name": String("read"), "type": String("function_call")}, Object {"call_id": String("t1"), "output": String("actual file bytes"), "type": String("function_call_output")}], "model": String("model-a"), "stream": Bool(true), "tools": Array [Object {"description": String("Read a file"), "name": String("read"), "parameters": Object {"properties": Object {"path": Object {"type": String("string")}}, "required": Array [String("path")], "type": String("object")}, "type": String("function")}]})
+
+---- rr1_f07_parallel_results_form_one_user_content stdout ----
+
+thread 'rr1_f07_parallel_results_form_one_user_content' (10345361) panicked at crates/lingxi-adapters/tests/r05_t03_rr1_replay.rs:388:5:
+assertion `left == right` failed: user -> model(two calls) -> user(two functionResponse parts): {"contents":[{"parts":[{"text":"read files"}],"role":"user"},{"parts":[{"functionCall":{"args":{"path":"a"},"id":"g1","name":"read"}},{"functionCall":{"args":{"path":"b"},"id":"g2","name":"read"}}],"role":"model"},{"parts":[{"functionResponse":{"id":"g1","name":"read","response":{"content":"actual file bytes","status":"succeeded"}}}],"role":"user"},{"parts":[{"functionResponse":{"id":"g2","name":"read","response":{"content":"actual file bytes","status":"succeeded"}}}],"role":"user"}],"tools":[{"functionDeclarations":[{"description":"Read a file","name":"read","parametersJsonSchema":{"properties":{"path":{"type":"string"}},"required":["path"],"type":"object"}}]}]}
+  left: 4
+ right: 3
+
+---- rr1_f08_missing_required_reasoning_fails_closed_before_dispatch stdout ----
+
+thread 'rr1_f08_missing_required_reasoning_fails_closed_before_dispatch' (10345364) panicked at crates/lingxi-adapters/tests/r05_t03_rr1_replay.rs:563:10:
+missing required replay state must refuse locally: Object {"max_tokens": Number(65536), "messages": Array [Object {"content": String("read files"), "role": String("user")}, Object {"content": String("reading"), "role": String("assistant"), "tool_calls": Array [Object {"function": Object {"arguments": String("{\"path\":\"a\"}"), "name": String("read")}, "id": String("ds2"), "type": String("function")}]}, Object {"content": String("file body"), "role": String("tool"), "tool_call_id": String("ds2")}], "model": String("deepseek-reasoner"), "stream": Bool(true), "stream_options": Object {"include_usage": Bool(true)}, "thinking": Object {"type": String("enabled")}, "tools": Array [Object {"function": Object {"description": String("Read a file"), "name": String("read"), "parameters": Object {"properties": Object {"path": Object {"type": String("string")}}, "required": Array [String("path")], "type": String("object")}}, "type": String("function")}]}
+
+---- rr1_f07_interleaved_parts_keep_original_order stdout ----
+
+thread 'rr1_f07_interleaved_parts_keep_original_order' (10345360) panicked at crates/lingxi-adapters/tests/r05_t03_rr1_replay.rs:421:5:
+assertion `left == right` failed: {"contents":[{"parts":[{"text":"read files"}],"role":"user"},{"parts":[{"text":"middle visible text"},{"functionCall":{"args":{"path":"a"},"id":"g1","name":"read"}},{"functionCall":{"args":{"path":"b"},"id":"g2","name":"read"}}],"role":"model"},{"parts":[{"functionResponse":{"id":"g1","name":"read","response":{"content":"actual file bytes","status":"succeeded"}}}],"role":"user"},{"parts":[{"functionResponse":{"id":"g2","name":"read","response":{"content":"actual file bytes","status":"succeeded"}}}],"role":"user"}],"tools":[{"functionDeclarations":[{"description":"Read a file","name":"read","parametersJsonSchema":{"properties":{"path":{"type":"string"}},"required":["path"],"type":"object"}}]}]}
+  left: Null
+ right: "g1"
+
+---- rr1_f10_responses_tools_interspersed_keep_positions stdout ----
+
+thread 'rr1_f10_responses_tools_interspersed_keep_positions' (10345375) panicked at crates/lingxi-adapters/tests/r05_t03_rr1_replay.rs:844:5:
+assertion `left == right` failed: {"input":[{"content":[{"text":"read files","type":"input_text"}],"role":"user","type":"message"},{"content":[{"text":"between calls","type":"output_text"}],"role":"assistant","type":"message"},{"arguments":"{\"path\":\"a\"}","call_id":"c1","name":"read","type":"function_call"},{"arguments":"{\"path\":\"b\"}","call_id":"c2","name":"read","type":"function_call"},{"call_id":"c1","output":"actual file bytes","type":"function_call_output"},{"call_id":"c2","output":"actual file bytes","type":"function_call_output"}],"model":"model","stream":true,"tools":[{"description":"Read a file","name":"read","parameters":{"properties":{"path":{"type":"string"}},"required":["path"],"type":"object"},"type":"function"}]}
+  left: String("message")
+ right: String("function_call")
+
+---- rr1_f07_function_call_signature_survives_both_wire_modes stdout ----
+
+thread 'rr1_f07_function_call_signature_survives_both_wire_modes' (10345359) panicked at crates/lingxi-adapters/tests/r05_t03_rr1_replay.rs:362:5:
+assertion `left == right` failed: the thoughtSignature stays on the functionCall part: {"contents":[{"parts":[{"text":"read files"}],"role":"user"},{"parts":[{"functionCall":{"args":{"path":"a"},"id":"g1","name":"read"}}],"role":"model"},{"parts":[{"functionResponse":{"id":"g1","name":"read","response":{"content":"actual file bytes","status":"succeeded"}}}],"role":"user"}],"tools":[{"functionDeclarations":[{"description":"Read a file","name":"read","parametersJsonSchema":{"properties":{"path":{"type":"string"}},"required":["path"],"type":"object"}}]}]}
+  left: Object {"functionCall": Object {"args": Object {"path": String("a")}, "id": String("g1"), "name": String("read")}}
+ right: Object {"functionCall": Object {"args": Object {"path": String("a")}, "id": String("g1"), "name": String("read")}, "thoughtSignature": String("signed-function-part")}
+
+
+failures:
+    rr1_f06_buffered_empty_thinking_preserves_signature_on_next_request
+    rr1_f06_byte_split_stream_keeps_the_signed_thinking_block
+    rr1_f06_stream_identical_signature_resend_is_tolerated
+    rr1_f06_stream_placeholder_signature_accepts_the_final_signature_delta
+    rr1_f07_function_call_signature_survives_both_wire_modes
+    rr1_f07_interleaved_parts_keep_original_order
+    rr1_f07_parallel_results_form_one_user_content
+    rr1_f08_buffered_reasoning_content_reaches_the_canonical
+    rr1_f08_deepseek_reasoning_replays_through_renderer_and_compat
+    rr1_f08_missing_required_reasoning_fails_closed_before_dispatch
+    rr1_f09_responses_reasoning_item_never_crosses_providers
+    rr1_f09_same_family_other_provider_never_receives_the_signature
+    rr1_f09_same_model_id_different_provider_refuses
+    rr1_f09_same_provider_other_model_refuses
+    rr1_f10_codex_replay_keeps_text_reasoning_tool_order
+    rr1_f10_responses_keep_text_reasoning_tool_order
+    rr1_f10_responses_multi_segment_interleave_keeps_positions
+    rr1_f10_responses_tools_interspersed_keep_positions
+
+test result: FAILED. 6 passed; 18 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+error: test failed, to rerun pass `-p lingxi-adapters --test r05_t03_rr1_replay`
+exit=101

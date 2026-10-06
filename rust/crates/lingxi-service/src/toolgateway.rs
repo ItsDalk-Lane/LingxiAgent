@@ -803,109 +803,8 @@ impl ToolInvocationGateway {
         request: InvocationRequest,
     ) -> Result<PreparedInvocation, GatewayRefusal> {
         let now = self.clock.now_unix_ms();
-        let prepared_tool_call = self
-            .registry
-            .prepare_invocation(
-                &request.reference,
-                request.pin,
-                &request.raw_arguments,
-                &self.budget,
-            )
-            .map_err(map_catalog_error)?;
-        // Defense in depth over the driver's R04-T01 gate: the wire digest
-        // (when the caller compared one) must equal the digest the trusted
-        // boundary just derived.
+        let (prepared_tool_call, entry, resources, policy) = self.admission_checks(&request)?;
         let args_digest_hex = prepared_tool_call.args_digest.hex.clone();
-        let entry = match request.surface {
-            CallerSurface::DelegationDispatch => InvocationEntry::Delegation,
-            CallerSurface::SubagentRun => InvocationEntry::Subagent,
-            CallerSurface::UserRun => {
-                // The resident/on-demand split is the manifest's own
-                // availability classification.
-                match self.registry.describe(&prepared_tool_call.target_id) {
-                    Ok(listing) => {
-                        if listing.availability
-                            == lingxi_kernel::toolcatalog::Availability::Deferred
-                        {
-                            InvocationEntry::OnDemand
-                        } else {
-                            InvocationEntry::Direct
-                        }
-                    }
-                    Err(err) => return Err(map_catalog_error(err)),
-                }
-            }
-        };
-        // ── R04-T04: resource normalization (`资源规范化`) ──
-        // Between argument validation and the permission adjudication
-        // (the frozen §4.2 chain: 目标解析→可用性→参数校验→资源规范化→
-        // 权限→批准→…). A target with a resource extractor derives the
-        // REAL canonical scopes now; an unauthorized scope is a LOUD
-        // preparation refusal — an approver is never asked to bless a
-        // path the resource boundary would refuse, and nothing is
-        // dispatched.
-        let resources: Vec<ResourceScope> = {
-            let executors = self
-                .executors
-                .lock()
-                .unwrap_or_else(|poisoned| poisoned.into_inner());
-            match executors
-                .get(&prepared_tool_call.target_id)
-                .and_then(|binding| binding.resources.as_ref())
-            {
-                Some(extractor) => {
-                    let input = ResourceExtractionInput {
-                        principal_kind: request.principal.storage_kind(),
-                        principal_subject: request.principal.storage_subject(),
-                        session_id: request.session_id.clone(),
-                        run_id: request.run_id.clone(),
-                    };
-                    match extractor(&input, &prepared_tool_call.effective) {
-                        Ok(scopes) => scopes,
-                        Err(message) => {
-                            tracing::warn!(
-                                run_id = %request.run_id,
-                                target = %prepared_tool_call.target_id,
-                                "{message}"
-                            );
-                            return Err(GatewayRefusal::ResourceScopeDenied {
-                                code: "resource_scope_refused".to_string(),
-                                message,
-                            });
-                        }
-                    }
-                }
-                None => Vec::new(),
-            }
-        };
-        let policy_input = PolicyAdjudicationInput {
-            entry,
-            target_id: prepared_tool_call.target_id.as_str().to_string(),
-            local_name: prepared_tool_call.local_name.clone(),
-            permission_kind: prepared_tool_call.permission.kind,
-            capability_base: prepared_tool_call.permission.capability_base.clone(),
-            args_digest_hex: args_digest_hex.clone(),
-            principal_kind: request.principal.storage_kind(),
-            principal_subject: request.principal.storage_subject(),
-            session_id: request.session_id.clone(),
-            run_id: request.run_id.clone(),
-            agent_id: request.agent_id.clone(),
-            permission_context: request.permission,
-        };
-        let policy = match self.policy.adjudicate(&policy_input) {
-            PolicyVerdict::Denied {
-                code,
-                layer,
-                message,
-            } => {
-                return Err(GatewayRefusal::PolicyDenied {
-                    code,
-                    layer,
-                    message,
-                });
-            }
-            verdict => verdict,
-        };
         let expires_at = now.saturating_add(self.prepared_ttl_ms);
         let handle_nonce = match crate::auth::hex_random_public(16) {
             Ok(hex) => format!("prep:{hex}"),
@@ -981,6 +880,168 @@ impl ToolInvocationGateway {
             policy,
             resources,
         })
+    }
+
+    /// The pure ADMISSION half of [`Self::prepare`]: target resolution →
+    /// availability → generation pin → schema validation + normalization →
+    /// trusted digest → resource normalization → policy adjudication. No
+    /// prepared record is minted and nothing is registered — the R05 RR1
+    /// F11 whole-batch admission runs this for EVERY request of a model
+    /// turn BEFORE the first side effect, then the per-request execution
+    /// path re-runs the full `prepare` at its own moment (pre-validation
+    /// never replaces the immediate authorization).
+    fn admission_checks(
+        &self,
+        request: &InvocationRequest,
+    ) -> Result<
+        (
+            lingxi_kernel::toolcatalog::PreparedToolCall,
+            InvocationEntry,
+            Vec<ResourceScope>,
+            PolicyVerdict,
+        ),
+        GatewayRefusal,
+    > {
+        let prepared_tool_call = self
+            .registry
+            .prepare_invocation(
+                &request.reference,
+                request.pin,
+                &request.raw_arguments,
+                &self.budget,
+            )
+            .map_err(map_catalog_error)?;
+        let entry = match request.surface {
+            CallerSurface::DelegationDispatch => InvocationEntry::Delegation,
+            CallerSurface::SubagentRun => InvocationEntry::Subagent,
+            CallerSurface::UserRun => {
+                // The resident/on-demand split is the manifest's own
+                // availability classification.
+                match self.registry.describe(&prepared_tool_call.target_id) {
+                    Ok(listing) => {
+                        if listing.availability
+                            == lingxi_kernel::toolcatalog::Availability::Deferred
+                        {
+                            InvocationEntry::OnDemand
+                        } else {
+                            InvocationEntry::Direct
+                        }
+                    }
+                    Err(err) => return Err(map_catalog_error(err)),
+                }
+            }
+        };
+        // ── R04-T04: resource normalization (`资源规范化`) ──
+        // Between argument validation and the permission adjudication
+        // (the frozen §4.2 chain: 目标解析→可用性→参数校验→资源规范化→
+        // 权限→批准→…). A target with a resource extractor derives the
+        // REAL canonical scopes now; an unauthorized scope is a LOUD
+        // preparation refusal — an approver is never asked to bless a
+        // path the resource boundary would refuse, and nothing is
+        // dispatched.
+        let resources: Vec<ResourceScope> = {
+            let executors = self
+                .executors
+                .lock()
+                .unwrap_or_else(|poisoned| poisoned.into_inner());
+            match executors
+                .get(&prepared_tool_call.target_id)
+                .and_then(|binding| binding.resources.as_ref())
+            {
+                Some(extractor) => {
+                    let input = ResourceExtractionInput {
+                        principal_kind: request.principal.storage_kind(),
+                        principal_subject: request.principal.storage_subject(),
+                        session_id: request.session_id.clone(),
+                        run_id: request.run_id.clone(),
+                    };
+                    match extractor(&input, &prepared_tool_call.effective) {
+                        Ok(scopes) => scopes,
+                        Err(message) => {
+                            tracing::warn!(
+                                run_id = %request.run_id,
+                                target = %prepared_tool_call.target_id,
+                                "{message}"
+                            );
+                            return Err(GatewayRefusal::ResourceScopeDenied {
+                                code: "resource_scope_refused".to_string(),
+                                message,
+                            });
+                        }
+                    }
+                }
+                None => Vec::new(),
+            }
+        };
+        let policy_input = PolicyAdjudicationInput {
+            entry,
+            target_id: prepared_tool_call.target_id.as_str().to_string(),
+            local_name: prepared_tool_call.local_name.clone(),
+            permission_kind: prepared_tool_call.permission.kind,
+            capability_base: prepared_tool_call.permission.capability_base.clone(),
+            args_digest_hex: prepared_tool_call.args_digest.hex.clone(),
+            principal_kind: request.principal.storage_kind(),
+            principal_subject: request.principal.storage_subject(),
+            session_id: request.session_id.clone(),
+            run_id: request.run_id.clone(),
+            agent_id: request.agent_id.clone(),
+            permission_context: request.permission,
+        };
+        let policy = match self.policy.adjudicate(&policy_input) {
+            PolicyVerdict::Denied {
+                code,
+                layer,
+                message,
+            } => {
+                return Err(GatewayRefusal::PolicyDenied {
+                    code,
+                    layer,
+                    message,
+                });
+            }
+            verdict => verdict,
+        };
+        Ok((prepared_tool_call, entry, resources, policy))
+    }
+
+    /// R05 RR1 F11: the whole-batch ADMISSION probe — the pure validation
+    /// half of the gateway (digest gate + target identity/availability/
+    /// generations + CURRENT-schema arguments + resource scopes + policy
+    /// verdict) with NO prepared record and NO registration. The driver
+    /// runs this for every request of a model turn before the first side
+    /// effect; a refusal here means the whole batch stays at zero
+    /// dispatch. The per-request execution path still runs the FULL
+    /// `prepare` at its own moment (immediate authorization is never
+    /// replaced by pre-validation).
+    pub fn validate_from_request(
+        &self,
+        ctx: &RunContext,
+        surface: CallerSurface,
+        agent_id: &str,
+        permission: InvocationPermissionContext,
+        call_id: &ToolCallId,
+        request: &ToolRequest,
+    ) -> Result<(), GatewayRefusal> {
+        if !request.digest_matches_arguments() {
+            return Err(GatewayRefusal::DigestMismatch {
+                declared: request.args_digest.hex.clone(),
+                computed: request.arguments.digest().hex,
+            });
+        }
+        let reference = ToolTargetRef::ByTargetId {
+            target_id: ToolTargetId::parse(&request.target),
+        };
+        let unified = InvocationRequest::from_trusted_entry(
+            ctx,
+            surface,
+            agent_id,
+            permission,
+            reference,
+            None,
+            request.arguments.as_value().clone(),
+            call_id.clone(),
+        );
+        self.admission_checks(&unified).map(|_| ())
     }
 
     /// Prepares from the DRIVER's request shape: the registry reference is

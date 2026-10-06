@@ -351,10 +351,13 @@ openai-completions 补流式解码与 C07 全态工具结果渲染，驱动重�
 - **F-02（证据形式）**：T03-C05 原为编译期常量单次运行（防预置强度中）。修复：移植
   `c05_runtime_nonce_rides_the_next_request_and_follows_changes`——stub 脚本先于 nonce 固定，
   运行时 nonce（pid/nanos/counter）逐字节上线，两腿不同值跟随变化，构成任务书强形式。
-- **N-01（观察，归渲染层后续）**：openai-responses 族渲染器把 opaque（encrypted reasoning item）
+- **N-01（已修复，R05 RR1 F10，2026-10-04）**：openai-responses 族渲染器把 opaque（encrypted reasoning item）
   立即入列、文本累积到最后统一入列；assistant 内容为 text-在前的非标顺序时，重渲染后 opaque
-  位置前移（字节逐字保留、不跨族、不渲正文；canonical reasoning-在前顺序下位置严格正确）。
-  归 T05 渲染层按原位置穿插时处理。
+  位置前移。RR1 WP-T03 修复：渲染按内容原相对顺序重放——文本段在原位成 message item（相邻段
+  `\n` 连接），reasoning item 原位 verbatim，function_call 经解析期 `function_call_item` 锚点回到原位
+  （无锚点的手工交换保持 content-first）；Responses 与 Codex 同步（共享 render_input_items）。同族
+  google 的 functionCall Part 也改为原位锚点重放（R05 RR1 F07）。永久测试
+  `lingxi-adapters/tests/r05_t03_rr1_replay.rs`（rr1_f10_*）。
 - **N-02（观察，产品策略）**：write 工具结果的 wire 文本含 `[resource: out.txt <file://…绝对路径…>]`，
   即工作区绝对路径经 file:// URI 上送模型。这是 resource_refs 的保真上送（非压平），行为正确；
   是否对模型暴露绝对路径归 T06 资源引用处理时裁定（已登记 PROGRESS_LEDGER 后续义务）。
@@ -382,32 +385,57 @@ openai-completions 补流式解码与 C07 全态工具结果渲染，驱动重�
    代码围栏保护、pending-tag 与栈深守卫保守回退）→ think 层（`THINK_TAGS`）→ mood 层
    （`MOOD_TAGS`）→ `DeltaNormalizer`。live delta 与 history 投影
    （`split_reserved_tag_segments`）共用同一 scanner——同一来源，不会长歪（C13 钉死）。
-5. **D5 事件词汇决策**：text 片段 = `final_answer`；reasoning 片段（provider 原生
-   reasoning + think 块文本）= `reasoning`；mood 块从事件流剥离（冻结词汇无 mood 事件，
-   canonical 消息保留原文）；`commentary` 在此链无来源（保留词汇）。segment id 形如
+5. **D5 事件词汇决策**（R05 RR1 F12/F13 修订）：live text 片段 = `unresolved`
+   ——在调用的 terminal 分类前，任何族都不知道片段文本是否最终答案（文本之后仍可能跟
+   工具调用），wire 契约（`AssistantPhase::Unresolved`）禁止静默猜成 `final_answer`；
+   text segment 的 END 事件在调用 terminal 处解析：仅当 driver 判定该轮为携带可见
+   答案文本的真 `Final` 时为 `final_answer`，否则保持 `unresolved`（incumbent
+   `phaseKnownAtEnd` 形状：段以 unresolved 开、在 end 处解析）。reasoning 片段
+   （provider 原生 reasoning + think 块文本）= `reasoning`；mood 块从事件流剥离
+   （冻结词汇无 mood 事件）。segment id 形如
    `assistant:{turn}:reasoning:default` / `assistant:{turn}:text:default`，开启后驻留到
    `finish`。
-6. **idle 超时**：`DEFAULT_STREAM_IDLE_TIMEOUT_MS = 60_000` = R05_BASELINE 预登记
+6. **final 消息规范化投影（R05 RR1 F13）**：`normalize_final_message` 是
+   `ProviderTurn::Final` 消息进入 `final_message_committed` 事件 / messages 行 /
+   历史读取的唯一投影——Text 块经同一 scanner 重切（think 族 → Reasoning 块、
+   mood 族内容丢弃、围栏/转义字面量保持文本），非文本块原样保留；原始协议文本仅
+   存在于 run 的 typed exchange（供应商重放所需），绝不混回可展示正文。规范化后
+   无任何可见文本（仅 mood / 仅过程块）的 final 不提交，run 以
+   `completed.no_final.process_only` 结算。
+7. **idle 超时**：`DEFAULT_STREAM_IDLE_TIMEOUT_MS = 60_000` = R05_BASELINE 预登记
    `http_idle_stream_timeout_ms`。流停转（无 delta 无 terminal 超 60s）即取消 call scope
    （D8：await 点 drop，释放 provider socket），按可重试 upstream 失败结算；一个执行点
    覆盖 connect → 首字节 → 帧间隔全链路。
-7. **解码器界限（C04）**：`SSE_BUFFER_LIMIT = 8 MiB` 兼作整流总读上界——比预登记
+8. **解码器界限（C04）**：`SSE_BUFFER_LIMIT = 8 MiB` 兼作整流总读上界——比预登记
    `stream_total_buffer_max_bytes`（16 MiB）更紧，§8 允许收紧（预登记值是上限不是目标）；
    `SSE_FRAME_MAX_BYTES = 1 MiB` = 预登记 `sse_single_frame_max_bytes`；
    `TOOL_ARGUMENTS_MAX_BYTES = 1 MiB` = 预登记 `tool_arguments_max_bytes`。全部响亮拒绝，
    绝不静默截断。
-8. **C02 严格 UTF-8**：非法 UTF-8 在任意分片下产生同一 `InvalidMessage`；已交付的事件恒为
+9. **C02 严格 UTF-8**：非法 UTF-8 在任意分片下产生同一 `InvalidMessage`；已交付的事件恒为
    完好前缀，erring feed 内已完成但尚未交付的事件随错误一并丢弃（不带着污染缓冲继续交付）。
-9. **C07 canonical 参数规则**：非对象参数响亮拒绝；重复键 last-wins 且 digest 覆盖
-   canonical 值；浮点与超安全整数一律响亮拒绝（`ArgumentsNotSafeInteger`，与 TS
-   incumbent 逐点 parity——这是冻结规则，不是舍入策略）。
-10. **C09/C11 截断与停止原因的决策记录**：截断（length / max_tokens /
+10. **C07 canonical 参数规则**：非对象参数响亮拒绝；重复键 last-wins 且 digest 覆盖
+    canonical 值；浮点与超安全整数一律响亮拒绝（`ArgumentsNotSafeInteger`，与 TS
+    incumbent 逐点 parity——这是冻结规则，不是舍入策略）。
+11. **C09/C11 截断与停止原因的决策记录**：截断（length / max_tokens /
     model_context_window_exceeded / MAX_TOKENS / incomplete(max_output_tokens)）=
     **可重试** `BudgetExceeded`——该调用零副作用（工具批次整批不派发），partial 内容留在
     delta 事件里，重试安全；拒绝类（content_filter / refusal / SAFETY / RECITATION /
     BLOCKLIST / PROHIBITED_CONTENT / SPII / IMAGE_SAFETY）= **不可重试** `Forbidden`；
     google `MALFORMED_FUNCTION_CALL` = 不可重试 `InvalidMessage`（族自带的终态诚实信号：
     模型自己的 function call 畸形）。usage 在失败臂照常保留（真实账单不丢）。
+12. **R05 RR1 F12 终结严格化**：传输结束 ≠ 协议完成。四族 buffered/stream 分类仅凭
+    已知的正常终态理由——openai `finish_reason` 缺失或未知值、anthropic `stop_reason`
+    缺失或未知值、未闭合 content block（仅见 `message_stop`）、google `finishReason`
+    缺失或未知值、responses `status` 缺失/未知值或 incomplete 未知原因，一律响亮
+    `InvalidMessage`，绝不猜成 Final / ToolRequests；正常停止但全部内容为过程块
+    （reasoning/opaque、无答案文本）的轮 → `ProviderTurn::Empty`（过程语义、
+    `content` 随行供重放），run 以 no_final 终结算，不产生 `final_message_committed`。
+13. **R05 RR1 F11 整批准入**：`admit_provider_call_ids`（四族共享）——同 provider
+    call id 同形（target+digest）重发折叠为一次，异形冲突整批响亮拒绝；
+    driver 侧在首个副作用前对整批做静态准入（digest 门 + 网关纯校验
+    `validate_from_request`：目标/可用性/代次/CURRENT schema/策略裁决），任一失败
+    → 整批零派发、逐项结构化拒绝回传模型；执行时仍逐项重跑完整 prepare 与
+    权限/批准/取消/代次复核（预验证不取代即时授权）。
 
 ## 21. T04 kernel 演进
 
@@ -592,6 +620,32 @@ openai-completions 补流式解码与 C07 全态工具结果渲染，驱动重�
   验证保持 BLOCKED_NOT_AUTHORIZED；session thinking level / structured output /
   replay 策略源归 T06/T07（CompatOptions 对应字段生产端恒 None）。
 
+### 28a. T05 RR1 修订（F14/F15/F16，2026-10-05，实现后登记）
+
+上节遗留与裁决 5 的「后续网络加固阶段」延期被 RR1 审查（gate G03）判定为
+**不合法延期**（原任务书 T05 步骤 1 是本阶段必需义务），已由 RR1 WP-T05 修复关闭：
+
+- **裁决 5 修订**：固定 `no_proxy()` 不再是生产行为——`build_client_with_timeouts`
+  退化为 Direct 策略的遗留构造器（隔离测试保持原语义）；生产走
+  `models/network.rs` 的统一网络策略（`NetworkPlane` 代次化）：system（load 时
+  HTTP(S)_PROXY/ALL_PROXY/NO_PROXY 环境快照——现役 `shared/network-proxy.ts` 契约
+  镜像，含强制环回 bypass 与完整 NO_PROXY 语法）/manual（http/https/socks/socks5，
+  校验拒绝 userinfo/path/query）/direct。显式 `trustedCaPem`（PEM bundle）叠加于
+  rustls-platform-verifier 之上＝NODE_EXTRA_CA_CERTS 等价物；TLS 链/主机名/有效期
+  校验永不放宽（无 accept-invalid 路径）。chat 五族/OAuth/辅助/worker callback/
+  operations/egress 下载全部消费同一 plane；`POST /lingxi/v1/models/reload` 原子
+  发布新策略代次。消费面正反对照（计数代理、生成 CA 的 TLS 授权/未授权/错主机名/
+  过期/错链）＝`r05_t05_network.rs` mod rr1_f14。
+- **C11B 边界修订**：原「DNS rebinding 离线不可判」声明缺口撤销——egress 对非
+  same-origin 的 https 主机名先解析并判定**全部候选**（任一守卫候选即拒，混合
+  公私记录同拒），然后经 `resolve_to_addrs` **钉住**已判定候选拨打（SNI/Host/证书
+  校验仍按域名）；代理解析边界与认证头不带同样有钉（mod rr1_f15）。
+- **预算边界修订（F16）**：错误 body（chat/operations 分类路径）读入纳入剩余绝对
+  预算+64KiB 上限且保留超时/截断/读失败事实；operation admit 与 run 驱动模型 permit
+  排队、401 协调刷新等待全部包裹剩余预算（`BudgetExceeded` 诚实结算，不再各段重置
+  或等满配额窗）；OAuth 端点 body 读入加 256KiB 上限。
+- live provider 验证仍为 BLOCKED_NOT_AUTHORIZED（本修订只关离线义务）。
+
 ## 29. T06 设计裁决（Worker 回调异步化 / 媒体与辅助操作平面，实现前锁定）
 
 1. **`WorkerModelPort::complete` 演进为 boxed-future 异步端口**（形如
@@ -748,3 +802,36 @@ openai-completions 补流式解码与 C07 全态工具结果渲染，驱动重�
    egress 的 DNS-rebinding 判定缺口维持已声明状态（离线不可判定）；
    T05 登记的 C11B NOT_RUN 由本任务的 egress.rs + 测试解除（T05 台账
    更新见 R05_ACCEPTANCE_LEDGER）。
+
+## 31. RR1 F38 实现登记（R05-T07 修复 r1，2026-10-06）
+
+取消后（请求可能已发出）的对账义务落地，涉及三处接口演进：
+
+1. **`WorkerModelPort` 新增 `abandoned(fact: AbandonedWorkerCallback)`**
+   （默认 no-op；`BoundedWorkerModel` 转发 inner）：一个在结算前被 drop 的
+   回调（invocation deadline 到期 `timeout_at` drop，或 run 取消 drop 整个
+   execute future）的记账入口。`fact` 为**自有数据**（RunContext/invocation/
+   cb_id/parent_tool_call/purpose/started_at 全 owned）——run 取消路径只有
+   Drop 代码运行，行必须能脱离到 detached task。生产实现
+   `GatewayWorkerModel::abandoned` 经既有 `LedgerWorkerCallbackTrace` 写行：
+   outcome=`cancelled`、usage unknown、`transport_attempts=None`（尝试数
+   未知）、身份诚实 `unreported`；写失败响亮记日志（future 已不存在，行是
+   最后的诚实见证，不是控制流事实）。
+2. **usage 台账 `transport_attempts` nullable 化（migration v7 表重建）**：
+   `ModelCallUsageRecord.transport_attempts: Option<u32>`——`Some(0)`=not-sent、
+   `Some(n)`=观测到的物理请求数、`None`=drop 后尝试数未知（绝不以 0/1 冒充）。
+   v6 库开库即升 v7，旧行原值保留（`r05_t07_persistence.rs::
+   migration_v6_to_v7_makes_attempts_nullable_and_keeps_rows`）。
+3. **run driver 取消臂写行不写事件**：`root.cancelled()` 竞态臂与 fence
+   Stale+cancelled 臂在 `settle_cancellation` 之前为该 call 落台账行
+   （新私有入口 `persist_model_call_cancelled_in_flight`，与完成路径共用单一
+   record 构造点 `model_call_usage_record_of`）；**不写**
+   `model_call_completed` 事件——A09/C16 的「取消的 call 不以伪造 completed
+   事件收尾」纪律原样保持（cancellation_tree r03_a05 与 r05_t04 c16 两条
+   既有反例零改动通过）。
+4. **五族 stream parse-Err 路径拾回已观测 usage**（F21「意外工具响应有
+   usage」自检腿揭出的同类缺口）：各 accumulator 新增
+   `observed_usage_report()`（openai-completions 原始 usage JSON、responses/
+   codex terminal 聚合、anthropic/google fold+violation），execute 的
+   finish-Err 分支把它附到 Failed 结果（`with_usage_report`，同一严格解码，
+   无任何放宽）——回合照常响亮失败，计费事实不随 parse 错误消失。

@@ -1,0 +1,15 @@
+WP-T07-E03 / R3（R05-T07-修复-r2，2026-10-06）：runs.rs 零改动证明
+
+仓库主树 rust/crates/lingxi-service/src/runs.rs 的 SHA-256，在三个时点亲自核验一致
+（动手前基线 / 臂粒度变异验证之后 / 收尾）：
+
+b7b8671a8c4dc507ab77364e700985db69c2b619cc2f80cc54d86d0bf7eb17f3  rust/crates/lingxi-service/src/runs.rs
+
+核验命令（本会话实际执行）：
+  shasum -a 256 rust/crates/lingxi-service/src/runs.rs
+
+本轮 F39 修复为纯测试侧：唯一代码改动是
+rust/crates/lingxi-service/tests/r05_t07_rr1_usage_ledger.rs（追加 rr1_f39 两腿 +
+GatedStorage 委托式 StoragePort 包装 + FenceArmProvider 脚本回合）。
+变异验证只在隔离副本 /tmp/r05t07-f39-mut（独立 CARGO_TARGET_DIR）进行，
+副本已删除；副本还原后与主树 cmp 逐字节一致（MUT-COPY-REVERTED-BYTE-IDENTICAL）。

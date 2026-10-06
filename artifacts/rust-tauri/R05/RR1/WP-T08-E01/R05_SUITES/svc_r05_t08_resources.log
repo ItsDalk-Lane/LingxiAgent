@@ -1,0 +1,12 @@
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.10s
+     Running tests/r05_t08_resources.rs (/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T//rust-target-r05-t08/debug/deps/r05_t08_resources-f66968a3ba499b0b)
+
+running 2 tests
+test f27_sampler_controls_detect_growth_release_and_failure ... ok
+test f27_sustained_cancel_error_worker_load_stays_bounded has been running for over 60 seconds
+F27 cancel phase: hits=62 dropped=60 settled=0 dangling=60
+F27 raw resource series: /var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-r05f27-f27-series-47614-1791220212553576000/f27-resource-series.json
+test f27_sustained_cancel_error_worker_load_stays_bounded ... ok
+
+test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 309.00s
+

@@ -1,0 +1,68 @@
+[
+  {
+    "id": "R00-T02-LA-16CEB6D12A6A",
+    "required_then": "把 modelId 加入 provider 注册表并刷新模型，返回新清单",
+    "scope_share": "OAuth/CredentialService 服务端全份额离线替身验证（start/callback/poll/state/PKCE/logout/custom modelId 管理按该叶 then 文本逐项）：R05-T02。",
+    "declared_later_share": "叶自身的用户可见行为/外围接入=后续阶段（按 r00ExecutionStageIds 归属），本阶段不判其产品形态",
+    "mapped_run": "svc:r05_t02_credentials",
+    "recorded_status": "PASS",
+    "deferred_to_stages": [],
+    "original_assertion_cases": [],
+    "recorded_reason": "R05 share satisfied: all share pins held; the remainder stays REQUIRED and moves with deferredToStages=[]: 叶自身的用户可见行为/外围接入=后续阶段（按 r00ExecutionStageIds 归属），本阶段不判其产品形态"
+  },
+  {
+    "id": "R00-T02-LA-8060BE8AA02C",
+    "required_then": "从 provider 注册表移除 modelId 并刷新模型，返回新清单",
+    "scope_share": "OAuth/CredentialService 服务端全份额离线替身验证（start/callback/poll/state/PKCE/logout/custom modelId 管理按该叶 then 文本逐项）：R05-T02。",
+    "declared_later_share": "叶自身的用户可见行为/外围接入=后续阶段（按 r00ExecutionStageIds 归属），本阶段不判其产品形态",
+    "mapped_run": "svc:r05_t02_credentials",
+    "recorded_status": "PASS",
+    "deferred_to_stages": [],
+    "original_assertion_cases": [],
+    "recorded_reason": "R05 share satisfied: all share pins held; the remainder stays REQUIRED and moves with deferredToStages=[]: 叶自身的用户可见行为/外围接入=后续阶段（按 r00ExecutionStageIds 归属），本阶段不判其产品形态"
+  },
+  {
+    "id": "R00-T02-LA-99D6C304D697",
+    "required_then": "start 返回登录指引；手输授权码经 callback 完成登录，设备码经 poll 进入 done 后刷新 provider；失败不报告已登录",
+    "scope_share": "OAuth/CredentialService 服务端全份额离线替身验证（start/callback/poll/state/PKCE/logout/custom modelId 管理按该叶 then 文本逐项）：R05-T02。",
+    "declared_later_share": "叶自身的用户可见行为/外围接入=后续阶段（按 r00ExecutionStageIds 归属），本阶段不判其产品形态",
+    "mapped_run": "svc:r05_t02_credentials",
+    "recorded_status": "PASS",
+    "deferred_to_stages": [],
+    "original_assertion_cases": [],
+    "recorded_reason": "R05 share satisfied: all share pins held; the remainder stays REQUIRED and moves with deferredToStages=[]: 叶自身的用户可见行为/外围接入=后续阶段（按 r00ExecutionStageIds 归属），本阶段不判其产品形态"
+  },
+  {
+    "id": "R00-T02-LA-CA0BF9A7AEA9",
+    "required_then": "返回每个 OAuth provider 的 loggedIn 与可用模型数量",
+    "scope_share": "OAuth/CredentialService 服务端全份额离线替身验证（start/callback/poll/state/PKCE/logout/custom modelId 管理按该叶 then 文本逐项）：R05-T02。",
+    "declared_later_share": "叶自身的用户可见行为/外围接入=后续阶段（按 r00ExecutionStageIds 归属），本阶段不判其产品形态",
+    "mapped_run": "svc:r05_t02_credentials",
+    "recorded_status": "PASS",
+    "deferred_to_stages": [],
+    "original_assertion_cases": [],
+    "recorded_reason": "R05 share satisfied: all share pins held; the remainder stays REQUIRED and moves with deferredToStages=[]: 叶自身的用户可见行为/外围接入=后续阶段（按 r00ExecutionStageIds 归属），本阶段不判其产品形态"
+  },
+  {
+    "id": "R00-T02-LA-CFEC64F68DDE",
+    "required_then": "返回指定 OAuth provider 的模型 ID",
+    "scope_share": "OAuth/CredentialService 服务端全份额离线替身验证（start/callback/poll/state/PKCE/logout/custom modelId 管理按该叶 then 文本逐项）：R05-T02。",
+    "declared_later_share": "叶自身的用户可见行为/外围接入=后续阶段（按 r00ExecutionStageIds 归属），本阶段不判其产品形态",
+    "mapped_run": "svc:r05_t02_credentials",
+    "recorded_status": "PASS",
+    "deferred_to_stages": [],
+    "original_assertion_cases": [],
+    "recorded_reason": "R05 share satisfied: all share pins held; the remainder stays REQUIRED and moves with deferredToStages=[]: 叶自身的用户可见行为/外围接入=后续阶段（按 r00ExecutionStageIds 归属），本阶段不判其产品形态"
+  },
+  {
+    "id": "R00-T02-LA-FC80B6C4FBE4",
+    "required_then": "删除指定供应商凭证、清空认证缓存并刷新模型列表，返回成功或错误",
+    "scope_share": "OAuth/CredentialService 服务端全份额离线替身验证（start/callback/poll/state/PKCE/logout/custom modelId 管理按该叶 then 文本逐项）：R05-T02。",
+    "declared_later_share": "叶自身的用户可见行为/外围接入=后续阶段（按 r00ExecutionStageIds 归属），本阶段不判其产品形态",
+    "mapped_run": "svc:r05_t02_credentials",
+    "recorded_status": "PASS",
+    "deferred_to_stages": [],
+    "original_assertion_cases": [],
+    "recorded_reason": "R05 share satisfied: all share pins held; the remainder stays REQUIRED and moves with deferredToStages=[]: 叶自身的用户可见行为/外围接入=后续阶段（按 r00ExecutionStageIds 归属），本阶段不判其产品形态"
+  }
+]

@@ -3,9 +3,9 @@
  "artifactKind": "R05_ACCEPTANCE_LEDGER",
  "stage_id": "R05",
  "generated_by": "EXECUTOR-R05-T08",
- "generated_at": "2026-10-03T22:17:38.249100+00:00",
+ "generated_at": "2026-10-06",
  "baseline": "c549ff654508ab951e2cf39cf9d309fc9c6b8656 (branch codex/rust-tauri-migration HEAD; all R05-T01 changes are an UNCOMMITTED working-tree diff on top — no commit/push authorization was granted)",
- "note": "T01+T02+T03 slices (each C01-C12) + T04 slice (C01-C16) + T05 slice (C01-C13 + C11B leg split; 66 entries). Every PASS entry is backed by real executed evidence under artifacts/rust-tauri/R05/ (T05 slice re-executed on the REVIEW-T05 R01 fix tree, evidence in T05/fix-r1/); the NOT_RUN entries (C11B SSRF/attachment policy legs; C12 proxy config surface + private-CA capability gap) carry explicit blockingReasons with source citations. R05-T08 补全：14 个 T08 条目（10 OFFLINE_BINARY + 4 场景级）以 verify-stage R05 overall PASS 的真实结果登记；104 个 C-ID 全部有归属条目。",
+ "note": "T01+T02+T03 slices (each C01-C12) + T04 slice (C01-C16) + T05 slice (C01-C13 + C11B leg split; 66 entries). Every PASS entry is backed by real executed evidence under artifacts/rust-tauri/R05/ (T05 slice re-executed on the REVIEW-T05 R01 fix tree, evidence in T05/fix-r1/); the NOT_RUN entries (C11B SSRF/attachment policy legs; C12 proxy config surface + private-CA capability gap) carry explicit blockingReasons with source citations. R05-T08 补全：14 个 T08 条目（10 OFFLINE_BINARY + 4 场景级）以 verify-stage R05 overall PASS 的真实结果登记；104 个 C-ID 全部有归属条目。 RR1 F26 重登记：103 C-ID 权威登记册=r05_required_cids.tsv（93 cid+10 command）；本台账条目与三 TSV/R05_TEST_MAP 一致性以登记册为准。",
  "acceptances": [
   {
    "caseId": "R05-T01-C01",
@@ -26939,14 +26939,20 @@
     "operation": "chat",
     "auth": "api_key (stub)"
    },
-   "status": "NOT_RUN",
-   "command": "n/a（范围裁决 + F-01 更正登记）",
-   "testNames": [],
-   "executedCount": 0,
+   "status": "PASS",
+   "command": "cargo test --manifest-path rust/Cargo.toml --locked -p lingxi-service --test r05_t05_network （RR1 F14 修复后实跑；登记于 r05_stage_cids.tsv cid R05-T05-C12）",
+   "testNames": [
+    "rr1_f14::direct_policy_dials_the_source_itself",
+    "rr1_f14::manual_proxy_routes_a_real_chat_turn_through_the_proxy",
+    "rr1_f14::private_ca_authorizes_chat_and_default_verification_refuses_it",
+    "rr1_f14::system_mode_routes_through_the_snapshotted_environment",
+    "rr1_f14::wrong_hostname_expired_and_wrong_chain_are_refused"
+   ],
+   "executedCount": 21,
    "ignoredRequiredTests": [],
-   "exitCode": null,
+   "exitCode": 0,
    "expected": "代理与 TLS 不降级：系统/手动/直连/NO_PROXY 配置面；有效/无效证书与测试私有 CA；拒绝无效证书；私有 CA 显式授权；不全局关闭 TLS 验证。",
-   "observed": "拆腿登记（REVIEW-T05 R01）：(1) 无效证书拒绝腿 PASS——审查者 tls-probe 以生产 dispatch::build_client() 实证自签证书被拒（macOS 信任评估错误码 -67843），同端口纯 HTTP 对照 200，全仓无 danger_accept_invalid_certs 调用点；固化为常驻测试登记为廉价后续项。(2) 代理配置面腿 NOT_APPLICABLE 成立（附来源）：现役模型路径零代理处理代码；审查者 node-fetch-proxy-probe 实测内建 fetch 不受理 HTTP(S)_PROXY（直连 200、计数代理 0 命中）；lib/net/outbound-proxy.ts 的 dispatcher 只影响 MCP/bridge 面——直连裁决（§25 裁决 5 的 no_proxy()）与现役对齐，F-02 已把同一纪律补到 OAuth client（token/refresh 携带 client_secret/refresh_token；计数代理回归测试 r05_t02_oauth_flows::the_credential_bearing_client_never_consults_the_ambient_proxy 钉住，pre-fix 失败已实证）。(3) 私有 CA 腿为真实能力差距（F-01 更正，原「无现役对应物」理由事实错误）：现役内建 fetch 尊重 NODE_EXTRA_CA_CERTS（审查者 node-extra-ca-probe 实测私有 CA 签名端点 200 OK），另有 Windows 系统 CA 合并通道（desktop/src/shared/windows-system-ca.cjs，main.cjs:95 接线）；Rust 侧 rustls-platform-verifier 读平台根（Windows 系统 CA 腿由此覆盖），但无 NODE_EXTRA_CA_CERTS 等价物（全平台操作者附加 CA 文件通道）——显式登记为后续网络加固阶段任务。TLS 验证从未全局关闭。",
+   "observed": "RR1 F14 关闭原 NOT_RUN/延期：统一 NetworkPlane（system/manual/direct、NO_PROXY 语法+强制环回 bypass、显式 trusted CA 叠加平台校验）+全消费方接线+management reload 代次发布；受控计数代理+源服务+生成 CA 的 HTTPS 正反对照全绿（21 测试，WP-T05 证据）。原拆腿登记保留为历史；BLOCKERS §3 已标注关闭。",
    "sourceSha": "c549ff654508ab951e2cf39cf9d309fc9c6b8656",
    "workingTreeDigest": "sha256:fce44af502eebc89e4c7ff12f3714327ba22f915c7da38d47e2aa1949048c2c2",
    "runnerDigest": {
@@ -28637,17 +28643,17 @@
     "auth": "loopback token / apiKey stub"
    },
    "status": "PASS",
-   "command": "r05_stage_suites 生产者（T06 worker 套件精确钉数）+ rust_test_workspace",
+   "command": "cargo test --manifest-path rust/Cargo.toml --locked -p lingxi-service --test r05_t08_production_tools（RR1 F24：正式二进制 worker 嵌套链）",
    "testNames": [
-    "svc:r05_t06_worker_model::c06_main_run_worker_and_callback_complete_under_global_model_concurrency_one",
-    "svc:r05_t06_worker_model::c04_worker_callback_rides_the_real_gateway_and_trace_joins_parent_and_child",
-    "svc:r05_t06_worker_model::c05_single_threaded_runtime_serves_a_delayed_callback_without_starvation"
+    "f24_worker_nested_chain_under_global_permit_one",
+    "f24_worker_child_environment_carries_no_credential_material",
+    "f24_sigterm_with_parked_callback_reaps_the_worker_child"
    ],
-   "executedCount": 3,
+   "executedCount": 6,
    "ignoredRequiredTests": [],
    "exitCode": 0,
    "expected": "该 C-ID 的场景级绑定在最终门禁真实执行（R05_TEST_MAP.binding）",
-   "observed": "worker 嵌套链（真实子进程、配额=1、可取消、无死锁/自建loop/secret 传递）在正式 bootstrap 接线并在终门禁重跑",
+   "observed": "RR1 F24 关闭原场景级绑定：config workers 封闭节→组合根 register_worker_tool 生产调用点；正式二进制 permit=1 嵌套链（主模型 HTTP→工具→真实子进程 worker→RPC callback 经宿主 Gateway 真实 HTTP（aux 凭证）→worker 结果→最终回复）；model_call_usage.parent_tool_call_id JOIN=1；env 白名单无密钥；SIGTERM 后 worker 子进程被 reap（pgrep 归零）。首轮的 T06 手工接线测试仍是有效补充证据（svc:r05_t06_worker_model）。",
    "lockfileHashes": {},
    "schemaHash": "storage-registry-v5(16dce1c9…)",
    "fixtureHash": null,

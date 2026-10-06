@@ -26,7 +26,11 @@
 
 use lingxi_protocol::{ErrorCode, ProtocolError};
 
-use super::credentials::{scrub_materials, ApplicableAuth};
+use super::credentials::{sanitize_diagnostic, ApplicableAuth};
+
+/// The shared client-handle type every network consumer holds (R05 RR1
+/// F14; defined in [`super::network`], re-exported for the families).
+pub use super::network::NetworkClient;
 
 /// R05_BASELINE §8 `http_connect_timeout_ms`.
 pub const HTTP_CONNECT_TIMEOUT_MS: u64 = 10_000;
@@ -81,35 +85,104 @@ pub fn budget_exceeded_error(detail: String) -> ProtocolError {
 }
 
 /// Builds the shared no-redirect client (one per adapter instance) with the
-/// pre-registered timeout segments.
+/// pre-registered timeout segments. R05 RR1 F14: this is the DIRECT-policy
+/// legacy entry — production consumers hold a
+/// [`super::network::NetworkClient`] bound to the model plane's reloadable
+/// [`super::network::NetworkPlane`] instead.
 pub fn build_client() -> Result<reqwest::Client, ProtocolError> {
     build_client_with_timeouts(&HttpTimeouts::default())
 }
 
 /// Builds the shared no-redirect client with explicit timeout segments
 /// (C10: a credential-bearing request is never replayed onto a redirected
-/// origin). R05-T05: proxy auto-detection is DISABLED (`no_proxy`) —
-/// incumbent parity (the TS model path uses Node fetch, which never
-/// consults ambient proxies), and an ambient proxy breaks the A10
-/// acceptance proof (it synthesizes its own answers for refused/dropped
-/// upstreams, masking the real wire outcome) while silently exposing
-/// credential material. An explicit, opt-in proxy/TLS configuration
-/// surface is the registered C12 leftover (see INTERFACE_EVOLUTION §25).
+/// origin). The DIRECT policy leg of [`build_client_under_policy`] — the
+/// pre-F14 behavior kept for the isolated/test constructors.
 pub fn build_client_with_timeouts(
     timeouts: &HttpTimeouts,
 ) -> Result<reqwest::Client, ProtocolError> {
-    reqwest::Client::builder()
+    build_client_under_policy(
+        timeouts,
+        &super::network::NetworkPolicy {
+            proxy: super::network::ProxyPolicy::Direct,
+            trusted_ca_pem: None,
+        },
+    )
+}
+
+/// Builds the shared no-redirect client UNDER one frozen
+/// [`super::network::NetworkPolicy`] (R05 RR1 F14, T05-C12): the policy's
+/// proxy routing (system / manual / direct with the incumbent NO_PROXY and
+/// forced-loopback-bypass grammar, via a per-URL proxy interceptor) and its
+/// EXPLICIT trusted CA bundle (added ON TOP of the platform verifier's
+/// roots). The default chain, hostname and validity verification are never
+/// relaxed — no `accept_invalid_certs`, no hostname bypass; a CA or proxy
+/// misconfiguration is a loud construction failure, never a degraded
+/// no-verify fallback.
+pub fn build_client_under_policy(
+    timeouts: &HttpTimeouts,
+    policy: &super::network::NetworkPolicy,
+) -> Result<reqwest::Client, ProtocolError> {
+    build_client_pinned_under_policy(timeouts, policy, "", &[])
+}
+
+/// [`build_client_under_policy`] with an optional DNS PIN (R05 RR1 F15):
+/// when `pinned_host` is non-empty, the client's resolution of that ONE
+/// host is overridden to the pre-verified `pinned_addrs`
+/// (`ClientBuilder::resolve_to_addrs`) — the transport cannot re-resolve
+/// the name to an address the caller never verified. An empty host builds
+/// the ordinary shared client.
+pub fn build_client_pinned_under_policy(
+    timeouts: &HttpTimeouts,
+    policy: &super::network::NetworkPolicy,
+    pinned_host: &str,
+    pinned_addrs: &[std::net::SocketAddr],
+) -> Result<reqwest::Client, ProtocolError> {
+    let mut builder = reqwest::Client::builder()
         .redirect(reqwest::redirect::Policy::none())
-        .no_proxy()
-        .connect_timeout(timeouts.connect)
-        .build()
-        .map_err(|err| {
+        .connect_timeout(timeouts.connect);
+    if !pinned_host.is_empty() {
+        builder = builder.resolve_to_addrs(pinned_host, pinned_addrs);
+    }
+    match proxy_intercept(policy) {
+        Some(intercept) => builder = builder.proxy(intercept),
+        None => builder = builder.no_proxy(),
+    }
+    if let Some(pem) = policy.trusted_ca_pem.as_deref() {
+        for certificate in reqwest::Certificate::from_pem_bundle(pem.as_bytes()).map_err(|err| {
             ProtocolError::new(
                 ErrorCode::Internal,
-                format!("http client construction failed: {err}"),
+                format!(
+                    "the network policy's trusted CA bundle is not parseable PEM: {err} \
+                         (validated at config load — this is a wiring bug, never a \
+                         no-verify fallback)"
+                ),
                 false,
             )
-        })
+        })? {
+            builder = builder.add_root_certificate(certificate);
+        }
+    }
+    builder.build().map_err(|err| {
+        ProtocolError::new(
+            ErrorCode::Internal,
+            format!("http client construction failed: {err}"),
+            false,
+        )
+    })
+}
+
+/// The per-URL proxy interceptor of one policy (a `Proxy::custom` closure
+/// consulting the frozen policy — installing ANY explicit proxy also
+/// disables reqwest's own ambient proxy detection, so the policy is the
+/// single routing authority).
+fn proxy_intercept(policy: &super::network::NetworkPolicy) -> Option<reqwest::Proxy> {
+    let resolved = super::network::resolve_proxy_set(&policy.proxy);
+    if resolved.is_empty() {
+        return None;
+    }
+    Some(reqwest::Proxy::custom(move |url: &reqwest::Url| {
+        super::network::pick_proxy(url, &resolved).map(str::to_string)
+    }))
 }
 
 /// Sends one built request under the three-segment timeout discipline
@@ -126,6 +199,12 @@ pub fn build_client_with_timeouts(
 ///    (distinguished by a fresh clock read).
 /// 3. Non-2xx answers classify through [`classify_error_status`] — a 429
 ///    additionally carries its `Retry-After` hint in the error details.
+///    R05 RR1 F16: the error body itself is read under the REMAINING
+///    absolute budget and a hard size cap ([`read_error_body_bounded`]) —
+///    a stalled, trickling or oversized error body can no longer park the
+///    call past its total deadline or buffer unboundedly, and the
+///    timeout/truncation/read-failure FACT is preserved in the classified
+///    error instead of being swallowed into an empty excerpt.
 ///
 /// The caller's streamed-read phase applies the remaining budget through
 /// [`drive_sse_stream_within_budget`].
@@ -139,15 +218,89 @@ pub async fn send_with_timeouts(
     let status = response.status();
     if !status.is_success() {
         let retry_after_ms = parse_retry_after(response.headers());
-        let body_text = response.text().await.unwrap_or_default();
-        return Err(classify_error_status(
-            status,
-            &body_text,
-            auth,
-            retry_after_ms,
-        ));
+        let (body_text, read_note) = read_error_body_bounded(response, deadline_unix_ms).await;
+        let (mut error, retryable) =
+            classify_error_status(status, &body_text, auth, retry_after_ms);
+        if let Some(note) = read_note {
+            error.message.push_str(&format!("; {note}"));
+        }
+        return Err((error, retryable));
     }
     Ok(response)
+}
+
+/// The hard size cap of one non-2xx error body read (R05 RR1 F16): the
+/// excerpt that reaches the run's error message is bounded to
+/// [`EXCERPT_BOUND_CHARS`] after scrubbing anyway; 64 KiB is far above any
+/// diagnostic value and far below an unbounded buffer.
+pub const ERROR_BODY_MAX_BYTES: usize = 64 * 1024;
+
+/// Reads one non-2xx body under the remaining absolute budget and
+/// [`ERROR_BODY_MAX_BYTES`] (R05 RR1 F16). Returns the bytes that arrived
+/// plus an honest NOTE of how the read ended:
+/// - `None` — the body closed cleanly;
+/// - deadline — "…abandoned at the call's total deadline" (the call's
+///   outcome is already determined by the status; the read is cut, never
+///   parked past its budget);
+/// - cap — "…truncated at the error-body byte cap";
+/// - transport failure — "…read failed: {err}".
+///
+/// The pre-fix shape (`response.text().await.unwrap_or_default()`) had
+/// neither bound and SWALLOWED every read failure — a stalled error body
+/// outlived the total deadline and a mid-read break vanished silently.
+pub async fn read_error_body_bounded(
+    mut response: reqwest::Response,
+    deadline_unix_ms: Option<u64>,
+) -> (String, Option<String>) {
+    let mut out: Vec<u8> = Vec::new();
+    loop {
+        let next = response.chunk();
+        let chunk = match remaining_budget_ms(deadline_unix_ms) {
+            Some(remaining) => {
+                match tokio::time::timeout(std::time::Duration::from_millis(remaining), next).await
+                {
+                    Ok(result) => result,
+                    Err(_) => {
+                        return (
+                            String::from_utf8_lossy(&out).into_owned(),
+                            Some(
+                                "the error body read was abandoned at the call's total \
+                                 deadline (deadline_unix_ms reached); the excerpt holds only \
+                                 the bytes that arrived"
+                                    .to_string(),
+                            ),
+                        );
+                    }
+                }
+            }
+            None => next.await,
+        };
+        match chunk {
+            Ok(Some(bytes)) => {
+                if out.len() + bytes.len() > ERROR_BODY_MAX_BYTES {
+                    out.extend_from_slice(&bytes[..ERROR_BODY_MAX_BYTES - out.len()]);
+                    return (
+                        String::from_utf8_lossy(&out).into_owned(),
+                        Some(format!(
+                            "the error body was truncated at the {ERROR_BODY_MAX_BYTES} byte \
+                             read cap"
+                        )),
+                    );
+                }
+                out.extend_from_slice(&bytes);
+            }
+            Ok(None) => return (String::from_utf8_lossy(&out).into_owned(), None),
+            Err(err) => {
+                return (
+                    String::from_utf8_lossy(&out).into_owned(),
+                    Some(format!(
+                        "the error body read failed mid-body: {err} (the excerpt holds only \
+                         the bytes that arrived)"
+                    )),
+                );
+            }
+        }
+    }
 }
 
 /// The send half of [`send_with_timeouts`] WITHOUT status classification
@@ -350,14 +503,16 @@ pub fn append_provider_api_path(endpoint: &str, target_path: &str) -> String {
 }
 
 /// The provider's error body is attacker-influenceable echo: the excerpt
-/// that travels into the run's error message is truncated and scrubbed of
-/// the in-play credential material first (C09).
+/// that travels into the run's error message is scrubbed of the in-play
+/// credential material (raw AND encoded echoes, C09) FIRST and bounded-
+/// truncated second — the truncation can never cut a key in half and leave
+/// an unmatched prefix behind (R05 RR1 F05).
 pub fn scrubbed_excerpt(body_text: &str, auth: &ApplicableAuth) -> String {
-    scrub_materials(
-        &body_text.chars().take(512).collect::<String>(),
-        &auth.materials(),
-    )
+    sanitize_diagnostic(body_text, &auth.materials(), EXCERPT_BOUND_CHARS)
 }
+
+/// The bounded excerpt length (characters, after the scrub).
+pub const EXCERPT_BOUND_CHARS: usize = 512;
 
 /// The per-family incremental decode half of [`drive_sse_stream`] (R05-T04)
 /// — implemented by each family's stream accumulator. Pure and synchronous:

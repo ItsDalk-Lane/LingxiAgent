@@ -1,0 +1,9 @@
+== run 2026-10-06T03:38:13+0800 (pid 74792) ==
+== R02-T08 / R02-A16 legacy-entry regression (SHA-bound baseline/candidate replay, pristine baseline, content-based cause classes) ==
+base SHA:      201584f2917a7fd96d6ea603bdeddbd420082cfe
+candidate SHA: d80737b6cb9186c8a18c0f35923aac00249d45c3
+scope: regression gate only — PASS here is NOT the formal audit seal (orchestrator step)
+PASS E0-ancestry (base is an ancestor of candidate)
+NOTE candidate-worktree-dirty: this run binds the WORKTREE (uncommitted changes), tracked diff sha256=495cbbea9b57f6583cad9689776e41030ad899199d332045183f6264e549eb22, full tracked+untracked binding in e0-candidate-binding.tsv (1005 paths)
+NOTE e0-binding-exclusion: artifacts/rust-tauri/R05/RR1/INDEPENDENT-9/verify-R05/R04_REGRESSION/R03_REGRESSION/R02/A16/legacy-entry/** (this gate's own run-time evidence output subtree — in-repo evidence root; runner output, never candidate source; applied symmetrically to both bindings — recorded in the # header row of e0-candidate-binding.tsv)
+== isolated copies under /var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T//r02-a16.WM3a5y ==

@@ -1,0 +1,80 @@
+{
+  "head": "d80737b6cb9186c8a18c0f35923aac00249d45c3",
+  "binary_sha256": "c5d19bddd502762da19077c9e6f01d40ddc0bdb18b5777c6705735249bdb5861",
+  "config_has_capability_declarations": false,
+  "actual_network_requests": 1,
+  "wire_tools": [
+    "edit",
+    "read",
+    "write"
+  ],
+  "run_status": [
+    "completed",
+    "completed.with_final"
+  ],
+  "live_deltas": [
+    {
+      "type": "model_call_delta",
+      "phase": "final_answer",
+      "delta": "literal:\n```\n<think>keep quoted</think>\n```\n"
+    },
+    {
+      "type": "assistant_segment_delta",
+      "phase": "final_answer",
+      "delta": "literal:\n```\n<think>keep quoted</think>\n```\n"
+    },
+    {
+      "type": "model_call_delta",
+      "phase": "reasoning",
+      "delta": "PRIVATE_THINK_PROBE"
+    },
+    {
+      "type": "assistant_segment_delta",
+      "phase": "reasoning",
+      "delta": "PRIVATE_THINK_PROBE"
+    },
+    {
+      "type": "model_call_delta",
+      "phase": "final_answer",
+      "delta": "VISIBLE_FINAL_PROBE"
+    },
+    {
+      "type": "assistant_segment_delta",
+      "phase": "final_answer",
+      "delta": "VISIBLE_FINAL_PROBE"
+    }
+  ],
+  "http_final_messages": [
+    {
+      "type": "final_message_committed",
+      "message": {
+        "role": "assistant",
+        "content": [
+          {
+            "type": "text",
+            "text": "literal:\n```\n<think>keep quoted</think>\n```\n<think>PRIVATE_THINK_PROBE</think><mood>PRIVATE_MOOD_PROBE</mood>VISIBLE_FINAL_PROBE"
+          }
+        ],
+        "modelCallId": "run_000001a1055804b5_000001-mc0001"
+      }
+    }
+  ],
+  "restart_history_equal": true,
+  "lsof_exit": 0,
+  "lsof_first_lines": [
+    "COMMAND   PID USER   FD      TYPE DEVICE SIZE NODE NAME",
+    "sites-pre   7 root  cwd   unknown                  /proc/7/cwd (readlink: Permission denied)",
+    "sites-pre   7 root  rtd   unknown                  /proc/7/root (readlink: Permission denied)",
+    "sites-pre   7 root  txt   unknown                  /proc/7/exe (readlink: Permission denied)",
+    "sites-pre   7 root    0   unknown                  /proc/7/fd/0 (readlink: Permission denied)",
+    "sites-pre   7 root    1   unknown                  /proc/7/fd/1 (readlink: Permission denied)"
+  ],
+  "test_original_fd_counter": 0,
+  "linux_proc_fd_count": 3,
+  "helper_with_40_extra_files": {
+    "original_test_counter": 0,
+    "linux_proc_fd_count": "environment /proc pid not visible",
+    "lsof_first_lines": []
+  },
+  "evidence_dir": "/workspace/scratch/9b4397d87a13/audit/closed_loop/binary-probe-02rlpcrh"
+}

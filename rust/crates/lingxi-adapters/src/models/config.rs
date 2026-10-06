@@ -24,6 +24,12 @@ pub struct ModelPlaneConfig {
     pub providers: BTreeMap<String, ProviderConfig>,
     #[serde(default)]
     pub models: ModelsSection,
+    /// The unified network policy section (R05 RR1 F14, T05-C12): the
+    /// frozen proxy/NO_PROXY/explicit-CA carrier every outbound consumer of
+    /// the model plane reads. Absent = the incumbent default (system mode,
+    /// platform roots only).
+    #[serde(default)]
+    pub network: super::network::NetworkConfigSection,
 }
 
 /// One provider entry of the `providers` section.
@@ -184,6 +190,39 @@ pub struct RouteBinding {
     pub compat: Option<RouteCompatHints>,
     #[serde(default)]
     pub group_id: Option<String>,
+    /// R05 RR1 F01: the DECLARED per-model capabilities of this binding.
+    /// Absent = the undeclared state (a turn that NEEDS a capability is
+    /// refused locally before any request leaves the process — R05-A02;
+    /// a model NAME is never treated as a capability database).
+    #[serde(default)]
+    pub capabilities: Option<RouteCapabilities>,
+}
+
+/// The declared capability block of one route binding (R05 RR1 F01). Each
+/// field is a three-state declaration: `Some(true)` = the model declares
+/// support, `Some(false)` = explicitly unsupported, `None` = undeclared.
+/// Only `Some(true)` authorizes a turn that needs the capability — an
+/// undeclared or explicitly-unsupported need is a LOUD local refusal with
+/// zero physical requests, never a silent tool/image drop, provider swap
+/// or model substitution.
+///
+/// Scope note: `tools` covers tool declarations on the turn input;
+/// `imageInput` covers host-authorized image inputs (the chat route and
+/// the auxiliary `vision` slot). Reasoning support / context and output
+/// budgets / protocol options are the `compat` block's carriers (the TS
+/// model object's `reasoning`, `maxTokens`, `contextWindow` fields) — this
+/// block does not duplicate them.
+#[derive(Debug, Clone, Default, PartialEq, Eq, Deserialize)]
+#[serde(rename_all = "camelCase", deny_unknown_fields)]
+pub struct RouteCapabilities {
+    /// Whether the bound model accepts tool declarations (`Some(true)`
+    /// required for any turn carrying a non-empty tool snapshot).
+    #[serde(default)]
+    pub tools: Option<bool>,
+    /// Whether the bound model accepts image inputs (`Some(true)`
+    /// required for any turn carrying host-authorized images).
+    #[serde(default)]
+    pub image_input: Option<bool>,
 }
 
 /// The declared compat hints of one route binding (R05-T05). Every field
@@ -315,6 +354,10 @@ impl ModelsSection {
 pub enum ModelConfigError {
     /// The JSON itself is malformed or violates the closed schema.
     InvalidJson { detail: String },
+    /// The `network` section violates its closed shape (R05 RR1 F14): an
+    /// unknown proxy mode, an invalid proxy URL, a manual mode without any
+    /// URL, or an unparseable trusted-CA PEM bundle.
+    InvalidNetworkSection { detail: String },
     /// A provider id is empty.
     EmptyProviderId,
     /// The protocol family name is not in the contract vocabulary.
@@ -415,6 +458,10 @@ impl std::fmt::Display for ModelConfigError {
                 f,
                 "provider {provider:?} declares an invalid oauth flow descriptor: {detail}"
             ),
+            ModelConfigError::InvalidNetworkSection { detail } => write!(
+                f,
+                "the network section declares an invalid network policy: {detail}"
+            ),
             ModelConfigError::InvalidRouteCompat { operation, detail } => write!(
                 f,
                 "route for operation {operation} declares an invalid compat block: {detail}"
@@ -465,6 +512,14 @@ impl ModelPlaneConfig {
     /// Validates an already-parsed config (the service config file parses
     /// its own envelope first and hands the sections over).
     pub fn validate(&self) -> Result<(), ModelConfigError> {
+        // R05 RR1 F14: the network policy section validates with the rest
+        // of the plane (a bad proxy URL or a malformed CA bundle is a loud
+        // LOAD error, never a runtime surprise).
+        self.network
+            .validate()
+            .map_err(|error| ModelConfigError::InvalidNetworkSection {
+                detail: error.message,
+            })?;
         for (id, provider) in &self.providers {
             if id.trim().is_empty() {
                 return Err(ModelConfigError::EmptyProviderId);

@@ -393,7 +393,7 @@ fn plane_api_key(endpoint: &str, key: &str) -> String {
                 "auth": {{"kind": "apiKey", "apiKey": {key}}}
             }}
         }},
-        "models": {{"chat": {{"provider": "main", "model": "stub-model"}}}}"#,
+        "models": {{"chat": {{"provider": "main", "model": "stub-model", "capabilities": {{"tools": true}}}}}}"#,
         endpoint = serde_json::to_string(endpoint).expect("json"),
         key = serde_json::to_string(key).expect("json"),
     )
@@ -414,7 +414,7 @@ fn plane_with_aux(endpoint: &str, key: &str) -> String {
             }}
         }},
         "models": {{
-            "chat": {{"provider": "main", "model": "stub-model"}},
+            "chat": {{"provider": "main", "model": "stub-model", "capabilities": {{"tools": true}}}},
             "summarize": {{"provider": "aux", "model": "summarize-model"}}
         }}"#,
         endpoint = serde_json::to_string(endpoint).expect("json"),
@@ -433,7 +433,7 @@ fn plane_oauth(endpoint: &str, token_endpoint: &str) -> String {
                     "deviceAuthorizationEndpoint": {device_endpoint}}}
             }}
         }},
-        "models": {{"chat": {{"provider": "main", "model": "stub-model"}}}}"#,
+        "models": {{"chat": {{"provider": "main", "model": "stub-model", "capabilities": {{"tools": true}}}}}}"#,
         endpoint = serde_json::to_string(endpoint).expect("json"),
         token_endpoint = serde_json::to_string(token_endpoint).expect("json"),
         device_endpoint = serde_json::to_string(&format!("{token_endpoint}/device")).expect("json"),
@@ -677,6 +677,7 @@ async fn c01_multi_run_session_trace_stays_continuous_and_per_call_queryable() {
             owner_user_id: Some(lingxi_service::LOCAL_OWNER_USER_ID.to_string()),
             session_id: Some("sess_local_alpha".to_string()),
             run_id: None,
+            ..ModelUsageQuery::default()
         },
     )
     .await;
@@ -698,6 +699,7 @@ async fn c01_multi_run_session_trace_stays_continuous_and_per_call_queryable() {
                 owner_user_id: None,
                 session_id: None,
                 run_id: Some(run_id.clone()),
+                ..ModelUsageQuery::default()
             },
         )
         .await;
@@ -854,6 +856,7 @@ async fn c02_background_subagent_and_worker_rows_carry_true_parentage() {
             "plug",
             &format!("{main_run}-tc0001"),
             "cb-1",
+            &lingxi_protocol::ToolCallId::new(format!("{main_run}-tc0001")),
             &lingxi_service::workerrpc::WorkerModelRequest {
                 prompt: "summarize this".to_string(),
                 purpose: "summarize".to_string(),
@@ -872,6 +875,7 @@ async fn c02_background_subagent_and_worker_rows_carry_true_parentage() {
             owner_user_id: Some(lingxi_service::LOCAL_OWNER_USER_ID.to_string()),
             session_id: Some("sess_local_alpha".to_string()),
             run_id: None,
+            ..ModelUsageQuery::default()
         },
     )
     .await;
@@ -962,13 +966,15 @@ async fn c03_refresh_retry_is_two_physical_requests_in_one_honest_row() {
             owner_user_id: None,
             session_id: None,
             run_id: Some(run_id.clone()),
+            ..ModelUsageQuery::default()
         },
     )
     .await;
     assert_eq!(rows.len(), 1, "ONE logical call — one row");
     let row = &rows[0];
     assert_eq!(
-        row.transport_attempts, 2,
+        row.transport_attempts,
+        Some(2),
         "the refresh retry is counted as a second physical request"
     );
     let usage = row.usage.as_ref().expect("the successful request's usage");
@@ -1006,6 +1012,7 @@ async fn c03_retryable_failure_then_success_are_two_rows_and_unknown_is_not_zero
             owner_user_id: None,
             session_id: None,
             run_id: Some(run_id.clone()),
+            ..ModelUsageQuery::default()
         },
     )
     .await;
@@ -1018,7 +1025,7 @@ async fn c03_retryable_failure_then_success_are_two_rows_and_unknown_is_not_zero
         "the failed request's usage stays unknown"
     );
     assert!(rows[0].invalid_detail.is_none());
-    assert_eq!(rows[0].transport_attempts, 1);
+    assert_eq!(rows[0].transport_attempts, Some(1));
     assert_eq!(
         rows[0].attempt.as_deref(),
         Some(format!("{run_id}#a1").as_str()),
@@ -1065,6 +1072,7 @@ async fn c05_unknown_partial_and_reported_states_stay_distinct_everywhere() {
                 owner_user_id: None,
                 session_id: None,
                 run_id: Some(run.to_string()),
+                ..ModelUsageQuery::default()
             },
         )
         .await;
@@ -1141,6 +1149,7 @@ async fn c06_illegal_usage_numbers_mark_the_row_invalid_and_never_distort() {
             owner_user_id: None,
             session_id: None,
             run_id: Some(run_id.clone()),
+            ..ModelUsageQuery::default()
         },
     )
     .await;
@@ -1189,6 +1198,7 @@ async fn c08_cost_stays_unknown_without_a_price_basis() {
             owner_user_id: None,
             session_id: None,
             run_id: Some(run_id.clone()),
+            ..ModelUsageQuery::default()
         },
     )
     .await;
@@ -1283,6 +1293,7 @@ async fn c09_owner_scoped_queries_isolate_and_secrets_never_enter_the_db() {
             owner_user_id: Some(lingxi_service::LOCAL_OWNER_USER_ID.to_string()),
             session_id: None,
             run_id: None,
+            ..ModelUsageQuery::default()
         },
     )
     .await;
@@ -1298,6 +1309,7 @@ async fn c09_owner_scoped_queries_isolate_and_secrets_never_enter_the_db() {
             owner_user_id: Some("user_other".to_string()),
             session_id: None,
             run_id: None,
+            ..ModelUsageQuery::default()
         },
     )
     .await;
@@ -1564,6 +1576,7 @@ async fn c10_a_ledger_write_failure_publishes_no_completion_and_the_retry_is_ide
             owner_user_id: None,
             session_id: Some("sess_local_alpha".to_string()),
             run_id: None,
+            ..ModelUsageQuery::default()
         },
     )
     .await;
@@ -1580,6 +1593,7 @@ async fn c10_a_ledger_write_failure_publishes_no_completion_and_the_retry_is_ide
             owner_user_id: None,
             session_id: None,
             run_id: Some(run_id.clone()),
+            ..ModelUsageQuery::default()
         },
     )
     .await;
@@ -1595,6 +1609,7 @@ async fn c10_a_ledger_write_failure_publishes_no_completion_and_the_retry_is_ide
             owner_user_id: None,
             session_id: None,
             run_id: Some(run_id.clone()),
+            ..ModelUsageQuery::default()
         },
     )
     .await;

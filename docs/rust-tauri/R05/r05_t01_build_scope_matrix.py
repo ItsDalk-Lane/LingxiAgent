@@ -29,9 +29,13 @@ Disposition rules (applied in order, each leaf matches exactly one):
          cross-provider credential isolation included); the settings-page
          registration/selection UI chain remains R07.
   R4  D11 OAuth leaves (R05-only)
-      -> share: R05-T02 CredentialService/OAuth adaptation owns the full
-         server-side share offline (start/callback/poll/status/logout/custom
-         modelId management); no R07 remainder.
+      -> full: the leaf is EXCLUSIVE to R05 (execution_stage_ids == [R05]),
+         so R05 owns its FULL original behavior — no share split, no later
+         remainder (R05 RR1 F25/G01: the frozen candidate released these
+         six leaves on suite-level green while deferredToStages=[]; the
+         per-assertion evidence is the rr1_f04 battery of
+         r05_t02_credentials, pinned per assertion by the stage map's
+         full_original_behavior leaves).
   R5  D12 media leaves (generate/config/providers/tasks/speech-recognition)
       -> share: R05-T06 owns the media operation protocol adaptation and
          async job semantics (job accepted != artifact complete, ResourceRef
@@ -166,12 +170,19 @@ def classify(leaf_id: str, leaf: dict) -> dict:
     if fid.startswith("F-D11-"):
         if stages != ["R05"]:
             raise SystemExit(f"{leaf_id}: D11 leaf expected R05-only stages, got {stages}")
+        # R05 RR1 F25 (G01): an R05-EXCLUSIVE leaf means R05 owns the FULL
+        # original behavior — a "share" with no later stage would be an
+        # unowned remainder (the frozen candidate's hole). The per-assertion
+        # evidence is the rr1_f04 battery of svc:r05_t02_credentials,
+        # mirrored 1:1 by the stage map's full_original_behavior leaves.
         return {
-            "disposition": "share",
+            "disposition": "full",
             "rule": "R4",
             "r05_share": (
-                "OAuth/CredentialService 服务端全份额离线替身验证（start/callback/poll/state/PKCE/"
-                "logout/custom modelId 管理按该叶 then 文本逐项）：R05-T02。"
+                "R05 独占叶：R05-T02 CredentialService/OAuth 交付全部原行为（start/callback/poll/"
+                "state/PKCE/logout/custom modelId 管理按该叶 then 文本逐项），每条原断言由"
+                " r05_t02_credentials 套件的 rr1_f04 具名测试逐项钉住（阶段图"
+                " full_original_behavior）；无后续阶段余额。"
             ),
             "deferred_to": None,
             "deferred_reason": None,
@@ -282,8 +293,17 @@ def main() -> None:
 
     single_stage = [l for l in out_leaves if l["r00_execution_stage_ids"] == ["R05"]]
     for l in single_stage:
-        if l["disposition"] != "share":
+        # R05 RR1 F25: an R05-exclusive leaf must own its FULL original
+        # behavior (disposition "full") — "deferred" would orphan the
+        # obligation in this very stage, and "share" leaves an unowned
+        # remainder (the frozen candidate's G01 hole).
+        if l["disposition"] not in ("share", "full"):
             raise SystemExit(f"single-stage leaf {l['id']} may never defer")
+        if l["disposition"] == "share" and l.get("r07_remainder"):
+            raise SystemExit(
+                f"single-stage leaf {l['id']} declares a share with a later-stage remainder, "
+                "but no later stage exists to own it"
+            )
 
     doc = {
         "schema": "lingxi.r05-scope-matrix.v1",
@@ -304,6 +324,7 @@ def main() -> None:
             "base": len(base),
             "supplemental_total": len(out_leaves),
             "share": sum(1 for l in out_leaves if l["disposition"] == "share"),
+            "full": sum(1 for l in out_leaves if l["disposition"] == "full"),
             "deferred": sum(1 for l in out_leaves if l["disposition"] == "deferred"),
             "single_stage_r05_only": len(single_stage),
             "dual_stage_r05_r07": sum(

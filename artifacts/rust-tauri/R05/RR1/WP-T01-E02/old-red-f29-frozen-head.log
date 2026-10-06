@@ -1,0 +1,21 @@
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.10s
+     Running tests/r05_t01_model_plane.rs (rust/target/debug/deps/r05_t01_model_plane-7abf357853db7e5e)
+
+running 1 test
+test rr1_f29::f29_management_reload_during_inflight_401_never_leaks_the_new_key ... FAILED
+
+failures:
+
+---- rr1_f29::f29_management_reload_during_inflight_401_never_leaks_the_new_key stdout ----
+
+thread 'rr1_f29::f29_management_reload_during_inflight_401_never_leaks_the_new_key' (9799744) panicked at crates/lingxi-service/tests/r05_t01_model_plane.rs:1503:13:
+the OLD endpoint A captured the NEW endpoint's key on request #1 — the management reload during an in-flight 401 mixed credential material across config generations: authorization: Bearer dummy-real-entry-new-key
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+
+
+failures:
+    rr1_f29::f29_management_reload_during_inflight_401_never_leaks_the_new_key
+
+test result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 7 filtered out; finished in 0.58s
+
+error: test failed, to rerun pass `-p lingxi-service --test r05_t01_model_plane`

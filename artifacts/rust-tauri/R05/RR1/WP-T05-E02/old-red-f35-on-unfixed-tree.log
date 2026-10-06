@@ -1,0 +1,24 @@
+   Compiling lingxi-adapters v0.0.0 (/Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-adapters)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 2.24s
+     Running unittests src/lib.rs (rust/target/debug/deps/lingxi_adapters-25f1ae8b0ef7c0f1)
+
+running 1 test
+test models::network::tests::bracketed_ipv6_no_proxy_entries_bypass_public_literals ... FAILED
+
+failures:
+
+---- models::network::tests::bracketed_ipv6_no_proxy_entries_bypass_public_literals stdout ----
+
+thread 'models::network::tests::bracketed_ipv6_no_proxy_entries_bypass_public_literals' (11327044) panicked at crates/lingxi-adapters/src/models/network.rs:760:9:
+assertion `left == right` failed
+  left: Some("http://p.invalid:1")
+ right: None
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+
+
+failures:
+    models::network::tests::bracketed_ipv6_no_proxy_entries_bypass_public_literals
+
+test result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 117 filtered out; finished in 0.00s
+
+error: test failed, to rerun pass `-p lingxi-adapters --lib`

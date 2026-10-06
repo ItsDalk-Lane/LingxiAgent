@@ -1,7 +1,10 @@
 {
   "family": "openai-completions",
   "case": "tool_roundtrip",
-  "route": {"provider": "openai-golden", "model": "gpt-golden-4o"},
+  "route": {
+    "provider": "openai-golden",
+    "model": "gpt-golden-4o"
+  },
   "input": {
     "submission": "把三个笔记合并到 out.md",
     "system_prompt": "golden persona",
@@ -10,13 +13,37 @@
         "target": "tool:first-party:read",
         "wire_name": "read",
         "description": "Read a file 读取文件",
-        "schema": {"type": "object", "properties": {"path": {"type": "string"}}, "required": ["path"]}
+        "schema": {
+          "type": "object",
+          "properties": {
+            "path": {
+              "type": "string"
+            }
+          },
+          "required": [
+            "path"
+          ]
+        }
       },
       {
         "target": "tool:first-party:write",
         "wire_name": "write",
         "description": "Write a file 写入文件",
-        "schema": {"type": "object", "properties": {"content": {"type": "string"}, "path": {"type": "string"}}, "required": ["path", "content"]}
+        "schema": {
+          "type": "object",
+          "properties": {
+            "content": {
+              "type": "string"
+            },
+            "path": {
+              "type": "string"
+            }
+          },
+          "required": [
+            "path",
+            "content"
+          ]
+        }
       }
     ],
     "prior": [
@@ -24,15 +51,56 @@
         "assistant": {
           "call": "mc-golden-1",
           "content": [
-            {"reasoning": "先读两个文件再写"},
-            {"opaque": {"provider": "openai-completions", "data": {"type": "mystery-part", "blob": "z"}}},
-            {"text": "读取两个文件"}
+            {
+              "reasoning": "先读两个文件再写"
+            },
+            {
+              "opaque": {
+                "provider": "openai-completions",
+                "data": {
+                  "type": "mystery-part",
+                  "blob": "z"
+                }
+              }
+            },
+            {
+              "text": "读取两个文件"
+            }
           ],
           "tool_calls": [
-            {"seq": 1, "provider_call_id": "call_读取-α-0001", "target": "tool:first-party:read", "arguments": {"path": "/tmp/notes-α.md"}},
-            {"seq": 2, "provider_call_id": "call_读取-β-0002", "target": "tool:first-party:read", "arguments": {"path": "/tmp/notes-β.md"}},
-            {"seq": 3, "provider_call_id": "call_写入-0003", "target": "tool:first-party:write", "arguments": {"content": "new 内容", "path": "/tmp/out.md"}},
-            {"seq": 4, "provider_call_id": "call_读取-γ-0004", "target": "tool:first-party:read", "arguments": {"path": "/tmp/notes-γ.md"}}
+            {
+              "seq": 1,
+              "provider_call_id": "call_读取-α-0001",
+              "target": "tool:first-party:read",
+              "arguments": {
+                "path": "/tmp/notes-α.md"
+              }
+            },
+            {
+              "seq": 2,
+              "provider_call_id": "call_读取-β-0002",
+              "target": "tool:first-party:read",
+              "arguments": {
+                "path": "/tmp/notes-β.md"
+              }
+            },
+            {
+              "seq": 3,
+              "provider_call_id": "call_写入-0003",
+              "target": "tool:first-party:write",
+              "arguments": {
+                "content": "new 内容",
+                "path": "/tmp/out.md"
+              }
+            },
+            {
+              "seq": 4,
+              "provider_call_id": "call_读取-γ-0004",
+              "target": "tool:first-party:read",
+              "arguments": {
+                "path": "/tmp/notes-γ.md"
+              }
+            }
           ]
         }
       },
@@ -43,9 +111,18 @@
           "outcome": {
             "kind": "success_full",
             "text": "部分正文 partial body",
-            "resource_refs": [{"id": "res-golden-1", "kind": "attachment", "name": "out.txt", "uri": "file:///tmp/out.txt"}],
+            "resource_refs": [
+              {
+                "id": "res-golden-1",
+                "kind": "attachment",
+                "name": "out.txt",
+                "uri": "file:///tmp/out.txt"
+              }
+            ],
             "truncated": true,
-            "status": {"exited": 3}
+            "status": {
+              "exited": 3
+            }
           }
         }
       },
@@ -53,21 +130,30 @@
         "tool_result": {
           "seq": 2,
           "provider_call_id": "call_读取-β-0002",
-          "outcome": {"kind": "failed", "code": "forbidden", "message": "denied by policy 策略"}
+          "outcome": {
+            "kind": "failed",
+            "code": "forbidden",
+            "message": "denied by policy 策略"
+          }
         }
       },
       {
         "tool_result": {
           "seq": 3,
           "provider_call_id": "call_写入-0003",
-          "outcome": {"kind": "cancelled"}
+          "outcome": {
+            "kind": "cancelled"
+          }
         }
       },
       {
         "tool_result": {
           "seq": 4,
           "provider_call_id": "call_读取-γ-0004",
-          "outcome": {"kind": "unknown", "reason": "worker receipt lost 丢失"}
+          "outcome": {
+            "kind": "unknown",
+            "reason": "worker receipt lost 丢失"
+          }
         }
       }
     ]
@@ -76,29 +162,120 @@
   "expected_request": {
     "model": "gpt-golden-4o",
     "messages": [
-      {"role": "system", "content": "golden persona"},
-      {"role": "user", "content": "把三个笔记合并到 out.md"},
+      {
+        "role": "system",
+        "content": "golden persona"
+      },
+      {
+        "role": "user",
+        "content": "把三个笔记合并到 out.md"
+      },
       {
         "role": "assistant",
         "content": "读取两个文件",
         "tool_calls": [
-          {"id": "call_读取-α-0001", "type": "function", "function": {"name": "read", "arguments": "{\"path\":\"/tmp/notes-α.md\"}"}},
-          {"id": "call_读取-β-0002", "type": "function", "function": {"name": "read", "arguments": "{\"path\":\"/tmp/notes-β.md\"}"}},
-          {"id": "call_写入-0003", "type": "function", "function": {"name": "write", "arguments": "{\"content\":\"new 内容\",\"path\":\"/tmp/out.md\"}"}},
-          {"id": "call_读取-γ-0004", "type": "function", "function": {"name": "read", "arguments": "{\"path\":\"/tmp/notes-γ.md\"}"}}
-        ]
+          {
+            "id": "call_读取-α-0001",
+            "type": "function",
+            "function": {
+              "name": "read",
+              "arguments": "{\"path\":\"/tmp/notes-α.md\"}"
+            }
+          },
+          {
+            "id": "call_读取-β-0002",
+            "type": "function",
+            "function": {
+              "name": "read",
+              "arguments": "{\"path\":\"/tmp/notes-β.md\"}"
+            }
+          },
+          {
+            "id": "call_写入-0003",
+            "type": "function",
+            "function": {
+              "name": "write",
+              "arguments": "{\"content\":\"new 内容\",\"path\":\"/tmp/out.md\"}"
+            }
+          },
+          {
+            "id": "call_读取-γ-0004",
+            "type": "function",
+            "function": {
+              "name": "read",
+              "arguments": "{\"path\":\"/tmp/notes-γ.md\"}"
+            }
+          }
+        ],
+        "reasoning_content": "先读两个文件再写"
       },
-      {"role": "tool", "tool_call_id": "call_读取-α-0001", "content": "部分正文 partial body\n[resource: out.txt]\n[process exited with code 3]\n[result truncated at the tool's bound]"},
-      {"role": "tool", "tool_call_id": "call_读取-β-0002", "content": "tool error [forbidden]: denied by policy 策略"},
-      {"role": "tool", "tool_call_id": "call_写入-0003", "content": "tool call cancelled by the host before completion"},
-      {"role": "tool", "tool_call_id": "call_读取-γ-0004", "content": "tool outcome could not be determined: worker receipt lost 丢失"}
+      {
+        "role": "tool",
+        "tool_call_id": "call_读取-α-0001",
+        "content": "部分正文 partial body\n[resource: out.txt]\n[process exited with code 3]\n[result truncated at the tool's bound]"
+      },
+      {
+        "role": "tool",
+        "tool_call_id": "call_读取-β-0002",
+        "content": "tool error [forbidden]: denied by policy 策略"
+      },
+      {
+        "role": "tool",
+        "tool_call_id": "call_写入-0003",
+        "content": "tool call cancelled by the host before completion"
+      },
+      {
+        "role": "tool",
+        "tool_call_id": "call_读取-γ-0004",
+        "content": "tool outcome could not be determined: worker receipt lost 丢失"
+      }
     ],
     "tools": [
-      {"type": "function", "function": {"name": "read", "description": "Read a file 读取文件", "parameters": {"type": "object", "properties": {"path": {"type": "string"}}, "required": ["path"]}}},
-      {"type": "function", "function": {"name": "write", "description": "Write a file 写入文件", "parameters": {"type": "object", "properties": {"content": {"type": "string"}, "path": {"type": "string"}}, "required": ["path", "content"]}}}
+      {
+        "type": "function",
+        "function": {
+          "name": "read",
+          "description": "Read a file 读取文件",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "path": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "path"
+            ]
+          }
+        }
+      },
+      {
+        "type": "function",
+        "function": {
+          "name": "write",
+          "description": "Write a file 写入文件",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "content": {
+                "type": "string"
+              },
+              "path": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "path",
+              "content"
+            ]
+          }
+        }
+      }
     ],
     "stream": true,
-    "stream_options": {"include_usage": true}
+    "stream_options": {
+      "include_usage": true
+    }
   },
   "response_wire": {
     "sse_frames": [
@@ -113,9 +290,16 @@
   "expected_turn": {
     "kind": "final",
     "content": [
-      {"reasoning": "已读 两个文件"},
-      {"text": "合并完成"}
+      {
+        "reasoning": "已读 两个文件"
+      },
+      {
+        "text": "合并完成"
+      }
     ],
-    "usage": {"input_tokens": 256, "output_tokens": 17}
+    "usage": {
+      "input_tokens": 256,
+      "output_tokens": 17
+    }
   }
 }

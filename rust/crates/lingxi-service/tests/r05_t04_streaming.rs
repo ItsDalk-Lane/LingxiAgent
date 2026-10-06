@@ -453,7 +453,7 @@ fn openai_plane(stub: &StubServer) -> String {
                 "auth": {{"kind": "apiKey", "apiKey": "sk-openai-t04"}}
             }}
         }},
-        "models": {{"chat": {{"provider": "main", "model": "gpt-t04"}}}}"#,
+        "models": {{"chat": {{"provider": "main", "model": "gpt-t04", "capabilities": {{"tools": true}}}}}}"#,
         stub.v1()
     )
 }
@@ -468,7 +468,7 @@ fn anthropic_plane(stub: &StubServer) -> String {
                 "auth": {{"kind": "apiKey", "apiKey": "sk-ant-t04"}}
             }}
         }},
-        "models": {{"chat": {{"provider": "anthropic_svc", "model": "claude-t04"}}}}"#,
+        "models": {{"chat": {{"provider": "anthropic_svc", "model": "claude-t04", "capabilities": {{"tools": true}}}}}}"#,
         stub.origin()
     )
 }
@@ -1108,8 +1108,17 @@ async fn c15_a08_http200_stream_failures_keep_the_run_honest() {
             "{}data: {{\"truncat",
             openai_text_frame("先发一帧")
         )),
-        // Leg 3: usage arrived but no content and no finish — then [DONE].
-        sse(format!("{}{}", openai_usage_frame(7, 0), openai_done())),
+        // Leg 3: usage arrived but no content — then a normal stop and
+        // [DONE]. (R05 RR1 F12: a stream ending WITHOUT a finish_reason is
+        // a protocol violation however empty it looks; this leg now uses
+        // the legal empty-terminal shape — the assertion it pins, the
+        // usage honesty and the explicit empty outcome, is unchanged.)
+        sse(format!(
+            "{}{}{}",
+            openai_usage_frame(7, 0),
+            openai_finish_frame("stop"),
+            openai_done()
+        )),
         // Leg 4: a duplicated terminal marker (a frame after [DONE]).
         sse(format!(
             "{}{}{}",
@@ -1381,12 +1390,16 @@ async fn c13_live_normalization_and_history_projection_share_the_scanner() {
         match payload {
             KnownEventPayload::ModelCallDelta(p) => match p.phase {
                 lingxi_protocol::AssistantPhase::Reasoning => reasoning_deltas.push_str(&p.delta),
-                lingxi_protocol::AssistantPhase::FinalAnswer => text_deltas.push_str(&p.delta),
+                // R05 RR1 F12: live text is `unresolved` until the call's
+                // terminal resolves it — accumulate it as the text body.
+                lingxi_protocol::AssistantPhase::Unresolved
+                | lingxi_protocol::AssistantPhase::FinalAnswer => text_deltas.push_str(&p.delta),
                 other => panic!("unexpected model_call_delta phase {other:?}"),
             },
             KnownEventPayload::AssistantSegmentDelta(p) => match p.semantic_phase {
                 lingxi_protocol::AssistantPhase::Reasoning => segment_reasoning.push_str(&p.delta),
-                lingxi_protocol::AssistantPhase::FinalAnswer => segment_text.push_str(&p.delta),
+                lingxi_protocol::AssistantPhase::Unresolved
+                | lingxi_protocol::AssistantPhase::FinalAnswer => segment_text.push_str(&p.delta),
                 other => panic!("unexpected segment delta phase {other:?}"),
             },
             _ => {}
@@ -1424,13 +1437,48 @@ async fn c13_live_normalization_and_history_projection_share_the_scanner() {
         }
     }
 
-    // The canonical message keeps the RAW text (mood included).
+    // The canonical message is the NORMALIZED projection (R05 RR1 F13):
+    // the standalone think block structures as a reasoning block, the mood
+    // content never returns as displayable body, and the fenced literal
+    // stays text. The rr1_f13 test pins the full CL-02 shape; this asserts
+    // the same-source contract for THIS cross-delta cut.
     let content = final_message_content(&boot.state, &run_id)
         .await
         .expect("final message row");
-    assert!(content.contains("<mood>开心</mood>"), "{content}");
-    assert!(content.contains("<think>不是标签</think>"), "{content}");
-    assert!(content.contains("内部推理"), "{content}");
+    let message: serde_json::Value = serde_json::from_str(&content).expect("canonical json");
+    let blocks = message["content"].as_array().expect("content blocks");
+    let all_text: String = blocks
+        .iter()
+        .filter(|b| b["type"] == "text")
+        .filter_map(|b| b["text"].as_str())
+        .collect();
+    let all_reasoning: String = blocks
+        .iter()
+        .filter(|b| b["type"] == "reasoning")
+        .filter_map(|b| b["text"].as_str())
+        .collect();
+    assert!(
+        all_text.contains("<think>不是标签</think>"),
+        "fenced tags stay literal text: {all_text:?}"
+    );
+    assert!(all_text.contains("完成"), "{all_text:?}");
+    assert!(
+        !all_text.contains("开心") && !all_text.contains("<mood>"),
+        "mood content never returns as body: {all_text:?}"
+    );
+    assert!(
+        all_reasoning.contains("内部推理"),
+        "the think block is persisted as reasoning: {all_reasoning:?}"
+    );
+    assert_eq!(
+        blocks
+            .iter()
+            .filter(|b| b["type"] == "reasoning")
+            .filter_map(|b| b["text"].as_str())
+            .count(),
+        1,
+        "no doubled reasoning"
+    );
 
     // Same-source: the history projection of the FINAL raw text is the
     // same scanner — the standalone think block structures identically,
@@ -1465,4 +1513,507 @@ async fn c13_live_normalization_and_history_projection_share_the_scanner() {
 
     stub.stop().await;
     teardown_boot(&boot).await;
+}
+
+// ── R05 RR1 (WP-T04, F11/F12/F13): migrated adversarial regressions ──────────
+//
+// The permanent homes of the 2026-10-04 closed-loop / protocol audit
+// counterexamples that reach the REAL service boundary (config → gateway →
+// adapter → run driver → file tools → storage):
+// - CL-03/PF05 (F11): batch admission BEFORE side effects — a legal first
+//   call + a schema-violating second call executes NOTHING (the frozen
+//   candidate wrote the first file first); a same-provider-id conflict is
+//   loud with zero dispatch; an identical re-send executes once; distinct
+//   ids with equal arguments both execute.
+// - CL-02 反例B/PF06 (F12): a normally-stopped reasoning-only turn settles
+//   `completed.no_final.process_only` — NO final_message_committed (the
+//   frozen candidate persisted completed.with_final with only Reasoning).
+// - CL-02 反例A/PF06 (F13): the committed final message is the NORMALIZED
+//   projection (the frozen candidate persisted the raw tagged text); the
+//   live deltas and the persisted message share the one scanner; the
+//   final_message_committed event carries the same normalized content as
+//   the messages row.
+
+/// One openai tool-call stream: all `calls` in one delta + the
+/// `tool_calls` finish + [DONE].
+fn rr1_openai_tool_stream(calls: &[(&str, &str, serde_json::Value)]) -> Script {
+    let wire_calls: Vec<serde_json::Value> = calls
+        .iter()
+        .enumerate()
+        .map(|(i, (id, name, args))| {
+            serde_json::json!({
+                "index": i, "id": id, "type": "function",
+                "function": {"name": name, "arguments": args.to_string()}
+            })
+        })
+        .collect();
+    sse(format!(
+        "{}{}{}",
+        openai_frame(serde_json::json!({
+            "id":"chatcmpl-rr1","choices":[{"index":0,
+                "delta":{"role":"assistant","tool_calls":wire_calls},"finish_reason":null}]}
+        )),
+        openai_finish_frame("tool_calls"),
+        openai_done()
+    ))
+}
+
+/// The tool-result messages of the stub's Nth recorded request.
+fn rr1_tool_results_of(requests: &[RecordedRequest], index: usize) -> Vec<serde_json::Value> {
+    requests.get(index).expect("request recorded").body["messages"]
+        .as_array()
+        .expect("messages array")
+        .iter()
+        .filter(|m| m["role"] == "tool")
+        .cloned()
+        .collect()
+}
+
+#[tokio::test]
+async fn rr1_f11_legal_then_schema_invalid_batch_has_zero_side_effects() {
+    // CL-03 反例 A verbatim in shape: `write(output.txt, legal)` followed by
+    // `read(path=123)` in ONE model turn. The read arguments are parseable
+    // JSON (number, not string) — the violation is against the CURRENT tool
+    // schema, discovered at admission. Expected AFTER the repair: the WHOLE
+    // batch is refused before any side effect (the frozen candidate wrote
+    // output.txt first).
+    let stub = StubServer::start(vec![
+        rr1_openai_tool_stream(&[
+            (
+                "call_good",
+                "write",
+                serde_json::json!({"path": "output.txt", "content": "BAD_BATCH_WROTE_FILE"}),
+            ),
+            ("call_bad", "read", serde_json::json!({"path": 123})),
+        ]),
+        openai_final("rr1 f11 batch refused honestly"),
+    ])
+    .await;
+    let boot = boot_with_config("rr1-f11a", &openai_plane(&stub)).await;
+
+    let run_id = execute(&boot.state, "Execute model tool batch.").await;
+    let (status, reason) = run_row(&boot.state, &run_id).await;
+    assert_eq!(status, "completed");
+    assert_eq!(reason.as_deref(), Some("completed.with_final"));
+
+    // ZERO side effects: the workspace file never materialized and no tool
+    // was ever started (admission refusals close as never-dispatched
+    // completions, never as started dispatches).
+    assert!(
+        !boot.workspace.join("output.txt").exists(),
+        "the legal sibling must not execute before the batch passes admission"
+    );
+    assert_eq!(
+        count_events(&boot.state, &run_id, "tool_call_started").await,
+        0,
+        "a batch that failed admission dispatches nothing"
+    );
+    // Both calls came back to the model as structured refusals under their
+    // own (distinct) ids — the model can correct and retry.
+    let requests = stub.requests();
+    assert!(
+        requests.len() >= 2,
+        "the model was re-asked after the refusal"
+    );
+    let results = rr1_tool_results_of(&requests, 1);
+    assert_eq!(results.len(), 2, "both calls answered: {results:?}");
+    let ids: Vec<&str> = results
+        .iter()
+        .map(|r| r["tool_call_id"].as_str().expect("id"))
+        .collect();
+    assert_eq!(ids, vec!["call_good", "call_bad"]);
+    for result in &results {
+        assert!(
+            result["content"].to_string().contains("refused")
+                || result["content"].to_string().contains("failed")
+                || result["content"].to_string().contains("schema")
+                || result["content"].to_string().contains("not dispatched")
+                || result["content"].to_string().contains("admission"),
+            "the refusal outcome travels to the model: {result}"
+        );
+    }
+
+    stub.stop().await;
+    teardown_boot(&boot).await;
+}
+
+#[tokio::test]
+async fn rr1_f11_same_provider_id_conflict_is_loud_with_zero_side_effects() {
+    // CL-03 反例 B verbatim in shape: two `id="dup"` writes with different
+    // paths in one turn. The adapter must reject the whole batch as a
+    // protocol violation (the frozen candidate executed BOTH and answered
+    // with two same-id results in the next request).
+    let stub = StubServer::start(vec![rr1_openai_tool_stream(&[
+        (
+            "dup",
+            "write",
+            serde_json::json!({"path": "a.txt", "content": "A"}),
+        ),
+        (
+            "dup",
+            "write",
+            serde_json::json!({"path": "b.txt", "content": "B"}),
+        ),
+    ])])
+    .await;
+    let boot = boot_with_config("rr1-f11b", &openai_plane(&stub)).await;
+
+    let run_id = execute(&boot.state, "Duplicate id batch.").await;
+    let (status, reason) = run_row(&boot.state, &run_id).await;
+    assert_eq!(status, "failed");
+    assert_eq!(reason.as_deref(), Some("failed.provider_error"));
+    assert!(!boot.workspace.join("a.txt").exists());
+    assert!(!boot.workspace.join("b.txt").exists());
+    assert_eq!(
+        count_events(&boot.state, &run_id, "tool_call_started").await,
+        0
+    );
+    assert_eq!(stub.requests().len(), 1, "no re-ask after the loud refusal");
+    assert!(
+        final_message_content(&boot.state, &run_id).await.is_none(),
+        "no fabricated final"
+    );
+
+    stub.stop().await;
+    teardown_boot(&boot).await;
+}
+
+#[tokio::test]
+async fn rr1_f11_identical_resend_executes_once() {
+    // T04-C10: a SAME-id SAME-arguments re-send completes once — one
+    // execution, one result under the shared id (never a double write,
+    // never two same-id results in the next request).
+    let stub = StubServer::start(vec![
+        rr1_openai_tool_stream(&[
+            (
+                "same",
+                "write",
+                serde_json::json!({"path": "once.txt", "content": "ONCE"}),
+            ),
+            (
+                "same",
+                "write",
+                serde_json::json!({"path": "once.txt", "content": "ONCE"}),
+            ),
+        ]),
+        openai_final("rr1 f11 resend collapsed"),
+    ])
+    .await;
+    let boot = boot_with_config("rr1-f11c", &openai_plane(&stub)).await;
+
+    let run_id = execute(&boot.state, "Write once, resend identical.").await;
+    let (status, _reason) = run_row(&boot.state, &run_id).await;
+    assert_eq!(status, "completed");
+    let content =
+        std::fs::read_to_string(boot.workspace.join("once.txt")).expect("executed exactly once");
+    assert_eq!(content, "ONCE");
+    assert_eq!(
+        count_events(&boot.state, &run_id, "tool_call_started").await,
+        1,
+        "the identical re-send collapses to one execution"
+    );
+    let requests = stub.requests();
+    let results = rr1_tool_results_of(&requests, 1);
+    assert_eq!(
+        results.len(),
+        1,
+        "one result under the shared id: {results:?}"
+    );
+
+    stub.stop().await;
+    teardown_boot(&boot).await;
+}
+
+#[tokio::test]
+async fn rr1_f11_distinct_ids_with_equal_arguments_both_execute() {
+    // The positive control against over-dedup: two DIFFERENT ids carrying
+    // IDENTICAL arguments are two legal calls — both execute.
+    let stub = StubServer::start(vec![
+        rr1_openai_tool_stream(&[
+            ("one", "read", serde_json::json!({"path": "note.txt"})),
+            ("two", "read", serde_json::json!({"path": "note.txt"})),
+        ]),
+        openai_final("rr1 f11 two independent reads"),
+    ])
+    .await;
+    let boot = boot_with_config("rr1-f11d", &openai_plane(&stub)).await;
+    std::fs::write(boot.workspace.join("note.txt"), "rr1 note").expect("seed");
+
+    let run_id = execute(&boot.state, "Read the note twice.").await;
+    let (status, _) = run_row(&boot.state, &run_id).await;
+    assert_eq!(status, "completed");
+    assert_eq!(
+        count_events(&boot.state, &run_id, "tool_call_started").await,
+        2,
+        "distinct ids never merge"
+    );
+    let requests = stub.requests();
+    let results = rr1_tool_results_of(&requests, 1);
+    assert_eq!(results.len(), 2);
+    let ids: Vec<&str> = results
+        .iter()
+        .map(|r| r["tool_call_id"].as_str().expect("id"))
+        .collect();
+    assert_eq!(ids, vec!["one", "two"]);
+
+    stub.stop().await;
+    teardown_boot(&boot).await;
+}
+
+#[tokio::test]
+async fn rr1_f12_reasoning_only_turn_settles_process_only_without_final() {
+    // CL-02 反例 B verbatim in shape: only `reasoning_content` deltas, then
+    // a legal `finish_reason=stop` and [DONE]. The run must settle
+    // completed.no_final.process_only with NO final_message_committed (the
+    // frozen candidate persisted completed.with_final carrying only a
+    // Reasoning block).
+    let stub = StubServer::start(vec![sse(format!(
+        "{}{}{}",
+        openai_frame(serde_json::json!({
+            "id":"chatcmpl-rr1p","choices":[{"index":0,
+                "delta":{"reasoning_content":"PROCESS_ONLY_REASONING"},"finish_reason":null}]}
+        )),
+        openai_finish_frame("stop"),
+        openai_done()
+    ))])
+    .await;
+    let boot = boot_with_config("rr1-f12a", &openai_plane(&stub)).await;
+
+    let run_id = execute(&boot.state, "Reply with the model response.").await;
+    let (status, reason) = run_row(&boot.state, &run_id).await;
+    assert_eq!(status, "completed");
+    assert_eq!(
+        reason.as_deref(),
+        Some("completed.no_final.process_only"),
+        "process-only content is a real no-final terminal"
+    );
+    assert!(
+        final_message_content(&boot.state, &run_id).await.is_none(),
+        "no final message row without a true final"
+    );
+    assert_eq!(
+        count_events(&boot.state, &run_id, "final_message_committed").await,
+        0,
+        "no final_message_committed without a true final"
+    );
+    // The process content stays honestly visible as reasoning deltas.
+    let payloads = known_payloads(&boot.state, &run_id).await;
+    let reasoning: String = payloads
+        .iter()
+        .filter_map(|p| match p {
+            KnownEventPayload::ModelCallDelta(d) => Some(d.delta.as_str()),
+            _ => None,
+        })
+        .collect();
+    assert!(reasoning.contains("PROCESS_ONLY_REASONING"));
+
+    stub.stop().await;
+    teardown_boot(&boot).await;
+}
+
+#[tokio::test]
+async fn rr1_f12_mood_only_text_settles_process_only_without_final() {
+    // The mood-only leg: visible-looking text that normalizes to NOTHING
+    // displayable is process content, not a final answer.
+    let stub = StubServer::start(vec![openai_final("<mood>只是心情</mood>")]).await;
+    let boot = boot_with_config("rr1-f12b", &openai_plane(&stub)).await;
+
+    let run_id = execute(&boot.state, "How are you.").await;
+    let (status, reason) = run_row(&boot.state, &run_id).await;
+    assert_eq!(status, "completed");
+    assert_eq!(reason.as_deref(), Some("completed.no_final.process_only"));
+    assert!(final_message_content(&boot.state, &run_id).await.is_none());
+    assert_eq!(
+        count_events(&boot.state, &run_id, "final_message_committed").await,
+        0
+    );
+
+    stub.stop().await;
+    teardown_boot(&boot).await;
+}
+
+#[tokio::test]
+async fn rr1_f12_unclassified_live_text_stays_unresolved_until_the_terminal() {
+    // PF06 live-phase leg (assertion unchanged in intent): pre-terminal
+    // text is NOT marked final_answer. Durable model_call_delta phases for
+    // text are `unresolved`; the text segment's END — which fires at the
+    // call's terminal, after the provider turn is classified — resolves to
+    // final_answer only because the turn really was a final with visible
+    // text.
+    let stub = StubServer::start(vec![openai_final("确定答案")]).await;
+    let boot = boot_with_config("rr1-f12c", &openai_plane(&stub)).await;
+
+    let run_id = execute(&boot.state, "Answer deterministically.").await;
+    let (status, _) = run_row(&boot.state, &run_id).await;
+    assert_eq!(status, "completed");
+
+    let payloads = known_payloads(&boot.state, &run_id).await;
+    for payload in &payloads {
+        if let KnownEventPayload::ModelCallDelta(d) = payload {
+            assert!(
+                !matches!(d.phase, lingxi_protocol::AssistantPhase::FinalAnswer),
+                "a live text delta is never pre-classified final_answer: {d:?}"
+            );
+        }
+    }
+    let text_segment_ends: Vec<&lingxi_protocol::AssistantSegmentEndPayload> = payloads
+        .iter()
+        .filter_map(|p| match p {
+            KnownEventPayload::AssistantSegmentEnd(e) => Some(e),
+            _ => None,
+        })
+        .collect();
+    assert!(
+        text_segment_ends.iter().any(|e| matches!(
+            e.semantic_phase,
+            lingxi_protocol::AssistantPhase::FinalAnswer
+        )),
+        "the confirmed-final text segment resolves at its end: {text_segment_ends:?}"
+    );
+
+    stub.stop().await;
+    teardown_boot(&boot).await;
+}
+
+#[tokio::test]
+async fn rr1_f13_final_message_projection_is_normalized_same_source() {
+    // CL-02 反例 A verbatim: a fenced literal think tag, a standalone think
+    // block, a mood block, and the visible answer — the live stream splits
+    // them; the COMMITTED final message must be the same normalized
+    // projection (the frozen candidate persisted one raw Text block with
+    // all tags intact).
+    let raw = "literal:\n```\n<think>keep quoted</think>\n```\n<think>PRIVATE_THINK_PROBE</think><mood>PRIVATE_MOOD_PROBE</mood>VISIBLE_FINAL_PROBE";
+    let stub = StubServer::start(vec![anthropic_final(raw)]).await;
+    let boot = boot_with_config("rr1-f13", &anthropic_plane(&stub)).await;
+
+    let run_id = execute(&boot.state, "Reply with the model response.").await;
+    let (status, reason) = run_row(&boot.state, &run_id).await;
+    assert_eq!(status, "completed");
+    assert_eq!(reason.as_deref(), Some("completed.with_final"));
+
+    // The persisted message row is the NORMALIZED projection.
+    let content_json = final_message_content(&boot.state, &run_id)
+        .await
+        .expect("final message row");
+    let message: serde_json::Value =
+        serde_json::from_str(&content_json).expect("canonical message json");
+    let blocks = message["content"].as_array().expect("content blocks");
+    let text_of =
+        |b: &serde_json::Value| -> String { b["text"].as_str().unwrap_or_default().to_string() };
+    let kinds: Vec<&str> = blocks
+        .iter()
+        .map(|b| b["type"].as_str().unwrap_or_default())
+        .collect();
+    assert!(
+        kinds.contains(&"reasoning"),
+        "the standalone think block structures as reasoning: {kinds:?}"
+    );
+    assert!(
+        kinds.contains(&"text"),
+        "the visible answer stays text: {kinds:?}"
+    );
+    let all_text: String = blocks
+        .iter()
+        .filter(|b| b["type"] == "text")
+        .map(text_of)
+        .collect();
+    let all_reasoning: String = blocks
+        .iter()
+        .filter(|b| b["type"] == "reasoning")
+        .map(text_of)
+        .collect();
+    // Code-fence protection survives into the persisted projection.
+    assert!(
+        all_text.contains("<think>keep quoted</think>"),
+        "the fenced literal stays literal text: {all_text:?}"
+    );
+    assert!(
+        all_text.contains("VISIBLE_FINAL_PROBE"),
+        "the visible answer is the persisted body: {all_text:?}"
+    );
+    // The private think/mood content never returns as displayable body.
+    assert!(
+        !all_text.contains("PRIVATE_THINK_PROBE")
+            && !all_text.contains("<mood>")
+            && !all_text.contains("PRIVATE_MOOD_PROBE")
+            && !all_text.contains("<think>PRIVATE"),
+        "raw tags never混回 the persisted body: {all_text:?}"
+    );
+    assert!(
+        all_reasoning.contains("PRIVATE_THINK_PROBE"),
+        "the think content is preserved as reasoning (not dropped): {all_reasoning:?}"
+    );
+
+    // The final_message_committed EVENT carries the same normalized message
+    // as the row (event and storage are one projection).
+    let payloads = known_payloads(&boot.state, &run_id).await;
+    let committed: Vec<&lingxi_protocol::FinalMessageCommittedPayload> = payloads
+        .iter()
+        .filter_map(|p| match p {
+            KnownEventPayload::FinalMessageCommitted(m) => Some(m),
+            _ => None,
+        })
+        .collect();
+    assert_eq!(committed.len(), 1);
+    let event_message = &committed[0].message;
+    assert!(
+        event_message.content.iter().any(|b| matches!(
+            b,
+            lingxi_protocol::ContentBlock::Text { text }
+                if text.contains("VISIBLE_FINAL_PROBE")
+        )),
+        "the committed event is normalized too: {:?}",
+        event_message.content
+    );
+    assert!(
+        !event_message.content.iter().any(|b| matches!(
+            b,
+            lingxi_protocol::ContentBlock::Text { text }
+                if text.contains("PRIVATE_MOOD_PROBE") || text.contains("<think>PRIVATE")
+        )),
+        "no raw tags in the committed event body"
+    );
+
+    // Same-source: the LIVE deltas decompose identically (think →
+    // reasoning, mood stripped, fenced literal + visible answer as text).
+    let mut live_reasoning = String::new();
+    let mut live_text = String::new();
+    for payload in &payloads {
+        if let KnownEventPayload::ModelCallDelta(d) = payload {
+            match d.phase {
+                lingxi_protocol::AssistantPhase::Reasoning => live_reasoning.push_str(&d.delta),
+                _ => live_text.push_str(&d.delta),
+            }
+        }
+    }
+    assert!(live_reasoning.contains("PRIVATE_THINK_PROBE"));
+    assert!(live_text.contains("<think>keep quoted</think>"));
+    assert!(live_text.contains("VISIBLE_FINAL_PROBE"));
+    assert!(!live_text.contains("PRIVATE_MOOD_PROBE"));
+
+    stub.stop().await;
+    teardown_boot(&boot).await;
+}
+
+#[tokio::test]
+async fn rr1_f12_unclassified_live_text_is_not_marked_final_pre_terminal() {
+    // The audit's normalizer-level counterexample, asserted at the owning
+    // module's boundary: feeding text with no terminal produces NO
+    // final_answer-phase ModelDelta.
+    use lingxi_service::streaming_norm::{DeltaNormalizer, NormEvent};
+    let mut n = DeltaNormalizer::new(1);
+    let events = n.feed(&lingxi_kernel::ports::ModelTurnDelta::Text(
+        "I will inspect the file now".into(),
+    ));
+    println!("pre_terminal_events={events:?}");
+    assert!(
+        !events.iter().any(|e| matches!(
+            e,
+            NormEvent::ModelDelta {
+                phase: lingxi_protocol::AssistantPhase::FinalAnswer,
+                ..
+            }
+        )),
+        "no terminal or semantic phase received yet"
+    );
 }

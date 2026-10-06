@@ -1,0 +1,35 @@
+{
+  "head": "d80737b6cb9186c8a18c0f35923aac00249d45c3",
+  "probe_tests": 8,
+  "actual_contract_failures": 8,
+  "files": {
+    "R05_T06_T07_ADVERSARIAL_REVIEW.md": {
+      "bytes": 17960,
+      "sha256": "5dc584f5d137c5ae00a7e1187f46827a642153ea2bf130c90863127c40a5cc5d"
+    },
+    "tests/usage_audit.rs": {
+      "bytes": 66985,
+      "sha256": "f924eb97d4053abd01f9d034f739e9212f1a4bf1fc305fab0453c7a89bc983d9"
+    },
+    "tests/operations_audit.rs": {
+      "bytes": 37647,
+      "sha256": "2c35a8d15b4ce87cf65da32a0561f6ac32b946a93470cc594ce31df04aa59d68"
+    },
+    "usage_probes.log": {
+      "bytes": 4366,
+      "sha256": "f0637b2d85f9e4d7cc7d089a19a6eba1d01045a76417b9dc4c0256f54f3596c1"
+    },
+    "operations_probes.log": {
+      "bytes": 2860,
+      "sha256": "469c976fd252a237a2d9f9dd5224848fe4facc50d3436bffa3ccfff5043e2ae6"
+    },
+    "Cargo.toml": {
+      "bytes": 643,
+      "sha256": "670622bf0251b6c019e592542571d436fba190b2cc27f596afca6bb7efaff621"
+    },
+    "Cargo.lock": {
+      "bytes": 61799,
+      "sha256": "9578fd6c1a01da792016226ab6820dd165f5012d0f86dac18d9cf3a9c6d6037d"
+    }
+  }
+}

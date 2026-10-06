@@ -1,0 +1,28 @@
+{
+  "kind": "actual checked-in Python assembler executed on historical log fixtures (not Cargo rerun)",
+  "mutation": "rename R05-T02-C01 to non-existent R05-T99-C99 only in scratch cid-table.txt",
+  "assembler_exit": 0,
+  "stdout": "assembled 82 run records / 91 C-ID case records",
+  "mirror_conditions_recomputed": {
+    "r05_prefix": true,
+    "exactly_91_ids": true,
+    "nine_pinned_ids": true,
+    "all_runs_registered": true,
+    "one_owner_per_test": true,
+    "all_tests_owned": true
+  },
+  "original_id_present": false,
+  "fabricated_id_present": true,
+  "allCasesOk": true,
+  "allSuitesOk": true,
+  "limitation": "Actual Rust 1.98.1 mirror tests and original Python assembler were both exercised; assembler input reused historical logs as fixtures. This is NOT a full mutated verify-stage run.",
+  "mirror_rust_execution": {
+    "toolchain": "1.98.1",
+    "location": "isolated source copy, source Rust byte-identical; only copied C-ID table mutated",
+    "command": "cargo test --manifest-path audit/gate/cid_mirror_repo/rust/Cargo.toml --locked --offline -p xtask --bin xtask r05_",
+    "control_log": "audit/gate/cid-mirror-control.log",
+    "control_result": "7 passed; 0 failed; 0 ignored",
+    "mutated_log": "audit/gate/cid-mirror-mutated.log",
+    "mutated_result": "7 passed; 0 failed; 0 ignored"
+  }
+}

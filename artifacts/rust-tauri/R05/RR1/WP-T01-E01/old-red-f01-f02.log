@@ -1,0 +1,47 @@
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.11s
+     Running tests/r05_t01_model_plane.rs (rust/target/debug/deps/r05_t01_model_plane-7abf357853db7e5e)
+
+running 5 tests
+test rr1_f01_f02::f01_control_no_capability_needs_still_dispatches ... ok
+test rr1_f01_f02::f01_undeclared_image_capability_makes_zero_requests ... FAILED
+test rr1_f01_f02::f02_old_route_never_resolves_new_generation_material ... FAILED
+test rr1_f01_f02::f01_undeclared_tools_capability_makes_zero_requests ... FAILED
+test rr1_f01_f02::f02_reload_during_401_never_sends_new_key_to_old_endpoint ... FAILED
+
+failures:
+
+---- rr1_f01_f02::f01_undeclared_image_capability_makes_zero_requests stdout ----
+
+thread 'rr1_f01_f02::f01_undeclared_image_capability_makes_zero_requests' (9537626) panicked at crates/lingxi-service/tests/r05_t01_model_plane.rs:1430:9:
+assertion `left == right` failed: the gateway dispatched an image-bearing request for a model with NO declared image-input capability (R05-A02)
+  left: 1
+ right: 0
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+
+---- rr1_f01_f02::f02_old_route_never_resolves_new_generation_material stdout ----
+
+thread 'rr1_f01_f02::f02_old_route_never_resolves_new_generation_material' (9537628) panicked at crates/lingxi-service/tests/r05_t01_model_plane.rs:1665:9:
+an old-generation route was handed the NEW endpoint's key: Ok(Bearer("dummy-new-key"))
+
+---- rr1_f01_f02::f01_undeclared_tools_capability_makes_zero_requests stdout ----
+
+thread 'rr1_f01_f02::f01_undeclared_tools_capability_makes_zero_requests' (9537627) panicked at crates/lingxi-service/tests/r05_t01_model_plane.rs:1393:9:
+assertion `left == right` failed: the gateway dispatched a tools-bearing request for a model with NO declared tools capability (R05-A02: refuse before any request leaves the process)
+  left: 1
+ right: 0
+
+---- rr1_f01_f02::f02_reload_during_401_never_sends_new_key_to_old_endpoint stdout ----
+
+thread 'rr1_f01_f02::f02_reload_during_401_never_sends_new_key_to_old_endpoint' (9537629) panicked at crates/lingxi-service/tests/r05_t01_model_plane.rs:1614:13:
+the OLD endpoint A captured the NEW endpoint's key on request #1 (401 retry mixed credential material across config generations): authorization: Bearer dummy-new-key
+
+
+failures:
+    rr1_f01_f02::f01_undeclared_image_capability_makes_zero_requests
+    rr1_f01_f02::f01_undeclared_tools_capability_makes_zero_requests
+    rr1_f01_f02::f02_old_route_never_resolves_new_generation_material
+    rr1_f01_f02::f02_reload_during_401_never_sends_new_key_to_old_endpoint
+
+test result: FAILED. 1 passed; 4 failed; 0 ignored; 0 measured; 7 filtered out; finished in 0.51s
+
+error: test failed, to rerun pass `-p lingxi-service --test r05_t01_model_plane`

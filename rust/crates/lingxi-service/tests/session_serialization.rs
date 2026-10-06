@@ -712,6 +712,7 @@ async fn failed_tool_path_settles_and_returns_quotas() {
                 },
                 ProviderTurn::Empty {
                     detail: "cannot answer after the tool failed".to_string(),
+                    content: Vec::new(),
                 },
             ],
         )],

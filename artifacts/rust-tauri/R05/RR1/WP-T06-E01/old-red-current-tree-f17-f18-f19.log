@@ -1,0 +1,140 @@
+warning: field `body` is never read
+  --> crates/lingxi-service/tests/r05_t06_rr1_media_resource.rs:57:5
+   |
+54 | struct Recorded {
+   |        -------- field in this struct
+...
+57 |     body: Vec<u8>,
+   |     ^^^^
+   |
+   = note: `Recorded` has a derived impl for the trait `Clone`, but this is intentionally ignored during dead code analysis
+   = note: `#[warn(dead_code)]` (part of `#[warn(unused)]`) on by default
+
+warning: fields `gateway` and `plane_json` are never read
+   --> crates/lingxi-service/tests/r05_t06_rr1_media_resource.rs:284:5
+    |
+283 | struct Chain {
+    |        ----- fields in this struct
+284 |     gateway: Arc<ConfigModelGateway>,
+    |     ^^^^^^^
+285 |     plane_json: String,
+    |     ^^^^^^^^^^
+
+warning: `lingxi-service` (test "r05_t06_rr1_media_resource") generated 2 warnings
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.13s
+     Running tests/r05_t06_rr1_media_resource.rs (rust/target/debug/deps/r05_t06_rr1_media_resource-a8eec76cae06e894)
+
+running 15 tests
+test rr1_f17_legal_attachment_reads_still_work ... FAILED
+test rr1_f17_leaf_symlink_to_outside_is_refused_by_real_target ... ok
+test rr1_f17_attachment_read_uses_the_authorized_canonical_path ... FAILED
+test rr1_f18_old_task_survives_reload_without_retargeting ... FAILED
+test rr1_f18_legacy_fallback_uses_the_distinct_host_tracker_id ... FAILED
+test rr1_f18_cross_kind_task_id_is_refused ... FAILED
+test rr1_f18_duplicate_provider_task_id_is_disambiguated ... FAILED
+test rr1_f18_video_poll_sends_the_provider_job_id ... FAILED
+test rr1_f19_cancel_after_completion_keeps_the_delivered_fact ... FAILED
+test rr1_f18_f19_dashscope_image_task_still_completes_via_registered_product ... ok
+test rr1_f19_concurrent_polls_deliver_once ... FAILED
+test rr1_f17_attachment_size_caps_refuse_loudly ... ok
+test rr1_f19_cancel_during_inflight_poll_fences_download_and_completion ... FAILED
+test rr1_f19_cancel_during_download_leaves_no_registered_product ... FAILED
+test rr1_f17_special_file_is_refused_not_read_unbounded ... FAILED
+
+failures:
+
+---- rr1_f17_legal_attachment_reads_still_work stdout ----
+
+thread 'rr1_f17_legal_attachment_reads_still_work' (11517397) panicked at crates/lingxi-service/tests/r05_t06_rr1_media_resource.rs:524:6:
+relative authorized audio read: OperationFailure { code: InvalidMessage, message: "cannot read the audio file note.wav: No such file or directory (os error 2)", retryable: false }
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+
+---- rr1_f17_attachment_read_uses_the_authorized_canonical_path stdout ----
+RR1-F17 authorized attachment: type=png, authorized="/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-r05t06rr1-f17-canonical-28811-0/authorized-workspace/rr1-authorized-path-28811.png", actual_read_is_outside_workspace=true
+RR1-F17 authorized attachment: type=wav, authorized="/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-r05t06rr1-f17-canonical-28811-0/authorized-workspace/rr1-authorized-path-28811.wav", actual_read_is_outside_workspace=true
+
+thread 'rr1_f17_attachment_read_uses_the_authorized_canonical_path' (11517394) panicked at crates/lingxi-service/tests/r05_t06_rr1_media_resource.rs:478:5:
+authorization validates cwd+relative path but the read must use the authorized canonical scope, never the process cwd's same-named file: ["png", "wav"]
+
+---- rr1_f18_old_task_survives_reload_without_retargeting stdout ----
+
+thread 'rr1_f18_old_task_survives_reload_without_retargeting' (11517403) panicked at crates/lingxi-service/tests/r05_t06_rr1_media_resource.rs:902:5:
+assertion `left == right` failed: the old task's poll must NEVER reach the reloaded provider binding
+  left: 1
+ right: 0
+
+---- rr1_f18_legacy_fallback_uses_the_distinct_host_tracker_id stdout ----
+
+thread 'rr1_f18_legacy_fallback_uses_the_distinct_host_tracker_id' (11517402) panicked at crates/lingxi-service/tests/r05_t06_rr1_media_resource.rs:778:10:
+the legacy fallback settles the poll: OperationFailure { code: InvalidMessage, message: "provider returned HTTP 404 Not Found: {}", retryable: false }
+
+---- rr1_f18_cross_kind_task_id_is_refused stdout ----
+
+thread 'tokio-rt-worker' (11517427) panicked at crates/lingxi-service/tests/r05_t06_rr1_media_resource.rs:123:21:
+stub: unscripted path /api/v1/tasks/track-1
+
+thread 'rr1_f18_cross_kind_task_id_is_refused' (11517399) panicked at crates/lingxi-service/tests/r05_t06_rr1_media_resource.rs:1025:5:
+the refusal names the untracked-kind fact: OperationFailure { code: UpstreamUnavailable, message: "provider request failed before a response: error sending request for url (http://127.0.0.1:54984/api/v1/tasks/track-1)", retryable: false }
+
+---- rr1_f18_duplicate_provider_task_id_is_disambiguated stdout ----
+RR1-F18 duplicate tracker receipts: first="track-1" second="track-1"
+
+thread 'rr1_f18_duplicate_provider_task_id_is_disambiguated' (11517400) panicked at crates/lingxi-service/tests/r05_t06_rr1_media_resource.rs:962:5:
+assertion `left != right` failed: two LIVE tasks sharing the provider's bare id must not share one host record
+  left: "track-1"
+ right: "track-1"
+
+---- rr1_f18_video_poll_sends_the_provider_job_id stdout ----
+RR1-F18 video poll paths: ["/v1/videos", "/agnesapi?video_id=local-track"]
+
+thread 'rr1_f18_video_poll_sends_the_provider_job_id' (11517404) panicked at crates/lingxi-service/tests/r05_t06_rr1_media_resource.rs:729:5:
+the poll must send the provider-facing video_id; the local tracker is only the legacy fallback — actual paths: ["/v1/videos", "/agnesapi?video_id=local-track"]
+
+---- rr1_f19_cancel_after_completion_keeps_the_delivered_fact stdout ----
+
+thread 'rr1_f19_cancel_after_completion_keeps_the_delivered_fact' (11517405) panicked at crates/lingxi-service/tests/r05_t06_rr1_media_resource.rs:1323:10:
+cancel after completion answers with the delivered fact: OperationFailure { code: InvalidMessage, message: "media task \"done-track\" is not tracked by this service instance", retryable: false }
+
+---- rr1_f19_concurrent_polls_deliver_once stdout ----
+RR1-F19 concurrent polls: left=Ok(Completed { products: [RegisteredProduct { resource_id: "video-1791171875411-4c96a22af768f9c2", path: "/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-r05t06rr1-chain-products-28811-23/video-1791171875411-4c96a22af768f9c2", mime: "video/mp4", size_bytes: 3, sha256: "06df4f7e1394f1c57cc6583fba4d8060a5a66f4f4771c14aeff6b9af8a28c9b3" }] }) right=Ok(Completed { products: [RegisteredProduct { resource_id: "video-1791171875411-280a26f5545a407e", path: "/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-r05t06rr1-chain-products-28811-23/video-1791171875411-280a26f5545a407e", mime: "video/mp4", size_bytes: 3, sha256: "06df4f7e1394f1c57cc6583fba4d8060a5a66f4f4771c14aeff6b9af8a28c9b3" }] }) downloads=2 files=2
+
+thread 'rr1_f19_concurrent_polls_deliver_once' (11517408) panicked at crates/lingxi-service/tests/r05_t06_rr1_media_resource.rs:1267:5:
+assertion `left == right` failed: both callers get the SAME terminal receipt
+  left: "video-1791171875411-4c96a22af768f9c2"
+ right: "video-1791171875411-280a26f5545a407e"
+
+---- rr1_f19_cancel_during_inflight_poll_fences_download_and_completion stdout ----
+RR1-F19 cancellation race: late_result=Ok(Completed { products: [RegisteredProduct { resource_id: "video-1791171875614-ee478e36ad099da9", path: "/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-r05t06rr1-chain-products-28811-24/video-1791171875614-ee478e36ad099da9", mime: "video/mp4", size_bytes: 4, sha256: "9f64a747e1b97f131fabb6b447296c9b6f0201e79fb3c5356e6c77e89b6a806a" }] }); requests=["/v1/videos", "/agnesapi?video_id=cancel-track", "/audit-product.mp4"]; registered_products=1
+
+thread 'rr1_f19_cancel_during_inflight_poll_fences_download_and_completion' (11517407) panicked at crates/lingxi-service/tests/r05_t06_rr1_media_resource.rs:1110:5:
+an acknowledged local cancellation must fence an in-flight poll, never let the late answer overwrite the cancellation with Completed
+
+---- rr1_f19_cancel_during_download_leaves_no_registered_product stdout ----
+RR1-F19 cancel-during-download: late_result=Ok(Completed { products: [RegisteredProduct { resource_id: "video-1791171875714-0e9b713c416d95eb", path: "/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-r05t06rr1-chain-products-28811-16/video-1791171875714-0e9b713c416d95eb", mime: "video/mp4", size_bytes: 18, sha256: "2f655ab37e133bc8edf9edc67d19554785c7dbbbe7bfff3ca5f941b7df66d75e" }] }); registered_products=1
+
+thread 'rr1_f19_cancel_during_download_leaves_no_registered_product' (11517406) panicked at crates/lingxi-service/tests/r05_t06_rr1_media_resource.rs:1181:5:
+the cancel was acknowledged before the completion committed: Ok(Completed { products: [RegisteredProduct { resource_id: "video-1791171875714-0e9b713c416d95eb", path: "/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-r05t06rr1-chain-products-28811-16/video-1791171875714-0e9b713c416d95eb", mime: "video/mp4", size_bytes: 18, sha256: "2f655ab37e133bc8edf9edc67d19554785c7dbbbe7bfff3ca5f941b7df66d75e" }] })
+
+---- rr1_f17_special_file_is_refused_not_read_unbounded stdout ----
+
+thread 'rr1_f17_special_file_is_refused_not_read_unbounded' (11517398) panicked at crates/lingxi-service/tests/r05_t06_rr1_media_resource.rs:602:17:
+the authorized read of a FIFO never returned — the reader must refuse non-regular sources bounded, never block or read them unbounded
+
+
+failures:
+    rr1_f17_attachment_read_uses_the_authorized_canonical_path
+    rr1_f17_legal_attachment_reads_still_work
+    rr1_f17_special_file_is_refused_not_read_unbounded
+    rr1_f18_cross_kind_task_id_is_refused
+    rr1_f18_duplicate_provider_task_id_is_disambiguated
+    rr1_f18_legacy_fallback_uses_the_distinct_host_tracker_id
+    rr1_f18_old_task_survives_reload_without_retargeting
+    rr1_f18_video_poll_sends_the_provider_job_id
+    rr1_f19_cancel_after_completion_keeps_the_delivered_fact
+    rr1_f19_cancel_during_download_leaves_no_registered_product
+    rr1_f19_cancel_during_inflight_poll_fences_download_and_completion
+    rr1_f19_concurrent_polls_deliver_once
+
+test result: FAILED. 3 passed; 12 failed; 0 ignored; 0 measured; 0 filtered out; finished in 5.02s
+
+error: test failed, to rerun pass `-p lingxi-service --test r05_t06_rr1_media_resource`

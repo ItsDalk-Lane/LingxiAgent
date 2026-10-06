@@ -19,21 +19,28 @@
 //! 3. [`DeltaNormalizer`] maps the cleaned fragments onto the frozen wire
 //!    vocabulary (contract §6 / S09): `model_call_delta` carries the
 //!    per-phase fragment, `assistant_segment_*` the segment-structured view.
-//!    D5 decisions:
-//!    - text fragments are `final_answer` (the Rust adapters know the block
-//!      kind at arrival; the incumbent's `unresolved` phase existed only for
-//!      phase-at-end APIs whose textSignature resolved late — no such
-//!      ambiguity exists on this chain, so `unresolved` never originates
-//!      here);
-//!    - reasoning fragments (provider-native `ModelTurnDelta::Reasoning`
-//!      AND think-tag block text) are `reasoning`;
-//!    - mood blocks are STRIPPED from the event stream: the frozen wire
-//!      vocabulary has no mood event, and the canonical persisted message
-//!      keeps the raw tagged text (the adapter accumulates verbatim), so
-//!      history replays the same structure through
-//!      [`split_reserved_tag_segments`] — live and history are same-source;
-//!    - `commentary` has no source on this chain either (reserved
-//!      vocabulary, documented in R05_INTERFACE_EVOLUTION).
+//!    R05 RR1 F12/F13 (D5 revision): live TEXT fragments are `unresolved`
+//!    while the turn's semantics are undetermined — the frozen wire
+//!    contract (wire.rs `AssistantPhase::Unresolved`) forbids silently
+//!    guessing `final_answer` from an unclassified first fragment (no
+//!    family knows at delta time that text will not be followed by tool
+//!    calls). The text segment's END event — which fires at the call's
+//!    terminal — carries the RESOLVED phase: `final_answer` only when the
+//!    driver classified the turn as a real final with visible text (the
+//!    incumbent `phaseKnownAtEnd` shape: segments open unresolved, the end
+//!    resolves). Reasoning fragments (provider-native
+//!    [`ModelTurnDelta::Reasoning`] AND think-tag block text) are
+//!    `reasoning`; mood blocks are STRIPPED from the event stream.
+//! 4. [`normalize_final_message`] is the ONE projection from a provider
+//!    final message onto the persisted/committed form: Text blocks re-split
+//!    through the SAME scanner (think-family blocks become Reasoning,
+//!    mood-family blocks drop, code-fenced literals stay literal text) —
+//!    live deltas, the committed `final_message_committed` event, the
+//!    messages row and the restart read all share this one source (R05 RR1
+//!    F13; the raw protocol text stays in the run's typed exchange for
+//!    provider replay, never mixed back into the displayable body).
+//!    - `commentary` has no source on this chain (reserved vocabulary,
+//!      documented in R05_INTERFACE_EVOLUTION).
 //!
 //!    Segment ids follow the incumbent shape with the run's turn number as
 //!    the ordinal: `assistant:{turn}:reasoning:default` /
@@ -43,7 +50,7 @@
 //!    one resident text segment per model call.
 
 use lingxi_kernel::ports::ModelTurnDelta;
-use lingxi_protocol::{AssistantPhase, SegmentKind};
+use lingxi_protocol::{AssistantPhase, ContentBlock, NormalizedMessage, SegmentKind};
 
 /// The think layer's vocabulary (`core/events.ts` THINK_TAGS).
 pub const THINK_TAGS: [&str; 3] = ["think", "thinking", "mm:think"];
@@ -802,7 +809,13 @@ impl DeltaNormalizer {
     /// resolve as literal text into the CURRENT segment), then close the
     /// open segments (reasoning first — the incumbent's
     /// `finishOpenSegments` order).
-    pub fn finish(&mut self) -> Vec<NormEvent> {
+    ///
+    /// R05 RR1 F12: `final_answer_confirmed` is the driver's TERMINAL
+    /// classification of the call (true only when the provider turn is a
+    /// real `Final` carrying visible text). The text segment's END carries
+    /// `final_answer` only then; otherwise it closes as `unresolved` — the
+    /// undetermined phase is surfaced, never guessed (wire.rs contract).
+    pub fn finish(&mut self, final_answer_confirmed: bool) -> Vec<NormEvent> {
         let mut out = Vec::new();
         for event in self.think.flush() {
             self.route_think(event, &mut out);
@@ -821,7 +834,11 @@ impl DeltaNormalizer {
             self.text_open = false;
             out.push(NormEvent::SegmentEnd {
                 segment_id: self.text_segment_id(),
-                phase: AssistantPhase::FinalAnswer,
+                phase: if final_answer_confirmed {
+                    AssistantPhase::FinalAnswer
+                } else {
+                    AssistantPhase::Unresolved
+                },
             });
         }
         out
@@ -895,17 +912,21 @@ impl DeltaNormalizer {
             out.push(NormEvent::SegmentStart {
                 segment_id: segment_id.clone(),
                 kind: SegmentKind::Text,
-                phase: AssistantPhase::FinalAnswer,
+                phase: AssistantPhase::Unresolved,
             });
         }
+        // R05 RR1 F12: the live text phase stays UNRESOLVED — no family can
+        // know at fragment time that this text is the final answer (text
+        // may still be followed by tool calls in the same turn). The
+        // resolution fires on the segment's END at the call's terminal.
         out.push(NormEvent::ModelDelta {
-            phase: AssistantPhase::FinalAnswer,
+            phase: AssistantPhase::Unresolved,
             delta: text.to_string(),
         });
         out.push(NormEvent::SegmentDelta {
             segment_id,
             delta: text.to_string(),
-            phase: AssistantPhase::FinalAnswer,
+            phase: AssistantPhase::Unresolved,
         });
     }
 }
@@ -963,6 +984,77 @@ pub fn split_reserved_tag_segments(content: &str, tags: &[&str]) -> Vec<Reserved
     }
     push_text!();
     segments
+}
+
+/// The full reserved vocabulary of the normalization chain (the think layer
+/// followed by the mood layer — one combined scan order).
+const RESERVED_VOCABULARY: [&str; 6] =
+    ["think", "thinking", "mm:think", "mood", "pulse", "reflect"];
+
+fn is_mood_tag(tag: &str) -> bool {
+    MOOD_TAGS.contains(&tag)
+}
+
+/// R05 RR1 F13: the ONE projection from a provider final message onto the
+/// committed/persisted form. Every `Text` block re-splits through the SAME
+/// scanner the live chain uses:
+/// - think-family blocks become [`ContentBlock::Reasoning`] (process state,
+///   structured out of the displayable body);
+/// - mood-family blocks DROP (never displayable, never persisted as body);
+/// - literal text — including code-fenced/escaped reserved tags and paired
+///   unknown markup — stays `Text` verbatim.
+///
+/// Non-text blocks pass through untouched (provider-native Reasoning,
+/// opaque protocol state, resource refs): the projection never invents or
+/// destroys protocol state.
+///
+/// The RAW message stays authoritative for the run's typed exchange
+/// (provider replay needs the bytes the provider sent); this projection is
+/// what `final_message_committed`, the messages row and every history read
+/// carry — live and persisted share the one scanner (same-source).
+pub fn normalize_final_message(message: NormalizedMessage) -> NormalizedMessage {
+    let mut content = Vec::with_capacity(message.content.len());
+    for block in &message.content {
+        match block {
+            ContentBlock::Text { text } => {
+                for segment in split_reserved_tag_segments(text, &RESERVED_VOCABULARY) {
+                    match segment {
+                        ReservedTagSegment::Text(piece) => {
+                            if !piece.is_empty() {
+                                content.push(ContentBlock::Text { text: piece });
+                            }
+                        }
+                        ReservedTagSegment::Block { tag, content: body } => {
+                            if is_mood_tag(&tag) {
+                                // Mood content is dropped from the committed
+                                // body (same as the live chain).
+                                continue;
+                            }
+                            if !body.is_empty() {
+                                content.push(ContentBlock::Reasoning { text: body });
+                            }
+                        }
+                    }
+                }
+            }
+            other => content.push(other.clone()),
+        }
+    }
+    NormalizedMessage {
+        role: message.role,
+        content,
+        model_call_id: message.model_call_id,
+    }
+}
+
+/// Whether a (possibly normalized) message carries any displayable answer
+/// text at all (R05 RR1 F12: a turn whose every block is process state —
+/// reasoning/opaque/mood-only text — has no final to commit).
+pub fn message_has_visible_text(message: &NormalizedMessage) -> bool {
+    message
+        .content
+        .iter()
+        .any(|block| matches!(block, ContentBlock::Text { text } if !text.trim().is_empty()))
 }
 
 #[cfg(test)]
@@ -1154,9 +1246,11 @@ mod tests {
         let mut out = norm.feed(&ModelTurnDelta::Text(
             "<think>why</think>\n<mood>glad</mood>hello".to_string(),
         ));
-        out.extend(norm.finish());
+        out.extend(norm.finish(true));
         // Reasoning fragment → reasoning segment; mood stripped entirely;
-        // body → final_answer text segment; both segments close at finish.
+        // body text opens UNRESOLVED (F12: no guessing final_answer from an
+        // unclassified fragment) and its segment END resolves to final_answer
+        // only when the driver confirmed the turn's terminal classification.
         let kinds: Vec<&str> = out
             .iter()
             .map(|e| match e {
@@ -1168,12 +1262,15 @@ mod tests {
                     match phase {
                         AssistantPhase::Reasoning => "delta:reasoning",
                         AssistantPhase::FinalAnswer => "delta:final",
-                        _ => "delta:other",
+                        AssistantPhase::Unresolved => "delta:unresolved",
+                        AssistantPhase::Commentary => "delta:commentary",
                     }
                 }
                 NormEvent::SegmentEnd { phase, .. } => match phase {
                     AssistantPhase::Reasoning => "end:reasoning",
-                    _ => "end:final",
+                    AssistantPhase::FinalAnswer => "end:final",
+                    AssistantPhase::Unresolved => "end:unresolved",
+                    AssistantPhase::Commentary => "end:commentary",
                 },
             })
             .collect();
@@ -1184,8 +1281,8 @@ mod tests {
                 "delta:reasoning",
                 "delta:reasoning",
                 "start:text",
-                "delta:final",
-                "delta:final",
+                "delta:unresolved",
+                "delta:unresolved",
                 "end:reasoning",
                 "end:final",
             ]
@@ -1193,15 +1290,34 @@ mod tests {
         let body: String = out
             .iter()
             .filter_map(|e| match e {
-                NormEvent::SegmentDelta {
-                    phase: AssistantPhase::FinalAnswer,
-                    delta,
-                    ..
-                } => Some(delta.as_str()),
+                NormEvent::SegmentDelta { phase, .. } if *phase == AssistantPhase::Unresolved => {
+                    match e {
+                        NormEvent::SegmentDelta { delta, .. } => Some(delta.as_str()),
+                        _ => None,
+                    }
+                }
                 _ => None,
             })
             .collect();
         assert_eq!(body, "hello", "mood content never enters the event stream");
+        // Without terminal confirmation the text segment closes unresolved.
+        let mut norm = DeltaNormalizer::new(2);
+        let mut out = norm.feed(&ModelTurnDelta::Text("partial".to_string()));
+        out.extend(norm.finish(false));
+        assert!(out.iter().any(|e| matches!(
+            e,
+            NormEvent::SegmentEnd {
+                phase: AssistantPhase::Unresolved,
+                ..
+            }
+        )));
+        assert!(!out.iter().any(|e| matches!(
+            e,
+            NormEvent::ModelDelta {
+                phase: AssistantPhase::FinalAnswer,
+                ..
+            }
+        )));
     }
 
     #[test]
@@ -1242,5 +1358,66 @@ mod tests {
                 ReservedTagSegment::Text(" post".to_string()),
             ]
         );
+    }
+
+    #[test]
+    fn final_message_projection_matches_the_live_decomposition() {
+        use lingxi_protocol::ModelCallId;
+        // The CL-02 反例 A shape: fenced literal + standalone think + mood +
+        // visible answer.
+        let raw = "literal:\n```\n<think>keep quoted</think>\n```\n<think>PRIVATE_THINK_PROBE</think><mood>PRIVATE_MOOD_PROBE</mood>VISIBLE_FINAL_PROBE";
+        let message = NormalizedMessage {
+            role: "assistant".to_string(),
+            content: vec![ContentBlock::Text {
+                text: raw.to_string(),
+            }],
+            model_call_id: Some(ModelCallId::new("mc-x")),
+        };
+        let normalized = normalize_final_message(message);
+        let joined: String = normalized
+            .content
+            .iter()
+            .map(|b| match b {
+                ContentBlock::Text { text } => format!("[text:{text}]"),
+                ContentBlock::Reasoning { text } => format!("[reasoning:{text}]"),
+                _ => "[other]".to_string(),
+            })
+            .collect();
+        assert_eq!(
+            joined,
+            "[text:literal:\n```\n<think>keep quoted</think>\n```\n]\
+             [reasoning:PRIVATE_THINK_PROBE]\
+             [text:VISIBLE_FINAL_PROBE]"
+        );
+        assert!(message_has_visible_text(&normalized));
+        // Mood-only text has NO visible answer left.
+        let mood_only = NormalizedMessage {
+            role: "assistant".to_string(),
+            content: vec![ContentBlock::Text {
+                text: "<mood>glad</mood>".to_string(),
+            }],
+            model_call_id: None,
+        };
+        let normalized = normalize_final_message(mood_only);
+        assert!(normalized.content.is_empty());
+        assert!(!message_has_visible_text(&normalized));
+        // Reasoning/opaque blocks pass through untouched (protocol state is
+        // never invented or destroyed by the projection).
+        let mixed = NormalizedMessage {
+            role: "assistant".to_string(),
+            content: vec![
+                ContentBlock::Reasoning {
+                    text: "native".to_string(),
+                },
+                ContentBlock::Opaque {
+                    provider: "p".to_string(),
+                    data: serde_json::json!({"sig": 1}),
+                },
+            ],
+            model_call_id: None,
+        };
+        let normalized = normalize_final_message(mixed);
+        assert_eq!(normalized.content.len(), 2);
+        assert!(!message_has_visible_text(&normalized));
     }
 }

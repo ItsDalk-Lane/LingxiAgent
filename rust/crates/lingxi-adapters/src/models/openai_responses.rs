@@ -61,7 +61,7 @@ pub const FAMILY: &str = "openai-responses";
 /// The real HTTP adapter for the openai-responses family. Stateless per
 /// call; no redirects (C10); error classification shared.
 pub struct OpenAiResponsesAdapter {
-    client: reqwest::Client,
+    client: dispatch::NetworkClient,
     schema_budget: SchemaBudget,
     timeouts: dispatch::HttpTimeouts,
 }
@@ -76,8 +76,24 @@ impl OpenAiResponsesAdapter {
         schema_budget: SchemaBudget,
         timeouts: dispatch::HttpTimeouts,
     ) -> Result<Self, ProtocolError> {
+        Self::new_with_timeouts_and_network(
+            schema_budget,
+            timeouts,
+            super::network::NetworkPlane::direct_isolated(),
+        )
+    }
+
+    /// R05 RR1 F14: the client is BOUND to the model plane's reloadable
+    /// network policy (proxy / NO_PROXY / explicit CA per configuration
+    /// generation; the legacy constructors keep the pre-F14 direct
+    /// behavior for isolated tests).
+    pub fn new_with_timeouts_and_network(
+        schema_budget: SchemaBudget,
+        timeouts: dispatch::HttpTimeouts,
+        network: std::sync::Arc<super::network::NetworkPlane>,
+    ) -> Result<Self, ProtocolError> {
         Ok(Self {
-            client: dispatch::build_client_with_timeouts(&timeouts)?,
+            client: network.client_handle(timeouts)?,
             schema_budget,
             timeouts,
         })
@@ -134,8 +150,12 @@ impl OpenAiResponsesAdapter {
             Err(error) => return fail(error, false),
         };
         let url = dispatch::append_provider_api_path(&route.endpoint, "/responses");
+        let client = match self.client.client() {
+            Ok(client) => client,
+            Err(error) => return fail(error, false),
+        };
         let request = dispatch::apply_auth(
-            self.client.post(&url).json(&body),
+            client.post(&url).json(&body),
             auth,
             BearerStyle::AuthorizationBearer,
         );
@@ -164,6 +184,12 @@ impl OpenAiResponsesAdapter {
         if let Err((error, retryable)) = drive {
             return fail(error, retryable);
         }
+        // R05 RR1 F38 (F21 same-path fix): capture the usage the stream
+        // observed BEFORE `finish` consumes the accumulator — a parse
+        // failure must not erase it.
+        let salvaged_usage = drive_handler
+            .accumulator
+            .observed_usage_report(lingxi_kernel::model_exchange::ProtocolFamily::OpenAiResponses);
         match drive_handler
             .accumulator
             .finish(call, &input.tools, &self.schema_budget)
@@ -183,7 +209,7 @@ impl OpenAiResponsesAdapter {
             },
             Err(error) => {
                 let retryable = error.retryable;
-                fail(error, retryable)
+                fail(error, retryable).with_usage_report(salvaged_usage)
             }
         }
     }
@@ -191,12 +217,56 @@ impl OpenAiResponsesAdapter {
 
 // ── outbound rendering (pure; shared with the codex sibling) ────────────────
 
+/// Whether an assistant turn's content carries THIS family's opaque state
+/// (R05 RR1 F09): reasoning items, function_call anchors and preserved
+/// unknown items are bound to the provider/model that minted them.
+fn turn_carries_family_state(content: &[ContentBlock], family: &str) -> bool {
+    content
+        .iter()
+        .any(|block| matches!(block, ContentBlock::Opaque { provider, .. } if provider == family))
+}
+
+/// R05 RR1 F09: the source-authorization gate for this family's opaque
+/// state (same contract as the other families' — a family tag is never
+/// source authorization).
+fn enforce_turn_origin(
+    origin: &Option<lingxi_kernel::model_exchange::TurnOrigin>,
+    route: &ResolvedModelRoute,
+    family: &str,
+) -> Result<(), ProtocolError> {
+    let invalid = |detail: String| ProtocolError::new(ErrorCode::InvalidMessage, detail, false);
+    match origin {
+        Some(origin) if origin.authorizes(&route.provider, &route.model) => Ok(()),
+        Some(origin) => Err(invalid(format!(
+            "the exchange history carries {family} opaque state (reasoning items / call \
+             anchors) minted by provider {:?} model {:?}; this request targets provider {:?} \
+             model {:?}. Same-protocol-family is NOT source authorization — replaying another \
+             origin's encrypted state would corrupt the protocol round-trip. Restart or compact \
+             the session onto one serving model, or re-route the run to the origin model.",
+            origin.provider, origin.model, route.provider, route.model
+        ))),
+        None => Err(invalid(format!(
+            "the exchange history carries {family} opaque state (reasoning items / call \
+             anchors) with no recorded serving origin; unproven protocol state is never \
+             forwarded onto a request (restart or compact the session)"
+        ))),
+    }
+}
+
 /// Renders the exchange into the family's `input` items (shared by both
 /// responses adapters — the wire vocabulary is identical; only the
 /// transport framing differs).
+///
+/// R05 RR1 F10: the items keep the ORIGINAL relative order of the turn's
+/// content — text message segments, reasoning items and anchored
+/// function_calls each replay at the position they arrived in; the family
+/// never re-sorts history into a fixed "standard" order. (Adjacent text
+/// blocks merge into one message segment joined by `\n` — the registered
+/// normalization for indistinguishable adjacent segments.)
 pub(crate) fn render_input_items(
     input: &ModelTurnInput,
     family: &str,
+    route: &ResolvedModelRoute,
 ) -> Result<Vec<serde_json::Value>, ProtocolError> {
     let invalid = |detail: String| ProtocolError::new(ErrorCode::InvalidMessage, detail, false);
     let mut items: Vec<serde_json::Value> = Vec::new();
@@ -222,82 +292,131 @@ pub(crate) fn render_input_items(
             ExchangeItem::AssistantTurn {
                 content,
                 tool_calls,
+                origin,
                 ..
             } => {
-                let mut text = String::new();
-                for block in content {
-                    match block {
-                        ContentBlock::Text { text: block_text } => {
-                            if !text.is_empty() {
-                                text.push('\n');
-                            }
-                            text.push_str(block_text);
-                        }
-                        ContentBlock::Reasoning { .. } => {
-                            // A bare Reasoning has no wire shape without
-                            // its reasoning item (the opaque companion
-                            // carries it — handled below); never rendered
-                            // as answer text.
-                        }
-                        ContentBlock::Opaque { provider, data } => {
-                            // This family's reasoning items re-insert
-                            // verbatim at their position (C10); another
-                            // family's state is never echoed.
-                            if provider == family
-                                && data.get("type").and_then(|t| t.as_str()) == Some("reasoning")
-                            {
-                                items.push(data.clone());
-                            }
-                        }
-                        ContentBlock::ResourceRef { resource } => {
-                            if !text.is_empty() {
-                                text.push('\n');
-                            }
-                            match &resource.uri {
-                                Some(uri) => text.push_str(&format!("[resource: {uri}]")),
-                                None => text.push_str("[resource]"),
-                            }
-                        }
+                // R05 RR1 F09: opaque state is source-bound — check before
+                // any of it could be echoed.
+                if turn_carries_family_state(content, family) {
+                    enforce_turn_origin(origin, route, family)?;
+                }
+                // The position-anchored rendering map: call_id → (the
+                // exchange call, consumed-by-anchor yet?).
+                let mut calls_by_id: std::collections::HashMap<
+                    String,
+                    (lingxi_kernel::model_exchange::RequestedToolCall, bool),
+                > = std::collections::HashMap::new();
+                for call in tool_calls {
+                    if let Some(id) = &call.provider_call_id {
+                        calls_by_id.insert(id.clone(), (call.clone(), false));
                     }
                 }
-                if !text.is_empty() {
+                // The ordered walk: adjacent text blocks accumulate into the
+                // current message segment; every non-text block flushes it
+                // FIRST so the segment keeps its position.
+                let mut text_run: Vec<String> = Vec::new();
+                let flush_text = |items: &mut Vec<serde_json::Value>,
+                                  text_run: &mut Vec<String>| {
+                    if text_run.is_empty() {
+                        return;
+                    }
+                    let text = text_run.join("\n");
+                    text_run.clear();
                     items.push(serde_json::json!({
                         "type": "message",
                         "role": "assistant",
                         "content": [{"type": "output_text", "text": text}],
                     }));
+                };
+                for block in content {
+                    match block {
+                        ContentBlock::Text { text } => text_run.push(text.clone()),
+                        ContentBlock::Reasoning { .. } => {
+                            // A bare Reasoning has no wire shape without its
+                            // reasoning item (the opaque companion carries
+                            // it); never rendered as answer text. It still
+                            // BREAKS the adjacent-text run (two message
+                            // segments either side of it stay two segments).
+                            flush_text(&mut items, &mut text_run);
+                        }
+                        ContentBlock::Opaque { provider, data } => {
+                            if provider != family {
+                                // Another family's state is never echoed
+                                // (C10); it still breaks the text run the
+                                // same way a same-family item would.
+                                flush_text(&mut items, &mut text_run);
+                                continue;
+                            }
+                            match data.get("type").and_then(|t| t.as_str()) {
+                                // This family's reasoning items re-insert
+                                // verbatim at their position (C10).
+                                Some("reasoning") => {
+                                    flush_text(&mut items, &mut text_run);
+                                    items.push(data.clone());
+                                }
+                                // R05 RR1 F10: an anchored function_call
+                                // replays AT ITS ORIGINAL POSITION.
+                                Some("function_call_item") => {
+                                    flush_text(&mut items, &mut text_run);
+                                    let call_id = data
+                                        .get("call_id")
+                                        .and_then(|c| c.as_str())
+                                        .ok_or_else(|| {
+                                            invalid(
+                                                "function_call_item anchor without a call_id: \
+                                                 the position-bound call cannot be resolved \
+                                                 (never a guess)"
+                                                    .to_string(),
+                                            )
+                                        })?
+                                        .to_string();
+                                    let entry = calls_by_id.get_mut(&call_id).ok_or_else(|| {
+                                        invalid(format!(
+                                            "function_call_item anchor names call id \
+                                                 {call_id:?} which this exchange's tool calls \
+                                                 do not contain; the anchor/call pairing is \
+                                                 inconsistent (never a guess)"
+                                        ))
+                                    })?;
+                                    if entry.1 {
+                                        return Err(invalid(format!(
+                                            "function_call_item anchor names call id \
+                                             {call_id:?} twice: a duplicated anchor is a \
+                                             conflict, never merged"
+                                        )));
+                                    }
+                                    entry.1 = true;
+                                    items.push(render_function_call_item(&entry.0.clone(), input)?);
+                                }
+                                // Any other preserved item re-inserts
+                                // verbatim at its position.
+                                _ => {
+                                    flush_text(&mut items, &mut text_run);
+                                    items.push(data.clone());
+                                }
+                            }
+                        }
+                        ContentBlock::ResourceRef { resource } => {
+                            let text = match &resource.uri {
+                                Some(uri) => format!("[resource: {uri}]"),
+                                None => "[resource]".to_string(),
+                            };
+                            text_run.push(text);
+                        }
+                    }
                 }
+                flush_text(&mut items, &mut text_run);
+                // Calls WITHOUT a position anchor (manually built exchanges,
+                // legacy shapes) keep the documented content-first order.
                 for call in tool_calls {
-                    let wire_name =
-                        input
-                            .tools
-                            .wire_name_of_target(&call.target)
-                            .ok_or_else(|| {
-                                invalid(format!(
-                                    "exchange history names tool target {:?}, which the current \
-                                 declaration snapshot does not contain (the registry moved \
-                                 mid-run); cannot faithfully re-render the transcript",
-                                    call.target
-                                ))
-                            })?;
-                    let provider_call_id = call.provider_call_id.clone().ok_or_else(|| {
-                        invalid(format!(
-                            "exchange history tool call {} ({}) carries no provider \
-                             correlation id; this protocol requires the pairing",
-                            call.tool_call_id, call.target
-                        ))
-                    })?;
-                    items.push(serde_json::json!({
-                        "type": "function_call",
-                        "call_id": provider_call_id,
-                        "name": wire_name,
-                        "arguments": serde_json::to_string(call.arguments.as_value())
-                            .map_err(|err| ProtocolError::new(
-                                ErrorCode::Internal,
-                                format!("effective arguments serialize: {err}"),
-                                false,
-                            ))?,
-                    }));
+                    let anchored = call
+                        .provider_call_id
+                        .as_ref()
+                        .is_some_and(|id| calls_by_id.get(id).is_some_and(|e| e.1));
+                    if anchored {
+                        continue;
+                    }
+                    items.push(render_function_call_item(call, input)?);
                 }
             }
             ExchangeItem::ToolResult {
@@ -322,6 +441,46 @@ pub(crate) fn render_input_items(
     Ok(items)
 }
 
+/// The wire shape of one exchange tool call: `{type, call_id, name,
+/// arguments}` (the pairing fields verbatim).
+fn render_function_call_item(
+    call: &lingxi_kernel::model_exchange::RequestedToolCall,
+    input: &ModelTurnInput,
+) -> Result<serde_json::Value, ProtocolError> {
+    let invalid = |detail: String| ProtocolError::new(ErrorCode::InvalidMessage, detail, false);
+    let wire_name = input
+        .tools
+        .wire_name_of_target(&call.target)
+        .ok_or_else(|| {
+            invalid(format!(
+                "exchange history names tool target {:?}, which the current declaration \
+                 snapshot does not contain (the registry moved mid-run); cannot faithfully \
+                 re-render the transcript",
+                call.target
+            ))
+        })?
+        .to_string();
+    let provider_call_id = call.provider_call_id.clone().ok_or_else(|| {
+        invalid(format!(
+            "exchange history tool call {} ({}) carries no provider correlation id; this \
+             protocol requires the pairing",
+            call.tool_call_id, call.target
+        ))
+    })?;
+    Ok(serde_json::json!({
+        "type": "function_call",
+        "call_id": provider_call_id,
+        "name": wire_name,
+        "arguments": serde_json::to_string(call.arguments.as_value()).map_err(|err| {
+            ProtocolError::new(
+                ErrorCode::Internal,
+                format!("effective arguments serialize: {err}"),
+                false,
+            )
+        })?,
+    }))
+}
+
 /// Builds the request body (pure). `streaming` flips `stream` (the codex
 /// sibling always passes true; this family defaults to false). NOTE:
 /// `store` is deliberately ABSENT here — this family never references
@@ -332,7 +491,7 @@ pub fn render_responses_request(
     route: &ResolvedModelRoute,
     streaming: bool,
 ) -> Result<serde_json::Value, ProtocolError> {
-    let items = render_input_items(input, FAMILY)?;
+    let items = render_input_items(input, FAMILY, route)?;
     let tools: Vec<serde_json::Value> = input
         .tools
         .declarations
@@ -429,18 +588,19 @@ pub(crate) fn parse_responses_response_as(
             false,
         ));
     }
-    // C11 stop-reason honesty (R05-T04): an incomplete response classifies
-    // by WHY it is incomplete — a budget truncation is a retryable
-    // BudgetExceeded (zero side effects from this turn; the partial content
-    // stays in the call's delta events), a content-filter stop is a
-    // non-retryable Forbidden. A server-side CANCELLED response is a
-    // non-retryable Cancelled. A non-terminal status (`queued` /
-    // `in_progress`) in this terminal slot is a loud protocol violation —
-    // the adapter never asked for a background response. Other incomplete
-    // reasons keep the content classification below (the registered
-    // contract stance: only the mapped reasons are truncation/refusal
-    // facts).
+    // C11 stop-reason honesty (R05-T04) + R05 RR1 F12: transport end is not
+    // protocol completion. An incomplete response classifies by WHY it is
+    // incomplete — a budget truncation is a retryable BudgetExceeded (zero
+    // side effects from this turn; the partial content stays in the call's
+    // delta events), a content-filter stop is a non-retryable Forbidden. A
+    // server-side CANCELLED response is a non-retryable Cancelled. A
+    // non-terminal status (`queued` / `in_progress`) in this terminal slot
+    // is a loud protocol violation — the adapter never asked for a
+    // background response. An ABSENT or unmapped status is equally loud:
+    // the turn never classifies, nothing dispatches, and no Final is ever
+    // guessed from body content alone.
     match response.status.as_deref() {
+        Some("completed") => {}
         Some("incomplete") => {
             let reason = response
                 .incomplete_details
@@ -483,7 +643,13 @@ pub(crate) fn parse_responses_response_as(
                         usage_report: usage_report.clone(),
                     });
                 }
-                _ => {}
+                other => {
+                    return Err(invalid(format!(
+                        "provider response is incomplete with an UNMAPPED reason ({other:?}): \
+                         an incomplete turn is a truncation fact, never a content-classified \
+                         final"
+                    )));
+                }
             }
         }
         Some("cancelled") => {
@@ -506,7 +672,19 @@ pub(crate) fn parse_responses_response_as(
                  is a protocol violation, never a fabricated final"
             )));
         }
-        _ => {}
+        Some(other) => {
+            return Err(invalid(format!(
+                "provider response carries the UNKNOWN status {other:?}: an unmapped terminal \
+                 is never guessed into a completed turn"
+            )));
+        }
+        None => {
+            return Err(invalid(
+                "provider response ended WITHOUT a status: the transport's end is not protocol \
+                 completion — the turn never classifies, nothing dispatches"
+                    .to_string(),
+            ));
+        }
     }
     let mut content: Vec<ContentBlock> = Vec::new();
     let mut requests: Vec<ToolRequest> = Vec::new();
@@ -606,6 +784,18 @@ pub(crate) fn parse_responses_response_as(
                         })?
                         .with_provider_call_id(call_id);
                 requests.push(request);
+                // R05 RR1 F10: the function_call item is an ordered position
+                // of the response — the exchange keeps an anchor opaque HERE
+                // so the renderer replays the call at this exact position
+                // (text/reasoning/tool relative order is never normalized
+                // into a fixed "standard" order).
+                content.push(ContentBlock::Opaque {
+                    provider: family.to_string(),
+                    data: serde_json::json!({
+                        "type": "function_call_item",
+                        "call_id": call_id,
+                    }),
+                });
             }
             // Every other output item type (web_search_call, ...) is
             // provider state — preserved verbatim, never dropped.
@@ -615,13 +805,22 @@ pub(crate) fn parse_responses_response_as(
             }),
         }
     }
+    // R05 RR1 F11: the batch-level identity admission — a same-id re-send
+    // with identical shape collapses, a same-id CONFLICT rejects the whole
+    // turn (zero requests admitted, zero side effects).
+    let requests = super::batch_admission::admit_provider_call_ids(family, requests)?;
     if !requests.is_empty() {
         return Ok(ParsedChat {
             turn: ProviderTurn::ToolRequests { requests, content },
             usage_report: usage_report.clone(),
         });
     }
-    if !content.is_empty() {
+    // R05 RR1 F12: a normally-stopped turn whose output carries NO answer
+    // text (reasoning/opaque only) is process content, not a final answer.
+    let has_answer_text = content
+        .iter()
+        .any(|block| matches!(block, ContentBlock::Text { .. }));
+    if has_answer_text {
         return Ok(ParsedChat {
             turn: ProviderTurn::Final {
                 message: NormalizedMessage {
@@ -633,23 +832,24 @@ pub(crate) fn parse_responses_response_as(
             usage_report: usage_report.clone(),
         });
     }
-    let detail = match response.status.as_deref() {
-        Some("incomplete") => format!(
-            "provider response incomplete (reason: {})",
-            response
-                .incomplete_details
-                .as_ref()
-                .and_then(|d| d.get("reason"))
-                .and_then(|r| r.as_str())
-                .unwrap_or("absent")
-        ),
-        other => format!(
+    let detail = if content.is_empty() {
+        format!(
             "provider returned no content and no tool calls (status: {})",
-            other.unwrap_or("absent")
-        ),
+            response.status.as_deref().unwrap_or("absent")
+        )
+    } else {
+        format!(
+            "provider turn completed with process-only content (reasoning/opaque state, no \
+             answer text; status: {})",
+            response.status.as_deref().unwrap_or("absent")
+        )
     };
     Ok(ParsedChat {
-        turn: ProviderTurn::Empty { detail },
+        turn: ProviderTurn::Empty {
+            detail,
+            // R05 RR1 F12: the process-state blocks ride along for replay.
+            content,
+        },
         usage_report,
     })
 }
@@ -690,6 +890,20 @@ impl ResponsesStreamAccumulator {
             family: family.to_string(),
             terminal: None,
         }
+    }
+
+    /// R05 RR1 F38: the usage fact the terminal response object observed
+    /// (decoded through the SAME strict family decoder) — the salvage a
+    /// parse-failed turn still accounts with. Never a guess.
+    pub fn observed_usage_report(
+        &self,
+        family: lingxi_kernel::model_exchange::ProtocolFamily,
+    ) -> lingxi_kernel::usage::ReportedUsage {
+        let raw = self
+            .terminal
+            .as_ref()
+            .and_then(|terminal| terminal.get("usage").filter(|usage| !usage.is_null()));
+        super::usage::salvage_usage_report(family, raw)
     }
 
     /// Consumes one decoded SSE event; returns the live deltas it produced.
@@ -813,6 +1027,13 @@ mod tests {
     use lingxi_protocol::ToolCallId;
     use lingxi_protocol::UsageRecord;
 
+    fn origin() -> Option<lingxi_kernel::model_exchange::TurnOrigin> {
+        Some(lingxi_kernel::model_exchange::TurnOrigin {
+            provider: "deepseek-responses".to_string(),
+            model: "responses-test".to_string(),
+        })
+    }
+
     fn route() -> ResolvedModelRoute {
         ResolvedModelRoute {
             provider: "deepseek-responses".to_string(),
@@ -892,6 +1113,7 @@ mod tests {
                 args_digest: request.args_digest.clone(),
                 args_summary: None,
             }],
+            origin: None,
         });
         input.prior.push(ExchangeItem::ToolResult {
             tool_call_id: ToolCallId::new("run-tc0001"),
@@ -962,6 +1184,7 @@ mod tests {
             call: call.clone(),
             content: message.content.clone(),
             tool_calls: Vec::new(),
+            origin: origin(),
         });
         let rendered = render_responses_request(&input, &route(), false).expect("renders");
         assert_eq!(rendered["input"][1], reasoning_item);

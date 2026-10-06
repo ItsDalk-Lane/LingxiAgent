@@ -21,6 +21,7 @@
 
 pub mod anthropic_messages;
 pub mod auxiliary;
+pub mod batch_admission;
 pub mod compat;
 pub mod config;
 pub mod credentials;
@@ -28,6 +29,7 @@ pub mod dispatch;
 pub mod egress;
 pub mod gateway;
 pub mod google_generative_ai;
+pub mod network;
 pub mod oauth;
 pub mod openai_codex_responses;
 pub mod openai_completions;

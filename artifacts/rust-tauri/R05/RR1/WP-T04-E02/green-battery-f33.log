@@ -1,0 +1,16 @@
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.08s
+     Running tests/r05_t04_rr1_batch_terminal.rs (rust/target/debug/deps/r05_t04_rr1_batch_terminal-e52d94a9fb0bc03c)
+
+running 9 tests
+test openai_done_without_finish_reason_does_not_make_final ... ok
+test anthropic_open_tool_block_cannot_close_as_a_completed_batch ... ok
+test buffered_bodies_without_a_normal_stop_reason_are_loud ... ok
+test identical_resends_collapse_but_distinct_ids_stay_independent ... ok
+test unmapped_terminal_values_through_the_stream_accumulators_stay_loud ... ok
+test thinking_only_and_opaque_only_do_not_form_final_answers ... ok
+test present_but_unmapped_terminal_values_are_loud_and_name_the_value ... ok
+test positive_controls_normal_terminals_and_legal_batches_still_work ... ok
+test duplicate_provider_ids_with_conflicting_arguments_reject_whole_batch ... ok
+
+test result: ok. 9 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+

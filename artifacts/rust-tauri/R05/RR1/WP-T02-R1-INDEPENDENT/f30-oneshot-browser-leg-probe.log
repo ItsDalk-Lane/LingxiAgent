@@ -1,0 +1,64 @@
+warning: unused import: `std::sync::Arc`
+ --> src/lib.rs:6:5
+  |
+6 | use std::sync::Arc;
+  |     ^^^^^^^^^^^^^^
+  |
+  = note: `#[warn(unused_imports)]` (part of `#[warn(unused)]`) on by default
+
+warning: unused import: `std::time::Duration`
+ --> src/lib.rs:7:5
+  |
+7 | use std::time::Duration;
+  |     ^^^^^^^^^^^^^^^^^^^
+
+warning: unused imports: `CredentialService` and `ProductionRefreshDriver`
+ --> src/lib.rs:8:35
+  |
+8 | use lingxi_service::credentials::{CredentialService, ProductionRefreshDriver};
+  |                                   ^^^^^^^^^^^^^^^^^  ^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: unused import: `lingxi_service::inject::ManualClock`
+ --> src/lib.rs:9:5
+  |
+9 | use lingxi_service::inject::ManualClock;
+  |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: unused imports: `AsyncReadExt` and `AsyncWriteExt`
+  --> src/lib.rs:10:17
+   |
+10 | use tokio::io::{AsyncReadExt, AsyncWriteExt};
+   |                 ^^^^^^^^^^^^  ^^^^^^^^^^^^^
+
+warning: function `pkce_plane` is never used
+  --> src/lib.rs:12:4
+   |
+12 | fn pkce_plane(token_endpoint: &str) -> lingxi_adapters::models::config::ModelPlaneConfig {
+   |    ^^^^^^^^^^
+   |
+   = note: `#[warn(dead_code)]` (part of `#[warn(unused)]`) on by default
+
+warning: `r05t02-oneshot-probe` (lib) generated 6 warnings (run `cargo fix --lib -p r05t02-oneshot-probe` to apply 5 suggestions)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.08s
+     Running unittests src/lib.rs (target/debug/deps/r05t02_oneshot_probe-2a14711dc220f409)
+
+running 1 test
+test browser_completion_consumes_the_one_shot_login_transaction ... FAILED
+
+failures:
+
+---- browser_completion_consumes_the_one_shot_login_transaction stdout ----
+manual replay outcome: Ok(LoggedIn { persisted: true })
+token-endpoint exchanges after replay: 2
+
+thread 'browser_completion_consumes_the_one_shot_login_transaction' (10175563) panicked at src/lib.rs:118:5:
+the manual replay of an already-completed browser login must be refused (one-shot), got Ok(LoggedIn { persisted: true })
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+
+
+failures:
+    browser_completion_consumes_the_one_shot_login_transaction
+
+test result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.03s
+
+error: test failed, to rerun pass `--lib`

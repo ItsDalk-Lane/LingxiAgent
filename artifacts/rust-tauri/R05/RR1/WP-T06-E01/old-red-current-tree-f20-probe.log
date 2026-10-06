@@ -1,0 +1,32 @@
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.12s
+     Running tests/zz_f20_old_red_probe.rs (rust/target/debug/deps/zz_f20_old_red_probe-7e76873352b79b45)
+
+running 2 tests
+test probe_f20_dropped_speech_future_must_kill_and_clean ... FAILED
+test probe_f20_system_speech_must_wait_for_the_unified_permit ... FAILED
+
+failures:
+
+---- probe_f20_dropped_speech_future_must_kill_and_clean stdout ----
+PROBE-F20 cancel leg: say_alive_after_grace=2; intermediate_file_left=true
+
+thread 'probe_f20_dropped_speech_future_must_kill_and_clean' (11517173) panicked at crates/lingxi-service/tests/zz_f20_old_red_probe.rs:344:5:
+assertion `left == right` failed: aborting the caller future must kill the spawned say process
+  left: 2
+ right: 0
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+
+---- probe_f20_system_speech_must_wait_for_the_unified_permit stdout ----
+PROBE-F20 permit leg: speech=Ok(RegisteredProduct { resource_id: "speech-1791171875209-0556a78cb18ddb73", path: "/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-f20-probe-permit-products-28759-3/speech-1791171875209-0556a78cb18ddb73", mime: "audio/mp4", size_bytes: 60616, sha256: "aafa6358e085356ac09873569fdcdebc5280542c3f3d36902cfe5d164892d0e6" }); product_files=2; say_alive=2
+
+thread 'probe_f20_system_speech_must_wait_for_the_unified_permit' (11517294) panicked at crates/lingxi-service/tests/zz_f20_old_red_probe.rs:255:5:
+system speech must sit under the unified permit+deadline; a queued call whose budget is exhausted fails honestly instead of returning a product
+
+
+failures:
+    probe_f20_dropped_speech_future_must_kill_and_clean
+    probe_f20_system_speech_must_wait_for_the_unified_permit
+
+test result: FAILED. 0 passed; 2 failed; 0 ignored; 0 measured; 0 filtered out; finished in 3.62s
+
+error: test failed, to rerun pass `-p lingxi-service --test zz_f20_old_red_probe`

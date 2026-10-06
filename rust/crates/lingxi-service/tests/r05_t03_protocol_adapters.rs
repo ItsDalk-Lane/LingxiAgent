@@ -623,7 +623,7 @@ async fn c01_c04_same_model_id_two_families_never_cross_wire_or_credentials() {
                 "auth": {{"kind": "apiKey", "apiKey": "sk-goog-svc"}}
             }}
         }},
-        "models": {{"chat": {{"provider": "anthropic_svc", "model": "shared-model"}}}}"#,
+        "models": {{"chat": {{"provider": "anthropic_svc", "model": "shared-model", "capabilities": {{"tools": true}}}}}}"#,
         stub_a.origin(),
         stub_g.origin()
     );
@@ -676,7 +676,7 @@ async fn c01_c04_same_model_id_two_families_never_cross_wire_or_credentials() {
                 "auth": {{"kind": "apiKey", "apiKey": "sk-goog-svc"}}
             }}
         }},
-        "models": {{"chat": {{"provider": "google_svc", "model": "shared-model"}}}}"#,
+        "models": {{"chat": {{"provider": "google_svc", "model": "shared-model", "capabilities": {{"tools": true}}}}}}"#,
         stub_a.origin(),
         stub_g.origin()
     );
@@ -744,7 +744,7 @@ async fn c02_anthropic_tool_roundtrip_with_the_real_file_tool() {
                 "auth": {{"kind": "apiKey", "apiKey": "sk-ant-svc"}}
             }}
         }},
-        "models": {{"chat": {{"provider": "anthropic_svc", "model": "claude-svc"}}}}"#,
+        "models": {{"chat": {{"provider": "anthropic_svc", "model": "claude-svc", "capabilities": {{"tools": true}}}}}}"#,
         stub.origin()
     );
     let boot = boot_with_config("c02", &plane_json).await;
@@ -858,7 +858,7 @@ async fn c03_google_parallel_calls_pair_function_responses_by_exchange_mapping()
                 "auth": {{"kind": "apiKey", "apiKey": "sk-goog-svc"}}
             }}
         }},
-        "models": {{"chat": {{"provider": "google_svc", "model": "gemini-svc"}}}}"#,
+        "models": {{"chat": {{"provider": "google_svc", "model": "gemini-svc", "capabilities": {{"tools": true}}}}}}"#,
         stub.origin()
     );
     let boot = boot_with_config("c03", &plane_json).await;
@@ -872,8 +872,10 @@ async fn c03_google_parallel_calls_pair_function_responses_by_exchange_mapping()
     let requests = stub.requests();
     assert_eq!(requests.len(), 2);
     let contents = requests[1].body["contents"].as_array().expect("contents");
-    // user(submission) + model(2 functionCall parts) + user(fr a) + user(fr b)
-    assert_eq!(contents.len(), 4, "{contents:?}");
+    // user(submission) + model(2 functionCall parts) + user(ONE turn, 2
+    // functionResponse parts — the official Gemini parallel grouping, R05
+    // RR1 F07).
+    assert_eq!(contents.len(), 3, "{contents:?}");
     let model_parts = contents[1]["parts"].as_array().expect("model parts");
     assert_eq!(contents[1]["role"], "model");
     assert_eq!(
@@ -885,14 +887,17 @@ async fn c03_google_parallel_calls_pair_function_responses_by_exchange_mapping()
         serde_json::json!({"functionCall": {"name": "read", "args": {"path": "note-b.txt"}, "id": "fc-b"}})
     );
     // Each functionResponse pairs by the EXCHANGE's own call→name mapping
-    // (never a guessed name) and carries the REAL file content.
-    let fr_a = &contents[2]["parts"][0]["functionResponse"];
+    // (never a guessed name) and carries the REAL file content — both as
+    // parts of the ONE user turn of this tool round.
     assert_eq!(contents[2]["role"], "user");
+    let result_parts = contents[2]["parts"].as_array().expect("result parts");
+    assert_eq!(result_parts.len(), 2, "parallel results share one turn");
+    let fr_a = &result_parts[0]["functionResponse"];
     assert_eq!(fr_a["name"], "read");
     assert_eq!(fr_a["id"], "fc-a");
     assert_eq!(fr_a["response"]["status"], "succeeded");
     assert_eq!(fr_a["response"]["content"], "body A 内容");
-    let fr_b = &contents[3]["parts"][0]["functionResponse"];
+    let fr_b = &result_parts[1]["functionResponse"];
     assert_eq!(fr_b["id"], "fc-b");
     assert_eq!(fr_b["response"]["content"], "body B 内容");
 
@@ -939,7 +944,7 @@ async fn c04_same_provider_call_id_in_two_sessions_stays_isolated() {
                 "auth": {{"kind": "apiKey", "apiKey": "sk-ant-svc"}}
             }}
         }},
-        "models": {{"chat": {{"provider": "anthropic_svc", "model": "claude-svc"}}}}"#,
+        "models": {{"chat": {{"provider": "anthropic_svc", "model": "claude-svc", "capabilities": {{"tools": true}}}}}}"#,
         stub.origin()
     );
     let boot = boot_with_config("c04", &plane_json).await;
@@ -1016,7 +1021,7 @@ async fn c05_leg(tag: &str) -> (String, String) {
                 "auth": {{"kind": "apiKey", "apiKey": "sk-ant-svc"}}
             }}
         }},
-        "models": {{"chat": {{"provider": "anthropic_svc", "model": "claude-svc"}}}}"#,
+        "models": {{"chat": {{"provider": "anthropic_svc", "model": "claude-svc", "capabilities": {{"tools": true}}}}}}"#,
         stub.origin()
     );
     let boot = boot_with_config(tag, &plane_json).await;
@@ -1092,7 +1097,7 @@ async fn c06_openai_completions_mixed_content_parts_survive_in_order() {
                 "auth": {{"kind": "apiKey", "apiKey": "sk-openai-svc"}}
             }}
         }},
-        "models": {{"chat": {{"provider": "main", "model": "gpt-svc"}}}}"#,
+        "models": {{"chat": {{"provider": "main", "model": "gpt-svc", "capabilities": {{"tools": true}}}}}}"#,
         stub.v1()
     );
     let boot = boot_with_config("c06", &plane_json).await;
@@ -1140,7 +1145,7 @@ async fn c07_auth_header_goes_verbatim_and_none_sends_nothing() {
                 "auth": {{"kind": "authHeader", "header": "X-Custom-Key", "value": "custom-secret-42"}}
             }}
         }},
-        "models": {{"chat": {{"provider": "main", "model": "gpt-svc"}}}}"#,
+        "models": {{"chat": {{"provider": "main", "model": "gpt-svc", "capabilities": {{"tools": true}}}}}}"#,
         stub.v1()
     );
     let boot = boot_with_config("c07a", &plane_json).await;
@@ -1163,7 +1168,7 @@ async fn c07_auth_header_goes_verbatim_and_none_sends_nothing() {
                 "auth": {{"kind": "none"}}
             }}
         }},
-        "models": {{"chat": {{"provider": "main", "model": "gpt-svc"}}}}"#,
+        "models": {{"chat": {{"provider": "main", "model": "gpt-svc", "capabilities": {{"tools": true}}}}}}"#,
         stub.v1()
     );
     let boot = boot_with_config("c07b", &plane_json).await;
@@ -1198,7 +1203,7 @@ async fn c08_a_policy_refusal_rides_the_next_request_as_a_structured_failure() {
                 "auth": {{"kind": "apiKey", "apiKey": "sk-ant-svc"}}
             }}
         }},
-        "models": {{"chat": {{"provider": "anthropic_svc", "model": "claude-svc"}}}}"#,
+        "models": {{"chat": {{"provider": "anthropic_svc", "model": "claude-svc", "capabilities": {{"tools": true}}}}}}"#,
         stub.origin()
     );
     let boot = boot_with_config("c08", &plane_json).await;
@@ -1282,7 +1287,7 @@ async fn c12_retry_continues_the_confirmed_exchange_without_rebuild_or_redo() {
                 "auth": {{"kind": "apiKey", "apiKey": "sk-openai-svc"}}
             }}
         }},
-        "models": {{"chat": {{"provider": "main", "model": "gpt-svc"}}}}"#,
+        "models": {{"chat": {{"provider": "main", "model": "gpt-svc", "capabilities": {{"tools": true}}}}}}"#,
         stub.v1()
     );
     let boot = boot_with_config("c12", &plane_json).await;
@@ -1369,7 +1374,7 @@ async fn codex_family_runs_end_to_end_over_sse() {
                 "auth": {{"kind": "apiKey", "apiKey": "{}"}}
             }}
         }},
-        "models": {{"chat": {{"provider": "codex_svc", "model": "gpt-codex-svc"}}}}"#,
+        "models": {{"chat": {{"provider": "codex_svc", "model": "gpt-codex-svc", "capabilities": {{"tools": true}}}}}}"#,
         stub.origin(),
         CODEX_GOLDEN_JWT
     );
@@ -1425,6 +1430,147 @@ async fn codex_family_runs_end_to_end_over_sse() {
         "{final_content}"
     );
 
+    stub.stop().await;
+    teardown_boot(&boot).await;
+}
+
+// ── R05 RR1 F08: the OpenAI-compatible reasoning carrier over the REAL
+//    service chain (parser/accumulator → canonical → renderer → compat →
+//    captured HTTP) ───────────────────────────────────────────────────────────
+
+/// One openai-completions SSE turn carrying the DeepSeek-style
+/// `reasoning_content` BEFORE a tool call (the thinking-mode tool round).
+fn openai_reasoning_tool_call(
+    id: &str,
+    name: &str,
+    arguments: &str,
+    reasoning: &str,
+    prompt_tokens: u64,
+    completion_tokens: u64,
+) -> StubResponse {
+    openai_sse(&[
+        serde_json::json!({"id":format!("chatcmpl-{id}"),"choices":[{"index":0,"delta":{"role":"assistant","reasoning_content":reasoning},"finish_reason":null}]}),
+        serde_json::json!({"id":format!("chatcmpl-{id}"),"choices":[{"index":0,"delta":{"tool_calls":[{"index":0,"id":id,"type":"function","function":{"name":name,"arguments":""}}]},"finish_reason":null}]}),
+        serde_json::json!({"id":format!("chatcmpl-{id}"),"choices":[{"index":0,"delta":{"tool_calls":[{"index":0,"function":{"arguments":arguments}}]},"finish_reason":null}]}),
+        serde_json::json!({"id":format!("chatcmpl-{id}"),"choices":[{"index":0,"delta":{},"finish_reason":"tool_calls"}]}),
+        serde_json::json!({"id":format!("chatcmpl-{id}"),"choices":[],"usage":{"prompt_tokens":prompt_tokens,"completion_tokens":completion_tokens}}),
+    ])
+}
+
+#[tokio::test]
+async fn rr1_f08_deepseek_reasoning_replays_onto_the_next_wire_request() {
+    let stub = StubServer::start(vec![
+        openai_reasoning_tool_call(
+            "call_ds_1",
+            "read",
+            "{\"path\":\"note.txt\"}",
+            "provider reasoning via real sse",
+            11,
+            5,
+        ),
+        openai_final("deepseek final 完成"),
+    ])
+    .await;
+    // The provider NAME identifies the official DeepSeek channel (the
+    // endpoint is the controlled stub — the same double boundary every leg
+    // here uses); `deepseek-reasoner` is the channel's thinking model id.
+    let plane_json = format!(
+        r#""providers": {{
+            "deepseek": {{
+                "protocol": "openai-completions",
+                "endpoint": "{}",
+                "auth": {{"kind": "apiKey", "apiKey": "sk-deepseek-dummy"}}
+            }}
+        }},
+        "models": {{"chat": {{"provider": "deepseek", "model": "deepseek-reasoner", "capabilities": {{"tools": true}}}}}}"#,
+        stub.origin()
+    );
+    let boot = boot_with_config("rr1f08a", &plane_json).await;
+    std::fs::write(boot.workspace.join("note.txt"), FILE_BODY).expect("seed workspace file");
+
+    let run_id = execute(&boot.state, "please read note.txt").await;
+    let (status, reason) = run_row(&boot.state, &run_id).await;
+    assert_eq!(status, "completed");
+    assert_eq!(reason.as_deref(), Some("completed.with_final"));
+
+    let requests = stub.requests();
+    assert_eq!(requests.len(), 2, "exactly the two protocol turns");
+    // Turn 2: the compat layer enabled thinking mode for the channel's
+    // thinking model, and the REAL reasoning rides the assistant tool-call
+    // message — never a fabricated carrier, never a silent drop.
+    let second = &requests[1];
+    assert_eq!(second.body["thinking"]["type"], "enabled");
+    let assistant = &second.body["messages"][1];
+    assert_eq!(assistant["role"], "assistant");
+    assert_eq!(
+        assistant["reasoning_content"], "provider reasoning via real sse",
+        "the real reasoning replays onto the tool round: {assistant}"
+    );
+    assert_eq!(assistant["tool_calls"][0]["id"], "call_ds_1");
+    assert_eq!(
+        assistant["tool_calls"][0]["function"]["name"], "read",
+        "the tool pairing is intact"
+    );
+    // The first request went out WITHOUT any carrier (turn 1 has no
+    // history) — the carrier only appears where the exchange provides it.
+    assert!(
+        requests[0].body["messages"]
+            .as_array()
+            .expect("messages")
+            .iter()
+            .all(|m| m.get("reasoning_content").is_none()),
+        "no fabricated carrier on the first turn"
+    );
+    stub.stop().await;
+    teardown_boot(&boot).await;
+}
+
+#[tokio::test]
+async fn rr1_f08_missing_required_reasoning_fails_closed_before_the_wire() {
+    let stub = StubServer::start(vec![
+        // Turn 1: a thinking-mode tool round whose response carries NO
+        // reasoning_content — the required replay state is missing.
+        openai_tool_call("call_ds_2", "read", "{\"path\":\"note.txt\"}", 11, 5),
+        openai_final("never reached"),
+    ])
+    .await;
+    let plane_json = format!(
+        r#""providers": {{
+            "deepseek": {{
+                "protocol": "openai-completions",
+                "endpoint": "{}",
+                "auth": {{"kind": "apiKey", "apiKey": "sk-deepseek-dummy"}}
+            }}
+        }},
+        "models": {{"chat": {{"provider": "deepseek", "model": "deepseek-reasoner", "capabilities": {{"tools": true}}}}}}"#,
+        stub.origin()
+    );
+    let boot = boot_with_config("rr1f08b", &plane_json).await;
+    std::fs::write(boot.workspace.join("note.txt"), FILE_BODY).expect("seed workspace file");
+
+    let run_id = execute(&boot.state, "please read note.txt").await;
+    let (status, _) = run_row(&boot.state, &run_id).await;
+    assert_eq!(
+        status, "failed",
+        "the run fails honestly — no degraded wire"
+    );
+    // The second request NEVER left the process: the refusal is local
+    // (exactly ONE stub hit — the turn-1 request whose response created the
+    // gap).
+    assert_eq!(
+        stub.hits(),
+        1,
+        "the fail-closed refusal happens before dispatch (physical HTTP = 1)"
+    );
+    let requests = stub.requests();
+    assert!(
+        requests[0].body["messages"]
+            .as_array()
+            .expect("messages")
+            .iter()
+            .all(|m| m.get("reasoning_content").is_none()),
+        "the stub never received a fabricated carrier"
+    );
     stub.stop().await;
     teardown_boot(&boot).await;
 }

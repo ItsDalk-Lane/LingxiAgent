@@ -1,0 +1,15 @@
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.11s
+     Running tests/cancellation_tree.rs (rust/target/debug/deps/cancellation_tree-e1cbeaac8f9d7e57)
+
+running 8 tests
+test state_change_transaction_commits_legal_legs_and_diagnoses_bad_ones ... ok
+test cancel_surface_is_diagnosable_for_unknown_terminal_foreign_and_dangling ... ok
+test queue_wait_cancel_leaves_the_unrelated_holder_untouched ... ok
+test r03_a06_cancel_parent_spares_unrelated_background ... ok
+test panicking_tool_child_is_supervised_and_the_run_settles_loudly ... ok
+test approval_wait_round_trips_approve_and_reject_legs ... ok
+test r03_a05_cancel_exits_each_wait_state_and_returns_quotas ... ok
+test noncooperating_child_is_reported_unconfirmed_not_fake_quiet ... ok
+
+test result: ok. 8 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.65s
+

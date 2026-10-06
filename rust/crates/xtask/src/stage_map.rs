@@ -503,7 +503,14 @@ pub fn parse_stage_map(text: &str) -> Result<StageMap, String> {
                     )));
                 }
                 let (r02_share, r07_share, stage_share, later_share) =
-                    if is_stage_neutral_kind(&basis_kind) {
+                    if basis_kind == BASIS_FULL_ORIGINAL_BEHAVIOR {
+                        // R05 RR1 F25: a FULL leaf owns its original behavior
+                        // in THIS stage — there is no share split at all, so
+                        // none of the four share texts is required; the
+                        // evidence is the per-assertion case coverage
+                        // (originalAssertionCases, validated below).
+                        (String::new(), String::new(), String::new(), String::new())
+                    } else if is_stage_neutral_kind(&basis_kind) {
                         let stage_share = non_empty_string(
                             entry.get("stageShare").ok_or_else(|| {
                                 err(&format!(
@@ -3123,16 +3130,18 @@ mod map_tests {
             bound.len(),
             "the R05 map invents supplemental leaves unknown to the R00 ledger"
         );
-        // Every R05 leaf is stage_share_satisfied with a per-leaf case pin
-        // against the registered producer (no share is "inherited" without a
-        // machine check, and no delivered share is silently deferred).
+        // R05 RR1 F25 (G01): classification follows stage EXCLUSIVITY. A leaf
+        // whose R00 execution_stage_ids contain ONLY R05 is EXCLUSIVE — it
+        // must be full_original_behavior with one case PER original
+        // assertion (never a share: that would leave an unowned remainder).
+        // Every other leaf is stage_share_satisfied with a non-empty later
+        // stage set and a per-leaf case pin against the registered
+        // producer.
+        let mut share_leaves = 0usize;
+        let mut full_leaves = 0usize;
         for leaf in &map.supplemental_leaves {
-            assert_eq!(
-                leaf.basis_kind,
-                crate::stage_map::BASIS_STAGE_SHARE_SATISFIED,
-                "leaf {} must classify its R05 share explicitly",
-                leaf.id
-            );
+            let exclusive =
+                leaf.r00_execution_stage_ids.len() == 1 && leaf.r00_execution_stage_ids[0] == "R05";
             let contract = leaf
                 .assertion_contract
                 .as_ref()
@@ -3148,47 +3157,129 @@ mod map_tests {
                 "leaf {} must reference its producer",
                 leaf.id
             );
+            if exclusive {
+                assert_eq!(
+                    leaf.basis_kind,
+                    crate::stage_map::BASIS_FULL_ORIGINAL_BEHAVIOR,
+                    "leaf {} is EXCLUSIVE to R05 — a stage_share_satisfied classification \
+                     would leave an unowned remainder (F25)",
+                    leaf.id
+                );
+                full_leaves += 1;
+                assert_eq!(
+                    leaf.original_assertion_cases.len(),
+                    leaf.r00_assertions.len(),
+                    "leaf {} must pin one case per original assertion",
+                    leaf.id
+                );
+                for group in &leaf.original_assertion_cases {
+                    assert_eq!(
+                        group.len(),
+                        1,
+                        "one named case per assertion (leaf {})",
+                        leaf.id
+                    );
+                }
+            } else {
+                assert_eq!(
+                    leaf.basis_kind,
+                    crate::stage_map::BASIS_STAGE_SHARE_SATISFIED,
+                    "leaf {} must classify its R05 share explicitly",
+                    leaf.id
+                );
+                assert!(
+                    leaf.r00_execution_stage_ids
+                        .iter()
+                        .any(|id| id.as_str() != "R05"),
+                    "leaf {} is classified as a share but no later stage exists to own \
+                     the remainder (F25)",
+                    leaf.id
+                );
+                share_leaves += 1;
+            }
         }
-        // The leaf-case mapping TSV pins exactly one case per leaf.
+        assert_eq!(full_leaves, 6, "the six R05-only OAuth leaves must be full");
+        assert_eq!(share_leaves, 124);
+        // The leaf-case mapping TSV: 124 suite-level lines + 13 TEST-LEVEL
+        // lines (the six exclusive leaves' per-assertion cases), and every
+        // case the map pins must appear exactly once.
         let tsv = std::fs::read_to_string(
             r05_repo_root().join("docs/rust-tauri/R05/r05_leaf_case_map.tsv"),
         )
         .expect("docs/rust-tauri/R05/r05_leaf_case_map.tsv must exist");
-        let mut case_names: Vec<&str> = tsv
-            .lines()
-            .filter_map(|l| l.strip_prefix("leafcase "))
-            .map(|rest| rest.split_whitespace().next().unwrap_or("?"))
-            .collect();
-        assert_eq!(case_names.len(), 130, "the leaf-case map drifted from 130");
+        let mut case_names: Vec<&str> = Vec::new();
+        let mut test_level = 0usize;
+        for line in tsv.lines().filter(|l| l.starts_with("leafcase ")) {
+            let fields: Vec<&str> = line.split_whitespace().collect();
+            assert!(
+                fields.len() == 3 || fields.len() == 4,
+                "leafcase lines are suite-level (3 fields) or test-level (4 fields): {line}"
+            );
+            if fields.len() == 4 {
+                test_level += 1;
+            }
+            case_names.push(fields[1]);
+        }
+        assert_eq!(case_names.len(), 137, "the leaf-case map drifted from 137");
+        assert_eq!(
+            test_level, 13,
+            "the six exclusive leaves pin 13 test-level cases"
+        );
         case_names.sort_unstable();
         case_names.dedup();
-        assert_eq!(case_names.len(), 130, "duplicate leaf case names");
+        assert_eq!(case_names.len(), 137, "duplicate leaf case names");
+        let pinned_in_map: std::collections::BTreeSet<&str> = map
+            .supplemental_leaves
+            .iter()
+            .flat_map(|l| {
+                l.assertion_contract
+                    .as_ref()
+                    .map(|c| c.cases.iter().map(|p| p.case.as_str()).collect::<Vec<_>>())
+                    .unwrap_or_default()
+            })
+            .collect();
+        let tsv_set: std::collections::BTreeSet<&str> = case_names.iter().copied().collect();
+        assert_eq!(
+            pinned_in_map, tsv_set,
+            "the map's pinned leaf cases and the TSV must match exactly"
+        );
     }
 
     #[test]
     fn r05_stage_pin_table_matches_the_registered_suites() {
         let pins = parse_r05_pin_table();
-        // The 18 integration suites with their EXACT pinned counts (dropping
-        // or re-counting a suite here is the N03 fake-green shape).
+        // The 27 integration suites with their EXACT pinned counts (dropping
+        // or re-counting a suite here is the N03 fake-green shape). R05 RR1
+        // re-registered 2026-10-05: the original 18 suites plus the nine RR1
+        // repair batteries, with the RR1-grown counts.
         let expected: &[(&str, u32)] = &[
             ("adp:r05_t02_oauth_flows", 21),
             ("adp:r05_t03_goldens", 3),
+            ("adp:r05_t03_rr1_replay", 33),
+            ("adp:r05_t04_rr1_batch_terminal", 9),
             ("adp:r05_t04_streaming", 18),
             ("adp:r05_t05_compat", 1),
             ("adp:r05_t05_timeouts", 13),
             ("adp:r05_t06_operations", 27),
+            ("adp:r05_t07_rr1_usage_strict", 7),
             ("adp:r05_t07_usage_families", 14),
             ("svc:r05_t01_binary_wiring", 2),
-            ("svc:r05_t01_model_plane", 7),
-            ("svc:r05_t02_credentials", 16),
-            ("svc:r05_t03_protocol_adapters", 10),
-            ("svc:r05_t04_streaming", 9),
+            ("svc:r05_t01_model_plane", 24),
+            ("svc:r05_t02_credentials", 38),
+            ("svc:r05_t03_protocol_adapters", 12),
+            ("svc:r05_t04_streaming", 18),
+            ("svc:r05_t05_network", 21),
             ("svc:r05_t05_timeouts", 9),
             ("svc:r05_t06_operations", 7),
+            ("svc:r05_t06_rr1_media_resource", 17),
+            ("svc:r05_t06_rr1_system_speech", 10),
             ("svc:r05_t06_worker_model", 10),
-            ("svc:r05_t07_persistence", 4),
+            ("svc:r05_t07_persistence", 5),
+            ("svc:r05_t07_rr1_usage_ledger", 15),
             ("svc:r05_t07_usage_trace", 9),
-            ("svc:r05_t08_closed_loop", 10),
+            ("svc:r05_t08_closed_loop", 11),
+            ("svc:r05_t08_production_tools", 6),
+            ("svc:r05_t08_resources", 2),
         ];
         let mut suite_pins: Vec<(String, u32)> = pins
             .iter()
@@ -3225,43 +3316,85 @@ mod map_tests {
         }
     }
 
+    /// Parses docs/rust-tauri/R05/r05_required_cids.tsv (the AUTHORITATIVE
+    /// required-C-ID registry of R05 RR1 F26: 103 = 100 original + 3
+    /// appended). Returns (cid, binding) pairs.
+    fn parse_r05_required_cid_registry() -> Vec<(String, String)> {
+        let text = std::fs::read_to_string(
+            r05_repo_root().join("docs/rust-tauri/R05/r05_required_cids.tsv"),
+        )
+        .expect("docs/rust-tauri/R05/r05_required_cids.tsv must exist");
+        text.lines()
+            .filter_map(|l| l.strip_prefix("reqcid "))
+            .map(|rest| {
+                let mut fields = rest.split_whitespace();
+                let cid = fields.next().expect("reqcid <C-ID>").to_string();
+                let binding = fields.next().expect("reqcid <C-ID> <binding>").to_string();
+                assert!(
+                    fields.next().is_none(),
+                    "reqcid line carries extra fields: {rest:?}"
+                );
+                (cid, binding)
+            })
+            .collect()
+    }
+
     #[test]
     fn r05_stage_cid_table_owns_every_pinned_test_exactly_once() {
         let pins = parse_r05_pin_table();
         let declared = parse_r05_cid_table();
-        // (a) The owned C-ID set is exactly the registered 91: 81 T01–T07
-        //     C-IDs whose evidence is cargo-owned, plus the 10 T08 binary
-        //     legs (C01–C09/C12). The T08 C10/C11/C13/C14 are scenario-level
-        //     duties; eight T01–T07 C-IDs (T01-C01/C12 matrix-script
-        //     evidence, T05-C04/C06/C09/C10 supporting-suite evidence,
-        //     T05-C12 registered deferral, T06-C11B alias of T05-C11B) are
-        //     documented in R05_TEST_MAP.json without cid-owned cargo tests.
-        let mut cids: std::collections::BTreeSet<&str> = Default::default();
-        for (cid, _, _) in &declared {
-            assert!(
-                cid.starts_with("R05-T"),
-                "non-R05 case id {cid} in the table"
-            );
-            cids.insert(cid.as_str());
-        }
+        // (a) R05 RR1 F26 (G02/N01/N03): the cid table's C-ID set is
+        //     EXACTLY the `cid`-bound half of the AUTHORITATIVE registry —
+        //     not a count, not nine examples: the full identity set. The
+        //     rename probe (R05-T02-C01 → R05-T99-C99, count unchanged)
+        //     turns THIS assert red.
+        let registry = parse_r05_required_cid_registry();
         assert_eq!(
-            cids.len(),
-            91,
-            "the R05 cid table must own exactly the 91 registered C-IDs (got {})",
-            cids.len()
+            registry.len(),
+            103,
+            "the authoritative registry must carry the 103 required C-IDs"
         );
-        for expect in [
-            "R05-T01-C02",
-            "R05-T02-C12",
-            "R05-T03-C12",
-            "R05-T04-C16",
-            "R05-T05-C13",
-            "R05-T06-C12",
-            "R05-T07-C10",
-            "R05-T08-C01",
-            "R05-T08-C12",
-        ] {
-            assert!(cids.contains(expect), "the cid table dropped {expect}");
+        let mut seen_registry: Vec<&str> = Vec::new();
+        for (cid, binding) in &registry {
+            assert!(
+                !seen_registry.contains(&cid.as_str()),
+                "duplicate registry entry {cid}"
+            );
+            seen_registry.push(cid);
+            assert!(
+                binding == "cid" || binding.starts_with("command:"),
+                "registry entry {cid} has an unknown binding {binding:?}"
+            );
+        }
+        let expected_cid_owned: std::collections::BTreeSet<&str> = registry
+            .iter()
+            .filter(|(_, binding)| binding == "cid")
+            .map(|(cid, _)| cid.as_str())
+            .collect();
+        let cids: std::collections::BTreeSet<&str> =
+            declared.iter().map(|(cid, _, _)| cid.as_str()).collect();
+        assert_eq!(
+            cids,
+            expected_cid_owned,
+            "the cid table must own EXACTLY the registry's cid-bound set — a fabricated, \
+             renamed, or dropped C-ID is a mismatch (fabricated/unregistered: {:?}; \
+             missing: {:?})",
+            cids.difference(&expected_cid_owned).collect::<Vec<_>>(),
+            expected_cid_owned.difference(&cids).collect::<Vec<_>>()
+        );
+        // The command-bound half must name REGISTERED stage-map commands
+        // (the shared-execution bindings point at real gate commands).
+        let map = parse_production_r05();
+        let command_keys: std::collections::BTreeSet<&str> =
+            map.commands.iter().map(|c| c.key.as_str()).collect();
+        for (cid, binding) in &registry {
+            if let Some(key) = binding.strip_prefix("command:") {
+                assert!(
+                    command_keys.contains(key),
+                    "registry entry {cid} binds to command {key:?} which the R05 map \
+                     does not register"
+                );
+            }
         }
         // (b) Every cid line references a REGISTERED pin-table run.
         for (cid, run, _) in &declared {
@@ -3295,6 +3428,76 @@ mod map_tests {
                 "run {run:?} pins {count} executed tests but the cid table owns {owned}"
             );
         }
+    }
+
+    #[test]
+    fn r05_scope_matrix_covers_every_r05_bound_leaf_honestly() {
+        // R05-T01-C01's named producer for the command-bound registry entry
+        // (R05 RR1 F26): the checked-in R05_SCOPE_MATRIX.json must cover the
+        // SAME 130-leaf set as the stage map, classify the six R05-exclusive
+        // OAuth leaves as FULL R05 ownership (F25 — the frozen matrix
+        // released them as "share" with no R07 remainder), and never defer a
+        // single-stage leaf.
+        let root = r05_repo_root();
+        let text = std::fs::read_to_string(root.join("docs/rust-tauri/R05/R05_SCOPE_MATRIX.json"))
+            .expect("R05_SCOPE_MATRIX.json readable");
+        let value: serde_json::Value = serde_json::from_str(&text).expect("scope matrix JSON");
+        let map = parse_production_r05();
+        let map_ids: std::collections::BTreeSet<String> = map
+            .supplemental_leaves
+            .iter()
+            .map(|l| l.id.clone())
+            .collect();
+        let mut matrix_ids: std::collections::BTreeSet<String> = Default::default();
+        for entry in value["supplemental_leaves"]
+            .as_array()
+            .expect("supplemental_leaves array")
+        {
+            let id = entry["id"].as_str().expect("leaf id").to_string();
+            let stages: Vec<&str> = entry["r00_execution_stage_ids"]
+                .as_array()
+                .expect("stage ids")
+                .iter()
+                .map(|s| s.as_str().expect("stage str"))
+                .collect();
+            let disposition = entry["disposition"].as_str().expect("disposition");
+            let exclusive = stages.len() == 1 && stages[0] == "R05";
+            if exclusive {
+                assert_eq!(
+                    disposition, "full",
+                    "leaf {id} is R05-exclusive: the scope matrix must own it as FULL \
+                     behavior (F25 — a share would leave an unowned remainder)"
+                );
+                assert!(
+                    entry["r07_remainder"].is_null(),
+                    "leaf {id} declares an R07 remainder but has no later stage"
+                );
+            }
+            // Non-exclusive leaves may legally be share OR deferred (the
+            // R1/R2 rules defer genuine later-stage business entries — the
+            // deferred_to set names the owning stage, checked by the
+            // generator).
+            matrix_ids.insert(id);
+        }
+        let missing: Vec<String> = map_ids
+            .iter()
+            .filter(|id| !matrix_ids.contains(id.as_str()))
+            .cloned()
+            .collect();
+        assert!(
+            missing.is_empty(),
+            "the scope matrix dropped R05-bound leaves: {missing:?}"
+        );
+        assert_eq!(
+            map_ids.len(),
+            matrix_ids.len(),
+            "the scope matrix invented leaves"
+        );
+        let full = value["counts"]["full"].as_u64().expect("full count");
+        assert_eq!(
+            full, 6,
+            "exactly the six OAuth leaves are R05-exclusive full"
+        );
     }
 
     #[test]

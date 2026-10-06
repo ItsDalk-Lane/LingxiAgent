@@ -1,0 +1,30 @@
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.12s
+     Running tests/r05_t08_closed_loop.rs (/workspace/scratch/9b4397d87a13/audit/runtime/target/debug/deps/r05_t08_closed_loop-27bca846a4b6f935)
+
+running 10 tests
+test c02_two_full_chain_runs_different_runtime_nonces ... ok
+test c01_read_edit_read_final_restart_five_way_chain ... ok
+test c03_allowed_and_denied_file_sentinels ... ok
+test c04_request_id_replay_and_conflict ... ok
+test c05_restart_reads_history_zero_reexecution ... ok
+test c06_crash_after_tool_effect_no_blind_redo ... ok
+test c08_two_sessions_shared_callid_isolated ... ok
+test c07_crash_midstream_honest_terminal ... ok
+test c09_live_stream_and_history_projection_agree ... ok
+test c12_repeated_cycles_stay_bounded ... FAILED
+
+failures:
+
+---- c12_repeated_cycles_stay_bounded stdout ----
+
+thread 'c12_repeated_cycles_stay_bounded' (3068) panicked at crates/lingxi-service/tests/r05_t08_closed_loop.rs:2210:14:
+numeric rss: ParseIntError { kind: Empty }
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+
+
+failures:
+    c12_repeated_cycles_stay_bounded
+
+test result: FAILED. 9 passed; 1 failed; 0 ignored; 0 measured; 0 filtered out; finished in 3.54s
+
+error: test failed, to rerun pass `-p lingxi-service --test r05_t08_closed_loop`

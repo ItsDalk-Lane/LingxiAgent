@@ -50,6 +50,7 @@ use lingxi_kernel::model_exchange::{CredentialAuthKind, ResolvedModelRoute};
 
 use crate::inject::ServiceClock;
 
+pub mod login;
 pub mod store;
 use store::CredentialStore;
 
@@ -86,6 +87,19 @@ impl ProductionRefreshDriver {
     pub fn new(request_timeout: Duration) -> Result<Self, String> {
         Ok(Self {
             http: OAuthHttp::new().map_err(|err| err.to_string())?,
+            request_timeout,
+        })
+    }
+
+    /// R05 RR1 F14: the production constructor — the OAuth refresh
+    /// transport bound to the model plane's shared, reloadable network
+    /// policy (the legacy constructor keeps the pre-F14 direct behavior).
+    pub fn with_network(
+        request_timeout: Duration,
+        network: std::sync::Arc<lingxi_adapters::models::network::NetworkPlane>,
+    ) -> Result<Self, String> {
+        Ok(Self {
+            http: OAuthHttp::new_with_network(network).map_err(|err| err.to_string())?,
             request_timeout,
         })
     }
@@ -153,9 +167,27 @@ struct OAuthState {
 
 /// One provider's coordinated credential cell.
 struct ProviderCell {
+    /// R05 RR1 F03: the NEVER-reused instance identity of this cell. Every
+    /// `seed_cell` allocation draws a fresh number from the service-wide
+    /// monotonic counter — unlike `generation` (which restarts at 1 for
+    /// every new cell), `instance` can never ABA: a handle, a login
+    /// transaction or a refresh flight that recorded an older instance is
+    /// refused against a re-seeded/recreated provider even when the new
+    /// cell's `generation` numerically matches.
+    instance: u64,
     /// The auth config this cell was seeded from (reload keeps the cell —
     /// its tokens, its in-flight flight — only when this is unchanged).
     seed: AuthConfig,
+    /// R05 RR1 F02: the model-plane configuration generation this cell's
+    /// SEED was installed at. Cells whose seed survives a reload KEEP
+    /// their epoch (the material is unchanged — still the current
+    /// generation's material); a re-seeded cell carries the generation
+    /// the installing reload published. `resolve` refuses any route whose
+    /// `config_generation` is OLDER than this epoch — the boundary that
+    /// keeps newer credential material off an older route's endpoint
+    /// (within-world OAuth refreshes do NOT touch this field: they rotate
+    /// material inside one configuration generation).
+    seed_epoch: u64,
     /// Bumped on every install/revoke — the fence against late write-backs.
     generation: u64,
     material: ProviderMaterial,
@@ -230,6 +262,14 @@ pub struct ProviderCredentialStatus {
     pub last_persist_failure: Option<String>,
     pub last_error: Option<String>,
     pub last_refresh_at_unix_ms: Option<u64>,
+    /// R05 RR1 F04 (LA-CA0BF9A7AEA9): the OAuth login verdict — `false`
+    /// for non-OAuth kinds (the concept does not apply).
+    pub logged_in: bool,
+    /// R05 RR1 F04: the number of AVAILABLE models (the config-bound ∪
+    /// custom registry dedup, served only while logged in; non-OAuth
+    /// kinds report 0 — their models are static configuration, visible on
+    /// the plane itself).
+    pub available_models: usize,
 }
 
 /// A minted credential handle (C12). The `handle_id` is 128 bits of system
@@ -246,7 +286,13 @@ pub struct CredentialHandle {
 
 #[derive(Clone)]
 struct HandleEntry {
+    /// The trusted subject the handle was minted for (F03: a handle
+    /// presented by any OTHER principal is refused before material moves).
+    principal: String,
     provider: String,
+    /// The cell INSTANCE the handle was minted against (F03 — never
+    /// reused across a provider's lifecycle).
+    instance: u64,
     generation: u64,
     expires_at_unix_ms: u64,
 }
@@ -258,6 +304,24 @@ struct CredentialServiceInner {
     refresh: Arc<dyn RefreshDriver>,
     clock: Arc<dyn ServiceClock>,
     handles: StdMutex<BTreeMap<String, HandleEntry>>,
+    /// R05 RR1 F03: the service-wide monotonic cell-instance counter. A
+    /// number is drawn for every `seed_cell` (construction, re-seed,
+    /// remove→recreate); numbers are NEVER reused within a service
+    /// lifetime, which is what makes a stale handle/flight/login
+    /// transaction impossible to revive against a numerically-equal
+    /// generation of a LATER cell.
+    next_instance: std::sync::atomic::AtomicU64,
+    /// R05 RR1 F04: the model-plane's config-bound (provider → model ids)
+    /// listing, updated at construction and every reload — the
+    /// OAuth-model-registry half of "available models" (the other half is
+    /// the per-provider custom registry in the store).
+    config_models: StdRwLock<BTreeMap<String, Vec<String>>>,
+    /// R05 RR1 F04: the in-flight OAuth login transactions (one per
+    /// provider max — `oauth_start` replaces any older transaction).
+    logins: StdMutex<BTreeMap<String, login::PendingLogin>>,
+    /// R05 RR1 F04: the login surface's `'static` flow-clock bridge parts
+    /// (leaked exactly once — see `login::StaticFlowClockParts`).
+    flow_clock_parts: std::sync::OnceLock<login::StaticFlowClockParts>,
 }
 
 /// The credential service. Clone-cheap (one shared inner); the production
@@ -271,6 +335,10 @@ impl CredentialService {
     /// The general constructor (injected store/driver/clock — the test and
     /// embedding seam). Seeds every provider from the validated config;
     /// OAuth providers additionally seed their token set from the store.
+    /// The seed epoch is configuration generation 1, matching the gateway
+    /// a freshly built plane starts at (R05 RR1 F02's lockstep contract:
+    /// every subsequent plane install reloads BOTH sides with the SAME
+    /// generation number).
     pub fn new(
         config: &ModelPlaneConfig,
         store: Option<CredentialStore>,
@@ -278,6 +346,7 @@ impl CredentialService {
         clock: Arc<dyn ServiceClock>,
     ) -> Self {
         let mut providers = BTreeMap::new();
+        let mut next_instance = 1_u64;
         for (id, provider) in &config.providers {
             providers.insert(
                 id.clone(),
@@ -285,8 +354,11 @@ impl CredentialService {
                     id,
                     &provider.auth,
                     store.as_ref(),
+                    1,
+                    next_instance,
                 ))),
             );
+            next_instance += 1;
         }
         Self {
             inner: Arc::new(CredentialServiceInner {
@@ -295,6 +367,10 @@ impl CredentialService {
                 refresh,
                 clock,
                 handles: StdMutex::new(BTreeMap::new()),
+                next_instance: std::sync::atomic::AtomicU64::new(next_instance),
+                config_models: StdRwLock::new(config_models_of(config)),
+                logins: StdMutex::new(BTreeMap::new()),
+                flow_clock_parts: std::sync::OnceLock::new(),
             }),
         }
     }
@@ -302,25 +378,39 @@ impl CredentialService {
     /// The production assembly: the store file inside the private runtime
     /// dir (loaded loudly — a malformed/conflicting store refuses startup,
     /// never a silent empty one), the real HTTP refresh driver.
+    ///
+    /// R05 RR1 F03: the store is ALWAYS constructed — a service that boots
+    /// on a plane without OAuth providers must still be able to seed and
+    /// durably persist OAuth material when a reload hot-adds an OAuth
+    /// provider (the file itself is only created on the first write, so a
+    /// static-only plane gains no empty `credentials.json`).
     pub fn bootstrap(
         config: &ModelPlaneConfig,
         runtime_dir: &std::path::Path,
         clock: Arc<dyn ServiceClock>,
     ) -> Result<Self, CredentialServiceError> {
-        let needs_store = config
-            .providers
-            .values()
-            .any(|provider| matches!(provider.auth, AuthConfig::OAuth(_)));
-        let store = if needs_store {
-            Some(
-                CredentialStore::load(Arc::new(store::FsStoreIo::new(runtime_dir)))
-                    .map_err(CredentialServiceError::Store)?,
-            )
-        } else {
-            None
-        };
-        let refresh = ProductionRefreshDriver::new(OAUTH_REQUEST_TIMEOUT)
-            .map_err(CredentialServiceError::Http)?;
+        Self::bootstrap_with_network(config, runtime_dir, clock, None)
+    }
+
+    /// R05 RR1 F14: [`Self::bootstrap`] with the model plane's shared
+    /// network policy (the OAuth refresh transport routes under the SAME
+    /// frozen proxy / NO_PROXY / explicit-CA policy as every other model
+    /// consumer; `None` keeps the pre-F14 direct behavior).
+    pub fn bootstrap_with_network(
+        config: &ModelPlaneConfig,
+        runtime_dir: &std::path::Path,
+        clock: Arc<dyn ServiceClock>,
+        network: Option<std::sync::Arc<lingxi_adapters::models::network::NetworkPlane>>,
+    ) -> Result<Self, CredentialServiceError> {
+        let store = Some(
+            CredentialStore::load(Arc::new(store::FsStoreIo::new(runtime_dir)))
+                .map_err(CredentialServiceError::Store)?,
+        );
+        let refresh = match network {
+            Some(network) => ProductionRefreshDriver::with_network(OAUTH_REQUEST_TIMEOUT, network),
+            None => ProductionRefreshDriver::new(OAUTH_REQUEST_TIMEOUT),
+        }
+        .map_err(CredentialServiceError::Http)?;
         Ok(Self::new(config, store, Arc::new(refresh), clock))
     }
 
@@ -368,6 +458,7 @@ impl CredentialService {
             Arc::clone(cell),
             flow.clone(),
             refresh_token.to_string(),
+            guard.instance,
             guard.generation,
             sender,
         );
@@ -408,6 +499,19 @@ impl CredentialService {
         loop {
             let flight = {
                 let mut guard = cell.lock().await;
+                // R05 RR1 F02: the generation-consistency boundary. A
+                // route resolved against an older configuration generation
+                // must never receive the CURRENT generation's material —
+                // that is precisely how a reload could place a NEW key on
+                // an OLD endpoint. Refuse loudly (a safe, retryable
+                // failure: the caller's next call re-resolves the route).
+                if guard.seed_epoch > route.config_generation {
+                    return Err(CredentialError::StaleRoute {
+                        provider: route.provider.clone(),
+                        route_generation: route.config_generation,
+                        seed_epoch: guard.seed_epoch,
+                    });
+                }
                 match &guard.material {
                     ProviderMaterial::None => return Ok(ApplicableAuth::None),
                     ProviderMaterial::Static(auth) => return Ok(auth.clone()),
@@ -494,6 +598,19 @@ impl CredentialService {
         let cell = self.cell_for(&route.provider)?;
         let flight = {
             let mut guard = cell.lock().await;
+            // R05 RR1 F02: a 401 arriving on a route older than the
+            // current credential seed epoch belongs to a configuration
+            // world that was replaced mid-call. It must not trigger (or
+            // join) a refresh FOR THAT DEAD WORLD, and the bounded retry
+            // that follows must not place newer material on the older
+            // route — refuse here; the caller settles the safe failure.
+            if guard.seed_epoch > route.config_generation {
+                return Err(CredentialError::StaleRoute {
+                    provider: route.provider.clone(),
+                    route_generation: route.config_generation,
+                    seed_epoch: guard.seed_epoch,
+                });
+            }
             match &guard.material {
                 ProviderMaterial::Revoked => return Ok(RefreshVerdict::Revoked),
                 ProviderMaterial::None => return Ok(RefreshVerdict::NotRefreshable),
@@ -554,6 +671,12 @@ impl CredentialService {
     pub async fn revoke(&self, provider: &str) -> Result<(), CredentialError> {
         let cell = self.cell_for(provider)?;
         let mut guard = cell.lock().await;
+        // R05 RR1 F04: a revocation also kills any pending login
+        // transaction (a late login completing against a revoked
+        // credential must never install).
+        if let Some(pending) = self.take_login(provider) {
+            pending.cancel.cancel();
+        }
         let has_stored_tokens =
             matches!(&guard.material, ProviderMaterial::OAuth(state) if state.tokens.is_some());
         if has_stored_tokens {
@@ -579,11 +702,17 @@ impl CredentialService {
     /// Re-seeds the credential state from a freshly validated config (the
     /// management reload surface re-reads the SAME source for the gateway
     /// and this service — one consistent plane). Cells whose seed did not
-    /// change keep their material, generation, tokens and in-flight flight;
-    /// a changed/added provider gets a fresh cell (OAuth tokens re-seeded
-    /// from the store); a removed provider's cell is dropped (its in-flight
-    /// flight's write-back is fenced by the map-currency check).
-    pub async fn reload(&self, config: &ModelPlaneConfig) {
+    /// change keep their material, generation, tokens and in-flight flight
+    /// (and their seed epoch — the material is unchanged, so it is still
+    /// the current generation's material); a changed/added provider gets a
+    /// fresh cell (OAuth tokens re-seeded from the store) stamped with
+    /// `config_generation` — the model-plane generation the installing
+    /// reload publishes (R05 RR1 F02: the caller passes the SAME number it
+    /// hands the gateway, so `resolve` can refuse routes older than the
+    /// material's world); a removed provider's cell is dropped (its
+    /// in-flight flight's write-back is fenced by the map-currency
+    /// check).
+    pub async fn reload(&self, config: &ModelPlaneConfig, config_generation: u64) {
         // Snapshot the current map (Arc clones) and RELEASE the std read
         // guard before any await — a std guard held across an await is not
         // Send, and the handler future must stay Send.
@@ -609,10 +738,20 @@ impl CredentialService {
                 None => None,
             };
             let cell = kept.unwrap_or_else(|| {
+                // R05 RR1 F03: every fresh cell draws a NEVER-reused
+                // instance number — the identity that makes a stale
+                // handle/login/flight unrevivable against a recreated
+                // provider, whatever its generation counter says.
+                let instance = self
+                    .inner
+                    .next_instance
+                    .fetch_add(1, std::sync::atomic::Ordering::SeqCst);
                 Arc::new(tokio::sync::Mutex::new(seed_cell(
                     id,
                     &provider.auth,
                     self.inner.store.as_ref(),
+                    config_generation,
+                    instance,
                 )))
             });
             next.insert(id.clone(), cell);
@@ -622,6 +761,21 @@ impl CredentialService {
             .providers
             .write()
             .expect("credential providers lock") = next;
+        // A provider that left the plane takes its pending login
+        // transaction with it (the transaction's cell instance can never
+        // match again — the fence does the work; this keeps the map tidy).
+        let configured: Vec<String> = config.providers.keys().cloned().collect();
+        self.inner
+            .logins
+            .lock()
+            .expect("credential logins lock")
+            .retain(|provider, _| configured.contains(provider));
+        // R05 RR1 F04: the config-bound model listing follows the plane.
+        *self
+            .inner
+            .config_models
+            .write()
+            .expect("credential config models lock") = config_models_of(config);
     }
 
     /// The material-free status snapshot of every provider (management
@@ -664,6 +818,23 @@ impl CredentialService {
                 ),
                 ProviderMaterial::Revoked => (guard.seed.kind(), "revoked", None),
             };
+            // R05 RR1 F04 (LA-CA0BF9A7AEA9): loggedIn + the available
+            // model count (the config-bound ∪ custom registry, only while
+            // logged in).
+            let (logged_in, available_models) = if kind == CredentialAuthKind::OAuth {
+                let logged_in = matches!(
+                    &guard.material,
+                    ProviderMaterial::OAuth(state) if state.tokens.is_some()
+                );
+                let count = if logged_in {
+                    self.available_model_ids(&provider).len()
+                } else {
+                    0
+                };
+                (logged_in, count)
+            } else {
+                (false, 0)
+            };
             out.push(ProviderCredentialStatus {
                 provider,
                 kind: auth_kind_name(kind),
@@ -675,16 +846,57 @@ impl CredentialService {
                 last_persist_failure: guard.last_persist_failure.clone(),
                 last_error: guard.last_error.clone(),
                 last_refresh_at_unix_ms: guard.last_refresh_at_unix_ms,
+                logged_in,
+                available_models,
             });
         }
         out
     }
 
+    /// R05 RR1 F04: the deduplicated (config-bound ∪ custom registry)
+    /// model ids of one provider. Lock order: cell (held by the caller) →
+    /// config_models/store — the same order `install_tokens`/`revoke`
+    /// use, so no cycle is possible.
+    fn available_model_ids(&self, provider: &str) -> Vec<String> {
+        let mut seen = std::collections::BTreeSet::new();
+        let config_bound = self
+            .inner
+            .config_models
+            .read()
+            .expect("credential config models lock")
+            .get(provider)
+            .cloned()
+            .unwrap_or_default();
+        let custom = self
+            .inner
+            .store
+            .as_ref()
+            .map(|store| store.custom_models_for(provider))
+            .unwrap_or_default();
+        config_bound
+            .into_iter()
+            .chain(custom)
+            .filter(|model| seen.insert(model.clone()))
+            .collect()
+    }
+
     /// Mints a credential handle for one provider (C12). An unknown
     /// provider id is refused (a forged provider reference never mints).
-    pub async fn mint_handle(&self, provider: &str) -> Result<CredentialHandle, CredentialError> {
+    /// R05 RR1 F03: the handle is bound to the MINTING PRINCIPAL and to
+    /// the cell's never-reused INSTANCE identity (in addition to the
+    /// generation) — a handle minted before a rotation, a revocation, or a
+    /// provider remove→recreate can never resolve again, and no other
+    /// subject can present it.
+    pub async fn mint_handle(
+        &self,
+        principal: &str,
+        provider: &str,
+    ) -> Result<CredentialHandle, CredentialError> {
         let cell = self.cell_for(provider)?;
-        let generation = cell.lock().await.generation;
+        let (instance, generation) = {
+            let guard = cell.lock().await;
+            (guard.instance, guard.generation)
+        };
         let mut bytes = [0u8; 16];
         getrandom::getrandom(&mut bytes).map_err(|err| CredentialError::Transient {
             provider: provider.to_string(),
@@ -700,7 +912,9 @@ impl CredentialService {
             handles.insert(
                 handle_id.clone(),
                 HandleEntry {
+                    principal: principal.to_string(),
                     provider: provider.to_string(),
+                    instance,
                     generation,
                     expires_at_unix_ms,
                 },
@@ -714,12 +928,15 @@ impl CredentialService {
     }
 
     /// Resolves a handle to the CURRENT material. The registry is the
-    /// authority: an unknown id, a provider mismatch, an expired handle or
-    /// a stale generation (the credential rotated/revoked since the mint)
-    /// are all loud refusals (C12). A handle resolution NEVER triggers a
+    /// authority: an unknown id, a provider mismatch, an expired handle, a
+    /// presentation by any principal other than the minting one, or a
+    /// stale instance/generation (the credential rotated, was revoked, or
+    /// the provider was re-seeded/recreated since the mint) are all loud
+    /// refusals (C12, R05 RR1 F03). A handle resolution NEVER triggers a
     /// refresh — it returns the current material or refuses.
     pub async fn resolve_handle(
         &self,
+        principal: &str,
         handle: &CredentialHandle,
     ) -> Result<ApplicableAuth, CredentialError> {
         let entry = {
@@ -743,12 +960,26 @@ impl CredentialService {
             // extends (or rewrites) a handle.
             return Err(refused("the handle's expiry does not match the registry"));
         }
+        if entry.principal != principal {
+            return Err(refused(
+                "the handle was minted for a different principal (cross-subject presentation)",
+            ));
+        }
         let now = self.inner.clock.now_unix_ms();
         if now >= entry.expires_at_unix_ms {
             return Err(refused("the handle has expired"));
         }
         let cell = self.cell_for(&entry.provider)?;
         let guard = cell.lock().await;
+        if guard.instance != entry.instance {
+            // R05 RR1 F03: the provider's credential world was REPLACED (a
+            // re-seeding reload, or a remove→recreate) — the new cell's
+            // numerically-equal generation must never revive this handle.
+            return Err(refused(
+                "the provider's credential was replaced since the handle was minted (stale \
+                 instance)",
+            ));
+        }
         if guard.generation != entry.generation {
             return Err(refused(
                 "the credential rotated since the handle was minted (stale generation)",
@@ -807,8 +1038,17 @@ fn auth_kind_name(kind: CredentialAuthKind) -> &'static str {
 }
 
 /// Builds a fresh cell of one provider from its validated config seed (and
-/// the store, for OAuth).
-fn seed_cell(provider: &str, auth: &AuthConfig, store: Option<&CredentialStore>) -> ProviderCell {
+/// the store, for OAuth). `seed_epoch` is the model-plane configuration
+/// generation this seed belongs to (R05 RR1 F02 — 1 at construction, the
+/// installing reload's generation afterwards); `instance` is the
+/// never-reused cell identity (R05 RR1 F03).
+fn seed_cell(
+    provider: &str,
+    auth: &AuthConfig,
+    store: Option<&CredentialStore>,
+    seed_epoch: u64,
+    instance: u64,
+) -> ProviderCell {
     let material = match auth {
         AuthConfig::None => ProviderMaterial::None,
         AuthConfig::ApiKey { api_key } => {
@@ -826,7 +1066,9 @@ fn seed_cell(provider: &str, auth: &AuthConfig, store: Option<&CredentialStore>)
         }),
     };
     ProviderCell {
+        instance,
         seed: auth.clone(),
+        seed_epoch,
         generation: 1,
         material,
         flight: None,
@@ -835,6 +1077,34 @@ fn seed_cell(provider: &str, auth: &AuthConfig, store: Option<&CredentialStore>)
         last_error: None,
         last_refresh_at_unix_ms: None,
     }
+}
+
+/// R05 RR1 F04: the config-bound (provider → model ids) listing of a plane
+/// — every operation slot's binding contributes its (provider, model) pair.
+fn config_models_of(config: &ModelPlaneConfig) -> BTreeMap<String, Vec<String>> {
+    let mut out: BTreeMap<String, Vec<String>> = BTreeMap::new();
+    let mut push = |binding: &Option<lingxi_adapters::models::config::RouteBinding>| {
+        if let Some(binding) = binding {
+            out.entry(binding.provider.clone())
+                .or_default()
+                .push(binding.model.clone());
+        }
+    };
+    let models = &config.models;
+    push(&models.chat);
+    push(&models.title);
+    push(&models.summarize);
+    push(&models.memory);
+    push(&models.vision);
+    push(&models.approval);
+    push(&models.guard);
+    push(&models.embedding);
+    push(&models.rerank);
+    push(&models.image);
+    push(&models.video);
+    push(&models.speech);
+    push(&models.speech_recognition);
+    out
 }
 
 /// Maps a refresh-transport failure onto the flight outcome vocabulary.
@@ -874,6 +1144,7 @@ async fn run_refresh_flight(
     cell: Arc<tokio::sync::Mutex<ProviderCell>>,
     flow: OAuthFlowConfig,
     refresh_token: String,
+    start_instance: u64,
     start_generation: u64,
     sender: tokio::sync::watch::Sender<Option<FlightOutcome>>,
 ) {
@@ -882,7 +1153,17 @@ async fn run_refresh_flight(
         .refresh(&provider, &flow, &refresh_token)
         .await
     {
-        Ok(tokens) => install_tokens(&inner, &provider, &cell, tokens, start_generation).await,
+        Ok(tokens) => {
+            install_tokens(
+                &inner,
+                &provider,
+                &cell,
+                tokens,
+                start_instance,
+                start_generation,
+            )
+            .await
+        }
         Err(error) => {
             let outcome = classify_refresh_error(&error);
             let mut guard = cell.lock().await;
@@ -905,11 +1186,15 @@ async fn run_refresh_flight(
 }
 
 /// Installs a minted token set: fence → persist → memory (C05/C06).
+/// R05 RR1 F03: the fence is (instance, generation) — the write-back is
+/// discarded unless the cell is STILL the very instance the flight (or
+/// login transaction) started against, at the very generation it left.
 async fn install_tokens(
     inner: &Arc<CredentialServiceInner>,
     provider: &str,
     cell: &Arc<tokio::sync::Mutex<ProviderCell>>,
     tokens: OAuthTokens,
+    start_instance: u64,
     start_generation: u64,
 ) -> FlightOutcome {
     // Lock order is cell → store EVERYWHERE (revoke takes the same order),
@@ -936,6 +1221,12 @@ async fn install_tokens(
     if !still_current {
         return FlightOutcome::Discarded;
     }
+    if guard.instance != start_instance {
+        // Fence 1b (R05 RR1 F03): the cell the flight started against was
+        // REPLACED by a later re-seed/recreate that landed on this same
+        // Arc-bearing map slot — the instance identity is the tiebreaker.
+        return FlightOutcome::Discarded;
+    }
     if guard.generation != start_generation {
         // Fence 2 (revoke/racing install): the credential moved while the
         // transport ran — the late token is discarded, never written back.
@@ -943,8 +1234,19 @@ async fn install_tokens(
     }
     let flow = match &guard.material {
         ProviderMaterial::OAuth(state) => state.flow.clone(),
-        // The material kind moved without a generation change is impossible
-        // (every material change bumps the generation) — never trust it
+        // R05 RR1 F04: a LOGIN may re-mint a revoked OAuth provider (the
+        // C05 doc rule: "a login re-mints; the store row was deleted at
+        // revoke time") — the flow comes from the seed. This arm is
+        // reachable ONLY for logins that started AFTER the revoke (the
+        // generation fence above discards anything older; a refresh flight
+        // can never start from revoked material), so it cannot resurrect a
+        // fenced credential.
+        ProviderMaterial::Revoked => match &guard.seed {
+            AuthConfig::OAuth(flow) => flow.clone(),
+            _ => return FlightOutcome::Discarded,
+        },
+        // Every other material kind without a generation change is
+        // impossible (each change bumps the generation) — never trust it
         // blindly.
         _ => return FlightOutcome::Discarded,
     };
@@ -1262,12 +1564,18 @@ mod tests {
             Err(CredentialError::NotConfigured { .. })
         ));
         assert!(matches!(
-            service.mint_handle("ghost").await,
+            service.mint_handle("principal_test", "ghost").await,
             Err(CredentialError::NotConfigured { .. })
         ));
-        let handle = service.mint_handle("main").await.expect("minted");
+        let handle = service
+            .mint_handle("principal_test", "main")
+            .await
+            .expect("minted");
         assert_eq!(
-            service.resolve_handle(&handle).await.expect("resolves"),
+            service
+                .resolve_handle("principal_test", &handle)
+                .await
+                .expect("resolves"),
             ApplicableAuth::Bearer("sk-live".to_string())
         );
         // A forged id is refused.
@@ -1276,7 +1584,7 @@ mod tests {
             ..handle.clone()
         };
         assert!(matches!(
-            service.resolve_handle(&forged).await,
+            service.resolve_handle("principal_test", &forged).await,
             Err(CredentialError::HandleRefused { .. })
         ));
         // A cross-provider presentation is refused.
@@ -1285,7 +1593,7 @@ mod tests {
             ..handle.clone()
         };
         assert!(matches!(
-            service.resolve_handle(&cross).await,
+            service.resolve_handle("principal_test", &cross).await,
             Err(CredentialError::HandleRefused { .. })
         ));
         // A tampered expiry is refused.
@@ -1294,7 +1602,7 @@ mod tests {
             ..handle.clone()
         };
         assert!(matches!(
-            service.resolve_handle(&tampered).await,
+            service.resolve_handle("principal_test", &tampered).await,
             Err(CredentialError::HandleRefused { .. })
         ));
     }
@@ -1432,7 +1740,8 @@ mod tests {
         });
         // Let the flight start and park inside the gated transport.
         tokio::task::yield_now().await;
-        // A changed seed swaps in a NEW cell mid-flight.
+        // A changed seed swaps in a NEW cell mid-flight (generation 2 —
+        // the plane install number the paired gateway reload publishes).
         let changed = ModelPlaneConfig::parse_and_validate(
             r#"{
                 "providers": {
@@ -1449,7 +1758,7 @@ mod tests {
             }"#,
         )
         .expect("valid");
-        service.reload(&changed).await;
+        service.reload(&changed, 2).await;
         gate.notify_waiters();
         let result = waiter.await.expect("joined");
         assert!(
@@ -1479,10 +1788,13 @@ mod tests {
         let driver = Arc::new(ScriptedRefresh::ok("at-x"));
         let service =
             CredentialService::new(&static_config("sk-live"), None, driver, clock.clone());
-        let handle = service.mint_handle("main").await.expect("minted");
+        let handle = service
+            .mint_handle("principal_test", "main")
+            .await
+            .expect("minted");
         clock.advance(CREDENTIAL_HANDLE_TTL_MS);
         assert!(matches!(
-            service.resolve_handle(&handle).await,
+            service.resolve_handle("principal_test", &handle).await,
             Err(CredentialError::HandleRefused { ref detail, .. }) if detail.contains("expired")
         ));
     }

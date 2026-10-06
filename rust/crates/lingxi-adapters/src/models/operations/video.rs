@@ -421,7 +421,9 @@ pub async fn execute_agnes_video_query(
         .as_deref()
         .filter(|legacy| !legacy.is_empty() && *legacy != query.task_id);
     let Some(legacy_task_id) = legacy_task_id else {
-        return Err(dispatcher.classify_error_response(response, auth).await);
+        return Err(dispatcher
+            .classify_error_response(response, auth, deadline_unix_ms)
+            .await);
     };
     let legacy = OperationRequestPlan::get(format!(
         "{}/videos/{}",
@@ -433,7 +435,9 @@ pub async fn execute_agnes_video_query(
         .send_unclassified(&legacy, deadline_unix_ms)
         .await?;
     if !response.status().is_success() {
-        return Err(dispatcher.classify_error_response(response, auth).await);
+        return Err(dispatcher
+            .classify_error_response(response, auth, deadline_unix_ms)
+            .await);
     }
     let body = dispatcher
         .read_json_body(response, deadline_unix_ms)

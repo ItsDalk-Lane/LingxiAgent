@@ -70,6 +70,21 @@ pub enum CredentialError {
     /// stale-generation or bound to another provider (C12: forged or
     /// misused handles are refused loudly).
     HandleRefused { provider: String, detail: String },
+    /// R05 RR1 F04: an OAuth-only surface (login/poll/logout, the model
+    /// registry) was aimed at a provider whose auth kind is NOT OAuth — an
+    /// EXPLICIT rejection (the leaf texts demand it), never a quiet empty
+    /// answer and never a 404 that would hide a KNOWN provider.
+    NotOAuth { provider: String, kind: String },
+    /// R05 RR1 F02: the route was resolved against an OLDER configuration
+    /// generation than the credential material's seed epoch — handing the
+    /// current material to that route would put NEW credentials on an OLD
+    /// endpoint. Refused loudly (a safe failure): a fresh call re-resolves
+    /// the route at the current generation and proceeds normally.
+    StaleRoute {
+        provider: String,
+        route_generation: u64,
+        seed_epoch: u64,
+    },
 }
 
 impl CredentialError {
@@ -83,7 +98,9 @@ impl CredentialError {
             | CredentialError::NotLoggedIn { provider }
             | CredentialError::Transient { provider, .. }
             | CredentialError::PersistenceFailed { provider, .. }
-            | CredentialError::HandleRefused { provider, .. } => provider,
+            | CredentialError::HandleRefused { provider, .. }
+            | CredentialError::NotOAuth { provider, .. }
+            | CredentialError::StaleRoute { provider, .. } => provider,
         }
     }
 }
@@ -122,6 +139,22 @@ impl std::fmt::Display for CredentialError {
             CredentialError::HandleRefused { provider, detail } => write!(
                 f,
                 "provider {provider:?} credential handle refused: {detail}"
+            ),
+            CredentialError::NotOAuth { provider, kind } => write!(
+                f,
+                "provider {provider:?} uses auth kind {kind:?}; this surface serves OAuth \
+                 providers only (explicit rejection, never a fallback)"
+            ),
+            CredentialError::StaleRoute {
+                provider,
+                route_generation,
+                seed_epoch,
+            } => write!(
+                f,
+                "provider {provider:?} route was resolved at configuration generation \
+                 {route_generation} but its credential seed belongs to generation \
+                 {seed_epoch}: refusing to place newer credential material on the older \
+                 route (a fresh call re-resolves the current configuration and proceeds)"
             ),
         }
     }
@@ -187,15 +220,105 @@ pub trait ProviderCredentialPort: Send + Sync {
 /// to cross a trust boundary (a provider error echo, a diagnostic, an event
 /// payload — C09). This is the primary defense at the production site; the
 /// service's pattern-based log redactor is the second net.
+///
+/// R05 RR1 F05: an auth server (or a malicious/echoing upstream) can return
+/// the material in SAFE-ENCODED form — percent-encoded (both hex cases, and
+/// the unreserved-keeping variant) or JSON-escaped (`\u00xx` sequences, and
+/// serde's `\"` / `\\` / `\/` escapes). Every deterministic encoding of each
+/// material is scrubbed alongside the raw form, so an encoded echo is never
+/// a side door around the raw exact match.
 pub fn scrub_materials(text: &str, materials: &[&str]) -> String {
     let mut out = text.to_string();
     for material in materials {
         if material.is_empty() {
             continue;
         }
-        out = out.replace(*material, "[redacted]");
+        for needle in material_variants(material) {
+            if needle == *material {
+                // The raw form is handled below with the same call; avoid a
+                // duplicate scan of the (common) all-unreserved case where
+                // an encoded variant equals the raw form.
+                continue;
+            }
+            out = out.replace(&needle, REDACTED);
+        }
+        out = out.replace(material, REDACTED);
     }
     out
+}
+
+/// The scrub replacement marker (shared with the service redactor's
+/// vocabulary so layered scrubs stay readable).
+pub const REDACTED: &str = "[redacted]";
+
+/// The deterministic encodings of one material string that an echo could
+/// carry (R05 RR1 F05). The RAW form is NOT included — the caller scrubs it
+/// unconditionally.
+fn material_variants(material: &str) -> Vec<String> {
+    let mut variants = Vec::with_capacity(6);
+    // Percent-encodings: every byte, upper- and lowercase hex, plus the
+    // unreserved-keeping form (the shape `urlencode` produces).
+    let percent_all = |upper: bool| {
+        material
+            .bytes()
+            .map(|byte| {
+                if upper {
+                    format!("%{byte:02X}")
+                } else {
+                    format!("%{byte:02x}")
+                }
+            })
+            .collect::<String>()
+    };
+    variants.push(percent_all(true));
+    variants.push(percent_all(false));
+    let percent_unreserved: String = material
+        .bytes()
+        .map(|byte| {
+            if byte.is_ascii_alphanumeric() || matches!(byte, b'-' | b'.' | b'_' | b'~') {
+                (byte as char).to_string()
+            } else {
+                format!("%{byte:02X}")
+            }
+        })
+        .collect();
+    variants.push(percent_unreserved);
+    // JSON escapes: the full `\uXXXX` sequence form (lowercase hex, the
+    // serde/shell convention) and serde_json's own string-body escaping
+    // (covers `\"`, `\\`, `\/`, `\n`, ... for materials with specials).
+    let json_unicode: String = material
+        .chars()
+        .map(|character| format!("\\u{:04x}", character as u32))
+        .collect();
+    variants.push(json_unicode);
+    if let Ok(quoted) = serde_json::to_string(material) {
+        if let Some(escaped) = quoted
+            .strip_prefix('"')
+            .and_then(|body| body.strip_suffix('"'))
+        {
+            // serde only escapes characters that NEED escaping; for an
+            // all-plain material this equals the raw form (skipped by the
+            // caller) — a material with specials (`"` `\` `/` control)
+            // yields a distinct escaped needle.
+            if escaped != material {
+                variants.push(escaped.to_string());
+            }
+        }
+    }
+    variants
+}
+
+/// The host-boundary diagnostic rule (R05 RR1 F05): every error/diagnostic
+/// text that is about to leave the adapter/provider boundary is FIRST
+/// scrubbed of the in-play credential materials (raw AND encoded forms,
+/// [`scrub_materials`]) and THEN bounded-truncated. The order is the fix:
+/// truncating first could cut a key in half and leave a prefix that the
+/// exact-match scrub can never match again.
+pub fn sanitize_diagnostic(text: &str, materials: &[&str], bound_chars: usize) -> String {
+    scrub_materials(text, materials)
+        .chars()
+        .take(bound_chars)
+        .collect()
 }
 
 #[cfg(test)]

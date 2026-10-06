@@ -43,3 +43,19 @@
 ## 主树清洁声明
 
 - 主工作树在全部负向运行期间与之后**零注入**：被改文件仅存在于副本；`git status` 与 R05 门禁的候选绑定摘要（working-tree-manifest）可复核。副本 `$HOME/r05t08-work/negcopy` 保留至阶段收口后由用户处置（含 .git 的本地 clone，约 6 GB）。
+
+## RR1 新增负向验证（F25/F26/F27；2026-10-05/06，隔离 /tmp 副本）
+
+- 执行者：R05-T08-执行者（RR1 WP-T08）。隔离方式：主树 rsync 副本（剔除 target/node_modules/.git/dist 等），主树零接触（每例后从主树恢复被改文件并复跑对照绿）。首轮 16 项负测**不降格**（上表原样有效；其结论属首轮候选，RR1 候选的门禁复跑由收口执行）。
+
+| 注入（对应 F-ID） | 变异（唯一目标） | 判定检查 | 退出码 | 实测失败原因（点名） | 判定 |
+|---|---|---|---|---|---|
+| RR1-F26-MUT1（换名 CID，G02/N01 复现） | r05_stage_cids.tsv 的 `R05-T02-C01` → `R05-T99-C99`（数量不变） | xtask `r05_stage_cid_table_owns_every_pinned_test_exactly_once` | 101 | `fabricated/unregistered: ["R05-T99-C99"]; missing: ["R05-T02-C01"]`——冻结候选上 7/7 镜像仍绿的换名洞已闭合 | OK |
+| RR1-F26-MUT2（删登记行） | r05_required_cids.tsv 删 `reqcid R05-T04-C07` | 同上 | 101 | `the authoritative registry must carry exactly 103 required C-IDs` | OK |
+| RR1-F26-MUT3（伪命令绑定） | `R05-T08-C13 command:r04_regression_gate` → `command:bogus_gate` | 同上 | 101 | `binds to command "bogus_gate" which the R05 map does not register` | OK |
+| RR1-F26-MUT6（生产者预跑） | cid 表删 `R05-T04-C07`（assembler 侧同形） | r05_t08_stage_suites.sh 的预跑身份校验 | 1 | `missing: ['R05-T04-C07']`（任何测试运行前即拒） | OK |
+| RR1-F25-MUT4（伪 share 化独占叶） | R05.json 六叶之一 basisKind→stage_share_satisfied | xtask `r05_production_map_mirrors_every_r00_supplemental_leaf_bound_to_r05` | 101 | `is EXCLUSIVE to R05 — a stage_share_satisfied classification would leave an unowned remainder (F25)`；verify.rs 侧另有单测 `exclusive_leaf_classified_as_share_fails_with_unowned_remainder` 红/绿双向 | OK |
+| RR1-F25-MUT5（删测试级叶案例） | r05_leaf_case_map.tsv 删 `r05-full-16CEB6D12A6A-a1` 行 | 同上 | 101 | `the leaf-case map drifted from 137`（且图钉案例集与 TSV 精确互核） | OK |
+| RR1-F27-MUT7（采样器回退） | r05_t08_resources.rs 的 fds_of 回退为冻结候选谓词（默认格式 lsof+行首数字计数） | `--test r05_t08_resources f27_sampler_controls` | 101 | `a live unix process has at least stdio open; the sampler saw 0`——CL-06 的恒 0 缺陷被正对照抓住 | OK |
+
+- 每例均有注入前正常对照（镜像 8/8、controls 绿）；恢复后复跑全绿。注：MUT4/MUT5 涉及 include_str! 编译期内嵌，副本内重编译后判定（与门禁真实运行方式一致）。

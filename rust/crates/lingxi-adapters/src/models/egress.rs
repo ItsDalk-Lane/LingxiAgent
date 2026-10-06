@@ -18,9 +18,18 @@
 //!   a configured provider endpoint origin (the loopback stub and
 //!   self-hosted same-origin asset case; fix-r1 closed the review F-01
 //!   gap where non-decimal spellings rode the hostname branch);
-//! - an https PUBLIC hostname passes (DNS-rebinding is not decidable
-//!   offline — a declared gap, not a silent pass);
-//! - plain http is same-origin-only (any host);
+//! - an https PUBLIC hostname passes ONLY after its REAL DNS RESOLUTION is
+//!   verified: every candidate address is judged by the guarded-range
+//!   table (loopback / private / link-local / ULA / mapped spellings), a
+//!   hostname with ANY guarded candidate refuses, and the download DIALS
+//!   THROUGH the verified address set (`resolve_to_addrs` — the transport
+//!   cannot re-resolve the name to an address the guard never judged; R05
+//!   RR1 F15 closed the check-then-dial gap the audit's CN-F06 counter
+//!   example proved: `https://localhost:<port>/` reached an unauthorized
+//!   loopback listener). When the frozen network policy routes the URL
+//!   through a PROXY, the proxy is the resolution authority — the local
+//!   candidates are still verified as defense in depth, but the dial is
+//!   the proxy's; plain http is same-origin-only (any host);
 //! - redirects are never followed (the shared no-redirect client);
 //! - the download carries NO credential material of any provider;
 //! - the body is read under [`EGRESS_DOWNLOAD_MAX_BYTES`] DURING the read
@@ -289,23 +298,98 @@ fn ip_is_guarded(octets: &[u8]) -> bool {
     }
 }
 
-/// The egress guard: one configured provider-endpoint origin allowlist plus
-/// the shared no-redirect client.
+/// The egress guard's hostname resolver (R05 RR1 F15): `(host, port) →
+/// candidate socket addresses`. The DEFAULT is the operating system's
+/// resolver (`tokio::net::lookup_host` — the same getaddrinfo path the
+/// transport would use); tests inject a controlled resolver to pin exact
+/// candidate sets (mixed public/private records, re-resolution, failures)
+/// without touching real DNS. The resolver is an IO boundary ONLY — the
+/// GUARDED-RANGE JUDGMENT of the returned candidates is always this
+/// module's own code.
+pub type EgressResolver = std::sync::Arc<
+    dyn Fn(
+            &str,
+            u16,
+        ) -> std::pin::Pin<
+            Box<dyn std::future::Future<Output = Result<Vec<std::net::SocketAddr>, String>> + Send>,
+        > + Send
+        + Sync,
+>;
+
+/// The default OS resolver (getaddrinfo via tokio).
+fn system_resolver() -> EgressResolver {
+    std::sync::Arc::new(
+        |host: &str,
+         port: u16|
+         -> std::pin::Pin<
+            Box<dyn std::future::Future<Output = Result<Vec<std::net::SocketAddr>, String>> + Send>,
+        > {
+            let host = host.to_string();
+            Box::pin(async move {
+                let candidates = tokio::net::lookup_host((host.as_str(), port))
+                    .await
+                    .map_err(|err| format!("system resolver refused {host:?}: {err}"))?;
+                Ok(candidates.collect())
+            })
+        },
+    )
+}
+
+/// True when the candidate is judged by the socket address's IP (v4 or v6)
+/// through the guarded-range table.
+fn socket_addr_is_guarded(addr: &std::net::SocketAddr) -> bool {
+    match addr {
+        std::net::SocketAddr::V4(v4) => ip_is_guarded(&v4.ip().octets()),
+        std::net::SocketAddr::V6(v6) => {
+            let octets = v6.ip().octets();
+            // A v4-mapped candidate folds to its embedded v4 policy (the
+            // dual-stack dial would reach the v4 address).
+            ip_is_guarded(&octets)
+        }
+    }
+}
+
+/// The egress guard: one configured provider-endpoint origin allowlist, a
+/// policy-bound client handle and the resolver.
 pub struct EgressGuard {
     allowed_origins: std::sync::RwLock<Vec<String>>,
-    client: reqwest::Client,
+    client: dispatch::NetworkClient,
     timeouts: HttpTimeouts,
+    resolver: EgressResolver,
 }
 
 impl EgressGuard {
     /// Builds the guard from the configured provider endpoint URLs. Origins
     /// are compared as `scheme://host[:port]` with default ports elided.
+    /// The legacy constructor keeps the pre-F14 direct policy and the
+    /// system resolver; production wiring uses
+    /// [`Self::from_provider_endpoints_and_network`].
     pub fn from_provider_endpoints(endpoints: &[String]) -> Result<Self, ProtocolError> {
+        Self::from_provider_endpoints_and_network(
+            endpoints,
+            super::network::NetworkPlane::direct_isolated(),
+        )
+    }
+
+    /// R05 RR1 F14: the production constructor — the download client is
+    /// BOUND to the model plane's shared, reloadable network policy.
+    pub fn from_provider_endpoints_and_network(
+        endpoints: &[String],
+        network: std::sync::Arc<super::network::NetworkPlane>,
+    ) -> Result<Self, ProtocolError> {
         Ok(Self {
             allowed_origins: std::sync::RwLock::new(parse_origins(endpoints)?),
-            client: dispatch::build_client()?,
+            client: network.client_handle(HttpTimeouts::default())?,
             timeouts: HttpTimeouts::default(),
+            resolver: system_resolver(),
         })
+    }
+
+    /// Overrides the resolver (a TEST seam for controlled candidate sets —
+    /// see [`EgressResolver`]; the guarded-range judgment stays here).
+    pub fn with_resolver(mut self, resolver: EgressResolver) -> Self {
+        self.resolver = resolver;
+        self
     }
 
     /// Atomically swaps the allowlist (the model-plane reload surface calls
@@ -317,10 +401,21 @@ impl EgressGuard {
         Ok(())
     }
 
-    /// Policy check of ONE URL (no fetch). Public for the service layer's
-    /// pre-flight and for tests.
+    /// Policy check of ONE URL (no fetch, no DNS). Public for the service
+    /// layer's pre-flight and for tests. R05 RR1 F15: this remains the
+    /// SYNCHRONOUS pass (scheme/userinfo/literal-IP/origin rules); the
+    /// HOSTNAME resolution judgment lives in [`Self::resolve_candidates`]
+    /// and runs inside [`Self::download`] (and the service pre-flight via
+    /// [`Self::check_url_resolved`]).
     pub fn check_url(&self, url: &str) -> Result<(), ProtocolError> {
-        let parts = parse_url(url)?;
+        self.check_parts(&parse_url(url)?).map(|_| ())
+    }
+
+    /// The shared policy core: parses once, answers the parsed parts AND
+    /// whether the ORIGIN EXCEPTION matched (the configured-endpoint
+    /// origin is the explicit local-model exception — R05 RR1 F15 keeps it
+    /// minimal and origin-exact).
+    fn check_parts(&self, parts: &UrlParts) -> Result<bool, ProtocolError> {
         let allowed = self.allowed_origins.read().expect("egress origins lock");
         let same_origin = allowed.contains(&parts.origin);
         // Literal-IP hosts in guarded ranges refuse unless the origin is a
@@ -330,51 +425,155 @@ impl EgressGuard {
         // an IPv6 host arrives colon-hex (unbracketed, contains ':').
         if let Some(octets) = parse_ipv4(&parts.host) {
             if ip_is_guarded(&octets) && !same_origin {
-                return Err(refuse(format!(
-                    "egress URL {url:?} targets a guarded literal IP; refusing (the only \
-                     exception is a configured provider endpoint origin)"
-                )));
+                return Err(refuse(
+                    "egress URL targets a guarded literal IP; refusing (the only exception \
+                     is a configured provider endpoint origin)"
+                        .to_string(),
+                ));
             }
         } else if parts.host.contains(':') {
             match parse_ipv6(&parts.host) {
                 Some(octets) => {
                     if ip_is_guarded(&octets) && !same_origin {
-                        return Err(refuse(format!(
-                            "egress URL {url:?} targets a guarded literal IPv6; refusing (the \
-                             only exception is a configured provider endpoint origin)"
-                        )));
+                        return Err(refuse(
+                            "egress URL targets a guarded literal IPv6; refusing (the only \
+                             exception is a configured provider endpoint origin)"
+                                .to_string(),
+                        ));
                     }
                 }
                 None => {
-                    return Err(refuse(format!(
-                        "egress URL {url:?} carries an unparseable IPv6 literal; refusing"
-                    )));
+                    return Err(refuse(
+                        "egress URL carries an unparseable IPv6 literal; refusing".to_string(),
+                    ));
                 }
             }
         }
-        // Plain http is same-origin-only (any host); https public hostnames
-        // pass (DNS rebinding is the declared offline-undecidable gap).
+        // Plain http is same-origin-only (any host); https hostnames pass
+        // the SYNC layer and are judged on their RESOLVED candidates in
+        // the async layer (`resolve_candidates`).
         if parts.scheme == "http" && !same_origin {
+            return Err(refuse(
+                "egress URL is plain http outside the configured provider endpoint origins; \
+                 refusing"
+                    .to_string(),
+            ));
+        }
+        Ok(same_origin)
+    }
+
+    /// True when the URL's host is a HOSTNAME (not an IP literal) — the
+    /// resolution-judgment candidates exist only for these.
+    fn host_is_name(parts: &UrlParts) -> bool {
+        parse_ipv4(&parts.host).is_none() && !parts.host.contains(':')
+    }
+
+    /// R05 RR1 F15 — resolves the URL's hostname and judges EVERY candidate
+    /// through the guarded-range table:
+    /// - a resolution failure or an EMPTY candidate set refuses loudly
+    ///   (an unresolvable product URL is never dialed "to see");
+    /// - ANY guarded candidate (loopback / private / link-local / ULA /
+    ///   mapped / multicast — including a MIXED public+private record set)
+    ///   refuses: the transport could dial that candidate;
+    /// - an all-public candidate set is returned VERIFIED — the caller
+    ///   dials THROUGH it (pinned), so a DNS change between check and
+    ///   dial cannot reach an address this function never judged.
+    ///
+    /// Literal-IP URLs (judged synchronously) and same-origin exceptions
+    /// (the configured endpoint origin itself) return an EMPTY set = no
+    /// resolution judgment applies.
+    async fn resolve_candidates(
+        &self,
+        parts: &UrlParts,
+        same_origin: bool,
+    ) -> Result<Vec<std::net::SocketAddr>, ProtocolError> {
+        if same_origin || !Self::host_is_name(parts) || parts.scheme != "https" {
+            return Ok(Vec::new());
+        }
+        let port = parts
+            .origin
+            .rsplit(':')
+            .next()
+            .and_then(|tail| tail.parse::<u16>().ok())
+            .unwrap_or(443);
+        let candidates = (self.resolver)(&parts.host, port).await.map_err(|detail| {
+            refuse(format!(
+                "egress URL host {:?} could not be resolved ({}); an unresolvable \
+                     destination is never dialed",
+                parts.host, detail
+            ))
+        })?;
+        if candidates.is_empty() {
             return Err(refuse(format!(
-                "egress URL {url:?} is plain http outside the configured provider endpoint \
-                 origins; refusing"
+                "egress URL host {:?} resolved to ZERO addresses; refusing",
+                parts.host
             )));
         }
+        for candidate in &candidates {
+            if socket_addr_is_guarded(candidate) {
+                return Err(refuse(format!(
+                    "egress URL host {:?} resolves to a guarded address ({candidate}); a \
+                     hostname whose record set contains ANY loopback/private/link-local \
+                     candidate is never dialed (the only exception is a configured \
+                     provider endpoint origin)",
+                    parts.host
+                )));
+            }
+        }
+        Ok(candidates)
+    }
+
+    /// The full async policy judgment of one URL (no fetch): the sync rules
+    /// PLUS the resolution judgment of [`Self::resolve_candidates`]. The
+    /// service layer's pre-flight calls this; `download` calls it as its
+    /// first stage and dials through the verified candidates.
+    pub async fn check_url_resolved(&self, url: &str) -> Result<(), ProtocolError> {
+        let parts = parse_url(url)?;
+        let same_origin = self.check_parts(&parts)?;
+        self.resolve_candidates(&parts, same_origin).await?;
         Ok(())
     }
 
     /// Fetches one media URL through the policy: no credentials, no
     /// redirects, the Content-Type MUST be image/, video/, or audio/, the
-    /// body is read under [`EGRESS_DOWNLOAD_MAX_BYTES`] mid-read. Returns
-    /// the bytes with the response Content-Type (mime hint resolution is
-    /// the caller's).
+    /// body is read under [`EGRESS_DOWNLOAD_MAX_BYTES`] mid-read.
+    /// R05 RR1 F15: an https HOSTNAME is dialed THROUGH its verified
+    /// candidate set (a per-download pinned client, `resolve_to_addrs` —
+    /// SNI/Host/certificate verification still run under the domain); when
+    /// the frozen network policy routes this URL through a proxy, the
+    /// proxy is the resolution authority (the verified-candidate judgment
+    /// still ran as defense in depth) and the dial is the ordinary
+    /// policy-bound client. Returns the bytes with the response
+    /// Content-Type (mime hint resolution is the caller's).
     pub async fn download(
         &self,
         url: &str,
         deadline_unix_ms: Option<u64>,
     ) -> Result<(Vec<u8>, String), (ProtocolError, bool)> {
-        self.check_url(url).map_err(|error| (error, false))?;
-        let request = self.client.get(url);
+        let parts = parse_url(url).map_err(|error| (error, false))?;
+        let same_origin = self.check_parts(&parts).map_err(|error| (error, false))?;
+        let verified = self
+            .resolve_candidates(&parts, same_origin)
+            .await
+            .map_err(|error| (error, false))?;
+        // Which client dials: pinned (direct + hostname + verified
+        // candidates) or the ordinary policy client (proxy / literal IP /
+        // same-origin exception).
+        let target = reqwest::Url::parse(url).map_err(|err| {
+            (
+                refuse(format!("egress URL {url:?} is not parseable: {err}")),
+                false,
+            )
+        })?;
+        let proxied = self.client.plane().policy().proxies(&target);
+        let request_client = if !verified.is_empty() && !proxied {
+            self.client
+                .pinned_client(&parts.host, &verified)
+                .map_err(|error| (error, false))?
+        } else {
+            self.client.client().map_err(|error| (error, false))?
+        };
+        let request = request_client.get(url);
         let response =
             dispatch::send_head_with_timeouts(request, &self.timeouts, deadline_unix_ms).await?;
         let status = response.status();

@@ -2,8 +2,8 @@
   "schemaVersion": 1,
   "artifactKind": "R05_PROGRESS_LEDGER",
   "stage_id": "R05",
-  "generated_by": "EXECUTOR-R05-T01",
-  "generated_at": "2026-10-03",
+  "generated_by": "R05-T08-执行者（RR1 WP-T08）",
+  "generated_at": "2026-10-06",
   "baseline": {
     "branch": "codex/rust-tauri-migration",
     "head_sha": "c549ff654508ab951e2cf39cf9d309fc9c6b8656",
@@ -352,7 +352,14 @@
       "controlsGreen": true,
       "log": "artifacts/rust-tauri/R05/T08-E01/negative/case-results.json"
     },
-    "note": "T08 终树五门禁+生产者+verify-stage R05(内嵌 R04→R03→R02 整链)全部真实通过；树绑定 working-tree-manifest.txt sha256 0b110d87…(36461 文件)。"
+    "verify_stage_r05_rr1_independent9": {
+      "overall": "FAIL",
+      "exit": 1,
+      "command": "PATH=/Users/study_superior/.cargo/bin:$PATH /Users/study_superior/.cargo/bin/cargo run --manifest-path rust/Cargo.toml --locked -p xtask -- verify-stage R05 --evidence artifacts/rust-tauri/R05/RR1/INDEPENDENT-9/verify-R05",
+      "log": "artifacts/rust-tauri/R05/RR1/INDEPENDENT-9/verify-R05/verify-stage-result.json",
+      "note": "2026-10-05T18:25:34Z–19:52:10Z，RR1 候选（testedSha d80737b6 + 未提交工作树，worktreeDirty=true）上首次完整 verify-stage R05，由独立阶段审查者亲跑（rustup 代理 1.98.1）。7 命令：r05_stage_suites（91 runs）/fmt/clippy/contracts/boundaries PASS；rust_test_workspace FAIL（timedOut=true，冷编译耗尽 2400s，被杀前 41 套件 0 失败；随后 --no-fail-fast 完整枚举 115 套件/1472 通过/3 失败=1 ALF 环境项+2 负载敏感，隔离复跑全绿）；r04_regression_gate FAIL（F41 存储注册表 v6/v7 未补登 + F42 .gitignore×legacy 镜像绑定，均确定性复现并附控制组归因）。130/130 R00 绑定叶 pass。结论=RR1_ISSUE_MATRIX.json independentStageReview：offline_gate FAIL / independent_review FAIL / stage_readiness NOT_ACCEPTED / R06_READY=false。"
+    },
+    "note": "T08 终树五门禁+生产者+verify-stage R05(内嵌 R04→R03→R02 整链)全部真实通过；树绑定 working-tree-manifest.txt sha256 0b110d87…(36461 文件)。〔2026-10-06 诚实增补：上列 T08-E01/FINAL-WFR2-1 各 PASS 记录属首轮候选（testedSha c549ff654 工作树）的历史事实，该轮此后被 2026-10-04 对抗审查判 NOT_ACCEPTED，按 N16 其结论不继承到 RR1 候选；RR1 候选的现行正式门禁结果=verify_stage_r05_rr1_independent9（FAIL）。〕"
   },
   "environment_items": [
     {
@@ -391,5 +398,27 @@
     "Media/ASR 38 D12 leaves: wire-level facts registered in PROTOCOL_WIRE_MATRIX.json; Rust protocol adaptation + async job semantics — T06 (rule R5)",
     "REV-T03 R01 N-02: write-tool results carry file:// absolute workspace paths to the model payload (faithful resource_refs upload, correct as-is; whether to expose absolute paths to the model is a product-policy decision) — adjudicate when T06 lands resource references",
     "R05-T07 usage ledger: a model call killed mid-flight (started event without a completed event) leaves no usage row — accounting granularity is resolved requests; an intent-before-dispatch ledger phase (InvocationJournal-style) is a registered later-stage option, not an R05 obligation (documented in MODEL_USAGE_SEMANTICS.md §5/§10)"
-  ]
+  ],
+  "rr1_repair_round": {
+    "adversarial_audit": "2026-10-04 NOT_ACCEPTED（F01–F28；证据包 INPUT-adversarial-2026-10-04）",
+    "matrix": "docs/rust-tauri/R05/repair-current/RR1_ISSUE_MATRIX.json（状态权威）",
+    "wp_status": "T01–T08 各 F-ID 任务级独立验收全部 INDEPENDENT_PASS（含追加轮 F29–F39 与 T08 F24/F25/F26/F27/F28，2026-10-06 R05-T08 独立验收-r1）；F31 随 F25 消费（SELF_CHECKED）；仍 OPEN=F34/F40/F41/F42/F43 + R05-T05-C11B/C13、R05-T06-C11B 三行（见 stage_final_review）",
+    "evidence_roots": "artifacts/rust-tauri/R05/RR1/WP-T01..T08-*",
+    "gate_tables_reregistered": "2026-10-05 F26：27 套件/93 cid+10 command=103 权威登记册/137 叶案例（13 测试级）；首轮 18 套件/82 runs/91 C-ID 的注册已由重建取代（历史见 R05_REPORT §5）",
+    "stage_final_review": {
+      "reviewer": "R05 RR1 独立阶段审查者（阶段终审 r1，全新上下文，2026-10-06）",
+      "candidate": "codex/rust-tauri-migration @ d80737b6cb9186c8a18c0f35923aac00249d45c3 + RR1 未提交工作树（testedSha=d80737b6、worktreeDirty=true、运行期绑定 stable）",
+      "verdict": {
+        "offline_gate": "FAIL",
+        "independent_review": "FAIL（阶段级；T01–T08 任务级 INDEPENDENT_PASS 记录不作废）",
+        "live_verification": "BLOCKED_NOT_AUTHORIZED（RR-BLK-CREDENTIALS，最迟 R10）",
+        "stage_readiness": "NOT_ACCEPTED",
+        "R06_READY": false
+      },
+      "evidence": "artifacts/rust-tauri/R05/RR1/INDEPENDENT-9/（verify-stage 完整门禁）与 INDEPENDENT-9-supplementary/（workspace 枚举、F41/F42 standalone 复现与控制组、隔离复跑）",
+      "authoritative_record": "docs/rust-tauri/R05/repair-current/RR1_ISSUE_MATRIX.json → independentStageReview 键（审查者唯一可写追加）+ F41/F42/F43 新条目",
+      "remaining_blockers": "F41（R02 存储注册表未补 v6/v7，前序闭包确定性红）；F42（d80737b6 .gitignore 负向规则 × legacy 镜像绑定，标准门禁布局确定性红）；F34（Anthropic 已知 stop_reason+未闭块防线无永久测试腿）；F40 + R05-T05-C11B/C13、R05-T06-C11B 三行台账收口；F43（rust_test_workspace 无有效窗口完整通过记录）",
+      "next_round_input": "docs/rust-tauri/R05/repair-current/RR1_FINAL_REPORT.md（下一修复轮按总控 §3.3 重走修复→任务验收→阶段终审，不得以本 FAIL 结论伪造 PASS）"
+    }
+  }
 }

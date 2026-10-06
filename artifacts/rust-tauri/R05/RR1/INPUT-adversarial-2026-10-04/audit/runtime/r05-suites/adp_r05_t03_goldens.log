@@ -1,0 +1,12 @@
+    Blocking waiting for file lock on build directory
+   Compiling lingxi-adapters v0.0.0 (/workspace/scratch/9b4397d87a13/LingxiAgent/rust/crates/lingxi-adapters)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 28.03s
+     Running tests/r05_t03_goldens.rs (/workspace/scratch/9b4397d87a13/audit/runtime/target/debug/deps/r05_t03_goldens-cf5ea23275115a73)
+
+running 3 tests
+test forward_and_roundtrip_goldens_render_and_parse_exactly ... ok
+test the_golden_set_covers_five_families_times_three_cases ... ok
+test error_goldens_classify_and_transport_exactly ... ok
+
+test result: ok. 3 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.15s
+

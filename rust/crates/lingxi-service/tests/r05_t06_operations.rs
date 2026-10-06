@@ -314,7 +314,7 @@ async fn chain(
                 }}
             }},
             "models": {{
-                "chat": {{"provider": "text_a", "model": "text-model"}},
+                "chat": {{"provider": "text_a", "model": "text-model", "capabilities": {{"tools": true}}}},
                 "summarize": {{"provider": "text_a", "model": "sum-model"}},
                 "image": {{"provider": "image_b", "model": "dall-e-3"}},
                 "speech": {{"provider": "speech_c", "model": "gpt-4o-mini-tts"}},

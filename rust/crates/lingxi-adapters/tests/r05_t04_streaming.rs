@@ -566,12 +566,15 @@ fn c05_anthropic_half_json_arguments_close_loud_with_zero_dispatch() {
 #[test]
 fn c06_parseable_arguments_admit_nothing_before_the_protocol_terminal() {
     // Call A's arguments are complete and parseable from the third frame on;
-    // the stream then continues (call B, more text) before [DONE]. Nothing
-    // executable may exist at the parseable-but-open point.
+    // the stream then continues (call B, more text) before the terminal.
+    // Nothing executable may exist at the parseable-but-open point.
+    // (R05 RR1 F12: the terminal is the pair finish_reason + [DONE] — the
+    // fixture now carries the legal `tool_calls` finish frame.)
     let frames = vec![
         serde_json::json!({"id":"x","choices":[{"index":0,"delta":{"role":"assistant","tool_calls":[{"index":0,"id":"call_a","type":"function","function":{"name":"read","arguments":"{\"path\":\"a.txt\"}"}}]},"finish_reason":null}]}),
         serde_json::json!({"id":"x","choices":[{"index":0,"delta":{"content":"中间的文本"},"finish_reason":null}]}),
         serde_json::json!({"id":"x","choices":[{"index":0,"delta":{"tool_calls":[{"index":1,"id":"call_b","type":"function","function":{"name":"write","arguments":"{\"path\":\"b.txt\",\"content\":\"v\"}"}}]},"finish_reason":null}]}),
+        serde_json::json!({"id":"x","choices":[{"index":0,"delta":{},"finish_reason":"tool_calls"}]}),
     ];
     let body = openai_body(&frames);
     let events = decode_complete_body(&body).expect("decode");

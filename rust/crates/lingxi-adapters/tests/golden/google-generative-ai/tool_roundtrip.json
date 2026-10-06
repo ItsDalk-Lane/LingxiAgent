@@ -1,7 +1,10 @@
 {
   "family": "google-generative-ai",
   "case": "tool_roundtrip",
-  "route": {"provider": "google-golden", "model": "gemini-golden-2.5"},
+  "route": {
+    "provider": "google-golden",
+    "model": "gemini-golden-2.5"
+  },
   "input": {
     "submission": "读取两个文件并写出一个合并结果",
     "system_prompt": "golden persona",
@@ -10,13 +13,37 @@
         "target": "tool:first-party:read",
         "wire_name": "read",
         "description": "Read a file 读取文件",
-        "schema": {"type": "object", "properties": {"path": {"type": "string"}}, "required": ["path"]}
+        "schema": {
+          "type": "object",
+          "properties": {
+            "path": {
+              "type": "string"
+            }
+          },
+          "required": [
+            "path"
+          ]
+        }
       },
       {
         "target": "tool:first-party:write",
         "wire_name": "write",
         "description": "Write a file 写入文件",
-        "schema": {"type": "object", "properties": {"content": {"type": "string"}, "path": {"type": "string"}}, "required": ["path", "content"]}
+        "schema": {
+          "type": "object",
+          "properties": {
+            "content": {
+              "type": "string"
+            },
+            "path": {
+              "type": "string"
+            }
+          },
+          "required": [
+            "path",
+            "content"
+          ]
+        }
       }
     ],
     "prior": [
@@ -24,14 +51,48 @@
         "assistant": {
           "call": "mc-golden-1",
           "content": [
-            {"reasoning": "计划读取"},
-            {"opaque": {"provider": "google-generative-ai", "data": {"type": "thoughtSignature", "signature": "sig-goog-rt"}}},
-            {"text": "开始读取"}
+            {
+              "reasoning": "计划读取"
+            },
+            {
+              "opaque": {
+                "provider": "google-generative-ai",
+                "data": {
+                  "type": "thoughtSignature",
+                  "signature": "sig-goog-rt"
+                }
+              }
+            },
+            {
+              "text": "开始读取"
+            }
           ],
           "tool_calls": [
-            {"seq": 1, "provider_call_id": "fc-读取-α", "target": "tool:first-party:read", "arguments": {"path": "/tmp/a.md"}},
-            {"seq": 2, "provider_call_id": "fc-读取-β", "target": "tool:first-party:read", "arguments": {"path": "/tmp/b.md"}},
-            {"seq": 3, "provider_call_id": "fc-写入-γ", "target": "tool:first-party:write", "arguments": {"content": "x", "path": "/tmp/c.md"}}
+            {
+              "seq": 1,
+              "provider_call_id": "fc-读取-α",
+              "target": "tool:first-party:read",
+              "arguments": {
+                "path": "/tmp/a.md"
+              }
+            },
+            {
+              "seq": 2,
+              "provider_call_id": "fc-读取-β",
+              "target": "tool:first-party:read",
+              "arguments": {
+                "path": "/tmp/b.md"
+              }
+            },
+            {
+              "seq": 3,
+              "provider_call_id": "fc-写入-γ",
+              "target": "tool:first-party:write",
+              "arguments": {
+                "content": "x",
+                "path": "/tmp/c.md"
+              }
+            }
           ]
         }
       },
@@ -39,48 +100,165 @@
         "tool_result": {
           "seq": 1,
           "provider_call_id": "fc-读取-α",
-          "outcome": {"kind": "success_text", "text": "内容 A"}
+          "outcome": {
+            "kind": "success_text",
+            "text": "内容 A"
+          }
         }
       },
       {
         "tool_result": {
           "seq": 2,
           "provider_call_id": "fc-读取-β",
-          "outcome": {"kind": "cancelled"}
+          "outcome": {
+            "kind": "cancelled"
+          }
         }
       },
       {
         "tool_result": {
           "seq": 3,
           "provider_call_id": "fc-写入-γ",
-          "outcome": {"kind": "failed", "code": "internal", "message": "disk full 磁盘满"}
+          "outcome": {
+            "kind": "failed",
+            "code": "internal",
+            "message": "disk full 磁盘满"
+          }
         }
       }
     ]
   },
   "expected_request": {
-    "systemInstruction": {"parts": [{"text": "golden persona"}]},
+    "systemInstruction": {
+      "parts": [
+        {
+          "text": "golden persona"
+        }
+      ]
+    },
     "contents": [
-      {"role": "user", "parts": [{"text": "读取两个文件并写出一个合并结果"}]},
+      {
+        "role": "user",
+        "parts": [
+          {
+            "text": "读取两个文件并写出一个合并结果"
+          }
+        ]
+      },
       {
         "role": "model",
         "parts": [
-          {"text": "计划读取", "thought": true, "thoughtSignature": "sig-goog-rt"},
-          {"text": "开始读取"},
-          {"functionCall": {"name": "read", "args": {"path": "/tmp/a.md"}, "id": "fc-读取-α"}},
-          {"functionCall": {"name": "read", "args": {"path": "/tmp/b.md"}, "id": "fc-读取-β"}},
-          {"functionCall": {"name": "write", "args": {"content": "x", "path": "/tmp/c.md"}, "id": "fc-写入-γ"}}
+          {
+            "text": "计划读取",
+            "thought": true,
+            "thoughtSignature": "sig-goog-rt"
+          },
+          {
+            "text": "开始读取"
+          },
+          {
+            "functionCall": {
+              "name": "read",
+              "args": {
+                "path": "/tmp/a.md"
+              },
+              "id": "fc-读取-α"
+            }
+          },
+          {
+            "functionCall": {
+              "name": "read",
+              "args": {
+                "path": "/tmp/b.md"
+              },
+              "id": "fc-读取-β"
+            }
+          },
+          {
+            "functionCall": {
+              "name": "write",
+              "args": {
+                "content": "x",
+                "path": "/tmp/c.md"
+              },
+              "id": "fc-写入-γ"
+            }
+          }
         ]
       },
-      {"role": "user", "parts": [{"functionResponse": {"name": "read", "response": {"status": "succeeded", "content": "内容 A"}, "id": "fc-读取-α"}}]},
-      {"role": "user", "parts": [{"functionResponse": {"name": "read", "response": {"status": "cancelled", "content": "tool call cancelled by the host before completion"}, "id": "fc-读取-β"}}]},
-      {"role": "user", "parts": [{"functionResponse": {"name": "write", "response": {"status": "failed", "content": "tool error [internal]: disk full 磁盘满"}, "id": "fc-写入-γ"}}]}
+      {
+        "role": "user",
+        "parts": [
+          {
+            "functionResponse": {
+              "name": "read",
+              "response": {
+                "status": "succeeded",
+                "content": "内容 A"
+              },
+              "id": "fc-读取-α"
+            }
+          },
+          {
+            "functionResponse": {
+              "name": "read",
+              "response": {
+                "status": "cancelled",
+                "content": "tool call cancelled by the host before completion"
+              },
+              "id": "fc-读取-β"
+            }
+          },
+          {
+            "functionResponse": {
+              "name": "write",
+              "response": {
+                "status": "failed",
+                "content": "tool error [internal]: disk full 磁盘满"
+              },
+              "id": "fc-写入-γ"
+            }
+          }
+        ]
+      }
     ],
     "tools": [
       {
         "functionDeclarations": [
-          {"name": "read", "description": "Read a file 读取文件", "parametersJsonSchema": {"type": "object", "properties": {"path": {"type": "string"}}, "required": ["path"]}},
-          {"name": "write", "description": "Write a file 写入文件", "parametersJsonSchema": {"type": "object", "properties": {"content": {"type": "string"}, "path": {"type": "string"}}, "required": ["path", "content"]}}
+          {
+            "name": "read",
+            "description": "Read a file 读取文件",
+            "parametersJsonSchema": {
+              "type": "object",
+              "properties": {
+                "path": {
+                  "type": "string"
+                }
+              },
+              "required": [
+                "path"
+              ]
+            }
+          },
+          {
+            "name": "write",
+            "description": "Write a file 写入文件",
+            "parametersJsonSchema": {
+              "type": "object",
+              "properties": {
+                "content": {
+                  "type": "string"
+                },
+                "path": {
+                  "type": "string"
+                }
+              },
+              "required": [
+                "path",
+                "content"
+              ]
+            }
+          }
         ]
       }
     ]
@@ -88,15 +266,32 @@
   "response_wire": {
     "candidates": [
       {
-        "content": {"role": "model", "parts": [{"text": "全部处理完毕。"}]},
+        "content": {
+          "role": "model",
+          "parts": [
+            {
+              "text": "全部处理完毕。"
+            }
+          ]
+        },
         "finishReason": "STOP"
       }
     ],
-    "usageMetadata": {"promptTokenCount": 410, "candidatesTokenCount": 12}
+    "usageMetadata": {
+      "promptTokenCount": 410,
+      "candidatesTokenCount": 12
+    }
   },
   "expected_turn": {
     "kind": "final",
-    "content": [{"text": "全部处理完毕。"}],
-    "usage": {"input_tokens": 410, "output_tokens": 12}
+    "content": [
+      {
+        "text": "全部处理完毕。"
+      }
+    ],
+    "usage": {
+      "input_tokens": 410,
+      "output_tokens": 12
+    }
   }
 }

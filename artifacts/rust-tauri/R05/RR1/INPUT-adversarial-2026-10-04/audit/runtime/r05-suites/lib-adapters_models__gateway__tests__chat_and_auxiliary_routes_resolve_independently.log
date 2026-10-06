@@ -1,0 +1,11 @@
+    Blocking waiting for file lock on package cache
+    Blocking waiting for file lock on package cache
+    Blocking waiting for file lock on package cache
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 6.67s
+     Running unittests src/lib.rs (/workspace/scratch/9b4397d87a13/audit/runtime/target/debug/deps/lingxi_adapters-2df85df269f4660f)
+
+running 1 test
+test models::gateway::tests::chat_and_auxiliary_routes_resolve_independently ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 108 filtered out; finished in 0.00s
+

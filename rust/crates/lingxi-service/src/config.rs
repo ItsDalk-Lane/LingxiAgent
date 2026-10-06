@@ -131,6 +131,11 @@ pub struct CliOptions {
     /// DB queue wait budget in milliseconds (F07): how long ONE submission
     /// may wait for queue capacity before surfacing QueueFull → 503.
     pub db_wait_budget_ms: Option<u64>,
+    /// Process-wide concurrent MODEL call ceiling
+    /// (`--model-global-permits`, R05 RR1 F24 / T08-C11); `None` = the
+    /// documented default (8). This is the GLOBAL layer of the model quota
+    /// only — the per-agent/per-session layers keep their defaults.
+    pub model_global_permits: Option<usize>,
 }
 
 /// Result of home-source precedence resolution.
@@ -660,6 +665,28 @@ where
                     MAX_TIME_BUDGET_MS,
                 )?);
             }
+            // R05 RR1 F24 (T08-C11's "模型全局 permit=1" precondition): the
+            // process-wide concurrent MODEL call ceiling. Strictly smaller
+            // than the default 8 — the nested worker chain (main model →
+            // tool → worker → host callback) must stay deadlock-free by
+            // construction, not by an ample permit supply.
+            "--model-global-permits" => {
+                if options.model_global_permits.is_some() {
+                    return Err(ConfigError::DuplicateArgument {
+                        flag: "--model-global-permits".to_string(),
+                    });
+                }
+                options.model_global_permits = Some(parse_limit_usize(
+                    &mut iter,
+                    "--model-global-permits",
+                    "process-wide concurrent model calls; supported range \
+                     1..=usize::MAX (the GLOBAL layer of the R03-T02 model \
+                     quota; per-agent/per-session layers keep their defaults — \
+                     lowering only tightens)",
+                    1,
+                    usize::MAX as u64,
+                )?);
+            }
             other => {
                 return Err(ConfigError::UnknownArgument {
                     value: other.to_string(),
@@ -775,10 +802,11 @@ where
 }
 
 /// The strict `--config` file, fully parsed. The closed key set is
-/// `{home, workspace?, providers?, models?}` (R05-T01 widened the original
-/// exactly-`{"home"}` contract): anything outside that set, a missing
-/// `home`, non-string `home`/`workspace` values and unreadable/unparsable
-/// files are loud errors, never silently skipped.
+/// `{home, workspace?, providers?, models?, workers?}` (R05-T01 widened the
+/// original exactly-`{"home"}` contract; R05 RR1 F24 added the single
+/// `workers` entry): anything outside that set, a missing `home`,
+/// non-string `home`/`workspace` values and unreadable/unparsable files are
+/// loud errors, never silently skipped.
 #[derive(Debug, Clone)]
 pub struct ServiceConfigFile {
     /// The data root (still pre-validation-as-home; the caller resolves and
@@ -793,6 +821,198 @@ pub struct ServiceConfigFile {
     /// and/or `models`, already validated against the closed model-plane
     /// schema (a half-valid plane never reaches the composition root).
     pub model_plane: Option<ModelPlaneConfig>,
+    /// The config-declared single-operation worker (R05 RR1 F24): present
+    /// iff the file declares `workers`, already validated against its
+    /// closed schema. The composition root registers it through the REAL
+    /// R04 discipline (approval/resources/process supervision/host model
+    /// port); it is never an arbitrary install surface (argv is fixed by
+    /// the config, callers only pass schema-validated JSON arguments).
+    pub workers: Option<WorkerToolRegistration>,
+}
+
+/// The ONE config-declared worker of the `workers` section (R05 RR1 F24 /
+/// the original R05 "受控单操作 worker" of T08-C11). Exactly one entry may
+/// be declared (an object, not a list): this is a controlled registration
+/// surface, not a plugin marketplace.
+#[derive(Debug, Clone, PartialEq)]
+pub struct WorkerToolRegistration {
+    /// Model-facing tool name (also the registry local name).
+    pub local_name: String,
+    /// The allowlisted single operation the worker executes.
+    pub op: String,
+    pub description: String,
+    /// The worker argv — command + fixed arguments, NO shell, NO
+    /// interpolation of caller input (caller arguments ride the JSON
+    /// request envelope only).
+    pub argv: Vec<String>,
+    /// The worker child's cwd. Absolute; defaults to the workspace root at
+    /// registration.
+    pub cwd: Option<PathBuf>,
+    /// The tool's JSON Schema (an object).
+    pub input_schema: serde_json::Value,
+    /// Argument keys whose string values are FILE PATHS subject to the
+    /// resource grant (derived scopes; claimed files verified).
+    pub path_args: Vec<String>,
+    /// The host-granted model-callback purposes (C09: a callback whose
+    /// purpose is not listed is refused — the payload never widens the
+    /// grant).
+    pub allowed_model_purposes: Vec<String>,
+}
+
+/// Parses and validates the `workers` section (the closed single-entry
+/// schema). Every malformed shape is a loud error naming the field.
+fn parse_workers_section(
+    path: &Path,
+    value: &serde_json::Value,
+) -> Result<WorkerToolRegistration, ConfigError> {
+    let detail_of = |detail: String| ConfigError::ConfigFileInvalid {
+        path: path.to_path_buf(),
+        detail,
+    };
+    let object = value.as_object().ok_or_else(|| {
+        detail_of("\"workers\" must be an object (the ONE controlled worker entry)".to_string())
+    })?;
+    for key in object.keys() {
+        if !matches!(
+            key.as_str(),
+            "localName"
+                | "op"
+                | "description"
+                | "argv"
+                | "cwd"
+                | "inputSchema"
+                | "pathArgs"
+                | "allowedModelPurposes"
+        ) {
+            return Err(detail_of(format!(
+                "unknown key {key:?} inside \"workers\" (the closed key set is \"localName\", \
+                 \"op\", \"description\", \"argv\", \"cwd\", \"inputSchema\", \"pathArgs\", \
+                 \"allowedModelPurposes\")"
+            )));
+        }
+    }
+    let string_field = |key: &str, required: bool| -> Result<Option<String>, ConfigError> {
+        match object.get(key) {
+            None => {
+                if required {
+                    Err(detail_of(format!(
+                        "\"workers\" is missing the required key {key:?}"
+                    )))
+                } else {
+                    Ok(None)
+                }
+            }
+            Some(value) => value
+                .as_str()
+                .map(|s| s.to_string())
+                .map(Some)
+                .ok_or_else(|| detail_of(format!("\"workers\".{key} must be a string"))),
+        }
+    };
+    let local_name = string_field("localName", true)?.expect("required checked");
+    if local_name.is_empty()
+        || !local_name
+            .chars()
+            .all(|c| c.is_ascii_alphanumeric() || c == '_' || c == '-')
+    {
+        return Err(detail_of(format!(
+            "\"workers\".localName must be a non-empty [A-Za-z0-9_-] tool name, got {local_name:?}"
+        )));
+    }
+    let op = string_field("op", true)?.expect("required checked");
+    if op.is_empty() {
+        return Err(detail_of(
+            "\"workers\".op must be a non-empty operation id".to_string(),
+        ));
+    }
+    let description = string_field("description", false)?
+        .unwrap_or_else(|| format!("config-declared worker {local_name} ({op})"));
+    let argv = object
+        .get("argv")
+        .ok_or_else(|| detail_of("\"workers\" is missing the required key \"argv\"".to_string()))?
+        .as_array()
+        .ok_or_else(|| detail_of("\"workers\".argv must be an array of strings".to_string()))?
+        .iter()
+        .map(|v| {
+            v.as_str().map(str::to_string).ok_or_else(|| {
+                detail_of("\"workers\".argv must be an array of strings".to_string())
+            })
+        })
+        .collect::<Result<Vec<String>, ConfigError>>()?;
+    if argv.is_empty() {
+        return Err(detail_of(
+            "\"workers\".argv must name the worker executable plus its fixed arguments".to_string(),
+        ));
+    }
+    let argv0 = PathBuf::from(&argv[0]);
+    if !argv0.is_absolute() {
+        return Err(detail_of(format!(
+            "\"workers\".argv[0] must be an ABSOLUTE path to the worker executable, got {:?}",
+            argv[0]
+        )));
+    }
+    let cwd = match object.get("cwd") {
+        None => None,
+        Some(value) => {
+            let text = value.as_str().ok_or_else(|| {
+                detail_of(
+                    "\"workers\".cwd must be a string containing an absolute path".to_string(),
+                )
+            })?;
+            let cwd = PathBuf::from(text);
+            if !cwd.is_absolute() {
+                return Err(detail_of(format!(
+                    "\"workers\".cwd must be an absolute path, got {text:?}"
+                )));
+            }
+            Some(cwd)
+        }
+    };
+    let input_schema = object
+        .get("inputSchema")
+        .ok_or_else(|| {
+            detail_of("\"workers\" is missing the required key \"inputSchema\"".to_string())
+        })?
+        .clone();
+    if !input_schema.is_object() {
+        return Err(detail_of(
+            "\"workers\".inputSchema must be a JSON Schema object".to_string(),
+        ));
+    }
+    let string_array = |key: &str| -> Result<Vec<String>, ConfigError> {
+        match object.get(key) {
+            None => Ok(Vec::new()),
+            Some(value) => value
+                .as_array()
+                .ok_or_else(|| detail_of(format!("\"workers\".{key} must be an array of strings")))?
+                .iter()
+                .map(|v| {
+                    v.as_str().map(str::to_string).ok_or_else(|| {
+                        detail_of(format!("\"workers\".{key} must be an array of strings"))
+                    })
+                })
+                .collect::<Result<Vec<String>, ConfigError>>(),
+        }
+    };
+    let path_args = string_array("pathArgs")?;
+    let allowed_model_purposes = string_array("allowedModelPurposes")?;
+    for purpose in &allowed_model_purposes {
+        if purpose.is_empty() {
+            return Err(detail_of(
+                "\"workers\".allowedModelPurposes entries must be non-empty".to_string(),
+            ));
+        }
+    }
+    Ok(WorkerToolRegistration {
+        local_name,
+        op,
+        description,
+        argv,
+        cwd,
+        input_schema,
+        path_args,
+        allowed_model_purposes,
+    })
 }
 
 /// Reads and validates the whole strict config file. Unknown keys and every
@@ -818,10 +1038,13 @@ pub fn read_service_config(path: &Path) -> Result<ServiceConfigFile, ConfigError
         .as_object()
         .ok_or_else(|| detail_of("top level must be a JSON object".to_string()))?;
     for key in object.keys() {
-        if !matches!(key.as_str(), "home" | "workspace" | "providers" | "models") {
+        if !matches!(
+            key.as_str(),
+            "home" | "workspace" | "providers" | "models" | "workers"
+        ) {
             return Err(detail_of(format!(
                 "unknown key {key:?} (the closed key set is \"home\", \"workspace\", \
-                 \"providers\", \"models\")"
+                 \"providers\", \"models\", \"workers\")"
             )));
         }
     }
@@ -866,10 +1089,15 @@ pub fn read_service_config(path: &Path) -> Result<ServiceConfigFile, ConfigError
             )
         }
     };
+    let workers = match object.get("workers") {
+        None => None,
+        Some(value) => Some(parse_workers_section(path, value)?),
+    };
     Ok(ServiceConfigFile {
         home: PathBuf::from(home),
         workspace,
         model_plane,
+        workers,
     })
 }
 
@@ -1597,6 +1825,7 @@ mod tests {
         let parsed = read_service_config(&path).unwrap();
         assert_eq!(parsed.workspace, None);
         assert!(parsed.model_plane.is_none());
+        assert!(parsed.workers.is_none());
         // providers-only also yields a (valid) plane with no route bindings.
         std::fs::write(
             &path,
@@ -1655,6 +1884,126 @@ mod tests {
             );
         }
         std::fs::remove_dir_all(&dir).ok();
+    }
+
+    // ── R05 RR1 F24: the `workers` section's closed schema ──────────────────
+
+    #[test]
+    fn workers_section_parses_and_validates_the_closed_shape() {
+        let dir = unique_dir("workers-ok");
+        let path = dir.join("service.json");
+        std::fs::write(
+            &path,
+            r#"{"home": "/tmp/a", "workers": {
+                "localName": "digest",
+                "op": "digest",
+                "argv": ["/usr/local/bin/worker", "--mode", "digest"],
+                "cwd": "/tmp/ws",
+                "inputSchema": {"type": "object", "properties": {"input": {"type": "string"}}},
+                "pathArgs": ["input"],
+                "allowedModelPurposes": ["summarize"]
+            }}"#,
+        )
+        .unwrap();
+        let parsed = read_service_config(&path).unwrap();
+        let worker = parsed.workers.expect("workers section");
+        assert_eq!(worker.local_name, "digest");
+        assert_eq!(worker.op, "digest");
+        assert_eq!(worker.argv.len(), 3);
+        assert_eq!(worker.argv[0], "/usr/local/bin/worker");
+        assert_eq!(worker.cwd.as_deref(), Some(Path::new("/tmp/ws")));
+        assert_eq!(worker.path_args, vec!["input".to_string()]);
+        assert_eq!(worker.allowed_model_purposes, vec!["summarize".to_string()]);
+        // description defaults; schema must be an object (kept verbatim).
+        assert!(worker.description.contains("digest"));
+        assert!(worker.input_schema.is_object());
+        std::fs::remove_dir_all(&dir).ok();
+    }
+
+    #[test]
+    fn workers_section_rejects_every_malformed_shape_loudly() {
+        let dir = unique_dir("workers-bad");
+        let cases: Vec<(&str, String)> = vec![
+            (
+                "not-an-object",
+                r#"{"home": "/tmp/a", "workers": []}"#.to_string(),
+            ),
+            (
+                "unknown-inner-key",
+                r#"{"home": "/tmp/a", "workers": {"localName": "w", "op": "o",
+                    "argv": ["/abs/w"], "inputSchema": {"type": "object"},
+                    "installPath": "/opt/x"}}"#
+                    .to_string(),
+            ),
+            (
+                "missing-argv",
+                r#"{"home": "/tmp/a", "workers": {"localName": "w", "op": "o",
+                    "inputSchema": {"type": "object"}}}"#
+                    .to_string(),
+            ),
+            (
+                "relative-argv0",
+                r#"{"home": "/tmp/a", "workers": {"localName": "w", "op": "o",
+                    "argv": ["worker-bin"], "inputSchema": {"type": "object"}}}"#
+                    .to_string(),
+            ),
+            (
+                "relative-cwd",
+                r#"{"home": "/tmp/a", "workers": {"localName": "w", "op": "o",
+                    "argv": ["/abs/w"], "cwd": "ws", "inputSchema": {"type": "object"}}}"#
+                    .to_string(),
+            ),
+            (
+                "non-object-schema",
+                r#"{"home": "/tmp/a", "workers": {"localName": "w", "op": "o",
+                    "argv": ["/abs/w"], "inputSchema": "string"}}"#
+                    .to_string(),
+            ),
+            (
+                "bad-local-name",
+                r#"{"home": "/tmp/a", "workers": {"localName": "w with space", "op": "o",
+                    "argv": ["/abs/w"], "inputSchema": {"type": "object"}}}"#
+                    .to_string(),
+            ),
+            (
+                "empty-op",
+                r#"{"home": "/tmp/a", "workers": {"localName": "w", "op": "",
+                    "argv": ["/abs/w"], "inputSchema": {"type": "object"}}}"#
+                    .to_string(),
+            ),
+            (
+                "non-string-purpose",
+                r#"{"home": "/tmp/a", "workers": {"localName": "w", "op": "o",
+                    "argv": ["/abs/w"], "inputSchema": {"type": "object"},
+                    "allowedModelPurposes": [42]}}"#
+                    .to_string(),
+            ),
+        ];
+        for (name, content) in cases {
+            let path = dir.join(format!("{name}.json"));
+            std::fs::write(&path, content).unwrap();
+            let err = read_service_config(&path).unwrap_err();
+            assert!(
+                matches!(err, ConfigError::ConfigFileInvalid { .. }),
+                "{name}: expected ConfigFileInvalid, got {err:?}"
+            );
+        }
+        std::fs::remove_dir_all(&dir).ok();
+    }
+
+    #[test]
+    fn cli_parses_model_global_permits_strictly() {
+        let ok = parse_cli(["--model-global-permits", "1"]).unwrap();
+        assert_eq!(ok.model_global_permits, Some(1));
+        let none = parse_cli(["--bind", "127.0.0.1:0"]).unwrap();
+        assert_eq!(none.model_global_permits, None);
+        assert!(parse_cli(["--model-global-permits", "0"]).is_err());
+        assert!(parse_cli(["--model-global-permits", "-3"]).is_err());
+        assert!(parse_cli(["--model-global-permits"]).is_err());
+        assert!(
+            parse_cli(["--model-global-permits", "1", "--model-global-permits", "2"]).is_err(),
+            "duplicate flag is loud"
+        );
     }
 
     #[test]

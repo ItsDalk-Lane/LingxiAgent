@@ -374,15 +374,13 @@ pub fn parse_embedding(
         }
     }
     let usage = if family == ProtocolFamily::MinimaxEmbeddings {
-        // `Number(body?.total_tokens)` finite → `{ total_tokens }`.
+        // The incumbent's `Number(body?.total_tokens)` finite →
+        // `{ total_tokens }`, made strict (R05 RR1 F22): the RAW value
+        // passes through and the strict decoder judges its type — no f64
+        // round-trip (integer precision survives; a string/float is
+        // invalid, never a coerced number; a JSON null is absent).
         body.get("total_tokens")
-            .map(parse::js_number)
-            .filter(|n| n.is_finite())
-            .map(|n| {
-                let mut usage = serde_json::Map::new();
-                usage.insert("total_tokens".to_string(), parse::js_number_to_json(n));
-                serde_json::Value::Object(usage)
-            })
+            .map(|total| serde_json::json!({"total_tokens": total}))
     } else {
         // `body?.usage && typeof body.usage === "object"` (arrays count as
         // objects in JS; null is falsy and drops out).

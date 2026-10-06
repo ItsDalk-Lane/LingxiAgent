@@ -248,6 +248,32 @@ pub struct RequestedToolCall {
     pub args_summary: Option<String>,
 }
 
+/// The serving identity that produced one assistant turn (R05 RR1 F09).
+///
+/// Provider-opaque protocol state — thinking signatures, thought
+/// signatures, encrypted reasoning items — is bound to the provider/model
+/// that MINTED it: a renderer echoes such state only onto a request for the
+/// SAME provider+model. A protocol family tag alone is never source
+/// authorization: an exchange recorded under provider A must not have its
+/// signatures forwarded to provider B of the same family (and a provider
+/// cannot validate another model's signatures either). `None` marks a turn
+/// whose producer identity was not recorded (legacy history, doubles): a
+/// turn carrying same-family opaque state without an origin is REFUSED at
+/// render time — unproven state is never silently forwarded.
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct TurnOrigin {
+    pub provider: String,
+    pub model: String,
+}
+
+impl TurnOrigin {
+    /// Whether this origin authorizes replay onto the given route identity
+    /// (exact provider AND model match — anything else is a source change).
+    pub fn authorizes(&self, provider: &str, model: &str) -> bool {
+        self.provider == provider && self.model == model
+    }
+}
+
 /// One item of the run's prior model exchange, in the order it happened.
 #[derive(Debug, Clone, PartialEq)]
 pub enum ExchangeItem {
@@ -258,6 +284,10 @@ pub enum ExchangeItem {
         call: ModelCallId,
         content: Vec<ContentBlock>,
         tool_calls: Vec<RequestedToolCall>,
+        /// The provider/model that served this turn (R05 RR1 F09 source
+        /// binding; see [`TurnOrigin`]). The driver records it from the
+        /// serving adapter's result.
+        origin: Option<TurnOrigin>,
     },
     /// The REAL outcome of one executed tool call — all four
     /// [`ToolOutcome`] states with content blocks, resource refs,

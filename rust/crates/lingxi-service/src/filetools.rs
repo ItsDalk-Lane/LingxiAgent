@@ -417,7 +417,9 @@ impl MutationLocks {
 // ── filesystem IO discipline (unix dirfd walk; windows std fallback) ───────
 
 #[cfg(unix)]
-mod fsio {
+// R05 RR1 F17: the dirfd/no-follow open discipline is shared with the
+// operation plane's authorized attachment reads (crate-visible).
+pub(crate) mod fsio {
     use std::ffi::OsStr;
     use std::io;
     use std::os::unix::io::{FromRawFd, RawFd};
@@ -491,6 +493,31 @@ mod fsio {
                     self.fd,
                     cname.as_ptr().cast(),
                     libc::O_RDONLY | libc::O_NOFOLLOW | libc::O_CLOEXEC,
+                )
+            });
+            match fd {
+                Ok(fd) => Some(Ok(unsafe { std::fs::File::from_raw_fd(fd) })),
+                Err(err)
+                    if err.raw_os_error() == Some(libc::ELOOP)
+                        || err.raw_os_error() == Some(libc::ENOTDIR) =>
+                {
+                    Some(Err(err))
+                }
+                Err(err) if err.raw_os_error() == Some(libc::ENOENT) => None,
+                Err(err) => Some(Err(err)),
+            }
+        }
+
+        /// R05 RR1 F17: the attachment-read variant — `O_NONBLOCK` keeps
+        /// the OPEN itself from blocking on a FIFO (a regular file ignores
+        /// the flag; the caller refuses non-regular handles right after).
+        pub fn open_attachment_nofollow(&self, name: &OsStr) -> Option<io::Result<std::fs::File>> {
+            let cname = os_to_c(name);
+            let fd = io_error_fd(unsafe {
+                libc::openat(
+                    self.fd,
+                    cname.as_ptr().cast(),
+                    libc::O_RDONLY | libc::O_NOFOLLOW | libc::O_NONBLOCK | libc::O_CLOEXEC,
                 )
             });
             match fd {
@@ -636,7 +663,8 @@ mod fsio {
 /// symlink-swap race is NOT closed on Windows — registered form,
 /// real-machine verification deferred to the stage's Windows leg.
 #[cfg(windows)]
-mod fsio {
+// R05 RR1 F17: shared with the operation plane's attachment reads.
+pub(crate) mod fsio {
     use std::ffi::{OsStr, OsString};
     use std::io;
     use std::path::Path;
@@ -681,6 +709,14 @@ mod fsio {
                 Err(err) if err.kind() == io::ErrorKind::NotFound => None,
                 Err(err) => Some(Err(err)),
             }
+        }
+
+        /// R05 RR1 F17: the attachment-read variant. Windows has no FIFO
+        /// open-blocking shape — the regular no-follow open is the whole
+        /// discipline here; non-regular sources are refused by the
+        /// caller's handle metadata check.
+        pub fn open_attachment_nofollow(&self, name: &OsStr) -> Option<io::Result<std::fs::File>> {
+            self.open_file_nofollow(name)
         }
 
         pub fn create_temp(&self, random_hex: &str) -> io::Result<(std::fs::File, OsString)> {

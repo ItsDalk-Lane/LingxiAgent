@@ -599,8 +599,19 @@ pub enum ProviderTurn {
     /// Process-only content (reasoning / partial output): this model call
     /// ended, the run continues with another turn.
     Continue { process_note: String },
-    /// The provider finished with zero usable content (empty reply).
-    Empty { detail: String },
+    /// The provider finished with zero USABLE content (empty reply).
+    ///
+    /// R05 RR1 F12: a normally-stopped turn whose blocks are ALL process
+    /// state (reasoning / provider-opaque, no answer text) is classified
+    /// here too — never as a `Final` (a process-only turn must not commit a
+    /// final message). `content` carries those blocks so the exchange /
+    /// renderer contract can still replay the protocol state (e.g. a
+    /// Google empty-text signature part); it is empty for a genuinely
+    /// empty reply.
+    Empty {
+        detail: String,
+        content: Vec<ContentBlock>,
+    },
     /// The provider call failed. `retryable` marks transient failures where
     /// a NEW ATTEMPT on the SAME run is legitimate — a provider reconnect
     /// never mints a new user task (run id stays fixed).
@@ -663,8 +674,9 @@ impl ResultFence {
 /// family that actually served the call (the ledger's `protocol` column —
 /// the descriptor deliberately stays the wire-visible triple).
 /// `transport_attempts` counts the PHYSICAL provider requests the logical
-/// call sent (>= 1; a 401-refresh resend is a second billable request —
-/// T07-C03).
+/// call sent (>= 1 for anything handed to the transport; a pre-send
+/// refusal is explicitly [`ProviderTurnResult::mark_not_sent`] — R05 RR1
+/// F21; a 401-refresh resend is a second billable request — T07-C03).
 #[derive(Debug, Clone, PartialEq)]
 pub struct ProviderTurnResult {
     pub fence: ResultFence,
@@ -741,6 +753,19 @@ impl ProviderTurnResult {
     /// resend) — T07-C03: the possibly-billable request stays countable.
     pub fn with_transport_attempts(mut self, attempts: u32) -> Self {
         self.transport_attempts = attempts.max(1);
+        self
+    }
+
+    /// R05 RR1 F21: marks the result as NEVER DISPATCHED — zero physical
+    /// provider requests left the process. The pre-send refusal sites
+    /// (route resolution, the per-model capability check, credential
+    /// resolution) use this so the usage ledger's
+    /// [`crate::usage::ModelCallUsageRecord::transport_attempts`] states
+    /// the honest `not-sent` fact (0) instead of the `of_ctx` default of
+    /// 1 — a request that was never handed to the transport is never
+    /// recorded as one physical attempt.
+    pub fn mark_not_sent(mut self) -> Self {
+        self.transport_attempts = 0;
         self
     }
 

@@ -1497,6 +1497,7 @@ async fn panicking_tool_child_is_supervised_and_the_run_settles_loudly() {
                 },
                 ProviderTurn::Empty {
                     detail: "model saw the tool failure".to_string(),
+                    content: Vec::new(),
                 },
             ],
         )],
@@ -1807,6 +1808,7 @@ async fn approval_wait_round_trips_approve_and_reject_legs() {
                 },
                 ProviderTurn::Empty {
                     detail: "nothing more after rejection".to_string(),
+                    content: Vec::new(),
                 },
             ],
         )],

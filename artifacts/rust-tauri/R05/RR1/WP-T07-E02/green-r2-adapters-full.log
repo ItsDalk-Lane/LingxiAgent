@@ -1,0 +1,462 @@
+   Compiling lingxi-adapters v0.0.0 (/Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-adapters)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 52.50s
+     Running unittests src/lib.rs (rust/target/debug/deps/lingxi_adapters-25f1ae8b0ef7c0f1)
+
+running 119 tests
+test models::credentials::tests::applicable_auth_lists_its_materials ... ok
+test models::credentials::tests::credential_error_text_never_names_material_shape_fields ... ok
+test models::config::tests::unknown_keys_are_refused ... ok
+test models::anthropic_messages::tests::cross_family_opaque_state_is_never_echoed ... ok
+test models::anthropic_messages::tests::unknown_tool_and_malformed_blocks_are_loud ... ok
+test models::anthropic_messages::tests::request_shape_system_tools_and_max_tokens ... ok
+test models::anthropic_messages::tests::a_max_tokens_stop_maps_to_retryable_budget_failure ... ok
+test models::dispatch::tests::a_429_carries_its_retry_after_hint_in_the_error_details ... ok
+test models::credentials::tests::scrub_materials_removes_every_occurrence_and_ignores_empty ... ok
+test models::anthropic_messages::tests::tool_roundtrip_renders_tool_use_and_merged_tool_results ... ok
+test models::dispatch::tests::error_status_classification_matches_the_incumbent ... ok
+test models::config::tests::credential_is_explicit_and_never_defaulted ... ok
+test models::dispatch::tests::the_incumbent_join_rule_is_verbatim ... ok
+test models::config::tests::unknown_protocol_and_route_provider_are_loud ... ok
+test models::config::tests::valid_config_parses ... ok
+test models::config::tests::endpoint_shape_is_validated ... ok
+test models::config::tests::t06_operation_bindings_parse_and_family_mismatch_is_loud ... ok
+test models::config::tests::route_compat_block_is_loud_on_unknown_keys_and_values ... ok
+test models::compat::tests::openrouter_adaptive_disable_is_a_loud_refusal ... ok
+test models::config::tests::oauth_flow_descriptors_are_validated ... ok
+test models::config::tests::route_compat_block_parses_and_validates ... ok
+test models::anthropic_messages::tests::thinking_and_signature_roundtrip_as_state_never_text ... ok
+test models::compat::tests::replay_contract_covers_the_served_families ... ok
+test models::compat::tests::anthropic_marks_system_and_two_recent_user_messages ... ok
+test models::compat::tests::codex_strips_budget_and_temperature_fields ... ok
+test models::compat::tests::anthropic_max_effort_raises_the_implicit_one_third_cap ... ok
+test models::config::tests::auth_header_shape_is_validated ... ok
+test models::compat::tests::volcengine_disable_guard_passes_through_without_controls ... ok
+test models::compat::tests::ollama_bridges_response_format_and_num_ctx ... ok
+test models::dispatch::tests::retry_after_parses_seconds_and_http_dates_and_refuses_garbage ... ok
+test models::compat::tests::dispatch_is_first_match_in_incumbent_order ... ok
+test models::gateway::tests::a_family_outside_the_operations_matrix_is_loud ... ok
+test models::compat::tests::replay_center_validates_clears_and_refuses ... ok
+test models::gateway::tests::chat_and_auxiliary_routes_resolve_independently ... ok
+test models::gateway::tests::reload_swaps_atomically_and_bumps_the_generation ... ok
+test models::gateway::tests::the_pin_pair_rule_never_guesses_a_provider_from_a_model ... ok
+test models::gateway::tests::unconfigured_operations_are_loud_route_gaps ... ok
+test models::google_generative_ai::tests::an_unpairable_tool_result_is_a_loud_render_failure ... ok
+test models::google_generative_ai::tests::model_ids_are_percent_encoded_into_the_path ... ok
+test models::gateway::tests::the_five_chat_families_resolve_for_dispatch ... ok
+test models::google_generative_ai::tests::request_shape_system_instruction_and_function_declarations ... ok
+test models::network::tests::bracketed_ipv6_no_proxy_entries_bypass_public_literals ... ok
+test models::google_generative_ai::tests::tool_roundtrip_pairs_function_responses_by_exchange_name ... ok
+test models::google_generative_ai::tests::thoughts_signatures_and_function_calls_parse_in_order ... ok
+test models::network::tests::forced_local_bypass_beats_every_list ... ok
+test models::network::tests::loopback_bracket_entries_are_pinned_at_the_entry_level ... ok
+test models::network::tests::no_proxy_grammar_matches_the_incumbent_forms ... ok
+test models::network::tests::scheme_selection_prefers_the_scheme_proxy ... ok
+test models::network::tests::config_validation_is_loud_on_every_incumbent_rule ... ok
+test models::egress::tests::the_endpoint_origin_exception_lets_the_loopback_stub_through ... ok
+test models::egress::tests::scheme_userinfo_and_host_shapes_refuse ... ok
+test models::network::tests::plane_generations_rebuild_the_client_lazily ... ok
+test models::network::tests::system_mode_resolves_the_environment_snapshot ... ok
+test models::egress::tests::ipv4_parsing_is_strict_and_default_ports_elide ... ok
+test models::egress::tests::https_public_passes_and_plain_http_is_same_origin_only ... ok
+test models::egress::tests::the_same_origin_exception_matches_normalized_origins_across_spellings ... ok
+test models::openai_codex_responses::tests::codex_body_pins_store_stream_and_instructions ... ok
+test models::openai_codex_responses::tests::the_incumbent_url_rule_is_verbatim ... ok
+test models::egress::tests::guarded_ipv4_literals_refuse_outside_the_endpoint_exception ... ok
+test models::openai_codex_responses::tests::account_id_extracts_from_the_jwt_claim_or_fails_honestly ... ok
+test models::egress::tests::non_decimal_ipv4_spellings_and_mapped_ipv6_refuse_like_their_normalized_form ... ok
+test models::openai_completions::tests::a_history_target_missing_from_the_snapshot_fails_loudly ... ok
+test models::openai_completions::tests::final_answer_identity_comes_from_the_driver_not_the_response ... ok
+test models::openai_completions::tests::first_turn_request_carries_the_route_model_and_declarations ... ok
+test models::openai_completions::tests::mixed_content_parts_keep_every_block_in_order ... ok
+test models::openai_completions::tests::parses_tool_calls_with_usage_and_identity_from_the_driver ... ok
+test models::openai_completions::tests::stream_aggregates_text_and_usage_and_requires_done ... ok
+test models::openai_completions::tests::stream_rejects_multi_choice_and_missing_ids_loudly ... ok
+test models::openai_completions::tests::streaming_request_flips_the_wire_mode ... ok
+test models::openai_completions::tests::stream_aggregates_tool_call_fragments_and_reasoning_in_order ... ok
+test models::openai_completions::tests::system_prompt_renders_as_the_first_system_message ... ok
+test models::openai_completions::tests::tool_call_exchange_renders_the_protocol_pairing ... ok
+test models::openai_completions::tests::tool_outcome_rendering_is_honest_for_all_four_states ... ok
+test models::openai_completions::tests::unknown_wire_names_are_protocol_violations_never_guesses ... ok
+test models::openai_completions::tests::zero_choices_and_empty_content_are_loud_or_explicit ... ok
+test models::openai_responses::tests::failed_status_is_an_honest_failure_never_an_empty_turn ... ok
+test models::openai_responses::tests::request_shape_instructions_tools_and_no_server_state ... ok
+test models::openai_responses::tests::reasoning_items_roundtrip_verbatim_with_summary_as_reasoning ... ok
+test models::streaming::tests::a_leading_bom_is_stripped_once ... ok
+test models::openai_responses::tests::stream_terminal_event_carries_the_authoritative_aggregate ... ok
+test models::openai_responses::tests::tool_roundtrip_uses_function_call_pairing ... ok
+test models::streaming::tests::an_unterminated_event_at_eof_is_discarded_and_reported ... ok
+test models::streaming::tests::comments_and_id_and_retry_fields_are_ignored ... ok
+test models::streaming::tests::invalid_utf8_is_a_loud_error ... ok
+test models::streaming::tests::multi_line_data_joins_and_chunks_may_split_anywhere ... ok
+test models::streaming::tests::simple_frames_dispatch_on_blank_lines ... ok
+test models::tool_render::tests::running_and_stop_unconfirmed_statuses_are_honest ... ok
+test models::tool_render::tests::the_four_base_states_keep_the_t01_vocabulary ... ok
+test models::tool_render::tests::success_renders_resources_status_and_truncation_last ... ok
+test models::usage::tests::a_half_reported_usage_is_partial_naming_the_missing_half ... ok
+test models::usage::tests::absent_usage_is_absent_never_zero ... ok
+test models::usage::tests::anthropic_cache_categories_are_separate_from_input ... ok
+test models::usage::tests::every_mapping_names_all_five_chat_families ... ok
+test models::usage::tests::negative_float_and_string_counts_are_invalid_never_satruated ... ok
+test models::usage::tests::openai_totals_include_their_components_but_never_re_add ... ok
+test models::usage::tests::operation_totals_are_never_split_by_guessing ... ok
+test storage::migrations::tests::fingerprints_are_stable_sha256_hex ... ok
+test models::streaming::tests::the_buffer_bound_is_loud ... ok
+test storage::migrations::tests::migration_sql_avoids_if_not_exists ... ok
+test storage::migrations::tests::migrations_are_contiguous_from_one ... ok
+test storage::migrations::tests::not_a_database_maps_to_corrupted ... ok
+test storage::migrations::tests::sqlite_error_mapping_by_primary_code ... ok
+test storage::queue::tests::pragma_knobs_above_the_sqlite_i32_range_are_rejected_loudly ... ok
+test storage::queue::tests::queue_capacity_above_the_tokio_bound_is_rejected_loudly ... ok
+test storage::queue::tests::queue_wait_budget_above_the_documented_max_is_rejected_loudly ... ok
+test storage::queue::tests::zero_queue_wait_budget_is_rejected_loudly ... ok
+test storage::run_store::run_id_sequence_tests::foreign_and_malformed_shapes_never_seed ... ok
+test storage::run_store::run_id_sequence_tests::recognizes_only_ids_this_allocator_mints ... ok
+test storage::queue::tests::out_of_range_pragma_knobs_are_rejected_before_any_db_open ... ok
+test storage::migrations::tests::foreign_tables_without_receipts_are_rejected ... ok
+test storage::queue::tests::accepted_pragma_knobs_round_trip_through_real_sqlite ... ok
+test models::streaming::tests::the_per_frame_bound_is_loud_across_lines_and_chunks ... ok
+test storage::migrations::tests::tampered_user_version_is_rejected ... ok
+test storage::migrations::tests::apply_then_verify_is_idempotent ... ok
+test storage::migrations::tests::tampered_fingerprint_is_rejected ... ok
+test storage::migrations::tests::tampered_version_row_is_rejected ... ok
+test storage::migrations::tests::integrity_check_passes_a_healthy_db_and_flags_a_broken_one ... ok
+test storage::migrations::tests::newer_database_is_rejected_not_downgraded ... ok
+test storage::queue::tests::queue_wait_budget_turns_a_full_queue_into_loud_queue_full ... ok
+
+test result: ok. 119 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.16s
+
+     Running unittests src/bin/lingxi-storage-inspect.rs (rust/target/debug/deps/lingxi_storage_inspect-934098a26458502a)
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running tests/active_run_listing.rs (rust/target/debug/deps/active_run_listing-c7182283442c050f)
+
+running 2 tests
+test lists_only_non_terminal_runs_with_full_recovery_facts ... ok
+test a_run_without_attempt_rows_is_loud_corruption ... ok
+
+test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.02s
+
+     Running tests/backup_faults.rs (rust/target/debug/deps/backup_faults-8d329fd15fbdcf17)
+
+running 2 tests
+test backup_faults::checkpoint_fault_fails_the_backup_explicitly_and_leaves_no_artifact ... ok
+test backup_faults::interrupted_backup_copy_fails_explicitly_and_removes_the_partial_file ... ok
+
+test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.02s
+
+     Running tests/backup_restore.rs (rust/target/debug/deps/backup_restore-681c381ec6c496f6)
+
+running 11 tests
+test backup_validates_the_file_stem ... ok
+test backup_into_unwritable_destination_fails_without_artifacts ... ok
+test database_files_are_tightened_to_owner_only ... ok
+test a11_online_backup_captures_wal_resident_committed_data_and_restores ... ok
+test a11_pure_online_backup_without_precheckpoint_is_also_complete ... ok
+test backup_and_restore_artifacts_are_owner_only ... ok
+test restore_refuses_an_existing_target ... ok
+test restore_refuses_a_tampered_backup_file ... ok
+test a11_transaction_boundary_rolled_back_data_is_absent_from_backup ... ok
+test a11_backup_of_a_started_but_uncommitted_run_is_a_complete_prefix ... ok
+test a11_backup_during_concurrent_commits_is_a_consistent_prefix ... ok
+
+test result: ok. 11 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.25s
+
+     Running tests/disk_full_fault.rs (rust/target/debug/deps/disk_full_fault-dd409e4bb3150471)
+
+running 2 tests
+test unix_fault::start_commit_also_fails_under_the_fault ... ok
+test unix_fault::commit_fails_for_real_at_commit_time_without_fake_success ... ok
+
+test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.02s
+
+     Running tests/event_store_reads.rs (rust/target/debug/deps/event_store_reads-2c60b028a3f942e5)
+
+running 3 tests
+test event_type_column_tampering_is_loud_corruption ... ok
+test head_floor_and_events_after_read_the_durable_log ... ok
+test purge_moves_the_floor_and_reports_removed_rows ... ok
+
+test result: ok. 3 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.02s
+
+     Running tests/invocation_journal_store.rs (rust/target/debug/deps/invocation_journal_store-9929d3a069357d74)
+
+running 5 tests
+test journal_refuses_cross_owner_writes_and_serves_the_decision_seam ... ok
+test journal_replays_are_idempotent_and_conflicts_are_loud ... ok
+test journal_lifecycle_binds_identity_and_follows_the_phase_ladder ... ok
+test journal_rejects_illegal_ladder_moves_and_receipt_shapes ... ok
+test journal_recovery_classes_follow_the_durable_phase ... ok
+
+test result: ok. 5 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.03s
+
+     Running tests/late_result_fencing_property.rs (rust/target/debug/deps/late_result_fencing_property-29c36b2f42923c27)
+
+running 1 test
+test duplicate_out_of_order_and_delayed_results_fence_exactly_once ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.62s
+
+     Running tests/migration_idempotency.rs (rust/target/debug/deps/migration_idempotency-8b09bf1dc0d7013d)
+
+running 2 tests
+test tampered_version_rollback_is_rejected_not_replayed ... ok
+test repeated_migration_checks_are_idempotent ... ok
+
+test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.09s
+
+     Running tests/r05_t02_oauth_flows.rs (rust/target/debug/deps/r05_t02_oauth_flows-e75c6185ea9bc019)
+
+running 21 tests
+test pkce_each_begin_mints_fresh_state_and_verifier ... ok
+test pkce_cancellation_while_waiting_is_clean ... ok
+test pkce_duplicate_callback_is_refused_by_the_closed_listener ... ok
+test pkce_error_callback_and_codeless_callback_are_terminal_and_loud ... ok
+test device_code_untrusted_verification_uri_is_a_loud_protocol_failure ... ok
+test sub_second_expires_in_mints_an_immediately_expired_token ... ok
+test device_code_cancellation_wins_at_the_wait ... ok
+test the_credential_bearing_client_never_consults_the_ambient_proxy ... ok
+test token_endpoint_redirect_is_never_followed ... ok
+test pkce_wrong_state_is_a_400_and_the_flow_survives_for_the_valid_one ... ok
+test pkce_happy_path_binds_state_and_verifier_to_the_exchange ... ok
+test device_code_endpoint_echoes_are_scrubbed_of_in_play_material ... ok
+test refresh_happy_path_and_refresh_token_rollover_rule ... ok
+test missing_expires_in_falls_back_to_jwt_exp_and_refuses_when_absent ... ok
+test device_code_deadline_expires_the_flow ... ok
+test device_code_happy_path_prompts_once_and_mints_tokens ... ok
+test device_code_slow_down_grows_the_interval_by_five_seconds ... ok
+test device_code_denial_and_expired_token_are_terminal_and_distinct ... ok
+test refresh_classification_invalid_grant_401_transient_and_scrub ... ok
+test pkce_expired_state_is_rejected_at_the_loop_top_and_after_accept ... ok
+test refresh_timeout_is_transient_never_terminal ... ok
+
+test result: ok. 21 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.11s
+
+     Running tests/r05_t03_goldens.rs (rust/target/debug/deps/r05_t03_goldens-500733e1c0444cf2)
+
+running 3 tests
+test the_golden_set_covers_five_families_times_three_cases ... ok
+test forward_and_roundtrip_goldens_render_and_parse_exactly ... ok
+test error_goldens_classify_and_transport_exactly ... ok
+
+test result: ok. 3 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.02s
+
+     Running tests/r05_t03_rr1_replay.rs (rust/target/debug/deps/r05_t03_rr1_replay-03bbfcc2b4dbef61)
+
+running 33 tests
+test rr1_f06_stream_absent_placeholder_signature_accepts_the_final_delta ... ok
+test rr1_f06_stream_two_different_final_signatures_are_a_true_conflict ... ok
+test rr1_f07_empty_text_signature_part_round_trips_verbatim ... ok
+test rr1_f06_stream_identical_signature_resend_is_tolerated ... ok
+test rr1_f09_same_provider_other_model_refuses ... ok
+test rr1_f06_stream_placeholder_signature_accepts_the_final_signature_delta ... ok
+test rr1_f08_buffered_reasoning_content_reaches_the_canonical ... ok
+test rr1_f07_f10_unmatched_or_duplicated_anchors_fail_loudly ... ok
+test rr1_f10_responses_multi_segment_interleave_keeps_positions ... ok
+test rr1_f09_responses_reasoning_item_never_crosses_providers ... ok
+test rr1_f06_buffered_empty_thinking_preserves_signature_on_next_request ... ok
+test rr1_f10_responses_tools_interspersed_keep_positions ... ok
+test rr1_f09_same_family_other_provider_never_receives_the_signature ... ok
+test rr1_f09_same_model_id_different_provider_refuses ... ok
+test rr1_f10_codex_replay_keeps_text_reasoning_tool_order ... ok
+test rr1_f10_responses_keep_text_reasoning_tool_order ... ok
+test rr1_f10_responses_keep_reasoning_text_tool_order ... ok
+test rr1_f07_function_call_signature_survives_both_wire_modes ... ok
+test rr1_f09_same_origin_replays_the_signature_verbatim ... ok
+test rr1_f07_interleaved_parts_keep_original_order ... ok
+test rr1_f07_parallel_results_form_one_user_content ... ok
+test rr1_f07_consecutive_rounds_and_reverse_results_group_per_round ... ok
+test rr1_f32_responses_duplicated_function_call_anchor_is_refused ... ok
+test rr1_f32_off_level_deepseek_round_without_carrier_is_exempt ... ok
+test rr1_f08_missing_required_reasoning_fails_closed_before_dispatch ... ok
+test rr1_f32_no_origin_family_state_refused_on_all_three_gated_families ... ok
+test rr1_f32_declared_non_reasoning_model_strips_the_carrier ... ok
+test rr1_f08_deepseek_reasoning_replays_through_renderer_and_compat ... ok
+test rr1_f08_no_contract_provider_never_receives_the_carrier ... ok
+test rr1_f32_utility_mode_deepseek_round_without_carrier_is_exempt ... ok
+test rr1_f06_byte_split_stream_keeps_the_signed_thinking_block ... ok
+test rr1_f32_utility_mode_strips_a_present_deepseek_carrier ... ok
+test rr1_f32_off_level_strips_a_present_deepseek_carrier ... ok
+
+test result: ok. 33 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running tests/r05_t04_rr1_batch_terminal.rs (rust/target/debug/deps/r05_t04_rr1_batch_terminal-ba853f1c2a406e72)
+
+running 9 tests
+test openai_done_without_finish_reason_does_not_make_final ... ok
+test anthropic_open_tool_block_cannot_close_as_a_completed_batch ... ok
+test buffered_bodies_without_a_normal_stop_reason_are_loud ... ok
+test unmapped_terminal_values_through_the_stream_accumulators_stay_loud ... ok
+test thinking_only_and_opaque_only_do_not_form_final_answers ... ok
+test identical_resends_collapse_but_distinct_ids_stay_independent ... ok
+test positive_controls_normal_terminals_and_legal_batches_still_work ... ok
+test present_but_unmapped_terminal_values_are_loud_and_name_the_value ... ok
+test duplicate_provider_ids_with_conflicting_arguments_reject_whole_batch ... ok
+
+test result: ok. 9 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running tests/r05_t04_streaming.rs (rust/target/debug/deps/r05_t04_streaming-5dbbdb2d7f091c82)
+
+running 18 tests
+test c05_openai_half_json_arguments_close_loud_with_zero_dispatch ... ok
+test c15_decoder_level_stream_failures_are_loud ... ok
+test c05_anthropic_half_json_arguments_close_loud_with_zero_dispatch ... ok
+test c09_openai_length_stop_with_one_complete_tool_dispatches_nothing ... ok
+test c09_anthropic_max_tokens_stop_with_one_complete_tool_dispatches_nothing ... ok
+test c10_openai_duplicates_conflicts_and_adjacent_identical_text ... ok
+test c06_parseable_arguments_admit_nothing_before_the_protocol_terminal ... ok
+test c08_anthropic_interleaved_tool_blocks_accumulate_independently ... ok
+test c14_opaque_blocks_roundtrip_and_signatures_never_leak_into_deltas ... ok
+test c07_duplicate_keys_and_overprecision_numbers_follow_one_canonical_rule ... ok
+test c10_anthropic_duplicates_conflicts_and_event_field_agreement ... ok
+test c07_wrong_shaped_arguments_refuse_loudly ... ok
+test c02_invalid_utf8_is_deterministic_at_every_fragmentation ... ok
+test c11_stop_reason_table_is_complete_across_the_fragmenting_families ... ok
+test c04_bounds_are_loud_at_the_preregistered_limits ... ok
+test c01_openai_full_response_is_fragmentation_invariant ... ok
+test c01_split_bom_and_crlf_are_fragmentation_invariant ... ok
+test c01_anthropic_full_response_is_fragmentation_invariant ... ok
+
+test result: ok. 18 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.52s
+
+     Running tests/r05_t05_compat.rs (rust/target/debug/deps/r05_t05_compat-ddf368131df0ea32)
+
+running 1 test
+test every_golden_aligns_with_the_incumbent_ts_run ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.02s
+
+     Running tests/r05_t05_timeouts.rs (rust/target/debug/deps/r05_t05_timeouts-524bff1312d5bf4d)
+
+running 13 tests
+test connect_refusal_is_the_expected_underlying_kind ... ok
+test retry_after_parsing_pins_the_rfc_9110_forms ... ok
+test pre_send_budget_exhaustion_sends_nothing_and_is_not_retryable ... ok
+test connect_refusal_is_retryable_upstream ... ok
+test accepted_then_dropped_is_terminal_and_never_resent ... ok
+test http_5xx_is_bounded_retryable_without_a_fabricated_hint ... ok
+test http_429_delay_seconds_hint_lands_in_details ... ok
+test http_429_garbage_hint_is_ignored_never_trusted ... ok
+test http_429_http_date_hint_lands_in_details ... ok
+test mid_stream_transport_break_is_terminal_and_never_resent ... ok
+test first_byte_window_hit_is_terminal_no_blind_resend ... ok
+test deadline_hit_inside_first_byte_wait_is_non_retryable_budget ... ok
+test deadline_hit_mid_stream_abandons_the_read_without_rewind ... ok
+
+test result: ok. 13 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.51s
+
+     Running tests/r05_t06_operations.rs (rust/target/debug/deps/r05_t06_operations-c69e26bfcf0c8091)
+
+running 27 tests
+test c01_image_agnes_wire ... ok
+test c01_speech_dashscope_wire ... ok
+test c01_image_minimax_refusals_envelope_and_parse ... ok
+test c01_video_submit_wire_and_parse ... ok
+test c01_minimax_speech_parse_hex_envelope_and_refusals ... ok
+test c01_image_codex_sse_aggregate_parses ... ok
+test c01_transcribe_bigasr_wire ... ok
+test c01_image_gemini_wire_and_remote_url_refusal ... ok
+test c01_embedding_gemini_voyage_minimax_wire ... ok
+test c01_speech_minimax_wire_and_group_id_refusal ... ok
+test c01_tiers_refusal_texts_are_verbatim ... ok
+test c01_embedding_ollama_wire ... ok
+test c01_embedding_openai_wire ... ok
+test c01_transcribe_mimo_and_dashscope_wire ... ok
+test c01_image_openai_wire_and_parse ... ok
+test c01_embedding_parse_contracts ... ok
+test c01_speech_openai_wire ... ok
+test c01_rerank_wire_and_parse ... ok
+test c01_image_dashscope_submit_pending_and_query_states ... ok
+test c01_image_volcengine_wire_and_parse ... ok
+test c01_transcribe_openai_multipart_wire ... ok
+test c01_tiers_golden_sizes_match_the_incumbent_search ... ok
+test c02_openai_image_roundtrip_bytes_out_bytes_in ... ok
+test c02_bigasr_status_header_gates_the_answer ... ok
+test c02_agnes_video_query_legacy_fallback_only_under_exact_conditions ... ok
+test c01_embedding_validation_texts_are_verbatim ... ok
+test c02_operation_body_cap_trips_mid_read_with_one_request ... ok
+
+test result: ok. 27 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.02s
+
+     Running tests/r05_t07_rr1_usage_strict.rs (rust/target/debug/deps/r05_t07_rr1_usage_strict-9b309ac31c98ae36)
+
+running 7 tests
+test rr1_f22_invalid_detail_never_echoes_the_payload ... ok
+test rr1_f22_rerank_non_numeric_usage_must_not_be_coerced_to_reported_zero ... ok
+test rr1_f22_legal_rerank_usage_still_reports ... ok
+test rr1_f23_gemini_thoughts_are_separate_from_candidate_tokens ... ok
+test rr1_f23_gemini_component_matrix_and_family_controls ... ok
+test rr1_f22_minimax_total_tokens_keeps_its_raw_type ... ok
+test rr1_f22_operation_usage_type_table ... ok
+
+test result: ok. 7 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running tests/r05_t07_usage_families.rs (rust/target/debug/deps/r05_t07_usage_families-5ee30e7328fbed33)
+
+running 14 tests
+test c07_every_chat_family_declares_its_formula_and_inclusion_semantics ... ok
+test c04_anthropic_interrupted_before_output_is_partial_never_zero ... ok
+test c07_gemini_thoughts_and_cache_map_inside_their_totals ... ok
+test c07_anthropic_cache_categories_stay_separate_from_the_input_total ... ok
+test c07_openai_families_normalize_cache_and_reasoning_without_re_adding ... ok
+test c05_absent_usage_is_unknown_and_a_half_reported_usage_is_partial ... ok
+test c04_responds_families_carry_one_final_snapshot_on_the_terminal_object ... ok
+test c06_negative_float_string_and_overflow_counts_mark_the_fact_invalid ... ok
+test c04_gemini_streaming_running_metadata_replaces_not_sums ... ok
+test c04_anthropic_running_total_going_backwards_is_loud ... ok
+test c04_anthropic_running_output_replaces_never_sums ... ok
+test c04_openai_final_usage_repeats_are_idempotent_and_conflicts_are_loud ... ok
+test c06_gemini_streaming_violating_usage_metadata_marks_the_fact_invalid ... ok
+test c06_anthropic_streaming_violating_usage_fragments_mark_the_fact_invalid ... ok
+
+test result: ok. 14 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running tests/run_finalize_property.rs (rust/target/debug/deps/run_finalize_property-eb3c66817e8c3128)
+
+running 2 tests
+test out_of_order_illegal_settlement_is_rejected_and_run_still_settles_once ... ok
+test r03_a02_duplicate_and_out_of_order_settlements_settle_exactly_once ... ok
+
+test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.20s
+
+     Running tests/run_id_allocator.rs (rust/target/debug/deps/run_id_allocator-39ef2c828286ba83)
+
+running 5 tests
+test opaque_existing_run_id_never_seeds_and_reopen_allocates_cleanly ... ok
+test non_minted_hex_tails_do_not_seed_the_high_water_mark ... ok
+test reseed_after_failure_gap_never_reissues_a_consumed_id ... ok
+test exhausted_sequence_fails_loudly_instead_of_panicking_or_wrapping ... ok
+test concurrent_allocations_stay_unique_and_reseed_above_all ... ok
+
+test result: ok. 5 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.06s
+
+     Running tests/run_lineage_store.rs (rust/target/debug/deps/run_lineage_store-4900b9f458a64e0b)
+
+running 2 tests
+test lineage_requires_an_existing_owned_active_run ... ok
+test lineage_round_trips_and_is_immutable ... ok
+
+test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.02s
+
+     Running tests/storage_transactions.rs (rust/target/debug/deps/storage_transactions-2a0264ee205eca52)
+
+running 7 tests
+test bounded_queue_reports_full_instead_of_dropping ... ok
+test wal_mode_is_negotiated_and_reported ... ok
+test read_only_data_dir_is_a_loud_open_failure ... ok
+test finalize_is_idempotent_and_conflicts_are_diagnosed ... ok
+test graceful_close_checkpoints_and_data_survives_restart ... ok
+test a07_crash_windows_distinguish_commit_boundaries ... ok
+test busy_timeout_is_explicit_not_a_hang ... ok
+
+test result: ok. 7 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.25s
+
+   Doc-tests lingxi_adapters
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+ADAPTERS EXIT: 0

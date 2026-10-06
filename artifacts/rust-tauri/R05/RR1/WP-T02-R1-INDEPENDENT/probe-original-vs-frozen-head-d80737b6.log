@@ -1,0 +1,88 @@
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.08s
+     Running unittests src/lib.rs (target/debug/deps/r05_credential_network_audit_frozen-7337612da0caeadc)
+
+running 10 tests
+test tests::truncation_must_not_expose_credential_prefix ... FAILED
+test tests::old_route_must_not_receive_new_endpoint_credential ... FAILED
+test tests::removed_then_readded_provider_must_not_revive_old_handle ... FAILED
+test tests::old_handle_must_not_resolve_reloaded_secret ... FAILED
+test tests::undeclared_image_capability_must_make_zero_requests ... FAILED
+test tests::protocol_error_echo_must_not_carry_complete_secret_into_kernel ... FAILED
+test tests::undeclared_tool_capability_must_make_zero_requests ... FAILED
+test tests::reload_during_401_must_not_send_new_key_to_old_endpoint ... FAILED
+test tests::domain_resolving_to_loopback_must_not_be_connected ... FAILED
+test tests::error_body_must_obey_total_deadline ... FAILED
+
+failures:
+
+---- tests::truncation_must_not_expose_credential_prefix stdout ----
+
+thread 'tests::truncation_must_not_expose_credential_prefix' (10175380) panicked at src/lib.rs:238:9:
+credential prefix leaked after truncation and both redaction layers: "                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        secret-c"
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+
+---- tests::old_route_must_not_receive_new_endpoint_credential stdout ----
+
+thread 'tests::old_route_must_not_receive_new_endpoint_credential' (10175376) panicked at src/lib.rs:54:9:
+old endpoint route was handed the new endpoint's key: Ok(Bearer("dummy-new-key"))
+
+---- tests::removed_then_readded_provider_must_not_revive_old_handle stdout ----
+
+thread 'tests::removed_then_readded_provider_must_not_revive_old_handle' (10175379) panicked at src/lib.rs:41:9:
+revoked handle revived after provider recreation and returned Ok(Bearer("dummy-new-key"))
+
+---- tests::old_handle_must_not_resolve_reloaded_secret stdout ----
+
+thread 'tests::old_handle_must_not_resolve_reloaded_secret' (10175375) panicked at src/lib.rs:29:9:
+old credential handle survived key rotation and returned Ok(Bearer("dummy-new-key"))
+
+---- tests::undeclared_image_capability_must_make_zero_requests stdout ----
+
+thread 'tests::undeclared_image_capability_must_make_zero_requests' (10175381) panicked at src/lib.rs:230:9:
+assertion `left == right` failed: gateway sent image for a model with no declared image capability
+  left: 1
+ right: 0
+
+---- tests::protocol_error_echo_must_not_carry_complete_secret_into_kernel stdout ----
+
+thread 'tests::protocol_error_echo_must_not_carry_complete_secret_into_kernel' (10175377) panicked at src/lib.rs:197:9:
+full credential escaped into kernel ProtocolError and survived service redaction: provider requested unknown tool "dummy-cobalt-key": not a name this call declared (a wire name maps to a target through the send-time snapshot only — never a guess)
+
+---- tests::undeclared_tool_capability_must_make_zero_requests stdout ----
+
+thread 'tests::undeclared_tool_capability_must_make_zero_requests' (10175382) panicked at src/lib.rs:215:9:
+assertion `left == right` failed: gateway sent tools for a model with no declared tools capability
+  left: 1
+ right: 0
+
+---- tests::reload_during_401_must_not_send_new_key_to_old_endpoint stdout ----
+
+thread 'tests::reload_during_401_must_not_send_new_key_to_old_endpoint' (10175378) panicked at src/lib.rs:152:9:
+old HTTP endpoint captured NEW endpoint's key on 401 retry: authorization: Bearer dummy-new-key
+
+---- tests::domain_resolving_to_loopback_must_not_be_connected stdout ----
+
+thread 'tests::domain_resolving_to_loopback_must_not_be_connected' (10175373) panicked at src/lib.rs:172:9:
+egress guard connected to an unauthorized private TCP destination after resolving hostname localhost; no credential or TLS bypass was used
+
+---- tests::error_body_must_obey_total_deadline stdout ----
+
+thread 'tests::error_body_must_obey_total_deadline' (10175374) panicked at src/lib.rs:256:9:
+error body read exceeded its absolute deadline by >200ms
+
+
+failures:
+    tests::domain_resolving_to_loopback_must_not_be_connected
+    tests::error_body_must_obey_total_deadline
+    tests::old_handle_must_not_resolve_reloaded_secret
+    tests::old_route_must_not_receive_new_endpoint_credential
+    tests::protocol_error_echo_must_not_carry_complete_secret_into_kernel
+    tests::reload_during_401_must_not_send_new_key_to_old_endpoint
+    tests::removed_then_readded_provider_must_not_revive_old_handle
+    tests::truncation_must_not_expose_credential_prefix
+    tests::undeclared_image_capability_must_make_zero_requests
+    tests::undeclared_tool_capability_must_make_zero_requests
+
+test result: FAILED. 0 passed; 10 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.26s
+
+error: test failed, to rerun pass `--lib`

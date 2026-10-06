@@ -617,7 +617,7 @@ impl Harness {
                         "auth": {{"kind": "apiKey", "apiKey": "sk-test-t08"}}
                     }}
                 }},
-                "models": {{"chat": {{"provider": "main", "model": "stub-model-t08"}}}}}}"#,
+                "models": {{"chat": {{"provider": "main", "model": "stub-model-t08", "capabilities": {{"tools": true}}}}}}}}"#,
                 serde_json::to_string(&home.to_string_lossy()).expect("home json"),
                 serde_json::to_string(&workspace.to_string_lossy()).expect("ws json"),
                 stub_endpoint
@@ -2195,6 +2195,9 @@ async fn c12_repeated_cycles_stay_bounded() {
     let pid = child.pid();
 
     async fn rss_of(pid: i32) -> u64 {
+        // R05 RR1 F27 (CL-06): the sampler must VALIDATE its sample — the
+        // exit status and the numeric shape — a failed read is a loud
+        // panic (UNKNOWN), never a fake 0.
         let pid_text = pid.to_string();
         let out = tokio::process::Command::new("ps")
             .arg("-o")
@@ -2203,24 +2206,62 @@ async fn c12_repeated_cycles_stay_bounded() {
             .arg(&pid_text)
             .output()
             .await
-            .expect("ps");
-        String::from_utf8_lossy(&out.stdout)
-            .trim()
-            .parse::<u64>()
-            .expect("numeric rss")
+            .expect("ps runs");
+        assert!(
+            out.status.success(),
+            "rss sampling of pid {pid} failed: {}",
+            String::from_utf8_lossy(&out.stderr).trim()
+        );
+        let text = String::from_utf8_lossy(&out.stdout).trim().to_string();
+        assert!(
+            !text.is_empty(),
+            "rss sampling of pid {pid} produced no row"
+        );
+        text.parse::<u64>()
+            .unwrap_or_else(|e| panic!("non-numeric rss {text:?}: {e}"))
     }
     async fn fds_of(pid: i32) -> usize {
+        // R05 RR1 F27 (CL-06): the pre-fix sampler ran `lsof -p PID`
+        // (default column format, first column COMMAND) and counted lines
+        // STARTING WITH A DIGIT — every real row was filtered out and the
+        // FD bound could hold vacuously at 0. The machine-readable form
+        // (`-F fn`), the exit-status check and the `p<digits>` identity
+        // check make the count real; a failed sample is a loud panic, and
+        // the sampler's own positive/negative controls live in
+        // r05_t08_resources.rs (f27_sampler_controls_*).
         let pid_text = pid.to_string();
         let out = tokio::process::Command::new("lsof")
             .arg("-p")
             .arg(&pid_text)
+            .arg("-F")
+            .arg("fn")
             .output()
             .await
-            .expect("lsof");
-        String::from_utf8_lossy(&out.stdout)
-            .lines()
-            .filter(|l| l.trim().starts_with(|c: char| c.is_ascii_digit()))
-            .count()
+            .expect("lsof runs");
+        assert!(
+            out.status.success(),
+            "fd sampling of pid {pid} failed: {}",
+            String::from_utf8_lossy(&out.stderr).trim()
+        );
+        let text = String::from_utf8_lossy(&out.stdout);
+        let mut saw_pid_record = false;
+        let mut fds = 0usize;
+        for line in text.lines() {
+            if let Some(recorded) = line.strip_prefix('p') {
+                assert_eq!(
+                    recorded, pid_text,
+                    "lsof reported pid {recorded}, requested {pid_text}"
+                );
+                saw_pid_record = true;
+            } else if line.starts_with('f') && line[1..].chars().all(|c| c.is_ascii_digit()) {
+                fds += 1;
+            }
+        }
+        assert!(
+            saw_pid_record,
+            "lsof output carried no p<{pid_text}> identity record"
+        );
+        fds
     }
 
     // Warmup + baseline sample AFTER two completed cycles.
@@ -2319,5 +2360,148 @@ async fn c12_repeated_cycles_stay_bounded() {
     );
 
     child.stop().await;
+    stub.stop().await;
+}
+
+// ── R05 RR1 F13 (WP-T04): the normalized final projection on the REAL
+// binary — authenticated HTTP history before AND after a graceful
+// SIGTERM/restart, plus the on-disk row, all carry the SAME normalized
+// message (the CL-02 反例 A shape: fenced literal think tag + standalone
+// think block + mood block + visible answer; the frozen candidate
+// persisted one raw Text block with every tag intact). ─────────────────
+
+#[tokio::test]
+async fn rr1_f13_normalized_final_survives_restart_on_the_real_binary() {
+    let raw = "literal:\n```\n<think>keep quoted</think>\n```\n\
+               <think>PRIVATE_THINK_T08</think><mood>PRIVATE_MOOD_T08</mood>VISIBLE_FINAL_T08";
+    let stub = StubServer::start(Box::new(move |_body| Step::Sse(final_turn(raw)))).await;
+    let h = Harness::new("rr1f13", &stub.endpoint(), &[]);
+    let child = h.start_service().await;
+    let token = h.token();
+    let addr = child.addr;
+
+    let (status, accepted) = submit(
+        addr,
+        &token,
+        "sess_local_alpha",
+        "reply with the model response",
+    )
+    .await;
+    assert_eq!(status, 200, "submission accepted: {accepted}");
+    let run_id = accepted["runId"].as_str().expect("runId").to_string();
+    let final_status = wait_run_status(&h.home, &run_id, |s| s == "completed", "completed").await;
+    assert_eq!(final_status, "completed");
+
+    // The history surface (authenticated HTTP) carries the normalized final.
+    let (before_status, page_before) = http_json(
+        addr,
+        "GET",
+        "/lingxi/v1/sessions/sess_local_alpha/events",
+        &token,
+        None,
+    )
+    .await;
+    assert_eq!(before_status, 200);
+    let assert_normalized = |page: &serde_json::Value, label: &str| {
+        let finals: Vec<&serde_json::Value> = page["items"]
+            .as_array()
+            .expect("items")
+            .iter()
+            .filter(|e| e["payload"]["type"] == "final_message_committed")
+            .collect();
+        assert_eq!(finals.len(), 1, "exactly one final message ({label})");
+        let body = serde_json::to_string(&finals[0]["payload"]["message"]).unwrap();
+        assert!(
+            body.contains("VISIBLE_FINAL_T08") && body.contains("<think>keep quoted</think>"),
+            "the visible answer and the fenced literal persist ({label}): {body}"
+        );
+        assert!(
+            !body.contains("PRIVATE_MOOD_T08") && !body.contains("<mood>"),
+            "mood content never returns as body ({label}): {body}"
+        );
+        assert!(
+            body.contains("PRIVATE_THINK_T08") && body.contains("\"reasoning\""),
+            "the think block persists as a reasoning block ({label}): {body}"
+        );
+        assert!(
+            !body.contains("<think>PRIVATE_THINK_T08"),
+            "the raw think tag never persists as body text ({label}): {body}"
+        );
+    };
+    assert_normalized(&page_before, "before restart");
+
+    // The live deltas on the same surface: think → reasoning phase, mood
+    // stripped, text unresolved (F12) — one source with the final message.
+    let deltas: Vec<&serde_json::Value> = page_before["items"]
+        .as_array()
+        .expect("items")
+        .iter()
+        .filter(|e| e["payload"]["type"] == "model_call_delta")
+        .collect();
+    assert!(!deltas.is_empty());
+    let reasoning: String = deltas
+        .iter()
+        .filter(|d| d["payload"]["phase"] == "reasoning")
+        .filter_map(|d| d["payload"]["delta"].as_str())
+        .collect();
+    assert!(
+        reasoning.contains("PRIVATE_THINK_T08"),
+        "the think block streamed as live reasoning: {reasoning}"
+    );
+    for d in &deltas {
+        assert!(
+            d["payload"]["phase"] != "final_answer",
+            "a live delta is never pre-classified final_answer: {}",
+            serde_json::to_string(d).unwrap()
+        );
+    }
+    let all_delta_text: String = deltas
+        .iter()
+        .filter_map(|d| d["payload"]["delta"].as_str())
+        .collect();
+    assert!(!all_delta_text.contains("PRIVATE_MOOD_T08"));
+
+    // The on-disk row is the SAME normalized message.
+    let db = open_runs_db(&h.home);
+    let final_row = query_one(
+        &db,
+        "SELECT content_json FROM messages WHERE run_id = ?1",
+        &[&run_id],
+    )
+    .expect("final message row");
+    assert!(
+        final_row.contains("VISIBLE_FINAL_T08") && final_row.contains("\"reasoning\""),
+        "the DB row is the normalized projection: {final_row}"
+    );
+    assert!(
+        !final_row.contains("PRIVATE_MOOD_T08") && !final_row.contains("<think>PRIVATE"),
+        "no raw tags in the DB row: {final_row}"
+    );
+    drop(db);
+
+    // Graceful SIGTERM → a NEW process reads back the IDENTICAL normalized
+    // history (nothing re-executed: the stub count stays 1).
+    let hits_before = stub.hits();
+    child.stop().await;
+    let child2 = h.start_service().await;
+    let token2 = h.token();
+    let (after_status, page_after) = http_json(
+        child2.addr,
+        "GET",
+        "/lingxi/v1/sessions/sess_local_alpha/events",
+        &token2,
+        None,
+    )
+    .await;
+    assert_eq!(after_status, 200);
+    assert_eq!(
+        page_after["items"].as_array().expect("items").len(),
+        page_before["items"].as_array().expect("items").len(),
+        "history after restart is IDENTICAL"
+    );
+    assert_normalized(&page_after, "after restart");
+    assert_eq!(stub.hits(), hits_before, "zero new provider turns");
+
+    child2.stop().await;
     stub.stop().await;
 }

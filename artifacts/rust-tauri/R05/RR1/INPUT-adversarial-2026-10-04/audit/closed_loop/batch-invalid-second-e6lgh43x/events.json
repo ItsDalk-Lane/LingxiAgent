@@ -1,0 +1,271 @@
+{
+  "streamId": "sess_local_alpha",
+  "mode": "snapshot",
+  "fromSeq": "0",
+  "snapshotSeq": "14",
+  "items": [
+    {
+      "schemaVersion": 1,
+      "eventId": "run_000001a1055a695d_000001-start",
+      "streamId": "sess_local_alpha",
+      "seq": "1",
+      "sessionId": "sess_local_alpha",
+      "runId": "run_000001a1055a695d_000001",
+      "attempt": "run_000001a1055a695d_000001#a1",
+      "eventType": "run_state_changed",
+      "payload": {
+        "type": "run_state_changed",
+        "from": "queued",
+        "to": "running"
+      }
+    },
+    {
+      "schemaVersion": 1,
+      "eventId": "run_000001a1055a695d_000001-run_000001a1055a695d_000001-mc0001-start",
+      "streamId": "sess_local_alpha",
+      "seq": "2",
+      "sessionId": "sess_local_alpha",
+      "runId": "run_000001a1055a695d_000001",
+      "attempt": "run_000001a1055a695d_000001#a1",
+      "eventType": "model_call_started",
+      "payload": {
+        "type": "model_call_started",
+        "modelCallId": "run_000001a1055a695d_000001-mc0001",
+        "provider": "main",
+        "model": "batch-probe",
+        "operation": "chat"
+      }
+    },
+    {
+      "schemaVersion": 1,
+      "eventId": "run_000001a1055a695d_000001-run_000001a1055a695d_000001-mc0001-done",
+      "streamId": "sess_local_alpha",
+      "seq": "3",
+      "sessionId": "sess_local_alpha",
+      "runId": "run_000001a1055a695d_000001",
+      "attempt": "run_000001a1055a695d_000001#a1",
+      "eventType": "model_call_completed",
+      "payload": {
+        "type": "model_call_completed",
+        "modelCallId": "run_000001a1055a695d_000001-mc0001"
+      }
+    },
+    {
+      "schemaVersion": 1,
+      "eventId": "run_000001a1055a695d_000001-run_000001a1055a695d_000001-tc0001-start",
+      "streamId": "sess_local_alpha",
+      "seq": "4",
+      "sessionId": "sess_local_alpha",
+      "runId": "run_000001a1055a695d_000001",
+      "attempt": "run_000001a1055a695d_000001#a1",
+      "eventType": "tool_call_started",
+      "payload": {
+        "type": "tool_call_started",
+        "toolCall": {
+          "toolCallId": "run_000001a1055a695d_000001-tc0001",
+          "target": "tool:first-party:write",
+          "argsDigest": {
+            "algorithm": "sha256",
+            "canonicalization": "lingxi-canonical-json-v1",
+            "hex": "9392b29e91a8692bfea9d1c0da51dd996cd7115fbc84d40e3d9d5865e9290fb1"
+          }
+        }
+      }
+    },
+    {
+      "schemaVersion": 1,
+      "eventId": "run_000001a1055a695d_000001-run_000001a1055a695d_000001-tc0001-done",
+      "streamId": "sess_local_alpha",
+      "seq": "5",
+      "sessionId": "sess_local_alpha",
+      "runId": "run_000001a1055a695d_000001",
+      "attempt": "run_000001a1055a695d_000001#a1",
+      "eventType": "tool_call_completed",
+      "payload": {
+        "type": "tool_call_completed",
+        "toolCallId": "run_000001a1055a695d_000001-tc0001",
+        "result": {
+          "status": "success",
+          "content": [
+            {
+              "type": "text",
+              "text": "Successfully wrote to output.txt"
+            }
+          ],
+          "resourceRefs": [
+            {
+              "resourceId": "file:/workspace/scratch/9b4397d87a13/audit/closed_loop/batch-invalid-second-e6lgh43x/workspace/output.txt",
+              "kind": "artifact",
+              "displayName": "output.txt",
+              "uri": "file:///workspace/scratch/9b4397d87a13/audit/closed_loop/batch-invalid-second-e6lgh43x/workspace/output.txt",
+              "digest": {
+                "algorithm": "sha256",
+                "canonicalization": "raw-bytes",
+                "hex": "fb2e4277bca89556be31b98fc765679e21685d060a322aed45cd6e017afd8edc"
+              },
+              "sizeBytes": "20"
+            }
+          ],
+          "truncated": false
+        }
+      }
+    },
+    {
+      "schemaVersion": 1,
+      "eventId": "run_000001a1055a695d_000001-run_000001a1055a695d_000001-tc0002-done",
+      "streamId": "sess_local_alpha",
+      "seq": "6",
+      "sessionId": "sess_local_alpha",
+      "runId": "run_000001a1055a695d_000001",
+      "attempt": "run_000001a1055a695d_000001#a1",
+      "eventType": "tool_call_completed",
+      "payload": {
+        "type": "tool_call_completed",
+        "toolCallId": "run_000001a1055a695d_000001-tc0002",
+        "result": {
+          "status": "failed",
+          "truncated": false,
+          "error": {
+            "code": "invalid_message",
+            "message": "tool arguments violate the current schema: $/path: expected type [\"string\"], found number",
+            "retryable": false
+          }
+        }
+      }
+    },
+    {
+      "schemaVersion": 1,
+      "eventId": "run_000001a1055a695d_000001-run_000001a1055a695d_000001-mc0002-start",
+      "streamId": "sess_local_alpha",
+      "seq": "7",
+      "sessionId": "sess_local_alpha",
+      "runId": "run_000001a1055a695d_000001",
+      "attempt": "run_000001a1055a695d_000001#a1",
+      "eventType": "model_call_started",
+      "payload": {
+        "type": "model_call_started",
+        "modelCallId": "run_000001a1055a695d_000001-mc0002",
+        "provider": "main",
+        "model": "batch-probe",
+        "operation": "chat"
+      }
+    },
+    {
+      "schemaVersion": 1,
+      "eventId": "run_000001a1055a695d_000001-run_000001a1055a695d_000001-mc0002-ev1",
+      "streamId": "sess_local_alpha",
+      "seq": "8",
+      "sessionId": "sess_local_alpha",
+      "runId": "run_000001a1055a695d_000001",
+      "attempt": "run_000001a1055a695d_000001#a1",
+      "eventType": "assistant_segment_start",
+      "payload": {
+        "type": "assistant_segment_start",
+        "segmentId": "assistant:2:text:default",
+        "kind": "text",
+        "semanticPhase": "final_answer"
+      }
+    },
+    {
+      "schemaVersion": 1,
+      "eventId": "run_000001a1055a695d_000001-run_000001a1055a695d_000001-mc0002-ev2",
+      "streamId": "sess_local_alpha",
+      "seq": "9",
+      "sessionId": "sess_local_alpha",
+      "runId": "run_000001a1055a695d_000001",
+      "attempt": "run_000001a1055a695d_000001#a1",
+      "eventType": "model_call_delta",
+      "payload": {
+        "type": "model_call_delta",
+        "modelCallId": "run_000001a1055a695d_000001-mc0002",
+        "phase": "final_answer",
+        "delta": "DONE"
+      }
+    },
+    {
+      "schemaVersion": 1,
+      "eventId": "run_000001a1055a695d_000001-run_000001a1055a695d_000001-mc0002-ev3",
+      "streamId": "sess_local_alpha",
+      "seq": "10",
+      "sessionId": "sess_local_alpha",
+      "runId": "run_000001a1055a695d_000001",
+      "attempt": "run_000001a1055a695d_000001#a1",
+      "eventType": "assistant_segment_delta",
+      "payload": {
+        "type": "assistant_segment_delta",
+        "segmentId": "assistant:2:text:default",
+        "delta": "DONE",
+        "semanticPhase": "final_answer"
+      }
+    },
+    {
+      "schemaVersion": 1,
+      "eventId": "run_000001a1055a695d_000001-run_000001a1055a695d_000001-mc0002-ev4",
+      "streamId": "sess_local_alpha",
+      "seq": "11",
+      "sessionId": "sess_local_alpha",
+      "runId": "run_000001a1055a695d_000001",
+      "attempt": "run_000001a1055a695d_000001#a1",
+      "eventType": "assistant_segment_end",
+      "payload": {
+        "type": "assistant_segment_end",
+        "segmentId": "assistant:2:text:default",
+        "semanticPhase": "final_answer"
+      }
+    },
+    {
+      "schemaVersion": 1,
+      "eventId": "run_000001a1055a695d_000001-run_000001a1055a695d_000001-mc0002-done",
+      "streamId": "sess_local_alpha",
+      "seq": "12",
+      "sessionId": "sess_local_alpha",
+      "runId": "run_000001a1055a695d_000001",
+      "attempt": "run_000001a1055a695d_000001#a1",
+      "eventType": "model_call_completed",
+      "payload": {
+        "type": "model_call_completed",
+        "modelCallId": "run_000001a1055a695d_000001-mc0002"
+      }
+    },
+    {
+      "schemaVersion": 1,
+      "eventId": "run_000001a1055a695d_000001-done",
+      "streamId": "sess_local_alpha",
+      "seq": "13",
+      "sessionId": "sess_local_alpha",
+      "runId": "run_000001a1055a695d_000001",
+      "attempt": "run_000001a1055a695d_000001#a1",
+      "eventType": "run_state_changed",
+      "payload": {
+        "type": "run_state_changed",
+        "from": "running",
+        "to": "completed",
+        "reason": "completed.with_final"
+      }
+    },
+    {
+      "schemaVersion": 1,
+      "eventId": "run_000001a1055a695d_000001-final",
+      "streamId": "sess_local_alpha",
+      "seq": "14",
+      "sessionId": "sess_local_alpha",
+      "runId": "run_000001a1055a695d_000001",
+      "attempt": "run_000001a1055a695d_000001#a1",
+      "eventType": "final_message_committed",
+      "payload": {
+        "type": "final_message_committed",
+        "message": {
+          "role": "assistant",
+          "content": [
+            {
+              "type": "text",
+              "text": "DONE"
+            }
+          ],
+          "modelCallId": "run_000001a1055a695d_000001-mc0002"
+        }
+      }
+    }
+  ],
+  "nextCursor": null
+}

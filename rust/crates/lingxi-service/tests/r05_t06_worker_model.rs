@@ -336,7 +336,7 @@ fn real_worker_model(
                 }}
             }},
             "models": {{
-                "chat": {{"provider": "stub_svc", "model": "chat-model"}},
+                "chat": {{"provider": "stub_svc", "model": "chat-model", "capabilities": {{"tools": true}}}},
                 "summarize": {{"provider": "stub_svc", "model": "summarize-model"}}
             }}
         }}"#,
@@ -606,6 +606,7 @@ impl WorkerModelPort for HangingModel {
         _worker: &'a str,
         _invocation: &'a str,
         _cb_id: &'a str,
+        _parent_tool_call: &'a lingxi_protocol::ToolCallId,
         _request: &'a WorkerModelRequest,
     ) -> Pin<
         Box<

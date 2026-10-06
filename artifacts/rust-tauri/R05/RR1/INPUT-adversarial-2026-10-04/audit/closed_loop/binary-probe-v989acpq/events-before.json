@@ -1,0 +1,161 @@
+{
+  "streamId": "sess_local_alpha",
+  "mode": "snapshot",
+  "fromSeq": "0",
+  "snapshotSeq": "9",
+  "items": [
+    {
+      "schemaVersion": 1,
+      "eventId": "run_000001a1055c124a_000001-start",
+      "streamId": "sess_local_alpha",
+      "seq": "1",
+      "sessionId": "sess_local_alpha",
+      "runId": "run_000001a1055c124a_000001",
+      "attempt": "run_000001a1055c124a_000001#a1",
+      "eventType": "run_state_changed",
+      "payload": {
+        "type": "run_state_changed",
+        "from": "queued",
+        "to": "running"
+      }
+    },
+    {
+      "schemaVersion": 1,
+      "eventId": "run_000001a1055c124a_000001-run_000001a1055c124a_000001-mc0001-start",
+      "streamId": "sess_local_alpha",
+      "seq": "2",
+      "sessionId": "sess_local_alpha",
+      "runId": "run_000001a1055c124a_000001",
+      "attempt": "run_000001a1055c124a_000001#a1",
+      "eventType": "model_call_started",
+      "payload": {
+        "type": "model_call_started",
+        "modelCallId": "run_000001a1055c124a_000001-mc0001",
+        "provider": "text_only",
+        "model": "text-only-no-tools",
+        "operation": "chat"
+      }
+    },
+    {
+      "schemaVersion": 1,
+      "eventId": "run_000001a1055c124a_000001-run_000001a1055c124a_000001-mc0001-ev1",
+      "streamId": "sess_local_alpha",
+      "seq": "3",
+      "sessionId": "sess_local_alpha",
+      "runId": "run_000001a1055c124a_000001",
+      "attempt": "run_000001a1055c124a_000001#a1",
+      "eventType": "assistant_segment_start",
+      "payload": {
+        "type": "assistant_segment_start",
+        "segmentId": "assistant:1:reasoning:default",
+        "kind": "reasoning",
+        "semanticPhase": "reasoning"
+      }
+    },
+    {
+      "schemaVersion": 1,
+      "eventId": "run_000001a1055c124a_000001-run_000001a1055c124a_000001-mc0001-ev2",
+      "streamId": "sess_local_alpha",
+      "seq": "4",
+      "sessionId": "sess_local_alpha",
+      "runId": "run_000001a1055c124a_000001",
+      "attempt": "run_000001a1055c124a_000001#a1",
+      "eventType": "model_call_delta",
+      "payload": {
+        "type": "model_call_delta",
+        "modelCallId": "run_000001a1055c124a_000001-mc0001",
+        "phase": "reasoning",
+        "delta": "PROCESS_ONLY_REASONING"
+      }
+    },
+    {
+      "schemaVersion": 1,
+      "eventId": "run_000001a1055c124a_000001-run_000001a1055c124a_000001-mc0001-ev3",
+      "streamId": "sess_local_alpha",
+      "seq": "5",
+      "sessionId": "sess_local_alpha",
+      "runId": "run_000001a1055c124a_000001",
+      "attempt": "run_000001a1055c124a_000001#a1",
+      "eventType": "assistant_segment_delta",
+      "payload": {
+        "type": "assistant_segment_delta",
+        "segmentId": "assistant:1:reasoning:default",
+        "delta": "PROCESS_ONLY_REASONING",
+        "semanticPhase": "reasoning"
+      }
+    },
+    {
+      "schemaVersion": 1,
+      "eventId": "run_000001a1055c124a_000001-run_000001a1055c124a_000001-mc0001-ev4",
+      "streamId": "sess_local_alpha",
+      "seq": "6",
+      "sessionId": "sess_local_alpha",
+      "runId": "run_000001a1055c124a_000001",
+      "attempt": "run_000001a1055c124a_000001#a1",
+      "eventType": "assistant_segment_end",
+      "payload": {
+        "type": "assistant_segment_end",
+        "segmentId": "assistant:1:reasoning:default",
+        "semanticPhase": "reasoning"
+      }
+    },
+    {
+      "schemaVersion": 1,
+      "eventId": "run_000001a1055c124a_000001-run_000001a1055c124a_000001-mc0001-done",
+      "streamId": "sess_local_alpha",
+      "seq": "7",
+      "sessionId": "sess_local_alpha",
+      "runId": "run_000001a1055c124a_000001",
+      "attempt": "run_000001a1055c124a_000001#a1",
+      "eventType": "model_call_completed",
+      "payload": {
+        "type": "model_call_completed",
+        "modelCallId": "run_000001a1055c124a_000001-mc0001",
+        "usage": {
+          "inputTokens": "3",
+          "outputTokens": "4"
+        }
+      }
+    },
+    {
+      "schemaVersion": 1,
+      "eventId": "run_000001a1055c124a_000001-done",
+      "streamId": "sess_local_alpha",
+      "seq": "8",
+      "sessionId": "sess_local_alpha",
+      "runId": "run_000001a1055c124a_000001",
+      "attempt": "run_000001a1055c124a_000001#a1",
+      "eventType": "run_state_changed",
+      "payload": {
+        "type": "run_state_changed",
+        "from": "running",
+        "to": "completed",
+        "reason": "completed.with_final"
+      }
+    },
+    {
+      "schemaVersion": 1,
+      "eventId": "run_000001a1055c124a_000001-final",
+      "streamId": "sess_local_alpha",
+      "seq": "9",
+      "sessionId": "sess_local_alpha",
+      "runId": "run_000001a1055c124a_000001",
+      "attempt": "run_000001a1055c124a_000001#a1",
+      "eventType": "final_message_committed",
+      "payload": {
+        "type": "final_message_committed",
+        "message": {
+          "role": "assistant",
+          "content": [
+            {
+              "type": "reasoning",
+              "text": "PROCESS_ONLY_REASONING"
+            }
+          ],
+          "modelCallId": "run_000001a1055c124a_000001-mc0001"
+        }
+      }
+    }
+  ],
+  "nextCursor": null
+}

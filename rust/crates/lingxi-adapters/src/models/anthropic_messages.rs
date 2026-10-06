@@ -75,7 +75,7 @@ pub const FAMILY: &str = "anthropic-messages";
 /// call; no redirects (C10); error classification shared
 /// ([`dispatch::classify_error_status`]).
 pub struct AnthropicMessagesAdapter {
-    client: reqwest::Client,
+    client: dispatch::NetworkClient,
     schema_budget: SchemaBudget,
     max_output_tokens: u32,
     timeouts: dispatch::HttpTimeouts,
@@ -99,6 +99,24 @@ impl AnthropicMessagesAdapter {
         max_output_tokens: u32,
         timeouts: dispatch::HttpTimeouts,
     ) -> Result<Self, ProtocolError> {
+        Self::new_with_timeouts_and_network(
+            schema_budget,
+            max_output_tokens,
+            timeouts,
+            super::network::NetworkPlane::direct_isolated(),
+        )
+    }
+
+    /// R05 RR1 F14: the client is BOUND to the model plane's reloadable
+    /// network policy (proxy / NO_PROXY / explicit CA per configuration
+    /// generation; the legacy constructors keep the pre-F14 direct
+    /// behavior for isolated tests).
+    pub fn new_with_timeouts_and_network(
+        schema_budget: SchemaBudget,
+        max_output_tokens: u32,
+        timeouts: dispatch::HttpTimeouts,
+        network: std::sync::Arc<super::network::NetworkPlane>,
+    ) -> Result<Self, ProtocolError> {
         if max_output_tokens == 0 {
             return Err(ProtocolError::new(
                 ErrorCode::Internal,
@@ -107,7 +125,7 @@ impl AnthropicMessagesAdapter {
             ));
         }
         Ok(Self {
-            client: dispatch::build_client_with_timeouts(&timeouts)?,
+            client: network.client_handle(timeouts)?,
             schema_budget,
             max_output_tokens,
             timeouts,
@@ -168,8 +186,12 @@ impl AnthropicMessagesAdapter {
             Err(error) => return fail(error, false),
         };
         let url = dispatch::append_provider_api_path(&route.endpoint, "/v1/messages");
+        let client = match self.client.client() {
+            Ok(client) => client,
+            Err(error) => return fail(error, false),
+        };
         let request = dispatch::apply_auth(
-            self.client
+            client
                 .post(&url)
                 .header("anthropic-version", ANTHROPIC_VERSION)
                 .json(&body),
@@ -201,6 +223,10 @@ impl AnthropicMessagesAdapter {
         if let Err((error, retryable)) = drive {
             return fail(error, retryable);
         }
+        // R05 RR1 F38 (F21 same-path fix): capture the usage the stream
+        // observed BEFORE `finish` consumes the accumulator — a parse
+        // failure must not erase it.
+        let salvaged_usage = drive_handler.accumulator.observed_usage_report();
         match drive_handler
             .accumulator
             .finish(call, &input.tools, &self.schema_budget)
@@ -220,13 +246,53 @@ impl AnthropicMessagesAdapter {
             },
             Err(error) => {
                 let retryable = error.retryable;
-                fail(error, retryable)
+                fail(error, retryable).with_usage_report(salvaged_usage)
             }
         }
     }
 }
 
 // ── outbound rendering (pure) ───────────────────────────────────────────────
+
+/// Whether an assistant turn's content carries THIS family's opaque state
+/// (R05 RR1 F09): such state is bound to the provider/model that minted it
+/// and may only be echoed onto a request for the same origin.
+fn turn_carries_family_state(content: &[ContentBlock]) -> bool {
+    content
+        .iter()
+        .any(|block| matches!(block, ContentBlock::Opaque { provider, .. } if provider == FAMILY))
+}
+
+/// R05 RR1 F09: the source-authorization gate for this family's opaque
+/// state. A family tag alone never authorizes replay: the turn's recorded
+/// origin must be the request's exact provider+model, and a turn carrying
+/// family state with NO recorded origin is refused (unproven state is never
+/// forwarded — the honest interruption, never a silent drop or a fabricated
+/// conversion).
+fn enforce_turn_origin(
+    origin: &Option<lingxi_kernel::model_exchange::TurnOrigin>,
+    route: &ResolvedModelRoute,
+) -> Result<(), ProtocolError> {
+    let invalid = |detail: String| ProtocolError::new(ErrorCode::InvalidMessage, detail, false);
+    match origin {
+        Some(origin) if origin.authorizes(&route.provider, &route.model) => Ok(()),
+        Some(origin) => Err(invalid(format!(
+            "the exchange history carries anthropic-messages opaque state (thinking signature / \
+             redacted thinking) minted by provider {:?} model {:?}; this request targets provider \
+             {:?} model {:?}. Same-protocol-family is NOT source authorization — replaying \
+             another origin's signed state would corrupt the protocol round-trip. Restart or \
+             compact the session onto one serving model, or re-route the run to the origin \
+             model.",
+            origin.provider, origin.model, route.provider, route.model
+        ))),
+        None => Err(invalid(
+            "the exchange history carries anthropic-messages opaque state (thinking signature / \
+             redacted thinking) with no recorded serving origin; unproven protocol state is \
+             never forwarded onto a request (restart or compact the session)"
+                .to_string(),
+        )),
+    }
+}
 
 /// Renders one assistant turn's content blocks into this family's content
 /// array. Returns the blocks; the caller appends tool_use blocks after
@@ -271,9 +337,22 @@ fn render_assistant_blocks(content: &[ContentBlock]) -> Vec<serde_json::Value> {
                         // Verbatim provider state (e.g. redacted_thinking)
                         // round-trips byte-identically.
                         Some("redacted_thinking") => blocks.push(data.clone()),
-                        // A signature orphan has nothing to sign — skipped
-                        // (never fabricated into a thinking block).
-                        Some("thinking_signature") => {}
+                        // R05 RR1 F06: a signature opaque with NO preceding
+                        // reasoning block is the signed EMPTY-thinking
+                        // shape (a thinking block with no visible text but
+                        // a valid signature). The signature proves the
+                        // block existed — reconstruct it in place, never
+                        // drop live protocol state.
+                        Some("thinking_signature") => {
+                            if let Some(signature) = data.get("signature").and_then(|s| s.as_str())
+                            {
+                                blocks.push(serde_json::json!({
+                                    "type": "thinking",
+                                    "thinking": "",
+                                    "signature": signature,
+                                }));
+                            }
+                        }
                         _ => {}
                     }
                 }
@@ -345,8 +424,14 @@ pub fn render_messages_request(
             ExchangeItem::AssistantTurn {
                 content,
                 tool_calls,
+                origin,
                 ..
             } => {
+                // R05 RR1 F09: opaque state is source-bound — check BEFORE
+                // any of it could be echoed.
+                if turn_carries_family_state(content) {
+                    enforce_turn_origin(origin, route)?;
+                }
                 let mut blocks = render_assistant_blocks(content);
                 for call in tool_calls {
                     let wire_name =
@@ -510,8 +595,17 @@ pub fn parse_messages_response(
                     });
                 }
                 // The signature is protocol state, never user-facing text:
-                // it round-trips as an adjacent opaque block (C10).
-                if let Some(signature) = block.get("signature").and_then(|s| s.as_str()) {
+                // it round-trips as an adjacent opaque block (C10). R05 RR1
+                // F06: a VALID (non-empty) signature survives even when the
+                // visible thinking text is EMPTY — the opaque then rides
+                // alone and the renderer reconstructs the signed
+                // empty-thinking block from it (an empty-string signature is
+                // a placeholder, i.e. the absence of state).
+                if let Some(signature) = block
+                    .get("signature")
+                    .and_then(|s| s.as_str())
+                    .filter(|s| !s.is_empty())
+                {
                     content.push(ContentBlock::Opaque {
                         provider: FAMILY.to_string(),
                         data: serde_json::json!({
@@ -576,13 +670,20 @@ pub fn parse_messages_response(
             }
         }
     }
-    // C11 stop-reason honesty (R05-T04): the blocks above already passed
-    // every shape/argument validation (a malformed tool input stays a loud
-    // InvalidMessage — nothing dispatched), so the CLOSED turn classifies
-    // by its terminal reason. A truncated or refused turn never forms a
-    // Final and never dispatches its tool batch; the partial content lives
-    // on in the call's delta events (zero side effects → retry is safe).
+    // R05 RR1 F11: the batch-level identity admission — a same-id re-send
+    // with identical shape collapses, a same-id CONFLICT rejects the whole
+    // turn (zero requests admitted, zero side effects).
+    let requests = super::batch_admission::admit_provider_call_ids(FAMILY, requests)?;
+    // C11 stop-reason honesty (R05-T04) + R05 RR1 F12: `message_stop` (the
+    // transport terminal) is not protocol completion on its own. The CLOSED
+    // turn classifies ONLY by a KNOWN normal `stop_reason`: its absence, or
+    // an unknown value, is a protocol surprise — never a guessed Final,
+    // never a dispatched batch. A truncated (max_tokens) or refused turn
+    // never forms a Final and never dispatches its tool batch; the partial
+    // content lives on in the call's delta events (zero side effects →
+    // retry is safe).
     match response.stop_reason.as_deref() {
+        Some("end_turn") | Some("tool_use") | Some("stop_sequence") => {}
         Some("max_tokens") | Some("model_context_window_exceeded") => {
             return Ok(ParsedChat {
                 turn: ProviderTurn::Failed {
@@ -615,7 +716,20 @@ pub fn parse_messages_response(
                 usage_report: usage_report.clone(),
             });
         }
-        _ => {}
+        Some(other) => {
+            return Err(invalid(format!(
+                "provider response carries the UNKNOWN stop_reason {other:?}: an unmapped \
+                 terminal is never guessed into a completed turn"
+            )));
+        }
+        None => {
+            return Err(invalid(
+                "provider response ended WITHOUT a stop_reason: the transport's terminal \
+                 (message_stop / the buffered body's last byte) is not protocol completion — \
+                 the turn never classifies, nothing dispatches"
+                    .to_string(),
+            ));
+        }
     }
     if !requests.is_empty() {
         return Ok(ParsedChat {
@@ -623,7 +737,12 @@ pub fn parse_messages_response(
             usage_report: usage_report.clone(),
         });
     }
-    if !content.is_empty() {
+    // R05 RR1 F12: a normally-stopped turn whose blocks carry NO answer
+    // text (thinking/opaque only) is process content, not a final answer.
+    let has_answer_text = content
+        .iter()
+        .any(|block| matches!(block, ContentBlock::Text { .. }));
+    if has_answer_text {
         return Ok(ParsedChat {
             turn: ProviderTurn::Final {
                 message: NormalizedMessage {
@@ -635,12 +754,23 @@ pub fn parse_messages_response(
             usage_report: usage_report.clone(),
         });
     }
+    let detail = if content.is_empty() {
+        format!(
+            "provider returned no content and no tool calls (stop_reason: {})",
+            response.stop_reason.as_deref().unwrap_or("absent")
+        )
+    } else {
+        format!(
+            "provider turn completed with process-only content (thinking/opaque state, no \
+             answer text; stop_reason: {})",
+            response.stop_reason.as_deref().unwrap_or("absent")
+        )
+    };
     Ok(ParsedChat {
         turn: ProviderTurn::Empty {
-            detail: format!(
-                "provider returned no content and no tool calls (stop_reason: {})",
-                response.stop_reason.as_deref().unwrap_or("absent")
-            ),
+            detail,
+            // R05 RR1 F12: the process-state blocks ride along for replay.
+            content,
         },
         usage_report,
     })
@@ -726,6 +856,27 @@ impl MessagesStreamAccumulator {
             usage_seen: false,
             usage_violation: None,
             message_stop_seen: false,
+        }
+    }
+
+    /// R05 RR1 F38: the usage fact folded so far (the running-total fold
+    /// cloned and finished — a half-known account stays `Partial` naming
+    /// its missing half) — the salvage a parse-failed turn still accounts
+    /// with. A kept violation re-enters the SAME strict decoder as
+    /// `Invalid`. Never a guess: nothing observed stays `Unknown`.
+    pub fn observed_usage_report(&self) -> lingxi_kernel::usage::ReportedUsage {
+        if let Some(violation) = &self.usage_violation {
+            return super::usage::salvage_usage_report(
+                lingxi_kernel::model_exchange::ProtocolFamily::AnthropicMessages,
+                Some(violation),
+            );
+        }
+        if !self.usage_seen {
+            return lingxi_kernel::usage::ReportedUsage::Unknown;
+        }
+        match self.usage.clone().finish() {
+            Some(usage) => lingxi_kernel::usage::ReportedUsage::Known(usage),
+            None => lingxi_kernel::usage::ReportedUsage::Unknown,
         }
     }
 
@@ -919,7 +1070,18 @@ impl MessagesStreamAccumulator {
                                 .ok_or_else(|| {
                                     invalid("signature_delta without signature".to_string())
                                 })?;
+                        // R05 RR1 F06: an EMPTY existing signature is the
+                        // stream's OPENING PLACEHOLDER (`content_block_start`
+                        // carries `signature: ""` on the documented wire) —
+                        // the first non-empty delta ASSIGNS the block's final
+                        // signature (the official SDK's signature update is
+                        // an assignment, never a concatenation). Only two
+                        // DIFFERENT non-empty signatures are a true conflict;
+                        // an identical re-send is a no-op.
                         match signature {
+                            Some(existing) if existing.is_empty() && !fragment.is_empty() => {
+                                *signature = Some(fragment.to_string());
+                            }
                             Some(existing) if existing != fragment => {
                                 return Err(invalid(
                                     "a thinking block carried two DIFFERENT signatures: a \
@@ -1060,9 +1222,14 @@ impl MessagesStreamAccumulator {
         Ok(emitted)
     }
 
-    /// Validates the CLOSED batch (`message_stop` seen) through the SAME
-    /// buffered parser. A stream without `message_stop` is truncated: loud,
-    /// never half-parsed (C05/C09).
+    /// Validates the CLOSED batch through the SAME buffered parser. A
+    /// stream without `message_stop` is truncated: loud, never half-parsed
+    /// (C05/C09). R05 RR1 F12: `message_stop` alone is still not protocol
+    /// completion — every opened content block must have received its
+    /// `content_block_stop` (an unclosed tool/text/thinking block is an
+    /// untrustworthy terminal: the turn never classifies, nothing
+    /// dispatches), and the buffered parse below additionally requires a
+    /// known normal `stop_reason`.
     pub fn finish(
         self,
         call: &ModelCallId,
@@ -1077,6 +1244,19 @@ impl MessagesStreamAccumulator {
                     .to_string(),
             ));
         }
+        let unclosed: Vec<u64> = self
+            .block_order
+            .iter()
+            .filter(|index| !self.closed.contains(index))
+            .copied()
+            .collect();
+        if !unclosed.is_empty() {
+            return Err(invalid(format!(
+                "message_stop arrived while content block(s) {unclosed:?} were still open (no \
+                 content_block_stop): the transport's terminal is not the protocol's — an \
+                 unclosed block is never admitted as a completed batch"
+            )));
+        }
         let mut content: Vec<serde_json::Value> = Vec::new();
         for index in &self.block_order {
             match self.blocks.get(index).expect("ordered above") {
@@ -1085,8 +1265,14 @@ impl MessagesStreamAccumulator {
                 }
                 PendingBlock::Thinking { text, signature } => {
                     let mut block = serde_json::json!({"type": "thinking", "thinking": text});
+                    // R05 RR1 F06: only a FINAL (non-empty) signature rides
+                    // the reassembled block — a placeholder that never got
+                    // its `signature_delta` is the absence of a signature,
+                    // not an empty-string signature.
                     if let Some(signature) = signature {
-                        block["signature"] = serde_json::Value::String(signature.clone());
+                        if !signature.is_empty() {
+                            block["signature"] = serde_json::Value::String(signature.clone());
+                        }
                     }
                     content.push(block);
                 }
@@ -1173,6 +1359,13 @@ mod tests {
         ToolDeclarationSnapshot,
     };
     use lingxi_protocol::{ToolCallId, UsageRecord};
+
+    fn origin() -> Option<lingxi_kernel::model_exchange::TurnOrigin> {
+        Some(lingxi_kernel::model_exchange::TurnOrigin {
+            provider: "anthropic".to_string(),
+            model: "claude-test".to_string(),
+        })
+    }
 
     fn route() -> ResolvedModelRoute {
         ResolvedModelRoute {
@@ -1264,6 +1457,7 @@ mod tests {
                 text: "reading both".to_string(),
             }],
             tool_calls: vec![mk("/tmp/a", "toolu_a", 1), mk("/tmp/b", "toolu_b", 2)],
+            origin: origin(),
         });
         input.prior.push(ExchangeItem::ToolResult {
             tool_call_id: ToolCallId::new("run-tc0001"),
@@ -1367,6 +1561,7 @@ mod tests {
                 args_digest: requests[0].args_digest.clone(),
                 args_summary: None,
             }],
+            origin: origin(),
         });
         let body = render_messages_request(&input, &route(), DEFAULT_MAX_OUTPUT_TOKENS, false)
             .expect("renders");
@@ -1404,6 +1599,7 @@ mod tests {
                 },
             ],
             tool_calls: Vec::new(),
+            origin: origin(),
         });
         let body = render_messages_request(&input, &route(), DEFAULT_MAX_OUTPUT_TOKENS, false)
             .expect("renders");

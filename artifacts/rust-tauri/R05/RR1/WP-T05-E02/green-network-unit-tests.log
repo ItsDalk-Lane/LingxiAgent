@@ -1,0 +1,15 @@
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.08s
+     Running unittests src/lib.rs (rust/target/debug/deps/lingxi_adapters-25f1ae8b0ef7c0f1)
+
+running 8 tests
+test models::network::tests::loopback_bracket_entries_are_pinned_at_the_entry_level ... ok
+test models::network::tests::forced_local_bypass_beats_every_list ... ok
+test models::network::tests::scheme_selection_prefers_the_scheme_proxy ... ok
+test models::network::tests::config_validation_is_loud_on_every_incumbent_rule ... ok
+test models::network::tests::system_mode_resolves_the_environment_snapshot ... ok
+test models::network::tests::bracketed_ipv6_no_proxy_entries_bypass_public_literals ... ok
+test models::network::tests::no_proxy_grammar_matches_the_incumbent_forms ... ok
+test models::network::tests::plane_generations_rebuild_the_client_lazily ... ok
+
+test result: ok. 8 passed; 0 failed; 0 ignored; 0 measured; 111 filtered out; finished in 0.00s
+

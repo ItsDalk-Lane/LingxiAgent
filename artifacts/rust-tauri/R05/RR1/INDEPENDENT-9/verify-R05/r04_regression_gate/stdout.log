@@ -1,0 +1,141 @@
+xtask: verify-stage R04 [cargo test --manifest-path rust/Cargo.toml --workspace --locked] > /Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR1/INDEPENDENT-9/verify-R05/R04_REGRESSION/rust_test_workspace
+xtask: verify-stage R04 [rust_test_workspace] FAIL
+xtask: verify-stage R04 [bash scripts/rust-tauri/r04_t08_matrix.sh {EVIDENCE}/R04_MATRIX] > /Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR1/INDEPENDENT-9/verify-R05/R04_REGRESSION/r04_tool_matrix
+xtask: verify-stage R04 [r04_tool_matrix] PASS
+xtask: verify-stage R04 [cargo fmt --manifest-path rust/Cargo.toml --all -- --check] > /Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR1/INDEPENDENT-9/verify-R05/R04_REGRESSION/rust_fmt
+xtask: verify-stage R04 [rust_fmt] PASS
+xtask: verify-stage R04 [cargo clippy --manifest-path rust/Cargo.toml --workspace --all-targets --locked -- -D warnings] > /Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR1/INDEPENDENT-9/verify-R05/R04_REGRESSION/rust_clippy
+xtask: verify-stage R04 [rust_clippy] PASS
+xtask: verify-stage R04 [bash scripts/rust-tauri/r01-t02-check-generated.sh] > /Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR1/INDEPENDENT-9/verify-R05/R04_REGRESSION/check_contracts
+xtask: verify-stage R04 [check_contracts] PASS
+xtask: verify-stage R04 [python3 -B docs/rust-tauri/R01/r01_t01_check_ownership.py] > /Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR1/INDEPENDENT-9/verify-R05/R04_REGRESSION/check_boundaries
+xtask: verify-stage R04 [check_boundaries] PASS
+xtask: verify-stage R04 [cargo run --manifest-path rust/Cargo.toml --locked -p xtask -- verify-stage R03 --evidence {EVIDENCE}/R03_REGRESSION] > /Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR1/INDEPENDENT-9/verify-R05/R04_REGRESSION/r03_regression_gate
+xtask: verify-stage R04 [r03_regression_gate] FAIL
+xtask: verify-stage R04 [bash scripts/rust-tauri/r04_rr1_g05_repair_suites.sh {EVIDENCE}/R04_RR1_REPAIR] > /Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR1/INDEPENDENT-9/verify-R05/R04_REGRESSION/r04_rr1_repair_suites
+xtask: verify-stage R04 [r04_rr1_repair_suites] PASS
+xtask: verify-stage R04 supplemental R00-T02-LA-00C88B996AA0 [deferred_to_later_stage] DEFERRED_TO_LATER_STAGE
+xtask: verify-stage R04 supplemental R00-T02-LA-0199B843D759 [stage_share_satisfied] FAIL
+xtask: verify-stage R04 supplemental R00-T02-LA-04A6A2BD1547 [stage_share_satisfied] FAIL
+xtask: verify-stage R04 supplemental R00-T02-LA-071B6E2C286A [deferred_to_later_stage] DEFERRED_TO_LATER_STAGE
+xtask: verify-stage R04 supplemental R00-T02-LA-0818574ABD43 [stage_share_satisfied] FAIL
+xtask: verify-stage R04 supplemental R00-T02-LA-0B669B30C854 [stage_share_satisfied] FAIL
+xtask: verify-stage R04 supplemental R00-T02-LA-0CDC88FC0999 [deferred_to_later_stage] DEFERRED_TO_LATER_STAGE
+xtask: verify-stage R04 supplemental R00-T02-LA-0EC4C0E2EB51 [deferred_to_later_stage] DEFERRED_TO_LATER_STAGE
+xtask: verify-stage R04 supplemental R00-T02-LA-125C9E21A621 [deferred_to_later_stage] DEFERRED_TO_LATER_STAGE
+xtask: verify-stage R04 supplemental R00-T02-LA-127373C72E30 [deferred_to_later_stage] DEFERRED_TO_LATER_STAGE
+xtask: verify-stage R04 supplemental R00-T02-LA-15AD6ED13B4D [stage_share_satisfied] FAIL
+xtask: verify-stage R04 supplemental R00-T02-LA-15D154AE53C8 [deferred_to_later_stage] DEFERRED_TO_LATER_STAGE
+xtask: verify-stage R04 supplemental R00-T02-LA-18EFB2D9D5FD [stage_share_satisfied] FAIL
+xtask: verify-stage R04 supplemental R00-T02-LA-196D50D8DD6E [stage_share_satisfied] FAIL
+xtask: verify-stage R04 supplemental R00-T02-LA-1BEA3A4B9CB0 [deferred_to_later_stage] DEFERRED_TO_LATER_STAGE
+xtask: verify-stage R04 supplemental R00-T02-LA-1CD1C31CCF44 [stage_share_satisfied] PASS
+xtask: verify-stage R04 supplemental R00-T02-LA-20DD2E4529D9 [deferred_to_later_stage] DEFERRED_TO_LATER_STAGE
+xtask: verify-stage R04 supplemental R00-T02-LA-21B3F4DC9140 [stage_share_satisfied] FAIL
+xtask: verify-stage R04 supplemental R00-T02-LA-238267978DDA [deferred_to_later_stage] DEFERRED_TO_LATER_STAGE
+xtask: verify-stage R04 supplemental R00-T02-LA-240E200EF440 [stage_share_satisfied] FAIL
+xtask: verify-stage R04 supplemental R00-T02-LA-25C4FF66FEE5 [stage_share_satisfied] FAIL
+xtask: verify-stage R04 supplemental R00-T02-LA-2C28E576FC61 [deferred_to_later_stage] DEFERRED_TO_LATER_STAGE
+xtask: verify-stage R04 supplemental R00-T02-LA-2D194C1684BC [stage_share_satisfied] FAIL
+xtask: verify-stage R04 supplemental R00-T02-LA-2D896560381E [stage_share_satisfied] FAIL
+xtask: verify-stage R04 supplemental R00-T02-LA-2DA782C5C7B9 [stage_share_satisfied] FAIL
+xtask: verify-stage R04 supplemental R00-T02-LA-2EB39AE34CB5 [deferred_to_later_stage] DEFERRED_TO_LATER_STAGE
+xtask: verify-stage R04 supplemental R00-T02-LA-2F2B6E173C1B [deferred_to_later_stage] DEFERRED_TO_LATER_STAGE
+xtask: verify-stage R04 supplemental R00-T02-LA-2FB382A137FC [deferred_to_later_stage] DEFERRED_TO_LATER_STAGE
+xtask: verify-stage R04 supplemental R00-T02-LA-3617DF5B23D5 [deferred_to_later_stage] DEFERRED_TO_LATER_STAGE
+xtask: verify-stage R04 supplemental R00-T02-LA-3A50AD28E08E [deferred_to_later_stage] DEFERRED_TO_LATER_STAGE
+xtask: verify-stage R04 supplemental R00-T02-LA-3ADEC43FAFF7 [deferred_to_later_stage] DEFERRED_TO_LATER_STAGE
+xtask: verify-stage R04 supplemental R00-T02-LA-3CBCAE9AD914 [stage_share_satisfied] PASS
+xtask: verify-stage R04 supplemental R00-T02-LA-3F4FF7BA0528 [deferred_to_later_stage] DEFERRED_TO_LATER_STAGE
+xtask: verify-stage R04 supplemental R00-T02-LA-4173A08A51CC [deferred_to_later_stage] DEFERRED_TO_LATER_STAGE
+xtask: verify-stage R04 supplemental R00-T02-LA-45627E4F8173 [deferred_to_later_stage] DEFERRED_TO_LATER_STAGE
+xtask: verify-stage R04 supplemental R00-T02-LA-478704C17551 [deferred_to_later_stage] DEFERRED_TO_LATER_STAGE
+xtask: verify-stage R04 supplemental R00-T02-LA-483E461BB59D [stage_share_satisfied] FAIL
+xtask: verify-stage R04 supplemental R00-T02-LA-48B0C7A7453E [stage_share_satisfied] FAIL
+xtask: verify-stage R04 supplemental R00-T02-LA-4A43314AE253 [deferred_to_later_stage] DEFERRED_TO_LATER_STAGE
+xtask: verify-stage R04 supplemental R00-T02-LA-4C35E6AEC6F7 [stage_share_satisfied] FAIL
+xtask: verify-stage R04 supplemental R00-T02-LA-4E810F7FA63E [deferred_to_later_stage] DEFERRED_TO_LATER_STAGE
+xtask: verify-stage R04 supplemental R00-T02-LA-4E8EDC4E25FC [deferred_to_later_stage] DEFERRED_TO_LATER_STAGE
+xtask: verify-stage R04 supplemental R00-T02-LA-4F0466F7C090 [stage_share_satisfied] PASS
+xtask: verify-stage R04 supplemental R00-T02-LA-549AC6365C5D [deferred_to_later_stage] DEFERRED_TO_LATER_STAGE
+xtask: verify-stage R04 supplemental R00-T02-LA-5542B3D7EDBB [deferred_to_later_stage] DEFERRED_TO_LATER_STAGE
+xtask: verify-stage R04 supplemental R00-T02-LA-55B24FEE5AFB [deferred_to_later_stage] DEFERRED_TO_LATER_STAGE
+xtask: verify-stage R04 supplemental R00-T02-LA-563F04AF5AD7 [deferred_to_later_stage] DEFERRED_TO_LATER_STAGE
+xtask: verify-stage R04 supplemental R00-T02-LA-5C043EAD2299 [deferred_to_later_stage] DEFERRED_TO_LATER_STAGE
+xtask: verify-stage R04 supplemental R00-T02-LA-5E61048F19B9 [stage_share_satisfied] FAIL
+xtask: verify-stage R04 supplemental R00-T02-LA-5F5B67BC5748 [deferred_to_later_stage] DEFERRED_TO_LATER_STAGE
+xtask: verify-stage R04 supplemental R00-T02-LA-5FA75FC2FE4C [deferred_to_later_stage] DEFERRED_TO_LATER_STAGE
+xtask: verify-stage R04 supplemental R00-T02-LA-5FEFBFCEBC04 [deferred_to_later_stage] DEFERRED_TO_LATER_STAGE
+xtask: verify-stage R04 supplemental R00-T02-LA-61EEE9F4CDD9 [deferred_to_later_stage] DEFERRED_TO_LATER_STAGE
+xtask: verify-stage R04 supplemental R00-T02-LA-67256417FB2B [stage_share_satisfied] FAIL
+xtask: verify-stage R04 supplemental R00-T02-LA-730E5984212D [deferred_to_later_stage] DEFERRED_TO_LATER_STAGE
+xtask: verify-stage R04 supplemental R00-T02-LA-75753997F5C6 [deferred_to_later_stage] DEFERRED_TO_LATER_STAGE
+xtask: verify-stage R04 supplemental R00-T02-LA-75C0AE981505 [stage_share_satisfied] FAIL
+xtask: verify-stage R04 supplemental R00-T02-LA-7747A6F59130 [deferred_to_later_stage] DEFERRED_TO_LATER_STAGE
+xtask: verify-stage R04 supplemental R00-T02-LA-78B18101F37D [deferred_to_later_stage] DEFERRED_TO_LATER_STAGE
+xtask: verify-stage R04 supplemental R00-T02-LA-7FF8D4E48BC9 [stage_share_satisfied] FAIL
+xtask: verify-stage R04 supplemental R00-T02-LA-865A9825A3EB [deferred_to_later_stage] DEFERRED_TO_LATER_STAGE
+xtask: verify-stage R04 supplemental R00-T02-LA-895DAC8DD5B7 [deferred_to_later_stage] DEFERRED_TO_LATER_STAGE
+xtask: verify-stage R04 supplemental R00-T02-LA-8A3C87812B4F [stage_share_satisfied] FAIL
+xtask: verify-stage R04 supplemental R00-T02-LA-8B0A373FCC16 [deferred_to_later_stage] DEFERRED_TO_LATER_STAGE
+xtask: verify-stage R04 supplemental R00-T02-LA-8BCB8A749864 [stage_share_satisfied] FAIL
+xtask: verify-stage R04 supplemental R00-T02-LA-8D3CEB6133E1 [stage_share_satisfied] FAIL
+xtask: verify-stage R04 supplemental R00-T02-LA-93D5237ADE81 [stage_share_satisfied] PASS
+xtask: verify-stage R04 supplemental R00-T02-LA-96DD1FF9E9D5 [stage_share_satisfied] FAIL
+xtask: verify-stage R04 supplemental R00-T02-LA-988A120F3B2C [deferred_to_later_stage] DEFERRED_TO_LATER_STAGE
+xtask: verify-stage R04 supplemental R00-T02-LA-9FF4E1805297 [deferred_to_later_stage] DEFERRED_TO_LATER_STAGE
+xtask: verify-stage R04 supplemental R00-T02-LA-A0C824E245A0 [deferred_to_later_stage] DEFERRED_TO_LATER_STAGE
+xtask: verify-stage R04 supplemental R00-T02-LA-A2E1607C1102 [deferred_to_later_stage] DEFERRED_TO_LATER_STAGE
+xtask: verify-stage R04 supplemental R00-T02-LA-A2ED86212AC8 [deferred_to_later_stage] DEFERRED_TO_LATER_STAGE
+xtask: verify-stage R04 supplemental R00-T02-LA-A336F79E964D [stage_share_satisfied] FAIL
+xtask: verify-stage R04 supplemental R00-T02-LA-A5745E27F494 [deferred_to_later_stage] DEFERRED_TO_LATER_STAGE
+xtask: verify-stage R04 supplemental R00-T02-LA-A9DAA48DC603 [deferred_to_later_stage] DEFERRED_TO_LATER_STAGE
+xtask: verify-stage R04 supplemental R00-T02-LA-AD7FAE6288FA [stage_share_satisfied] PASS
+xtask: verify-stage R04 supplemental R00-T02-LA-ADB6B0580864 [deferred_to_later_stage] DEFERRED_TO_LATER_STAGE
+xtask: verify-stage R04 supplemental R00-T02-LA-AF18F5CEA14F [deferred_to_later_stage] DEFERRED_TO_LATER_STAGE
+xtask: verify-stage R04 supplemental R00-T02-LA-AF8E24A2F524 [deferred_to_later_stage] DEFERRED_TO_LATER_STAGE
+xtask: verify-stage R04 supplemental R00-T02-LA-B103E4D06D3B [deferred_to_later_stage] DEFERRED_TO_LATER_STAGE
+xtask: verify-stage R04 supplemental R00-T02-LA-B4BB2438E855 [stage_share_satisfied] FAIL
+xtask: verify-stage R04 supplemental R00-T02-LA-B97D0D4296FA [stage_share_satisfied] PASS
+xtask: verify-stage R04 supplemental R00-T02-LA-BB1BB3A9C5F4 [stage_share_satisfied] FAIL
+xtask: verify-stage R04 supplemental R00-T02-LA-BC244641BC1E [deferred_to_later_stage] DEFERRED_TO_LATER_STAGE
+xtask: verify-stage R04 supplemental R00-T02-LA-BC2FBD618278 [stage_share_satisfied] FAIL
+xtask: verify-stage R04 supplemental R00-T02-LA-BDE3AC44D79C [deferred_to_later_stage] DEFERRED_TO_LATER_STAGE
+xtask: verify-stage R04 supplemental R00-T02-LA-C406F9A17A3E [deferred_to_later_stage] DEFERRED_TO_LATER_STAGE
+xtask: verify-stage R04 supplemental R00-T02-LA-C4F6E3BFF341 [deferred_to_later_stage] DEFERRED_TO_LATER_STAGE
+xtask: verify-stage R04 supplemental R00-T02-LA-C69342F075A2 [deferred_to_later_stage] DEFERRED_TO_LATER_STAGE
+xtask: verify-stage R04 supplemental R00-T02-LA-C6D338A24CF8 [stage_share_satisfied] PASS
+xtask: verify-stage R04 supplemental R00-T02-LA-C70E819F8DA4 [stage_share_satisfied] FAIL
+xtask: verify-stage R04 supplemental R00-T02-LA-C88F29B5114A [stage_share_satisfied] FAIL
+xtask: verify-stage R04 supplemental R00-T02-LA-C90F42576683 [stage_share_satisfied] FAIL
+xtask: verify-stage R04 supplemental R00-T02-LA-CAA876503B1B [deferred_to_later_stage] DEFERRED_TO_LATER_STAGE
+xtask: verify-stage R04 supplemental R00-T02-LA-CC738012B6EE [deferred_to_later_stage] DEFERRED_TO_LATER_STAGE
+xtask: verify-stage R04 supplemental R00-T02-LA-CD1524CC7DC3 [stage_share_satisfied] FAIL
+xtask: verify-stage R04 supplemental R00-T02-LA-CD5D7FC02D8E [stage_share_satisfied] FAIL
+xtask: verify-stage R04 supplemental R00-T02-LA-CE69063550AA [stage_share_satisfied] FAIL
+xtask: verify-stage R04 supplemental R00-T02-LA-CEDC75156D33 [stage_share_satisfied] FAIL
+xtask: verify-stage R04 supplemental R00-T02-LA-CFD9F02BC6AA [stage_share_satisfied] FAIL
+xtask: verify-stage R04 supplemental R00-T02-LA-D01766AF4475 [stage_share_satisfied] FAIL
+xtask: verify-stage R04 supplemental R00-T02-LA-D09857E2B057 [deferred_to_later_stage] DEFERRED_TO_LATER_STAGE
+xtask: verify-stage R04 supplemental R00-T02-LA-D6509017C382 [deferred_to_later_stage] DEFERRED_TO_LATER_STAGE
+xtask: verify-stage R04 supplemental R00-T02-LA-DA37966CFEAC [deferred_to_later_stage] DEFERRED_TO_LATER_STAGE
+xtask: verify-stage R04 supplemental R00-T02-LA-DA5AD5C40098 [stage_share_satisfied] FAIL
+xtask: verify-stage R04 supplemental R00-T02-LA-DD47275AC5AE [stage_share_satisfied] FAIL
+xtask: verify-stage R04 supplemental R00-T02-LA-DDD47840AB06 [deferred_to_later_stage] DEFERRED_TO_LATER_STAGE
+xtask: verify-stage R04 supplemental R00-T02-LA-E1FBE1A59BC6 [stage_share_satisfied] FAIL
+xtask: verify-stage R04 supplemental R00-T02-LA-E7CC636A724C [deferred_to_later_stage] DEFERRED_TO_LATER_STAGE
+xtask: verify-stage R04 supplemental R00-T02-LA-E7F852F9BF60 [stage_share_satisfied] FAIL
+xtask: verify-stage R04 supplemental R00-T02-LA-E9C7A48CADC4 [stage_share_satisfied] FAIL
+xtask: verify-stage R04 supplemental R00-T02-LA-EA3C6A0C5214 [deferred_to_later_stage] DEFERRED_TO_LATER_STAGE
+xtask: verify-stage R04 supplemental R00-T02-LA-EB9E56CF6007 [deferred_to_later_stage] DEFERRED_TO_LATER_STAGE
+xtask: verify-stage R04 supplemental R00-T02-LA-EC033184BA37 [stage_share_satisfied] FAIL
+xtask: verify-stage R04 supplemental R00-T02-LA-EC77C2B04726 [stage_share_satisfied] PASS
+xtask: verify-stage R04 supplemental R00-T02-LA-EE18A57F7348 [deferred_to_later_stage] DEFERRED_TO_LATER_STAGE
+xtask: verify-stage R04 supplemental R00-T02-LA-EF43ADCE19A1 [stage_share_satisfied] FAIL
+xtask: verify-stage R04 supplemental R00-T02-LA-F4DA2AFCB72B [stage_share_satisfied] FAIL
+xtask: verify-stage R04 supplemental R00-T02-LA-F5E8EAC12C42 [deferred_to_later_stage] DEFERRED_TO_LATER_STAGE
+xtask: verify-stage R04 supplemental R00-T02-LA-F88B0A969094 [stage_share_satisfied] PASS
+xtask: verify-stage R04 supplemental R00-T02-LA-F9277C29D570 [deferred_to_later_stage] DEFERRED_TO_LATER_STAGE
+xtask: verify-stage R04 supplemental R00-T02-LA-FAE7503D0D0F [stage_share_satisfied] FAIL
+xtask: verify-stage R04 supplemental R00-T02-LA-FE662653580F [deferred_to_later_stage] DEFERRED_TO_LATER_STAGE
+xtask: verify-stage R04 result written to /Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R05/RR1/INDEPENDENT-9/verify-R05/R04_REGRESSION/verify-stage-result.json (overall: "FAIL")

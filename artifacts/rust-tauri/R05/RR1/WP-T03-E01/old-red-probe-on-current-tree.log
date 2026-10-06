@@ -1,0 +1,102 @@
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.09s
+     Running unittests src/lib.rs (target/debug/deps/r05_protocol_adversarial_probe-86dbd972e050980a)
+
+running 13 tests
+test probes::anthropic_documented_empty_signature_placeholder_accepts_final_signature ... 
+thread 'probes::anthropic_documented_empty_signature_placeholder_accepts_final_signature' (10335227) panicked at src/lib.rs:58:9:
+standard signature_delta must replace initial placeholder, actual=Err(ProtocolError { code: InvalidMessage, message: "a thinking block carried two DIFFERENT signatures: a conflict is never merged", retryable: false, details: None })
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+FAILED
+test probes::anthropic_empty_thinking_preserves_signature_on_next_request ... 
+thread 'probes::anthropic_empty_thinking_preserves_signature_on_next_request' (10335228) panicked at src/lib.rs:67:9:
+assertion `left == right` failed: empty thinking can carry required state: {"max_tokens":16384,"messages":[{"content":"read files","role":"user"},{"content":[{"id":"t1","input":{"path":"a"},"name":"read","type":"tool_use"}],"role":"assistant"},{"content":[{"content":"actual file bytes","is_error":false,"tool_use_id":"t1","type":"tool_result"}],"role":"user"}],"model":"claude","stream":false,"tools":[{"description":"Read a file","input_schema":{"properties":{"path":{"type":"string"}},"required":["path"],"type":"object"},"name":"read"}]}
+  left: Object {"id": String("t1"), "input": Object {"path": String("a")}, "name": String("read"), "type": String("tool_use")}
+ right: Object {"signature": String("opaque-sig"), "thinking": String(""), "type": String("thinking")}
+FAILED
+test probes::anthropic_open_tool_block_cannot_close_as_a_completed_batch ... 
+thread 'probes::anthropic_open_tool_block_cannot_close_as_a_completed_batch' (10335229) panicked at src/lib.rs:141:9:
+unclosed tool block is not a trustworthy terminal: actual=Ok(ParsedChat { turn: ToolRequests { requests: [ToolRequest { target: "tool:first-party:read", arguments: EffectiveArguments { canonical: Object {"path": String("a")}, canonical_bytes: [123, 34, 112, 97, 116, 104, 34, 58, 34, 97, 34, 125] }, args_digest: ContentDigest { algorithm: "sha256", canonicalization: "lingxi-canonical-json-v1", hex: "fde64ffe7a4a0bbd5d2fe2c294b795808c14bcb57a1d08f1c9dcd59871a020f4" }, args_summary: None, provider_call_id: Some("t1"), delegation: None }], content: [] }, usage_report: Unknown })
+FAILED
+test probes::deepseek_stream_reasoning_replays_through_actual_renderer_and_compat ... actual_compatible_payload={"max_tokens":65536,"messages":[{"content":"read files","role":"user"},{"content":"","role":"assistant","tool_calls":[{"function":{"arguments":"{\"path\":\"a\"}","name":"read"},"id":"ds1","type":"function"}]},{"content":"actual file bytes","role":"tool","tool_call_id":"ds1"}],"model":"deepseek-reasoner","stream":true,"stream_options":{"include_usage":true},"thinking":{"type":"enabled"},"tools":[{"function":{"description":"Read a file","name":"read","parameters":{"properties":{"path":{"type":"string"}},"required":["path"],"type":"object"}},"type":"function"}]}
+
+thread 'probes::deepseek_stream_reasoning_replays_through_actual_renderer_and_compat' (10335230) panicked at src/lib.rs:112:9:
+assertion `left == right` failed
+  left: Null
+ right: String("original provider reasoning")
+FAILED
+test probes::duplicate_provider_ids_with_conflicting_arguments_reject_whole_batch ... duplicate_id_results=[
+    "ToolRequests { requests: [ToolRequest { target: \"tool:first-party:read\", arguments: EffectiveArguments { canonical: Object {\"path\": String(\"a\")}, canonical_bytes: [123, 34, 112, 97, 116, 104, 34, 58, 34, 97, 34, 125] }, args_digest: ContentDigest { algorithm: \"sha256\", canonicalization: \"lingxi-canonical-json-v1\", hex: \"fde64ffe7a4a0bbd5d2fe2c294b795808c14bcb57a1d08f1c9dcd59871a020f4\" }, args_summary: None, provider_call_id: Some(\"same\"), delegation: None }, ToolRequest { target: \"tool:first-party:read\", arguments: EffectiveArguments { canonical: Object {\"path\": String(\"b\")}, canonical_bytes: [123, 34, 112, 97, 116, 104, 34, 58, 34, 98, 34, 125] }, args_digest: ContentDigest { algorithm: \"sha256\", canonicalization: \"lingxi-canonical-json-v1\", hex: \"9202535d7f9ddfd8b7799dd5987f9640148d8767b6a02f69c7834db1d5e4b4ae\" }, args_summary: None, provider_call_id: Some(\"same\"), delegation: None }], content: [] }",
+    "ToolRequests { requests: [ToolRequest { target: \"tool:first-party:read\", arguments: EffectiveArguments { canonical: Object {\"path\": String(\"a\")}, canonical_bytes: [123, 34, 112, 97, 116, 104, 34, 58, 34, 97, 34, 125] }, args_digest: ContentDigest { algorithm: \"sha256\", canonicalization: \"lingxi-canonical-json-v1\", hex: \"fde64ffe7a4a0bbd5d2fe2c294b795808c14bcb57a1d08f1c9dcd59871a020f4\" }, args_summary: None, provider_call_id: Some(\"same\"), delegation: None }, ToolRequest { target: \"tool:first-party:read\", arguments: EffectiveArguments { canonical: Object {\"path\": String(\"b\")}, canonical_bytes: [123, 34, 112, 97, 116, 104, 34, 58, 34, 98, 34, 125] }, args_digest: ContentDigest { algorithm: \"sha256\", canonicalization: \"lingxi-canonical-json-v1\", hex: \"9202535d7f9ddfd8b7799dd5987f9640148d8767b6a02f69c7834db1d5e4b4ae\" }, args_summary: None, provider_call_id: Some(\"same\"), delegation: None }], content: [] }",
+    "ToolRequests { requests: [ToolRequest { target: \"tool:first-party:read\", arguments: EffectiveArguments { canonical: Object {\"path\": String(\"a\")}, canonical_bytes: [123, 34, 112, 97, 116, 104, 34, 58, 34, 97, 34, 125] }, args_digest: ContentDigest { algorithm: \"sha256\", canonicalization: \"lingxi-canonical-json-v1\", hex: \"fde64ffe7a4a0bbd5d2fe2c294b795808c14bcb57a1d08f1c9dcd59871a020f4\" }, args_summary: None, provider_call_id: Some(\"same\"), delegation: None }, ToolRequest { target: \"tool:first-party:read\", arguments: EffectiveArguments { canonical: Object {\"path\": String(\"b\")}, canonical_bytes: [123, 34, 112, 97, 116, 104, 34, 58, 34, 98, 34, 125] }, args_digest: ContentDigest { algorithm: \"sha256\", canonicalization: \"lingxi-canonical-json-v1\", hex: \"9202535d7f9ddfd8b7799dd5987f9640148d8767b6a02f69c7834db1d5e4b4ae\" }, args_summary: None, provider_call_id: Some(\"same\"), delegation: None }], content: [] }",
+    "ToolRequests { requests: [ToolRequest { target: \"tool:first-party:read\", arguments: EffectiveArguments { canonical: Object {\"path\": String(\"a\")}, canonical_bytes: [123, 34, 112, 97, 116, 104, 34, 58, 34, 97, 34, 125] }, args_digest: ContentDigest { algorithm: \"sha256\", canonicalization: \"lingxi-canonical-json-v1\", hex: \"fde64ffe7a4a0bbd5d2fe2c294b795808c14bcb57a1d08f1c9dcd59871a020f4\" }, args_summary: None, provider_call_id: Some(\"same\"), delegation: None }, ToolRequest { target: \"tool:first-party:read\", arguments: EffectiveArguments { canonical: Object {\"path\": String(\"b\")}, canonical_bytes: [123, 34, 112, 97, 116, 104, 34, 58, 34, 98, 34, 125] }, args_digest: ContentDigest { algorithm: \"sha256\", canonicalization: \"lingxi-canonical-json-v1\", hex: \"9202535d7f9ddfd8b7799dd5987f9640148d8767b6a02f69c7834db1d5e4b4ae\" }, args_summary: None, provider_call_id: Some(\"same\"), delegation: None }], content: [] }",
+]
+
+thread 'probes::duplicate_provider_ids_with_conflicting_arguments_reject_whole_batch' (10335231) panicked at src/lib.rs:127:9:
+conflicting same-ID calls must never be admitted
+FAILED
+test probes::google_function_call_signature_survives_buffered_and_streamed_round_trip ... buffered={"contents":[{"parts":[{"text":"read files"}],"role":"user"},{"parts":[{"functionCall":{"args":{"path":"a"},"id":"g1","name":"read"}}],"role":"model"},{"parts":[{"functionResponse":{"id":"g1","name":"read","response":{"content":"actual file bytes","status":"succeeded"}}}],"role":"user"}],"tools":[{"functionDeclarations":[{"description":"Read a file","name":"read","parametersJsonSchema":{"properties":{"path":{"type":"string"}},"required":["path"],"type":"object"}}]}]}
+streamed={"contents":[{"parts":[{"text":"read files"}],"role":"user"},{"parts":[{"functionCall":{"args":{"path":"a"},"id":"g1","name":"read"}}],"role":"model"},{"parts":[{"functionResponse":{"id":"g1","name":"read","response":{"content":"actual file bytes","status":"succeeded"}}}],"role":"user"}],"tools":[{"functionDeclarations":[{"description":"Read a file","name":"read","parametersJsonSchema":{"properties":{"path":{"type":"string"}},"required":["path"],"type":"object"}}]}]}
+
+thread 'probes::google_function_call_signature_survives_buffered_and_streamed_round_trip' (10335232) panicked at src/lib.rs:83:9:
+assertion `left == right` failed: required thoughtSignature must stay on function part
+  left: Object {"functionCall": Object {"args": Object {"path": String("a")}, "id": String("g1"), "name": String("read")}}
+ right: Object {"functionCall": Object {"args": Object {"path": String("a")}, "id": String("g1"), "name": String("read")}, "thoughtSignature": String("signed-function-part")}
+FAILED
+test probes::google_parallel_results_form_one_reply_turn ... parallel_result_payload={"contents":[{"parts":[{"text":"read files"}],"role":"user"},{"parts":[{"functionCall":{"args":{"path":"a"},"id":"g1","name":"read"}},{"functionCall":{"args":{"path":"b"},"id":"g2","name":"read"}}],"role":"model"},{"parts":[{"functionResponse":{"id":"g1","name":"read","response":{"content":"actual file bytes","status":"succeeded"}}}],"role":"user"},{"parts":[{"functionResponse":{"id":"g2","name":"read","response":{"content":"actual file bytes","status":"succeeded"}}}],"role":"user"}],"tools":[{"functionDeclarations":[{"description":"Read a file","name":"read","parametersJsonSchema":{"properties":{"path":{"type":"string"}},"required":["path"],"type":"object"}}]}]}
+
+thread 'probes::google_parallel_results_form_one_reply_turn' (10335233) panicked at src/lib.rs:95:9:
+assertion `left == right` failed: user -> model(two calls) -> user(two functionResponse parts)
+  left: 4
+ right: 3
+FAILED
+test probes::openai_done_without_finish_reason_does_not_make_final ... 
+thread 'probes::openai_done_without_finish_reason_does_not_make_final' (10335234) panicked at src/lib.rs:150:9:
+no normal choice finish reason: actual=Ok(ParsedChat { turn: Final { message: NormalizedMessage { role: "assistant", content: [Text { text: "only partial" }], model_call_id: Some(ModelCallId("audit-mc0001")) } }, usage_report: Unknown })
+FAILED
+test probes::positive_controls_normal_text_final_and_signature_without_placeholder_work ... ok
+test probes::provider_opaque_state_never_replays_into_another_provider_of_same_family ... different_provider_result=Ok(Object {"max_tokens": Number(16384), "messages": Array [Object {"content": String("read files"), "role": String("user")}, Object {"content": Array [Object {"signature": String("provider-a-sig"), "thinking": String("private-to-provider-a"), "type": String("thinking")}, Object {"id": String("a1"), "input": Object {"path": String("a")}, "name": String("read"), "type": String("tool_use")}], "role": String("assistant")}, Object {"content": Array [Object {"content": String("actual file bytes"), "is_error": Bool(false), "tool_use_id": String("a1"), "type": String("tool_result")}], "role": String("user")}], "model": String("other-model"), "stream": Bool(true), "tools": Array [Object {"description": String("Read a file"), "input_schema": Object {"properties": Object {"path": Object {"type": String("string")}}, "required": Array [String("path")], "type": String("object")}, "name": String("read")}]})
+
+thread 'probes::provider_opaque_state_never_replays_into_another_provider_of_same_family' (10335236) panicked at src/lib.rs:160:9:
+family tag alone must not authorize cross-provider signature replay
+FAILED
+test probes::responses_text_reasoning_and_tools_keep_original_relative_order ... responses_replay_order={"input":[{"content":[{"text":"read files","type":"input_text"}],"role":"user","type":"message"},{"encrypted_content":"sig","id":"r1","summary":[{"text":"then thought","type":"summary_text"}],"type":"reasoning"},{"content":[{"text":"first text","type":"output_text"}],"role":"assistant","type":"message"},{"arguments":"{\"path\":\"a\"}","call_id":"t1","name":"read","type":"function_call"},{"call_id":"t1","output":"actual file bytes","type":"function_call_output"}],"model":"model","stream":true,"tools":[{"description":"Read a file","name":"read","parameters":{"properties":{"path":{"type":"string"}},"required":["path"],"type":"object"},"type":"function"}]}
+
+thread 'probes::responses_text_reasoning_and_tools_keep_original_relative_order' (10335237) panicked at src/lib.rs:199:9:
+assertion `left == right` failed: text preceded reasoning in the original response
+  left: String("reasoning")
+ right: String("message")
+FAILED
+test probes::thinking_only_and_opaque_only_do_not_form_final_answers ... process_only_family_0=Final { message: NormalizedMessage { role: "assistant", content: [Reasoning { text: "process only" }], model_call_id: Some(ModelCallId("audit-mc0001")) } }
+process_only_family_1=Final { message: NormalizedMessage { role: "assistant", content: [Reasoning { text: "process only" }, Opaque { provider: "anthropic-messages", data: Object {"signature": String("sig"), "type": String("thinking_signature")} }], model_call_id: Some(ModelCallId("audit-mc0001")) } }
+process_only_family_2=Final { message: NormalizedMessage { role: "assistant", content: [Reasoning { text: "process only" }], model_call_id: Some(ModelCallId("audit-mc0001")) } }
+process_only_family_3=Final { message: NormalizedMessage { role: "assistant", content: [Reasoning { text: "process only" }, Opaque { provider: "openai-responses", data: Object {"encrypted_content": String("opaque"), "id": String("r1"), "summary": Array [Object {"text": String("process only"), "type": String("summary_text")}], "type": String("reasoning")} }], model_call_id: Some(ModelCallId("audit-mc0001")) } }
+process_only_family_4=Final { message: NormalizedMessage { role: "assistant", content: [Opaque { provider: "openai-codex-responses", data: Object {"encrypted_content": String("opaque"), "id": String("r1"), "summary": Array [], "type": String("reasoning")} }], model_call_id: Some(ModelCallId("audit-mc0001")) } }
+
+thread 'probes::thinking_only_and_opaque_only_do_not_form_final_answers' (10335238) panicked at src/lib.rs:186:9:
+a completed request carrying only non-answer state is not a final answer
+FAILED
+test probes::unclassified_live_text_is_not_persisted_as_final_answer ... pre_terminal_events=[SegmentStart { segment_id: "assistant:1:text:default", kind: Text, phase: FinalAnswer }, ModelDelta { phase: FinalAnswer, delta: "I will inspect the file now" }, SegmentDelta { segment_id: "assistant:1:text:default", delta: "I will inspect the file now", phase: FinalAnswer }]
+
+thread 'probes::unclassified_live_text_is_not_persisted_as_final_answer' (10335239) panicked at src/lib.rs:169:9:
+no terminal or semantic phase received yet
+FAILED
+
+failures:
+
+failures:
+    probes::anthropic_documented_empty_signature_placeholder_accepts_final_signature
+    probes::anthropic_empty_thinking_preserves_signature_on_next_request
+    probes::anthropic_open_tool_block_cannot_close_as_a_completed_batch
+    probes::deepseek_stream_reasoning_replays_through_actual_renderer_and_compat
+    probes::duplicate_provider_ids_with_conflicting_arguments_reject_whole_batch
+    probes::google_function_call_signature_survives_buffered_and_streamed_round_trip
+    probes::google_parallel_results_form_one_reply_turn
+    probes::openai_done_without_finish_reason_does_not_make_final
+    probes::provider_opaque_state_never_replays_into_another_provider_of_same_family
+    probes::responses_text_reasoning_and_tools_keep_original_relative_order
+    probes::thinking_only_and_opaque_only_do_not_form_final_answers
+    probes::unclassified_live_text_is_not_persisted_as_final_answer
+
+test result: FAILED. 1 passed; 12 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+error: test failed, to rerun pass `--lib`

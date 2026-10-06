@@ -181,7 +181,7 @@ pub enum TaskPollOutcome {
 
 /// Executes operation plans under the shared dispatch discipline.
 pub struct OperationDispatcher {
-    client: reqwest::Client,
+    client: dispatch::NetworkClient,
     timeouts: HttpTimeouts,
 }
 
@@ -191,16 +191,32 @@ impl OperationDispatcher {
     }
 
     pub fn with_timeouts(timeouts: HttpTimeouts) -> Result<Self, ProtocolError> {
+        Self::with_timeouts_and_network(timeouts, super::network::NetworkPlane::direct_isolated())
+    }
+
+    /// R05 RR1 F14: the production constructor — the operation plane's
+    /// client is BOUND to the model plane's shared, reloadable network
+    /// policy (proxy / NO_PROXY / explicit CA per configuration
+    /// generation; the legacy constructors keep the pre-F14 direct
+    /// behavior for isolated tests).
+    pub fn with_timeouts_and_network(
+        timeouts: HttpTimeouts,
+        network: std::sync::Arc<super::network::NetworkPlane>,
+    ) -> Result<Self, ProtocolError> {
         Ok(Self {
-            client: dispatch::build_client_with_timeouts(&timeouts)?,
+            client: network.client_handle(timeouts)?,
             timeouts,
         })
     }
 
-    fn build_request(&self, plan: &OperationRequestPlan) -> reqwest::RequestBuilder {
+    fn build_request(
+        &self,
+        plan: &OperationRequestPlan,
+    ) -> Result<reqwest::RequestBuilder, (ProtocolError, bool)> {
+        let client = self.client.client().map_err(|error| (error, false))?;
         let mut request = match plan.method {
-            "GET" => self.client.get(&plan.url),
-            _ => self.client.post(&plan.url),
+            "GET" => client.get(&plan.url),
+            _ => client.post(&plan.url),
         };
         for (name, value) in &plan.headers {
             request = request.header(name.as_str(), value.as_str());
@@ -208,7 +224,7 @@ impl OperationDispatcher {
         if !plan.body.is_empty() {
             request = request.body(plan.body.clone());
         }
-        request
+        Ok(request)
     }
 
     /// Executes the plan and reads a bounded JSON body. Non-2xx answers
@@ -235,7 +251,7 @@ impl OperationDispatcher {
         auth: &ApplicableAuth,
     ) -> Result<(serde_json::Value, reqwest::header::HeaderMap), (ProtocolError, bool)> {
         let response = dispatch::send_with_timeouts(
-            self.build_request(plan),
+            self.build_request(plan)?,
             &self.timeouts,
             deadline_unix_ms,
             auth,
@@ -266,7 +282,7 @@ impl OperationDispatcher {
         auth: &ApplicableAuth,
     ) -> Result<(Vec<u8>, Option<String>), (ProtocolError, bool)> {
         let response = dispatch::send_with_timeouts(
-            self.build_request(plan),
+            self.build_request(plan)?,
             &self.timeouts,
             deadline_unix_ms,
             auth,
@@ -293,7 +309,7 @@ impl OperationDispatcher {
         deadline_unix_ms: Option<u64>,
     ) -> Result<reqwest::Response, (ProtocolError, bool)> {
         dispatch::send_head_with_timeouts(
-            self.build_request(plan),
+            self.build_request(plan)?,
             &self.timeouts,
             deadline_unix_ms,
         )
@@ -322,20 +338,27 @@ impl OperationDispatcher {
 
     /// Classifies a non-2xx unclassified response through the shared table
     /// (the body excerpt is read bounded and scrubbed against the in-play
-    /// auth material).
+    /// auth material). R05 RR1 F16: the error-body read now runs under the
+    /// REMAINING absolute budget and the shared 64 KiB error-body cap, and
+    /// the timeout/truncation/read-failure FACT is preserved in the
+    /// classified error — the pre-fix shape passed `None` (no deadline)
+    /// and swallowed every read failure into an empty excerpt.
     pub async fn classify_error_response(
         &self,
         response: reqwest::Response,
         auth: &ApplicableAuth,
+        deadline_unix_ms: Option<u64>,
     ) -> (ProtocolError, bool) {
         let status = response.status();
         let retry_after_ms = dispatch::parse_retry_after(response.headers());
-        let body_text = match read_body_bounded(response, OPERATION_JSON_BODY_MAX_BYTES, None).await
-        {
-            Ok(bytes) => String::from_utf8_lossy(&bytes).into_owned(),
-            Err(_) => String::new(),
-        };
-        dispatch::classify_error_status(status, &body_text, auth, retry_after_ms)
+        let (body_text, read_note) =
+            dispatch::read_error_body_bounded(response, deadline_unix_ms).await;
+        let (mut error, retryable) =
+            dispatch::classify_error_status(status, &body_text, auth, retry_after_ms);
+        if let Some(note) = read_note {
+            error.message.push_str(&format!("; {note}"));
+        }
+        (error, retryable)
     }
 }
 

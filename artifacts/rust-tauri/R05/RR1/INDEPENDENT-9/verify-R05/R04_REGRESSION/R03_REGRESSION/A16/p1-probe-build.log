@@ -1,0 +1,17 @@
+     Locking 205 packages to latest compatible versions
+   Compiling mio v1.2.4
+   Compiling lingxi-kernel v0.0.0 (/Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-kernel)
+   Compiling tokio v1.53.2
+   Compiling tokio-util v0.7.19
+   Compiling tower v0.5.3
+   Compiling tokio-rustls v0.26.6
+   Compiling tower-http v0.6.11
+   Compiling h2 v0.4.19
+   Compiling hyper v1.11.1
+   Compiling hyper-util v0.1.21
+   Compiling hyper-rustls v0.27.10
+   Compiling reqwest v0.13.5
+   Compiling lingxi-adapters v0.0.0 (/Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-adapters)
+   Compiling r03-t08-a16-mutation-probe v0.0.0 (/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-r03t08-a16-v1XS9a/probe)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 7.86s
+  Executable mutation_probe.rs (/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T//rust-target-r03-t08-a16-probe/debug/deps/mutation_probe-d089ac1047431249)

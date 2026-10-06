@@ -1,0 +1,16 @@
+   Compiling lingxi-adapters v0.0.0 (/Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-adapters)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 15.08s
+     Running tests/r05_t07_rr1_usage_strict.rs (rust/target/debug/deps/r05_t07_rr1_usage_strict-9b309ac31c98ae36)
+
+running 7 tests
+test rr1_f22_invalid_detail_never_echoes_the_payload ... ok
+test rr1_f23_gemini_thoughts_are_separate_from_candidate_tokens ... ok
+test rr1_f22_legal_rerank_usage_still_reports ... ok
+test rr1_f22_rerank_non_numeric_usage_must_not_be_coerced_to_reported_zero ... ok
+test rr1_f22_minimax_total_tokens_keeps_its_raw_type ... ok
+test rr1_f23_gemini_component_matrix_and_family_controls ... ok
+test rr1_f22_operation_usage_type_table ... ok
+
+test result: ok. 7 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+exit=0

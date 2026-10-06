@@ -129,6 +129,6 @@
       {"opaque": {"provider": "google-generative-ai", "data": {"type": "thoughtSignature", "signature": "sig-goog-1"}}},
       {"text": "Done 完成。"}
     ],
-    "usage": {"input_tokens": 88, "output_tokens": 19}
+    "usage": {"input_tokens": 88, "output_tokens": 574}
   }
 }
